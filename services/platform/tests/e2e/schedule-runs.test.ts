@@ -71,10 +71,7 @@ type Person = Readonly<{
 
 async function scheduleRuns({ task }: TestContext): Promise<void> {
   const joining = [await joiner(), await joiner()] as const;
-  await installSlackActorFixture({
-    privateMember: joining[0].slot,
-    extraMembers: [joining[1].slot],
-  });
+  await installSlackActorFixture();
   const reader = await admin(joining[0], "Schedule reader", true);
   const outsider = await admin(joining[1], "Outside reader", false);
   await fixtureDatabase()

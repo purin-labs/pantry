@@ -1,6 +1,5 @@
 import type { SingleDatabase } from "../src/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import {
   resolveUser,
   upsertUser,
@@ -295,23 +294,6 @@ beforeEach(async function setup() {
     now: Date.now(),
     ttlMs: 3600000,
   });
-  const ownerSession = await issueControlSession({
-    db: env.DB,
-    userId: owner.userId,
-    now: Date.now(),
-    ttlMs: 3600000,
-  });
-  const account = await connectRealAccountPlatform(env, {
-    organisationId: scope.organisationId,
-    owner: { user: owner, session: ownerSession.session },
-    members: [
-      {
-        slot: "operator",
-        actor: { user: actor, session: actorSession.session },
-      },
-    ],
-  });
-  env = account.env;
   execution = await requireOrganisationExecutionScope(
     env,
     scope.organisationId,

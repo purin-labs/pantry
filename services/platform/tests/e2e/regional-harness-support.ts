@@ -8,12 +8,7 @@ import { openRouterText, openRouterToolCall } from "./slack-journey-support";
 import {
   issueControlSession,
   revokeControlSession,
-  upsertUser,
 } from "../../src/data/control-plane";
-import {
-  attachSharedAccountNativeOrganisation,
-  type SharedAccountNativeClient,
-} from "./shared-account-platform-fixture";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "../../src/actors/actor-router";
@@ -252,68 +247,4 @@ export async function verifyConversationWriteFence(
   expect(
     await readConversation(execution.database, scope, CONVERSATION),
   ).toEqual(stored);
-}
-
-/**
- * The account authority admits a person to an Organisation only through an
- * account instance, as production onboarding attaches one. One call attaches
- * the journey's Organisations: the fixture has one instance for each.
- */
-export async function attachRegionalAccounts(
-  primary: OrganisationExecutionScope,
-  foreign?: OrganisationExecutionScope,
-): Promise<void> {
-  await attachSharedAccountNativeOrganisation({
-    organisationId: primary.organisationId,
-    owner: await regionalOwner(primary),
-    members: {},
-    ...(foreign === undefined
-      ? {}
-      : {
-          foreign: {
-            organisationId: foreign.organisationId,
-            owner: await regionalOwner(foreign),
-          },
-        }),
-  });
-}
-
-async function regionalOwner(
-  scope: OrganisationExecutionScope,
-): Promise<SharedAccountNativeClient> {
-  const owner = await scope.database
-    .prepare(
-      "SELECT user_id AS userId FROM service_role_grant WHERE organisation_id = ? AND role = 'owner'",
-    )
-    .bind(scope.organisationId)
-    .first<{ userId: string }>();
-  if (owner === null) throw new Error("Missing owner");
-  const userId = parseUserId(owner.userId);
-  if (!userId.ok) throw new Error(userId.error.code);
-  const row = await env.DB.prepare(
-    "SELECT issuer, subject, email, display_name AS displayName, email_verified AS emailVerified FROM app_user WHERE user_id = ?",
-  )
-    .bind(userId.value)
-    .first<{
-      issuer: string;
-      subject: string;
-      email: string;
-      displayName: string;
-      emailVerified: number;
-    }>();
-  if (row === null || row.emailVerified !== 1)
-    throw new Error("Missing verified regional owner");
-  const now = Date.now();
-  const identity = await upsertUser({
-    db: env.DB,
-    identity: { ...row, emailVerified: true },
-    now,
-  });
-  const session = await issueControlSession({
-    db: env.DB,
-    userId: userId.value,
-    now,
-    ttlMs: 600_000,
-  });
-  return { identity, session };
 }

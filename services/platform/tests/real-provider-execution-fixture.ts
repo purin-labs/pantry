@@ -1,12 +1,14 @@
 import type { SingleDatabase } from "../src/database-handles";
 import { createHash } from "node:crypto";
-import type { AuthorityPartition, RequestAuthority } from "@purin-labs/contracts";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
+import type {
+  AuthorityPartition,
+  RequestAuthority,
+} from "@purin-labs/contracts";
+import { upsertUser } from "../src/data/control-plane";
 import { createAccessGrant } from "../src/data/access-grants";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
 import type { IntegrationAccountId, OrganisationId } from "../src/ids";
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv } from "./worker-fakes";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
@@ -175,38 +177,14 @@ export async function realProviderExecutionFixture(
     });
     if (!grant.ok) throw new Error(grant.error.code);
   }
-  const ownerSession = await issueControlSession({
-    db,
-    userId: owner.userId,
-    now: Date.now(),
-    ttlMs: 3600000,
+  const testEnv = platformEnv({
+    DB: db,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
-  const operatorSession = await issueControlSession({
-    db,
-    userId: operator.userId,
-    now: Date.now(),
-    ttlMs: 3600000,
-  });
-  const account = await connectRealAccountPlatform(
-    platformEnv({
-      DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    }),
-    {
-      organisationId: input.organisationId,
-      owner: { user: owner, session: ownerSession.session },
-      members: [
-        {
-          slot: "operator",
-          actor: { user: operator, session: operatorSession.session },
-        },
-      ],
-    },
-  );
   return {
-    env: account.env,
+    env: testEnv,
     scope: await requireOrganisationExecutionScope(
-      account.env,
+      testEnv,
       input.organisationId,
     ),
   };

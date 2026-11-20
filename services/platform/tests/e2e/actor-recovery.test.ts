@@ -32,7 +32,7 @@ import { type SessionId } from "../../src/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { network } from "./network";
 import {
-  attachSlackActorToAccountAuthority,
+  seedSlackActorOwner,
   isStringRecord,
   requiredPlacement,
   signedSlackRequest,
@@ -861,7 +861,7 @@ async function installRecoveryFixture(): Promise<{
     now,
   });
   if (!published.ok) throw new Error(published.error.code);
-  await attachSlackActorToAccountAuthority({
+  await seedSlackActorOwner({
     organisationId: ORGANISATION_ID,
     owner: { subject: "e2e-actor-recovery-owner", name: "E2E Recovery Owner" },
     actor: { subject: "e2e-actor-recovery", name: "E2E Actor Recovery" },

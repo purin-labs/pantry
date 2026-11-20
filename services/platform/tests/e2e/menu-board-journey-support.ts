@@ -540,15 +540,7 @@ export async function installBoardJourney(
 ): Promise<BoardJourney> {
   const staffClient = await commerceClient(`board-${name}-staff`);
   const viewerClient = await commerceClient(`board-${name}-viewer`);
-  const fixture = await installSlackActorFixture({
-    privateMember: {
-      client: staffClient,
-      laterPersonId: `person_${name}_staff`,
-    },
-    extraMembers: [
-      { client: viewerClient, laterPersonId: `person_${name}_viewer` },
-    ],
-  });
+  const fixture = await installSlackActorFixture();
   await fixtureDatabase().batch([
     ...member(staffClient.identity.userId, `person_${name}_staff`, "operator"),
     ...member(viewerClient.identity.userId, `person_${name}_viewer`, "viewer"),

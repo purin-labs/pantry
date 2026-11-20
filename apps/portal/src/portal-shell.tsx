@@ -15,6 +15,7 @@ import {
   workspacePagePath,
   type PortalRoute,
 } from "./route";
+import { signInPath } from "./control-paths";
 import { PortalFrame } from "./shell";
 import {
   PageHeader,
@@ -82,14 +83,6 @@ function onboardingStepHref(
   }
 }
 
-function googleSignInHref(): string {
-  const returnTo = window.location.pathname + window.location.search;
-  return (
-    "/v1/control/auth/google/start?" +
-    new URLSearchParams({ returnTo }).toString()
-  );
-}
-
 export function SignIn(): React.ReactNode {
   return (
     <main id="portal-content" className="signin-shell" tabIndex={-1}>
@@ -116,7 +109,7 @@ export function SignIn(): React.ReactNode {
           <p className="signin-intro">
             Open your workspace and continue operating.
           </p>
-          <a className="signin-button" href={googleSignInHref()}>
+          <a className="signin-button" href={signInPath()}>
             <GoogleMark />
             <span>Continue with Google</span>
           </a>

@@ -17,7 +17,6 @@ import {
   prepareOrganisationPurgeConnections,
 } from "./data/provider-connection-writes";
 import { prepareOrganisationPurgeCredentialGenerations } from "./data/provider-credential-generation";
-import { prepareServiceInvitationAcceptance } from "./data/service-invitation-role";
 import {
   prepareSlackInstallationCredentialMove,
   prepareSlackInstallationRevocation,
@@ -93,8 +92,6 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
       prepareReadinessAssessmentDeletion(session, organisationId),
     baseProjectMembership: (db, input) =>
       prepareBaseProjectMembership(db, input),
-    invitationAcceptance: (db, input) =>
-      prepareServiceInvitationAcceptance(db, input),
   },
   archive: {
     connectionsDisable: (session, input) => [

@@ -54,10 +54,7 @@ import {
 } from "./device-fleet-support";
 import { network } from "./network";
 import { voiceMacRequest } from "./voice-mac-support";
-import {
-  activateSharedAccountNativeTenant,
-  attachSharedAccountNativeOrganisation,
-} from "./shared-account-platform-fixture";
+import { activateOrganisation } from "./organisation-fixture";
 import { openRouterText } from "./slack-journey-support";
 
 /**
@@ -1056,12 +1053,7 @@ async function vocabularyJourney(): Promise<void> {
     createdAt: new Date().toISOString(),
   });
   if (!provisioned.ok) throw new Error("The demo merchant was not provisioned");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
-  await activateSharedAccountNativeTenant(organisationId);
+  await activateOrganisation(organisationId);
   // A gateway finds two devices. A person confirms one, and the other waits.
   const gatewayStart = await startGateway(
     organisationId,

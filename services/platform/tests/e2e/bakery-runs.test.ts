@@ -53,7 +53,6 @@ import {
   commerceWorkspace as workspace,
   commerceHeaders as headers,
 } from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { expect, it, vi } from "vitest";
 import { responseJson } from "../../../../apps/portal/src/control-client";
 import { savePreparedScenarioCopy } from "../../../../apps/portal/src/features/workflow-simulator/workspace-commands";
@@ -124,11 +123,6 @@ async function sharedRuns(): Promise<void> {
   ]);
   // The foreign Organisation stays native: it only answers cross-Organisation
   // reads, which are refused either way.
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: { privateMember: viewer },
-  });
   const path = `/v1/control/organisations/${organisation}/bakery/runs`;
   const body = {
     name: "冷たいトレー",
@@ -507,16 +501,6 @@ async function chatRehearsalSave(): Promise<void> {
   const owner = await client("bakery-chat-save");
   const otherAdmin = await client("bakery-chat-save-other-admin");
   const organisation = await workspace(owner, "Chat save acceptance");
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: {
-      operator: {
-        client: otherAdmin,
-        laterPersonId: "person_bakery_chat_other_admin",
-      },
-    },
-  });
   const scope = {
     organisationId: organisation,
     userId: owner.identity.userId,
@@ -988,11 +972,6 @@ async function scenarioApprovalJourney(): Promise<void> {
       Date.now(),
     ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: { operator: otherAdmin },
-  });
   const merchantId = `merchant_bakery_c3_${crypto.randomUUID().replaceAll("-", "")}`;
   await connectCommerceFixture(organisation, owner.identity.userId, merchantId);
   const sample = await sendScenario(

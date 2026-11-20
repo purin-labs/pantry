@@ -30,7 +30,6 @@ import {
   signInToChatGpt,
   type PurgeOwner,
 } from "./purge-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -122,15 +121,6 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
   // authority serves it and the Organisation that shares the workspace.
   const fresh = await purgeOwner("reclaim-fresh", NAME);
   expect(await directoryHandle(fresh.organisationId)).toBe(purgedHandle);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: fresh.organisationId,
-    owner: fresh.client,
-    members: {},
-    foreign: {
-      organisationId: neighbour.organisationId,
-      owner: neighbour.client,
-    },
-  });
 
   // The Organisation that shares the workspace keeps its Slack: its token is
   // the one that the purged Organisation's Vault held.

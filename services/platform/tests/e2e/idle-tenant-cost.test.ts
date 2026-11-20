@@ -10,7 +10,6 @@ import {
 } from "./commerce-support";
 import { network } from "./network";
 import { PlanJourney } from "./production-plan-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import {
   seedSlackWorkspace,
   slackAccount,
@@ -85,11 +84,6 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     owner.identity.userId,
     merchantId,
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const slackChecks: string[] = [];
   network.use(slackAuthTestHandler(CAFE_SLACK.teamId, slackChecks));
   await seedSlackWorkspace(CAFE_SLACK, { client: owner, organisationId });

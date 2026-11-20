@@ -1,6 +1,5 @@
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { seedNativeProviderAccount } from "./real-provider-execution-fixture";
-import { issueControlSession, upsertUser } from "../src/data/control-plane";
+import { upsertUser } from "../src/data/control-plane";
 import {
   registerEmailMailboxAccount,
   assignAgentMailbox,
@@ -510,30 +509,16 @@ async function turnInput(sql: ReturnType<typeof sqlStorage>) {
     now: 2,
   });
   if (!published.ok) throw new Error(published.error.code);
-  const session = await issueControlSession({
-    db,
-    userId: owner.userId,
-    now: Date.now(),
-    ttlMs: 3600000,
+  const testEnv = platformEnv({
+    DB: db,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
   });
-  const account = await connectRealAccountPlatform(
-    platformEnv({
-      DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
-        TEST_ORGANISATION_PLACEMENT_PROFILE,
-    }),
-    {
-      organisationId: organisationId.value,
-      owner: { user: owner, session: session.session },
-      members: [],
-    },
-  );
   const scope = await requireOrganisationExecutionScope(
-    account.env,
+    testEnv,
     organisationId.value,
   );
   return {
-    env: account.env,
+    env: testEnv,
     scope,
     connectorSql: sql,
     responsePolicy: "cue_routed" as const,

@@ -89,7 +89,6 @@ describe("Google control OIDC", () => {
     expect(completed).toEqual({
       ok: true,
       value: {
-        identityToken: idToken,
         identity: {
           issuer: "https://accounts.google.com",
           subject: "google-subject",

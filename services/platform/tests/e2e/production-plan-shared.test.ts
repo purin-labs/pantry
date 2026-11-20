@@ -21,7 +21,6 @@ import {
   PlanRoomClient,
   planPath,
 } from "./production-plan-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -64,11 +63,6 @@ async function sharedProductionPlanJourney({
     ...member(organisationId, operator.identity.userId, "operator"),
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator, privateMember: viewer },
-  });
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
     schemaVersion: "underclerk.provision-demo.v2",

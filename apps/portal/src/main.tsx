@@ -4,6 +4,7 @@ import React from "react";
 import { identityServiceErrorMessage } from "./identity-copy";
 import { assertNever, isRecord } from "@purin-labs/std";
 import { readCookie } from "./control-client";
+import { signInPath } from "./control-paths";
 
 type Invitation = {
   challengeId: string;
@@ -176,7 +177,7 @@ class IdentityLinkController extends React.Component<
     if (!hasControlSession()) {
       return (
         <div className="action-region">
-          <a className="signin-button" href={identityLinkSignInUrl()}>
+          <a className="signin-button" href={signInPath()}>
             Sign in with Google
           </a>
           <p>
@@ -295,12 +296,6 @@ async function fetchJson(path: string): Promise<unknown> {
 function readBrowserToken(href: string): string | null {
   const value = new URL(href).searchParams.get("token");
   return value !== null && /^[A-Za-z0-9._-]+$/u.test(value) ? value : null;
-}
-
-function identityLinkSignInUrl(): string {
-  const returnTo = `${window.location.pathname}${window.location.search}`;
-  const query = new URLSearchParams({ returnTo });
-  return `/v1/control/auth/google/start?${query.toString()}`;
 }
 
 function clearIdentityLinkToken(): void {

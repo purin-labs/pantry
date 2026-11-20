@@ -113,10 +113,7 @@ async function projectInformationFlowJourney(
     await person("Viewer"),
     await person("Unrelated member"),
   ] as const;
-  await installSlackActorFixture({
-    privateMember: people[0].slot,
-    extraMembers: [people[1].slot, people[2].slot, people[3].slot],
-  });
+  await installSlackActorFixture();
   const owner = await joinOrganisation(people[0]);
   const editor = await joinOrganisation(people[1]);
   const viewer = await joinOrganisation(people[2]);

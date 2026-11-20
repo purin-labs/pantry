@@ -290,6 +290,7 @@ export const PURGE_CATALOGUE = [
     reason: "The erasure ledger of the Organisation's harness history.",
   },
   { table: "organisation_inference_selection", action: "erase" },
+  { table: "organisation_invitation", action: "erase" },
   {
     table: "organisation_onboarding",
     action: "keep",

@@ -343,9 +343,7 @@ export async function installSlackSideCaseFixture(): Promise<
   }
 > {
   const peer = await commerceClient("e2e-side-case-peer");
-  const fixture = await installSlackActorFixture({
-    privateMember: { client: peer, laterPersonId: PEER_PERSON_ID },
-  });
+  const fixture = await installSlackActorFixture();
   const now = Date.now();
   await fixtureDatabase().batch([
     fixtureDatabase()

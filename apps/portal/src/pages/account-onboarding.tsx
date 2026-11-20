@@ -1,20 +1,16 @@
 import React from "react";
-import { Check, CircleAlert, Plus } from "lucide-react";
+import { Check, CircleAlert } from "lucide-react";
 import { Link } from "react-router";
 import {
-  readAccountOnboardingOptions,
-  readAccountOnboardingRequest,
-  readAccountOnboardingResult,
-  type AccountOnboardingOptions,
-  type AccountOnboardingOrganization,
-  type AccountOnboardingRequest,
+  ORGANISATION_NAME_MAX,
+  readOrganisationCreationRequest,
+  type CreatedOrganisation,
+  type OrganisationCreationRequest,
 } from "@purin-labs/control-api";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
-import {
-  ControlApiError,
-  controlMutation,
-  controlRead,
-} from "../control-client";
+import { ControlApiError } from "../control-client";
+import { signInPath } from "../control-paths";
+import { createOrganisation } from "../features/access/organisation-requests";
 import { organisationPath } from "../route";
 import { AgentModal } from "./agent-modal";
 import {
@@ -23,8 +19,9 @@ import {
   turnOnJevFeatures,
   type JevSetupState,
 } from "./account-onboarding-jev";
+import "./account-onboarding.css";
 
-/** What the Organisations page found after Pantry reported the setup ready. */
+/** What the Organisations page found after Pantry made the organisation. */
 export type AccountSetupListing =
   | Readonly<{
       kind: "listed";
@@ -34,97 +31,57 @@ export type AccountSetupListing =
     }>
   | Readonly<{ kind: "missing" }>;
 
-type AccountSetupStep =
-  "organisation" | "project" | "billing" | "prepare" | "jev" | "done";
-
-/** The choices of steps 1 to 3. Back keeps every choice and typed name. */
-export type AccountSetupDraft = Readonly<{
-  options: AccountOnboardingOptions;
-  organization: string;
-  organizationName: string;
-  project: string;
-  projectName: string;
-}>;
+type AccountSetupStep = "organisation" | "prepare" | "jev" | "done";
 
 type AccountSetupRecovery =
-  | Readonly<{ kind: "options" }>
   | Readonly<{ kind: "sign_in" }>
-  | Readonly<{ kind: "choose_project"; draft: AccountSetupDraft | null }>
-  | Readonly<{ kind: "billing"; draft: AccountSetupDraft }>
-  | Readonly<{
-      kind: "request";
-      request: AccountOnboardingRequest;
-      draft: AccountSetupDraft | null;
-    }>
+  | Readonly<{ kind: "close" }>
+  /** Back to the name step. The next Create starts a new setup. */
+  | Readonly<{ kind: "name"; name: string }>
+  /** The same setup again: Pantry answers the same organisation. */
+  | Readonly<{ kind: "request"; request: OrganisationCreationRequest }>
   | Readonly<{
       kind: "listing";
-      nativeOrganizationId: string;
-      request: AccountOnboardingRequest;
-      draft: AccountSetupDraft | null;
-    }>
-  | Readonly<{ kind: "new_project"; draft: AccountSetupDraft | null }>;
+      organisationId: string;
+      request: OrganisationCreationRequest;
+    }>;
 
 type AccountSetupFailure = Readonly<{
   step: AccountSetupStep;
-  tone: "danger" | "warning";
   title: string;
   reason: string;
   next: string | null;
   detail: string | null;
   /** The label of the primary action. */
   action: string;
+  /** A sign-in link beside the primary action. */
   signIn: boolean;
   recovery: AccountSetupRecovery;
-  /** A second way forward, shown as a text action beside the primary one. */
-  alternative?: Readonly<{ action: string; recovery: AccountSetupRecovery }>;
 }>;
 
 /**
- * A setup that Pantry accepted keeps its draft only in this tab. After a
- * reload the request is known but the names are not.
+ * A view after the name step knows the request, so a reload, a retry or a
+ * new sign-in sends the same operation id and makes no second organisation.
  */
-export type AccountSetupView =
+type AccountSetupView =
   | Readonly<{ kind: "closed" }>
-  | Readonly<{ kind: "loading" }>
-  | Readonly<{
-      kind: "organisation";
-      draft: AccountSetupDraft;
-      problem: string | null;
-    }>
-  | Readonly<{
-      kind: "project";
-      draft: AccountSetupDraft;
-      problem: string | null;
-    }>
-  | Readonly<{ kind: "billing"; draft: AccountSetupDraft }>
-  | Readonly<{
-      kind: "preparing";
-      request: AccountOnboardingRequest;
-      draft: AccountSetupDraft | null;
-      startedAt: number;
-    }>
+  | Readonly<{ kind: "organisation"; name: string; problem: string | null }>
+  | Readonly<{ kind: "preparing"; request: OrganisationCreationRequest }>
   | Readonly<{
       kind: "finishing";
-      nativeOrganizationId: string;
-      request: AccountOnboardingRequest;
-      draft: AccountSetupDraft | null;
-      startedAt: number;
+      organisationId: string;
+      request: OrganisationCreationRequest;
     }>
   | Readonly<{
       /** The optional Jev step (Plan 88). The organisation exists already. */
       kind: "jev";
-      nativeOrganizationId: string;
+      organisationId: string;
       organisationHandle: string;
       workspaceHandle: string | null;
-      draft: AccountSetupDraft | null;
+      name: string;
       jev: JevSetupState;
     }>
-  | Readonly<{
-      kind: "done";
-      nativeOrganizationId: string;
-      organisationHandle: string;
-      draft: AccountSetupDraft | null;
-    }>
+  | Readonly<{ kind: "done"; organisationHandle: string; name: string }>
   | Readonly<{ kind: "failed"; failure: AccountSetupFailure }>;
 
 export type OpenAccountSetupView = Exclude<
@@ -134,52 +91,25 @@ export type OpenAccountSetupView = Exclude<
 
 export type AccountSetupActions = Readonly<{
   close: () => void;
-  chooseOrganisation: (id: string) => void;
   nameOrganisation: (name: string) => void;
-  chooseProject: (id: string) => void;
-  nameProject: (name: string) => void;
-  back: () => void;
   next: () => void;
   recover: () => void;
-  alternative: () => void;
   /** Turns on the three Jev switches of the new organisation. */
   turnOnJev: () => void;
 }>;
 
-type AccountSetupChoice = Readonly<{
-  organisation: string;
-  project: string;
-  newOrganisation: boolean;
-  newProject: boolean;
-}>;
+type StepState = "done" | "current" | "next" | "failed";
 
-type StepState = "done" | "current" | "next" | "failed" | "attention";
-
-export const ACCOUNT_SETUP_CREATE = "__create__";
-
-const PATH = "/v1/control/account-onboarding";
-const CREATE = ACCOUNT_SETUP_CREATE;
 const FORM_ID = "satyr-account-setup";
 const PROBLEM_ID = "satyr-account-setup-problem";
-const SIGN_IN_PATH = "/v1/control/auth/google/start?returnTo=/portal";
-const POLL_LIMIT = 60;
+const SIGN_IN_PATH = signInPath("/portal");
+const SETUP_UNAVAILABLE = "Pantry could not make the organisation. Try again.";
 const STEPS: readonly Readonly<{ step: AccountSetupStep; label: string }>[] = [
   { step: "organisation", label: "Organisation" },
-  { step: "project", label: "Project" },
-  { step: "billing", label: "Billing" },
   { step: "prepare", label: "Prepare" },
   { step: "jev", label: "Jev" },
   { step: "done", label: "Done" },
 ];
-
-function responseValue(raw: unknown): unknown {
-  if (!isRecord(raw) || raw.ok !== true) {
-    throw new Error("Account setup is unavailable. Retry or sign in again.");
-  }
-  return raw.value;
-}
-
-const SETUP_UNAVAILABLE = "Account setup is unavailable. Retry to continue.";
 
 /** The server's own code, so that a person can report the exact failure. */
 function errorCode(error: unknown): string | null {
@@ -190,21 +120,22 @@ function errorCode(error: unknown): string | null {
   return typeof code === "string" ? `Error code: ${code}` : null;
 }
 
-function sessionEnded(error: unknown): boolean {
-  return error instanceof ControlApiError && error.kind === "session_ended";
-}
-
-function storedRequest(key: string): AccountOnboardingRequest | null {
+/** The setup that this tab started, or null. A damaged value is removed. */
+function storedRequest(key: string): OrganisationCreationRequest | null {
   const raw = window.sessionStorage.getItem(key);
   if (raw === null) {
     return null;
   }
+  let request: OrganisationCreationRequest | null;
   try {
-    return readAccountOnboardingRequest(JSON.parse(raw));
+    request = readOrganisationCreationRequest(JSON.parse(raw));
   } catch {
-    window.sessionStorage.removeItem(key);
-    return null;
+    request = null;
   }
+  if (request === null) {
+    window.sessionStorage.removeItem(key);
+  }
+  return request;
 }
 
 function forgetRequest(key: string): void {
@@ -215,89 +146,28 @@ function forgetRequest(key: string): void {
   }
 }
 
-function matchesId(id: string, value: Readonly<{ id: string }>): boolean {
-  return value.id === id;
-}
-
-function draftOrganization(
-  draft: AccountSetupDraft,
-): AccountOnboardingOrganization | null {
-  return (
-    draft.options.organizations.find(
-      matchesId.bind(null, draft.organization),
-    ) ?? null
-  );
-}
-
-function startDraft(options: AccountOnboardingOptions): AccountSetupDraft {
-  const organization = options.organizations[0];
-  return {
-    options,
-    organization: organization?.id ?? CREATE,
-    organizationName: "",
-    project: organization?.projects[0]?.id ?? CREATE,
-    projectName: "Seams Pantry",
-  };
-}
-
-function draftChoice(draft: AccountSetupDraft): AccountSetupChoice {
-  const organization = draftOrganization(draft);
-  const project =
-    organization?.projects.find(matchesId.bind(null, draft.project)) ?? null;
-  return {
-    organisation: organization?.name ?? draft.organizationName.trim(),
-    project: project?.name ?? draft.projectName.trim(),
-    newOrganisation: organization === null,
-    newProject: project === null,
-  };
-}
-
-function draftSelection(draft: AccountSetupDraft): unknown {
-  if (draft.organization === CREATE) {
-    return {
-      kind: "new_organization",
-      organizationName: draft.organizationName,
-      projectName: draft.projectName,
-    };
+/** A refusal that the same request cannot change ends the saved setup. */
+function endsSetup(error: unknown): boolean {
+  if (!(error instanceof ControlApiError)) {
+    return false;
   }
-  if (draft.project === CREATE) {
-    return {
-      kind: "new_project",
-      organizationId: draft.organization,
-      projectName: draft.projectName,
-    };
+  switch (error.kind) {
+    case "organisation_create_invalid":
+    case "organisation_owner_unverified":
+    case "organisation_limit_reached":
+    case "idempotency_key_conflict":
+      return true;
+    default:
+      return false;
   }
-  return {
-    kind: "existing_project",
-    organizationId: draft.organization,
-    projectId: draft.project,
-  };
-}
-
-function projectCount(organization: AccountOnboardingOrganization): string {
-  const count = organization.projects.length;
-  if (count === 0) {
-    return "No projects";
-  }
-  return count === 1 ? "1 project" : `${count} projects`;
-}
-
-function formatSetupTime(milliseconds: number): string {
-  const seconds = Math.max(0, Math.floor(milliseconds / 1000));
-  const rest = seconds % 60;
-  return `${Math.floor(seconds / 60)}:${rest < 10 ? "0" : ""}${rest}`;
 }
 
 function sessionFailure(step: AccountSetupStep): AccountSetupFailure {
   return {
     step,
-    tone: "danger",
     title: "Your session has ended",
     reason: "Sign in again to continue the setup.",
-    next:
-      step === "prepare" || step === "done"
-        ? "Pantry keeps this setup and continues it after you sign in."
-        : null,
+    next: "Pantry keeps this setup and continues it after you sign in.",
     detail: null,
     action: "Sign in again",
     signIn: true,
@@ -305,158 +175,113 @@ function sessionFailure(step: AccountSetupStep): AccountSetupFailure {
   };
 }
 
-function optionsFailure(error: unknown): AccountSetupFailure {
-  if (sessionEnded(error)) {
-    return sessionFailure("organisation");
-  }
+function storageFailure(name: string): AccountSetupFailure {
   return {
     step: "organisation",
-    tone: "danger",
-    title: "Pantry cannot read your account",
-    reason: errorMessage(error, SETUP_UNAVAILABLE),
-    next: "Try again. If the problem continues, sign in again.",
-    detail: errorCode(error),
-    action: "Try again",
-    signIn: true,
-    recovery: { kind: "options" },
-  };
-}
-
-function startFailure(
-  error: unknown,
-  draft: AccountSetupDraft,
-  storage: boolean,
-): AccountSetupFailure {
-  return {
-    step: "billing",
-    tone: "danger",
-    title: "Pantry cannot start the setup",
-    reason: errorMessage(error, SETUP_UNAVAILABLE),
-    next: storage
-      ? "Allow site data for this page, then try again."
-      : "Check the names, then try again.",
+    title: "Pantry cannot keep this setup",
+    reason: "This browser does not let Pantry keep the setup in this tab.",
+    next: "Allow site data for this page, then try again.",
     detail: null,
     action: "Try again",
     signIn: false,
-    recovery: { kind: "billing", draft },
+    recovery: { kind: "name", name },
   };
 }
 
-function blockedFailure(
-  error: ControlApiError,
-  draft: AccountSetupDraft | null,
-): AccountSetupFailure {
-  return {
-    step: "billing",
-    tone: "danger",
-    title: "This project cannot start Seams Pantry",
-    reason: error.message,
-    next: null,
-    detail: errorCode(error),
-    action: "Choose another project",
-    signIn: false,
-    recovery: { kind: "choose_project", draft },
-  };
-}
-
-function stoppedFailure(
+/** The failure view of a refused or lost create request. */
+function createFailure(
   error: unknown,
-  request: AccountOnboardingRequest,
-  draft: AccountSetupDraft | null,
+  request: OrganisationCreationRequest,
 ): AccountSetupFailure {
-  if (sessionEnded(error)) {
-    return sessionFailure("prepare");
+  const reason = errorMessage(error, SETUP_UNAVAILABLE);
+  const detail = errorCode(error);
+  switch (error instanceof ControlApiError ? error.kind : "unknown") {
+    case "session_ended":
+      return sessionFailure("prepare");
+    case "organisation_owner_unverified":
+      return {
+        step: "organisation",
+        title: "Pantry needs a verified email",
+        reason,
+        next: null,
+        detail,
+        action: "Sign in with another account",
+        signIn: true,
+        recovery: { kind: "sign_in" },
+      };
+    case "organisation_limit_reached":
+      return {
+        step: "organisation",
+        title: "You cannot own more organisations",
+        reason,
+        next: null,
+        detail,
+        action: "Close",
+        signIn: false,
+        recovery: { kind: "close" },
+      };
+    case "idempotency_key_conflict":
+      return {
+        step: "prepare",
+        title: "This setup changed",
+        reason: "Pantry used this setup for a different name.",
+        next: "Start again to make a new setup.",
+        detail,
+        action: "Start again",
+        signIn: false,
+        recovery: { kind: "name", name: request.name },
+      };
+    default:
+      return {
+        step: "prepare",
+        title: "The setup stopped",
+        reason,
+        next: "Try again to continue the same setup. Pantry does not make a second organisation.",
+        detail,
+        action: "Try again",
+        signIn: true,
+        recovery: { kind: "request", request },
+      };
   }
-  return {
-    step: "prepare",
-    tone: "danger",
-    title: "The setup stopped",
-    reason: errorMessage(error, SETUP_UNAVAILABLE),
-    next: "Try again to continue the same setup. Pantry does not create a second organisation.",
-    detail: errorCode(error),
-    action: "Try again",
-    signIn: true,
-    recovery: { kind: "request", request, draft },
-  };
-}
-
-function slowFailure(
-  request: AccountOnboardingRequest,
-  draft: AccountSetupDraft | null,
-  startedAt: number,
-): AccountSetupFailure {
-  return {
-    step: "prepare",
-    tone: "warning",
-    title: "The setup takes longer than usual",
-    reason: `The setup is not finished after ${formatSetupTime(Date.now() - startedAt)}.`,
-    next: "Check again to continue the same setup.",
-    detail: null,
-    action: "Check again",
-    signIn: false,
-    recovery: { kind: "request", request, draft },
-  };
 }
 
 function listingFailure(
-  nativeOrganizationId: string,
-  request: AccountOnboardingRequest,
-  draft: AccountSetupDraft | null,
+  organisationId: string,
+  request: OrganisationCreationRequest,
   error: unknown,
 ): AccountSetupFailure {
-  const listing: AccountSetupRecovery = {
-    kind: "listing",
-    nativeOrganizationId,
-    request,
-    draft,
-  };
-  if (error === null) {
-    // The account platform can answer ready for a project whose old Pantry
-    // organisation was deleted; a new project gets a new organisation.
-    return {
-      step: "done",
-      tone: "danger",
-      title: "Your organisation is not available",
-      reason:
-        "Pantry finished the setup, but your organisation list does not show the organisation.",
-      next: "The project can still point to a deleted organisation. Create a new project for Seams Pantry, or check again.",
-      detail: `Organisation ID: ${nativeOrganizationId}`,
-      action: "Create a new project",
-      signIn: false,
-      recovery: { kind: "new_project", draft },
-      alternative: { action: "Check again", recovery: listing },
-    };
+  if (error instanceof ControlApiError && error.kind === "session_ended") {
+    return sessionFailure("prepare");
   }
-  if (sessionEnded(error)) {
-    return sessionFailure("done");
-  }
-  return {
-    step: "done",
-    tone: "danger",
-    title: "Pantry cannot read your organisation list",
-    reason: errorMessage(error, SETUP_UNAVAILABLE),
-    next: "Your session can be out of date. Sign in again, then open this page.",
-    detail: `Organisation ID: ${nativeOrganizationId}`,
-    action: "Check again",
-    signIn: true,
-    recovery: listing,
-  };
-}
-
-/** A new project for the same organisation; a typed new name stays. */
-function newProjectDraft(draft: AccountSetupDraft): AccountSetupDraft {
-  return {
-    ...draft,
-    project: CREATE,
-    projectName: draft.project === CREATE ? draft.projectName : "",
-  };
+  const listing = { kind: "listing", organisationId, request } as const;
+  return error === null
+    ? {
+        step: "prepare",
+        title: "Your organisation is not in your list",
+        reason:
+          "Pantry made the organisation, but your organisation list does not show it.",
+        next: "Check again in a moment.",
+        detail: `Organisation ID: ${organisationId}`,
+        action: "Check again",
+        signIn: false,
+        recovery: listing,
+      }
+    : {
+        step: "prepare",
+        title: "Pantry cannot read your organisation list",
+        reason: errorMessage(error, SETUP_UNAVAILABLE),
+        next: "Your session can be out of date. Sign in again, then open this page.",
+        detail: `Organisation ID: ${organisationId}`,
+        action: "Check again",
+        signIn: true,
+        recovery: listing,
+      };
 }
 
 type AccountSetupProps = Readonly<{
   userId: string;
   /** Reads the session again and reports if it lists the organisation. */
-  finish: (nativeOrganizationId: string) => Promise<AccountSetupListing>;
-  organisationName: (nativeOrganizationId: string) => string | null;
+  finish: (organisationId: string) => Promise<AccountSetupListing>;
   /**
    * True once the organisation list has loaded. A saved setup resumes only
    * then: its request would discard the list's early organisation reads.
@@ -466,20 +291,17 @@ type AccountSetupProps = Readonly<{
 
 /**
  * The setup dialog of the Organisations page. The page owns it, so it stays
- * open while the Portal reads the session again after Pantry is ready.
- * Selecting or creating a project is the setup action; there is no enable
- * step.
+ * open while the Portal reads the session again after Pantry made the
+ * organisation. The create request answers when the organisation exists.
  */
 export class AccountSetup extends React.Component<
   AccountSetupProps,
   { readonly view: AccountSetupView }
 > {
   state: { readonly view: AccountSetupView } = { view: { kind: "closed" } };
-  private timer: number | null = null;
   private disposed = false;
-  private polls = 0;
   /**
-   * Each read or poll belongs to one attempt. A result is used only while its
+   * Each request belongs to one attempt. A result is used only while its
    * attempt is current: `this.state` can still hold the view before the last
    * `setState`, so it cannot tell if a result is stale.
    */
@@ -487,14 +309,9 @@ export class AccountSetup extends React.Component<
   private resumed = false;
   private readonly actions: AccountSetupActions = {
     close: this.close.bind(this),
-    chooseOrganisation: this.chooseOrganisation.bind(this),
     nameOrganisation: this.nameOrganisation.bind(this),
-    chooseProject: this.chooseProject.bind(this),
-    nameProject: this.nameProject.bind(this),
-    back: this.back.bind(this),
     next: this.next.bind(this),
     recover: this.recover.bind(this),
-    alternative: this.alternative.bind(this),
     turnOnJev: this.turnOnJev.bind(this),
   };
 
@@ -511,41 +328,43 @@ export class AccountSetup extends React.Component<
     this.resumeSavedSetup();
   }
 
+  componentWillUnmount(): void {
+    this.disposed = true;
+  }
+
   /** A reload or a new sign-in continues the setup that this tab started. */
   private resumeSavedSetup(): void {
     if (this.resumed || !this.props.resume) {
       return;
     }
     this.resumed = true;
+    if (this.savedRequest() !== null) {
+      this.open();
+    }
+  }
+
+  private savedRequest(): OrganisationCreationRequest | null {
     try {
-      if (storedRequest(this.storageKey)) {
-        this.open();
-      }
+      return storedRequest(this.storageKey);
     } catch {
-      // Setup still renders; submission reports unavailable browser storage.
+      // Without browser storage the setup starts again; Create reports it.
+      return null;
     }
   }
 
-  componentWillUnmount(): void {
-    this.disposed = true;
-    this.stopTimer();
-  }
-
+  /** Opens the dialog. A setup that this tab started continues. */
   open(): void {
-    void this.load();
-  }
-
-  private stopTimer(): void {
-    if (this.timer !== null) {
-      window.clearTimeout(this.timer);
+    const saved = this.savedRequest();
+    if (saved !== null) {
+      void this.submit(this.nextAttempt(), saved);
+      return;
     }
-    this.timer = null;
+    this.nextAttempt();
+    this.setState({ view: { kind: "organisation", name: "", problem: null } });
   }
 
   /** Ends the current attempt; its pending results are ignored. */
   private nextAttempt(): number {
-    this.stopTimer();
-    this.polls = 0;
     this.attempt += 1;
     return this.attempt;
   }
@@ -564,157 +383,30 @@ export class AccountSetup extends React.Component<
     this.setState({ view: { kind: "failed", failure } });
   }
 
-  private async load(): Promise<void> {
-    const attempt = this.nextAttempt();
-    this.setState({ view: { kind: "loading" } });
-    try {
-      const saved = storedRequest(this.storageKey);
-      if (saved) {
-        await this.submit(attempt, saved, null, Date.now());
-        return;
-      }
-      const options = readAccountOnboardingOptions(
-        responseValue(await controlRead(PATH)),
-      );
-      if (this.current(attempt)) {
-        this.setState({
-          view: {
-            kind: "organisation",
-            draft: startDraft(options),
-            problem: null,
-          },
-        });
-      }
-    } catch (error) {
-      if (this.current(attempt)) {
-        this.fail(optionsFailure(error));
-      }
-    }
-  }
-
-  private chooseOrganisation(id: string): void {
-    const view = this.state.view;
-    if (view.kind !== "organisation") {
-      return;
-    }
-    const organization = view.draft.options.organizations.find(
-      matchesId.bind(null, id),
-    );
-    this.setState({
-      view: {
-        kind: "organisation",
-        draft: {
-          ...view.draft,
-          organization: organization?.id ?? CREATE,
-          project: organization?.projects[0]?.id ?? CREATE,
-        },
-        problem: null,
-      },
-    });
+  private showName(name: string, problem: string | null): void {
+    this.nextAttempt();
+    this.setState({ view: { kind: "organisation", name, problem } });
   }
 
   private nameOrganisation(name: string): void {
-    const view = this.state.view;
-    if (view.kind !== "organisation") {
-      return;
-    }
-    this.setState({
-      view: {
-        kind: "organisation",
-        draft: { ...view.draft, organizationName: name },
-        problem: null,
-      },
-    });
-  }
-
-  private chooseProject(id: string): void {
-    const view = this.state.view;
-    if (view.kind !== "project") {
-      return;
-    }
-    this.setState({
-      view: {
-        kind: "project",
-        draft: { ...view.draft, project: id },
-        problem: null,
-      },
-    });
-  }
-
-  private nameProject(name: string): void {
-    const view = this.state.view;
-    if (view.kind !== "project") {
-      return;
-    }
-    this.setState({
-      view: {
-        kind: "project",
-        draft: { ...view.draft, projectName: name },
-        problem: null,
-      },
-    });
-  }
-
-  private back(): void {
-    const view = this.state.view;
-    if (view.kind === "project") {
-      this.setState({
-        view: { kind: "organisation", draft: view.draft, problem: null },
-      });
-    } else if (view.kind === "billing") {
-      this.setState({
-        view: { kind: "project", draft: view.draft, problem: null },
-      });
+    if (this.state.view.kind === "organisation") {
+      this.setState({ view: { kind: "organisation", name, problem: null } });
     }
   }
 
   private next(): void {
     const view = this.state.view;
-    switch (view.kind) {
-      case "organisation":
-        if (
-          view.draft.organization === CREATE &&
-          view.draft.organizationName.trim() === ""
-        ) {
-          this.setState({
-            view: { ...view, problem: "Enter a name for the organisation." },
-          });
-          return;
-        }
-        this.setState({
-          view: { kind: "project", draft: view.draft, problem: null },
-        });
-        return;
-      case "project":
-        if (
-          (view.draft.organization === CREATE ||
-            view.draft.project === CREATE) &&
-          view.draft.projectName.trim() === ""
-        ) {
-          this.setState({
-            view: { ...view, problem: "Enter a name for the project." },
-          });
-          return;
-        }
-        this.setState({ view: { kind: "billing", draft: view.draft } });
-        return;
-      case "billing":
-        this.start(view.draft);
-        return;
-      case "jev":
-        // Skip and Continue: the switches stay as the step left them.
-        if (view.jev.kind === "busy") return;
-        this.setState({
-          view: {
-            kind: "done",
-            nativeOrganizationId: view.nativeOrganizationId,
-            organisationHandle: view.organisationHandle,
-            draft: view.draft,
-          },
-        });
-        return;
-      default:
-        return;
+    if (view.kind === "organisation") {
+      this.start(view.name);
+    } else if (view.kind === "jev" && view.jev.kind !== "busy") {
+      // Skip and Continue: the switches stay as the step left them.
+      this.setState({
+        view: {
+          kind: "done",
+          organisationHandle: view.organisationHandle,
+          name: view.name,
+        },
+      });
     }
   }
 
@@ -727,112 +419,79 @@ export class AccountSetup extends React.Component<
     if (view.kind !== "jev" || view.jev.kind !== "choose") return;
     const attempt = this.attempt;
     this.setState({ view: { ...view, jev: { kind: "busy" } } });
-    const result = await turnOnJevFeatures(view.nativeOrganizationId);
+    const result = await turnOnJevFeatures(view.organisationId);
     if (!this.current(attempt)) return;
     this.setState({ view: { ...view, jev: { kind: "result", result } } });
   }
 
-  private start(draft: AccountSetupDraft): void {
-    let request: AccountOnboardingRequest;
-    try {
-      request = readAccountOnboardingRequest({
-        version: 1,
-        operationId: crypto.randomUUID(),
-        selection: draftSelection(draft),
-      });
-    } catch (error) {
-      this.fail(startFailure(error, draft, false));
+  /** A new setup: a new operation id, kept in this tab before the request. */
+  private start(name: string): void {
+    const request = readOrganisationCreationRequest({
+      operationId: crypto.randomUUID(),
+      name,
+    });
+    if (request === null) {
+      this.showName(name, "Enter a name for the organisation.");
       return;
     }
     try {
       window.sessionStorage.setItem(this.storageKey, JSON.stringify(request));
-    } catch (error) {
-      this.fail(startFailure(error, draft, true));
+    } catch {
+      this.fail(storageFailure(name));
       return;
     }
-    void this.submit(this.nextAttempt(), request, draft, Date.now());
+    void this.submit(this.nextAttempt(), request);
   }
 
   private async submit(
     attempt: number,
-    request: AccountOnboardingRequest,
-    draft: AccountSetupDraft | null,
-    startedAt: number,
+    request: OrganisationCreationRequest,
   ): Promise<void> {
-    this.timer = null;
     if (!this.current(attempt)) {
       return;
     }
-    this.setState({ view: { kind: "preparing", request, draft, startedAt } });
+    this.setState({ view: { kind: "preparing", request } });
+    let created: CreatedOrganisation;
     try {
-      const result = readAccountOnboardingResult(
-        responseValue(await controlMutation(PATH, "POST", request)),
-      );
-      if (!this.current(attempt)) {
-        return;
-      }
-      if (result.kind === "ready") {
-        await this.finish(
-          attempt,
-          result.nativeOrganizationId,
-          request,
-          draft,
-          startedAt,
-        );
-        return;
-      }
-      this.polls += 1;
-      if (this.polls >= POLL_LIMIT) {
-        this.fail(slowFailure(request, draft, startedAt));
-        return;
-      }
-      this.timer = window.setTimeout(
-        this.submit.bind(this, attempt, request, draft, startedAt),
-        1000,
-      );
+      created = await createOrganisation(request);
     } catch (error) {
       if (!this.current(attempt)) {
         return;
       }
+      if (endsSetup(error)) {
+        forgetRequest(this.storageKey);
+      }
       if (
         error instanceof ControlApiError &&
-        error.kind === "account_setup_blocked"
+        error.kind === "organisation_create_invalid"
       ) {
-        forgetRequest(this.storageKey);
-        this.fail(blockedFailure(error, draft));
-        return;
+        this.showName(request.name, error.message);
+      } else {
+        this.fail(createFailure(error, request));
       }
-      this.fail(stoppedFailure(error, request, draft));
+      return;
+    }
+    if (this.current(attempt)) {
+      await this.finish(attempt, created.organisationId, request);
     }
   }
 
   /**
-   * Pantry is ready only for the person who can see the organisation. The
-   * setup record stays until the session lists it, so a reload or a new sign
-   * in checks the same setup again.
+   * The setup record stays until the session lists the organisation, so a
+   * reload or a new sign-in checks the same setup again.
    */
   private async finish(
     attempt: number,
-    nativeOrganizationId: string,
-    request: AccountOnboardingRequest,
-    draft: AccountSetupDraft | null,
-    startedAt: number,
+    organisationId: string,
+    request: OrganisationCreationRequest,
   ): Promise<void> {
-    this.setState({
-      view: {
-        kind: "finishing",
-        nativeOrganizationId,
-        request,
-        draft,
-        startedAt,
-      },
-    });
+    this.setState({ view: { kind: "finishing", organisationId, request } });
     let listing: AccountSetupListing;
     try {
-      listing = await this.props.finish(nativeOrganizationId);
+      listing = await this.props.finish(organisationId);
     } catch (error) {
       if (this.current(attempt)) {
-        this.fail(listingFailure(nativeOrganizationId, request, draft, error));
+        this.fail(listingFailure(organisationId, request, error));
       }
       return;
     }
@@ -843,16 +502,16 @@ export class AccountSetup extends React.Component<
       return;
     }
     if (listing.kind === "missing") {
-      this.fail(listingFailure(nativeOrganizationId, request, draft, null));
+      this.fail(listingFailure(organisationId, request, null));
       return;
     }
     this.setState({
       view: {
         kind: "jev",
-        nativeOrganizationId,
+        organisationId,
         organisationHandle: listing.organisationHandle,
         workspaceHandle: listing.workspaceHandle,
-        draft,
+        name: request.name,
         jev: { kind: "choose" },
       },
     });
@@ -860,70 +519,29 @@ export class AccountSetup extends React.Component<
 
   private recover(): void {
     const view = this.state.view;
-    if (view.kind === "failed") {
-      this.runRecovery(view.failure.recovery);
+    if (view.kind !== "failed") {
+      return;
     }
-  }
-
-  private alternative(): void {
-    const view = this.state.view;
-    if (view.kind === "failed" && view.failure.alternative !== undefined) {
-      this.runRecovery(view.failure.alternative.recovery);
-    }
-  }
-
-  private runRecovery(recovery: AccountSetupRecovery): void {
+    const recovery = view.failure.recovery;
     switch (recovery.kind) {
-      case "options":
-        void this.load();
-        return;
       case "sign_in":
         window.location.assign(SIGN_IN_PATH);
         return;
-      case "choose_project":
-        if (recovery.draft === null) {
-          void this.load();
-        } else {
-          this.setState({
-            view: { kind: "project", draft: recovery.draft, problem: null },
-          });
-        }
+      case "close":
+        this.close();
         return;
-      case "billing":
-        this.setState({ view: { kind: "billing", draft: recovery.draft } });
+      case "name":
+        this.showName(recovery.name, null);
         return;
       case "request":
-        void this.submit(
-          this.nextAttempt(),
-          recovery.request,
-          recovery.draft,
-          Date.now(),
-        );
+        void this.submit(this.nextAttempt(), recovery.request);
         return;
       case "listing":
         void this.finish(
           this.nextAttempt(),
-          recovery.nativeOrganizationId,
+          recovery.organisationId,
           recovery.request,
-          recovery.draft,
-          Date.now(),
         );
-        return;
-      case "new_project":
-        // The old setup ends here; the new project starts a new operation.
-        forgetRequest(this.storageKey);
-        if (recovery.draft === null) {
-          void this.load();
-          return;
-        }
-        this.nextAttempt();
-        this.setState({
-          view: {
-            kind: "project",
-            draft: newProjectDraft(recovery.draft),
-            problem: null,
-          },
-        });
         return;
       default:
         assertNever(recovery, "Unknown account setup recovery");
@@ -932,19 +550,8 @@ export class AccountSetup extends React.Component<
 
   render(): React.ReactNode {
     const view = this.state.view;
-    if (view.kind === "closed") {
-      return null;
-    }
-    return (
-      <AccountSetupDialog
-        view={view}
-        actions={this.actions}
-        organisationName={
-          view.kind === "done"
-            ? this.props.organisationName(view.nativeOrganizationId)
-            : null
-        }
-      />
+    return view.kind === "closed" ? null : (
+      <AccountSetupDialog view={view} actions={this.actions} />
     );
   }
 }
@@ -952,13 +559,8 @@ export class AccountSetup extends React.Component<
 /** The step a view belongs to; a failure stays on the step that failed. */
 function viewStep(view: OpenAccountSetupView): AccountSetupStep {
   switch (view.kind) {
-    case "loading":
     case "organisation":
       return "organisation";
-    case "project":
-      return "project";
-    case "billing":
-      return "billing";
     case "preparing":
     case "finishing":
       return "prepare";
@@ -985,7 +587,7 @@ function stepState(
     return "next";
   }
   if (view.kind === "failed") {
-    return view.failure.tone === "warning" ? "attention" : "failed";
+    return "failed";
   }
   return view.kind === "done" ? "done" : "current";
 }
@@ -995,7 +597,6 @@ const STEP_STATE_TEXT: Record<StepState, string> = {
   current: ", current step",
   next: "",
   failed: ", failed",
-  attention: ", needs attention",
 };
 
 function stepIndex(step: AccountSetupStep): number {
@@ -1062,16 +663,14 @@ function focusStepHeading(
 }
 
 function focusKey(view: OpenAccountSetupView): string {
-  if (view.kind === "failed") {
-    return `failed:${view.failure.step}:${view.failure.title}`;
-  }
-  return view.kind === "loading" ? "loading" : viewStep(view);
+  return view.kind === "failed"
+    ? `failed:${view.failure.step}:${view.failure.title}`
+    : viewStep(view);
 }
 
 export function AccountSetupDialog(props: {
   readonly view: OpenAccountSetupView;
   readonly actions: AccountSetupActions;
-  readonly organisationName: string | null;
 }): React.ReactNode {
   const heading = React.useRef<HTMLHeadingElement>(null);
   useStepFocus(heading, focusKey(props.view));
@@ -1085,7 +684,7 @@ export function AccountSetupDialog(props: {
     >
       <AccountSetupSteps view={props.view} />
       <div className="account-setup-body">
-        {setupBody(props.view, props.actions, props.organisationName, heading)}
+        {setupBody(props.view, props.actions, heading)}
       </div>
     </AgentModal>
   );
@@ -1095,19 +694,13 @@ function SetupIntro(props: {
   readonly heading: React.RefObject<HTMLHeadingElement | null>;
   readonly title: string;
   readonly lead: string;
-  readonly live?: boolean;
 }): React.ReactNode {
   return (
     <div className="account-setup-intro">
       <h4 ref={props.heading} tabIndex={-1} className="account-setup-heading">
         {props.title}
       </h4>
-      <p
-        className="account-setup-lead"
-        role={props.live === true ? "status" : undefined}
-      >
-        {props.lead}
-      </p>
+      <p className="account-setup-lead">{props.lead}</p>
     </div>
   );
 }
@@ -1115,48 +708,14 @@ function SetupIntro(props: {
 function setupBody(
   view: OpenAccountSetupView,
   actions: AccountSetupActions,
-  organisationName: string | null,
   heading: React.RefObject<HTMLHeadingElement | null>,
 ): React.ReactNode {
   switch (view.kind) {
-    case "loading":
-      return (
-        <>
-          <SetupIntro
-            heading={heading}
-            title="Choose an organisation"
-            lead="Pantry gets the organisations from your account."
-            live
-          />
-          <div className="account-setup-skeleton" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-        </>
-      );
     case "organisation":
       return (
-        <OrganisationChoices
-          draft={view.draft}
+        <OrganisationName
+          name={view.name}
           problem={view.problem}
-          actions={actions}
-          heading={heading}
-        />
-      );
-    case "project":
-      return (
-        <ProjectChoices
-          draft={view.draft}
-          problem={view.problem}
-          actions={actions}
-          heading={heading}
-        />
-      );
-    case "billing":
-      return (
-        <BillingSummary
-          draft={view.draft}
           actions={actions}
           heading={heading}
         />
@@ -1165,8 +724,7 @@ function setupBody(
     case "finishing":
       return (
         <SetupProgress
-          draft={view.draft}
-          startedAt={view.startedAt}
+          name={view.request.name}
           finishing={view.kind === "finishing"}
           heading={heading}
         />
@@ -1191,11 +749,7 @@ function setupBody(
           <SetupIntro
             heading={heading}
             title="Seams Pantry is ready"
-            lead={
-              organisationName === null
-                ? "The new organisation is in your organisation list. Open it to start."
-                : `${organisationName} is in your organisation list. Open it to start.`
-            }
+            lead={`${view.name} is in your organisation list. Open it to start.`}
           />
         </div>
       );
@@ -1214,56 +768,6 @@ function submitSetupStep(
   actions.next();
 }
 
-function chooseSetupValue(
-  choose: (value: string) => void,
-  event: React.ChangeEvent<HTMLInputElement>,
-): void {
-  choose(event.currentTarget.value);
-}
-
-function SetupChoice(props: {
-  readonly group: string;
-  readonly value: string;
-  readonly checked: boolean;
-  readonly title: string;
-  readonly detail: string;
-  readonly create: boolean;
-  readonly choose: (value: string) => void;
-  readonly children?: React.ReactNode;
-}): React.ReactNode {
-  return (
-    <div
-      className="account-setup-choice"
-      data-selected={props.checked ? "true" : "false"}
-    >
-      <label className="account-setup-choice-head">
-        <input
-          type="radio"
-          name={props.group}
-          value={props.value}
-          checked={props.checked}
-          onChange={chooseSetupValue.bind(null, props.choose)}
-        />
-        <span className="account-setup-choice-tile" aria-hidden="true">
-          {props.create ? (
-            <Plus size={16} strokeWidth={1.75} />
-          ) : (
-            props.title.trim().charAt(0).toUpperCase()
-          )}
-        </span>
-        <span className="account-setup-choice-text">
-          <strong>{props.title}</strong>
-          <small>{props.detail}</small>
-        </span>
-        <span className="account-setup-choice-check" aria-hidden="true">
-          <Check size={13} strokeWidth={2.25} />
-        </span>
-      </label>
-      {props.checked ? props.children : null}
-    </div>
-  );
-}
-
 function changeSetupName(
   name: (value: string) => void,
   event: React.ChangeEvent<HTMLInputElement>,
@@ -1271,7 +775,7 @@ function changeSetupName(
   name(event.currentTarget.value);
 }
 
-/** A missing name sends the person back to the field that needs it. */
+/** A refused name sends the person back to the field that needs it. */
 function focusInvalidName(
   input: React.RefObject<HTMLInputElement | null>,
   problem: string | null,
@@ -1281,68 +785,17 @@ function focusInvalidName(
   }
 }
 
-function SetupNameField(props: {
-  readonly label: string;
-  readonly field: string;
-  readonly value: string;
+function OrganisationName(props: {
+  readonly name: string;
   readonly problem: string | null;
-  readonly change: (value: string) => void;
+  readonly actions: AccountSetupActions;
+  readonly heading: React.RefObject<HTMLHeadingElement | null>;
 }): React.ReactNode {
   const input = React.useRef<HTMLInputElement>(null);
   React.useEffect(focusInvalidName.bind(null, input, props.problem), [
     props.problem,
   ]);
   return (
-    <div className="account-setup-name">
-      <label>
-        <span>{props.label}</span>
-        <input
-          ref={input}
-          name={props.field}
-          value={props.value}
-          maxLength={200}
-          autoComplete="off"
-          aria-invalid={props.problem !== null}
-          aria-describedby={props.problem === null ? undefined : PROBLEM_ID}
-          onChange={changeSetupName.bind(null, props.change)}
-        />
-      </label>
-      {props.problem === null ? null : (
-        <p id={PROBLEM_ID} className="error-text" role="alert">
-          {props.problem}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function renderOrganisationChoice(
-  draft: AccountSetupDraft,
-  actions: AccountSetupActions,
-  organization: AccountOnboardingOrganization,
-): React.ReactNode {
-  return (
-    <SetupChoice
-      key={organization.id}
-      group="organisation"
-      value={organization.id}
-      checked={draft.organization === organization.id}
-      title={organization.name}
-      detail={projectCount(organization)}
-      create={false}
-      choose={actions.chooseOrganisation}
-    />
-  );
-}
-
-function OrganisationChoices(props: {
-  readonly draft: AccountSetupDraft;
-  readonly problem: string | null;
-  readonly actions: AccountSetupActions;
-  readonly heading: React.RefObject<HTMLHeadingElement | null>;
-}): React.ReactNode {
-  const organizations = props.draft.options.organizations;
-  return (
     <form
       id={FORM_ID}
       className="account-setup-form"
@@ -1351,201 +804,38 @@ function OrganisationChoices(props: {
     >
       <SetupIntro
         heading={props.heading}
-        title="Choose an organisation"
-        lead={
-          organizations.length === 0
-            ? "Your account has no organisations. Create one for Seams Pantry."
-            : "Seams Pantry runs in an organisation of your account. Choose one, or create a new one."
-        }
+        title="Name your organisation"
+        lead="Seams Pantry makes a new organisation for your shop. You become its owner."
       />
-      <fieldset className="account-setup-choices">
-        <legend className="visually-hidden">
-          Organisations in your account
-        </legend>
-        {organizations.map(
-          renderOrganisationChoice.bind(null, props.draft, props.actions),
-        )}
-        <SetupChoice
-          group="organisation"
-          value={CREATE}
-          checked={props.draft.organization === CREATE}
-          title="Create an organisation"
-          detail="Pantry creates it in your account."
-          create
-          choose={props.actions.chooseOrganisation}
-        >
-          <SetupNameField
-            label="Organisation name"
-            field="organizationName"
-            value={props.draft.organizationName}
-            problem={props.problem}
-            change={props.actions.nameOrganisation}
+      <div className="account-setup-name">
+        <label>
+          <span>Organisation name</span>
+          <input
+            ref={input}
+            name="organisationName"
+            value={props.name}
+            maxLength={ORGANISATION_NAME_MAX}
+            autoComplete="organization"
+            aria-invalid={props.problem !== null}
+            aria-describedby={props.problem === null ? undefined : PROBLEM_ID}
+            onChange={changeSetupName.bind(
+              null,
+              props.actions.nameOrganisation,
+            )}
           />
-        </SetupChoice>
-      </fieldset>
-    </form>
-  );
-}
-
-function renderProjectChoice(
-  draft: AccountSetupDraft,
-  actions: AccountSetupActions,
-  project: Readonly<{ id: string; name: string }>,
-): React.ReactNode {
-  return (
-    <SetupChoice
-      key={project.id}
-      group="project"
-      value={project.id}
-      checked={draft.project === project.id}
-      title={project.name}
-      detail="Existing project"
-      create={false}
-      choose={actions.chooseProject}
-    />
-  );
-}
-
-function ProjectChoices(props: {
-  readonly draft: AccountSetupDraft;
-  readonly problem: string | null;
-  readonly actions: AccountSetupActions;
-  readonly heading: React.RefObject<HTMLHeadingElement | null>;
-}): React.ReactNode {
-  const organization = draftOrganization(props.draft);
-  const name = organization?.name ?? props.draft.organizationName.trim();
-  return (
-    <form
-      id={FORM_ID}
-      className="account-setup-form"
-      noValidate
-      onSubmit={submitSetupStep.bind(null, props.actions)}
-    >
-      <SetupIntro
-        heading={props.heading}
-        title="Choose a project"
-        lead={
-          organization === null
-            ? `${name} is a new organisation. Pantry creates a project in it.`
-            : `Seams Pantry uses one project in ${name}. The project holds the account and billing for Pantry.`
-        }
-      />
-      <fieldset className="account-setup-choices">
-        <legend className="visually-hidden">Projects in {name}</legend>
-        {(organization?.projects ?? []).map(
-          renderProjectChoice.bind(null, props.draft, props.actions),
+        </label>
+        {props.problem === null ? null : (
+          <p id={PROBLEM_ID} className="error-text" role="alert">
+            {props.problem}
+          </p>
         )}
-        <SetupChoice
-          group="project"
-          value={CREATE}
-          checked={props.draft.project === CREATE}
-          title="Create a project"
-          detail={`Pantry creates it in ${name}.`}
-          create
-          choose={props.actions.chooseProject}
-        >
-          <SetupNameField
-            label="Project name"
-            field="projectName"
-            value={props.draft.projectName}
-            problem={props.problem}
-            change={props.actions.nameProject}
-          />
-        </SetupChoice>
-      </fieldset>
+      </div>
     </form>
   );
-}
-
-function SetupSummary(props: {
-  readonly choice: AccountSetupChoice;
-  readonly billing: boolean;
-}): React.ReactNode {
-  return (
-    <dl className="account-setup-summary">
-      <div>
-        <dt>Organisation</dt>
-        <dd>
-          <span>{props.choice.organisation}</span>
-          {props.choice.newOrganisation ? (
-            <span className="account-setup-tag">New</span>
-          ) : null}
-        </dd>
-      </div>
-      <div>
-        <dt>Project</dt>
-        <dd>
-          <span>{props.choice.project}</span>
-          {props.choice.newProject ? (
-            <span className="account-setup-tag">New</span>
-          ) : null}
-        </dd>
-      </div>
-      {props.billing ? (
-        <div>
-          <dt>Billing</dt>
-          <dd>Pantry uses the billing of this project.</dd>
-        </div>
-      ) : null}
-    </dl>
-  );
-}
-
-function BillingSummary(props: {
-  readonly draft: AccountSetupDraft;
-  readonly actions: AccountSetupActions;
-  readonly heading: React.RefObject<HTMLHeadingElement | null>;
-}): React.ReactNode {
-  const choice = draftChoice(props.draft);
-  return (
-    <form
-      id={FORM_ID}
-      className="account-setup-form"
-      noValidate
-      onSubmit={submitSetupStep.bind(null, props.actions)}
-    >
-      <SetupIntro
-        heading={props.heading}
-        title="Confirm billing"
-        lead="Seams Pantry uses the account and billing of this project. Check the details before you start."
-      />
-      <SetupSummary choice={choice} billing />
-      {choice.newOrganisation || choice.newProject ? (
-        <p className="account-setup-note">
-          Pantry creates the new items in your account when you select Start
-          setup.
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
-function SetupClock(props: { readonly startedAt: number }): React.ReactNode {
-  const [now, setNow] = React.useState(Date.now);
-  React.useEffect(startSetupClock.bind(null, setNow), []);
-  return (
-    <span className="account-setup-clock">
-      Time: {formatSetupTime(now - props.startedAt)}
-    </span>
-  );
-}
-
-function startSetupClock(
-  setNow: React.Dispatch<React.SetStateAction<number>>,
-): () => void {
-  const timer = window.setInterval(tickSetupClock.bind(null, setNow), 1000);
-  return window.clearInterval.bind(window, timer);
-}
-
-function tickSetupClock(
-  setNow: React.Dispatch<React.SetStateAction<number>>,
-): void {
-  setNow(Date.now());
 }
 
 function SetupProgress(props: {
-  readonly draft: AccountSetupDraft | null;
-  readonly startedAt: number;
+  readonly name: string;
   readonly finishing: boolean;
   readonly heading: React.RefObject<HTMLHeadingElement | null>;
 }): React.ReactNode {
@@ -1554,11 +844,14 @@ function SetupProgress(props: {
       <SetupIntro
         heading={props.heading}
         title="Seams Pantry prepares your organisation"
-        lead="This can take a few minutes. Keep this window open to see the result."
+        lead="This takes a few seconds. Keep this window open to see the result."
       />
-      {props.draft === null ? null : (
-        <SetupSummary choice={draftChoice(props.draft)} billing={false} />
-      )}
+      <dl className="account-setup-summary">
+        <div>
+          <dt>Organisation</dt>
+          <dd>{props.name}</dd>
+        </div>
+      </dl>
       <div className="account-setup-progress-block">
         <div
           className="account-setup-progress"
@@ -1571,9 +864,8 @@ function SetupProgress(props: {
           <span role="status">
             {props.finishing
               ? "Pantry adds the organisation to your list."
-              : "The setup is in progress."}
+              : "Pantry makes the organisation."}
           </span>
-          <SetupClock startedAt={props.startedAt} />
         </div>
       </div>
       <p className="account-setup-note">
@@ -1589,11 +881,7 @@ function SetupProblem(props: {
   readonly heading: React.RefObject<HTMLHeadingElement | null>;
 }): React.ReactNode {
   return (
-    <div
-      className="account-setup-problem"
-      data-tone={props.failure.tone}
-      role="alert"
-    >
+    <div className="account-setup-problem" role="alert">
       <span className="account-setup-problem-mark" aria-hidden="true">
         <CircleAlert size={20} strokeWidth={1.75} />
       </span>
@@ -1614,18 +902,13 @@ function SetupProblem(props: {
 function SecondaryButton(props: {
   readonly label: string;
   readonly onClick: () => void;
-  readonly back?: boolean;
   readonly disabled?: boolean;
 }): React.ReactNode {
   return (
     <button
       type="button"
       disabled={props.disabled}
-      className={
-        props.back === true
-          ? "modal-secondary-button account-setup-back"
-          : "modal-secondary-button"
-      }
+      className="modal-secondary-button"
       onClick={props.onClick}
     >
       {props.label}
@@ -1633,11 +916,34 @@ function SecondaryButton(props: {
   );
 }
 
-function SubmitButton(props: { readonly label: string }): React.ReactNode {
+function PrimaryButton(props: {
+  readonly label: string;
+  readonly onClick: () => void;
+  readonly disabled?: boolean;
+}): React.ReactNode {
   return (
-    <button type="submit" form={FORM_ID} className="modal-primary-button">
+    <button
+      type="button"
+      disabled={props.disabled}
+      className="modal-primary-button"
+      onClick={props.onClick}
+    >
       {props.label}
     </button>
+  );
+}
+
+function SignInLink(props: {
+  readonly label: string;
+  readonly primary: boolean;
+}): React.ReactNode {
+  return (
+    <a
+      className={`${props.primary ? "modal-primary-button" : "modal-secondary-button"} account-setup-link`}
+      href={SIGN_IN_PATH}
+    >
+      {props.label}
+    </a>
   );
 }
 
@@ -1646,27 +952,13 @@ function setupFooter(
   actions: AccountSetupActions,
 ): React.ReactNode {
   switch (view.kind) {
-    case "loading":
-      return <SecondaryButton label="Cancel" onClick={actions.close} />;
     case "organisation":
       return (
         <>
           <SecondaryButton label="Cancel" onClick={actions.close} />
-          <SubmitButton label="Continue" />
-        </>
-      );
-    case "project":
-      return (
-        <>
-          <SecondaryButton label="Back" onClick={actions.back} back />
-          <SubmitButton label="Continue" />
-        </>
-      );
-    case "billing":
-      return (
-        <>
-          <SecondaryButton label="Back" onClick={actions.back} back />
-          <SubmitButton label="Start setup" />
+          <button type="submit" form={FORM_ID} className="modal-primary-button">
+            Create organisation
+          </button>
         </>
       );
     case "preparing":
@@ -1674,13 +966,7 @@ function setupFooter(
       return <SecondaryButton label="Close" onClick={actions.close} />;
     case "jev":
       return view.jev.kind === "result" ? (
-        <button
-          type="button"
-          className="modal-primary-button"
-          onClick={actions.next}
-        >
-          Continue
-        </button>
+        <PrimaryButton label="Continue" onClick={actions.next} />
       ) : (
         <>
           <SecondaryButton
@@ -1688,14 +974,11 @@ function setupFooter(
             onClick={actions.next}
             disabled={view.jev.kind === "busy"}
           />
-          <button
-            type="button"
-            className="modal-primary-button"
+          <PrimaryButton
+            label={view.jev.kind === "busy" ? "Turning on Jev…" : "Turn on Jev"}
             onClick={actions.turnOnJev}
             disabled={view.jev.kind === "busy"}
-          >
-            {view.jev.kind === "busy" ? "Turning on Jev…" : "Turn on Jev"}
-          </button>
+          />
         </>
       );
     case "done":
@@ -1721,44 +1004,26 @@ function failureFooter(
   failure: AccountSetupFailure,
   actions: AccountSetupActions,
 ): React.ReactNode {
-  if (failure.recovery.kind === "sign_in") {
-    return (
-      <>
-        <SecondaryButton label="Close" onClick={actions.close} />
-        <a
-          className="modal-primary-button account-setup-link"
-          href={SIGN_IN_PATH}
-        >
-          {failure.action}
-        </a>
-      </>
-    );
+  switch (failure.recovery.kind) {
+    case "sign_in":
+      return (
+        <>
+          <SecondaryButton label="Close" onClick={actions.close} />
+          <SignInLink label={failure.action} primary />
+        </>
+      );
+    case "close":
+      return <PrimaryButton label={failure.action} onClick={actions.close} />;
+    default:
+      return (
+        <>
+          {failure.signIn ? (
+            <SignInLink label="Sign in again" primary={false} />
+          ) : (
+            <SecondaryButton label="Close" onClick={actions.close} />
+          )}
+          <PrimaryButton label={failure.action} onClick={actions.recover} />
+        </>
+      );
   }
-  return (
-    <>
-      {failure.alternative !== undefined ? (
-        <SecondaryButton
-          label={failure.alternative.action}
-          onClick={actions.alternative}
-          back
-        />
-      ) : failure.signIn ? (
-        <a
-          className="modal-secondary-button account-setup-link"
-          href={SIGN_IN_PATH}
-        >
-          Sign in again
-        </a>
-      ) : (
-        <SecondaryButton label="Close" onClick={actions.close} />
-      )}
-      <button
-        type="button"
-        className="modal-primary-button"
-        onClick={actions.recover}
-      >
-        {failure.action}
-      </button>
-    </>
-  );
 }

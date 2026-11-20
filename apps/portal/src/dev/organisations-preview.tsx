@@ -1,10 +1,8 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router";
-import type {
-  AccountOnboardingOptions,
-  AccountOnboardingRequest,
-} from "@purin-labs/control-api";
+import type { OrganisationCreationRequest } from "@purin-labs/control-api";
+import { isRecord } from "@purin-labs/std";
 import "../styles.css";
 import { PortalFrame } from "../shell";
 import {
@@ -13,13 +11,15 @@ import {
   type OrganisationListItem,
 } from "../pages/workspaces";
 import {
-  ACCOUNT_SETUP_CREATE,
   AccountSetupDialog,
   type AccountSetupActions,
-  type AccountSetupDraft,
   type AccountSetupListing,
   type OpenAccountSetupView,
 } from "../pages/account-onboarding";
+import {
+  AccountInvitationPage,
+  readAccountInvitationRoute,
+} from "../pages/account-invitation";
 
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV) {
@@ -120,108 +120,44 @@ const SCENARIOS: Record<string, readonly OrganisationListItem[]> = {
   ],
 };
 
-/** The account the setup dialog reads: two organisations, three projects. */
-const ACCOUNT: AccountOnboardingOptions = {
-  organizations: [
-    {
-      id: "org_preview_nini",
-      name: "Nini Corp",
-      projects: [
-        { id: "proj_preview_satyr", name: "Seams Pantry" },
-        { id: "proj_preview_gifts", name: "Gift boxes" },
-      ],
-    },
-    {
-      id: "org_preview_atelier",
-      name: "Atelier Lowerarchy",
-      projects: [{ id: "proj_preview_kitchen", name: "Kitchen" }],
-    },
-  ],
-};
-
-const EXISTING: AccountSetupDraft = {
-  options: ACCOUNT,
-  organization: "org_preview_nini",
-  organizationName: "",
-  project: "proj_preview_satyr",
-  projectName: "Seams Pantry",
-};
-
-const CREATED: AccountSetupDraft = {
-  options: ACCOUNT,
-  organization: ACCOUNT_SETUP_CREATE,
-  organizationName: "Nini Pâtisserie",
-  project: ACCOUNT_SETUP_CREATE,
-  projectName: "Seams Pantry",
-};
-
-const REQUEST: AccountOnboardingRequest = {
-  version: 1,
+const REQUEST: OrganisationCreationRequest = {
   operationId: "operation_preview",
-  selection: {
-    kind: "existing_project",
-    organizationId: "org_preview_nini",
-    projectId: "proj_preview_satyr",
-  },
+  name: NINI.name,
 };
-
-const PREPARED_AT = Date.now() - 65_000;
 
 /** Every state of the setup dialog, by the name used in `?setup=`. */
 const SETUP_VIEWS: Record<string, OpenAccountSetupView> = {
-  loading: { kind: "loading" },
-  organisation: { kind: "organisation", draft: EXISTING, problem: null },
-  "organisation-create": {
+  organisation: { kind: "organisation", name: "", problem: null },
+  "organisation-named": {
     kind: "organisation",
-    draft: { ...CREATED, organizationName: "" },
-    problem: "Enter a name for the organisation.",
-  },
-  "organisation-none": {
-    kind: "organisation",
-    draft: {
-      ...CREATED,
-      options: { organizations: [] },
-      organizationName: "Nini Corp",
-    },
+    name: "Nini Pâtisserie",
     problem: null,
   },
-  project: { kind: "project", draft: EXISTING, problem: null },
-  "project-new": { kind: "project", draft: CREATED, problem: null },
-  billing: { kind: "billing", draft: EXISTING },
-  "billing-new": { kind: "billing", draft: CREATED },
-  preparing: {
-    kind: "preparing",
-    request: REQUEST,
-    draft: EXISTING,
-    startedAt: PREPARED_AT,
+  "organisation-problem": {
+    kind: "organisation",
+    name: "",
+    problem: "Enter a name for the organisation.",
   },
-  "preparing-resumed": {
-    kind: "preparing",
-    request: REQUEST,
-    draft: null,
-    startedAt: Date.now() - 4_000,
-  },
+  preparing: { kind: "preparing", request: REQUEST },
   finishing: {
     kind: "finishing",
-    nativeOrganizationId: NINI.organisationId,
+    organisationId: NINI.organisationId,
     request: REQUEST,
-    draft: EXISTING,
-    startedAt: PREPARED_AT,
   },
   jev: {
     kind: "jev",
-    nativeOrganizationId: NINI.organisationId,
+    organisationId: NINI.organisationId,
     organisationHandle: NINI.organisationHandle,
     workspaceHandle: null,
-    draft: EXISTING,
+    name: NINI.name,
     jev: { kind: "choose" },
   },
   "jev-result": {
     kind: "jev",
-    nativeOrganizationId: NINI.organisationId,
+    organisationId: NINI.organisationId,
     organisationHandle: NINI.organisationHandle,
     workspaceHandle: null,
-    draft: EXISTING,
+    name: NINI.name,
     jev: {
       kind: "result",
       result: [
@@ -245,29 +181,13 @@ const SETUP_VIEWS: Record<string, OpenAccountSetupView> = {
   },
   done: {
     kind: "done",
-    nativeOrganizationId: NINI.organisationId,
     organisationHandle: NINI.organisationHandle,
-    draft: EXISTING,
-  },
-  "failed-account": {
-    kind: "failed",
-    failure: {
-      step: "organisation",
-      tone: "danger",
-      title: "Pantry cannot read your account",
-      reason: "Pantry could not complete this request. Try again.",
-      next: "Try again. If the problem continues, sign in again.",
-      detail: "Error code: authority_unavailable",
-      action: "Try again",
-      signIn: true,
-      recovery: { kind: "options" },
-    },
+    name: NINI.name,
   },
   "failed-session": {
     kind: "failed",
     failure: {
       step: "prepare",
-      tone: "danger",
       title: "Your session has ended",
       reason: "Sign in again to continue the setup.",
       next: "Pantry keeps this setup and continues it after you sign in.",
@@ -277,70 +197,34 @@ const SETUP_VIEWS: Record<string, OpenAccountSetupView> = {
       recovery: { kind: "sign_in" },
     },
   },
-  "failed-blocked": {
-    kind: "failed",
-    failure: {
-      step: "billing",
-      tone: "danger",
-      title: "This project cannot start Seams Pantry",
-      reason:
-        "This project cannot start the Seams Pantry setup. Choose another project or ask its owner to check access.",
-      next: null,
-      detail: "Error code: account_setup_blocked",
-      action: "Choose another project",
-      signIn: false,
-      recovery: { kind: "choose_project", draft: EXISTING },
-    },
-  },
   "failed-stopped": {
     kind: "failed",
     failure: {
       step: "prepare",
-      tone: "danger",
       title: "The setup stopped",
       reason: "Pantry could not complete this request. Try again.",
-      next: "Try again to continue the same setup. Pantry does not create a second organisation.",
+      next: "Try again to continue the same setup. Pantry does not make a second organisation.",
       detail: "Error code: authority_unavailable",
       action: "Try again",
       signIn: true,
-      recovery: { kind: "request", request: REQUEST, draft: EXISTING },
-    },
-  },
-  "failed-slow": {
-    kind: "failed",
-    failure: {
-      step: "prepare",
-      tone: "warning",
-      title: "The setup takes longer than usual",
-      reason: "The setup is not finished after 1:04.",
-      next: "Check again to continue the same setup.",
-      detail: null,
-      action: "Check again",
-      signIn: false,
-      recovery: { kind: "request", request: REQUEST, draft: EXISTING },
+      recovery: { kind: "request", request: REQUEST },
     },
   },
   "failed-missing": {
     kind: "failed",
     failure: {
-      step: "done",
-      tone: "danger",
-      title: "Your organisation is not available",
+      step: "prepare",
+      title: "Your organisation is not in your list",
       reason:
-        "Pantry finished the setup, but your organisation list does not show the organisation.",
-      next: "The project can still point to a deleted organisation. Create a new project for Seams Pantry, or check again.",
-      detail: "Organisation ID: organisation_preview_nini",
-      action: "Create a new project",
+        "Pantry made the organisation, but your organisation list does not show it.",
+      next: "Check again in a moment.",
+      detail: `Organisation ID: ${NINI.organisationId}`,
+      action: "Check again",
       signIn: false,
-      recovery: { kind: "new_project", draft: EXISTING },
-      alternative: {
-        action: "Check again",
-        recovery: {
-          kind: "listing",
-          nativeOrganizationId: NINI.organisationId,
-          request: REQUEST,
-          draft: EXISTING,
-        },
+      recovery: {
+        kind: "listing",
+        organisationId: NINI.organisationId,
+        request: REQUEST,
       },
     },
   },
@@ -348,6 +232,7 @@ const SETUP_VIEWS: Record<string, OpenAccountSetupView> = {
 
 const params = new URL(window.location.href).searchParams;
 const setup = params.get("setup");
+const invitation = params.get("invitation");
 const theme = params.get("theme");
 if (theme === "dark" || theme === "light") {
   document.documentElement.dataset.portalMode = theme;
@@ -368,14 +253,9 @@ const ACTIONS: OrganisationActions = {
 
 const SETUP_ACTIONS: AccountSetupActions = {
   close: previewOpen,
-  chooseOrganisation: previewOpen,
   nameOrganisation: previewOpen,
-  chooseProject: previewOpen,
-  nameProject: previewOpen,
-  back: previewOpen,
   next: previewOpen,
   recover: previewOpen,
-  alternative: previewOpen,
   turnOnJev: previewOpen,
 };
 
@@ -395,15 +275,110 @@ function resolveAfter(milliseconds: number, resolve: () => void): void {
 }
 
 /**
- * The setup route always answers from this mock, so the preview never sends
- * a setup to a real backend. `?setup=live` runs the real dialog: the account
- * read, three pending status reads, then ready. With `?setup=live-missing`
- * the session never lists the organisation.
+ * The fake server's records. They stay in this tab, so a reload meets the
+ * same server, as a reload of the Portal meets the same Pantry.
  */
-function installPreviewAccount(): void {
+type PreviewServer = {
+  posts: number;
+  created: Record<string, OrganisationListItem>;
+};
+
+const SERVER_KEY = "organisations-preview:server";
+
+function readServer(): PreviewServer {
+  const raw = window.sessionStorage.getItem(SERVER_KEY);
+  const value: unknown = raw === null ? null : JSON.parse(raw);
+  return isRecord(value) && isRecord(value.created)
+    ? (value as PreviewServer)
+    : { posts: 0, created: {} };
+}
+
+function createdOrganisations(): readonly OrganisationListItem[] {
+  return Object.values(readServer().created);
+}
+
+function previewHandle(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/gu, "-")
+    .replace(/^-|-$/gu, "");
+}
+
+/**
+ * `POST /v1/control/organisations` as Pantry answers it: a repeat of an
+ * operation id answers the same organisation, and the same id with another
+ * name is a conflict. `?setup=live-limit`: the person owns 5 organisations;
+ * `?setup=live-unverified`: the Google email is not verified.
+ */
+function answerCreate(body: OrganisationCreationRequest): Response {
+  const server = readServer();
+  server.posts += 1;
+  const earlier = server.created[body.operationId];
+  let answer: Response;
+  if (setup === "live-unverified") {
+    answer = json({ ok: false, error: "organisation_owner_unverified" }, 403);
+  } else if (earlier !== undefined) {
+    answer =
+      earlier.name === body.name.trim()
+        ? json({ ok: true, organisation: earlier })
+        : json({ ok: false, error: "idempotency_key_conflict" }, 409);
+  } else if (setup === "live-limit") {
+    answer = json({ ok: false, error: "organisation_limit_reached" }, 409);
+  } else {
+    const count = Object.keys(server.created).length + 1;
+    const organisation: OrganisationListItem = {
+      ...NINI,
+      organisationId: `organisation_preview_created_${count}`,
+      organisationHandle: previewHandle(body.name),
+      name: body.name.trim(),
+    };
+    server.created[body.operationId] = organisation;
+    answer = json({
+      ok: true,
+      organisation: {
+        organisationId: organisation.organisationId,
+        organisationHandle: organisation.organisationHandle,
+      },
+    });
+  }
+  window.sessionStorage.setItem(SERVER_KEY, JSON.stringify(server));
+  return answer;
+}
+
+const INVITATION_STATUS: Record<string, number> = {
+  organisation_invitation_not_found: 404,
+  organisation_invitation_email_mismatch: 403,
+  organisation_invitation_closed: 409,
+  organisation_invitation_expired: 409,
+};
+
+/** `?invitation=accepted` accepts; any other value is the refusal code. */
+function answerAccept(): Response {
+  if (invitation === "accepted") {
+    return json({
+      ok: true,
+      member: { userId: "user_preview", role: "operator" },
+    });
+  }
+  return json(
+    { ok: false, error: invitation },
+    INVITATION_STATUS[invitation ?? ""] ?? 503,
+  );
+}
+
+const ACCEPT_PATH =
+  /^\/v1\/control\/organisations\/[^/]+\/invitations\/[^/]+\/accept$/u;
+
+/**
+ * The create and accept routes answer from this fake, so the preview never
+ * sends a setup to a real backend. `?setup=live` runs the real dialog; with
+ * `?setup=live-missing` the session never lists the organisation.
+ */
+function installPreviewServer(): void {
   document.cookie = "satyr_control_csrf=organisations-preview; path=/";
   const fetchControl = window.fetch.bind(window);
-  let reads = 0;
   window.fetch = async function previewFetch(
     input: RequestInfo | URL,
     init?: RequestInit,
@@ -412,28 +387,16 @@ function installPreviewAccount(): void {
       input instanceof Request ? input.url : String(input),
       window.location.href,
     );
-    if (url.pathname !== "/v1/control/account-onboarding") {
-      return fetchControl(input, init);
+    const post = (init?.method ?? "GET") === "POST";
+    if (post && url.pathname === "/v1/control/organisations") {
+      await wait(700);
+      return answerCreate(JSON.parse(String(init?.body)));
     }
-    await wait(700);
-    if ((init?.method ?? "GET") === "GET") {
-      return json({ ok: true, value: ACCOUNT });
+    if (post && ACCEPT_PATH.test(url.pathname)) {
+      await wait(500);
+      return answerAccept();
     }
-    reads += 1;
-    if (reads <= 3) {
-      return json({
-        ok: true,
-        value: {
-          kind: "pending",
-          operationId: "operation_preview",
-          instanceId: "instance_preview",
-        },
-      });
-    }
-    return json({
-      ok: true,
-      value: { kind: "ready", nativeOrganizationId: NINI.organisationId },
-    });
+    return fetchControl(input, init);
   };
 }
 
@@ -447,14 +410,17 @@ function PreviewRoute(): React.ReactNode {
   const scenario = params.get("scenario") ?? "single";
   const [organisations, setOrganisations] = React.useState<
     readonly OrganisationListItem[]
-  >(SCENARIOS[scenario] ?? SCENARIOS.single ?? []);
+  >([
+    ...(SCENARIOS[scenario] ?? SCENARIOS.single ?? []),
+    ...createdOrganisations(),
+  ]);
   const load = React.useCallback(
     previewOrganisations.bind(null, organisations),
     [organisations],
   );
   const finish = React.useCallback(
-    finishPreviewSetup.bind(null, setOrganisations),
-    [],
+    finishPreviewSetup.bind(null, scenario, setOrganisations),
+    [scenario],
   );
   const view = setup === null ? undefined : SETUP_VIEWS[setup];
   return (
@@ -473,35 +439,55 @@ function PreviewRoute(): React.ReactNode {
         supportTools={null}
       />
       {view === undefined ? null : (
-        <AccountSetupDialog
-          view={view}
-          actions={SETUP_ACTIONS}
-          organisationName={view.kind === "done" ? NINI.name : null}
-        />
+        <AccountSetupDialog view={view} actions={SETUP_ACTIONS} />
       )}
     </>
   );
 }
 
+/** The session read after the setup: it lists what the fake server made. */
 async function finishPreviewSetup(
+  scenario: string,
   setOrganisations: React.Dispatch<
     React.SetStateAction<readonly OrganisationListItem[]>
   >,
+  organisationId: string,
 ): Promise<AccountSetupListing> {
   await wait(900);
-  if (setup === "live-missing") {
+  const created = createdOrganisations();
+  const listed = created.find(
+    (organisation) => organisation.organisationId === organisationId,
+  );
+  if (setup === "live-missing" || listed === undefined) {
     return { kind: "missing" };
   }
-  setOrganisations([NINI]);
+  setOrganisations([...(SCENARIOS[scenario] ?? []), ...created]);
   return {
     kind: "listed",
-    organisationHandle: NINI.organisationHandle,
-    workspaceHandle: null,
+    organisationHandle: listed.organisationHandle,
+    workspaceHandle: listed.workspaces[0]?.workspaceHandle ?? null,
   };
 }
 
-installPreviewAccount();
-if (setup !== "live" && setup !== "live-missing") {
+function PreviewInvitation(): React.ReactNode {
+  const route = readAccountInvitationRoute(
+    new URL(window.location.href),
+    window.sessionStorage,
+  );
+  return route.kind === "none" ? (
+    <p>Open the preview with an invitation link.</p>
+  ) : (
+    <AccountInvitationPage
+      Frame={PortalFrame}
+      route={route}
+      displayName="Pta"
+      logout={previewSettled}
+    />
+  );
+}
+
+installPreviewServer();
+if (setup === null || !setup.startsWith("live")) {
   // A fixed state must not resume a setup left by an earlier live run.
   window.sessionStorage.removeItem(
     "satyr:account-onboarding:organisations-preview",
@@ -510,6 +496,6 @@ if (setup !== "live" && setup !== "live-missing") {
 
 createRoot(root).render(
   <MemoryRouter initialEntries={["/portal"]}>
-    <PreviewRoute />
+    {invitation === null ? <PreviewRoute /> : <PreviewInvitation />}
   </MemoryRouter>,
 );

@@ -18,10 +18,7 @@ import {
   commerceWorkspace,
   connectCommerceFixture,
 } from "./commerce-support";
-import {
-  activateSharedAccountNativeTenant,
-  attachSharedAccountNativeOrganisation,
-} from "./shared-account-platform-fixture";
+import { activateOrganisation } from "./organisation-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -67,12 +64,7 @@ async function portalPayoutReadJourney(test: TestContext): Promise<void> {
   const viewer = await commerceClient("payout-viewer");
   const organisationId = await commerceWorkspace(owner, "Pâtisserie payouts");
   await addViewer(organisationId, viewer.identity.userId);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { privateMember: viewer },
-  });
-  await activateSharedAccountNativeTenant(organisationId);
+  await activateOrganisation(organisationId);
   await connectCommerceFixture(
     organisationId,
     owner.identity.userId,

@@ -53,7 +53,7 @@ import {
 import { resolveOrganisationModelRoute } from "../../services/platform/src/models/route";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
-import { attachToAccountAuthority, fixturePeople } from "./account-authority";
+import { fixturePeople } from "./account-authority";
 
 export {
   OrganisationDO,
@@ -63,13 +63,10 @@ export {
 
 const CONTROL = "https://brain-fixture.internal";
 const names = ["Owner", "Other"] as const;
-const {
-  fixtureUser,
-  fixtureOrganisation,
-  fixturePerson,
-  auxiliaryOwner,
-  login,
-} = fixturePeople("", "plan42j-browser");
+const { fixtureUser, fixtureOrganisation, login } = fixturePeople(
+  "",
+  "plan42j-browser",
+);
 const SUPPLIER = "supplier@example.test";
 const LIMITS: EmailIngressLimits = {
   maxActiveCases: 5,
@@ -272,13 +269,6 @@ async function seed(env: Env) {
       "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
     ).bind(organisationId, owner.userId, now),
   ]);
-  const ownerPerson = await fixturePerson(env, organisationId, owner);
-  await attachToAccountAuthority(env, {
-    organisationId,
-    owner: ownerPerson,
-    administrator: await fixturePerson(env, organisationId, other),
-    auxiliary: auxiliaryOwner.bind(null, env),
-  });
   const policy = defaultDenyPolicy({ now });
   policy.version = 1;
   policy.authz.allowedTools = [

@@ -32,15 +32,7 @@ async function goalControlsJourney(context: TestContext): Promise<void> {
   const chatgpt = new FakeChatGpt();
   chatgpt.answer = () =>
     textAnswer(JSON.stringify({ kind: "reply", text: "Stock reviewed." }));
-  const { session } = await preparePortalChatJourney({
-    account: {
-      privateMember: {
-        client: outsiderClient,
-        laterPersonId: outsiderPersonId,
-      },
-    },
-    chatgpt,
-  });
+  const { session } = await preparePortalChatJourney({ chatgpt });
   expect((await chat(session, 1)).status).toBe(200);
   await expect
     .poll(readWork.bind(null, session), { timeout: 15_000 })

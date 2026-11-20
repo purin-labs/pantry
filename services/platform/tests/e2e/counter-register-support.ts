@@ -15,7 +15,6 @@ import {
 } from "./commerce-support";
 import { controlBase } from "./device-fleet-support";
 import { organisationDatabase } from "./organisation-database";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 /**
  * A café with a published menu and a cash counter, for the Register journeys
@@ -79,11 +78,6 @@ export async function setupRegisterShop(tag: string) {
         now,
       ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
 
   const admin = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",

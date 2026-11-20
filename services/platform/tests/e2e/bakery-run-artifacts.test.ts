@@ -4,10 +4,7 @@ import { expect, it } from "vitest";
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
-import {
-  attachSharedAccountNativeOrganisation,
-  nativeAccountRequest,
-} from "./shared-account-platform-fixture";
+import { controlRequest } from "./organisation-fixture";
 import failed from "../fixtures/bakery-persistent-failure.json";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 
@@ -38,11 +35,6 @@ async function artifactJourney(): Promise<void> {
         Date.now(),
       ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: { operator: reviewer },
-  });
   const snapshot = parseRunSnapshot({
     name: "Failed cell at 30 seconds",
     document: { kind: "saved", document: failed.document, artifacts: [] },
@@ -56,8 +48,8 @@ async function artifactJourney(): Promise<void> {
     name: snapshot.name,
     document: JSON.parse(snapshot.file),
   };
-  expect((await nativeAccountRequest(owner, path, body)).status).toBe(409);
-  const prepared = await nativeAccountRequest(owner, stage, body);
+  expect((await controlRequest(owner, path, body)).status).toBe(409);
+  const prepared = await controlRequest(owner, stage, body);
   expect(prepared.status, await prepared.clone().text()).toBe(200);
   const missing = await prepared.json();
   if (!isRecord(missing) || !Array.isArray(missing.missing))
@@ -66,44 +58,40 @@ async function artifactJourney(): Promise<void> {
   const first = failed.artifacts[0];
   if (first === undefined) throw new Error("Fixture contains no physics");
   const firstStage = `${stage}/artifacts/${first.digest}`;
-  expect((await nativeAccountRequest(reviewer, stage, null)).status).toBe(404);
-  expect((await nativeAccountRequest(foreign, stage, null)).status).toBe(404);
+  expect((await controlRequest(reviewer, stage, null)).status).toBe(404);
+  expect((await controlRequest(foreign, stage, null)).status).toBe(404);
   expect(
     (
-      await nativeAccountRequest(owner, firstStage, {
+      await controlRequest(owner, firstStage, {
         content: first.content + " ",
       })
     ).status,
   ).toBe(409);
   expect(
-    (await nativeAccountRequest(owner, firstStage, { content: first.content }))
+    (await controlRequest(owner, firstStage, { content: first.content }))
       .status,
   ).toBe(200);
   expect(
     (
-      await nativeAccountRequest(
+      await controlRequest(
         reviewer,
         `${path}/${id}/artifacts/${first.digest}`,
         null,
       )
     ).status,
   ).toBe(404);
-  expect((await nativeAccountRequest(reviewer, firstStage, null)).status).toBe(
-    404,
-  );
-  expect((await nativeAccountRequest(owner, path, body)).status).toBe(409);
-  expect(
-    (await nativeAccountRequest(owner, `${path}/${id}`, null)).status,
-  ).toBe(404);
+  expect((await controlRequest(reviewer, firstStage, null)).status).toBe(404);
+  expect((await controlRequest(owner, path, body)).status).toBe(409);
+  expect((await controlRequest(owner, `${path}/${id}`, null)).status).toBe(404);
   // A replacement uploader recovers the exact preparation after losing its reply.
-  const resumed = await nativeAccountRequest(owner, stage, body);
+  const resumed = await controlRequest(owner, stage, body);
   const remaining = await resumed.json();
   if (!isRecord(remaining) || !Array.isArray(remaining.missing))
     throw new Error("Missing resumed index");
   expect(remaining.missing).not.toContain(first.digest);
   for (const artifact of failed.artifacts) {
     if (!remaining.missing.includes(artifact.digest)) continue;
-    const uploaded = await nativeAccountRequest(
+    const uploaded = await controlRequest(
       owner,
       `${stage}/artifacts/${artifact.digest}`,
       { content: artifact.content },
@@ -116,24 +104,22 @@ async function artifactJourney(): Promise<void> {
     )
     .bind(Date.now(), organisation, owner.identity.userId)
     .run();
-  expect((await nativeAccountRequest(owner, path, body)).status).toBe(404);
-  expect((await nativeAccountRequest(owner, firstStage, null)).status).toBe(
-    404,
-  );
+  expect((await controlRequest(owner, path, body)).status).toBe(404);
+  expect((await controlRequest(owner, firstStage, null)).status).toBe(404);
   await fixtureDatabase()
     .prepare(
       "UPDATE service_role_grant SET status = 'active', revoked_at = NULL WHERE organisation_id = ? AND user_id = ?",
     )
     .bind(organisation, owner.identity.userId)
     .run();
-  const published = await nativeAccountRequest(owner, path, body);
+  const published = await controlRequest(owner, path, body);
   expect(published.status, await published.clone().text()).toBe(201);
   // Exact retry finds the immutable publication after its response is lost.
-  expect((await nativeAccountRequest(owner, path, body)).status).toBe(200);
-  const saved = await nativeAccountRequest(reviewer, `${path}/${id}`, null);
+  expect((await controlRequest(owner, path, body)).status).toBe(200);
+  const saved = await controlRequest(reviewer, `${path}/${id}`, null);
   expect(await saved.text()).toBe(snapshot.content);
   for (const artifact of failed.artifacts) {
-    const response = await nativeAccountRequest(
+    const response = await controlRequest(
       reviewer,
       `${path}/${id}/artifacts/${artifact.digest}`,
       null,
@@ -155,7 +141,7 @@ async function artifactJourney(): Promise<void> {
   });
   expect(
     (
-      await nativeAccountRequest(
+      await controlRequest(
         reviewer,
         `${path}/${id}/artifacts/${first.digest}`,
         null,
@@ -167,7 +153,7 @@ async function artifactJourney(): Promise<void> {
   });
   expect(
     (
-      await nativeAccountRequest(
+      await controlRequest(
         reviewer,
         `${path}/${id}/artifacts/${first.digest}`,
         null,
@@ -176,7 +162,7 @@ async function artifactJourney(): Promise<void> {
   ).toBe(200);
   expect(
     (
-      await nativeAccountRequest(
+      await controlRequest(
         foreign,
         `${path}/${id}/artifacts/${first.digest}`,
         null,
@@ -191,19 +177,17 @@ async function artifactJourney(): Promise<void> {
     .run();
   expect(
     (
-      await nativeAccountRequest(
+      await controlRequest(
         reviewer,
         `${path}/${id}/artifacts/${first.digest}`,
         null,
       )
     ).status,
   ).toBe(404);
-  expect(
-    (await nativeAccountRequest(reviewer, `${path}/${id}`, null)).status,
-  ).toBe(404);
-  const catalogue = await (
-    await nativeAccountRequest(owner, path, null)
-  ).json();
+  expect((await controlRequest(reviewer, `${path}/${id}`, null)).status).toBe(
+    404,
+  );
+  const catalogue = await (await controlRequest(owner, path, null)).json();
   if (!isRecord(catalogue) || !Array.isArray(catalogue.snapshots))
     throw new Error("Missing catalogue");
   expect(catalogue.snapshots.length).toBe(1);

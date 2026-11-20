@@ -21,10 +21,10 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
-import type { SharedAccountNativeClient } from "./shared-account-platform-fixture";
+import type { OrganisationClient } from "./organisation-fixture";
 
 export type PurgeOwner = Readonly<{
-  client: SharedAccountNativeClient;
+  client: OrganisationClient;
   organisationId: OrganisationId;
 }>;
 

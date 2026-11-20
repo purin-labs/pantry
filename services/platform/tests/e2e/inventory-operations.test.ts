@@ -31,7 +31,6 @@ import {
   commerceHeaders,
   connectCommerceFixture,
 } from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { placePickupOrder } from "./cafe-order-support";
 
 it(
@@ -75,12 +74,6 @@ async function inventoryJourney(context: TestContext): Promise<void> {
       )
       .bind(organisationId, viewer.identity.userId, Date.now()),
   ]);
-  // Commerce routes admit only an Organisation that the account authority knows.
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { privateMember: viewer },
-  });
   const journey = new InventoryJourney(
     organisationId,
     merchantId,

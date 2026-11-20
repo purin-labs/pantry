@@ -30,7 +30,6 @@ import {
 } from "./hibernatable-socket-support";
 import { control } from "./chat-journey-support";
 import { network } from "./network";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { openRouterText, requiredPlacement } from "./slack-journey-support";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
@@ -237,11 +236,6 @@ async function installCanvasScenario(): Promise<CanvasScenario> {
       )
       .bind(organisationId, owner.identity.userId, now),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: teammate, privateMember: leaver },
-  });
   await ensureCreatedOrganisationActor({ env, organisationId, now });
   const organisation = await requireActiveOrganisationActor({
     env,

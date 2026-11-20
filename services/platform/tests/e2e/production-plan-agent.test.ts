@@ -1,6 +1,6 @@
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { newConversationId } from "@purin-labs/control-api";
+import { newConversationId, newProjectId } from "@purin-labs/control-api";
 import { parseInventoryProductionPlanResult } from "@purin-labs/kitchen-control-api";
 import { isRecord } from "@purin-labs/std";
 
@@ -52,8 +52,8 @@ declare module "vitest" {
  * each role. While the chat waits, an administrator changes a third line in
  * the shared plan. The owner allows the prompt; the agent reads the plan, and
  * its edit is refused, because the chat is not shared with the plan. A private
- * chat cannot be shared with the plan, so the owner shares the chat in the
- * Base Project and then with the plan, and asks again. The chat's private first
+ * chat cannot be shared with the plan, so the owner shares the chat in a
+ * Project of their own and then with the plan, and asks again. The chat's private first
  * turn may not keep it from the plan: the agent changes two lines, and the
  * administrator's page shows the agent's named cursor on each line. The owner
  * then accepts the plan, and Commerce holds every planned quantity.
@@ -205,25 +205,49 @@ async function productionPlanAgentJourney({
 
   // 4. The owner shares the chat with the plan. A private chat names only
   //    its person, so the plan refuses it until the chat is in a Project.
-  //    The owner shares the chat in the workspace's Base Project, whose
-  //    readers may read the chat's private first turn.
+  //    The Base Project has a viewer who may not read the chat's private
+  //    first turn, so the owner makes a Project of their own for the chat.
   const sharePath = `/v1/control/organisations/${author.organisationId}/commerce/inventory/production-plan/${LOCATION}/share`;
   const privateShare = await postJson(author, sharePath, { conversationId });
   expect(privateShare).toMatchObject({
     status: 409,
     body: { error: "production_plan_chat_private" },
   });
+  const projectId = newProjectId();
+  const madeProject = await postJson(
+    author,
+    `/v1/control/organisations/${author.organisationId}/projects`,
+    {
+      kind: "create_project",
+      operationId: crypto.randomUUID(),
+      projectId,
+      content: {
+        name: "Production",
+        brief: "Today's production plan.",
+        references: [],
+      },
+    },
+  );
+  expect(madeProject.status, JSON.stringify(madeProject.body)).toBe(200);
+  const sharedProject = await postJson(
+    author,
+    `/v1/control/organisations/${author.organisationId}/projects/${projectId}/access`,
+    {
+      kind: "share_project",
+      operationId: crypto.randomUUID(),
+      expectedAccessRevision: 0,
+      members: [],
+    },
+  );
+  expect(sharedProject.status, JSON.stringify(sharedProject.body)).toBe(200);
   const base = await fixtureDatabase()
     .prepare(
-      `SELECT project.project_id AS projectId, project.access_revision AS accessRevision
-       FROM organisation_default_project AS d
-       JOIN project ON project.organisation_id = d.organisation_id
-        AND project.project_id = d.project_id
-      WHERE d.organisation_id = ?`,
+      `SELECT project_id AS projectId, access_revision AS accessRevision
+       FROM project WHERE organisation_id = ? AND project_id = ?`,
     )
-    .bind(author.organisationId)
+    .bind(author.organisationId, projectId)
     .first<{ projectId: string; accessRevision: number }>();
-  if (base === null) throw new Error("Base Project missing");
+  if (base === null) throw new Error("The new Project is missing");
   const stored = await storedConversation(author, conversationId);
   const chatShared = await postJson(
     author,

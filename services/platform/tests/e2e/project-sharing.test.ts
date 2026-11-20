@@ -29,10 +29,7 @@ import { newProjectId, type UserId } from "@purin-labs/control-api";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
-import {
-  attachSharedAccountNativeOrganisation,
-  type SharedAccountNativeClient,
-} from "./shared-account-platform-fixture";
+import { type OrganisationClient } from "./organisation-fixture";
 import { newOrganisationId, type OrganisationId } from "../../src/ids";
 
 it(
@@ -52,7 +49,7 @@ async function projectMembershipJourney(context: TestContext): Promise<void> {
   const viewer = await createMember(organisationId, "Viewer");
   const outsider = await createMember(organisationId, "Unrelated member");
   const foreign = await createMember(otherOrganisationId, "Foreign member");
-  await attachMembers(organisationId, [owner, editor, viewer, outsider]);
+  await assignOwner(organisationId, owner);
   const projectId = newProjectId();
   await fixtureDatabase()
     .prepare(
@@ -191,7 +188,7 @@ async function projectMembershipJourney(context: TestContext): Promise<void> {
 type Member = Readonly<{
   userId: UserId;
   session: IssuedControlSession;
-  client: SharedAccountNativeClient;
+  client: OrganisationClient;
 }>;
 
 async function createMember(
@@ -219,34 +216,17 @@ async function createMember(
   return { userId, session: client.session, client };
 }
 
-// The one account attach of the Organisation; it admits every listed member.
-async function attachMembers(
+/** The first person of a journey owns its Organisation. */
+async function assignOwner(
   organisationId: OrganisationId,
-  members: readonly [Member, Member, ...Member[]],
+  owner: Member,
 ): Promise<void> {
-  const [owner, operator, privateMember, ...extra] = members;
-  // The account provision maps its owner to the Organisation's Pantry owner.
   await fixtureDatabase()
     .prepare(
       "UPDATE service_role_grant SET role = 'owner' WHERE organisation_id = ? AND user_id = ?",
     )
     .bind(organisationId, owner.userId)
     .run();
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner: owner.client,
-    members: {
-      operator: operator.client,
-      ...(privateMember === undefined
-        ? {}
-        : { privateMember: privateMember.client }),
-    },
-    extraMembers: extra.map(memberClient),
-  });
-}
-
-function memberClient(member: Member): SharedAccountNativeClient {
-  return member.client;
 }
 
 async function requestAccess(
@@ -288,7 +268,7 @@ async function projectDeletionJourney(context: TestContext): Promise<void> {
   const owner = await createMember(organisationId, "Project owner");
   const editor = await createMember(organisationId, "Private editor");
   const viewer = await createMember(organisationId, "Private viewer");
-  await attachMembers(organisationId, [owner, editor, viewer]);
+  await assignOwner(organisationId, owner);
   const projectId = newProjectId();
   const base = `/v1/control/organisations/${organisationId}/chat`;
   const projects = `/v1/control/organisations/${organisationId}/projects`;
@@ -500,7 +480,7 @@ async function projectTransitionJourney(context: TestContext): Promise<void> {
     organisationId,
     "Destination colleague",
   );
-  await attachMembers(organisationId, [owner, sourcePeer, destinationPeer]);
+  await assignOwner(organisationId, owner);
   const sourceId = newProjectId();
   const destinationId = newProjectId();
   const base = `/v1/control/organisations/${organisationId}/chat`;
@@ -701,7 +681,7 @@ async function sharedConversationJourney(context: TestContext): Promise<void> {
   const editor = await createMember(organisationId, "Conversation editor");
   const viewer = await createMember(organisationId, "Conversation viewer");
   const outsider = await createMember(organisationId, "Unrelated colleague");
-  await attachMembers(organisationId, [owner, editor, viewer, outsider]);
+  await assignOwner(organisationId, owner);
   const projectId = newProjectId();
   await fixtureDatabase()
     .prepare(

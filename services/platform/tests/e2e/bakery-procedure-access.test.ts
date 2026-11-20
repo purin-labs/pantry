@@ -13,10 +13,7 @@ import {
   commerceHeaders,
   connectCommerceFixture,
 } from "./commerce-support";
-import {
-  attachSharedAccountNativeOrganisation,
-  activateSharedAccountNativeTenant,
-} from "./shared-account-platform-fixture";
+import { activateOrganisation } from "./organisation-fixture";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { opaqueSubjectReference } from "../../src/access-control/references";
 import { listAccessGrants } from "../../src/data/access-grants";
@@ -44,12 +41,7 @@ async function procedureAccessJourney({ task }: TestContext): Promise<void> {
     owner,
     "Procedure source access",
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
-  await activateSharedAccountNativeTenant(organisationId);
+  await activateOrganisation(organisationId);
   const merchantId = "merchant_bakery_c3_cursor_source";
   await connectCommerceFixture(
     organisationId,

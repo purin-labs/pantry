@@ -732,7 +732,7 @@ executor storage.
    before the stream ends, and the provider receipt settles the exact Case
    outbox entry.
 
-The shared Console owns organisation creation and account membership.
-The portal uses the native control plane for provider OAuth,
-setup, readiness, activation, rotation, disable, reconnect, archive, and
-restore operations.
+Pantry owns organisation creation, members, invitations and request
+eligibility ([Plan 95](docs/plan-95-pantry-own-accounts.md)). The portal uses
+the native control plane for these and for provider OAuth, setup, readiness,
+activation, rotation, disable, reconnect, archive, and restore operations.

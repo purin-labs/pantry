@@ -80,10 +80,7 @@ const FIFTH_ANSWER = "Order 1043 ships on Monday with the tins.";
 
 async function slackHeldOutput({ task }: TestContext): Promise<void> {
   const joining = [await joiner(), await joiner()] as const;
-  await installSlackActorFixture({
-    privateMember: joining[0].slot,
-    extraMembers: [joining[1].slot],
-  });
+  await installSlackActorFixture();
   const member = await admin(joining[0], "Direct message owner");
   const other = await admin(joining[1], "Other admin");
   await givePortalHandles(ORGANISATION_ID);

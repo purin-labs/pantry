@@ -439,7 +439,6 @@ export async function handleControlRequest(
         resolveSupportRole: resolveControlSupportRole,
       });
     case "organisations":
-    case "accountOnboarding":
     case "organisation":
     case "members":
     case "member":

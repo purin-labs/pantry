@@ -31,7 +31,7 @@ import { requireVaultHandle } from "../test-ids";
 import { commerceClient } from "./commerce-support";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
-import { addNativeServiceMember } from "./shared-account-platform-fixture";
+import { addOrganisationMember } from "./organisation-fixture";
 import { controlFetch } from "./chat-journey-support";
 
 const SATYR_KEY = "typesafe-satyr-e2e-key-0000000000";
@@ -258,7 +258,7 @@ async function paidUseClosedJourney(): Promise<void> {
   const calls = installFakes(Promise.resolve(), 10_000);
   const { organisationId, owner, accountId } = await shop("p88-paid-use");
   const admin = await commerceClient("p88-paid-use-admin");
-  await addNativeServiceMember(organisationId, admin, "admin");
+  await addOrganisationMember(organisationId, admin, "admin");
   await change(organisationId, owner.session, {
     feature: "mail_classification",
     enabled: true,
@@ -343,7 +343,7 @@ async function noKeyJourney(): Promise<void> {
   const calls = installFakes();
   const { organisationId, owner, accountId } = await shop("p88-no-key");
   const operator = await commerceClient("p88-no-key-operator");
-  await addNativeServiceMember(organisationId, operator, "operator");
+  await addOrganisationMember(organisationId, operator, "operator");
 
   // J1: no key of its own; Pantry's key funds Jev, and every switch starts off.
   const initial = await features(organisationId, owner.session);

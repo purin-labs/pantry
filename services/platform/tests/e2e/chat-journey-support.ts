@@ -61,18 +61,16 @@ export const CONVERSATION_ID = "conv_719795b9-7490-4476-b8f5-40463dafd29a";
 /**
  * The Slack actor's Organisation, ready for Portal chat. With `chatgpt`, its
  * owner signs in to ChatGPT and the subscription becomes its inference route.
- * `account` names one more person whom the account authority admits.
  */
 export async function preparePortalChatJourney(
   options: Readonly<{
-    account?: Parameters<typeof installSlackActorFixture>[0];
     chatgpt?: FakeChatGpt;
   }> = {},
 ): Promise<{
   session: IssuedControlSession;
   fixture: Awaited<ReturnType<typeof installSlackActorFixture>>;
 }> {
-  const fixture = await installSlackActorFixture(options.account ?? {});
+  const fixture = await installSlackActorFixture();
   const identity = parseUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab");
   if (!identity.ok) throw new Error(identity.error.code);
   if (options.chatgpt !== undefined) {

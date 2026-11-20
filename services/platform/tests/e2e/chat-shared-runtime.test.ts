@@ -128,10 +128,7 @@ async function sharedRuntimeJourney(context: TestContext): Promise<void> {
     await person("Viewer"),
     await person("Excluded"),
   ] as const;
-  await installSlackActorFixture({
-    privateMember: people[0].slot,
-    extraMembers: [people[1].slot, people[2].slot, people[3].slot],
-  });
+  await installSlackActorFixture();
   const owner = await member(people[0]);
   const editor = await member(people[1]);
   const viewer = await member(people[2]);

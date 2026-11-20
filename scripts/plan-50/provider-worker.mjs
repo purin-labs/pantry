@@ -34,11 +34,7 @@ import {
 } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import { readSessionBudgetAccount } from "../../services/platform/src/actors/agent-session-budget.ts";
-import {
-  attachTrialOrganisation,
-  compileTrialTurnAuthority,
-  ownerUser,
-} from "./account-authority.mjs";
+import { compileTrialTurnAuthority } from "./account-authority.mjs";
 import { registerSession } from "./draft-seed.mjs";
 import { createSessionGoalExecution } from "../../services/platform/src/actors/session-goal-usage.ts";
 import { newRequestId } from "../../services/platform/src/ids.ts";
@@ -62,9 +58,6 @@ function required(result) {
 }
 
 export class ProposalOrganisation extends ProposalOrganisationOwner {
-  // The provider trial attaches the account after its own seeds below.
-  async attachTrialAccount() {}
-
   async install() {
     await super.install();
     if (await this.ctx.storage.get("provider_fixture_installed")) return;
@@ -93,14 +86,6 @@ export class ProposalOrganisation extends ProposalOrganisationOwner {
         "UPDATE organisation_onboarding SET lifecycle = 'active', capability_profile = 'approved_provider_writes', activation_receipt_id = 'receipt_native_provider_activation', activated_at = ? WHERE organisation_id = ?",
       ).bind(now, organisationId),
     ]);
-    await attachTrialOrganisation(this.env, {
-      organisationId,
-      ownerUserId: ownerUser,
-      members: {
-        operator: userId,
-        privateMember: "user_22222222-2222-5222-8222-222222222222",
-      },
-    });
     const client = new CommerceAdminClient({
       baseUrl: this.env.UNDERCLERK_BASE_URL,
       serviceToken: this.env.UNDERCLERK_SERVICE_TOKEN,

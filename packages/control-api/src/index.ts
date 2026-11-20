@@ -73,7 +73,7 @@ export { parseChatGoalView } from "./chat-goal.ts";
 
 export * from "./claude.ts";
 export * from "./slack-reasoning-effort.ts";
-export * from "./account-onboarding.ts";
+export * from "./organisations.ts";
 export * from "./vault.ts";
 export * from "./voice.ts";
 export * from "./voice-engines.ts";

@@ -18,7 +18,6 @@ import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-pla
 import { requireIntegrationAccountId, requireVaultHandle } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 
 const NOW = 1_784_016_325_277;
 const ORIGIN = "https://pantry.example";
@@ -619,21 +618,14 @@ async function createFixture(slug: string): Promise<Fixture> {
     ttlMs: 3_600_000,
   });
   const connector: FakeConnector = { calls: [], resumeOutcome: { ok: true } };
-  const account = await connectRealAccountPlatform(
-    platformEnv({
-      DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      PANTRY_PUBLIC_ORIGIN: ORIGIN,
-      CONNECTOR: fakeConnectorNamespace(connector),
-    }),
-    {
-      organisationId: organisation.organisationId,
-      owner: { user: owner, session: issued.session },
-      members: [],
-    },
-  );
+  const testEnv = platformEnv({
+    DB: db,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_PUBLIC_ORIGIN: ORIGIN,
+    CONNECTOR: fakeConnectorNamespace(connector),
+  });
   return {
-    env: account.env,
+    env: testEnv,
     db,
     organisationId: organisation.organisationId,
     integrationAccountId: connected.account.integrationAccountId,

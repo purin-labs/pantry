@@ -1,7 +1,6 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it, vi } from "vitest";
@@ -516,19 +515,11 @@ async function controlsPublication(): Promise<void> {
     kind: "contactEndpointVerification",
     organisationIdRaw: f.organisationId,
   });
-  const account = await connectRealAccountPlatform(
-    {
-      DB: f.db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
-    } as UnitTestEnv,
-    {
-      organisationId: f.organisationId,
-      owner: { user: f.owner, session: session.session },
-      members: [],
-    },
-  );
-  const env = account.env;
+  const env = {
+    DB: f.db,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    PANTRY_PUBLIC_ORIGIN: "https://pantry.example",
+  } as UnitTestEnv;
   const headers = {
     origin: "https://pantry.example",
     "content-type": "application/json",

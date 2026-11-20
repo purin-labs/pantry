@@ -20,7 +20,6 @@ import {
   connectCommerceFixture,
 } from "./commerce-support";
 import { PlanJourney } from "./production-plan-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -59,11 +58,6 @@ async function feedCatchUpJourney({ task }: TestContext): Promise<void> {
     owner.identity.userId,
     merchantId,
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
 
   // 1. Pantry's reader is stopped while the café is set up.

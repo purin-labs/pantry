@@ -75,10 +75,7 @@ type Step = (body: Record<string, unknown>) => Promise<Response> | Response;
 
 async function slackHeldEffect({ task }: TestContext): Promise<void> {
   const joining = [await joiner(), await joiner()] as const;
-  const fixture = await installSlackActorFixture({
-    privateMember: joining[0].slot,
-    extraMembers: [joining[1].slot],
-  });
+  const fixture = await installSlackActorFixture();
   const member = await admin(joining[0], "Direct message owner");
   const other = await admin(joining[1], "Other admin");
   await givePortalHandles(ORGANISATION_ID);

@@ -1,14 +1,15 @@
 import { lifecycleFenceOf } from "../../data/organisation-lifecycle-moves";
 import { signalChat } from "../../chat/signals";
 import { runtimeFetch } from "../../runtime-fetch";
-import {
-  resolveAccountMembershipContext,
-  AccountServiceGrantAcceptance,
-  applyAccountServiceGrantAcceptance,
-} from "../../account-platform/service-membership";
-import type { OrganizationInvitation as AccountInvitation } from "@seams-internal/console-shared/accountPlatform";
 import type { Env } from "../../env";
-import { handlePantryOnboarding } from "../../account-platform/onboarding";
+import { createOwnedOrganisation } from "../../organisation-access/creation";
+import { readOrganisationCreationRequest } from "@purin-labs/control-api";
+import {
+  acceptInvitation,
+  issueInvitation,
+  listPendingInvitations,
+  revokeInvitation,
+} from "../../organisation-access/invitations";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import { commerceSystemReadiness } from "../../commerce/contract/system-readiness";
@@ -82,15 +83,8 @@ import {
   isRecord,
 } from "@purin-labs/std";
 import { readOnboardingRow } from "../../data/organisation-onboarding-row";
-import {
-  prepareServiceInvitationRole,
-  readServiceInvitationRole,
-  serviceInvitationRoleExists,
-} from "../../data/service-invitation-role";
-import type { Variant } from "@purin-labs/type-utils";
 
 export type OnboardingControlRoute =
-  | Readonly<{ kind: "accountOnboarding" }>
   | Readonly<{ kind: "organisations" }>
   | Readonly<{ kind: "organisation"; organisationIdRaw: string }>
   | Readonly<{ kind: "members"; organisationIdRaw: string }>
@@ -122,8 +116,6 @@ export type OnboardingControlRoute =
 export function matchOnboardingControlRoute(
   pathname: string,
 ): OnboardingControlRoute | null {
-  if (pathname === "/v1/control/account-onboarding")
-    return { kind: "accountOnboarding" };
   if (pathname === "/v1/control/organisations")
     return { kind: "organisations" };
   if (pathname === "/v1/control/setup/catalog") return { kind: "setupCatalog" };
@@ -214,8 +206,6 @@ export function handleOnboardingControlRoute(
   route: OnboardingControlRoute,
 ): Promise<Response> {
   switch (route.kind) {
-    case "accountOnboarding":
-      return handlePantryOnboarding(request, env);
     case "organisations":
       return handleOrganisations(request, env);
     case "organisation":
@@ -270,6 +260,7 @@ async function handleOrganisations(
   request: Request,
   env: Env,
 ): Promise<Response> {
+  if (request.method === "POST") return handleCreateOrganisation(request, env);
   if (request.method !== "GET") return controlError("method_not_allowed", 405);
   const authenticated = await authenticateControlRead(request, env);
   if (!authenticated.ok) return authenticated.response;
@@ -282,6 +273,46 @@ async function handleOrganisations(
     memberships: memberships.memberships,
     membershipAvailability: memberships.availability,
   });
+}
+
+/**
+ * Plan 95 step 2: a signed-in person makes an organisation and becomes its
+ * owner. The operation id makes a retry return the same organisation.
+ */
+async function handleCreateOrganisation(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  const authenticated = await authenticateControlMutation(request, env);
+  if (!authenticated.ok) return authenticated.response;
+  const body = await readJsonRecord(request);
+  const input = body.ok ? readOrganisationCreationRequest(body.value) : null;
+  if (input === null) return controlError("organisation_create_invalid", 422);
+  const owner = await resolveMutationUser(
+    env,
+    authenticated.value.session.userId,
+  );
+  if (owner instanceof Response) return owner;
+  const created = await createOwnedOrganisation({
+    env,
+    owner,
+    request: input,
+    now: Date.now(),
+  });
+  if (created.ok) return controlJson({ ok: true, organisation: created.value });
+  switch (created.error.code) {
+    case "organisation_create_invalid":
+      return controlError(created.error.code, 422);
+    case "organisation_owner_unverified":
+      return controlError(created.error.code, 403);
+    case "organisation_limit_reached":
+    case "idempotency_key_conflict":
+      return controlError(created.error.code, 409);
+    case "authority_unavailable":
+      return controlError(created.error.code, 503);
+    default:
+      return assertNever(created.error.code);
+  }
 }
 
 async function handleOrganisation(
@@ -602,37 +633,6 @@ async function handleMember(
       );
 }
 
-type PendingPantryServiceInvitation = Readonly<{
-  organisationInvitationId: string;
-  invitedEmail: string;
-  role: "admin" | "operator" | "viewer";
-  createdAt: number;
-  expiresAt: number;
-  kind: "pending";
-}>;
-
-async function pendingServiceInvitation(
-  execution: OrganisationExecutionScope,
-  invitation: Variant<AccountInvitation, "pending">,
-): Promise<PendingPantryServiceInvitation | null> {
-  const row = await readServiceInvitationRole(
-    execution.database,
-    execution.organisationId,
-    invitation.id,
-  );
-  if (row === null) return null;
-  const role = parseAssignableControlRole(row.role);
-  if (!role.ok) throw new Error("Invalid retained service invitation role");
-  return {
-    organisationInvitationId: invitation.id,
-    invitedEmail: invitation.email,
-    role: role.value,
-    createdAt: Date.parse(invitation.createdAt),
-    expiresAt: Date.parse(invitation.expiresAt),
-    kind: "pending",
-  };
-}
-
 async function handleInvitations(
   request: Request,
   env: Env,
@@ -648,30 +648,14 @@ async function handleInvitations(
     request.method === "POST",
   );
   if (!authorized.ok) return authorized.response;
-  const context = await resolveAccountMembershipContext(
-    env,
-    authorized.organisationId,
-    authorized.authenticated.session,
-  );
-  if (!context.ok) return accountMembershipError(context.error.code);
-  if (request.method === "GET") {
-    const listed = await context.value.client.listMemberships(
-      context.value.actor,
-    );
-    if (!listed.ok) return accountMembershipError(listed.error.code);
-    const invitations: PendingPantryServiceInvitation[] = [];
-    for (const invitation of listed.value.invitations) {
-      if (invitation.kind !== "pending") continue;
-      const projected = await pendingServiceInvitation(
+  if (request.method === "GET")
+    return controlJson({
+      ok: true,
+      invitations: await listPendingInvitations(
         authorized.executionScope,
-        invitation,
-      );
-      if (projected !== null) invitations.push(projected);
-    }
-    if (!(await authorized.executionScope.isActive()))
-      return controlError("organisation_placement_conflict", 409);
-    return controlJson({ ok: true, invitations });
-  }
+        Date.now(),
+      ),
+    });
   const body = await readJsonRecord(request);
   if (!body.ok || !hasExactKeys(body.value, ["email", "role"]))
     return controlError("organisation_invitation_invalid", 422);
@@ -679,39 +663,15 @@ async function handleInvitations(
   const email = parseOrganisationInvitationEmail(body.value.email);
   if (!role.ok || !email.ok)
     return controlError("organisation_invitation_invalid", 422);
-  const issued = await context.value.client.inviteMembership({
-    binding: context.value.actor.binding,
-    user: context.value.actor.user,
-    authority: context.value.actor.authority,
-    invitation: {
-      email: email.value.value,
-      role: "MEMBER",
-      projectAccess: [
-        {
-          projectId: context.value.actor.binding.scope.projectId,
-          accessLevel: role.value === "viewer" ? "viewer" : "editor",
-        },
-      ],
-    },
+  const issued = await issueInvitation(authorized.executionScope, {
+    email: email.value.value,
+    role: role.value,
+    invitedBy: authorized.authenticated.session.userId,
+    now: Date.now(),
   });
-  if (!issued.ok) return accountMembershipError(issued.error.code);
-  await authorized.executionScope.database.batch([
-    authorized.executionScope.prepareMutationFence(),
-    prepareServiceInvitationRole(authorized.executionScope.database, {
-      organisationId: authorized.organisationId,
-      invitationId: issued.value.invitation.id,
-      role: role.value,
-      invitedBy: authorized.authenticated.session.userId,
-      createdAt: Date.parse(issued.value.invitation.createdAt),
-    }),
-  ]);
-  const invitation = await pendingServiceInvitation(
-    authorized.executionScope,
-    issued.value.invitation,
-  );
-  if (invitation === null || invitation.role !== role.value)
-    return controlError("operation_conflict", 409);
-  return controlJson({ ok: true, invitation, token: issued.value.token }, 201);
+  return issued.ok
+    ? controlJson({ ok: true, ...issued.value }, 201)
+    : invitationError(issued.error.code);
 }
 
 async function handleRevokeInvitation(
@@ -737,29 +697,21 @@ async function handleRevokeInvitation(
     invitationId.trim() !== invitationId
   )
     return controlError("organisation_invitation_revoke_invalid", 422);
-  const context = await resolveAccountMembershipContext(
-    env,
-    authorized.organisationId,
-    authorized.authenticated.session,
-  );
-  if (!context.ok) return accountMembershipError(context.error.code);
-  const retained = await serviceInvitationRoleExists(
-    authorized.executionScope.database,
-    authorized.organisationId,
+  const revoked = await revokeInvitation(
+    authorized.executionScope,
     invitationId,
+    Date.now(),
   );
-  if (!retained) return controlError("organisation_invitation_not_found", 404);
-  const revoked = await context.value.client.revokeInvitation({
-    binding: context.value.actor.binding,
-    user: context.value.actor.user,
-    authority: context.value.actor.authority,
-    invitationId,
-  });
   return revoked.ok
     ? controlJson({ ok: true, invitation: revoked.value })
-    : accountMembershipError(revoked.error.code);
+    : invitationError(revoked.error.code);
 }
 
+/**
+ * The invited person is not a member yet, so the request has a session and
+ * no organisation role. The invitation, its token and the person's verified
+ * email decide the answer.
+ */
 async function handleAcceptInvitation(
   request: Request,
   env: Env,
@@ -778,52 +730,53 @@ async function handleAcceptInvitation(
     typeof body.value.token !== "string" ||
     body.value.token.trim() !== body.value.token ||
     body.value.token.length === 0 ||
+    body.value.token.length > 256 ||
     invitationId.trim() !== invitationId ||
     invitationId.length === 0
   )
     return controlError("organisation_invitation_accept_invalid", 422);
-  const context = await resolveAccountMembershipContext(
-    env,
-    organisation.value,
-    authenticated.value.session,
-  );
-  if (!context.ok) return accountMembershipError(context.error.code);
-  const receipt = await AccountServiceGrantAcceptance.accept(
-    context.value,
-    invitationId,
-    body.value.token,
-  );
-  if (!receipt.ok) return accountMembershipError(receipt.error.code);
   const execution = await OrganisationExecutionScope.resolve(
     env,
     organisation.value,
   );
-  if (!execution.ok) return controlError(execution.error.code, 409);
-  const identity = await resolveMutationUser(
+  if (!execution.ok)
+    return controlError("organisation_invitation_not_found", 404);
+  const user = await resolveMutationUser(
     env,
     authenticated.value.session.userId,
   );
-  if (identity instanceof Response) return identity;
-  const applied = await applyAccountServiceGrantAcceptance({
-    execution: execution.value,
-    receipt: receipt.value,
-    displayName: identity.displayName,
+  if (user instanceof Response) return user;
+  const accepted = await acceptInvitation(execution.value, {
+    invitationId,
+    token: body.value.token,
+    user,
     now: Date.now(),
   });
-  return applied.ok
-    ? controlJson({ ok: true, member: applied.value })
-    : accountMembershipError(applied.error.code);
+  return accepted.ok
+    ? controlJson({ ok: true, member: accepted.value })
+    : invitationError(accepted.error.code);
 }
 
-function accountMembershipError(code: string): Response {
-  return controlError(
-    code,
-    code === "authority_unavailable"
-      ? 503
-      : code === "operation_conflict"
-        ? 409
-        : 403,
-  );
+function invitationError(
+  code:
+    | "organisation_invitation_not_found"
+    | "organisation_invitation_closed"
+    | "organisation_invitation_expired"
+    | "organisation_invitation_email_mismatch"
+    | "organisation_placement_conflict",
+): Response {
+  switch (code) {
+    case "organisation_invitation_not_found":
+      return controlError(code, 404);
+    case "organisation_invitation_email_mismatch":
+      return controlError(code, 403);
+    case "organisation_invitation_closed":
+    case "organisation_invitation_expired":
+    case "organisation_placement_conflict":
+      return controlError(code, 409);
+    default:
+      return assertNever(code);
+  }
 }
 
 async function handleSetupCatalog(

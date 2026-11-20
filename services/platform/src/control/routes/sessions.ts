@@ -15,13 +15,13 @@ import {
 import {
   issueControlSession,
   listEligibleControlMemberships,
-  listControlMemberships,
   renewControlSession,
   resolveUser,
   revokeControlSession,
   rotateControlSession,
   upsertUser,
   validateControlCsrf,
+  type ActiveControlSession,
 } from "../../data/control-plane";
 import type { Env } from "../../env";
 import { requirePublicOrigin } from "../../public-origin";
@@ -38,15 +38,6 @@ import {
 import { googleConfig } from "../google-oidc-config";
 import { controlError, controlHeaders, controlJson } from "../http";
 import { assertNever } from "@purin-labs/std";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
-import { resolvePantryAccountBinding } from "../../account-platform/binding";
-import {
-  linkPantryAccountUser,
-  registerPantryOnboardingIdentity,
-} from "../../account-platform/identity";
-import type { ActiveControlSession } from "../../data/control-plane";
-import type { Result } from "../../result";
-import type { AccountPlatformError } from "../../account-platform/types";
 
 const OIDC_STATE_COOKIE = "satyr_control_oidc_state";
 // A session lasts seven days from its last use and thirty from its sign-in.
@@ -268,27 +259,10 @@ async function handleGoogleCallback(
     now,
     ttlMs: CONTROL_SESSION_TTL_MS,
   });
-  const linked = await linkAuthenticatedAccountInstances({
-    env,
-    session: issued.session,
-    redirectPath: completed.value.redirectPath,
-    googleIdToken: completed.value.identityToken,
-  });
-  if (!linked.ok) {
-    await revokeControlSession({ db: env.DB, session: issued.session, now });
-    return oidcCallbackError(linked.error.code, 503);
-  }
   const redirect = new URL(
     completed.value.redirectPath,
     requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN),
   );
-  redirect.searchParams.delete("accountLink");
-  redirect.searchParams.delete("accountInvitationLink");
-  if (linked.value.kind === "incomplete") {
-    redirect.searchParams.set("accountLink", "incomplete");
-    if (linked.value.invitationError !== null)
-      redirect.searchParams.set("accountInvitationLink", "failed");
-  }
   const approvalGrant =
     completed.value.approvalChallenge === null
       ? undefined
@@ -326,89 +300,6 @@ function oidcCallbackError(code: string, status: number): Response {
     expiredCookie(OIDC_STATE_COOKIE, true, "/v1/control/auth/google/callback"),
   );
   return response;
-}
-
-type AccountInstanceLinks =
-  | Readonly<{ kind: "complete"; invitationError?: never }>
-  | Readonly<{
-      kind: "incomplete";
-      invitationError: AccountPlatformError | null;
-    }>;
-
-type AccountInstanceLinkInput = Readonly<{
-  env: Env;
-  session: ActiveControlSession;
-  googleIdToken: string;
-}>;
-
-async function linkAuthenticatedAccountInstance(
-  input: AccountInstanceLinkInput,
-  organisationId: OrganisationId,
-): Promise<Result<void, AccountPlatformError>> {
-  try {
-    const binding = await resolvePantryAccountBinding(input.env, organisationId);
-    if (!binding.ok) return binding;
-    const linked = await linkPantryAccountUser(input.env, {
-      binding: binding.value,
-      userId: input.session.userId,
-      nativeSessionId: input.session.controlSessionId,
-      googleIdToken: input.googleIdToken,
-    });
-    return linked.ok ? { ok: true, value: undefined } : linked;
-  } catch {
-    return { ok: false, error: { code: "authority_unavailable" } };
-  }
-}
-
-async function linkAuthenticatedAccountInstances(
-  input: Readonly<{
-    env: Env;
-    session: ActiveControlSession;
-    redirectPath: string;
-    googleIdToken: string;
-  }>,
-): Promise<Result<AccountInstanceLinks, AccountPlatformError>> {
-  const identity = await registerPantryOnboardingIdentity(
-    input.env,
-    input.session,
-    input.googleIdToken,
-  );
-  if (!identity.ok) return identity;
-  const grants = await listControlMemberships({
-    env: input.env,
-    userId: input.session.userId,
-  });
-  const organisations = new Set<OrganisationId>();
-  for (const grant of grants) organisations.add(grant.organisationId);
-  const invitationOrganisation = new URL(
-    input.redirectPath,
-    "https://satyr.invalid",
-  ).searchParams.get("accountInvitationOrganisation");
-  if (invitationOrganisation !== null) {
-    const parsed = parseOrganisationId(invitationOrganisation);
-    if (!parsed.ok) return { ok: false, error: { code: "scope_forbidden" } };
-    organisations.add(parsed.value);
-  }
-  const organisationIds = Array.from(organisations);
-  const links = await Promise.all(
-    organisationIds.map(linkAuthenticatedAccountInstance.bind(null, input)),
-  );
-  let incomplete = false;
-  let invitationError: AccountPlatformError | null = null;
-  for (let index = 0; index < links.length; index += 1) {
-    const result = links[index];
-    if (result !== undefined && !result.ok) {
-      incomplete = true;
-      if (organisationIds[index] === invitationOrganisation)
-        invitationError = result.error;
-    }
-  }
-  return {
-    ok: true,
-    value: incomplete
-      ? { kind: "incomplete", invitationError }
-      : { kind: "complete" },
-  };
 }
 
 async function handleSession(

@@ -3,6 +3,8 @@ import {
   defaultPreferenceDocument,
 } from "@purin-labs/control-api";
 
+const SETUP_NAME = "Cafe browser lab";
+
 /** Uses the existing browser fixture for session, membership, and workspace data. */
 export async function runAccountSetupJourney(page, options) {
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -15,7 +17,7 @@ export async function runAccountSetupJourney(page, options) {
     .waitFor();
   const session = await page.evaluate(readFixtureSession);
   assertEqual(typeof session.identity.userId, "string");
-  assertCheck(session.memberships.length > 0);
+  assertCheck(session.memberships.length > 1);
   await page.evaluate(clearRememberedOrganisations);
 
   const fixture = new AccountSetupFixture(page, session);
@@ -31,43 +33,39 @@ export async function runAccountSetupJourney(page, options) {
     .click();
   const dialog = page.getByRole("dialog", { name: "Set up Seams Pantry" });
   await dialog
-    .getByRole("heading", { name: "Choose an organisation", exact: true })
+    .getByRole("heading", { name: "Name your organisation", exact: true })
     .waitFor();
-  assertEqual(
-    await dialog.getByRole("radio", { name: /Browser account/u }).isChecked(),
-    true,
-    "The first account organisation starts selected",
-  );
-  await dialog.getByRole("button", { name: "Continue", exact: true }).click();
+  await dialog.getByText("Step 1 of 4", { exact: true }).waitFor();
   await dialog
-    .getByRole("heading", { name: "Choose a project", exact: true })
+    .getByRole("button", { name: "Create organisation", exact: true })
+    .click();
+  await dialog
+    .getByText("Enter a name for the organisation.", { exact: true })
     .waitFor();
-  await dialog.getByRole("button", { name: "Continue", exact: true }).click();
+  assertEqual(fixture.posts, 0, "An empty name sends no request");
+  await dialog.getByLabel("Organisation name").fill(SETUP_NAME);
+  await page.screenshot({ path: `${options.artifactDir}/setup-name.png` });
+  const beforeCreate = fixture.snapshot();
+
+  // Pantry makes the organisation, but its answer is lost on the way back.
+  fixture.loseNextAnswer = true;
   await dialog
-    .getByRole("heading", { name: "Confirm billing", exact: true })
-    .waitFor();
-  await dialog.getByText("Portal setup", { exact: true }).waitFor();
-  await page.screenshot({ path: `${options.artifactDir}/setup-billing.png` });
-  await dialog
-    .getByRole("button", { name: "Start setup", exact: true })
+    .getByRole("button", { name: "Create organisation", exact: true })
     .click();
   await dialog
     .getByRole("heading", { name: "The setup stopped", exact: true })
     .waitFor();
   await dialog.getByText("Error code: authority_unavailable").waitFor();
-  await dialog
-    .getByRole("button", { name: "Try again", exact: true })
-    .waitFor();
   await page.screenshot({ path: `${options.artifactDir}/setup-stopped.png` });
-  const saved = await page.evaluate(readSavedSetup, storageKey);
-  assertCheck(
-    saved,
-    "An uncertain accepted request remains available for recovery",
-  );
+  const saved = JSON.parse(await page.evaluate(readSavedSetup, storageKey));
+  assertEqual(saved.name, SETUP_NAME, "The tab keeps the setup with its name");
+  assertEqual(saved.operationId, fixture.request.operationId);
 
-  await page.reload();
-  // The optional Jev step: one choice turns on the three switches. Without a
-  // Gmail mailbox two of them stay off, the step says why, and setup goes on.
+  // Try again sends the same operation id, and Pantry answers the same
+  // organisation. The optional Jev step: one choice turns on the three
+  // switches. Without a Gmail mailbox two of them stay off, the step says
+  // why, and the setup goes on.
+  await dialog.getByRole("button", { name: "Try again", exact: true }).click();
   await dialog.getByRole("heading", { name: JEV_STEP, exact: true }).waitFor();
   await dialog.getByText("TypeSafe runs it", { exact: false }).waitFor();
   assertEqual(
@@ -92,53 +90,49 @@ export async function runAccountSetupJourney(page, options) {
   assertEqual(fixture.jevChanges.join(","), JEV_FEATURES.join(","));
   await page.screenshot({ path: `${options.artifactDir}/setup-jev.png` });
   await dialog.getByRole("button", { name: "Continue", exact: true }).click();
-  await dialog
-    .getByRole("heading", { name: "Seams Pantry is ready", exact: true })
-    .waitFor();
+  await waitForDone(dialog, SETUP_NAME);
   await page.waitForFunction(setupRequestCleared, storageKey);
   const organisation = page.locator(
     'a.organisation-row-link[href="/portal/cafe-browser-lab"]',
   );
   await organisation.waitFor();
-  assertEqual(fixture.acceptedSetups, 1);
+  const created = fixture.snapshot();
+  assertEqual(created.made, 1, "One setup makes one organisation");
+  assertEqual(created.posts - beforeCreate.posts, 2);
+  assertEqual(created.operationCount, 1, "Try again reuses the operation");
   assertEqual(
-    fixture.operationIds.size,
-    1,
-    "Recovery reuses the accepted operation",
-  );
-  assertEqual(
-    fixture.documents,
-    2,
+    created.documents,
+    beforeCreate.documents,
     "Setup completion does not reload the document",
   );
-  assertEqual(
-    fixture.sessionReads,
-    3,
+  assertCheck(
+    created.sessionReads > beforeCreate.sessionReads,
     "A new membership reads the session again",
   );
-  const created = fixture.snapshot();
-  await page.screenshot({
-    path: `${options.artifactDir}/setup-recovered.png`,
-  });
+  await page.screenshot({ path: `${options.artifactDir}/setup-done.png` });
 
-  await page.evaluate(storeSavedSetup, {
-    key: storageKey,
-    request: fixture.request,
-  });
-  const beforeReplay = fixture.snapshot();
+  // A repeat with the same stored operation id: a reload continues it, and
+  // Pantry answers the same organisation.
+  await page.evaluate(storeSavedSetup, { key: storageKey, request: saved });
   await page.reload();
-  await skipJevStep(dialog);
+  await skipJevStep(dialog, SETUP_NAME);
   await page.waitForFunction(setupRequestCleared, storageKey);
   await organisation.waitFor();
-  assertEqual(fixture.documents - beforeReplay.documents, 1);
-  assertEqual(fixture.sessionReads - beforeReplay.sessionReads, 1);
-  assertEqual(fixture.organisationReads - beforeReplay.organisationReads, 1);
-  assertEqual(fixture.acceptedSetups, 1);
+  const open = dialog.getByRole("link", {
+    name: "Open organisation",
+    exact: true,
+  });
+  assertEqual(await open.getAttribute("href"), "/portal/cafe-browser-lab");
   const replayed = fixture.snapshot();
+  assertEqual(replayed.made, 1, "A repeat makes no second organisation");
+  assertEqual(replayed.posts - created.posts, 1);
+  assertEqual(replayed.operationCount, 1);
+  assertEqual(replayed.documents - created.documents, 1);
+  assertEqual(replayed.sessionReads - created.sessionReads, 1);
+  assertEqual(replayed.organisationReads - created.organisationReads, 1);
+  await page.screenshot({ path: `${options.artifactDir}/setup-repeat.png` });
 
-  await dialog
-    .getByRole("link", { name: "Open organisation", exact: true })
-    .click();
+  await open.click();
   await page.waitForURL("**/portal/cafe-browser-lab/main");
   await page.getByRole("navigation", { name: "Workspace pages" }).waitFor();
   await page.screenshot({
@@ -150,43 +144,69 @@ export async function runAccountSetupJourney(page, options) {
     storageKey,
     options,
   );
+  const refusals = await verifyCreateRefusals(
+    page,
+    fixture,
+    storageKey,
+    options,
+  );
   const appearance = await verifySavedAppearance(page, fixture, options);
   const startup = await verifyOrganisationStartup(page, fixture, options);
+  const invitation = await verifyInvitationPage(page, options);
   return {
     result: "passed",
+    organisation: {
+      name: SETUP_NAME,
+      operationId: saved.operationId,
+      handle: "cafe-browser-lab",
+    },
     created,
     replayed,
     unlisted,
+    refusals,
     appearance,
     startup,
+    invitation,
     checks: [
-      "Setup walks organisation, project and billing steps in one dialog",
-      "A stopped setup shows its reason and the server error code",
-      "Uncertain acceptance preserves the saved request",
-      "Manual reload resumes the same operation",
-      "Pending setup polls until ready",
+      "Setup names the organisation in one step, then prepares it",
+      "An empty name sends no request",
+      "A lost answer shows the reason and the server error code",
+      "The tab keeps the operation id and the name of the setup",
+      "Try again sends the same operation id and makes no second organisation",
       "New membership appears without a document reload",
+      "A reload with the stored operation id answers the same organisation",
       "Restored completed setup skips duplicate session and organisation reads",
       "Workspace navigation remains available",
-      "A ready setup that the session does not list shows a failure, not an empty page",
-      "Create a new project leaves the old setup and starts a new operation",
+      "An organisation that the session does not list shows a failure, not an empty page",
       "Check again finds the late membership and opens the new organisation",
+      "The organisation limit and an unverified email show their messages and end the setup",
       "Saved dark appearance applies before the Portal paints",
       "System appearance follows the browser color scheme on reload",
       "Session and remembered organisation reads overlap on return visits",
       "One loading layout preserves the organisation heading and navigation",
       "A revoked organisation never appears from an early read",
+      "The invitation page shows Accept, then the message of each refusal",
+      "An accepted invitation clears the link and confirms the role",
     ],
   };
 }
 
+async function waitForDone(dialog, name) {
+  await dialog
+    .getByRole("heading", { name: "Seams Pantry is ready", exact: true })
+    .waitFor();
+  await dialog
+    .getByText(`${name} is in your organisation list.`, { exact: false })
+    .waitFor();
+}
+
 /**
- * The production failure of 2026-10-19: setup reports ready, but the new
- * session does not list the organisation. The dialog must say so and keep
- * the setup until a later session read lists it.
+ * The production failure of 2026-10-19: Pantry made the organisation, but the
+ * new session does not list it. The dialog must say so and keep the setup
+ * until a later session read lists it.
  */
 async function verifyUnlistedOrganisation(page, fixture, storageKey, options) {
-  fixture.setupTarget = fixture.lateMembership;
+  fixture.nextTarget = fixture.lateMembership;
   await page.goto(`${options.portalUrl}/portal?p21_auth=1`);
   await page.evaluate(setFixtureCsrf);
   await page
@@ -196,59 +216,31 @@ async function verifyUnlistedOrganisation(page, fixture, storageKey, options) {
     .getByRole("button", { name: "Set up Seams Pantry", exact: true })
     .click();
   const dialog = page.getByRole("dialog", { name: "Set up Seams Pantry" });
-  await dialog.getByRole("button", { name: "Continue", exact: true }).click();
-  await dialog.getByRole("button", { name: "Continue", exact: true }).click();
+  await dialog.getByLabel("Organisation name").fill("Riverside cafe");
   await dialog
-    .getByRole("button", { name: "Start setup", exact: true })
+    .getByRole("button", { name: "Create organisation", exact: true })
     .click();
-  const unavailable = dialog.getByRole("heading", {
-    name: "Your organisation is not available",
-    exact: true,
-  });
-  await unavailable.waitFor();
+  await dialog
+    .getByRole("heading", {
+      name: "Your organisation is not in your list",
+      exact: true,
+    })
+    .waitFor();
   await dialog
     .getByText(`Organisation ID: ${fixture.lateMembership.organisationId}`)
     .waitFor();
   await page.screenshot({ path: `${options.artifactDir}/setup-unlisted.png` });
-  assertEqual(fixture.request.selection.kind, "existing_project");
-  const firstOperation = fixture.request.operationId;
   const kept = (await page.evaluate(readSavedSetup, storageKey)) !== null;
   assertCheck(
     kept,
     "An unlisted organisation keeps the setup for a later check",
   );
 
-  // A project bound to a deleted organisation needs a new project.
-  await dialog
-    .getByRole("button", { name: "Create a new project", exact: true })
-    .click();
-  await dialog
-    .getByRole("heading", { name: "Choose a project", exact: true })
-    .waitFor();
-  assertEqual(
-    await dialog.getByRole("radio", { name: /Create a project/u }).isChecked(),
-    true,
-  );
-  await page.waitForFunction(setupRequestCleared, storageKey);
-  await dialog.getByLabel("Project name").fill("Second shop");
-  await dialog.getByRole("button", { name: "Continue", exact: true }).click();
-  await dialog.getByText("Second shop", { exact: true }).waitFor();
-  await dialog
-    .getByRole("button", { name: "Start setup", exact: true })
-    .click();
-  await unavailable.waitFor();
-  const selection = fixture.request.selection.kind;
-  assertEqual(selection, "new_project");
-  assertCheck(
-    fixture.request.operationId !== firstOperation,
-    "A new project starts a new setup operation",
-  );
-
   fixture.lateListed = true;
   await dialog
     .getByRole("button", { name: "Check again", exact: true })
     .click();
-  await skipJevStep(dialog);
+  await skipJevStep(dialog, "Riverside cafe");
   await page.waitForFunction(setupRequestCleared, storageKey);
   const open = dialog.getByRole("link", {
     name: "Open organisation",
@@ -265,14 +257,224 @@ async function verifyUnlistedOrganisation(page, fixture, storageKey, options) {
   await page.waitForURL(
     `**/portal/${fixture.lateMembership.organisationHandle}/main`,
   );
-  fixture.setupTarget = fixture.membership;
+  fixture.nextTarget = fixture.membership;
   fixture.lateListed = false;
   return {
-    selection,
     kept,
-    newOperation: true,
+    made: fixture.made,
     opened: fixture.lateMembership.organisationHandle,
   };
+}
+
+const CREATE_REFUSALS = [
+  {
+    error: "organisation_limit_reached",
+    status: 409,
+    title: "You cannot own more organisations",
+    message:
+      "You own 5 organisations. A person can own at most 5. Delete one of your organisations, then try again.",
+    action: { role: "button", name: "Close" },
+  },
+  {
+    error: "organisation_owner_unverified",
+    status: 403,
+    title: "Pantry needs a verified email",
+    message:
+      "Your Google account has no verified email. Sign in with a Google account that has a verified email.",
+    action: { role: "link", name: "Sign in with another account" },
+  },
+];
+
+/** A refusal that no retry can change shows its message and ends the setup. */
+async function verifyCreateRefusals(page, fixture, storageKey, options) {
+  await page.goto(`${options.portalUrl}/portal?p21_auth=1`);
+  await page.evaluate(setFixtureCsrf);
+  await page
+    .locator('a.organisation-row-link[href="/portal/cafe-browser-lab"]')
+    .waitFor();
+  const dialog = page.getByRole("dialog", { name: "Set up Seams Pantry" });
+  const footer = dialog.locator(".agent-modal-footer");
+  const made = fixture.made;
+  const outcomes = [];
+  for (const refusal of CREATE_REFUSALS) {
+    fixture.refusal = refusal;
+    await page
+      .getByRole("button", { name: "Set up Seams Pantry", exact: true })
+      .click();
+    await dialog.getByLabel("Organisation name").fill("Sixth shop");
+    await dialog
+      .getByRole("button", { name: "Create organisation", exact: true })
+      .click();
+    await dialog
+      .getByRole("heading", { name: refusal.title, exact: true })
+      .waitFor();
+    await dialog.getByText(refusal.message, { exact: true }).waitFor();
+    await dialog.getByText(`Error code: ${refusal.error}`).waitFor();
+    await footer
+      .getByRole(refusal.action.role, {
+        name: refusal.action.name,
+        exact: true,
+      })
+      .waitFor();
+    await page.screenshot({
+      path: `${options.artifactDir}/setup-${refusal.error}.png`,
+    });
+    assertEqual(
+      await page.evaluate(readSavedSetup, storageKey),
+      null,
+      "A refusal that no retry changes ends the setup",
+    );
+    outcomes.push({
+      error: refusal.error,
+      title: refusal.title,
+      message: refusal.message,
+      action: refusal.action.name,
+    });
+    await footer.getByRole("button", { name: "Close", exact: true }).click();
+    await dialog.waitFor({ state: "hidden" });
+  }
+  fixture.refusal = null;
+  assertEqual(fixture.made, made, "A refused setup makes no organisation");
+  return outcomes;
+}
+
+const INVITATION_LINK =
+  "/portal?p21_auth=1&accountInvitationOrganisation=organisation_browser&accountInvitationId=invitation_browser#accountInvitationToken=isolated-browser-invitation";
+
+const INVITATION_REFUSALS = [
+  {
+    error: "authority_unavailable",
+    status: 503,
+    message: "Pantry could not complete this request. Try again.",
+    retry: true,
+    signIn: null,
+  },
+  {
+    error: "organisation_invitation_not_found",
+    status: 404,
+    message:
+      "Pantry cannot find this invitation. Ask the sender for a new link.",
+    retry: false,
+    signIn: null,
+  },
+  {
+    error: "organisation_invitation_email_mismatch",
+    status: 403,
+    message:
+      "This invitation is for a different email. Sign in with the Google account that received the invitation.",
+    retry: false,
+    signIn: "Sign in with another account",
+  },
+  {
+    error: "organisation_invitation_closed",
+    status: 409,
+    message:
+      "This invitation is closed. The sender revoked or replaced it, or another person accepted it. Ask the sender for a new link.",
+    retry: false,
+    signIn: null,
+  },
+  {
+    error: "organisation_invitation_expired",
+    status: 409,
+    message: "This invitation expired. Ask the sender for a new link.",
+    retry: false,
+    signIn: null,
+  },
+];
+
+/**
+ * The invitation link opens the invitation page. Accept sends the token of
+ * the link. Each refusal shows its message; only a refusal that a second
+ * press can change keeps the Accept button.
+ */
+async function verifyInvitationPage(page, options) {
+  const invitation = { answer: null, accepts: [] };
+  await page.route(
+    "**/v1/control/organisations/*/invitations/*/accept",
+    answerInvitation.bind(null, invitation),
+  );
+  const heading = page.getByRole("heading", {
+    name: "Seams Pantry invitation",
+    exact: true,
+  });
+  const accept = page.getByRole("button", {
+    name: "Accept invitation",
+    exact: true,
+  });
+  const refusals = [];
+  for (const refusal of INVITATION_REFUSALS) {
+    invitation.answer = refusal;
+    await openInvitationLink(page, options);
+    await heading.waitFor();
+    await accept.click();
+    await page
+      .getByRole("alert")
+      .filter({ hasText: refusal.message })
+      .waitFor();
+    assertEqual(
+      await accept.count(),
+      refusal.retry ? 1 : 0,
+      `Accept stays only for a refusal that a retry can change: ${refusal.error}`,
+    );
+    let signIn = null;
+    if (refusal.signIn !== null) {
+      signIn = await page
+        .getByRole("link", { name: refusal.signIn, exact: true })
+        .getAttribute("href");
+      assertCheck(
+        signIn.startsWith("/v1/control/auth/google/start?") &&
+          new URL(signIn, options.portalUrl).searchParams
+            .get("returnTo")
+            .includes("accountInvitationId=invitation_browser"),
+        "The sign-in link comes back to the invitation",
+      );
+    }
+    await page.screenshot({
+      path: `${options.artifactDir}/invitation-${refusal.error}.png`,
+    });
+    refusals.push({ error: refusal.error, message: refusal.message, signIn });
+  }
+  invitation.answer = {
+    status: 200,
+    body: {
+      ok: true,
+      member: { userId: "user_invited", role: "operator" },
+    },
+  };
+  await openInvitationLink(page, options);
+  await heading.waitFor();
+  await accept.click();
+  await page
+    .getByText("Invitation accepted. Your Pantry role is ready.", {
+      exact: true,
+    })
+    .waitFor();
+  assertEqual(new URL(page.url()).pathname, "/portal");
+  assertEqual(new URL(page.url()).hash, "", "The link leaves the address bar");
+  await page.screenshot({
+    path: `${options.artifactDir}/invitation-accepted.png`,
+  });
+  assertEqual(invitation.accepts.length, INVITATION_REFUSALS.length + 1);
+  for (const body of invitation.accepts)
+    assertEqual(body.token, "isolated-browser-invitation");
+  return { refusals, accepted: true, accepts: invitation.accepts.length };
+}
+
+/** A new document each time: the same link with its fragment would not load. */
+async function openInvitationLink(page, options) {
+  await page.goto("about:blank");
+  await page.goto(`${options.portalUrl}${INVITATION_LINK}`);
+}
+
+function answerInvitation(invitation, route) {
+  if (route.request().method() !== "POST") return route.fallback();
+  invitation.accepts.push(route.request().postDataJSON());
+  const answer = invitation.answer;
+  return json(
+    route,
+    answer.body ?? { ok: false, error: answer.error },
+    answer.status,
+  );
 }
 
 const JEV_STEP =
@@ -289,15 +491,20 @@ const JEV_VIEW = {
   mailClassification: { enabled: false, mailboxes: [] },
   relatedCases: { enabled: false, mode: null, sourceCount: 0 },
   screenRelevance: { enabled: true },
+  allowance: null,
+  paidUse: {
+    enabled: false,
+    spendingLimitMinor: 0,
+    spentMinor: 0,
+    priced: false,
+  },
 };
 
 /** Skip leaves every Jev switch off and sends no change. */
-async function skipJevStep(dialog) {
+async function skipJevStep(dialog, name) {
   await dialog.getByRole("heading", { name: JEV_STEP, exact: true }).waitFor();
   await dialog.getByRole("button", { name: "Skip", exact: true }).click();
-  await dialog
-    .getByRole("heading", { name: "Seams Pantry is ready", exact: true })
-    .waitFor();
+  await waitForDone(dialog, name);
 }
 
 function clearRememberedOrganisations() {
@@ -401,31 +608,12 @@ async function verifyOrganisationStartup(page, fixture, options) {
       .count(),
     0,
   );
-  await page.goto(
-    `${options.portalUrl}/portal?accountInvitationOrganisation=organisation_browser&accountInvitationId=invitation_browser&accountInvitationLink=failed#accountInvitationToken=isolated-browser-invitation`,
-  );
-  await page
-    .getByRole("heading", { name: "Seams Pantry invitation", exact: true })
-    .waitFor();
-  await page
-    .getByRole("link", { name: "Sign in to retry", exact: true })
-    .waitFor();
-  assertEqual(
-    await page
-      .getByRole("button", { name: "Accept invitation", exact: true })
-      .count(),
-    0,
-  );
-  await page.screenshot({
-    path: `${options.artifactDir}/invitation-link-failed.png`,
-  });
   return {
     allowed,
     revoked,
     partialOutage: "verified list stays usable",
     totalOutage: "explicit unavailable view",
     recovery: "fresh session read",
-    invitationFailure: "scoped sign-in retry",
   };
 }
 
@@ -517,23 +705,34 @@ function hasSeenStartupOrganisation() {
   return window.portalStartupOrganisationSeen;
 }
 
+/**
+ * Pantry's create route as the browser sees it: it records each request and
+ * answers it. A repeat of an operation id answers the organisation that the
+ * first request made, and the session lists an organisation once it exists.
+ */
 class AccountSetupFixture {
-  phase = "empty";
+  posts = 0;
+  made = 0;
   request = null;
-  acceptedSetups = 0;
   documents = 0;
   sessionReads = 0;
   organisationReads = 0;
   operationIds = new Set();
   jevChanges = [];
+  /** The next answer is lost after Pantry made the organisation. */
+  loseNextAnswer = false;
+  /** A refusal for each request, or null. */
+  refusal = null;
 
   constructor(page, session) {
     this.page = page;
     this.session = session;
     this.membership = session.memberships[0];
     this.lateMembership = session.memberships[1];
-    this.setupTarget = this.membership;
+    this.nextTarget = this.membership;
     this.lateListed = false;
+    /** operation id -> the name and the organisation that it made */
+    this.created = new Map();
     this.appearance = defaultPreferenceDocument(
       session.identity.userId,
       "appearance",
@@ -555,9 +754,16 @@ class AccountSetupFixture {
       documents: this.documents,
       sessionReads: this.sessionReads,
       organisationReads: this.organisationReads,
-      acceptedSetups: this.acceptedSetups,
+      posts: this.posts,
+      made: this.made,
       operationCount: this.operationIds.size,
     };
+  }
+
+  madeOrganisation(organisationId) {
+    for (const entry of this.created.values())
+      if (entry.target.organisationId === organisationId) return true;
+    return false;
   }
 
   async handle(route) {
@@ -568,7 +774,9 @@ class AccountSetupFixture {
     }
     if (path === "/v1/control/session") {
       this.sessionReads += 1;
-      const listed = this.phase === "ready" ? [this.membership] : [];
+      const listed = this.madeOrganisation(this.membership.organisationId)
+        ? [this.membership]
+        : [];
       if (this.lateListed) listed.push(this.lateMembership);
       return json(route, sessionWithMemberships(this.session, listed));
     }
@@ -589,61 +797,44 @@ class AccountSetupFixture {
         );
       return json(route, { ok: true, value: JEV_VIEW });
     }
-    if (path !== "/v1/control/account-onboarding") return route.fallback();
-    if (request.method() === "GET") {
-      return json(route, {
-        ok: true,
-        value: {
-          organizations: [
-            {
-              id: "org_browser_account",
-              name: "Browser account",
-              projects: [{ id: "proj_browser_setup", name: "Portal setup" }],
-            },
-          ],
-        },
-      });
-    }
-    assertEqual(request.method(), "POST");
-    const body = request.postDataJSON();
-    assertEqual(body.version, 1);
-    assertCheck(
-      ["existing_project", "new_project"].includes(body.selection.kind),
-      `Unexpected setup selection ${body.selection.kind}`,
-    );
-    this.operationIds.add(body.operationId);
-    this.request = body;
-    switch (this.phase) {
-      case "empty":
-        this.phase = "accepted";
-        this.acceptedSetups += 1;
-        return json(route, { ok: false, error: "authority_unavailable" }, 503);
-      case "accepted":
-        this.phase = "pending";
-        return json(route, {
-          ok: true,
-          value: {
-            kind: "pending",
-            operationId: body.operationId,
-            instanceId: "instance_satyr_browser",
-          },
-        });
-      case "pending":
-        this.phase = "ready";
-        return this.ready(route);
-      case "ready":
-        return this.ready(route);
-      default:
-        throw new Error("Unknown browser setup fixture phase");
-    }
+    if (path !== "/v1/control/organisations" || request.method() !== "POST")
+      return route.fallback();
+    return this.create(route, request.postDataJSON());
   }
 
-  ready(route) {
+  create(route, body) {
+    this.posts += 1;
+    assertEqual(
+      Object.keys(body).sort().join(","),
+      "name,operationId",
+      "The dialog sends only the operation id and the name",
+    );
+    assertCheck(/^[A-Za-z0-9_-]{8,128}$/u.test(body.operationId));
+    this.request = body;
+    this.operationIds.add(body.operationId);
+    if (this.refusal !== null)
+      return json(
+        route,
+        { ok: false, error: this.refusal.error },
+        this.refusal.status,
+      );
+    const earlier = this.created.get(body.operationId);
+    if (earlier !== undefined && earlier.name !== body.name)
+      return json(route, { ok: false, error: "idempotency_key_conflict" }, 409);
+    const target = earlier?.target ?? this.nextTarget;
+    if (earlier === undefined) {
+      this.created.set(body.operationId, { name: body.name, target });
+      this.made += 1;
+    }
+    if (this.loseNextAnswer) {
+      this.loseNextAnswer = false;
+      return json(route, { ok: false, error: "authority_unavailable" }, 503);
+    }
     return json(route, {
       ok: true,
-      value: {
-        kind: "ready",
-        nativeOrganizationId: this.setupTarget.organisationId,
+      organisation: {
+        organisationId: target.organisationId,
+        organisationHandle: target.organisationHandle,
       },
     });
   }

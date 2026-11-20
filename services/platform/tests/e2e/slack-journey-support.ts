@@ -30,10 +30,6 @@ import {
   type IssuedControlSession,
 } from "../../src/data/control-plane";
 import {
-  attachSharedAccountNativeOrganisation,
-  type SharedAccountSlotMember,
-} from "./shared-account-platform-fixture";
-import {
   parseSessionId,
   parseOrganisationId,
   parseWorkspaceId,
@@ -73,17 +69,7 @@ export const DISCOVERY_ANSWER =
 export const DISCOVERY_UNAVAILABLE =
   "Integration discovery is unavailable for this thread.";
 
-/**
- * The account authority accepts one attach for each Organisation. A journey
- * that needs a second admitted member names it here instead of attaching again.
- */
-export async function installSlackActorFixture(
-  account: Readonly<{
-    privateMember?: SharedAccountSlotMember;
-    /** More people with the access of the private member. */
-    extraMembers?: readonly SharedAccountSlotMember[];
-  }> = {},
-): Promise<{
+export async function installSlackActorFixture(): Promise<{
   readonly connectorId: string;
   readonly selectedIntegrationAccountId: string;
   readonly selectedConnectionId: string;
@@ -292,11 +278,10 @@ export async function installSlackActorFixture(
     now,
   });
   if (!published.ok) throw new Error(published.error.code);
-  const owner = await attachSlackActorToAccountAuthority({
+  const owner = await seedSlackActorOwner({
     organisationId: ORGANISATION_ID,
     owner: { subject: "e2e-slack-owner", name: "E2E Slack Owner" },
     actor: { subject: "e2e-slack-actor", name: "E2E Slack Actor" },
-    ...account,
     now,
   });
 
@@ -352,17 +337,19 @@ export async function discoverSlackChannel(
   ]);
 }
 
-export async function attachSlackActorToAccountAuthority(
+/**
+ * The owner of the Slack fixture Organisation, and the Slack actor's signed-in
+ * person, who has no role yet.
+ */
+export async function seedSlackActorOwner(
   input: Readonly<{
     organisationId: OrganisationId;
     owner: Readonly<{ subject: string; name: string }>;
     actor: Readonly<{ subject: string; name: string }>;
-    privateMember?: SharedAccountSlotMember;
-    extraMembers?: readonly SharedAccountSlotMember[];
     now: number;
   }>,
 ): Promise<Awaited<ReturnType<typeof googleClient>>> {
-  const { organisationId, privateMember, extraMembers, now } = input;
+  const { organisationId, now } = input;
   const personId = `person_${input.owner.subject}`;
   const owner = await googleClient(input.owner.subject, input.owner.name, now);
   await fixtureDatabase().batch([
@@ -380,22 +367,13 @@ export async function attachSlackActorToAccountAuthority(
       )
       .bind(organisationId, owner.identity.userId, personId, now - 1_000),
   ]);
-  const actor = await googleClient(input.actor.subject, input.actor.name, now);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members:
-      privateMember === undefined
-        ? { operator: actor }
-        : { operator: actor, privateMember },
-    ...(extraMembers === undefined ? {} : { extraMembers }),
-  });
+  await googleClient(input.actor.subject, input.actor.name, now);
   return owner;
 }
 
 /**
- * The owner that `installSlackActorFixture` gives the account authority, with
- * a fresh control session. A journey uses it for an owner's account changes.
+ * The owner of the `installSlackActorFixture` Organisation, with a fresh
+ * control session. A journey uses it for an owner's account changes.
  */
 export function slackActorFixtureOwner(now: number = Date.now()) {
   return googleClient("e2e-slack-owner", "E2E Slack Owner", now);

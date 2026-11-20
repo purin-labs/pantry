@@ -53,9 +53,7 @@ async function projectCasesJourney(context: TestContext): Promise<void> {
   // The Slack fixture makes the one account attach of the Organisation. It
   // admits the Slack actor and the peer; both become administrators below.
   const peerClient = await commerceClient("project-cases-peer");
-  await installSlackActorFixture({
-    privateMember: { client: peerClient, laterPersonId: PEER_PERSON_ID },
-  });
+  await installSlackActorFixture();
   const scope = await requireOrganisationExecutionScope(env, ORGANISATION_ID);
   const owner = await promoteSlackActor();
   const peer = await addPeerAdministrator(peerClient);

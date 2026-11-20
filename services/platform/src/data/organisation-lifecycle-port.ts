@@ -160,18 +160,6 @@ type OrganisationMembershipParts = Readonly<{
       now: number;
     }>,
   ): readonly D1PreparedStatement[];
-  /** The invitation of an accepted membership is accepted (organisation). */
-  invitationAcceptance(
-    db: OrganisationDatabase,
-    input: Readonly<{
-      organisationId: OrganisationId;
-      invitationId: string;
-      userId: UserId;
-      membershipId: string;
-      acceptanceReceiptId: string;
-      now: number;
-    }>,
-  ): D1PreparedStatement;
 }>;
 
 /** The parts of the archive batch and of the delete of an archived Organisation. */

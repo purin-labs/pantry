@@ -1,7 +1,13 @@
 import { assertNever, isRecord } from "@purin-labs/std";
 
 export type ControlErrorKind =
-  | "account_setup_blocked"
+  | "organisation_create_invalid"
+  | "organisation_owner_unverified"
+  | "organisation_limit_reached"
+  | "organisation_invitation_not_found"
+  | "organisation_invitation_email_mismatch"
+  | "organisation_invitation_closed"
+  | "organisation_invitation_expired"
   | "goal_execution_busy"
   | "goal_revision_conflict"
   | "goal_usage_pending"
@@ -120,8 +126,14 @@ function controlErrorKind(code: string | null): ControlErrorKind {
     case "insufficient_role":
     case "organisation_role_insufficient":
       return "forbidden";
-    case "account_setup_blocked":
-      return "account_setup_blocked";
+    case "organisation_create_invalid":
+    case "organisation_owner_unverified":
+    case "organisation_limit_reached":
+    case "organisation_invitation_not_found":
+    case "organisation_invitation_email_mismatch":
+    case "organisation_invitation_closed":
+    case "organisation_invitation_expired":
+      return code;
     case "organisation_not_found":
       return "workspace_missing";
     case "commerce_action_not_found":
@@ -133,8 +145,6 @@ function controlErrorKind(code: string | null): ControlErrorKind {
     case "stale_merchant_revision":
     case "stale_resource_revision":
     case "revision_conflict":
-    case "stale_merchant_revision":
-    case "stale_resource_revision":
       return "commerce_revision_conflict";
     case "inventory_receipt_already_applied":
       return "inventory_receipt_duplicate";
@@ -254,8 +264,20 @@ function controlErrorKind(code: string | null): ControlErrorKind {
 
 function controlErrorMessage(kind: ControlErrorKind): string {
   switch (kind) {
-    case "account_setup_blocked":
-      return "This project cannot start the Seams Pantry setup. Choose another project or ask its owner to check access.";
+    case "organisation_create_invalid":
+      return "Enter an organisation name of 1 to 120 characters.";
+    case "organisation_owner_unverified":
+      return "Your Google account has no verified email. Sign in with a Google account that has a verified email.";
+    case "organisation_limit_reached":
+      return "You own 5 organisations. A person can own at most 5. Delete one of your organisations, then try again.";
+    case "organisation_invitation_not_found":
+      return "Pantry cannot find this invitation. Ask the sender for a new link.";
+    case "organisation_invitation_email_mismatch":
+      return "This invitation is for a different email. Sign in with the Google account that received the invitation.";
+    case "organisation_invitation_closed":
+      return "This invitation is closed. The sender revoked or replaced it, or another person accepted it. Ask the sender for a new link.";
+    case "organisation_invitation_expired":
+      return "This invitation expired. Ask the sender for a new link.";
     case "goal_execution_busy":
       return "Wait for the current turn to finish, then refresh the goal and try again.";
     case "goal_revision_conflict":

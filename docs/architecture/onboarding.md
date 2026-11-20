@@ -26,42 +26,43 @@ The Portal is a client of canonical records. It does not infer lifecycle state
 from button history, URL parameters, diagnostics or provider responses.
 Diagnostics describe state. They never change it.
 
-| State                                   | Owner                                                                |
-| --------------------------------------- | -------------------------------------------------------------------- |
-| Account, project and account membership | Shared Console (Account Platform)                                    |
-| Portal identity and session             | Google OIDC sign-in, `app_user`, `control_session`                   |
-| Organisation lifecycle                  | `organisation_onboarding` in the Organisation's regional D1          |
-| Satyr service role of a member          | `service_role_grant`                                                 |
-| Placement (home region and D1)          | `organisation_placement`, resolved by `OrganisationExecutionScope`   |
-| Selected commerce system                | `organisation_commerce_system` (`satyr_commerce` or `shopify`)       |
-| Provider accounts and credentials       | `integration_account`, `provider_connection`, Vault (Spec 12)        |
-| Operating policy and cue preset         | Immutable rows in `organisation_setup_snapshot`                      |
-| Readiness                               | `organisation_readiness_assessment`                                  |
-| Activation                              | `OrganisationActor`, `organisation_activation_attempt` and its steps |
+| State                             | Owner                                                                 |
+| --------------------------------- | --------------------------------------------------------------------- |
+| Portal identity and session       | Google OIDC sign-in, `app_user`, `control_session`                    |
+| Organisation creation             | `POST /v1/control/organisations`, which calls `bootstrapOrganisation` |
+| Invitations                       | `organisation_invitation` in the Organisation's regional D1           |
+| Request eligibility               | `OrganisationAccess` (native reads, Plan 95)                          |
+| Organisation lifecycle            | `organisation_onboarding` in the Organisation's regional D1           |
+| Satyr service role of a member    | `service_role_grant`                                                  |
+| Placement (home region and D1)    | `organisation_placement`, resolved by `OrganisationExecutionScope`    |
+| Selected commerce system          | `organisation_commerce_system` (`satyr_commerce` or `shopify`)        |
+| Provider accounts and credentials | `integration_account`, `provider_connection`, Vault (Spec 12)         |
+| Operating policy and cue preset   | Immutable rows in `organisation_setup_snapshot`                       |
+| Readiness                         | `organisation_readiness_assessment`                                   |
+| Activation                        | `OrganisationActor`, `organisation_activation_attempt` and its steps  |
 
 ### Account setup and Organisation creation
 
-The shared Console owns Organisation creation. No Portal route creates an
-Organisation directly.
+Pantry owns Organisation creation ([Plan 95](../plan-95-pantry-own-accounts.md)).
+No outside account takes part.
 
-1. Google sign-in registers the verified identity with the Account Platform.
-   Satyr keeps only the receipt (`account_identity_link`), not the token.
-2. `GET` and `POST /v1/control/account-onboarding` list the Console projects
-   and start or resume setup. Each call carries a 30-second signed
-   `satyr_onboarding` assertion bound to the native principal, session,
-   Google subject and request digest.
-3. The Console sends a signed command to `/account-platform/v1/provision`.
-   `provisionSatyrAccount` in
-   [`provisioning.ts`](../../services/platform/src/account-platform/provisioning.ts)
-   checks the deployment, user, scope and placement cell, then calls
-   `bootstrapOrganisation`.
-4. On `ready`, Satyr opens the Organisation only if it is active and the
-   person has an active `service_role_grant` (else `account_setup_blocked`).
+1. Google sign-in makes the `app_user` and the `control_session`. Sign-in
+   makes no other request.
+2. `POST /v1/control/organisations` with `{ operationId, name }` makes the
+   Organisation. The person must sign in with a verified Google email, and
+   becomes the owner. `createOwnedOrganisation` in
+   [`creation.ts`](../../services/platform/src/organisation-access/creation.ts)
+   places it in the root cell of `PANTRY_ORGANISATION_PLACEMENT_PROFILE`, or
+   in the cell that the request names, and calls `bootstrapOrganisation`.
+3. A person owns at most five active Organisations
+   (`organisation_limit_reached`).
 
 The Portal page
 [`account-onboarding.tsx`](../../apps/portal/src/pages/account-onboarding.tsx)
 keeps one request per user in session storage. A retry reuses its
-`operationId`, so a lost response cannot create a second Organisation.
+`operationId`, which is the idempotency key of the route, so a lost response
+cannot create a second Organisation. A repeat answers with the first
+Organisation, also when the person has reached the limit since.
 
 `bootstrapOrganisation` reserves the Organisation in the directory D1. Then
 one regional D1 batch writes the `organisation` row, its default workspace,
@@ -71,9 +72,10 @@ The same batch writes `organisation_onboarding` (`configuring`,
 row and the `organisation_created` event. A failed batch creates no
 Organisation.
 
-When an Organisation can no longer be restored, `runAccountInstanceRelease`
-in [`instance-release.ts`](../../services/platform/src/account-platform/instance-release.ts)
-reports it, and the Console archives its instance.
+Until Plan 95 step 4, `runAccountInstanceRelease` in
+[`instance-release.ts`](../../services/platform/src/account-platform/instance-release.ts)
+still reports an Organisation that can no longer be restored to the old
+Console.
 
 ### Organisation lifecycle
 
@@ -113,7 +115,8 @@ and has no connection attempt in the last 30 days.
 ### Environment isolation
 
 Each Organisation has one environment: `development` or `production`. The
-Console sets it at provision time, and no route changes it. Every provider,
+creation route sets `production` in the production deployment and
+`development` elsewhere, and no route changes it. Every provider,
 readiness and activation row carries the environment.
 
 - Shopify, Stripe and Square connections fail with
@@ -162,9 +165,8 @@ Provider routes, the commerce system choice and Projects are in other areas.
 | ----------------------------------------------------------- | ------------------------------------------------------------ |
 | `/auth/google/start`, `/auth/google/callback`               | Sign-in and approval step-up                                 |
 | `/session`, `/session/rotate`, `/logout`                    | Read, rotate or revoke the session                           |
-| `/account-onboarding`                                       | `GET` options, `POST` start or resume Console setup          |
 | `/home-regions`, `/setup/catalog`                           | `GET` placement cells; `GET` templates and presets           |
-| `/organisations`                                            | `GET` the memberships of the signed-in person                |
+| `/organisations`                                            | `GET` the memberships of the person; `POST` create one       |
 | `/organisations/:id`                                        | `GET` projection (viewer), `PATCH`/`DELETE` (owner)          |
 | `…/members`, `…/members/:userId`                            | `GET` (viewer); `PATCH` role, `DELETE` (admin)               |
 | `…/invitations`, `…/invitations/:id/revoke`, `…/:id/accept` | `GET` (viewer); invite, revoke (admin); accept (any session) |
@@ -208,11 +210,18 @@ admits its role and every higher role.
 - At least one active owner remains. Triggers on `service_role_grant`
   enforce it (`organisation_final_owner_required`).
 - An invitation assigns `admin`, `operator` or `viewer`, never `owner`.
-- The Account Platform issues, stores and expires invitations
-  ([`service-membership.ts`](../../services/platform/src/account-platform/service-membership.ts)).
-  Satyr keeps the service role in `account_service_invitation_role`.
-- Acceptance posts the token. Satyr applies the role from the Account
-  Platform grant receipt. Removal goes through the Account Platform first.
+- Pantry issues, stores and expires invitations
+  ([`invitations.ts`](../../services/platform/src/organisation-access/invitations.ts),
+  `organisation_invitation`). An invitation keeps the SHA-256 of a random
+  32-byte token, and expires after 7 days. A new invitation for the same email
+  replaces the open one. Pantry sends no e-mail: the inviter copies the link.
+- Acceptance posts the token. The person must sign in with a verified Google
+  email equal to the invitation email. One regional batch writes the
+  `person`, the `service_role_grant`, the default Project membership and the
+  accepted state. A second accept by the same person answers the same
+  membership, and a person who is already a member keeps the role they have.
+- Removal (`revokeOrganisationMembership`) returns the person's private chats
+  to the default Project in the same batch.
 - A role change increments `configuration_version` and records
   `readiness_invalidated`.
 
@@ -308,7 +317,7 @@ Other refusals return `{ ok: false, error: <code> }`.
 | ---------------------------------------------------------- | ------------------------- |
 | Success                                                    | `200` (invitation: `201`) |
 | No session or invalid session                              | `401`                     |
-| Bad origin, bad CSRF, or Account Platform refusal          | `403`                     |
+| Bad origin, bad CSRF, or an invitation for another email   | `403`                     |
 | No membership or low role                                  | `404`                     |
 | Version, idempotency, lifecycle or placement conflict      | `409`                     |
 | Invalid input (`400` on account onboarding); terminal fail | `422`                     |
@@ -343,17 +352,17 @@ The `onboarding_event` CHECK allows these types. Platform emits no invitation
 type and its TypeScript event union omits them; the CHECK keeps them so that
 deployed databases need no table rebuild.
 
-| Group          | Event types                                                                               | Emitted by                             |
-| -------------- | ----------------------------------------------------------------------------------------- | -------------------------------------- |
-| Onboarding     | `onboarding_started`, `_resumed`, `_stage_viewed`, `_stage_completed`                     | Bootstrap, setup, activation           |
-| Organisation   | `organisation_created`, `organisation_archived`                                           | Bootstrap, `organisation-lifecycle.ts` |
-| Invitation     | `invitation_created`, `_accepted`, `_revoked`                                             | None (Account Platform owns them)      |
-| Provider       | `provider_attempt_started`, `_connected`, `_cancelled`, `_failed`, `_expired`             | `provider-attempt.ts`                  |
-| Reconciliation | `provider_reconciliation_started`, `_completed`, `_failed`                                | `onboarding-reconciliation.ts`         |
-| Accounts       | `default_account_changed`                                                                 | `integration-account.ts`               |
-| Setup          | `setup_saved`, `readiness_assessed`, `readiness_invalidated`                              | Setup, readiness, account changes      |
-| Activation     | `activation_started`, `_phase_completed`, `_succeeded`, `_failed`, `first_task_presented` | `activation.ts`                        |
-| Support        | `support_reference_created`                                                               | `activation.ts`, `provider-attempt.ts` |
+| Group          | Event types                                                                               | Emitted by                                           |
+| -------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Onboarding     | `onboarding_started`, `_resumed`, `_stage_viewed`, `_stage_completed`                     | Bootstrap, setup, activation                         |
+| Organisation   | `organisation_created`, `organisation_archived`                                           | Bootstrap, `organisation-lifecycle.ts`               |
+| Invitation     | `invitation_created`, `_accepted`, `_revoked`                                             | None yet (`organisation_invitation` keeps the state) |
+| Provider       | `provider_attempt_started`, `_connected`, `_cancelled`, `_failed`, `_expired`             | `provider-attempt.ts`                                |
+| Reconciliation | `provider_reconciliation_started`, `_completed`, `_failed`                                | `onboarding-reconciliation.ts`                       |
+| Accounts       | `default_account_changed`                                                                 | `integration-account.ts`                             |
+| Setup          | `setup_saved`, `readiness_assessed`, `readiness_invalidated`                              | Setup, readiness, account changes                    |
+| Activation     | `activation_started`, `_phase_completed`, `_succeeded`, `_failed`, `first_task_presented` | `activation.ts`                                      |
+| Support        | `support_reference_created`                                                               | `activation.ts`, `provider-attempt.ts`               |
 
 ### Audit evidence
 

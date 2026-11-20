@@ -68,10 +68,7 @@ type Person = Readonly<{
 
 async function slackCaseTitle({ task }: TestContext): Promise<void> {
   const joining = [await joiner(), await joiner()] as const;
-  await installSlackActorFixture({
-    privateMember: joining[0].slot,
-    extraMembers: [joining[1].slot],
-  });
+  await installSlackActorFixture();
   const author = await admin(joining[0], "Slack author");
   const reader = await admin(joining[1], "Unlinked reader");
   await linkSlackUser(author);

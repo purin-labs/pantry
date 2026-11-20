@@ -29,7 +29,6 @@ import {
   commerceHeaders,
   commerceWorkspace,
 } from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 type Client = Awaited<ReturnType<typeof commerceClient>>;
 const WORKFLOW = "latte-j3";
@@ -101,11 +100,6 @@ async function journey(): Promise<void> {
   const organisation = await commerceWorkspace(owner, "Workflow draft");
   await member(organisation, operator, "operator");
   await member(organisation, viewer, "viewer");
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: { operator, privateMember: viewer },
-  });
   await ensureCreatedOrganisationActor({
     env,
     organisationId: requireOrganisationId(organisation),

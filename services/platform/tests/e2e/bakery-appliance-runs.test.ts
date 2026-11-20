@@ -20,7 +20,6 @@ import {
   commerceHeaders,
 } from "./commerce-support";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 it(
   "saves an appliance run and shares its canvas positions with organisation-scoped access",
@@ -54,11 +53,6 @@ async function savedApplianceJourney(): Promise<void> {
       Date.now(),
     ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: organisation,
-    owner,
-    members: { privateMember: viewer },
-  });
   const snapshot = parseRunSnapshot({
     name: "Interrupted financier",
     document: interrupted,
