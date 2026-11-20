@@ -1,29 +1,47 @@
 # Plan 90 — Café Counter Register and POS Payment Adapters
 
-Status (20 November 2026): Phases 1, 2, 3A and 4A are built and released.
-Phases 3B and 5 are built and not released. Phases 3C and 4B wait for
-hardware and a provider document. The owner steps for every hardware check
+Status (20 November 2026): Phases 1, 2, 3A, 3B, 4A and 5 are built and
+released. The hardware work is deferred until the shop has the devices (the
+owner's decision of 20 November): Phase 3C (Square Terminal), Phase 4B
+(`stera terminal` and its POS-link spec), the live iPad check of Phase 3B
+and the printer check of Phase 5. The owner steps for every hardware check
 are in [the hardware runbook](runbooks/plan-90-hardware-acceptance.md).
 
 - Phase 3B (Square Point of Sale app on the iPad) is proven with a fake
   Square in the commerce journey `tests/square-japan-tenders-journey.test.ts`
-  and the Platform journey `tests/e2e/square-in-commerce.test.ts`. Its
-  release needs commerce schema 92 (one new table; the rehearsal from
-  production `3fd041b` passed) and the regional D1 patch
-  `services/platform/scripts/plan90-square-pos-app-d1-patch.sql` before the
-  Platform deploy. A rollback of the commerce Worker to `f031c27b` refuses
-  schema 92, as the earlier rollback refused schema 91.
-- Phase 5 (receipt printer and cash drawer) is built in simulation. Its
-  release needs the regional D1 patch
-  `services/platform/scripts/plan-90-receipt-printer-d1-patch.sql` and a new
-  `shop-gateway` build. Its physical certification waits for the owner's
-  `MCP31LB`.
+  and the Platform journey `tests/e2e/square-in-commerce.test.ts`. No live
+  payment has gone through the Square app (runbook step A).
+- Phase 5 (receipt printer and cash drawer) is proven in simulation. Its
+  physical certification waits for the owner's `MCP31LB` (runbook step D).
 - The FeliCa readback of Phase 3A was wrong and is fixed with Phase 3B:
   Square records e-money as a `CARD` payment with the card brand `FELICA`
   and the sub-brand in `electronic_money_details.felica_details.felica_brand`,
-  not as `source_type: "FELICA"`. The released code would refuse every real
-  FeliCa Terminal payment. No terminal is assigned in production, so no sale
-  was affected.
+  not as `source_type: "FELICA"`. The code of the first commerce release
+  refused every real FeliCa Terminal payment. No terminal was assigned in
+  production, so no sale was affected.
+
+Release of Phases 3B and 5 (20 November, 10:24 to 10:26 UTC), from `dev`
+`3cd6686`:
+
+- The commerce Worker `underclerk` is version `789f3773` (schema 92). The
+  rehearsal from production `3fd041b` passed first. Both production merchants
+  upgraded to schema 92 on their first request and answer their snapshot with
+  the same records as before.
+- The regional D1 patches `plan90-square-pos-app-d1-patch.sql` and
+  `plan-90-receipt-printer-d1-patch.sql` are applied to
+  `satyr-organisation-apac`. A copy of the production schema with its real
+  device rows took both patches first. The 9 enrolled devices keep their rows.
+- The Platform `satyr-edge` is version `2aa4f61c`, with the new
+  `shop-gateway` build in the Portal assets. The schema gate passed (global
+  61, APAC 368 and 1 extra). The live Portal entry files, the gateway install
+  script and its three binaries equal the build. The helper Workers and the
+  Slack ingress were not deployed again: they changed only by the package
+  rename.
+- Rollback: the Platform target is `ea3efc43`. A rollback of the commerce
+  Worker to `f031c27b` refuses schema 92, so recover the engine with a forward
+  fix.
+
+Earlier releases:
 
 - The Platform releases of 19 and 20 November carry Phase 2: the Register in
   the Portal, the counter-register domain and the Sous Chef tools.
@@ -429,7 +447,7 @@ refund through Square; FeliCa refuses provider refund and settles via
 `record_counter_manual_cash_refund` with exact payout and cash positions; a
 cancelled terminal prompt allows switching the same counter basket to cash.
 
-Phase 3B (`square_pos_app`) — built on 20 November 2026, not deployed:
+Phase 3B (`square_pos_app`) — built and released on 20 November 2026:
 
 - Café › Counters & payments: "Use the Square app on an iPad" assigns the
   counter to the Square Point of Sale app (`POST
@@ -496,8 +514,8 @@ Work (Phase 4B — physical `stera terminal` driver, **gated on GMO-FG spec**):
 
 ### Phase 5 — Star `MCP31LB` receipt printer and `mJ-Drawer` (optional)
 
-State (20 November 2026): built and proven in simulation. It is not
-released. The physical certification waits for the owner's `MCP31LB` and
+State (20 November 2026): built, proven in simulation and released. The
+physical certification is deferred until the owner has the `MCP31LB` and
 `mJ-Drawer` (step D of
 [the hardware runbook](runbooks/plan-90-hardware-acceptance.md)).
 
@@ -591,11 +609,12 @@ and the Devices fault show it, and the sale stays complete; a viewer is
 refused. The artifact is the simulated printer's text and bytes in
 `output/e2e/shop-gateway/receipt-printer/printer/`.
 
-Before the release:
-
-- Apply `services/platform/scripts/plan-90-receipt-printer-d1-patch.sql` to
-  each regional D1 database.
-- Release a new `shop-gateway` build with the Portal.
+The release of 20 November applied
+`services/platform/scripts/plan-90-receipt-printer-d1-patch.sql` to the
+regional D1 database and served a new `shop-gateway` build with the Portal.
+A gateway does not update itself: a gateway that runs an older build has no
+printer support until the shop runs the install command from the Devices
+page again.
 
 Not verified on hardware: the bytes on a real `MCP31LB`, the Japanese font on
 the unit, the status block over Ethernet (if the printer sends no status, the
