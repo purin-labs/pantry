@@ -392,7 +392,8 @@ Open for the owner: the pre-push hook.
   `env.ts`, and step A1.2 removes them.
 - No behavior changed: the change is types, imports and the name of one helper.
   The type checks of the source, the unit tests and the journeys pass. The unit
-  suite passes (302 files, 1,732 tests).
+  suite passes (302 files, 1,732 tests), and the full E2E suite passes with the
+  counts of the baseline (234 files, 455 tests, 55 minutes).
 
 The step is smaller than its first description. A count with the type checker gave
 the reason: callers use 245 methods of the four Actors at 440 places, in about 130
