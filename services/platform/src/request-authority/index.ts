@@ -33,10 +33,7 @@ import {
   isRecord,
 } from "@purin-labs/std";
 
-export type {
-  GrantSubject,
-  WorkflowAuthorityKind,
-} from "../authorization/access-grants/types";
+export type { GrantSubject } from "../authorization/access-grants/types";
 
 type RawRecord = Record<string, unknown>;
 

@@ -13,20 +13,12 @@ import { sha256Hex } from "@purin-labs/std";
 import type { CaseContextReplayAuthority } from "../projection";
 
 export type {
-  CanonicalContextSourceRef,
   ContextAssemblyStrategyVersion,
   ContextBundle,
-  ContextBundleDisposition,
-  ContextFreshness,
   ContextItem,
-  ContextProjectionRevision,
-  ContextRetrievalEvidence,
   ContextVisibility,
   ModelContextBundle,
   ModelContextItem,
-  ModelContextSourceKind,
-  PolicyVersion,
-  WorkflowAuthorityKind,
 } from "./types";
 export type { CaseContextReplayAuthority } from "../projection";
 export type { FlowLabel, ObservationEvidence } from "../../policy";

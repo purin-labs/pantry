@@ -6,8 +6,6 @@ export {
   FlowLabel,
   joinFlowLabels,
   labelAllowsAudiences,
-  labelAllowsRecipient,
-  parseFlowRecipient,
   policyAllowsAudiences,
   policyLevel,
   outsideWrittenFlowLabel,
@@ -17,11 +15,8 @@ export { decideAutomaticContextAdmission, decideContextAdmission } from "./pac";
 export { digestCanonical, serializeCanonical } from "./digest";
 export {
   advanceInformationFlowContext,
-  canonicalInformationFlowContext,
   digestFlowBinding,
   FlowBinding,
-  type FlowBindingIdentity,
-  type FlowBindingTurnIdentity,
   flowBindingMatchesIdentity,
   flowBindingMatchesTurn,
   flowBindingForContext,
@@ -38,20 +33,14 @@ export {
   sinkRefusalAsksPerson,
   type CaseConversationSinkRefusal,
 } from "./sinks";
-export {
-  organisationAuthzFromPolicy,
-  readCurrentOrganisationAuthz,
-  type CurrentOrganisationAuthz,
-} from "./organisation-authz";
+export { organisationAuthzFromPolicy } from "./organisation-authz";
 export {
   createCurrentSourceFlowLabel,
   createCurrentObservedSourceFlowLabel,
-  grantSubjectIsCurrent,
   integrationResourceScopeForGrant,
   visibilityForGrantSubject,
 } from "./source-labels";
 export type {
-  AdvanceInformationFlowContextResult,
   CanonicalFlowPolicy,
   ContextAdmissionDecision,
   ContextAdmissionSubject,
@@ -60,23 +49,14 @@ export type {
   FlowAudience,
   FlowRecipient,
   FlowDecision,
-  FlowDecisionReason,
-  FlowBindingError,
-  FlowLabelError,
   FlowLabelDecision,
-  FlowLevel,
   FlowWriter,
   FlowPolicyInput,
   FlowPolicyOwner,
   FlowSink,
   FlowSource,
-  IntegrationResourceFlowSource,
-  InformationFlowContextError,
-  ObservationEvidenceError,
   SerializedFlowBinding,
   SerializedFlowLabel,
-  SerializedFlowPolicy,
-  SerializedFlowReader,
   SerializedInformationFlowContext,
   SerializedObservationEvidence,
   ToolEffectSink,

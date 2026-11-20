@@ -86,8 +86,6 @@ import {
   publishSkillRevision,
 } from "./agent-operations/skills";
 
-export type { ScheduleSpec, ScheduleWeekday } from "@purin-labs/control-api";
-
 export type AgentLifecycle = "active" | "archived";
 
 export type InstallationLifecycle = "active" | "suspended" | "archived";

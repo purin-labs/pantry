@@ -9,10 +9,7 @@ import type {
 import type { FlowLabel, ObservationEvidence } from "../../policy";
 import type { FileContextProvider } from "@purin-labs/contracts";
 
-export type {
-  ContextVisibility,
-  WorkflowAuthorityKind,
-} from "../../authorization/access-grants/types";
+export type { ContextVisibility } from "../../authorization/access-grants/types";
 
 export type {
   CanonicalContextSourceRef,

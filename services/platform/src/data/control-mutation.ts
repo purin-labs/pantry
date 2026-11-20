@@ -11,7 +11,6 @@ export {
   prepareControlMutationReceipt,
   prepareControlMutationReceiptAfterWrite,
   prepareControlMutationReceiptCompletion,
-  prepareOrganisationControlMutationReceipt,
   readControlMutationReplay,
 } from "./shared-rows/mutation-receipt";
 
