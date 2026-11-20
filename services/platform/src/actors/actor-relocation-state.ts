@@ -13,7 +13,7 @@ import {
   type ActorExportError,
   type ActorExportSource,
 } from "./actor-export";
-import { eraseActorContentSql } from "./portal-chat-cleanup";
+import { eraseActorContentSql } from "./placement-execution-quiescence";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import { readActionResult } from "./action-ledger";
 import { reconcileCommerceProviderReceipt } from "../commerce/action-model";

@@ -101,7 +101,7 @@ import {
 } from "./actor-router";
 import { actorStub } from "./actor-stubs";
 import { currentActorSchemaVersion } from "./current-actor-schema-version";
-import { quiescePlacementExecution } from "./portal-chat-cleanup";
+import { quiescePlacementExecution } from "./placement-execution-quiescence";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,

@@ -71,7 +71,7 @@ import {
   type ActorRestoreManifest,
 } from "./actor-restore-manifest";
 import type { ActorNamespaces } from "./actor-router";
-import { quiescePlacementExecution } from "./portal-chat-cleanup";
+import { quiescePlacementExecution } from "./placement-execution-quiescence";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
