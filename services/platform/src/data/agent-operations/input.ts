@@ -1,8 +1,8 @@
 import { responsibilityScopeCommerce } from "./scope-commerce";
-import type {
-  CommerceListEntryRef,
-  CommerceRelationshipRef,
-} from "@purin-labs/commerce-contracts";
+import type { CommerceTypeParts } from "../../commerce-type-parts";
+
+type CommerceListEntryRef = CommerceTypeParts["listEntryRef"];
+type CommerceRelationshipRef = CommerceTypeParts["relationshipRef"];
 import type { Result } from "../../result";
 import {
   isScheduleWeekday,

@@ -1147,6 +1147,7 @@
     "services/platform/src/slack/installation-store.ts": "foundation/authority",
     "services/platform/src/slack/channel-baseline-grant.ts": "foundation/authority",
     "services/platform/src/data/merchant-agent-ids.ts": "foundation/agent",
-    "services/platform/src/slack/surface-parts.ts": "foundation/authority"
+    "services/platform/src/slack/surface-parts.ts": "foundation/authority",
+    "services/platform/src/commerce-type-parts.ts": "foundation/kernel"
   }
 }

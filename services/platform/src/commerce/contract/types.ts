@@ -23,3 +23,27 @@ export type CafeCommerceAcceptanceFaultRecord = Readonly<{
   armedAt: number;
   queueConsumedAt: number | null;
 }>;
+
+// The commerce types that foundation records carry (`commerce-type-parts.ts`).
+declare module "../../commerce-type-parts" {
+  interface CommerceTypeParts {
+    /** The commerce effect of an action ledger entry. */
+    entityPlaneEffect: import("@purin-labs/commerce-contracts").CommerceEntityPlaneEffect;
+    /** A relationship that a scope or a cue selector names. */
+    relationshipRef: import("@purin-labs/commerce-contracts").CommerceRelationshipRef;
+    /** A list entry that a scope or a cue selector names. */
+    listEntryRef: import("@purin-labs/commerce-contracts").CommerceListEntryRef;
+    /** The graph query of a saved selector. */
+    graphQuery: import("@purin-labs/commerce-contracts").CommerceGraphQuery;
+    /** A record type of a cue selector. */
+    entityTypeId: import("@purin-labs/commerce-contracts").CommerceEntityTypeId;
+    /** A list of a cue selector. */
+    listId: import("@purin-labs/commerce-contracts").CommerceListId;
+    /** A published saved selector of a cue selector. */
+    publishedSelector: import("@purin-labs/commerce-contracts").PublishedCommerceSelector;
+    /** The observation of an entity plane cue. */
+    entityPlaneObservation: import("@purin-labs/commerce-client").CommerceEntityPlaneObservationV1;
+    /** The published resource evidence of a responsibility scope. */
+    publishedResourceMetadata: import("@purin-labs/commerce-client").CommerceEntityPlanePublishedResourceMetadataResponse;
+  }
+}

@@ -4,7 +4,9 @@ import {
   type CanonicalAction,
   type RequestAuthority,
 } from "@purin-labs/contracts";
-import type { CommerceEntityPlaneEffect } from "@purin-labs/commerce-contracts";
+import type { CommerceTypeParts } from "../commerce-type-parts";
+
+type CommerceEntityPlaneEffect = CommerceTypeParts["entityPlaneEffect"];
 
 import {
   parseCaseId,

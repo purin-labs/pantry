@@ -28,6 +28,8 @@ import { COMMERCE_GRANT_TARGETS } from "./commerce/entity-plane/grant-targets";
 import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
 import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
 import { commerceGraphReads } from "./commerce/contract/graph-reads";
+import { parseEntityPlaneObservation } from "@purin-labs/commerce-client";
+import { entityPlaneObservationParser } from "./cues/engine";
 import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
 import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
 import { commerceExceptionInbox } from "./control/agent-operation-activity";
@@ -192,3 +194,7 @@ providerServices.register({
   readProviderCleanupContext: (...input) =>
     readProviderCleanupContext(...input),
 });
+
+entityPlaneObservationParser.register((raw) =>
+  parseEntityPlaneObservation(raw),
+);
