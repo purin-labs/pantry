@@ -384,7 +384,8 @@ with no named Project is filed in the Organisation's default Project. See
 with a patch script for deployed databases in `services/platform/scripts/`.
 
 A source file over 3,000 lines may not grow, and a new source file may not pass
-3,000 lines; `pnpm lint:file-size` refuses both. Put new code in a new module
+3,000 lines; `pnpm lint:file-size` refuses both. The rule also holds for a
+style sheet. Put new code in a new module
 beside the large file. When a listed file gets smaller, run
 `node scripts/check-file-size-ratchet.mjs --update`.
 [Refactor 10](docs/refactor-10.md) splits the large files.
@@ -409,10 +410,14 @@ behaviour and plain CSS with Portal tokens for styles. Do not add shadcn/ui,
 Tailwind or a second component library. Before you build a control, look in
 `apps/portal/src/ui/`: it holds the prebuilt Portal components, for example
 `Select`, `Popover`, `Switch`, `SideDrawer`, `ActionMenu`, `CrmTable`,
-`EmptyState`, `TaskList`, `Trace`, `TimeLanes` and `PermissionRequestDialog`.
+`Button`, `EmptyState`, `TaskList`, `Trace`, `TimeLanes` and
+`PermissionRequestDialog`.
 Import them from `apps/portal/src/ui` (the `index.ts` entrypoint); `ui/README.md` describes
 each one. If no component fits, build the new one in `ui/` on a Base UI part,
-with its own CSS file, and export it from `ui/index.ts`. Every Portal dropdown
+with its own CSS file, and export it from `ui/index.ts`. A new button with a
+label is the `Button` of `apps/portal/src/ui/button.tsx`, with a `variant`
+(`primary`, `secondary`, `danger` or `link`); do not give a raw `<button>` the
+classes `primary-button`, `secondary` or `danger`. Every Portal dropdown
 is the [Base UI Select](https://base-ui.com/react/components/select) in
 `apps/portal/src/ui/select.tsx`, with the Base UI part names: `Select.Root`,
 `Select.Trigger`, `Select.Value`, `Select.Popup`, `Select.Item`,

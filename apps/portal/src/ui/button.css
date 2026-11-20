@@ -1,0 +1,80 @@
+/* The Portal button. Each rule names the class and an attribute. A page rule
+   for every raw button of a container, such as `.home-recovery button`, has
+   less specificity, so it does not change a declaration of this file. A page
+   that sets the size, the width or the font of a button in its own container
+   targets `button.pantry-button` there. */
+
+.pantry-button[data-variant] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--pantry-radius-pill);
+  /* The weight stays open: a place such as an error panel sets its own. */
+  font-family: inherit;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--pantry-motion-fast) ease,
+    color var(--pantry-motion-fast) ease;
+}
+
+/* The main action is larger, and it takes the text size of its place. */
+.pantry-button[data-size="lg"] {
+  min-height: 44px;
+  padding: 0 22px;
+  font-size: inherit;
+}
+
+/* A disabled button is one whose write runs, so the pointer shows a wait. */
+.pantry-button[data-variant]:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.pantry-button[data-variant="primary"] {
+  color: var(--pantry-on-primary);
+  background: var(--pantry-primary);
+  box-shadow: var(--pantry-primary-ring);
+  font-weight: 400;
+}
+
+.pantry-button[data-variant="primary"]:hover:not(:disabled) {
+  background: var(--pantry-primary-hover);
+}
+
+.pantry-button[data-variant="secondary"] {
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--pantry-button-ring);
+}
+
+.pantry-button[data-variant="secondary"]:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.pantry-button[data-variant="danger"] {
+  color: var(--danger-text);
+  background: var(--paper);
+  box-shadow: var(--pantry-danger-ring);
+}
+
+.pantry-button[data-variant="danger"]:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+
+/* An action in a line of text or beside a main action: no box. */
+.pantry-button[data-variant="link"] {
+  justify-content: flex-start;
+  padding: 0;
+  color: var(--pantry-link);
+  background: transparent;
+  box-shadow: none;
+  font-weight: 500;
+  text-align: start;
+  text-decoration: underline;
+}

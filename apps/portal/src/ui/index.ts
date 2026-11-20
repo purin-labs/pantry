@@ -9,6 +9,7 @@ export {
   type AttachmentProps,
   type AttachmentState,
 } from "./attachment";
+export { Button, type ButtonProps, type ButtonVariant } from "./button";
 export { EmptyState, type EmptyStateProps } from "./empty-state";
 export {
   CrmTable,
