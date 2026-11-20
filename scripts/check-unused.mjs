@@ -13,6 +13,15 @@
 // with its own HTML file, a new config. Add that file to the entry list of its
 // workspace in knip.json. Do not add it to the baseline.
 //
+// knip does not judge a file that a generator writes, such as
+// services/platform/src/generated/ (scripts/generate-actions.ts): the
+// generator decides its exports, and a hand edit is lost at the next run. Its
+// folder is in the ignore list of its workspace in knip.json.
+//
+// An export that something outside the import graph reads at run time, such
+// as a browser check script or a lint that reads the source text, carries a
+// `@public` tag in its doc comment, with the reader.
+//
 //   node scripts/check-unused.mjs            check
 //   node scripts/check-unused.mjs --update   drop the entries that are gone
 //   node scripts/check-unused.mjs --init     write the baseline from the tree
