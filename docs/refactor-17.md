@@ -986,6 +986,72 @@ the "Costs" row and the open points of the two entries above where it names them
   calls `memory/access.ts`. Each needs a port through the tool effect and the turn
   tools.
 
+**21 November 2026. The agent foundation: four changes and the measures for the
+rest,** on the branch `refactor-17-agent-foundation`. This is a part of the work,
+not the end of it.
+
+- **A route matcher is a part of the Worker.** `control/routes/agents.ts` matches the
+  paths under an agent and calls the route handler of each owner. It holds no rule,
+  and only `control-router.ts` calls it. The map counts it as `workers/platform`.
+- **Brain.** `actors/harness-memory-proposal.ts` defines `MemoryProposalPort`. The
+  wiring gives the function of `memory/access.ts`.
+- **Slack.** The Slack half of the side Case proposal is in
+  `agent-tools/slack/side-case-proposal.ts`. The port `slackThreadSideCase` has
+  `propose`.
+- **Two helpers at their owner.** `emailAttachmentForHarness` is in the Inbox
+  handlers. `context/untrusted-commerce-text.ts` is `foundation/agent-tools`: it has
+  no import, and the tool files use it.
+- **Measures.** Layer crossings: 674 to 658. `foundation/agent` to Inbox: 11 to 5. To
+  commerce: 21 to 19. To Slack: 5 to 3. To Brain and to WhatsApp: 1 to 0 each.
+  `foundation/agent-tools` to Inbox: 1 to 0. `foundation/agent-tools` to
+  `foundation/agent`: 23 to 21.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite pass. The catalog digests are equal. 81
+  journey files ran in five groups: 80 pass and 1 is skipped. The full E2E suite did
+  not run on the branch.
+
+**The order inside the foundation: measures for a decision.** Each line is one
+choice, measured with `node scripts/check-layers.mjs --report` on a changed copy of
+the map. The base is 660. No line is applied.
+
+| Choice                                                              | Total | Effect                                                                               |
+| ------------------------------------------------------------------- | ----: | ------------------------------------------------------------------------------------ |
+| `packages/control-api` is `foundation/contracts`                    |   642 | Order 126 to 108. One pair is renamed, so the lint needs `--init` for it             |
+| The tool handlers are a module above `agent`                        |   652 | Order 126 to 118. `session-support.ts`, `context.ts`, `files/`, `messages/`, `turn/` |
+| `actors/case-conversation-sink.ts` is `foundation/agent`            |   658 | Order 126 to 124. No pair grows                                                      |
+| `chat/turn-access.ts` is `foundation/agent`                         |   658 | Order 126 to 122, table 117 to 119. `authority -> agent` grows                       |
+| `conversation` goes below `agent` in the order                      |   678 | `conversation -> agent` has 48 imports, and `agent -> conversation` has 28           |
+| `control` goes below `authority` in the order                       |   686 | Worse by 26                                                                          |
+| `case-context-discovery/` is `foundation/authority`                 |   669 | Worse by 9                                                                           |
+| `context/files/persistence.ts` is `foundation/authority`            |   686 | Table 117 to 143                                                                     |
+| `actors/session-execution-admission.ts` is `foundation/agent-tools` |   661 | Worse by 1                                                                           |
+
+The first two lines are the proposal. Together they give 658 to 633. The package `@purin-labs/control-api` imports
+only `contracts`, `contract-schema`, `std` and `type-utils`: it is a contract, and 12
+of the 18 order crossings that it gives are `authority` reading its shapes. The tool
+files have two concerns: the executor (`catalog/`, `define-tool.ts`, `errors.ts`,
+`tool-effect.ts`) is below the Session, and the handlers with their Session support
+are above it.
+
+- **Still open in part 1, with the reason.**
+  - `agent-tools/session-support.ts`, 10 imports of commerce and Café. Kitchen and
+    commerce handlers share its commerce helpers. A move to commerce gives Kitchen
+    4 new imports of commerce. It needs the service interfaces of the commerce
+    contract.
+  - `actors/harness-follow-up.ts`, 3 imports of Slack texts. The exit check of a tool
+    effect calls it 4 levels down, so the port needs a new argument in about 8 functions
+    of `session-support.ts` and in 2 Plan 50 workers.
+  - `context/assembly/commerce.ts` (5), `data/agent-operations*` and its routes (9),
+    `cues/engine.ts` (2): commerce reads of the agent. As commerce files they give
+    more crossings (660 to 665 or 668), because foundation files import them.
+  - `actors/action-ledger.ts` (3) and the access grant files (4): the same result,
+    660 to 665.
+  - `access-control/decision-explanation.ts` (1) and `organisation-policy.ts` (4 Jev
+    files, 3 files of the `OrganisationDO` class chain): step A1.8 and step A1.9 for
+    the Organisation actor.
+  - The route files of `control/` that call Slack, Brain, commerce and integrations
+    (13). A route file with rules is not a part of the Worker, so no map change.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
