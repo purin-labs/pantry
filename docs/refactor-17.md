@@ -3,7 +3,7 @@
 Date: 2026-11-20. Revised two times on 2026-11-20: after a review of the first version,
 and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
-Status: accepted in part; step A0 and step S1 are done on the branch `refactor-17`
+Status: accepted in part; step A0 and step S1 are done and on `dev` since 2026-11-20
 (see [Steps done](#steps-done) and [Baseline](#baseline)). The owner accepted the two stages, one decision
 API for approvals, specs by subsystem, and the prune of dead code, duplicate code and
 low-impact tests. The other decisions in [Decisions](#decisions) need the owner.
@@ -13,7 +13,7 @@ scripts and each open branch.
 
 The counts come from `origin/dev` at `e18cecb` (2026-11-20), unless a line says
 `main`. The first two versions measured `main` at `18c97fe`, which is 170 commits
-behind `origin/dev`. The work is on the branch `refactor-17`, which starts from `origin/dev`.
+behind `origin/dev`. The work started from `origin/dev`.
 The counts of the sections before [Steps done](#steps-done) come from name rules, a
 first guess. `scripts/layers.json` replaced those rules in step A0.2, and
 `node scripts/check-layers.mjs --report` gives the counts of the current tree.
@@ -336,8 +336,8 @@ physical bake. This refactor does not remove `schedule.ts`.
 
 ## Steps done
 
-**20 November 2026, on the branch `refactor-17` (from `origin/dev` `e18cecb`). Not
-pushed, and not on `dev`.** Step A0 and step S1 are done.
+**20 November 2026. Step A0 and step S1 are done.** The owner agreed to the landing,
+and the commits are on `dev` since that day.
 
 | Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -371,12 +371,12 @@ What the map shows that the first measure did not:
   code of four modules each. The map puts them in `workers/platform` with a note, so
   each import of them from a lower module counts as upward.
 
-Open for the owner: the push of the branch, its landing on `dev`, and the pre-push
-hook.
+Open for the owner: the pre-push hook.
 
 ## Baseline
 
-Step A0.4, measured on the branch `refactor-17` on 2026-11-20, on the owner's Mac,
+Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
+on the owner's Mac,
 with other sessions at work on the same machine. A step of Stage A compares its
 result with these lines.
 
