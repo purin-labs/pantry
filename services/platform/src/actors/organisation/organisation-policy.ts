@@ -33,6 +33,7 @@ import {
   resolvePantryTypeSafeKey,
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
+  type TypeSafeAuthority,
 } from "../../integrations/typesafe/authority";
 import {
   decideCaseContextCollectionRelationship,
@@ -47,48 +48,13 @@ import {
 import { evaluateOperationalCaseContextDiscovery } from "../../case-context-discovery/operational-evaluation";
 import {
   caseContextDiscoveryReadiness,
-  caseContextDiscoveryRoute,
   caseContextDiscoveryRouteAuthority,
   parseCaseContextDiscoveryPolicy,
-  type CaseContextDiscoveryPolicy,
   identifier,
   integerIn,
 } from "../../case-context-discovery/policy";
 import { digestCanonical } from "../../policy/information-flow/digest";
-import {
-  parseJevFeatureCommand,
-  parseJevPaidUseCommand,
-  type JevFeaturesView,
-} from "@purin-labs/control-api/portal/jev-features";
-import {
-  disableJevMailClassification,
-  enableJevMailClassification,
-  jevMailCoverage,
-  repinJevMailClassification,
-} from "../../jev-features/mail-switch";
-import {
-  readJevScreenRelevance,
-  writeJevScreenRelevance,
-} from "../../jev-features/screen-relevance";
-import {
-  JEV_RELATED_CASES_LIMITS,
-  jevAllowanceView,
-  jevFreeUseCovers,
-} from "../../jev-features/limits";
-import {
-  ensureJevPaidHold,
-  readJevPaidSpendMinor,
-  readJevPaidUse,
-  writeJevPaidUse,
-} from "../../jev-features/paid-use";
-import { resolvePantryAccountBinding } from "../../account-platform/binding";
-import { listIntegrationAccounts } from "../../data/integration-account";
-import {
-  assertNever,
-  errorMessage,
-  isRecord,
-  sha256Hex,
-} from "@purin-labs/std";
+import { errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
 import {
   caseContextCollectionReviewDecision,
   caseContextCollectionSourceAccess,
@@ -111,11 +77,46 @@ import type {
   OrganisationPolicyHead,
 } from "./policy-types";
 import { OrganisationActorBase } from "./organisation-actor-base";
+import type { Env } from "../../env";
 
 /**
  * Policy activation, credentials, TypeSafe and Case context discovery for the Organisation.
  */
+/**
+ * What the policy needs from the Jev features of the integrations area. The
+ * class of the Worker gives it.
+ */
+export type PolicyJevPort = Readonly<{
+  /** Keeps each mailbox that was on, on, under a new TypeSafe authority. */
+  repinMailClassification(
+    input: Readonly<{
+      db: OrganisationExecutionScope["database"];
+      organisationId: OrganisationId;
+      from: TypeSafeAuthority;
+      to: TypeSafeAuthority;
+      now: number;
+    }>,
+  ): Promise<unknown>;
+  /**
+   * Holds the paid use of one Jev purpose when the free use does not cover
+   * the reservation.
+   */
+  ensurePaidHold(
+    input: Readonly<{
+      sql: SqlStorage;
+      env: Env;
+      organisationId: OrganisationId;
+      purpose: "case_context_discovery_relationship";
+      reservationMicrousd: number;
+      now: number;
+    }>,
+  ): Promise<unknown>;
+}>;
+
 export abstract class OrganisationPolicy extends OrganisationActorBase {
+  /** The Jev parts that two policy commands call. */
+  protected abstract jevForPolicy(): PolicyJevPort;
+
   async readCaseContextDiscoveryConfiguration(
     input: Readonly<{ organisationId: OrganisationId }>,
   ) {
@@ -268,7 +269,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
       if (!sameTypeSafeAuthority(before, authority)) {
         // Each mailbox that was on stays on under the new authority.
         try {
-          await repinJevMailClassification({
+          await this.jevForPolicy().repinMailClassification({
             db: scope.database,
             organisationId: scope.organisationId,
             from: before,
@@ -285,259 +286,6 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
       }
       await this.rearm();
     }
-  }
-
-  /** Settings › AI features › Jev (Plan 88 section 2). */
-  async readJevFeatures(input: Readonly<{ organisationId: OrganisationId }>) {
-    return this.command(
-      input.organisationId,
-      this.admittedReadJevFeatures.bind(this),
-    );
-  }
-
-  protected async admittedReadJevFeatures(
-    scope: OrganisationExecutionScope,
-  ): Promise<Result<JevFeaturesView, { code: string }>> {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const sql = this.ctx.storage.sql;
-    const authority = currentTypeSafeAuthority(sql, scope.organisationId);
-    const credential = await resolveTypeSafeCredential({
-      sql,
-      db: scope.database,
-      keys: this.env,
-      organisationId: scope.organisationId,
-    });
-    const mailboxes = await jevMailCoverage({
-      db: scope.database,
-      organisationId: scope.organisationId,
-      authority,
-      now: Date.now(),
-    });
-    if (!(await isOrganisationExecutionActive(sql, scope)))
-      return organisationPlacementConflict();
-    const discovery = readCaseContextDiscoveryPolicy(
-      sql,
-      scope.organisationId,
-    ).policy;
-    const binding = await resolvePantryAccountBinding(
-      this.env,
-      scope.organisationId,
-    );
-    if (!(await isOrganisationExecutionActive(sql, scope)))
-      return organisationPlacementConflict();
-    // The owner approved the Jev price for every account (D9).
-    const priced = binding.ok ? true : null;
-    return {
-      ok: true,
-      value: {
-        funding: authority.kind,
-        keyAvailable:
-          credential !== null &&
-          sameTypeSafeAuthority(credential.authority, authority),
-        mailClassification: {
-          enabled: mailboxes.some((mailbox) => mailbox.covered),
-          mailboxes: mailboxes.map((mailbox) => ({
-            integrationAccountId: mailbox.integrationAccountId,
-            displayName: mailbox.displayName,
-            covered: mailbox.covered,
-          })),
-        },
-        relatedCases: {
-          enabled: discovery.mode !== "disabled",
-          mode: discovery.mode === "disabled" ? null : discovery.mode,
-          sourceCount:
-            discovery.mode === "disabled" ? 0 : discovery.sources.length,
-        },
-        screenRelevance: {
-          enabled: readJevScreenRelevance(sql, scope.organisationId),
-        },
-        allowance:
-          authority.kind === "satyr_platform"
-            ? jevAllowanceView(sql, scope.organisationId, Date.now())
-            : null,
-        paidUse: {
-          ...readJevPaidUse(sql, scope.organisationId),
-          spentMinor: readJevPaidSpendMinor(
-            sql,
-            scope.organisationId,
-            Date.now(),
-          ),
-          priced,
-        },
-      },
-    };
-  }
-
-  /** Paid use above the free use (Plan 88 section 4). The route admits only the owner. */
-  async manageJevPaidUse(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      actorId: string;
-      body: unknown;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedManageJevPaidUse.bind(this, input),
-    );
-  }
-
-  protected async admittedManageJevPaidUse(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      actorId: string;
-      body: unknown;
-    }>,
-    scope: OrganisationExecutionScope,
-  ): Promise<Result<JevFeaturesView, { code: string }>> {
-    const command = parseJevPaidUseCommand(input.body);
-    if (command === null)
-      return { ok: false, error: { code: "jev_paid_use_invalid" } };
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    this.ctx.storage.transactionSync(
-      writeJevPaidUse.bind(null, this.ctx.storage.sql, {
-        organisationId: scope.organisationId,
-        enabled: command.enabled,
-        spendingLimitMinor: command.spendingLimitMinor,
-        actorId: input.actorId,
-        now: Date.now(),
-      }),
-    );
-    return this.admittedReadJevFeatures(scope);
-  }
-
-  async manageJevFeature(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      actorId: string;
-      body: unknown;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedManageJevFeature.bind(this, input),
-    );
-  }
-
-  protected async admittedManageJevFeature(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      actorId: string;
-      body: unknown;
-    }>,
-    scope: OrganisationExecutionScope,
-  ): Promise<Result<JevFeaturesView, { code: string }>> {
-    const command = parseJevFeatureCommand(input.body);
-    if (command === null)
-      return { ok: false, error: { code: "jev_feature_invalid" } };
-    const sql = this.ctx.storage.sql;
-    const authority = currentTypeSafeAuthority(sql, scope.organisationId);
-    if (command.enabled) {
-      const credential = await resolveTypeSafeCredential({
-        sql,
-        db: scope.database,
-        keys: this.env,
-        organisationId: scope.organisationId,
-      });
-      if (
-        credential === null ||
-        !sameTypeSafeAuthority(credential.authority, authority)
-      )
-        return { ok: false, error: { code: "jev_key_unavailable" } };
-    }
-    if (!(await isOrganisationExecutionActive(sql, scope)))
-      return organisationPlacementConflict();
-    const now = Date.now();
-    switch (command.feature) {
-      case "mail_classification":
-        if (!command.enabled) {
-          await disableJevMailClassification({
-            db: scope.database,
-            organisationId: scope.organisationId,
-            now,
-          });
-          break;
-        }
-        if (
-          (await enableJevMailClassification({
-            db: scope.database,
-            organisationId: scope.organisationId,
-            authority,
-            actorId: input.actorId,
-            now,
-          })) === 0
-        )
-          return {
-            ok: false,
-            error: { code: "jev_feature_source_unavailable" },
-          };
-        break;
-      case "related_cases": {
-        const head = readCaseContextDiscoveryPolicy(sql, scope.organisationId);
-        let policy: CaseContextDiscoveryPolicy = { mode: "disabled" };
-        if (command.enabled) {
-          const sources = (
-            await listIntegrationAccounts({
-              db: scope.database,
-              organisationId: scope.organisationId,
-            })
-          ).filter(
-            (account) =>
-              account.provider === "gmail" &&
-              account.lifecycle.kind === "active",
-          );
-          if (sources.length === 0)
-            return {
-              ok: false,
-              error: { code: "jev_feature_source_unavailable" },
-            };
-          policy = {
-            mode:
-              command.mode ??
-              (head.policy.mode === "shadow" ? "shadow" : "metadata_only"),
-            route: caseContextDiscoveryRoute(authority),
-            sources: sources.slice(0, 20).map((account) => ({
-              source: "gmail" as const,
-              integrationAccountId: account.integrationAccountId,
-            })),
-            limits: JEV_RELATED_CASES_LIMITS,
-          };
-        }
-        const published =
-          await this.admittedPublishCaseContextDiscoveryConfiguration(
-            {
-              organisationId: input.organisationId,
-              actorId: input.actorId,
-              body: {
-                commandId: `jev-settings-${crypto.randomUUID()}`,
-                expectedRevision: head.revision,
-                policy,
-              },
-            },
-            scope,
-          );
-        if (!published.ok) return published;
-        break;
-      }
-      case "screen_relevance":
-        this.ctx.storage.transactionSync(
-          writeJevScreenRelevance.bind(null, sql, {
-            organisationId: scope.organisationId,
-            enabled: command.enabled,
-            actorId: input.actorId,
-            now,
-          }),
-        );
-        break;
-      default:
-        assertNever(command);
-    }
-    return this.admittedReadJevFeatures(scope);
   }
 
   async readCaseContextDiscoverySourceReadiness(
@@ -771,17 +519,12 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
       scope.organisationId,
     ).policy;
     if (discovery.mode !== "disabled")
-      await ensureJevPaidHold({
+      await this.jevForPolicy().ensurePaidHold({
         sql: this.ctx.storage.sql,
         env: this.env,
         organisationId: scope.organisationId,
         purpose: "case_context_discovery_relationship",
-        freeUseCovers: jevFreeUseCovers(
-          this.ctx.storage.sql,
-          scope.organisationId,
-          discovery.limits.reservationMicrousd,
-          Date.now(),
-        ),
+        reservationMicrousd: discovery.limits.reservationMicrousd,
         now: Date.now(),
       });
     const result = await evaluateOperationalCaseContextDiscovery({

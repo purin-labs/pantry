@@ -198,8 +198,72 @@ import type {
   OrganisationStateError,
 } from "./organisation/types";
 import { OrganisationCommerce } from "./organisation/organisation-commerce";
+import type { PolicyJevPort } from "./organisation/organisation-policy";
+import {
+  JEV_FOR_POLICY,
+  manageJevFeatureForOrganisation,
+  manageJevPaidUseForOrganisation,
+  readJevFeaturesForOrganisation,
+  type OrganisationJevHost,
+  type OrganisationJevRpc,
+} from "../jev-features/organisation-settings";
 
-export class OrganisationDO extends OrganisationCommerce {
+export class OrganisationDO
+  extends OrganisationCommerce
+  implements OrganisationJevRpc
+{
+  // The Jev settings of the integrations area (`jev-features/`).
+
+  protected jevForPolicy(): PolicyJevPort {
+    return JEV_FOR_POLICY;
+  }
+
+  #jevHost(): OrganisationJevHost {
+    return {
+      env: this.env,
+      storage: this.ctx.storage,
+      validateOrganisation: validateActionOrganisation.bind(
+        null,
+        this.ctx.storage.sql,
+      ),
+      publishCaseContextDiscoveryConfiguration:
+        this.admittedPublishCaseContextDiscoveryConfiguration.bind(this),
+    };
+  }
+
+  async readJevFeatures(input: Readonly<{ organisationId: OrganisationId }>) {
+    return this.command(
+      input.organisationId,
+      readJevFeaturesForOrganisation.bind(null, this.#jevHost()),
+    );
+  }
+
+  async manageJevPaidUse(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      manageJevPaidUseForOrganisation.bind(null, this.#jevHost(), input),
+    );
+  }
+
+  async manageJevFeature(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      manageJevFeatureForOrganisation.bind(null, this.#jevHost(), input),
+    );
+  }
+
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   machineCensus(): Promise<readonly MachineCensus[]> {
     return actorMachineCensus(this.ctx.storage);
