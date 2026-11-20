@@ -21,9 +21,6 @@ import type { FileProviderCredentialStore } from "../../provider-workflows/file-
 import { readCanonicalSessionForPersistence } from "../../actors/agent-session-canonical";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type {
-  HarnessEmailMailboxSearchResult,
-} from "../channels/services";
-import type {
   HarnessFileRead,
   HarnessFileSearch,
   HarnessWorkspaceQuery,
@@ -41,16 +38,6 @@ import { audiencesForAdmission } from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { SessionToolContext } from "../context";
-
-export function emailAttachmentForHarness(
-  attachment: import("../../mail/gmail-adapter").GmailAttachmentRef,
-): HarnessEmailMailboxSearchResult["messages"][number]["attachments"][number] {
-  return {
-    filename: attachment.filename,
-    mimeType: attachment.mimeType,
-    declaredBytes: attachment.declaredBytes,
-  };
-}
 
 export async function searchFilesForEmbeddedHarness(
   context: SessionToolContext,

@@ -813,6 +813,7 @@
     "services/platform/src/commerce/stock-action-execution.ts": "areas/kitchen",
     "services/platform/src/commerce/stock-action-plan.ts": "areas/kitchen",
     "services/platform/src/commerce/stock-action.ts": "areas/kitchen",
+    "services/platform/src/context/untrusted-commerce-text.ts": "foundation/agent-tools",
     "services/platform/src/control-router.ts": "workers/platform",
     "services/platform/src/control/admission/bakery-workflows.ts": "areas/kitchen",
     "services/platform/src/control/admission/chat-signals.ts": "foundation/conversation",

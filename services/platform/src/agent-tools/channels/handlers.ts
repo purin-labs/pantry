@@ -93,7 +93,6 @@ import {
   requireCurrentEmailToolLease,
   selectProviderResourceGrants,
 } from "../session-support";
-import { emailAttachmentForHarness } from "../files/handlers";
 import type { SessionToolContext } from "../context";
 
 export async function searchEmailMailboxForEmbeddedHarness(
@@ -1759,4 +1758,14 @@ function latestWhatsAppSupportSourceRevision(
     revision = Math.max(revision, conversationWindow.sourceRevision);
   }
   return revision;
+}
+
+function emailAttachmentForHarness(
+  attachment: import("../../mail/gmail-adapter").GmailAttachmentRef,
+): HarnessEmailMailboxSearchResult["messages"][number]["attachments"][number] {
+  return {
+    filename: attachment.filename,
+    mimeType: attachment.mimeType,
+    declaredBytes: attachment.declaredBytes,
+  };
 }

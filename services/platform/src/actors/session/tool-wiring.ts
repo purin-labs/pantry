@@ -13,6 +13,7 @@ import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId, RequestId } from "../../ids";
 import type { Result } from "../../result";
 import type { HarnessToolArgumentObserver } from "../embedded-harness";
+import type { MemoryProposalPort } from "../harness-memory-proposal";
 import type { SlackThreadSideCase } from "./harness-source";
 
 /** What a person's browser gave with a message. The contracts own the form. */
@@ -122,6 +123,8 @@ export interface SessionToolWiring {
   areaServices(turn: ToolTurnContext): ToolServiceSet;
   /** The side Case of a Slack thread. Slack gives it. */
   readonly slackThreadSideCase: SlackThreadSideCase;
+  /** Stores a Memory candidate. Brain gives it. */
+  readonly proposeMemory: MemoryProposalPort;
   /** The effects on a person's page. Kitchen gives them. */
   readonly pageEffects: SessionPageEffects;
   /** Sees the arguments of a tool call while the model writes them. */

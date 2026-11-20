@@ -62,6 +62,11 @@ import type {
   CheckpointPublicationError,
 } from "./types";
 import type { Env } from "../../env";
+import type { SessionToolContext } from "../../agent-tools/context";
+import type {
+  HarnessSideCaseProposalRequest,
+  HarnessSideCaseProposalResult,
+} from "../../agent-tools/catalog/types";
 
 /**
  * The tools that a turn adds to the tool list, with the live authority that
@@ -444,6 +449,18 @@ export function ignoreUnusedSideCaseOrigin(): void {}
 export interface SlackThreadSideCase {
   /** The words that a turn of such a side Case adds to its instructions. */
   readonly harnessInstruction: string;
+  /**
+   * Stores the agent's proposal of a side Case and posts it in the thread
+   * with its Start button.
+   */
+  propose(
+    input: SessionToolContext,
+    authority: Variant<
+      HarnessTurnLease["requestAuthority"],
+      "direct_conversation" | "shared_conversation"
+    >,
+    request: HarnessSideCaseProposalRequest,
+  ): Promise<HarnessSideCaseProposalResult>;
   /** Admits the proposal of the side Case before inference. */
   admit(
     storage: DurableObjectStorage,

@@ -890,6 +890,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         ...tools.areaServices(toolTurn),
         ...sessionOwnToolServices(toolTurn, {
           persistence: this.persistence,
+          wiring: tools,
           attachments: canonicalInput.value.attachments,
           links: canonicalInput.value.links,
         }),

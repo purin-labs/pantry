@@ -3,7 +3,6 @@ import { assertNever } from "@purin-labs/std";
 
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { readAdmittedChatInput } from "../chat/turn-access";
-import { proposeMemoryFromInstruction } from "../memory/access";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
 import type {
@@ -14,6 +13,51 @@ import {
   requireSessionExecution,
 } from "./session-execution-admission";
 import type { SessionToolContext } from "../agent-tools/context";
+import type { FlowLabel } from "../policy/information-flow";
+import type { Result } from "../result";
+
+/**
+ * Stores a Memory candidate that cites one instruction of a person. Brain
+ * owns the Memory records and gives this function through the Worker.
+ */
+export type MemoryProposalPort = (
+  input: Readonly<{
+    env: SessionToolContext["env"];
+    execution: SessionToolContext["execution"]["scope"];
+    organisationId: SessionToolContext["execution"]["scope"]["organisationId"];
+    agent: Readonly<{
+      caseId: string;
+      assignmentId: string;
+      sessionId: string;
+    }>;
+    instruction: Readonly<{
+      kind: "operator_instruction";
+      caseId: string;
+      entryId: string;
+      digest: string;
+    }>;
+    turnLabel: FlowLabel;
+    memoryKind: "fact" | "preference";
+    statement: string;
+    now: number;
+  }>,
+) => Promise<
+  Result<
+    Readonly<{
+      kind: "proposed" | "already_proposed";
+      memoryId: string;
+      revision: number;
+    }>,
+    Readonly<{
+      code:
+        | "memory_evidence_unavailable"
+        | "memory_evidence_invalid"
+        | "memory_invalid"
+        | "memory_capacity_exceeded"
+        | "memory_unavailable";
+    }>
+  >
+>;
 
 /**
  * Whether a turn is offered the Memory proposal tool. It is the rule of the
@@ -42,6 +86,7 @@ export function turnMayProposeMemory(
  * throws, so the tool reports no outcome that it does not know.
  */
 export async function proposeMemoryForHarness(
+  proposeMemoryFromInstruction: MemoryProposalPort,
   input: SessionToolContext,
   request: HarnessMemoryProposalRequest,
 ): Promise<HarnessMemoryProposalResult> {

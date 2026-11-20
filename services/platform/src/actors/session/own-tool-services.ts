@@ -21,7 +21,7 @@ import {
   admittedMessageLinkEgress,
   recordMessageAttachmentObservation,
 } from "./model-route";
-import type { ToolTurnContext } from "./tool-wiring";
+import type { SessionToolWiring, ToolTurnContext } from "./tool-wiring";
 
 /**
  * The services of the tool families that the foundation owns: files, the
@@ -37,6 +37,8 @@ export function sessionOwnToolServices(
   turn: ToolTurnContext,
   session: Readonly<{
     persistence: AgentSessionPersistence;
+    /** The parts of the areas, for the tools of a turn that need one. */
+    wiring: Pick<SessionToolWiring, "proposeMemory" | "slackThreadSideCase">;
     /** The files and the links of the turn's own message. */
     attachments: Parameters<
       typeof createAttachmentInspectionTool
@@ -91,13 +93,21 @@ export function sessionOwnToolServices(
       ),
     },
     turn: {
-      proposeMemory: tool(proposeMemoryForHarness),
+      proposeMemory: proposeMemoryForHarness.bind(
+        null,
+        session.wiring.proposeMemory,
+        turn,
+      ),
       scheduleFollowUp: scheduleFollowUpForHarness.bind(null, {
         env: turn.env,
         execution: turn.execution,
         lease: turn.lease,
       }),
-      proposeSideCase: tool(proposeSideCaseForHarness),
+      proposeSideCase: proposeSideCaseForHarness.bind(
+        null,
+        session.wiring.slackThreadSideCase,
+        turn,
+      ),
     },
   };
 }
