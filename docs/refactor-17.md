@@ -1934,6 +1934,27 @@ value, and it reads no field of the Actor class.
   policy, Jev, Memory and Evals parts of the Organisation were modules before this
   step.
 
+### The decision for each test file (2026-11-21)
+
+Each test file in scope has a decision: the 300 Platform unit test files, and the 17
+commerce test files that import a source file that Refactor 17 changed.
+[The table](refactor-17-test-decisions.md) has one row for each file, with the outcome
+that it checks.
+
+- **Result.** 316 files stay as they are. One file loses one case. No file is deleted.
+- **The one delete,** in its own commit: "sets the band when the price is the one that
+  was shown" in `offer-price-allowance.test.ts`. It asserted a call to a mock of the
+  test. The journey `e2e/pi-commerce-actions.test.ts` applies a price allowance through
+  the real route and the real commerce engine.
+- **Why so few.** Plan 92 removed the weak tests of this suite three days before. This
+  pass found no test that asserts the shape of a module, and no test whose only
+  assertion is a call to a mock that the test controls, other than the one above.
+- **The limit.** "Keep: the only check" does not prove that no journey has the outcome.
+  The search for a journey ran for the files with mock signals, not for each case.
+- **The protected list of Plan 92** did not change.
+- **Counts.** The Platform unit suite: 301 files and 1,730 tests before, 301 files and
+  1,729 tests after.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
