@@ -23,6 +23,7 @@ import {
   type MenuPriceSide,
 } from "../commerce/menu-price-action";
 import type { Env } from "../env";
+import { decisionCardBlocks, type DecisionCardButton } from "./decision-card";
 import { requirePublicOrigin } from "../public-origin";
 import { assertNever } from "@purin-labs/std";
 
@@ -275,71 +276,64 @@ export function commerceCardBlocks(
   text: string,
   controls: CommerceCardControls,
 ): readonly Record<string, unknown>[] {
-  const elements = [
+  return decisionCardBlocks(text.slice(0, SECTION_TEXT_LIMIT), [
     ...decisionButtons(controls),
     ...(controls.portalUrl === null
       ? []
       : [
-          portalButton(
-            controls.kind === "details" ? controls.label : "Details",
-            controls.portalUrl,
-          ),
+          {
+            kind: "link",
+            actionId: "commerce_action_details",
+            label: controls.kind === "details" ? controls.label : "Details",
+            url: controls.portalUrl,
+            primary: false,
+          } as const,
         ]),
-  ];
-  return [
-    {
-      type: "section",
-      text: { type: "mrkdwn", text: text.slice(0, SECTION_TEXT_LIMIT) },
-    },
-    ...(elements.length === 0 ? [] : [{ type: "actions", elements }]),
-  ];
+  ]);
 }
 
 function decisionButtons(
   controls: CommerceCardControls,
-): readonly Record<string, unknown>[] {
+): readonly DecisionCardButton[] {
   switch (controls.kind) {
     case "decide":
       return [
         {
-          type: "button",
-          action_id: SLACK_COMMERCE_APPROVE_ACTION,
-          text: { type: "plain_text", text: "Approve" },
-          style: "primary",
+          kind: "answer",
+          actionId: SLACK_COMMERCE_APPROVE_ACTION,
+          label: "Approve",
           value: controls.nonce,
+          primary: true,
           confirm: {
-            title: { type: "plain_text", text: "Approve this change?" },
-            text: {
-              type: "plain_text",
-              text: "Seams Pantry makes the change at once. Only an owner or admin can approve.",
-            },
-            confirm: { type: "plain_text", text: "Approve" },
-            deny: { type: "plain_text", text: "Cancel" },
+            title: "Approve this change?",
+            text: "Seams Pantry makes the change at once. Only an owner or admin can approve.",
+            confirm: "Approve",
+            deny: "Cancel",
           },
         },
         {
-          type: "button",
-          action_id: SLACK_COMMERCE_DECLINE_ACTION,
-          text: { type: "plain_text", text: "Decline" },
+          kind: "answer",
+          actionId: SLACK_COMMERCE_DECLINE_ACTION,
+          label: "Decline",
           value: controls.nonce,
+          primary: false,
           confirm: {
-            title: { type: "plain_text", text: "Decline this change?" },
-            text: {
-              type: "plain_text",
-              text: "Seams Pantry does not make the change. Only an owner or admin can decline.",
-            },
-            confirm: { type: "plain_text", text: "Decline" },
-            deny: { type: "plain_text", text: "Cancel" },
+            title: "Decline this change?",
+            text: "Seams Pantry does not make the change. Only an owner or admin can decline.",
+            confirm: "Decline",
+            deny: "Cancel",
           },
         },
       ];
     case "check_again":
       return [
         {
-          type: "button",
-          action_id: SLACK_COMMERCE_APPROVE_ACTION,
-          text: { type: "plain_text", text: "Check again" },
+          kind: "answer",
+          actionId: SLACK_COMMERCE_APPROVE_ACTION,
+          label: "Check again",
           value: controls.nonce,
+          primary: false,
+          confirm: null,
         },
       ];
     case "details":
@@ -347,13 +341,4 @@ function decisionButtons(
     default:
       return assertNever(controls);
   }
-}
-
-function portalButton(label: string, url: string): Record<string, unknown> {
-  return {
-    type: "button",
-    action_id: "commerce_action_details",
-    text: { type: "plain_text", text: label },
-    url,
-  };
 }

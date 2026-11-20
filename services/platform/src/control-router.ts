@@ -237,10 +237,20 @@ import {
 } from "./control/routes/workspace";
 import { assertNever } from "@purin-labs/std";
 import { ACCESS_CONTROL_PARTS } from "./control/access-control-parts";
+import {
+  decidePendingDecisionWith,
+  pendingDecisionSources,
+} from "./control/pending-decision-parts";
+import {
+  handlePendingDecisionsRoute,
+  matchPendingDecisionsRoute,
+  type PendingDecisionsRoute,
+} from "./control/routes/pending-decisions";
 
 type ControlRoute =
   | ChatGoalRoute
   | AgentPermissionRequestRoute
+  | PendingDecisionsRoute
   | HeldOutputRequestRoute
   | ChatSharingRoute
   | UserPreferencesRoute
@@ -371,9 +381,26 @@ export async function handleControlRequest(
     case "costsSheet":
       return handleCostsSheetRoute(request, env, route);
     case "agentPermissionRequest":
-      return handleAgentPermissionRequestRoute(request, env, route);
+      return handleAgentPermissionRequestRoute(
+        request,
+        env,
+        route,
+        decidePendingDecisionWith(env),
+      );
+    case "pendingDecisions":
+      return handlePendingDecisionsRoute(
+        request,
+        env,
+        route,
+        pendingDecisionSources(env),
+      );
     case "heldOutputRequest":
-      return handleHeldOutputRequestRoute(request, env, route);
+      return handleHeldOutputRequestRoute(
+        request,
+        env,
+        route,
+        decidePendingDecisionWith(env),
+      );
     case "accessControl":
     case "accessControlOptions":
     case "accessControlExplain":
@@ -447,7 +474,12 @@ export async function handleControlRequest(
     case "customConnectorSetupAttempt":
     case "customConnectorSetupAction":
     case "customConnectorWriteAction":
-      return handleCustomConnectorControlRoute(request, env, route);
+      return handleCustomConnectorControlRoute(
+        request,
+        env,
+        route,
+        decidePendingDecisionWith(env),
+      );
     case "setup":
     case "stageViewed":
     case "readiness":
@@ -486,7 +518,12 @@ export async function handleControlRequest(
     case "commerceActionRejection":
     case "commerceActionExecution":
     case "commerceActionPluginPreview":
-      return handleCommerceControlRoute(request, env, route);
+      return handleCommerceControlRoute(
+        request,
+        env,
+        route,
+        decidePendingDecisionWith(env),
+      );
     case "agentOperations":
     case "agentOperationRevisions":
       return handleAgentControlRoute(request, env, route);
@@ -495,7 +532,12 @@ export async function handleControlRequest(
     case "commerceSystemSync":
     case "satyrCommerceDemo":
     case "commerceCueRefresh":
-      return handleCommerceControlRoute(request, env, route);
+      return handleCommerceControlRoute(
+        request,
+        env,
+        route,
+        decidePendingDecisionWith(env),
+      );
     case "home":
       return handleWorkspaceControlRoute(request, env, route);
     case "commercePublishedResources":
@@ -566,7 +608,12 @@ export async function handleControlRequest(
     case "productCatalog":
     case "productPhotos":
     case "libraryImage":
-      return handleCommerceControlRoute(request, env, route);
+      return handleCommerceControlRoute(
+        request,
+        env,
+        route,
+        decidePendingDecisionWith(env),
+      );
     case "merchantSupport":
     case "operatorOnboarding":
     case "operatorGmailPilotBudget":
@@ -660,6 +707,8 @@ function matchControlRoute(pathname: string): ControlRoute {
   if (heldOutputRoute !== null) return heldOutputRoute;
   const agentPermissionRoute = matchAgentPermissionRequestRoute(pathname);
   if (agentPermissionRoute !== null) return agentPermissionRoute;
+  const pendingDecisionsRoute = matchPendingDecisionsRoute(pathname);
+  if (pendingDecisionsRoute !== null) return pendingDecisionsRoute;
   const accessControlRoute = matchAccessControlRoute(pathname);
   if (accessControlRoute !== null) return accessControlRoute;
   const mailAssistantRoute = matchMailAssistantRoute(pathname);

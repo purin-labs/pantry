@@ -1,3 +1,4 @@
+import { DecisionButtons } from "../../ui";
 import { Select } from "../../ui/select";
 import React from "react";
 import { MessageCircle, FileCode2 } from "lucide-react";
@@ -639,15 +640,15 @@ function CustomConnectorWriteReview(input: {
       )}
       {input.props.canManage &&
       (action.state === "proposed" || action.state === "approval_requested") ? (
-        <div className="custom-connector-actions">
-          <button
-            type="button"
-            disabled={input.props.busy || action.preview.kind === "unavailable"}
-            onClick={beginCustomApprovalStepUp.bind(null, input.props, action)}
-          >
-            Verify and approve with Google
-          </button>
-        </div>
+        <DecisionButtons
+          className="custom-connector-actions"
+          disabled={input.props.busy || action.preview.kind === "unavailable"}
+          allow={{
+            label: "Verify and approve with Google",
+            onSelect: beginCustomApprovalStepUp.bind(null, input.props, action),
+          }}
+          refuse={null}
+        />
       ) : null}
       {input.props.canManage && action.state === "signed" ? (
         <div className="custom-connector-actions">

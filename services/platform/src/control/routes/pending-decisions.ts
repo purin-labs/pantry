@@ -1,0 +1,53 @@
+import type { Env } from "../../env";
+import { authorizeOrganisationRequest } from "../authorization";
+import { controlError, controlJson } from "../http";
+import {
+  listPendingDecisions,
+  type PendingDecisionSources,
+} from "../pending-decisions";
+
+export type PendingDecisionsRoute = Readonly<{
+  kind: "pendingDecisions";
+  organisationIdRaw: string;
+}>;
+
+export function matchPendingDecisionsRoute(
+  pathname: string,
+): PendingDecisionsRoute | null {
+  const matched = /^\/v1\/control\/organisations\/([^/]+)\/decisions$/u.exec(
+    pathname,
+  );
+  if (matched === null) return null;
+  try {
+    return {
+      kind: "pendingDecisions",
+      organisationIdRaw: decodeURIComponent(matched[1] ?? ""),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * `GET /v1/control/organisations/{org}/decisions`: the decisions that wait
+ * for the signed-in member, over every store. A viewer may call it, as a
+ * viewer may call the read of each store. Each store applies its own check,
+ * so a member sees here what that member sees on the pages of today.
+ */
+export async function handlePendingDecisionsRoute(
+  request: Request,
+  env: Env,
+  route: PendingDecisionsRoute,
+  sources: PendingDecisionSources,
+): Promise<Response> {
+  if (request.method !== "GET") return controlError("method_not_allowed", 405);
+  const authorized = await authorizeOrganisationRequest(
+    request,
+    env,
+    route.organisationIdRaw,
+    "viewer",
+    false,
+  );
+  if (!authorized.ok) return authorized.response;
+  return controlJson(await listPendingDecisions(sources, authorized));
+}

@@ -35,6 +35,7 @@ import {
   signedSlackRequest,
   slackEnvelope,
 } from "./slack-journey-support";
+import { pendingDecisionsOf } from "./access-route-support";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -173,6 +174,8 @@ async function slackHeldOutput({ task }: TestContext): Promise<void> {
     firstRequest,
   ]);
   expect(await pendingOf(other)).toEqual([]);
+  // The one read over every store hides it from that person too.
+  expect(await pendingDecisionsOf(ORGANISATION_ID, other.session)).toEqual([]);
   expect((await readHeld(other, firstRequest)).status).toBe(404);
   expect((await decide(other, firstRequest, "allow")).status).toBe(404);
   expect(posts()).toHaveLength(1);

@@ -8,7 +8,11 @@ import { isRecord } from "@purin-labs/std";
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
 import { actorStub } from "../../src/actors/actor-stubs";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-slack-case-work";
-import { createGrant, enableCapability } from "./access-route-support";
+import {
+  createGrant,
+  enableCapability,
+  pendingDecisionsOf,
+} from "./access-route-support";
 import { network } from "./network";
 import {
   decide as decideRequest,
@@ -100,6 +104,11 @@ async function permissionJourney(test: TestContext): Promise<void> {
     ],
   });
 
+  // The one read over every store shows the request one time.
+  expect(await pendingDecisionsOf(ORGANISATION_ID, owner)).toEqual([
+    { kind: "permission_request", id: menuRequestId },
+  ]);
+
   // 2. An allow before Access gives the capability is refused.
   const early = await decide(owner, menuRequestId, "allow");
   expect(early.status).toBe(409);
@@ -125,6 +134,9 @@ async function permissionJourney(test: TestContext): Promise<void> {
     status: "allowed",
     waitingForSlack: false,
   });
+
+  // A decided request waits for nobody.
+  expect(await pendingDecisionsOf(ORGANISATION_ID, owner)).toEqual([]);
 
   // 4. The request continues in the thread, for the original question.
   await expect.poll(slack.visibleMessageCount, { timeout: 60_000 }).toBe(3);

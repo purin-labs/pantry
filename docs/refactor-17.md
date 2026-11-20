@@ -1455,6 +1455,76 @@ the branch `refactor-17-table-owners`.
   voice Macs and the cue claim pass: 11 tests. `wrangler deploy --dry-run` passes
   for the six Workers. The full E2E suite did not run on the branch.
 
+### A2.1 — One decision API (2026-11-21)
+
+The six parts of the step are done. Three items stay open for the owner or for a later
+step; they are at the end of this entry.
+
+- **The record.** [Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)
+  gives each kind: its store, who reads it, who decides, what happens, and what a
+  person sees in the Portal and in Slack.
+- **The one read.** `GET /v1/control/organisations/{id}/decisions` gives the
+  decisions that wait for the reader. `PendingDecision` in
+  `@purin-labs/control-api` is the union: `governed_action`, `held_output`,
+  `permission_request` and `email_review`. `listPendingDecisions`
+  (`control/pending-decisions.ts`) reads each store one time with the read of its
+  page, copies no record and writes nothing. A Case approval wait is the Case's view
+  of a ledger action, so that action is one entry. No route changed its answer.
+- **The one decide call.** `decidePendingDecision`
+  (`control/decide-pending-decision.ts`) takes a `PendingDecisionCall`: the kind,
+  the id of the entry in the one read, and the answer `allow` or `refuse`. It gives
+  the call to the store that owns the decision. The nine decide routes call it: the
+  held output, the permission request, the approval and the rejection of a commerce
+  action, the approval of a custom connector write, and the approve and reject
+  actions of a Gmail reply and of an operational email.
+- **Each store keeps its checks.** The code of each store did not change: the role,
+  the step-up grant, the mutation boundary, the challenge of an email proposal, the
+  receipt and the effect. Each route answers with the same status and body, and it
+  makes its checks in the same order.
+- **The proof is the request.** The call carries the request as the proof of the
+  person, because the step-up grant, the mutation boundary and the challenge are in
+  it. The stores still answer with a `Response`.
+- **The one Portal component.** `DecisionButtons` (`apps/portal/src/ui/decision-buttons.tsx`)
+  shows allow and refuse, and owns the second question of a refusal. Six places use
+  it: the chat card and the status band of a governed action, the review of a custom
+  connector write, the two email reviews of the mailbox page and the Inbox
+  conversation. Each place gives its labels and classes as props, so each place
+  keeps its look. A temporary check rendered the old and the new markup of the six
+  places: they are equal. The held output and the permission request stay on
+  `PermissionRequestDialog`, and the chat email draft stays on `DraftMessageCard`.
+  Each of the two was one shared component before the step.
+- **The one Slack card builder.** `decisionCardBlocks` (`slack/decision-card.ts`)
+  builds the section and the actions block from a list of buttons: a link to the
+  Portal, or an answer with an optional confirm. The commerce approval card, the
+  permission request card and the notice card use it. A temporary check serialised
+  14 cards before and after: the 7,905 bytes are equal. The check is deleted. The
+  email review notice is plain text and did not change.
+- **The journey of a refused Gmail reply.** `mail-reply-shared-draft.test.ts` has a
+  third journey: a viewer may not reject, a rejection with a reason is refused, an
+  administrator rejects, Gmail loses the draft, the shared draft ends, a late
+  approval sends nothing, and the reply leaves the one read.
+- **Layers and ratchets.** `control/pending-decisions.ts` and
+  `control/decide-pending-decision.ts` are `foundation/control` and name no area.
+  The Worker file `control/pending-decision-parts.ts` gives the readers and the
+  stores. Layer crossings: 477, no change. Copies: 878 to 877. Unused exports: 807,
+  no change.
+- **Open for the owner: two looks of one kind.** The items of "Two looks of one
+  kind, as found" in Appendix E did not change. `DecisionButtons` keeps each look
+  through props. A decision of the owner removes a prop value, not a component.
+- **Open for the owner: a custom connector write has no refusal.** The type of the
+  call permits only `allow` for it, no button refuses it, and it has no refused
+  journey. It can only expire.
+- **Open for a later step: Slack and a `Result` for each store.** The Deny of a
+  permission request (`slack/permission-request-deny.ts`) and the buttons of a
+  commerce action (`slack/commerce-approval.ts`) prove the person through a verified
+  Slack link, not through a Portal session, and they call the stores directly. To
+  send them through the one call, each store must first return a `Result` and take
+  the proof as a value. That change moves the checks of four route files, so it is
+  not a change with no risk for behavior. It is not done.
+- **Found, not changed.** An approval of a Gmail reply after its rejection answers
+  with status 502 and `email_reply_edit_unavailable`. Nothing is sent. A status 409
+  fits better, but the step changes no answer.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
@@ -2388,3 +2458,112 @@ drafts or sends. Each result is plain text with the host's own digest.
 - One branch was not reachable and is still not: `email_reply_now` in a `draft_only`
   turn ("This turn permits review drafts only."). The list of that turn does not
   hold the tool, so the model reads "Unknown tool".
+
+## Appendix E — The decisions that wait for a person, before step A2.1
+
+This record was written on 21 November 2026, before any change of step A2.1. It names
+each kind of decision that waits for a person, where it is stored, who reads and
+decides it, and what a person sees. The texts are the texts of the code on that day.
+
+### The four stores of the plan
+
+| Kind                 | Store                                                                                                                                                                                              | States                                                                                                                 | Life                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Governed action      | `action_ledger` in `OrganisationDO` SQLite (`actors/action-ledger.ts`). A commerce action or a custom connector write                                                                              | `proposed`, `approval_requested`, `signed`, `executing`, `indeterminate`, `confirmed`, `failed`, `rejected`, `expired` | 15 minutes, set by the proposer. The ledger expires an entry when a call reads it     |
+| Case approval wait   | `case_commerce_approval` in `CaseDO` SQLite (`actors/case/proposals.ts`). It is a copy: the Case never decides, it reads the ledger                                                                | `waiting`, `decided`, `lapsed`                                                                                         | The Case alarm reads the ledger each minute for 10 minutes, then each 15 minutes      |
+| Held output          | `held_output_request` in regional D1 (`data/held-output-request.ts`). An answer or a step that an exit check stopped                                                                               | `pending`, `allowed`, `denied`, `expired`                                                                              | 7 days. The 15-minute reconciliation cron sets `expired`                              |
+| Permission request   | `agent_permission_request` in regional D1 (`data/agent-permission-request.ts`). A capability or a record read that a turn lacks                                                                    | `pending`, `allowed`, `denied`                                                                                         | 7 days, checked when a person reads or decides. No stored `expired`                   |
+| Email reply proposal | The Case holds the lifecycle (`case_email_proposal`); `email_reply_proposal` in regional D1 is the projection. The approval challenge is a signed value (`mail-inbox/email-approval-challenge.ts`) | `awaiting_approval`, `approved`, and the end states                                                                    | 72 hours. The challenge has no life: it goes stale with a new version or another user |
+
+### Who reads and who decides
+
+| Kind               | Read                                                                                                                                                                                                 | Decide                                                                                                                                                                                                                                       | Who may decide                                                                                                                                                                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action    | `GET …/commerce/actions/{nonce}`; `GET …/operations` (all states, 50 newest); `GET …/custom-connectors/{c}/actions/{nonce}`. RPC `readActionActivity`, `getAction`. No read of only the waiting ones | `POST …/commerce/actions/{nonce}/approval`, `/rejection`, `/execute`; `POST …/custom-connectors/{c}/actions/{nonce}/approval`. RPC `requestActionApproval`, `signAction`, `rejectAction`. Slack buttons through `slack/commerce-approval.ts` | Owner or admin. Approval in the Portal needs a session of 10 minutes or less and a Google approval grant for this action. In Slack: owner or admin with a linked Slack account, and no action that moves money |
+| Case approval wait | `CaseDO.inspect()` (`commerceApprovals`), for the activity and execution views                                                                                                                       | Nobody. `syncCommerceApprovalWait` copies the answer of the ledger                                                                                                                                                                           | Not applicable                                                                                                                                                                                                 |
+| Held output        | `GET …/access-control/held-outputs/{id}`; the list is a part of `GET …/access-control/permission-requests`                                                                                           | `POST …/access-control/held-outputs/{id}/decision` with `allow` or `deny`                                                                                                                                                                    | A member who may see the content. `outside_written`: only the person who asked. `outside_organisation`: owner, admin or the person who asked                                                                   |
+| Permission request | `GET …/access-control/permission-requests` (a member below admin sees only their own); `GET …/permission-requests/{id}`                                                                              | `POST …/permission-requests/{id}/decision`. Slack Deny button through `slack/permission-request-deny.ts`. A Portal chat then resumes with `POST …/chat/conversations/{id}/permission`                                                        | Owner or admin. Allow needs that the access is already there: the Portal enables the capabilities and adds the grants first                                                                                    |
+| Email reply        | `GET …/email-reviews` (replies and operational emails); `GET …/email-replies/{id}` gives the preview with the challenge                                                                              | `POST …/email-replies/{id}/approve` with the version, the digest and the challenge; `/reject`; the same for `…/email-operational/{id}`                                                                                                       | Owner or admin. Approve needs the challenge of this user for this version. Reject needs no challenge                                                                                                           |
+
+### What happens
+
+| Kind               | Approve                                                                                                                                                                   | Refuse                                                                                           | Expiry                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Governed action    | The entry is `signed`; the Case wait is synced; a mutation receipt is stored. The Portal then calls `/execute`. The Slack button approves and executes at once            | The entry is `rejected`; the Case wait is synced; the Case gets the outcome; a receipt is stored | The entry is `expired` at the next ledger call. The Case wait lapses and the Case opens again   |
+| Held output        | Answer: the Connector sends it and the Case takes the delivery receipt. Step in Slack: the parked turn continues. Step in a Portal chat: the pass is used at the next ask | Answer: the Case drops it with a fixed note. Step: the Case notes the refused effect             | The cron sets `expired` and ends it as a refusal                                                |
+| Permission request | Slack: the Connector queues the parked turn again and updates the card. Portal chat: the paused run continues when the person selects Continue                            | Slack: the card shows the refusal. Portal chat: the person stops the response                    | The request leaves the list. A decision gets status 409. A paused chat run fails after 24 hours |
+| Email reply        | The Connector sends the mail through Gmail; the lifecycle moves; a receipt is stored                                                                                      | The Connector disposes the proposal; the lifecycle is `rejected`; a receipt is stored            | Found at preview or dispatch, then synced as `expired`                                          |
+
+### What a person sees in the Portal
+
+| Kind               | Component                                                                                                     | Where                                                                                   | Buttons, in order                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action    | `ChatCommerceActionCard` (`features/governed-actions/chat-commerce-action-card.tsx`)                          | A chat, one card for each `?commerceAction=` link of an answer                          | "Approve and apply", "Reject" (then "Reject change", "Keep proposal"). Signed: "Apply change"                                                |
+| Governed action    | `CommerceActionStatus` (`features/governed-actions/commerce-action-status.tsx`)                               | The status band of a page, from Operations › Approvals or a link                        | "Approve and apply", "Reject change" (then "Reject change", "Keep proposal", which resets after 5 seconds). Also "Reconcile approved change" |
+| Governed action    | `CustomConnectorWriteReview` (`features/integrations/custom-connectors.tsx`)                                  | Integrations, from a `?customConnector=&customAction=` link                             | "Verify and approve with Google". Signed: "Run approved action". No button refuses a write                                                   |
+| Held output        | `HeldOutputPrompt` (`features/access/held-output-prompt.tsx`), on `PermissionRequestDialog`                   | Access page link, the Permission requests drawer, and by itself in the chat of the step | Answer: "Do not send", "Send". Step: "Deny", "Allow"                                                                                         |
+| Permission request | `AgentPermissionRequestPrompt` (`features/access/agent-permission-request.tsx`), on `PermissionRequestDialog` | Access page link, the drawer, and the chat that waits                                   | "Deny", "Allow". In a chat after the decision: "Stop response", "Continue"                                                                   |
+| Permission request | `ChatCapabilityPermissionPrompt` (`features/chat/permission-prompt.tsx`), on `PermissionRequestDialog`        | A chat whose turn lacks a capability and stored no request of an agent                  | "Deny", "Allow". A member who cannot decide: "Stop response", "Check again"                                                                  |
+| Email reply        | `EmailReviewSurface` (`features/email-review/review.tsx`)                                                     | Integrations › mailbox                                                                  | "Approve and send", "Reject", "Open in Gmail", "Close"                                                                                       |
+| Email reply        | `ChatEmailDraftCard` (`features/chat/draft-cards.tsx`), on `DraftMessageCard`                                 | A chat                                                                                  | "Send", "Discard", and an edit button                                                                                                        |
+| Email reply        | `MailConversation` (`features/mail-inbox/conversation.tsx`)                                                   | The Inbox                                                                               | "Approve and send", "Edit", "Reject"                                                                                                         |
+
+The list of the waiting ones is `PermissionRequestQueue` on the Access page and
+`PermissionRequestsDrawer` in the account menu. Both show permission requests and held
+outputs from one read, each with a "Review" button. Operations › Approvals lists the
+governed actions. The mailbox page and the Inbox list the email replies.
+
+### What a person sees in Slack
+
+| Kind               | Builder                                                                 | Blocks                                                                                                                                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action    | `commerceCardBlocks` (`slack/commerce-approval-card.ts`)                | A section, then actions: "Approve" (`commerce_action_approve`, primary, with a confirm), "Decline" (`commerce_action_decline`, with a confirm), and a link "Details" or "Review in Portal". An action that moves money has only the link |
+| Held output        | `heldCardBlocks` (`slack/held-output-notice.ts`), on `noticeCardBlocks` | A section and one link button "Review in Portal" (`held_request_review`). No decision in Slack                                                                                                                                           |
+| Permission request | `permissionCardBlocks` (`slack/permission-request-notice.ts`)           | A section, then actions: the link "Review and allow" (`permission_request_review`, primary) and "Deny" (`permission_request_deny`, with a confirm). Allow is only in the Portal                                                          |
+| Email reply        | `buildSlackEmailReviewNotice` (`slack/email-review-notice.ts`)          | Plain text with a link "Review in Portal". No blocks and no decision in Slack                                                                                                                                                            |
+
+### Other decisions that wait for a person
+
+Each one has its own store, route and card. Step A2.1 does not join them, because the
+plan names four stores. They are here so that the next step can decide.
+
+| Kind                     | Store                                                          | Decide                                                                                                             | Card                                                                                        |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Configuration draft      | `operator_configuration_draft` in regional D1, 1 hour          | Only the person who asked: a card in a Portal chat (confirm, cancel), or a reply in Slack with the action and code | `ChatConfigurationDraftCard`: the action label, "Discard". Slack: a typed reply, no buttons |
+| Recipe workflow proposal | The same draft table                                           | Owner or admin who asked: `…/bakery/workflows/{id}/proposals/{draft}/(approve\|decline)`                           | The Workflow page of the recipe, and the chat card                                          |
+| Campaign brief           | `campaign_brief` in regional D1, 1 hour                        | Owner or admin: accept or dismiss. A review record only                                                            | No Portal card was found                                                                    |
+| Side Case proposal       | `side_case_proposal` in regional D1, 7 days                    | Start, or do it here. No plain refusal                                                                             | `ChatSideCaseCard`. Slack: "Start thread" (`satyr_side_case_start`)                         |
+| Memory candidate         | `memory_revision` in `OrganisationDO` SQLite, no expiry        | Owner or admin: accept, reject, revoke                                                                             | Brain › Knowledge: "Accept", "Edit first", "Decline"                                        |
+| Eval candidate           | The Evals store of the Organisation actor                      | Owner or admin: accept, reject, revoke                                                                             | Brain › Evals                                                                               |
+| Slack message draft      | `slack_message_proposal` in regional D1, 24 hours              | Owner or admin: send, discard, edit                                                                                | A draft card in the chat                                                                    |
+| WhatsApp reply proposal  | `connector_whatsapp_proposal` in `ConnectorDO` SQLite, 4 hours | Approve, reject, edit, resolve                                                                                     | The Inbox conversation                                                                      |
+| Supplier destination     | `supplier_destination_revision` in regional D1                 | A second owner or admin activates it. The proposer cannot                                                          | The supplier payouts page                                                                   |
+| Kitchen agent save       | The scenario save store of Kitchen, 15 minutes                 | The person approves the save                                                                                       | The Kitchen workspace                                                                       |
+
+### Two looks of one kind, as found
+
+- **Governed action, reject.** The chat card says "Reject" first. The page card says
+  "Reject change" first, and its confirm resets after 5 seconds.
+- **Governed action, approve.** A commerce action approves in a popup and then applies in
+  one click. A custom connector write approves on a full page of Google and then needs
+  a second click, "Run approved action".
+- **Custom connector write.** No route and no button refuses one. It can only expire.
+- **Permission request in a chat.** A request that an agent stored shows "Pantry agent
+  would like to …" with the grants. A capability that a turn lacks with no stored
+  request shows "… would like to {action}" with no grants.
+- **Email reply.** Three places with three button sets: "Approve and send" and "Reject"
+  on the mailbox page; "Send" and "Discard" in a chat; "Approve and send", "Edit" and
+  "Reject" in the Inbox.
+- **Held output in Slack** has no decision button, and a permission request has only
+  Deny. A commerce action has both buttons.
+
+### The journeys that prove each kind today
+
+| Kind                   | Allowed                                                                                    | Refused                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action        | `slack-commerce-approval.test.ts`, `pi-commerce-actions.test.ts`                           | `slack-commerce-approval.test.ts` (decline in Slack and in the Portal), `slack-offer-price-change.test.ts`                                      |
+| Case approval wait     | `portal-chat-approval-wait.test.ts` (the chat waits, then runs after the card expires)     | The same file: a late rejection gets status 409                                                                                                 |
+| Held output            | `slack-held-output.test.ts`, `slack-held-effect.test.ts`, `airtable-exit-approval.test.ts` | `slack-held-output.test.ts`, `slack-held-effect.test.ts`                                                                                        |
+| Permission request     | `slack-permission-request.test.ts`, `chat-permission-request.test.ts`                      | `slack-permission-request.test.ts`, `slack-proposal-permission.test.ts` (the Slack Deny)                                                        |
+| Email reply            | `mail-inbox.test.ts`, `mail-reply-shared-draft.test.ts`                                    | `mail-operational-placement.test.ts` rejects an operational email. `mail-reply-shared-draft.test.ts` rejects a Gmail reply (added in step A2.1) |
+| Custom connector write | `remote-mcp.test.ts`                                                                       | None: no refusal exists                                                                                                                         |

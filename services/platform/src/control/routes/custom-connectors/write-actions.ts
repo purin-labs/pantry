@@ -1,3 +1,4 @@
+import type { DecidePendingDecision } from "../../decide-pending-decision";
 import { acceptedExecutionAuthority } from "../../../organisation-access/access";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
@@ -63,6 +64,7 @@ export async function handleCustomConnectorWriteAction(
   request: Request,
   env: Env,
   route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
+  decide: DecidePendingDecision,
 ): Promise<Response> {
   if (!isActionNonce(route.actionNonceRaw)) {
     return controlError("custom_connector_action_not_found", 404);
@@ -71,7 +73,16 @@ export async function handleCustomConnectorWriteAction(
     return readCustomConnectorWriteAction(request, env, route);
   }
   if (route.action === "approval") {
-    return approveCustomConnectorWriteAction(request, env, route);
+    return decide(
+      { request, organisationIdRaw: route.organisationIdRaw },
+      {
+        kind: "governed_action",
+        surface: "custom_connector",
+        connectorIdRaw: route.connectorIdRaw,
+        id: route.actionNonceRaw,
+        answer: "allow",
+      },
+    );
   }
   if (route.action === "execute" || route.action === "retry") {
     return executeCustomConnectorWriteAction(request, env, route);
@@ -116,10 +127,18 @@ async function readCustomConnectorWriteAction(
     : controlError("custom_connector_action_not_found", 404);
 }
 
-async function approveCustomConnectorWriteAction(
+/**
+ * Records the approval of one write of a custom connector. The caller
+ * checked that the id has the form of an action nonce.
+ */
+export async function approveCustomConnectorWriteAction(
   request: Request,
   env: Env,
-  route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
+  route: Readonly<{
+    organisationIdRaw: string;
+    connectorIdRaw: string;
+    actionNonceRaw: string;
+  }>,
 ): Promise<Response> {
   if (request.method !== "POST") return controlError("method_not_allowed", 405);
   const context = await prepareWriteMutation(request, env, route, "approval");
@@ -586,7 +605,11 @@ type WriteMutationContext = Readonly<{
 async function prepareWriteMutation(
   request: Request,
   env: Env,
-  route: Variant<CustomConnectorControlRoute, "customConnectorWriteAction">,
+  route: Readonly<{
+    organisationIdRaw: string;
+    connectorIdRaw: string;
+    actionNonceRaw: string;
+  }>,
   operation: "approval" | "execute" | "retry" | "reconcile",
   retainBody = false,
 ): Promise<

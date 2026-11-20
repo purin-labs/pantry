@@ -14,7 +14,7 @@ import type {
   FlowPolicyInput,
   FlowWriter,
 } from "../../src/policy/information-flow";
-import { accessControlPath } from "./access-route-support";
+import { accessControlPath, pendingDecisionsOf } from "./access-route-support";
 import { commerceClient, commerceHeaders } from "./commerce-support";
 import { ORGANISATION_ID } from "./slack-journey-support";
 
@@ -189,7 +189,17 @@ export async function pendingOf(
   const body: unknown = await response.json();
   if (!isRecord(body) || !Array.isArray(body.heldOutputs))
     throw new Error("Pending list invalid");
-  return body.heldOutputs.filter(isRecord);
+  const held = body.heldOutputs.filter(isRecord);
+  // The one read over every store loses no held output and shows each one
+  // one time. A turn can add a request between the two reads, so the one
+  // read may hold more.
+  const decisions = await pendingDecisionsOf(ORGANISATION_ID, person.session);
+  const ids = decisions
+    .filter((decision) => decision.kind === "held_output")
+    .map((decision) => decision.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  for (const entry of held) expect(ids).toContain(String(entry.requestId));
+  return held;
 }
 
 /** The stored status of one held output. */

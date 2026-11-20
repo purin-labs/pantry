@@ -504,6 +504,19 @@ browser journey `scripts/permission-toasts/browser-permission-toasts.js`
 proves the toast path in a Portal chat; see
 `docs/evidence/permission-toasts/README.md`.
 
+### Decision buttons
+
+`DecisionButtons` shows the buttons of one decision that waits for a person:
+allow, then refuse. Use it for every place that shows such a decision outside
+the `PermissionRequestDialog`: a governed action, a custom connector write and
+an email reply. Each place gives its own labels and classes, so each place
+keeps its look. `refuse.confirm` asks one more time before a refusal:
+`resetAfterMs` goes back with no answer, and `resetWhenDone` goes back when
+the refusal ends. `between` puts a control between the two answers, for
+example Edit. With `className` the buttons get a group element, and with
+`groupLabel` that element has the group role. Without `className` the buttons
+join the row of the page. `refuse` is null where a decision has no refusal.
+
 ### Drafted messages
 
 `DraftMessageCard` shows a message that the agent drafted for another app,
