@@ -191,7 +191,7 @@ export function slowModel(parts: readonly string[], gapMs = PART_GAP_MS) {
   };
 }
 
-export function sse(chunk: Record<string, unknown>): string {
+function sse(chunk: Record<string, unknown>): string {
   return `data: ${JSON.stringify(chunk)}\n\n`;
 }
 

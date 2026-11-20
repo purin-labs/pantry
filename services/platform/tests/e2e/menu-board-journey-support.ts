@@ -234,7 +234,7 @@ export async function dropFromDraft(
   }
 }
 
-export function nextDraftMessage(
+function nextDraftMessage(
   socket: WebSocket,
   kind: string,
   send: () => void,
@@ -276,7 +276,7 @@ export function applied(
   if (!result.ok) throw new Error(result.error.code);
 }
 
-export function member(
+function member(
   userId: string,
   personId: string,
   role: "operator" | "viewer",

@@ -146,7 +146,7 @@ type AccessControlViewActions =
   | Readonly<{ kind: "read_only" }>
   | Readonly<{ kind: "manage"; createGrant: true; applyDefaults: true }>;
 
-export type AccessControlCapabilityView = Readonly<{
+type AccessControlCapabilityView = Readonly<{
   definition: CapabilityDefinition;
   mode: CapabilityMode;
   provenance: CapabilityPolicyProvenance;
@@ -186,7 +186,7 @@ type AccessControlProvenanceView = Readonly<{
   label: string;
 }>;
 
-export type AccessControlGrantView = Readonly<{
+type AccessControlGrantView = Readonly<{
   grantId: AccessGrant["grantId"];
   revision: number;
   subject: AccessControlSubjectView;
@@ -202,7 +202,7 @@ export type AccessControlGrantView = Readonly<{
   actions: AccessControlGrantActions;
 }>;
 
-export type AccessControlSourcePolicyView = Readonly<{
+type AccessControlSourcePolicyView = Readonly<{
   sourceRefId: string;
   revision: number;
   capability: Readonly<{

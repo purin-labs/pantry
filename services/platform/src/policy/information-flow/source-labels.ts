@@ -611,7 +611,7 @@ async function readActiveIntegrationAccountPolicy(
   }
 }
 
-export async function grantSubjectIsCurrent(
+async function grantSubjectIsCurrent(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   subject: GrantSubject,

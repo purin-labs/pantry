@@ -146,8 +146,6 @@ type WhatsAppEnvelopeEntry = {
   readonly occurredAt: number;
 };
 
-export type { WhatsAppProposalState };
-
 export type WhatsAppProposalRow = {
   readonly proposalId: string;
   readonly version: number;

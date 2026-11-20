@@ -55,7 +55,7 @@ type OnePasswordItemOverview = Readonly<{
   state?: string;
 }>;
 
-export type OnePasswordField = Readonly<{
+type OnePasswordField = Readonly<{
   id: string;
   title: string;
   sectionId?: string;

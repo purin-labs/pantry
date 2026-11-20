@@ -312,7 +312,7 @@ async function armLostPublish(): Promise<void> {
   if (!armed.ok) throw new Error(await armed.text());
 }
 
-export function seedProductProjection(
+function seedProductProjection(
   _actor: OrganisationDO,
   state: DurableObjectState,
 ): void {

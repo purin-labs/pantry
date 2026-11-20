@@ -131,13 +131,6 @@ export function parseContextVisibility(
   }
 }
 
-export function contextVisibilityMatches(
-  left: ContextVisibility,
-  right: ContextVisibility,
-): boolean {
-  return encodeContextVisibility(left) === encodeContextVisibility(right);
-}
-
 function readNonEmptyString(value: unknown): string | null {
   return typeof value === "string" && value.trim().length > 0 ? value : null;
 }

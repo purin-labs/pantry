@@ -32,7 +32,7 @@ export type VaultRotationBatchLimit = number & {
   readonly [vaultRotationBatchLimitBrand]: "VaultRotationBatchLimit";
 };
 
-export type VaultRootRotationFailureCode =
+type VaultRootRotationFailureCode =
   | "active_key_version_changed"
   | "source_root_unavailable"
   | "target_root_unavailable"

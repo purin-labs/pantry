@@ -8,7 +8,6 @@ import {
   parseBakerySurfaceEffect,
   type BakerySurfaceEffectV1,
 } from "@purin-labs/bakery-model/bakery-surface";
-import { readOrganisationCodexConnection } from "../../src/models/codex-connection";
 import {
   issueControlSession,
   type IssuedControlSession,
@@ -121,15 +120,6 @@ export async function preparePortalChatJourney(
   });
 
   return { session, fixture };
-}
-
-export function readConnection(reconcile: boolean) {
-  return readOrganisationCodexConnection({
-    env,
-    organisationId: ORGANISATION_ID,
-    now: Date.now(),
-    reconcile,
-  });
 }
 
 export async function readWork(session: IssuedControlSession): Promise<string> {

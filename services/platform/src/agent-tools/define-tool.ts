@@ -31,7 +31,7 @@ export type ToolEffect =
  * Who may run a call again after a lost process left it in flight. The same
  * three values as `ToolRerun` in `actors/pi-tool-replay.ts`.
  */
-export type ToolRerun =
+type ToolRerun =
   | { readonly kind: "any_caller"; readonly reason: string }
   | { readonly kind: "script"; readonly reason: string }
   | { readonly kind: "none" };

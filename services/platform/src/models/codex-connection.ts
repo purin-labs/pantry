@@ -127,7 +127,7 @@ export type OrganisationCodexConnection =
       readonly observedAt: number;
     };
 
-export type CodexAuthorizationAttempt = {
+type CodexAuthorizationAttempt = {
   readonly attemptId: CodexAuthorizationAttemptId;
   /**
    * `device_code`: the person types `userCode` at OpenAI, and Pantry polls.

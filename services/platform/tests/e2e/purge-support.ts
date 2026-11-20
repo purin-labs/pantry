@@ -135,9 +135,7 @@ export async function erasedTableResidue(
   return residue;
 }
 
-export async function cleanupStatus(
-  organisationId: OrganisationId,
-): Promise<unknown> {
+async function cleanupStatus(organisationId: OrganisationId): Promise<unknown> {
   const scope = await requireOrganisationExecutionScope(env, organisationId);
   return scope.database
     .prepare(

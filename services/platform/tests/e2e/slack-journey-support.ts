@@ -1592,7 +1592,7 @@ export function hex(bytes: Uint8Array): string {
   return result;
 }
 
-export function requiredOrganisationId(raw: string) {
+function requiredOrganisationId(raw: string) {
   const parsed = parseOrganisationId(raw);
   if (!parsed.ok) throw new Error(parsed.error.code);
   return parsed.value;

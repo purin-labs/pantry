@@ -352,7 +352,7 @@ export async function workKind(
   return (await storedConversation(user, id))?.conversation.work.kind ?? null;
 }
 
-export function journalEntries(
+function journalEntries(
   _actor: unknown,
   state: DurableObjectState,
 ): readonly Readonly<{ entryId: string; payload: string }>[] {

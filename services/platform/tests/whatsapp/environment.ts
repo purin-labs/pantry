@@ -19,7 +19,6 @@ import {
   whatsappConversationWindowCaseId,
 } from "../../src/data/whatsapp";
 import {
-  parseIntegrationAccountId,
   type UserId,
   type IntegrationAccountId,
   type ProviderConnectionId,
@@ -359,10 +358,6 @@ async function seedInstallation(
     .bind(installationId, organisationId, definitionId, userId, now, now)
     .run();
   return installationId;
-}
-
-export function requireIntegrationAccountId(raw: string): IntegrationAccountId {
-  return require_(parseIntegrationAccountId(raw));
 }
 
 function require_<T>(

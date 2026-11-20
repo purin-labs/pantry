@@ -105,7 +105,7 @@ export type TransientTurnInput<TValue> = {
   >;
 };
 
-export type TransientHarnessSinkUsage = {
+type TransientHarnessSinkUsage = {
   readonly acceptedEvents: number;
   readonly historyEntries: number;
 };

@@ -140,7 +140,7 @@ export type ActiveOrganisationMembership = {
   readonly createdAt: number;
 };
 
-export type OrganisationWorkspace = {
+type OrganisationWorkspace = {
   readonly workspaceId: WorkspaceId;
   readonly workspaceHandle: WorkspaceHandle;
   readonly name: string;

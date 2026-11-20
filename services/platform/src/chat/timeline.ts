@@ -40,7 +40,7 @@ import {
   parseChatQuestion,
 } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
-export type ConnectorCardTarget = ConversationCardTarget;
+type ConnectorCardTarget = ConversationCardTarget;
 
 /** The provider-neutral content that can be accepted into a conversation. */
 export type ChatInputPart =

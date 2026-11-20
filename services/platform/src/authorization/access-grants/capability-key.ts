@@ -5,7 +5,7 @@ import type {
 } from "@purin-labs/contracts";
 import { hasExactKeys, isNonBlankString, isRecord } from "@purin-labs/std";
 
-export type PlatformCapabilityDefinition = Readonly<{
+type PlatformCapabilityDefinition = Readonly<{
   readonly kind: "platform_capability";
   readonly capabilityId: string;
   readonly capabilityVersion: number;
@@ -70,9 +70,7 @@ function encodeCustomConnectorCapabilityKey(
   ].join(":");
 }
 
-export function encodeFileCapabilityKey(
-  definition: FileCapabilityDefinition,
-): string {
+function encodeFileCapabilityKey(definition: FileCapabilityDefinition): string {
   return [
     "file",
     definition.capabilityId,
@@ -82,7 +80,7 @@ export function encodeFileCapabilityKey(
   ].join(":");
 }
 
-export function encodePlatformCapabilityKey(
+function encodePlatformCapabilityKey(
   definition: PlatformCapabilityDefinition,
 ): string {
   return [
@@ -275,17 +273,6 @@ export function parseFileResourceScope(
     default:
       return null;
   }
-}
-
-export function parseProviderCapabilityKey(
-  value: string,
-): Result<ProviderCapabilityDefinition, CapabilityKeyParseError> {
-  const parsed = parseCapabilityKey(value);
-  if (!parsed.ok) {
-    return parsed;
-  }
-  if (parsed.value.kind !== "provider_resource") return invalidKey(value);
-  return { ok: true, value: parsed.value };
 }
 
 function parseCapabilityVersion(value: string | undefined): number | null {

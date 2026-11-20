@@ -498,35 +498,6 @@ export async function verifyStoredVaultSecret(input: {
       };
 }
 
-export async function verifyRevokedVaultSecret(input: {
-  readonly db: OrganisationDatabase;
-  readonly keys: CredentialVaultBindings;
-  readonly stored: VaultStoredSecret;
-}): Promise<
-  Result<
-    true,
-    | VaultResolveError
-    | {
-        readonly code: "vault_secret_not_revoked";
-      }
-  >
-> {
-  const resolved = await resolveVaultHandle({
-    db: input.db,
-    keys: input.keys,
-    organisationId: input.stored.organisationId,
-    handle: input.stored.handle,
-  });
-
-  if (!resolved.ok) {
-    return resolved.error.code === "vault_secret_revoked"
-      ? { ok: true, value: true }
-      : resolved;
-  }
-
-  return { ok: false, error: { code: "vault_secret_not_revoked" } };
-}
-
 export async function revokeVaultSecret(input: {
   db: OrganisationDatabase;
   organisationId: OrganisationId;
