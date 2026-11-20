@@ -41,7 +41,7 @@ import {
 import { traceWarn } from "../observability";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
-import { resolveActiveSlackDestinationConnection } from "../slack/organisation-routing";
+import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import { buildWorkflowAuthority } from "../request-authority";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
 import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";

@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { DatabaseSync } from "node:sqlite";
 import { expect, it } from "vitest";
 import {
@@ -11,7 +13,7 @@ import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
   revokeSlackOrganisationConnections,
-} from "../src/slack/organisation-routing";
+} from "../src/slack/installation-store";
 import { schemaDatabase } from "./split-topology";
 
 const NOW = 1_791_470_000_000;

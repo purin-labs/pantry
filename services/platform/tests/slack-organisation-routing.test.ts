@@ -27,15 +27,17 @@ import {
 import { parseSlackUserId } from "../src/slack/events";
 import { parseInitialOrganisationPlacement } from "../src/placement";
 import {
+  resolveOrClaimSlackThreadRoute,
+  selectSlackDmOrganisation,
+} from "../src/slack/organisation-routing";
+import {
   configureSlackChannelDefault,
   userMayDisconnectSlackInstallation,
   createSlackInstallation,
   createSlackOrganisationConnection,
   disconnectSlackInstallation,
   listSlackOrganisationRouting,
-  resolveOrClaimSlackThreadRoute,
-  selectSlackDmOrganisation,
-} from "../src/slack/organisation-routing";
+} from "../src/slack/installation-store";
 import { createMigratedDatabase } from "./sqlite-d1";
 
 const APP_ID = requiredSlackAppId("A_PLAN25B");
@@ -211,7 +213,8 @@ async function routesDmSelection(): Promise<void> {
   await selectSlackDmOrganisation(
     {
       DB: fixture.db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       installationId: INSTALLATION_ID,
@@ -428,7 +431,8 @@ async function createFixture(): Promise<{
   await createSlackOrganisationConnection(
     {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       connectionId: CONNECTION_A,
@@ -441,7 +445,8 @@ async function createFixture(): Promise<{
   await createSlackOrganisationConnection(
     {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     {
       connectionId: CONNECTION_B,

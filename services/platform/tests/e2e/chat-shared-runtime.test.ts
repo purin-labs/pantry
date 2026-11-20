@@ -23,7 +23,7 @@ import { createActiveConnectedIntegration } from "../../src/data/integration-acc
 import { parseVaultHandle } from "../../src/credential-vault/domain";
 import { resolveActiveSlackOrganisationCredential } from "../../src/credential-vault/surface-installation-resolution";
 import { resolveConfiguredSlackInstallationIdentity } from "../../src/slack/installation-identity";
-import { createSlackOrganisationConnection } from "../../src/slack/organisation-routing";
+import { createSlackOrganisationConnection } from "../../src/slack/installation-store";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, vi, type TestContext } from "vitest";

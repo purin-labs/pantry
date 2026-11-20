@@ -8,7 +8,7 @@ import { parseIntegrationAccountId } from "../ids";
 import type {
   SlackChannelDefault,
   SlackOrganisationRoutingProjection,
-} from "./organisation-routing";
+} from "./installation-store";
 import { readSlackConnectionIntegrationAccountId } from "../data/slack-installation-records";
 
 /** False when the channel's connection or its account cannot be read. */

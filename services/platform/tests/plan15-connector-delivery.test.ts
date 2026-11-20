@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../src/data/organisation", organisationModuleMock);
 vi.mock("../src/credential-vault", credentialVaultMock);
-vi.mock("../src/slack/organisation-routing", slackRoutingMock);
+vi.mock("../src/slack/installation-store", slackRoutingMock);
 
 import { ConnectorDO } from "../src/actors/connector";
 import { activateConnectorFixture } from "./fixtures/connector-activation";

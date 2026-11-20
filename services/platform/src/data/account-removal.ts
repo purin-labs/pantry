@@ -36,10 +36,8 @@ import { prepareRemovedConnectionGenerationsRevocation } from "./provider-creden
 import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
-} from "../slack/organisation-routing";
-import {
-  prepareConfigurationVersionBump,
-} from "./organisation-onboarding-row";
+} from "../slack/installation-store";
+import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
 
 type RemoveIntegrationAccountError =
   | { readonly code: "integration_account_not_found" }
@@ -282,7 +280,9 @@ export async function removeIntegrationAccount(input: {
     );
   }
   statements.push(
-    prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now, {
+      atConfigurationVersion: state.configurationVersion,
+    }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

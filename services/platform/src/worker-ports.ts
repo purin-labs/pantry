@@ -25,6 +25,11 @@ import {
   readShownMemoryStanding,
 } from "./memory/access";
 import { memoryService } from "./memory/contract/memory-service";
+import { slackDmSelection } from "./slack/installation-store";
+import {
+  prepareRevokedDmSelectionRelease,
+  selectSlackDmOrganisation,
+} from "./slack/organisation-routing";
 
 memoryService.register({
   readMemoryViews: (...input) => readMemoryViews(...input),
@@ -59,4 +64,10 @@ connectionParts.register({
     setWhatsAppProviderHealth: (...input) =>
       setWhatsAppProviderHealth(...input),
   },
+});
+
+slackDmSelection.register({
+  prepareRevokedSelectionRelease: (...input) =>
+    prepareRevokedDmSelectionRelease(...input),
+  selectOrganisation: (...input) => selectSlackDmOrganisation(...input),
 });

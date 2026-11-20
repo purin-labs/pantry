@@ -10,7 +10,7 @@ import { newSlackInstallationId, parseSlackAppId } from "../src/ids";
 import { parseInitialOrganisationPlacement } from "../src/placement";
 import { admitSlackInstallOrganisation } from "../src/slack/install-organisation";
 import type { SlackInstallationIdentity } from "../src/slack/installation-identity";
-import { createSlackInstallation } from "../src/slack/organisation-routing";
+import { createSlackInstallation } from "../src/slack/installation-store";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationId, requireWorkspaceId } from "./test-ids";
 
