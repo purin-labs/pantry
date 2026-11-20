@@ -465,7 +465,6 @@ async function sourceEvidence() {
       "scripts/plan-50/proposal-worker.mjs",
       "services/platform/src/actors/harness-commerce-proposal.ts",
       "services/platform/src/actors/case.ts",
-      "services/platform/src/actors/case/case-actor.ts",
       "services/platform/src/actors/action-ledger.ts",
       "services/platform/src/actors/organisation.ts",
       "services/platform/src/authorization/access-grants/turn-authority.ts",
