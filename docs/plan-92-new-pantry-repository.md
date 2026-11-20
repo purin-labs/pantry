@@ -399,7 +399,11 @@ Open, for the owner (not changed here):
   until a joint passed its rated speed. Now the planner names a load or
   collision fault only for a path that the arm reaches, and a transfer from
   a held pose (a returned tray, a loaded oven) checks its reach first.
-  Every other outcome has the same motion, events and result.
+  Every other outcome has the same motion, events and result. Released on
+  20 November 2026 at 00:09 UTC (`satyr-edge` `ea3efc43`, Platform only,
+  from `dev` `eb9cc71`); rollback target `e20bdbde`. The Portal serves the
+  new bundle `1b418dcc…` and still serves the old bundle `31da6f43…` for
+  saved runs.
 - The FR10 cannot hold the tray in every start pose of the combined cell,
   so its rack cycle stops at step 0; the UR5e, CR10 and CRX-10iA complete
   it. The combined-cell journeys use the UR5e.
