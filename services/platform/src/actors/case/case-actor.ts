@@ -601,9 +601,7 @@ export abstract class CaseActor
     try {
       const recovery = await admitActorRecovery(this.env, this.ctx.storage);
       if (recovery.kind !== "admitted") return;
-      const { resumeConversationExecution } =
-        await import("../../chat/application");
-      const outcome = await resumeConversationExecution(
+      const outcome = await this.areaParts().portalChat.resumeExecution(
         this.env,
         recovery.scope,
         pending,

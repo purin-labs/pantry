@@ -13,6 +13,16 @@ import type { CaseParts } from "./case/parts";
 const CASE_PARTS: CaseParts = {
   commerce: caseCommercePart,
   inbox: caseInboxPart,
+  portalChat: {
+    // The chat application loads on the first resume, as it did before the
+    // part, so the Worker start does not load the chat run.
+    async resumeExecution(env, scope, execution, caseActor) {
+      const { resumeConversationExecution } = await import(
+        "../chat/application"
+      );
+      return resumeConversationExecution(env, scope, execution, caseActor);
+    },
+  },
 };
 
 /**

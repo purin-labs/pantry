@@ -82,6 +82,13 @@ function isAttachmentPart(part: ChatInputPart): part is ChatAttachmentPart {
 }
 
 /** The screen observation of a message, as a field to spread into it. */
+export function surfaceObservationField(
+  surfaceObservation: SurfaceObservationV2 | undefined,
+): Readonly<{ surfaceObservation?: SurfaceObservationV2 }> {
+  return surfaceObservation === undefined ? {} : { surfaceObservation };
+}
+
+/** The screen observation of the parts of a message, as a field to spread into it. */
 export function surfaceObservationFromParts(
   parts: readonly ChatInputPart[],
 ): Readonly<{ surfaceObservation?: SurfaceObservationV2 }> {

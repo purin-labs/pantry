@@ -27,9 +27,9 @@ import {
 } from "../control/admission/chat-signals";
 import {
   ensureWorkspaceCanvasChat,
-  readWorkspaceCanvasChat,
   continueWorkspaceCanvasChat,
 } from "../chat/workspace-canvas";
+import { readWorkspaceCanvasChat } from "../chat/workspace-canvas-read";
 import {
   CHAT_SIGNAL,
   SURFACE_EFFECT_SIGNAL,

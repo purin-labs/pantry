@@ -1,11 +1,15 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
+import type { ConversationExecution } from "../../chat/execution";
+import type { Env } from "../../env";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { ConversationCaseActor } from "../case-direct-processing";
 import type { CaseCommerceProposalBody, CaseEntityPlaneCommand } from "./types";
 
 /**
- * The parts that the product areas give to the Case (Refactor 17, step A1.6
- * for the Case). A Case stores values of the areas: a commerce proposal, an
+ * The parts that the product areas and the surfaces give to the Case
+ * (Refactor 17, step A1.6 for the Case). A Case stores values of the areas: a commerce proposal, an
  * email reply proposal, a page of Kitchen. It keeps each value as the JSON
  * that it received, and it reads only the fields that its own types name. The
  * area checks the rest of the value through its part.
@@ -16,6 +20,7 @@ import type { CaseCommerceProposalBody, CaseEntityPlaneCommand } from "./types";
 export type CaseParts = Readonly<{
   commerce: CaseCommercePart;
   inbox: CaseInboxPart;
+  portalChat: CasePortalChatPart;
 }>;
 
 /** The checks of the commerce values in a Case. */
@@ -43,6 +48,17 @@ export type CaseInboxPart = Readonly<{
   triggerConnectorId(
     authority: Variant<RequestAuthority, "agent_mailbox" | "whatsapp_support">,
   ): string;
+}>;
+
+/** The Portal chat part: a Case runs the turn of a Portal chat. */
+type CasePortalChatPart = Readonly<{
+  /** Resumes the chat turn that the Case scheduled; "pending" waits for the alarm. */
+  resumeExecution(
+    env: Env,
+    scope: OrganisationExecutionScope,
+    execution: ConversationExecution,
+    caseActor: ConversationCaseActor,
+  ): Promise<"settled" | "pending">;
 }>;
 
 let provided: CaseParts | null = null;
