@@ -89,7 +89,7 @@ export class ConnectorDO extends ConnectorEmail {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 
   protected readonly channels: ConnectorChannels = {
-    adapters: [this.slack, this.emailChannel()],
+    adapters: [this.slack, this.emailChannel(), this.whatsAppChannel()],
     caseWork: this.slack,
     delivery: this.slack,
   };

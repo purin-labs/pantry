@@ -23,6 +23,7 @@ import { invalid, parseIngressContent } from "./ingress-content";
 import type {
   ConnectorDeliveryRequest,
   ConnectorDeliveryState,
+  DeliveryRow,
   ConnectorIngressRecord,
   ConnectorIngressRequest,
   ConnectorResult,
@@ -88,7 +89,8 @@ export function parseIngressRequest(
   const ingress = parseIngress(request.ingress);
   if (
     ingress?.content.kind === "record_message" &&
-    ingress.content.provenance.organisationId !== request.identity.organisationId
+    ingress.content.provenance.organisationId !==
+      request.identity.organisationId
   )
     return null;
   const attachments = parseAttachments(request);
@@ -227,3 +229,19 @@ export function parseDeliveryState(
 
 /** A route read that started beside an admission which then refused. */
 export function ignoreUnusedCredentialRoute(): void {}
+
+export function parseDeliveryRows(rows: readonly DeliveryRow[]): {
+  readonly deliveries: ConnectorDelivery[];
+  readonly receipts: ConnectorDeliveryReceipt[];
+} | null {
+  const deliveries: ConnectorDelivery[] = [];
+  const receipts: ConnectorDeliveryReceipt[] = [];
+  for (const row of rows) {
+    const delivery = parseDelivery(JSON.parse(row.payload));
+    const state = parseDeliveryState(row.state_json);
+    if (delivery === null || state === null) return null;
+    deliveries.push(delivery);
+    if (state.kind === "delivered") receipts.push(state.receipt);
+  }
+  return { deliveries, receipts };
+}

@@ -1,6 +1,5 @@
 import type { ChannelAlarmDue } from "./connector/channel-adapter";
 import { nextConnectorCaseWorkAlarm } from "./connector-case-work";
-import { nextWhatsAppSweepAt } from "./connector-whatsapp";
 import type { AlarmReconciler } from "./lifecycle/actor-alarm";
 
 /**
@@ -23,6 +22,5 @@ export function connectorAlarmReconcilers(
       },
     },
     ...channels.flatMap((due) => due(sql)),
-    { name: "whatsapp_sweep", nextDue: () => nextWhatsAppSweepAt(sql) },
   ];
 }

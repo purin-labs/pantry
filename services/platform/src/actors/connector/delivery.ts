@@ -13,6 +13,7 @@ import {
   ensureConnectorIdentity,
   parseDelivery,
   parseDeliveryState,
+  parseDeliveryRows,
   parseIngress,
 } from "./ingress-parsers";
 import { count, invalid } from "./support";
@@ -30,7 +31,6 @@ import {
   type JsonRow,
   type MetaRow,
 } from "./types";
-import { parseDeliveryRows } from "./whatsapp-parsers";
 
 /** The identity of this Connector. It throws when the Connector has none. */
 export function readConnectorIdentity(sql: SqlStorage): ConnectorIdentity {

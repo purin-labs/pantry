@@ -3,20 +3,12 @@ import {
   runAlarmSteps,
   runAlarmStepsTogether,
 } from "../lifecycle/actor-alarm";
-import { runtimeFetch } from "../../runtime-fetch";
 import {
   createWarmActorSlotSchema,
   eraseWarmActorSlots,
   type WarmActorSlot,
 } from "../warm-actor-slots";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
-import { readWhatsAppIngressPolicy } from "../../data/whatsapp";
-import {
-  newRequestId,
-  parseIntegrationAccountId,
-  parseOrganisationId,
-} from "../../ids";
-import { traceWarn } from "../../observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   actorExecutionAdmissionOpen,
@@ -38,28 +30,6 @@ import {
   renewRunningConnectorCaseWorkLeases,
 } from "../connector-case-work";
 import type { Result } from "../../result";
-import {
-  claimDueWhatsAppCase,
-  completeWhatsAppProcessing,
-  createConnectorWhatsAppSchema,
-  expireWhatsAppProposals,
-  sweepWhatsAppDeadlines,
-  readWhatsAppCase,
-  rearmWhatsAppDebounce,
-  recordWhatsAppOperatorNotice,
-  settleWhatsAppTurn,
-  undeliveredWhatsAppNoticeKeys,
-  readWhatsAppRuntime,
-  type WhatsAppRuntimeSnapshot,
-} from "../connector-whatsapp";
-import {
-  dispatchWhatsAppReplyFor,
-  previewWhatsAppProposalFor,
-} from "../connector-whatsapp-rpc";
-import { processWhatsAppCaseTurn } from "../whatsapp-case-processing";
-import { notifyOperator } from "../connector-whatsapp-rpc";
-import { fenceAbandonedWhatsAppSends } from "../connector-whatsapp-proposal";
-import { createWhatsAppContentCipher } from "../whatsapp-active-content";
 import { PlacedActor } from "../lifecycle/placed-actor";
 import { armConnectorAlarm } from "./alarm";
 import {
@@ -79,7 +49,6 @@ import {
   type ConnectorDeliveryResult,
   type ConnectorIngressAcceptance,
   type ConnectorResult,
-  WHATSAPP_TURN_RETRY_MS,
 } from "./types";
 import { ConnectorCaseWorkDrain } from "./case-work-drain";
 import type {
@@ -123,10 +92,6 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
     );
     for (const channel of this.channels.adapters)
       channel.createSchema(this.ctx.storage);
-    createConnectorWhatsAppSchema(
-      this.ctx.storage.sql,
-      this.ctx.storage.transactionSync.bind(this.ctx.storage),
-    );
     createWarmActorSlotSchema(this.ctx.storage.sql);
   }
 
@@ -352,12 +317,6 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
       together.push(...steps.together.map(whenActive));
       inOrder.push(...steps.inOrder.map(whenActive));
     }
-    together.push(
-      whenActive({
-        name: "whatsapp_turns",
-        run: () => this.runDueWhatsAppTurns(admission.scope),
-      }),
-    );
     const failed = [
       ...(await runAlarmStepsTogether("connector", together)),
       ...(await runAlarmSteps("connector", inOrder)),
@@ -369,304 +328,6 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
 
   /** Runs in a row with a failed alarm step; the backoff grows with it. */
   private readonly alarmRetries = { failures: 0 };
-
-  /**
-   * Runs every WhatsApp Case whose burst debounce has gone quiet. Expired
-   * proposals are swept first so an approval queue never shows a body that
-   * can no longer be sent inside the service window.
-   */
-  protected async runDueWhatsAppTurns(
-    scope: OrganisationExecutionScope,
-  ): Promise<void> {
-    try {
-      const now = Date.now();
-      // Time-driven cleanup first: a Case whose service window has passed can
-      // no longer be replied to, so its envelope and drafts go before any new
-      // turn is claimed.
-      const swept = this.ctx.storage.transactionSync(
-        sweepWhatsAppDeadlines.bind(null, this.ctx.storage.sql, now),
-      );
-      if (swept.recoveredProcessing) {
-        traceWarn("connector.whatsapp_processing_recovered", {
-          requestId: newRequestId(),
-          reason: "turn_lease_expired",
-        });
-      }
-      const expired = this.ctx.storage.transactionSync(
-        expireWhatsAppProposals.bind(null, this.ctx.storage.sql, now),
-      );
-      // An attempt that stopped with an earlier instance of this Actor ends
-      // as `send_indeterminate` and fences the account before any new turn.
-      const fenced = this.ctx.storage.transactionSync(
-        fenceAbandonedWhatsAppSends.bind(null, this.ctx.storage.sql, now),
-      );
-      const pendingNoticeKeys = [
-        ...fenced,
-        ...expired.map((entry) => entry.noticeKey).filter(isPresentNoticeKey),
-        ...undeliveredWhatsAppNoticeKeys(this.ctx.storage.sql, now),
-      ];
-      for (;;) {
-        if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) break;
-        const claim = this.ctx.storage.transactionSync(
-          claimDueWhatsAppCase.bind(null, this.ctx.storage.sql, Date.now()),
-        );
-        if (claim.kind === "idle") break;
-        const pendingNotice = await this.runWhatsAppCaseTurn(
-          scope,
-          claim.caseId,
-        );
-        pendingNoticeKeys.push(...pendingNotice);
-        this.ctx.storage.transactionSync(
-          completeWhatsAppProcessing.bind(null, this.ctx.storage.sql),
-        );
-      }
-      // Notices are durable and remain retryable. Deliver them only after
-      // customer work so a slow Slack destination cannot block a due Case.
-      await this.notifyWhatsAppOperator(scope, pendingNoticeKeys, Date.now());
-    } catch (error) {
-      // A throw leaves the claimed Case with no debounce. Re-arm it inside the
-      // same recovery as the processing release, or the admitted message would
-      // wait for a customer to send another one.
-      const claimed = readWhatsAppRuntime(this.ctx.storage.sql)?.processing;
-      this.ctx.storage.transactionSync(() => {
-        if (claimed?.kind === "processing") {
-          rearmWhatsAppDebounce(this.ctx.storage.sql, {
-            caseId: claimed.caseId,
-            retryAt: Date.now() + WHATSAPP_TURN_RETRY_MS,
-          });
-        }
-        completeWhatsAppProcessing(this.ctx.storage.sql);
-      });
-      traceWarn("connector.whatsapp_turn_failed", {
-        requestId: newRequestId(),
-        reason: error instanceof Error ? error.message : "unknown",
-      });
-    }
-  }
-
-  /**
-   * Delivers already-recorded operator notices. Notices are durable before
-   * delivery, so a failed post stays queued and is retried by the sweep at the
-   * top of the alarm rather than lost.
-   */
-  protected async notifyWhatsAppOperator(
-    scope: OrganisationExecutionScope,
-    noticeKeys: readonly string[],
-    now: number,
-  ): Promise<void> {
-    if (noticeKeys.length === 0) return;
-    const runtime = readWhatsAppRuntime(this.ctx.storage.sql);
-    if (runtime === null) return;
-    for (const noticeKey of noticeKeys) {
-      await notifyOperator(
-        { storage: this.ctx.storage, env: this.env, scope },
-        runtime,
-        noticeKey,
-        now,
-      );
-    }
-  }
-
-  protected async runWhatsAppCaseTurn(
-    scope: OrganisationExecutionScope,
-    caseId: string,
-  ): Promise<readonly string[]> {
-    const runtime = readWhatsAppRuntime(this.ctx.storage.sql);
-    const supportCase = readWhatsAppCase(this.ctx.storage.sql, caseId);
-    if (runtime === null || runtime.disabledAt !== null || supportCase === null)
-      return [];
-    const organisationId = parseOrganisationId(runtime.organisationId);
-    const integrationAccountId = parseIntegrationAccountId(
-      runtime.integrationAccountId,
-    );
-    if (!organisationId.ok || !integrationAccountId.ok) {
-      return this.rearmWhatsAppCase(
-        runtime,
-        caseId,
-        "whatsapp_cue_policy_identity_invalid",
-      );
-    }
-    const policy = await readWhatsAppIngressPolicy({
-      db: scope.database,
-      organisationId: organisationId.value,
-      integrationAccountId: integrationAccountId.value,
-      connectedAt: Date.now(),
-    });
-    if (
-      policy.kind !== "enabled" ||
-      policy.policyVersion !== runtime.policyVersion
-    ) {
-      return this.rearmWhatsAppCase(
-        runtime,
-        caseId,
-        "whatsapp_cue_policy_unavailable",
-      );
-    }
-    const account = await scope.database
-      .prepare(
-        `SELECT display_phone_number AS displayPhoneNumber
-         FROM whatsapp_phone_number_account
-        WHERE integration_account_id = ? AND organisation_id = ?`,
-      )
-      .bind(runtime.integrationAccountId, runtime.organisationId)
-      .first<{ readonly displayPhoneNumber: string }>();
-    if (account === null) return [];
-    const cipher = await createWhatsAppContentCipher({
-      root: this.env.DATA_ENCRYPTION_ROOT,
-      organisationId: runtime.organisationId,
-      integrationAccountId: runtime.integrationAccountId,
-    });
-    if (!cipher.ok) return [];
-    const turn = await processWhatsAppCaseTurn(this.env, {
-      scope,
-      connectorSql: this.ctx.storage.sql,
-      cipher: cipher.value,
-      organisationId: runtime.organisationId,
-      integrationAccountId: runtime.integrationAccountId,
-      caseId,
-      customerWaId: supportCase.customerWaId,
-      businessDisplayPhoneNumber: account.displayPhoneNumber,
-      supportBindingId: runtime.supportBindingId,
-      bindingRevision: runtime.bindingRevision,
-      policyVersion: runtime.policyVersion,
-      cuePolicy: {
-        relevantMessageTopics: policy.relevantMessageTopics,
-        automaticAcknowledgementText: policy.automaticAcknowledgementText,
-        agentMode: policy.agentMode,
-        alwaysWaitTopics: policy.alwaysWaitTopics,
-      },
-      limits: runtime.limits,
-      credentialGeneration: runtime.credentialGeneration,
-      serviceWindowExpiresAt: supportCase.serviceWindowExpiresAt,
-      now: Date.now(),
-    });
-    if (!turn.ok) {
-      traceWarn("connector.whatsapp_turn_failed", {
-        requestId: newRequestId(),
-        reason: turn.error.code,
-      });
-      return this.rearmWhatsAppCase(runtime, caseId, turn.error.code);
-    }
-    if (turn.value.kind === "skipped" && turn.value.pendingNoticeKey !== null) {
-      return [turn.value.pendingNoticeKey];
-    }
-    if (turn.value.kind === "skipped") {
-      // `service_window_closing` is terminal — the reply could not be sent in
-      // time and retrying cannot change that. Everything else is transient.
-      return turn.value.reason === "service_window_closing"
-        ? []
-        : this.rearmWhatsAppCase(runtime, caseId, turn.value.reason);
-    }
-    // Plan 83: a held reply waits for a person. The Inbox shows it.
-    if (turn.value.kind === "proposed" && !turn.value.hold) {
-      return this.sendAutomaticWhatsAppProposal(
-        scope,
-        runtime,
-        caseId,
-        turn.value,
-      );
-    }
-    this.ctx.storage.transactionSync(
-      settleWhatsAppTurn.bind(null, this.ctx.storage.sql, caseId),
-    );
-    return [];
-  }
-
-  protected async sendAutomaticWhatsAppProposal(
-    scope: OrganisationExecutionScope,
-    runtime: WhatsAppRuntimeSnapshot,
-    caseId: string,
-    proposal: Readonly<{ proposalId: string; version: number }>,
-  ): Promise<readonly string[]> {
-    const now = Date.now();
-    const preview = await previewWhatsAppProposalFor(
-      { storage: this.ctx.storage, env: this.env, scope },
-      proposal.proposalId,
-      now,
-    );
-    if (!preview.ok || preview.value.kind !== "current") {
-      return this.rearmWhatsAppCase(
-        runtime,
-        caseId,
-        preview.ok
-          ? `whatsapp_automatic_send_${preview.value.kind}`
-          : preview.error.code,
-      );
-    }
-    const sent = await dispatchWhatsAppReplyFor(
-      {
-        storage: this.ctx.storage,
-        env: this.env,
-        scope,
-        origin: { kind: "automatic" },
-        armAlarm: this.armAlarm.bind(this),
-      },
-      {
-        proposalId: proposal.proposalId,
-        approvedVersion: proposal.version,
-        approvedBodyDigest: preview.value.preview.bodyDigest,
-        approvedBy: "system:whatsapp_cue_engine",
-        now,
-        fetcher: runtimeFetch,
-      },
-    );
-    if (!sent.ok)
-      return this.rearmWhatsAppCase(runtime, caseId, sent.error.code);
-    if (
-      sent.value.kind === "sent" ||
-      sent.value.kind === "send_indeterminate"
-    ) {
-      this.ctx.storage.transactionSync(
-        settleWhatsAppTurn.bind(null, this.ctx.storage.sql, caseId),
-      );
-      return [];
-    }
-    if (
-      sent.value.kind === "expired" ||
-      sent.value.kind === "service_window_closed"
-    ) {
-      return [];
-    }
-    return this.rearmWhatsAppCase(
-      runtime,
-      caseId,
-      `whatsapp_automatic_send_${sent.value.kind}`,
-    );
-  }
-
-  /**
-   * Puts a Case back on the clock after a turn that produced no outcome, and
-   * escalates to an operator once the bounded retries are spent.
-   */
-  protected rearmWhatsAppCase(
-    runtime: WhatsAppRuntimeSnapshot,
-    caseId: string,
-    reason: string,
-  ): readonly string[] {
-    const rearmed = this.ctx.storage.transactionSync(() =>
-      rearmWhatsAppDebounce(this.ctx.storage.sql, {
-        caseId,
-        retryAt: Date.now() + WHATSAPP_TURN_RETRY_MS,
-      }),
-    );
-    if (rearmed.kind !== "exhausted") return [];
-    traceWarn("connector.whatsapp_turn_exhausted", {
-      requestId: newRequestId(),
-      reason,
-    });
-    const noticeKey = this.ctx.storage.transactionSync(() =>
-      recordWhatsAppOperatorNotice(this.ctx.storage.sql, {
-        reason: {
-          kind: "service_window_expired",
-          caseId,
-          expiredAt: Date.now(),
-        },
-        policyVersion: runtime.policyVersion,
-        now: Date.now(),
-      }),
-    );
-    return noticeKey === null ? [] : [noticeKey];
-  }
 
   /**
    * Hand accepted work to the drain, starting one unless one runs. A call that
@@ -732,8 +393,4 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
       }
     }
   }
-}
-
-function isPresentNoticeKey(value: string | null): value is string {
-  return value !== null;
 }

@@ -89,9 +89,6 @@ export type ConnectorDeliveryClaim =
       readonly delivery: ConnectorDelivery;
     };
 
-/** How long a Case waits before a turn that produced no outcome is retried. */
-export const WHATSAPP_TURN_RETRY_MS = 60_000;
-
 export const DELIVERY_LEASE_MS = 30_000;
 
 export const DELIVERY_RETRY_MS = 5_000;

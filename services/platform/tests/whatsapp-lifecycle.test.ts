@@ -49,6 +49,7 @@ import {
 import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
 import { armConnectorAlarm } from "../src/actors/connector/alarm";
 import { emailAlarmDue } from "../src/actors/connector/email";
+import { whatsAppAlarmDue } from "../src/actors/connector-whatsapp";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
@@ -314,7 +315,10 @@ async function createLifecycleFixture(): Promise<LifecycleFixture> {
       env,
       scope: await requireOrganisationExecutionScope(env, world.organisationId),
       // The Connector arms its alarm with the due work of each channel.
-      armAlarm: armConnectorAlarm.bind(null, testStorage(sql), [emailAlarmDue]),
+      armAlarm: armConnectorAlarm.bind(null, testStorage(sql), [
+        emailAlarmDue,
+        whatsAppAlarmDue,
+      ]),
     },
     sql,
     cipher: cipher.value,
