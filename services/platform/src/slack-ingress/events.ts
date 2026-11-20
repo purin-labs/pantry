@@ -7,7 +7,7 @@ import {
   jsonResponse,
   methodNotAllowed,
 } from "../http";
-import type { SlackCaseCommand } from "../ingress-queue";
+import type { SlackCaseCommand } from "../slack/case-command-message";
 import {
   newRequestId,
   type RequestId,

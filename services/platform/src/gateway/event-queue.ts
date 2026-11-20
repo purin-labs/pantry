@@ -15,10 +15,8 @@ import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActorAtPlacement,
 } from "../actors/actor-router";
-import {
-  parseIngressQueueMessage,
-  type AgentScheduleDispatchQueueMessage,
-} from "../ingress-queue";
+import { parseIngressQueueMessage } from "../ingress-queue";
+import type { AgentScheduleDispatchQueueMessage } from "../schedules/queue-messages";
 import {
   newRequestId,
   parseCaseId,

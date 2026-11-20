@@ -29,7 +29,7 @@ import type { Env, OrganisationActorStub } from "../env";
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "../ingress-queue";
+} from "./queue-messages";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import {

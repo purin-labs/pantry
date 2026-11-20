@@ -11,7 +11,7 @@ import type {
   ControlMutationReceiptScope,
 } from "../../data/control-mutation";
 import type { Env } from "../../env";
-import { createCommerceOutboxReconcileQueueMessage } from "../../ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/queue-messages";
 import {
   newRequestId,
   type IntegrationAccountId,

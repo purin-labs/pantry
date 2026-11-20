@@ -20,7 +20,7 @@ import {
   type RequestId,
 } from "../ids";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
-import { createCommerceOutboxReconcileQueueMessage } from "../ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "./queue-messages";
 import { traceWarn } from "../observability";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 

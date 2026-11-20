@@ -45,7 +45,7 @@ import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { samePlacement } from "../data/organisation-placement";
-import type { SlackCaseCommand } from "../ingress-queue";
+import type { SlackCaseCommand } from "./case-command-message";
 import { buildSlackUserMessage } from "./user-message";
 import { slackAuthoredText } from "./events";
 import { resolveSlackTurnModelRouteAtScope } from "../models/route";

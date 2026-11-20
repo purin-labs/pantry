@@ -2,7 +2,7 @@ import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { RequestId, SessionId } from "../../ids";
 import { slackAuthoredText } from "../../slack/events";
 import { traceWarn } from "../../observability";
-import type { SlackCaseCommand } from "../../ingress-queue";
+import type { SlackCaseCommand } from "../../slack/case-command-message";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { SessionActorRoute } from "../actor-router";
 import type { CountRow } from "../sql-rows";

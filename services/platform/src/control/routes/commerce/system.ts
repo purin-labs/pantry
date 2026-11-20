@@ -40,7 +40,7 @@ import {
   type CommerceSystem,
   type CommerceSystemSelection,
 } from "../../../data/organisation-commerce-system";
-import { createCommerceOutboxReconcileQueueMessage } from "../../../ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/queue-messages";
 import {
   newRequestId,
   parseIntegrationAccountId,

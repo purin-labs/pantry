@@ -3,7 +3,7 @@ import { resolveActiveSlackThreadCredential } from "../../credential-vault";
 import { newRequestId, parseSessionId } from "../../ids";
 import { slackAuthoredText } from "../../slack/events";
 import { traceLog, traceWarn } from "../../observability";
-import type { SlackCaseCommand } from "../../ingress-queue";
+import type { SlackCaseCommand } from "../../slack/case-command-message";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { actorExecutionAdmissionOpen } from "../actor-execution-quiescence";
 import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";

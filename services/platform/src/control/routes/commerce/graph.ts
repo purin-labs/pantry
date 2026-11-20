@@ -59,7 +59,7 @@ import {
   type CommerceExportPresetError,
 } from "../../../data/export-preset";
 import { prepareTurnAuthority } from "../../../context/turn-context";
-import { createCommerceOutboxReconcileQueueMessage } from "../../../ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/queue-messages";
 import {
   newRequestId,
   parseCaseId,

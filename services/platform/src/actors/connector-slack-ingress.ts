@@ -11,7 +11,7 @@ import {
   parseSlackOrganisationConnectionId,
   type RequestId,
 } from "../ids";
-import { parseSlackCaseEventEnvelope } from "../ingress-queue";
+import { parseSlackCaseEventEnvelope } from "../slack/case-command-message";
 import type { SlackMessageEvent } from "../slack/events";
 import type {
   SlackCaseIngressAdmission,

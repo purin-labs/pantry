@@ -22,7 +22,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import { createCommerceDeliveryQueueMessage } from "../ingress-queue";
+import { createCommerceDeliveryQueueMessage } from "../commerce/queue-messages";
 import {
   discoverShopifyIdentity,
   exchangeShopifyAuthorizationCode,

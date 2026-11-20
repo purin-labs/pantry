@@ -85,8 +85,11 @@ API delivery is the context source, not an implicit history backfill.
 ### Queued ingress and commerce webhooks
 
 Work that needs no answer in the request goes to `EVENT_Q` (`satyr-events`) or
-`CUE_Q` (`satyr-cues`). The message types are in
-[`ingress-queue.ts`](../../services/platform/src/ingress-queue.ts):
+`CUE_Q` (`satyr-cues`). Each module owns its message types (`queue-messages.ts`
+in `commerce/`, `shopify/`, `schedules/` and `mail/`, and
+`slack/case-command-message.ts`).
+[`ingress-queue.ts`](../../services/platform/src/ingress-queue.ts) holds the
+union of the `EVENT_Q` messages and picks the parser. The types are
 `slack.case_command.v1`, `commerce.delivery.v1`,
 `shopify.commerce_refresh.v1`, `underclerk.outbox_reconcile.v1`,
 `email.change.v1` and `agent_schedule.dispatch.v1`. Consumers parse each body

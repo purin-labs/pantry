@@ -1,6 +1,6 @@
 import { runtimeFetch } from "../runtime-fetch";
 import type { Env } from "../env";
-import { createEmailChangeQueueMessage } from "../ingress-queue";
+import { createEmailChangeQueueMessage } from "../mail/queue-messages";
 import {
   parseGmailPushEnvelope,
   readGmailPushBody,

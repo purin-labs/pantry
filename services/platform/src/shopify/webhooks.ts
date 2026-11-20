@@ -9,10 +9,8 @@ import {
   methodNotAllowed,
   notFound,
 } from "../http";
-import {
-  createCommerceDeliveryQueueMessage,
-  createShopifyCommerceRefreshQueueMessage,
-} from "../ingress-queue";
+import { createCommerceDeliveryQueueMessage } from "../commerce/queue-messages";
+import { createShopifyCommerceRefreshQueueMessage } from "./queue-messages";
 import {
   newRequestId,
   parseOrganisationId,

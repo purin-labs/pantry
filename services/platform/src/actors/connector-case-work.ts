@@ -10,7 +10,7 @@ import {
 import {
   parseSlackCaseCommand,
   type SlackCaseCommand,
-} from "../ingress-queue";
+} from "../slack/case-command-message";
 import { parseStoredRequestAuthority } from "../request-authority";
 import type { SlackEventId } from "../slack/events";
 import { parseOrganisationPlacement } from "../placement";

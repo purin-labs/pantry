@@ -13,6 +13,7 @@ import {
   type ThreadKey,
   type WorkspaceId,
 } from "../ids";
+import { readRequiredObject, readRequiredString } from "../queue-fields";
 import type { Result } from "../result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonEmptyString, isRecord } from "@purin-labs/std";
@@ -137,7 +138,7 @@ export function parseSlackEnvelope(
     return parsed;
   }
 
-  const envelopeType = readStringMember(parsed.value, "type");
+  const envelopeType = readRequiredString(parsed.value, "type");
 
   if (!envelopeType.ok) {
     return envelopeType;
@@ -178,7 +179,7 @@ function parseJsonObject(
 function parseUrlVerificationEnvelope(
   body: JsonObject,
 ): Result<SlackEnvelope, SlackPayloadError> {
-  const challenge = readStringMember(body, "challenge");
+  const challenge = readRequiredString(body, "challenge");
 
   if (!challenge.ok) {
     return challenge;
@@ -205,20 +206,20 @@ function parseEventCallbackEnvelope(
     return workspaceId;
   }
 
-  const appIdRaw = readStringMember(body, "api_app_id");
+  const appIdRaw = readRequiredString(body, "api_app_id");
   if (!appIdRaw.ok) return appIdRaw;
   const appId = parseSlackAppId(appIdRaw.value);
   if (!appId.ok) {
     return { ok: false, error: { code: "invalid_field", field: "api_app_id" } };
   }
 
-  const event = readObjectMember(body, "event");
+  const event = readRequiredObject(body, "event");
 
   if (!event.ok) {
     return event;
   }
 
-  const eventType = readStringMember(event.value, "type");
+  const eventType = readRequiredString(event.value, "type");
 
   if (!eventType.ok) {
     return eventType;
@@ -332,7 +333,7 @@ function parseSlackChangedMessageEvent(
     return channelId;
   }
 
-  const message = readObjectMember(event, "message");
+  const message = readRequiredObject(event, "message");
 
   if (!message.ok) {
     return message;
@@ -344,7 +345,7 @@ function parseSlackChangedMessageEvent(
 
   // Slack puts `event_ts` on the outer change event; the edited message itself
   // carries only its original `ts`.
-  const eventTs = readStringMember(event, "event_ts");
+  const eventTs = readRequiredString(event, "event_ts");
 
   if (!eventTs.ok) {
     return eventTs;
@@ -389,7 +390,7 @@ function parseSlackMessageEvent(
     return author;
   }
 
-  const messageTs = readStringMember(event, "ts");
+  const messageTs = readRequiredString(event, "ts");
 
   if (!messageTs.ok) {
     return messageTs;
@@ -397,7 +398,7 @@ function parseSlackMessageEvent(
 
   const eventTs =
     outerEventTs === undefined
-      ? readStringMember(event, "event_ts")
+      ? readRequiredString(event, "event_ts")
       : ({ ok: true, value: outerEventTs } as const);
 
   if (!eventTs.ok) {
@@ -849,7 +850,7 @@ function parseSlackFileCandidate(
     return { ok: false, error: { code: "invalid_field", field } };
   }
 
-  const fileId = readStringMember(raw, "id");
+  const fileId = readRequiredString(raw, "id");
 
   if (!fileId.ok) {
     return { ok: false, error: { code: "invalid_field", field } };
@@ -865,8 +866,8 @@ function parseSlackFileCandidate(
     return parseRemoteSlackFile(raw, fileId.value);
   }
 
-  const displayName = readStringMember(raw, "name");
-  const declaredMediaType = readStringMember(raw, "mimetype");
+  const displayName = readRequiredString(raw, "name");
+  const declaredMediaType = readRequiredString(raw, "mimetype");
   const declaredByteLength = raw.size;
   const timestamp = raw.timestamp;
 
@@ -996,7 +997,7 @@ export function parseSlackUserId(
 function readSlackEventId(
   body: JsonObject,
 ): Result<SlackEventId, SlackPayloadError> {
-  const raw = readStringMember(body, "event_id");
+  const raw = readRequiredString(body, "event_id");
 
   if (!raw.ok) {
     return raw;
@@ -1008,7 +1009,7 @@ function readSlackEventId(
 function readSlackUserId(
   body: JsonObject,
 ): Result<SlackUserId, SlackPayloadError> {
-  const raw = readStringMember(body, "user");
+  const raw = readRequiredString(body, "user");
 
   if (!raw.ok) {
     return raw;
@@ -1020,7 +1021,7 @@ function readSlackUserId(
 function readWorkspaceId(
   body: JsonObject,
 ): Result<WorkspaceId, SlackPayloadError> {
-  const raw = readStringMember(body, "team_id");
+  const raw = readRequiredString(body, "team_id");
 
   if (!raw.ok) {
     return raw;
@@ -1036,7 +1037,7 @@ function readWorkspaceId(
 }
 
 function readChannelId(body: JsonObject): Result<ChannelId, SlackPayloadError> {
-  const raw = readStringMember(body, "channel");
+  const raw = readRequiredString(body, "channel");
 
   if (!raw.ok) {
     return raw;
@@ -1082,40 +1083,6 @@ export function deriveSlackThreadKey(
   }
 
   return parsed;
-}
-
-function readObjectMember(
-  body: JsonObject,
-  field: string,
-): Result<JsonObject, SlackPayloadError> {
-  const value = body[field];
-
-  if (value === undefined) {
-    return { ok: false, error: { code: "missing_field", field } };
-  }
-
-  if (!isRecord(value)) {
-    return { ok: false, error: { code: "invalid_field", field } };
-  }
-
-  return { ok: true, value };
-}
-
-function readStringMember(
-  body: JsonObject,
-  field: string,
-): Result<string, SlackPayloadError> {
-  const value = body[field];
-
-  if (value === undefined) {
-    return { ok: false, error: { code: "missing_field", field } };
-  }
-
-  if (typeof value !== "string" || value.trim().length === 0) {
-    return { ok: false, error: { code: "invalid_field", field } };
-  }
-
-  return { ok: true, value: value.trim() };
 }
 
 function readOptionalStringMember(

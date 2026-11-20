@@ -2,7 +2,7 @@ import type { ConnectorDelivery, ConnectorIdentity } from "@purin-labs/contracts
 import {
   createSlackCaseCommand,
   type SlackCaseCommand,
-} from "../../ingress-queue";
+} from "../../slack/case-command-message";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   inspectConnectorCaseWorkEfficiency,

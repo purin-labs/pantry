@@ -15,7 +15,7 @@ import {
 } from "@purin-labs/commerce-client";
 
 import { registerSupplierOperationalEmailContact } from "../../data/email-operational";
-import { createCommerceOutboxReconcileQueueMessage } from "../../ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "../queue-messages";
 import {
   newRequestId,
   type IntegrationAccountId,

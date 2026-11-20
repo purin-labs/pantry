@@ -55,11 +55,11 @@ import {
 import {
   createCommerceDeliveryQueueMessage,
   type CommerceDeliveryQueueMessage,
-  type EmailChangeQueueMessage,
-  type IngressQueueMessageError,
-  type ShopifyCommerceRefreshQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "../ingress-queue";
+} from "../commerce/queue-messages";
+import type { EmailChangeQueueMessage } from "../mail/queue-messages";
+import type { IngressQueueMessageError } from "../queue-fields";
+import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
 import { gmailConnectorIdValue } from "../data/email-mailbox";
 import {
   parseConnectorId,

@@ -104,7 +104,7 @@ import {
   type StockExecution,
 } from "./stock-action-execution";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
-import { createCommerceOutboxReconcileQueueMessage } from "../ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "./queue-messages";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 

@@ -54,7 +54,6 @@
     "services/platform/src/agent-tools/drafts/drafts.ts": "Holds tool definitions of cafe, commerce, inbox and kitchen. Split by area in step A1.3.",
     "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and helpers of four areas. Split in step A1.4.",
     "services/platform/src/actors/organisation.ts": "The class OrganisationDO with logic of tenancy, authority, commerce and collaboration. The class becomes a shell of the Worker in steps A1.1 and A1.5.",
-    "services/platform/src/ingress-queue.ts": "The queue consumer of the Worker with message types of slack, commerce, kitchen and agent. Each module gets its message types in step A1.",
     "services/platform/src/actors/organisation/support.ts": "Helpers of the Organisation actor for the code of commerce, policy and Code Mode. They go with their module when the class becomes a shell (step A1.9)."
   },
   "placement": {
@@ -1056,7 +1055,7 @@
     "services/platform/src/http.ts": "foundation/kernel",
     "services/platform/src/ids.ts": "foundation/kernel",
     "services/platform/src/incremental-output-screen.ts": "foundation/authority",
-    "services/platform/src/ingress-queue.ts": "workers/platform",
+    "services/platform/src/ingress-queue.ts": "surfaces/webhooks",
     "services/platform/src/integration-gateway.ts": "workers/platform",
     "services/platform/src/isolate-location.ts": "foundation/kernel",
     "services/platform/src/lenient-base64.ts": "foundation/agent",
@@ -1069,6 +1068,7 @@
     "services/platform/src/policy-rule-id.ts": "foundation/authority",
     "services/platform/src/policy-snapshot.ts": "foundation/authority",
     "services/platform/src/public-origin.ts": "foundation/kernel",
+    "services/platform/src/queue-fields.ts": "foundation/kernel",
     "services/platform/src/redaction.ts": "foundation/authority",
     "services/platform/src/request-deadline.ts": "foundation/kernel",
     "services/platform/src/result.ts": "foundation/kernel",

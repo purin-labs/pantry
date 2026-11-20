@@ -6,7 +6,7 @@ import {
   createSlackCaseCommand,
   slackConversationAuthorityKind,
   type SlackCaseCommand,
-} from "../ingress-queue";
+} from "./case-command-message";
 import {
   buildDirectSlackAuthority,
   buildSharedSlackAuthority,

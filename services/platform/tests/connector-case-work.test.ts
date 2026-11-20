@@ -15,7 +15,7 @@ import {
 import {
   createSlackCaseCommand,
   parseSlackCaseCommand,
-} from "../src/ingress-queue";
+} from "../src/slack/case-command-message";
 import { parsePersonId } from "../src/data/person-authz";
 import {
   parseAssignmentId,

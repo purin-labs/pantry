@@ -38,7 +38,7 @@ import { cueLogIntegrationAccountId } from "../../src/gateway/cue-delivery";
 import { handleCommerceDeliveryQueueMessage } from "../../src/gateway/support";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../../src/commerce-lab/lab-metadata";
 import type { NormalizedCueEvent } from "../../src/cues/engine";
-import { createCommerceDeliveryQueueMessage } from "../../src/ingress-queue";
+import { createCommerceDeliveryQueueMessage } from "../../src/commerce/queue-messages";
 import {
   parseIntegrationAccountId,
   parseRequestId,

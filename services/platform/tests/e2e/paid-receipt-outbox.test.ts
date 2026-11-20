@@ -11,7 +11,7 @@ import {
   parseSlackInstallationId,
   parseSlackOrganisationConnectionId,
 } from "../../src/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "../../src/ingress-queue";
+import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/queue-messages";
 import {
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,

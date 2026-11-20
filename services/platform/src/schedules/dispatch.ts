@@ -12,8 +12,8 @@ import {
 import { newRequestId } from "../ids";
 import {
   createAgentScheduleDispatchQueueMessage,
-  type IngressQueueMessage,
-} from "../ingress-queue";
+  type AgentScheduleDispatchQueueMessage,
+} from "./queue-messages";
 import { traceWarn } from "../observability";
 import { computeScheduleWindowKey } from "./window";
 
@@ -36,7 +36,7 @@ type ScheduleDispatchOutcome = {
 export async function runScheduleDispatch(
   input: Readonly<{
     env: OrganisationPlacementBindings;
-    queue: Queue<IngressQueueMessage>;
+    queue: Queue<AgentScheduleDispatchQueueMessage>;
     now: number;
   }>,
 ): Promise<ScheduleDispatchOutcome> {

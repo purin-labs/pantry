@@ -11,7 +11,7 @@ import {
   parseUserId,
   parseWorkspaceId,
 } from "../ids";
-import type { SlackCaseCommand } from "../ingress-queue";
+import type { SlackCaseCommand } from "../slack/case-command-message";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "../request-authority";
 import { deriveSlackCaseRouteIdentities } from "../slack/case-routing";
