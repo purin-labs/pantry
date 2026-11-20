@@ -1,7 +1,7 @@
 {
   "totals": {
     "upward": 582,
-    "areas": 344,
+    "areas": 345,
     "order": 135,
     "table": 125
   },
@@ -24,7 +24,7 @@
     "areas/commerce -> areas/integrations": 1,
     "areas/commerce -> areas/kitchen": 19,
     "areas/commerce -> areas/organisation": 14,
-    "areas/commerce -> areas/shopify": 2,
+    "areas/commerce -> areas/shopify": 1,
     "areas/commerce -> surfaces/portal": 6,
     "areas/commerce -> surfaces/slack": 5,
     "areas/commerce -> surfaces/webhooks": 3,
@@ -66,7 +66,7 @@
     "areas/organisation -> surfaces/portal": 17,
     "areas/organisation -> surfaces/slack": 4,
     "areas/organisation -> surfaces/voice": 2,
-    "areas/shopify -> areas/commerce": 6,
+    "areas/shopify -> areas/commerce": 8,
     "areas/shopify -> areas/integrations": 10,
     "areas/shopify -> surfaces/webhooks": 2,
     "foundation/actor-runtime -> areas/commerce": 1,

@@ -11,26 +11,25 @@ The counts are from 2026-11-20. Run the commands again before a removal.
 Delete `services/platform/src/shopify/`: the connector, the webhooks, the action
 execution, the provider adapter (`provider-adapter.ts`), the connection workflow
 (`connection-workflow.ts`), the location observation (`location-observation.ts`) and
-the queue message (`queue-messages.ts`), the connection check
+the queue message (`queue-messages.ts`), the commerce action (`commerce-action.ts`), the connection check
 (`connection-observation.ts`) and the credential check (`credential-replacement.ts`).
 
 ## 2. The files that import this folder
 
 Nine source files outside the folder import it. Remove the Shopify lines in each one.
 
-| File                                                                                                        | What it uses                                                            |
-| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `provider-adapters/catalogue.ts`                                                                            | The registration of the provider adapter and of the connection workflow |
-| `integration-gateway.ts`                                                                                    | The Shopify routes of the Worker                                        |
-| `ingress-queue.ts`                                                                                          | The queue message type in the union, and its parser                     |
-| `gateway/support.ts`                                                                                        | The queue message for a webhook                                         |
-| `actors/organisation.ts`, `actors/organisation/schema.ts`, `actors/organisation/organisation-actor-base.ts` | The location observation that the Organisation actor holds              |
-| `commerce/provider-execution.ts`                                                                            | The execution of a commerce action on Shopify                           |
-| `provider-lifecycle/credential-replacement.ts`                                                              | One `case` line for the check of a replaced credential                  |
+| File                                                                                                        | What it uses                                                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider-adapters/catalogue.ts`                                                                            | The registration of the provider adapter and of the connection workflow                                                                                          |
+| `integration-gateway.ts`                                                                                    | The Shopify routes of the Worker                                                                                                                                 |
+| `ingress-queue.ts`                                                                                          | The queue message type in the union, and its parser                                                                                                              |
+| `gateway/support.ts`                                                                                        | The queue message for a webhook                                                                                                                                  |
+| `actors/organisation.ts`, `actors/organisation/schema.ts`, `actors/organisation/organisation-actor-base.ts` | The location observation that the Organisation actor holds                                                                                                       |
+| `commerce/provider-execution.ts`                                                                            | Two calls, for a shop whose commerce system is Shopify: the execution and the reconciliation of an action. The union members with `kind: "shopify"` go with them |
+| `provider-lifecycle/credential-replacement.ts`                                                              | One `case` line for the check of a replaced credential                                                                                                           |
 
-`commerce/provider-execution.ts` is the one direct call that is not a registration.
-Step A2.5 puts it behind the `CommerceProvider` port. After that, a removal changes
-only registration lines.
+Each of these files holds only call lines or registration lines for Shopify. The
+Shopify code itself is in this folder.
 
 Find the importers again:
 

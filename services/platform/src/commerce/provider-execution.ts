@@ -37,17 +37,9 @@ import type {
 } from "../actors/action-ledger";
 import type { Env } from "../env";
 import {
-  buildShopifyOrderCancelDraft,
-  parseShopifyOrderCancelArgs,
-  SHOPIFY_ORDER_CANCEL_TOOL,
-} from "../generated/action-registry";
-import {
-  executeShopifyAction,
-  reconcileShopifyOrderCancellation,
-  resolveShopifyWriteCredential,
-  resolveShopifyWriteCredentialForAction,
-} from "../shopify/action-execution";
-import type { ShopifyExecutionReceipt } from "../shopify/action-execution";
+  executeShopifyCommerceAction,
+  reconcileShopifyCommerceAction,
+} from "../shopify/commerce-action";
 import type { Result } from "../result";
 import { assertNever } from "@purin-labs/std";
 import {
@@ -94,10 +86,7 @@ import {
   ORDER_REFUND_VERB,
   orderRefundAllocation,
 } from "./order-refund-action";
-import {
-  isStockOperationVerb,
-  stockOperationResourceId,
-} from "./stock-action";
+import { isStockOperationVerb, stockOperationResourceId } from "./stock-action";
 import {
   executeStockOperation,
   reconcileStockOperation,
@@ -124,7 +113,7 @@ type ApprovedCommerceActionEntry = VariantBy<
   "executing" | "indeterminate"
 >;
 
-type CommerceEffectGatePermit =
+export type CommerceEffectGatePermit =
   | Readonly<{
       kind: "lab";
       current: CommerceProjection;
@@ -146,11 +135,10 @@ type CommerceEffectGatePermit =
       approval: ApprovedCommerceActionEntry["approval"];
     }>;
 
-type CommerceProviderReconciliation =
+export type CommerceProviderReconciliation =
   | Readonly<{
       kind: "settled";
-      receipt:
-        CommerceShopifyProviderReceipt | CommerceEngineProviderReceipt;
+      receipt: CommerceShopifyProviderReceipt | CommerceEngineProviderReceipt;
     }>
   | Readonly<{
       kind: "retryable";
@@ -158,7 +146,7 @@ type CommerceProviderReconciliation =
     }>
   | Readonly<{ kind: "unresolved" }>;
 
-type CommerceProviderOperation =
+export type CommerceProviderOperation =
   | {
       readonly kind: "projection_delivery";
       readonly delivery: CanonicalCommerceDelivery;
@@ -966,74 +954,6 @@ async function reconcileCommerceCancellation(
     case "indeterminate":
       return { ok: true, value: { kind: "unresolved" } };
   }
-}
-
-async function reconcileShopifyCommerceAction(
-  input: Readonly<{
-    env: Env;
-    action: VariantBy<ActionLedgerEntry, "state", "indeterminate">;
-    current: Variant<CommerceProjection, "commerce_order">;
-    path: Variant<CommerceActionPath, "cancel_order">;
-    permit: Variant<CommerceEffectGatePermit, "shopify">;
-    now: number;
-    fetcher: typeof fetch;
-  }>,
-): Promise<
-  Result<CommerceProviderReconciliation, CommerceProviderExecutionError>
-> {
-  const parsedArgs = parseShopifyOrderCancelArgs({
-    shopDomain: input.permit.accountContext.account.providerAccountId,
-    orderId: input.current.projection.provenance.resourceId,
-    cancelReason: shopifyCancelReason(input.path.reason),
-    refundOriginal: input.path.refund === "full",
-    restock: input.path.restock,
-    notifyCustomer: input.path.notifyCustomer,
-    staffNote: input.path.note,
-  });
-  if (!parsedArgs.ok) return { ok: true, value: { kind: "unresolved" } };
-  const credential = await resolveShopifyWriteCredential({
-    env: input.env,
-    organisationId: input.action.action.organisationId,
-    integrationAccountId: input.action.action.integrationAccountId,
-    fetcher: input.fetcher,
-    now: input.now,
-  });
-  if (!credential.ok) return { ok: true, value: { kind: "unresolved" } };
-  const reconciliation = await reconcileShopifyOrderCancellation({
-    credential: credential.value,
-    orderId: input.current.projection.provenance.resourceId,
-    fetcher: input.fetcher,
-  });
-  if (
-    !reconciliation.ok ||
-    reconciliation.value.kind !== "cancelled" ||
-    reconciliation.value.cancelReason !== shopifyCancelReason(input.path.reason)
-  ) {
-    return { ok: true, value: { kind: "unresolved" } };
-  }
-  return {
-    ok: true,
-    value: {
-      kind: "settled",
-      receipt: shopifyReceipt({
-        actionNonce: input.action.action.nonce.value,
-        flowBindingDigest: input.permit.flowDecision.flowBindingDigest,
-        decisionDigest: input.permit.flowDecision.decisionDigest,
-        resourceId: input.path.resourceId,
-        revision: commerceProjectionRevision(input.current),
-        observedAt: reconciliation.value.cancelledAt,
-        result: {
-          kind: "confirmed",
-          actionKind: "shopify_order_cancel",
-          provider: "shopify",
-          statusCode: 200,
-          orderId: reconciliation.value.orderId,
-          jobId: `shopify_reconciled_${input.action.action.nonce.value}`,
-          jobDone: true,
-        },
-      }),
-    },
-  };
 }
 
 export async function executeCommerceProviderAction(input: {
@@ -2060,7 +1980,8 @@ async function reconcileApprovedMenuPrice(
     organisationId: input.action.action.organisationId,
     integrationAccountId: input.action.action.integrationAccountId,
   });
-  if (!merchantBinding.ok) return { ok: true, value: { kind: "indeterminate" } };
+  if (!merchantBinding.ok)
+    return { ok: true, value: { kind: "indeterminate" } };
   const flowDecision = await authorizeCommerceEffectSink(
     input.scope.database,
     input.scope.accountAccess,
@@ -2218,7 +2139,8 @@ async function runApprovedStockOperation(
     organisationId: input.action.action.organisationId,
     integrationAccountId: input.action.action.integrationAccountId,
   });
-  if (!merchantBinding.ok) return { ok: true, value: { kind: "indeterminate" } };
+  if (!merchantBinding.ok)
+    return { ok: true, value: { kind: "indeterminate" } };
   const flowDecision = await authorizeCommerceEffectSink(
     input.scope.database,
     input.scope.accountAccess,
@@ -2307,7 +2229,8 @@ async function reconcileApprovedOrderRefund(
     organisationId: input.action.action.organisationId,
     integrationAccountId: input.action.action.integrationAccountId,
   });
-  if (!merchantBinding.ok) return { ok: true, value: { kind: "indeterminate" } };
+  if (!merchantBinding.ok)
+    return { ok: true, value: { kind: "indeterminate" } };
   const flowDecision = await authorizeCommerceEffectSink(
     input.scope.database,
     input.scope.accountAccess,
@@ -2372,7 +2295,8 @@ async function reconcileApprovedCafeMenu(
     organisationId: input.action.action.organisationId,
     integrationAccountId: input.action.action.integrationAccountId,
   });
-  if (!merchantBinding.ok) return { ok: true, value: { kind: "indeterminate" } };
+  if (!merchantBinding.ok)
+    return { ok: true, value: { kind: "indeterminate" } };
   const flowDecision = await authorizeCommerceEffectSink(
     input.scope.database,
     input.scope.accountAccess,
@@ -2515,12 +2439,12 @@ function commerceReceipt(
   CommerceEngineProviderReceipt,
   "projectionKind",
   | "offer"
-      | "fulfillment"
-      | "product"
-      | "merchant_plugin"
-      | "cafe_menu"
-      | "order_refund"
-      | "stock_operation"
+  | "fulfillment"
+  | "product"
+  | "merchant_plugin"
+  | "cafe_menu"
+  | "order_refund"
+  | "stock_operation"
 > {
   return {
     kind: "commerce_provider_receipt",
@@ -2591,83 +2515,6 @@ function commerceCancellationReceipt(
   };
 }
 
-async function executeShopifyCommerceAction(input: {
-  readonly env: Env;
-  readonly action: ExecutingActionLedgerEntry;
-  readonly current: Variant<CommerceProjection, "commerce_order">;
-  readonly path: Variant<CommerceActionPath, "cancel_order">;
-  readonly permit: Variant<CommerceEffectGatePermit, "shopify">;
-  readonly currentRevision: number;
-  readonly now: number;
-  readonly fetcher: typeof fetch;
-}): Promise<Result<CommerceProviderOperation, CommerceProviderExecutionError>> {
-  const parsedArgs = parseShopifyOrderCancelArgs({
-    shopDomain: input.permit.accountContext.account.providerAccountId,
-    orderId: input.current.projection.provenance.resourceId,
-    cancelReason: shopifyCancelReason(input.path.reason),
-    refundOriginal: input.path.refund === "full",
-    restock: input.path.restock,
-    notifyCustomer: input.path.notifyCustomer,
-    staffNote: input.path.note,
-  });
-  if (!parsedArgs.ok) {
-    return {
-      ok: false,
-      error: { code: "commerce_action_provider_execution_failed" },
-    };
-  }
-
-  const draft = await buildShopifyOrderCancelDraft(parsedArgs.value);
-  const providerAction: LedgerCanonicalAction = {
-    ...input.action.action,
-    host: draft.host,
-    verb: draft.verb,
-    path: draft.path,
-    argsHash: draft.argsHash,
-    amount: draft.amount,
-    resourceKey: draft.resourceKey,
-  };
-  const credential = await resolveShopifyWriteCredentialForAction({
-    env: input.env,
-    action: input.action,
-    fetcher: input.fetcher,
-    now: input.now,
-  });
-  if (!credential.ok) {
-    return {
-      ok: false,
-      error: { code: "commerce_action_provider_execution_failed" },
-    };
-  }
-  const executed = await executeShopifyAction({
-    action: providerAction,
-    call: {
-      kind: "shopify_order_cancel",
-      tool: SHOPIFY_ORDER_CANCEL_TOOL,
-      args: parsedArgs.value,
-    },
-    credential: credential.value,
-    fetcher: input.fetcher,
-  });
-  if (!executed.ok) {
-    return {
-      ok: false,
-      error: { code: "commerce_action_provider_execution_failed" },
-    };
-  }
-
-  const receipt: CommerceShopifyProviderReceipt = shopifyReceipt({
-    actionNonce: input.action.action.nonce.value,
-    flowBindingDigest: input.permit.flowDecision.flowBindingDigest,
-    decisionDigest: input.permit.flowDecision.decisionDigest,
-    resourceId: input.path.resourceId,
-    revision: input.currentRevision,
-    observedAt: new Date(input.now).toISOString(),
-    result: executed.value,
-  });
-  return { ok: true, value: { kind: "provider_receipt", receipt } };
-}
-
 async function authorizeCommerceEffectSink(
   db: OrganisationDatabase,
   accountAccess: AccountPlatformAccess,
@@ -2705,89 +2552,8 @@ async function authorizeCommerceEffectSink(
     : { ok: false, error: { code: "commerce_action_flow_denied" } };
 }
 
-function shopifyCancelReason(
-  reason: Variant<CommerceActionPath, "cancel_order">["reason"],
-): "CUSTOMER" | "FRAUD" | "INVENTORY" {
-  switch (reason) {
-    case "customer_requested":
-      return "CUSTOMER";
-    case "fraud_suspected":
-      return "FRAUD";
-    case "inventory_unavailable":
-      return "INVENTORY";
-  }
-}
-
-function shopifyReceipt(input: {
-  readonly actionNonce: string;
-  readonly flowBindingDigest: string;
-  readonly decisionDigest: string;
-  readonly resourceId: string;
-  readonly revision: number;
-  readonly observedAt: string;
-  readonly result: ShopifyExecutionReceipt;
-}): CommerceShopifyProviderReceipt {
-  switch (input.result.kind) {
-    case "confirmed":
-      return {
-        kind: "commerce_provider_receipt",
-        provider: "shopify",
-        receiptId: `shopify_receipt_${input.actionNonce}`,
-        effectId: `shopify_effect_${input.actionNonce}`,
-        actionNonce: input.actionNonce,
-        flowBindingDigest: input.flowBindingDigest,
-        decisionDigest: input.decisionDigest,
-        eventId: null,
-        resourceId: input.resourceId,
-        projectionKind: "commerce_order",
-        revision: input.revision,
-        status: "accepted",
-        jobId: input.result.jobId,
-        jobDone: input.result.jobDone,
-        errors: [],
-        observedAt: input.observedAt,
-      };
-    case "failed":
-      return {
-        kind: "commerce_provider_receipt",
-        provider: "shopify",
-        receiptId: `shopify_receipt_${input.actionNonce}`,
-        effectId: `shopify_effect_${input.actionNonce}`,
-        actionNonce: input.actionNonce,
-        flowBindingDigest: input.flowBindingDigest,
-        decisionDigest: input.decisionDigest,
-        eventId: null,
-        resourceId: input.resourceId,
-        projectionKind: "commerce_order",
-        revision: input.revision,
-        status: "failed",
-        jobId: null,
-        jobDone: null,
-        errors: input.result.errors,
-        observedAt: input.observedAt,
-      };
-    case "indeterminate":
-      return {
-        kind: "commerce_provider_receipt",
-        provider: "shopify",
-        receiptId: `shopify_receipt_${input.actionNonce}`,
-        effectId: `shopify_effect_${input.actionNonce}`,
-        actionNonce: input.actionNonce,
-        flowBindingDigest: input.flowBindingDigest,
-        decisionDigest: input.decisionDigest,
-        eventId: null,
-        resourceId: input.resourceId,
-        projectionKind: "commerce_order",
-        revision: input.revision,
-        status: "indeterminate",
-        jobId: null,
-        jobDone: null,
-        errors: [],
-        observedAt: input.observedAt,
-      };
-  }
-}
-
-function commerceProjectionRevision(projection: CommerceProjection): number {
+export function commerceProjectionRevision(
+  projection: CommerceProjection,
+): number {
   return projection.projection.provenance.revision;
 }
