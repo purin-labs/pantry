@@ -25,7 +25,7 @@
     "packages/type-utils": "foundation/std",
     "packages/contract-schema": "foundation/std",
     "packages/contracts": "foundation/contracts",
-    "packages/control-api": "foundation/control",
+    "packages/control-api": "foundation/contracts",
     "packages/collaboration": "foundation/collaboration",
     "packages/async-control": "foundation/async-control",
     "packages/commerce-contracts": "areas/commerce",
