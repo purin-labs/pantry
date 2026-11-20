@@ -70,19 +70,12 @@ import type {
   TrackingActionTarget,
 } from "@purin-labs/control-api";
 import type { PermissionRequired } from "@purin-labs/control-api";
-
-export type {
-  AgentOperationKind,
-} from "@purin-labs/commerce-control-api/portal/agent-operations";
 export type { AgentOperationsTransport } from "../agent-operations";
 export type {
   AgentOperationMutationState,
   AgentOperationRunner,
-  AgentOperationStep,
   AgentOperationSubmitter,
 } from "./agent-console-shared";
-export { humanizeIdentifier, runAsync } from "./agent-console-shared";
-export { AgentsPage, SkillsLibraryPage } from "./agent-console";
 
 type AgentOperationsPage =
   | "operations"
