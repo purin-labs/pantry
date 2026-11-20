@@ -1138,8 +1138,8 @@ async function runEmailTurn(
 type EmailReplyTurnSettlement = Readonly<{
   caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"] &
     Pick<
-      import("./case/case-actor").CaseActor,
-      "acceptEmailProposal" | "transitionEmailProposal"
+      import("./case-inbox/rpc").CaseInboxRpc,
+      "acceptEmailProposal" | "transitionEmailProposal"| "transitionEmailProposal"
     >;
   prepared: Readonly<{
     assignment: import("@purin-labs/contracts").CaseAssignment;
@@ -2024,7 +2024,7 @@ async function failEmailCompletion(
 async function dispatchAutomaticEmailProposal(
   env: Env,
   input: EmailThreadTurnInput,
-  caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"],
+  caseActor: EmailReplyTurnSettlement["caseActor"],
   proposal: Readonly<{ proposalId: string; version: number }>,
 ): Promise<Result<string, EmailThreadTurnError>> {
   if (!(await isEmailTurnActive(input)))

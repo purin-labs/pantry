@@ -1,8 +1,6 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../../database-handles";
 import type { ActionMutationExecution } from "../action-mutation-execution";
-import { parseEmailReplyProposalLifecycle } from "../../data/email-mailbox";
-import { parseEmailProposalTarget } from "../../data/email-operational";
 import {
   isCurrentAuthorityPartition,
   parseStoredAuthorityPartition,
@@ -37,8 +35,6 @@ import {
   commerceProposalOriginSchema,
   dropHeldOutputRequestSchema,
   noteRefusedEffectRequestSchema,
-  operationalEmailProposalSchema,
-  replyEmailProposalSchema,
   resolveCommerceApprovalRequestSchema,
   settleAssignmentRequestSchema,
   waitForCommerceApprovalRequestSchema,
@@ -53,7 +49,6 @@ import {
   parseCaseContent,
   parseCaseTrigger,
   parseConnectorDeliveryReceipt,
-  parseEmailProposalEvidence,
   parseSessionProposal,
   parseTerminalDisposition,
 } from "./record-parsers";
@@ -65,7 +60,6 @@ import type {
   AcceptProposalRequest,
   BeginAssignmentRequest,
   CaseCommerceApprovalRecord,
-  CaseEmailProposal,
   CaseEnsureRequest,
   CaseOutputDropReason,
   CaseCommerceProposal,
@@ -354,70 +348,6 @@ export function readCaseMetaId(sql: SqlStorage): string | null {
   return row?.case_id ?? null;
 }
 
-export function parseCaseEmailProposal(
-  value: unknown,
-): CaseEmailProposal | null {
-  if (typeof value !== "object" || value === null || Array.isArray(value))
-    return null;
-  if ((value as Record<string, unknown>).kind === "operational_new_message") {
-    const proposal = checked(operationalEmailProposalSchema, value);
-    if (proposal === null) return null;
-    const lifecycle = parseEmailReplyProposalLifecycle(proposal.lifecycle);
-    const target = parseEmailProposalTarget(proposal.target);
-    if (!lifecycle.ok || target === null) return null;
-    return {
-      kind: "operational_new_message",
-      proposalId: proposal.proposalId,
-      version: proposal.version,
-      caseId: proposal.caseId,
-      integrationAccountId: proposal.integrationAccountId,
-      target,
-      targetDigest: proposal.targetDigest,
-      subjectDigest: proposal.subjectDigest,
-      bodyDigest: proposal.bodyDigest,
-      snapshotDigest: proposal.snapshotDigest,
-      policyVersion: proposal.policyVersion,
-      credentialGeneration: proposal.credentialGeneration,
-      createdAt: proposal.createdAt,
-      expiresAt: proposal.expiresAt,
-      lifecycle: lifecycle.value,
-    };
-  }
-  const proposal = checked(replyEmailProposalSchema, value);
-  if (proposal === null) return null;
-  const lifecycle = parseEmailReplyProposalLifecycle(proposal.lifecycle);
-  const evidence = parseEmailProposalEvidence(proposal.evidence);
-  if (!lifecycle.ok || evidence === null) return null;
-  return {
-    proposalId: proposal.proposalId,
-    version: proposal.version,
-    caseId: proposal.caseId,
-    threadId: proposal.threadId,
-    providerDraftId: proposal.providerDraftId,
-    evidence,
-    providerDraftMessageId: proposal.providerDraftMessageId,
-    triggeringProviderMessageId: proposal.triggeringProviderMessageId,
-    mailboxBindingId: proposal.mailboxBindingId,
-    bindingRevision: proposal.bindingRevision,
-    policyVersion: proposal.policyVersion,
-    targetDigest: proposal.targetDigest,
-    bodyDigest: proposal.bodyDigest,
-    snapshotDigest: proposal.snapshotDigest,
-    createdAt: proposal.createdAt,
-    expiresAt: proposal.expiresAt,
-    lifecycle: lifecycle.value,
-  };
-}
-
-export function parseCaseEmailProposalJson(
-  payload: string,
-): CaseEmailProposal | null {
-  try {
-    return parseCaseEmailProposal(JSON.parse(payload));
-  } catch {
-    return null;
-  }
-}
 
 export function parseWaitForCommerceApprovalRequest(
   value: unknown,

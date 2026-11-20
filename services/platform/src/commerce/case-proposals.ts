@@ -110,7 +110,10 @@ function parseCommerceCaseProposalBody(
     action.kind === "submit_supplier_payout" ||
     action.kind === "resume_supplier_payout_funding"
   ) {
-    const authority = checked(integrationAccountAuthoritySchema, value.authority);
+    const authority = checked(
+      integrationAccountAuthoritySchema,
+      value.authority,
+    );
     if (value.provenance !== null || authority === null) return null;
     const account = parseIntegrationAccountId(authority.integrationAccountId);
     if (!account.ok) return null;

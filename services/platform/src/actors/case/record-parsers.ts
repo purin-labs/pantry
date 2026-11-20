@@ -50,7 +50,6 @@ import {
   droppedOutputSchema,
   heldOutputSchema,
   rejectedOutputSchema,
-  emailProposalEvidenceSchema,
   goalMessageSchema,
   journalCursorSchema,
   outputLifecycleSchema,
@@ -711,25 +710,6 @@ export function isOpen(value: string): boolean {
 
 export function isPresent<T>(value: T | null): value is T {
   return value !== null;
-}
-
-export function parseEmailProposalEvidence(
-  raw: unknown,
-):
-  | import("../../case-context-discovery/evidence").CaseContextCollectionProposalEvidence
-  | null {
-  if (raw === undefined) return { kind: "source_only" };
-  const evidence = checked(emailProposalEvidenceSchema, raw);
-  if (evidence === null) return null;
-  if (evidence.kind === "source_only") return { kind: "source_only" };
-  const dependency = parseCaseEvidenceDependency(evidence.dependency);
-  return dependency?.kind === "case_context_collection_evidence"
-    ? {
-        kind: "case_context_collection_evidence",
-        dependency,
-        flowBindingDigest: evidence.flowBindingDigest,
-      }
-    : null;
 }
 
 export async function flowLabelForTrigger(

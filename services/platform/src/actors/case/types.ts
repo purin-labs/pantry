@@ -18,8 +18,6 @@ import type {
   SessionProposal,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { EmailReplyProposalLifecycle } from "../../data/email-mailbox";
-import type { EmailProposalTarget } from "../../data/email-operational";
 import type {
   MerchantActionDecision,
   MerchantActionRejectionEvidence,
@@ -30,47 +28,6 @@ import type { SerializedFlowBinding } from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { CaseSourceProvenance } from "./source-provenance";
-
-export type CaseGmailReplyProposal = {
-  readonly evidence: import("../../case-context-discovery/evidence").CaseContextCollectionProposalEvidence;
-  readonly proposalId: string;
-  readonly version: number;
-  readonly caseId: string;
-  readonly threadId: string;
-  readonly providerDraftId: string;
-  readonly providerDraftMessageId: string;
-  readonly triggeringProviderMessageId: string;
-  readonly mailboxBindingId: string;
-  readonly bindingRevision: number;
-  readonly policyVersion: number;
-  readonly targetDigest: string;
-  readonly bodyDigest: string;
-  readonly snapshotDigest: string;
-  readonly createdAt: number;
-  readonly expiresAt: number;
-  readonly lifecycle: EmailReplyProposalLifecycle;
-};
-
-export type CaseOperationalEmailProposal = {
-  readonly kind: "operational_new_message";
-  readonly proposalId: string;
-  readonly version: number;
-  readonly caseId: string;
-  readonly integrationAccountId: string;
-  readonly target: EmailProposalTarget;
-  readonly targetDigest: string;
-  readonly subjectDigest: string;
-  readonly bodyDigest: string;
-  readonly snapshotDigest: string;
-  readonly policyVersion: number;
-  readonly credentialGeneration: number;
-  readonly createdAt: number;
-  readonly expiresAt: number;
-  readonly lifecycle: EmailReplyProposalLifecycle;
-};
-
-export type CaseEmailProposal =
-  CaseGmailReplyProposal | CaseOperationalEmailProposal;
 
 export type QuarantinedCaseDiscardResult =
   | {
@@ -333,10 +290,7 @@ export type ParsedAcceptCommerceProposalRequest =
   | Readonly<{
       readonly kind: "agent_bound";
       readonly proposal: CaseCommerceProposal & {
-        readonly origin: Variant<
-          CaseCommerceProposalOrigin,
-          "agent_session"
-        >;
+        readonly origin: Variant<CaseCommerceProposalOrigin, "agent_session">;
       };
       readonly acceptedAt: number;
       readonly flowBinding: FlowBinding;

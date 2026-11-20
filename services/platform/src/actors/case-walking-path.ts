@@ -112,7 +112,6 @@ export type CaseWalkingCase = Pick<
   | "holdOutput"
   | "rejectOutput"
   | "inspect"
-  | "transitionEmailProposal"
 >;
 export type OngoingCaseWalkingCase = CaseWalkingCase &
   Pick<CaseActor, "prepareOngoingTurn">;

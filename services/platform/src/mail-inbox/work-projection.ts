@@ -6,7 +6,7 @@ import type {
   MailWorkReplyState,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
-import type { CaseGmailReplyProposal } from "../actors/case/types";
+import type { CaseGmailReplyProposal } from "../actors/case-inbox/email-proposals";
 import type { EmailReplyProposalLifecycle } from "../data/email-mailbox";
 
 export function mailWorkCaseState(lifecycle: CaseLifecycle): MailWorkCaseState {

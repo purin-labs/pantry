@@ -1,8 +1,7 @@
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
-import type {
-  CaseCommerceProposalBody,
-  CaseEntityPlaneCommand,
-} from "./types";
+import type { Variant } from "@purin-labs/type-utils";
+import type { CaseCommerceProposalBody, CaseEntityPlaneCommand } from "./types";
 
 /**
  * The parts that the product areas give to the Case (Refactor 17, step A1.6
@@ -16,6 +15,7 @@ import type {
  */
 export type CaseParts = Readonly<{
   commerce: CaseCommercePart;
+  inbox: CaseInboxPart;
 }>;
 
 /** The checks of the commerce values in a Case. */
@@ -35,6 +35,14 @@ export type CaseCommercePart = Readonly<{
   parseEntityPlaneCommand(value: unknown): CaseEntityPlaneCommand | null;
   /** The receipt of a commerce provider for an action, or null. */
   parseProviderReceipt(value: unknown): CommerceProviderReceipt | null;
+}>;
+
+/** The parts of the Inbox that a Case trigger needs. */
+export type CaseInboxPart = Readonly<{
+  /** The Connector that admits the work of a mailbox or a WhatsApp number. */
+  triggerConnectorId(
+    authority: Variant<RequestAuthority, "agent_mailbox" | "whatsapp_support">,
+  ): string;
 }>;
 
 let provided: CaseParts | null = null;

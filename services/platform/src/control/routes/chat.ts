@@ -80,10 +80,10 @@ import {
 } from "../../chat/public-conversation";
 import { readOnboardingRow } from "../../data/organisation-onboarding-row";
 import {
-  readConversationEmailReviews,
   readConversationLinks,
   unreadConversationCount,
 } from "../../chat/conversation-links";
+import { readConversationEmailReviews } from "../../mail-inbox/conversation-email-reviews";
 import { chatError, chatSaveError } from "./chat/errors";
 
 export type PortalChatExecution = Pick<ExecutionContext, "waitUntil">;
