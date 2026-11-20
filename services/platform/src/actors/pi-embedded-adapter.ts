@@ -9,21 +9,23 @@ import {
   PI_DURABLE_CHECKPOINT_FORMAT,
 } from "./pi-durable-checkpoint";
 import {
-  PACKAGED_PI_MODEL,
   PACKAGED_PI_OPENAI_MODEL,
+  PLATFORM_PI_MODELS,
   type PlatformPiModel,
 } from "./pi-model-transport";
 
 export const PACKAGED_PI_CHECKPOINT_FORMAT = PI_DURABLE_CHECKPOINT_FORMAT;
 export const PACKAGED_PI_HARNESS_BUILD = PI_DURABLE_BUILD;
-const PI_EMBEDDED_HARNESS_ADAPTER = createPiDurableAdapter(PACKAGED_PI_MODEL);
 /** Pantry's paid OpenRouter route: one adapter for each model it runs. */
-export const PI_PLATFORM_EMBEDDED_HARNESS_ADAPTERS: Readonly<
-  Record<PlatformPiModel, EmbeddedHarnessAdapter>
-> = {
-  [PACKAGED_PI_MODEL]: PI_EMBEDDED_HARNESS_ADAPTER,
-  "qwen/qwen3.7-flash": createPiDurableAdapter("qwen/qwen3.7-flash"),
-};
+export const PI_PLATFORM_EMBEDDED_HARNESS_ADAPTERS = Object.fromEntries(
+  PLATFORM_PI_MODELS.map(platformAdapterEntry),
+) as Readonly<Record<PlatformPiModel, EmbeddedHarnessAdapter>>;
+
+function platformAdapterEntry(
+  model: PlatformPiModel,
+): [PlatformPiModel, EmbeddedHarnessAdapter] {
+  return [model, createPiDurableAdapter(model)];
+}
 export const PI_OPENAI_EMBEDDED_HARNESS_ADAPTER = createPiDurableAdapter(
   PACKAGED_PI_OPENAI_MODEL,
 );

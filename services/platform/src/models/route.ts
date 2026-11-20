@@ -8,9 +8,10 @@ import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 import { readOrganisationCodexConnectionAtScope } from "./codex-connection";
 import {
-  PACKAGED_PI_MODEL,
+  PLATFORM_DEFAULT_PI_MODEL,
   PACKAGED_PI_OPENAI_MODEL,
   isPlatformPiModel,
+  platformPiModelName,
 } from "../actors/pi-model-transport";
 import {
   resolveCurrentOrganisationAnthropicModelCredential,
@@ -147,7 +148,7 @@ export function organisationChatModelOptions(
   return [
     {
       id: route.model,
-      name: route.model,
+      name: routeModelName(route),
       description: "The model configured for this workspace inference source.",
       capabilities: {
         input: { text: true, images: true, documents: false },
@@ -159,6 +160,27 @@ export function organisationChatModelOptions(
       },
     },
   ];
+}
+
+function routeModelName(route: OrganisationModelRoute): string {
+  return route.keySource === "platform" && isPlatformPiModel(route.model)
+    ? platformPiModelName(route.model)
+    : route.model;
+}
+
+/**
+ * The route of a chat that stored `storedModel` (spec FND-04). On Pantry's
+ * paid route the stored model follows the route's model: that route offers
+ * one model, so the person did not choose the stored one, and a chat from
+ * before a change of the default keeps working. A model that a new message
+ * names is still checked by selectOrganisationChatModel.
+ */
+export function selectStoredOrganisationChatModel(
+  route: OrganisationModelRoute,
+  storedModel: string,
+): Result<OrganisationModelRoute, { readonly code: "chat_model_invalid" }> {
+  if (route.keySource === "platform") return { ok: true, value: route };
+  return selectOrganisationChatModel(route, storedModel);
 }
 
 export function selectOrganisationChatModel(
@@ -181,6 +203,10 @@ export function selectOrganisationChatModel(
           ? { ok: true, value: { ...route, model: model.value } }
           : model;
       }
+      // A page loaded before a change of the paid route's default still names
+      // the earlier model. The message runs on the route's model.
+      if (route.keySource === "platform" && isPlatformPiModel(requestedModel))
+        return { ok: true, value: route };
       if (requestedModel !== route.model) {
         return { ok: false, error: { code: "chat_model_invalid" } };
       }
@@ -321,7 +347,8 @@ export function resolvePantryPlatformModelRoute(
       error: { code: "satyr_platform_credential_unavailable" },
     };
   }
-  const model = env.PANTRY_PLATFORM_PI_MODEL?.trim() || PACKAGED_PI_MODEL;
+  const model =
+    env.PANTRY_PLATFORM_PI_MODEL?.trim() || PLATFORM_DEFAULT_PI_MODEL;
   if (!isPlatformPiModel(model)) {
     return { ok: false, error: { code: "satyr_platform_model_unsupported" } };
   }

@@ -118,6 +118,7 @@ import {
 } from "../../src/data/merchant-agent-preset";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import { readPortalOutput } from "./full-worker";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const CONVERSATION_ID = "conv_cc97400f-2eb9-52d3-b35e-56a9ef3e6085";
 const LONG_TEXT = 'Canonical long response: café, 焼き菓子, "quoted". '
@@ -249,7 +250,7 @@ async function sessionOriginJourney(
           kind: "retry",
           conversationId: CONVERSATION_ID,
           requestId,
-          model: "moonshotai/kimi-k3",
+          model: PLATFORM_DEFAULT_PI_MODEL,
         })
       ).status,
     ).toBe(200);
@@ -586,7 +587,7 @@ it(
             requestId,
             "Read the most recently saved bakery run, then show the current bakery workspace.",
           ),
-          model: "moonshotai/kimi-k3",
+          model: PLATFORM_DEFAULT_PI_MODEL,
           conversationId,
         })
       ).status,
@@ -614,7 +615,7 @@ it(
             kind: "retry",
             conversationId,
             requestId,
-            model: "moonshotai/kimi-k3",
+            model: PLATFORM_DEFAULT_PI_MODEL,
           })
         ).status,
       ).toBe(200);
@@ -2332,7 +2333,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
     kind: "retry",
     conversationId: capacityId,
     requestId: "request_capacity",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
   });
   expect(retry.status).toBe(409);
   expect(await retry.json()).toMatchObject({
@@ -3441,7 +3442,7 @@ function command(requestId: string, text: string) {
     kind: "message",
     conversationId: CONVERSATION_ID,
     requestId,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text,
     surfaceContext: null,
   };
@@ -3810,7 +3811,7 @@ async function projectPiReply(
       id,
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -3829,7 +3830,7 @@ async function projectPiReply(
       id,
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
       usage: {
         prompt_tokens: inputTokens,
@@ -3922,7 +3923,7 @@ async function finishProjectContextJourney(input: {
           "project_autumn_request",
           "Keep the saved-run finding. Use the current project brief.",
         ),
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         conversationId: input.conversationId,
       })
     ).status,
@@ -3972,7 +3973,7 @@ async function finishProjectContextJourney(input: {
           "project_ungrouped_request",
           "Keep the accepted saved-run finding; finish this task.",
         ),
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         conversationId: input.conversationId,
       })
     ).status,
@@ -4409,7 +4410,7 @@ async function proveThreadForking(
     source.conversation,
     evidence,
   );
-  const model = "moonshotai/kimi-k3";
+  const model = PLATFORM_DEFAULT_PI_MODEL;
   const gate = Promise.withResolvers<void>();
   evidence.pause = { kind: "waiting", gate };
   expect(
@@ -5436,7 +5437,7 @@ function uploadInspectionAttachment(
       kind: "message",
       conversationId,
       requestId,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       text: "Inspect the attached document.",
       browserContext: { kind: "unavailable" },
       surfaceContext: null,

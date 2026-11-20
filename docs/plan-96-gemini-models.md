@@ -1,7 +1,8 @@
 # Plan 96 — Gemini models in Pantry
 
-Status: proposed on 21 November 2026, at the request of the owner. Six
-decisions wait for the owner (see "Decisions"). No step has started.
+Status: accepted with the default decisions on 21 November 2026, when the
+owner asked to implement it. Steps A1 and A2 are on `dev` (see "Steps done").
+Part A is not released. Part B waits for Pi 1.6 (D3).
 
 Owner: the model routes (spec FND-04, "Agent harness and model routes").
 Touches: [Plan 73 — model exit Worker](plan-73-model-exit-worker.md),
@@ -175,10 +176,18 @@ The paths are those on `ebf2996`. Refactor 17 can move a file;
   `google/gemini-4-hydrogen`. `PLATFORM_PI_MODELS` holds Hydrogen, kimi-k3 (only
   for turns that pin it) and `qwen/qwen3.7-flash` (tests). Each has one adapter.
 - A stored chat model on this route follows the route's model. The person did
-  not choose the stored model, because the route offers only one model. A model
-  that a new message names explicitly is still refused when the route does not
-  offer it. One change in `selectStoredConversationModel` covers the chat, goal,
-  side Case and cancel paths. `loadDirectCasePolicy` gets the same rule.
+  not choose the stored model, because the route offers only one model. One
+  change in `selectStoredConversationModel` covers the chat, goal, side Case
+  and cancel paths. `loadDirectCasePolicy` gets the route that this selects.
+- A message that names a model of `PLATFORM_PI_MODELS` runs on the route's
+  model, because a page loaded before the release still names the earlier
+  default. A message that names any other model is refused
+  (`chat_model_invalid`) before a model request.
+- A Slack thread keeps the model that its Session started with: the Session
+  pins its route at its start (`initializedSession` in
+  `actors/case-walking-path.ts`). A new thread starts on the new default. So
+  an earlier default stays in `PLATFORM_PI_MODELS` while an open thread can
+  pin it.
 - The model option shows "Gemini 4 Hydrogen", not the raw id. The context
   window stays at 256,000 tokens. The effort options stay low, medium and high.
 - The default thinking level stays `minimal`. The Slack reasoning setting still
@@ -255,17 +264,21 @@ part B.
 
 ### A1. A stored model follows the route that Seams pays for
 
-- Change `selectStoredConversationModel` and `loadDirectCasePolicy` as in the
-  design.
-- Journeys, on the model fake of the platform-route journeys:
-  - J1: a Portal chat whose stored model is the earlier default answers its next
-    message. The request to OpenRouter names the current model. The person sees
-    one answer and no failure.
-  - J2: a Slack thread that started on the earlier default gets one answer in
-    the same thread after the change.
-- If a Session cannot take a new model route, find out how a model change in a
-  Claude chat works, and use the same path. Do not add a second path.
-- Checks: `check:types`, the two journeys, `pnpm --filter @purin-labs/platform test`.
+- Change `selectStoredConversationModel` and `selectOrganisationChatModel` as
+  in the design.
+- Journeys, on the model fake of the platform-route journeys. Each sets
+  `PANTRY_PLATFORM_PI_MODEL` to kimi-k3 for the time before the release and
+  removes it for the release:
+  - J1 (`platform-model-change.test.ts`): a Portal chat that kimi-k3 answered
+    opens with "Gemini 4 Hydrogen" in its menu. A message from a page that
+    still names kimi-k3 gets one answer from Hydrogen. A message that names
+    another model is refused before a model request. Without the change, the
+    chat shows "Connect the workspace's selected AI provider in Integrations
+    before chatting."
+  - J2 (`slack-model-change.test.ts`): an open Slack thread gets its next
+    answer in the same thread, on kimi-k3, with its history. A new thread gets
+    its answer from Hydrogen.
+- Checks: `check:types`, the two journeys, the changed journey files.
 
 ### A2. Gemini 4 Hydrogen as the default
 
@@ -284,10 +297,13 @@ part B.
 ### A4. One week after A3
 
 - Compare the OpenRouter spend per day with the week before A3.
-- Then remove kimi-k3 from `PLATFORM_PI_MODELS`. A turn that still pins it
-  fails after that, with `embedded_harness_model_authority_unavailable`.
-- Before the removal, check that no unfinished turn pins kimi-k3, for example a
-  turn that waits for an approval. Find a read-only way to check this in A4.
+- Keep kimi-k3 in `PLATFORM_PI_MODELS`. An open Slack thread pins it for
+  the life of its Session (J2), and a removal fails that thread's next message
+  with `embedded_harness_model_authority_unavailable`.
+- A removal needs its own step first: a Session whose pinned model left the
+  list continues in a new lineage on the current default, with the thread's
+  history. Propose that step only when kimi-k3 must go, for example when
+  OpenRouter stops it.
 
 ### B1. Pi 1.6 upgrade
 
@@ -335,16 +351,31 @@ part B.
 - Production proof: the live check of B4 on production, and the live Slack
   journey.
 
+## Steps done
+
+| Step | What exists                                                                                                                                                                                                                                                                                                                                                                      |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1   | `selectStoredOrganisationChatModel` in `models/route.ts`: a stored chat on the paid route follows the route's model, and a message that names a model of `PLATFORM_PI_MODELS` runs on the route's model. Journeys J1 and J2 pass, and J1 fails without the change                                                                                                                |
+| A2   | `PLATFORM_DEFAULT_PI_MODEL` is `google/gemini-4-hydrogen`, with the Portal name "Gemini 4 Hydrogen". `PLATFORM_PI_MODELS` is one table of the three models and their names, with one adapter for each. 32 test files take the default from the constant in place of a literal kimi-k3 id. Two digest tests keep the literal kimi-k3 route, because a stored digest must not move |
+
+Checks on 21 November 2026: `check:types`, the E2E type check, every lint, the Platform
+unit suite (1,732 tests) and the full E2E suite (241 files, 465 tests). One journey,
+`counter-receipt-printer.test.ts`, failed once under the load of the full suite and passed
+twice alone; it uses no model route.
+
+Not done for part A: the live Slack journey on Hydrogen (A2), the release (A3) and the
+check of A4. They need the owner's approval for a production change.
+
 ## Decisions
 
-| Id  | Question                                           | Recommendation                                                                             | Cost                                                                        | Default        |
-| --- | -------------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- | -------------- |
-| D1  | The default model of the route that Seams pays for | Gemini 4 Hydrogen                                                                          | $28 per 1,000 turns, against $30 now. Carbon: $37, then $74 from 1 December | Hydrogen       |
-| D2  | Open chats on that route after the change          | They move to the new default at their next message                                         | None                                                                        | They move      |
-| D3  | When to upgrade Pi to 1.6                          | Not before 27 November 2026, on the newest 1.6 patch, in its own release                   | About one day of adapter work and journeys, plus a sandbox release          | As recommended |
-| D4  | The first model of the Google key route            | Hydrogen; the menu offers all four                                                         | None. The Organisation pays Google                                          | Hydrogen       |
-| D5  | The context window on the Google key route         | 256,000 tokens, as on the other routes                                                     | A full 1,048,576-token turn on Neon costs about $3 of input                 | 256,000        |
-| D6  | A model choice on the route that Seams pays for    | Not in this plan. It needs a meter and a limit for each Organisation, as Jev has (Plan 88) | Carbon from 1 December costs 2.5 times kimi-k3 per turn                     | No choice      |
+| Id  | Question                                           | Recommendation                                                                                 | Cost                                                                        | Default        |
+| --- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------------- |
+| D1  | The default model of the route that Seams pays for | Gemini 4 Hydrogen                                                                              | $28 per 1,000 turns, against $30 now. Carbon: $37, then $74 from 1 December | Hydrogen       |
+| D2  | Open chats on that route after the change          | Portal chats move to the new default at their next message. Open Slack threads stay on kimi-k3 | None. kimi-k3 costs the same per turn                                       | As recommended |
+| D3  | When to upgrade Pi to 1.6                          | Not before 27 November 2026, on the newest 1.6 patch, in its own release                       | About one day of adapter work and journeys, plus a sandbox release          | As recommended |
+| D4  | The first model of the Google key route            | Hydrogen; the menu offers all four                                                             | None. The Organisation pays Google                                          | Hydrogen       |
+| D5  | The context window on the Google key route         | 256,000 tokens, as on the other routes                                                         | A full 1,048,576-token turn on Neon costs about $3 of input                 | 256,000        |
+| D6  | A model choice on the route that Seams pays for    | Not in this plan. It needs a meter and a limit for each Organisation, as Jev has (Plan 88)     | Carbon from 1 December costs 2.5 times kimi-k3 per turn                     | No choice      |
 
 ## The owner's actions
 

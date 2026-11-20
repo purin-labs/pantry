@@ -1,5 +1,5 @@
 import {
-  selectOrganisationChatModel,
+  selectStoredOrganisationChatModel,
   organisationChatModelOptions,
   type OrganisationModelRoute,
 } from "../../models/route";
@@ -25,14 +25,14 @@ export function modelOptionHasId(
 export function selectStoredConversationModel(
   workspace: OrganisationModelRoute,
   conversation: Conversation,
-): ReturnType<typeof selectOrganisationChatModel> {
+): ReturnType<typeof selectStoredOrganisationChatModel> {
   const stored = conversation.modelRoute;
   if (
     stored.keySource !== workspace.keySource ||
     stored.provider !== workspace.provider
   )
     return { ok: true, value: workspace };
-  return selectOrganisationChatModel(workspace, stored.model);
+  return selectStoredOrganisationChatModel(workspace, stored.model);
 }
 
 export function conversationUsesInferenceSource(

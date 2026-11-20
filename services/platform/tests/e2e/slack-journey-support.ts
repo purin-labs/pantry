@@ -44,6 +44,7 @@ import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 export const SLACK_SIGNING_SECRET = "slack-signing-e2e-secret";
 export const ORGANISATION_ID = requiredOrganisationId(
   "organisation_e2e_slack_actor",
@@ -1287,7 +1288,7 @@ export function openRouterText(text: string, id: string): Response {
       id,
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -1300,7 +1301,7 @@ export function openRouterText(text: string, id: string): Response {
       id,
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
       usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
     },
@@ -1317,7 +1318,7 @@ export function openRouterToolCall(
       id: `chatcmpl_${callId}`,
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -1340,7 +1341,7 @@ export function openRouterToolCall(
       id: `chatcmpl_${callId}`,
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
     },
   ]);

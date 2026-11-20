@@ -7,6 +7,7 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { describe, expect, test, vi } from "vitest";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
 
 const organisationCredentialMock = vi.hoisted(() => ({
   resolveOrganisationOpenAiModelCredentialForRoute: vi.fn(),
@@ -41,7 +42,7 @@ async function resolvesPlatformOpenRouterKey(): Promise<void> {
   const route = {
     keySource: "platform" as const,
     provider: "openai-compatible" as const,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
   };
 
   const resolved = await createEmbeddedHarnessModelRouteLease({

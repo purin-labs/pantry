@@ -29,6 +29,7 @@ import {
 } from "./menu-board-journey-support";
 import { HttpResponse } from "msw";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -307,7 +308,7 @@ function addText(boardId: string, text: string) {
         id: `chatcmpl_${callId}`,
         object: "chat.completion.chunk",
         created: 1_787_500_000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [{ index: 0, delta, finish_reason: finish }],
       });
       const index = alongside === undefined ? 0 : 1;

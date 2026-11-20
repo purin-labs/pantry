@@ -62,6 +62,7 @@ import {
 } from "./slack-journey-support";
 import { network } from "./network";
 import { revokeAccessGrant } from "../../src/data/access-grants";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const SOURCE_NAME = "Restricted P54B supplier.pdf";
 const SOURCE_ID = "id:p54b-supplier";
@@ -304,7 +305,7 @@ async function projectInformationFlowJourney(
         platformConversation(
           conversationId,
           conversationTitle,
-          "moonshotai/kimi-k3",
+          PLATFORM_DEFAULT_PI_MODEL,
         ),
         0,
         { projectId },
@@ -315,7 +316,7 @@ async function projectInformationFlowJourney(
     kind: "message",
     conversationId,
     requestId: "p54b_initial",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Acknowledge the inherited project context without searching or reading files.",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
@@ -445,7 +446,7 @@ async function projectInformationFlowJourney(
     kind: "message",
     conversationId,
     requestId: "p54b_revoke_during_response",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Check the retained context once more.",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },

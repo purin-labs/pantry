@@ -25,6 +25,7 @@ import { conversationTimeline } from "../../src/chat/conversation";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 export { CodeModePlatformGovernorActor } from "../../src/actors/code-mode-platform-governor";
 
@@ -249,7 +250,7 @@ function simulatedResponse(text: string): Response {
     id,
     object: "chat.completion.chunk",
     created: 1790985600,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [
       {
         index: 0,
@@ -265,7 +266,7 @@ function simulatedResponse(text: string): Response {
     id,
     object: "chat.completion.chunk",
     created: 1790985600,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
   };
   return new Response(
@@ -393,7 +394,7 @@ function simulatedToolResponse(
     id,
     object: "chat.completion.chunk",
     created: 1790985600,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [
       {
         index: 0,
@@ -416,7 +417,7 @@ function simulatedToolResponse(
     id,
     object: "chat.completion.chunk",
     created: 1790985600,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
   };
   return new Response(
@@ -672,7 +673,7 @@ async function turn(
           kind: "message",
           conversationId,
           requestId,
-          model: "moonshotai/kimi-k3",
+          model: PLATFORM_DEFAULT_PI_MODEL,
           text,
           browserContext: { kind: "unavailable" },
           surfaceContext: null,

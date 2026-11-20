@@ -32,6 +32,7 @@ import { control } from "./chat-journey-support";
 import { network } from "./network";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { openRouterText, requiredPlacement } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 // A frame that has not come within this time does not come.
 const QUIET_MS = 750;
@@ -99,7 +100,7 @@ async function canvasChatSignalJourney({ task }: TestContext): Promise<void> {
         kind: "message",
         conversationId,
         requestId: "canvas_signal_request",
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text: REQUEST_TEXT,
         browserContext: { kind: "unavailable" },
         surfaceContext: null,

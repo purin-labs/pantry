@@ -45,6 +45,7 @@ import {
   requireVaultHandle,
   requireWorkspaceId,
 } from "../test-ids";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const ORGANISATION_ID = requireOrganisationId(
   "organisation_e2e_actor_recovery",
@@ -604,7 +605,7 @@ async function recoversActorDelivery(
   });
   expect(model.requests).toHaveLength(1);
   expect(model.requests[0]).toMatchObject({
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     stream: true,
   });
   expect(slack.deliveryAttempts).toHaveLength(2);
@@ -1212,7 +1213,7 @@ function openRouterText(text: string): Response {
       id: "chatcmpl_e2e_actor_recovery",
       object: "chat.completion.chunk",
       created: 1_787_500_100,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -1225,7 +1226,7 @@ function openRouterText(text: string): Response {
       id: "chatcmpl_e2e_actor_recovery",
       object: "chat.completion.chunk",
       created: 1_787_500_100,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
     },
   ]);

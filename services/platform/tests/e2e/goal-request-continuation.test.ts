@@ -17,6 +17,7 @@ import {
 } from "./chat-journey-support";
 import { ORGANISATION_ID, openRouterStream } from "./slack-journey-support";
 import { network } from "./network";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "retains the request goal across Portal steps and Case eviction, then enrolls a new message in the replacement goal",
@@ -169,7 +170,7 @@ function measuredResponse(call: number): Response {
       id: `goal_request_${call}`,
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -182,7 +183,7 @@ function measuredResponse(call: number): Response {
       id: `goal_request_${call}`,
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
       usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
     },
@@ -226,7 +227,7 @@ function sendPiMessage(
         kind: "message",
         conversationId: CONVERSATION_ID,
         requestId: `request_credit_${turn}`,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text: `Review ${turn}`,
         surfaceContext: null,
       }),

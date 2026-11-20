@@ -19,6 +19,7 @@ import { parseUserId } from "../../src/ids";
 import { requireActiveOrganisationActorAtPlacement } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const CONVERSATION = "conv_c55af3e2-19c2-446a-9f44-e00000000055";
 
@@ -116,7 +117,7 @@ export async function regionalHarnessJourney(
     kind: "message",
     conversationId,
     requestId: `request_${conversationId}`,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "List connected integrations.",
     surfaceContext: null,
     browserContext: {

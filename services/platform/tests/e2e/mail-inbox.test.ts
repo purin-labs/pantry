@@ -274,6 +274,7 @@ import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-p
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
 import type { OrganisationActorStub } from "../../src/env";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 async function prepareMailBudgetJourney() {
   const owner = await client("mail-budget-pi-owner");
@@ -633,7 +634,7 @@ function budgetToolCall(
       id,
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -656,7 +657,7 @@ function budgetToolCall(
       id,
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
       usage: {
         prompt_tokens: totalTokens - 100,
@@ -923,7 +924,7 @@ class TransientGoalProvider {
         id: "transient_goal",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [
           {
             index: 0,
@@ -947,7 +948,7 @@ class TransientGoalProvider {
         id: "transient_goal",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
         usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
       },

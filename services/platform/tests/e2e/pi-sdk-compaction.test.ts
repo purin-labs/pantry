@@ -15,6 +15,7 @@ import {
   openRouterToolCall,
   openRouterStream,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const LARGE_ACCEPTED_RESPONSE = "Accepted batch evidence. ".repeat(5_000);
 
@@ -191,7 +192,7 @@ function textWithUsage(text: string, inputTokens: number): Response {
       id: "compaction_usage",
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -204,7 +205,7 @@ function textWithUsage(text: string, inputTokens: number): Response {
       id: "compaction_usage",
       object: "chat.completion.chunk",
       created: 1_787_500_000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
       usage: {
         prompt_tokens: inputTokens,

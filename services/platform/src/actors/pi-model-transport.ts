@@ -31,20 +31,31 @@ type PiModelRouteInput = Pick<
   "model" | "modelTokenAllowance" | "modelRouteLease"
 >;
 
-export const PACKAGED_PI_MODEL = "moonshotai/kimi-k3";
 /**
- * The OpenRouter models that Pantry's paid route runs. Production runs
- * PACKAGED_PI_MODEL; `PANTRY_PLATFORM_PI_MODEL` selects a cheaper one for tests
- * that call OpenRouter.
+ * The OpenRouter models that Pantry's paid route runs, with the name that
+ * Portal shows (spec FND-04). Production runs PLATFORM_DEFAULT_PI_MODEL;
+ * `PANTRY_PLATFORM_PI_MODEL` selects a cheaper one for tests that call
+ * OpenRouter. An earlier default stays here while a Session can pin it: an
+ * unfinished turn restores only on a model that has an adapter.
  */
-export const PLATFORM_PI_MODELS = [
-  PACKAGED_PI_MODEL,
-  "qwen/qwen3.7-flash",
-] as const;
-export type PlatformPiModel = (typeof PLATFORM_PI_MODELS)[number];
+const PLATFORM_PI_MODEL_NAMES = {
+  "google/gemini-4-hydrogen": "Gemini 4 Hydrogen",
+  "moonshotai/kimi-k3": "Kimi K3",
+  "qwen/qwen3.7-flash": "Qwen3.7 Flash",
+} as const;
+export type PlatformPiModel = keyof typeof PLATFORM_PI_MODEL_NAMES;
+export const PLATFORM_DEFAULT_PI_MODEL: PlatformPiModel =
+  "google/gemini-4-hydrogen";
+export const PLATFORM_PI_MODELS = Object.keys(
+  PLATFORM_PI_MODEL_NAMES,
+) as readonly PlatformPiModel[];
 
 export function isPlatformPiModel(model: string): model is PlatformPiModel {
-  return (PLATFORM_PI_MODELS as readonly string[]).includes(model);
+  return Object.hasOwn(PLATFORM_PI_MODEL_NAMES, model);
+}
+
+export function platformPiModelName(model: PlatformPiModel): string {
+  return PLATFORM_PI_MODEL_NAMES[model];
 }
 export const PACKAGED_PI_OPENAI_MODEL = "gpt-5.6-luna";
 

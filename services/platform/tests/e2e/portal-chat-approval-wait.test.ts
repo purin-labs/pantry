@@ -42,6 +42,7 @@ import {
   openRouterText,
   openRouterToolCall,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const TOOLS =
   "commerce_entity_context commerce_propose_refund commerce_propose_action";
@@ -324,7 +325,7 @@ function sendMessage(
         kind: "message",
         conversationId: CONVERSATION_ID,
         requestId: `request_approval_wait_${turn}`,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text,
         surfaceContext: null,
       }),
@@ -345,7 +346,7 @@ function retryMessage(
         kind: "retry",
         conversationId: CONVERSATION_ID,
         requestId: `request_approval_wait_${turn}`,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
       }),
     },
   );

@@ -37,6 +37,7 @@ import {
   openRouterToolCall,
 } from "./slack-journey-support";
 import interrupted from "../../../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const CONVERSATION_ID = "conv_c55af3e2-19c2-446a-9f44-e00000000060";
 const RETIRED_CANVAS_CONTEXT =
@@ -299,7 +300,7 @@ async function agentCanvasJourney(
         kind: "message",
         conversationId,
         requestId: "request_agent_canvas",
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text: "Move the first saved appliance canvas node to 450,220.",
         surfaceContext: null,
         browserContext: {
@@ -540,7 +541,7 @@ async function scriptCanvasJourney({ task, onTestFinished }: TestContext) {
     kind: "message",
     conversationId: chat.conversationId,
     requestId: "request_script_canvas",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Move the first two canvas steps in one script.",
     surfaceContext: null,
     browserContext: {
@@ -877,7 +878,7 @@ async function verifyPeerAccess(
         kind: "message",
         conversationId,
         requestId: "request_viewer_canvas",
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text: "Move a node",
         surfaceContext: null,
         browserContext: { kind: "unavailable" },
@@ -915,7 +916,7 @@ async function verifyContinuation(
     kind: "message",
     conversationId,
     requestId: "request_agent_canvas",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Move the first saved appliance canvas node to 450,220.",
     surfaceContext: null,
     browserContext: {
@@ -957,7 +958,7 @@ async function verifyContinuation(
     kind: "message",
     conversationId,
     requestId: "retired_request",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Do not edit from an earlier conversation",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
@@ -967,7 +968,7 @@ async function verifyContinuation(
     kind: "message",
     conversationId: next.conversationId,
     requestId: "next_canvas_request",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Inspect the current canvas",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
@@ -1048,7 +1049,7 @@ async function verifyInterruptedCanvasRequest(
     kind: "message",
     conversationId,
     requestId,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Recover this request",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
@@ -1063,7 +1064,7 @@ async function verifyInterruptedCanvasRequest(
     kind: "retry",
     conversationId,
     requestId,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
   });
   expect(retried.status).toBe(200);
   await retried.body?.cancel();

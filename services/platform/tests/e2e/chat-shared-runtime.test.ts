@@ -98,6 +98,7 @@ import {
   verifyChatCaseExecution,
   verifyExecutionHidden,
 } from "./case-execution-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "shares accepted Actor history, attributes a peer turn, restores history, rejects an incompatible member, and revokes a running contributor",
@@ -180,7 +181,7 @@ async function sharedRuntimeJourney(context: TestContext): Promise<void> {
     platformConversation(
       privateConversationId,
       "Private biscuit",
-      "moonshotai/kimi-k3",
+      PLATFORM_DEFAULT_PI_MODEL,
     ),
     0,
   );
@@ -308,7 +309,7 @@ async function sharedRuntimeJourney(context: TestContext): Promise<void> {
   await saveConversation(
     await requireOrganisationExecutionScope(env, ORGANISATION_ID),
     owner.userId,
-    platformConversation(conversationId, "Shared launch", "moonshotai/kimi-k3"),
+    platformConversation(conversationId, "Shared launch", PLATFORM_DEFAULT_PI_MODEL),
     0,
   );
   await fixtureDatabase().prepare(
@@ -1711,7 +1712,7 @@ function send(
     kind: "message",
     conversationId,
     requestId,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text,
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
