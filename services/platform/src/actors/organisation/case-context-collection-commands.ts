@@ -41,6 +41,7 @@ import type { Env } from "../../env";
 import type { SchemaTransaction } from "../schema-migrations";
 import type { OrganisationStateError } from "./types";
 import type { Result } from "../../result";
+import { organisationPlacementConflict } from "./organisation-record";
 
 /**
  * Policy activation, credentials, TypeSafe and Case context discovery for the Organisation.
@@ -567,11 +568,4 @@ export async function admittedReviewCaseContextCollectionRelationship(
   });
   await host.rearm();
   return result;
-}
-
-function organisationPlacementConflict(): Result<
-  never,
-  { readonly code: "organisation_placement_conflict" }
-> {
-  return { ok: false, error: { code: "organisation_placement_conflict" } };
 }

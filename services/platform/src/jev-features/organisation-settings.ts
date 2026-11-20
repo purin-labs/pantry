@@ -43,6 +43,7 @@ import {
   readJevScreenRelevance,
   writeJevScreenRelevance,
 } from "./screen-relevance";
+import { organisationPlacementConflict } from "../actors/organisation/organisation-record";
 
 type JevCommandInput = Readonly<{
   organisationId: OrganisationId;
@@ -318,10 +319,3 @@ export const JEV_FOR_POLICY: PolicyJevPort = {
       now: input.now,
     }),
 };
-
-function organisationPlacementConflict(): Result<
-  never,
-  { readonly code: "organisation_placement_conflict" }
-> {
-  return { ok: false, error: { code: "organisation_placement_conflict" } };
-}

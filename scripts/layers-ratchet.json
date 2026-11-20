@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 190,
+    "upward": 187,
     "areas": 214,
     "order": 103,
     "table": 117
@@ -86,7 +86,6 @@
     "foundation/authority -> areas/commerce": 7,
     "foundation/authority -> foundation/agent": 11,
     "foundation/authority -> foundation/conversation": 4,
-    "foundation/authority -> workers/platform": 3,
     "foundation/collaboration -> areas/commerce": 1,
     "foundation/connections -> areas/organisation": 1,
     "foundation/connections -> foundation/authority": 1,

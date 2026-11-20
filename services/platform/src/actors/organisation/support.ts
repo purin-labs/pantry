@@ -19,10 +19,7 @@ import {
 } from "../../ids";
 import { traceWarn } from "../../observability";
 import type { Result } from "../../result";
-import {
-  ACTION_EXECUTION_LEASE_DURATION_MS,
-  readNextActionExecutionLeaseDeadline,
-} from "../action-ledger";
+import { readNextActionExecutionLeaseDeadline } from "../action-ledger";
 import { admitActorRecovery } from "../actor-activation";
 import {
   readActivationExportSource,
@@ -31,37 +28,13 @@ import {
 import { readNextCodeModeOrganisationAlarmAt } from "../code-mode-budget";
 import { errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
-import { armAlarmBy } from "../lifecycle/actor-alarm";
-import type { CodeModeOrganisationActorError } from "./code-mode-types";
-import type {
-  OrganisationMeta,
-  OrganisationMetaRow,
-  OrganisationStateError,
-} from "./types";
-import type {
-  OrganisationPolicyActivation,
-  OrganisationPolicyHead,
-  OrganisationPolicyHeadRow,
-} from "./policy-types";
+import type { OrganisationMeta, OrganisationMetaRow } from "./types";
+import {
+  organisationPlacementConflict,
+  readOrganisationMetaRow,
+} from "./organisation-record";
 
 const COMMERCE_BOARD_PRESENCE_TTL_MS = 30_000;
-
-export function validateActionOrganisation(
-  sql: SqlStorage,
-  organisationId: OrganisationId,
-): Result<null, OrganisationStateError> {
-  const organisation = readOrganisationMetaRow(sql);
-
-  if (organisation === undefined) {
-    return { ok: false, error: { code: "organisation_not_initialized" } };
-  }
-
-  if (organisation.organisation_id !== organisationId) {
-    return { ok: false, error: { code: "organisation_mismatch" } };
-  }
-
-  return { ok: true, value: null };
-}
 
 export function pruneCommerceBoardPresence(
   presence: Map<string, CommerceBoardPresenceEntry>,
@@ -90,27 +63,6 @@ function compareCommerceBoardPresence(
   right: CommerceBoardPresenceEntry,
 ): number {
   return left.userId === right.userId ? 0 : left.userId < right.userId ? -1 : 1;
-}
-
-export function validateCodeModeOrganisation(
-  sql: SqlStorage,
-  organisationId: OrganisationId,
-  requireActive: boolean,
-): Result<OrganisationMetaRow, CodeModeOrganisationActorError> {
-  const organisation = readOrganisationMetaRow(sql);
-  if (organisation === undefined) {
-    return { ok: false, error: { code: "organisation_not_initialized" } };
-  }
-  if (organisation.organisation_id !== organisationId) {
-    return { ok: false, error: { code: "organisation_mismatch" } };
-  }
-  if (requireActive && organisation.status !== "active") {
-    return {
-      ok: false,
-      error: { code: "organisation_not_active", status: organisation.status },
-    };
-  }
-  return { ok: true, value: organisation };
 }
 
 /** A socket without a room route cannot belong to this Actor's rooms. */
@@ -149,16 +101,6 @@ export function socketSweepInterval(ctx: DurableObjectState): number | null {
   return SOCKET_SWEEP_INTERVAL_MS;
 }
 
-export async function armActionExecutionAlarm(
-  storage: DurableObjectStorage,
-  now: number,
-): Promise<void> {
-  const deadline = now + ACTION_EXECUTION_LEASE_DURATION_MS;
-  if (!Number.isSafeInteger(now) || now < 0 || !Number.isSafeInteger(deadline))
-    return;
-  await armAlarmBy(storage, deadline);
-}
-
 export function readNextOrganisationAlarmAt(sql: SqlStorage): number | null {
   const actionAt = readNextActionExecutionLeaseDeadline(
     sql,
@@ -178,20 +120,6 @@ function requireOrganisationMetaId(sql: SqlStorage): OrganisationId {
   return organisationId.value;
 }
 
-export function readOrganisationMetaRow(
-  sql: SqlStorage,
-): OrganisationMetaRow | undefined {
-  const rows = sql
-    .exec<OrganisationMetaRow>(
-      `SELECT organisation_id, name, plan, status, created_at
-       FROM organisation_meta
-       LIMIT 1`,
-    )
-    .toArray();
-
-  return rows[0];
-}
-
 export function organisationRowToMeta(
   row: OrganisationMetaRow,
 ): OrganisationMeta {
@@ -207,44 +135,6 @@ export function organisationRowToMeta(
     plan: row.plan,
     status: row.status,
     createdAt: row.created_at,
-  };
-}
-
-export function readOrganisationPolicyHead(
-  sql: SqlStorage,
-): OrganisationPolicyHeadRow | undefined {
-  return sql
-    .exec<OrganisationPolicyHeadRow>(
-      `SELECT organisation_id, active_version, restriction_version, digest, body, activated_at
-       FROM organisation_policy_head
-       LIMIT 1`,
-    )
-    .toArray()[0];
-}
-
-function policyHeadFromRow(
-  row: OrganisationPolicyHeadRow,
-): OrganisationPolicyHead {
-  return {
-    activeVersion: row.active_version,
-    restrictionVersion: row.restriction_version,
-    digest: row.digest,
-    activatedAt: row.activated_at,
-  };
-}
-
-export function existingPolicyActivation(
-  _sql: SqlStorage,
-  row: OrganisationPolicyHeadRow,
-): Result<OrganisationPolicyActivation, OrganisationStateError> {
-  return {
-    ok: true,
-    value: {
-      head: policyHeadFromRow(row),
-      consumers: 0,
-      delivered: 0,
-      pending: 0,
-    },
   };
 }
 
@@ -269,13 +159,6 @@ export async function executeOrganisationCommand<
   if (!(await isOrganisationExecutionActive(storage.sql, admission.scope)))
     return organisationPlacementConflict();
   return result;
-}
-
-export function organisationPlacementConflict(): Result<
-  never,
-  { readonly code: "organisation_placement_conflict" }
-> {
-  return { ok: false, error: { code: "organisation_placement_conflict" } };
 }
 
 export async function resolveOrganisationActorDatabase(

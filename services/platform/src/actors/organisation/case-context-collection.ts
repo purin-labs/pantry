@@ -37,6 +37,7 @@ import { identifier } from "../../case-context-discovery/policy";
 import { assertNever, isRecord } from "@purin-labs/std";
 import type { CaseContextCollectionReviewCommand } from "@purin-labs/control-api";
 import type { PolicyCaseContextSourcePort } from "./organisation-policy";
+import { organisationPlacementConflict } from "./organisation-record";
 
 function parseOperationalCaseContextDiscoverySourceRequest(
   raw: unknown,
@@ -532,10 +533,3 @@ export const CASE_CONTEXT_SOURCE_FOR_POLICY: PolicyCaseContextSourcePort = {
   parseSourceRequest: parseOperationalCaseContextDiscoverySourceRequest,
   verifiedRequest: verifiedOperationalCaseContextDiscoveryRequest,
 };
-
-function organisationPlacementConflict(): Result<
-  never,
-  { readonly code: "organisation_placement_conflict" }
-> {
-  return { ok: false, error: { code: "organisation_placement_conflict" } };
-}

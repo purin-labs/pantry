@@ -80,16 +80,18 @@ import { organisationAlarmReconcilers } from "../organisation-alarm";
 import { schemaTransaction } from "./schema";
 import {
   executeOrganisationCommand,
-  organisationPlacementConflict,
   readNextOrganisationAlarmAt,
   resolveOrganisationActorDatabase,
-  validateActionOrganisation,
 } from "./support";
 import type {
   OrganisationMeta,
   OrganisationMetaInput,
   OrganisationStateError,
 } from "./types";
+import {
+  organisationPlacementConflict,
+  validateActionOrganisation,
+} from "./organisation-record";
 
 /**
  * The Organisation actor's state, its command admission and its shared helpers (Refactor 10, step 2.6). The layers above add policy and credentials, then commerce, Code Mode and activation; `OrganisationDO` keeps the members that use its private rooms and drafts.
