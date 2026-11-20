@@ -1,9 +1,11 @@
 # Plan 94 — Pantry moves to the GitHub organisation `purin-labs`
 
-Status: 19 November 2026. The repository is `purin-labs/pantry`, the folder
-move is done, the old `satyr` repository is archived and the old clone is
-deleted (see "Done"). Open: the GitHub Apps, the first CI run and the
-group B legacy names (see "Steps").
+Status: 20 November 2026. The repository is `purin-labs/pantry`, the folder
+move is done, all 27 workspace packages use `@purin-labs/*`, the old `satyr`
+repository is archived and the old clone is deleted (see "Done"). The owner
+also decided on 20 November 2026 that `seams-tech/seams-monorepo` will move
+to `purin-labs/monorepo`. Open: the monorepo relocation, the GitHub Apps,
+the first CI run and the group B legacy names (see "Steps").
 
 The owner decided on 19 November 2026:
 
@@ -21,8 +23,8 @@ undone. The organisation `purin-io` was never made on GitHub.
 
 | Organisation | Brand | Repositories | Local folder |
 |---|---|---|---|
-| `seams-tech` (stays) | Seams | `seams-wallet`, `seams-monorepo` (site, Console, wallet deploy), `speak-to-sign`, `seams-sdk` (archived). Also the archived history of Pantry: `pantry-history` and `satyr` | `~/Dev/rust` |
-| `purin-labs` (new) | Purin | `pantry` | `~/Dev/purin-labs` |
+| `seams-tech` (stays) | Seams | `seams-wallet`, `speak-to-sign`, `seams-sdk` (archived). Also the archived history of Pantry: `pantry-history` and `satyr` | `~/Dev/rust` |
+| `purin-labs` (new) | Purin | `pantry`, `monorepo` (moving from `seams-tech/seams-monorepo`: site, Console, wallet deploy) | `~/Dev/purin-labs` |
 
 The npm organisations follow the same line. The wallet packages keep the
 `@seams` scope. `@purin-labs` is for Purin packages; Pantry publishes none
@@ -46,24 +48,25 @@ the move:
 
 - The Console (`seams-sdk-d1-console`) creates organisations and members for
   Pantry. People sign in to Pantry through it (decision 2).
-- Pantry CI checks out `seams-tech/seams-monorepo`. That repository is
-  public, so a workflow in another organisation needs no token.
-- Local E2E runs need `PANTRY_ACCOUNT_WORKER_ARTIFACT`, built from
-  seams-monorepo, and `PLAYWRIGHT_MODULE` from seams-wallet.
+- Pantry CI checks out `seams-tech/seams-monorepo` (updated to
+  `purin-labs/monorepo` after step 2). That repository is public, so a
+  workflow needs no token.
+- Local E2E runs need `PANTRY_ACCOUNT_WORKER_ARTIFACT`, built from the
+  monorepo, and `PLAYWRIGHT_MODULE` from seams-wallet.
 - [Plan 93](plan-93-clean-cutover.md) still renames the Console service id
-  `satyr` in seams-monorepo. That change lands in `seams-tech`.
+  `satyr` in the monorepo (which moves to `purin-labs/monorepo` in step 2).
 
-## Facts (19 November 2026)
+## Facts (19–20 November 2026)
 
 **The new organisations.** The GitHub organisation `purin-labs` exists (Free
-plan, made on 19 November). The npm organisation `purin-labs` exists.
+plan, made on 19 November; org id `358632792`). The npm organisation
+`purin-labs` exists.
 
-**What stays the same.** Nothing in `seams-tech` changes: the npm packages and
-their trusted publishers, the Console OIDC pin to
-`seams-tech/seams-monorepo`, the wallet links, the speak-to-sign hackathon
-links and the `seams.sh` site. The organisation rename would have changed
-links in 22 files of seams-wallet, 17 of seams-monorepo and 15 of
-speak-to-sign, and 6 npm trusted publishers. The split changes none of them.
+**What stays the same.** Nothing in `seams-wallet` or `speak-to-sign` changes:
+the npm packages and their trusted publishers, the wallet links, the
+speak-to-sign hackathon links and the `seams.sh` site stay in `seams-tech`.
+`seams-monorepo` moves to `purin-labs/monorepo` in step 2 (requiring a
+dual-accept OIDC update in `automationRoute.ts` before the transfer).
 
 **The pantry repository** (private, on the Free plan):
 
@@ -181,12 +184,46 @@ empty folder"):
 1. **The owner: the GitHub Apps.** Check the apps on `seams-tech`
    (Settings → GitHub Apps) and install the ones that Pantry needs on
    `purin-labs`.
-2. **Run Pantry CI once** in the new organisation: add the label `run-ci` to
+2. **Relocate `seams-tech/seams-monorepo` to `purin-labs/monorepo`** (owner
+   decision, 20 November 2026). The repository is public (id `1366871528`),
+   has 26 GitHub Environments (including `production-console` and
+   `staging-console`), 0 webhooks and 0 npm publish workflows.
+   - **Before the transfer:** update the Console GitHub OIDC pin in
+     `packages/wallet-console-server-ts/src/tenantDeployment/automationRoute.ts`
+     (and `tests/helpers/githubDeploymentOidc.ts`) so deployed Console
+     Workers accept both `seams-tech/seams-monorepo` (`282445520`) and
+     `purin-labs/monorepo` (`358632792`, immutable subject prefix
+     `repo:purin-labs@358632792/monorepo@1366871528`), then deploy the
+     Console. Without this, the three OIDC workflows
+     (`deploy-staging-backend.yml`, `deploy-live-demo.yml`,
+     `deploy-production-mainnet-backend.yml`) fail cutover auth right after
+     the move.
+   - **Transfer and rename:** transfer `seams-tech/seams-monorepo` to
+     `purin-labs` and rename it to `monorepo`. Keep it public (or add a read
+     token for Pantry CI). Check `gh api repos/purin-labs/monorepo/actions/oidc/customization/sub`
+     to confirm the exact immutable subject prefix. Do not recreate
+     `seams-tech/seams-monorepo` (that deletes the redirect).
+   - **After the transfer:** update `--repo` defaults in `seams-monorepo`
+     (`scripts/console-deployment-environment.mjs`,
+     `scripts/dispatch-deployment-workflow.mjs`,
+     `deployment/wallet-system/scripts/apply-github-external-values.mjs`),
+     remove the old `seams-tech/seams-monorepo` OIDC branch once verified,
+     and update `purin-labs/pantry` (`.github/workflows/pantry.yml` line 64
+     and `README.md`) to `purin-labs/monorepo`. If the local clone moves
+     from `~/Dev/rust/seams-monorepo` to `~/Dev/purin-labs/monorepo`, run
+     `git worktree repair` for `voiceid-stt-bench` and update the bench path
+     in `scripts/plan-82-g06/run-server.sh` and
+     `scripts/shop-voice/run-journey.py`.
+   - **Console secrets:** the 26 GitHub Environments and their secrets move
+     with the repository (any `seams-tech` team reviewers are stripped). The
+     10 `SATYR_*` secrets in `production-console` and `staging-console` move
+     with them and keep working through the CI fallback until Plan 93 step 4.
+3. **Run Pantry CI once** in the new organisation: add the label `run-ci` to
    pull request #1 (`gh api repos/purin-labs/pantry/issues/1/labels`). It
    uses the free minutes of `purin-labs`.
-3. **The legacy `satyr` names in the code:** group A is done; group B
+4. **The legacy `satyr` names in the code:** group A is done; group B
    waits for [Plan 93](plan-93-clean-cutover.md) step 2.
-4. **The Portal shop footer** links to `https://github.com/seams-tech`
+5. **The Portal shop footer** links to `https://github.com/seams-tech`
    (`apps/portal/src/features/ecommerce/footer.tsx`). Change it with the
    brand rename.
 
