@@ -16,6 +16,9 @@ import {
 } from "./data/whatsapp";
 import { proposeEvalFromCorrection } from "./evals/access";
 import { commerceAccessTargets } from "./access-control/commerce-access-targets";
+import { actionLedgerCommerce } from "./actors/action-ledger";
+import { slackMayApproveAction } from "./commerce/action-model";
+import { parseCommerceEntityPlaneEffect } from "./commerce/entity-plane/proposals";
 import { commerceGrantSelection } from "./authorization/access-grants/commerce-grant-selection";
 import { COMMERCE_ACCESS_TARGETS } from "./commerce/entity-plane/access-targets";
 import { commerceGrantTargets } from "./authorization/access-grants/commerce-grant-targets";
@@ -130,3 +133,8 @@ commerceGraphReads.register({
 commerceExceptionInbox.register((...input) =>
   readCommerceExceptionInbox(...input),
 );
+
+actionLedgerCommerce.register({
+  parseEffect: (raw) => parseCommerceEntityPlaneEffect(raw),
+  slackMayApprove: (action) => slackMayApproveAction(action),
+});
