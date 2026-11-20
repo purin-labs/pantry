@@ -7,12 +7,23 @@ import {
 import {
   prepareArchivedOrganisationAccountsDisable,
   prepareArchivedOrganisationWebhooksDisable,
+  prepareOrganisationPurgeAccounts,
 } from "./data/integration-account-writes";
 import type { OrganisationLifecycleParts } from "./data/organisation-lifecycle-port";
 import { prepareInitialOrganisationWorkspace } from "./data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
-import { prepareArchivedOrganisationConnectionsDisable } from "./data/provider-connection-writes";
+import {
+  prepareArchivedOrganisationConnectionsDisable,
+  prepareOrganisationPurgeConnections,
+} from "./data/provider-connection-writes";
+import { prepareOrganisationPurgeCredentialGenerations } from "./data/provider-credential-generation";
 import { prepareServiceInvitationAcceptance } from "./data/service-invitation-role";
+import {
+  directorySlackRecordCount,
+  directorySlackRecordDeletions,
+  prepareSlackInstallationCredentialMove,
+  prepareSlackInstallationRevocation,
+} from "./data/slack-installation-records";
 import {
   prepareChatDirectoryRevisionBump,
   prepareReturnPrivateChatsToDefault,
@@ -91,5 +102,23 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
     ],
     projectMembersDeletion: (session, input) =>
       prepareOrganisationProjectMembersDeletion(session, input),
+  },
+  purge: {
+    pseudonymize: {
+      integration_account: (context) =>
+        prepareOrganisationPurgeAccounts(context),
+      provider_credential_generation: (context) =>
+        prepareOrganisationPurgeCredentialGenerations(context),
+      provider_connection: (context) =>
+        prepareOrganisationPurgeConnections(context),
+    },
+    directoryRecordDeletions: (directory, organisationId) =>
+      directorySlackRecordDeletions(directory, organisationId),
+    directoryRecordCount: (directory, organisationId) =>
+      directorySlackRecordCount(directory, organisationId),
+    slackInstallationRevocation: (directory, input) =>
+      prepareSlackInstallationRevocation(directory, input),
+    slackInstallationCredentialMove: (directory, input) =>
+      prepareSlackInstallationCredentialMove(directory, input),
   },
 };

@@ -5,6 +5,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
+import {
+  purgeGuarded,
+  type OrganisationPurgeContext,
+} from "./organisation-lifecycle-port";
 import type { RowGuard } from "./shared-rows/organisation-row";
 
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
@@ -208,4 +212,32 @@ export function prepareDisconnectedAccountGenerationsRevocation(
       input.organisationId,
       input.integrationAccountId,
     );
+}
+
+/** The purge deletes the custom generations and revokes the handle of the others. */
+export function prepareOrganisationPurgeCredentialGenerations(
+  context: OrganisationPurgeContext,
+): D1PreparedStatement[] {
+  return [
+    purgeGuarded(
+      context,
+      `DELETE FROM provider_credential_generation
+       WHERE organisation_id = ? AND provider_connection_id IN (
+         SELECT provider_connection_id FROM provider_connection
+         WHERE source_kind = 'custom_api'
+       )`,
+    ),
+    ...context.connections.map((connection) =>
+      context.session
+        .prepare(
+          `UPDATE provider_credential_generation SET credential_ref = ?
+           WHERE provider_connection_id = ? AND ${context.purged.sql}`,
+        )
+        .bind(
+          `vault:archived:${connection.id}:revoked`,
+          connection.id,
+          ...context.purged.bindings,
+        ),
+    ),
+  ];
 }

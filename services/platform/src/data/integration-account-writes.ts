@@ -5,6 +5,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
+import {
+  purgeGuarded,
+  type OrganisationPurgeContext,
+} from "./organisation-lifecycle-port";
 
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
 
@@ -462,4 +466,35 @@ export function prepareArchivedOrganisationWebhooksDisable(
        WHERE organisation_id = ? AND lifecycle != 'revoked' AND ${input.guard.sql}`,
     )
     .bind(input.now, input.organisationId, ...input.guard.bindings);
+}
+
+/** The purge deletes the custom accounts and pseudonymizes the others. */
+export function prepareOrganisationPurgeAccounts(
+  context: OrganisationPurgeContext,
+): D1PreparedStatement[] {
+  return [
+    purgeGuarded(
+      context,
+      "DELETE FROM integration_account WHERE organisation_id = ? AND source_kind = 'custom_api'",
+    ),
+    ...context.accounts.map((account) =>
+      context.session
+        .prepare(
+          `UPDATE integration_account
+           SET provider_account_id = ?, display_name = 'Archived account',
+               lifecycle = 'revoked', lifecycle_reason_code = NULL,
+               capability_set = '[]', is_default_for_provider = 0,
+               disabled_by_user_id = NULL, disabled_at = NULL,
+               revoked_at = ?, updated_at = ?
+           WHERE integration_account_id = ? AND ${context.purged.sql}`,
+        )
+        .bind(
+          `archived:${account.providerAccountHash}`,
+          context.now,
+          context.now,
+          account.id,
+          ...context.purged.bindings,
+        ),
+    ),
+  ];
 }

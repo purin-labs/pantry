@@ -5,6 +5,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
+import {
+  purgeGuarded,
+  type OrganisationPurgeContext,
+} from "./organisation-lifecycle-port";
 import type { RowGuard } from "./shared-rows/organisation-row";
 
 type Database = OrganisationDatabase | OrganisationDatabaseSession;
@@ -271,4 +275,41 @@ export function prepareArchivedOrganisationConnectionsDisable(
       input.organisationId,
       ...input.guard.bindings,
     );
+}
+
+/** The purge deletes the custom connections and pseudonymizes the others. */
+export function prepareOrganisationPurgeConnections(
+  context: OrganisationPurgeContext,
+): D1PreparedStatement[] {
+  return [
+    purgeGuarded(
+      context,
+      "DELETE FROM provider_connection WHERE organisation_id = ? AND source_kind = 'custom_api'",
+    ),
+    ...context.connections.map((connection) =>
+      context.session
+        .prepare(
+          // A shared-application connection has no organisation credential to
+          // pseudonymize, and its authority branch requires the handle to stay
+          // null, so only the organisation-credential branch is rewritten.
+          `UPDATE provider_connection
+           SET provider_subject_id = ?,
+               credential_ref = CASE
+                 WHEN authority_kind = 'connection_credential' THEN ?
+                 ELSE NULL
+               END,
+               lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL,
+               updated_at = ?
+           WHERE provider_connection_id = ? AND ${context.purged.sql}`,
+        )
+        .bind(
+          `archived:${connection.providerSubjectHash}`,
+          `vault:archived:${connection.id}:revoked`,
+          context.now,
+          context.now,
+          connection.id,
+          ...context.purged.bindings,
+        ),
+    ),
+  ];
 }

@@ -20,6 +20,7 @@ import type {
   SurfaceKind,
 } from "@purin-labs/contracts";
 import type {
+  GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
@@ -35,6 +36,7 @@ export type OrganisationLifecycleParts = Readonly<{
   creation: OrganisationCreationParts;
   membership: OrganisationMembershipParts;
   archive: OrganisationArchiveParts;
+  purge: OrganisationPurgeParts;
 }>;
 
 /** The parts of the creation batch and of the install batch of a surface. */
@@ -192,6 +194,91 @@ type OrganisationArchiveParts = Readonly<{
     input: Readonly<{ organisationId: OrganisationId; guard: RowGuard }>,
   ): D1PreparedStatement;
 }>;
+
+/** What the purge rewrite of a pseudonymized table needs. */
+export type OrganisationPurgeContext = Readonly<{
+  session: Session;
+  organisationId: OrganisationId;
+  /** True once the batch's first statement has moved the lifecycle. */
+  purged: RowGuard;
+  accounts: readonly Readonly<{ id: string; providerAccountHash: string }>[];
+  connections: readonly Readonly<{ id: string; providerSubjectHash: string }>[];
+  now: number;
+}>;
+
+/** The rewrite of one pseudonymized table, in the order of the purge batch. */
+type PurgeRewrite = (
+  context: OrganisationPurgeContext,
+) => readonly D1PreparedStatement[];
+
+/** The parts of the purge batch and of the erase of a purged Organisation. */
+export type OrganisationPurgeParts = Readonly<{
+  /** The rewrite of each pseudonymized connection table (connections). */
+  pseudonymize: Readonly<{
+    integration_account: PurgeRewrite;
+    provider_credential_generation: PurgeRewrite;
+    provider_connection: PurgeRewrite;
+  }>;
+  /** The directory's Slack records that name the Organisation (Slack). */
+  directoryRecordDeletions(
+    directory: GlobalDatabase,
+    organisationId: OrganisationId,
+  ): readonly (readonly [table: string, statement: D1PreparedStatement])[];
+  /** How many of those records exist (Slack). */
+  directoryRecordCount(
+    directory: GlobalDatabase,
+    organisationId: OrganisationId,
+  ): D1PreparedStatement;
+  /**
+   * Before the purge erases the Vault: the revoke of an installation that no
+   * other Organisation uses (Slack).
+   */
+  slackInstallationRevocation(
+    directory: GlobalDatabase,
+    input: Readonly<{
+      installationId: string;
+      organisationId: OrganisationId;
+      now: number;
+    }>,
+  ): D1PreparedStatement;
+  /** The move of a shared bot token to the next Organisation (Slack). */
+  slackInstallationCredentialMove(
+    directory: GlobalDatabase,
+    input: Readonly<{
+      installationId: string;
+      organisationId: OrganisationId;
+      botTokenRef: string;
+      nextOrganisationId: OrganisationId;
+      nextBotTokenRef: string;
+      now: number;
+    }>,
+  ): D1PreparedStatement;
+}>;
+
+/** A purge statement: the SQL AND the guard, with the Organisation first. */
+export function purgeGuardedStatement(
+  session: Session,
+  guard: RowGuard,
+  organisationId: OrganisationId,
+  sql: string,
+): D1PreparedStatement {
+  return session
+    .prepare(`${sql} AND ${guard.sql}`)
+    .bind(organisationId, ...guard.bindings);
+}
+
+/** The same statement under the guard of the purge batch. */
+export function purgeGuarded(
+  context: OrganisationPurgeContext,
+  sql: string,
+): D1PreparedStatement {
+  return purgeGuardedStatement(
+    context.session,
+    context.purged,
+    context.organisationId,
+    sql,
+  );
+}
 
 let provided: OrganisationLifecycleParts | null = null;
 
