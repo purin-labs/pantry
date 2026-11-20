@@ -217,10 +217,6 @@ export class CandidateActor extends CanonicalActor {
           commerce: {
             readEntityContext: unavailableTool,
             readMerchantReport: unavailableTool,
-          },
-          drafts: {
-            readWorkflowCanvas: rejectWorkflowCanvasTool,
-            moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
             readProductDescriptionDraft: this.readProductDraft.bind(
               this,
               lease,
@@ -229,7 +225,13 @@ export class CandidateActor extends CanonicalActor {
               this,
               lease,
             ),
-            readMenuDraft: unavailableTool,
+          },
+          kitchen: {
+            readWorkflowCanvas: rejectWorkflowCanvasTool,
+            moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
+          },
+          menu: { readMenuDraft: unavailableTool },
+          channels: {
             readEmailDraft: unavailableTool,
             editEmailDraft: unavailableTool,
           },

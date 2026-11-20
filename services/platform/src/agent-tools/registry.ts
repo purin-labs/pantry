@@ -7,12 +7,14 @@ import {
   emailReplyDraftEdit,
   emailReplyDraftRead,
   emailReplyProposal,
-  productionPlanEdit,
-  productionPlanRead,
-  slackMessageProposal,
   whatsAppSupportRead,
   whatsAppSupportReplySend,
 } from "./channels/channels";
+import { emailDraftEdit, emailDraftRead } from "./channels/email-draft";
+import {
+  productDescriptionDraftEdit,
+  productDescriptionDraftRead,
+} from "./commerce/description-draft";
 import { commerceEntityContext } from "./commerce/entity-context";
 import {
   counterSaleRead,
@@ -41,8 +43,6 @@ import {
   deviceSnapshotRead,
 } from "./devices/devices";
 import {
-  emailDraftEdit,
-  emailDraftRead,
   menuBoardArchive,
   menuBoardComment,
   menuBoardCreate,
@@ -53,10 +53,6 @@ import {
   menuDraftEdit,
   menuDraftRead,
   menuPriceProposal,
-  productDescriptionDraftEdit,
-  productDescriptionDraftRead,
-  workflowCanvasMove,
-  workflowCanvasRead,
 } from "./drafts/drafts";
 import { fileRead, fileSearch, workspaceQuery } from "./files/files";
 import {
@@ -74,13 +70,22 @@ import {
 } from "./kitchen/costs";
 import { PASTRY_BENCH_VIEW_TOOLS } from "./kitchen/pastry-bench";
 import {
+  productionPlanEdit,
+  productionPlanRead,
+} from "./kitchen/production-plan";
+import {
   recipeWorkflowProposal,
   recipeWorkflowRead,
 } from "./kitchen/recipe-workflow";
 import { recipeRead, recipeSave } from "./kitchen/recipes";
 import { savedBakeryRunRead } from "./kitchen/saved-runs";
 import { supplierCreate, supplierRead } from "./kitchen/suppliers";
+import {
+  workflowCanvasMove,
+  workflowCanvasRead,
+} from "./kitchen/workflow-canvas";
 import { messageAttachmentInspect, messageLinkRead } from "./messages/messages";
+import { slackMessageProposal } from "./slack/slack";
 import { followUp, memoryProposal, sideCaseProposal } from "./turn/turn";
 
 /**

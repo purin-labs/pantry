@@ -24,6 +24,11 @@ import type {
   SavedBakeryRunResult,
 } from "../../commerce/bakery/saved-runs";
 import type { RecipeDraft } from "../../commerce/recipe-commands";
+import type {
+  WorkflowCanvasMoveTool,
+  WorkflowCanvasReadTool,
+} from "../../actors/workflow-canvas-tools";
+import type { CatalogExecutionContext } from "../catalog/execute";
 import type { StaffPageToolReceipt } from "../catalog/types";
 import { defineToolFamily } from "../define-tool";
 import { ToolRequestError } from "../errors";
@@ -228,6 +233,53 @@ type RecipeWorkflowProposeTool = (
 export class RecipeWorkflowRequestError extends ToolRequestError {}
 
 /**
+ * Plan 40D: one location's shared production plan. The requests come from
+ * Commerce; the planned quantities are the shared draft that people edit
+ * too. A person accepts the plan.
+ */
+export type HarnessProductionPlanRead = Readonly<{
+  readonly locationId: string;
+}>;
+
+export type HarnessProductionPlanEdit = HarnessProductionPlanRead &
+  Readonly<{ readonly requestId: string; readonly quantity: string }>;
+
+export type HarnessProductionPlan = Readonly<{
+  readonly locationId: string;
+  /** The location's requests that wait for acceptance. */
+  readonly requests: readonly Readonly<{
+    readonly requestId: string;
+    readonly inventoryItemId: string;
+    /** The item's name, as the same read returns it; null when it is absent. */
+    readonly itemName: string | null;
+    readonly recipeId: string;
+    readonly requestedQuantity: string;
+    readonly unit: string;
+    readonly neededBy: string;
+    /** The plan's draft quantity, or null when the plan keeps the request's. */
+    readonly plannedQuantity: string | null;
+  }>[];
+  /** True when the location has more waiting requests than this read shows. */
+  readonly truncated: boolean;
+}>;
+
+type ProductionPlanReadTool = (
+  request: HarnessProductionPlanRead,
+) => Promise<HarnessProductionPlan>;
+
+type ProductionPlanEditTool = (
+  request: HarnessProductionPlanEdit,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<HarnessProductionPlan>;
+
+/**
+ * Plan 40D: a plan request that the model can correct, such as a request that
+ * no longer waits for acceptance. Its message reaches the model.
+ */
+export class ProductionPlanRequestError extends ToolRequestError {}
+
+/**
  * A view command of a Portal page (Plan 87 phase 4). It runs in the person's
  * browser as their own click does and saves nothing. The result is what the
  * page shows after the command.
@@ -256,6 +308,10 @@ export type KitchenToolServices = {
   readonly createSupplier: SupplierCreateTool;
   readonly readRecipeWorkflow: RecipeWorkflowReadTool;
   readonly proposeRecipeWorkflow: RecipeWorkflowProposeTool;
+  readonly readProductionPlan?: ProductionPlanReadTool;
+  readonly editProductionPlan?: ProductionPlanEditTool;
+  readonly readWorkflowCanvas: WorkflowCanvasReadTool;
+  readonly moveWorkflowCanvasObject: WorkflowCanvasMoveTool;
 };
 
 export const defineKitchenTool =

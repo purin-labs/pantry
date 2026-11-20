@@ -1,15 +1,15 @@
-import type { IntegrationAccountReference } from "../../access-control/integration-discovery";
+import type {
+  IntegrationAccountReference,
+} from "../../access-control/integration-discovery";
+import type {
+  EmailDraftEditRequest,
+  EmailDraftRead,
+} from "../../actors/email-draft";
 import type { EmailSelfTestRequest } from "../../data/email-self-test";
 import type { EmailReplyCitation } from "../../mail-inbox/reply-sources";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import { defineToolFamily } from "../define-tool";
 import { ToolRequestError } from "../errors";
-
-/**
- * A Slack draft the model can correct, such as one for a channel that is not
- * connected. Its message reaches the model, so it names no channel or account.
- */
-export class SlackDraftRequestError extends ToolRequestError {}
 
 /**
  * Plan 40D: a reply draft request the model can correct, such as a read from
@@ -78,21 +78,6 @@ export type HarnessEmailOperationalProposalReceipt = Readonly<{
   readonly snapshotDigest: string;
 }>;
 
-export type HarnessSlackMessagePropose = Readonly<{
-  readonly accountRef: IntegrationAccountReference;
-  /** A connected channel's name or ID; null lets the person choose. */
-  readonly channel: string | null;
-  readonly text: string;
-}>;
-
-export type HarnessSlackMessageProposalReceipt = Readonly<{
-  readonly kind: "proposed";
-  readonly proposalId: string;
-  readonly version: number;
-  /** The connected channel the draft points to, or null until a person picks one. */
-  readonly channel: string | null;
-}>;
-
 export type HarnessWhatsAppSupportInbox = Readonly<{
   readonly scope: "active_cases";
   readonly cases: readonly Readonly<{
@@ -158,60 +143,9 @@ type EmailReplyDraftEdit = (
   boundary: CatalogExecutionContext,
 ) => Promise<HarnessEmailReplyDraft>;
 
-/**
- * Plan 40D: one location's shared production plan. The requests come from
- * Commerce; the planned quantities are the shared draft that people edit
- * too. A person accepts the plan.
- */
-export type HarnessProductionPlanRead = Readonly<{
-  readonly locationId: string;
-}>;
-
-export type HarnessProductionPlanEdit = HarnessProductionPlanRead &
-  Readonly<{ readonly requestId: string; readonly quantity: string }>;
-
-export type HarnessProductionPlan = Readonly<{
-  readonly locationId: string;
-  /** The location's requests that wait for acceptance. */
-  readonly requests: readonly Readonly<{
-    readonly requestId: string;
-    readonly inventoryItemId: string;
-    /** The item's name, as the same read returns it; null when it is absent. */
-    readonly itemName: string | null;
-    readonly recipeId: string;
-    readonly requestedQuantity: string;
-    readonly unit: string;
-    readonly neededBy: string;
-    /** The plan's draft quantity, or null when the plan keeps the request's. */
-    readonly plannedQuantity: string | null;
-  }>[];
-  /** True when the location has more waiting requests than this read shows. */
-  readonly truncated: boolean;
-}>;
-
-type ProductionPlanReadTool = (
-  request: HarnessProductionPlanRead,
-) => Promise<HarnessProductionPlan>;
-
-type ProductionPlanEditTool = (
-  request: HarnessProductionPlanEdit,
-  operationId: string,
-  boundary: CatalogExecutionContext,
-) => Promise<HarnessProductionPlan>;
-
-/**
- * Plan 40D: a plan request that the model can correct, such as a request that
- * no longer waits for acceptance. Its message reaches the model.
- */
-export class ProductionPlanRequestError extends ToolRequestError {}
-
 type EmailOperationalPropose = (
   request: HarnessEmailOperationalPropose,
 ) => Promise<HarnessEmailOperationalProposalReceipt>;
-
-type SlackMessagePropose = (
-  request: HarnessSlackMessagePropose,
-) => Promise<HarnessSlackMessageProposalReceipt>;
 
 type WhatsAppSupportRead = (
   request: HarnessWhatsAppSupportRead,
@@ -221,18 +155,25 @@ type WhatsAppSupportReplySend = (
   request: HarnessWhatsAppSupportReplySend,
 ) => Promise<HarnessWhatsAppSupportReplyReceipt>;
 
-/** What a turn gives to the mail, production plan, Slack and WhatsApp tools. */
+type EmailDraftReadTool = () => Promise<EmailDraftRead>;
+
+type EmailDraftEditTool = (
+  request: EmailDraftEditRequest,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<EmailDraftRead>;
+
+/** What a turn gives to the mail and WhatsApp tools. */
 export type ChannelToolServices = {
   readonly searchEmailMailbox: EmailMailboxSearch;
   readonly proposeEmailReply: EmailReplyPropose;
   readonly readEmailReplyDraft: EmailReplyDraftRead;
   readonly editEmailReplyDraft: EmailReplyDraftEdit;
-  readonly readProductionPlan?: ProductionPlanReadTool;
-  readonly editProductionPlan?: ProductionPlanEditTool;
   readonly proposeEmailOperational: EmailOperationalPropose;
-  readonly proposeSlackMessage: SlackMessagePropose;
   readonly readWhatsAppSupport: WhatsAppSupportRead;
   readonly sendWhatsAppSupportReply: WhatsAppSupportReplySend;
+  readonly readEmailDraft: EmailDraftReadTool;
+  readonly editEmailDraft: EmailDraftEditTool;
 };
 
 export const defineChannelTool =

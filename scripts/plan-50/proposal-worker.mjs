@@ -356,10 +356,6 @@ export class CandidateActor extends RecoveryActor {
             readEntityContext: unavailableTool,
             readMerchantReport: unavailableTool,
             proposeCommerceAction: this.propose.bind(this, lease),
-          },
-          drafts: {
-            readWorkflowCanvas: this.readWorkflowCanvas.bind(this, lease),
-            moveWorkflowCanvasObject: this.moveWorkflowCanvas.bind(this, lease),
             readProductDescriptionDraft: this.readProductDescriptionDraft.bind(
               this,
               lease,
@@ -368,7 +364,13 @@ export class CandidateActor extends RecoveryActor {
               this,
               lease,
             ),
-            readMenuDraft: unavailableTool,
+          },
+          kitchen: {
+            readWorkflowCanvas: this.readWorkflowCanvas.bind(this, lease),
+            moveWorkflowCanvasObject: this.moveWorkflowCanvas.bind(this, lease),
+          },
+          menu: { readMenuDraft: unavailableTool },
+          channels: {
             readEmailDraft: unavailableTool,
             editEmailDraft: unavailableTool,
           },

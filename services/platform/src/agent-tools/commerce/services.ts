@@ -10,7 +10,14 @@ import type {
 import type { MerchantPluginDraft } from "../../commerce/merchant-plugin-action";
 import type { OrderRefundLineRequest } from "../../commerce/order-refund-action";
 import type { PaymentsToolRead } from "../../commerce/payments-read";
+import type {
+  DraftAgentEditRequest,
+  DraftAgentReadArgs,
+  DraftAgentSnapshot,
+} from "../../actors/product-description-draft";
+import type { CatalogExecutionContext } from "../catalog/execute";
 import type { CommerceActionProposalOrigin } from "../catalog/types";
+import { ToolRequestError } from "../errors";
 import { defineToolFamily } from "../define-tool";
 import type { StockActionProposal } from "./proposals";
 
@@ -95,11 +102,29 @@ type MerchantReportRead = (
   request: HarnessMerchantReportRequest,
 ) => Promise<MerchantReportResult>;
 
+type ProductDescriptionDraftRead = (
+  request: DraftAgentReadArgs,
+) => Promise<DraftAgentSnapshot>;
+
+type ProductDescriptionDraftEdit = (
+  request: DraftAgentEditRequest,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<DraftAgentSnapshot>;
+
+/**
+ * A description draft request that the model can correct, such as a product
+ * id that names no product. Its message reaches the model.
+ */
+export class DescriptionDraftRequestError extends ToolRequestError {}
+
 /** What a turn gives to the commerce tools. */
 export type CommerceToolServices = {
   readonly readEntityContext: EntityContextRead;
   readonly readMerchantReport: MerchantReportRead;
   readonly readPayments: PaymentsReadTool;
+  readonly readProductDescriptionDraft: ProductDescriptionDraftRead;
+  readonly editProductDescriptionDraft: ProductDescriptionDraftEdit;
   readonly proposeCommerceAction: CommerceActionProposal;
   readonly proposeMerchantPlugin: MerchantPluginProposal;
   readonly proposeOrderRefund: OrderRefundProposal;

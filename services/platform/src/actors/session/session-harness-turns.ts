@@ -159,16 +159,30 @@ import {
 } from "../../agent-tools/bakery/handlers";
 import {
   editEmailReplyDraftForEmbeddedHarness,
-  editProductionPlanForEmbeddedHarness,
   proposeEmailOperationalForEmbeddedHarness,
   proposeEmailReplyForEmbeddedHarness,
-  proposeSlackMessageForEmbeddedHarness,
   readEmailReplyDraftForEmbeddedHarness,
-  readProductionPlanForEmbeddedHarness,
   readWhatsAppSupportForEmbeddedHarness,
   searchEmailMailboxForEmbeddedHarness,
   sendWhatsAppSupportReplyForEmbeddedHarness,
 } from "../../agent-tools/channels/handlers";
+import {
+  editEmailDraftForEmbeddedHarness,
+  readEmailDraftForEmbeddedHarness,
+} from "../../agent-tools/channels/email-draft-handlers";
+import {
+  editProductDescriptionDraftForEmbeddedHarness,
+  readProductDescriptionDraftForEmbeddedHarness,
+} from "../../agent-tools/commerce/description-draft-handlers";
+import {
+  editProductionPlanForEmbeddedHarness,
+  readProductionPlanForEmbeddedHarness,
+} from "../../agent-tools/kitchen/production-plan-handlers";
+import {
+  moveWorkflowCanvasForEmbeddedHarness,
+  readWorkflowCanvasForEmbeddedHarness,
+} from "../../agent-tools/kitchen/workflow-canvas-handlers";
+import { proposeSlackMessageForEmbeddedHarness } from "../../agent-tools/slack/handlers";
 import {
   advanceOrderQueueForEmbeddedHarness,
   markSoldOutForEmbeddedHarness,
@@ -186,18 +200,12 @@ import {
 } from "../../agent-tools/devices/handlers";
 import { readJevFeaturesForEmbeddedHarness } from "../../agent-tools/jev/handlers";
 import {
-  editEmailDraftForEmbeddedHarness,
   editMenuBoardForEmbeddedHarness,
   createMenuBoardForEmbeddedHarness,
   archiveMenuBoardForEmbeddedHarness,
   editMenuDraftForEmbeddedHarness,
-  editProductDescriptionDraftForEmbeddedHarness,
-  moveWorkflowCanvasForEmbeddedHarness,
-  readEmailDraftForEmbeddedHarness,
   readMenuBoardsForEmbeddedHarness,
   readMenuDraftForEmbeddedHarness,
-  readProductDescriptionDraftForEmbeddedHarness,
-  readWorkflowCanvasForEmbeddedHarness,
 } from "../../agent-tools/drafts/handlers";
 import {
   queryWorkspaceForEmbeddedHarness,
@@ -1016,14 +1024,13 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
             }),
         },
         channels: {
+          readEmailDraft: tool(readEmailDraftForEmbeddedHarness),
+          editEmailDraft: tool(editEmailDraftForEmbeddedHarness),
           searchEmailMailbox: tool(searchEmailMailboxForEmbeddedHarness),
           proposeEmailReply: tool(proposeEmailReplyForEmbeddedHarness),
           readEmailReplyDraft: tool(readEmailReplyDraftForEmbeddedHarness),
           editEmailReplyDraft: tool(editEmailReplyDraftForEmbeddedHarness),
-          readProductionPlan: tool(readProductionPlanForEmbeddedHarness),
-          editProductionPlan: tool(editProductionPlanForEmbeddedHarness),
           proposeEmailOperational: tool(proposeEmailOperationalForEmbeddedHarness),
-          proposeSlackMessage: tool(proposeSlackMessageForEmbeddedHarness),
           readWhatsAppSupport: tool(readWhatsAppSupportForEmbeddedHarness),
           sendWhatsAppSupportReply: sendWhatsAppSupportReplyForEmbeddedHarness.bind(
             null,
@@ -1035,6 +1042,12 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           ),
         },
         commerce: {
+          readProductDescriptionDraft: tool(
+            readProductDescriptionDraftForEmbeddedHarness,
+          ),
+          editProductDescriptionDraft: tool(
+            editProductDescriptionDraftForEmbeddedHarness,
+          ),
           readEntityContext: tool(readEntityContextForEmbeddedHarness),
           readMerchantReport: tool(readMerchantReportForEmbeddedHarness),
           readPayments: tool(readPaymentsForEmbeddedHarness),
@@ -1068,7 +1081,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           markSoldOut: tool(markSoldOutForEmbeddedHarness),
           executeRegisterViewCommand: executePageViewCommand,
         },
+        slack: {
+          proposeSlackMessage: tool(proposeSlackMessageForEmbeddedHarness),
+        },
         kitchen: {
+          readProductionPlan: tool(readProductionPlanForEmbeddedHarness),
+          editProductionPlan: tool(editProductionPlanForEmbeddedHarness),
+          readWorkflowCanvas: tool(readWorkflowCanvasForEmbeddedHarness),
+          moveWorkflowCanvasObject: tool(moveWorkflowCanvasForEmbeddedHarness),
           readSavedBakeryRun: readSavedBakeryRunForHarness.bind(
             null,
             input.requestId,
@@ -1135,15 +1155,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
             assignment,
           }),
         },
-        drafts: {
-          readWorkflowCanvas: tool(readWorkflowCanvasForEmbeddedHarness),
-          moveWorkflowCanvasObject: tool(moveWorkflowCanvasForEmbeddedHarness),
-          readProductDescriptionDraft: tool(
-            readProductDescriptionDraftForEmbeddedHarness,
-          ),
-          editProductDescriptionDraft: tool(
-            editProductDescriptionDraftForEmbeddedHarness,
-          ),
+        menu: {
           readMenuDraft: tool(readMenuDraftForEmbeddedHarness),
           editMenuDraft: tool(editMenuDraftForEmbeddedHarness),
           readMenuBoards: tool(readMenuBoardsForEmbeddedHarness),
@@ -1151,8 +1163,6 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           createMenuBoard: tool(createMenuBoardForEmbeddedHarness),
           archiveMenuBoard: tool(archiveMenuBoardForEmbeddedHarness),
           proposeMenuPrice: tool(proposeMenuPriceForHarness),
-          readEmailDraft: tool(readEmailDraftForEmbeddedHarness),
-          editEmailDraft: tool(editEmailDraftForEmbeddedHarness),
         },
         files: {
           searchFiles: tool(searchFilesForEmbeddedHarness),
