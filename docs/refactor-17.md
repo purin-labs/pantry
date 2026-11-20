@@ -1316,11 +1316,10 @@ foundation/conversation`: 28 to 22. `foundation/authority -> foundation/agent`: 
 -> surfaces/slack` (3): the Slack notices of a permission request and of a held
   effect.
 
-### A2.1 — One decision API, parts 1 to 3 (2026-11-21)
+### A2.1 — One decision API (2026-11-21)
 
-Parts 1 to 3 of the step are done: the record, the one read and the one decide call.
-Parts 4 to 6 are open: the one Portal card, the one Slack card builder and the journey
-for a refused Gmail reply.
+The six parts of the step are done. Three items stay open for the owner or for a later
+step; they are at the end of this entry.
 
 - **The record.** [Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)
   gives each kind: its store, who reads it, who decides, what happens, and what a
@@ -1345,24 +1344,47 @@ for a refused Gmail reply.
   makes its checks in the same order.
 - **The proof is the request.** The call carries the request as the proof of the
   person, because the step-up grant, the mutation boundary and the challenge are in
-  it. The stores still answer with a `Response`. A decide function with a `Result`
-  for each store is a larger change of four route files; it is not done.
-- **A custom connector write has no refusal.** The type of the call permits only
-  `allow` for it.
-- **Slack does not use the call.** The Deny of a permission request
-  (`slack/permission-request-deny.ts`) and the buttons of a commerce action
-  (`slack/commerce-approval.ts`) prove the person through a verified Slack link, not
-  through a Portal session. They call the stores directly, as before.
-- **Layers.** `control/pending-decisions.ts` and `control/decide-pending-decision.ts`
-  are `foundation/control` and name no area. The Worker file
-  `control/pending-decision-parts.ts` gives the readers and the stores. Layer
-  crossings: 477, no change.
-- **Still open: part 4.** One Portal card in `apps/portal/src/ui/` for the six
-  places that show a decision. The owner must decide the items in "Two looks of one
-  kind, as found" of Appendix E.
-- **Still open: part 5.** One Slack card builder, with a temporary check that the
-  block JSON is equal byte for byte.
-- **Still open: part 6.** No journey rejects a Gmail reply.
+  it. The stores still answer with a `Response`.
+- **The one Portal component.** `DecisionButtons` (`apps/portal/src/ui/decision-buttons.tsx`)
+  shows allow and refuse, and owns the second question of a refusal. Six places use
+  it: the chat card and the status band of a governed action, the review of a custom
+  connector write, the two email reviews of the mailbox page and the Inbox
+  conversation. Each place gives its labels and classes as props, so each place
+  keeps its look. A temporary check rendered the old and the new markup of the six
+  places: they are equal. The held output and the permission request stay on
+  `PermissionRequestDialog`, and the chat email draft stays on `DraftMessageCard`.
+  Each of the two was one shared component before the step.
+- **The one Slack card builder.** `decisionCardBlocks` (`slack/decision-card.ts`)
+  builds the section and the actions block from a list of buttons: a link to the
+  Portal, or an answer with an optional confirm. The commerce approval card, the
+  permission request card and the notice card use it. A temporary check serialised
+  14 cards before and after: the 7,905 bytes are equal. The check is deleted. The
+  email review notice is plain text and did not change.
+- **The journey of a refused Gmail reply.** `mail-reply-shared-draft.test.ts` has a
+  third journey: a viewer may not reject, a rejection with a reason is refused, an
+  administrator rejects, Gmail loses the draft, the shared draft ends, a late
+  approval sends nothing, and the reply leaves the one read.
+- **Layers and ratchets.** `control/pending-decisions.ts` and
+  `control/decide-pending-decision.ts` are `foundation/control` and name no area.
+  The Worker file `control/pending-decision-parts.ts` gives the readers and the
+  stores. Layer crossings: 477, no change. Copies: 878 to 877. Unused exports: 807,
+  no change.
+- **Open for the owner: two looks of one kind.** The items of "Two looks of one
+  kind, as found" in Appendix E did not change. `DecisionButtons` keeps each look
+  through props. A decision of the owner removes a prop value, not a component.
+- **Open for the owner: a custom connector write has no refusal.** The type of the
+  call permits only `allow` for it, no button refuses it, and it has no refused
+  journey. It can only expire.
+- **Open for a later step: Slack and a `Result` for each store.** The Deny of a
+  permission request (`slack/permission-request-deny.ts`) and the buttons of a
+  commerce action (`slack/commerce-approval.ts`) prove the person through a verified
+  Slack link, not through a Portal session, and they call the stores directly. To
+  send them through the one call, each store must first return a `Result` and take
+  the proof as a value. That change moves the checks of four route files, so it is
+  not a change with no risk for behavior. It is not done.
+- **Found, not changed.** An approval of a Gmail reply after its rejection answers
+  with status 502 and `email_reply_edit_unavailable`. Nothing is sent. A status 409
+  fits better, but the step changes no answer.
 
 ## Baseline
 
@@ -2398,11 +2420,11 @@ plan names four stores. They are here so that the next step can decide.
 
 ### The journeys that prove each kind today
 
-| Kind                   | Allowed                                                                                    | Refused                                                                                                    |
-| ---------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| Governed action        | `slack-commerce-approval.test.ts`, `pi-commerce-actions.test.ts`                           | `slack-commerce-approval.test.ts` (decline in Slack and in the Portal), `slack-offer-price-change.test.ts` |
-| Case approval wait     | `portal-chat-approval-wait.test.ts` (the chat waits, then runs after the card expires)     | The same file: a late rejection gets status 409                                                            |
-| Held output            | `slack-held-output.test.ts`, `slack-held-effect.test.ts`, `airtable-exit-approval.test.ts` | `slack-held-output.test.ts`, `slack-held-effect.test.ts`                                                   |
-| Permission request     | `slack-permission-request.test.ts`, `chat-permission-request.test.ts`                      | `slack-permission-request.test.ts`, `slack-proposal-permission.test.ts` (the Slack Deny)                   |
-| Email reply            | `mail-inbox.test.ts`, `mail-reply-shared-draft.test.ts`                                    | `mail-operational-placement.test.ts` rejects an operational email. No journey rejects a Gmail reply        |
-| Custom connector write | `remote-mcp.test.ts`                                                                       | None: no refusal exists                                                                                    |
+| Kind                   | Allowed                                                                                    | Refused                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action        | `slack-commerce-approval.test.ts`, `pi-commerce-actions.test.ts`                           | `slack-commerce-approval.test.ts` (decline in Slack and in the Portal), `slack-offer-price-change.test.ts`                                      |
+| Case approval wait     | `portal-chat-approval-wait.test.ts` (the chat waits, then runs after the card expires)     | The same file: a late rejection gets status 409                                                                                                 |
+| Held output            | `slack-held-output.test.ts`, `slack-held-effect.test.ts`, `airtable-exit-approval.test.ts` | `slack-held-output.test.ts`, `slack-held-effect.test.ts`                                                                                        |
+| Permission request     | `slack-permission-request.test.ts`, `chat-permission-request.test.ts`                      | `slack-permission-request.test.ts`, `slack-proposal-permission.test.ts` (the Slack Deny)                                                        |
+| Email reply            | `mail-inbox.test.ts`, `mail-reply-shared-draft.test.ts`                                    | `mail-operational-placement.test.ts` rejects an operational email. `mail-reply-shared-draft.test.ts` rejects a Gmail reply (added in step A2.1) |
+| Custom connector write | `remote-mcp.test.ts`                                                                       | None: no refusal exists                                                                                                                         |
