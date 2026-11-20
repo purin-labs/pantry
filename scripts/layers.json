@@ -820,6 +820,7 @@
     "services/platform/src/context/untrusted-commerce-text.ts": "foundation/agent-tools",
     "services/platform/src/case-context-discovery/source.ts": "areas/inbox",
     "services/platform/src/control-router.ts": "workers/platform",
+    "services/platform/src/control/access-control-parts.ts": "workers/platform",
     "services/platform/src/control/admission/bakery-workflows.ts": "areas/kitchen",
     "services/platform/src/control/admission/chat-signals.ts": "foundation/conversation",
     "services/platform/src/control/admission/control-mutation.ts": "foundation/control",

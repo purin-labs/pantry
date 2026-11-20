@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 193,
+    "upward": 190,
     "areas": 214,
     "order": 103,
     "table": 117
@@ -92,7 +92,6 @@
     "foundation/connections -> foundation/authority": 1,
     "foundation/control -> areas/brain": 1,
     "foundation/control -> areas/commerce": 6,
-    "foundation/control -> areas/integrations": 3,
     "foundation/control -> areas/organisation": 1,
     "foundation/control -> foundation/agent": 3,
     "foundation/control -> foundation/conversation": 3,

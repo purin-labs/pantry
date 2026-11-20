@@ -67,6 +67,10 @@ import {
 } from "./references";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isPositiveInteger } from "@purin-labs/std";
+import type {
+  CustomConnectorId,
+  CustomConnectorRevision,
+} from "../custom-connectors/identity";
 
 const SUBJECT_RESOLUTION_LIMIT = 1_000;
 
@@ -84,8 +88,11 @@ export type CustomConnectorAccountRead = (
 ) => Promise<
   Result<
     Readonly<{
-      source: Readonly<{ connectorId: string }>;
-      binding: Readonly<{ acceptedRevision: number; definitionDigest: string }>;
+      source: Readonly<{ connectorId: CustomConnectorId }>;
+      binding: Readonly<{
+        acceptedRevision: CustomConnectorRevision;
+        definitionDigest: string;
+      }>;
     }>,
     unknown
   >
