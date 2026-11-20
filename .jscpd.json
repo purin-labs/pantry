@@ -1,0 +1,19 @@
+{
+  "path": ["apps", "packages", "services", "crates"],
+  "format": ["typescript", "tsx", "javascript", "jsx", "rust"],
+  "minTokens": 70,
+  "mode": "weak",
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/target/**",
+    "**/.wrangler/**",
+    "**/public/**",
+    "**/generated/**",
+    "**/*.generated.*",
+    "**/tests/**",
+    "**/test/**",
+    "**/*.test.*",
+    "**/scripts/**"
+  ]
+}

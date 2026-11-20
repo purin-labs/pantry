@@ -1,0 +1,82 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "include": ["files", "exports", "types"],
+  "ignore": ["**/public/**", "**/dist/**", "**/*.d.mts"],
+  "workspaces": {
+    ".": {
+      "entry": [
+        "scripts/**/*.{js,cjs,mjs,ts}",
+        "services/chatgpt-exit/server.mjs",
+        "services/shop-voice/pack.mjs"
+      ],
+      "project": ["scripts/**/*.{js,cjs,mjs,ts}", "services/*/*.mjs"]
+    },
+    "services/platform": {
+      "vitest": false,
+      "entry": [
+        "src/integration-gateway.ts",
+        "src/{chatgpt-exit,code-mode-sandbox,model-exit,slack-ingress,vault-onepassword}/worker.ts",
+        "src/**/*.fixtures.ts",
+        "scripts/**/*.{ts,mjs}",
+        "tests/**/*.test.ts",
+        "tests/**/*.type-fixtures.ts",
+        "tests/**/*.types.ts",
+        "tests/e2e/setup.ts",
+        "tests/e2e/runtime-worker.ts",
+        "vitest.config.ts",
+        "vitest.e2e.config.ts",
+        "src/**/*.type-fixtures.ts",
+        "tests/cloudflare-workers-module.ts",
+        "tests/media-wasm-module.ts",
+        "tests/commerce-fixture-worker-setup.ts"
+      ],
+      "project": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.{ts,mjs}"]
+    },
+    "services/commerce": {
+      "entry": [
+        "src/worker.ts",
+        "scripts/**/*.{ts,mjs}",
+        "tests/**/*.test.ts",
+        "tests/fixture-worker/worker.ts",
+        "src/**/*.type-fixtures.ts"
+      ],
+      "project": ["src/**/*.ts", "tests/**/*.ts", "scripts/**/*.{ts,mjs}"]
+    },
+    "apps/portal": {
+      "entry": [
+        "src/bootstrap.tsx",
+        "src/tv/main.tsx",
+        "src/dev/*.{ts,tsx}",
+        "src/features/production-run/linea/espresso-rehearsal.ts",
+        "src/features/production-run/execution-worker.ts",
+        "src/features/voice/wake-worker.ts",
+        "src/**/*.typecheck.ts",
+        "src/**/*.type-fixtures.ts",
+        "vite.config.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/storefront": {
+      "entry": ["worker/index.ts", "src/**/*.test.ts"],
+      "project": ["src/**/*.{ts,tsx}", "worker/**/*.ts"]
+    },
+    "apps/docs": {
+      "entry": [
+        "src/.vitepress/config.ts",
+        "src/.vitepress/theme/index.ts",
+        "scripts/*.mjs"
+      ],
+      "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
+    },
+    "packages/*": {
+      "entry": [
+        "src/**/*.fixtures.ts",
+        "src/**/*.type-fixtures.ts",
+        "src/**/*.test.ts",
+        "scripts/**/*.{ts,mjs}",
+        "src/**/type-fixtures.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  }
+}

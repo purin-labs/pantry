@@ -388,6 +388,18 @@ A source file over 3,000 lines may not grow, and a new source file may not pass
 beside the large file. When a listed file gets smaller, run
 `node scripts/check-file-size-ratchet.mjs --update`.
 [Refactor 10](docs/refactor-10.md) splits the large files.
+[Refactor 17](docs/refactor-17.md) gives each source file a module in one of
+three layers: foundation, product areas and surfaces. `scripts/layers.json` is
+the map. An import goes only down the layers, one area imports no other area,
+and only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
+new crossing, and it refuses a source file, a top-level folder or a D1 table
+with no line in the map. Remove a crossing with a port: the lower module
+defines an interface, and the higher one gives the implementation. Then run
+`node scripts/check-layers.mjs --update`. `pnpm lint:clones` refuses a new copy
+of product code, and `pnpm lint:unused` refuses a new unused file or export. A
+file that only a tool starts, such as a new Worker entry or a page with its own
+HTML file, goes into the entry list of its workspace in `knip.json`. When a
+copy or an unused export goes, run the script with `--update`.
 A Portal feature reads the control API through `controlRead` and changes it
 through `controlMutation` (`apps/portal/src/control-client.ts`); `pnpm
 lint:portal-fetch` refuses a new raw `fetch`. When a file loses one, run

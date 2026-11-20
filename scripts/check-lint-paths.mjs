@@ -10,9 +10,20 @@
 // deleted files, an output file) goes into ABSENT below, with its reason.
 //
 //   node scripts/check-lint-paths.mjs
+//
+// Step A0.6 uses the same reader for the list that a folder move needs:
+//
+//   node scripts/check-lint-paths.mjs --bound          totals by kind of file
+//   node scripts/check-lint-paths.mjs --bound --list   each file with its count
+//
+// It prints each tracked file, apart from product source and documents, that
+// holds the path of another tracked file: a path from the repository root, or
+// a `./` or `../` path from its own folder. A move of the named file must
+// change that file too. Imports between source files and links in documents
+// are not in this list: the type check and `pnpm lint:doc-links` find those.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -64,6 +75,11 @@ function matcher(pattern) {
   return (path) => regex.test(path);
 }
 
+if (process.argv[2] === "--bound") {
+  printBound(process.argv[3] === "--list");
+  process.exit(0);
+}
+
 const faults = [];
 let checked = 0;
 for (const source of SOURCES) {
@@ -93,3 +109,106 @@ if (faults.length > 0) {
   process.exit(1);
 }
 console.log(`${checked} lint paths in ${SOURCES.length} files match a file`);
+
+function kindOfBound(path) {
+  const name = posix.basename(path);
+  if (SOURCES.includes(path)) return "lint and ratchet";
+  if (path.startsWith(".github/") || path.startsWith(".githooks/")) return "CI";
+  if (name === "package.json" || name === "pnpm-workspace.yaml") {
+    return "package manifest";
+  }
+  if (/^wrangler.*\.jsonc?$/.test(name)) return "Wrangler file";
+  if (/^tsconfig.*\.json$/.test(name)) return "tsconfig";
+  if (/^(vite|vitest).*\.config\.ts$/.test(name))
+    return "Vite and Vitest config";
+  if (/^Dockerfile/.test(name) || name === ".dockerignore") return "Dockerfile";
+  if (name === "Cargo.toml" || name === "build.rs") return "Cargo";
+  if (name === "repo-binaries.json" || name === "journeys.json") return name;
+  if (/\.html$/.test(name)) return "HTML page";
+  if (path.startsWith("scripts/") || /\/scripts\//.test(path)) return "script";
+  if (/\/tests?\//.test(path)) return "test support";
+  return "other";
+}
+
+function printBound(list) {
+  const known = new Set(tracked);
+  const folders = new Set();
+  for (const path of tracked) {
+    for (
+      let at = path.indexOf("/");
+      at !== -1;
+      at = path.indexOf("/", at + 1)
+    ) {
+      folders.add(path.slice(0, at));
+    }
+  }
+  const exists = (path) => known.has(path) || folders.has(path);
+  const candidates = tracked.filter(
+    (path) =>
+      !/\.(md|rs|png|jpg|jpeg|webp|svg|woff2|wasm|onnx|csv|lock|txt|pdf|glb|ico)$/.test(
+        path,
+      ) &&
+      path !== "pnpm-lock.yaml" &&
+      !/^docs\//.test(path) &&
+      !/\/(src|public|vendor)\//.test(path) &&
+      !/\.test\.tsx?$/.test(path) &&
+      !/\.(type-fixtures|types)\.ts$/.test(path),
+  );
+  const FROM_ROOT = new RegExp(`(?<![\\w./-])(${ROOTS}/[\\w@./*-]+)`, "g");
+  const RELATIVE = /(?<![\w/-])(\.\.?\/[\w@./-]+)/g;
+  const rows = [];
+  for (const path of candidates) {
+    const text = readFileSync(join(root, path), "utf8");
+    const paths = new Set();
+    for (const match of text.matchAll(FROM_ROOT)) {
+      const target = match[1].replace(/[/.*]+$/, "").replace(/\/\*.*$/, "");
+      if (target !== path && exists(target)) paths.add(target);
+    }
+    for (const match of text.matchAll(RELATIVE)) {
+      const base = posix.normalize(posix.join(posix.dirname(path), match[1]));
+      const target = [base, `${base}.ts`, `${base}.mjs`, `${base}.js`].find(
+        (candidate) => exists(candidate),
+      );
+      if (target !== undefined && target !== path && !target.startsWith("..")) {
+        paths.add(target);
+      }
+    }
+    // The binary list names files that are in R2 and not in git.
+    if (path === "repo-binaries.json") {
+      const list = JSON.parse(text);
+      for (const key of [
+        ...Object.keys(list.files),
+        ...Object.keys(list.folders),
+      ]) {
+        paths.add(key);
+      }
+    }
+    if (paths.size > 0)
+      rows.push({ path, kind: kindOfBound(path), count: paths.size });
+  }
+  const kinds = new Map();
+  for (const row of rows) {
+    const entry = kinds.get(row.kind) ?? { files: 0, paths: 0 };
+    entry.files += 1;
+    entry.paths += row.count;
+    kinds.set(row.kind, entry);
+  }
+  console.log("files  paths  kind");
+  for (const [kind, entry] of [...kinds].sort(
+    (a, b) => b[1].paths - a[1].paths,
+  )) {
+    console.log(
+      `${String(entry.files).padStart(5)} ${String(entry.paths).padStart(6)}  ${kind}`,
+    );
+  }
+  console.log(
+    `${rows.length} files hold ${rows.reduce((sum, row) => sum + row.count, 0)} paths of other files.`,
+  );
+  if (list) {
+    for (const row of rows.sort((a, b) =>
+      a.kind + a.path < b.kind + b.path ? -1 : 1,
+    )) {
+      console.log(`${row.kind}\t${row.count}\t${row.path}`);
+    }
+  }
+}

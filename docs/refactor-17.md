@@ -3,8 +3,8 @@
 Date: 2026-11-20. Revised two times on 2026-11-20: after a review of the first version,
 and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
-Status: accepted in part; step A0 and step S1 started on 2026-11-20 on the branch
-`refactor-17` (see [Steps done](#steps-done)). The owner accepted the two stages, one decision
+Status: accepted in part; step A0 and step S1 are done on the branch `refactor-17`
+(see [Steps done](#steps-done) and [Baseline](#baseline)). The owner accepted the two stages, one decision
 API for approvals, specs by subsystem, and the prune of dead code, duplicate code and
 low-impact tests. The other decisions in [Decisions](#decisions) need the owner.
 Owner: the whole repository.
@@ -14,9 +14,9 @@ scripts and each open branch.
 The counts come from `origin/dev` at `e18cecb` (2026-11-20), unless a line says
 `main`. The first two versions measured `main` at `18c97fe`, which is 170 commits
 behind `origin/dev`. The work is on the branch `refactor-17`, which starts from `origin/dev`.
-`node scripts/refactor-17/measure-layers.mjs <platform src>` repeats the import counts,
-and `--packages <root>` lists the package dependencies that point upward. Its name
-rules are a first guess with some files placed by hand, so each count is approximate.
+The counts of the sections before [Steps done](#steps-done) come from name rules, a
+first guess. `scripts/layers.json` replaced those rules in step A0.2, and
+`node scripts/check-layers.mjs --report` gives the counts of the current tree.
 
 ## Goal
 
@@ -52,14 +52,14 @@ The documents have their own track, [Stage S](#stage-s--plans-become-specs).
 The repository groups code by technology. One product area is in up to seven places.
 Kitchen is the clearest example:
 
-| Part of Kitchen (measured on `main`) | Place today | Lines |
-| --- | --- | ---: |
-| Portal pages | `apps/portal/src/features/{production-run,workflow-simulator,costs,recipes}` | 131,000 |
-| Model and engine | `packages/{bakery-model,production-simulation,bakery-workflow}` | 84,700 |
-| CRDT documents | `packages/{workflow-canvas-crdt,costs-sheet-crdt,production-plan-crdt}` | 3,100 |
-| Server code and agent tools | `services/platform/src/commerce/bakery`, `actors/bakery-*`, `actors/workflow-*`, `control/routes/bakery*`, `agent-tools/{bakery,kitchen,costs}` | 25,000 |
-| Physics | `crates/bakery-native` | 20,000 |
-| Model builders and journeys | `scripts/{bakery-mujoco,bakery-robots,production-simulation}` | 145,000 |
+| Part of Kitchen (measured on `main`) | Place today                                                                                                                                     |   Lines |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------: |
+| Portal pages                         | `apps/portal/src/features/{production-run,workflow-simulator,costs,recipes}`                                                                    | 131,000 |
+| Model and engine                     | `packages/{bakery-model,production-simulation,bakery-workflow}`                                                                                 |  84,700 |
+| CRDT documents                       | `packages/{workflow-canvas-crdt,costs-sheet-crdt,production-plan-crdt}`                                                                         |   3,100 |
+| Server code and agent tools          | `services/platform/src/commerce/bakery`, `actors/bakery-*`, `actors/workflow-*`, `control/routes/bakery*`, `agent-tools/{bakery,kitchen,costs}` |  25,000 |
+| Physics                              | `crates/bakery-native`                                                                                                                          |  20,000 |
+| Model builders and journeys          | `scripts/{bakery-mujoco,bakery-robots,production-simulation}`                                                                                   | 145,000 |
 
 The measurements of the Platform Worker (`services/platform/src`, 469,000 lines):
 
@@ -100,16 +100,16 @@ Other facts:
 
 The review also found these faults:
 
-| # | Fault | Evidence |
-| --- | --- | --- |
-| F1 | The information-flow exit check is a convention in each tool handler | `executeRegisteredTool` (`agent-tools/catalog/execute.ts:401`) parses, claims and calls the handler. About 7 helpers at 13 sites run the check. The lint checks only the class of a capability. The executor also names 17 error classes of the areas (`execute.ts:319`) |
-| F2 | Parallel paths for one concern | The mailbox and WhatsApp tool hosts (`actors/email-harness-tools.ts`, 1,083 lines) use no registry and no capability claim. A person meets 4 approval mechanisms. 5 outboxes exist |
-| F3 | Most guards do not run in CI | CI runs 5 of the 15 `lint:*` scripts. No git hook exists |
-| F4 | Kitchen cannot run on the server | Physics runs only in the browser. `schedule.ts` (4,510 lines) and `engine.ts` are two planners. `dev/workflow-preview.tsx` ships in the production bundle |
-| F5 | The Portal has no server state layer | 107 `controlRead` calls in ad-hoc hooks. `useLatestRead` has 3 users. 1,212 raw `<button>` elements, no `Button`. `styles.css` has 11,106 lines, and the size ratchet skips CSS. Two surface registries |
-| F6 | Commerce providers have no shared interface | 20 files branch on the commerce system kind. The `CommerceSystem` union has 4 copies. The Shopify API version has 4 |
-| F7 | The CRDT packages repeat one skeleton | 7 packages repeat the encoding wrapper and the document class. `workflow-canvas-crdt` has its own protocol |
-| F8 | The documents drift | 28 broken links (on `main`). `AGENTS.md` has 689 lines. Plan 14 names a retired harness |
+| #   | Fault                                                                | Evidence                                                                                                                                                                                                                                                                 |
+| --- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F1  | The information-flow exit check is a convention in each tool handler | `executeRegisteredTool` (`agent-tools/catalog/execute.ts:401`) parses, claims and calls the handler. About 7 helpers at 13 sites run the check. The lint checks only the class of a capability. The executor also names 17 error classes of the areas (`execute.ts:319`) |
+| F2  | Parallel paths for one concern                                       | The mailbox and WhatsApp tool hosts (`actors/email-harness-tools.ts`, 1,083 lines) use no registry and no capability claim. A person meets 4 approval mechanisms. 5 outboxes exist                                                                                       |
+| F3  | Most guards do not run in CI                                         | CI runs 5 of the 15 `lint:*` scripts. No git hook exists                                                                                                                                                                                                                 |
+| F4  | Kitchen cannot run on the server                                     | Physics runs only in the browser. `schedule.ts` (4,510 lines) and `engine.ts` are two planners. `dev/workflow-preview.tsx` ships in the production bundle                                                                                                                |
+| F5  | The Portal has no server state layer                                 | 107 `controlRead` calls in ad-hoc hooks. `useLatestRead` has 3 users. 1,212 raw `<button>` elements, no `Button`. `styles.css` has 11,106 lines, and the size ratchet skips CSS. Two surface registries                                                                  |
+| F6  | Commerce providers have no shared interface                          | 20 files branch on the commerce system kind. The `CommerceSystem` union has 4 copies. The Shopify API version has 4                                                                                                                                                      |
+| F7  | The CRDT packages repeat one skeleton                                | 7 packages repeat the encoding wrapper and the document class. `workflow-canvas-crdt` has its own protocol                                                                                                                                                               |
+| F8  | The documents drift                                                  | 28 broken links (on `main`). `AGENTS.md` has 689 lines. Plan 14 names a retired harness                                                                                                                                                                                  |
 
 ## The three layers
 
@@ -156,15 +156,15 @@ Wrangler file lives only there. No module imports a Worker.
 
 ### Import rules
 
-| From | May import |
-| --- | --- |
-| A foundation module | A foundation module lower in [the order](#foundation-modules) |
-| The `contract` of an area | `std`, `kernel`, `contracts`, and the `contract` of another area |
+| From                             | May import                                                                                                  |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| A foundation module              | A foundation module lower in [the order](#foundation-modules)                                               |
+| The `contract` of an area        | `std`, `kernel`, `contracts`, and the `contract` of another area                                            |
 | The `server` and `ui` of an area | The foundation, its own `contract`, the `contract` of another area (its schemas and its service interfaces) |
-| A surface | The foundation and the public entry of an area |
-| A Worker | All three layers |
-| A journey | A Worker, and the `testing` entry of a module |
-| The commerce engine | Only `std`, `type-utils`, its contracts and its client, as today |
+| A surface                        | The foundation and the public entry of an area                                                              |
+| A Worker                         | All three layers                                                                                            |
+| A journey                        | A Worker, and the `testing` entry of a module                                                               |
+| The commerce engine              | Only `std`, `type-utils`, its contracts and its client, as today                                            |
 
 One pattern replaces each upward import: **the host defines a port, the area gives a
 part, the Worker registers it.** The tool registry already works this way.
@@ -173,11 +173,11 @@ part, the Worker registers it.** The tool registry already works this way.
 
 The review placed these by hand:
 
-| Folder | Split |
-| --- | --- |
-| `chat/` (18,300 lines) | The conversation store, access, forks, side Cases, sharing and `turn-access.ts` go to `conversation`: actors, tools and draft code in about 30 files import them. The stream, the prompt, the screen context and the page labels are the Portal surface (about 7,600 lines with the other Portal-only files) |
-| Mail and WhatsApp | The transport is a surface: `mail/`, `whatsapp/`, the Connector's email and WhatsApp code (20,400 lines). The Inbox page, the mailbox agent and the reply drafts are the area `inbox` (29,200 lines) |
-| `case-context-discovery/` | Foundation (`agent`): the Case, the Session and the Organisation actors import it. `case-execution/` stays in `brain` |
+| Folder                    | Split                                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `chat/` (18,300 lines)    | The conversation store, access, forks, side Cases, sharing and `turn-access.ts` go to `conversation`: actors, tools and draft code in about 30 files import them. The stream, the prompt, the screen context and the page labels are the Portal surface (about 7,600 lines with the other Portal-only files) |
+| Mail and WhatsApp         | The transport is a surface: `mail/`, `whatsapp/`, the Connector's email and WhatsApp code (20,400 lines). The Inbox page, the mailbox agent and the reply drafts are the area `inbox` (29,200 lines)                                                                                                         |
+| `case-context-discovery/` | Foundation (`agent`): the Case, the Session and the Organisation actors import it. `case-execution/` stays in `brain`                                                                                                                                                                                        |
 
 ### Names
 
@@ -192,22 +192,22 @@ The review placed these by hand:
 
 The order is bottom-up. A module imports only modules above it in this table.
 
-| # | Module | Lines today | Imports against the order |
-| --- | --- | ---: | ---: |
-| 1 | `std`, `type-utils` | 1,000 | — (packages today; the engine uses them) |
-| 2 | `kernel` | 1,200 | 12, almost all from `env.ts` |
-| 3 | `contracts` | 10,700 | 1 package dependency: `commerce-contracts` |
-| 4 | `tenancy` | 15,600 | 28 |
-| 5 | `actor-runtime` | 14,700 | 28 |
-| 6 | `authority` | 36,100 | 27 |
-| 7 | `connections` | not measured (step A0.2) | not measured |
-| 8 | `control` | 1,900, the Portal client, a part of `control-api` | 5, and 6 package dependencies of `control-api` |
-| 9 | `agent-tools` | 12,000 | 41 |
-| 10 | `agent` | 84,400 | 41 |
-| 11 | `conversation` | 43,300 | 2 |
-| 12 | `collaboration` | 3,000 | — |
-| 13 | `ui` | 16,500 | — |
-| 14 | `testing` | 18,100 | — |
+| #   | Module                     |                                       Lines today |                      Imports against the order |
+| --- | -------------------------- | ------------------------------------------------: | ---------------------------------------------: |
+| 1   | `std`, `type-utils`        |                                             1,000 |       — (packages today; the engine uses them) |
+| 2   | `kernel`                   |                                             1,200 |                   12, almost all from `env.ts` |
+| 3   | `contracts`                |                                            10,700 |     1 package dependency: `commerce-contracts` |
+| 4   | `tenancy`                  |                                            15,600 |                                             28 |
+| 5   | `actor-runtime`            |                                            14,700 |                                             28 |
+| 6   | `authority`                |                                            36,100 |                                             27 |
+| 7   | `connections`              |                          not measured (step A0.2) |                                   not measured |
+| 8   | `control`                  | 1,900, the Portal client, a part of `control-api` | 5, and 6 package dependencies of `control-api` |
+| 9   | `ui`                       |                                            16,500 |        — (it imports only `std` and `control`) |
+| 10  | `agent-tools`              |                                            12,000 |                                             41 |
+| 11  | `agent`                    |                                            84,400 |                                             41 |
+| 12  | `conversation`             |                                            43,300 |                                              2 |
+| 13  | `collaboration`            |                                             3,000 |                                              — |
+| 14  | `async-control`, `testing` |                                            18,100 |                                              — |
 
 `std` stays apart from `kernel`, so that the commerce engine imports no Platform code.
 The shared primitives that `commerce-contracts` defines today, such as
@@ -253,46 +253,46 @@ These rules continue the rules of [Refactor 10](refactor-10.md):
 
 ### A0 — Guards and the map
 
-| Step | Work | Closes |
-| --- | --- | --- |
-| A0.1 | Run every lint in CI. `pnpm lint:source` holds the lints that need only the git tree, with `check:shared-helpers`. `pnpm lint:static` adds the two checks of the physics files. `pnpm lint` adds `lint:d1-patch`, which needs a base revision; CI keeps its own step for it. Add a pre-push hook that runs `lint:source`, for the time that CI has no budget | F3 |
-| A0.2 | Write `scripts/refactor-17/targets.json`: each source file with its layer and its module, and each D1 table and actor table with its owner module. Start from the rules of `measure-layers.mjs`, then review each file by hand. Cover the Platform, the Portal, the packages, the crates, the scripts and the tests. The measure also reads imports of workspace packages and the dependencies of each `package.json` | — |
-| A0.3 | Add `pnpm lint:layers`. It reads the targets and the imports of the current tree. It refuses a new upward import, a new import of the inside of another area, a new import against the foundation order, and a new file with no target. A ratchet file holds the known crossings (about 1,100), and its count can only go down | — |
-| A0.4 | Record the baseline: the lints, the type checks, the E2E suite with its run time, the Portal build, the tool catalog digest and the bundle size of each Worker | — |
-| A0.5 | Add a link check for `docs/` and `AGENTS.md` to `pnpm lint` | F8 |
-| A0.6 | List each file that holds a path of another file: the 15 lint scripts, `eslint.config.mjs`, the 4 ratchet files, `journeys.json`, the Vitest configs, the Wrangler files (also `image_build_context: "../.."`), the Dockerfiles, `Cargo.toml`, CI, `repo-binaries.json`, the action registry generator and the deploy scripts. Stage B needs this list | — |
-| A0.7 | Add a guard for silent failure: each path that `eslint.config.mjs` or a lint script names must match at least one file. 12 import rules of the information-flow boundary name exact paths today, so a renamed file turns its rule off with no error | — |
-| A0.8 | Record the prune baseline: a knip scan and a jscpd scan with their exact commands, and the list of test files with their kind ([Prune](#prune-with-each-step)) | — |
+| Step | Work                                                                                                                                                                                                                                                                                                                                                                                                                           | Closes |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| A0.1 | Run every lint in CI. `pnpm lint:source` holds the lints that need only the git tree, with `check:shared-helpers`. `pnpm lint:static` adds the two checks of the physics files. `pnpm lint` adds `lint:d1-patch`, which needs a base revision; CI keeps its own step for it. Add a pre-push hook that runs `lint:source`, for the time that CI has no budget                                                                   | F3     |
+| A0.2 | Write `scripts/layers.json`: each source file with its layer and its module, and each D1 table with its owner module. An actor table takes the module of the file that creates it. Start from name rules, then review each file by hand. Cover the Platform, the Portal, the packages, the crates, the scripts and the tests. The measure also reads imports of workspace packages and the dependencies of each `package.json` | —      |
+| A0.3 | Add `pnpm lint:layers`. It reads the targets and the imports of the current tree. It refuses a new upward import, a new import of the inside of another area, a new import against the foundation order, and a new file with no target. A ratchet file holds the known crossings (about 1,100), and its count can only go down                                                                                                 | —      |
+| A0.4 | Record the baseline: the lints, the type checks, the E2E suite with its run time, the Portal build, the tool catalog digest and the bundle size of each Worker                                                                                                                                                                                                                                                                 | —      |
+| A0.5 | Add a link check for `docs/` and `AGENTS.md` to `pnpm lint`                                                                                                                                                                                                                                                                                                                                                                    | F8     |
+| A0.6 | List each file that holds a path of another file: the 15 lint scripts, `eslint.config.mjs`, the 4 ratchet files, `journeys.json`, the Vitest configs, the Wrangler files (also `image_build_context: "../.."`), the Dockerfiles, `Cargo.toml`, CI, `repo-binaries.json`, the action registry generator and the deploy scripts. Stage B needs this list                                                                         | —      |
+| A0.7 | Add a guard for silent failure: each path that `eslint.config.mjs` or a lint script names must match at least one file. 12 import rules of the information-flow boundary name exact paths today, so a renamed file turns its rule off with no error                                                                                                                                                                            | —      |
+| A0.8 | Record the prune baseline: a knip scan and a jscpd scan with their exact commands, and the list of test files with their kind ([Prune](#prune-with-each-step))                                                                                                                                                                                                                                                                 | —      |
 
 ### A1 — Ports
 
 Each step defines one port in the foundation and moves the area code behind it. The
 files stay in their folders.
 
-| Step | Port | Work | Closes |
-| --- | --- | --- | --- |
-| A1.1 | Typed actor access | Each actor module declares an RPC interface for its methods, for example `ProductionPlanRoomRpc`. A helper gives a typed stub for one interface. The class implements each interface. Today `env.ts` types each binding with its class, and 62 typed stubs name `CaseDO`, `OrganisationDO`, `SessionDO` or `ConnectorDO` | — |
-| A1.2 | Environment parts | Each foundation module declares the part of the environment that it needs. The full `Env` type belongs to the Worker entry | — |
-| A1.3 | Tool families | The executor names no area. One base class, `ToolRequestError`, replaces the 17 error classes. A handler gets a tool context of the foundation (the Session, the lease, the scope) and the services of its own area. This replaces `CatalogToolAuthority`, one object with a callback for each tool of each area. `ToolSelection` names no Kitchen type: a surface command is a string that the area checks. The special cases in `execute.ts` (`commerce_entity_context`, `requestableRead`, the bakery receipt reader) become fields of their tool definitions. The tool families register through one list, in the order of today | F1 |
-| A1.4 | Effect in two parts | A `draft`, `receipt` or `scheduled` tool (27 tools) defines `prepare` and `run`. `prepare` does the live checks and the reads, then returns the sink, the action and `run`. The executor reads the label, runs the exit check and calls `run`. This is the shape of `settleStaffPageEffect` today, for every effect tool. A staff page effect keeps its second check. The step first lists what each `proposal` tool (13) and each `surface` tool (43) does today, and it keeps that. `lint:layers` then refuses an effect tool with no `prepare` | F1 |
-| A1.5 | One tool host | The mailbox and WhatsApp hosts dispatch through the registry, with the selection rules `agent_mailbox` and `whatsapp_support`. Capability claims for them are a separate decision (D6) | F2 |
-| A1.6 | Channel adapter | Slack, email, WhatsApp and the Portal chat stream register as channel adapters. The Case and Connector kernels import no card, no mailbox row and no stream | — |
-| A1.7 | Session ports | The Session names no area: integration reads, Inbox reads, commerce proposals and Kitchen effects arrive as ports | — |
-| A1.8 | Authority ports | The access-control read model gets the integration accounts and the provider catalogue through a port | — |
-| A1.9 | Actor modules | A Durable Object class composes modules. The class chains end: `ConnectorDO` over `ConnectorEmail`, `ConnectorEvals` and `ConnectorWhatsApp`, and the 6 levels of `SessionDO`. Each class keeps one ordered list of schema steps. A module gives its steps, and the class sets their order, so the stored versions do not change | F2 |
-| A1.10 | Area contracts | Each area marks its public files in the targets: its schemas and its service interfaces. The 275 imports between areas go through them. A call goes through a service interface that the Worker wires. No cycle between two contracts | — |
-| A1.11 | Contracts and `control-api` | `contracts` stops its `export *` of `commerce-contracts`: each of its 40 import sites names what it needs. The shared primitives move below both. `control-api` loses its 6 dependencies on area packages: each area slice of it becomes a part of that area's public files. `bakery-model` reads commerce through the commerce contract | F6 |
+| Step  | Port                        | Work                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Closes |
+| ----- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| A1.1  | Typed actor access          | Each actor module declares an RPC interface for its methods, for example `ProductionPlanRoomRpc`. A helper gives a typed stub for one interface. The class implements each interface. Today `env.ts` types each binding with its class, and 62 typed stubs name `CaseDO`, `OrganisationDO`, `SessionDO` or `ConnectorDO`                                                                                                                                                                                                                                                                                                             | —      |
+| A1.2  | Environment parts           | Each foundation module declares the part of the environment that it needs. The full `Env` type belongs to the Worker entry                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | —      |
+| A1.3  | Tool families               | The executor names no area. One base class, `ToolRequestError`, replaces the 17 error classes. A handler gets a tool context of the foundation (the Session, the lease, the scope) and the services of its own area. This replaces `CatalogToolAuthority`, one object with a callback for each tool of each area. `ToolSelection` names no Kitchen type: a surface command is a string that the area checks. The special cases in `execute.ts` (`commerce_entity_context`, `requestableRead`, the bakery receipt reader) become fields of their tool definitions. The tool families register through one list, in the order of today | F1     |
+| A1.4  | Effect in two parts         | A `draft`, `receipt` or `scheduled` tool (27 tools) defines `prepare` and `run`. `prepare` does the live checks and the reads, then returns the sink, the action and `run`. The executor reads the label, runs the exit check and calls `run`. This is the shape of `settleStaffPageEffect` today, for every effect tool. A staff page effect keeps its second check. The step first lists what each `proposal` tool (13) and each `surface` tool (43) does today, and it keeps that. `lint:layers` then refuses an effect tool with no `prepare`                                                                                    | F1     |
+| A1.5  | One tool host               | The mailbox and WhatsApp hosts dispatch through the registry, with the selection rules `agent_mailbox` and `whatsapp_support`. Capability claims for them are a separate decision (D6)                                                                                                                                                                                                                                                                                                                                                                                                                                               | F2     |
+| A1.6  | Channel adapter             | Slack, email, WhatsApp and the Portal chat stream register as channel adapters. The Case and Connector kernels import no card, no mailbox row and no stream                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | —      |
+| A1.7  | Session ports               | The Session names no area: integration reads, Inbox reads, commerce proposals and Kitchen effects arrive as ports                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | —      |
+| A1.8  | Authority ports             | The access-control read model gets the integration accounts and the provider catalogue through a port                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | —      |
+| A1.9  | Actor modules               | A Durable Object class composes modules. The class chains end: `ConnectorDO` over `ConnectorEmail`, `ConnectorEvals` and `ConnectorWhatsApp`, and the 6 levels of `SessionDO`. Each class keeps one ordered list of schema steps. A module gives its steps, and the class sets their order, so the stored versions do not change                                                                                                                                                                                                                                                                                                     | F2     |
+| A1.10 | Area contracts              | Each area marks its public files in the targets: its schemas and its service interfaces. The 275 imports between areas go through them. A call goes through a service interface that the Worker wires. No cycle between two contracts                                                                                                                                                                                                                                                                                                                                                                                                | —      |
+| A1.11 | Contracts and `control-api` | `contracts` stops its `export *` of `commerce-contracts`: each of its 40 import sites names what it needs. The shared primitives move below both. `control-api` loses its 6 dependencies on area packages: each area slice of it becomes a part of that area's public files. `bakery-model` reads commerce through the commerce contract                                                                                                                                                                                                                                                                                             | F6     |
 
 ### A2 — The faults that need no port
 
-| Step | Work | Closes |
-| --- | --- | --- |
-| A2.1 | One decision API over the four approval stores: one read of the decisions that wait for a person, and one card component in the Portal and one in Slack. The stores stay: the action ledger in `OrganisationDO` SQLite, the Case approval wait in `CaseDO` SQLite, the held output and the permission request in regional D1, the email challenge as a signed value | F2 |
-| A2.2 | `useLatestRead` and `useMutation` as the one way to read and change in a Portal component. A ratchet counts the direct `controlRead` calls in a component | F5 |
-| A2.3 | Add `Button` to `ui/`. Put each token in one file. Add CSS to the file-size ratchet. One surface registry (Plan 87, section 5) | F5 |
-| A2.4 | `dev/workflow-preview.tsx` becomes a page of Kitchen with no preview fixture, and the two rehearsal pages get the same decision. CI fetches `/workflow-preview.html`, and 19 browser scripts name the file, so the step changes them in the same landing. A lint checks that the Kitchen engine and model import no DOM type, so that a server run stays possible | F4 |
-| A2.5 | One `CommerceProvider` port with two implementations: the built-in engine and Shopify. The 20 branches on the system kind go behind it. One definition of the `CommerceSystem` union and of `BankPayout`. Shopify becomes one module that is easy to delete ([The Shopify module](#the-shopify-module)) | F6 |
-| A2.6 | `defineSharedDoc({ schema, validate })` in `collaboration` gives the encoding wrapper, the document class and the protocol. Each CRDT package keeps its schema and its operations. `workflow-canvas-crdt` uses `createSyncProtocol`. The frame bytes stay | F7 |
+| Step | Work                                                                                                                                                                                                                                                                                                                                                                | Closes |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| A2.1 | One decision API over the four approval stores: one read of the decisions that wait for a person, and one card component in the Portal and one in Slack. The stores stay: the action ledger in `OrganisationDO` SQLite, the Case approval wait in `CaseDO` SQLite, the held output and the permission request in regional D1, the email challenge as a signed value | F2     |
+| A2.2 | `useLatestRead` and `useMutation` as the one way to read and change in a Portal component. A ratchet counts the direct `controlRead` calls in a component                                                                                                                                                                                                           | F5     |
+| A2.3 | Add `Button` to `ui/`. Put each token in one file. Add CSS to the file-size ratchet. One surface registry (Plan 87, section 5)                                                                                                                                                                                                                                      | F5     |
+| A2.4 | `dev/workflow-preview.tsx` becomes a page of Kitchen with no preview fixture, and the two rehearsal pages get the same decision. CI fetches `/workflow-preview.html`, and 19 browser scripts name the file, so the step changes them in the same landing. A lint checks that the Kitchen engine and model import no DOM type, so that a server run stays possible   | F4     |
+| A2.5 | One `CommerceProvider` port with two implementations: the built-in engine and Shopify. The 20 branches on the system kind go behind it. One definition of the `CommerceSystem` union and of `BankPayout`. Shopify becomes one module that is easy to delete ([The Shopify module](#the-shopify-module))                                                             | F6     |
+| A2.6 | `defineSharedDoc({ schema, validate })` in `collaboration` gives the encoding wrapper, the document class and the protocol. Each CRDT package keeps its schema and its operations. `workflow-canvas-crdt` uses `createSyncProtocol`. The frame bytes stay                                                                                                           | F7     |
 
 #### The Shopify module
 
@@ -337,29 +337,104 @@ physical bake. This refactor does not remove `schedule.ts`.
 ## Steps done
 
 **20 November 2026, on the branch `refactor-17` (from `origin/dev` `e18cecb`). Not
-pushed, and not on `dev`.**
+pushed, and not on `dev`.** Step A0 and step S1 are done.
 
-| Step | State | What exists |
-| --- | --- | --- |
-| A0.1 | Done, but the hook is off | `pnpm lint` is `lint:static` and `lint:d1-patch`. CI runs `pnpm lint:static` in one step, in place of five lint steps and the shared helper step. `.githooks/pre-push` runs `lint:source`. No clone uses the hook yet: the setting is shared by every worktree of a clone, so the owner decides it |
-| A0.2 | First version | `scripts/layers.json`: 66 folder rules and 580 file lines for the 1,086 files of `services/platform/src`, and a module for each of the 26 workspace packages. It comes from name rules, with eight folders placed by hand. No other file was reviewed one by one. Not covered: the Portal, the crates, the scripts, the tests, the tables. `foundation/connections` has no file yet |
-| A0.3 | Done for the covered tree | `pnpm lint:layers` (`scripts/check-layers.mjs`) with `scripts/layers-ratchet.json`: 1,131 crossings in 142 module pairs (608 upward, 319 between areas, 204 against the foundation order). The counts are higher than the measure of this plan, because the lint also counts package imports and the hand placement moved some files. A probe file with one new upward import was refused |
-| A0.5 | Done | `pnpm lint:doc-links`: 833 relative links in 180 pages. `scripts/doc-links-ratchet.json` holds 31 links that were broken before, most of them in the two architecture documents. Step S2 removes them |
-| A0.7 | Done | `pnpm lint:lint-paths`: 842 paths in 27 lint files match a file. No lint path was broken |
-| S1 | Done | `docs/specs/README.md`: the 33 specs with their sources, and a table of 115 old plan and refactor numbers. `pnpm lint:plan-numbers` reads each form of a mention: 105 numbers in code, all in the table. 52 rows point to the archive |
+| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A0.1 | `pnpm lint` is `lint:static` and `lint:d1-patch`. CI runs `pnpm lint:static` in one step, in place of five lint steps and the shared helper step. `.githooks/pre-push` runs `lint:source`. The hook is off: its setting is shared by every worktree of a clone, so the owner decides it                                                                                                                                                                                                                                                           |
+| A0.2 | `scripts/layers.json`: 105 folder rules and 621 file lines for the 1,788 source files of `services/platform/src` and `apps/portal/src`, a module for each of the 26 workspace packages, a place in the target layout for each other tracked folder (`placement`), and an owner module for each of the 218 D1 tables (`tables`). The review moved 35 Platform files, among them 9 onboarding files that a name rule had put in `cafe`. `foundation/connections` has no file yet: its files are in `areas/integrations`                             |
+| A0.3 | `pnpm lint:layers` (`scripts/check-layers.mjs`) with `scripts/layers-ratchet.json`: 1,350 crossings in 231 pairs. 671 imports go upward, 377 go between areas, 176 go against the foundation order, and 126 SQL writes change a table of another module. A pair cannot grow, and a new pair is refused. The lint also refuses a source file with no module, a tracked folder with no place and a D1 table with no owner. `--tables` prints the writers of each table, and `--misfits` prints each file whose imports are mostly in another module |
+| A0.4 | [Baseline](#baseline)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| A0.5 | `pnpm lint:doc-links`: 833 relative links in 180 pages. `scripts/doc-links-ratchet.json` holds 31 links that were broken before, most of them in the two architecture documents. Step S2 removes them                                                                                                                                                                                                                                                                                                                                             |
+| A0.6 | `node scripts/check-lint-paths.mjs --bound` prints each file that holds the path of another file: 472 files with 3,341 paths. 264 are scripts, 91 are test support files, 29 are tsconfig files, 26 are lint and ratchet files and 25 are package manifests. `--bound --list` gives the files for the move script of Stage B                                                                                                                                                                                                                      |
+| A0.7 | `pnpm lint:lint-paths`: 953 paths in 27 lint files match a file. No lint path was broken                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| A0.8 | `pnpm lint:clones` (jscpd 5.4.3, `.jscpd.json`, `scripts/jscpd-baseline.json`) refuses a new copy of product code. `pnpm lint:unused` (knip 6.46.1, `knip.json`, `scripts/unused-ratchet.json`) refuses a new unused file and a new unused export. `node scripts/list-tests.mjs` gives the test files with their kind and their module                                                                                                                                                                                                            |
+| S1   | `docs/specs/README.md`: the 33 specs with their sources, and a table of 115 old plan and refactor numbers. `pnpm lint:plan-numbers` reads each form of a mention: 105 numbers in code, all in the table. 52 rows point to the archive                                                                                                                                                                                                                                                                                                             |
 
-`pnpm lint` passes on the branch in 19 seconds, with the Kitchen model files from the
-local cache.
+Each new check was proved with a probe: a new upward import, a write of another
+module's table, a new top-level folder, a copied function, a new unused file, a new
+unused export and a broken link. Each probe was refused.
 
-Not done of step A0:
+What the map shows that the first measure did not:
 
-- A0.2 for the Portal, the crates, the scripts, the tests and the tables, and the
-  review of the Platform list file by file.
-- A0.4, the baseline: the type checks, the E2E suite with its run time, the Portal
-  build, the tool catalog digest and the bundle sizes.
-- A0.6, the list of the files that hold a path. The path guard of step A0.7 covers
-  the lint files only.
-- A0.8, knip and jscpd with their ratchets.
+- 46 of the 218 D1 tables have writers in two or more modules. The largest:
+  `vault_secret` (6 modules), `organisation_onboarding`, `integration_account` and
+  `provider_connection` (5 each). Step A2 gives each a write function
+  in its owner.
+- No SQL statement in the Platform source reads or writes 5 tables: `connector`,
+  `install`, `thread_binding`, `thread_file_watch`, `tool_call`. The Plan 93 cutover
+  can leave them out, after a check of each one.
+- The Portal adds 172 crossings. Its features import the shell 71 times (`route.ts`,
+  `page-address.ts`, the sidebar), and a feature of one area imports another area 95
+  times.
+- The class file of `OrganisationDO` and the queue consumer `ingress-queue.ts` hold
+  code of four modules each. The map puts them in `workers/platform` with a note, so
+  each import of them from a lower module counts as upward.
+
+Open for the owner: the push of the branch, its landing on `dev`, and the pre-push
+hook.
+
+## Baseline
+
+Step A0.4, measured on the branch `refactor-17` on 2026-11-20, on the owner's Mac,
+with other sessions at work on the same machine. A step of Stage A compares its
+result with these lines.
+
+| Check                      | Result                                                         | Command                                                 |
+| -------------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
+| Every lint                 | passes, 26 s                                                   | `pnpm lint`                                             |
+| Type check, Platform       | passes, 4 s                                                    | `pnpm --filter @purin-labs/platform check:types`        |
+| Type check, Platform tests | passes, 1 s                                                    | `pnpm --filter @purin-labs/platform check:test-types`   |
+| Type check, packages       | passes, 4 s                                                    | `pnpm check:packages`                                   |
+| Type check, engine         | passes, 1 s                                                    | `pnpm --filter @purin-labs/commerce-worker check:types` |
+| Portal build               | passes, 3 s. 280 script files with 7.12 MB, and 0.88 MB of CSS | `pnpm portal:build`                                     |
+| E2E suite of the Platform  | not measured yet                                               | `pnpm --filter @purin-labs/platform test:e2e`           |
+
+The bundle of each Worker, from `node scripts/worker-bundle-sizes.mjs` (a Wrangler
+dry run, no upload):
+
+| Worker              |      Bytes | Gzip bytes |
+| ------------------- | ---------: | ---------: |
+| `platform`          |  9,658,352 |  2,311,772 |
+| `commerce`          |  4,759,826 |    991,214 |
+| `vault-onepassword` | 14,555,351 |  4,287,466 |
+| `code-mode-sandbox` |    773,725 |    323,060 |
+| `slack-ingress`     |    119,476 |     30,543 |
+| `chatgpt-exit`      |     55,847 |     13,822 |
+| `model-exit`        |      5,227 |      2,015 |
+
+The tool catalog. Steps A1.3 and A1.4 change the tool registry, and the digest must
+stay the same:
+
+| Value                                                     | Result                                                             |
+| --------------------------------------------------------- | ------------------------------------------------------------------ |
+| Registered tools                                          | 116, with 33 capabilities and 47 surface commands                  |
+| Tools in the widest selection                             | 117                                                                |
+| SHA-256 of the tool names in order, one name on each line | `0ad0603b2740725442d8782ab6c05013d7bd39d892fa279f11e3d07229799e47` |
+| `catalogHarnessToolCatalogDigest` of the widest selection | `146bbd674420018eb69b2605daf59f6f3bb76eba10a96052fdb6120f6e4971b1` |
+| `catalogHarnessToolCatalogDigest` with no argument        | `5d3e3158f521246350507cdb4971427149840e2ddbfa97a03eccbee8436db632` |
+
+The widest selection has each capability and each surface command of `TOOLS` in
+`agent-tools/registry.ts`, in registry order, and each turn flag on (`memoryProposal`,
+`followUp`, `sideCaseProposal`, `permissionRequest`). No script computes it: the
+functions need the Vitest resolver. Step A1.3 adds a temporary check with these
+values and removes it at the end of step A1.
+
+The prune baseline of step A0.8:
+
+| Measure                     | Result                                                                                                                                | Command                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| Copies of product code      | 937 copies with 17,423 lines (1.59 %) in 2,715 files. The Platform has 555, the Portal 159, `production-simulation` 73, the engine 64 | `node scripts/check-clones.mjs --report` |
+| Unused files                | 1: `services/platform/src/devices/work.ts`, which Plan 24 will call                                                                   | `node scripts/check-unused.mjs --report` |
+| Unused exports              | 908: the Platform 473, the Portal 262, the engine 82, `contracts` 44, `commerce-client` 24                                            | the same                                 |
+| Journeys                    | 308 files with 161,000 lines: 237 of the Platform and 71 of the engine. 196 import the source                                         | `node scripts/list-tests.mjs`            |
+| Other tests                 | 329 files with 148,000 lines. 43 use `vi.mock`                                                                                        | the same                                 |
+| Test support and type files | 105 support files (26,000 lines) and 198 type files (15,000 lines)                                                                    | the same                                 |
+
+jscpd 5 finds more copies than the jscpd 4 scan of Plan 92 (491), with the same
+`--min-tokens 70`: it is a different program, and this scan also reads the crates.
+The two counts are not comparable. knip reads the entry files in `knip.json`. A file
+that only a tool starts must be in that list, or knip reports it as unused.
 
 ## Prune with each step
 
@@ -370,13 +445,13 @@ dead, so the prune belongs to each step.
 
 What Plan 92 left, on `origin/dev`:
 
-| Kind | State |
-| --- | --- |
-| Unused code | Plan 92 deleted the unused files that its hand check allowed, and it removed `export` from 3,539 names. 147 type re-exports in `contracts` and 332 re-export lines wait for a decision on the public surface of each package |
-| Duplicate code | jscpd finds 491 clones with 8,010 lines (1.0 %). Kept with a reason: the head of about 100 control routes, some commerce commands with their own replay, three Kitchen engines |
-| Old-row adapters | Kept, because their old rows exist or cannot be counted: the actor storage upgrades, the commerce schema chain 66 to 90, some chat and Square readers |
-| Tests | 237 journeys (135,000 lines), 302 other Platform test files (123,000 lines, 43 of them with `vi.mock`), 86 commerce test files (51,000 lines) |
-| Not done | Batch E: large shrinks of money-path test files |
+| Kind             | State                                                                                                                                                                                                                        |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Unused code      | Plan 92 deleted the unused files that its hand check allowed, and it removed `export` from 3,539 names. 147 type re-exports in `contracts` and 332 re-export lines wait for a decision on the public surface of each package |
+| Duplicate code   | jscpd finds 491 clones with 8,010 lines (1.0 %). Kept with a reason: the head of about 100 control routes, some commerce commands with their own replay, three Kitchen engines                                               |
+| Old-row adapters | Kept, because their old rows exist or cannot be counted: the actor storage upgrades, the commerce schema chain 66 to 90, some chat and Square readers                                                                        |
+| Tests            | 237 journeys (135,000 lines), 302 other Platform test files (123,000 lines, 43 of them with `vi.mock`), 86 commerce test files (51,000 lines)                                                                                |
+| Not done         | Batch E: large shrinks of money-path test files                                                                                                                                                                              |
 
 ### Dead code
 
@@ -409,20 +484,21 @@ What Plan 92 left, on `origin/dev`:
 A test file gets a decision when a step changes the file that it tests. The decision
 follows the test policy of `AGENTS.md`:
 
-| The test | Decision |
-| --- | --- |
-| Asserts the calls of a mock, or a result that its own fixture gives | Delete |
-| Asserts step order, a private state name or the shape of a module | Delete |
-| Its outcome is in a journey | Delete, and name the journey in the commit |
-| Fails only because the structure moved, and its outcome does not matter | Delete. Do not repair its fixture |
-| Is the only check of an authorization, money or data outcome | Keep. Move the check into a journey if the journey exists |
-| A fault journey with one case for each internal step | Keep one case for each distinct outcome |
+| The test                                                                | Decision                                                  |
+| ----------------------------------------------------------------------- | --------------------------------------------------------- |
+| Asserts the calls of a mock, or a result that its own fixture gives     | Delete                                                    |
+| Asserts step order, a private state name or the shape of a module       | Delete                                                    |
+| Its outcome is in a journey                                             | Delete, and name the journey in the commit                |
+| Fails only because the structure moved, and its outcome does not matter | Delete. Do not repair its fixture                         |
+| Is the only check of an authorization, money or data outcome            | Keep. Move the check into a journey if the journey exists |
+| A fault journey with one case for each internal step                    | Keep one case for each distinct outcome                   |
 
 - **The protected list.** Plan 92 names the tests that it kept against its sweep,
   each as the only check of an outcome. They stay until a journey has the same check.
-- **A journey reads the Worker from outside.** 174 journeys import `src/`. A ratchet
-  counts those imports, and the count can only go down. A journey acts through HTTP,
-  RPC or the `testing` entry of a module.
+- **A journey reads the Worker from outside.** 178 of the 237 Platform journeys import
+  the source (`node scripts/list-tests.mjs`). A journey acts through HTTP, RPC or the
+  `testing` entry of a module. A ratchet counts those imports from the step that
+  gives the first `testing` entry: before that step, a new journey has no other way.
 - **A test is deleted in its own commit,** not in the commit that changes the code.
   The commit names the outcome and where it is still checked, or says that no check
   is left and why that is accepted.
@@ -473,16 +549,16 @@ vendor/  patches/    stay at the root
 
 Where the areas come from:
 
-| Area | From the Platform | From the Portal | From packages, crates and scripts |
-| --- | --- | --- | --- |
-| `commerce` | `commerce/`, `shopify/`, `stripe/`, `payouts/`, commerce routes and actors (58,000 lines) | `commerce`, `ecommerce`, `checkout-profiles`, `orders`, `payments`, `payouts`, `bank-payouts`, `api-keys`, `governed-actions`, `content-studio` | `commerce-contracts`, `commerce-client`, `commerce-query-sqlite`, `product-description-crdt`, `services/commerce`, `integrations/shopify` |
-| `cafe` | menu, board, order queue, counter and terminal code (22,000) | `menu-boards`, `order-queue`, `terminals` | `menu-draft-crdt`, `menu-board-crdt` |
-| `kitchen` | `commerce/bakery`, recipe, cost and workflow code (25,000) | `production-run`, `workflow-simulator`, `costs`, `recipes` | `bakery-model`, `production-simulation`, `bakery-workflow`, 3 CRDT packages, `bakery-native`, `scripts/bakery-*`, `scripts/production-simulation`, `recipes/` |
-| `inbox` | `mail-inbox/`, the mailbox agent, the reply drafts (29,000) | `mail-inbox`, `email-review`, `mail-setup` | `email-draft-crdt`, `mail-reply-crdt` |
-| `brain` | `memory/`, `evals/`, `case-execution/` (10,000) | `brain` | — |
-| `integrations` | `provider-*`, `custom-connectors/`, `integrations/`, `jev-features/` (47,000) | `integrations`, `vault`, `jev-features` | `custom-connector-fetch` |
-| `devices` | `devices/` (7,000 with the voice routes, which go to `surfaces/voice`) | `devices` | `shop-gateway` protocol |
-| `organisation` | onboarding, access pages, billing, operators (9,000) | `access`, `billing`, `agent-schedules`, and `pages/` split by owner | — |
+| Area           | From the Platform                                                                         | From the Portal                                                                                                                                 | From packages, crates and scripts                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `commerce`     | `commerce/`, `shopify/`, `stripe/`, `payouts/`, commerce routes and actors (58,000 lines) | `commerce`, `ecommerce`, `checkout-profiles`, `orders`, `payments`, `payouts`, `bank-payouts`, `api-keys`, `governed-actions`, `content-studio` | `commerce-contracts`, `commerce-client`, `commerce-query-sqlite`, `product-description-crdt`, `services/commerce`, `integrations/shopify`                     |
+| `cafe`         | menu, board, order queue, counter and terminal code (22,000)                              | `menu-boards`, `order-queue`, `terminals`                                                                                                       | `menu-draft-crdt`, `menu-board-crdt`                                                                                                                          |
+| `kitchen`      | `commerce/bakery`, recipe, cost and workflow code (25,000)                                | `production-run`, `workflow-simulator`, `costs`, `recipes`                                                                                      | `bakery-model`, `production-simulation`, `bakery-workflow`, 3 CRDT packages, `bakery-native`, `scripts/bakery-*`, `scripts/production-simulation`, `recipes/` |
+| `inbox`        | `mail-inbox/`, the mailbox agent, the reply drafts (29,000)                               | `mail-inbox`, `email-review`, `mail-setup`                                                                                                      | `email-draft-crdt`, `mail-reply-crdt`                                                                                                                         |
+| `brain`        | `memory/`, `evals/`, `case-execution/` (10,000)                                           | `brain`                                                                                                                                         | —                                                                                                                                                             |
+| `integrations` | `provider-*`, `custom-connectors/`, `integrations/`, `jev-features/` (47,000)             | `integrations`, `vault`, `jev-features`                                                                                                         | `custom-connector-fetch`                                                                                                                                      |
+| `devices`      | `devices/` (7,000 with the voice routes, which go to `surfaces/voice`)                    | `devices`                                                                                                                                       | `shop-gateway` protocol                                                                                                                                       |
+| `organisation` | onboarding, access pages, billing, operators (9,000)                                      | `access`, `billing`, `agent-schedules`, and `pages/` split by owner                                                                             | —                                                                                                                                                             |
 
 `packages/control-api` (34,000 lines) splits by area into each `contract`. The rest
 becomes `foundation/control`. `apps/portal/src/dev` (24,000 lines, 35 preview pages)
@@ -496,12 +572,12 @@ The workspace file lists exact folders: `areas/*/contract`, `areas/*/server`,
 
 Stage B must answer these before a file moves:
 
-| Question | What decides it |
-| --- | --- |
-| Packages or folders (D1) | A trial with one foundation module and one area as packages: the `tsrs` time, the Worker start, the Portal build |
-| Where the journeys import from | 235 journeys import the inside of the Worker. Each module needs a `testing` entry, or the journeys keep an exception in the lint |
-| The move script | It must rewrite each file of the list of step A0.6. A dry run in a scratch worktree must pass `pnpm lint` with the guard of step A0.7, the type checks, a container build and one E2E shard |
-| The other sessions | A move date for each module, told before. The script runs again on an open branch |
+| Question                       | What decides it                                                                                                                                                                             |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Packages or folders (D1)       | A trial with one foundation module and one area as packages: the `tsrs` time, the Worker start, the Portal build                                                                            |
+| Where the journeys import from | 235 journeys import the inside of the Worker. Each module needs a `testing` entry, or the journeys keep an exception in the lint                                                            |
+| The move script                | It must rewrite each file of the list of step A0.6. A dry run in a scratch worktree must pass `pnpm lint` with the guard of step A0.7, the type checks, a container build and one E2E shard |
+| The other sessions             | A move date for each module, told before. The script runs again on an open branch                                                                                                           |
 
 After the cutover, the storage is new and empty. These steps are then cheap, and each
 needs its own decision: one outbox table shape for the 5 outboxes, new names for
@@ -528,26 +604,26 @@ those adapters under "Kept, with the reason" and "Product code with no test now"
   spec id, also for the 26 plans that are only in the archive. The 1,560 mentions in
   code keep the old numbers (D4).
 
-| Step | Work | When |
-| --- | --- | --- |
-| S1 | Write `docs/specs/README.md`: the layer map, the list of specs with their source plans ([Appendix A](#appendix-a--the-specs-and-their-sources)), and the table of old numbers. A scan builds the table, and it reads each form: "Plan 53", `plan-53` and `plan53`. Extend the link check: a plan number in a source comment must be in the table | Now |
-| S2 | Write the specs, one area at a time. A person or a second session checks each spec against the code before its plans move to `docs/history/` | After the brand names of Plan 94 are final |
-| S3 | Move the plan index and the names table out of `AGENTS.md`. `AGENTS.md` keeps the rules and one line for each area. Target: under 250 lines. Each area gets a short `AGENTS.md` in Stage B | With S2 |
+| Step | Work                                                                                                                                                                                                                                                                                                                                             | When                                       |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| S1   | Write `docs/specs/README.md`: the layer map, the list of specs with their source plans ([Appendix A](#appendix-a--the-specs-and-their-sources)), and the table of old numbers. A scan builds the table, and it reads each form: "Plan 53", `plan-53` and `plan53`. Extend the link check: a plan number in a source comment must be in the table | Now                                        |
+| S2   | Write the specs, one area at a time. A person or a second session checks each spec against the code before its plans move to `docs/history/`                                                                                                                                                                                                     | After the brand names of Plan 94 are final |
+| S3   | Move the plan index and the names table out of `AGENTS.md`. `AGENTS.md` keeps the rules and one line for each area. Target: under 250 lines. Each area gets a short `AGENTS.md` in Stage B                                                                                                                                                       | With S2                                    |
 
-| Code | Folder | Specs |
-| --- | --- | ---: |
-| `FND` | `foundation` | 11 |
-| `COM` | `areas/commerce` | 5 |
-| `CAFE` | `areas/cafe` | 1 |
-| `KIT` | `areas/kitchen` | 4 |
-| `INB` | `areas/inbox` | 1 |
-| `BRN` | `areas/brain` | 1 |
-| `INT` | `areas/integrations` | 1 |
-| `DEV` | `areas/devices` | 1 |
-| `ORG` | `areas/organisation` | 2 |
-| `PRT` | `surfaces/portal` | 1 |
-| `VOX` | `surfaces/voice` | 1 |
-| `ENG` | `engineering` | 4 |
+| Code   | Folder               | Specs |
+| ------ | -------------------- | ----: |
+| `FND`  | `foundation`         |    11 |
+| `COM`  | `areas/commerce`     |     5 |
+| `CAFE` | `areas/cafe`         |     1 |
+| `KIT`  | `areas/kitchen`      |     4 |
+| `INB`  | `areas/inbox`        |     1 |
+| `BRN`  | `areas/brain`        |     1 |
+| `INT`  | `areas/integrations` |     1 |
+| `DEV`  | `areas/devices`      |     1 |
+| `ORG`  | `areas/organisation` |     2 |
+| `PRT`  | `surfaces/portal`    |     1 |
+| `VOX`  | `surfaces/voice`     |     1 |
+| `ENG`  | `engineering`        |     4 |
 
 33 specs replace 59 plan and refactor files and 15 other documents (counted on `main`).
 `docs/runbooks/` stays. [The commerce spec](../services/commerce/docs/spec.md) stays
@@ -558,26 +634,26 @@ points to it.
 
 Stage A changes code, not paths. These steps have the highest risk:
 
-| Step | Risk | Check |
-| --- | --- | --- |
-| A1.1 | A wrong interface hides a method. The type check finds it | The type checks and the E2E suite |
-| A1.4 | The executor runs the exit check at a different point than a handler did. A tool can start to ask, or stop | Before the change, record for each of the 27 tools: the checks, their order and their result in one allowed and one refused journey. Compare after. Report each difference |
-| A1.5 | A mailbox turn gets a different tool list or a different catalog digest | The mailbox and WhatsApp journeys. The digest of the mailbox host |
-| A1.6, A1.9 | The class chains hold shared state. A module can lose a field that a parent class gave it | The actor journeys, the relocation journey and the idle tenant journey |
-| A2.1 | A person sees a decision two times, or not at all | One journey for each of the four kinds, allowed and refused |
-| A2.6 | A stored draft does not open | A stored draft of each of the 8 documents opens after the change |
+| Step       | Risk                                                                                                       | Check                                                                                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1.1       | A wrong interface hides a method. The type check finds it                                                  | The type checks and the E2E suite                                                                                                                                          |
+| A1.4       | The executor runs the exit check at a different point than a handler did. A tool can start to ask, or stop | Before the change, record for each of the 27 tools: the checks, their order and their result in one allowed and one refused journey. Compare after. Report each difference |
+| A1.5       | A mailbox turn gets a different tool list or a different catalog digest                                    | The mailbox and WhatsApp journeys. The digest of the mailbox host                                                                                                          |
+| A1.6, A1.9 | The class chains hold shared state. A module can lose a field that a parent class gave it                  | The actor journeys, the relocation journey and the idle tenant journey                                                                                                     |
+| A2.1       | A person sees a decision two times, or not at all                                                          | One journey for each of the four kinds, allowed and refused                                                                                                                |
+| A2.6       | A stored draft does not open                                                                               | A stored draft of each of the 8 documents opens after the change                                                                                                           |
 
 General risks:
 
-| Risk | What limits it |
-| --- | --- |
+| Risk                                                                                | What limits it                                                                                                        |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | The tool catalog digest changes, and running Sessions lose their checkpoint lineage | The order of the definitions stays. Each landing compares the digest. A step that cannot keep it stops for a decision |
-| An inversion changes behavior | Each inversion is one small commit with the E2E suite |
-| The work stops in the middle | Each landing leaves a tree that works. The ratchet shows what is left. Stage A alone gives the layers |
-| A port is the wrong abstraction | The first use of each port is one area. The other areas follow after it works |
-| A spec loses a decision or a limit | The plans stay unchanged in `docs/history/`. A second reader checks each spec against the code |
-| A prune deletes the only check of an outcome | The test rules, the protected list of Plan 92, and a delete in its own commit that names the outcome |
-| A prune deletes code that only a script or a runbook uses | The hand check before each delete. Knip had 10 to 15 % false positives in Plan 92 |
+| An inversion changes behavior                                                       | Each inversion is one small commit with the E2E suite                                                                 |
+| The work stops in the middle                                                        | Each landing leaves a tree that works. The ratchet shows what is left. Stage A alone gives the layers                 |
+| A port is the wrong abstraction                                                     | The first use of each port is one area. The other areas follow after it works                                         |
+| A spec loses a decision or a limit                                                  | The plans stay unchanged in `docs/history/`. A second reader checks each spec against the code                        |
+| A prune deletes the only check of an outcome                                        | The test rules, the protected list of Plan 92, and a delete in its own commit that names the outcome                  |
+| A prune deletes code that only a script or a runbook uses                           | The hand check before each delete. Knip had 10 to 15 % false positives in Plan 92                                     |
 
 ## Decisions
 
@@ -656,20 +732,21 @@ moved files more than it inverted imports.
 
 The count of work for Stage A:
 
-| Work | Count |
-| --- | ---: |
-| Imports to remove or invert | about 1,100 |
-| Ports | 11 |
-| Effect tools to give two parts | 27 |
-| Typed stubs to move to an interface | 62 |
-| Class chains to compose | 3 |
-| Landings, each with a full E2E run | at least 25 |
-| Test files to judge when their module changes | 302 Platform test files that are not journeys |
-| Journeys that import the inside of the Worker | 174 |
-| Specs to write | 33 |
+| Work                                          |                                                                   Count |
+| --------------------------------------------- | ----------------------------------------------------------------------: |
+| Imports to remove or invert                   | 1,224 (671 upward, 377 between areas, 176 against the foundation order) |
+| Table writes to move to the owner             |                                    126, in 69 pairs of table and module |
+| Ports                                         |                                                                      11 |
+| Effect tools to give two parts                |                                                                      27 |
+| Typed stubs to move to an interface           |                                                                      62 |
+| Class chains to compose                       |                                                                       3 |
+| Landings, each with a full E2E run            |                                                             at least 25 |
+| Test files to judge when their module changes |                329 test files that are not journeys (43 with `vi.mock`) |
+| Journeys that import the inside of the Worker |                                                                     178 |
+| Specs to write                                |                                                                      33 |
 
-Step A0.4 measures the run time of the E2E suite. Steps A1.1 to A1.3 give the time
-for one port. The estimate for the rest uses those two numbers.
+[Baseline](#baseline) gives the run time of the E2E suite. Steps A1.1 to A1.3 give
+the time for one port. The estimate for the rest uses those two numbers.
 
 Runtime cost: none. The same Workers run the same code.
 
@@ -688,16 +765,17 @@ Runtime cost: none. The same Workers run the same code.
 
 ## Not checked
 
-- The rules of `measure-layers.mjs` are a first guess. Step A0.2 replaces them. The
-  layer sizes and the import counts can move by some percent.
+- The layer sizes in the sections before [Steps done](#steps-done) come from name
+  rules. `scripts/layers.json` replaced those rules, and it moved some files: the
+  sizes can differ by some percent.
+- `scripts/layers.json` is reviewed by name, by the misfit report and by the table
+  writers. No person read each of the 1,788 files. A wrong line shows as a crossing
+  with no reason, and the step that meets it corrects it.
 - The split of `chat/` by file. Only its largest files were read.
-- The imports of the Portal, the packages and the scripts were counted by folder, not
-  by target module.
 - No port was tried. A1.4 was checked against two handlers only:
   `pauseDeviceForEmbeddedHarness` and `settleStaffPageEffect`.
-- The run time of the E2E suite.
-- No knip scan and no jscpd scan ran for this plan. The clone and unused-code counts
-  come from Plan 92.
+- The imports of the scripts, the crates and the tests are not in `lint:layers`. Each
+  of them has a place in the target layout (`placement`), and no more.
 - The Kitchen table, the count of broken links and the spec counts come from `main`.
 - The size of `connections` and the count of service interfaces.
 
@@ -758,67 +836,67 @@ Two comments of the second review were not used. pnpm takes only a folder with a
 
 ## Appendix A — The specs and their sources
 
-| Id | Spec | Written from |
-| --- | --- | --- |
-| FND-01 | `foundation/01-tenancy-and-placement.md` | `architecture/runtime.md` (data model, placement), Refactor 12, `economics-costs.md` |
-| FND-02 | `foundation/02-actor-runtime.md` | Plan 14, `architecture/runtime.md` (platform layout, actors) |
-| FND-03 | `foundation/03-cases-sessions-and-conversations.md` | Plan 15, `architecture/runtime.md` (Case coordination, cues), Refactor 9, Plan 42H, Plan 74 |
-| FND-04 | `foundation/04-agent-harness-and-model-routes.md` | `architecture/runtime.md` (harness adapter), Plans 28, 73 and 75 |
-| FND-05 | `foundation/05-messages-attachments-and-context.md` | Plans 37 and 42G |
-| FND-06 | `foundation/06-identity-policy-and-approval.md` | `architecture/security.md` |
-| FND-07 | `foundation/07-information-flow.md` | Plans 27, 27C and 89 |
-| FND-08 | `foundation/08-vault.md` | Plans 12 and 79 |
-| FND-09 | `foundation/09-agent-tools-and-screen-context.md` | Plans 81 and 87 |
-| FND-10 | `foundation/10-shared-drafts.md` | Plans 40 and 40C |
-| FND-11 | `foundation/11-contracts.md` | Plan 78 |
-| COM-01 | `areas/commerce/01-commerce-domain.md` | `commerce-domain-architecture.md`, `commerce-monorepo.md`, Plan 22 |
-| COM-02 | `areas/commerce/02-commerce-engine.md` | Plans 76, 76A, 77 and 80 |
-| COM-03 | `areas/commerce/03-providers-and-the-read-layer.md` | Plans 9 and 47, `integrations/shopify.md` |
-| COM-04 | `areas/commerce/04-checkout-and-payments.md` | Plans 33, 33C and 33D |
-| COM-05 | `areas/commerce/05-merchant-operations.md` | Plans 16, 23, 31B and 39 |
-| CAFE-01 | `areas/cafe/01-menus-boards-and-the-order-queue.md` | Plan 40B |
-| KIT-01 | `areas/kitchen/01-orchestration-views.md` | Plans 42, 42E and 42F |
-| KIT-02 | `areas/kitchen/02-physics-and-equipment-models.md` | Plans 42B and 60A, the calibration worksheet |
-| KIT-03 | `areas/kitchen/03-recipe-workflows.md` | Plans 61A, 61E and 84, `workflow-canvas-design-profile.md` |
-| KIT-04 | `areas/kitchen/04-costs-and-margins.md` | Plan 86 |
-| INB-01 | `areas/inbox/01-one-inbox.md` | Plan 83 |
-| BRN-01 | `areas/brain/01-brain.md` | Plans 42J and 42K |
-| INT-01 | `areas/integrations/01-integrations-and-connectors.md` | `architecture/integrations.md`, `integrations/google-oauth.md` |
-| DEV-01 | `areas/devices/01-devices.md` | Plan 85 |
-| ORG-01 | `areas/organisation/01-onboarding-and-lifecycle.md` | `architecture/onboarding.md`, `organisation-setup-flow.md` |
-| ORG-02 | `areas/organisation/02-jev-from-seams.md` | Plan 88 |
-| PRT-01 | `surfaces/portal/01-portal.md` | Plan 21, `portal-ui-inventory.md`, `style-guide.md` |
-| VOX-01 | `surfaces/voice/01-voice-control.md` | Plans 82 and 82C, the voice handover |
-| ENG-01 | `engineering/01-decision-log.md` | Plan 3 |
-| ENG-02 | `engineering/02-code-and-repository.md` | `code-style.md`, Refactor 10, Plan 92 |
-| ENG-03 | `engineering/03-names.md` | Plan 91, the names table of `AGENTS.md` |
-| ENG-04 | `engineering/04-testing.md` | `test-coverage-e2e.md` |
+| Id      | Spec                                                   | Written from                                                                                |
+| ------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| FND-01  | `foundation/01-tenancy-and-placement.md`               | `architecture/runtime.md` (data model, placement), Refactor 12, `economics-costs.md`        |
+| FND-02  | `foundation/02-actor-runtime.md`                       | Plan 14, `architecture/runtime.md` (platform layout, actors)                                |
+| FND-03  | `foundation/03-cases-sessions-and-conversations.md`    | Plan 15, `architecture/runtime.md` (Case coordination, cues), Refactor 9, Plan 42H, Plan 74 |
+| FND-04  | `foundation/04-agent-harness-and-model-routes.md`      | `architecture/runtime.md` (harness adapter), Plans 28, 73 and 75                            |
+| FND-05  | `foundation/05-messages-attachments-and-context.md`    | Plans 37 and 42G                                                                            |
+| FND-06  | `foundation/06-identity-policy-and-approval.md`        | `architecture/security.md`                                                                  |
+| FND-07  | `foundation/07-information-flow.md`                    | Plans 27, 27C and 89                                                                        |
+| FND-08  | `foundation/08-vault.md`                               | Plans 12 and 79                                                                             |
+| FND-09  | `foundation/09-agent-tools-and-screen-context.md`      | Plans 81 and 87                                                                             |
+| FND-10  | `foundation/10-shared-drafts.md`                       | Plans 40 and 40C                                                                            |
+| FND-11  | `foundation/11-contracts.md`                           | Plan 78                                                                                     |
+| COM-01  | `areas/commerce/01-commerce-domain.md`                 | `commerce-domain-architecture.md`, `commerce-monorepo.md`, Plan 22                          |
+| COM-02  | `areas/commerce/02-commerce-engine.md`                 | Plans 76, 76A, 77 and 80                                                                    |
+| COM-03  | `areas/commerce/03-providers-and-the-read-layer.md`    | Plans 9 and 47, `integrations/shopify.md`                                                   |
+| COM-04  | `areas/commerce/04-checkout-and-payments.md`           | Plans 33, 33C and 33D                                                                       |
+| COM-05  | `areas/commerce/05-merchant-operations.md`             | Plans 16, 23, 31B and 39                                                                    |
+| CAFE-01 | `areas/cafe/01-menus-boards-and-the-order-queue.md`    | Plan 40B                                                                                    |
+| KIT-01  | `areas/kitchen/01-orchestration-views.md`              | Plans 42, 42E and 42F                                                                       |
+| KIT-02  | `areas/kitchen/02-physics-and-equipment-models.md`     | Plans 42B and 60A, the calibration worksheet                                                |
+| KIT-03  | `areas/kitchen/03-recipe-workflows.md`                 | Plans 61A, 61E and 84, `workflow-canvas-design-profile.md`                                  |
+| KIT-04  | `areas/kitchen/04-costs-and-margins.md`                | Plan 86                                                                                     |
+| INB-01  | `areas/inbox/01-one-inbox.md`                          | Plan 83                                                                                     |
+| BRN-01  | `areas/brain/01-brain.md`                              | Plans 42J and 42K                                                                           |
+| INT-01  | `areas/integrations/01-integrations-and-connectors.md` | `architecture/integrations.md`, `integrations/google-oauth.md`                              |
+| DEV-01  | `areas/devices/01-devices.md`                          | Plan 85                                                                                     |
+| ORG-01  | `areas/organisation/01-onboarding-and-lifecycle.md`    | `architecture/onboarding.md`, `organisation-setup-flow.md`                                  |
+| ORG-02  | `areas/organisation/02-jev-from-seams.md`              | Plan 88                                                                                     |
+| PRT-01  | `surfaces/portal/01-portal.md`                         | Plan 21, `portal-ui-inventory.md`, `style-guide.md`                                         |
+| VOX-01  | `surfaces/voice/01-voice-control.md`                   | Plans 82 and 82C, the voice handover                                                        |
+| ENG-01  | `engineering/01-decision-log.md`                       | Plan 3                                                                                      |
+| ENG-02  | `engineering/02-code-and-repository.md`                | `code-style.md`, Refactor 10, Plan 92                                                       |
+| ENG-03  | `engineering/03-names.md`                              | Plan 91, the names table of `AGENTS.md`                                                     |
+| ENG-04  | `engineering/04-testing.md`                            | `test-coverage-e2e.md`                                                                      |
 
 A spec keeps an `Open work` section for the built plans that are not complete: Plans
 61A, 82, 82C and 92.
 
 Plans that stay plans, in `docs/plans/`, with their numbers:
 
-| Plan | State |
-| --- | --- |
-| Plan 24, cobot bakes | No code |
-| Plan 82B, ambient voice | Draft |
-| Plan 90, café Register | In progress on `origin/dev` (phases 2, 3A and 4A have commits) |
-| Plan 93, clean cutover | Draft, step 1 done |
-| Plan 94, `purin-labs` organisation | In progress |
-| Refactor 16, Kitchen physics | Proposed |
-| Refactor 17, three layers | This document |
-| Blocked and deferred tasks | Was `blocked-deferred-tasks.md` |
+| Plan                               | State                                                          |
+| ---------------------------------- | -------------------------------------------------------------- |
+| Plan 24, cobot bakes               | No code                                                        |
+| Plan 82B, ambient voice            | Draft                                                          |
+| Plan 90, café Register             | In progress on `origin/dev` (phases 2, 3A and 4A have commits) |
+| Plan 93, clean cutover             | Draft, step 1 done                                             |
+| Plan 94, `purin-labs` organisation | In progress                                                    |
+| Refactor 16, Kitchen physics       | Proposed                                                       |
+| Refactor 17, three layers          | This document                                                  |
+| Blocked and deferred tasks         | Was `blocked-deferred-tasks.md`                                |
 
 Other documents:
 
-| Document | New place |
-| --- | --- |
-| `docs/deployment/*.md` (3 files) | `docs/runbooks/` |
-| `docs/recipes/*.md` and the root `recipes/` | With the Kitchen area in Stage B |
-| `docs/reference/hone-engines/` | `docs/specs/areas/brain/reference/` |
-| `docs/experiement-1.md` | `docs/history/`. Its one link is broken, and no document names it |
-| `docs/brand/`, `docs/handoffs/` | Stay |
+| Document                                    | New place                                                         |
+| ------------------------------------------- | ----------------------------------------------------------------- |
+| `docs/deployment/*.md` (3 files)            | `docs/runbooks/`                                                  |
+| `docs/recipes/*.md` and the root `recipes/` | With the Kitchen area in Stage B                                  |
+| `docs/reference/hone-engines/`              | `docs/specs/areas/brain/reference/`                               |
+| `docs/experiement-1.md`                     | `docs/history/`. Its one link is broken, and no document names it |
+| `docs/brand/`, `docs/handoffs/`             | Stay                                                              |
 
 The 26 archive plans that code names in the form "Plan N" (counted on `main`): 13, 19,
 25, 25B, 27B, 31, 32, 35, 40D, 41, 48, 50, 50A, 55F, 56, 57, 61B, 61C, 61D, 70, 70B,
@@ -904,7 +982,12 @@ The executor then does the same for every effect tool:
 
 ```ts
 const effect = await tool.prepare(context, request);
-const flowLabel = await currentTurnFlowLabel(storage, execution, lease, tool.name);
+const flowLabel = await currentTurnFlowLabel(
+  storage,
+  execution,
+  lease,
+  tool.name,
+);
 const passed = await toolEffectPassesExit(env, execution, lease, {
   flowLabel,
   sink: effect.sink,
@@ -934,7 +1017,9 @@ After, the module declares its interface, and the class implements it:
 ```ts
 // actors/production-plan.ts (the module)
 export interface ProductionPlanRoomRpc {
-  editProductionPlan(input: ProductionPlanEdit): Promise<ProductionPlanEditResult>;
+  editProductionPlan(
+    input: ProductionPlanEdit,
+  ): Promise<ProductionPlanEditResult>;
 }
 
 // the caller
