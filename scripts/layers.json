@@ -55,7 +55,8 @@
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools. It imports each family, so it is a part of the Worker: it moves to workers/platform when the Worker gives the registry to the Session (step A1.7).",
     "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and helpers of four areas. Split in step A1.4.",
     "services/platform/src/actors/organisation.ts": "The class OrganisationDO with logic of tenancy, authority, commerce and collaboration. The class becomes a shell of the Worker in steps A1.1 and A1.5.",
-    "services/platform/src/actors/organisation/support.ts": "Helpers of the Organisation actor for the code of commerce, policy and Code Mode. They go with their module when the class becomes a shell (step A1.9)."
+    "services/platform/src/actors/organisation/support.ts": "Helpers of the Organisation actor for the code of commerce, policy and Code Mode. They go with their module when the class becomes a shell (step A1.9).",
+    "services/platform/src/actors/connector.ts": "The class ConnectorDO. It joins the Slack, email, WhatsApp and Eval parts of the Connector actor. The class becomes a shell of the Worker in step A1.9."
   },
   "placement": {
     "*": "root",
@@ -578,7 +579,7 @@
     "services/platform/src/actors/connector-whatsapp-proposal.ts": "surfaces/whatsapp",
     "services/platform/src/actors/connector-whatsapp-rpc.ts": "surfaces/whatsapp",
     "services/platform/src/actors/connector-whatsapp.ts": "surfaces/whatsapp",
-    "services/platform/src/actors/connector.ts": "foundation/conversation",
+    "services/platform/src/actors/connector.ts": "workers/platform",
     "services/platform/src/actors/connector/alarm.ts": "foundation/conversation",
     "services/platform/src/actors/connector/case-work-drain.ts": "foundation/conversation",
     "services/platform/src/actors/connector/connector-actor-base.ts": "foundation/conversation",
@@ -856,7 +857,7 @@
     "services/platform/src/control/routes/chat-side-cases.ts": "foundation/conversation",
     "services/platform/src/control/routes/chat-signals.ts": "foundation/conversation",
     "services/platform/src/control/routes/chat-slack-messages.ts": "surfaces/slack",
-    "services/platform/src/control/routes/chat.ts": "foundation/conversation",
+    "services/platform/src/control/routes/chat.ts": "surfaces/portal",
     "services/platform/src/control/routes/checkout-profiles.ts": "areas/commerce",
     "services/platform/src/control/routes/claude.ts": "foundation/agent",
     "services/platform/src/control/routes/commerce-api-keys.ts": "areas/commerce",
