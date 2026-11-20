@@ -1,6 +1,6 @@
 import { Type, type Static } from "typebox";
 import type { StrictUnion } from "@purin-labs/type-utils";
-import { StrictObject } from "@purin-labs/commerce-contracts/schema";
+import { StrictObject } from "@purin-labs/contract-schema";
 
 // Request eligibility of an Organisation (Plan 95). A request asks if a
 // person or an automation of the Organisation may take one action now.
