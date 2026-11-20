@@ -76,7 +76,7 @@ export function kitchenToolServices(
   executeCostsViewCommand: ReturnType<typeof pageViewCommandExecutor>,
   costsCommerce: CostsCommerce,
 ): KitchenToolServices {
-  const tool = withToolContext(turn);
+  const tool = withToolContext({ ...turn, commerce: costsCommerce });
   return {
     readProductionPlan: tool(readProductionPlanForEmbeddedHarness),
     editProductionPlan: tool(editProductionPlanForEmbeddedHarness),

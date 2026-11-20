@@ -54,14 +54,9 @@ import type {
   SupplyCostSaveTool,
 } from "./costs";
 import {
-  admitCommerceReadObservation,
   collaborationEditDeadline,
   collaborationMember,
   liveDeviceMember,
-  prepareStaffPageWork,
-  refreshRecipeProjection,
-  selectMerchantReportSourceGrant,
-  type PreparedCommerceRead,
   type ToolEffect,
 } from "../session-support";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
@@ -86,6 +81,10 @@ import {
   requireSessionExecution,
   type SessionExecutionAdmission,
 } from "../../actors/session-execution-admission";
+import type {
+  CommerceToolReads,
+  PreparedCommerceRead,
+} from "../../commerce/contract/tool-reads";
 
 const SUPPLY_COST_TERMS_SCOPE = "supply-cost-terms:shop";
 const LOT_INVOICE_COST_SCOPE = "bakery-lot-invoice-cost:shop";
@@ -103,12 +102,13 @@ type SessionCostsStaffWork = Readonly<{
  * What the costs tools need from commerce for one turn. Commerce gives it,
  * and the Worker passes it, so Kitchen imports no file of commerce here.
  */
-export type CostsCommerce = Readonly<{
+export type CostsCommerce = CommerceToolReads &
+  Readonly<{
   /** Prepares one commerce read of this turn for the grant that is selected. */
   prepareRead(
     selectGrant: (
-      input: Parameters<typeof selectMerchantReportSourceGrant>[3],
-    ) => ReturnType<typeof selectMerchantReportSourceGrant>,
+      input: Parameters<CommerceToolReads["selectMerchantReportSourceGrant"]>[3],
+    ) => ReturnType<CommerceToolReads["selectMerchantReportSourceGrant"]>,
     label: string,
   ): Promise<PreparedCommerceRead>;
   /**
@@ -337,7 +337,7 @@ export function embeddedHarnessCostsTools(
         try {
           preparedReads.push(
             await commerce.prepareRead(
-              selectMerchantReportSourceGrant.bind(
+              commerce.selectMerchantReportSourceGrant.bind(
                 null,
                 lease,
                 read,
@@ -370,7 +370,7 @@ export function embeddedHarnessCostsTools(
         personId: String(member.personId),
         admitObservations: async (value, merchantRevision) => {
           for (const prepared of preparedReads) {
-            await admitCommerceReadObservation(
+            await commerce.admitCommerceReadObservation(
               storage,
               lease,
               prepared,
@@ -383,7 +383,7 @@ export function embeddedHarnessCostsTools(
       };
     },
     runStaffEffect: async (effect) => {
-      const work = await prepareStaffPageWork(
+      const work = await commerce.prepareStaffPageWork(
         env,
         execution,
         lease,
@@ -420,7 +420,7 @@ export function embeddedHarnessCostsTools(
               key,
             ),
           settled: effect.refreshProjection
-            ? refreshRecipeProjection.bind(null, env, execution, work)
+            ? commerce.refreshRecipeProjection.bind(null, env, execution, work)
             : () => Promise.resolve(),
         },
         content: {

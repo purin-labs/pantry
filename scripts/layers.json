@@ -64,7 +64,7 @@
   ],
   "mixed": {
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools. It imports each family, so it is a part of the Worker. The class SessionDO gives it to the Session (step A1.7).",
-    "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and helpers of four areas. Split in step A1.4.",
+    "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and small helpers that the tools of the Inbox, Kitchen and devices share. The commerce helpers are in agent-tools/commerce/read-support.ts, behind the service interface CommerceToolReads of the commerce contract.",
     "services/platform/src/actors/organisation.ts": "The class OrganisationDO with logic of tenancy, authority, commerce and collaboration. The class becomes a shell of the Worker in steps A1.1 and A1.5.",
     "services/platform/src/actors/organisation/support.ts": "Helpers of the class OrganisationDO: the command runner, the socket sweep, the alarm time and the commerce board presence. The helpers of the policy, the Organisation record and Code Mode left in step A1.9.",
     "services/platform/src/actors/connector.ts": "The class ConnectorDO. It joins the Slack, email, WhatsApp and Eval parts of the Connector actor. The class becomes a shell of the Worker in step A1.9.",

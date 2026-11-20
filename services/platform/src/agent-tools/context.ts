@@ -19,9 +19,11 @@ export interface SessionToolContext {
  * Returns a function that gives one handler this turn's context, so that the
  * tool authority names each handler once instead of repeating its arguments.
  */
-export function withToolContext(context: SessionToolContext) {
+export function withToolContext<Context extends SessionToolContext>(
+  context: Context,
+) {
   return <Args extends readonly unknown[], Result>(
-      handler: (context: SessionToolContext, ...args: Args) => Result,
+      handler: (context: Context, ...args: Args) => Result,
     ) =>
     (...args: Args): Result =>
       handler(context, ...args);

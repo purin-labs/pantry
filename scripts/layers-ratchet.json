@@ -1,7 +1,7 @@
 {
   "totals": {
-    "upward": 147,
-    "areas": 153,
+    "upward": 137,
+    "areas": 151,
     "order": 79,
     "table": 117
   },
@@ -46,7 +46,7 @@
     "areas/integrations -> surfaces/slack": 4,
     "areas/integrations -> surfaces/webhooks": 1,
     "areas/integrations -> surfaces/whatsapp": 6,
-    "areas/kitchen -> areas/commerce": 3,
+    "areas/kitchen -> areas/commerce": 1,
     "areas/kitchen -> areas/inbox": 1,
     "areas/kitchen -> areas/organisation": 1,
     "areas/kitchen -> surfaces/slack": 1,
@@ -105,8 +105,6 @@
     "foundation/tenancy -> foundation/control": 2,
     "foundation/tenancy -> foundation/conversation": 4,
     "foundation/tenancy -> surfaces/slack": 1,
-    "foundation/tool-handlers -> areas/cafe": 1,
-    "foundation/tool-handlers -> areas/commerce": 9,
     "foundation/tool-handlers -> surfaces/slack": 3,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,

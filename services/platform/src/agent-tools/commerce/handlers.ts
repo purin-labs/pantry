@@ -80,14 +80,16 @@ import {
 } from "../../context/assembly";
 import { assertNever } from "@purin-labs/std";
 import {
+  type ToolEffect,
+} from "../session-support";
+import type { SessionToolContext } from "../context";
+import {
   type PreparedCommerceRead,
   admitCommerceReadObservation,
   prepareStaffPageWork,
   requestableReportRead,
   selectMerchantReportSourceGrant,
-  type ToolEffect,
-} from "../session-support";
-import type { SessionToolContext } from "../context";
+} from "./read-support";
 
 export async function prepareCommerceReadForEmbeddedHarness(
   env: Env,

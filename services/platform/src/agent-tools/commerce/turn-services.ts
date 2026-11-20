@@ -45,6 +45,18 @@ import type {
   HarnessCampaignBriefRequest,
   HarnessConfigurationProposalRequest,
 } from "./services";
+import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
+import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
+import {
+  admitCommerceReadObservation,
+  prepareSharedCommerceObservation,
+  prepareStaffPageWork,
+  refreshRecipeProjection,
+  requestableReportRead,
+  selectInternalQuerySourceGrant,
+  selectMerchantReportSourceGrant,
+  supplierDirectoryQuery,
+} from "./read-support";
 
 /**
  * What commerce gives to one turn: the services of the commerce tools, the
@@ -107,6 +119,7 @@ function costsCommerce(turn: ToolTurnContext) {
       actor,
     }) as const;
   return {
+    ...COMMERCE_TOOL_READS,
     prepareRead: prepareCommerceReadForEmbeddedHarness.bind(
       null,
       env,
@@ -251,3 +264,17 @@ export async function bindAllowanceReference(
     currency: view.currency,
   };
 }
+
+/** The commerce reads of a tool handler, for the area that the Worker gives them to. */
+const COMMERCE_TOOL_READS: CommerceToolReads = {
+  prepareCommerceRead: prepareCommerceReadForEmbeddedHarness,
+  prepareSharedCommerceObservation,
+  admitCommerceReadObservation,
+  requestableReportRead,
+  prepareStaffPageWork,
+  refreshRecipeProjection,
+  selectInternalQuerySourceGrant,
+  selectMerchantReportSourceGrant,
+  supplierDirectoryQuery,
+  parseCommerceGraphQuery,
+};

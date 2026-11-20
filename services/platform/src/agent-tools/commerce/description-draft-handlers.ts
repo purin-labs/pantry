@@ -19,17 +19,19 @@ import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../context/assembly/commerce";
-import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
 import {
   type DraftThreadLink,
-  admitCommerceReadObservation,
   collaborationEditDeadline,
   collaborationMember,
-  prepareSharedCommerceObservation,
   type ToolEffect,
 } from "../session-support";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
 import type { SessionToolContext } from "../context";
+import {
+  admitCommerceReadObservation,
+  prepareSharedCommerceObservation,
+  selectInternalQuerySourceGrant,
+} from "./read-support";
 
 /**
  * A draft tool reads its product under a product read grant. When no grant
@@ -55,25 +57,16 @@ function selectDescriptionDraftSourceGrant(
     now: string;
   }>,
 ) {
-  const query = parseCommerceGraphQuery({
-    kind: "entity_by_ref",
-    reference: { origin: "system", typeId: "product", entityId: productId },
-    traversal: { maxDepth: 0, resultLimit: 1 },
-    filter: null,
-  });
-  if (!query.ok) {
-    return query;
-  }
-  return selectNamedCommerceQuerySourceGrant({
-    organisationId: input.organisationId,
-    merchantId: input.merchantId,
-    grants: input.grants,
-    now: input.now,
-    requestAuthority: lease.requestAuthority,
-    causationId: String(lease.turn.turnId),
-    query: query.value,
-    allowedSensitivity: "internal",
-  });
+  return selectInternalQuerySourceGrant(
+    lease,
+    parseCommerceGraphQuery({
+      kind: "entity_by_ref",
+      reference: { origin: "system", typeId: "product", entityId: productId },
+      traversal: { maxDepth: 0, resultLimit: 1 },
+      filter: null,
+    }),
+    input,
+  );
 }
 
 export async function readProductDescriptionDraftForEmbeddedHarness(

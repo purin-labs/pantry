@@ -52,16 +52,11 @@ import {
 } from "../../context/assembly/commerce";
 import { assertNever } from "@purin-labs/std";
 import {
-  admitCommerceReadObservation,
   liveDeviceMember,
-  prepareStaffPageWork,
-  refreshRecipeProjection,
-  requestableReportRead,
-  supplierDirectoryQuery,
   untrustedDeviceText,
   type ToolEffect,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { KitchenToolContext } from "./services";
 
 function stepFacts(document: BakeryWorkflowDocument) {
   const steps = [];
@@ -90,7 +85,7 @@ function stepFacts(document: BakeryWorkflowDocument) {
 
 /** Plan 84: the recipe as the Workflow page shows it, after the same boundary as a page read. */
 export async function readRecipeWorkflowForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
   request: RecipeWorkflowReadRequest,
 ): Promise<unknown> {
   const { env, storage, execution, lease, assignment } = context;
@@ -216,10 +211,10 @@ const SUPPLIER_DIRECTORY_SCOPE = "supplier-directory:shop";
 const SUPPLIER_READ_LIMIT = 100;
 
 export async function readRecipesForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
 ): Promise<RecipeToolRead> {
   const { env, storage, execution, lease, assignment } = context;
-  const work = await prepareStaffPageWork(
+  const work = await context.commerce.prepareStaffPageWork(
     env,
     execution,
     lease,
@@ -247,7 +242,7 @@ export async function readRecipesForEmbeddedHarness(
     })),
     items: collection.items,
   };
-  await admitCommerceReadObservation(
+  await context.commerce.admitCommerceReadObservation(
     storage,
     lease,
     work.prepared,
@@ -259,12 +254,12 @@ export async function readRecipesForEmbeddedHarness(
 }
 
 export async function saveRecipeForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
   request: RecipeSaveRequest,
   operationId: string,
 ): Promise<ToolEffect<StaffPageToolReceipt>> {
   const { env, execution, lease, assignment } = context;
-  const work = await prepareStaffPageWork(
+  const work = await context.commerce.prepareStaffPageWork(
     env,
     execution,
     lease,
@@ -301,7 +296,12 @@ export async function saveRecipeForEmbeddedHarness(
             key,
           ),
         ),
-      settled: refreshRecipeProjection.bind(null, env, execution, work),
+      settled: context.commerce.refreshRecipeProjection.bind(
+        null,
+        env,
+        execution,
+        work,
+      ),
     },
     content: {
       member: work.member,
@@ -316,10 +316,10 @@ export async function saveRecipeForEmbeddedHarness(
 }
 
 export async function readSuppliersForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
 ): Promise<SupplierToolRead> {
   const { env, storage, execution, lease, assignment } = context;
-  const work = await prepareStaffPageWork(
+  const work = await context.commerce.prepareStaffPageWork(
     env,
     execution,
     lease,
@@ -327,7 +327,7 @@ export async function readSuppliersForEmbeddedHarness(
     "supplier_directory",
     "supplier",
   );
-  const query = supplierDirectoryQuery(SUPPLIER_READ_LIMIT);
+  const query = context.commerce.supplierDirectoryQuery(SUPPLIER_READ_LIMIT);
   if (!query.ok) {
     throw new Error("supplier query invalid");
   }
@@ -343,7 +343,7 @@ export async function readSuppliersForEmbeddedHarness(
     now: work.prepared.now,
   });
   if (!read.ok) {
-    requestableReportRead(
+    context.commerce.requestableReportRead(
       "supplier_directory",
       new CommerceReadRequestError(read.error),
     );
@@ -373,7 +373,7 @@ export async function readSuppliersForEmbeddedHarness(
     }),
     more: read.value.nextCursor !== null,
   };
-  await admitCommerceReadObservation(
+  await context.commerce.admitCommerceReadObservation(
     storage,
     lease,
     work.prepared,
@@ -419,7 +419,7 @@ function supplierEntryDecimal(attributes: SupplierAttributes): string | null {
 }
 
 export async function createSupplierForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
   request: SupplierCreateRequest,
   operationId: string,
 ): Promise<ToolEffect<StaffPageToolReceipt>> {
@@ -439,7 +439,7 @@ export async function createSupplierForEmbeddedHarness(
       `${parsed.error.detail ?? "The supplier fields are invalid"}. Nothing changed. Correct the fields, or ask the person.`,
     );
   }
-  const work = await prepareStaffPageWork(
+  const work = await context.commerce.prepareStaffPageWork(
     env,
     execution,
     lease,
