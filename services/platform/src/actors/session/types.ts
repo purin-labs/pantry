@@ -44,8 +44,10 @@ import type { CanonicalTextTurnTransitionError } from "../agent-session-text-tur
 import type { SessionBudgetError } from "../agent-session-budget";
 import type { SessionTurnStreamError } from "../agent-session-turn-stream";
 import type { CanonicalTextTurnStartError } from "../agent-session-turn-start";
-import type { CaseConversationSinkRefusal } from "../case-conversation-sink";
-import type { SerializedFlowBinding } from "../../policy";
+import type {
+  CaseConversationSinkRefusal,
+  SerializedFlowBinding,
+} from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

@@ -13,6 +13,8 @@ import { isNonNegativeInteger } from "@purin-labs/std";
 import type { ConversationScope } from "./store";
 import { parseConversationActorIdentity } from "./conversation-actor-identity";
 import { parseCaseId, type CaseId } from "../ids";
+import { authorizeProject } from "../projects/access";
+import type { NativeChatSourceAccess } from "../policy/information-flow/source-labels";
 
 export type AuthorizedConversation = Readonly<{
   creatorUserId: UserId;
@@ -186,3 +188,9 @@ export async function conversationCaseIdentity(
     scope.organisationId,
   );
 }
+
+/** The access checks that the label of a native chat source asks for. */
+export const NATIVE_CHAT_SOURCE_ACCESS: NativeChatSourceAccess = {
+  authorizeProject,
+  authorizeConversation,
+};

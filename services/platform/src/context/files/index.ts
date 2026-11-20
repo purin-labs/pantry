@@ -65,7 +65,6 @@ export {
 export {
   readGrantedFile,
   searchGrantedFiles,
-  type CanonicalFileReference,
   type FileReadToolResult,
   type FileSearchToolResult,
   type FileToolObservation,

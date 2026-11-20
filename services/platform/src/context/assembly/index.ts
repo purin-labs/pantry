@@ -160,6 +160,18 @@ export interface TurnMemoryReader {
   read(request: TurnMemoryReadRequest): Promise<TurnMemoryRead>;
 }
 
+/**
+ * The reader for a turn with no verified subject that a Memory scope could
+ * match. Nothing applies to such a turn, so it reads nothing.
+ */
+export function turnMemoryReaderWithoutSubjects(): TurnMemoryReader {
+  return { read: readNoTurnMemory };
+}
+
+export async function readNoTurnMemory(): Promise<TurnMemoryRead> {
+  return { kind: "read", candidates: [], more: false };
+}
+
 export type CaseContextTailCandidate = {
   readonly organisationId: OrganisationId;
   readonly source: Variant<CanonicalContextSourceRef, "case_entry">;

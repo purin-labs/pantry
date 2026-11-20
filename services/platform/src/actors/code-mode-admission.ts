@@ -1,5 +1,5 @@
 import { SessionExecutionAdmission } from "./session-execution-admission";
-import { authorizeChatHarnessLease } from "../chat/turn-access";
+import { authorizeSessionTurnLease } from "./session-turn-access";
 import type {
   AgentSessionLifecycle,
   CodeModeExecutionReceipt,
@@ -748,7 +748,7 @@ async function requireChatHarnessAccess(
   );
   if (execution === null) throw new Error("chat_access_revoked");
   if (
-    !(await authorizeChatHarnessLease(
+    !(await authorizeSessionTurnLease(
       authority.env.DB,
       execution.scope.database,
       authority.organisationId,

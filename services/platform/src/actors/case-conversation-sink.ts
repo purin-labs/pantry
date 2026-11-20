@@ -2,7 +2,11 @@ import type { AuthorityPartition, RequestAuthority } from "@purin-labs/contracts
 import type { Variant } from "@purin-labs/type-utils";
 
 import type { Env } from "../env";
-import { decideFlowSink, type FlowBinding } from "../policy";
+import {
+  decideFlowSink,
+  type CaseConversationSinkRefusal,
+  type FlowBinding,
+} from "../policy";
 import type { FlowDecision } from "../policy";
 import type { Result } from "../result";
 import { slackConversationReachesOutside } from "../slack/conversation-facts";
@@ -19,26 +23,6 @@ type CurrentConversationAuthority = {
   readonly requestAuthority: RequestAuthority;
   readonly authorityPartition: Pick<AuthorityPartition, "digest">;
 };
-
-export type CaseConversationSinkRefusal = {
-  readonly code:
-    | "case_flow_authority_partition_changed"
-    | "case_flow_destination_invalid"
-    | "case_flow_destination_mismatch"
-    | `case_flow_sink_${Exclude<FlowDecision["kind"], "allow">}`;
-};
-
-/**
- * The refusals that a person can answer (Plan 27C). The level rule stopped
- * the output, so it waits for approval. Other refusals, such as a changed
- * authority, stay final.
- */
-export function sinkRefusalAsksPerson(code: string): boolean {
-  return (
-    code === "case_flow_sink_deny" ||
-    code === "case_flow_sink_approval_required"
-  );
-}
 
 /**
  * Decide whether a flow may reach the conversation of a channel.

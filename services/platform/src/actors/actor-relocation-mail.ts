@@ -16,7 +16,13 @@ import type { Result } from "../result";
 import { readPlacementByEpoch } from "../data/organisation-placement";
 import { selectOrganisationPlacementDatabase } from "../organisation-execution-scope";
 import { dispatchRfcMessageId } from "../mail/reply-target";
-import type { ActorRelocationId } from "./actor-relocation";
+import {
+  resolveFrozenReceiptActors,
+  type ActorRelocationError,
+  type ActorRelocationId,
+  type RelocationBindings,
+} from "./actor-relocation";
+import { actorStub } from "./actor-stubs";
 import type { ActorFenceToken } from "./actor-registry";
 import { readActivationExportSource } from "./actor-export";
 import {
@@ -243,5 +249,37 @@ function settleMailReceipt(
 }
 
 function rejectedReceipt(): Result<never, RelocationReceiptError> {
+  return { ok: false, error: { code: "relocation_receipt_rejected" } };
+}
+
+export async function reconcileActorRelocationMailReceipt(input: {
+  readonly env: RelocationBindings;
+  readonly relocationId: ActorRelocationId;
+  readonly receipt: RelocationMailReceipt;
+  readonly now: number;
+}): Promise<Result<null, ActorRelocationError>> {
+  const source = await resolveFrozenReceiptActors(
+    input.env,
+    input.relocationId,
+  );
+  if (!source.ok) return source;
+  for (const entry of source.value.entries) {
+    if (
+      entry.identity.objectKind !== "connector" ||
+      entry.identity.logicalObjectId !== input.receipt.connectorId
+    )
+      continue;
+    const connector = actorStub(
+      input.env.CONNECTOR,
+      entry.physicalObjectName,
+      entry.placement,
+    );
+    return connector.reconcileRelocationMailReceipt({
+      relocationId: source.value.relocationId,
+      expectedFenceToken: entry.fenceToken,
+      receipt: input.receipt,
+      now: input.now,
+    });
+  }
   return { ok: false, error: { code: "relocation_receipt_rejected" } };
 }

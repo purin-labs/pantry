@@ -516,3 +516,27 @@ async function computeDecisionDigest(
 ): Promise<string> {
   return digestCanonical({ effect, flowBindingDigest, sink, reason });
 }
+
+/**
+ * Why a flow may not reach the conversation of a channel. The Connector, the
+ * Session and the commerce delivery ask for this decision.
+ */
+export type CaseConversationSinkRefusal = {
+  readonly code:
+    | "case_flow_authority_partition_changed"
+    | "case_flow_destination_invalid"
+    | "case_flow_destination_mismatch"
+    | `case_flow_sink_${Exclude<FlowDecision["kind"], "allow">}`;
+};
+
+/**
+ * The refusals that a person can answer (Plan 27C). The level rule stopped
+ * the output, so it waits for approval. Other refusals, such as a changed
+ * authority, stay final.
+ */
+export function sinkRefusalAsksPerson(code: string): boolean {
+  return (
+    code === "case_flow_sink_deny" ||
+    code === "case_flow_sink_approval_required"
+  );
+}

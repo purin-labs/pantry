@@ -582,3 +582,10 @@ function parseSeamsPublicKey(raw: string): NearEd25519PublicKey | null {
 function invalidApprovalEvidence(): Result<never, ApprovalEvidenceError> {
   return { ok: false, error: { code: "approval_evidence_invalid" } };
 }
+
+/** Whether a value has the form of the nonce of a commerce action. */
+export function isCommerceActionNonce(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
+    value,
+  );
+}

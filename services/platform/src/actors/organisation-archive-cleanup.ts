@@ -13,11 +13,11 @@ import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
 } from "../placement";
-import { parseOrganisationPlacementFenceToken } from "../data/organisation-placement";
 import {
   isOrganisationPolicyPlacementActive,
+  parseOrganisationPlacementFenceToken,
   type OrganisationPolicyPlacement,
-} from "../policy-snapshot";
+} from "../data/organisation-placement";
 import type { ActorFenceToken } from "./actor-registry";
 import type { ActorExportError } from "./actor-export";
 import type { Result } from "../result";

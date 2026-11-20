@@ -1,6 +1,5 @@
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { SIDE_CASE_HARNESS_INSTRUCTION } from "../../chat/side-cases";
-import type { SideCaseOrigin } from "../../chat/side-case-origin";
+import type { SessionSideCase } from "./conversation-port";
 import { turnMayProposeSideCase } from "./turn-tool-offers";
 import type {
   AcceptedHarnessEventCursor,
@@ -60,7 +59,6 @@ import type {
   CanonicalHarnessCheckpointRestoreError,
   CheckpointPublicationError,
 } from "./types";
-import type { Env } from "../../env";
 import type { SessionToolContext } from "../../agent-tools/context";
 import type {
   HarnessSideCaseProposalRequest,
@@ -446,8 +444,6 @@ export function ignoreUnusedSideCaseOrigin(): void {}
  * The side Case that a Slack thread started (Plan 74). Slack gives its rules.
  */
 export interface SlackThreadSideCase {
-  /** The words that a turn of such a side Case adds to its instructions. */
-  readonly harnessInstruction: string;
   /**
    * Stores the agent's proposal of a side Case and posts it in the thread
    * with its Start button.
@@ -460,14 +456,6 @@ export interface SlackThreadSideCase {
     >,
     request: HarnessSideCaseProposalRequest,
   ): Promise<HarnessSideCaseProposalResult>;
-  /** Admits the proposal of the side Case before inference. */
-  admit(
-    storage: DurableObjectStorage,
-    lease: HarnessTurnLease,
-    proposal: Variant<SideCaseOrigin, "slack_thread">["proposal"],
-    authorizeCommit: () => void | Promise<void>,
-    env: Env,
-  ): Promise<void>;
 }
 
 /**
@@ -478,19 +466,11 @@ export interface SlackThreadSideCase {
  */
 export function sideCaseHarnessInstructions(
   instructions: string,
-  origin: SideCaseOrigin | null,
-  slackThread: SlackThreadSideCase,
+  sideCase: SessionSideCase | null,
 ): string {
-  switch (origin?.kind) {
-    case undefined:
-      return instructions;
-    case "portal_chat":
-      return `${instructions}\n\n${SIDE_CASE_HARNESS_INSTRUCTION}`;
-    case "slack_thread":
-      return `${instructions}\n\n${slackThread.harnessInstruction}`;
-    default:
-      return assertNever(origin);
-  }
+  return sideCase === null
+    ? instructions
+    : `${instructions}\n\n${sideCase.instruction}`;
 }
 
 /**

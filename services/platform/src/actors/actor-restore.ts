@@ -53,6 +53,7 @@ import {
   type ReservedOrganisationPlacementMove,
   type OrganisationPlacementError,
   type OrganisationPlacementMoveTarget,
+  type ActorRestoreId,
 } from "../data/organisation-placement";
 import type { Env } from "../env";
 import { parseOrganisationId, type OrganisationId } from "../ids";
@@ -80,11 +81,7 @@ import {
   isPositiveInteger,
 } from "@purin-labs/std";
 
-declare const actorRestoreIdBrand: unique symbol;
-
-export type ActorRestoreId = string & {
-  readonly [actorRestoreIdBrand]: "ActorRestoreId";
-};
+export type { ActorRestoreId };
 
 type RestoreBase = {
   readonly restoreId: ActorRestoreId;

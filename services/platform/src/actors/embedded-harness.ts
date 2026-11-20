@@ -28,8 +28,10 @@ import type {
 } from "./agent-session-harness-authority";
 import type { HarnessHistoryAcceptance } from "./harness-history";
 import type { HarnessHistoryRead } from "./harness-history";
-import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
-import type { HarnessCodeModeAdmission, HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
+import type {
+  HarnessCodeModeSandbox,
+  HarnessNativeCodeMode,
+} from "../agent-tools/catalog/types";
 /** `picocodex` and `codex` name retired backends; their checkpoints restart fresh. */
 export type ActiveEmbeddedHarnessBackendId = Exclude<
   EmbeddedHarnessBackendId,
@@ -166,46 +168,7 @@ export type HarnessToolArgumentObserver = {
 };
 
 /** Reaches the sandbox Worker that runs the VM of one execution. */
-export type HarnessCodeModeSandbox = (executionId: string) => CodemodeRemote;
-
-export type HarnessNativeCodeMode =
-  | {
-      readonly kind: "enabled";
-      /**
-       * `null` when this deployment has no sandbox Worker. Admission then
-       * fails before any reservation, and no other executor takes its place.
-       */
-      readonly sandbox: HarnessCodeModeSandbox | null;
-      readonly admission: HarnessCodeModeAdmission;
-      executeTool(
-        executionLease: HarnessCodeModeExecutionLease,
-        name: string,
-        inputJson: string,
-        callId: string,
-      ): Promise<AuthorizedHarnessToolResult>;
-      /**
-       * The capabilities that the nested call `callId` claimed. They are the
-       * sources of its result, and they are stored with that result.
-       */
-      claimedCapabilities(callId: string): readonly string[];
-      /**
-       * Whether a result with these sources may reach generated code now. It
-       * reads current authority, and it spends no allowance. A replay asks
-       * this for every recorded result, because a recorded result is not
-       * current authorization.
-       */
-      authorizeSources(
-        capabilities: readonly string[],
-      ): Promise<Result<null, { readonly detail: string }>>;
-    }
-  | {
-      readonly kind: "disabled";
-      readonly sandbox?: never;
-      readonly admission?: never;
-      readonly executeTool?: never;
-      readonly claimedCapabilities?: never;
-      readonly authorizeSources?: never;
-    };
+export type { HarnessCodeModeSandbox, HarnessNativeCodeMode };
 
 /**
  * A route that calls the provider directly sends each model request with

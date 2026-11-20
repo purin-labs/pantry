@@ -5,6 +5,11 @@ import type {
   RequestAuthority,
 } from "@purin-labs/contracts";
 
+import type {
+  CanonicalFileReference,
+  FileReadToolResult,
+  FileSearchToolResult,
+} from "../../agent-tools/catalog/types";
 import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
 import type {
   AccessGrantTarget,
@@ -46,44 +51,11 @@ const FILE_SEARCH_QUERY_MAX_CHARS = 256;
 const FILE_SEARCH_MAX_RESULTS = 20;
 const FILE_READ_MAX_SEGMENTS = 8;
 
-export type CanonicalFileReference = Readonly<{
-  readonly integrationAccountId: IntegrationAccountId;
-  readonly provider: FileContextProvider;
-  readonly providerFileId: string;
-}>;
-
-export type FileSearchToolResult = Readonly<{
-  readonly reference: CanonicalFileReference;
-  readonly segmentIndex: number;
-  readonly sourceRevision: number;
-  readonly title: string;
-  readonly displayPath: string;
-  readonly deepLink: string;
-  readonly excerpt: string;
-  readonly metadataOnlyReason: string | null;
-}>;
-
-export type FileReadToolResult =
-  | Readonly<{
-      readonly kind: "content";
-      readonly reference: CanonicalFileReference;
-      readonly title: string;
-      readonly displayPath: string;
-      readonly deepLink: string;
-      readonly startSegment: number;
-      readonly segments: readonly string[];
-      readonly continuation:
-        | Readonly<{ readonly kind: "complete" }>
-        | Readonly<{ readonly kind: "more"; readonly nextSegment: number }>;
-    }>
-  | Readonly<{
-      readonly kind: "metadata_only";
-      readonly reference: CanonicalFileReference;
-      readonly title: string;
-      readonly displayPath: string;
-      readonly deepLink: string;
-      readonly reason: string;
-    }>;
+export type {
+  CanonicalFileReference,
+  FileReadToolResult,
+  FileSearchToolResult,
+};
 
 export type FileToolObservation = Readonly<{
   readonly inputLabel: FlowLabel;

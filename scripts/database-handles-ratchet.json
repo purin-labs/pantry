@@ -15,7 +15,7 @@
   "services/platform/src/data/held-output-context.ts": 1,
   "services/platform/src/data/integration-account-reads.ts": 1,
   "services/platform/src/data/organisation-onboarding-row.ts": 1,
-  "services/platform/src/data/organisation-placement.ts": 1,
+  "services/platform/src/data/organisation-placement.ts": 2,
   "services/platform/src/data/organisation-regional-copy.ts": 14,
   "services/platform/src/data/provider-authorization-state.ts": 1,
   "services/platform/src/data/query-source.ts": 2,
@@ -28,7 +28,6 @@
   "services/platform/src/gateway/admin/actor-registry.ts": 1,
   "services/platform/src/messages/attachment-collection.ts": 1,
   "services/platform/src/organisation-execution-scope.ts": 1,
-  "services/platform/src/policy-snapshot.ts": 1,
   "services/platform/src/slack/ingress-admission.ts": 1,
   "services/platform/src/slack/install-organisation.ts": 1
 }

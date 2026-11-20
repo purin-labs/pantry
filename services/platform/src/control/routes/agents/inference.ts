@@ -15,7 +15,10 @@ import {
   type AnthropicApiKey,
   type OpenAiApiKey,
 } from "../../../credential-vault";
-import { resolveOrganisationModelRouteForSelection } from "../../../models/route";
+import {
+  activationModelRouteError,
+  resolveOrganisationModelRouteForSelection,
+} from "../../../models/route";
 import {
   admitControlMutation,
   controlMutationIdentity,
@@ -28,7 +31,6 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import { activationModelRouteError } from "../../onboarding-runtime";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
 

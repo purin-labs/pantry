@@ -16,6 +16,7 @@ import {
 } from "./case-inbox/email-proposals";
 import { caseInboxPart } from "./case-inbox/part";
 import type { CaseInboxRpc } from "./case-inbox/rpc";
+import { ACTOR_MACHINES } from "./actor-machines";
 import { CaseActor } from "./case/case-actor";
 import type { CaseParts } from "./case/parts";
 
@@ -44,6 +45,10 @@ const CASE_PARTS: CaseParts = {
 export class CaseDO extends CaseActor implements CaseInboxRpc {
   protected areaParts(): CaseParts {
     return CASE_PARTS;
+  }
+
+  protected actorMachines() {
+    return ACTOR_MACHINES;
   }
 
   // The email reply proposals and the mail work (`actors/case-inbox/`).

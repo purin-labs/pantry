@@ -24,10 +24,8 @@ import {
 } from "./kitchen/turn-services";
 import { stageConfigurationDraft } from "./organisation/configuration-draft";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
-import {
-  admitSlackSideCaseInformationFlow,
-  SLACK_SIDE_CASE_HARNESS_INSTRUCTION,
-} from "../slack/side-cases";
+import { slackThreadSideCase } from "../slack/side-cases";
+import { sessionConversation } from "../chat/session-conversation";
 import { proposeSlackSideCaseForHarness } from "./slack/side-case-proposal";
 import { proposeMemoryFromInstruction } from "../memory/access";
 import { slackToolServices } from "./slack/turn-services";
@@ -96,11 +94,8 @@ export const SESSION_TOOL_WIRING: SessionToolWiring = {
   mayRequestPermission: turnMayRequestPermission,
   requestPermission: requestPermissionForHarness,
   pageEffects: KITCHEN_PAGE_EFFECTS,
-  slackThreadSideCase: {
-    harnessInstruction: SLACK_SIDE_CASE_HARNESS_INSTRUCTION,
-    admit: admitSlackSideCaseInformationFlow,
-    propose: proposeSlackSideCaseForHarness,
-  },
+  slackThreadSideCase: { propose: proposeSlackSideCaseForHarness },
+  conversation: sessionConversation(slackThreadSideCase),
   // Plan 40B phase 7: a board edit shows on the board while the model writes
   // it.
   argumentObserver: createMenuBoardDraftPreview,

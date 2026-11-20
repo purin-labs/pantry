@@ -1,3 +1,4 @@
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 import {
   censusOfActorMachines,
   type MachineCensus,
@@ -227,10 +228,17 @@ export abstract class CaseActor
   async machineCensus(): Promise<readonly MachineCensus[]> {
     const alarm = await this.ctx.storage.getAlarm();
     const now = Date.now();
-    const census = censusOfActorMachines(this.ctx.storage.sql, { alarm, now });
+    const census = censusOfActorMachines(
+      this.ctx.storage.sql,
+      { alarm, now },
+      this.actorMachines(),
+    );
     const stale = staleAssignmentCensus(this.ctx.storage.sql, alarm, now);
     return stale === null ? census : [...census, stale];
   }
+
+  /** The machines of the census. The Worker's class gives them. */
+  protected abstract actorMachines(): readonly MachineDefinition[];
 
   /** True after the quarantined Case discarded its state; the Case then reads nothing. */
   protected discarded = false;

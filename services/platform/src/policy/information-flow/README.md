@@ -101,7 +101,7 @@ for each missing approval before it uses a pass (`settleStaffPageEffect`).
 ## A block asks
 
 - A Case output waits. `holdCaseOutput` stores a `held_output_request`. Use
-  `sinkRefusalAsksPerson` to tell these refusals from final ones.
+  `sinkRefusalAsksPerson` (`sinks.ts`) to tell these refusals from final ones.
 - A tool effect cannot wait inside its turn. `toolEffectPassesExit` asks through
   `passOrAskForExitApproval`. Allow gives one pass to that capability, account and
   resource of that Session. A Slack turn continues in a new turn. A Portal chat

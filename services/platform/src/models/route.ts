@@ -474,3 +474,27 @@ function modelRouteDigestMaterial(route: ModelRoute): ModelRoute {
       };
   }
 }
+
+/** The public error code of a model route that an Organisation cannot use. */
+export function activationModelRouteError(
+  code: OrganisationModelRouteError["code"],
+): string {
+  switch (code) {
+    case "claude_connection_unavailable":
+      return "claude_connection_required";
+    case "organisation_codex_subscription_unavailable":
+      return "codex_subscription_required";
+    case "satyr_platform_credential_unavailable":
+      return "satyr_platform_credential_required";
+    case "satyr_platform_model_unsupported":
+      return "satyr_platform_model_unsupported";
+    case "organisation_openai_api_key_unavailable":
+      return "organisation_openai_api_key_required";
+    case "organisation_anthropic_api_key_unavailable":
+      return "organisation_anthropic_api_key_required";
+    case "organisation_inference_selection_unavailable":
+      return "inference_selection_unavailable";
+    default:
+      return assertNever(code);
+  }
+}
