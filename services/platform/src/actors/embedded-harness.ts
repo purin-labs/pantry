@@ -319,10 +319,11 @@ export type EmbeddedHarnessConstructionInput = {
   readonly checkpointBinding: EmbeddedHarnessCheckpointBinding;
   readonly toolHost: HarnessToolHost;
   /**
-   * The replay rule of a tool after a lost process, by tool name. The caller
-   * takes it from the one list of the agent tools.
+   * The rules of a tool, by tool name: its replay rule after a lost process,
+   * and what a script gets of it. The caller takes them from the one list of
+   * the agent tools.
    */
-  readonly toolReplay: (name: string) => "safe" | "unsafe";
+  readonly toolRules: (name: string) => import("./pi-tool-replay").PiToolRules;
   /** Sees tool arguments while they stream (Plan 40B phase 7). */
   readonly toolArguments?: HarnessToolArgumentObserver;
   readonly eventSink: CanonicalHarnessEventSink;

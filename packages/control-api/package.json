@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@purin-labs/contracts": "workspace:*",
-    "@purin-labs/commerce-contracts": "workspace:*",
     "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",

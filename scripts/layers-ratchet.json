@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 240,
+    "upward": 216,
     "areas": 214,
     "order": 130,
     "table": 118
@@ -74,14 +74,13 @@
     "foundation/actor-runtime -> foundation/conversation": 3,
     "foundation/actor-runtime -> surfaces/email": 2,
     "foundation/agent -> areas/brain": 1,
-    "foundation/agent -> areas/commerce": 22,
-    "foundation/agent -> areas/inbox": 27,
+    "foundation/agent -> areas/commerce": 21,
+    "foundation/agent -> areas/inbox": 11,
     "foundation/agent -> areas/integrations": 1,
-    "foundation/agent -> areas/kitchen": 4,
     "foundation/agent -> areas/organisation": 4,
     "foundation/agent -> foundation/conversation": 29,
     "foundation/agent -> surfaces/portal": 1,
-    "foundation/agent -> surfaces/slack": 7,
+    "foundation/agent -> surfaces/slack": 5,
     "foundation/agent -> surfaces/whatsapp": 1,
     "foundation/agent -> workers/platform": 1,
     "foundation/agent-tools -> areas/cafe": 1,
@@ -127,7 +126,6 @@
     "foundation/tenancy -> surfaces/slack": 1,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
-    "package packages/control-api -> @purin-labs/commerce-contracts": 1,
     "surfaces/email -> workers/platform": 1,
     "table access_grant (foundation/authority) <- areas/commerce": 1,
     "table access_grant (foundation/authority) <- areas/inbox": 1,

@@ -1,4 +1,4 @@
-import type { CostUnit } from "@purin-labs/control-api";
+import type { CostUnit } from "@purin-labs/kitchen-control-api";
 import type { ControlMutationIntent } from "../../control-client";
 
 export type CostsMutation = (

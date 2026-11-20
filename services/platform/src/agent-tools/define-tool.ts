@@ -132,6 +132,17 @@ type ToolSpec<Name extends string, Input extends TSchema, Request, Services> = {
    * belongs to the turn's message, chat or thread.
    */
   readonly directOnly?: true;
+  /**
+   * A Code Mode script does not get the tool in its tool list: the tool
+   * changes what a person sees, so only the model calls it.
+   */
+  readonly modelOnly?: true;
+  /**
+   * The schema of the value that a Code Mode script receives from the tool.
+   * The result of such a tool is a `StructuredToolResult`. Without it, a
+   * script receives the text of the result.
+   */
+  readonly structuredOutput?: TSchema;
   /** The failure when the turn has no handler, for example outside a shop. */
   readonly unavailable: string;
   /**
@@ -202,6 +213,8 @@ export type RegisteredTool<
   readonly rerun: ToolRerun;
   readonly selection: ToolSelection;
   readonly directOnly: boolean;
+  readonly modelOnly: boolean;
+  readonly structuredOutput?: TSchema;
   readonly unavailable: string;
   /** Checks the schema, then decodes. Throws before any capability claim. */
   readonly parse: (input: unknown) => unknown;
@@ -267,6 +280,8 @@ export function defineToolFamily<Services>() {
         rerun: spec.rerun,
         selection: spec.selection,
         directOnly: spec.directOnly === true,
+        modelOnly: spec.modelOnly === true,
+        structuredOutput: spec.structuredOutput,
         unavailable: spec.unavailable,
         parse,
         // The executor calls a handler only with the request that this tool's

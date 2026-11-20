@@ -12,7 +12,7 @@ import {
   type SupplyCostBulkTier,
   type SupplyCostLineWrite,
   type SupplyCostTerms,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import {
   buildLotWritesForSheet,
   inspectDirtyLots,

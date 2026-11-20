@@ -3,7 +3,10 @@ import type {
   CommerceGraphQueryResult,
 } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
-import { CommerceContextToolResult } from "../../actors/commerce-context-tool-result";
+import {
+  CommerceContextToolResult,
+  commerceContextOutputSchema,
+} from "../../actors/commerce-context-tool-result";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { COMMERCE_SENSITIVITIES } from "../../commerce/sensitivity";
@@ -113,6 +116,8 @@ const PARAMETERS = {
  */
 export const commerceEntityContext = defineCommerceTool({
   name: "commerce_entity_context",
+  // A script receives the graph as a value, not as text.
+  structuredOutput: commerceContextOutputSchema,
   description:
     "Read a bounded, scoped commerce entity subgraph for the current Case. " +
     "Call as tools.commerce_entity_context({ request: { selection, traversal, " +

@@ -30,7 +30,7 @@ import {
   defaultCostAssumptions,
   type CostForecastPlan,
   type CostUnit,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import { assertNever } from "@purin-labs/std";
 import type {
   CommerceAdminClient,

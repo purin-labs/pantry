@@ -11,7 +11,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { readCaseSessionAssignment } from "../../src/actors/actor-journal/transactions";
 import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
 import { SessionDO } from "../../src/actors/agent-session";
-import type { TransientWhatsAppTurnRequest } from "../../src/actors/session/types";
+import type { TransientWhatsAppTurnRequest } from "../../src/actors/inbox-turns/rpc";
 import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
 import {
   startActorRelocation,

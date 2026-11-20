@@ -51,9 +51,13 @@ import { deferredExecutionRelease } from "./replay";
 import {
   CODE_MODE_RELEASE_RETRY_MS,
   type TrackedTransientSessionExecution,
+  type TransientSessionExecution,
   sessionPlacementR2Keys,
 } from "./support";
 import type { SessionToolWiring } from "./tool-wiring";
+import type { SessionTransientHost } from "./transient-host";
+import { piToolRules } from "../pi-tool-replay";
+import { settleActorExecution } from "../actor-execution-quiescence";
 import type {
   CanonicalHarnessEventError,
   CheckpointPublicationError,
@@ -102,6 +106,40 @@ export abstract class SessionActorBase extends PlacedActor<null> {
     new Set<TrackedTransientSessionExecution>();
 
   protected readonly liveGoalRuns = new Set<string>();
+
+  /**
+   * Runs one transient turn and holds it in the set that the cleanup, the
+   * relocation and the release of stopped turns read.
+   */
+  protected async trackTransientTurn<Value>(
+    start: (execution: TransientSessionExecution) => Promise<Value>,
+  ): Promise<Value> {
+    const execution: TransientSessionExecution = {
+      state: { kind: "preparing" },
+    };
+    const work = start(execution);
+    const tracked: TrackedTransientSessionExecution = {
+      execution,
+      settlement: settleActorExecution(work),
+    };
+    this.transientExecutions.add(tracked);
+    try {
+      return await work;
+    } finally {
+      this.transientExecutions.delete(tracked);
+    }
+  }
+
+  /** What a module of a transient turn gets from the Session. */
+  protected transientHost(): SessionTransientHost {
+    return {
+      env: this.env,
+      ctx: this.ctx,
+      persistence: this.persistence,
+      liveGoalRuns: this.liveGoalRuns,
+      toolRules: piToolRules.bind(null, this.sessionTools().registry),
+    };
+  }
 
   protected activeMessagePreparation: ActiveAttachmentPreparationControl | null =
     null;

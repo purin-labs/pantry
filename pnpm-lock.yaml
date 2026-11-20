@@ -439,9 +439,6 @@ importers:
 
   packages/control-api:
     dependencies:
-      '@purin-labs/commerce-contracts':
-        specifier: workspace:*
-        version: link:../commerce-contracts
       '@purin-labs/contract-schema':
         specifier: workspace:*
         version: link:../contract-schema

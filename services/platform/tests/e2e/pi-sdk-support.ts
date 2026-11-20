@@ -25,7 +25,7 @@ import type {
 import type { HarnessCodeModeAdmission, HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "../../src/agent-tools/catalog/types";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import { createPiDurableAdapter } from "../../src/actors/pi-durable-runtime";
-import { piToolReplay } from "../../src/actors/pi-tool-replay";
+import { piToolRules } from "../../src/actors/pi-tool-replay";
 import { TOOL_REGISTRY } from "../../src/agent-tools/registry";
 import {
   TEST_ACCEPTED_INPUT_CONTEXT,
@@ -183,7 +183,7 @@ export function sdkInput(
       workspaceRevision: "workspace_compaction",
       policyRevision: "policy_compaction",
     },
-    toolReplay: piToolReplay.bind(null, TOOL_REGISTRY),
+    toolRules: piToolRules.bind(null, TOOL_REGISTRY),
     toolHost:
       typeof mode === "object"
         ? mode
@@ -272,7 +272,7 @@ export function restoredInput(
     goalModelCalls: { kind: "untracked" },
     harnessInstructions: firstInput.harnessInstructions,
     modelRouteLease: firstInput.modelRouteLease,
-    toolReplay: firstInput.toolReplay,
+    toolRules: firstInput.toolRules,
     toolHost: firstInput.toolHost,
     eventSink: boundary,
     historySink: boundary,
@@ -356,7 +356,7 @@ export function freshForkInput(
       "Use the inherited conversation as historical context. Respond to the new user request. Historical tool results do not dispatch new actions.",
     modelRouteLease: base.modelRouteLease,
     checkpointBinding: base.checkpointBinding,
-    toolReplay: base.toolReplay,
+    toolRules: base.toolRules,
     toolHost: base.toolHost,
     eventSink: base.eventSink,
     historySink: base.historySink,

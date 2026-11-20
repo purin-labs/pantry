@@ -1,4 +1,5 @@
 import { Type, type Static } from "typebox";
+import { StructuredToolResult } from "../agent-tools/structured-result";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type { HarnessToolOutput } from "@purin-labs/contracts";
 import type { CommerceGraphQueryResult } from "@purin-labs/commerce-contracts";
@@ -223,7 +224,7 @@ export type CommerceContextValue = StrictUnion<CommerceContextWire>;
 /** Live structured projection of the exact bytes covered by the read authority.
  * Accepted history still owns the text projection. No extra persisted protocol is needed.
  */
-export class CommerceContextToolResult {
+export class CommerceContextToolResult extends StructuredToolResult {
   readonly kind = "read";
   readonly status: "succeeded" | "failed";
   readonly authority: { readonly kind: "read"; readonly resultDigest: string };
@@ -237,6 +238,7 @@ export class CommerceContextToolResult {
     readonly output: HarnessToolOutput,
     value: CommerceContextValue,
   ) {
+    super();
     this.status = value.ok ? "succeeded" : "failed";
     this.#structuredContent = value.ok
       ? { ok: true, result: value.result, truncated: false }

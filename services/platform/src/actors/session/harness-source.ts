@@ -1,7 +1,6 @@
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { SIDE_CASE_HARNESS_INSTRUCTION } from "../../chat/side-cases";
 import type { SideCaseOrigin } from "../../chat/side-case-origin";
-import { SLACK_SIDE_CASE_HARNESS_INSTRUCTION } from "../../slack/side-cases";
 import { turnMayProposeSideCase } from "../harness-side-case-proposal";
 import { turnMayRequestPermission } from "../harness-follow-up";
 import type {
@@ -62,6 +61,7 @@ import type {
   CanonicalHarnessCheckpointRestoreError,
   CheckpointPublicationError,
 } from "./types";
+import type { Env } from "../../env";
 
 /**
  * The tools that a turn adds to the tool list, with the live authority that
@@ -439,6 +439,22 @@ export function ignoreUnusedForkHistory(): void {}
 export function ignoreUnusedSideCaseOrigin(): void {}
 
 /**
+ * The side Case that a Slack thread started (Plan 74). Slack gives its rules.
+ */
+export interface SlackThreadSideCase {
+  /** The words that a turn of such a side Case adds to its instructions. */
+  readonly harnessInstruction: string;
+  /** Admits the proposal of the side Case before inference. */
+  admit(
+    storage: DurableObjectStorage,
+    lease: HarnessTurnLease,
+    proposal: Variant<SideCaseOrigin, "slack_thread">["proposal"],
+    authorizeCommit: () => void | Promise<void>,
+    env: Env,
+  ): Promise<void>;
+}
+
+/**
  * The harness instructions of a turn of a side Case: the Case's own, and the
  * side Case instruction of its kind (Plan 74). A Slack thread keeps one
  * Session over its turns, so each turn and the binding that its start pins
@@ -447,6 +463,7 @@ export function ignoreUnusedSideCaseOrigin(): void {}
 export function sideCaseHarnessInstructions(
   instructions: string,
   origin: SideCaseOrigin | null,
+  slackThread: SlackThreadSideCase,
 ): string {
   switch (origin?.kind) {
     case undefined:
@@ -454,7 +471,7 @@ export function sideCaseHarnessInstructions(
     case "portal_chat":
       return `${instructions}\n\n${SIDE_CASE_HARNESS_INSTRUCTION}`;
     case "slack_thread":
-      return `${instructions}\n\n${SLACK_SIDE_CASE_HARNESS_INSTRUCTION}`;
+      return `${instructions}\n\n${slackThread.harnessInstruction}`;
     default:
       return assertNever(origin);
   }
