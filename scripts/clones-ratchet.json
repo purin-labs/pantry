@@ -57,7 +57,7 @@
     "apps/portal/src/features/workflow-simulator/route.tsx = apps/portal/src/features/workflow-simulator/route.tsx": 3,
     "apps/portal/src/features/workflow-simulator/scene.ts = apps/portal/src/features/workflow-simulator/scene.ts": 9,
     "apps/portal/src/features/workflow-simulator/scene.ts = apps/portal/src/features/workflow-simulator/spatial/floor-plan.ts": 1,
-    "apps/portal/src/features/workflow-simulator/scene.ts = apps/portal/src/features/workflow-simulator/spatial/physics-factory-scene.ts": 4,
+    "apps/portal/src/features/workflow-simulator/scene.ts = apps/portal/src/features/workflow-simulator/spatial/physics-factory-scene.ts": 3,
     "apps/portal/src/features/workflow-simulator/simulator-state.ts = apps/portal/src/features/workflow-simulator/simulator-state.ts": 1,
     "apps/portal/src/features/workflow-simulator/spatial/floor-plan-fixtures.ts = apps/portal/src/features/workflow-simulator/spatial/floor-plan-fixtures.ts": 2,
     "apps/portal/src/features/workflow-simulator/spatial/floor-plan-materials.ts = apps/portal/src/features/workflow-simulator/spatial/floor-plan-materials.ts": 25,
