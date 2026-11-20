@@ -1,5 +1,8 @@
-import type { CobotTask } from "@purin-labs/control-api";
-import type { BakeRunHold } from "@purin-labs/kitchen-control-api";
+import type { CobotObserved, CobotTask } from "@purin-labs/control-api";
+import type {
+  BakeAuthorityMode,
+  BakeRunHold,
+} from "@purin-labs/kitchen-control-api";
 import type {
   BakeRunInput,
   PhysicalRun,
@@ -42,6 +45,8 @@ export type StoredBakeRun = Readonly<{
   runId: string;
   proposalId: string;
   productName: string;
+  /** A shadow run (S5) watches its devices and sends them nothing. */
+  mode: BakeAuthorityMode;
   state: ActiveRunState;
   input: BakeRunInput;
   devices: readonly BakeRunDevice[];
@@ -52,6 +57,8 @@ export type StoredBakeRun = Readonly<{
   pausedDevices: readonly string[];
   /** The last time a signal of the run's devices arrived. */
   lastEvidenceAt: number;
+  /** A shadow run's observed moves, in the order of their arrival. */
+  observed: readonly CobotObserved[];
   startedAt: number;
   endedAt: number | null;
 }>;

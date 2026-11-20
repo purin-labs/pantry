@@ -1,6 +1,7 @@
 import {
   parseBakeBoard,
   parseBakeRunRead,
+  type BakeAuthorityInput,
   type BakeBoard,
   type BakeRunActionInput,
   type BakeRunRead,
@@ -40,6 +41,21 @@ export async function saveBakeLevel(
     controlPath(organisationId, "bakes/levels"),
     "PUT",
     level,
+    undefined,
+    { kind: "prepared", idempotencyKey },
+  );
+}
+
+/** Plan 24 S5: an admin sets the shadow or approval mode of a kitchen. */
+export async function saveBakeAuthority(
+  organisationId: string,
+  authority: BakeAuthorityInput,
+  idempotencyKey: string,
+): Promise<void> {
+  await controlMutation(
+    controlPath(organisationId, "bakes/authority"),
+    "PUT",
+    authority,
     undefined,
     { kind: "prepared", idempotencyKey },
   );

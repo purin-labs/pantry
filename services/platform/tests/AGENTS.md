@@ -258,10 +258,21 @@ test and any fixture that exists only for the obsolete behavior.
   Portal chat agent read a run and pause it for the owner with an answering
   gateway; a viewer has no chat and the Bakes page refuses the viewer's
   pause. `e2e/bake-support.ts` holds the counter shop and the chat helpers of
-  both Plan 24 journeys. The artifacts are
-  `output/plan-24/bake-run-journey.json` and
+  the Plan 24 journeys. `e2e/bake-run-support.ts` holds the cobot kitchen of
+  the bake run journeys: the counter, the controller simulator, the real
+  gateway relay, the three confirmed devices, the kitchen's authority and the
+  level. The artifacts are `output/plan-24/bake-run-journey.json` and
   `output/plan-24/bake-run-agent.json`. It needs the account Worker, `cargo`
   and `MUJOCO_DIR`.
+- `e2e/bake-shadow.test.ts` is the exit journey of Plan 24 S5: a kitchen is
+  in shadow mode until an admin changes it, and an operator and a viewer
+  cannot. An approved proposal starts a shadow run. The controller simulator
+  runs the bake from its own script on both cobots and the oven; the run
+  matches each move to its planned task with the time difference, and a move
+  outside the plan stays unmatched. The Platform sends the gateway no task,
+  pause, resume, stop or inquiry, the simulator starts no Platform task, and
+  the counter stock does not change: a pause and a check are refused. The
+  artifact is `output/plan-24/bake-shadow-journey.json`.
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E

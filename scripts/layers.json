@@ -141,6 +141,7 @@
     "agent_permission_request": "foundation/authority",
     "agent_responsibility_scope": "foundation/agent",
     "app_user": "foundation/tenancy",
+    "bake_authority": "areas/kitchen",
     "bake_proposal": "areas/kitchen",
     "bake_run": "areas/kitchen",
     "bake_stock_level": "areas/kitchen",

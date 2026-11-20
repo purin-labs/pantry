@@ -51,6 +51,38 @@ const decisionInputSchema = Type.Union([
 ]);
 export type BakeDecisionInput = Static<typeof decisionInputSchema>;
 
+const authorityMode = Type.Union([
+  Type.Literal("shadow"),
+  Type.Literal("approval"),
+]);
+export type BakeAuthorityMode = Static<typeof authorityMode>;
+
+/**
+ * Plan 24 S5: an admin sets the authority of the bake runs at one kitchen
+ * location. In `shadow` mode (the default) an approved proposal starts a run
+ * that only watches the cobots; in `approval` mode the run sends its tasks.
+ */
+const authorityInputSchema = Type.Object(
+  {
+    kitchenLocation,
+    mode: authorityMode,
+    /** The revision that the person saw, or null for a location with none. */
+    expectedRevision: Type.Union([Type.Integer({ minimum: 1 }), Type.Null()]),
+  },
+  { additionalProperties: false },
+);
+export type BakeAuthorityInput = Static<typeof authorityInputSchema>;
+
+const authoritySchema = Type.Object({
+  kitchenLocation: Type.String({ minLength: 1 }),
+  mode: authorityMode,
+  /** Null while the location keeps the default, shadow mode. */
+  revision: Type.Union([Type.Integer({ minimum: 1 }), Type.Null()]),
+  setBy: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
+  setAt: Type.Union([time, Type.Null()]),
+});
+export type BakeAuthorityView = Static<typeof authoritySchema>;
+
 const stockLevelSchema = Type.Object({
   inventoryItemId: id,
   productName: name,
@@ -132,6 +164,7 @@ const boardSchema = Type.Object({
     Type.Object({
       runId: Type.String({ minLength: 1 }),
       proposalId: Type.String({ pattern: "^bake_[a-f0-9]{24}$" }),
+      mode: authorityMode,
       state: Type.Union([
         Type.Literal("not_started"),
         Type.Literal("running"),
@@ -171,7 +204,12 @@ const boardSchema = Type.Object({
   ),
   /** The locations of the shop's gateways on the Devices page. */
   kitchenLocations: Type.Array(Type.String({ minLength: 1 })),
-  /** What the reader may do: an admin edits a level, an operator decides. */
+  /** The authority of each kitchen location and of each level's location. */
+  authority: Type.Array(authoritySchema),
+  /**
+   * What the reader may do: an admin edits a level and the authority, an
+   * operator decides.
+   */
   access: Type.Object({
     mayEditLevels: Type.Boolean(),
     mayDecide: Type.Boolean(),
@@ -182,6 +220,7 @@ export type BakeBoard = Static<typeof boardSchema>;
 export type BakeBoardRecords = Omit<BakeBoard, "access">;
 
 const decodeLevelInput = recordParser(stockLevelInputSchema);
+const decodeAuthorityInput = recordParser(authorityInputSchema);
 const decodeDecisionInput = recordParser(decisionInputSchema);
 const decodeBoard = recordParser(boardSchema);
 
@@ -190,6 +229,14 @@ export function parseBakeStockLevelInput(
   value: unknown,
 ): BakeStockLevelInput | null {
   const result = decodeLevelInput(value);
+  return result.ok ? result.value : null;
+}
+
+/** Null when the body is not an authority mode. */
+export function parseBakeAuthorityInput(
+  value: unknown,
+): BakeAuthorityInput | null {
+  const result = decodeAuthorityInput(value);
   return result.ok ? result.value : null;
 }
 

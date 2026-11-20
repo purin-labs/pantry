@@ -4788,6 +4788,20 @@ CREATE TABLE bake_stock_level (
   PRIMARY KEY (organisation_id, inventory_item_id)
 );
 
+-- Plan 24 S5: the authority of the bake runs at one kitchen location. A
+-- location with no row is in shadow mode: an approved proposal starts a run
+-- that only watches the cobots and sends nothing. An admin sets approval mode
+-- on the Bakes page; then an approval dispatches the run's tasks.
+CREATE TABLE bake_authority (
+  organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
+  kitchen_location TEXT NOT NULL CHECK (length(kitchen_location) BETWEEN 1 AND 64),
+  mode TEXT NOT NULL CHECK (mode IN ('shadow', 'approval')),
+  revision INTEGER NOT NULL CHECK (revision > 0),
+  set_by TEXT NOT NULL,
+  set_at INTEGER NOT NULL CHECK (set_at >= 0),
+  PRIMARY KEY (organisation_id, kitchen_location)
+);
+
 -- Plan 24 S1: one proposed bake run of one product. A product has at most one
 -- active proposal (open or approved) and at most one that waits for it; the
 -- two partial unique indexes hold that rule. An approved proposal ends when
@@ -4848,6 +4862,7 @@ CREATE TABLE bake_run (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   proposal_id TEXT NOT NULL REFERENCES bake_proposal (proposal_id),
   actor_id TEXT CHECK (actor_id IS NULL OR length(actor_id) BETWEEN 1 AND 128),
+  mode TEXT NOT NULL DEFAULT 'approval' CHECK (mode IN ('shadow', 'approval')),
   state TEXT NOT NULL CHECK (state IN ('not_started', 'running', 'paused', 'held', 'completed', 'stopped', 'checked')),
   problem_code TEXT CHECK (problem_code IS NULL OR length(problem_code) BETWEEN 1 AND 64),
   problem_text TEXT CHECK (problem_text IS NULL OR length(problem_text) BETWEEN 1 AND 500),

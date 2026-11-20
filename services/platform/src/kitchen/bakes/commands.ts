@@ -153,6 +153,7 @@ export type BakeCommandError = Readonly<{
     | "bake_run_missing"
     | "bake_run_not_completed"
     | "bake_run_refused"
+    | "bake_run_shadow"
     | "bake_stock_unavailable";
   message: string;
 }>;
@@ -736,6 +737,11 @@ async function checkBakeRun(
         goodPieces: run.check.goodPieces,
       },
     };
+  if (run?.mode === "shadow")
+    return refuse(
+      "bake_run_shadow",
+      "A shadow run changes no stock. Count the pieces on the Stock page.",
+    );
   if (run?.state !== "completed")
     return refuse(
       "bake_run_not_completed",

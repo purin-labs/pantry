@@ -12,20 +12,25 @@ import { expect, it } from "vitest";
 import {
   newConversationId,
   parseDeviceActivity,
-  type CobotTaskMessage,
   type PlatformGatewayMessage,
 } from "@purin-labs/control-api";
-import {
-  parseBakeRunRead,
-  type BakeRunRead,
-  type BakeRunTaskView,
-} from "@purin-labs/kitchen-control-api";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { deviceFleetStub } from "../../src/actors/device-fleet";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import type { OrganisationId } from "../../src/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import {
+  DEVICES,
+  controllerState,
+  equipCobotKitchen,
+  firstProposal,
+  readRun,
+  runAction,
+  sentTasks,
+  setAuthority,
+  taskOf,
+} from "./bake-run-support";
 import {
   applyFinancierWorkflow,
   chatThrough,
@@ -45,11 +50,7 @@ import {
   type Script,
 } from "./bake-support";
 import { organisationDatabase } from "./organisation-database";
-import {
-  CobotGatewayPump,
-  cobotSession,
-  controllerControl,
-} from "./cobot-gateway-support";
+import { cobotSession } from "./cobot-gateway-support";
 import {
   connectGateway,
   controlBase,
@@ -71,7 +72,6 @@ import { network } from "./network";
 const HOME = "bake-run";
 /** The simulator's clock runs this much faster than the wall. */
 const TIME_SCALE = 60;
-const DEVICES = ["cobot-1", "cobot-2", "oven-1"] as const;
 
 it(
   "S4: an approved bake loads, bakes and unloads with two cobots through the real gateway; the read agrees with the receipts, the stock waits for an operator's check, and a second delivery makes no second move",
@@ -85,121 +85,30 @@ it(
   agentPauseJourney,
 );
 
-async function readRun(
-  organisationId: string,
-  session: IssuedControlSession,
-  proposalId: string,
-): Promise<BakeRunRead> {
-  const response = await send(
-    `${controlBase(organisationId)}/bakes/proposals/${proposalId}/run`,
-    session,
-    "GET",
-  );
-  expect(response.status, JSON.stringify(response.body)).toBe(200);
-  return parseBakeRunRead(response.body);
-}
-
-function runAction(
-  organisationId: string,
-  session: IssuedControlSession,
-  proposalId: string,
-  body: Record<string, unknown>,
-) {
-  return send(
-    `${controlBase(organisationId)}/bakes/proposals/${proposalId}/run`,
-    session,
-    "POST",
-    body,
-  );
-}
-
-type ControllerDevice = Readonly<{
-  sourceKey: string;
-  fault: unknown;
-  operations: Readonly<Record<string, number>>;
-  tasksStarted: number;
-}>;
-
-async function controllerState() {
-  const state = await controllerControl(HOME, { op: "state" });
-  const devices = state.devices as readonly ControllerDevice[];
-  const device = (sourceKey: string): ControllerDevice => {
-    const found = devices.find((item) => item.sourceKey === sourceKey);
-    if (found === undefined) throw new Error(`No controller ${sourceKey}`);
-    return found;
-  };
-  return { state, device };
-}
-
-function taskOf(read: BakeRunRead, key: string): BakeRunTaskView {
-  const task = read.run.view?.tasks.find((item) => item.key === key);
-  if (task === undefined) throw new Error(`No task ${key}`);
-  return task;
-}
-
 async function bakeRunJourney(): Promise<void> {
   const { owner, staff, viewer, organisationId, merchantId } =
     await deviceShop("bakerun");
   const base = controlBase(organisationId);
-  const shop = await openCounterShop(
-    organisationId,
-    owner.identity.userId,
-    merchantId,
-  );
-  await applyFinancierWorkflow(organisationId, owner.session);
-  const started = await cobotSession("start", HOME, { timeScale: TIME_SCALE });
-  const evidence: Record<string, unknown> = { controllerReady: started.ready };
 
   // 1. The gateway enrolls with the two cobots and the oven of the
-  //    simulator behind the real adapter, and the owner confirms them.
-  const gatewayStart = await startGateway(
+  //    simulator behind the real adapter, and the owner confirms them. The
+  //    owner sets the kitchen to approval mode (S5: shadow is the default).
+  const kitchen = await equipCobotKitchen({
     organisationId,
-    owner.session,
-    "Bakery gateway",
-  );
-  const gateway = await connectGateway(
-    await credentialOf(
-      await enrollGateway(
-        organisationId,
-        gatewayStart.gatewayId,
-        gatewayStart.code,
-      ),
-    ),
-  );
-  const pump = new CobotGatewayPump(gateway, HOME);
-  await expect
-    .poll(() => gateway.received.some((item) => item.type === "welcome"), {
-      timeout: 20_000,
-    })
-    .toBe(true);
-  await expect
-    .poll(
-      async () =>
-        (await readDeviceList(organisationId, owner.session)).devices.filter(
-          (device) => device.kind === "kitchen_device",
-        ).length,
-      { timeout: 20_000 },
-    )
-    .toBe(3);
-  const pending = await readDeviceList(organisationId, owner.session);
-  for (const sourceKey of DEVICES) {
-    const confirmed = await send(
-      `${base}/devices/${requireKitchenDevice(pending, sourceKey).deviceId}/confirm`,
-      owner.session,
-      "POST",
-      { name: sourceKey, stationId: "station_bakery" },
-    );
-    expect(confirmed.status, JSON.stringify(confirmed.body)).toBe(200);
-  }
+    owner: owner.session,
+    ownerUserId: owner.identity.userId,
+    merchantId,
+    home: HOME,
+    timeScale: TIME_SCALE,
+    mode: "approval",
+    bakeSeconds: 900,
+  });
+  const { gateway, pump } = kitchen;
+  const gatewayStart = { gatewayId: kitchen.gatewayId };
+  const evidence: Record<string, unknown> = {};
 
   // The counter falls below its level, and one proposal opens with the oven.
-  const opening = await readBoard(organisationId, owner.session);
-  const level = levelOf(productOf(opening).inventoryItemId);
-  expect((await putLevel(organisationId, owner.session, level)).status).toBe(
-    200,
-  );
-  await shop.runUntil("first_fall");
-  const proposal = await onlyProposal(organisationId, owner.session);
+  const proposal = await firstProposal(kitchen);
   expect(proposal).toMatchObject({
     state: "open",
     mouldGroups: 1,
@@ -274,10 +183,7 @@ async function bakeRunJourney(): Promise<void> {
 
   // 3. Each task has planned and observed times, and the observed times are
   //    the receipts' device clocks.
-  const sent = gateway.received.filter(
-    (message): message is Extract<PlatformGatewayMessage, CobotTaskMessage> =>
-      message.type === "cobot_task",
-  );
+  const sent = sentTasks(gateway.received);
   // Load, bake and unload, each sent once: both cobots took a move.
   expect(sent.map((message) => message.sourceKey)).toEqual([
     "cobot-1",
@@ -305,7 +211,7 @@ async function bakeRunJourney(): Promise<void> {
   expect(load.observed.endSeconds ?? 0).toBeLessThanOrEqual(
     unload.observed.startSeconds ?? 0,
   );
-  const controller = await controllerState();
+  const controller = await controllerState(HOME);
   for (const sourceKey of DEVICES) {
     expect(controller.device(sourceKey).fault).toBeNull();
     expect(controller.device(sourceKey).operations.submit).toBe(1);
@@ -423,12 +329,13 @@ async function bakeRunJourney(): Promise<void> {
   await expect
     .poll(() => pump.reports(firstTask.requestId).slice(repliesBefore))
     .toEqual([expect.objectContaining({ state: "completed", replayed: true })]);
-  const afterDuplicate = (await controllerState()).device("cobot-1");
+  const afterDuplicate = (await controllerState(HOME)).device("cobot-1");
   expect(afterDuplicate.operations.submit).toBe(1);
   expect(afterDuplicate.tasksStarted).toBe(1);
 
   // 6. The artifact: the run read, the dispatch records, the receipts and
   //    the simulator's state.
+  const controllerAtEnd = (await controllerState(HOME)).state;
   await pump.stop();
   await gateway.close();
   evidence.run = final.run;
@@ -448,7 +355,7 @@ async function bakeRunJourney(): Promise<void> {
     fleet: again,
     relay: pump.reports(firstTask.requestId).slice(repliesBefore),
   };
-  evidence.controller = (await controllerState()).state;
+  evidence.controller = controllerAtEnd;
   evidence.day = day.level;
   const artifact = await cobotSession("artifact", HOME, {
     name: "bake-run-journey",
@@ -470,8 +377,6 @@ async function readActorId(
     .first<{ actorId: string | null }>();
   return row?.actorId ?? null;
 }
-
-const FAKE_DEVICES = ["cobot-1", "cobot-2", "oven-1"] as const;
 
 /**
  * A gateway that only answers: the clock read, an `accepted` report for each
@@ -512,7 +417,7 @@ async function answeringGateway(
     return { sequence: next, deviceClockMs: Date.now() - zero };
   };
   const clocks = () =>
-    FAKE_DEVICES.map((sourceKey) => ({
+    DEVICES.map((sourceKey) => ({
       sourceKey,
       ...stamp(sourceKey),
       state: "idle" as const,
@@ -550,7 +455,7 @@ async function answeringGateway(
       });
   }, 2_000);
   const devices = await readDeviceList(organisationId, session);
-  for (const sourceKey of FAKE_DEVICES) {
+  for (const sourceKey of DEVICES) {
     const confirmed = await send(
       `${controlBase(organisationId)}/devices/${requireKitchenDevice(devices, sourceKey).deviceId}/confirm`,
       session,
@@ -604,6 +509,10 @@ async function agentPauseJourney(): Promise<void> {
     organisationId,
     author.session,
   );
+  expect(
+    (await setAuthority(organisationId, author.session, "approval", null))
+      .status,
+  ).toBe(200);
   const opening = await readBoard(organisationId, author.session);
   expect(
     (

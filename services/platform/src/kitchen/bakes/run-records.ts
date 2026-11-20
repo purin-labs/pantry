@@ -1,4 +1,7 @@
-import type { BakeRunState } from "@purin-labs/kitchen-control-api";
+import type {
+  BakeAuthorityMode,
+  BakeRunState,
+} from "@purin-labs/kitchen-control-api";
 import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId } from "../../ids";
 import type { BakeDeciderRole } from "./records";
@@ -14,6 +17,7 @@ export type BakeRunSummary = Readonly<{
   runId: string;
   proposalId: string;
   actorId: string | null;
+  mode: BakeAuthorityMode;
   state: BakeRunState;
   problem: Readonly<{ code: string; message: string }> | null;
   holdCode: string | null;
@@ -32,6 +36,7 @@ type RunRow = Readonly<{
   run_id: string;
   proposal_id: string;
   actor_id: string | null;
+  mode: BakeAuthorityMode;
   state: BakeRunState;
   problem_code: string | null;
   problem_text: string | null;
@@ -45,7 +50,7 @@ type RunRow = Readonly<{
   stock_receipt_id: string | null;
 }>;
 
-const COLUMNS = `run_id, proposal_id, actor_id, state, problem_code,
+const COLUMNS = `run_id, proposal_id, actor_id, mode, state, problem_code,
   problem_text, hold_code, started_at, ended_at, checked_by, checked_role,
   checked_at, good_pieces, stock_receipt_id`;
 
@@ -54,6 +59,7 @@ function fromRow(row: RunRow): BakeRunSummary {
     runId: row.run_id,
     proposalId: row.proposal_id,
     actorId: row.actor_id,
+    mode: row.mode,
     state: row.state,
     problem:
       row.problem_code === null
@@ -119,6 +125,7 @@ export async function writeBakeRunNotStarted(
   input: Readonly<{
     runId: string;
     proposalId: string;
+    mode: BakeAuthorityMode;
     code: string;
     message: string;
     now: number;
@@ -126,10 +133,11 @@ export async function writeBakeRunNotStarted(
 ): Promise<void> {
   await db
     .prepare(
-      `INSERT INTO bake_run (run_id, organisation_id, proposal_id, state,
+      `INSERT INTO bake_run (run_id, organisation_id, proposal_id, mode, state,
          problem_code, problem_text, updated_at)
-       VALUES (?, ?, ?, 'not_started', ?, ?, ?)
+       VALUES (?, ?, ?, ?, 'not_started', ?, ?, ?)
        ON CONFLICT (run_id) DO UPDATE SET
+         mode = excluded.mode,
          problem_code = excluded.problem_code,
          problem_text = excluded.problem_text,
          updated_at = excluded.updated_at
@@ -139,6 +147,7 @@ export async function writeBakeRunNotStarted(
       input.runId,
       organisationId,
       input.proposalId,
+      input.mode,
       input.code,
       input.message.slice(0, 500),
       input.now,
@@ -154,16 +163,18 @@ export async function writeBakeRunStarted(
     runId: string;
     proposalId: string;
     actorId: string;
+    mode: BakeAuthorityMode;
     now: number;
   }>,
 ): Promise<void> {
   await db
     .prepare(
       `INSERT INTO bake_run (run_id, organisation_id, proposal_id, actor_id,
-         state, started_at, updated_at)
-       VALUES (?, ?, ?, ?, 'running', ?, ?)
+         mode, state, started_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 'running', ?, ?)
        ON CONFLICT (run_id) DO UPDATE SET
-         actor_id = excluded.actor_id, state = 'running', problem_code = NULL,
+         actor_id = excluded.actor_id, mode = excluded.mode,
+         state = 'running', problem_code = NULL,
          problem_text = NULL, started_at = excluded.started_at,
          updated_at = excluded.updated_at
        WHERE bake_run.state = 'not_started'`,
@@ -173,6 +184,7 @@ export async function writeBakeRunStarted(
       organisationId,
       input.proposalId,
       input.actorId,
+      input.mode,
       input.now,
       input.now,
     )

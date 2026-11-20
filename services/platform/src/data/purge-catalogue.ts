@@ -65,6 +65,7 @@ export const PURGE_CATALOGUE = [
   { table: "bake_run", action: "erase" },
   { table: "bake_proposal", action: "erase" },
   { table: "bake_stock_level", action: "erase" },
+  { table: "bake_authority", action: "erase" },
   { table: "bakery_agent_run_save", action: "erase" },
   { table: "bakery_agent_scenario_save", action: "erase" },
   { table: "bakery_cost_plan", action: "erase" },

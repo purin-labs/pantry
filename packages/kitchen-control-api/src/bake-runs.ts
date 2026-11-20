@@ -7,6 +7,10 @@ import { recordParser } from "@purin-labs/contract-schema";
  * and the positions of the mould groups all read `view`, so they agree on
  * each task. Every observed value comes from a device receipt; a position
  * that no receipt proves is `unknown`.
+ *
+ * S5: a run in `shadow` mode sends nothing. The controller runs the bake from
+ * its own script, and the run matches each observed move to its planned task
+ * (`shadow`). The same `view` shows the observed times of those moves.
  */
 
 const text = Type.String({ minLength: 1 });
@@ -97,7 +101,11 @@ const viewSchema = Type.Object({
     Type.Object({
       mouldGroup: Type.Integer({ minimum: 1 }),
       position: positionSchema,
-      basis: Type.Union([Type.Literal("declared"), Type.Literal("receipt")]),
+      basis: Type.Union([
+        Type.Literal("declared"),
+        Type.Literal("receipt"),
+        Type.Literal("observed"),
+      ]),
     }),
   ),
   disposition: nullable(
@@ -112,6 +120,46 @@ const viewSchema = Type.Object({
   ),
 });
 export type BakeRunView = Static<typeof viewSchema>;
+
+const shadowMatchSchema = Type.Object({
+  observationId: text,
+  sourceKey: text,
+  task: taskSchema,
+  state: nullable(
+    Type.Union([
+      Type.Literal("started"),
+      Type.Literal("completed"),
+      Type.Literal("failed"),
+    ]),
+  ),
+  carrierAt: nullable(carrierAt),
+  reason: nullable(Type.String()),
+  observed: Type.Object({
+    startSeconds: nullable(seconds),
+    endSeconds: nullable(seconds),
+  }),
+  /** The planned task with the same move, or null for a move outside the plan. */
+  planned: nullable(
+    Type.Object({
+      key: text,
+      sourceKey: text,
+      startSeconds: seconds,
+      endSeconds: seconds,
+    }),
+  ),
+  sameCobot: nullable(Type.Boolean()),
+  /** Observed minus planned, in seconds. */
+  difference: Type.Object({
+    startSeconds: nullable(seconds),
+    endSeconds: nullable(seconds),
+  }),
+});
+export type BakeShadowMatch = Static<typeof shadowMatchSchema>;
+
+const modeSchema = Type.Union([
+  Type.Literal("shadow"),
+  Type.Literal("approval"),
+]);
 
 const holdSchema = Type.Object({
   code: Type.Union([
@@ -153,6 +201,8 @@ const runSchema = Type.Object({
   runId: text,
   proposalId: Type.String({ pattern: "^bake_[a-f0-9]{24}$" }),
   productName: text,
+  /** `shadow`: the run watches and sends nothing (S5). */
+  mode: modeSchema,
   state: runStateSchema,
   /** Why the run did not start, while it has not started. */
   problem: nullable(Type.Object({ code: text, message: text })),
@@ -213,6 +263,14 @@ const runSchema = Type.Object({
     Type.Object({ step: text, lateSeconds: Type.Number({ minimum: 0 }) }),
   ),
   view: nullable(viewSchema),
+  /** A shadow run's observed moves, each matched to its planned task. */
+  shadow: nullable(
+    Type.Object({
+      matches: Type.Array(shadowMatchSchema),
+      /** Planned tasks that no observed move made yet. */
+      unobserved: Type.Array(text),
+    }),
+  ),
 });
 export type BakeRunRecord = Static<typeof runSchema>;
 

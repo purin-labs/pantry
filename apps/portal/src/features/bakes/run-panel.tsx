@@ -4,6 +4,7 @@ import type {
   BakeRunRecord,
   BakeRunTaskView,
   BakeRunView,
+  BakeShadowMatch,
 } from "@purin-labs/kitchen-control-api";
 
 import {
@@ -26,6 +27,10 @@ import "./run-panel.css";
  * one read of the run, so they agree on each task. A position that no
  * receipt proves shows as unknown. An operator or a higher role pauses,
  * resumes, settles, stops and checks the run here.
+ *
+ * A shadow run (S5) sends nothing: the drawer shows each move that the
+ * controller made, the planned task that it matches and the difference of
+ * the times. A person only stops watching it.
  */
 
 const REFRESH_MS = 3_000;
@@ -83,14 +88,23 @@ export function BakeRunPanel(
   const state = act.state("run");
   const busy = state.kind === "running";
   const send = (input: BakeRunActionInput) => void act.run("run", input);
+  const shadow = run.mode === "shadow";
   return (
     <section className="bake-run" aria-label="Bake run">
       <div className="bake-run-head">
-        <h3>Bake run</h3>
+        <h3>{shadow ? "Shadow run" : "Bake run"}</h3>
         <span className={`bake-run-state bake-run-state-${run.state}`}>
-          {RUN_STATE[run.state]}
+          {shadow && run.state === "completed"
+            ? "Watched to the end"
+            : RUN_STATE[run.state]}
         </span>
       </div>
+      {shadow ? (
+        <p className="bake-run-note">
+          Shadow mode: Seams Pantry sends nothing to the devices and changes no
+          stock. It matches each move of the cobots to the plan.
+        </p>
+      ) : null}
       {run.problem === null ? null : (
         <p className="bake-run-alert" role="status">
           The run did not start: {run.problem.message}
@@ -107,7 +121,18 @@ export function BakeRunPanel(
           {Math.round(run.unloadRisk.lateSeconds)} s late.
         </p>
       )}
-      {access.mayOperate ? (
+      {access.mayOperate && shadow && run.state === "running" ? (
+        <div className="bakes-actions">
+          <Button
+            variant="danger"
+            disabled={busy}
+            onClick={() => send({ action: "stop" })}
+          >
+            Stop watching
+          </Button>
+        </div>
+      ) : null}
+      {access.mayOperate && !shadow ? (
         <div className="bakes-actions">
           {run.state === "not_started" ? (
             <Button disabled={busy} onClick={() => send({ action: "start" })}>
@@ -145,7 +170,7 @@ export function BakeRunPanel(
           ) : null}
         </div>
       ) : null}
-      {run.state === "completed" && access.mayOperate ? (
+      {run.state === "completed" && access.mayOperate && !shadow ? (
         <form
           className="bake-run-check"
           onSubmit={(event) => {
@@ -185,6 +210,12 @@ export function BakeRunPanel(
           <RunTimeline run={run} view={run.view} />
           <Positions view={run.view} />
         </>
+      )}
+      {run.shadow === null ? null : (
+        <ObservedMoves
+          matches={run.shadow.matches}
+          unobserved={run.shadow.unobserved}
+        />
       )}
     </section>
   );
@@ -312,6 +343,52 @@ function RunTimeline(
           />
         }
       />
+    </div>
+  );
+}
+
+function signed(value: number | null): string {
+  if (value === null) return "no time yet";
+  return `${value >= 0 ? "+" : ""}${value.toFixed(1)} s`;
+}
+
+/** A shadow run's moves: each one's planned task and its time difference. */
+function ObservedMoves(
+  props: Readonly<{
+    matches: readonly BakeShadowMatch[];
+    unobserved: readonly string[];
+  }>,
+): React.ReactNode {
+  return (
+    <div className="bake-run-block">
+      <h4>Observed moves</h4>
+      {props.matches.length === 0 ? (
+        <p className="bake-run-note">No move of the cobots yet.</p>
+      ) : (
+        <ul className="bake-run-groups" aria-label="Observed moves">
+          {props.matches.map((match) => (
+            <li key={`${match.sourceKey}/${match.observationId}`}>
+              <span>
+                {match.observationId} on {match.sourceKey}
+              </span>
+              <span
+                className={
+                  match.planned === null ? "bake-run-unknown" : undefined
+                }
+              >
+                {match.planned === null
+                  ? "Not in the plan"
+                  : `${match.planned.key}${match.sameCobot === false ? ` (planned for ${match.planned.sourceKey})` : ""}: start ${signed(match.difference.startSeconds)}, end ${signed(match.difference.endSeconds)}`}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {props.unobserved.length === 0 ? null : (
+        <p className="bake-run-note">
+          Not seen yet: {props.unobserved.join(", ")}.
+        </p>
+      )}
     </div>
   );
 }

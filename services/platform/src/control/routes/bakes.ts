@@ -1,4 +1,5 @@
 import {
+  parseBakeAuthorityInput,
   parseBakeDecisionInput,
   parseBakeRunActionInput,
   parseBakeStockLevelInput,
@@ -12,6 +13,7 @@ import {
   type BakeCommandOutcome,
   type BakeMemberRole,
 } from "../../kitchen/bakes/commands";
+import { setBakeAuthority } from "../../kitchen/bakes/authority";
 import { setBakeStockLevel } from "../../kitchen/bakes/levels";
 import { roleMayConfigure } from "../../data/control-plane";
 import {
@@ -26,6 +28,8 @@ import { controlError, controlJson, readJsonRecord } from "../http";
  * product and the bake proposals. Every member reads them. An admin or the
  * owner sets a level. A decision goes to the Organisation Actor, which runs the
  * same check as a Slack click: a viewer is refused there, with the reason.
+ * An admin or the owner also sets the authority of each kitchen location
+ * (Plan 24 S5): shadow mode, the default, or approval mode.
  */
 export type BakeControlRoute = Readonly<{
   kind: "bakes";
@@ -33,12 +37,13 @@ export type BakeControlRoute = Readonly<{
   target:
     | Readonly<{ kind: "board" }>
     | Readonly<{ kind: "level" }>
+    | Readonly<{ kind: "authority" }>
     | Readonly<{ kind: "decision"; proposalId: string }>
     | Readonly<{ kind: "run"; proposalId: string }>;
 }>;
 
 const BAKES =
-  /^\/v1\/control\/organisations\/([^/]+)\/bakes(?:\/(levels)|\/proposals\/(bake_[a-f0-9]{24})\/(decision|run))?$/u;
+  /^\/v1\/control\/organisations\/([^/]+)\/bakes(?:\/(levels|authority)|\/proposals\/(bake_[a-f0-9]{24})\/(decision|run))?$/u;
 
 export function matchBakeControlRoute(
   pathname: string,
@@ -48,6 +53,8 @@ export function matchBakeControlRoute(
   const organisationIdRaw = match[1] ?? "";
   if (match[2] === "levels")
     return { kind: "bakes", organisationIdRaw, target: { kind: "level" } };
+  if (match[2] === "authority")
+    return { kind: "bakes", organisationIdRaw, target: { kind: "authority" } };
   if (match[3] !== undefined)
     return {
       kind: "bakes",
@@ -70,6 +77,8 @@ export function handleBakeControlRoute(
       return readBoard(request, env, route.organisationIdRaw);
     case "level":
       return putLevel(request, env, route.organisationIdRaw);
+    case "authority":
+      return putAuthority(request, env, route.organisationIdRaw);
     case "decision":
       return decide(
         request,
@@ -131,84 +140,43 @@ async function readBoard(
   });
 }
 
-async function putLevel(
-  request: Request,
-  env: Env,
-  organisationIdRaw: string,
-): Promise<Response> {
-  if (request.method !== "PUT") return controlError("method_not_allowed", 405);
-  const authorized = await authorizeOrganisationRequest(
-    request,
-    env,
-    organisationIdRaw,
-    "admin",
-    true,
-  );
-  if (!authorized.ok) return authorized.response;
-  const body = await readJsonRecord(request);
-  const input = body.ok ? parseBakeStockLevelInput(body.value) : null;
-  if (!body.ok || input === null)
-    return controlError("bake_level_invalid", 422);
-  const admitted = await admitControlMutation({
-    request,
-    authorized,
-    body: body.value,
-    boundary: "unversioned",
-    route: `/v1/control/organisations/${authorized.organisationId}/bakes/levels`,
-    operation: "kitchen.bake_level.set",
-  });
-  if (admitted instanceof Response) return admitted;
-  const now = Date.now();
-  const set = await setBakeStockLevel(
-    authorized.executionScope.database,
-    authorized.organisationId,
-    input,
-    authorized.authenticated.session.userId,
-    now,
-  );
-  if (!set.ok)
-    return refusal(
-      set.error.code,
-      set.error.message,
-      set.error.code === "bake_level_stale" ? 409 : 422,
-    );
-  const responseBody = { ok: true, level: set.value.level };
-  await recordSessionMutationReceipt(
-    authorized,
-    admitted,
-    { status: 200, body: responseBody },
-    now,
-  );
-  return controlJson(responseBody);
-}
+type Authorized = Extract<
+  Awaited<ReturnType<typeof authorizeOrganisationRequest>>,
+  { ok: true }
+>;
+
+type BakeWriteOutcome =
+  | Readonly<{ ok: true; body: Record<string, unknown> }>
+  | Readonly<{ ok: false; code: string; message: string; status: number }>;
 
 /**
- * One person's bake command from the Portal: it parses the body, admits the
- * mutation, runs the command in the Organisation Actor and keeps its receipt.
- * The Actor runs the same check as a Slack click or the agent's request.
+ * One person's write on the Bakes page: it checks the role, parses the body,
+ * admits the mutation, writes and keeps its receipt. An admin or the owner
+ * sets a stock level or the authority of a kitchen location (Plan 24 S5);
+ * every other write is a bake command that the Organisation Actor checks, as
+ * it checks a Slack click or the agent's request.
  */
-async function runPortalBakeCommand<Input>(
+async function bakeWrite<Input>(
   request: Request,
   env: Env,
   organisationIdRaw: string,
   route: Readonly<{
+    method: "PUT" | "POST";
+    role: "admin" | "viewer";
     path: string;
     parse: (value: Record<string, unknown>) => Input | null;
     invalid: string;
     operation: (input: Input) => string;
-    command: (
-      input: Input,
-      requester: Readonly<{ userId: string; role: BakeMemberRole }>,
-    ) => BakeCommand;
-    answer: (outcome: BakeCommandOutcome) => Record<string, unknown>;
+    write: (authorized: Authorized, input: Input) => Promise<BakeWriteOutcome>;
   }>,
 ): Promise<Response> {
-  if (request.method !== "POST") return controlError("method_not_allowed", 405);
+  if (request.method !== route.method)
+    return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
     organisationIdRaw,
-    "viewer",
+    route.role,
     true,
   );
   if (!authorized.ok) return authorized.response;
@@ -224,33 +192,10 @@ async function runPortalBakeCommand<Input>(
     operation: route.operation(input),
   });
   if (admitted instanceof Response) return admitted;
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId: authorized.organisationId,
-    now: Date.now(),
-  });
-  const done = await organisation.runBakeCommand({
-    organisationId: authorized.organisationId,
-    command: route.command(input, {
-      userId: authorized.authenticated.session.userId,
-      role: authorized.membership.role,
-    }),
-  });
-  if (!done.ok) {
-    const error = done.error;
-    if (!("message" in error)) return controlError(error.code, 503);
-    return refusal(
-      error.code,
-      error.message,
-      error.code === "bake_role_insufficient"
-        ? 403
-        : error.code === "bake_proposal_missing" ||
-            error.code === "bake_run_missing"
-          ? 404
-          : 409,
-    );
-  }
-  const responseBody = { ok: true, ...route.answer(done.value) };
+  const written = await route.write(authorized, input);
+  if (!written.ok)
+    return refusal(written.code, written.message, written.status);
+  const responseBody = { ok: true, ...written.body };
   await recordSessionMutationReceipt(
     authorized,
     admitted,
@@ -258,6 +203,133 @@ async function runPortalBakeCommand<Input>(
     Date.now(),
   );
   return controlJson(responseBody);
+}
+
+function putLevel(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  return bakeWrite(request, env, organisationIdRaw, {
+    method: "PUT",
+    role: "admin",
+    path: "levels",
+    parse: parseBakeStockLevelInput,
+    invalid: "bake_level_invalid",
+    operation: () => "kitchen.bake_level.set",
+    write: async (authorized, input) => {
+      const set = await setBakeStockLevel(
+        authorized.executionScope.database,
+        authorized.organisationId,
+        input,
+        authorized.authenticated.session.userId,
+        Date.now(),
+      );
+      return set.ok
+        ? { ok: true, body: { level: set.value.level } }
+        : {
+            ok: false,
+            code: set.error.code,
+            message: set.error.message,
+            status: set.error.code === "bake_level_stale" ? 409 : 422,
+          };
+    },
+  });
+}
+
+/** Plan 24 S5: an admin sets a kitchen location's shadow or approval mode. */
+function putAuthority(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  return bakeWrite(request, env, organisationIdRaw, {
+    method: "PUT",
+    role: "admin",
+    path: "authority",
+    parse: parseBakeAuthorityInput,
+    invalid: "bake_authority_invalid",
+    operation: (input) => `kitchen.bake_authority.${input.mode}`,
+    write: async (authorized, input) => {
+      const set = await setBakeAuthority(
+        authorized.executionScope.database,
+        authorized.organisationId,
+        input,
+        authorized.authenticated.session.userId,
+        Date.now(),
+      );
+      return set.ok
+        ? { ok: true, body: { authority: set.value.authority } }
+        : {
+            ok: false,
+            code: set.error.code,
+            message: set.error.message,
+            status: 409,
+          };
+    },
+  });
+}
+
+/** One person's bake command from the Portal, run by the Organisation Actor. */
+function runPortalBakeCommand<Input>(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+  route: Readonly<{
+    path: string;
+    parse: (value: Record<string, unknown>) => Input | null;
+    invalid: string;
+    operation: (input: Input) => string;
+    command: (
+      input: Input,
+      requester: Readonly<{ userId: string; role: BakeMemberRole }>,
+    ) => BakeCommand;
+    answer: (outcome: BakeCommandOutcome) => Record<string, unknown>;
+  }>,
+): Promise<Response> {
+  return bakeWrite(request, env, organisationIdRaw, {
+    method: "POST",
+    role: "viewer",
+    path: route.path,
+    parse: route.parse,
+    invalid: route.invalid,
+    operation: route.operation,
+    write: async (authorized, input) => {
+      const organisation = await requireActiveOrganisationActor({
+        env,
+        organisationId: authorized.organisationId,
+        now: Date.now(),
+      });
+      const done = await organisation.runBakeCommand({
+        organisationId: authorized.organisationId,
+        command: route.command(input, {
+          userId: authorized.authenticated.session.userId,
+          role: authorized.membership.role,
+        }),
+      });
+      if (done.ok) return { ok: true, body: route.answer(done.value) };
+      const error = done.error;
+      if (!("message" in error))
+        return {
+          ok: false,
+          code: error.code,
+          message: "Bakes are not available now. Try again.",
+          status: 503,
+        };
+      return {
+        ok: false,
+        code: error.code,
+        message: error.message,
+        status:
+          error.code === "bake_role_insufficient"
+            ? 403
+            : error.code === "bake_proposal_missing" ||
+                error.code === "bake_run_missing"
+              ? 404
+              : 409,
+      };
+    },
+  });
 }
 
 function decide(

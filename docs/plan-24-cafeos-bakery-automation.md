@@ -182,6 +182,25 @@ State (21 November 2026, branch `plan-24-s4`, not released): built.
 
 Exit: a shadow run gives zero commands to a cobot and zero stock changes.
 
+State (21 November 2026, branch `plan-24-s56`, not released): built.
+
+- Authority: each kitchen location has a mode, `shadow` or `approval`, in the regional table
+  `bake_authority` (`kitchen/bakes/authority.ts`). A location with no row is in shadow mode. An
+  admin or the owner sets the mode on the Bakes page (`PUT .../bakes/authority`, with the revision
+  that they read). A run takes the mode of its location when it starts and keeps it.
+- Shadow run: an approved proposal at a shadow location starts a run with the same compiled plan.
+  It reserves no device, writes no dispatch and sends no task, pause or stop. The device fleet
+  Actor gives it each `cobot_observed` move of its devices; the run matches each move to its
+  planned task with `correlateShadowMoves` and keeps the difference of the planned and observed
+  times. The canvas, the timeline and the positions show the observed times; a move that the plan
+  does not have shows as "Not in the plan". When every planned task has a completed move, the run
+  completes and its proposal ends. A shadow run has no alarm, no pause and no check: it changes no
+  stock.
+- Agent: `bake_read` shows the mode of each location and `bake_run_read` the shadow matches. The
+  agent cannot change the mode: approval mode lifts the restriction that keeps the cobots still,
+  and the agent lifts no restriction (rules above, Plan 81).
+- Patch: `services/platform/scripts/plan-24-shadow-mode-d1-patch.sql`, after the S4 patch.
+
 ### S6 — Approval mode and faults (4–6 days)
 
 Each case is one E2E journey with its own outcome:
@@ -203,6 +222,7 @@ dispatch with one visible disposition.
 | Step | What exists | Proof |
 | --- | --- | --- |
 | S4 | The bake run Durable Object on the server: start at approval, the dispatch ledger in the device fleet Actor, holds that a person settles, pause, stop, the check that raises the stock, one read for the drawer's canvas, timeline and positions, and two agent tools | `services/platform/tests/e2e/bake-run.test.ts` (artifacts `output/plan-24/bake-run-journey.json`, `output/plan-24/bake-run-agent.json`) |
+| S5 | Shadow mode: the authority of each kitchen location, a shadow run that matches each observed move to its planned task, zero commands and zero stock changes | `services/platform/tests/e2e/bake-shadow.test.ts` (artifact `output/plan-24/bake-shadow-journey.json`) |
 
 ## Exit gate of the simulation phase
 

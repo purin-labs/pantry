@@ -16,6 +16,7 @@ import {
 } from "../../ui";
 import { Select } from "../../ui/select";
 import { decideBake, readBakes, refusalText, saveBakeLevel } from "./requests";
+import { BakeAuthorityList } from "./authority";
 import { BakeRunPanel } from "./run-panel";
 import "./bakes.css";
 
@@ -101,6 +102,21 @@ export function BakesRoute(
               ? "Add a level for each fresh product that the kitchen bakes."
               : "An admin sets the level of each fresh product."
           }
+        />
+      </section>
+      <section className="bakes-section" aria-labelledby="bakes-authority">
+        <div className="bakes-heading">
+          <h2 id="bakes-authority">Authority</h2>
+        </div>
+        <p className="bakes-note">
+          In shadow mode an approved bake sends nothing: Seams Pantry only
+          watches the cobots. In approval mode it sends the bake's tasks.
+        </p>
+        <BakeAuthorityList
+          organisationId={organisationId}
+          authority={board.authority}
+          mayEdit={mayEditLevels}
+          saved={() => void reload()}
         />
       </section>
       <section className="bakes-section" aria-labelledby="bakes-proposals">

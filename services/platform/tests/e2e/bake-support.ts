@@ -280,13 +280,17 @@ async function applied(
     throw new Error(JSON.stringify(value.error));
 }
 
-/** The financier recipe in Kitchen, with one applied revision (Plan 84). */
+/**
+ * The financier recipe in Kitchen, with one applied revision (Plan 84). Its
+ * bake step gives a bake run its oven program, in seconds.
+ */
 export async function applyFinancierWorkflow(
   organisationId: string,
   session: IssuedControlSession,
+  bakeSeconds = 900,
 ): Promise<void> {
   const compiled = await compileFinancierRecipe(
-    financierRecipeInput(1, 2, 900),
+    financierRecipeInput(1, 2, bakeSeconds),
   );
   if (!compiled.ok) throw new Error(JSON.stringify(compiled.error));
   const response = await send(

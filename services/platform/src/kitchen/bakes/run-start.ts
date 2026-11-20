@@ -3,6 +3,7 @@ import type { BakeRunInput } from "@purin-labs/production-simulation/physical";
 import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
+import { readBakeAuthority } from "./authority";
 import type { BakeProposal } from "./records";
 import type { BakeRunError, BakeRunStart } from "./run";
 import {
@@ -21,6 +22,10 @@ import type { BakeRunDevice } from "./run-store";
  * move mould groups and one oven that bakes. If a device is missing or not
  * ready, the run does not start, and the proposal shows the reason. A person
  * starts it again when the devices are ready; the approval stands.
+ *
+ * S5: the run takes the authority of its kitchen location when it starts. A
+ * shadow run compiles the same plan and only watches; it reserves and sends
+ * nothing.
  */
 
 /** A device at the kitchen as the Devices page has it now. */
@@ -184,12 +189,18 @@ export async function startProposalRun(
       "bake_proposal_not_approved",
       "Only an approved proposal starts a bake run.",
     );
+  const mode = await readBakeAuthority(
+    db,
+    organisationId,
+    proposal.kitchenLocation,
+  );
   const planned = await planRun(proposal, ports);
   const launched = planned.ok
     ? await ports.launch({
         runId,
         proposalId: proposal.proposalId,
         productName: proposal.productName,
+        mode,
         input: planned.value.input,
         devices: planned.value.devices,
         approval: {
@@ -204,6 +215,7 @@ export async function startProposalRun(
     await writeBakeRunNotStarted(db, organisationId, {
       runId,
       proposalId: proposal.proposalId,
+      mode,
       code: launched.error.code,
       message: launched.error.message,
       now,

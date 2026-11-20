@@ -15,6 +15,7 @@ import type {
   BakeKitchenPorts,
   CounterStockChange,
 } from "../../kitchen/bakes/commands";
+import { listBakeAuthority } from "../../kitchen/bakes/authority";
 import type { BakeProposal } from "../../kitchen/bakes/records";
 import {
   listBakeProposals,
@@ -114,6 +115,7 @@ export async function readBakeRunOf(
   if (live === null || live === undefined)
     return {
       ...base,
+      mode: summary.mode,
       state: summary.state,
       hold: null,
       approval:
@@ -125,6 +127,7 @@ export async function readBakeRunOf(
       dispatches: [],
       unloadRisk: null,
       view: null,
+      shadow: null,
     };
   return {
     ...live,
@@ -177,6 +180,17 @@ export async function readBakeBoard(
     listBakeRuns(db, organisationId),
   ]);
   const products = listCountedProducts(sql, organisationId);
+  const kitchenLocations = [
+    ...new Set(
+      gateways
+        .filter((gateway) => gateway.state === "active")
+        .map((gateway) => gateway.locationId),
+    ),
+  ].sort();
+  const authority = await listBakeAuthority(db, organisationId, [
+    ...kitchenLocations,
+    ...levels.map((level) => level.kitchenLocation),
+  ]);
   const recipes = await Promise.all(
     levels.map((level) =>
       readAppliedWorkflowHead(db, organisationId, level.workflowId),
@@ -202,6 +216,7 @@ export async function readBakeBoard(
     runs: runs.map((run) => ({
       runId: run.runId,
       proposalId: run.proposalId,
+      mode: run.mode,
       state: run.state,
       problem: run.problem,
       holdCode: run.holdCode,
@@ -215,12 +230,7 @@ export async function readBakeBoard(
       title: workflow.title,
       revision: workflow.revision,
     })),
-    kitchenLocations: [
-      ...new Set(
-        gateways
-          .filter((gateway) => gateway.state === "active")
-          .map((gateway) => gateway.locationId),
-      ),
-    ].sort(),
+    kitchenLocations,
+    authority: [...authority],
   };
 }

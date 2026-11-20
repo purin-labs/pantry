@@ -1,15 +1,18 @@
 import type {
   CobotClockEntry,
+  CobotObserved,
   CobotRunSignal,
   CobotTaskMessage,
 } from "@purin-labs/control-api";
 import type {
+  BakeAuthorityMode,
   BakeRunHold,
   BakeRunRecord,
 } from "@purin-labs/kitchen-control-api";
 import { timeFromSeconds } from "@purin-labs/production-simulation";
 import {
   compileBakeRun,
+  correlateShadowMoves,
   drivePhysicalRun,
   observeBakeRun,
   openDisposition,
@@ -52,6 +55,12 @@ import {
  * Kitchen imports no file of the devices area. The run asks for what it needs
  * from the devices through `BakeRunDevicePorts`; the Worker gives the
  * implementation.
+ *
+ * S5, shadow mode: a run at a location in shadow mode compiles the same plan,
+ * reserves nothing and sends nothing. The controller runs the bake from its
+ * own script, as a person at the teach pendant would; the device fleet Actor
+ * gives the run each observed move, and the run matches it to its planned
+ * task with the difference of the times. A shadow run changes no stock.
  */
 
 export type RunActor = Readonly<{ kind: "person" | "agent"; id: string }>;
@@ -102,6 +111,7 @@ export type BakeRunStart = Readonly<{
   runId: string;
   proposalId: string;
   productName: string;
+  mode: BakeAuthorityMode;
   input: BakeRunInput;
   devices: readonly BakeRunDevice[];
   approval: BakeRunApproval;
@@ -117,7 +127,8 @@ export type BakeRunError = Readonly<{
     | "bake_run_not_held"
     | "bake_run_ended"
     | "bake_run_attempt_failed"
-    | "bake_run_result_open";
+    | "bake_run_result_open"
+    | "bake_run_shadow";
   message: string;
 }>;
 
@@ -173,7 +184,9 @@ async function persist(
     endedAt: after.endedAt,
     now,
   });
-  if (after.state === "running") await ctx.alarm.at(now + WATCH_MS);
+  // A shadow run sends nothing, so it has no dispatch to watch.
+  if (after.state === "running" && after.mode === "approval")
+    await ctx.alarm.at(now + WATCH_MS);
   else await ctx.alarm.clear();
   if (after.state === "completed" || after.state === "stopped")
     await ctx.devices.unwatch(ctx.actorId, after.devices);
@@ -233,6 +246,7 @@ export async function startBakeRun(
     runId: start.runId,
     proposalId: start.proposalId,
     productName: start.productName,
+    mode: start.mode,
     state: "running",
     input: start.input,
     devices: start.devices,
@@ -241,6 +255,7 @@ export async function startBakeRun(
     hold: null,
     pausedDevices: [],
     lastEvidenceAt: now,
+    observed: [],
     startedAt: now,
     endedAt: null,
   };
@@ -250,8 +265,10 @@ export async function startBakeRun(
     runId: run.runId,
     proposalId: run.proposalId,
     actorId: ctx.actorId,
+    mode: run.mode,
     now,
   });
+  if (run.mode === "shadow") return { ok: true, value: run };
   await ctx.alarm.at(now + WATCH_MS);
   return { ok: true, value: await advance(ctx, run, [], now) };
 }
@@ -449,6 +466,11 @@ export async function receiveBakeRunSignal(
 ): Promise<void> {
   const stored = loadBakeRun(ctx.sql);
   if (stored === null || stored.state === "stopped") return;
+  if (stored.mode === "shadow") {
+    if (signal.kind === "observed")
+      await observeShadowMove(ctx, stored, signal.observed, now);
+    return;
+  }
   const keys = new Set(stored.devices.map((device) => device.sourceKey));
   let run: StoredBakeRun = { ...stored, lastEvidenceAt: now };
   const evidence: PhysicalEvidence[] = [];
@@ -466,7 +488,7 @@ export async function receiveBakeRunSignal(
       break;
     }
     case "observed":
-      // Shadow mode (S5) correlates these; an approved run sends its tasks.
+      // Only a shadow run (S5) correlates these; this run sends its tasks.
       return;
     case "fault":
       if (!keys.has(signal.sourceKey)) return;
@@ -505,6 +527,66 @@ export async function receiveBakeRunSignal(
   await advanceSaved(ctx, stored, run, evidence, now);
 }
 
+function shadowOf(run: StoredBakeRun) {
+  return correlateShadowMoves(run.physical.bake.plan, {
+    origin: run.physical.ledger.origin,
+    messages: run.observed,
+  });
+}
+
+/**
+ * A shadow run keeps each observed move of its devices. When every planned
+ * task has a completed move, the run completes and its proposal ends: Pantry
+ * sent nothing, and the stock does not change.
+ */
+async function observeShadowMove(
+  ctx: BakeRunContext,
+  run: StoredBakeRun,
+  observed: CobotObserved,
+  now: number,
+): Promise<void> {
+  if (
+    run.state !== "running" ||
+    !run.devices.some((device) => device.sourceKey === observed.sourceKey) ||
+    run.observed.some(
+      (known) =>
+        known.sourceKey === observed.sourceKey &&
+        known.observationId === observed.observationId &&
+        known.state === observed.state,
+    )
+  )
+    return;
+  let after: StoredBakeRun = {
+    ...run,
+    observed: [...run.observed, observed],
+    lastEvidenceAt: now,
+  };
+  const shadow = shadowOf(after);
+  const done =
+    shadow.unobserved.length === 0 &&
+    run.physical.bake.plan.steps.every((step) =>
+      shadow.matches.some(
+        (match) =>
+          match.planned?.key === step.key && match.state === "completed",
+      ),
+    );
+  if (done) after = { ...after, state: "completed", endedAt: now };
+  await persist(ctx, run, after, now);
+  if (done) {
+    const steps = run.physical.bake.plan.steps.length;
+    await ctx.endProposal(
+      `Shadow run: the controller made each of the ${steps} planned moves. Pantry sent nothing, and the stock did not change.`,
+    );
+  }
+}
+
+function refuseShadow(): Result<never, BakeRunError> {
+  return refuse(
+    "bake_run_shadow",
+    "This run is in shadow mode: it sends nothing to the devices. Pause or stop the cobots at their teach pendant, or stop watching the run.",
+  );
+}
+
 /** Saves a change that `advance` does not see, then advances. */
 async function advanceSaved(
   ctx: BakeRunContext,
@@ -524,7 +606,7 @@ export async function watchBakeRun(
   now: number,
 ): Promise<void> {
   const run = loadBakeRun(ctx.sql);
-  if (run?.state !== "running") {
+  if (run?.state !== "running" || run.mode === "shadow") {
     await ctx.alarm.clear();
     return;
   }
@@ -576,6 +658,7 @@ export async function pauseBakeRun(
   const found = loaded(ctx);
   if (!found.ok) return found;
   const run = found.value;
+  if (run.mode === "shadow") return refuseShadow();
   if (run.state === "paused") return { ok: true, value: run };
   if (run.state !== "running" && run.state !== "held")
     return refuse(
@@ -607,6 +690,7 @@ export async function resumeBakeRun(
   const found = loaded(ctx);
   if (!found.ok) return found;
   const run = found.value;
+  if (run.mode === "shadow") return refuseShadow();
   if (run.state !== "paused")
     return refuse("bake_run_not_paused", "The run is not paused.");
   for (const device of run.devices)
@@ -653,7 +737,7 @@ export async function stopBakeRun(
   const after: StoredBakeRun = { ...run, state: "stopped", endedAt: now };
   await persist(ctx, run, after, now);
   await ctx.endProposal(
-    `The run was stopped by ${actor.kind === "agent" ? "the agent for " : ""}${actor.id}. Nothing was added to the stock.`,
+    `The ${run.mode === "shadow" ? "shadow run" : "run"} was stopped by ${actor.kind === "agent" ? "the agent for " : ""}${actor.id}. Nothing was added to the stock.`,
   );
   return { ok: true, value: after };
 }
@@ -674,6 +758,7 @@ export async function settleBakeRun(
   const found = loaded(ctx);
   if (!found.ok) return found;
   const run = found.value;
+  if (run.mode === "shadow") return refuseShadow();
   if (run.hold === null)
     return refuse("bake_run_not_held", "The run has nothing to settle.");
   if (decision === "stop") return stopBakeRun(ctx, actor, now);
@@ -766,11 +851,21 @@ export function readBakeRunRecord(
 ): Omit<BakeRunRecord, "check" | "problem"> | null {
   const run = loadBakeRun(ctx.sql);
   if (run === null) return null;
-  const view = observeBakeRun(run.physical);
+  const shadow = run.mode === "shadow" ? shadowOf(run) : null;
+  const engineView = observeBakeRun(run.physical);
+  const view: RecordView =
+    shadow === null
+      ? {
+          ...engineView,
+          tasks: [...engineView.tasks],
+          groups: [...engineView.groups],
+        }
+      : shadowView(engineView, shadow);
   return {
     runId: run.runId,
     proposalId: run.proposalId,
     productName: run.productName,
+    mode: run.mode,
     state: run.state,
     hold: run.hold,
     approval: run.approval,
@@ -793,7 +888,93 @@ export function readBakeRunRecord(
       writtenAt: action.writtenAt,
       sentAt: action.sentAt,
     })),
-    unloadRisk: unloadRisk(view, run.physical),
-    view: { ...view, tasks: [...view.tasks], groups: [...view.groups] },
+    unloadRisk: shadow === null ? unloadRisk(engineView, run.physical) : null,
+    view,
+    shadow:
+      shadow === null
+        ? null
+        : {
+            matches: shadow.matches.map((match) => ({ ...match })),
+            unobserved: [...shadow.unobserved],
+          },
+  };
+}
+
+type ShadowCorrelation = ReturnType<typeof correlateShadowMoves>;
+type RecordView = NonNullable<BakeRunRecord["view"]>;
+type ViewTask = RecordView["tasks"][number];
+type ViewGroup = RecordView["groups"][number];
+
+/**
+ * The views of a shadow run: each planned task shows the times and the state
+ * of the move that the controller made, and each mould group the place where
+ * the last observed move left it. A task with no observed move stays planned.
+ * A move of a group that the run does not bake stays in `shadow.matches`.
+ */
+function shadowView(view: BakeRunView, shadow: ShadowCorrelation): RecordView {
+  const tasks: ViewTask[] = view.tasks.map((task) => {
+    const match = shadow.matches.find((item) => item.planned?.key === task.key);
+    if (match === undefined)
+      return {
+        ...task,
+        state: task.state === "ready" ? "planned" : task.state,
+      };
+    const { startSeconds, endSeconds } = match.observed;
+    return {
+      ...task,
+      state:
+        match.state === "completed"
+          ? "completed"
+          : match.state === "failed"
+            ? "failed"
+            : "running",
+      observed: {
+        startSeconds,
+        endSeconds,
+        observedSeconds:
+          startSeconds === null || endSeconds === null
+            ? null
+            : endSeconds - startSeconds,
+      },
+      carrierAt: match.carrierAt,
+      reason: match.reason,
+    };
+  });
+  const groups = new Map<number, ViewGroup>(
+    view.groups.map((group) => [group.mouldGroup, group]),
+  );
+  let latest = view.logicalSeconds;
+  for (const match of shadow.matches) {
+    latest = Math.max(
+      latest,
+      match.observed.endSeconds ?? match.observed.startSeconds ?? 0,
+    );
+    const task = match.task;
+    // A group outside the run shows in the observed moves only.
+    if (
+      task.kind !== "move_mould_group" ||
+      match.state === "started" ||
+      !groups.has(task.mouldGroup)
+    )
+      continue;
+    const at = match.carrierAt ?? "unknown";
+    groups.set(task.mouldGroup, {
+      mouldGroup: task.mouldGroup,
+      basis: "observed",
+      position:
+        at === "source" || at === "destination"
+          ? { kind: "place", place: at === "source" ? task.from : task.to }
+          : at === "tool"
+            ? { kind: "tool", sourceKey: match.sourceKey }
+            : { kind: "unknown" },
+    });
+  }
+  return {
+    ...view,
+    logicalSeconds: latest,
+    tasks,
+    groups: [...groups.values()].sort(
+      (left, right) => left.mouldGroup - right.mouldGroup,
+    ),
   };
 }
