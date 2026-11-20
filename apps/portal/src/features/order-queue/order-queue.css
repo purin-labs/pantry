@@ -78,29 +78,14 @@
   gap: 8px;
 }
 
-.order-queue-actions button:not(:where(.pantry-select-trigger)) {
+.order-queue-actions button.pantry-button {
   min-block-size: 48px;
   min-inline-size: 96px;
   font-size: 16px;
 }
 
-.order-queue-actions .order-queue-primary {
-  border: 0;
-  box-shadow: none;
-  border-radius: 999px;
-  background: var(--pantry-primary);
-  color: var(--pantry-on-primary);
+.order-queue-actions button.pantry-button[data-variant="primary"] {
   font-weight: 500;
-  cursor: pointer;
-}
-
-.order-queue-actions .order-queue-primary:hover:not(:disabled) {
-  background: var(--pantry-primary-hover);
-}
-
-.order-queue-actions .order-queue-primary:disabled {
-  opacity: 0.45;
-  cursor: default;
 }
 
 .order-queue-started {
@@ -143,7 +128,7 @@
   color: var(--ink-strong);
 }
 
-.order-queue-sold-out-row button:not(:where(.pantry-select-trigger)) {
+.order-queue-sold-out-row button.pantry-button {
   flex: none;
   min-block-size: 44px;
 }

@@ -11,7 +11,7 @@ import {
 } from "@purin-labs/menu-board-crdt/board";
 import { isRecord } from "@purin-labs/std";
 import { controlAnswer, controlRead, controlUpload, controlWrite } from "../../control-client";
-import { controlPath } from "./menu-board-requests";
+import { controlPath } from "../../control-paths";
 import "./images-panel.css";
 
 /**

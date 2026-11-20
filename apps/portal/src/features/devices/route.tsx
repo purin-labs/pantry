@@ -4,7 +4,6 @@ import {
   DEVICE_STATIONS,
   type DeviceAlertSetting,
   type DeviceKind,
-  type DeviceList,
   type DeviceView,
 } from "@purin-labs/control-api";
 
@@ -15,6 +14,7 @@ import {
   PageSkeleton,
   RecoverableError,
 } from "../../page-components";
+import { Button, useLatestRead, useMutation } from "../../ui";
 import { Select } from "../../ui/select";
 import { AddGatewayDialog } from "./add-gateway";
 import { DeviceDrawer, StatusLine } from "./drawer";
@@ -44,21 +44,11 @@ export type DevicePagePaths = Readonly<{
 
 export type MemberRole = "owner" | "admin" | "operator" | "viewer";
 
-type Loaded =
-  | Readonly<{ kind: "loading" }>
-  | Readonly<{ kind: "failed" }>
-  | Readonly<{
-      kind: "ready";
-      list: DeviceList;
-      readAt: number;
-      /** The last refresh failed, so `list` is the previous answer. */
-      stale: boolean;
-    }>;
-
 type Filter = "all" | "attention";
 type RoleRequest = Readonly<{ action: string; need: "operator" | "admin" }>;
 
 const REFRESH_MS = 15_000;
+const WAITING_REFRESH_MS = 3_000;
 const OTHER_GROUPS: readonly Readonly<{ kind: DeviceKind; title: string }>[] = [
   { kind: "gateway", title: "Gateways" },
   { kind: "menu_screen", title: "Menu screens" },
@@ -82,7 +72,6 @@ export function DevicesRoute(
   }>,
 ): React.ReactNode {
   const { organisationId, role, pagePaths } = props;
-  const [loaded, setLoaded] = React.useState<Loaded>({ kind: "loading" });
   const [filter, setFilter] = React.useState<Filter>("all");
   const [query, setQuery] = React.useState("");
   const [kind, setKind] = React.useState<DeviceKind | "all">("all");
@@ -94,26 +83,23 @@ export function DevicesRoute(
     null,
   );
   const [message, setMessage] = React.useState<string | null>(null);
-  const load = React.useCallback(async (): Promise<void> => {
-    const list = await readDevices(organisationId);
-    setLoaded((previous) =>
-      list !== null
-        ? { kind: "ready", list, readAt: Date.now(), stale: false }
-        : previous.kind === "ready"
-          ? { ...previous, stale: true }
-          : { kind: "failed" },
-    );
-  }, [organisationId]);
+  // While the Add gateway dialog waits for a gateway, the page reads more often.
+  const [waiting, setWaiting] = React.useState(false);
+  const readList = React.useCallback(
+    (signal: AbortSignal) => readDevices(organisationId, signal),
+    [organisationId],
+  );
+  const {
+    read: loaded,
+    reload,
+    retry,
+  } = useLatestRead(readList, {
+    everyMs: waiting ? WAITING_REFRESH_MS : REFRESH_MS,
+    pauseWhenHidden: true,
+  });
   const refresh = React.useCallback(() => {
-    void load();
-  }, [load]);
-  React.useEffect(() => {
-    void load();
-    const timer = setInterval(() => {
-      if (!document.hidden) void load();
-    }, REFRESH_MS);
-    return () => clearInterval(timer);
-  }, [load]);
+    void reload();
+  }, [reload]);
 
   if (loaded.kind === "loading")
     return <PageSkeleton label="Loading devices" />;
@@ -121,22 +107,11 @@ export function DevicesRoute(
     return (
       <RecoverableError
         message="The devices could not be read."
-        action={
-          <button
-            type="button"
-            className="secondary"
-            onClick={() => {
-              setLoaded({ kind: "loading" });
-              void load();
-            }}
-          >
-            Try again
-          </button>
-        }
+        action={<Button onClick={() => void retry()}>Try again</Button>}
       />
     );
 
-  const { devices, unavailableKinds } = loaded.list;
+  const { devices, unavailableKinds } = loaded.value;
   const attention = devices.filter((device) => device.needsAttention).length;
   const ready = devices.filter(
     (device) =>
@@ -158,16 +133,16 @@ export function DevicesRoute(
     devices.find((device) => device.deviceId === selectedId) ?? null;
   const mayAdd = role === "owner" || role === "admin";
   const addButton = (
-    <button
-      type="button"
-      className="primary-button"
+    <Button
+      variant="primary"
+      size="lg"
       onClick={() => {
         if (mayAdd) setAdding(true);
         else setRoleRequest({ action: "add a gateway", need: "admin" });
       }}
     >
       Add gateway
-    </button>
+    </Button>
   );
   const dialogs = (
     <>
@@ -175,7 +150,7 @@ export function DevicesRoute(
         device={selected}
         organisationId={organisationId}
         role={role}
-        snapshotsEnabled={loaded.list.snapshotsEnabled}
+        snapshotsEnabled={loaded.value.snapshotsEnabled}
         pagePaths={pagePaths}
         close={() => setSelectedId(null)}
         changed={(text) => {
@@ -187,9 +162,10 @@ export function DevicesRoute(
       <AddGatewayDialog
         open={adding}
         organisationId={organisationId}
-        list={loaded.list}
+        list={loaded.value}
         close={() => setAdding(false)}
         refresh={refresh}
+        waiting={setWaiting}
       />
       <AlertSettingsDialog
         open={settings}
@@ -255,13 +231,7 @@ export function DevicesRoute(
         </p>
         <div className="devices-head-actions">
           {role === "owner" || role === "admin" ? (
-            <button
-              type="button"
-              className="secondary"
-              onClick={() => setSettings(true)}
-            >
-              Alert times
-            </button>
+            <Button onClick={() => setSettings(true)}>Alert times</Button>
           ) : null}
           {addButton}
         </div>
@@ -297,13 +267,13 @@ export function DevicesRoute(
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
-        {loaded.list.locations.length > 1 ? (
+        {loaded.value.locations.length > 1 ? (
           <label className="devices-field devices-kind">
             Location
             <Select.Root
               items={[
                 { value: "all", label: "All locations" },
-                ...loaded.list.locations.map((item) => ({
+                ...loaded.value.locations.map((item) => ({
                   value: item,
                   label: item,
                 })),
@@ -318,7 +288,7 @@ export function DevicesRoute(
               </Select.Trigger>
               <Select.Popup>
                 <Select.Item value="all">All locations</Select.Item>
-                {loaded.list.locations.map((item) => (
+                {loaded.value.locations.map((item) => (
                   <Select.Item key={item} value={item}>
                     {item}
                   </Select.Item>
@@ -352,9 +322,7 @@ export function DevicesRoute(
       {shown.length === 0 ? (
         <div className="devices-none">
           <p>No device matches these filters.</p>
-          <button
-            type="button"
-            className="secondary"
+          <Button
             onClick={() => {
               setFilter("all");
               setQuery("");
@@ -363,7 +331,7 @@ export function DevicesRoute(
             }}
           >
             Clear filters
-          </button>
+          </Button>
         </div>
       ) : (
         groupsOf(shown).map((group) => (
@@ -517,9 +485,9 @@ function RoleDialog(
             your role in Workspace settings.
           </p>
           <div className="devices-add-foot">
-            <button type="button" className="primary-button" onClick={close}>
+            <Button variant="primary" size="lg" onClick={close}>
               Close
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -561,6 +529,9 @@ function AlertSettingsDialog(
   );
 }
 
+/** The one write of the alert times form. */
+const SAVE = "save";
+
 function AlertSettingsForm(
   props: Readonly<{
     organisationId: string;
@@ -569,34 +540,32 @@ function AlertSettingsForm(
   }>,
 ): React.ReactNode {
   const { organisationId } = props;
-  const [setting, setSetting] = React.useState<DeviceAlertSetting>(() => ({
+  const readSetting = React.useCallback(
+    (signal: AbortSignal) => readAlertSetting(organisationId, signal),
+    [organisationId],
+  );
+  const { read: saved } = useLatestRead(readSetting);
+  const [defaults] = React.useState<DeviceAlertSetting>(() => ({
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     opensAtMinute: 7 * 60,
     closesAtMinute: 19 * 60,
     offlineDelayMinutes: 5,
   }));
-  const [failed, setFailed] = React.useState(false);
-  const [busy, setBusy] = React.useState(false);
-  React.useEffect(() => {
-    let current = true;
-    void readAlertSetting(organisationId).then((read) => {
-      if (current && read !== null) setSetting(read);
-    });
-    return () => {
-      current = false;
-    };
-  }, [organisationId]);
+  // The form shows the person's own change, then the saved times, then the defaults.
+  const [edited, setSetting] = React.useState<DeviceAlertSetting | null>(null);
+  const setting =
+    edited ?? (saved.kind === "ready" ? saved.value : null) ?? defaults;
+  const save = useMutation((next: DeviceAlertSetting, idempotencyKey: string) =>
+    writeAlertSetting(organisationId, next, idempotencyKey),
+  );
+  const saving = save.state(SAVE);
   return (
     <form
       className="devices-add-body"
       onSubmit={(event) => {
         event.preventDefault();
-        setBusy(true);
-        setFailed(false);
-        void writeAlertSetting(organisationId, setting).then((ok) => {
-          setBusy(false);
-          if (ok) props.saved();
-          else setFailed(true);
+        void save.run(SAVE, setting).then((outcome) => {
+          if (outcome.kind === "done") props.saved();
         });
       }}
     >
@@ -661,18 +630,23 @@ function AlertSettingsForm(
           }
         />
       </label>
-      {failed ? (
+      {saving.kind === "failed" ? (
         <p className="error-text" role="alert">
           The times did not save. Check the time zone name.
         </p>
       ) : null}
       <div className="devices-add-foot">
-        <button type="button" className="devices-link" onClick={props.close}>
+        <Button variant="link" onClick={props.close}>
           Cancel
-        </button>
-        <button type="submit" className="primary-button" disabled={busy}>
+        </Button>
+        <Button
+          variant="primary"
+          size="lg"
+          type="submit"
+          disabled={saving.kind === "running"}
+        >
           Save
-        </button>
+        </Button>
       </div>
     </form>
   );

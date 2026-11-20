@@ -32,7 +32,7 @@ import {
 } from "./square-pos-handoff";
 import "./register.css";
 
-const REFRESH_MS = 10_000;
+const REGISTER_POLL = { everyMs: 10_000 } as const;
 const JPY_QUICK_BILLS = [1_000, 5_000, 10_000] as const;
 
 export function RegisterRoute(
@@ -42,7 +42,7 @@ export function RegisterRoute(
     () => readCounterRegister(props.organisationId),
     [props.organisationId],
   );
-  const { read: registerRead, reload } = useLatestRead(loadRegister, REFRESH_MS);
+  const { read: registerRead, reload } = useLatestRead(loadRegister, REGISTER_POLL);
   const snapshot = registerRead.kind === "ready" ? registerRead.value : null;
 
   const [selectedSectionId, setSelectedSectionId] = React.useState<string>("");

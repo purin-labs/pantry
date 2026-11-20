@@ -1,10 +1,6 @@
 import React from "react";
-import {
-  parsePaymentsDay,
-  type PaymentStep as Payment,
-} from "@purin-labs/control-api";
+import type { PaymentStep as Payment } from "@purin-labs/control-api";
 
-import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import {
   nowIn,
@@ -13,8 +9,10 @@ import {
   usePeriod,
   usePeriodRead,
   useWiderWhenEmpty,
+  type PeriodWindow,
 } from "../../ui";
 import { PaymentLanes, type PaymentStep } from "./payment-lanes";
+import { readPayments } from "./requests";
 
 /**
  * The Payments page: the shop's card payments of a day, a week or a month, paid
@@ -27,17 +25,8 @@ export function PaymentsRoute(
   const { organisationId } = props;
   const control = usePeriod();
   const reader = React.useCallback(
-    async (window: Readonly<{ from: number; to: number }>) => {
-      const params = new URLSearchParams({
-        from: String(window.from),
-        to: String(window.to),
-      });
-      return parsePaymentsDay(
-        await controlRead(
-          `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/payments?${params.toString()}`,
-        ),
-      );
-    },
+    (window: PeriodWindow, signal: AbortSignal) =>
+      readPayments(organisationId, window, signal),
     [organisationId],
   );
   const read = usePeriodRead(control.period, reader, {

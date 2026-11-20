@@ -3,13 +3,18 @@ import { Link } from "react-router";
 import {
   DEVICE_STATIONS,
   VOICE_ENGINES,
-  type DeviceActivity,
   type DeviceView,
   type KitchenDeviceView,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
 
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
+import {
+  Button,
+  useLatestRead,
+  useMutation,
+  type ButtonVariant,
+} from "../../ui";
 import { Select } from "../../ui/select";
 import {
   readDeviceActivity,
@@ -55,10 +60,15 @@ type Panel =
   | Readonly<{ kind: "resume" }>
   | Readonly<{ kind: "settle" }>;
 
+type Command = Readonly<{
+  command: string;
+  body: Readonly<Record<string, unknown>>;
+}>;
+
 type Action = Readonly<{
   label: string;
   need: NeededRole;
-  tone: "primary" | "plain" | "danger";
+  tone: ButtonVariant;
   run: () => void;
 }>;
 
@@ -109,28 +119,28 @@ function DrawerBody(
 ): React.ReactNode {
   const { device, organisationId, role } = props;
   const [panel, setPanel] = React.useState<Panel>({ kind: "none" });
-  const [busy, setBusy] = React.useState(false);
-  const [failed, setFailed] = React.useState(false);
+  // One command for this device at a time.
+  const command = useMutation((sent: Command, idempotencyKey: string) =>
+    sendDeviceCommand(
+      organisationId,
+      device.deviceId,
+      sent.command,
+      sent.body,
+      idempotencyKey,
+    ),
+  );
+  const sending = command.state(device.deviceId);
+  const busy = sending.kind === "running";
+  const failed = sending.kind === "failed";
   const managed = device.kind === "gateway" || device.kind === "kitchen_device";
   const mayRead = ROLE_RANK[role] >= ROLE_RANK.operator;
   const run = async (
-    command: string,
+    name: string,
     body: Readonly<Record<string, unknown>>,
     message: string,
   ): Promise<void> => {
-    setBusy(true);
-    setFailed(false);
-    const ok = await sendDeviceCommand(
-      organisationId,
-      device.deviceId,
-      command,
-      body,
-    );
-    setBusy(false);
-    if (!ok) {
-      setFailed(true);
-      return;
-    }
+    const outcome = await command.run(device.deviceId, { command: name, body });
+    if (outcome.kind !== "done") return;
     setPanel({ kind: "none" });
     props.changed(message);
   };
@@ -162,15 +172,14 @@ function DrawerBody(
       {actions.length === 0 ? null : (
         <div className="devices-actions">
           {actions.map((action) => (
-            <button
+            <Button
+              variant={action.tone}
               key={action.label}
-              type="button"
-              className={`secondary devices-action-${action.tone}`}
               disabled={busy}
               onClick={action.run}
             >
               {action.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -227,13 +236,12 @@ function DrawerBody(
         ) : (
           <div className="devices-fold">
             <p className="devices-fold-title">Activity</p>
-            <button
-              type="button"
-              className="devices-link"
+            <Button
+              variant="link"
               onClick={() => props.askRole("read activity", "operator")}
             >
               Ask for access to activity
-            </button>
+            </Button>
           </div>
         )
       ) : (
@@ -285,7 +293,7 @@ function deviceActions(
       {
         label: "Rename",
         need: "operator",
-        tone: "plain",
+        tone: "secondary",
         run: gated("rename a gateway", "operator", () =>
           setPanel({ kind: "rename", name: device.name }),
         ),
@@ -338,7 +346,7 @@ function deviceActions(
     actions.push({
       label: "Request pause",
       need: "operator",
-      tone: device.work.state === "idle" ? "plain" : "primary",
+      tone: device.work.state === "idle" ? "secondary" : "primary",
       run: gated("request a pause", "operator", () => {
         void run(
           "pause",
@@ -351,7 +359,7 @@ function deviceActions(
     actions.push({
       label: "Lift restriction",
       need: "admin",
-      tone: "plain",
+      tone: "secondary",
       run: gated("lift a restriction", "admin", () => {
         void run("lift", {}, "Restriction lifted.");
       }),
@@ -360,7 +368,7 @@ function deviceActions(
     actions.push({
       label: "Restrict",
       need: "operator",
-      tone: "plain",
+      tone: "secondary",
       run: gated("restrict a device", "operator", () =>
         setPanel({ kind: "restrict", reason: "" }),
       ),
@@ -368,7 +376,7 @@ function deviceActions(
   actions.push({
     label: "Rename",
     need: "operator",
-    tone: "plain",
+    tone: "secondary",
     run: gated("rename a device", "operator", () =>
       setPanel({ kind: "rename", name: device.name }),
     ),
@@ -377,7 +385,7 @@ function deviceActions(
     actions.push({
       label: "Move",
       need: "admin",
-      tone: "plain",
+      tone: "secondary",
       run: gated("move a device", "admin", () =>
         setPanel({
           kind: "move",
@@ -409,13 +417,9 @@ function ActionPanel(
 ): React.ReactNode {
   const { panel, device, busy, setPanel, run } = props;
   const cancel = (
-    <button
-      type="button"
-      className="devices-link"
-      onClick={() => setPanel({ kind: "none" })}
-    >
+    <Button variant="link" onClick={() => setPanel({ kind: "none" })}>
       Cancel
-    </button>
+    </Button>
   );
   const stationItems = DEVICE_STATIONS.map((station) => ({
     value: station.stationId,
@@ -469,9 +473,9 @@ function ActionPanel(
           </label>
           <div className="devices-panel-actions">
             {cancel}
-            <button type="submit" className="primary-button" disabled={busy}>
+            <Button variant="primary" size="lg" type="submit" disabled={busy}>
               Restrict device
-            </button>
+            </Button>
           </div>
         </form>
       );
@@ -498,9 +502,9 @@ function ActionPanel(
           </label>
           <div className="devices-panel-actions">
             {cancel}
-            <button type="submit" className="primary-button" disabled={busy}>
+            <Button variant="primary" size="lg" type="submit" disabled={busy}>
               Save name
-            </button>
+            </Button>
           </div>
         </form>
       );
@@ -532,9 +536,9 @@ function ActionPanel(
           </label>
           <div className="devices-panel-actions">
             {cancel}
-            <button type="submit" className="primary-button" disabled={busy}>
+            <Button variant="primary" size="lg" type="submit" disabled={busy}>
               Move device
-            </button>
+            </Button>
           </div>
         </form>
       );
@@ -583,9 +587,9 @@ function ActionPanel(
           </label>
           <div className="devices-panel-actions">
             {cancel}
-            <button type="submit" className="primary-button" disabled={busy}>
+            <Button variant="primary" size="lg" type="submit" disabled={busy}>
               Confirm device
-            </button>
+            </Button>
           </div>
         </form>
       );
@@ -599,16 +603,15 @@ function ActionPanel(
           </p>
           <div className="devices-panel-actions">
             {cancel}
-            <button
-              type="button"
-              className="secondary devices-action-danger"
+            <Button
+              variant="danger"
               disabled={busy}
               onClick={() => {
                 void run("revoke", {}, `${device.name} has no access now.`);
               }}
             >
               Revoke access
-            </button>
+            </Button>
           </div>
         </div>
       );
@@ -621,16 +624,16 @@ function ActionPanel(
           </p>
           <div className="devices-panel-actions">
             {cancel}
-            <button
-              type="button"
-              className="primary-button"
+            <Button
+              variant="primary"
+              size="lg"
               disabled={busy}
               onClick={() => {
                 void run("resume", {}, `${device.name} resumed.`);
               }}
             >
               Resume
-            </button>
+            </Button>
           </div>
         </div>
       );
@@ -643,16 +646,16 @@ function ActionPanel(
           </p>
           <div className="devices-panel-actions">
             {cancel}
-            <button
-              type="button"
-              className="primary-button"
+            <Button
+              variant="primary"
+              size="lg"
               disabled={busy}
               onClick={() => {
                 void run("settle", {}, "Task result marked as checked.");
               }}
             >
               Mark as checked
-            </button>
+            </Button>
           </div>
         </div>
       );
@@ -744,35 +747,30 @@ function CameraSnapshots(
               Seams deletes each image after seven days and keeps no video.
             </p>
             <div className="devices-panel-actions">
-              <button
-                type="button"
-                className="devices-link"
-                onClick={() => setConfirming(false)}
-              >
+              <Button variant="link" onClick={() => setConfirming(false)}>
                 Cancel
-              </button>
-              <button
-                type="button"
-                className="primary-button"
+              </Button>
+              <Button
+                variant="primary"
+                size="lg"
                 disabled={busy}
                 onClick={() => {
                   void setEnabled(true);
                 }}
               >
                 Turn on snapshots
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
-          <button
-            type="button"
-            className="devices-link"
+          <Button
+            variant="link"
             onClick={gated("turn on snapshots", "admin", () =>
               setConfirming(true),
             )}
           >
             Turn on snapshots
-          </button>
+          </Button>
         )}
         {note === "" ? null : <p role="status">{note}</p>}
       </div>
@@ -781,13 +779,12 @@ function CameraSnapshots(
     return (
       <div className="devices-fold">
         <p className="devices-fold-title">Snapshots</p>
-        <button
-          type="button"
-          className="devices-link"
+        <Button
+          variant="link"
           onClick={() => askRole("see camera snapshots", "admin")}
         >
           Ask for access to snapshots
-        </button>
+        </Button>
       </div>
     );
   const snapshots = read?.kind === "read" ? read.snapshots : [];
@@ -796,26 +793,23 @@ function CameraSnapshots(
       <p className="devices-fold-title">Snapshots</p>
       <p>Seams deletes each image after seven days and keeps no video.</p>
       <div className="devices-snapshot-actions">
-        <button
-          type="button"
-          className="secondary devices-action-plain"
+        <Button
           disabled={busy}
           onClick={() => {
             void take();
           }}
         >
           Take a snapshot
-        </button>
-        <button
-          type="button"
-          className="devices-link"
+        </Button>
+        <Button
+          variant="link"
           disabled={busy}
           onClick={gated("turn off snapshots", "admin", () => {
             void setEnabled(false);
           })}
         >
           Turn off snapshots
-        </button>
+        </Button>
       </div>
       {note === "" ? null : <p role="status">{note}</p>}
       {read?.kind === "failed" ? (
@@ -852,21 +846,17 @@ function ActivityList(
   }>,
 ): React.ReactNode {
   const { organisationId, subjectId, refreshKey } = props;
-  const [activity, setActivity] = React.useState<
-    DeviceActivity | null | "failed"
-  >(null);
-  React.useEffect(() => {
-    let current = true;
-    void readDeviceActivity(organisationId, subjectId).then((read) => {
-      if (current) setActivity(read ?? "failed");
-    });
-    return () => {
-      current = false;
-    };
-  }, [organisationId, subjectId, refreshKey]);
-  if (activity === "failed")
+  const readActivity = React.useCallback(
+    (signal: AbortSignal) =>
+      readDeviceActivity(organisationId, subjectId, signal),
+    [organisationId, subjectId],
+  );
+  // The activity can change when the device does, so it reads again then.
+  const { read } = useLatestRead(readActivity, { reloadOn: refreshKey });
+  if (read.kind === "failed" || (read.kind === "ready" && read.stale))
     return <p className="devices-fold-title">Activity could not be read.</p>;
-  if (activity === null) return null;
+  if (read.kind === "loading") return null;
+  const activity = read.value;
   return (
     <>
       {activity.samples.length === 0 ? null : (

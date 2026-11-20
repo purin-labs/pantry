@@ -7,6 +7,24 @@ export function organisationRecordPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}`;
 }
 
+/** A path under one Organisation's record, such as `devices`. */
+export function controlPath(organisationId: string, suffix: string): string {
+  return `${organisationRecordPath(organisationId)}/${suffix}`;
+}
+
+/** A record of one period: its path with the start and the end in milliseconds. */
+export function periodPath(
+  organisationId: string,
+  suffix: string,
+  window: Readonly<{ from: number; to: number }>,
+): string {
+  const params = new URLSearchParams({
+    from: String(window.from),
+    to: String(window.to),
+  });
+  return `${controlPath(organisationId, suffix)}?${params.toString()}`;
+}
+
 export function homePath(organisationId: string): string {
   return `${organisationRecordPath(organisationId)}/home`;
 }

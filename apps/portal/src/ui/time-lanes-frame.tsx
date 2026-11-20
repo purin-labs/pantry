@@ -1,6 +1,7 @@
 import React from "react";
 
 import { EmptyState, PageSkeleton, RecoverableError } from "../page-components";
+import { Button } from "./button";
 import {
   FitPeriod,
   PeriodPicker,
@@ -8,6 +9,7 @@ import {
   type TimePeriod,
   type TimeRange,
 } from "./time-lanes";
+import { useLatestRead } from "./use-latest-read";
 
 /**
  * What a page with a timeline shares: the toolbar stays in place while a period
@@ -77,11 +79,7 @@ export function TimeLanesFrame(props: {
       ) : status.kind === "failed" ? (
         <RecoverableError
           message={status.message}
-          action={
-            <button className="secondary" type="button" onClick={status.retry}>
-              Try again
-            </button>
-          }
+          action={<Button onClick={status.retry}>Try again</Button>}
         />
       ) : (
         <>
@@ -109,13 +107,16 @@ export function TimeLanesNote(props: {
   return <p className="time-lanes-note">{props.children}</p>;
 }
 
+/** The start and the end of a period, in milliseconds. */
+export type PeriodWindow = Readonly<{ from: number; to: number }>;
+
 /**
  * Reads the period in view when it opens and on each change. An earlier answer
  * never replaces a later one. `read` keeps its identity while its inputs do.
  */
 export function usePeriodRead<Value>(
   period: TimePeriod,
-  read: (window: Readonly<{ from: number; to: number }>) => Promise<Value>,
+  read: (window: PeriodWindow, signal: AbortSignal) => Promise<Value>,
   words: Readonly<{
     loading: string;
     failed: string | ((cause: unknown) => string);
@@ -123,34 +124,18 @@ export function usePeriodRead<Value>(
 ): Readonly<{
   value: Value | null;
   /** The window that `value` answers; null until it has an answer. */
-  window: Readonly<{ from: number; to: number }> | null;
+  window: PeriodWindow | null;
   status: TimeLanesStatus;
 }> {
   const { from, to } = period;
-  const [answer, setAnswer] = React.useState<
-    | Readonly<{ kind: "loading" }>
-    | Readonly<{ kind: "failed"; cause: unknown }>
-    | Readonly<{
-        kind: "ready";
-        window: Readonly<{ from: number; to: number }>;
-        value: Value;
-      }>
-  >({ kind: "loading" });
-  const request = React.useRef(0);
-  const load = React.useCallback(async (): Promise<void> => {
-    const current = ++request.current;
-    setAnswer({ kind: "loading" });
-    try {
-      const value = await read({ from, to });
-      if (current === request.current)
-        setAnswer({ kind: "ready", window: { from, to }, value });
-    } catch (cause) {
-      if (current === request.current) setAnswer({ kind: "failed", cause });
-    }
-  }, [from, to, read]);
-  React.useEffect(() => {
-    void load();
-  }, [load]);
+  const readWindow = React.useCallback(
+    async (signal: AbortSignal) => ({
+      window: { from, to },
+      value: await read({ from, to }, signal),
+    }),
+    [from, to, read],
+  );
+  const { read: answer, retry } = useLatestRead(readWindow);
   switch (answer.kind) {
     case "loading":
       return {
@@ -167,12 +152,16 @@ export function usePeriodRead<Value>(
           message:
             typeof words.failed === "string"
               ? words.failed
-              : words.failed(answer.cause),
-          retry: () => void load(),
+              : words.failed(answer.error),
+          retry: () => void retry(),
         },
       };
     case "ready":
-      return { value: answer.value, window: answer.window, status: READY };
+      return {
+        value: answer.value.value,
+        window: answer.value.window,
+        status: READY,
+      };
   }
 }
 

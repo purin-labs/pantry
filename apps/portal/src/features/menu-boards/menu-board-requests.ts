@@ -5,11 +5,7 @@ import type {
 } from "@purin-labs/menu-draft-crdt";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 import { controlRead } from "../../control-client";
-
-/** A control route of the Organisation, such as `menu-boards`. */
-export function controlPath(organisationId: string, suffix: string): string {
-  return `/v1/control/organisations/${encodeURIComponent(organisationId)}/${suffix}`;
-}
+import { controlPath } from "../../control-paths";
 
 /** The shop's saved menu draft, which names the sections and items. */
 export async function readMenuDraft(

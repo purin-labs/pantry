@@ -674,44 +674,72 @@ columns to retain exact source formatting and units.
 
 ### Reads and writes
 
-Two hooks hold the request state of a page that reads a record through
-`controlRead` and changes it through `controlMutation`. The staff order queue
-(`features/order-queue/route.tsx`) uses both.
+`useLatestRead` and `useMutation` are the one way to read and to change a
+record in a Portal component. The request itself is a function in the request
+module of the feature, for example `features/devices/requests.ts`: it calls
+`controlRead` or `controlMutation`, parses the answer, and fails with an error.
+A component file calls no function of the control client;
+`pnpm lint:portal-requests` refuses a new call. The Devices page, the order
+queue, Payments, Payouts and the order timeline use the hooks.
 
-`useLatestRead(read, everyMs)` reads when the page opens, every `everyMs`
-milliseconds, and on `reload()`. Its `read` is `loading`, `failed` (no answer
-yet) or `ready` with the value, the time of the answer, and `stale` when a later
-read failed. An answer that arrives out of order is dropped, so the page never
-shows an older answer after a newer one. The answer of `reload()` also replaces
-each read that started before it. Call `reload()` after a write: a poll that
-started before the write cannot then show the old record.
+`useLatestRead(read, options)` reads when the page opens and on `reload()`.
+Its `read` is `loading`, `failed` (no answer yet) or `ready` with the value,
+the time of the answer, and `stale` when a later read failed. An answer that
+arrives out of order is dropped, so the page never shows an older answer after
+a newer one. The answer of `reload()` also replaces each read that started
+before it. Call `reload()` after a write: a poll that started before the write
+cannot then show the old record. `retry()` reads again and shows `loading`
+until the answer, for a "Try again" button.
+
+- `read` gets an `AbortSignal`. The signal ends when the page closes, when
+  `read` changes, and when a later read made this answer useless. Pass it to
+  `controlRead`, and the request stops then. A read that the Portal starts
+  early (`early-reads.ts`) passes no signal, because a read with a signal is
+  not shared.
+- `everyMs` reads again on a timer, and `pauseWhenHidden` starts no timed read
+  while the tab is hidden.
+- `reloadOn` reads again when its value changes, and keeps the answer on
+  screen meanwhile. A new `read` function starts again from `loading`.
 
 ```tsx
-const readQueue = React.useCallback(
-  () => controlRead(queuePath).then(parseQueue),
-  [queuePath],
+const readList = React.useCallback(
+  (signal: AbortSignal) => readDevices(organisationId, signal),
+  [organisationId],
 );
-const { read, reload } = useLatestRead(readQueue, 5_000);
+const { read, reload, retry } = useLatestRead(readList, {
+  everyMs: 15_000,
+  pauseWhenHidden: true,
+});
 ```
+
+`usePeriodRead(period, read, words)` is `useLatestRead` for a page with a
+period picker: it reads the window of the period in view and gives the
+`TimeLanesStatus` of the read.
 
 `useMutation(write, settled)` runs one write for each key at a time, for
 example one order on the queue. The state of a key is `idle`, `running` or
-`failed` with the error. Each attempt has its own idempotency key, which the
-hook gives to `write`. A second `run` for a key while its write runs sends
-nothing and answers `busy`. `settled` runs after each attempt, before the key
-is `idle` again, so the button stays busy until the page has read again.
+`failed` with the error, and `busy` says that a write runs for any key. Each
+attempt has its own idempotency key, which the hook gives to `write`. A second
+`run` for a key while its write runs sends nothing and answers `busy`.
+`settled` runs after each attempt, before the key is `idle` again, so the
+button stays busy until the page has read again. A page with one write at a
+time uses one constant key. A write is not stopped when the page closes.
 
 ```tsx
 const advance = useMutation(
   (action: OrderQueueAction, idempotencyKey: string, fulfillmentId: string) =>
-    controlMutation(`${queuePath}/${fulfillmentId}/advance`, "POST", { action },
-      undefined, { kind: "prepared", idempotencyKey }),
+    advanceOrder(organisationId, fulfillmentId, action, idempotencyKey),
   reload,
 );
 const state = advance.state(entry.fulfillmentId);
-<button disabled={state.kind === "running"}
-  onClick={() => void advance.run(entry.fulfillmentId, "ready")}>Ready</button>;
+<Button disabled={state.kind === "running"}
+  onClick={() => void advance.run(entry.fulfillmentId, "ready")}>Ready</Button>;
 ```
+
+The Organisation settings keep their writes in the `MutationLedger` of the
+shell (`mutation-state.ts`), which also refuses two different writes of one
+scope. It is the state of the `Portal` class, so those pages do not use
+`useMutation` yet.
 
 `controlMutation` and `controlUpload` forget every shared read when a write
 starts and when it ends. A caller that reads after the write gets a new read,

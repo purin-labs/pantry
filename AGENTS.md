@@ -405,6 +405,12 @@ A Portal feature reads the control API through `controlRead` and changes it
 through `controlMutation` (`apps/portal/src/control-client.ts`); `pnpm
 lint:portal-fetch` refuses a new raw `fetch`. When a file loses one, run
 `node scripts/check-portal-fetch-ratchet.mjs --update`.
+A Portal component reads through `useLatestRead` and changes through
+`useMutation` (`apps/portal/src/ui`). The request is a function in the request
+module of its feature, for example `features/devices/requests.ts`; `pnpm
+lint:portal-requests` refuses a new direct `controlRead` or `controlMutation`
+call in a component file. When a file loses one, run
+`node scripts/check-portal-requests-ratchet.mjs --update`.
 Portal components use [Base UI](https://base-ui.com) (`@base-ui/react`) for
 behaviour and plain CSS with Portal tokens for styles. Do not add shadcn/ui,
 Tailwind or a second component library. Before you build a control, look in

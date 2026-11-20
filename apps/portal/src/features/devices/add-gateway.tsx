@@ -6,6 +6,7 @@ import {
 } from "@purin-labs/control-api";
 
 import { cancelDialog, syncDialog } from "../../dialog";
+import { Button, useMutation } from "../../ui";
 import { Select } from "../../ui/select";
 import {
   sendDeviceCommand,
@@ -55,6 +56,8 @@ export function AddGatewayDialog(
     list: DeviceList;
     close: () => void;
     refresh: () => void;
+    /** Says that a step waits for the gateway, and when it stops. */
+    waiting: (on: boolean) => void;
   }>,
 ): React.ReactNode {
   const { open, close } = props;
@@ -78,9 +81,11 @@ function AddGatewaySteps(
     list: DeviceList;
     close: () => void;
     refresh: () => void;
+    /** Says that a step waits for the gateway, and when it stops. */
+    waiting: (on: boolean) => void;
   }>,
 ): React.ReactNode {
-  const { organisationId, list, refresh } = props;
+  const { organisationId, list, refresh, waiting } = props;
   const [step, setStep] = React.useState<Step>({ kind: "place" });
   const index =
     step.kind === "place"
@@ -91,11 +96,12 @@ function AddGatewaySteps(
           ? 2
           : 3;
   // While a step waits for the gateway, the page reads more often.
+  const stepWaits = step.kind === "install" || step.kind === "confirm";
   React.useEffect(() => {
-    if (step.kind !== "install" && step.kind !== "confirm") return;
-    const timer = setInterval(refresh, 3_000);
-    return () => clearInterval(timer);
-  }, [step.kind, refresh]);
+    if (!stepWaits) return undefined;
+    waiting(true);
+    return () => waiting(false);
+  }, [stepWaits, waiting]);
   React.useEffect(() => {
     if (step.kind !== "install") return;
     const gateway = list.devices.find(
@@ -183,13 +189,9 @@ function AddGatewaySteps(
             {doneText(step.active, step.waiting)}
           </p>
           <div className="devices-add-foot">
-            <button
-              type="button"
-              className="primary-button"
-              onClick={props.close}
-            >
+            <Button variant="primary" size="lg" onClick={props.close}>
               Done
-            </button>
+            </Button>
           </div>
         </>
       )}
@@ -324,12 +326,12 @@ function PlaceStep(
       </label>
       <StartFailureText failure={failure} />
       <div className="devices-add-foot">
-        <button type="button" className="devices-link" onClick={props.close}>
+        <Button variant="link" onClick={props.close}>
           Cancel
-        </button>
-        <button type="submit" className="primary-button" disabled={busy}>
+        </Button>
+        <Button variant="primary" size="lg" type="submit" disabled={busy}>
           Continue
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -352,9 +354,7 @@ function InstallStep(
       </p>
       <div className="devices-command">
         <code>{props.command}</code>
-        <button
-          type="button"
-          className="secondary"
+        <Button
           onClick={() => {
             navigator.clipboard.writeText(props.command).then(
               () => setCopied("yes"),
@@ -363,7 +363,7 @@ function InstallStep(
           }}
         >
           {copied === "yes" ? "Copied" : "Copy command"}
-        </button>
+        </Button>
       </div>
       {copied === "failed" ? (
         <p className="error-text">Select the command and copy it by hand.</p>
@@ -372,9 +372,9 @@ function InstallStep(
         Waiting for the gateway to connect.
       </p>
       <div className="devices-add-foot">
-        <button type="button" className="devices-link" onClick={props.close}>
+        <Button variant="link" onClick={props.close}>
           Close
-        </button>
+        </Button>
       </div>
     </>
   );
@@ -401,21 +401,24 @@ function ExpiredStep(
       </p>
       <StartFailureText failure={failure} />
       <div className="devices-add-foot">
-        <button type="button" className="devices-link" onClick={props.close}>
+        <Button variant="link" onClick={props.close}>
           Close
-        </button>
-        <button
-          type="button"
-          className="primary-button"
+        </Button>
+        <Button
+          variant="primary"
+          size="lg"
           disabled={busy}
           onClick={() => start(props.place)}
         >
           Make a new code
-        </button>
+        </Button>
       </div>
     </>
   );
 }
+
+/** The one write of the confirm step. */
+const CONFIRM = "confirm";
 
 function ConfirmStep(
   props: Readonly<{
@@ -428,8 +431,25 @@ function ConfirmStep(
   const [choices, setChoices] = React.useState<
     Readonly<Record<string, Choice>>
   >({});
-  const [busy, setBusy] = React.useState(false);
-  const [failed, setFailed] = React.useState(false);
+  // One write for the form: each chosen device gets its command.
+  const confirm = useMutation(
+    async (devices: readonly KitchenDeviceView[]): Promise<void> => {
+      const results = await Promise.allSettled(
+        devices.map((device) => {
+          const choice = choiceOf(device);
+          return sendDeviceCommand(
+            props.organisationId,
+            device.deviceId,
+            "confirm",
+            { name: choice.name.trim(), stationId: choice.stationId },
+          );
+        }),
+      );
+      if (results.some((result) => result.status === "rejected"))
+        throw new Error("A device did not save.");
+    },
+  );
+  const confirming = confirm.state(CONFIRM);
   const choiceOf = (device: KitchenDeviceView): Choice =>
     choices[device.deviceId] ?? {
       checked: false,
@@ -447,23 +467,9 @@ function ConfirmStep(
       className="devices-add-form"
       onSubmit={(event) => {
         event.preventDefault();
-        setBusy(true);
-        setFailed(false);
-        void Promise.all(
-          chosen.map((device) => {
-            const choice = choiceOf(device);
-            return sendDeviceCommand(
-              props.organisationId,
-              device.deviceId,
-              "confirm",
-              { name: choice.name.trim(), stationId: choice.stationId },
-            );
-          }),
-        ).then((results) => {
-          setBusy(false);
-          if (results.every(Boolean))
+        void confirm.run(CONFIRM, chosen).then((outcome) => {
+          if (outcome.kind === "done")
             props.finished(chosen.length, found.length - chosen.length);
-          else setFailed(true);
         });
       }}
     >
@@ -526,17 +532,22 @@ function ConfirmStep(
           })}
         </ul>
       )}
-      {failed ? (
+      {confirming.kind === "failed" ? (
         <p className="error-text" role="alert">
           A device did not save. Try again.
         </p>
       ) : null}
       <div className="devices-add-foot">
-        <button type="submit" className="primary-button" disabled={busy}>
+        <Button
+          variant="primary"
+          size="lg"
+          type="submit"
+          disabled={confirming.kind === "running"}
+        >
           {chosen.length === 0
             ? "Finish without confirming"
             : `Confirm ${chosen.length} ${chosen.length === 1 ? "device" : "devices"}`}
-        </button>
+        </Button>
       </div>
     </form>
   );

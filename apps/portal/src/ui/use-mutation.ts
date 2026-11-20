@@ -19,6 +19,8 @@ export type Mutation<Key extends string, Input, Value> = Readonly<{
    */
   run: (key: Key, input: Input) => Promise<MutationOutcome<Value>>;
   state: (key: Key) => MutationState;
+  /** A write runs for one key or more: the hook's list of writes in flight. */
+  busy: boolean;
   /** Forgets a failure, for example when the person dismisses its message. */
   reset: (key: Key) => void;
 }>;
@@ -30,6 +32,12 @@ const IDLE: MutationState = { kind: "idle" };
  * attempt has its own idempotency key, so a retry after a failure is a new
  * attempt and a second tap during a write sends nothing. `settled` runs after
  * each attempt that sent a write, for example to read the record again.
+ *
+ * A write is not stopped when the page closes: the record changes, and the
+ * hook then keeps no state for it. A page with one write at a time uses one
+ * constant key. The Organisation settings keep their writes in the
+ * `MutationLedger` of the shell (`mutation-state.ts`), which also refuses two
+ * different writes of one scope.
  */
 export function useMutation<Key extends string, Input, Value>(
   write: (input: Input, idempotencyKey: string, key: Key) => Promise<Value>,
@@ -96,5 +104,13 @@ export function useMutation<Key extends string, Input, Value>(
     },
     [update],
   );
-  return React.useMemo(() => ({ run, state, reset }), [run, state, reset]);
+  const busy = React.useMemo(() => {
+    for (const current of states.values())
+      if (current.kind === "running") return true;
+    return false;
+  }, [states]);
+  return React.useMemo(
+    () => ({ run, state, busy, reset }),
+    [run, state, busy, reset],
+  );
 }

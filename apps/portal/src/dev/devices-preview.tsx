@@ -188,6 +188,8 @@ const activity: DeviceActivity = {
 };
 let snapshotsEnabled = false;
 let snapshots: DeviceSnapshotList["snapshots"] = [];
+// controlMutation reads the session's CSRF cookie before it sends.
+document.cookie = "satyr_control_csrf=preview";
 const realFetch = window.fetch.bind(window);
 window.fetch = async (input, init) => {
   const path = String(input);

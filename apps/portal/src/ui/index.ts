@@ -166,12 +166,14 @@ export {
   TimeLanesNote,
   usePeriodRead,
   ViewSwitch,
+  type PeriodWindow,
   type TimeLanesStatus,
 } from "./time-lanes-frame";
 export {
   useLatestRead,
   type LatestRead,
   type LatestReadControl,
+  type LatestReadOptions,
 } from "./use-latest-read";
 export {
   useMutation,

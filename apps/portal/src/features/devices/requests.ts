@@ -14,64 +14,60 @@ import { isRecord } from "@purin-labs/std";
 
 import {
   ControlApiError,
+  controlAnswer,
   controlMutation,
   controlRead,
 } from "../../control-client";
-import { controlPath } from "../menu-boards/menu-board-requests";
+import { controlPath } from "../../control-paths";
 
-/** The Devices page's calls to the Platform. */
+/**
+ * The Devices page's calls to the Platform. A read for `useLatestRead` and a
+ * write for `useMutation` fail with an error. The other writes give their
+ * outcome as a value.
+ */
 
 export async function readDevices(
   organisationId: string,
-): Promise<DeviceList | null> {
-  try {
-    return parseDeviceList(
-      await controlRead(controlPath(organisationId, "devices")),
-    );
-  } catch {
-    return null;
-  }
+  signal: AbortSignal,
+): Promise<DeviceList> {
+  const list = parseDeviceList(
+    await controlRead(controlPath(organisationId, "devices"), signal),
+  );
+  if (list === null) throw new Error("The devices answer is not valid.");
+  return list;
 }
 
-/** What a device write got back: its status and JSON body, or null without an answer. */
-type Sent = Readonly<{ ok: boolean; status: number; body: unknown }> | null;
-
-async function send(
+function write(
   organisationId: string,
   suffix: string,
   method: "POST" | "PUT",
   body: unknown,
-  idempotencyKey: string = crypto.randomUUID(),
-): Promise<Sent> {
-  try {
-    const answer = await controlMutation(
-      controlPath(organisationId, suffix),
-      method,
-      body,
-      undefined,
-      { kind: "prepared", idempotencyKey },
-    );
-    return { ok: true, status: 200, body: answer };
-  } catch (error) {
-    return error instanceof ControlApiError && error.status !== null
-      ? { ok: false, status: error.status, body: error.details }
-      : null;
-  }
+  idempotencyKey: string,
+): Promise<unknown> {
+  return controlMutation(
+    controlPath(organisationId, suffix),
+    method,
+    body,
+    undefined,
+    { kind: "prepared", idempotencyKey },
+  );
 }
 
+/** A command for one device or gateway, such as `rename`. It fails when refused. */
 export async function sendDeviceCommand(
   organisationId: string,
   subjectId: string,
   command: string,
   body: Readonly<Record<string, unknown>> = {},
-): Promise<boolean> {
-  const response = await send(
+  idempotencyKey: string = crypto.randomUUID(),
+): Promise<void> {
+  await write(
     organisationId,
     `devices/${encodeURIComponent(subjectId)}/${command}`,
     "POST",
     body,
+    idempotencyKey,
   );
-  return response?.ok === true;
 }
 
 /** A gateway start: the code, a refusal with its error code, or no answer. */
@@ -90,14 +86,16 @@ export async function startGateway(
   locationId: string,
   idempotencyKey: string,
 ): Promise<GatewayStartResult> {
-  const response = await send(
-    organisationId,
-    "devices/gateways",
-    "POST",
-    { name, locationId },
-    idempotencyKey,
+  const response = await controlAnswer(
+    write(
+      organisationId,
+      "devices/gateways",
+      "POST",
+      { name, locationId },
+      idempotencyKey,
+    ),
   );
-  if (response === null) return { kind: "unanswered" };
+  if (!response.ok && response.status === null) return { kind: "unanswered" };
   if (!response.ok)
     return {
       kind: "refused",
@@ -115,36 +113,45 @@ export async function startGateway(
 export async function readDeviceActivity(
   organisationId: string,
   subjectId: string,
-): Promise<DeviceActivity | null> {
-  const raw = await controlRead(
-    controlPath(
-      organisationId,
-      `devices/${encodeURIComponent(subjectId)}/activity`,
+  signal: AbortSignal,
+): Promise<DeviceActivity> {
+  const activity = parseDeviceActivity(
+    await controlRead(
+      controlPath(
+        organisationId,
+        `devices/${encodeURIComponent(subjectId)}/activity`,
+      ),
+      signal,
     ),
-  ).catch(() => null);
-  return raw === null ? null : parseDeviceActivity(raw);
+  );
+  if (activity === null) throw new Error("The activity answer is not valid.");
+  return activity;
 }
 
+/** The saved alert times, or null when the workspace has saved none. */
 export async function readAlertSetting(
   organisationId: string,
+  signal: AbortSignal,
 ): Promise<DeviceAlertSetting | null> {
   const raw = await controlRead(
     controlPath(organisationId, "devices/alert-settings"),
-  ).catch(() => null);
+    signal,
+  );
   return isRecord(raw) ? parseDeviceAlertSetting(raw.setting) : null;
 }
 
 export async function writeAlertSetting(
   organisationId: string,
   setting: DeviceAlertSetting,
-): Promise<boolean> {
-  const response = await send(
+  idempotencyKey: string,
+): Promise<void> {
+  await write(
     organisationId,
     "devices/alert-settings",
     "PUT",
     setting,
+    idempotencyKey,
   );
-  return response?.ok === true;
 }
 
 export type SnapshotRead =
@@ -189,22 +196,31 @@ export async function takeDeviceSnapshot(
   organisationId: string,
   deviceId: string,
 ): Promise<"asked" | "no_access" | "failed"> {
-  const response = await send(
-    organisationId,
-    `devices/${encodeURIComponent(deviceId)}/snapshot`,
-    "POST",
-    {},
+  const response = await controlAnswer(
+    write(
+      organisationId,
+      `devices/${encodeURIComponent(deviceId)}/snapshot`,
+      "POST",
+      {},
+      crypto.randomUUID(),
+    ),
   );
-  if (response?.status === 403) return "no_access";
-  return response?.ok === true ? "asked" : "failed";
+  if (response.status === 403) return "no_access";
+  return response.ok ? "asked" : "failed";
 }
 
 export async function writeSnapshotsEnabled(
   organisationId: string,
   enabled: boolean,
 ): Promise<boolean> {
-  const response = await send(organisationId, "devices/camera-policy", "PUT", {
-    enabled,
-  });
-  return response?.ok === true;
+  const response = await controlAnswer(
+    write(
+      organisationId,
+      "devices/camera-policy",
+      "PUT",
+      { enabled },
+      crypto.randomUUID(),
+    ),
+  );
+  return response.ok;
 }

@@ -1,14 +1,18 @@
 import React from "react";
-import {
-  parseOrderQueueEntries,
-  parseSoldOutItems,
-  type OrderQueueAction,
-  type OrderQueueEntry,
-  type SoldOutItem,
+import type {
+  OrderQueueAction,
+  OrderQueueEntry,
+  SoldOutItem,
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import { ControlApiError, controlMutation, controlRead } from "../../control-client";
-import { useLatestRead, useMutation } from "../../ui";
+import { ControlApiError } from "../../control-client";
+import { Button, useLatestRead, useMutation } from "../../ui";
+import {
+  advanceOrder,
+  readOrderQueue,
+  readSoldOutItems,
+  writeSoldOut,
+} from "./requests";
 import "./order-queue.css";
 
 /**
@@ -20,27 +24,18 @@ import "./order-queue.css";
  * poll that started before the action can no longer show the old stage.
  */
 
-const READ_EVERY_MS = 5_000;
+const POLL = { everyMs: 5_000 } as const;
 
 export function OrderQueueRoute(props: Readonly<{ organisationId: string }>): React.ReactNode {
+  const { organisationId } = props;
   const readQueue = React.useCallback(
-    async () => {
-      const entries = entriesOf(await controlRead(queuePath(props.organisationId)));
-      if (entries === null) throw new Error("The order queue answer is not valid.");
-      return entries;
-    },
-    [props.organisationId],
+    (signal: AbortSignal) => readOrderQueue(organisationId, signal),
+    [organisationId],
   );
-  const { read: queue, reload } = useLatestRead(readQueue, READ_EVERY_MS);
+  const { read: queue, reload } = useLatestRead(readQueue, POLL);
   const advance = useMutation(
     (action: OrderQueueAction, idempotencyKey: string, fulfillmentId: string) =>
-      controlMutation(
-        `${queuePath(props.organisationId)}/${encodeURIComponent(fulfillmentId)}/advance`,
-        "POST",
-        { action },
-        undefined,
-        { kind: "prepared", idempotencyKey },
-      ),
+      advanceOrder(organisationId, fulfillmentId, action, idempotencyKey),
     reload,
   );
 
@@ -82,26 +77,15 @@ export function OrderQueueRoute(props: Readonly<{ organisationId: string }>): Re
  * mark ends at the shop's next midnight, on this device's clock zone.
  */
 function SoldOutToday(props: Readonly<{ organisationId: string }>): React.ReactNode {
-  const path = `/v1/control/organisations/${encodeURIComponent(props.organisationId)}/commerce/sold-out`;
-  const readItems = React.useCallback(async () => {
-    const raw = await controlRead(path);
-    const items = isRecord(raw) ? parseSoldOutItems(raw.items) : null;
-    if (items === null) throw new Error("The sold-out answer is not valid.");
-    return items;
-  }, [path]);
-  const { read, reload } = useLatestRead(readItems, READ_EVERY_MS);
+  const { organisationId } = props;
+  const readItems = React.useCallback(
+    (signal: AbortSignal) => readSoldOutItems(organisationId, signal),
+    [organisationId],
+  );
+  const { read, reload } = useLatestRead(readItems, POLL);
   const change = useMutation(
     (item: SoldOutItem, idempotencyKey: string) =>
-      controlMutation(
-        `${path}/${encodeURIComponent(item.variantId)}`,
-        "POST",
-        {
-          soldOut: item.soldOutUntil === null,
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
-        undefined,
-        { kind: "prepared", idempotencyKey },
-      ),
+      writeSoldOut(organisationId, item, idempotencyKey),
     reload,
   );
   const items = read.kind === "ready" ? read.value : null;
@@ -114,9 +98,9 @@ function SoldOutToday(props: Readonly<{ organisationId: string }>): React.ReactN
     <ul>
       {items.map((item) => <li key={item.variantId} className="order-queue-sold-out-row" data-sold-out={item.soldOutUntil === null ? undefined : "true"}>
         <span>{item.title}</span>
-        <button type="button" className="secondary" disabled={change.state(item.variantId).kind === "running"} onClick={() => void change.run(item.variantId, item)}>
+        <Button disabled={change.state(item.variantId).kind === "running"} onClick={() => void change.run(item.variantId, item)}>
           {item.soldOutUntil === null ? "Mark sold out" : "Put back on sale"}
-        </button>
+        </Button>
       </li>)}
     </ul>
     {failed === undefined ? null : <p className="order-queue-refusal" role="alert">{failed.title} did not change. Try again.</p>}
@@ -147,16 +131,16 @@ function OrderRow(props: Readonly<{
     </ul>
     <div className="order-queue-actions">
       {entry.stage === "ready"
-        ? <button type="button" className="order-queue-primary" disabled={props.busy} onClick={() => void props.advance(entry, "hand_over")}>
+        ? <Button variant="primary" disabled={props.busy} onClick={() => void props.advance(entry, "hand_over")}>
             {props.busy ? "Saving…" : "Hand over"}
-          </button>
+          </Button>
         : <>
             {canStart
-              ? <button type="button" className="secondary" disabled={props.busy} onClick={() => void props.advance(entry, "start")}>Start</button>
+              ? <Button disabled={props.busy} onClick={() => void props.advance(entry, "start")}>Start</Button>
               : started ? <span className="order-queue-started">Started</span> : null}
-            <button type="button" className="order-queue-primary" disabled={props.busy} onClick={() => void props.advance(entry, "ready")}>
+            <Button variant="primary" disabled={props.busy} onClick={() => void props.advance(entry, "ready")}>
               {props.busy ? "Saving…" : "Ready"}
-            </button>
+            </Button>
           </>}
     </div>
     {props.refusal === null ? null : <p className="order-queue-refusal" role="alert">{props.refusal}</p>}
@@ -164,14 +148,6 @@ function OrderRow(props: Readonly<{
 }
 
 function ignore(): void {}
-
-function queuePath(organisationId: string): string {
-  return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/order-queue`;
-}
-
-function entriesOf(raw: unknown): readonly OrderQueueEntry[] | null {
-  return isRecord(raw) ? parseOrderQueueEntries(raw.entries) : null;
-}
 
 function waitLabel(since: string, now: number): string {
   const minutes = Math.max(0, Math.floor((now - Date.parse(since)) / 60_000));
