@@ -9,6 +9,7 @@ import type {
   selectMerchantReportSourceGrant,
   supplierDirectoryQuery,
 } from "../../agent-tools/commerce/read-support";
+import type { readNamedCommerceQuery } from "../entity-plane/context-read";
 import type { parseCommerceGraphQuery } from "../entity-plane/routes";
 
 export type { PreparedCommerceRead } from "../../agent-tools/commerce/read-support";
@@ -39,6 +40,8 @@ export type CommerceToolReads = Readonly<{
   selectInternalQuerySourceGrant: typeof selectInternalQuerySourceGrant;
   /** The graph query of the supplier directory. */
   supplierDirectoryQuery: typeof supplierDirectoryQuery;
+  /** Runs one named graph query under the grant that the turn selects. */
+  readNamedCommerceQuery: typeof readNamedCommerceQuery;
   /** Parses a commerce graph query. */
   parseCommerceGraphQuery: typeof parseCommerceGraphQuery;
 }>;

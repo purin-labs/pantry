@@ -72,7 +72,7 @@ import {
   type CostPlanSaveResult,
   type LotCostSaveResult,
 } from "../../commerce/cost-plan-store";
-import { CommerceReadRequestError } from "../../context/assembly/commerce";
+import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import type { Env } from "../../env";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";

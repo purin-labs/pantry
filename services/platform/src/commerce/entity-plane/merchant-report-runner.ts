@@ -8,7 +8,7 @@ import type { AccessGrant } from "../../authorization/access-grants/types";
 import {
   readNamedCommerceQuery,
   type CommerceContextAssemblyError,
-} from "../../context/assembly/commerce";
+} from "./context-read";
 import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
 import type { Result } from "../../result";
 import type { CommerceGraphReader } from "./graph-reader";

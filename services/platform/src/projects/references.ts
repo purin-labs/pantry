@@ -1,9 +1,8 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { parseSystemEntityRef } from "@purin-labs/commerce-client";
 import { listAccessGrants } from "../data/access-grants";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import { selectNamedCommerceQuerySourceGrant } from "../context/assembly/commerce";
+import { commerceGrantSelection } from "../authorization/access-grants/commerce-grant-selection";
 import { integrationResourceScopeForGrant } from "../policy/information-flow/source-labels";
 import {
   readChatControlAuthority,
@@ -437,19 +436,14 @@ export async function observeProjectReference(
       });
       if (!commerce.ok || !merchant.ok || !grants.ok)
         return unavailable(reference, now);
-      const grant = selectNamedCommerceQuerySourceGrant({
+      const grant = commerceGrantSelection.use().selectRecordGrant({
         organisationId: scope.organisationId,
         merchantId: merchant.value.merchantId,
         grants: grants.value,
         requestAuthority: authority,
         causationId: `project_reference_${reference.id}`,
-        query: {
-          kind: "entity_by_ref",
-          reference: parseSystemEntityRef(reference.type, reference.id),
-          traversal: { maxDepth: 0, resultLimit: 1 },
-          filter: null,
-        },
-        allowedSensitivity: "public",
+        recordType: reference.type,
+        recordId: reference.id,
         now: new Date(now).toISOString(),
       });
       if (!grant.ok) return unavailable(reference, now);

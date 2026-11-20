@@ -51,13 +51,6 @@ import type {
   SerializedFlowLabel,
 } from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
-export {
-  assembleCommerceContext,
-  selectCommerceContextSourceGrant,
-  selectNamedCommerceQuerySourceGrant,
-  prepareNamedCommerceQuery,
-  type CommerceContextAssemblyError,
-} from "./commerce";
 
 export const CONTEXT_ASSEMBLY_STRATEGY_VERSION: ContextAssemblyStrategyVersion =
   "context_assembly_v1";

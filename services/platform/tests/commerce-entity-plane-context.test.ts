@@ -16,7 +16,7 @@ import type {
   CommerceRelationship,
 } from "@purin-labs/commerce-contracts";
 
-import { assembleCommerceContext } from "../src/context/assembly/commerce";
+import { assembleCommerceContext } from "../src/commerce/entity-plane/context-read";
 import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";
 import {
   handleCommerceGraphRoute,

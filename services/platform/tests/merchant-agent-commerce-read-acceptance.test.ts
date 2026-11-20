@@ -26,7 +26,7 @@ import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-sour
 import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
-} from "../src/context/assembly/commerce";
+} from "../src/commerce/entity-plane/context-read";
 import { parseOrganisationId } from "../src/ids";
 import { isRecord } from "@purin-labs/std";
 import {

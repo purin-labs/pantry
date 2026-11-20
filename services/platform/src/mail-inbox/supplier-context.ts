@@ -21,12 +21,7 @@ import { listAccessGrants } from "../data/access-grants";
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
-import {
-  readNamedCommerceQuery,
-  selectNamedCommerceQuerySourceGrant,
-} from "../context/assembly/commerce";
-import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
-import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
+import { commerceGraphReads } from "../commerce/contract/graph-reads";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import {
   validateLiveRequestAuthority,
@@ -586,7 +581,8 @@ async function readGrantedCommerceQuery(
     allowedSensitivity: "internal" as const,
     now: new Date().toISOString(),
   };
-  const grant = selectNamedCommerceQuerySourceGrant(scope);
+  const graph = commerceGraphReads.use();
+  const grant = graph.selectNamedCommerceQuerySourceGrant(scope);
   if (!grant.ok) return unavailable();
   const resourceScope = integrationResourceScopeForGrant(grant.value);
   if (resourceScope === null) return unavailable();
@@ -622,13 +618,13 @@ async function readGrantedCommerceQuery(
       env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
     ),
   });
-  const commerceEngine = new CommerceEngineSource({
+  const commerceEngine = graph.createCommerceEngineSource({
     organisationId: authority.organisationId,
     merchantId: String(binding.value.merchantId),
     integrationAccountId: binding.value.integrationAccountId,
     client,
   });
-  const reader = await createCommerceGraphReader({
+  const reader = await graph.createCommerceGraphReader({
     commerceSystem: system.value.commerceSystem,
     organisationId,
     merchantId: String(binding.value.merchantId),
@@ -636,7 +632,7 @@ async function readGrantedCommerceQuery(
     organisation: () =>
       requireActiveOrganisationActor({ env, organisationId, now: Date.now() }),
   });
-  const result = await readNamedCommerceQuery({ ...scope, reader });
+  const result = await graph.readNamedCommerceQuery({ ...scope, reader });
   if (!result.ok) return unavailable();
   return {
     ok: true,
@@ -716,7 +712,7 @@ export async function validateEmailCommerceEvidence(
     organisationId: organisationId.value,
   });
   if (!binding.ok || !system.ok) return changed();
-  const source = new CommerceEngineSource({
+  const source = commerceGraphReads.use().createCommerceEngineSource({
     organisationId: organisationIdRaw,
     merchantId: String(binding.value.merchantId),
     integrationAccountId: binding.value.integrationAccountId,

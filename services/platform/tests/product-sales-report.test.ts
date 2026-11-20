@@ -4,7 +4,7 @@ import {
   type ProductSalesReport,
 } from "@purin-labs/commerce-client";
 import type { AccessGrant } from "../src/authorization/access-grants/types";
-import { selectNamedCommerceQuerySourceGrant } from "../src/context/assembly/commerce";
+import { selectNamedCommerceQuerySourceGrant } from "../src/commerce/entity-plane/context-read";
 import {
   PRODUCT_SALES_SOURCE_TYPES,
   productSalesGrantProbe,

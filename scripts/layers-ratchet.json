@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 62,
-    "areas": 22,
-    "order": 20,
+    "upward": 55,
+    "areas": 19,
+    "order": 19,
     "table": 21
   },
   "crossings": {
@@ -15,7 +15,6 @@
     "areas/commerce -> workers/platform": 1,
     "areas/devices -> areas/cafe": 4,
     "areas/devices -> surfaces/voice": 2,
-    "areas/inbox -> areas/commerce": 3,
     "areas/inbox -> surfaces/whatsapp": 1,
     "areas/integrations -> areas/commerce": 1,
     "areas/integrations -> areas/organisation": 1,
@@ -27,10 +26,10 @@
     "areas/organisation -> areas/kitchen": 1,
     "areas/organisation -> surfaces/portal": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,
-    "foundation/agent -> areas/commerce": 18,
+    "foundation/agent -> areas/commerce": 13,
     "foundation/agent -> foundation/conversation": 3,
-    "foundation/authority -> areas/commerce": 7,
-    "foundation/authority -> foundation/agent": 3,
+    "foundation/authority -> areas/commerce": 6,
+    "foundation/authority -> foundation/agent": 2,
     "foundation/authority -> foundation/conversation": 1,
     "foundation/collaboration -> areas/commerce": 1,
     "foundation/connections -> areas/organisation": 1,
@@ -40,7 +39,6 @@
     "foundation/control -> foundation/agent": 2,
     "foundation/control -> foundation/conversation": 1,
     "foundation/control -> surfaces/slack": 2,
-    "foundation/conversation -> areas/commerce": 1,
     "foundation/conversation -> areas/kitchen": 4,
     "foundation/conversation -> surfaces/portal": 2,
     "foundation/conversation -> surfaces/slack": 4,

@@ -13,7 +13,6 @@ import {
   parseCommercePrincipalId,
   parseCommerceTimestamp,
 } from "@purin-labs/commerce-client";
-import { ToolRequestError } from "../../agent-tools/errors";
 import type { Result } from "../../result";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import {
@@ -21,57 +20,12 @@ import {
   selectActiveGrants,
 } from "../../authorization/access-grants/compiler";
 import type { AccessGrant } from "../../authorization/access-grants/types";
-import type { RequestableEntityTypeRead } from "../../authorization/requestable-capabilities";
-import { enforceCommerceGraphReadAuthority } from "../../commerce/entity-plane/authority";
-import {
-  CommerceGraphReader,
-  type CommerceGraphReaderError,
-} from "../../commerce/entity-plane/graph-reader";
-import { sensitivityAtMost } from "../../commerce/contract/sensitivity";
+import { enforceCommerceGraphReadAuthority } from "./authority";
+import type { CommerceGraphReader } from "./graph-reader";
+import { sensitivityAtMost } from "../contract/sensitivity";
+import type { CommerceContextAssemblyError } from "../contract/read-errors";
 
-export type CommerceContextAssemblyError =
-  | CommerceGraphReaderError
-  | Readonly<{
-      code:
-        | "commerce_context_sensitivity_denied"
-        | "commerce_context_authority_denied";
-    }>
-  /**
-   * A grant covers this query's scope, but the request authority's sensitivity
-   * ceiling is below what the query needs. Distinct from having no grant at
-   * all: the caller may be able to ask again under stronger authority.
-   */
-  | Readonly<{ code: "commerce_context_ceiling_denied" }>;
-
-export class CommerceReadRequestError extends ToolRequestError {
-  constructor(
-    readonly failure: CommerceContextAssemblyError,
-    /**
-     * The record type or types whose read grants would admit this read, when a
-     * permission request may ask for them.
-     */
-    requestableRead:
-      | RequestableEntityTypeRead
-      | readonly RequestableEntityTypeRead[]
-      | null = null,
-  ) {
-    super(describeCommerceReadFailure(failure), requestableRead);
-  }
-}
-
-function describeCommerceReadFailure(
-  failure: CommerceContextAssemblyError,
-): string {
-  switch (failure.code) {
-    case "commerce_context_authority_denied":
-      return "Commerce read denied (commerce_context_authority_denied). No active grant covers this query for the current conversation and merchant. If request_permission is available, call it and name the read that is missing. If it is not available, tell the person which read is missing. Do not send the person to a settings page. Do not retry this denied read.";
-    case "commerce_context_sensitivity_denied":
-    case "commerce_context_ceiling_denied":
-      return `Commerce read denied (${failure.code}). The request's sensitivity ceiling does not permit this query. Ask an authorized operator to review access controls, then start a new turn. Do not retry this denied read.`;
-    default:
-      return `Commerce read unavailable (${failure.code}). Authoritative evidence was not obtained.`;
-  }
-}
+export type { CommerceContextAssemblyError } from "../contract/read-errors";
 
 type PreparedCommerceContextRead = Readonly<{
   readonly query: CommerceGraphQuery;
@@ -175,7 +129,7 @@ export function selectNamedCommerceQuerySourceGrant(
   return { ok: false, error: { code: "commerce_context_authority_denied" } };
 }
 
-export function prepareNamedCommerceQuery(
+function prepareNamedCommerceQuery(
   input: Omit<Parameters<typeof readNamedCommerceQuery>[0], "reader">,
 ): Result<PreparedCommerceContextRead, CommerceContextAssemblyError> {
   const ceiling = sensitivityCeiling(input.requestAuthority);

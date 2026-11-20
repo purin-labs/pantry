@@ -46,10 +46,8 @@ import {
 } from "../../policy";
 import { digestCanonical } from "../../policy";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import {
-  CommerceReadRequestError,
-  readNamedCommerceQuery,
-} from "../../context/assembly/commerce";
+import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
+import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
 import { assertNever } from "@purin-labs/std";
 import {
   liveDeviceMember,
@@ -331,7 +329,7 @@ export async function readSuppliersForEmbeddedHarness(
   if (!query.ok) {
     throw new Error("supplier query invalid");
   }
-  const read = await readNamedCommerceQuery({
+  const read = await context.commerce.readNamedCommerceQuery({
     organisationId: String(execution.scope.organisationId),
     merchantId: work.prepared.merchantId,
     grants: work.prepared.grants,
@@ -385,7 +383,9 @@ export async function readSuppliersForEmbeddedHarness(
 }
 
 type SupplierAttributes =
-  Awaited<ReturnType<typeof readNamedCommerceQuery>> extends infer Read
+  Awaited<
+    ReturnType<CommerceToolReads["readNamedCommerceQuery"]>
+  > extends infer Read
     ? Read extends {
         ok: true;
         value: { listEntries: readonly (infer Entry)[] };

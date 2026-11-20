@@ -18,7 +18,7 @@ import { DescriptionDraftRequestError } from "./services";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { CommerceReadRequestError } from "../../context/assembly/commerce";
+import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import {
   type DraftThreadLink,
   collaborationEditDeadline,

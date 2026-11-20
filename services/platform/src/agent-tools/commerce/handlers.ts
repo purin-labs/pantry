@@ -70,11 +70,11 @@ import { createCommerceGraphReader } from "../../commerce/entity-plane/selected-
 import {
   CommerceReadRequestError,
   type CommerceContextAssemblyError,
-} from "../../context/assembly/commerce";
+} from "../../commerce/contract/read-errors";
 import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
-} from "../../context/assembly";
+} from "../../commerce/entity-plane/context-read";
 import { assertNever } from "@purin-labs/std";
 import {
   type ToolEffect,

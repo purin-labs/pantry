@@ -15,7 +15,21 @@ import {
   setWhatsAppProviderHealth,
 } from "./data/whatsapp";
 import { proposeEvalFromCorrection } from "./evals/access";
+import { commerceGrantSelection } from "./authorization/access-grants/commerce-grant-selection";
 import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
+import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
+import { commerceGraphReads } from "./commerce/contract/graph-reads";
+import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
+import {
+  readNamedCommerceQuery,
+  selectNamedCommerceQuerySourceGrant,
+} from "./commerce/entity-plane/context-read";
+import { createCommerceGraphReader } from "./commerce/entity-plane/selected-graph-reader";
+import {
+  commerceGraphControlAuthority,
+  controlCommerceSensitivityCeiling,
+  openControlCommerceGraph,
+} from "./control/commerce-graph";
 import { commerceDeliveryIntake } from "./commerce/contract/delivery-intake";
 import { applyCommerceDelivery } from "./actors/commerce-projection";
 import { normalizeCommerceDelivery } from "./commerce/commerce-wasm";
@@ -88,4 +102,19 @@ providerModules.register({ shopify: SHOPIFY_PROVIDER_MODULE });
 commerceDeliveryIntake.register({
   normalizeCommerceDelivery: (...input) => normalizeCommerceDelivery(...input),
   applyCommerceDelivery: (...input) => applyCommerceDelivery(...input),
+});
+
+commerceGrantSelection.register(COMMERCE_GRANT_SELECTION);
+
+commerceGraphReads.register({
+  selectNamedCommerceQuerySourceGrant: (...input) =>
+    selectNamedCommerceQuerySourceGrant(...input),
+  readNamedCommerceQuery: (...input) => readNamedCommerceQuery(...input),
+  createCommerceEngineSource: (options) => new CommerceEngineSource(options),
+  createCommerceGraphReader: (...input) => createCommerceGraphReader(...input),
+  openControlCommerceGraph: (...input) => openControlCommerceGraph(...input),
+  commerceGraphControlAuthority: (...input) =>
+    commerceGraphControlAuthority(...input),
+  controlCommerceSensitivityCeiling: (...input) =>
+    controlCommerceSensitivityCeiling(...input),
 });
