@@ -1,12 +1,23 @@
 import { Type, type Static } from "typebox";
 import { Value } from "typebox/value";
 
+import {
+  cobotClockMessageSchema,
+  cobotInquireMessageSchema,
+  cobotObservedMessageSchema,
+  cobotReportMessageSchema,
+  cobotTaskMessageSchema,
+  deviceStopMessageSchema,
+} from "./device-cobot.ts";
+import { shortText, sourceKey, strict } from "./device-shapes.ts";
+
 /**
  * The protocol of a shop gateway (Plan 85): a small computer in the shop that
  * connects its devices to Pantry. The gateway dials out and holds one socket.
  * Only Plan 24's operations cross this boundary: read health, reserve, submit
  * a bounded task, request a pause and read a receipt. The protocol has no
- * shell, no file transfer and no raw motion command.
+ * shell, no file transfer and no raw motion command. The cobot task messages
+ * are in `device-cobot.ts`.
  */
 
 /** One batched heartbeat every 30 s. */
@@ -23,14 +34,6 @@ export const DEVICE_GATEWAY_MINIMUM_VERSION = "0.1.0";
 export const DEVICE_GATEWAY_DEVICE_LIMIT = 64;
 /** A larger message from a gateway is refused. */
 export const DEVICE_GATEWAY_MESSAGE_BYTES = 64 * 1024;
-
-const strict = { additionalProperties: false } as const;
-const shortText = Type.String({ minLength: 1, maxLength: 120 });
-const sourceKey = Type.String({
-  minLength: 1,
-  maxLength: 120,
-  pattern: "^[A-Za-z0-9][A-Za-z0-9._:-]*$",
-});
 
 export const deviceKindSchema = Type.Union([
   Type.Literal("cobot"),
@@ -263,6 +266,9 @@ export const gatewayMessageSchema = Type.Union([
     },
     strict,
   ),
+  cobotReportMessageSchema,
+  cobotClockMessageSchema,
+  cobotObservedMessageSchema,
 ]);
 export type GatewayMessage = Static<typeof gatewayMessageSchema>;
 
@@ -352,6 +358,9 @@ export const platformGatewayMessageSchema = Type.Union([
     },
     strict,
   ),
+  cobotTaskMessageSchema,
+  cobotInquireMessageSchema,
+  deviceStopMessageSchema,
 ]);
 export type PlatformGatewayMessage = Static<
   typeof platformGatewayMessageSchema

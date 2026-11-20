@@ -9,6 +9,7 @@ import {
   deviceHealthSchema,
   deviceKindSchema,
 } from "./device-gateway.ts";
+import { strict } from "./device-shapes.ts";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
@@ -20,7 +21,6 @@ import type { Variant } from "@purin-labs/type-utils";
 
 export * from "./device-gateway.ts";
 
-const strict = { additionalProperties: false } as const;
 const timestamp = Type.Integer({ minimum: 0 });
 const text = Type.String({ minLength: 1, maxLength: 255 });
 

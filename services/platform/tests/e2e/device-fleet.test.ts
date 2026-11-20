@@ -1,5 +1,4 @@
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
-import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import {
@@ -8,17 +7,12 @@ import {
 } from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "../../src/actors/device-fleet";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import {
-  commerceClient,
-  commerceWorkspace,
-  connectCommerceFixture,
-} from "./commerce-support";
 import {
   connectGateway,
   controlBase,
   credentialOf,
+  deviceShop,
   enrollGateway,
   found,
   gatewaySocketResponse,
@@ -30,7 +24,6 @@ import {
   startGateway,
 } from "./device-fleet-support";
 import { network } from "./network";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import {
   ORGANISATION_ID,
   installSlackActorFixture,
@@ -57,48 +50,8 @@ it(
   revokeJourney,
 );
 
-async function shop() {
-  const owner = await commerceClient(`fleet-owner-${crypto.randomUUID()}`);
-  const staff = await commerceClient(`fleet-staff-${crypto.randomUUID()}`);
-  const viewer = await commerceClient(`fleet-viewer-${crypto.randomUUID()}`);
-  const organisationId = await commerceWorkspace(owner, "Fleet café");
-  await ensureCreatedOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
-  await connectCommerceFixture(
-    organisationId,
-    owner.identity.userId,
-    `merchant_fleet_${crypto.randomUUID().replaceAll("-", "")}`,
-  );
-  await fixtureDatabase().batch(
-    [
-      { user: staff, role: "operator", person: "person_fleet_staff" },
-      { user: viewer, role: "viewer", person: "person_fleet_viewer" },
-    ].flatMap(({ user, role, person }) => [
-      fixtureDatabase()
-        .prepare(
-          "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?)",
-        )
-        .bind(organisationId, person, role),
-      fixtureDatabase()
-        .prepare(
-          "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, ?, ?, 'active', ?, NULL)",
-        )
-        .bind(organisationId, user.identity.userId, person, role, Date.now()),
-    ]),
-  );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
-  return { owner, staff, viewer, organisationId };
-}
-
 async function enrollmentJourney(): Promise<void> {
-  const { owner, staff, viewer, organisationId } = await shop();
+  const { owner, staff, viewer, organisationId } = await deviceShop("fleet");
   const base = controlBase(organisationId);
 
   // 1. Only an admin or an owner starts an enrollment.
@@ -456,7 +409,7 @@ async function runDurableObjectAlarmSet(
 }
 
 async function revokeJourney(): Promise<void> {
-  const { owner, staff, viewer, organisationId } = await shop();
+  const { owner, staff, viewer, organisationId } = await deviceShop("fleet");
   const base = controlBase(organisationId);
   const started = await startGateway(
     organisationId,

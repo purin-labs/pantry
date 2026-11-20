@@ -7,11 +7,14 @@
 //! after GMO Financial Gate delivers the official specification.
 
 use std::collections::BTreeMap;
+#[cfg(test)]
 use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
+
+use crate::{journal, str_field};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -61,25 +64,12 @@ pub struct TerminalJournal {
 impl TerminalJournal {
     pub fn load(folder: &Path) -> Result<Self, String> {
         let path = folder.join("inflight-terminals.json");
-        let attempts = if path.exists() {
-            let text = fs::read_to_string(&path)
-                .map_err(|error| format!("{}: {error}", path.display()))?;
-            serde_json::from_str(&text)
-                .map_err(|error| format!("{}: {error}", path.display()))?
-        } else {
-            BTreeMap::new()
-        };
+        let attempts = journal::load(&path)?;
         Ok(Self { path, attempts })
     }
 
     fn persist(&self) -> Result<(), String> {
-        if let Some(parent) = self.path.parent() {
-            fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-        }
-        let body = serde_json::to_string_pretty(&self.attempts)
-            .map_err(|error| error.to_string())?;
-        fs::write(&self.path, body)
-            .map_err(|error| format!("{}: {error}", self.path.display()))
+        journal::save(&self.path, &self.attempts)
     }
 
     pub fn handle_collect(
@@ -256,13 +246,6 @@ impl TerminalJournal {
             "reasonCode": "attempt_not_found",
         }))
     }
-}
-
-fn str_field<'a>(value: &'a Value, name: &str) -> Result<&'a str, String> {
-    value
-        .get(name)
-        .and_then(Value::as_str)
-        .ok_or_else(|| format!("missing {name}"))
 }
 
 fn result_message(request_id: &str, entry: &JournaledTerminalAttempt) -> Value {

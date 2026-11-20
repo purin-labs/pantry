@@ -606,6 +606,12 @@ export class DeviceFleetActor extends DurableObject<Env> {
         recordPrinterResult(this.#sql, gatewayId, message, now);
         this.#releasePrinterWaiters(message.requestId);
         return;
+      // A cobot's task reports, clocks and shadow observations (Plan 24 S3).
+      // They record nothing yet: S4 adds the dispatch ledger that settles them.
+      case "cobot_report":
+      case "cobot_clock":
+      case "cobot_observed":
+        return;
     }
   }
 

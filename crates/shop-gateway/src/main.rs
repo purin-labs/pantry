@@ -3,23 +3,30 @@
 //! It enrolls once with a one-time code, then dials out and holds one socket to
 //! the Platform. The shop opens no port, and the Platform never calls it. Only
 //! Plan 24's operations cross the socket: health, samples, a pause and its
-//! answer. The protocol has no shell, no file transfer and no raw motion
-//! command. `packages/control-api/src/device-gateway.ts` owns the protocol.
+//! answer, and named cobot tasks. The protocol has no shell, no file transfer
+//! and no raw motion command. `packages/control-api/src/device-gateway.ts` owns
+//! the protocol.
 //!
-//! Plan 24 adds a typed adapter for each physical device. Today `--simulate`
-//! reads devices from a file, so that the whole path runs before any hardware.
-//! Plan 90 adds a LAN payment terminal (`terminal`) and a receipt printer with
-//! its cash drawer (`printer`).
+//! `--simulate` reads devices from a file, so that the whole path runs before
+//! any hardware. Plan 90 adds a LAN payment terminal (`terminal`) and a receipt
+//! printer with its cash drawer (`printer`). Plan 24 adds the cobot task
+//! adapter (`cobot`) for the cobot and oven controllers.
+//!
+//! `relay` runs the same session as `run` with standard input and output in
+//! place of the socket, so that a journey can carry the messages.
 
+mod cobot;
+mod journal;
 mod printer;
 mod terminal;
 
 use std::fs;
-use std::io::{ErrorKind, Read};
+use std::io::{BufRead, ErrorKind, Read, Write};
 use std::net::TcpStream;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
-use std::thread::sleep;
+use std::sync::mpsc::{Receiver, RecvTimeoutError, channel};
+use std::thread::{self, sleep};
 use std::time::{Duration, Instant};
 
 use serde::Deserialize;
@@ -33,7 +40,8 @@ use tungstenite::{Message, WebSocket};
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const HEARTBEAT: Duration = Duration::from_secs(30);
 const SAMPLE_EVERY: Duration = Duration::from_secs(60);
-const READ_TICK: Duration = Duration::from_millis(500);
+/// The session reads the Platform and the device adapters this often.
+const READ_TICK: Duration = Duration::from_millis(100);
 const LONGEST_RETRY: Duration = Duration::from_secs(60);
 /// The socket close code that says this gateway's access has ended.
 const REVOKED_CODE: u16 = 4403;
@@ -62,12 +70,16 @@ struct Simulation {
     /// Simulated receipt printers (Plan 90 Phase 5).
     #[serde(default)]
     printers: Vec<printer::SimulatedPrinter>,
+    /// Cobot and oven controllers, in the shape of `cobots.json` (Plan 24).
+    #[serde(default)]
+    cobots: Vec<cobot::ControllerAddress>,
 }
 
 /// The adapters whose tasks keep a local journal across socket drops.
 struct Adapters {
     terminals: terminal::TerminalJournal,
     printers: printer::Printers,
+    cobots: cobot::Cobots,
 }
 
 impl Adapters {
@@ -75,6 +87,7 @@ impl Adapters {
         Ok(Self {
             terminals: terminal::TerminalJournal::load(folder)?,
             printers: printer::Printers::load(folder, simulation.printers.clone())?,
+            cobots: cobot::Cobots::load(folder, simulation.cobots.clone())?,
         })
     }
 }
@@ -97,6 +110,119 @@ enum RunEnd {
     /// The Platform ended this gateway's access. It must not connect again.
     Revoked,
     Dropped(String),
+    /// The relay's input says the Platform side connected again.
+    Reconnected,
+    /// The relay's input ended.
+    InputClosed,
+}
+
+/// Where the session reads the Platform's messages and sends its own.
+trait Platform {
+    fn send(&mut self, message: &Value) -> Result<(), String>;
+    /// One message, or None after a quiet tick.
+    fn receive(&mut self) -> Result<Option<String>, RunEnd>;
+    /// The Platform's address and this gateway's credential, for an upload.
+    fn uploads(&self) -> Option<(&str, &str)>;
+}
+
+/// The real socket to the Platform.
+struct Socket<'a> {
+    socket: WebSocket<MaybeTlsStream<TcpStream>>,
+    url: &'a str,
+    credential: &'a str,
+}
+
+impl Platform for Socket<'_> {
+    fn send(&mut self, message: &Value) -> Result<(), String> {
+        self.socket
+            .send(Message::text(message.to_string()))
+            .map_err(|error| error.to_string())
+    }
+
+    fn receive(&mut self) -> Result<Option<String>, RunEnd> {
+        match self.socket.read() {
+            Ok(Message::Text(text)) => Ok(Some(text.as_str().to_string())),
+            Ok(Message::Close(frame)) => {
+                let code = frame.as_ref().map(|close| close.code);
+                if code == Some(CloseCode::from(REVOKED_CODE)) {
+                    return Err(RunEnd::Revoked);
+                }
+                Err(RunEnd::Dropped(format!("closed with {code:?}")))
+            }
+            Ok(_) => Ok(None),
+            Err(tungstenite::Error::Io(error))
+                if matches!(error.kind(), ErrorKind::WouldBlock | ErrorKind::TimedOut) =>
+            {
+                Ok(None)
+            }
+            Err(error) => Err(RunEnd::Dropped(error.to_string())),
+        }
+    }
+
+    fn uploads(&self) -> Option<(&str, &str)> {
+        Some((self.url, self.credential))
+    }
+}
+
+/// Standard input and output in place of the socket: each input line is one
+/// Platform message, or a local `{"relay":"connected"}` or
+/// `{"relay":"disconnected"}`. Each output line is one gateway message.
+struct Relay {
+    lines: Receiver<String>,
+    connected: bool,
+}
+
+impl Relay {
+    fn local(line: &str) -> Option<String> {
+        serde_json::from_str::<Value>(line)
+            .ok()?
+            .get("relay")?
+            .as_str()
+            .map(str::to_string)
+    }
+
+    /// Waits for `{"relay":"connected"}`. The Platform's messages in between
+    /// are lost, as they are on a dropped socket.
+    fn wait_for_connect(&mut self) -> bool {
+        loop {
+            match self.lines.recv() {
+                Ok(line) if Relay::local(&line).as_deref() == Some("connected") => {
+                    self.connected = true;
+                    return true;
+                }
+                Ok(_) => {}
+                Err(_) => return false,
+            }
+        }
+    }
+}
+
+impl Platform for Relay {
+    fn send(&mut self, message: &Value) -> Result<(), String> {
+        let mut out = std::io::stdout().lock();
+        writeln!(out, "{message}")
+            .and_then(|()| out.flush())
+            .map_err(|error| error.to_string())
+    }
+
+    fn receive(&mut self) -> Result<Option<String>, RunEnd> {
+        match self.lines.recv_timeout(READ_TICK) {
+            Ok(line) => match Relay::local(&line).as_deref() {
+                Some("connected") => Err(RunEnd::Reconnected),
+                Some("disconnected") => {
+                    self.connected = false;
+                    Err(RunEnd::Dropped("relay disconnected".into()))
+                }
+                _ => Ok(Some(line)),
+            },
+            Err(RecvTimeoutError::Timeout) => Ok(None),
+            Err(RecvTimeoutError::Disconnected) => Err(RunEnd::InputClosed),
+        }
+    }
+
+    fn uploads(&self) -> Option<(&str, &str)> {
+        None
+    }
 }
 
 fn main() -> ExitCode {
@@ -104,13 +230,14 @@ fn main() -> ExitCode {
     let result = match args.first().map(String::as_str) {
         Some("enroll") => enroll(&args[1..]),
         Some("run") => run(&args[1..]),
+        Some("relay") => relay(&args[1..]),
         Some("answer") => answer_once(&args[1..]),
         Some("version") => {
             println!("{VERSION}");
             Ok(())
         }
         _ => Err(
-            "usage: shop-gateway enroll --url U --organisation O --gateway G --code C | run [--simulate FILE] | answer [--simulate FILE] | version"
+            "usage: shop-gateway enroll --url U --organisation O --gateway G --code C | run [--simulate FILE] | relay [--simulate FILE] | answer [--simulate FILE] | version"
                 .to_string(),
         ),
     };
@@ -134,6 +261,14 @@ fn required(args: &[String], name: &str) -> Result<String, String> {
     option(args, name).ok_or_else(|| format!("{name} is required"))
 }
 
+/// A text field of a message.
+fn str_field<'a>(value: &'a Value, name: &str) -> Result<&'a str, String> {
+    value
+        .get(name)
+        .and_then(Value::as_str)
+        .ok_or_else(|| format!("missing {name}"))
+}
+
 fn home() -> Result<PathBuf, String> {
     if let Ok(path) = std::env::var("PANTRY_GATEWAY_HOME") {
         return Ok(PathBuf::from(path));
@@ -144,7 +279,6 @@ fn home() -> Result<PathBuf, String> {
 }
 
 fn write_private(path: &Path, contents: &str) -> Result<(), String> {
-    use std::io::Write;
     use std::os::unix::fs::OpenOptionsExt;
     let mut file = fs::OpenOptions::new()
         .write(true)
@@ -226,13 +360,16 @@ fn answer_once(args: &[String]) -> Result<(), String> {
     }
 }
 
-/// The answer to a task for a payment terminal or a receipt printer. None for
-/// a message of another kind.
+/// The answer to a task for a payment terminal, a receipt printer, a cobot or
+/// the oven. None for a message of another kind.
 fn answer_task(
     message: &Value,
     simulation: &Simulation,
     adapters: &mut Adapters,
 ) -> Option<Result<TaskReply, String>> {
+    if let Some(reply) = adapters.cobots.handle(message) {
+        return Some(reply.map(TaskReply::Send));
+    }
     let reply = match message.get("type").and_then(Value::as_str)? {
         "terminal_collect" => adapters
             .terminals
@@ -257,13 +394,20 @@ fn answer_task(
     Some(reply)
 }
 
-fn run(args: &[String]) -> Result<(), String> {
+/// The folder, the simulation and the adapters of a long session.
+fn start(args: &[String]) -> Result<(PathBuf, Simulation, Adapters), String> {
     let folder = home()?;
+    let simulation = read_simulation(args)?;
+    let mut adapters = Adapters::load(&folder, &simulation)?;
+    adapters.cobots.wait_for_devices();
+    Ok((folder, simulation, adapters))
+}
+
+fn run(args: &[String]) -> Result<(), String> {
+    let (folder, simulation, mut adapters) = start(args)?;
     let credential = fs::read_to_string(folder.join("credential"))
         .map_err(|_| "This gateway is not enrolled. Run the install command.".to_string())?;
     let url = fs::read_to_string(folder.join("url")).map_err(|error| error.to_string())?;
-    let simulation = read_simulation(args)?;
-    let mut adapters = Adapters::load(&folder, &simulation)?;
     let mut wait = Duration::from_secs(1);
     loop {
         let started = Instant::now();
@@ -273,6 +417,7 @@ fn run(args: &[String]) -> Result<(), String> {
                 return Ok(());
             }
             RunEnd::Dropped(reason) => eprintln!("The connection ended: {reason}"),
+            RunEnd::Reconnected | RunEnd::InputClosed => {}
         }
         // A connection that lasted resets the wait. A failing one backs off.
         if started.elapsed() > LONGEST_RETRY {
@@ -280,6 +425,36 @@ fn run(args: &[String]) -> Result<(), String> {
         }
         sleep(wait);
         wait = (wait * 2).min(LONGEST_RETRY);
+    }
+}
+
+/// The session of `run` on standard input and output. It starts connected.
+fn relay(args: &[String]) -> Result<(), String> {
+    let (_, simulation, mut adapters) = start(args)?;
+    let (sender, lines) = channel();
+    thread::spawn(move || {
+        for line in std::io::stdin().lock().lines() {
+            let Ok(line) = line else { break };
+            if !line.trim().is_empty() && sender.send(line).is_err() {
+                break;
+            }
+        }
+    });
+    let mut relay = Relay {
+        lines,
+        connected: true,
+    };
+    loop {
+        match serve(&mut relay, &simulation, &mut adapters) {
+            RunEnd::Revoked | RunEnd::InputClosed => return Ok(()),
+            RunEnd::Reconnected => {}
+            RunEnd::Dropped(reason) => {
+                eprintln!("The relay connection ended: {reason}");
+                if !relay.connected && !relay.wait_for_connect() {
+                    return Ok(());
+                }
+            }
+        }
     }
 }
 
@@ -305,21 +480,26 @@ fn connect_and_serve(
         Err(error) => return RunEnd::Dropped(error.to_string()),
     };
     request.headers_mut().insert(AUTHORIZATION, value);
-    let mut socket = match tungstenite::connect(request) {
+    let socket = match tungstenite::connect(request) {
         Ok((socket, _)) => socket,
         Err(tungstenite::Error::Http(response)) if response.status() == 401 => {
             return RunEnd::Revoked;
         }
         Err(error) => return RunEnd::Dropped(error.to_string()),
     };
-    if let Err(error) = set_read_tick(&mut socket) {
+    if let Err(error) = set_read_tick(&socket) {
         return RunEnd::Dropped(error);
     }
     println!("Connected to Seams Pantry.");
-    serve(&mut socket, simulation, adapters, url, credential)
+    let mut platform = Socket {
+        socket,
+        url,
+        credential,
+    };
+    serve(&mut platform, simulation, adapters)
 }
 
-fn set_read_tick(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>) -> Result<(), String> {
+fn set_read_tick(socket: &WebSocket<MaybeTlsStream<TcpStream>>) -> Result<(), String> {
     let stream: &TcpStream = match socket.get_ref() {
         MaybeTlsStream::Plain(stream) => stream,
         MaybeTlsStream::Rustls(stream) => stream.get_ref(),
@@ -330,41 +510,39 @@ fn set_read_tick(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>) -> Result<()
         .map_err(|error| error.to_string())
 }
 
-fn send(socket: &mut WebSocket<MaybeTlsStream<TcpStream>>, message: &Value) -> Result<(), String> {
-    socket
-        .send(Message::text(message.to_string()))
-        .map_err(|error| error.to_string())
+/// The hello: the simulated devices and each device that an adapter found.
+fn hello(simulation: &Simulation, adapters: &Adapters) -> Value {
+    let mut devices = simulation.devices.clone();
+    let found = adapters
+        .printers
+        .found_devices()
+        .into_iter()
+        .chain(adapters.cobots.found_devices());
+    for device in found {
+        if !devices
+            .iter()
+            .any(|known| known["sourceKey"] == device["sourceKey"])
+        {
+            devices.push(device);
+        }
+    }
+    json!({
+        "type": "hello",
+        "serviceVersion": VERSION,
+        "devices": devices,
+        "health": simulation.health,
+    })
 }
 
-fn serve(
-    socket: &mut WebSocket<MaybeTlsStream<TcpStream>>,
-    simulation: &Simulation,
-    adapters: &mut Adapters,
-    url: &str,
-    credential: &str,
-) -> RunEnd {
+/// One connection's session: the same for the socket and for the relay.
+fn serve(platform: &mut dyn Platform, simulation: &Simulation, adapters: &mut Adapters) -> RunEnd {
     let heartbeat = simulation
         .heartbeat_seconds
         .map_or(HEARTBEAT, Duration::from_secs);
     let sample_every = simulation
         .sample_seconds
         .map_or(SAMPLE_EVERY, Duration::from_secs);
-    let mut devices = simulation.devices.clone();
-    for found in adapters.printers.found_devices() {
-        if !devices
-            .iter()
-            .any(|device| device["sourceKey"] == found["sourceKey"])
-        {
-            devices.push(found);
-        }
-    }
-    let hello = json!({
-        "type": "hello",
-        "serviceVersion": VERSION,
-        "devices": devices,
-        "health": simulation.health,
-    });
-    if let Err(error) = send(socket, &hello) {
+    if let Err(error) = platform.send(&hello(simulation, adapters)) {
         return RunEnd::Dropped(error);
     }
     let connected = Instant::now();
@@ -375,7 +553,7 @@ fn serve(
     let mut welcomed = false;
     loop {
         if last_heartbeat.elapsed() >= heartbeat {
-            if let Err(error) = send(socket, &json!({ "type": "heartbeat" })) {
+            if let Err(error) = platform.send(&json!({ "type": "heartbeat" })) {
                 return RunEnd::Dropped(error);
             }
             last_heartbeat = Instant::now();
@@ -385,7 +563,7 @@ fn serve(
             && last_sample.is_none_or(|at| at.elapsed() >= sample_every)
         {
             let message = json!({ "type": "samples", "samples": simulation.samples });
-            if let Err(error) = send(socket, &message) {
+            if let Err(error) = platform.send(&message) {
                 return RunEnd::Dropped(error);
             }
             last_sample = Some(Instant::now());
@@ -396,30 +574,36 @@ fn serve(
                 && connected.elapsed() >= Duration::from_secs(event.after_seconds)
             {
                 let message = json!({ "type": "health", "reports": event.reports });
-                if let Err(error) = send(socket, &message) {
+                if let Err(error) = platform.send(&message) {
                     return RunEnd::Dropped(error);
                 }
                 sent_events[index] = true;
             }
         }
-        match socket.read() {
-            Ok(Message::Text(text)) => {
-                match answer(socket, text.as_str(), simulation, adapters, url, credential) {
-                    Ok(welcome) => welcomed = welcomed || welcome,
-                    Err(error) => return RunEnd::Dropped(error),
+        if welcomed {
+            let mut messages = adapters.cobots.tick();
+            // A controller that reported a new device changes the hello.
+            if adapters.cobots.take_devices_changed() {
+                messages.insert(0, hello(simulation, adapters));
+            }
+            for message in &messages {
+                if let Err(error) = platform.send(message) {
+                    return RunEnd::Dropped(error);
                 }
             }
-            Ok(Message::Close(frame)) => {
-                let code = frame.as_ref().map(|close| close.code);
-                if code == Some(CloseCode::from(REVOKED_CODE)) {
-                    return RunEnd::Revoked;
+        }
+        match platform.receive() {
+            Ok(Some(text)) => match answer(platform, &text, simulation, adapters) {
+                Ok(true) if !welcomed => {
+                    welcomed = true;
+                    // Pantry may have missed reports while it was away.
+                    adapters.cobots.reopen();
                 }
-                return RunEnd::Dropped(format!("closed with {code:?}"));
-            }
-            Ok(_) => {}
-            Err(tungstenite::Error::Io(error))
-                if matches!(error.kind(), ErrorKind::WouldBlock | ErrorKind::TimedOut) => {}
-            Err(error) => return RunEnd::Dropped(error.to_string()),
+                Ok(_) => {}
+                Err(error) => return RunEnd::Dropped(error),
+            },
+            Ok(None) => {}
+            Err(end) => return end,
         }
     }
 }
@@ -427,18 +611,16 @@ fn serve(
 /// A pause stops work at the adapter. A simulated device only answers. Returns
 /// true when this message is the Platform's welcome.
 fn answer(
-    socket: &mut WebSocket<MaybeTlsStream<TcpStream>>,
+    platform: &mut dyn Platform,
     text: &str,
     simulation: &Simulation,
     adapters: &mut Adapters,
-    url: &str,
-    credential: &str,
 ) -> Result<bool, String> {
     let message: Value = serde_json::from_str(text).map_err(|error| error.to_string())?;
     match answer_task(&message, simulation, adapters) {
         Some(Ok(TaskReply::Send(answers))) => {
             for answer in &answers {
-                send(socket, answer)?;
+                platform.send(answer)?;
             }
             return Ok(false);
         }
@@ -449,13 +631,10 @@ fn answer(
     }
     match message.get("type").and_then(Value::as_str) {
         Some("welcome") => Ok(true),
-        Some("pause" | "resume") => {
+        Some("pause" | "resume" | "stop") => {
             let request = message.get("requestId").cloned().unwrap_or(Value::Null);
-            println!("Seams Pantry sent {text}");
-            send(
-                socket,
-                &json!({ "type": "ack", "requestId": request, "outcome": "done" }),
-            )?;
+            eprintln!("Seams Pantry sent {text}");
+            platform.send(&json!({ "type": "ack", "requestId": request, "outcome": "done" }))?;
             Ok(false)
         }
         Some("snapshot") => {
@@ -463,17 +642,14 @@ fn answer(
                 .get("requestId")
                 .and_then(Value::as_str)
                 .unwrap_or("");
-            let outcome = match send_snapshot(request, simulation, url, credential) {
+            let outcome = match send_snapshot(request, simulation, platform.uploads()) {
                 Ok(()) => "done",
                 Err(error) => {
                     eprintln!("The snapshot failed: {error}");
                     "refused"
                 }
             };
-            send(
-                socket,
-                &json!({ "type": "ack", "requestId": request, "outcome": outcome }),
-            )?;
+            platform.send(&json!({ "type": "ack", "requestId": request, "outcome": outcome }))?;
             Ok(false)
         }
         Some("refused") => {
@@ -488,13 +664,13 @@ fn answer(
 fn send_snapshot(
     request: &str,
     simulation: &Simulation,
-    url: &str,
-    credential: &str,
+    uploads: Option<(&str, &str)>,
 ) -> Result<(), String> {
     let path = simulation
         .snapshot_file
         .as_ref()
         .ok_or("This gateway has no camera adapter.")?;
+    let (url, credential) = uploads.ok_or("A relay session uploads no image.")?;
     let bytes = fs::read(path).map_err(|error| format!("{}: {error}", path.display()))?;
     let snapshot = request.split(':').next().unwrap_or("");
     ureq::post(&format!("{url}/v1/device-gateways/snapshots/{snapshot}"))

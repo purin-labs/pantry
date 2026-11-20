@@ -10,7 +10,6 @@ import { isRecord } from "@purin-labs/std";
 
 import { deviceFleetStub } from "../../src/actors/device-fleet";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
@@ -18,16 +17,12 @@ import {
   createGrant,
   enableCapability,
 } from "./access-route-support";
-import {
-  commerceClient,
-  commerceHeaders,
-  commerceWorkspace,
-  connectCommerceFixture,
-} from "./commerce-support";
+import { commerceHeaders } from "./commerce-support";
 import {
   connectGateway,
   controlBase,
   credentialOf,
+  deviceShop,
   enrollGateway,
   found,
   helloAndWait,
@@ -38,10 +33,6 @@ import {
   type SimulatedGateway,
 } from "./device-fleet-support";
 import { PUBLIC_ORIGIN } from "./hibernatable-socket-support";
-import {
-  activateSharedAccountNativeTenant,
-  attachSharedAccountNativeOrganisation,
-} from "./shared-account-platform-fixture";
 
 /**
  * Plan 85 Phase 5, journey J6: camera snapshots. They are off until an admin
@@ -51,47 +42,6 @@ import {
  */
 
 const JPEG = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4, 0xff, 0xd9]);
-
-async function shop() {
-  const owner = await commerceClient(`camera-owner-${crypto.randomUUID()}`);
-  const staff = await commerceClient(`camera-staff-${crypto.randomUUID()}`);
-  const viewer = await commerceClient(`camera-viewer-${crypto.randomUUID()}`);
-  const organisationId = await commerceWorkspace(owner, "Camera café");
-  await ensureCreatedOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
-  await connectCommerceFixture(
-    organisationId,
-    owner.identity.userId,
-    `merchant_camera_${crypto.randomUUID().replaceAll("-", "")}`,
-  );
-  await fixtureDatabase().batch(
-    [
-      { user: staff, role: "operator", person: "person_camera_staff" },
-      { user: viewer, role: "viewer", person: "person_camera_viewer" },
-    ].flatMap(({ user, role, person }) => [
-      fixtureDatabase()
-        .prepare(
-          "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?)",
-        )
-        .bind(organisationId, person, role),
-      fixtureDatabase()
-        .prepare(
-          "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, ?, ?, 'active', ?, NULL)",
-        )
-        .bind(organisationId, user.identity.userId, person, role, Date.now()),
-    ]),
-  );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
-  await activateSharedAccountNativeTenant(organisationId);
-  return { owner, staff, viewer, organisationId };
-}
 
 async function operatorRoleSubject(
   organisationId: string,
@@ -189,7 +139,7 @@ it(
   "J6: a camera sends an image only when an admin has turned snapshots on and a person with access asks or a fault asks, and the image ends after seven days",
   { timeout: 240_000 },
   async (): Promise<void> => {
-    const { owner, staff, viewer, organisationId } = await shop();
+    const { owner, staff, viewer, organisationId } = await deviceShop("camera");
     const base = controlBase(organisationId);
 
     const started = await startGateway(

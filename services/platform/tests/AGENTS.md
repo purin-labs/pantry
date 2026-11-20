@@ -232,6 +232,19 @@ test and any fixture that exists only for the obsolete behavior.
   chat agent propose a bake and a stock level for a person, with no tool that
   approves, and a viewer stays refused. The artifacts are in
   `output/plan-24/`. It needs the account Worker.
+- `e2e/cobot-gateway.test.ts` is the exit journey of Plan 24 S3: the Plan 85
+  gateway journey with two simulated FR10 cobots and the oven behind the real
+  `cobot` adapter. The three found devices wait for a person, a pause and a
+  resume reach the controller before their `ack`, a task goes accepted,
+  running and completed, a second delivery is `replayed` with one task on the
+  controller, a relay restart during a move asks `status` and never submits
+  again, a stop and a silent controller get their own `ack`, a controller
+  fault reaches the Devices page, and a revoke closes the socket.
+  `shop-gateway-adapters.ts` runs `cobot-controller` and `shop-gateway relay`
+  for a home; `e2e/cobot-gateway-support.ts` pumps messages between the socket
+  and the relay. The artifact is `output/plan-24/cobot-gateway-journey.json`.
+  It needs the account Worker, `cargo`, and `PANTRY_COBOT_CONTROLLER_BINARY`
+  or `MUJOCO_DIR`.
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E
