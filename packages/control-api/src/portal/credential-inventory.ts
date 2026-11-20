@@ -79,6 +79,7 @@ export type CredentialAccountRecord = {
   readonly webhooks: readonly CredentialWebhook[];
   readonly rotations: readonly CredentialRotation[];
   readonly revocation: CredentialRevocation | null;
+  /** When the current result of the provider health check was first seen. */
   readonly lastManifestObservationAt: number | null;
 };
 

@@ -1233,6 +1233,13 @@ async function readCurrentProviderManifestVersion(
   return row.version;
 }
 
+/**
+ * Records a health check of a provider account when its result differs from
+ * the account's latest row. The scheduled run and each readiness read check
+ * every account, so a result that stays the same writes nothing: an
+ * account's rows are the changes of its health, and `observed_at` is the
+ * time that the current result was first seen.
+ */
 function prepareProviderManifestObservation(
   database: Pick<OrganisationDatabase, "prepare">,
   input: {
@@ -1252,7 +1259,23 @@ function prepareProviderManifestObservation(
       observation_id, organisation_id, integration_account_id, provider, environment,
       manifest_version, lifecycle, evidence_code, reason_code,
       missing_optional_capabilities, repair_actions, observed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12
+    WHERE NOT EXISTS (
+      SELECT 1 FROM (
+        SELECT provider, environment, manifest_version, lifecycle, evidence_code,
+               reason_code, missing_optional_capabilities, repair_actions
+        FROM provider_manifest_observation
+        WHERE integration_account_id = ?3
+        ORDER BY observed_at DESC, observation_id DESC
+        LIMIT 1
+      ) AS latest
+      WHERE latest.provider = ?4 AND latest.environment = ?5
+        AND latest.manifest_version = ?6 AND latest.lifecycle = ?7
+        AND latest.evidence_code IS ?8 AND latest.reason_code IS ?9
+        AND latest.missing_optional_capabilities IS ?10
+        AND latest.repair_actions IS ?11
+    )`,
     )
     .bind(
       `provider_observation_${crypto.randomUUID()}`,

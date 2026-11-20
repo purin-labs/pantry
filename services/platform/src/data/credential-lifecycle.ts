@@ -109,6 +109,7 @@ type CredentialAccountInventory = {
   readonly webhooks: readonly CredentialWebhookInventory[];
   readonly rotations: readonly CredentialRotationInventory[];
   readonly revocation: CredentialRevocationInventory | null;
+  /** When the current result of the provider health check was first seen. */
   readonly lastManifestObservationAt: number | null;
 };
 

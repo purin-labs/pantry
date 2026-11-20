@@ -8,8 +8,15 @@ import {
   lastSyncedAt,
   connectCommerceFixture,
 } from "./commerce-support";
+import { network } from "./network";
 import { PlanJourney } from "./production-plan-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import {
+  seedSlackWorkspace,
+  slackAccount,
+  slackAuthTestHandler,
+  type SharedSlackWorkspace,
+} from "./slack-workspace-support";
 import {
   addWrites,
   monthlyCostUsd,
@@ -36,20 +43,33 @@ const IDLE_HOUR_BUDGET: WriteCounts = {
   "rows ORGANISATION": 12,
 };
 
+/** The café's Slack workspace; Slack's `auth.test` checks its bot token. */
+const CAFE_SLACK: SharedSlackWorkspace = {
+  key: "idle-cafe",
+  appId: "A12345678",
+  teamId: "T0IDLECAFE",
+  installationId: "installation_e2e_idle_cafe",
+  botToken: "xoxb-idle-cafe",
+  dmUser: "U0IDLEPERSON",
+};
+
 it(
-  "costs close to nothing for a shop where nothing changes: every scheduled job runs for an hour, each object starts again, and the shop still reads as in sync",
+  "costs close to nothing for a shop where nothing changes: every scheduled job runs for an hour, each object starts again, and the shop still reads as in sync with its Slack healthy",
   { timeout: 300_000 },
   idleTenantCostJourney,
 );
 
 /**
- * A café is set up with its shop in Commerce, staff change two products,
- * and Pantry's scheduled jobs run for the shop's first hour. Then nothing
- * changes. Cloudflare stops each idle object, so every later call starts it
- * again: a start must write nothing. Every cron trigger of the production
- * Worker then runs for one more hour, with the objects stopped before each
- * five minutes. The shop stays inside the budget above and still reads as in
- * sync. No alarm that ran in the idle hour is armed again.
+ * A café is set up with its shop in Commerce and its Slack workspace, staff
+ * change two products, and Pantry's scheduled jobs run for the shop's first
+ * hour. Then nothing changes. Cloudflare stops each idle object, so every
+ * later call starts it again: a start must write nothing. Every cron trigger
+ * of the production Worker then runs for one more hour, with the objects
+ * stopped before each five minutes. The 15-minute health check still asks
+ * Slack about the bot token, and a result that stays the same writes
+ * nothing. The shop stays inside the budget above, still reads as in sync,
+ * and its Slack still reads as healthy. No alarm that ran in the idle hour
+ * is armed again.
  */
 async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
   const owner = await commerceClient(`idle-owner-${crypto.randomUUID()}`);
@@ -70,6 +90,9 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     owner,
     members: {},
   });
+  const slackChecks: string[] = [];
+  network.use(slackAuthTestHandler(CAFE_SLACK.teamId, slackChecks));
+  await seedSlackWorkspace(CAFE_SLACK, { client: owner, organisationId });
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
     schemaVersion: "underclerk.provision-demo.v2",
@@ -104,6 +127,7 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
   // 3. One idle hour of every cron trigger, with each object stopped before
   //    each five minutes.
   const idleHourAt = firstHourAt + hour;
+  slackChecks.length = 0;
   let idleHour: WriteCounts = {};
   for (let minute = 0; minute < 60; minute += 5) {
     await meter.stopObjects();
@@ -127,7 +151,15 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     `writes of an idle shop in one hour, over the budget\n${meter.takeStatements().join("\n")}`,
   ).toEqual({});
 
-  // 4. The shop still reads as in sync at the end of the idle hour.
+  // 4. The health check asked Slack in the idle hour, and the shop's Slack
+  //    still reads as healthy. The shop still reads as in sync.
+  expect(slackChecks, "Slack checks of the idle hour").toContain(
+    CAFE_SLACK.botToken,
+  );
+  expect(await slackAccount({ client: owner, organisationId })).toMatchObject({
+    lifecycle: { kind: "active" },
+    credential_health: { kind: "healthy" },
+  });
   const idleEnd = idleHourAt + hour;
   const stillSynced = await commerceSyncStatus(organisationId, idleEnd);
   expect(stillSynced).toMatchObject({ ok: true, value: { kind: "ready" } });
@@ -154,6 +186,7 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
     idleHour,
     idleHourBudget: IDLE_HOUR_BUDGET,
     idleMonthUsdAtListPrice: monthlyCostUsd(idleHour),
+    slackChecksInIdleHour: slackChecks.length,
     alarmsArmedAfterIdleHour: Object.keys(armed).length,
     alarmWrites,
     sync: stillSynced.ok ? stillSynced.value.kind : stillSynced,

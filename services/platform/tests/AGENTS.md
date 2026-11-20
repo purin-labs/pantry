@@ -42,6 +42,8 @@ test and any fixture that exists only for the obsolete behavior.
   stops each Durable Object before each five minutes, and fails when the shop
   writes more than the budget in the file: Durable Object rows, D1 rows, queue
   messages, KV writes and R2 writes. An object that starts again must write
+  nothing. The shop has a Slack workspace, so the 15-minute provider health
+  check asks Slack in the idle hour, and a result that stays the same writes
   nothing. `e2e/write-meter.ts` counts the writes and names the D1 statement
   that wrote. Run the journey after a change to a cron, an alarm, a poll or a
   Durable Object constructor. It needs the account Worker.
@@ -53,8 +55,9 @@ test and any fixture that exists only for the obsolete behavior.
   a live Organisation is refused, the bot token of the shared Slack workspace
   moves to the Organisation that still uses it before the Vault goes, its
   Slack still checks out with that token, and a second run changes nothing.
-  `e2e/purge-slack-support.ts` holds the shared workspace that it uses with
-  `e2e/purged-organisation-reclaim.test.ts`. It needs the account Worker.
+  `e2e/slack-workspace-support.ts` holds the Slack workspace that it shares
+  with `e2e/purged-organisation-reclaim.test.ts` and
+  `e2e/idle-tenant-cost.test.ts`. It needs the account Worker.
 - `e2e/message-link-fetch-placement.test.ts` follows a documentation read of
   a Portal chat and a link read of a Session to the link-fetch Actor of the
   Organisation's region, and checks that the operator's erase refuses that
