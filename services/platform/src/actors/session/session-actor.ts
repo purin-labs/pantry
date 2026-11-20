@@ -1,3 +1,12 @@
+import { SessionActorBase } from "./session-actor-base";
+import {
+  SessionCheckpoints,
+  type SessionCheckpointsRpc,
+} from "./session-checkpoints";
+import {
+  SessionHarnessTurns,
+  type SessionHarnessTurnsRpc,
+} from "./session-harness-turns";
 import {
   actorMachineCensus,
   type MachineCensus,
@@ -195,7 +204,62 @@ import { SessionTurnRecovery } from "./session-turn-recovery";
  * It names no product area. The class of the Worker, `SessionDO`, gives it
  * the agent tools and the parts of the areas.
  */
-export abstract class SessionActor extends SessionTurnRecovery {
+export abstract class SessionActor
+  extends SessionActorBase
+  implements SessionCheckpointsRpc, SessionHarnessTurnsRpc
+{
+  /** The checkpoints of the Session: restore, finalization and publication. */
+  protected readonly checkpoints = new SessionCheckpoints(this.shared);
+
+  /** The turns of the embedded harness: input, run, checkpoint and failure. */
+  protected readonly harnessTurns = new SessionHarnessTurns(
+    this.shared,
+    this.checkpoints,
+  );
+
+  /** The recovery of an interrupted turn and of a checkpoint that waits. */
+  protected readonly recovery = new SessionTurnRecovery(
+    this.shared,
+    this.checkpoints,
+    this.harnessTurns,
+  );
+
+  cancelCanonicalEmbeddedHarnessTurn(
+    ...input: Parameters<
+      SessionHarnessTurns["cancelCanonicalEmbeddedHarnessTurn"]
+    >
+  ) {
+    return this.harnessTurns.cancelCanonicalEmbeddedHarnessTurn(...input);
+  }
+
+  commitCanonicalHarnessCheckpoint(
+    ...input: Parameters<
+      SessionHarnessTurns["commitCanonicalHarnessCheckpoint"]
+    >
+  ) {
+    return this.harnessTurns.commitCanonicalHarnessCheckpoint(...input);
+  }
+
+  completeCanonicalCheckpointAndStream(
+    ...input: Parameters<
+      SessionCheckpoints["completeCanonicalCheckpointAndStream"]
+    >
+  ) {
+    return this.checkpoints.completeCanonicalCheckpointAndStream(...input);
+  }
+
+  readSessionTurnFlowBinding(
+    ...input: Parameters<SessionCheckpoints["readSessionTurnFlowBinding"]>
+  ) {
+    return this.checkpoints.readSessionTurnFlowBinding(...input);
+  }
+
+  readCompletedTurn(
+    ...input: Parameters<SessionCheckpoints["readCompletedTurn"]>
+  ) {
+    return this.checkpoints.readCompletedTurn(...input);
+  }
+
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   async machineCensus(): Promise<readonly MachineCensus[]> {
     const census = await actorMachineCensus(this.ctx.storage);
@@ -219,15 +283,15 @@ export abstract class SessionActor extends SessionTurnRecovery {
     if (nativeRecovery)
       this.ctx.blockConcurrencyWhile(async () => {
         try {
-          await this.resumePendingPiTurn();
+          await this.recovery.resumePendingPiTurn();
         } finally {
           // An old quarantine ends here too; its checks keep any other work.
-          await this.endInterruptedTurnQuarantine();
+          await this.recovery.endInterruptedTurnQuarantine();
         }
       });
     if (!nativeRecovery)
       this.ctx.blockConcurrencyWhile(
-        this.endOrQuarantineInterruptedTurn.bind(this),
+        this.recovery.endOrQuarantineInterruptedTurn.bind(this.recovery),
       );
     const finalization = readAcceptedCheckpointFinalization(
       this.ctx.storage.sql,
@@ -237,7 +301,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       hasUnpublishedHarnessCheckpoint(this.ctx.storage.sql)
     )
       this.ctx.blockConcurrencyWhile(
-        this.checkpoints.scheduleCheckpointFinalization.bind(this),
+        this.checkpoints.scheduleCheckpointFinalization.bind(this.checkpoints),
       );
   }
 
@@ -1369,7 +1433,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
     const failed = await runAlarmSteps("session", [
       {
         name: "checkpoint_finalization",
-        run: () => this.resumeAcceptedCheckpointFinalization(),
+        run: () => this.recovery.resumeAcceptedCheckpointFinalization(),
       },
       { name: "run_budget_deadline", run: () => this.endExhaustedRun() },
       {
@@ -1383,7 +1447,7 @@ export abstract class SessionActor extends SessionTurnRecovery {
       // An old quarantine settles its old Code Mode settlements and ends.
       {
         name: "quarantine_end",
-        run: () => this.endInterruptedTurnQuarantine(),
+        run: () => this.recovery.endInterruptedTurnQuarantine(),
       },
       {
         name: "ended_executions",
@@ -1406,7 +1470,10 @@ export abstract class SessionActor extends SessionTurnRecovery {
             liveRuns: this.shared.liveGoalRuns,
           }),
       },
-      { name: "pending_pi_turn", run: () => this.resumePendingPiTurn() },
+      {
+        name: "pending_pi_turn",
+        run: () => this.recovery.resumePendingPiTurn(),
+      },
       {
         name: "run_budget_deadline_arm",
         run: () => schedulePersistedRunBudgetDeadline(this.ctx.storage),

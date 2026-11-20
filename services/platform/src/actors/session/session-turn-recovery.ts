@@ -1,7 +1,6 @@
-import {
-  SessionCheckpoints,
-  type SessionCheckpointsRpc,
-} from "./session-checkpoints";
+import type { SessionShared } from "./session-shared";
+import type { SessionCheckpoints } from "./session-checkpoints";
+import type { SessionHarnessTurns } from "./session-harness-turns";
 import {
   countOpenEffectsBesidesBilling,
   reconcilePantryExecutionBilling,
@@ -59,11 +58,6 @@ import { materializedHarnessHistory } from "./harness-source";
 import { failOrphanedSessionTurnStreams } from "./replay";
 import { CODE_MODE_LEASE_REBIND_RETRY_MS } from "./support";
 import { KNOWN_ZERO_MODEL_USAGE } from "./transient-turns";
-import {
-  SessionHarnessTurns,
-  type SessionHarnessTurnsRpc,
-} from "./session-harness-turns";
-import { SessionActorBase } from "./session-actor-base";
 
 /**
  * What a Session termination ends by itself: the quarantine, and the open
@@ -80,58 +74,16 @@ const INTERRUPTED_TURN_NOTE =
 /**
  * Recovery of interrupted harness turns and of checkpoint publication and finalization.
  */
-export abstract class SessionTurnRecovery
-  extends SessionActorBase
-  implements SessionCheckpointsRpc, SessionHarnessTurnsRpc
-{
-  /** The checkpoints of the Session: restore, finalization and publication. */
-  protected readonly checkpoints = new SessionCheckpoints(this.shared);
+export class SessionTurnRecovery {
+  constructor(
+    private readonly shared: SessionShared,
+    private readonly checkpoints: SessionCheckpoints,
+    private readonly harnessTurns: SessionHarnessTurns,
+  ) {}
 
-  /** The turns of the embedded harness: input, run, checkpoint and failure. */
-  protected readonly harnessTurns = new SessionHarnessTurns(
-    this.shared,
-    this.checkpoints,
-  );
-
-  cancelCanonicalEmbeddedHarnessTurn(
-    ...input: Parameters<
-      SessionHarnessTurns["cancelCanonicalEmbeddedHarnessTurn"]
-    >
-  ) {
-    return this.harnessTurns.cancelCanonicalEmbeddedHarnessTurn(...input);
-  }
-
-  commitCanonicalHarnessCheckpoint(
-    ...input: Parameters<
-      SessionHarnessTurns["commitCanonicalHarnessCheckpoint"]
-    >
-  ) {
-    return this.harnessTurns.commitCanonicalHarnessCheckpoint(...input);
-  }
-
-  completeCanonicalCheckpointAndStream(
-    ...input: Parameters<
-      SessionCheckpoints["completeCanonicalCheckpointAndStream"]
-    >
-  ) {
-    return this.checkpoints.completeCanonicalCheckpointAndStream(...input);
-  }
-
-  readSessionTurnFlowBinding(
-    ...input: Parameters<SessionCheckpoints["readSessionTurnFlowBinding"]>
-  ) {
-    return this.checkpoints.readSessionTurnFlowBinding(...input);
-  }
-
-  readCompletedTurn(
-    ...input: Parameters<SessionCheckpoints["readCompletedTurn"]>
-  ) {
-    return this.checkpoints.readCompletedTurn(...input);
-  }
-
-  protected recoverUnrecoverableTurn(now: number): void {
-    recoverInterruptedSessionInTransaction(this.ctx.storage.sql, now);
-    discardHarnessTurnContinuation(this.ctx.storage.sql);
+  private recoverUnrecoverableTurn(now: number): void {
+    recoverInterruptedSessionInTransaction(this.shared.ctx.storage.sql, now);
+    discardHarnessTurnContinuation(this.shared.ctx.storage.sql);
   }
 
   /**
@@ -145,9 +97,9 @@ export abstract class SessionTurnRecovery
    * commerce action reconciles on its own path. Only a turn that cannot end
    * this way quarantines the Session.
    */
-  protected async endOrQuarantineInterruptedTurn(): Promise<void> {
+  async endOrQuarantineInterruptedTurn(): Promise<void> {
     if (await this.endInterruptedTurn()) return;
-    this.ctx.storage.transactionSync(
+    this.shared.ctx.storage.transactionSync(
       this.recoverUnrecoverableTurn.bind(this, Date.now()),
     );
     await this.endInterruptedTurnQuarantine();
@@ -160,8 +112,8 @@ export abstract class SessionTurnRecovery
    * indeterminate effect, or any work other than the billing of its turns,
    * stays quarantined: the effect may have happened, and a person decides it.
    */
-  protected async endInterruptedTurnQuarantine(): Promise<void> {
-    const sql = this.ctx.storage.sql;
+  async endInterruptedTurnQuarantine(): Promise<void> {
+    const sql = this.shared.ctx.storage.sql;
     const row = sql
       .exec<{ organisation_id: string; session_id: string }>(
         "SELECT organisation_id, session_id FROM session_meta LIMIT 1",
@@ -197,8 +149,8 @@ export abstract class SessionTurnRecovery
     // An old refused Code Mode settlement settles from the owners' records
     // first; one that no record decides stays and keeps the quarantine.
     await reconcileQuarantinedCodeModeSettlements({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.shared.env,
+      storage: this.shared.ctx.storage,
       organisationId: organisationId.value,
       sessionId: sessionId.value,
       now,
@@ -226,7 +178,7 @@ export abstract class SessionTurnRecovery
         Math.max(lease.issuedAt, Math.min(now, lease.expiresAt - 1)),
       );
     try {
-      const ended = this.ctx.storage.transactionSync(
+      const ended = this.shared.ctx.storage.transactionSync(
         terminateQuarantinedSessionInTransaction.bind(
           null,
           sql,
@@ -247,13 +199,13 @@ export abstract class SessionTurnRecovery
     // The billing of the ended turn goes to the account now; a failure
     // leaves it pending, and the alarm that this sets delivers it later.
     await reconcilePantryExecutionBilling({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.shared.env,
+      storage: this.shared.ctx.storage,
     });
   }
 
   private async endInterruptedTurn(): Promise<boolean> {
-    const sql = this.ctx.storage.sql;
+    const sql = this.shared.ctx.storage.sql;
     const lease = readCurrentHarnessTurnLease(sql);
     if (lease === null) return false;
     const organisationId = parseOrganisationId(lease.session.organisationId);
@@ -279,7 +231,7 @@ export abstract class SessionTurnRecovery
     const usage = readPiUsage(sql, lease);
     if (usage !== null && usage.totalTokens > 0) {
       const accepted = acceptCanonicalRunModelUsage(
-        this.ctx.storage,
+        this.shared.ctx.storage,
         identity,
         usage.totalTokens,
         now,
@@ -296,7 +248,7 @@ export abstract class SessionTurnRecovery
       acceptedAt,
     });
     if (!resolved.ok) return false;
-    this.ctx.storage.transactionSync(
+    this.shared.ctx.storage.transactionSync(
       settleControlledRunCancellation.bind(null, sql, { ...identity, now }),
     );
     discardHarnessTurnContinuation(sql);
@@ -321,7 +273,7 @@ export abstract class SessionTurnRecovery
     model: string,
     acceptedAt: number,
   ): Promise<void> {
-    const sql = this.ctx.storage.sql;
+    const sql = this.shared.ctx.storage.sql;
     const row = sql
       .exec<{
         history_sequence: number | null;
@@ -356,7 +308,7 @@ export abstract class SessionTurnRecovery
       canonicalStopNotice(INTERRUPTED_TURN_NOTE, model, lease.turn, acceptedAt),
     ];
     for (const entry of entries) {
-      const appended = await appendHarnessHistory(this.ctx.storage, {
+      const appended = await appendHarnessHistory(this.shared.ctx.storage, {
         leaseId: lease.leaseId,
         sessionId: lease.session.sessionId,
         turn: lease.turn,
@@ -381,17 +333,17 @@ export abstract class SessionTurnRecovery
     }
   }
 
-  protected async resumePendingPiTurn(): Promise<void> {
+  async resumePendingPiTurn(): Promise<void> {
     await reconcilePantryExecutionBilling({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.shared.env,
+      storage: this.shared.ctx.storage,
     });
     if (this.shared.canonicalTurn !== null) return;
-    const pending = readPiDurableRecovery(this.ctx.storage.sql);
+    const pending = readPiDurableRecovery(this.shared.ctx.storage.sql);
     if (pending === null) return;
     const execution = await SessionExecutionAdmission.resolve(
-      this.env,
-      this.ctx.storage,
+      this.shared.env,
+      this.shared.ctx.storage,
       pending.continuation.organisationId,
     );
     const authorized =
@@ -401,16 +353,16 @@ export abstract class SessionTurnRecovery
     // the next runtime generation before the resume commits that generation.
     const rebind = authorized
       ? await rebindPiRecoveryCodeModeLease({
-          env: this.env,
-          storage: this.ctx.storage,
+          env: this.shared.env,
+          storage: this.shared.ctx.storage,
           now: Date.now(),
         })
       : ({ kind: "not_required" } as const);
-    const resumed = this.ctx.storage.transactionSync(
+    const resumed = this.shared.ctx.storage.transactionSync(
       resumePiDurableRecovery.bind(
         null,
-        this.sessionTools().pageEffects.rebindRecovery,
-        this.ctx.storage,
+        this.shared.sessionTools().pageEffects.rebindRecovery,
+        this.shared.ctx.storage,
         pending,
         authorized,
         rebind,
@@ -419,7 +371,7 @@ export abstract class SessionTurnRecovery
     );
     if (rebind.kind === "deferred")
       await armAlarmBy(
-        this.ctx.storage,
+        this.shared.ctx.storage,
         Date.now() + CODE_MODE_LEASE_REBIND_RETRY_MS,
       );
     // No owner will hold the reservation again, so the script can neither
@@ -428,8 +380,8 @@ export abstract class SessionTurnRecovery
     if (resumed === null) return;
     const work = this.resumeHarnessTurn(resumed);
     this.shared.canonicalTurn = settleActorExecution(work);
-    this.ctx.waitUntil(
-      work.finally(this.checkpoints.clearCanonicalTurn.bind(this)),
+    this.shared.ctx.waitUntil(
+      work.finally(this.checkpoints.clearCanonicalTurn.bind(this.checkpoints)),
     );
   }
 
@@ -437,8 +389,8 @@ export abstract class SessionTurnRecovery
    * Ends the turn of a recovery that cannot resume, as an interruption does.
    * A failure here leaves the recovery as it was, and the next alarm repeats it.
    */
-  protected async endUnresumableTurn(): Promise<void> {
-    const row = this.ctx.storage.sql
+  private async endUnresumableTurn(): Promise<void> {
+    const row = this.shared.ctx.storage.sql
       .exec<{ organisation_id: string }>(
         "SELECT organisation_id FROM session_meta LIMIT 1",
       )
@@ -448,7 +400,7 @@ export abstract class SessionTurnRecovery
     if (organisationId === null || !organisationId.ok) return;
     const current = await readCanonicalSessionForPersistence(
       this.shared.persistence,
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       organisationId.value,
     );
     if (!current.ok || current.value.lifecycle.kind !== "recovering") return;
@@ -466,27 +418,30 @@ export abstract class SessionTurnRecovery
         cancellation.value,
       );
     if (!cancelled.ok) {
-      await armAlarmBy(this.ctx.storage, now + CODE_MODE_LEASE_REBIND_RETRY_MS);
+      await armAlarmBy(
+        this.shared.ctx.storage,
+        now + CODE_MODE_LEASE_REBIND_RETRY_MS,
+      );
       return;
     }
-    discardHarnessTurnContinuation(this.ctx.storage.sql);
+    discardHarnessTurnContinuation(this.shared.ctx.storage.sql);
     failOrphanedSessionTurnStreams(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       now,
       "code_mode_execution_unresumable",
     );
   }
 
-  protected async resumeHarnessTurn(pending: SavedRecovery): Promise<void> {
+  private async resumeHarnessTurn(pending: SavedRecovery): Promise<void> {
     const execution = await SessionExecutionAdmission.resolve(
-      this.env,
-      this.ctx.storage,
+      this.shared.env,
+      this.shared.ctx.storage,
       pending.continuation.organisationId,
     );
     if (execution === null) return;
     try {
       const history = await readHarnessHistory(
-        this.ctx.storage.sql,
+        this.shared.ctx.storage.sql,
         pending.lease.session.sessionId,
         pending.continuation.organisationId,
       );
@@ -530,7 +485,7 @@ export abstract class SessionTurnRecovery
         acceptedAt: Date.now(),
       });
       failSessionTurnStream(
-        this.ctx.storage.sql,
+        this.shared.ctx.storage.sql,
         pending.lease.turn.turnId,
         "bakery_continuation_failed",
         Date.now(),
@@ -541,7 +496,7 @@ export abstract class SessionTurnRecovery
       });
     } finally {
       finishHarnessTurnContinuation(
-        this.ctx.storage.sql,
+        this.shared.ctx.storage.sql,
         pending.lease.turn.turnId,
       );
     }
@@ -551,8 +506,10 @@ export abstract class SessionTurnRecovery
    * Finish what an interrupted turn left: the completion of a turn whose
    * checkpoint is accepted, or the archive write of a completed turn.
    */
-  protected async resumeAcceptedCheckpointFinalization(): Promise<void> {
-    const pending = readAcceptedCheckpointFinalization(this.ctx.storage.sql);
+  async resumeAcceptedCheckpointFinalization(): Promise<void> {
+    const pending = readAcceptedCheckpointFinalization(
+      this.shared.ctx.storage.sql,
+    );
     if (!pending.ok) return;
     if (pending.value.kind === "none") {
       await this.resumeCheckpointPublication();
@@ -569,8 +526,8 @@ export abstract class SessionTurnRecovery
     );
     if (!organisationId.ok) return;
     const execution = await SessionExecutionAdmission.resolve(
-      this.env,
-      this.ctx.storage,
+      this.shared.env,
+      this.shared.ctx.storage,
       organisationId.value,
     );
     if (execution === null) return;
@@ -583,16 +540,18 @@ export abstract class SessionTurnRecovery
     if (!result.ok) await this.checkpoints.scheduleCheckpointFinalization();
   }
 
-  protected async resumeCheckpointPublication(): Promise<void> {
-    const unpublished = readUnpublishedHarnessCheckpoint(this.ctx.storage.sql);
+  private async resumeCheckpointPublication(): Promise<void> {
+    const unpublished = readUnpublishedHarnessCheckpoint(
+      this.shared.ctx.storage.sql,
+    );
     if (!unpublished.ok || unpublished.value === null) return;
     const organisationId = parseOrganisationId(
       unpublished.value.checkpoint.session.organisationId,
     );
     if (!organisationId.ok) return;
     const execution = await SessionExecutionAdmission.resolve(
-      this.env,
-      this.ctx.storage,
+      this.shared.env,
+      this.shared.ctx.storage,
       organisationId.value,
     );
     if (execution === null) return;

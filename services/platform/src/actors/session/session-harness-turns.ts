@@ -948,7 +948,7 @@ export class SessionHarnessTurns {
       turn: input.lease.turn,
       restoreCheckpoint:
         this.checkpoints.restoreCanonicalHarnessCheckpointForRun.bind(
-          this,
+          this.checkpoints,
           input.lease,
         ),
       readHistory: readHarnessHistory.bind(null, this.shared.ctx.storage.sql),

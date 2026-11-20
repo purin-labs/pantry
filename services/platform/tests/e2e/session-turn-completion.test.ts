@@ -4,6 +4,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
 import { SessionDO } from "../../src/actors/agent-session";
+import { SessionCheckpoints } from "../../src/actors/session/session-checkpoints";
 import { fixtureDatabase } from "./organisation-database";
 import { network } from "./network";
 import {
@@ -115,15 +116,21 @@ function respond(
  * a moment does. Later completions, and every recovery completion, run.
  */
 function failFirstTurnFinalization(): () => void {
-  const prototype = SessionDO.prototype as unknown as Record<string, unknown>;
+  // The checkpoints module of the Session completes a turn.
+  const prototype = SessionCheckpoints.prototype as unknown as Record<
+    string,
+    unknown
+  >;
   const original = prototype.finalizeAcceptedSessionCheckpoint as (
-    this: SessionDO,
+    this: SessionCheckpoints,
     input: { readonly caller: { readonly kind: string } },
   ) => Promise<unknown>;
+  if (typeof original !== "function")
+    throw new Error("Missing turn completion");
   let failed = false;
   Object.defineProperty(prototype, "finalizeAcceptedSessionCheckpoint", {
     value: function finalizeOnceFailed(
-      this: SessionDO,
+      this: SessionCheckpoints,
       input: { readonly caller: { readonly kind: string } },
     ) {
       if (!failed && input.caller.kind === "turn") {

@@ -3,7 +3,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
-import { SessionDO } from "../../src/actors/agent-session";
+import { SessionTurnRecovery } from "../../src/actors/session/session-turn-recovery";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
 import {
@@ -103,8 +103,14 @@ function ignoreAlarmFailure(): boolean {
 
 /** The completion of accepted checkpoints fails on every alarm pass. */
 function failCheckpointCompletion(): () => void {
-  const prototype = SessionDO.prototype as unknown as Record<string, unknown>;
+  // The recovery module of the Session completes accepted checkpoints.
+  const prototype = SessionTurnRecovery.prototype as unknown as Record<
+    string,
+    unknown
+  >;
   const original = prototype.resumeAcceptedCheckpointFinalization;
+  if (typeof original !== "function")
+    throw new Error("Missing checkpoint completion");
   Object.defineProperty(prototype, "resumeAcceptedCheckpointFinalization", {
     value: function failingCompletion(): Promise<void> {
       return Promise.reject(new Error("checkpoint completion unavailable"));

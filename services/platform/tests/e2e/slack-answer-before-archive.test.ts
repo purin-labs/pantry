@@ -509,17 +509,20 @@ function interceptCheckpointArchive(
       recorded.timeline.push(`turn start ${turnStarts(recorded) + 1}`);
       return start.apply(this, args);
     };
-  const accept = SessionDO.prototype.commitCanonicalHarnessCheckpoint;
-  SessionDO.prototype.commitCanonicalHarnessCheckpoint = function acceptAndWrap(
-    this: SessionDO,
-    ...args: Parameters<typeof accept>
-  ) {
+  // A Session that wakes with no new turn reads its tools in its
+  // constructor, before it reads the archive. The wrap is on the Actor, so
+  // the modules of the Session see the same archive.
+  const prototype = SessionDO.prototype as unknown as {
+    sessionTools: (this: SessionDO) => unknown;
+  };
+  const tools = prototype.sessionTools;
+  prototype.sessionTools = function toolsAndWrap(this: SessionDO) {
     wrapOnce(this);
-    return accept.apply(this, args);
+    return tools.call(this);
   };
   test.onTestFinished(function restoreSession(): void {
     SessionDO.prototype.startCanonicalEmbeddedHarnessTextTurn = start;
-    SessionDO.prototype.commitCanonicalHarnessCheckpoint = accept;
+    prototype.sessionTools = tools;
   });
   return archive;
 }
