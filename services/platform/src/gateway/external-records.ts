@@ -28,7 +28,7 @@ import {
 import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
 import { connectExternalRecordsIntegration } from "../external-records/connection";
 import { resolveExternalRecordsAccessToken } from "../external-records/oauth";
-import { readOrganisationEnvironment } from "./support";
+import { requireOrganisationEnvironment } from "../integrations/contract/admin-integration";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,
@@ -107,7 +107,7 @@ export async function handleConfigureExternalRecordsCredential(
   const connected = await connectExternalRecordsIntegration({
     env,
     scope,
-    environment: await readOrganisationEnvironment(
+    environment: await requireOrganisationEnvironment(
       scope.database,
       organisationId.value,
     ),

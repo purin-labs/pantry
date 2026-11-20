@@ -49,10 +49,12 @@ import {
 import { noticeCardBlocks } from "../../slack/notice-card";
 import {
   deviceAlertCardBlocks,
-  deviceAlertNoticeOfUpdate,
   devicesPortalUrl,
-  isDeviceAlertDelivery,
 } from "../../slack/device-alert-card";
+import {
+  deviceAlertNoticeOfUpdate,
+  isDeviceAlertDelivery,
+} from "../../devices/contract/alert-delivery";
 import { slackMayApproveAction } from "../../commerce/action-model";
 import { resolveActiveSlackDestinationConnection } from "../../slack/organisation-routing";
 import { requireActiveOrganisationActor } from "../actor-router";

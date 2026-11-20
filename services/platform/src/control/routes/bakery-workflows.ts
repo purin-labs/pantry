@@ -11,11 +11,11 @@ import {
   writeWorkflowFindings,
 } from "../../commerce/bakery/workflow-revisions";
 import {
+  previewCode,
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
   readOperatorDraft,
 } from "../../data/operator-configuration-draft";
-import { previewCode } from "../../slack/configuration-presentation";
 import type { Env } from "../../env";
 import { newRequestId, type OrganisationId } from "../../ids";
 import { traceWarn } from "../../observability";
