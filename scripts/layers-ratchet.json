@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 131,
+    "upward": 128,
     "areas": 56,
-    "order": 53,
+    "order": 48,
     "table": 25
   },
   "crossings": {
@@ -52,13 +52,9 @@
     "areas/shopify -> areas/commerce": 4,
     "areas/shopify -> surfaces/webhooks": 2,
     "foundation/actor-runtime -> areas/commerce": 1,
-    "foundation/actor-runtime -> areas/devices": 1,
-    "foundation/actor-runtime -> areas/inbox": 2,
-    "foundation/actor-runtime -> foundation/agent": 2,
     "foundation/actor-runtime -> foundation/authority": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,
     "foundation/actor-runtime -> foundation/connections": 1,
-    "foundation/actor-runtime -> foundation/conversation": 3,
     "foundation/actor-runtime -> surfaces/email": 2,
     "foundation/agent -> areas/commerce": 19,
     "foundation/agent -> areas/integrations": 1,

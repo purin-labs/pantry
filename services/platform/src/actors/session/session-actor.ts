@@ -1,3 +1,4 @@
+import type { MachineDefinition } from "@purin-labs/std/state-machine";
 import {
   actorMachineCensus,
   type MachineCensus,
@@ -198,10 +199,16 @@ import { SessionTurnRecovery } from "./session-turn-recovery";
 export abstract class SessionActor extends SessionTurnRecovery {
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   async machineCensus(): Promise<readonly MachineCensus[]> {
-    const census = await actorMachineCensus(this.ctx.storage);
+    const census = await actorMachineCensus(
+      this.ctx.storage,
+      this.actorMachines(),
+    );
     const unknown = indeterminateEffectCensus(this.ctx.storage.sql, Date.now());
     return unknown === null ? census : [...census, unknown];
   }
+
+  /** The machines of the census. The Worker's class gives them. */
+  protected abstract actorMachines(): readonly MachineDefinition[];
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env, { executionBarrier: true });

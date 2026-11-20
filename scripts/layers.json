@@ -552,6 +552,7 @@
     "services/platform/src/actors/actor-execution-quiescence.ts": "foundation/actor-runtime",
     "services/platform/src/actors/actor-export.ts": "foundation/actor-runtime",
     "services/platform/src/actors/actor-journal.ts": "foundation/agent",
+    "services/platform/src/actors/actor-machines.ts": "workers/platform",
     "services/platform/src/actors/actor-placement-admission.ts": "foundation/actor-runtime",
     "services/platform/src/actors/actor-registry-reconciliation.ts": "foundation/actor-runtime",
     "services/platform/src/actors/actor-registry-sweep.ts": "foundation/actor-runtime",

@@ -7,6 +7,7 @@ import {
   actorMachineCensus,
   type MachineCensus,
 } from "./lifecycle/machine-census";
+import { ACTOR_MACHINES } from "./actor-machines";
 import {
   armAlarmAfterFailedSteps,
   runAlarmSteps,
@@ -556,7 +557,7 @@ export class OrganisationDO
 
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   machineCensus(): Promise<readonly MachineCensus[]> {
-    return actorMachineCensus(this.ctx.storage);
+    return actorMachineCensus(this.ctx.storage, ACTOR_MACHINES);
   }
 
   readonly #commerceBoardPresence = new Map<
