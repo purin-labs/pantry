@@ -1,3 +1,4 @@
+import type { OrganisationModuleHost } from "./module-host";
 import { ensureJevPaidHold } from "../../jev-features/paid-use";
 import {
   runScreenRelevanceCheck,
@@ -732,6 +733,21 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
 
     return input;
   }
+
+  /** What this Organisation gives to a module of a product area. */
+  protected readonly moduleHost: OrganisationModuleHost = (() => {
+    const actor = this;
+    return {
+      get ctx() {
+        return actor.ctx;
+      },
+      get env() {
+        return actor.env;
+      },
+      command: (organisationId, start) => actor.command(organisationId, start),
+      rearm: () => actor.rearm(),
+    };
+  })();
 
   /** Sets the alarm from the Organisation's stored work. */
   protected rearm(): Promise<number | null> {

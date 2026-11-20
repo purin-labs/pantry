@@ -1,3 +1,5 @@
+import type { SessionShared } from "./session-shared";
+import type { SessionCheckpoints } from "./session-checkpoints";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
 import {
   acceptedExecutionAuthority,
@@ -177,7 +179,6 @@ import type {
   CanonicalEmbeddedHarnessTurnResult,
   CanonicalHarnessCheckpointCommitError,
 } from "./types";
-import { SessionCheckpoints } from "./session-checkpoints";
 import type {
   SessionToolWiring,
   ToolTurnContext,
@@ -188,10 +189,13 @@ import type {
 /**
  * Canonical embedded harness turns: input, preparation, the run with its tools, and the checkpoint commit.
  */
-export abstract class SessionHarnessTurns extends SessionCheckpoints {
-  protected selectEmbeddedHarnessAdapter(
-    modelRoute: ModelRoute,
-  ): EmbeddedHarnessAdapter {
+export class SessionHarnessTurns {
+  constructor(
+    private readonly shared: SessionShared,
+    private readonly checkpoints: SessionCheckpoints,
+  ) {}
+
+  selectEmbeddedHarnessAdapter(modelRoute: ModelRoute): EmbeddedHarnessAdapter {
     return selectEmbeddedHarnessAdapterForModelRoute(modelRoute);
   }
 
@@ -203,24 +207,31 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       CanonicalEmbeddedHarnessCancellationError
     >
   > {
-    const committed = commitCancellationStartedSession(this.ctx.storage, input);
+    const committed = commitCancellationStartedSession(
+      this.shared.ctx.storage,
+      input,
+    );
     if (!committed.ok) return committed;
-    const preparation = this.activeMessagePreparation;
+    const preparation = this.shared.activeMessagePreparation;
     if (
       input.harnessLease !== undefined &&
       preparation !== null &&
       preparation.leaseId === input.harnessLease.leaseId
     ) {
       await preparation.cancel();
-      const budget = this.ctx.storage.transactionSync(
-        settleControlledRunCancellation.bind(null, this.ctx.storage.sql, {
-          ...canonicalRunBudgetIdentity(input.harnessLease),
-          now: Date.now(),
-        }),
+      const budget = this.shared.ctx.storage.transactionSync(
+        settleControlledRunCancellation.bind(
+          null,
+          this.shared.ctx.storage.sql,
+          {
+            ...canonicalRunBudgetIdentity(input.harnessLease),
+            now: Date.now(),
+          },
+        ),
       );
       if (!budget.ok) return budget;
     }
-    const active = this.activeEmbeddedHarnessTurn;
+    const active = this.shared.activeEmbeddedHarnessTurn;
     if (
       input.harnessLease !== undefined &&
       active !== null &&
@@ -230,8 +241,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       if (!cancelled.ok) return cancelled;
     }
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.event.organisationId,
     );
     if (!current.ok || current.value.lifecycle.kind !== "cancelling") {
@@ -253,17 +264,17 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     });
     if (!resolved.ok) return resolved;
     const ended = commitCancellationResolvedSession(
-      this.ctx.storage,
+      this.shared.ctx.storage,
       resolved.value,
     );
     if (ended.ok)
-      this.ctx.waitUntil(
+      this.shared.ctx.waitUntil(
         reconcilePantryExecutionBilling({
-          env: this.env,
-          storage: this.ctx.storage,
+          env: this.shared.env,
+          storage: this.shared.ctx.storage,
         }),
       );
-    if (ended.ok) await this.releaseEndedExecutions();
+    if (ended.ok) await this.shared.releaseEndedExecutions();
     return ended;
   }
 
@@ -273,7 +284,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
   ): Promise<
     Result<HarnessCheckpointCommit, CanonicalHarnessCheckpointCommitError>
   > {
-    const account = readSessionBudgetAccount(this.ctx.storage.sql, {
+    const account = readSessionBudgetAccount(this.shared.ctx.storage.sql, {
       organisationId: input.session.organisationId,
       sessionId: input.session.sessionId,
     });
@@ -298,15 +309,15 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     });
     if (!binding.ok) return binding;
     const prepared = await prepareHarnessCheckpoint({
-      storage: this.ctx.storage,
+      storage: this.shared.ctx.storage,
       checkpoint: input,
       now: Date.now,
     });
     if (!prepared.ok) return prepared;
-    return this.ctx.storage.transaction(
+    return this.shared.ctx.storage.transaction(
       commitCheckpointAndAlarm.bind(
         null,
-        this.ctx.storage,
+        this.shared.ctx.storage,
         prepared.value,
         transition,
       ),
@@ -323,7 +334,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
    * This input read can reuse the catalog's account answer. Execution checks
    * around billing still use the scope's live account access.
    */
-  protected async readCanonicalEmbeddedHarnessInput(input: {
+  async readCanonicalEmbeddedHarnessInput(input: {
     execution: SessionExecutionAdmission;
     requestingOrganisationId: OrganisationId;
     lease: HarnessTurnLease;
@@ -337,7 +348,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     if (
       !(await authorizeSessionTurnLease(
-        this.env.DB,
+        this.shared.env.DB,
         execution.scope.database,
         input.requestingOrganisationId,
         input.lease,
@@ -347,8 +358,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     const startedAt = Date.now();
     const initial = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     if (!initial.ok) return initial;
@@ -356,13 +367,13 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     }
     const authorized = preflightHarnessTurnLease(
-      this.ctx.storage,
+      this.shared.ctx.storage,
       input.lease,
       startedAt,
     );
     if (!authorized.ok) return authorized;
     const turn = initial.value.lifecycle.state.activeTurn.state.identity;
-    const accepted = readAcceptedSessionInput(this.ctx.storage.sql, {
+    const accepted = readAcceptedSessionInput(this.shared.ctx.storage.sql, {
       organisationId: initial.value.lifecycle.state.identity.organisationId,
       sessionId: initial.value.lifecycle.state.identity.sessionId,
       streamId: initial.value.lifecycle.state.identity.streamId,
@@ -376,7 +387,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         error: { code: "embedded_harness_input_identity_invalid" },
       };
     }
-    const assignment = readCaseSessionAssignment(this.ctx.storage.sql);
+    const assignment = readCaseSessionAssignment(this.shared.ctx.storage.sql);
     const workspaceRevision =
       initial.value.lifecycle.state.resumePoint.kind === "new"
         ? initial.value.lifecycle.state.resumePoint.workspaceRevisionReceipt
@@ -396,11 +407,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     ) {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     }
-    const context = await readSessionTurnModelContext(this.ctx.storage.sql, {
-      turnId: turn.turnId,
-      organisationId: initial.value.lifecycle.state.identity.organisationId,
-      sessionId: initial.value.lifecycle.state.identity.sessionId,
-    });
+    const context = await readSessionTurnModelContext(
+      this.shared.ctx.storage.sql,
+      {
+        turnId: turn.turnId,
+        organisationId: initial.value.lifecycle.state.identity.organisationId,
+        sessionId: initial.value.lifecycle.state.identity.sessionId,
+      },
+    );
     if (!context.ok) {
       return context;
     }
@@ -414,7 +428,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     }
     const informationFlow = await readSessionInformationFlow(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       {
         organisationId: initial.value.lifecycle.state.identity.organisationId,
         sessionId: initial.value.lifecycle.state.identity.sessionId,
@@ -462,11 +476,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (!liveContextAuthority.ok) {
       return { ok: false, error: { code: "invalid_persisted_state" } };
     }
-    const attachments = readSessionTurnAttachments(this.ctx.storage.sql, {
-      turnId: turn.turnId,
-      organisationId: initial.value.lifecycle.state.identity.organisationId,
-      sessionId: initial.value.lifecycle.state.identity.sessionId,
-    });
+    const attachments = readSessionTurnAttachments(
+      this.shared.ctx.storage.sql,
+      {
+        turnId: turn.turnId,
+        organisationId: initial.value.lifecycle.state.identity.organisationId,
+        sessionId: initial.value.lifecycle.state.identity.sessionId,
+      },
+    );
     if (attachments === null)
       return { ok: false, error: { code: "invalid_persisted_state" } };
     return {
@@ -491,7 +508,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
    * and started the fork history read. Everything read here is released only
    * after the fence is read again before the turn starts.
    */
-  protected async runCanonicalEmbeddedHarnessTurn(input: {
+  private async runCanonicalEmbeddedHarnessTurn(input: {
     execution: SessionExecutionAdmission;
     acceptedTurnTools: AcceptedTurnTools | null;
     inheritedHistory: ReturnType<
@@ -517,8 +534,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
   > {
     let phaseStartedAt = Date.now();
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     traceSessionHarnessPreparation(
@@ -536,7 +553,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     }
     const modelRoute = session.value.lifecycle.state.contract.modelRoute;
     const adapter = this.selectEmbeddedHarnessAdapter(modelRoute);
-    const assignment = readCaseSessionAssignment(this.ctx.storage.sql);
+    const assignment = readCaseSessionAssignment(this.shared.ctx.storage.sql);
     if (assignment === null || input.inheritedHistory === null) {
       return {
         ok: false,
@@ -544,7 +561,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       };
     }
     // A side Case's proposal is read beside its fork history (Plan 74).
-    const conversation = this.sessionTools().conversation;
+    const conversation = this.shared.sessionTools().conversation;
     const sideCaseRead = conversation.readSideCase(
       input.execution.scope,
       String(assignment.caseId),
@@ -563,7 +580,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     await conversation.admitForkInformationFlow(
       input.execution.scope.database,
       input.execution.scope.accountAccess,
-      this.ctx.storage,
+      this.shared.ctx.storage,
       input.lease,
       inheritedHistory,
       requireSessionExecution.bind(null, input.execution, input.lease),
@@ -572,17 +589,17 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (sideCase !== null)
       await sideCase.admit({
         scope: input.execution.scope,
-        storage: this.ctx.storage,
+        storage: this.shared.ctx.storage,
         lease: input.lease,
         authorizeCommit: requireSessionExecution.bind(
           null,
           input.execution,
           input.lease,
         ),
-        env: this.env,
+        env: this.shared.env,
       });
     const currentFlow = await readPersistedSessionTurnFlowBinding(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       {
         organisationId: input.requestingOrganisationId,
         sessionId: input.lease.session.sessionId,
@@ -637,7 +654,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     const catalogRead =
       input.acceptedTurnTools === null
         ? resolveAcceptedTurnTools({
-            turnTools: this.sessionTools().turnTools,
+            turnTools: this.shared.sessionTools().turnTools,
             scope: input.execution.scope,
             organisationId: input.requestingOrganisationId,
             authority: input.lease.requestAuthority,
@@ -677,21 +694,21 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         input,
         "harness_model_route",
         createEmbeddedHarnessModelRouteLease({
-          env: this.env,
+          env: this.shared.env,
           scope: input.execution.scope,
           sessionId,
           modelRoute,
         }),
       ),
       input.goalExecution === null
-        ? findServedGoalCase(this.env, input.execution.scope, assignment)
+        ? findServedGoalCase(this.shared.env, input.execution.scope, assignment)
         : null,
     ]);
     if (!canonicalInput.ok) return canonicalInput;
     if (!acceptedTurnTools.ok) return acceptedTurnTools;
     if (
-      this.activeMessagePreparation !== null ||
-      this.activeEmbeddedHarnessTurn !== null
+      this.shared.activeMessagePreparation !== null ||
+      this.shared.activeEmbeddedHarnessTurn !== null
     ) {
       return {
         ok: false,
@@ -700,9 +717,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     }
     const messagePreparation = new ActiveAttachmentPreparationControl(
       input.lease.leaseId,
-      destroyWorkspaceExecutor.bind(null, this.env),
+      destroyWorkspaceExecutor.bind(null, this.shared.env),
     );
-    this.activeMessagePreparation = messagePreparation;
+    this.shared.activeMessagePreparation = messagePreparation;
     let harnessInput: Awaited<
       ReturnType<typeof materializeEmbeddedHarnessUserInput>
     >;
@@ -722,9 +739,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
             continue;
           const prepared = await materializeAcceptedAttachment({
             execution: input.execution,
-            env: this.env,
-            archive: this.env.ARCHIVE,
-            storage: this.ctx.storage,
+            env: this.shared.env,
+            archive: this.shared.env.ARCHIVE,
+            storage: this.shared.ctx.storage,
             lease: input.lease,
             organisationId: input.requestingOrganisationId,
             attachment: content.attachment,
@@ -736,9 +753,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       }
       harnessInput = await materializeEmbeddedHarnessUserInput({
         execution: input.execution,
-        archive: this.env.ARCHIVE,
-        env: this.env,
-        storage: this.ctx.storage,
+        archive: this.shared.env.ARCHIVE,
+        env: this.shared.env,
+        storage: this.shared.ctx.storage,
         lease: input.lease,
         organisationId: input.requestingOrganisationId,
         input: canonicalInput.value,
@@ -746,8 +763,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       });
     } finally {
       messagePreparation.settle();
-      if (this.activeMessagePreparation === messagePreparation) {
-        this.activeMessagePreparation = null;
+      if (this.shared.activeMessagePreparation === messagePreparation) {
+        this.shared.activeMessagePreparation = null;
       }
     }
     traceSessionHarnessPreparation(
@@ -758,23 +775,25 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     );
     if (!harnessInput.ok) return harnessInput;
     phaseStartedAt = Date.now();
-    const permissionRequest = await this.sessionTools().mayRequestPermission({
-      db: input.execution.scope.database,
-      organisationId: String(input.execution.scope.organisationId),
-      authority: input.lease.requestAuthority,
-      sessionId: String(input.lease.session.sessionId),
-      turnId: String(input.lease.turn.turnId),
-    });
+    const permissionRequest = await this.shared
+      .sessionTools()
+      .mayRequestPermission({
+        db: input.execution.scope.database,
+        organisationId: String(input.execution.scope.organisationId),
+        authority: input.lease.requestAuthority,
+        sessionId: String(input.lease.session.sessionId),
+        turnId: String(input.lease.turn.turnId),
+      });
     const binding = await resolveCanonicalEmbeddedHarnessCheckpointBinding({
-      registry: this.sessionTools().registry,
+      registry: this.shared.sessionTools().registry,
       state: session.value.lifecycle,
       runtime: input.runtime,
       harnessInstructions,
       assignment,
       turnTools: acceptedTurnTools.value.turnTools,
-      bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
-        input.lease.requestAuthority,
-      ),
+      bakerySurfaceCommands: this.shared
+        .sessionTools()
+        .pageEffects.authorizedCommands(input.lease.requestAuthority),
       memoryProposal: turnMayProposeMemory(input.lease.requestAuthority),
       followUp: turnMayScheduleFollowUp(
         input.lease.requestAuthority,
@@ -796,7 +815,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (!binding.ok) return binding;
     const budgetIdentity = canonicalRunBudgetIdentity(input.lease);
     const budgetAccount = readSessionBudgetAccount(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       budgetIdentity,
     );
     if (!budgetAccount.ok) return budgetAccount;
@@ -816,8 +835,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     }
     phaseStartedAt = Date.now();
     const toolTurn: ToolTurnContext = {
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.shared.env,
+      storage: this.shared.ctx.storage,
       execution: input.execution,
       lease: input.lease,
       assignment,
@@ -828,19 +847,19 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       browserContext: input.browserContext,
       effectiveGrantSet: acceptedTurnTools.value.authority.effectiveGrantSet,
     };
-    const tools = this.sessionTools();
+    const tools = this.shared.sessionTools();
     const toolArguments = tools.argumentObserver(toolTurn);
     const toolHostPreparation = createCatalogHarnessToolHost({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.shared.env,
+      storage: this.shared.ctx.storage,
       organisationId: input.requestingOrganisationId,
       lease: input.lease,
       expectedCatalogDigest: binding.value.binding.toolCatalogDigest,
       capabilityKeys: assignment.authorityPartition.capabilityKeys,
       turnTools: acceptedTurnTools.value.turnTools,
-      bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
-        input.lease.requestAuthority,
-      ),
+      bakerySurfaceCommands: this.shared
+        .sessionTools()
+        .pageEffects.authorizedCommands(input.lease.requestAuthority),
       memoryProposal: turnMayProposeMemory(input.lease.requestAuthority),
       followUp: turnMayScheduleFollowUp(
         input.lease.requestAuthority,
@@ -858,7 +877,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       services: {
         ...tools.areaServices(toolTurn),
         ...tools.ownServices(toolTurn, {
-          persistence: this.persistence,
+          persistence: this.shared.persistence,
           wiring: tools,
           attachments: canonicalInput.value.attachments,
           links: canonicalInput.value.links,
@@ -867,27 +886,27 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       // The one place of the exit check: `prepare` of an effect tool returns
       // the effect, and this turn's authority settles it.
       settleEffect: tools.settleEffect.bind(null, {
-        env: this.env,
-        storage: this.ctx.storage,
+        env: this.shared.env,
+        storage: this.shared.ctx.storage,
         execution: input.execution,
         lease: input.lease,
       }),
       requestPermission: tools.requestPermission.bind(null, {
-        env: this.env,
+        env: this.shared.env,
         execution: input.execution,
         lease: input.lease,
         caseId: String(assignment.caseId),
       }),
       claimCapability: claimCanonicalRunCapability.bind(
         null,
-        this.ctx.storage,
+        this.shared.ctx.storage,
         input.execution,
         budgetIdentity,
         input.lease,
       ),
       authorizeSources: authorizeCanonicalRunSources.bind(
         null,
-        this.ctx.storage,
+        this.shared.ctx.storage,
         input.execution,
         budgetIdentity,
         input.lease,
@@ -901,12 +920,16 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       requestingOrganisationId: input.requestingOrganisationId,
       acceptedInput: canonicalInput.value.acceptedInput,
       turn: input.lease.turn,
-      restoreCheckpoint: this.restoreCanonicalHarnessCheckpointForRun.bind(
-        this,
-        input.lease,
+      restoreCheckpoint:
+        this.checkpoints.restoreCanonicalHarnessCheckpointForRun.bind(
+          this.checkpoints,
+          input.lease,
+        ),
+      readHistory: readHarnessHistory.bind(null, this.shared.ctx.storage.sql),
+      readUsage: readHarnessHistoryUsage.bind(
+        null,
+        this.shared.ctx.storage.sql,
       ),
-      readHistory: readHarnessHistory.bind(null, this.ctx.storage.sql),
-      readUsage: readHarnessHistoryUsage.bind(null, this.ctx.storage.sql),
     });
     const [toolHost, source] = await Promise.all([
       measureSessionHarnessPreparation(
@@ -951,9 +974,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       try {
         goalExecution = await createSessionGoalExecution(
           {
-            env: this.env,
-            storage: this.ctx.storage,
-            liveRuns: this.liveGoalRuns,
+            env: this.shared.env,
+            storage: this.shared.ctx.storage,
+            liveRuns: this.shared.liveGoalRuns,
           },
           input.lease,
           assignment,
@@ -993,10 +1016,10 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       const runtime = adapter.construct({
         persistence: {
           kind: "actor",
-          storage: this.ctx.storage,
+          storage: this.shared.ctx.storage,
           preflight: requirePiHarnessLease.bind(
             null,
-            this.ctx.storage,
+            this.shared.ctx.storage,
             input.lease,
           ),
         },
@@ -1033,8 +1056,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         ),
         toolRules: piToolRules.bind(null, tools.registry),
         toolArguments,
-        eventSink: this,
-        historySink: this,
+        eventSink: this.shared,
+        historySink: this.shared,
         turnLease: input.lease,
         now: Date.now,
       });
@@ -1048,7 +1071,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
 
       try {
         const authorized = preflightHarnessTurnLease(
-          this.ctx.storage,
+          this.shared.ctx.storage,
           input.lease,
           Date.now(),
         );
@@ -1059,7 +1082,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         const [active, billingBinding] = await Promise.all([
           input.execution.isTurnActive(input.lease),
           readPantryExecutionAdmissionBinding(
-            { env: this.env, storage: this.ctx.storage },
+            { env: this.shared.env, storage: this.shared.ctx.storage },
             input.lease,
           ),
         ]);
@@ -1068,7 +1091,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
             ok: false,
             error: { code: "embedded_harness_model_authority_unavailable" },
           };
-        if (this.activeEmbeddedHarnessTurn !== null) {
+        if (this.shared.activeEmbeddedHarnessTurn !== null) {
           return {
             ok: false,
             error: { code: "embedded_harness_model_authority_unavailable" },
@@ -1081,7 +1104,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         }
         if (!billingBinding.ok) return billingBinding;
         const billing = await admitPantryExecutionBilling(
-          { env: this.env, storage: this.ctx.storage },
+          { env: this.shared.env, storage: this.shared.ctx.storage },
           {
             lease: input.lease,
             binding: billingBinding.value,
@@ -1103,14 +1126,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         )
           return { ok: false, error: { code: "budget_reservation_conflict" } };
         const dispatched = markPantryExecutionDispatched(
-          this.ctx.storage.sql,
+          this.shared.ctx.storage.sql,
           input.lease.turn.turnId,
         );
         if (!dispatched.ok) return dispatched;
         const starting = runtime.value.startTurn(harnessInput.value);
         const started = await starting.completion;
         if (!started.ok) return started;
-        this.activeEmbeddedHarnessTurn = {
+        this.shared.activeEmbeddedHarnessTurn = {
           leaseId: input.lease.leaseId,
           lease: input.lease,
           acceptedInput: canonicalInput.value.acceptedInput,
@@ -1135,7 +1158,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           const cancelled = completion.cancellation;
           if (!cancelled.ok) return cancelled;
           const exhausted = reconcileCanonicalRunBudgetDeadline(
-            this.ctx.storage,
+            this.shared.ctx.storage,
             Math.max(
               Date.now(),
               budgetAccount.value.reservation.reservation.deadlineAt +
@@ -1190,17 +1213,19 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         };
       } finally {
         retainPantryExecutionUncertainty(
-          this.ctx.storage.sql,
+          this.shared.ctx.storage.sql,
           input.lease.turn.turnId,
         );
-        if (this.activeEmbeddedHarnessTurn?.leaseId === input.lease.leaseId) {
-          this.activeEmbeddedHarnessTurn = null;
+        if (
+          this.shared.activeEmbeddedHarnessTurn?.leaseId === input.lease.leaseId
+        ) {
+          this.shared.activeEmbeddedHarnessTurn = null;
         }
         phaseStartedAt = Date.now();
         await runtime.value.close();
-        await this.journalPlacedSteeringInputs(input, sessionId);
+        await this.shared.journalPlacedSteeringInputs(input, sessionId);
         traceHarnessHistoryBudgetWarning({
-          sql: this.ctx.storage.sql,
+          sql: this.shared.ctx.storage.sql,
           sessionId,
           turnId: input.lease.turn.turnId,
         });
@@ -1230,7 +1255,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     }
   }
 
-  protected async runAndCheckpointCanonicalEmbeddedHarnessTextTurn(input: {
+  async runAndCheckpointCanonicalEmbeddedHarnessTextTurn(input: {
     execution: SessionExecutionAdmission;
     /**
      * The connector catalog the same call resolved to start this turn. Null
@@ -1274,8 +1299,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
   > {
     let phaseStartedAt = Date.now();
     const before = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     traceSessionHarnessPreparation(
@@ -1304,16 +1329,18 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // and started the read of the Case's fork history beside it. Only this
     // Session's storage was used since. A turn that resumes in a later call
     // checks the receipt and starts the read here.
-    const assignment = readCaseSessionAssignment(this.ctx.storage.sql);
+    const assignment = readCaseSessionAssignment(this.shared.ctx.storage.sql);
     const inheritedHistory =
       input.startedInheritedHistory ??
       (assignment === null
         ? null
-        : this.sessionTools().conversation.readForkHistory(
-            this.env,
-            input.execution.scope,
-            String(assignment.caseId),
-          ));
+        : this.shared
+            .sessionTools()
+            .conversation.readForkHistory(
+              this.shared.env,
+              input.execution.scope,
+              String(assignment.caseId),
+            ));
     void inheritedHistory?.catch(ignoreUnusedForkHistory);
     const verifiedReceipt =
       reusableWorkspaceReceiptCheck(input.startReceiptCheck, receipt.value) ??
@@ -1339,8 +1366,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     }
     phaseStartedAt = Date.now();
     const budgetIdentity = canonicalRunBudgetIdentity(input.lease);
-    const reserved = this.ctx.storage.transactionSync(
-      reserveRunBudget.bind(null, this.ctx.storage.sql, {
+    const reserved = this.shared.ctx.storage.transactionSync(
+      reserveRunBudget.bind(null, this.shared.ctx.storage.sql, {
         ...budgetIdentity,
         operationId: `budget_reserve_${budgetIdentity.runId}`,
         turnId: input.lease.turn.turnId,
@@ -1350,7 +1377,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (!reserved.ok) return reserved;
     // The alarm cuts off a run that is still going after its grace period.
     await armAlarmBy(
-      this.ctx.storage,
+      this.shared.ctx.storage,
       reserved.value.deadlineAt + RUN_TIME_STOP_GRACE_MS,
     );
     traceSessionHarnessPreparation(
@@ -1368,9 +1395,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         ? null
         : StartedGoalExecution.start(
             {
-              env: this.env,
-              storage: this.ctx.storage,
-              liveRuns: this.liveGoalRuns,
+              env: this.shared.env,
+              storage: this.shared.ctx.storage,
+              liveRuns: this.shared.liveGoalRuns,
             },
             input.lease,
             assignment,
@@ -1401,7 +1428,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (!completed.ok) {
       await goalExecution?.close();
       const failed = failCanonicalRunBudget(
-        this.ctx.storage,
+        this.shared.ctx.storage,
         budgetIdentity,
         input.lease,
         completed.error,
@@ -1456,7 +1483,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     }
     phaseStartedAt = Date.now();
     const currentFlowBinding = await readPersistedSessionTurnFlowBinding(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       {
         organisationId: String(input.requestingOrganisationId),
         sessionId: String(input.lease.session.sessionId),
@@ -1488,7 +1515,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // The run has ended: a turn the time limit stopped may finish its last
     // model call after the limit.
     const modelUsageAccepted = acceptCanonicalRunModelUsage(
-      this.ctx.storage,
+      this.shared.ctx.storage,
       budgetIdentity,
       completed.value.modelUsage.totalTokens,
       Date.now(),
@@ -1501,12 +1528,12 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // turn out of processing settles the run as cancelled, not as succeeded
     // (Refactor 15, refactor 3).
     const after = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     const settled = settleCanonicalRunBudget(
-      this.ctx.storage,
+      this.shared.ctx.storage,
       budgetIdentity,
       after.ok && after.value.lifecycle.kind === "processing"
         ? "succeeded"
@@ -1564,7 +1591,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
 
     // The fence was read after the harness returned, and only this Session's
     // own storage was used since then.
-    const finalized = await this.finalizeAcceptedSessionCheckpoint({
+    const finalized = await this.checkpoints.finalizeAcceptedSessionCheckpoint({
       execution: input.execution,
       requestingOrganisationId: input.requestingOrganisationId,
       caller: {
@@ -1589,7 +1616,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     };
   }
 
-  protected async prepareCanonicalTextTurn(
+  async prepareCanonicalTextTurn(
     input: CanonicalTextTurnInput,
   ): Promise<
     Result<
@@ -1598,8 +1625,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     >
   > {
     const execution = await SessionExecutionAdmission.resolve(
-      this.env,
-      this.ctx.storage,
+      this.shared.env,
+      this.shared.ctx.storage,
       input.requestingOrganisationId,
     );
     if (execution === null)
@@ -1635,9 +1662,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           reason: "context_unavailable",
         },
       };
-    const surfaceContext = await this.sessionTools().pageEffects.normalizeState(
-      input.surfaceContext,
-    );
+    const surfaceContext = await this.shared
+      .sessionTools()
+      .pageEffects.normalizeState(input.surfaceContext);
     if (!surfaceContext.ok)
       return {
         ok: false,
@@ -1648,8 +1675,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       };
     phaseStartedAt = Date.now();
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     traceSessionHarnessPreparation(
@@ -1669,14 +1696,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       };
     }
     const reconciledBudget = reconcileSleepingSessionRunBudget(
-      this.ctx.storage,
+      this.shared.ctx.storage,
       current.value.lifecycle.state.identity,
       Date.now(),
     );
     if (!reconciledBudget.ok) return reconciledBudget;
     phaseStartedAt = Date.now();
     const runtime = await canonicalEmbeddedHarnessRuntimeSource(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       current.value.lifecycle,
       this.selectEmbeddedHarnessAdapter(
         current.value.lifecycle.state.contract.modelRoute,
@@ -1692,8 +1719,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // A Session holds one unpublished checkpoint at most: it drops the payload
     // of a checkpoint when it accepts the next one. An archive write that is
     // not finished is finished before this turn starts.
-    if (hasUnpublishedHarnessCheckpoint(this.ctx.storage.sql)) {
-      const published = await this.publishAcceptedCheckpoint({
+    if (hasUnpublishedHarnessCheckpoint(this.shared.ctx.storage.sql)) {
+      const published = await this.checkpoints.publishAcceptedCheckpoint({
         execution,
         attempt: "resumed",
         trace: input,
@@ -1705,17 +1732,17 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // start, and is used only when the restore is then admitted. The Session
     // keeps the payload of its latest checkpoint, so this read is local.
     if (runtime.value.kind === "restore") {
-      this.startedCheckpointPayload = {
+      this.shared.startedCheckpointPayload = {
         checkpoint: JSON.stringify(runtime.value.checkpoint),
         payload: readCheckpointPayloadForRestore({
-          sql: this.ctx.storage.sql,
-          bucket: this.env.ARCHIVE,
-          root: this.env.DATA_ENCRYPTION_ROOT,
+          sql: this.shared.ctx.storage.sql,
+          bucket: this.shared.env.ARCHIVE,
+          root: this.shared.env.DATA_ENCRYPTION_ROOT,
           checkpoint: runtime.value.checkpoint,
         }),
       };
     }
-    const assignment = readCaseSessionAssignment(this.ctx.storage.sql);
+    const assignment = readCaseSessionAssignment(this.shared.ctx.storage.sql);
     if (assignment === null) {
       return {
         ok: false,
@@ -1732,9 +1759,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // fence of the start commit, and the turn does not read the receipt
     // again. Between this wait and the commit the turn uses only this
     // Session's storage.
-    const conversation = this.sessionTools().conversation;
+    const conversation = this.shared.sessionTools().conversation;
     const inheritedHistory = conversation.readForkHistory(
-      this.env,
+      this.shared.env,
       execution.scope,
       String(assignment.caseId),
     );
@@ -1758,12 +1785,12 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // of this wait. With it the goal execution binds beside the reads of the
     // harness turn, with no read of its own.
     const servedGoalCase = findServedGoalCase(
-      this.env,
+      this.shared.env,
       execution.scope,
       assignment,
     );
     const acceptedTurnTools = await resolveAcceptedTurnTools({
-      turnTools: this.sessionTools().turnTools,
+      turnTools: this.shared.sessionTools().turnTools,
       scope: execution.scope,
       organisationId: input.requestingOrganisationId,
       authority: input.start.requestAuthority,
@@ -1783,7 +1810,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     phaseStartedAt = Date.now();
     const runtimePreflight =
       await resolveCanonicalEmbeddedHarnessCheckpointBinding({
-        registry: this.sessionTools().registry,
+        registry: this.shared.sessionTools().registry,
         state: current.value.lifecycle,
         runtime: runtime.value,
         harnessInstructions: sideCaseHarnessInstructions(
@@ -1792,22 +1819,24 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         ),
         assignment,
         turnTools: acceptedTurnTools.value.turnTools,
-        bakerySurfaceCommands:
-          this.sessionTools().pageEffects.authorizedCommands(
-            input.start.requestAuthority,
-          ),
+        bakerySurfaceCommands: this.shared
+          .sessionTools()
+          .pageEffects.authorizedCommands(input.start.requestAuthority),
         memoryProposal: turnMayProposeMemory(input.start.requestAuthority),
         followUp: turnMayScheduleFollowUp(
           input.start.requestAuthority,
           String(input.start.turnId),
         ),
-        ...(await turnToolSelection(this.sessionTools().mayRequestPermission, {
-          db: execution.scope.database,
-          organisationId: String(execution.scope.organisationId),
-          authority: input.start.requestAuthority,
-          sessionId: String(assignment.sessionId),
-          turnId: String(input.start.turnId),
-        })),
+        ...(await turnToolSelection(
+          this.shared.sessionTools().mayRequestPermission,
+          {
+            db: execution.scope.database,
+            organisationId: String(execution.scope.organisationId),
+            authority: input.start.requestAuthority,
+            sessionId: String(assignment.sessionId),
+            turnId: String(input.start.turnId),
+          },
+        )),
       });
     traceSessionHarnessPreparation(
       input,
@@ -1826,7 +1855,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     if (!start.ok) return start;
     phaseStartedAt = Date.now();
     const informationFlow = await prepareSessionInformationFlow({
-      sql: this.ctx.storage.sql,
+      sql: this.shared.ctx.storage.sql,
       organisationId: String(input.requestingOrganisationId),
       sessionId: String(start.value.harnessLease.session.sessionId),
       turnId: start.value.harnessLease.turn.turnId,
@@ -1857,7 +1886,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         acceptedTurnTools.value.authority,
         informationFlow.value.binding,
         input.streamSink.channelId,
-        this.env,
+        this.shared.env,
       );
       traceSessionHarnessPreparation(
         input,
@@ -1879,10 +1908,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     phaseStartedAt = Date.now();
     const startFence = await startFenceRead;
     if (!startFence.active || !execution.isLocallyOpen())
-      return this.ctx.storage.transactionSync(
-        failFrozenCanonicalPreparation.bind(null, this.ctx.storage.sql, input),
+      return this.shared.ctx.storage.transactionSync(
+        failFrozenCanonicalPreparation.bind(
+          null,
+          this.shared.ctx.storage.sql,
+          input,
+        ),
       );
-    const started = commitStartedSession(this.ctx.storage, {
+    const started = commitStartedSession(this.shared.ctx.storage, {
       acceptedInput: start.value.acceptedInput,
       activatedRuntime: start.value.activatedRuntime,
       attachments: attachments.value,
@@ -1905,7 +1938,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     );
     if (!started.ok) return started;
     try {
-      writeHarnessTurnContinuation(this.ctx.storage.sql, {
+      writeHarnessTurnContinuation(this.shared.ctx.storage.sql, {
         kind: "harness_turn_continuation.v1",
         organisationId: input.requestingOrganisationId,
         requestId: input.requestId,
@@ -1945,7 +1978,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       if (
         !completed.ok &&
         finalizationPendingFor(
-          this.ctx.storage.sql,
+          this.shared.ctx.storage.sql,
           start.value.harnessLease.turn.turnId,
         )
       ) {
@@ -1959,7 +1992,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           turn_id: start.value.harnessLease.turn.turnId,
           reason: completed.error.code,
         });
-        await this.scheduleCheckpointFinalization();
+        await this.checkpoints.scheduleCheckpointFinalization();
       } else if (!completed.ok) {
         traceWarn("session.embedded_turn_failed", {
           requestId: input.requestId,
@@ -2001,7 +2034,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           });
         }
         failSessionTurnStream(
-          this.ctx.storage.sql,
+          this.shared.ctx.storage.sql,
           start.value.harnessLease.turn.turnId,
           completed.error.code,
           input.completion.acceptedAt,
@@ -2010,13 +2043,13 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       return completed;
     } finally {
       finishHarnessTurnContinuation(
-        this.ctx.storage.sql,
+        this.shared.ctx.storage.sql,
         start.value.harnessLease.turn.turnId,
       );
     }
   }
 
-  protected async resolveFailedTurn(input: {
+  async resolveFailedTurn(input: {
     readonly organisationId: OrganisationId;
     readonly lease: HarnessTurnLease;
     readonly cancellationId: string;
@@ -2024,8 +2057,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     readonly acceptedAt: number;
   }): Promise<Result<null, CanonicalEmbeddedHarnessTextTurnError>> {
     const current = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.organisationId,
     );
     if (!current.ok) return current;
@@ -2064,3 +2097,9 @@ function finalizationPendingFor(sql: SqlStorage, turnId: string): boolean {
     pending.value.finalization.current.state.turnId === turnId
   );
 }
+
+/** The RPC methods of this module. The Actor class has one method for each. */
+export type SessionHarnessTurnsRpc = Pick<
+  SessionHarnessTurns,
+  "cancelCanonicalEmbeddedHarnessTurn" | "commitCanonicalHarnessCheckpoint"
+>;

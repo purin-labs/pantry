@@ -201,7 +201,11 @@ import type {
   OrganisationPing,
   OrganisationStateError,
 } from "./organisation/types";
-import { OrganisationCommerce } from "./organisation/organisation-commerce";
+import {
+  OrganisationCommerce,
+  type OrganisationCommerceRpc,
+} from "./organisation/organisation-commerce";
+import { OrganisationActorBase } from "./organisation/organisation-actor-base";
 import {
   activateOrganisationPolicy,
   admittedEvaluateCaseContextDiscovery,
@@ -245,12 +249,344 @@ import {
 } from "./organisation/organisation-record";
 
 export class OrganisationDO
-  extends OrganisationCommerce
+  extends OrganisationActorBase
   implements
     OrganisationPolicyRpc,
     OrganisationJevRpc,
-    OrganisationCaseContextCollectionRpc
+    OrganisationCaseContextCollectionRpc,
+    OrganisationCommerceRpc
 {
+  // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
+  // the cues, the commerce lab, the Code Mode leases, the workspace executor
+  // allocation and the onboarding activation.
+
+  protected readonly commerce = new OrganisationCommerce(this.moduleHost, {
+    ensureOrganisation: (input) => this.ensureOrganisation(input),
+    activatePolicy: (input) => this.activatePolicy(input),
+  });
+
+  advanceActivationSchema(
+    ...input: Parameters<OrganisationCommerce["advanceActivationSchema"]>
+  ) {
+    return this.commerce.advanceActivationSchema(...input);
+  }
+
+  proposeAction(...input: Parameters<OrganisationCommerce["proposeAction"]>) {
+    return this.commerce.proposeAction(...input);
+  }
+
+  requestActionApproval(
+    ...input: Parameters<OrganisationCommerce["requestActionApproval"]>
+  ) {
+    return this.commerce.requestActionApproval(...input);
+  }
+
+  getAction(...input: Parameters<OrganisationCommerce["getAction"]>) {
+    return this.commerce.getAction(...input);
+  }
+
+  readActionActivity(
+    ...input: Parameters<OrganisationCommerce["readActionActivity"]>
+  ) {
+    return this.commerce.readActionActivity(...input);
+  }
+
+  signAction(...input: Parameters<OrganisationCommerce["signAction"]>) {
+    return this.commerce.signAction(...input);
+  }
+
+  rejectAction(...input: Parameters<OrganisationCommerce["rejectAction"]>) {
+    return this.commerce.rejectAction(...input);
+  }
+
+  beginActionExecution(
+    ...input: Parameters<OrganisationCommerce["beginActionExecution"]>
+  ) {
+    return this.commerce.beginActionExecution(...input);
+  }
+
+  retryIndeterminateActionExecution(
+    ...input: Parameters<
+      OrganisationCommerce["retryIndeterminateActionExecution"]
+    >
+  ) {
+    return this.commerce.retryIndeterminateActionExecution(...input);
+  }
+
+  completeActionExecution(
+    ...input: Parameters<OrganisationCommerce["completeActionExecution"]>
+  ) {
+    return this.commerce.completeActionExecution(...input);
+  }
+
+  recordCommerceEntityPlaneEffect(
+    ...input: Parameters<
+      OrganisationCommerce["recordCommerceEntityPlaneEffect"]
+    >
+  ) {
+    return this.commerce.recordCommerceEntityPlaneEffect(...input);
+  }
+
+  reconcileActionExecution(
+    ...input: Parameters<OrganisationCommerce["reconcileActionExecution"]>
+  ) {
+    return this.commerce.reconcileActionExecution(...input);
+  }
+
+  reconcileCommerceProviderReceipt(
+    ...input: Parameters<
+      OrganisationCommerce["reconcileCommerceProviderReceipt"]
+    >
+  ) {
+    return this.commerce.reconcileCommerceProviderReceipt(...input);
+  }
+
+  claimCueDelivery(
+    ...input: Parameters<OrganisationCommerce["claimCueDelivery"]>
+  ) {
+    return this.commerce.claimCueDelivery(...input);
+  }
+
+  completeClaimedCueDelivery(
+    ...input: Parameters<OrganisationCommerce["completeClaimedCueDelivery"]>
+  ) {
+    return this.commerce.completeClaimedCueDelivery(...input);
+  }
+
+  applyCommerceDelivery(
+    ...input: Parameters<OrganisationCommerce["applyCommerceDelivery"]>
+  ) {
+    return this.commerce.applyCommerceDelivery(...input);
+  }
+
+  readRecoverableCommerceCues(
+    ...input: Parameters<OrganisationCommerce["readRecoverableCommerceCues"]>
+  ) {
+    return this.commerce.readRecoverableCommerceCues(...input);
+  }
+
+  readCurrentCommerceProjection(
+    ...input: Parameters<OrganisationCommerce["readCurrentCommerceProjection"]>
+  ) {
+    return this.commerce.readCurrentCommerceProjection(...input);
+  }
+
+  readCommerceProjectionHistory(
+    ...input: Parameters<OrganisationCommerce["readCommerceProjectionHistory"]>
+  ) {
+    return this.commerce.readCommerceProjectionHistory(...input);
+  }
+
+  readExactCommerceProjectionReference(
+    ...input: Parameters<
+      OrganisationCommerce["readExactCommerceProjectionReference"]
+    >
+  ) {
+    return this.commerce.readExactCommerceProjectionReference(...input);
+  }
+
+  markCommerceCuesEnqueued(
+    ...input: Parameters<OrganisationCommerce["markCommerceCuesEnqueued"]>
+  ) {
+    return this.commerce.markCommerceCuesEnqueued(...input);
+  }
+
+  settleCommerceCues(
+    ...input: Parameters<OrganisationCommerce["settleCommerceCues"]>
+  ) {
+    return this.commerce.settleCommerceCues(...input);
+  }
+
+  readAcceptedCommerceProjectionSequence(
+    ...input: Parameters<
+      OrganisationCommerce["readAcceptedCommerceProjectionSequence"]
+    >
+  ) {
+    return this.commerce.readAcceptedCommerceProjectionSequence(...input);
+  }
+
+  readCommerceQueryPlan(
+    ...input: Parameters<OrganisationCommerce["readCommerceQueryPlan"]>
+  ) {
+    return this.commerce.readCommerceQueryPlan(...input);
+  }
+
+  readCommerceRelationshipStep(
+    ...input: Parameters<OrganisationCommerce["readCommerceRelationshipStep"]>
+  ) {
+    return this.commerce.readCommerceRelationshipStep(...input);
+  }
+
+  readCommerceSystemSyncStatus(
+    ...input: Parameters<OrganisationCommerce["readCommerceSystemSyncStatus"]>
+  ) {
+    return this.commerce.readCommerceSystemSyncStatus(...input);
+  }
+
+  validateCommerceSystemProjections(
+    ...input: Parameters<
+      OrganisationCommerce["validateCommerceSystemProjections"]
+    >
+  ) {
+    return this.commerce.validateCommerceSystemProjections(...input);
+  }
+
+  seedCommerceLab(
+    ...input: Parameters<OrganisationCommerce["seedCommerceLab"]>
+  ) {
+    return this.commerce.seedCommerceLab(...input);
+  }
+
+  resetCommerceLab(
+    ...input: Parameters<OrganisationCommerce["resetCommerceLab"]>
+  ) {
+    return this.commerce.resetCommerceLab(...input);
+  }
+
+  verifyCommerceLab(
+    ...input: Parameters<OrganisationCommerce["verifyCommerceLab"]>
+  ) {
+    return this.commerce.verifyCommerceLab(...input);
+  }
+
+  activateOnboarding(
+    ...input: Parameters<OrganisationCommerce["activateOnboarding"]>
+  ) {
+    return this.commerce.activateOnboarding(...input);
+  }
+
+  armOnboardingActivationAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["armOnboardingActivationAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.armOnboardingActivationAcceptanceFault(...input);
+  }
+
+  inspectOnboardingActivationAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["inspectOnboardingActivationAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.inspectOnboardingActivationAcceptanceFault(...input);
+  }
+
+  clearOnboardingActivationAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["clearOnboardingActivationAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.clearOnboardingActivationAcceptanceFault(...input);
+  }
+
+  armCafeCommerceAcceptanceFault(
+    ...input: Parameters<OrganisationCommerce["armCafeCommerceAcceptanceFault"]>
+  ) {
+    return this.commerce.armCafeCommerceAcceptanceFault(...input);
+  }
+
+  inspectCafeCommerceAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["inspectCafeCommerceAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.inspectCafeCommerceAcceptanceFault(...input);
+  }
+
+  consumeCafeCommerceAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["consumeCafeCommerceAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.consumeCafeCommerceAcceptanceFault(...input);
+  }
+
+  clearCafeCommerceAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["clearCafeCommerceAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.clearCafeCommerceAcceptanceFault(...input);
+  }
+
+  settleCutoverCue(
+    ...input: Parameters<OrganisationCommerce["settleCutoverCue"]>
+  ) {
+    return this.commerce.settleCutoverCue(...input);
+  }
+
+  reserveCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["reserveCodeModeBudget"]>
+  ) {
+    return this.commerce.reserveCodeModeBudget(...input);
+  }
+
+  settleCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["settleCodeModeBudget"]>
+  ) {
+    return this.commerce.settleCodeModeBudget(...input);
+  }
+
+  claimCodeModeCapability(
+    ...input: Parameters<OrganisationCommerce["claimCodeModeCapability"]>
+  ) {
+    return this.commerce.claimCodeModeCapability(...input);
+  }
+
+  abandonCodeModeCapabilityCalls(
+    ...input: Parameters<OrganisationCommerce["abandonCodeModeCapabilityCalls"]>
+  ) {
+    return this.commerce.abandonCodeModeCapabilityCalls(...input);
+  }
+
+  rebindCodeModeLease(
+    ...input: Parameters<OrganisationCommerce["rebindCodeModeLease"]>
+  ) {
+    return this.commerce.rebindCodeModeLease(...input);
+  }
+
+  completeCodeModeCapability(
+    ...input: Parameters<OrganisationCommerce["completeCodeModeCapability"]>
+  ) {
+    return this.commerce.completeCodeModeCapability(...input);
+  }
+
+  reserveWorkspaceExecutorAllocation(
+    ...input: Parameters<
+      OrganisationCommerce["reserveWorkspaceExecutorAllocation"]
+    >
+  ) {
+    return this.commerce.reserveWorkspaceExecutorAllocation(...input);
+  }
+
+  settleWorkspaceExecutorAllocation(
+    ...input: Parameters<
+      OrganisationCommerce["settleWorkspaceExecutorAllocation"]
+    >
+  ) {
+    return this.commerce.settleWorkspaceExecutorAllocation(...input);
+  }
+
+  cancelWorkspaceExecutorAllocation(
+    ...input: Parameters<
+      OrganisationCommerce["cancelWorkspaceExecutorAllocation"]
+    >
+  ) {
+    return this.commerce.cancelWorkspaceExecutorAllocation(...input);
+  }
+
+  cancelCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["cancelCodeModeBudget"]>
+  ) {
+    return this.commerce.cancelCodeModeBudget(...input);
+  }
+
+  reconcileCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["reconcileCodeModeBudget"]>
+  ) {
+    return this.commerce.reconcileCodeModeBudget(...input);
+  }
+
   // The policy of the Organisation (`actors/organisation/organisation-policy.ts`):
   // the policy activation, the TypeSafe connection and the Case context
   // discovery configuration. The Inbox gives the source of a collection, and

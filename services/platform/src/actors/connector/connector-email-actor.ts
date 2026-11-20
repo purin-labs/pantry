@@ -1,3 +1,6 @@
+import { admitNamedConnector } from "./module-admission";
+import type { ConnectorModuleHost } from "./channel-adapter";
+import type { ConnectorEvals } from "./connector-evals";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
   createContinueSerialQueue,
@@ -183,14 +186,18 @@ import {
   type ConnectorEmailIdentityRequest,
   type EmailReplyProvenance,
 } from "./whatsapp-parsers";
-import { ConnectorWhatsApp } from "./connector-whatsapp-actor";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
  */
-export abstract class ConnectorEmail extends ConnectorWhatsApp {
-  protected activeMailOrganization: Promise<void> | null = null;
+export class ConnectorEmail {
+  constructor(
+    private readonly host: ConnectorModuleHost,
+    private readonly evals: ConnectorEvals,
+  ) {}
+
+  private activeMailOrganization: Promise<void> | null = null;
 
   /**
    * One in-flight mutation per proposal. Dispatch, resolve, dispose, and the
@@ -200,23 +207,22 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
    * send. Serialising per proposal makes the second caller re-read state the
    * first already wrote and return idempotently.
    */
-  protected readonly emailProposalWork =
-    createKeyedContinueSerialQueue<string>();
+  private readonly emailProposalWork = createKeyedContinueSerialQueue<string>();
 
-  protected evalAgentActive(): boolean {
-    const runtime = readEmailRuntime(this.ctx.storage.sql);
+  evalAgentActive(): boolean {
+    const runtime = readEmailRuntime(this.host.ctx.storage.sql);
     return runtime !== null && runtime.disabledAt === null;
   }
 
-  protected runEvalTask(
+  runEvalTask(
     scope: OrganisationExecutionScope,
     claim: ClaimedEvalTask,
     evals: EvalTaskServices,
     now: number,
   ): Promise<EvalTaskEnd> {
     return runMailboxEvalTask(
-      this.env,
-      this.ctx.storage.sql,
+      this.host.env,
+      this.host.ctx.storage.sql,
       scope,
       claim,
       evals,
@@ -229,102 +235,126 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
    * instance runs at a time, so a claim under another name is from an
    * instance that stopped.
    */
-  protected readonly emailReplyTurnOwner = crypto.randomUUID();
+  private readonly emailReplyTurnOwner = crypto.randomUUID();
 
-  protected readonly runningEmailReplyTurns = new Set<string>();
+  private readonly runningEmailReplyTurns = new Set<string>();
 
-  protected readonly emailMailboxWork = createContinueSerialQueue();
+  private readonly emailMailboxWork = createContinueSerialQueue();
 
   async reconcileRelocationMailReceipt(request: RelocationMailReceiptRequest) {
-    return reconcileFrozenMailReceipt(this.env, this.ctx.storage, request);
+    return reconcileFrozenMailReceipt(
+      this.host.env,
+      this.host.ctx.storage,
+      request,
+    );
   }
 
   async mailAssistant(input: MailAssistantActorInput) {
-    return this.trackExecution(this.runAdmittedMailAssistant.bind(this, input));
+    return this.host.trackExecution(
+      this.runAdmittedMailAssistant.bind(this, input),
+    );
   }
 
-  protected async runAdmittedMailAssistant(
+  private async runAdmittedMailAssistant(
     input: MailAssistantActorInput,
   ): Promise<
     Awaited<
       ReturnType<typeof runMailAssistant | typeof readMailAssistantStatus>
     >
   > {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid<never>("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    const identity = this.host.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input.identity,
+      ),
     );
     if (!identity.ok) return identity;
     const result =
       input.command === null
-        ? await readMailAssistantStatus(this.env, input)
+        ? await readMailAssistantStatus(this.host.env, input)
         : await runMailAssistant(
-            { env: this.env, storage: this.ctx.storage, scope },
+            { env: this.host.env, storage: this.host.ctx.storage, scope },
             { ...input, command: input.command },
           );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid<never>("connector_placement_conflict");
     return result;
   }
 
   async readMailOrganization(input: MailOrganizationReadInput) {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.readAdmittedMailOrganization.bind(this, input),
     );
   }
 
-  protected async readAdmittedMailOrganization(
+  private async readAdmittedMailOrganization(
     input: MailOrganizationReadInput,
   ): Promise<Awaited<ReturnType<typeof readOrganization>>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid<never>("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    const identity = this.host.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input.identity,
+      ),
     );
     if (!identity.ok) return identity;
     return readOrganization(
-      { env: this.env, storage: this.ctx.storage, scope },
+      { env: this.host.env, storage: this.host.ctx.storage, scope },
       input,
     );
   }
 
   async readMailClassifiedPage(input: MailClassifiedPageInput) {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.readAdmittedMailClassifiedPage.bind(this, input),
     );
   }
 
-  protected async readAdmittedMailClassifiedPage(
+  private async readAdmittedMailClassifiedPage(
     input: MailClassifiedPageInput,
   ): Promise<Awaited<ReturnType<typeof readClassifiedPage>>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid<never>("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    const identity = this.host.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input.identity,
+      ),
     );
     if (!identity.ok) return identity;
     return readClassifiedPage(
-      { env: this.env, storage: this.ctx.storage, scope },
+      { env: this.host.env, storage: this.host.ctx.storage, scope },
       input,
     );
   }
 
   async readMailDecision(input: MailDecisionInput) {
-    return this.trackExecution(this.readAdmittedMailDecision.bind(this, input));
+    return this.host.trackExecution(
+      this.readAdmittedMailDecision.bind(this, input),
+    );
   }
 
-  protected async readAdmittedMailDecision(
+  private async readAdmittedMailDecision(
     input: MailDecisionInput,
   ): Promise<Awaited<ReturnType<typeof readDecision>>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid<never>("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    const identity = this.host.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input.identity,
+      ),
     );
     if (!identity.ok) return identity;
     return readDecision(
-      { env: this.env, storage: this.ctx.storage, scope },
+      { env: this.host.env, storage: this.host.ctx.storage, scope },
       input,
     );
   }
@@ -333,27 +363,31 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     input: MailOrganizationActorInput &
       Readonly<{ command: MailOrganizationCommand }>,
   ) {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.manageAdmittedMailOrganization.bind(this, input),
     );
   }
 
-  protected async manageAdmittedMailOrganization(
+  private async manageAdmittedMailOrganization(
     input: MailOrganizationActorInput &
       Readonly<{ command: MailOrganizationCommand }>,
   ): Promise<Awaited<ReturnType<typeof manageOrganization>>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid<never>("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    const identity = this.host.ctx.storage.transactionSync(
+      ensureConnectorIdentity.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input.identity,
+      ),
     );
     if (!identity.ok) return identity;
     const result = await manageOrganization(
-      { env: this.env, storage: this.ctx.storage, scope },
+      { env: this.host.env, storage: this.host.ctx.storage, scope },
       input,
     );
-    await this.armAlarm();
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    await this.host.armAlarm();
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid<never>("connector_placement_conflict");
     return result;
   }
@@ -361,22 +395,24 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async acceptEmailChange(
     raw: unknown,
   ): Promise<ConnectorResult<EmailHintAcceptance>> {
-    return this.trackExecution(this.acceptAdmittedEmailChange.bind(this, raw));
+    return this.host.trackExecution(
+      this.acceptAdmittedEmailChange.bind(this, raw),
+    );
   }
 
-  protected async acceptAdmittedEmailChange(
+  private async acceptAdmittedEmailChange(
     raw: unknown,
   ): Promise<ConnectorResult<EmailHintAcceptance>> {
     const input = parseEmailChangeRequest(raw);
     if (input === null) return invalid("connector_email_hint_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const accepted = this.ctx.storage.transactionSync(
-      acceptConnectorEmailChange.bind(null, this.ctx.storage.sql, input),
+    const accepted = this.host.ctx.storage.transactionSync(
+      acceptConnectorEmailChange.bind(null, this.host.ctx.storage.sql, input),
     );
     if (!accepted.ok) return accepted;
-    await this.armAlarm();
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    await this.host.armAlarm();
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return accepted;
   }
@@ -390,17 +426,19 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async checkEmailChange(
     raw: unknown,
   ): Promise<ConnectorResult<EmailHintAcceptance>> {
-    return this.trackExecution(this.checkAdmittedEmailChange.bind(this, raw));
+    return this.host.trackExecution(
+      this.checkAdmittedEmailChange.bind(this, raw),
+    );
   }
 
-  protected async checkAdmittedEmailChange(
+  private async checkAdmittedEmailChange(
     raw: unknown,
   ): Promise<ConnectorResult<EmailHintAcceptance>> {
     const input = parseEmailCheckRequest(raw);
     if (input === null) return invalid("connector_email_check_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const runtime = readEmailRuntime(this.ctx.storage.sql);
+    const runtime = readEmailRuntime(this.host.ctx.storage.sql);
     if (
       runtime === null ||
       runtime.disabledAt !== null ||
@@ -408,8 +446,8 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     )
       return { ok: true, value: { kind: "inactive" } };
     const historyId = await readConnectorEmailHistoryId({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.host.env,
+      storage: this.host.ctx.storage,
       scope,
       integrationAccountId: runtime.integrationAccountId,
       now: input.now,
@@ -424,10 +462,10 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     });
   }
 
-  protected async trackMailboxExecution<Value>(
+  private async trackMailboxExecution<Value>(
     start: () => Promise<Value>,
   ): Promise<Value> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       (this.emailMailboxWork.enqueue<Value>).bind(this.emailMailboxWork, start),
     );
   }
@@ -440,22 +478,22 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async activateAdmittedEmailProcessing(
+  private async activateAdmittedEmailProcessing(
     raw: unknown,
   ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
     const input = parseEmailActivationRequest(raw);
     if (input === null) return invalid("connector_email_activation_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
     return this.activateEmailProcessingWithScope(scope, input);
   }
 
-  protected async activateEmailProcessingWithScope(
+  private async activateEmailProcessingWithScope(
     scope: OrganisationExecutionScope,
     input: NonNullable<ReturnType<typeof parseEmailActivationRequest>>,
   ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
-    const sql = this.ctx.storage.sql;
-    const identity = this.ctx.storage.transactionSync(
+    const sql = this.host.ctx.storage.sql;
+    const identity = this.host.ctx.storage.transactionSync(
       ensureConnectorIdentity.bind(null, sql, input.identity),
     );
     if (!identity.ok) return identity;
@@ -468,20 +506,20 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     )
       return invalid("connector_email_identity_conflict");
     if (current !== null && current.disabledAt === null) {
-      const updated = this.ctx.storage.transactionSync(
+      const updated = this.host.ctx.storage.transactionSync(
         updateEmailRuntimePolicy.bind(null, sql, {
           policyVersion: input.policyVersion,
           limits: input.limits,
         }),
       );
-      await this.armAlarm();
+      await this.host.armAlarm();
       if (!(await isActorExecutionActive(sql, scope)))
         return invalid("connector_placement_conflict");
       return updated;
     }
     const watch = await establishConnectorEmailWatch({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.host.env,
+      storage: this.host.ctx.storage,
       scope,
       integrationAccountId: input.integrationAccountId,
       now: input.now,
@@ -493,7 +531,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       return invalid(watch.error.code);
     }
     // The accepted watch and its floor travel with the drained export.
-    const activated = this.ctx.storage.transactionSync(
+    const activated = this.host.ctx.storage.transactionSync(
       activateEmailRuntime.bind(null, sql, {
         organisationId: input.identity.organisationId,
         integrationAccountId: input.integrationAccountId,
@@ -504,7 +542,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         now: input.now,
       }),
     );
-    await this.armAlarm();
+    await this.host.armAlarm();
     if (!(await isActorExecutionActive(sql, scope)))
       return invalid("connector_placement_conflict");
     return activated;
@@ -516,22 +554,21 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async disableAdmittedEmailProcessing(
+  private async disableAdmittedEmailProcessing(
     raw: unknown,
   ): Promise<ConnectorResult<null>> {
     const input = parseEmailIdentityRequest(raw);
     if (input === null) return invalid("connector_email_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
+    const disabled = this.host.ctx.storage.transactionSync(
+      disableEmailRuntime.bind(null, this.host.ctx.storage.sql, {
+        now: input.now,
+      }),
     );
-    if (!identity.ok) return identity;
-    const disabled = this.ctx.storage.transactionSync(
-      disableEmailRuntime.bind(null, this.ctx.storage.sql, { now: input.now }),
-    );
-    await this.armAlarm();
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    await this.host.armAlarm();
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return disabled;
   }
@@ -544,21 +581,21 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async resumeAdmittedEmailProcessing(
+  private async resumeAdmittedEmailProcessing(
     raw: unknown,
   ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
     const input = parseEmailResumeRequest(raw);
     if (input === null) return invalid("connector_email_resume_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const sql = this.ctx.storage.sql;
-    const identity = this.ctx.storage.transactionSync(
+    const sql = this.host.ctx.storage.sql;
+    const identity = this.host.ctx.storage.transactionSync(
       ensureConnectorIdentity.bind(null, sql, input.identity),
     );
     if (!identity.ok) return identity;
     if (nextEmailWatchCleanupAt(sql) !== null)
       return invalid("connector_email_watch_cleanup_pending");
-    const resumed = this.ctx.storage.transactionSync(
+    const resumed = this.host.ctx.storage.transactionSync(
       resumeEmailRuntime.bind(null, sql, {
         policyVersion: input.policyVersion,
         limits: input.limits,
@@ -566,7 +603,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         now: input.now,
       }),
     );
-    await this.armAlarm();
+    await this.host.armAlarm();
     if (!(await isActorExecutionActive(sql, scope)))
       return invalid("connector_placement_conflict");
     return resumed;
@@ -580,15 +617,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async reconnectAdmittedEmailProcessing(
+  private async reconnectAdmittedEmailProcessing(
     raw: unknown,
   ): Promise<ConnectorResult<EmailRuntimeSnapshot>> {
     const input = parseEmailReconnectRequest(raw);
     if (input === null) return invalid("connector_email_reconnect_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const sql = this.ctx.storage.sql;
-    const identity = this.ctx.storage.transactionSync(
+    const sql = this.host.ctx.storage.sql;
+    const identity = this.host.ctx.storage.transactionSync(
       ensureConnectorIdentity.bind(null, sql, input.identity),
     );
     if (!identity.ok) return identity;
@@ -601,15 +638,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     )
       return invalid("connector_email_runtime_missing");
     if (input.resetCursor) {
-      const disabled = this.ctx.storage.transactionSync(
+      const disabled = this.host.ctx.storage.transactionSync(
         disableEmailRuntime.bind(null, sql, { now: input.now }),
       );
       if (!disabled.ok) return disabled;
       return this.activateEmailProcessingWithScope(scope, input);
     }
     const watch = await renewConnectorEmailWatch({
-      storage: this.ctx.storage,
-      env: this.env,
+      storage: this.host.ctx.storage,
+      env: this.host.env,
       scope,
       integrationAccountId: input.integrationAccountId,
       now: input.now,
@@ -620,7 +657,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         return invalid("connector_placement_conflict");
       return invalid(watch.error.code);
     }
-    const reconnected = this.ctx.storage.transactionSync(
+    const reconnected = this.host.ctx.storage.transactionSync(
       reconnectEmailRuntime.bind(null, sql, {
         policyVersion: input.policyVersion,
         limits: input.limits,
@@ -628,7 +665,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         now: input.now,
       }),
     );
-    await this.armAlarm();
+    await this.host.armAlarm();
     if (!(await isActorExecutionActive(sql, scope)))
       return invalid("connector_placement_conflict");
     return reconnected;
@@ -640,15 +677,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async renewAdmittedEmailWatch(
+  private async renewAdmittedEmailWatch(
     raw: unknown,
   ): Promise<ConnectorResult<number>> {
     const input = parseEmailIdentityRequest(raw);
     if (input === null) return invalid("connector_email_request_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const sql = this.ctx.storage.sql;
-    const identity = this.ctx.storage.transactionSync(
+    const sql = this.host.ctx.storage.sql;
+    const identity = this.host.ctx.storage.transactionSync(
       ensureConnectorIdentity.bind(null, sql, input.identity),
     );
     if (!identity.ok) return identity;
@@ -658,8 +695,8 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     if (nextEmailWatchCleanupAt(sql) !== null)
       return invalid("connector_email_watch_cleanup_pending");
     const renewed = await renewConnectorEmailWatch({
-      storage: this.ctx.storage,
-      env: this.env,
+      storage: this.host.ctx.storage,
+      env: this.host.env,
       scope,
       integrationAccountId: runtime.integrationAccountId,
       now: input.now,
@@ -673,16 +710,21 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async inspectEmailRuntime(): Promise<
     ConnectorResult<EmailRuntimeStatus | null>
   > {
-    return this.trackExecution(this.inspectAdmittedEmailRuntime.bind(this));
+    return this.host.trackExecution(
+      this.inspectAdmittedEmailRuntime.bind(this),
+    );
   }
 
-  protected async inspectAdmittedEmailRuntime(): Promise<
+  private async inspectAdmittedEmailRuntime(): Promise<
     ConnectorResult<EmailRuntimeStatus | null>
   > {
-    const sql = this.ctx.storage.sql;
+    const sql = this.host.ctx.storage.sql;
     if (!actorExecutionAdmissionOpen(sql))
       return invalid("connector_placement_conflict");
-    const admission = await admitActorRecovery(this.env, this.ctx.storage);
+    const admission = await admitActorRecovery(
+      this.host.env,
+      this.host.ctx.storage,
+    );
     if (
       admission.kind !== "admitted" ||
       !(await isActorExecutionActive(sql, admission.scope))
@@ -708,19 +750,21 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async searchEmailMailbox(
     raw: unknown,
   ): Promise<ConnectorResult<ConnectorEmailMailboxSearch>> {
-    return this.trackExecution(this.searchAdmittedEmailMailbox.bind(this, raw));
+    return this.host.trackExecution(
+      this.searchAdmittedEmailMailbox.bind(this, raw),
+    );
   }
 
-  protected async searchAdmittedEmailMailbox(
+  private async searchAdmittedEmailMailbox(
     raw: unknown,
   ): Promise<ConnectorResult<ConnectorEmailMailboxSearch>> {
     const input = parseEmailMailboxSearchRequest(raw);
     if (input === null)
       return invalid("connector_email_search_request_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const sql = this.ctx.storage.sql;
-    const identity = this.ctx.storage.transactionSync(
+    const sql = this.host.ctx.storage.sql;
+    const identity = this.host.ctx.storage.transactionSync(
       ensureConnectorIdentity.bind(null, sql, input.identity),
     );
     if (!identity.ok) return identity;
@@ -731,12 +775,12 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       null,
       sql,
       scope,
-      this.env.DB,
+      this.host.env.DB,
       input.execution,
       runtimeFetch,
     );
     const access = await resolveConnectorGmailAccess({
-      env: this.env,
+      env: this.host.env,
       organisationId: runtime.organisationId,
       integrationAccountId: runtime.integrationAccountId,
       now: input.now,
@@ -746,7 +790,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       !(await isSessionMailExecutionActive(
         sql,
         scope,
-        this.env.DB,
+        this.host.env.DB,
         input.execution,
       ))
     )
@@ -762,7 +806,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       !(await isSessionMailExecutionActive(
         sql,
         scope,
-        this.env.DB,
+        this.host.env.DB,
         input.execution,
       ))
     )
@@ -787,24 +831,21 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async createEmailReplyProposal(
     raw: unknown,
   ): Promise<ConnectorResult<ConnectorEmailReplyProposal>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.createAdmittedEmailReplyProposal.bind(this, raw),
     );
   }
 
-  protected async createAdmittedEmailReplyProposal(
+  private async createAdmittedEmailReplyProposal(
     raw: unknown,
   ): Promise<ConnectorResult<ConnectorEmailReplyProposal>> {
     const input = parseEmailReplyProposalCreateRequest(raw);
     if (input === null)
       return invalid("connector_email_reply_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
-    const runtime = readEmailRuntime(this.ctx.storage.sql);
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
+    const runtime = readEmailRuntime(this.host.ctx.storage.sql);
     if (
       runtime === null ||
       runtime.disabledAt !== null ||
@@ -825,15 +866,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       organisationId: organisationId.value,
       integrationAccountId: integrationAccountId.value,
     });
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     if (!binding.ok) return invalid(binding.error.code);
     return this.withEmailProposalLock(
       input.proposalId,
       createConnectorEmailReplyProposal.bind(null, {
         scope,
-        env: this.env,
-        sql: this.ctx.storage.sql,
+        env: this.host.env,
+        sql: this.host.ctx.storage.sql,
         runtime,
         caseId: caseId.value,
         mailboxBindingId: binding.value.binding.mailboxBindingId,
@@ -851,19 +892,16 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedCreateEmailOperationalProposal(
+  private async admittedCreateEmailOperationalProposal(
     raw: unknown,
   ): Promise<ConnectorResult<OperationalEmailProposalRecord>> {
     const input = parseEmailOperationalProposalCreateRequest(raw);
     if (input === null) {
       return invalid("connector_email_operational_proposal_request_invalid");
     }
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const integrationAccountId = parseIntegrationAccountId(
       input.integrationAccountId,
     );
@@ -882,15 +920,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       context.value.connection.authority,
     );
     return executeOperationalEmailCommand<OperationalEmailProposalRecord>(
-      this.ctx.storage,
-      this.armAlarm.bind(this),
+      this.host.ctx.storage,
+      this.host.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
       createOperationalEmailProposal.bind(null, {
         execution: input.execution,
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         integrationAccountId: integrationAccountId.value,
         proposalId: input.proposalId,
@@ -914,19 +952,16 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedEditEmailOperationalProposal(
+  private async admittedEditEmailOperationalProposal(
     raw: unknown,
   ): Promise<ConnectorResult<OperationalEmailProposalRecord>> {
     const input = parseEmailOperationalProposalEditRequest(raw);
     if (input === null) {
       return invalid("connector_email_operational_proposal_edit_invalid");
     }
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const integrationAccountId = parseIntegrationAccountId(
       input.integrationAccountId,
     );
@@ -934,14 +969,14 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       return invalid("connector_email_operational_identity_invalid");
     }
     return executeOperationalEmailCommand<OperationalEmailProposalRecord>(
-      this.ctx.storage,
-      this.armAlarm.bind(this),
+      this.host.ctx.storage,
+      this.host.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
       editOperationalEmailProposal.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         integrationAccountId: integrationAccountId.value,
         proposalId: input.proposalId,
@@ -961,19 +996,16 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedPreviewEmailOperationalProposal(
+  private async admittedPreviewEmailOperationalProposal(
     raw: unknown,
   ): Promise<ConnectorResult<OperationalEmailProposalOutcome>> {
     const input = parseEmailOperationalProposalRequest(raw);
     if (input === null) {
       return invalid("connector_email_operational_proposal_request_invalid");
     }
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const integrationAccountId = parseIntegrationAccountId(
       input.integrationAccountId,
     );
@@ -981,14 +1013,14 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       return invalid("connector_email_operational_identity_invalid");
     }
     return executeOperationalEmailCommand<OperationalEmailProposalOutcome>(
-      this.ctx.storage,
-      this.armAlarm.bind(this),
+      this.host.ctx.storage,
+      this.host.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
       previewOperationalEmailProposal.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         integrationAccountId: integrationAccountId.value,
         proposalId: input.proposalId,
@@ -1005,19 +1037,16 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedDispatchEmailOperational(
+  private async admittedDispatchEmailOperational(
     raw: unknown,
   ): Promise<ConnectorResult<OperationalEmailDispatchOutcome>> {
     const input = parseEmailOperationalDispatchRequest(raw);
     if (input === null) {
       return invalid("connector_email_operational_dispatch_invalid");
     }
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const integrationAccountId = parseIntegrationAccountId(
       input.integrationAccountId,
     );
@@ -1025,14 +1054,14 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       return invalid("connector_email_operational_identity_invalid");
     }
     return executeOperationalEmailCommand<OperationalEmailDispatchOutcome>(
-      this.ctx.storage,
-      this.armAlarm.bind(this),
+      this.host.ctx.storage,
+      this.host.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
       dispatchOperationalEmail.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         integrationAccountId: integrationAccountId.value,
         proposalId: input.proposalId,
@@ -1049,33 +1078,30 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedRejectEmailOperational(
+  private async admittedRejectEmailOperational(
     raw: unknown,
   ): Promise<ConnectorResult<null>> {
     const input = parseEmailOperationalDispatchRequest(raw);
     if (input === null) {
       return invalid("connector_email_operational_dispatch_invalid");
     }
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const integrationAccountId = parseIntegrationAccountId(
       input.integrationAccountId,
     );
     if (!integrationAccountId.ok)
       return invalid("connector_email_operational_identity_invalid");
     return executeOperationalEmailCommand<null>(
-      this.ctx.storage,
-      this.armAlarm.bind(this),
+      this.host.ctx.storage,
+      this.host.armAlarm.bind(this),
       scope,
       input.proposalId,
       input.now,
       rejectAdmittedOperationalEmail.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         scope,
         integrationAccountId.value,
         input.proposalId,
@@ -1093,46 +1119,43 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedRevokeEmailOperationalProposals(
+  private async admittedRevokeEmailOperationalProposals(
     raw: unknown,
   ): Promise<ConnectorResult<{ readonly revoked: number }>> {
     const input = parseEmailOperationalAccountRequest(raw);
     if (input === null) {
       return invalid("connector_email_operational_account_request_invalid");
     }
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const integrationAccountId = parseIntegrationAccountId(
       input.integrationAccountId,
     );
     if (!integrationAccountId.ok) {
       return invalid("connector_email_operational_identity_invalid");
     }
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
-    const revoked = this.ctx.storage.transactionSync(
+    const revoked = this.host.ctx.storage.transactionSync(
       revokeOperationalEmailProposals.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         integrationAccountId.value,
         input.now,
       ),
     );
-    await this.armAlarm();
+    await this.host.armAlarm();
     for (const proposal of revoked) {
       const projected = await projectOperationalEmailRecord(
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         scope,
         proposal,
         input.now,
       );
       if (!projected.ok) return projected;
     }
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return { ok: true, value: { revoked: revoked.length } };
   }
@@ -1140,32 +1163,29 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async previewEmailProposal(
     raw: unknown,
   ): Promise<ConnectorResult<EmailProposalPreviewOutcome>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedPreviewEmailProposal.bind(this, raw),
     );
   }
 
-  protected async admittedPreviewEmailProposal(
+  private async admittedPreviewEmailProposal(
     raw: unknown,
   ): Promise<ConnectorResult<EmailProposalPreviewOutcome>> {
     const input = parseEmailProposalRequest(raw);
     if (input === null)
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const preview = await previewEmailProposal({
-      sql: this.ctx.storage.sql,
-      env: this.env,
+      sql: this.host.ctx.storage.sql,
+      env: this.host.env,
       scope,
       proposalId: input.proposalId,
       now: input.now,
       fetcher: runtimeFetch,
     });
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return preview.ok ? preview : invalid(preview.error.code);
   }
@@ -1173,12 +1193,12 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async authorizeEmailProposalDelivery(
     raw: unknown,
   ): Promise<ConnectorResult<null>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedAuthorizeEmailProposalDelivery.bind(this, raw),
     );
   }
 
-  protected async admittedAuthorizeEmailProposalDelivery(
+  private async admittedAuthorizeEmailProposalDelivery(
     raw: unknown,
   ): Promise<ConnectorResult<null>> {
     const input = parseEmailProposalRequest(raw);
@@ -1192,20 +1212,17 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         input.identity.organisationId
     )
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const authorized = await authorizeEmailReplyReview(
-      this.ctx.storage.sql,
-      this.env,
+      this.host.ctx.storage.sql,
+      this.host.env,
       scope,
       authority.value.requestAuthority,
       input.proposalId,
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return authorized.ok ? authorized : invalid(authorized.error.code);
   }
@@ -1213,25 +1230,24 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async dispatchEmailReply(
     raw: unknown,
   ): Promise<ConnectorResult<EmailDispatchOutcome>> {
-    return this.trackExecution(this.admittedDispatchEmailReply.bind(this, raw));
+    return this.host.trackExecution(
+      this.admittedDispatchEmailReply.bind(this, raw),
+    );
   }
 
-  protected async admittedDispatchEmailReply(
+  private async admittedDispatchEmailReply(
     raw: unknown,
   ): Promise<ConnectorResult<EmailDispatchOutcome>> {
     const input = parseEmailDispatchRequest(raw);
     if (input === null) return invalid("connector_email_dispatch_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const dispatched = await this.withEmailProposalLock(
       input.proposalId,
       dispatchEmailReply.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         approvedVersion: input.approvedVersion,
@@ -1240,7 +1256,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         fetcher: runtimeFetch,
       }),
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return dispatched.ok ? dispatched : invalid(dispatched.error.code);
   }
@@ -1253,17 +1269,17 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async readEmailReplyProvenance(
     input: ConnectorEmailIdentityRequest & Readonly<{ proposalId: string }>,
   ): Promise<ConnectorResult<EmailReplyProvenance>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedReadEmailReplyProvenance.bind(this, input),
     );
   }
 
-  protected async admittedReadEmailReplyProvenance(
+  private async admittedReadEmailReplyProvenance(
     input: Parameters<ConnectorEmail["readEmailReplyProvenance"]>[0],
   ): Promise<ConnectorResult<EmailReplyProvenance>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const sql = this.ctx.storage.sql;
+    const sql = this.host.ctx.storage.sql;
     const operation = latestEmailDraftOperation(sql, input.proposalId);
     if (operation === null || operation.state !== "awaiting_approval")
       return invalid("email_reply_edit_unavailable");
@@ -1292,20 +1308,20 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         chatContext: import("../../mail-inbox/reply-sources").EmailChatContext;
       }>,
   ): Promise<ConnectorResult<null>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedRecordEmailReplyEditProvenance.bind(this, input),
     );
   }
 
-  protected async admittedRecordEmailReplyEditProvenance(
+  private async admittedRecordEmailReplyEditProvenance(
     input: Parameters<ConnectorEmail["recordEmailReplyEditProvenance"]>[0],
   ): Promise<ConnectorResult<null>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
     const recorded = await this.withEmailProposalLock(
       input.proposalId,
       async (): Promise<ConnectorResult<null>> => {
-        const sql = this.ctx.storage.sql;
+        const sql = this.host.ctx.storage.sql;
         const operation = latestEmailDraftOperation(sql, input.proposalId);
         if (
           operation === null ||
@@ -1313,7 +1329,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
           readEmailProposalFlow(sql, input.proposalId) !== null
         )
           return invalid("email_reply_edit_unavailable");
-        const kept = this.ctx.storage.transactionSync(
+        const kept = this.host.ctx.storage.transactionSync(
           recordChatEditProvenance.bind(null, sql, input.proposalId, {
             chatSources: input.chatSources,
             chatContext: input.chatContext,
@@ -1324,7 +1340,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
           : invalid("email_reply_provenance_too_large");
       },
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return recorded;
   }
@@ -1342,27 +1358,24 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         attribution?: "single_editor" | "shared";
       }>,
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedEditReviewedEmailReply.bind(this, input),
     );
   }
 
-  protected async admittedEditReviewedEmailReply(
+  private async admittedEditReviewedEmailReply(
     input: Parameters<ConnectorEmail["editReviewedEmailReply"]>[0],
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
     if (input.authority.organisationId !== input.identity.organisationId)
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const edited = await this.withEmailProposalLock(
       input.proposalId,
       editEmailReplyBody.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         authority: input.authority,
@@ -1372,15 +1385,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         fetcher: runtimeFetch,
       }),
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     // A recorded correction queued its learning turn; wake for it. An edit
     // that recorded none leaves the alarm as it was.
     if (
       edited.ok &&
-      nextEmailCorrectionLearningAt(this.ctx.storage.sql) !== null
+      nextEmailCorrectionLearningAt(this.host.ctx.storage.sql) !== null
     )
-      await this.armAlarm();
+      await this.host.armAlarm();
     return edited.ok ? edited : invalid(edited.error.code);
   }
 
@@ -1394,18 +1407,18 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     input: ConnectorEmailIdentityRequest &
       Readonly<{ proposalId: string; version: number }>,
   ): Promise<ConnectorResult<EmailReplyCorrection | null>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedReadEmailReplyCorrection.bind(this, input),
     );
   }
 
-  protected async admittedReadEmailReplyCorrection(
+  private async admittedReadEmailReplyCorrection(
     input: Parameters<ConnectorEmail["readEmailReplyCorrection"]>[0],
   ): Promise<ConnectorResult<EmailReplyCorrection | null>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
     const correction = readEmailReplyCorrection(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.proposalId,
       input.version,
     );
@@ -1414,7 +1427,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       input.identity,
       input.proposalId,
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     if (!sources.ok) return sources;
     return { ok: true, value: sources.value ? correction : null };
@@ -1425,14 +1438,14 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
    * their cited revisions. A changed or erased source is a known fact and
    * answers false; a check that could not be made is an error.
    */
-  protected async emailProposalSourcesStand(
+  private async emailProposalSourcesStand(
     identity: ConnectorIdentity,
     proposalId: string,
   ): Promise<ConnectorResult<boolean>> {
-    const flow = readEmailProposalFlow(this.ctx.storage.sql, proposalId);
+    const flow = readEmailProposalFlow(this.host.ctx.storage.sql, proposalId);
     if (flow === null) return { ok: true, value: false };
     const valid = await validateEmailCaseContextCollectionDependency(
-      this.env,
+      this.host.env,
       identity.organisationId,
       flow.dependency,
     );
@@ -1454,27 +1467,24 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         lookup: import("@purin-labs/control-api").MailRelationshipLookup;
       }>,
   ): Promise<ConnectorResult<EmailRelationshipPreview>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedPreviewEmailRelationship.bind(this, input),
     );
   }
 
-  protected async admittedPreviewEmailRelationship(
+  private async admittedPreviewEmailRelationship(
     input: Parameters<ConnectorEmail["previewEmailRelationship"]>[0],
   ): Promise<ConnectorResult<EmailRelationshipPreview>> {
     if (input.authority.organisationId !== input.identity.organisationId)
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const preview = await this.withEmailProposalLock(
       input.proposalId,
       previewEmailRelationship.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         authority: input.authority,
@@ -1484,7 +1494,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       }),
     );
 
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return preview;
   }
@@ -1500,28 +1510,25 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         correction: import("@purin-labs/control-api").MailReplyCorrection;
       }>,
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedCorrectEmailRelationship.bind(this, input),
     );
   }
 
-  protected async admittedCorrectEmailRelationship(
+  private async admittedCorrectEmailRelationship(
     input: Parameters<ConnectorEmail["correctEmailRelationship"]>[0],
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
     if (input.authority.organisationId !== input.identity.organisationId)
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const corrected = await this.withEmailProposalLock(
       input.proposalId,
       correctEmailRelationship.bind(null, {
-        sql: this.ctx.storage.sql,
-        storage: this.ctx.storage,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        storage: this.host.ctx.storage,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         authority: input.authority,
@@ -1531,7 +1538,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       }),
     );
 
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return corrected;
   }
@@ -1539,12 +1546,12 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async dispatchReviewedEmailReply(
     raw: unknown,
   ): Promise<ConnectorResult<EmailDispatchOutcome>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedDispatchReviewedEmailReply.bind(this, raw),
     );
   }
 
-  protected async admittedDispatchReviewedEmailReply(
+  private async admittedDispatchReviewedEmailReply(
     raw: unknown,
   ): Promise<ConnectorResult<EmailDispatchOutcome>> {
     const input = parseEmailDispatchRequest(raw);
@@ -1558,16 +1565,13 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         input.identity.organisationId
     )
       return invalid("connector_email_dispatch_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const beforeSend = authorizeEmailReplyReview.bind(
       null,
-      this.ctx.storage.sql,
-      this.env,
+      this.host.ctx.storage.sql,
+      this.host.env,
       scope,
       parsed.value.requestAuthority,
       input.proposalId,
@@ -1575,8 +1579,8 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     const dispatched = await this.withEmailProposalLock(
       input.proposalId,
       dispatchEmailReply.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         approvedVersion: input.approvedVersion,
@@ -1586,7 +1590,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         beforeSend,
       }),
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return dispatched.ok ? dispatched : invalid(dispatched.error.code);
   }
@@ -1594,28 +1598,25 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async resolveEmailProposal(
     raw: unknown,
   ): Promise<ConnectorResult<EmailProposalResolution>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedResolveEmailProposal.bind(this, raw),
     );
   }
 
-  protected async admittedResolveEmailProposal(
+  private async admittedResolveEmailProposal(
     raw: unknown,
   ): Promise<ConnectorResult<EmailProposalResolution>> {
     const input = parseEmailResolveRequest(raw);
     if (input === null)
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const resolved = await this.withEmailProposalLock(
       input.proposalId,
       resolveEmailProposalState.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         dispatchVersion: input.dispatchVersion,
@@ -1623,7 +1624,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         fetcher: runtimeFetch,
       }),
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return resolved.ok ? resolved : invalid(resolved.error.code);
   }
@@ -1631,35 +1632,32 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   async disposeEmailProposal(
     raw: unknown,
   ): Promise<ConnectorResult<EmailDisposalOutcome>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedDisposeEmailProposal.bind(this, raw),
     );
   }
 
-  protected async admittedDisposeEmailProposal(
+  private async admittedDisposeEmailProposal(
     raw: unknown,
   ): Promise<ConnectorResult<EmailDisposalOutcome>> {
     const input = parseEmailProposalRequest(raw);
     if (input === null)
       return invalid("connector_email_proposal_request_invalid");
-    const scope = await this.admitExecution(input.identity);
-    if (scope === null) return invalid("connector_placement_conflict");
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok) return identity;
+    const admitted = await admitNamedConnector(this.host, input.identity);
+    if (!admitted.ok) return admitted;
+    const scope = admitted.value;
     const disposed = await this.withEmailProposalLock(
       input.proposalId,
       disposeEmailProposal.bind(null, {
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: input.proposalId,
         now: input.now,
         fetcher: runtimeFetch,
       }),
     );
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     return disposed.ok ? disposed : invalid(disposed.error.code);
   }
@@ -1680,27 +1678,27 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     );
   }
 
-  protected async admittedRevokeEmailMailbox(
+  private async admittedRevokeEmailMailbox(
     raw: unknown,
   ): Promise<ConnectorResult<EmailMailboxRevocation>> {
     const input = parseEmailMailboxRevocationRequest(raw);
     if (input === null) return invalid("connector_email_request_invalid");
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const fenced = this.ctx.storage.transactionSync(
-      fenceConnectorEmailMailbox.bind(null, this.ctx.storage.sql, input),
+    const fenced = this.host.ctx.storage.transactionSync(
+      fenceConnectorEmailMailbox.bind(null, this.host.ctx.storage.sql, input),
     );
     if (!fenced.ok) return invalid(fenced.error.code);
     if (input.kind === "erase") {
       await eraseMailClassificationRecords(scope, input.integrationAccountId);
     }
-    await this.armAlarm();
-    const pending = pendingEmailDraftProposals(this.ctx.storage.sql);
+    await this.host.armAlarm();
+    const pending = pendingEmailDraftProposals(this.host.ctx.storage.sql);
     const disposals: EmailMailboxDisposal[] = [];
     for (const operation of pending) {
       const disposed = await disposeEmailProposal({
-        sql: this.ctx.storage.sql,
-        env: this.env,
+        sql: this.host.ctx.storage.sql,
+        env: this.host.env,
         scope,
         proposalId: operation.proposalId,
         now: input.now,
@@ -1712,24 +1710,24 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         kind: disposed.ok ? disposed.value.kind : "cleanup_pending",
       });
     }
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     const stopped = await stopConnectorEmailWatch({
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.host.env,
+      storage: this.host.ctx.storage,
       scope,
       now: input.now,
       fetcher: runtimeFetch,
     });
-    await this.armAlarm();
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    await this.host.armAlarm();
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return invalid("connector_placement_conflict");
     const watchStopped = stopped.ok;
     return { ok: true, value: { watchStopped, disposals } };
   }
 
   /** Email as a channel of the Connector: its tables and its alarm part. */
-  protected emailChannel(): ChannelAdapter {
+  emailChannel(): ChannelAdapter {
     return {
       name: "email",
       createSchema: createEmailChannelSchema,
@@ -1740,15 +1738,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
   }
 
   /** Stops the Gmail watch of a mailbox whose cleanup is due. */
-  protected async stopDueEmailWatch(
+  private async stopDueEmailWatch(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
-    const watchCleanupAt = nextEmailWatchCleanupAt(this.ctx.storage.sql);
+    const watchCleanupAt = nextEmailWatchCleanupAt(this.host.ctx.storage.sql);
     if (watchCleanupAt !== null && watchCleanupAt <= Date.now()) {
       await this.emailMailboxWork.enqueue(
         stopConnectorEmailWatch.bind(null, {
-          env: this.env,
-          storage: this.ctx.storage,
+          env: this.host.env,
+          storage: this.host.ctx.storage,
           scope,
           now: Date.now(),
           fetcher: runtimeFetch,
@@ -1761,7 +1759,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
    * The mailbox work of one alarm. The mailbox's evals run here too: an eval
    * task runs the mailbox's agent.
    */
-  protected emailAlarmSteps(
+  private emailAlarmSteps(
     scope: OrganisationExecutionScope,
   ): ChannelAlarmSteps {
     return {
@@ -1780,7 +1778,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
           name: "email_correction_learning",
           run: () => this.runDueEmailCorrectionLearning(scope),
         },
-        { name: "eval_work", run: () => this.runDueEvalWork(scope) },
+        { name: "eval_work", run: () => this.evals.runDueEvalWork(scope) },
         {
           name: "mail_organization",
           run: () => this.runDueMailOrganization(scope),
@@ -1790,8 +1788,8 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
           run: () =>
             runEmailProposalMaintenance({
               scope,
-              sql: this.ctx.storage.sql,
-              env: this.env,
+              sql: this.host.ctx.storage.sql,
+              env: this.host.env,
               now: Date.now(),
               fetcher: runtimeFetch,
               withProposalLock: this.withEmailProposalLock.bind(this),
@@ -1801,22 +1799,22 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
           name: "operational_email",
           run: () =>
             this.emailMailboxWork.enqueue(
-              maintainOperationalEmail.bind(null, this.ctx.storage, scope),
+              maintainOperationalEmail.bind(null, this.host.ctx.storage, scope),
             ),
         },
       ],
     };
   }
 
-  protected async runDueMailOrganization(
+  private async runDueMailOrganization(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
     if (this.activeMailOrganization !== null)
       return this.activeMailOrganization;
     this.activeMailOrganization = runMailOrganization({
       scope,
-      env: this.env,
-      storage: this.ctx.storage,
+      env: this.host.env,
+      storage: this.host.ctx.storage,
     });
     try {
       await this.activeMailOrganization;
@@ -1825,15 +1823,15 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     }
   }
 
-  protected async runDueEmailEvaluation(
+  private async runDueEmailEvaluation(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
     try {
       // Admission queues the reply turn each admitted burst is owed.
       await runConnectorEmailEvaluation({
         scope,
-        storage: this.ctx.storage,
-        env: this.env,
+        storage: this.host.ctx.storage,
+        env: this.host.env,
         now: Date.now(),
         fetcher: runtimeFetch,
       });
@@ -1843,7 +1841,8 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         reason: error instanceof Error ? error.message : "unknown",
       });
     }
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
+      return;
     await this.runDueEmailReplyTurns(scope);
   }
 
@@ -1853,10 +1852,10 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
    * retry time, or at once by the instance that replaces this one. A turn is
    * claimed before it runs and is never run twice at the same time.
    */
-  protected async runDueEmailReplyTurns(
+  private async runDueEmailReplyTurns(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
-    const sql = this.ctx.storage.sql;
+    const sql = this.host.ctx.storage.sql;
     for (let processed = 0; processed < 5; processed += 1) {
       if (!(await isActorExecutionActive(sql, scope))) return;
       const runtime = readEmailRuntime(sql);
@@ -1867,7 +1866,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       )
         return;
       const now = Date.now();
-      const work = this.ctx.storage.transactionSync(
+      const work = this.host.ctx.storage.transactionSync(
         claimDueEmailReplyTurn.bind(null, sql, {
           now,
           owner: this.emailReplyTurnOwner,
@@ -1887,7 +1886,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       // finds it held by another and runs the turn.
       if (!(await isActorExecutionActive(sql, scope))) return;
       if (outcome.kind === "settled") {
-        this.ctx.storage.transactionSync(
+        this.host.ctx.storage.transactionSync(
           completeEmailReplyTurn.bind(null, sql, work.providerMessageId),
         );
         if (outcome.reason !== null)
@@ -1898,7 +1897,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
           });
         continue;
       }
-      const retried = this.ctx.storage.transactionSync(
+      const retried = this.host.ctx.storage.transactionSync(
         retryEmailReplyTurn.bind(null, sql, { work, now: Date.now() }),
       );
       traceWarn("connector.email_turn_failed", {
@@ -1912,7 +1911,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     }
   }
 
-  protected async runEmailReplyTurn(
+  private async runEmailReplyTurn(
     scope: OrganisationExecutionScope,
     runtime: EmailRuntimeSnapshot,
     work: EmailReplyTurnWork,
@@ -1931,13 +1930,13 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         readonly mailboxBindingId: string;
         readonly currentRevision: number;
       }>();
-    if (!(await isActorExecutionActive(this.ctx.storage.sql, scope)))
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
       return { kind: "retry", reason: "connector_placement_conflict" };
     if (binding === null)
       return { kind: "retry", reason: "mailbox_binding_missing" };
-    const turn = await processEmailThreadTurn(this.env, {
+    const turn = await processEmailThreadTurn(this.host.env, {
       scope,
-      connectorSql: this.ctx.storage.sql,
+      connectorSql: this.host.ctx.storage.sql,
       responsePolicy: "cue_routed",
       organisationId: runtime.organisationId,
       integrationAccountId: runtime.integrationAccountId,
@@ -1979,14 +1978,19 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
    * its own assignment and Session, so an attempt that stopped with its
    * instance is settled and the turn is run again.
    */
-  protected async runDueEmailCorrectionLearning(
+  private async runDueEmailCorrectionLearning(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
     for (let processed = 0; processed < 3; processed += 1) {
-      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
+        return;
       const now = Date.now();
-      const work = this.ctx.storage.transactionSync(
-        claimDueEmailCorrectionLearning.bind(null, this.ctx.storage.sql, now),
+      const work = this.host.ctx.storage.transactionSync(
+        claimDueEmailCorrectionLearning.bind(
+          null,
+          this.host.ctx.storage.sql,
+          now,
+        ),
       );
       if (work === null) return;
       // A turn that throws is one failed attempt. It must not stop the
@@ -1999,19 +2003,20 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
         () =>
           ({ kind: "retry", reason: "correction_learning_failed" }) as const,
       );
-      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
+        return;
       if (outcome.kind === "settled") {
-        this.ctx.storage.transactionSync(
+        this.host.ctx.storage.transactionSync(
           completeEmailCorrectionLearning.bind(
             null,
-            this.ctx.storage.sql,
+            this.host.ctx.storage.sql,
             work,
           ),
         );
         continue;
       }
-      const retried = this.ctx.storage.transactionSync(
-        retryEmailCorrectionLearning.bind(null, this.ctx.storage.sql, {
+      const retried = this.host.ctx.storage.transactionSync(
+        retryEmailCorrectionLearning.bind(null, this.host.ctx.storage.sql, {
           work,
           now,
         }),
@@ -2026,7 +2031,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     }
   }
 
-  protected async learnFromEmailCorrection(
+  private async learnFromEmailCorrection(
     scope: OrganisationExecutionScope,
     work: EmailCorrectionLearningWork,
     now: number,
@@ -2034,10 +2039,10 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     | Readonly<{ kind: "settled"; reason?: never }>
     | Readonly<{ kind: "retry"; reason: string }>
   > {
-    const sql = this.ctx.storage.sql;
+    const sql = this.host.ctx.storage.sql;
     const corrected = await readCorrectedEmailReply({
       sql,
-      env: this.env,
+      env: this.host.env,
       scope,
       proposalId: work.proposalId,
       version: work.version,
@@ -2066,7 +2071,7 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     if (!(await isActorExecutionActive(sql, scope)))
       return { kind: "retry", reason: "connector_placement_conflict" };
     if (binding === null) return { kind: "settled" };
-    const learned = await processEmailCorrectionLearning(this.env, {
+    const learned = await processEmailCorrectionLearning(this.host.env, {
       scope,
       connectorSql: sql,
       organisationId: runtime.organisationId,
@@ -2105,34 +2110,36 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
       : { kind: "retry", reason: learned.error.code };
   }
 
-  protected async runDueEmailCaseContextDiscoveries(
+  private async runDueEmailCaseContextDiscoveries(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
     for (let processed = 0; processed < 5; processed += 1) {
-      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
+        return;
       const now = Date.now();
-      const work = this.ctx.storage.transactionSync(
-        dueEmailCaseContextDiscovery.bind(null, this.ctx.storage.sql, now),
+      const work = this.host.ctx.storage.transactionSync(
+        dueEmailCaseContextDiscovery.bind(null, this.host.ctx.storage.sql, now),
       );
       if (work === null) return;
       const outcome = await runEmailCaseContextDiscoveryWork({
         scope,
-        env: this.env,
-        sql: this.ctx.storage.sql,
+        env: this.host.env,
+        sql: this.host.ctx.storage.sql,
         work,
         now,
       });
-      if (!(await isActorExecutionActive(this.ctx.storage.sql, scope))) return;
+      if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
+        return;
       if (outcome.kind === "evaluated") {
         traceLog("connector.email_case_context_discovery_evaluated", {
           requestId: newRequestId(),
           recorded: outcome.recorded,
         });
       }
-      const finalized = this.ctx.storage.transactionSync(
+      const finalized = this.host.ctx.storage.transactionSync(
         finalizeEmailCaseContextDiscovery.bind(
           null,
-          this.ctx.storage.sql,
+          this.host.ctx.storage.sql,
           work,
           outcome,
           now,
@@ -2150,10 +2157,50 @@ export abstract class ConnectorEmail extends ConnectorWhatsApp {
     }
   }
 
-  protected async withEmailProposalLock<T>(
+  private async withEmailProposalLock<T>(
     proposalId: string,
     task: () => Promise<T>,
   ): Promise<T> {
     return this.emailProposalWork.enqueue(proposalId, task);
   }
 }
+
+/** The RPC methods of this module. The Actor class has one method for each. */
+export type ConnectorEmailRpc = Pick<
+  ConnectorEmail,
+  | "reconcileRelocationMailReceipt"
+  | "mailAssistant"
+  | "readMailOrganization"
+  | "readMailClassifiedPage"
+  | "readMailDecision"
+  | "manageMailOrganization"
+  | "acceptEmailChange"
+  | "checkEmailChange"
+  | "activateEmailProcessing"
+  | "disableEmailProcessing"
+  | "resumeEmailProcessing"
+  | "reconnectEmailProcessing"
+  | "renewEmailWatch"
+  | "inspectEmailRuntime"
+  | "searchEmailMailbox"
+  | "createEmailReplyProposal"
+  | "createEmailOperationalProposal"
+  | "editEmailOperationalProposal"
+  | "previewEmailOperationalProposal"
+  | "dispatchEmailOperational"
+  | "rejectEmailOperational"
+  | "revokeEmailOperationalProposals"
+  | "previewEmailProposal"
+  | "authorizeEmailProposalDelivery"
+  | "dispatchEmailReply"
+  | "readEmailReplyProvenance"
+  | "recordEmailReplyEditProvenance"
+  | "editReviewedEmailReply"
+  | "readEmailReplyCorrection"
+  | "previewEmailRelationship"
+  | "correctEmailRelationship"
+  | "dispatchReviewedEmailReply"
+  | "resolveEmailProposal"
+  | "disposeEmailProposal"
+  | "revokeEmailMailbox"
+>;

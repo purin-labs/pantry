@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 20,
+    "upward": 19,
     "areas": 17,
     "order": 8,
     "table": 6
@@ -11,7 +11,6 @@
     "areas/commerce -> areas/cafe": 1,
     "areas/commerce -> areas/organisation": 3,
     "areas/commerce -> surfaces/slack": 2,
-    "areas/commerce -> workers/platform": 1,
     "areas/devices -> areas/cafe": 4,
     "areas/devices -> surfaces/voice": 2,
     "areas/inbox -> surfaces/whatsapp": 1,

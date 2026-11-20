@@ -1,3 +1,4 @@
+import type { SessionShared } from "./session-shared";
 import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { reconcilePantryExecutionBilling } from "../../account-platform/execution-billing";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
@@ -66,15 +67,16 @@ import type {
   SessionStateError,
   TurnStateInvalidError,
 } from "./types";
-import { SessionActorBase } from "./session-actor-base";
 
 /**
  * Harness checkpoint restore, publication and finalization for accepted turns.
  */
-export abstract class SessionCheckpoints extends SessionActorBase {
-  protected async scheduleCheckpointFinalization(): Promise<void> {
+export class SessionCheckpoints {
+  constructor(private readonly shared: SessionShared) {}
+
+  async scheduleCheckpointFinalization(): Promise<void> {
     const due = Date.now() + 1_000;
-    await armAlarmBy(this.ctx.storage, due);
+    await armAlarmBy(this.shared.ctx.storage, due);
   }
 
   async completeCanonicalCheckpointAndStream(input: {
@@ -101,10 +103,10 @@ export abstract class SessionCheckpoints extends SessionActorBase {
           reason: "execution_closed",
         },
       };
-    return commitCompletedSessionTurn(this.ctx.storage, input);
+    return commitCompletedSessionTurn(this.shared.ctx.storage, input);
   }
 
-  protected async restoreCanonicalHarnessCheckpointForRun(
+  async restoreCanonicalHarnessCheckpointForRun(
     lease: HarnessTurnLease,
     input: {
       requestingOrganisationId: OrganisationId;
@@ -112,8 +114,8 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     },
   ): Promise<Result<ArrayBuffer, CanonicalHarnessCheckpointRestoreError>> {
     const execution = await SessionExecutionAdmission.resolve(
-      this.env,
-      this.ctx.storage,
+      this.shared.env,
+      this.shared.ctx.storage,
       input.requestingOrganisationId,
     );
     if (execution === null || !(await execution.isTurnActive(lease)))
@@ -136,18 +138,18 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     });
     if (!before.ok) return before;
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     if (!session.ok) return session;
-    const account = readSessionBudgetAccount(this.ctx.storage.sql, {
+    const account = readSessionBudgetAccount(this.shared.ctx.storage.sql, {
       organisationId: input.requestingOrganisationId,
       sessionId: input.checkpoint.session.sessionId,
     });
     if (!account.ok) return account;
     const budgetBinding = await validateActiveRunCheckpointBudgetBinding({
-      sql: this.ctx.storage.sql,
+      sql: this.shared.ctx.storage.sql,
       account: account.value,
       checkpoint: input.checkpoint,
       identity: canonicalRunBudgetIdentity(lease),
@@ -156,14 +158,14 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     const adapter = selectEmbeddedHarnessAdapterForModelRoute(
       session.value.lifecycle.state.contract.modelRoute,
     );
-    const started = this.startedCheckpointPayload;
+    const started = this.shared.startedCheckpointPayload;
     const restored = await loadCanonicalHarnessCheckpoint({
-      bucket: this.env.ARCHIVE,
-      root: this.env.DATA_ENCRYPTION_ROOT,
+      bucket: this.shared.env.ARCHIVE,
+      root: this.shared.env.DATA_ENCRYPTION_ROOT,
       state: session.value.lifecycle,
       checkpoint: input.checkpoint,
       manifest: adapter.manifest,
-      sql: this.ctx.storage.sql,
+      sql: this.shared.ctx.storage.sql,
       payload:
         started !== null &&
         started.checkpoint === JSON.stringify(input.checkpoint)
@@ -204,7 +206,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
    * waits for the archive write. A failed archive write does not fail the
    * completed turn. The alarm repeats it, and the next turn waits for it.
    */
-  protected async finalizeAcceptedSessionCheckpoint(input: {
+  async finalizeAcceptedSessionCheckpoint(input: {
     execution: SessionExecutionAdmission;
     requestingOrganisationId: OrganisationId;
     /**
@@ -234,7 +236,9 @@ export abstract class SessionCheckpoints extends SessionActorBase {
           reason: "execution_closed",
         },
       };
-    const pending = readAcceptedCheckpointFinalization(this.ctx.storage.sql);
+    const pending = readAcceptedCheckpointFinalization(
+      this.shared.ctx.storage.sql,
+    );
     if (!pending.ok) return pending;
     if (
       pending.value.kind !== "pending" ||
@@ -317,7 +321,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
       };
     phaseStartedAt = Date.now();
     const account = readSessionBudgetAccount(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       current.state.identity,
     );
     if (!account.ok) return account;
@@ -327,7 +331,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     });
     if (!bound.ok) return bound;
     const flow = await readPersistedSessionTurnFlowBinding(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       {
         organisationId: input.requestingOrganisationId,
         sessionId: current.state.identity.sessionId,
@@ -355,10 +359,10 @@ export abstract class SessionCheckpoints extends SessionActorBase {
       phaseStartedAt,
     );
     if (!slept.ok) return slept;
-    this.ctx.waitUntil(
+    this.shared.ctx.waitUntil(
       reconcilePantryExecutionBilling({
-        env: this.env,
-        storage: this.ctx.storage,
+        env: this.shared.env,
+        storage: this.shared.ctx.storage,
       }),
     );
     // The turn is complete, and the archive write starts now. The Case
@@ -371,7 +375,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
         attempt: input.caller.kind === "turn" ? "first" : "resumed",
         trace,
       });
-      if (input.caller.kind === "turn") this.ctx.waitUntil(publishing);
+      if (input.caller.kind === "turn") this.shared.ctx.waitUntil(publishing);
       else await publishing;
     }
     const sessionId = parseSessionId(current.state.identity.sessionId);
@@ -415,7 +419,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
    * running one. A failed publication has set the alarm that repeats it when
    * the result arrives. The result never rejects.
    */
-  protected publishAcceptedCheckpoint(input: {
+  publishAcceptedCheckpoint(input: {
     execution: SessionExecutionAdmission;
     /**
      * "first" when the caller accepted the checkpoint in the same call.
@@ -427,18 +431,19 @@ export abstract class SessionCheckpoints extends SessionActorBase {
       readonly requestingOrganisationId: OrganisationId;
     };
   }): Promise<Result<null, CheckpointPublicationError>> {
-    if (this.checkpointPublication !== null) return this.checkpointPublication;
+    if (this.shared.checkpointPublication !== null)
+      return this.shared.checkpointPublication;
     const work = this.runCheckpointPublication(input)
       .catch(checkpointPublicationFailure)
       .then(this.deferFailedCheckpointPublication.bind(this, input.trace))
       .catch(checkpointPublicationFailure);
-    this.checkpointPublication = work;
+    this.shared.checkpointPublication = work;
     void work.finally(this.clearCheckpointPublication.bind(this, work));
     return work;
   }
 
   /** A failed archive write is left to the alarm. */
-  protected async deferFailedCheckpointPublication(
+  private async deferFailedCheckpointPublication(
     trace: {
       readonly requestId: RequestId;
       readonly requestingOrganisationId: OrganisationId;
@@ -455,13 +460,14 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     return published;
   }
 
-  protected clearCheckpointPublication(
+  private clearCheckpointPublication(
     work: Promise<Result<null, CheckpointPublicationError>>,
   ): void {
-    if (this.checkpointPublication === work) this.checkpointPublication = null;
+    if (this.shared.checkpointPublication === work)
+      this.shared.checkpointPublication = null;
   }
 
-  protected async runCheckpointPublication(input: {
+  private async runCheckpointPublication(input: {
     execution: SessionExecutionAdmission;
     attempt: "first" | "resumed";
     trace: {
@@ -477,16 +483,18 @@ export abstract class SessionCheckpoints extends SessionActorBase {
           reason: "execution_closed",
         },
       };
-    const unpublished = readUnpublishedHarnessCheckpoint(this.ctx.storage.sql);
+    const unpublished = readUnpublishedHarnessCheckpoint(
+      this.shared.ctx.storage.sql,
+    );
     if (!unpublished.ok) return unpublished;
     const publication = unpublished.value;
     if (publication === null) return { ok: true, value: null };
     const turnId = publication.checkpoint.turn.turnId;
     let phaseStartedAt = Date.now();
     const uploaded = await uploadHarnessCheckpoint({
-      storage: this.ctx.storage,
-      bucket: this.env.ARCHIVE,
-      root: this.env.DATA_ENCRYPTION_ROOT,
+      storage: this.shared.ctx.storage,
+      bucket: this.shared.env.ARCHIVE,
+      root: this.shared.env.DATA_ENCRYPTION_ROOT,
       publication,
       attempt: input.attempt,
     });
@@ -515,10 +523,10 @@ export abstract class SessionCheckpoints extends SessionActorBase {
           reason: "execution_inactive",
         },
       };
-    const published = this.ctx.storage.transactionSync(
+    const published = this.shared.ctx.storage.transactionSync(
       markHarnessCheckpointPublishedInTransaction.bind(
         null,
-        this.ctx.storage.sql,
+        this.shared.ctx.storage.sql,
         publication,
       ),
     );
@@ -531,8 +539,8 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     readonly turnId: string;
   }): Promise<Result<SerializedFlowBinding, SessionStateError>> {
     const session = await readCanonicalSessionForPersistence(
-      this.persistence,
-      this.ctx.storage.sql,
+      this.shared.persistence,
+      this.shared.ctx.storage.sql,
       input.requestingOrganisationId,
     );
     if (!session.ok) {
@@ -544,7 +552,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
       return { ok: false, error: { code: "organisation_mismatch" } };
     }
     const binding = await readPersistedSessionTurnFlowBinding(
-      this.ctx.storage.sql,
+      this.shared.ctx.storage.sql,
       {
         organisationId: input.requestingOrganisationId,
         sessionId: input.sessionId,
@@ -583,7 +591,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
     let finalMessage: string | null = null;
     let outcome: Outcome | null = null;
     for (;;) {
-      const replay = readSessionTurnReplay(this.ctx.storage.sql, {
+      const replay = readSessionTurnReplay(this.shared.ctx.storage.sql, {
         organisationId: input.organisationId,
         turnId: input.turnId,
         afterSequence,
@@ -610,7 +618,15 @@ export abstract class SessionCheckpoints extends SessionActorBase {
         };
   }
 
-  protected clearCanonicalTurn(): void {
-    this.canonicalTurn = null;
+  clearCanonicalTurn(): void {
+    this.shared.canonicalTurn = null;
   }
 }
+
+/** The RPC methods of this module. The Actor class has one method for each. */
+export type SessionCheckpointsRpc = Pick<
+  SessionCheckpoints,
+  | "completeCanonicalCheckpointAndStream"
+  | "readSessionTurnFlowBinding"
+  | "readCompletedTurn"
+>;

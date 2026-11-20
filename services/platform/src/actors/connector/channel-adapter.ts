@@ -158,3 +158,22 @@ export type ConnectorChannelHost = Readonly<{
   /** Wakes the Case work drain, so that a waiting reply can steer a turn. */
   wakeCaseWorkDrain(): void;
 }>;
+
+/**
+ * What the Connector gives to a module of one channel or of the evals
+ * (Refactor 17, step A1.9). A module is a class with this one value: it
+ * reads no field of the Actor class. The state and the bindings are read at
+ * each use.
+ */
+export type ConnectorModuleHost = Readonly<{
+  ctx: DurableObjectState;
+  env: Env;
+  /** The scope when this Connector is the named one and admits work. */
+  admitExecution(
+    identity: ConnectorIdentity,
+  ): Promise<OrganisationExecutionScope | null>;
+  /** Sets the alarm to the first time that a part of the Connector is due. */
+  armAlarm(): Promise<ConnectorResult<null>>;
+  /** Runs work that an export waits for. */
+  trackExecution<Value>(start: () => Promise<Value>): Promise<Value>;
+}>;

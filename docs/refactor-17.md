@@ -978,7 +978,8 @@ the "Costs" row and the open points of the two entries above where it names them
   `activeMessagePreparation`, `transientExecutions`, `liveGoalRuns` and the two
   Portal chat cleanup promises) and call each other through `this`. Each one needs
   its own landing with the actor journeys, the relocation journey and the idle
-  tenant journey.
+  tenant journey. Done on 2026-11-21: see "A1.9 — The class chains are
+  modules".
 - **Still open: 4 Slack imports and 1 Brain import.** `actors/harness-follow-up.ts`
   (3) posts the Slack card of a permission request and of a held effect through the
   Connector. It is Slack code with a foundation label: the exit check in
@@ -1867,6 +1868,71 @@ entries above where it names a crossing.
   all pass (41 tests).
   `wrangler deploy --dry-run` passes for the six Workers. The full E2E suite did
   not run on the branch.
+
+### A1.9 — The class chains are modules (2026-11-21)
+
+The three Actor class chains are gone. Each Actor class holds its parts as modules. A
+module is a class with a constructor. It gets the state that it needs as one explicit
+value, and it reads no field of the Actor class.
+
+- **The Session.** The chain was `SessionActorBase`, `SessionCheckpoints`,
+  `SessionHarnessTurns`, `SessionTurnRecovery` and `SessionActor`. It is now
+  `SessionActor` over `PlacedActor`, with four modules: `checkpoints`,
+  `harnessTurns`, `recovery` and `chatCleanup`. `SessionShared`
+  (`actors/session/session-shared.ts`) holds the state that the modules share: the
+  nine fields of the old base, the persistence, the two harness sinks and two
+  helpers. `SessionActorBase` is removed. `SessionDO` stays the class of the Worker:
+  it gives the tools.
+- **The Connector.** The chain was `ConnectorActorBase`, `ConnectorWhatsApp`,
+  `ConnectorEvals`, `ConnectorEmail` and `ConnectorDO`. It is now `ConnectorDO` over
+  `ConnectorActorBase`, with three modules: `evals`, `whatsApp` and `email`, beside
+  the Slack channel of step A1.6. `ConnectorModuleHost` is what a module gets: the
+  state, the bindings, `admitExecution`, `armAlarm` and `trackExecution`.
+- **The Organisation.** The chain was `OrganisationActorBase`,
+  `OrganisationCommerce` and `OrganisationDO`. It is now `OrganisationDO` over
+  `OrganisationActorBase`, with the module `commerce`. `OrganisationModuleHost` is
+  what a module gets: the state, the bindings, `command` and `rearm`. The onboarding
+  activation gave the Actor itself to two steps; the module now gets the two methods
+  (`ensureOrganisation` and `activatePolicy`) as an explicit value.
+- **The state and the bindings are read at each use.** A shared value or a host has a
+  getter for `ctx` and for `env`. A module then sees the same bindings as a method of
+  the Actor class. The fault journeys depend on this: they replace `env` of an Actor
+  instance.
+- **RPC.** Each module declares the type of its RPC methods: `SessionCheckpointsRpc`
+  (3 methods), `SessionHarnessTurnsRpc` (2), `ConnectorEvalsRpc` (4),
+  `ConnectorWhatsAppRpc` (16), `ConnectorEmailRpc` (35) and
+  `OrganisationCommerceRpc` (50). The Actor class implements each type with one
+  method for each name. A method takes the arguments of the module method and calls
+  it. No RPC method name and no argument shape changed.
+- **Schema.** No module has schema steps of its own. The Session keeps
+  `initializeAgentSessionPersistence`, the Connector keeps `createSchema` with the
+  ordered list of its channels, and the Organisation keeps its schema file. No schema
+  version, stored value, alarm time or journal entry changed. A module constructor
+  writes nothing.
+- **No hook is hidden.** No method of a module has the name of a method of
+  `PlacedActor` or of a base class. A script compared the names.
+- **Two shared admissions.** `admitNamedConnector` (`actors/connector/module-admission.ts`)
+  replaces 29 copies of one preamble in the WhatsApp and email modules: admit the work
+  at the placement, then check the stored identity. `admitCommerceLab` replaces 3
+  copies in the commerce module. The steps and their order are the same.
+- **The fault hooks of five journeys.** Five journeys patched a method of the Actor
+  instance or of `SessionDO.prototype` as a fault hook. The method is now in a module,
+  so the hook is on the module: `checkpoint-restart`, `checkpoint-atomic-acceptance`,
+  `session-turn-completion` and `session-alarm-steps`. `slack-answer-before-archive`
+  wraps the archive of each Session at `sessionTools`, which the constructor calls. No
+  assertion changed. Before the repair, `session-turn-completion` passed with no
+  fault: its journey does not prove that the fault ran.
+- **Measures.** Layer crossings: 287 to 285. Copies: 877 to 844. Unused exports: 805,
+  no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages` and the unit
+  suite pass on the last commit. After each module, the journeys of its Actor ran: 17
+  files for the Session, 17 for the Connector and `mail-inbox.test.ts`, 18 for the
+  Organisation. Each group has the recovery, relocation and placement journeys and
+  the idle tenant journey. The full E2E suite did not run on the branch.
+- **Still open.** `ConnectorActorBase` and `OrganisationActorBase` stay as the one
+  base of their Actor class: the state, the alarm, the admission and the hosts. The
+  policy, Jev, Memory and Evals parts of the Organisation were modules before this
+  step.
 
 ## Baseline
 
