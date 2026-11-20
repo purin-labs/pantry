@@ -9,7 +9,9 @@
 //
 // The check counts four kinds of crossing:
 //   upward   a lower layer imports a higher one
-//   areas    one area imports another area
+//   areas    one area imports a file of another area. An import of a workspace
+//            package of another area is allowed: the package is the contract
+//            of that area (step A1.10)
 //   order    a foundation module imports a foundation module that is later
 //            in foundationOrder
 //   table    a module writes a D1 table that another module owns
@@ -167,7 +169,11 @@ for (const path of tracked) {
     }
     const workspace = WORKSPACE.exec(specifier);
     const to = workspace === null ? undefined : packageByName.get(workspace[1]);
-    if (to !== undefined) record(from, to, `${path} -> ${specifier}`);
+    if (to === undefined) continue;
+    // A workspace package of an area is the contract of that area: its
+    // schemas, its model and its client. Another area may import it.
+    if (layerOf(from) === "areas" && layerOf(to) === "areas") continue;
+    record(from, to, `${path} -> ${specifier}`);
   }
 }
 

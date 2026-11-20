@@ -495,6 +495,11 @@ writer function**, on the branch `refactor-17-a1-8`.
   the Vault. `prepareActiveCredentialGeneration` replaces 3 insert statements.
 - The map shows 1,097 crossings. It showed 1,350 at the start of the day.
 
+The lint now allows an import of a workspace package of another area: the package is
+the contract of that area, as step A1.10 describes. An import of a file of another
+area stays a crossing. With this rule and with step A1.3 merged, the map shows 914
+crossings.
+
 What the day showed about the method:
 
 - A wrong line in the map hides a true crossing or shows a false one. The hub list

@@ -395,8 +395,9 @@ beside the large file. When a listed file gets smaller, run
 [Refactor 10](docs/refactor-10.md) splits the large files.
 [Refactor 17](docs/refactor-17.md) gives each source file a module in one of
 three layers: foundation, product areas and surfaces. `scripts/layers.json` is
-the map. An import goes only down the layers, one area imports no other area,
-and only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
+the map. An import goes only down the layers. One area imports no file of
+another area; it may import the workspace package of that area, which is its
+contract. Only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
 new crossing, and it refuses a source file, a top-level folder or a D1 table
 with no line in the map. Remove a crossing with a port: the lower module
 defines an interface, and the higher one gives the implementation. Then run
