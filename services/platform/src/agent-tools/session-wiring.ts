@@ -4,6 +4,7 @@ import {
   presentConfigurationCommand,
   previewCode,
 } from "../slack/configuration-presentation";
+import { KITCHEN_PAGE_EFFECTS } from "./bakery/page-effects";
 import { channelToolServices } from "./channels/turn-services";
 import {
   bindAllowanceReference,
@@ -12,7 +13,10 @@ import {
 import { deviceToolServices } from "./devices/turn-services";
 import { createMenuBoardDraftPreview } from "./drafts/board-draft-preview";
 import { menuToolServices } from "./drafts/turn-services";
-import { integrationToolServices } from "./integrations/turn-services";
+import {
+  customConnectorTurnTools,
+  integrationToolServices,
+} from "./integrations/turn-services";
 import { jevToolServices } from "./jev/turn-services";
 import {
   kitchenToolServices,
@@ -36,6 +40,7 @@ type AreaToolServices = Omit<ToolServices, keyof SessionOwnToolServices>;
  */
 export const SESSION_TOOL_WIRING: SessionToolWiring = {
   registry: TOOL_REGISTRY,
+  turnTools: customConnectorTurnTools,
   areaServices(turn): AreaToolServices {
     // The Organisation area stages a configuration draft. Commerce gives the
     // price reference of an allowance, and Slack gives the words.
@@ -71,6 +76,7 @@ export const SESSION_TOOL_WIRING: SessionToolWiring = {
       },
     };
   },
+  pageEffects: KITCHEN_PAGE_EFFECTS,
   // Plan 40B phase 7: a board edit shows on the board while the model writes
   // it.
   argumentObserver: createMenuBoardDraftPreview,

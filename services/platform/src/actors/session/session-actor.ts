@@ -41,7 +41,6 @@ import {
   type OrganisationArchiveCleanupError,
 } from "../organisation-archive-cleanup";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
-import type { BakerySurfaceReceiptV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type {
   AcceptedInputRef,
   HarnessCheckpointRecord,
@@ -105,11 +104,7 @@ import {
   validateCheckpointBudgetBinding,
 } from "../agent-session-harness-checkpoint";
 import { inspectLatestMessageLinkReceipt } from "../message-link-receipt-inspection";
-import {
-  reconcileBakerySurfaceEffects,
-  settleBakerySurfaceEffect,
-  type BakerySurfaceEffectSettlement,
-} from "../bakery-surface-effect";
+import type { PageEffectReceipt, PageEffectSettlement } from "./tool-wiring";
 import {
   reconcileCodeModeSettlements,
   reconcileFrozenCodeModeSettlements,
@@ -1245,8 +1240,8 @@ export abstract class SessionActor extends SessionTransientTurns {
 
   async settleBakerySurfaceEffect(input: {
     readonly requestingOrganisationId: OrganisationId;
-    readonly receipt: BakerySurfaceReceiptV1;
-  }): Promise<BakerySurfaceEffectSettlement> {
+    readonly receipt: PageEffectReceipt;
+  }): Promise<PageEffectSettlement> {
     const execution = await SessionExecutionAdmission.resolve(
       this.env,
       this.ctx.storage,
@@ -1254,7 +1249,7 @@ export abstract class SessionActor extends SessionTransientTurns {
     );
     if (execution === null)
       return { ok: false, code: "surface_effect_authority_invalid" };
-    return settleBakerySurfaceEffect({
+    return this.sessionTools().pageEffects.settle({
       db: execution.scope.database,
       storage: this.ctx.storage,
       organisationId: input.requestingOrganisationId,
@@ -1451,7 +1446,7 @@ export abstract class SessionActor extends SessionTransientTurns {
       {
         name: "bakery_surface_effects",
         run: () =>
-          reconcileBakerySurfaceEffects({
+          this.sessionTools().pageEffects.reconcile({
             db: admission.scope.database,
             storage: this.ctx.storage,
           }),

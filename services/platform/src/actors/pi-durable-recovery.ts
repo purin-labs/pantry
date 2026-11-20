@@ -1,4 +1,3 @@
-import { rebindBakerySurfaceRecovery } from "./bakery-surface-effect";
 import type {
   HarnessTurnLease,
   AgentSessionLifecycle,
@@ -52,6 +51,7 @@ import {
 import { PI_DURABLE_BUILD } from "./pi-durable-checkpoint";
 import { mayRerunToolCall, type ToolCaller } from "./pi-tool-replay";
 import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
+import type { SessionPageEffects } from "./session/tool-wiring";
 import type { Result } from "../result";
 
 /** An unfinished Pi turn that the Session resumes. */
@@ -285,6 +285,7 @@ export async function rebindPiRecoveryCodeModeLease(input: {
 }
 
 export function resumePiDurableRecovery(
+  rebindPageEffects: SessionPageEffects["rebindRecovery"],
   storage: DurableObjectStorage,
   saved: SavedRecovery,
   authorized: boolean,
@@ -366,7 +367,7 @@ export function resumePiDurableRecovery(
       runtimeGeneration: generation,
       now,
     });
-  rebindBakerySurfaceRecovery(storage.sql, saved.lease, lease);
+  rebindPageEffects(storage.sql, saved.lease, lease);
   const continuation: HarnessTurnContinuation = {
     kind: saved.continuation.kind,
     organisationId: saved.continuation.organisationId,

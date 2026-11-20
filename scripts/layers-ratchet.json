@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 298,
+    "upward": 288,
     "areas": 217,
     "order": 131,
     "table": 118
@@ -76,8 +76,8 @@
     "foundation/agent -> areas/brain": 1,
     "foundation/agent -> areas/commerce": 22,
     "foundation/agent -> areas/inbox": 27,
-    "foundation/agent -> areas/integrations": 3,
-    "foundation/agent -> areas/kitchen": 12,
+    "foundation/agent -> areas/integrations": 1,
+    "foundation/agent -> areas/kitchen": 4,
     "foundation/agent -> areas/organisation": 4,
     "foundation/agent -> foundation/conversation": 29,
     "foundation/agent -> surfaces/portal": 1,

@@ -350,6 +350,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
     const resumed = this.ctx.storage.transactionSync(
       resumePiDurableRecovery.bind(
         null,
+        this.sessionTools().pageEffects.rebindRecovery,
         this.ctx.storage,
         pending,
         authorized,
@@ -435,7 +436,7 @@ export abstract class SessionTurnRecovery extends SessionHarnessTurns {
       const result =
         await this.runAndCheckpointCanonicalEmbeddedHarnessTextTurn({
           execution,
-          customConnectorCatalog: null,
+          acceptedTurnTools: null,
           startReceiptCheck: null,
           startedInheritedHistory: null,
           startedGoalCase: null,

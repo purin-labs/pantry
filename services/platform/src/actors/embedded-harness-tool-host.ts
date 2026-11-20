@@ -14,6 +14,7 @@ import { type HarnessPermissionRequest, type HarnessPermissionRequestResult, typ
 import type {
   ToolRegistry,
   ToolServiceSet,
+  TurnTool,
 } from "../agent-tools/catalog/tool-registry";
 import type { EffectSettle } from "../agent-tools/tool-effect";
 import { createHarnessCodeModeAdmission } from "./code-mode-admission";
@@ -22,10 +23,6 @@ import type {
   HarnessToolHost,
 } from "./embedded-harness";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import {
-  customConnectorTurnTool,
-  type CustomConnectorCatalogEntry,
-} from "../custom-connectors";
 
 export type HarnessToolHostConstructionError =
   | {
@@ -46,7 +43,7 @@ export function harnessToolCatalogDigest(
   allowedCapabilities: readonly HarnessCapabilityName[] = harnessBaseCapabilities(
     registry,
   ),
-  customConnectorOperations: readonly CustomConnectorCatalogEntry[] = [],
+  turnTools: readonly TurnTool[] = [],
   bakerySurfaceCommands: readonly string[] = [],
   memoryProposal = false,
   followUp = false,
@@ -55,7 +52,7 @@ export function harnessToolCatalogDigest(
 ): Promise<string> {
   return catalogHarnessToolCatalogDigest(registry, {
     allowedCapabilities,
-    turnTools: customConnectorOperations.map(customConnectorTurnTool),
+    turnTools,
     bakerySurfaceCommands,
     memoryProposal,
     followUp,
@@ -71,7 +68,8 @@ export async function createCatalogHarnessToolHost(input: {
   readonly lease: HarnessTurnLease;
   readonly expectedCatalogDigest: string;
   readonly capabilityKeys: readonly string[];
-  readonly customConnectorOperations: readonly CustomConnectorCatalogEntry[];
+  /** The tools that this turn adds to the registry's tools. */
+  readonly turnTools: readonly TurnTool[];
   readonly bakerySurfaceCommands: readonly string[];
   /** True when the turn's authority may propose a Memory. */
   readonly memoryProposal: boolean;
@@ -117,7 +115,7 @@ export async function createCatalogHarnessToolHost(input: {
     expectedCatalogDigest: input.expectedCatalogDigest,
     catalogSelection: {
       allowedCapabilities: capabilities.value,
-      turnTools: input.customConnectorOperations.map(customConnectorTurnTool),
+      turnTools: input.turnTools,
       bakerySurfaceCommands: input.bakerySurfaceCommands,
       memoryProposal: input.memoryProposal,
       followUp: input.followUp,

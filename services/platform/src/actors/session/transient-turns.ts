@@ -1,14 +1,8 @@
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
-  COSTS_VIEW_COMMANDS,
-  PASTRY_BENCH_VIEW_COMMANDS,
-  REGISTER_VIEW_COMMANDS,
-} from "@purin-labs/control-api";
-import {
   createTransientGoalExecution,
   type GoalUsageContext,
 } from "../session-goal-usage";
-import { installedBakerySurfaceCommands } from "../../agent-tools/bakery/surface";
 import type { HarnessToolHost } from "../embedded-harness";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import type {
@@ -263,30 +257,6 @@ export async function reauthorizeTransientEmail(
   return eligibility.kind === "eligible"
     ? { ok: true, value: null }
     : { ok: false, error: { code: "gmail_inference_route_blocked" } };
-}
-
-/**
- * The surface commands that a Portal turn offers (Plan 87, D16): the Pantry
- * Kitchen commands and the Costs & margins view commands, to an owner or an
- * admin, whose browser may read the commands. A command checks the page when
- * it runs.
- */
-export function authorizedBakerySurfaceCommands(
-  authority: HarnessTurnLease["requestAuthority"],
-): readonly string[] {
-  if (authority.kind !== "control") return [];
-  if (authority.role === "admin" || authority.role === "owner") {
-    return [
-      ...installedBakerySurfaceCommands(),
-      ...COSTS_VIEW_COMMANDS,
-      ...PASTRY_BENCH_VIEW_COMMANDS,
-      ...REGISTER_VIEW_COMMANDS,
-    ];
-  }
-  if (authority.role === "operator") {
-    return [...REGISTER_VIEW_COMMANDS];
-  }
-  return [];
 }
 
 export function projectItemForSnapshot(

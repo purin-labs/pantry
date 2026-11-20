@@ -3,11 +3,16 @@ import { acceptedExecutionAccountAuthority } from "../../account-platform/access
 import { sessionActionMutationExecution } from "../../actors/action-mutation-execution";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
-import type { ToolTurnContext } from "../../actors/session/tool-wiring";
+import type {
+  SessionToolWiring,
+  ToolTurnContext,
+} from "../../actors/session/tool-wiring";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
 import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
 import {
   buildCustomConnectorWriteAuthority,
+  compileCustomConnectorCatalog,
+  customConnectorTurnTool,
   type CustomConnectorWriteCatalogEntry,
 } from "../../custom-connectors";
 import { parseCaseId, parseSessionId } from "../../ids";
@@ -19,6 +24,22 @@ import {
   writeAirtableForHarness,
 } from "./handlers";
 import type { IntegrationToolServices } from "./services";
+
+/**
+ * The tools that a turn adds to the tool list: one tool for each custom
+ * connector operation that the grants of the turn select.
+ */
+export async function customConnectorTurnTools(
+  input: Parameters<SessionToolWiring["turnTools"]>[0],
+): ReturnType<SessionToolWiring["turnTools"]> {
+  const catalog = await compileCustomConnectorCatalog({
+    db: input.database,
+    effectiveGrants: input.effectiveGrants,
+  });
+  return catalog.ok
+    ? { ok: true, value: catalog.value.map(customConnectorTurnTool) }
+    : catalog;
+}
 
 /** What Integrations gives to one turn: the services of its tools. */
 export function integrationToolServices(

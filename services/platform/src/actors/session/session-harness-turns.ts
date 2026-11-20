@@ -45,8 +45,6 @@ import {
   turnMayRequestPermission,
   turnMayScheduleFollowUp,
 } from "../harness-follow-up";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { parseSessionId, type RequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
@@ -152,7 +150,7 @@ import {
   claimCanonicalRunCapability,
 } from "./capability-claims";
 import {
-  type AcceptedCustomConnectorCatalog,
+  type AcceptedTurnTools,
   canonicalEmbeddedHarnessRuntimeSource,
   canonicalTextTurnWorkspaceReceipt,
   fenceWithoutReceiptCheck,
@@ -161,8 +159,7 @@ import {
   ignoreUnusedSideCaseOrigin,
   ignoreUnusedStartFence,
   materializeEmbeddedHarnessSource,
-  normalizeBakerySurfaceContext,
-  resolveAcceptedCustomConnectorCatalog,
+  resolveAcceptedTurnTools,
   resolveCanonicalEmbeddedHarnessCheckpointBinding,
   sideCaseHarnessInstructions,
   textTurnHarnessCheckpointInput,
@@ -192,7 +189,6 @@ import {
   traceSessionTurnCompletion,
   traceTurnCompletionRefused,
 } from "./traces";
-import { authorizedBakerySurfaceCommands } from "./transient-turns";
 import {
   commitCheckpointAndAlarm,
   completeEmbeddedHarnessTurnWithinBudget,
@@ -210,7 +206,11 @@ import type {
 } from "./types";
 import { SessionCheckpoints } from "./session-checkpoints";
 import { sessionOwnToolServices } from "./own-tool-services";
-import type { ToolTurnContext } from "./tool-wiring";
+import type {
+  ToolTurnContext,
+  TurnPageContext,
+  TurnPageState,
+} from "./tool-wiring";
 
 /**
  * Canonical embedded harness turns: input, preparation, the run with its tools, and the checkpoint commit.
@@ -356,7 +356,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     lease: HarnessTurnLease;
     turnPrompt: string;
     resolvedCatalog: Promise<
-      Result<AcceptedCustomConnectorCatalog, unknown>
+      Result<AcceptedTurnTools, unknown>
     > | null;
   }): Promise<
     Result<CanonicalEmbeddedHarnessInput, CanonicalEmbeddedHarnessInputError>
@@ -522,7 +522,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
    */
   protected async runCanonicalEmbeddedHarnessTurn(input: {
     execution: SessionExecutionAdmission;
-    customConnectorCatalog: AcceptedCustomConnectorCatalog | null;
+    acceptedTurnTools: AcceptedTurnTools | null;
     inheritedHistory: ReturnType<typeof readChatForkHistoryForCase> | null;
     /**
      * The goal execution that the caller started to bind, and that the caller
@@ -537,8 +537,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     harnessInstructions: string;
     thinkingLevel?: import("../embedded-harness").EmbeddedHarnessThinkingLevel;
     turnPrompt: string;
-    browserContext: BakeryBrowserContext;
-    surfaceContext: BakerySurfaceAttachmentV1 | null;
+    browserContext: TurnPageContext;
+    surfaceContext: TurnPageState | null;
   }): Promise<
     Result<CanonicalEmbeddedHarnessTurnResult, CanonicalEmbeddedHarnessRunError>
   > {
@@ -674,8 +674,9 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     // These four read the organisation's records and decide nothing alone.
     // The turn starts only after the fence is read again below.
     const catalogRead =
-      input.customConnectorCatalog === null
-        ? resolveAcceptedCustomConnectorCatalog({
+      input.acceptedTurnTools === null
+        ? resolveAcceptedTurnTools({
+            turnTools: this.sessionTools().turnTools,
             scope: input.execution.scope,
             organisationId: input.requestingOrganisationId,
             authority: input.lease.requestAuthority,
@@ -687,11 +688,11 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           })
         : Promise.resolve({
             ok: true as const,
-            value: input.customConnectorCatalog,
+            value: input.acceptedTurnTools,
           });
     const [
       canonicalInput,
-      customConnectorCatalog,
+      acceptedTurnTools,
       resolvedModelRouteLease,
       servedCase,
     ] = await Promise.all([
@@ -726,7 +727,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         : null,
     ]);
     if (!canonicalInput.ok) return canonicalInput;
-    if (!customConnectorCatalog.ok) return customConnectorCatalog;
+    if (!acceptedTurnTools.ok) return acceptedTurnTools;
     if (
       this.activeMessagePreparation !== null ||
       this.activeEmbeddedHarnessTurn !== null
@@ -809,8 +810,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       runtime: input.runtime,
       harnessInstructions,
       assignment,
-      customConnectorOperations: customConnectorCatalog.value.entries,
-      bakerySurfaceCommands: authorizedBakerySurfaceCommands(
+      turnTools: acceptedTurnTools.value.turnTools,
+      bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
         input.lease.requestAuthority,
       ),
       memoryProposal: turnMayProposeMemory(input.lease.requestAuthority),
@@ -864,7 +865,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       sessionId: session.value.lifecycle.state.identity.sessionId,
       turnPrompt: input.turnPrompt,
       browserContext: input.browserContext,
-      effectiveGrantSet: customConnectorCatalog.value.authority.effectiveGrantSet,
+      effectiveGrantSet: acceptedTurnTools.value.authority.effectiveGrantSet,
     };
     const tools = this.sessionTools();
     const toolArguments = tools.argumentObserver(toolTurn);
@@ -875,8 +876,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       lease: input.lease,
       expectedCatalogDigest: binding.value.binding.toolCatalogDigest,
       capabilityKeys: assignment.authorityPartition.capabilityKeys,
-      customConnectorOperations: customConnectorCatalog.value.entries,
-      bakerySurfaceCommands: authorizedBakerySurfaceCommands(
+      turnTools: acceptedTurnTools.value.turnTools,
+      bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
         input.lease.requestAuthority,
       ),
       memoryProposal: turnMayProposeMemory(input.lease.requestAuthority),
@@ -1277,7 +1278,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
      * The connector catalog the same call resolved to start this turn. Null
      * when the turn resumes in a later call, which resolves it again.
      */
-    customConnectorCatalog: AcceptedCustomConnectorCatalog | null;
+    acceptedTurnTools: AcceptedTurnTools | null;
     /**
      * The receipt check that read the fence of this turn's start commit in
      * the same call. Null when the turn resumes in a later call, which checks
@@ -1304,8 +1305,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     harnessInstructions: string;
     thinkingLevel?: import("../embedded-harness").EmbeddedHarnessThinkingLevel;
     turnPrompt: string;
-    browserContext: BakeryBrowserContext;
-    surfaceContext: BakerySurfaceAttachmentV1 | null;
+    browserContext: TurnPageContext;
+    surfaceContext: TurnPageState | null;
     completion: CanonicalTextTurnCompletionIdentity;
   }): Promise<
     Result<
@@ -1422,7 +1423,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     try {
       completed = await this.runCanonicalEmbeddedHarnessTurn({
         execution: input.execution,
-        customConnectorCatalog: input.customConnectorCatalog,
+        acceptedTurnTools: input.acceptedTurnTools,
         inheritedHistory,
         goalExecution,
         requestingOrganisationId: input.requestingOrganisationId,
@@ -1676,7 +1677,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           reason: "context_unavailable",
         },
       };
-    const surfaceContext = await normalizeBakerySurfaceContext(
+    const surfaceContext = await this.sessionTools().pageEffects.normalizeState(
       input.surfaceContext,
     );
     if (!surfaceContext.ok)
@@ -1802,7 +1803,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       execution.scope,
       assignment,
     );
-    const customConnectorCatalog = await resolveAcceptedCustomConnectorCatalog({
+    const acceptedTurnTools = await resolveAcceptedTurnTools({
+      turnTools: this.sessionTools().turnTools,
       scope: execution.scope,
       organisationId: input.requestingOrganisationId,
       authority: input.start.requestAuthority,
@@ -1818,7 +1820,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       "start_custom_catalog",
       phaseStartedAt,
     );
-    if (!customConnectorCatalog.ok) return customConnectorCatalog;
+    if (!acceptedTurnTools.ok) return acceptedTurnTools;
     phaseStartedAt = Date.now();
     const runtimePreflight =
       await resolveCanonicalEmbeddedHarnessCheckpointBinding({
@@ -1830,8 +1832,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           await sideCaseOrigin,
         ),
         assignment,
-        customConnectorOperations: customConnectorCatalog.value.entries,
-        bakerySurfaceCommands: authorizedBakerySurfaceCommands(
+        turnTools: acceptedTurnTools.value.turnTools,
+        bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
           input.start.requestAuthority,
         ),
         memoryProposal: turnMayProposeMemory(input.start.requestAuthority),
@@ -1892,7 +1894,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       // connector catalog. A refused sink leaves no turn and no stream.
       phaseStartedAt = Date.now();
       const sink = await decideCaseConversationSink(
-        customConnectorCatalog.value.authority,
+        acceptedTurnTools.value.authority,
         informationFlow.value.binding,
         input.streamSink.channelId,
         this.env,
@@ -1965,7 +1967,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       const completed =
         await this.runAndCheckpointCanonicalEmbeddedHarnessTextTurn({
           execution,
-          customConnectorCatalog: customConnectorCatalog.value,
+          acceptedTurnTools: acceptedTurnTools.value,
           startReceiptCheck: startFence.check,
           startedInheritedHistory: inheritedHistory,
           startedGoalCase: servedGoalCase,
