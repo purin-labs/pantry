@@ -20,3 +20,9 @@ sha2 = "0.10"
 # links it with MuJoCo under LTO (scripts/bakery-robots/build-browser.mjs).
 [profile.release]
 lto = "fat"
+
+# The cobot controller simulator (Plan 24 S2). Its source stays outside
+# src/, so the engine identity and the pinned browser bundle do not change.
+[[bin]]
+name = "cobot-controller"
+path = "controller/main.rs"

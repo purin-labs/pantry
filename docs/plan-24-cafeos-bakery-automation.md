@@ -1,7 +1,7 @@
 # Plan 24 — Cobot bakes in the first café kitchen
 
-Status: Rewritten on 3 November 2026 after a review with the owner. S1 is built (see S1); S2 to S6
-have no code yet.
+Status: Rewritten on 3 November 2026 after a review with the owner. S1 and S2 are built on the
+branch `plan-24-simulation` (see "Steps done"); S3 to S6 follow.
 The simulation phase comes first. The owner buys cobots only after its exit gate passes.
 Owner: CafeOS operations. Replaces the August version, which used a Japan-to-Singapore export
 order as its first path.
