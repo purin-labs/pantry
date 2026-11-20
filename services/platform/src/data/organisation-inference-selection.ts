@@ -11,6 +11,7 @@ export type OrganisationInferenceSelection =
   | { readonly kind: "codex_subscription" }
   | { readonly kind: "organisation_openai_api_key" }
   | { readonly kind: "organisation_anthropic_api_key" }
+  | { readonly kind: "organisation_google_api_key" }
   | { readonly kind: "satyr_platform" };
 
 type OrganisationInferenceSelectionSnapshot = {
@@ -57,11 +58,9 @@ export function parseOrganisationInferenceSelection(
   switch (raw.kind) {
     case "claude_oauth":
     case "codex_subscription":
-      return { ok: true, value: { kind: raw.kind } };
     case "organisation_openai_api_key":
-      return { ok: true, value: { kind: raw.kind } };
     case "organisation_anthropic_api_key":
-      return { ok: true, value: { kind: raw.kind } };
+    case "organisation_google_api_key":
     case "satyr_platform":
       return { ok: true, value: { kind: raw.kind } };
     default:

@@ -14,8 +14,8 @@ import {
   platformPiModelName,
 } from "../actors/pi-model-transport";
 import {
-  resolveCurrentOrganisationAnthropicModelCredential,
-  resolveCurrentOrganisationOpenAiModelCredential,
+  resolveCurrentOrganisationModelCredential,
+  type ModelKeyProvider,
 } from "../credential-vault";
 import {
   readOrganisationInferenceSelection,
@@ -24,10 +24,13 @@ import {
 import {
   DEFAULT_ORGANISATION_CODEX_MODEL,
   DEFAULT_ORGANISATION_ANTHROPIC_MODEL,
+  DEFAULT_ORGANISATION_GOOGLE_MODEL,
   parseOrganisationAnthropicModel,
   parseOrganisationCodexModel,
+  parseOrganisationGoogleModel,
   ORGANISATION_ANTHROPIC_MODEL_OPTIONS,
   ORGANISATION_CODEX_MODEL_OPTIONS,
+  ORGANISATION_GOOGLE_MODEL_OPTIONS,
 } from "./catalog";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever, sha256Hex } from "@purin-labs/std";
@@ -63,24 +66,15 @@ export type PantryPlatformModelRouteError = {
     | "satyr_platform_model_unsupported";
 };
 
-export type OrganisationOpenAiModelRoute = VariantBy<
+/** The route of an Organisation's own API key, for one provider. */
+export type OrganisationApiKeyModelRoute = VariantBy<
   ModelRoute,
   "keySource",
   "organisation_byo"
-> & { readonly provider: "openai" };
+>;
 
-export type OrganisationAnthropicModelRoute = VariantBy<
-  ModelRoute,
-  "keySource",
-  "organisation_byo"
-> & { readonly provider: "anthropic" };
-
-export type OrganisationOpenAiModelRouteError = {
-  readonly code: "organisation_openai_api_key_unavailable";
-};
-
-export type OrganisationAnthropicModelRouteError = {
-  readonly code: "organisation_anthropic_api_key_unavailable";
+export type OrganisationApiKeyModelRouteError = {
+  readonly code: `organisation_${ModelKeyProvider}_api_key_unavailable`;
 };
 
 export type OrganisationClaudeOAuthModelRoute = VariantBy<
@@ -92,15 +86,13 @@ export type OrganisationClaudeOAuthModelRoute = VariantBy<
 export type OrganisationModelRoute =
   | OrganisationClaudeOAuthModelRoute
   | OrganisationSubscriptionModelRoute
-  | OrganisationOpenAiModelRoute
-  | OrganisationAnthropicModelRoute
+  | OrganisationApiKeyModelRoute
   | PantryPlatformModelRoute;
 
 export type OrganisationModelRouteError =
   | { readonly code: "claude_connection_unavailable" }
   | OrganisationSubscriptionModelRouteError
-  | OrganisationOpenAiModelRouteError
-  | OrganisationAnthropicModelRouteError
+  | OrganisationApiKeyModelRouteError
   | PantryPlatformModelRouteError
   | { readonly code: "organisation_inference_selection_unavailable" };
 
@@ -145,6 +137,7 @@ export function organisationChatModelOptions(
     return ORGANISATION_CODEX_MODEL_OPTIONS;
   if (route.provider === "anthropic")
     return ORGANISATION_ANTHROPIC_MODEL_OPTIONS;
+  if (route.provider === "google") return ORGANISATION_GOOGLE_MODEL_OPTIONS;
   return [
     {
       id: route.model,
@@ -199,6 +192,12 @@ export function selectOrganisationChatModel(
     case "organisation_byo": {
       if (route.provider === "anthropic") {
         const model = parseOrganisationAnthropicModel(requestedModel);
+        return model.ok
+          ? { ok: true, value: { ...route, model: model.value } }
+          : model;
+      }
+      if (route.provider === "google") {
+        const model = parseOrganisationGoogleModel(requestedModel);
         return model.ok
           ? { ok: true, value: { ...route, model: model.value } }
           : model;
@@ -362,67 +361,40 @@ export function resolvePantryPlatformModelRoute(
   };
 }
 
-export async function resolveOrganisationOpenAiModelRoute(input: {
+/** The default model of each provider whose key an Organisation stores. */
+const API_KEY_DEFAULT_MODEL: Readonly<Record<ModelKeyProvider, string>> = {
+  openai: PACKAGED_PI_OPENAI_MODEL,
+  anthropic: DEFAULT_ORGANISATION_ANTHROPIC_MODEL,
+  google: DEFAULT_ORGANISATION_GOOGLE_MODEL,
+};
+
+export async function resolveOrganisationApiKeyModelRoute(input: {
   readonly env: Env;
   readonly scope: OrganisationExecutionScope;
+  readonly provider: ModelKeyProvider;
 }): Promise<
-  Result<OrganisationOpenAiModelRoute, OrganisationOpenAiModelRouteError>
+  Result<OrganisationApiKeyModelRoute, OrganisationApiKeyModelRouteError>
 > {
-  if (!(await input.scope.isActive()))
-    return {
-      ok: false,
-      error: { code: "organisation_openai_api_key_unavailable" },
-    };
-  const credential = await resolveCurrentOrganisationOpenAiModelCredential({
-    db: input.scope.database,
-    keys: input.env,
-    organisationId: input.scope.organisationId,
-  });
-  if (!credential.ok) {
-    return {
-      ok: false,
-      error: { code: "organisation_openai_api_key_unavailable" },
-    };
-  }
-  return {
-    ok: true,
-    value: {
-      keySource: "organisation_byo",
-      provider: "openai",
-      model: PACKAGED_PI_OPENAI_MODEL,
-      byoKeyRef: credential.value.handle,
+  const unavailable = {
+    ok: false as const,
+    error: {
+      code: `organisation_${input.provider}_api_key_unavailable` as const,
     },
   };
-}
-
-export async function resolveOrganisationAnthropicModelRoute(input: {
-  readonly env: Env;
-  readonly scope: OrganisationExecutionScope;
-}): Promise<
-  Result<OrganisationAnthropicModelRoute, OrganisationAnthropicModelRouteError>
-> {
-  if (!(await input.scope.isActive()))
-    return {
-      ok: false,
-      error: { code: "organisation_anthropic_api_key_unavailable" },
-    };
-  const credential = await resolveCurrentOrganisationAnthropicModelCredential({
+  if (!(await input.scope.isActive())) return unavailable;
+  const credential = await resolveCurrentOrganisationModelCredential({
     db: input.scope.database,
     keys: input.env,
     organisationId: input.scope.organisationId,
+    provider: input.provider,
   });
-  if (!credential.ok) {
-    return {
-      ok: false,
-      error: { code: "organisation_anthropic_api_key_unavailable" },
-    };
-  }
+  if (!credential.ok) return unavailable;
   return {
     ok: true,
     value: {
       keySource: "organisation_byo",
-      provider: "anthropic",
-      model: DEFAULT_ORGANISATION_ANTHROPIC_MODEL,
+      provider: input.provider,
+      model: API_KEY_DEFAULT_MODEL[input.provider],
       byoKeyRef: credential.value.handle,
     },
   };
@@ -455,9 +427,14 @@ export async function resolveOrganisationModelRouteForSelection(input: {
     case "codex_subscription":
       return resolveOrganisationSubscriptionModelRoute(input);
     case "organisation_openai_api_key":
-      return resolveOrganisationOpenAiModelRoute(input);
+      return resolveOrganisationApiKeyModelRoute({ ...input, provider: "openai" });
     case "organisation_anthropic_api_key":
-      return resolveOrganisationAnthropicModelRoute(input);
+      return resolveOrganisationApiKeyModelRoute({
+        ...input,
+        provider: "anthropic",
+      });
+    case "organisation_google_api_key":
+      return resolveOrganisationApiKeyModelRoute({ ...input, provider: "google" });
     case "satyr_platform":
       return resolvePantryPlatformModelRoute(input.env);
     default:
@@ -519,6 +496,8 @@ export function activationModelRouteError(
       return "organisation_openai_api_key_required";
     case "organisation_anthropic_api_key_unavailable":
       return "organisation_anthropic_api_key_required";
+    case "organisation_google_api_key_unavailable":
+      return "organisation_google_api_key_required";
     case "organisation_inference_selection_unavailable":
       return "inference_selection_unavailable";
     default:

@@ -99,7 +99,9 @@ export function keysOfInferenceSelection(
       ? "OpenAI API key"
       : kind === "organisation_anthropic_api_key"
         ? "Anthropic API key"
-        : null;
+        : kind === "organisation_google_api_key"
+          ? "Gemini API key"
+          : null;
   return name === null
     ? []
     : [

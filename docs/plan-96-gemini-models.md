@@ -1,8 +1,9 @@
 # Plan 96 — Gemini models in Pantry
 
 Status: accepted with the default decisions on 21 November 2026, when the
-owner asked to implement it. Steps A1 and A2 are on `dev` (see "Steps done").
-Part A is not released. Part B waits for Pi 1.6 (D3).
+owner asked to implement it. Steps A1, A2, B1, B2 and B3 and the journeys of
+B4 are built (see "Steps done"). Nothing is released. The release of B1 still
+waits for D3: not before 27 November 2026, on the newest 1.6 patch.
 
 Owner: the model routes (spec FND-04, "Agent harness and model routes").
 Touches: [Plan 73 — model exit Worker](plan-73-model-exit-worker.md),
@@ -358,13 +359,28 @@ part B.
 | A1   | `selectStoredOrganisationChatModel` in `models/route.ts`: a stored chat on the paid route follows the route's model, and a message that names a model of `PLATFORM_PI_MODELS` runs on the route's model. Journeys J1 and J2 pass, and J1 fails without the change                                                                                                                |
 | A2   | `PLATFORM_DEFAULT_PI_MODEL` is `google/gemini-4-hydrogen`, with the Portal name "Gemini 4 Hydrogen". `PLATFORM_PI_MODELS` is one table of the three models and their names, with one adapter for each. 32 test files take the default from the constant in place of a literal kimi-k3 id. Two digest tests keep the literal kimi-k3 route, because a stored digest must not move |
 
+| B1 | Pi 1.6.0 in the six packages. `chord` exports `Context` and `JsonValue` from subpaths; a parked Code Mode result ends the script as a failure; `PI_DURABLE_BUILD` and the sandbox package pin name 1.6.0, and the sandbox runbook values are current. The 30 Pi and Code Mode journey files pass |
+| B2 | One provider table in `credential-vault/organisation-model-resolution.ts` replaces the copies for OpenAI and Anthropic, and adds Google (`x-goog-api-key`, `generativelanguage.googleapis.com`). One route resolver, one lease branch and one key path serve the three providers. The contract, the selection kind, the Pi route (context window 256,000), the four adapters, the exit host, the three D1 CHECKs with `scripts/plan-96-gemini-key-d1-patch.sql`, and the history signatures with their provider, API and model |
+| B3 | The Portal source list has "Gemini API key" with the billing note, and every source label names it. The two copies of the selection union in Portal and the two selection parsers in `control-api` are one each |
+| B4 | `gemini-key-portal.test.ts` (J3, J4): the menu, a Hydrogen chat, a Carbon chat at high effort with a signed tool call, the refusal of a model that the menu does not offer, and a fork whose first request carries the signature from the history. J4 fails without the history change. No new J5: the inference route's admin check is the same for each provider |
+
+Billing: the Console contract names no Gemini key, so a Gemini key turn settles in
+Pantry unpriced, as every turn does in production. Only the E2E test meter differs.
+Plan 95 step 3 deletes `execution-billing.ts` and this exception.
+
 Checks on 21 November 2026: `check:types`, the E2E type check, every lint, the Platform
 unit suite (1,732 tests) and the full E2E suite (241 files, 465 tests). One journey,
 `counter-receipt-printer.test.ts`, failed once under the load of the full suite and passed
 twice alone; it uses no model route.
 
-Not done for part A: the live Slack journey on Hydrogen (A2), the release (A3) and the
-check of A4. They need the owner's approval for a production change.
+Checks of part B on 21 November 2026: both type checks, the Portal and `control-api`
+type checks, every lint, the changed unit tests, the 30 Pi journey files and 11 journey
+files of the key routes, history and forks, then the Platform unit suite (1,730 tests)
+and the full E2E suite (242 files, 460 tests passed, 6 skipped).
+
+Not done: the live Slack journey on Hydrogen (A2), the releases (A3, B5), the check of A4,
+and the live Gemini check of B4. They need the owner's approval for a production change,
+and B4 needs a Gemini API key from the owner.
 
 ## Decisions
 

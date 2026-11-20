@@ -1106,6 +1106,7 @@ function piThinkingLevel(
       return requested ?? "minimal";
     case "openai":
     case "anthropic":
+    case "google":
       return requested ?? "high";
   }
 }

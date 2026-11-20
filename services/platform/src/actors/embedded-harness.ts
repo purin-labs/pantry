@@ -196,6 +196,12 @@ export type EmbeddedHarnessModelRouteLease =
       resolveModelApiKey(): Promise<string>;
     }
   | {
+      /** The organisation's own Gemini API key (spec FND-04). */
+      readonly kind: "organisation_google_api_key";
+      readonly providerFetch: typeof fetch;
+      resolveModelApiKey(): Promise<string>;
+    }
+  | {
       /**
        * The organisation's ChatGPT subscription. The key is the access token
        * of its sign-in. `api` is the OpenAI API that the sign-in reaches:

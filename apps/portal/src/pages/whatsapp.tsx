@@ -28,6 +28,7 @@ import {
   type WhatsAppRuntimeView,
 } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppProviderHealth } from "@purin-labs/control-api";
+import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 /**
  * The WhatsApp setup: connect a number, assign an agent and publish the ingress
  * policy. Conversations and reply approvals are in the Inbox (Plan 83), so this
@@ -58,12 +59,7 @@ export type WhatsAppPanelActions = {
   readonly resume: (integrationAccountId: string) => Promise<void>;
 };
 
-type WhatsAppInferenceSelection =
-  | { readonly kind: "claude_oauth" }
-  | { readonly kind: "codex_subscription" }
-  | { readonly kind: "satyr_platform" }
-  | { readonly kind: "organisation_openai_api_key" }
-  | { readonly kind: "organisation_anthropic_api_key" };
+type WhatsAppInferenceSelection = OrganisationInferenceSelection;
 
 export type WhatsAppConnectionActionState = ProviderConnectionState;
 
@@ -743,6 +739,8 @@ function inferenceProviderLabel(selection: WhatsAppInferenceSelection): string {
       return "OpenAI (your API key)";
     case "organisation_anthropic_api_key":
       return "Anthropic Claude (your API key)";
+    case "organisation_google_api_key":
+      return "Google Gemini (your API key)";
     case "satyr_platform":
       return "Seams AI";
   }

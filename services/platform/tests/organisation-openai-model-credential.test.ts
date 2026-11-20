@@ -3,10 +3,10 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
 import {
-  parseOpenAiApiKey,
-  resolveCurrentOrganisationOpenAiModelCredential,
-  resolveOrganisationOpenAiModelCredentialForRoute,
-  storeOrganisationOpenAiModelCredential,
+  parseModelApiKey,
+  resolveCurrentOrganisationModelCredential,
+  resolveOrganisationModelCredentialForRoute,
+  storeOrganisationModelCredential,
 } from "../src/credential-vault";
 import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
 import { d1Database } from "./sqlite-d1";
@@ -34,7 +34,8 @@ async function storesAndRotatesKey(): Promise<void> {
   const firstKey = requiredApiKey(
     "sk-project-first-organisation-key-1234567890",
   );
-  const first = await storeOrganisationOpenAiModelCredential({
+  const first = await storeOrganisationModelCredential({
+    provider: "openai",
     db: fixture.db,
     keys: fixture.keys,
     organisationId: fixture.organisationId,
@@ -45,7 +46,8 @@ async function storesAndRotatesKey(): Promise<void> {
   if (!first.ok) return;
 
   await expect(
-    resolveCurrentOrganisationOpenAiModelCredential({
+    resolveCurrentOrganisationModelCredential({
+      provider: "openai",
       db: fixture.db,
       keys: fixture.keys,
       organisationId: fixture.organisationId,
@@ -58,7 +60,8 @@ async function storesAndRotatesKey(): Promise<void> {
   const secondKey = requiredApiKey(
     "sk-project-second-organisation-key-0987654321",
   );
-  const second = await storeOrganisationOpenAiModelCredential({
+  const second = await storeOrganisationModelCredential({
+    provider: "openai",
     db: fixture.db,
     keys: fixture.keys,
     organisationId: fixture.organisationId,
@@ -79,7 +82,8 @@ async function storesAndRotatesKey(): Promise<void> {
   ).toEqual({ revokedAt: 3 });
 
   await expect(
-    resolveOrganisationOpenAiModelCredentialForRoute({
+    resolveOrganisationModelCredentialForRoute({
+      provider: "openai",
       db: fixture.db,
       keys: fixture.keys,
       organisationId: fixture.organisationId,
@@ -90,7 +94,8 @@ async function storesAndRotatesKey(): Promise<void> {
     error: { code: "organisation_openai_credential_scope_mismatch" },
   });
   await expect(
-    resolveOrganisationOpenAiModelCredentialForRoute({
+    resolveOrganisationModelCredentialForRoute({
+      provider: "openai",
       db: fixture.db,
       keys: fixture.keys,
       organisationId: fixture.organisationId,
@@ -112,7 +117,7 @@ async function storesAndRotatesKey(): Promise<void> {
 }
 
 function rejectsMalformedKey(): void {
-  expect(parseOpenAiApiKey("short")).toEqual({
+  expect(parseModelApiKey("openai", "short")).toEqual({
     ok: false,
     error: { code: "organisation_openai_credential_invalid" },
   });
@@ -154,7 +159,7 @@ function createFixture(): {
 }
 
 function requiredApiKey(raw: string) {
-  const parsed = parseOpenAiApiKey(raw);
+  const parsed = parseModelApiKey("openai", raw);
   if (!parsed.ok) throw new Error(parsed.error.code);
   return parsed.value;
 }

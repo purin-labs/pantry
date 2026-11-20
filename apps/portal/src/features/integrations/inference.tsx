@@ -148,10 +148,19 @@ const INFERENCE_SOURCES: readonly InferenceSource[] = [
     detail: "Paste your own key. Anthropic bills you.",
     use: "Use this Anthropic key",
   },
+  {
+    kind: "organisation_google_api_key",
+    label: "Gemini API key",
+    // Google can use the content of free-tier requests to improve its
+    // products, so the key comes from a project that pays.
+    detail:
+      "Paste a key from a Google Cloud project with billing turned on. Google bills you.",
+    use: "Use this Gemini key",
+  },
 ];
 
 type InferenceApiKeyField = Readonly<{
-  name: "openAiApiKey" | "anthropicApiKey";
+  name: "openAiApiKey" | "anthropicApiKey" | "googleApiKey";
   label: string;
   provider: string;
 }>;
@@ -171,6 +180,12 @@ function inferenceApiKeyField(
         name: "anthropicApiKey",
         label: "Anthropic API key",
         provider: "Anthropic",
+      };
+    case "organisation_google_api_key":
+      return {
+        name: "googleApiKey",
+        label: "Gemini API key",
+        provider: "Google",
       };
     case "claude_oauth":
     case "codex_subscription":
@@ -250,7 +265,7 @@ function InferenceSourceChoice(props: {
                 name={apiKey.name}
                 required
                 pattern=".*\S.*"
-                title={`Enter an ${apiKey.label}.`}
+                title={`Enter the ${apiKey.label}.`}
                 autoComplete="off"
                 spellCheck={false}
                 disabled={props.busy}
@@ -355,6 +370,8 @@ function inferenceSelectionSummary(
       return "This workspace runs Pi with its OpenAI API key. OpenAI bills usage to the workspace account.";
     case "organisation_anthropic_api_key":
       return "This workspace runs Pi with its Anthropic API key. Anthropic bills usage to the workspace account.";
+    case "organisation_google_api_key":
+      return "This workspace runs Pi with its Gemini API key. Google bills usage to the workspace account.";
     default:
       return assertNever(selection, "Unexpected settings state");
   }

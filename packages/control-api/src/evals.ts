@@ -210,6 +210,7 @@ export type EvalRoute =
   | "codex_subscription"
   | "organisation_openai_api_key"
   | "organisation_anthropic_api_key"
+  | "organisation_google_api_key"
   | "satyr_platform";
 
 /**
@@ -414,6 +415,7 @@ const EVAL_ROUTES: readonly EvalRoute[] = [
   "codex_subscription",
   "organisation_openai_api_key",
   "organisation_anthropic_api_key",
+  "organisation_google_api_key",
   "satyr_platform",
 ];
 const MAX_RUNS = 100;

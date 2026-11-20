@@ -9,6 +9,7 @@ import type {
 } from "@earendil-works/pi-ai";
 import { openaiProvider } from "@earendil-works/pi-ai/providers/openai";
 import { anthropicProvider } from "@earendil-works/pi-ai/providers/anthropic";
+import { googleProvider } from "@earendil-works/pi-ai/providers/google";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { openaiCodexProvider } from "@earendil-works/pi-ai/providers/openai-codex";
 import { assertNever } from "@purin-labs/std";
@@ -18,6 +19,7 @@ import { runtimeFetch } from "../runtime-fetch";
 import {
   isOrganisationAnthropicModel,
   isOrganisationCodexModel,
+  isOrganisationGoogleModel,
 } from "../models/catalog";
 import type {
   EmbeddedHarnessConstructionInput,
@@ -78,6 +80,11 @@ type OrganisationChatGptSubscriptionLease = Variant<
   "organisation_chatgpt_subscription"
 >;
 
+type OrganisationGoogleLease = Variant<
+  EmbeddedHarnessConstructionInput["modelRouteLease"],
+  "organisation_google_api_key"
+>;
+
 type OrganisationAnthropicLease = Variant<
   EmbeddedHarnessConstructionInput["modelRouteLease"],
   "organisation_anthropic_api_key" | "organisation_claude_oauth"
@@ -105,6 +112,14 @@ export type PiInferenceRoute =
       readonly kind: "anthropic";
       readonly model: Model<"anthropic-messages">;
       readonly provider: Provider<"anthropic-messages">;
+      readonly providerFetch: typeof fetch;
+      resolveModelApiKey(): Promise<string>;
+    }
+  | {
+      /** The Gemini API with the organisation's own key (spec FND-04). */
+      readonly kind: "google";
+      readonly model: Model<"google-generative-ai">;
+      readonly provider: Provider<"google-generative-ai">;
       readonly providerFetch: typeof fetch;
       resolveModelApiKey(): Promise<string>;
     }
@@ -151,6 +166,8 @@ export function resolvePiInferenceRoute(
     case "organisation_claude_oauth":
     case "organisation_anthropic_api_key":
       return resolvePiAnthropicRoute(input, input.modelRouteLease);
+    case "organisation_google_api_key":
+      return resolvePiGoogleRoute(input, input.modelRouteLease);
     case "organisation_chatgpt_subscription":
       return resolvePiChatGptSubscriptionRoute(input, input.modelRouteLease);
     default:
@@ -224,6 +241,44 @@ function resolvePiAnthropicRoute(
       resolveModelApiKey: lease.resolveModelApiKey,
     },
   };
+}
+
+function resolvePiGoogleRoute(
+  input: PiModelRouteInput,
+  lease: OrganisationGoogleLease,
+): Result<PiInferenceRoute, EmbeddedHarnessConstructionError> {
+  if (!isOrganisationGoogleModel(input.model)) {
+    return { ok: false, error: { code: "embedded_harness_model_unsupported" } };
+  }
+  const provider = googleProvider();
+  const model = provider
+    .getModels()
+    .find(googleModelHasId.bind(null, input.model));
+  if (model === undefined) {
+    return { ok: false, error: { code: "embedded_harness_model_unsupported" } };
+  }
+  return {
+    ok: true,
+    value: {
+      kind: "google",
+      // Each Gemini 4 model takes 1,048,576 tokens. Pantry keeps the window
+      // of its other routes, which the model menu shows.
+      model: {
+        ...model,
+        contextWindow: Math.min(model.contextWindow, PI_CONTEXT_WINDOW),
+      },
+      provider,
+      providerFetch: lease.providerFetch,
+      resolveModelApiKey: lease.resolveModelApiKey,
+    },
+  };
+}
+
+function googleModelHasId(
+  id: string,
+  model: Model<"google-generative-ai">,
+): boolean {
+  return model.id === id;
 }
 
 function resolvePiChatGptSubscriptionRoute(
@@ -415,6 +470,7 @@ function streamPiProvider(
           inferenceRoute.model,
         ),
       );
+    // Each provider takes only its own model type, so each API has a case.
     case "openai":
     case "openai-chatgpt":
       return inferenceRoute.provider.streamSimple(
@@ -427,6 +483,16 @@ function streamPiProvider(
         ),
       );
     case "anthropic":
+      return inferenceRoute.provider.streamSimple(
+        inferenceRoute.model,
+        context,
+        reportingStreamOptions(
+          streamOptions,
+          inferenceRoute.providerFetch,
+          inferenceRoute.model,
+        ),
+      );
+    case "google":
       return inferenceRoute.provider.streamSimple(
         inferenceRoute.model,
         context,

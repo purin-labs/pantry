@@ -90,5 +90,7 @@ function mailAssistantRecipient(
       return "openai";
     case "anthropic":
       return "anthropic";
+    case "google":
+      return "google";
   }
 }

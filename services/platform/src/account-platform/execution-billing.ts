@@ -34,6 +34,19 @@ const PREFIX = "account_execution:";
 const PRICE_VERSION = "satyr-completed-turn-test-v1";
 const RETRY_MS = 5_000;
 
+/**
+ * Who pays for a turn. The Console contract lists no Gemini key, so a turn
+ * on one settles in Pantry unpriced and sends no funding to the Console.
+ * Plan 95 step 3 deletes this module.
+ */
+type PantryExecutionFunding =
+  | AccountExecutionFunding
+  | Readonly<{
+      kind: "customer";
+      selection: "organisation_google_api_key";
+      modelRouteDigest: string;
+    }>;
+
 type ExecutionIdentity = Readonly<{
   organisationId: string;
   scope: AccountScope;
@@ -42,7 +55,7 @@ type ExecutionIdentity = Readonly<{
   turnId: string;
   executionId: string;
   admittedAt: number;
-  funding: AccountExecutionFunding;
+  funding: PantryExecutionFunding;
 }>;
 
 type Terminal = StrictUnion<
@@ -265,7 +278,13 @@ function writePantryExecutionAdmissionInTransaction(
     funding: executionFunding(input.modelRoute, input.modelRouteDigest),
   };
   let operation: PantryExecutionBilling;
-  switch (input.binding.feePolicy.kind) {
+  // The Console contract cannot carry the funding of a Gemini key, so its
+  // turn settles in Pantry unpriced, as every turn does in production.
+  const feePolicyKind =
+    accountFunding(identity.funding) === null
+      ? "customer_unpriced"
+      : input.binding.feePolicy.kind;
+  switch (feePolicyKind) {
     case "customer_unpriced":
       operation = {
         kind: "customer_unpriced",
@@ -283,7 +302,7 @@ function writePantryExecutionAdmissionInTransaction(
       };
       break;
     default:
-      return assertNever(input.binding.feePolicy);
+      return assertNever(feePolicyKind);
   }
   const concurrent = readPantryExecutionBilling(sql, input.lease.turn.turnId);
   if (concurrent !== null) {
@@ -723,7 +742,7 @@ function terminalUsageRequest(
           reservationId: hold.reservationId,
           sourceRecordId: terminal.sourceRecordId,
           sourceDigest,
-          funding: identity.funding,
+          funding: paidFunding(identity.funding),
         },
       };
     case "cancelled":
@@ -743,7 +762,7 @@ function terminalUsageRequest(
           reservationId: hold.reservationId,
           sourceRecordId: terminal.sourceRecordId,
           sourceDigest,
-          funding: identity.funding,
+          funding: paidFunding(identity.funding),
         },
       };
     default:
@@ -785,10 +804,25 @@ function deliveredPhase(
   }
 }
 
+/** The funding as the Console contract names it, or null for a Gemini key. */
+function accountFunding(
+  funding: PantryExecutionFunding,
+): AccountExecutionFunding | null {
+  return funding.selection === "organisation_google_api_key" ? null : funding;
+}
+
+/** The funding of a paid turn; admission refuses a Gemini key on it. */
+function paidFunding(funding: PantryExecutionFunding): AccountExecutionFunding {
+  const account = accountFunding(funding);
+  if (account === null)
+    throw new Error("A paid turn was admitted on a Gemini key");
+  return account;
+}
+
 function executionFunding(
   route: ModelRoute,
   modelRouteDigest: string,
-): AccountExecutionFunding {
+): PantryExecutionFunding {
   switch (route.keySource) {
     case "platform":
       return {
@@ -808,6 +842,12 @@ function executionFunding(
           return {
             kind: "customer",
             selection: "organisation_anthropic_api_key",
+            modelRouteDigest,
+          };
+        case "google":
+          return {
+            kind: "customer",
+            selection: "organisation_google_api_key",
             modelRouteDigest,
           };
         default:
@@ -1039,7 +1079,7 @@ function parseIdentity(value: unknown): ExecutionIdentity | null {
     funding,
   };
 }
-function parseFunding(value: unknown): AccountExecutionFunding | null {
+function parseFunding(value: unknown): PantryExecutionFunding | null {
   if (
     !isRecord(value) ||
     !hasExactKeys(value, ["kind", "selection", "modelRouteDigest"]) ||
@@ -1059,6 +1099,7 @@ function parseFunding(value: unknown): AccountExecutionFunding | null {
       switch (value.selection) {
         case "organisation_openai_api_key":
         case "organisation_anthropic_api_key":
+        case "organisation_google_api_key":
         case "claude_oauth":
         case "codex_subscription":
           return {

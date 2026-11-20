@@ -14,7 +14,7 @@ export const modelRouteSchema = Type.Union([
   }),
   StrictObject({
     keySource: Type.Literal("organisation_byo"),
-    provider: Type.Enum(["openai", "anthropic"]),
+    provider: Type.Enum(["openai", "anthropic", "google"]),
     model: Type.String(),
     byoKeyRef: Type.String(),
   }),

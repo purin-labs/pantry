@@ -1,9 +1,7 @@
 import { organisationDatabase as organisationHandle } from "../../src/database-handles";
 import {
-  parseOpenAiApiKey,
-  parseAnthropicApiKey,
-  storeOrganisationOpenAiModelCredential,
-  storeOrganisationAnthropicModelCredential,
+  parseModelApiKey,
+  storeOrganisationModelCredential,
 } from "../../src/credential-vault";
 import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
 import { readOrganisationCodexConnectionAtScope } from "../../src/models/codex-connection";
@@ -2151,22 +2149,24 @@ function isRetiredRecoverySession(entry: ActorRegistryEntry): boolean {
 async function seedRegionalModelCredentials(
   scope: OrganisationExecutionScope,
 ): Promise<void> {
-  const openai = parseOpenAiApiKey(
+  const openai = parseModelApiKey("openai",
     "sk-project-regional-openai-test-1234567890",
   );
-  const anthropic = parseAnthropicApiKey(
+  const anthropic = parseModelApiKey("anthropic",
     "sk-ant-api03-regional-test-1234567890",
   );
   if (!openai.ok || !anthropic.ok) throw new Error("Invalid model key fixture");
   const stored = await Promise.all([
-    storeOrganisationOpenAiModelCredential({
+    storeOrganisationModelCredential({
+      provider: "openai",
       db: scope.database,
       keys: env,
       organisationId: scope.organisationId,
       apiKey: openai.value,
       now: Date.now(),
     }),
-    storeOrganisationAnthropicModelCredential({
+    storeOrganisationModelCredential({
+      provider: "anthropic",
       db: scope.database,
       keys: env,
       organisationId: scope.organisationId,

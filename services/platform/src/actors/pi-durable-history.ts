@@ -113,7 +113,7 @@ function nativeHistoryEntry(
     kind: "assistant_message",
     turn,
     model: message.model,
-    content: materializeAssistantHistoryContent(message.content),
+    content: materializeAssistantHistoryContent(message.content, message),
     stopReason:
       message.stopReason === "toolUse"
         ? "tool_use"

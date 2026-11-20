@@ -331,7 +331,6 @@
     "services/platform/src/credential-vault/backup.ts = services/platform/src/credential-vault/root-rotation.ts": 1,
     "services/platform/src/credential-vault/backup.ts = services/platform/src/credential-vault/service.ts": 1,
     "services/platform/src/credential-vault/backup.ts = services/platform/src/data/control-mutation.ts": 2,
-    "services/platform/src/credential-vault/organisation-model-resolution.ts = services/platform/src/credential-vault/organisation-model-resolution.ts": 3,
     "services/platform/src/credential-vault/service.ts = services/platform/src/credential-vault/service.ts": 1,
     "services/platform/src/credential-vault/surface-installation-resolution.ts = services/platform/src/credential-vault/surface-installation-resolution.ts": 1,
     "services/platform/src/cues/engine.ts = services/platform/src/cues/engine.ts": 3,

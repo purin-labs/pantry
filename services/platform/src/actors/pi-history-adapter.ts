@@ -3,6 +3,7 @@ import type {
   HarnessAssistantContent,
   HarnessHistoryContent,
   HarnessHistoryEntry,
+  HarnessOpaqueContinuation,
   HarnessToolOutput,
 } from "@purin-labs/contracts";
 import { renderHarnessHistoryContent } from "./harness-history";
@@ -64,7 +65,7 @@ function materializeEntry(
         : { role: "user", content, timestamp: entry.acceptedAt };
     }
     case "assistant_message": {
-      const content = materializeAssistantContent(entry.content);
+      const content = materializeAssistantContent(entry.content, model);
       if (content === null) return null;
       return {
         role: "assistant",
@@ -158,15 +159,27 @@ function materializeUserContent(
 
 function materializeAssistantContent(
   content: readonly HarnessAssistantContent[],
+  model: Model<string>,
 ): (TextContent | ThinkingContent | ToolCall)[] | null {
   const result: (TextContent | ThinkingContent | ToolCall)[] = [];
   for (const item of content) {
+    const signature = restoredSignature(item.continuation, model);
     switch (item.kind) {
       case "text":
-        result.push({ type: "text", text: item.text });
+        result.push({
+          type: "text",
+          text: item.text,
+          ...(signature === null ? {} : { textSignature: signature }),
+        });
         break;
       case "thinking":
-        result.push({ type: "thinking", thinking: item.text });
+        result.push({
+          type: "thinking",
+          thinking: item.text,
+          ...(signature === null
+            ? {}
+            : { thinkingSignature: signature, redacted: item.redacted }),
+        });
         break;
       case "tool_call": {
         const args = isPiToolArguments(item.arguments) ? item.arguments : null;
@@ -176,6 +189,7 @@ function materializeAssistantContent(
           id: item.callId,
           name: item.tool,
           arguments: args,
+          ...(signature === null ? {} : { thoughtSignature: signature }),
         });
         break;
       }
@@ -237,13 +251,30 @@ function materializeUsage(
   };
 }
 
+/** The provider, API and model that wrote one assistant message. */
+type SignatureOrigin = Readonly<{
+  provider: string;
+  api: string;
+  model: string;
+}>;
+
+/**
+ * The accepted content of one assistant message. A block keeps the
+ * provider's signature with the provider, API and model that wrote it, so a
+ * new lineage gives it back to that model only (spec FND-04). Gemini 3 and
+ * later refuse a function call of the current turn without its signature.
+ * The value stays in the same history entry, so the labels of the entry
+ * cover it.
+ */
 export function materializeAssistantHistoryContent(
   content: readonly (TextContent | ThinkingContent | ToolCall)[],
+  origin: SignatureOrigin,
 ): HarnessAssistantContent[] {
-  return content.map(materializeAssistantHistoryBlock);
+  return content.map(materializeAssistantHistoryBlock.bind(null, origin));
 }
 
 function materializeAssistantHistoryBlock(
+  origin: SignatureOrigin,
   item: TextContent | ThinkingContent | ToolCall,
 ): HarnessAssistantContent {
   switch (item.type) {
@@ -251,14 +282,14 @@ function materializeAssistantHistoryBlock(
       return {
         kind: "text",
         text: item.text,
-        continuation: { kind: "none" },
+        continuation: signatureContinuation(origin, item.textSignature),
       };
     case "thinking":
       return {
         kind: "thinking",
         text: item.thinking,
         redacted: item.redacted === true,
-        continuation: { kind: "none" },
+        continuation: signatureContinuation(origin, item.thinkingSignature),
       };
     case "toolCall":
       return {
@@ -266,9 +297,48 @@ function materializeAssistantHistoryBlock(
         callId: item.id,
         tool: item.name,
         arguments: item.arguments,
-        continuation: { kind: "none" },
+        continuation: signatureContinuation(origin, item.thoughtSignature),
       };
     default:
       return assertNever(item);
   }
+}
+
+function signatureContinuation(
+  origin: SignatureOrigin,
+  signature: string | undefined,
+): HarnessOpaqueContinuation {
+  return signature === undefined || signature.length === 0
+    ? { kind: "none" }
+    : {
+        kind: "opaque",
+        value: JSON.stringify({
+          provider: origin.provider,
+          api: origin.api,
+          model: origin.model,
+          signature,
+        }),
+      };
+}
+
+/** The signature of a block, only for the provider, API and model that wrote it. */
+function restoredSignature(
+  continuation: HarnessOpaqueContinuation,
+  model: Model<string>,
+): string | null {
+  if (continuation.kind !== "opaque") return null;
+  let stored: unknown;
+  try {
+    stored = JSON.parse(continuation.value);
+  } catch {
+    return null;
+  }
+  return isRecord(stored) &&
+    stored.provider === model.provider &&
+    stored.api === model.api &&
+    stored.model === model.id &&
+    typeof stored.signature === "string" &&
+    stored.signature.length > 0
+    ? stored.signature
+    : null;
 }

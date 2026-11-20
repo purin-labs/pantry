@@ -51,6 +51,8 @@ function inferenceSelectionSuccessMessage(
       return "New agent conversations will use Pi with your OpenAI API key.";
     case "organisation_anthropic_api_key":
       return "New agent conversations will use Pi with your Anthropic API key.";
+    case "organisation_google_api_key":
+      return "New agent conversations will use Pi with your Gemini API key.";
     default:
       return assertNever(selection, "Unexpected settings state");
   }

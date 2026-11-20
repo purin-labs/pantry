@@ -1,7 +1,9 @@
 import type { EmbeddedHarnessAdapter } from "./embedded-harness";
-import type {
-  OrganisationAnthropicModel,
-  OrganisationCodexModel,
+import {
+  ORGANISATION_GOOGLE_MODEL_OPTIONS,
+  type OrganisationAnthropicModel,
+  type OrganisationCodexModel,
+  type OrganisationGoogleModel,
 } from "../models/catalog";
 import { createPiDurableAdapter } from "./pi-durable-runtime";
 import {
@@ -37,6 +39,16 @@ export const PI_ANTHROPIC_EMBEDDED_HARNESS_ADAPTERS: Readonly<
   "claude-sonnet-5-5": createPiDurableAdapter("claude-sonnet-5-5"),
   "claude-sonnet-4-6": createPiDurableAdapter("claude-sonnet-4-6"),
 };
+/** The Gemini key route: one adapter for each model Portal offers. */
+export const PI_GOOGLE_EMBEDDED_HARNESS_ADAPTERS = Object.fromEntries(
+  ORGANISATION_GOOGLE_MODEL_OPTIONS.map(googleAdapterEntry),
+) as Readonly<Record<OrganisationGoogleModel, EmbeddedHarnessAdapter>>;
+
+function googleAdapterEntry(option: {
+  readonly id: OrganisationGoogleModel;
+}): [OrganisationGoogleModel, EmbeddedHarnessAdapter] {
+  return [option.id, createPiDurableAdapter(option.id)];
+}
 /** The ChatGPT subscription route: one adapter for each model Portal offers. */
 export const PI_CHATGPT_SUBSCRIPTION_EMBEDDED_HARNESS_ADAPTERS: Readonly<
   Record<OrganisationCodexModel, EmbeddedHarnessAdapter>

@@ -3,10 +3,10 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
 import {
-  parseAnthropicApiKey,
-  resolveCurrentOrganisationAnthropicModelCredential,
-  resolveOrganisationAnthropicModelCredentialForRoute,
-  storeOrganisationAnthropicModelCredential,
+  parseModelApiKey,
+  resolveCurrentOrganisationModelCredential,
+  resolveOrganisationModelCredentialForRoute,
+  storeOrganisationModelCredential,
 } from "../src/credential-vault";
 import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
 import { d1Database } from "./sqlite-d1";
@@ -17,7 +17,8 @@ describe("organisation Anthropic model credentials", () => {
   it("stores and resolves the current Claude key while fencing the old route", async () => {
     const fixture = createFixture();
     const firstKey = requiredApiKey("sk-ant-api03-first-organisation-key-1234567890");
-    const first = await storeOrganisationAnthropicModelCredential({
+    const first = await storeOrganisationModelCredential({
+      provider: "anthropic",
       db: fixture.db,
       keys: fixture.keys,
       organisationId: fixture.organisationId,
@@ -28,7 +29,8 @@ describe("organisation Anthropic model credentials", () => {
     if (!first.ok) return;
 
     await expect(
-      resolveCurrentOrganisationAnthropicModelCredential({
+      resolveCurrentOrganisationModelCredential({
+        provider: "anthropic",
         db: fixture.db,
         keys: fixture.keys,
         organisationId: fixture.organisationId,
@@ -39,7 +41,8 @@ describe("organisation Anthropic model credentials", () => {
     });
 
     const secondKey = requiredApiKey("sk-ant-api03-second-organisation-key-0987654321");
-    const second = await storeOrganisationAnthropicModelCredential({
+    const second = await storeOrganisationModelCredential({
+      provider: "anthropic",
       db: fixture.db,
       keys: fixture.keys,
       organisationId: fixture.organisationId,
@@ -51,7 +54,8 @@ describe("organisation Anthropic model credentials", () => {
     expect(second.value).not.toBe(first.value);
 
     await expect(
-      resolveOrganisationAnthropicModelCredentialForRoute({
+      resolveOrganisationModelCredentialForRoute({
+        provider: "anthropic",
         db: fixture.db,
         keys: fixture.keys,
         organisationId: fixture.organisationId,
@@ -62,7 +66,8 @@ describe("organisation Anthropic model credentials", () => {
       error: { code: "organisation_anthropic_credential_scope_mismatch" },
     });
     await expect(
-      resolveOrganisationAnthropicModelCredentialForRoute({
+      resolveOrganisationModelCredentialForRoute({
+        provider: "anthropic",
         db: fixture.db,
         keys: fixture.keys,
         organisationId: fixture.organisationId,
@@ -93,11 +98,11 @@ describe("organisation Anthropic model credentials", () => {
   });
 
   it("uses an Anthropic-specific parser and rejects OpenAI-shaped keys", () => {
-    expect(parseAnthropicApiKey("sk-project-openai-key-1234567890")).toEqual({
+    expect(parseModelApiKey("anthropic", "sk-project-openai-key-1234567890")).toEqual({
       ok: false,
       error: { code: "organisation_anthropic_credential_invalid" },
     });
-    expect(parseAnthropicApiKey("sk-ant-api03-valid-key-1234567890").ok).toBe(
+    expect(parseModelApiKey("anthropic", "sk-ant-api03-valid-key-1234567890").ok).toBe(
       true,
     );
   });
@@ -139,7 +144,7 @@ function createFixture(): {
 }
 
 function requiredApiKey(raw: string) {
-  const parsed = parseAnthropicApiKey(raw);
+  const parsed = parseModelApiKey("anthropic", raw);
   if (!parsed.ok) throw new Error(parsed.error.code);
   return parsed.value;
 }
