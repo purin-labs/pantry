@@ -1,4 +1,14 @@
-import { SessionActorBase } from "./session-actor-base";
+import { PlacedActor } from "../lifecycle/placed-actor";
+import { SessionShared } from "./session-shared";
+import {
+  type TrackedTransientSessionExecution,
+  type TransientSessionExecution,
+} from "./support";
+import type { SessionToolWiring } from "./tool-wiring";
+import type { SessionTransientHost } from "./transient-host";
+import { piToolRules } from "../pi-tool-replay";
+
+import { SessionPortalChatCleanup } from "./session-portal-chat-cleanup";
 import {
   SessionCheckpoints,
   type SessionCheckpointsRpc,
@@ -205,9 +215,90 @@ import { SessionTurnRecovery } from "./session-turn-recovery";
  * the agent tools and the parts of the areas.
  */
 export abstract class SessionActor
-  extends SessionActorBase
+  extends PlacedActor<null>
   implements SessionCheckpointsRpc, SessionHarnessTurnsRpc
 {
+  /**
+   * The agent tools and the parts of the product areas. The Worker's class
+   * gives them, so the Session names no area. It is a method, not a field:
+   * the constructor reads it before a field of the last class exists.
+   */
+  protected abstract sessionTools(): SessionToolWiring;
+
+  /**
+   * The state that the modules of the Session share. Each module gets this
+   * one value; no module reads a field of the Actor class.
+   */
+  protected readonly shared = new SessionShared(
+    { ctx: () => this.ctx, env: () => this.env },
+    () => this.sessionTools(),
+  );
+
+  /**
+   * Runs one transient turn and holds it in the set that the cleanup, the
+   * relocation and the release of stopped turns read.
+   */
+  protected async trackTransientTurn<Value>(
+    start: (execution: TransientSessionExecution) => Promise<Value>,
+  ): Promise<Value> {
+    const execution: TransientSessionExecution = {
+      state: { kind: "preparing" },
+    };
+    const work = start(execution);
+    const tracked: TrackedTransientSessionExecution = {
+      execution,
+      settlement: settleActorExecution(work),
+    };
+    this.shared.transientExecutions.add(tracked);
+    try {
+      return await work;
+    } finally {
+      this.shared.transientExecutions.delete(tracked);
+    }
+  }
+
+  /** What a module of a transient turn gets from the Session. */
+  protected transientHost(): SessionTransientHost {
+    return {
+      env: this.env,
+      ctx: this.ctx,
+      persistence: this.shared.persistence,
+      liveGoalRuns: this.shared.liveGoalRuns,
+      toolRules: piToolRules.bind(null, this.sessionTools().registry),
+    };
+  }
+
+  acceptCanonicalHarnessEvent(
+    ...input: Parameters<SessionShared["acceptCanonicalHarnessEvent"]>
+  ) {
+    return this.shared.acceptCanonicalHarnessEvent(...input);
+  }
+
+  appendHarnessHistory(
+    ...input: Parameters<SessionShared["appendHarnessHistory"]>
+  ) {
+    return this.shared.appendHarnessHistory(...input);
+  }
+
+  get sql(): SqlStorage {
+    return this.ctx.storage.sql;
+  }
+
+  get storage(): DurableObjectStorage {
+    return this.ctx.storage;
+  }
+
+  get durableState(): DurableObjectState {
+    return this.ctx;
+  }
+
+  get bindings(): Env {
+    return this.env;
+  }
+
+  /** The cleanup of a Portal chat: its erasure and its wait. */
+  protected readonly chatCleanup = new SessionPortalChatCleanup(this.shared);
+
   /** The checkpoints of the Session: restore, finalization and publication. */
   protected readonly checkpoints = new SessionCheckpoints(this.shared);
 
@@ -352,7 +443,8 @@ export abstract class SessionActor
       this.shared.portalChatCleanup !== null
     )
       return { ok: false, error: { code: "chat_cleanup_conflict" } };
-    this.shared.portalChatCleanup = this.admitPortalChatCleanup(input);
+    this.shared.portalChatCleanup =
+      this.chatCleanup.admitPortalChatCleanup(input);
     try {
       return await this.shared.portalChatCleanup;
     } finally {
@@ -369,9 +461,8 @@ export abstract class SessionActor
     );
     if (!closed.ok) return closed;
     if (this.shared.portalChatQuiescence === null)
-      this.shared.portalChatQuiescence = this.drainPortalChatCleanup(
-        closed.value,
-      );
+      this.shared.portalChatQuiescence =
+        this.chatCleanup.drainPortalChatCleanup(closed.value);
     const result = await this.shared.portalChatQuiescence;
     if (!result.ok) this.shared.portalChatQuiescence = null;
     return result;
