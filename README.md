@@ -210,7 +210,7 @@ export SATYR_ACCOUNT_WORKER_ARTIFACT=/path/to/seams-monorepo/.artifacts/shared-a
 
 The Worker contains fixture controls and test keys. Use it only for acceptance tests.
 Pantry production imports no seams-monorepo source.
-CI checks out an exact commit from the public `seams-tech/seams-monorepo` repository.
+CI checks out an exact commit from the public `purin-labs/monorepo` repository.
 It installs the locked dependencies and builds the same acceptance Worker in that separate checkout.
 Native journeys receive only the built Worker path and record its SHA-256 digest.
 The workflow needs no additional access token or repository variables.
