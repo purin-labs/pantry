@@ -4,13 +4,32 @@ import { Check, ChevronDown, LayoutGrid, Search } from "lucide-react";
 import { Link } from "react-router";
 import { ConsoleSidebarTooltip } from "./console-sidebar";
 import { organisationPath, workspacePagePath } from "./route";
-import type {
-  OrganisationChoice,
-  OrganisationShellContext,
-  WorkspaceChoice,
-  WorkspaceShellContext,
-} from "./shell";
 import "./workspace-switcher.css";
+
+export type OrganisationChoice = {
+  readonly organisationHandle: string;
+  readonly name: string;
+  readonly workspaces: readonly WorkspaceChoice[];
+};
+
+export type WorkspaceChoice = {
+  readonly organisationHandle: string;
+  readonly workspaceHandle: string;
+  readonly name: string;
+};
+
+export type OrganisationShellContext = {
+  readonly organisationHandle: string;
+  readonly name: string;
+  readonly choices: readonly OrganisationChoice[];
+};
+
+export type WorkspaceShellContext = {
+  readonly organisationHandle: string;
+  readonly workspaceHandle: string;
+  readonly name: string;
+  readonly choices: readonly WorkspaceChoice[];
+};
 
 type SwitcherProps = {
   readonly organisation: OrganisationShellContext;

@@ -114,6 +114,7 @@ import {
   utcDayKey,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
+import { createConnectorEvalSchema } from "../src/actors/connector-eval";
 import { processEmailThreadTurn } from "../src/actors/email-case-processing";
 import { claimMailResponseOwner } from "../src/mail-inbox/response-store";
 import { platformEnv } from "./worker-fakes";
@@ -180,7 +181,7 @@ function setup(turnOutcome: unknown): {
   vi.clearAllMocks();
   const fixture = emptySqliteFixture();
   const sql = sqlStorage(fixture.storage);
-  createConnectorEmailSchema(sql);
+  createConnectorEmailSchema(sql, createConnectorEvalSchema);
   createActorExecutionBarrierSchema(sql);
   for (const messageId of ["m1", "m2"]) {
     claimMailResponseOwner(sql, null, {

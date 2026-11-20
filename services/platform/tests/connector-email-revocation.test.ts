@@ -19,6 +19,7 @@ import {
   type EmailDraftState,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
+import { createConnectorEvalSchema } from "../src/actors/connector-eval";
 import { dispatchEmailReply } from "../src/actors/connector-email-proposal";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { platformEnv } from "./worker-fakes";
@@ -120,7 +121,7 @@ async function fenceTest(): Promise<void> {
 function setup(): ReturnType<typeof sqlStorage> {
   const fixture = emptySqliteFixture();
   const sql = sqlStorage(fixture.storage);
-  createConnectorEmailSchema(sql);
+  createConnectorEmailSchema(sql, createConnectorEvalSchema);
   return sql;
 }
 

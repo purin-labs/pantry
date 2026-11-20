@@ -3,11 +3,14 @@ import type {
   AgentOperationInput,
   AgentOperationsSnapshot,
 } from "../data/agent-operations";
-import type {
-  OperatorConfigurationDraft,
-  DeviceDraftCommand,
-  OperatorDraftCommand,
+import {
+  previewCode,
+  type OperatorConfigurationDraft,
+  type DeviceDraftCommand,
+  type OperatorDraftCommand,
 } from "../data/operator-configuration-draft";
+
+export { previewCode };
 import type { OfferPriceAllowanceCommand } from "../commerce/contract/offer-price-allowance";
 import { presentJevDraftCommand } from "../integrations/contract/jev-draft";
 import type { Variant } from "@purin-labs/type-utils";
@@ -383,17 +386,6 @@ export function renderConfigurationSummary(
     input.portalUrl,
   ];
   return { kind: "summary", text: lines.join("\n") };
-}
-
-/**
- * A short code identifying the exact change a preview showed.
- *
- * The operator repeats it when accepting, which is what ties their reply to
- * the change they read. Without it a reply to an older preview would accept
- * whatever change happens to be pending when it arrives.
- */
-export function previewCode(commandDigest: string): string {
-  return commandDigest.slice(0, 6).toUpperCase();
 }
 
 /** What a change would do, and the exact words that accept it. */

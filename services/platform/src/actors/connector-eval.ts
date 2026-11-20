@@ -11,6 +11,7 @@ import {
   type EvalRunProgress,
   type EvalRunResult,
   type EvalTaskKey,
+  type EvalTaskOutcome,
   type EvalTaskResult,
 } from "@purin-labs/control-api";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
@@ -65,6 +66,21 @@ export type SettledEvalTask = Readonly<{
   result: Omit<EvalTaskResult, keyof EvalTaskKey>;
   flowLabel: unknown;
 }>;
+
+/**
+ * How one claim of a task ended. `settled` is recorded already. `deferred`
+ * leaves the task claimed for another try, and names what it ends with if no
+ * tries are left.
+ */
+export type EvalTaskEnd =
+  | Readonly<{ kind: "settled"; outcome: EvalTaskOutcome }>
+  | Readonly<{
+      kind: "deferred";
+      retryAt: number;
+      exhausted: EvalTaskOutcome;
+    }>
+  /** The Connector stopped being the active instance. Nothing was changed. */
+  | Readonly<{ kind: "inactive" }>;
 
 type EvalRunAdmission =
   | Readonly<{ kind: "admitted"; run: ConnectorEvalRun }>

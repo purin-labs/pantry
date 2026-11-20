@@ -53,8 +53,8 @@ import {
   composeTriggerInstruction,
   inventoryCasePurpose,
   pinnedAgentForAutomation,
-  readOrganisationEnvironment,
 } from "./support";
+import { requireOrganisationEnvironment } from "../integrations/contract/admin-integration";
 
 export const CUE_DELIVERY_LEASE_MS = 30_000;
 
@@ -418,7 +418,7 @@ async function resolveSavedSelectorCueMembership(
     if (!commerceAuthority.ok) {
       return savedSelectorResolverFailure();
     }
-    const environment = await readOrganisationEnvironment(
+    const environment = await requireOrganisationEnvironment(
       scope.database,
       input.organisationId,
     );

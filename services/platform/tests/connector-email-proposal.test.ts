@@ -35,6 +35,7 @@ import {
   recordEmailDraftOperation,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
+import { createConnectorEvalSchema } from "../src/actors/connector-eval";
 import {
   dispatchEmailReply,
   disposeEmailProposal,
@@ -422,7 +423,7 @@ async function setup(state: GmailWorld): Promise<{
   });
   const fixture = emptySqliteFixture();
   const sql = sqlStorage(fixture.storage);
-  createConnectorEmailSchema(sql);
+  createConnectorEmailSchema(sql, createConnectorEvalSchema);
   activateEmailRuntime(sql, {
     organisationId: ORGANISATION,
     integrationAccountId: ACCOUNT,

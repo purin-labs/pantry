@@ -6,8 +6,15 @@ import {
   type LifecycleFence,
 } from "./organisation-lifecycle-moves";
 import { releaseSlackInstallationCredentials } from "../credential-vault/slack-installation-credential";
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
+import type {
+  OrganisationExecutionScope,
+  OrganisationPlacementBindings,
+} from "../organisation-execution-scope";
 import {
   newRequestId,
   parseProviderConnectionAttemptId,
@@ -28,16 +35,8 @@ import {
 import { actorStub } from "../actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
-import { purgeOrganisationWhatsAppConnectors } from "./whatsapp";
 import type { Env, SessionActorStub } from "../env";
-import { removeVoiceMacNames } from "../voice/dns";
-import {
-  listVoiceMacNameIds,
-  prepareArchivedOrganisationVoiceMacsRevocation,
-} from "../voice/store";
-import { purgeOrganisationDeviceFleets } from "../devices/purge";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
-import { revokeOrganisationDevicesStatements } from "../devices/store";
 import { parseOrganisationPlacement } from "../placement";
 import type { Result } from "../result";
 import { traceWarn } from "../observability";
@@ -63,10 +62,6 @@ import {
   prepareArchivedOrganisationCredentialRefsRevocation,
   prepareArchivedOrganisationSecretsRevocation,
 } from "../credential-vault/secret-revocation";
-import {
-  listSlackInstallationCredentialHandles,
-  revokeSlackOrganisationConnections,
-} from "../slack/organisation-routing";
 import {
   prepareProjectionRevisionBump,
   prepareRepairConfigurationBump,
@@ -974,8 +969,59 @@ async function reconcileSetupSnapshots(
   return Math.max(result.meta.changes ?? 0, 1);
 }
 
+/**
+ * The steps of the other areas and the surfaces in the archive cleanup and
+ * the purge of an Organisation: the voice Mac names, the Slack connections of
+ * the directory, the devices and the WhatsApp Connectors. The Worker gives
+ * them, so this module names none of those owners (Refactor 17).
+ */
+export type ArchiveCleanupParts = Readonly<{
+  /** Removes the DNS names of the voice Macs. False when a name stays. */
+  removeVoiceMacNames: (
+    env: Env,
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+  ) => Promise<boolean>;
+  revokeSlackConnections: (
+    directory: GlobalDatabase,
+    input: Readonly<{ organisationId: OrganisationId; now: number }>,
+  ) => Promise<number>;
+  listSlackCredentialHandles: (
+    directory: GlobalDatabase,
+    organisationId: OrganisationId,
+  ) => Promise<readonly string[]>;
+  prepareVoiceMacsRevocation: (
+    db: Pick<OrganisationDatabase, "prepare">,
+    input: Readonly<{
+      now: number;
+      organisationId: string;
+      guard: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+    }>,
+  ) => D1PreparedStatement;
+  revokeDevicesStatements: (
+    session: OrganisationDatabaseSession,
+    organisationId: OrganisationId,
+    now: number,
+  ) => readonly D1PreparedStatement[];
+  purgeDeviceFleets: (
+    env: Env,
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+    placement: OrganisationExecutionScope["placement"],
+  ) => Promise<void>;
+  purgeWhatsAppConnectors: (
+    input: Readonly<{
+      db: OrganisationDatabase;
+      namespace: Env["CONNECTOR"];
+      organisationId: OrganisationId;
+      now: number;
+    }>,
+  ) => Promise<number>;
+}>;
+
 export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
   readonly env: Env;
+  readonly parts: ArchiveCleanupParts;
   readonly db: OrganisationDatabase;
   // The global directory, which holds the Slack connection records and the
   // relocation and restore journals.
@@ -1016,6 +1062,7 @@ export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
     throw new Error("organisation_archive_cleanup_conflict");
   return reconcileArchivedOrganisation(
     input.env,
+    input.parts,
     input.db,
     input.directory,
     input.archive,
@@ -1028,6 +1075,7 @@ export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
 
 async function reconcileArchivedOrganisation(
   env: Env,
+  parts: ArchiveCleanupParts,
   db: OrganisationDatabase,
   directory: GlobalDatabase,
   archive: R2Bucket,
@@ -1090,18 +1138,15 @@ async function reconcileArchivedOrganisation(
       return 0;
     }
     // A failed removal here does not hold the revocations. The purge repeats it.
-    await removeVoiceMacNames(
-      env,
-      await listVoiceMacNameIds(db, organisation.organisationId),
-    );
+    await parts.removeVoiceMacNames(env, db, organisation.organisationId);
     // The directory records go first. A repeat after a failed regional batch
     // finds them revoked already.
-    let repaired = await revokeSlackOrganisationConnections(directory, {
+    let repaired = await parts.revokeSlackConnections(directory, {
       organisationId: organisation.organisationId,
       now,
     });
     const sharedCredentials = JSON.stringify(
-      await listSlackInstallationCredentialHandles(
+      await parts.listSlackCredentialHandles(
         directory,
         organisation.organisationId,
       ),
@@ -1137,12 +1182,12 @@ async function reconcileArchivedOrganisation(
         organisationId: organisation.organisationId,
         guard: stillArchived,
       }),
-      prepareArchivedOrganisationVoiceMacsRevocation(session, {
+      parts.prepareVoiceMacsRevocation(session, {
         now,
         organisationId: organisation.organisationId,
         guard: stillArchived,
       }),
-      ...revokeOrganisationDevicesStatements(
+      ...parts.revokeDevicesStatements(
         session,
         organisation.organisationId,
         now,
@@ -1175,11 +1220,7 @@ async function reconcileArchivedOrganisation(
         throw new Error("organisation_purge_lifecycle_conflict");
     }
     // The purge deletes the only rows that name these records.
-    const voiceNames = await listVoiceMacNameIds(
-      db,
-      organisation.organisationId,
-    );
-    if (!(await removeVoiceMacNames(env, voiceNames)))
+    if (!(await parts.removeVoiceMacNames(env, db, organisation.organisationId)))
       throw new Error("voice_mac_names_not_removed");
     const harnessErasure = await reconcileOrganisationHarnessErasure({
       db,
@@ -1202,13 +1243,13 @@ async function reconcileArchivedOrganisation(
     // customer text and proposal bodies. They are purged before the D1 rows
     // that name them are deleted, so erasure cannot lose track of an actor it
     // still needs to empty.
-    await purgeOrganisationDeviceFleets(
+    await parts.purgeDeviceFleets(
       env,
       db,
       organisation.organisationId,
       request.placement.placement,
     );
-    const connectorsPurged = await purgeOrganisationWhatsAppConnectors({
+    const connectorsPurged = await parts.purgeWhatsAppConnectors({
       db,
       namespace: connectorNamespace,
       organisationId: organisation.organisationId,

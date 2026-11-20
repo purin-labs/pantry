@@ -1,5 +1,12 @@
 import { isRecord } from "@purin-labs/std";
-import type { PendingCommerceApproval } from "./portal-types";
+
+/** An approval that waits for the person's step-up sign-in. */
+type PendingCommerceApproval = {
+  readonly organisationId: string;
+  readonly actionNonce: string;
+  readonly returnPath: string;
+  readonly createdAt: number;
+};
 
 const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "satyr:commerce-approval";
 

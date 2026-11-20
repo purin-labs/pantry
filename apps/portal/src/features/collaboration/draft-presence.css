@@ -1,0 +1,142 @@
+/* The marks of the other people in a shared draft: carets, selections,
+   mouse pointers and the participant list. */
+
+.description-draft-presence-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.description-draft-presence-mirror {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  visibility: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  pointer-events: none;
+}
+
+.description-draft-presence-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.description-draft-presence-selection {
+  position: absolute;
+  display: block;
+  border-radius: 2px;
+  background: var(--presence-tint);
+}
+
+.description-draft-presence-caret {
+  position: absolute;
+  display: block;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--presence-color);
+}
+
+.description-draft-presence-label {
+  position: absolute;
+  bottom: 100%;
+  left: -2px;
+  display: block;
+  max-width: 18ch;
+  padding: 3px 6px;
+  border-radius: 5px 5px 5px 1px;
+  background: var(--presence-color);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.description-draft-presence-caret.is-below .description-draft-presence-label {
+  top: 100%;
+  bottom: auto;
+  border-radius: 1px 5px 5px 5px;
+}
+
+.description-draft-presence-caret.is-idle .description-draft-presence-label {
+  opacity: 0;
+}
+
+.description-draft-participants {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.description-draft-participant {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.description-draft-participant-dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: var(--presence-color);
+}
+
+.description-draft-participant-state {
+  color: var(--ink-3);
+  font-size: 11px;
+}
+.description-draft-mouse-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.description-draft-mouse-pointer {
+  position: absolute;
+  color: var(--presence-color);
+  width: 20px;
+  height: 20px;
+}
+
+.description-draft-mouse-name {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  max-width: 140px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--presence-color);
+  color: white;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description-draft-mouse-pointer.label-left .description-draft-mouse-name {
+  left: auto;
+  right: 4px;
+}
+
+.description-draft-mouse-pointer.label-above .description-draft-mouse-name {
+  top: auto;
+  bottom: 4px;
+}

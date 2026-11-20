@@ -36,28 +36,21 @@ import {
   readWhatsAppSupportBinding,
   publishWhatsAppIngressPolicy,
   revokeWhatsAppConnection,
-  whatsappConnectorIdValue,
   type WhatsAppIngressPolicy,
   type WhatsAppPhoneNumber,
 } from "../data/whatsapp";
-import type { Env, ConnectorActorStub } from "../env";
+import type { Env } from "../env";
 import { permissionRequiredResponse } from "../control/permission-required";
 import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
+import { whatsappConnector } from "../mail-inbox/agent-mailbox-connector";
 import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,
 } from "./read-authorization";
-import {
-  parseConnectorId,
-  parseIntegrationAccountId,
-  type IntegrationAccountId,
-  type OrganisationId,
-} from "../ids";
-import { resolveActiveConnectorActor } from "../actors/actor-router";
+import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
 import { resolveWhatsAppApplicationConfiguration } from "./application";
 import { resolveWhatsAppOrganisationCredential } from "./credential";
 import { unsubscribeWhatsAppApp } from "./graph";
-import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
 
@@ -122,42 +115,6 @@ export function isWhatsAppCaseAction(
     raw === "human-reply" ||
     raw === "close"
   );
-}
-
-type WhatsAppConnectorHandle = {
-  readonly stub: ConnectorActorStub;
-  readonly identity: {
-    readonly organisationId: OrganisationId;
-    readonly connectorId: string;
-  };
-};
-
-export async function whatsappConnector(
-  env: Env,
-  organisationId: OrganisationId,
-  integrationAccountId: IntegrationAccountId,
-): Promise<Result<WhatsAppConnectorHandle, { readonly code: string }>> {
-  const connectorId = parseConnectorId(
-    whatsappConnectorIdValue(integrationAccountId),
-  );
-  if (!connectorId.ok)
-    return { ok: false, error: { code: "whatsapp_connector_invalid" } };
-  const connector = await resolveActiveConnectorActor({
-    env: env,
-    namespace: env.CONNECTOR,
-    organisationId,
-    connectorId: connectorId.value,
-    now: Date.now(),
-  });
-  return connector.ok
-    ? {
-        ok: true,
-        value: {
-          stub: connector.value,
-          identity: { organisationId, connectorId: connectorId.value },
-        },
-      }
-    : { ok: false, error: { code: connector.error.code } };
 }
 
 function whatsappLimitsFromPolicy(
