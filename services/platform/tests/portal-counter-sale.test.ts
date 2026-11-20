@@ -132,7 +132,14 @@ describe("Portal counter-sale boundary", function counterSaleBoundarySuite() {
       });
       // A re-presented sale whose quote moved is a different attempt.
       expect(intent).toBe(`counter-collect:${CHECKOUT}:${DIGEST}`);
-      return { ok: true, collection: { outcome: "ready" } };
+      return {
+        ok: true,
+        collection: {
+          outcome: "ready",
+          paymentAttemptId: "payment_attempt_1",
+          session: null,
+        },
+      };
     };
     await collectCounterSale(
       ORGANISATION,
