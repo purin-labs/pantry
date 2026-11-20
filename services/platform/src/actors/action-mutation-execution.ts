@@ -62,12 +62,19 @@ export type ActionMutationExecution = CapturedActionPlacement &
       }>
   );
 
+export type SlackLinkedMember = Readonly<{
+  userId: UserId;
+  personId: string;
+  role: "owner" | "admin" | "operator" | "viewer";
+}>;
+
 /**
- * Whether a Slack user is, right now, an owner or admin of the Organisation
- * through a verified link to their Pantry user, in the Slack workspace of an
- * active Slack account. Null when not; otherwise the person and role.
+ * The member behind a Slack user, right now: a verified link to their Pantry
+ * user in the Slack workspace of an active Slack account, and an active
+ * membership. Null when there is none. Each caller checks the role that its
+ * action needs.
  */
-export async function resolveSlackApprover(
+export async function resolveSlackLinkedMember(
   db: OrganisationDatabase,
   input: Readonly<{
     organisationId: string;
@@ -75,11 +82,7 @@ export async function resolveSlackApprover(
     workspaceId: string;
     slackUserId: string;
   }>,
-): Promise<Readonly<{
-  userId: UserId;
-  personId: string;
-  role: "owner" | "admin";
-}> | null> {
+): Promise<SlackLinkedMember | null> {
   const row = await db
     .prepare(
       `SELECT identity_link.user_id AS userId, membership.person_id AS personId,
@@ -109,12 +112,36 @@ export async function resolveSlackApprover(
   if (
     row === null ||
     typeof row.personId !== "string" ||
-    typeof row.userId !== "string"
+    typeof row.userId !== "string" ||
+    (row.role !== "owner" &&
+      row.role !== "admin" &&
+      row.role !== "operator" &&
+      row.role !== "viewer")
   )
     return null;
   const userId = parseUserId(row.userId);
-  if (!userId.ok || (row.role !== "owner" && row.role !== "admin")) return null;
-  return { userId: userId.value, personId: row.personId, role: row.role };
+  return userId.ok
+    ? { userId: userId.value, personId: row.personId, role: row.role }
+    : null;
+}
+
+/**
+ * Whether a Slack user is, right now, an owner or admin of the Organisation
+ * through a verified link to their Pantry user. Null when not; otherwise the
+ * person and role.
+ */
+export async function resolveSlackApprover(
+  db: OrganisationDatabase,
+  input: Parameters<typeof resolveSlackLinkedMember>[1],
+): Promise<Readonly<{
+  userId: UserId;
+  personId: string;
+  role: "owner" | "admin";
+}> | null> {
+  const member = await resolveSlackLinkedMember(db, input);
+  return member === null || (member.role !== "owner" && member.role !== "admin")
+    ? null
+    : { userId: member.userId, personId: member.personId, role: member.role };
 }
 
 export function sessionActionMutationExecution(

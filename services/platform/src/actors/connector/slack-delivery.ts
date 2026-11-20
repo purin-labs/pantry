@@ -53,6 +53,12 @@ import {
   devicesPortalUrl,
   isDeviceAlertDelivery,
 } from "../../slack/device-alert-card";
+import {
+  BAKE_PROPOSAL_CARD,
+  bakeProposalCardBlocks,
+  bakeProposalOfNotice,
+  bakesPortalUrl,
+} from "../../slack/bake-proposal-card";
 import { slackMayApproveAction } from "../../commerce/action-model";
 import { resolveActiveSlackDestinationConnection } from "../../slack/organisation-routing";
 import { requireActiveOrganisationActor } from "../actor-router";
@@ -264,6 +270,13 @@ export async function deliverSlackOutput(
       input.delivery.content.text,
     )) ??
     (await deviceAlertDeliveryBlocks(
+      env,
+      scope,
+      organisationId.value,
+      input.delivery.deliveryId,
+      input.delivery.content.text,
+    )) ??
+    (await bakeProposalDeliveryBlocks(
       env,
       scope,
       organisationId.value,
@@ -531,6 +544,32 @@ async function deviceAlertDeliveryBlocks(
   }
 }
 
+/** A bake proposal's card: buttons on its notice, none on its updates. */
+async function bakeProposalDeliveryBlocks(
+  env: Env,
+  scope: OrganisationExecutionScope,
+  organisationId: OrganisationId,
+  deliveryId: string,
+  text: string,
+): Promise<readonly Record<string, unknown>[] | null> {
+  if (!BAKE_PROPOSAL_CARD.isCard(deliveryId)) return null;
+  let portalUrl: string | null = null;
+  try {
+    const read = await readOrganisationDefaultWorkspacePortalAddress({
+      db: scope.database,
+      organisationId,
+    });
+    if (read.ok) portalUrl = bakesPortalUrl(env, read.value);
+  } catch {
+    // The card keeps its text, which says who decides.
+  }
+  return bakeProposalCardBlocks(
+    text,
+    bakeProposalOfNotice(deliveryId),
+    portalUrl,
+  );
+}
+
 /** The message of the notice that this delivery updates, if any. */
 function cardMessageTs(sql: SqlStorage, deliveryId: string): string | null {
   const nonce = commerceOutcomeNonce(deliveryId);
@@ -541,7 +580,8 @@ function cardMessageTs(sql: SqlStorage, deliveryId: string): string | null {
       : requestId !== null
         ? permissionNoticeDeliveryId(requestId)
         : (heldNoticeOfDecision(deliveryId) ??
-          deviceAlertNoticeOfUpdate(deliveryId));
+          deviceAlertNoticeOfUpdate(deliveryId) ??
+          BAKE_PROPOSAL_CARD.noticeOfUpdate(deliveryId));
   if (noticeDeliveryId === null) return null;
   const row = sql
     .exec<{ state_json: string }>(

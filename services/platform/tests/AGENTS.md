@@ -220,6 +220,18 @@ test and any fixture that exists only for the obsolete behavior.
   `shop-gateway-adapters.ts` runs the real `shop-gateway answer`, whose
   simulated printer writes the artifact in `output/e2e/shop-gateway/`. It
   needs the account Worker and `cargo`.
+- `e2e/bake-proposal.test.ts` follows the bake proposals of Plan 24 S1. The
+  café sells financiers through its QR order path, from the declared morning
+  in `scripts/plan-24/counter-day.json`, and Commerce restocks the counter.
+  The first fall below the level opens one proposal on a Case with one Slack
+  card whose thread resolves to that Case; the sales after it open none. A
+  viewer's Slack Reject is refused, the Portal refuses an approval with no
+  oven, and a rejection keeps its reason in the Portal and in Slack. A fall
+  while a proposal is open waits until that one ends, and one Slack Approve
+  decides; a second click changes nothing. A second journey has the Portal
+  chat agent propose a bake and a stock level for a person, with no tool that
+  approves, and a viewer stays refused. The artifacts are in
+  `output/plan-24/`. It needs the account Worker.
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E

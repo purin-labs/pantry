@@ -94,6 +94,7 @@ import {
   type ReadExactCommerceProjectionReferenceInput,
   type ValidateCommerceSystemInput,
 } from "../commerce-projection";
+import type { InventoryStockChange } from "../commerce-projection/stock-changes";
 import {
   parseCommerceEntityRelationRow,
   parseCommerceRelationshipRelationRow,
@@ -859,14 +860,32 @@ export abstract class OrganisationCommerce extends OrganisationPolicy {
     }
     if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
       return organisationPlacementConflict();
-    return this.ctx.storage.transactionSync(
+    const stockChanges: InventoryStockChange[] = [];
+    const applied = this.ctx.storage.transactionSync(
       applyCommerceDelivery.bind(
         null,
         this.ctx.storage.sql,
         input,
         input.commerceSystem,
+        stockChanges,
       ),
     );
+    if (applied.ok && stockChanges.length > 0)
+      await this.afterCommerceStockChanges(scope, stockChanges);
+    return applied;
+  }
+
+  /**
+   * A port for the areas that follow the counter stock (Plan 24 S1: the bake
+   * stock levels). It runs after a delivery changed the available stock of a
+   * position, and it never fails the delivery. Commerce gives no
+   * implementation; the Organisation Actor gives one.
+   */
+  protected afterCommerceStockChanges(
+    _scope: OrganisationExecutionScope,
+    _changes: readonly InventoryStockChange[],
+  ): Promise<void> {
+    return Promise.resolve();
   }
 
   async readRecoverableCommerceCues(input: {

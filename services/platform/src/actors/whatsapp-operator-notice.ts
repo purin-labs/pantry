@@ -6,7 +6,7 @@ import type { SqlStorage } from "@cloudflare/workers-types";
 
 import { resolveActiveSlackOrganisationCredential } from "../credential-vault";
 import type { Env } from "../env";
-import { parseChannelId, parseWorkspaceId } from "../ids";
+import { readOperationsDestination } from "../data/operations-destination";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "../slack/organisation-routing";
@@ -35,11 +35,6 @@ type WhatsAppNoticeOutcome =
 
 type WhatsAppNoticeError = { readonly code: string };
 
-type CommunicationDestination = {
-  readonly workspaceId: string;
-  readonly channelId: string;
-};
-
 export async function deliverWhatsAppOperatorNotice(
   input: Readonly<{
     env: Env;
@@ -63,31 +58,45 @@ export async function deliverWhatsAppOperatorNotice(
       value: { kind: "suppressed", reason: "already_notified" },
     };
   }
-  const destination = await readCommunicationDestination(input.scope);
-  if (destination === null) {
+  const destination = await readOperationsDestination(
+    input.scope.database,
+    input.scope.organisationId,
+  );
+  if (
+    !destination.ok &&
+    destination.error === "operations_destination_missing"
+  ) {
     return {
       ok: true,
       value: { kind: "undeliverable", reason: "destination_unselected" },
     };
   }
-  const workspaceId = parseWorkspaceId(destination.workspaceId);
-  const channelId = parseChannelId(destination.channelId);
+  if (
+    !destination.ok &&
+    destination.error === "operations_destination_unavailable"
+  )
+    return {
+      ok: false,
+      error: { code: "whatsapp_notice_destination_unavailable" },
+    };
   const installationIdentity = resolveConfiguredSlackInstallationIdentity({
     deploymentProfile: input.env.PANTRY_DEPLOYMENT_PROFILE,
     appId: input.env.SLACK_APP_ID,
   });
-  if (!workspaceId.ok || !channelId.ok || !installationIdentity.ok) {
+  if (!destination.ok || !installationIdentity.ok) {
     return {
       ok: true,
       value: { kind: "undeliverable", reason: "destination_invalid" },
     };
   }
+  const workspaceId = destination.value.workspaceId;
+  const channelId = destination.value.channelId;
   const connection = await resolveActiveSlackDestinationConnection(input.env, {
     environment: installationIdentity.value.environment,
     appId: installationIdentity.value.appId,
     organisationId: input.scope.organisationId,
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
+    workspaceId,
+    channelId,
   });
   if (!connection.ok) {
     return {
@@ -104,7 +113,7 @@ export async function deliverWhatsAppOperatorNotice(
     installationIdentity: installationIdentity.value,
     organisationId: input.scope.organisationId,
     integrationAccountId: connection.value.integrationAccountId,
-    workspaceId: workspaceId.value,
+    workspaceId,
   });
   if (!token.ok || token.value.kind !== "bearer") {
     return {
@@ -120,7 +129,7 @@ export async function deliverWhatsAppOperatorNotice(
   }
   const posted = await postSlackNotice({
     token: token.value.value,
-    channelId: destination.channelId,
+    channelId,
     text: renderOperatorNotice(input.displayPhoneNumber, notice.reason),
     fetcher: input.fetcher,
   });
@@ -133,7 +142,7 @@ export async function deliverWhatsAppOperatorNotice(
   markWhatsAppNoticeDelivered(input.sql, input.noticeKey, input.now);
   return {
     ok: true,
-    value: { kind: "delivered", channelId: destination.channelId },
+    value: { kind: "delivered", channelId },
   };
 }
 
@@ -164,23 +173,6 @@ export function renderOperatorNotice(
     case "send_indeterminate":
       return `${head} WhatsApp did not confirm whether an approved reply was delivered. Seams Pantry will not retry it: check WhatsApp and record what you find. ${tail}`;
   }
-}
-
-async function readCommunicationDestination(
-  scope: OrganisationExecutionScope,
-): Promise<CommunicationDestination | null> {
-  const row = await scope.database
-    .prepare(
-      `SELECT workspace_id AS workspaceId, channel_id AS channelId
-       FROM organisation_communication_destination WHERE organisation_id = ?`,
-    )
-    .bind(scope.organisationId)
-    .first<{ readonly workspaceId: unknown; readonly channelId: unknown }>();
-  return row !== null &&
-    typeof row.workspaceId === "string" &&
-    typeof row.channelId === "string"
-    ? { workspaceId: row.workspaceId, channelId: row.channelId }
-    : null;
 }
 
 async function postSlackNotice(

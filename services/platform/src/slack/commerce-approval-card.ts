@@ -1,3 +1,4 @@
+import { workspacePortalUrl } from "./portal-links";
 /**
  * The one Slack card of a commerce change that waits for approval (Plan 56).
  *
@@ -23,7 +24,6 @@ import {
   type MenuPriceSide,
 } from "../commerce/menu-price-action";
 import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
 import { assertNever } from "@purin-labs/std";
 
 const CARD_PARTS = "\n\n";
@@ -40,9 +40,11 @@ export function commerceActionPortalUrl(
   address: Readonly<{ organisationHandle: string; workspaceHandle: string }>,
   nonce: string,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/operations?commerceAction=${encodeURIComponent(nonce)}`;
+  return workspacePortalUrl(
+    env,
+    address,
+    `operations?commerceAction=${encodeURIComponent(nonce)}`,
+  );
 }
 
 /** What a proposal knows about the record that it changes. */

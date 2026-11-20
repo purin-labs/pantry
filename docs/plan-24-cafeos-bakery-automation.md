@@ -1,6 +1,7 @@
 # Plan 24 — Cobot bakes in the first café kitchen
 
-Status: Rewritten on 3 November 2026 after a review with the owner. No code exists for this plan.
+Status: Rewritten on 3 November 2026 after a review with the owner. S1 is built (see S1); S2 to S6
+have no code yet.
 The simulation phase comes first. The owner buys cobots only after its exit gate passes.
 Owner: CafeOS operations. Replaces the August version, which used a Japan-to-Singapore export
 order as its first path.
@@ -90,6 +91,25 @@ Times are estimates in agent days.
 
 Exit: a sale below the level gives one proposal, not one for each sale. A second proposal waits
 until the first one ends.
+
+State (21 November 2026, branch `plan-24-s1`, not released): built.
+
+- Records: the regional tables `bake_stock_level` and `bake_proposal`
+  (`services/platform/src/kitchen/bakes/records.ts`, machine `bake_proposal`). Two partial unique
+  indexes hold one active (open or approved) and one waiting proposal for each product. Patch:
+  `services/platform/scripts/plan-24-bake-proposal-d1-patch.sql`.
+- Trigger: the Organisation Actor compares the `available` stock of each position before and after
+  a commerce delivery. A café sale lowers `available` at checkout. A delivery with no counted
+  position reads nothing more and writes nothing. No cron, alarm or poll.
+- Decisions: `runBakeCommand` (`kitchen/bakes/commands.ts`) through `OrganisationDO.runBakeCommand`
+  serves the Portal, Slack, the agent and S4. An operator or a higher role decides; an approval
+  needs an oven; a rejection keeps its reason.
+- Slack: one card in the operations channel. The card's message is the root of a thread pinned
+  to the proposal's Case. The card holds the reason field, so a Slack rejection needs no modal.
+- For S4: `OrganisationDO.readApprovedBakeProposal` reads the approved proposal that a run starts
+  from, and `OrganisationDO.runBakeCommand({ kind: "end" })` ends it and opens the waiting one.
+- Proof: `services/platform/tests/e2e/bake-proposal.test.ts`, with the declared morning
+  `scripts/plan-24/counter-day.json`.
 
 ### S2 — Controller simulator (3–5 days)
 

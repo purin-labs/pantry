@@ -108,6 +108,14 @@ const DEVICE_COLUMNS = `device_id, gateway_id, source_key, name, device_kind,
   state, restrict_reason, revoked_at, health, fault_code, fault_text, paused_at,
   pause_acknowledged_at, work_state, work_task_ref, work_run_ref, work_label`;
 
+/** The columns of a list, each named through a table alias. */
+function columnsOf(alias: string, columns: string): string {
+  return columns
+    .split(",")
+    .map((column) => `${alias}.${column.trim()}`)
+    .join(", ");
+}
+
 function gatewayFromRow(row: GatewayRow): GatewayRecord {
   return {
     gatewayId: row.gateway_id,
@@ -333,6 +341,34 @@ export async function listGatewayDevices(
     .bind(organisationId, gatewayId)
     .all<DeviceRow>();
   return rows.results.map(deviceFromRow);
+}
+
+/**
+ * The first active device with a capability behind an active gateway at a
+ * location, for example the oven that a bake proposal names (Plan 24 S1).
+ */
+export async function findActiveDeviceWithCapability(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  input: Readonly<{ capabilityId: string; locationId: string }>,
+): Promise<DeviceRecord | null> {
+  const row = await db
+    .prepare(
+      `SELECT ${columnsOf("device", DEVICE_COLUMNS)}
+         FROM device_enrollment AS device
+         JOIN device_gateway AS gateway
+           ON gateway.gateway_id = device.gateway_id
+          AND gateway.organisation_id = device.organisation_id
+        WHERE device.organisation_id = ? AND device.state = 'active'
+          AND gateway.state = 'active' AND gateway.location_id = ?
+          AND EXISTS (
+            SELECT 1 FROM json_each(device.capabilities_json)
+             WHERE json_extract(json_each.value, '$.id') = ?)
+        ORDER BY device.created_at, device.device_id LIMIT 1`,
+    )
+    .bind(organisationId, input.locationId, input.capabilityId)
+    .first<DeviceRow>();
+  return row === null ? null : deviceFromRow(row);
 }
 
 export async function readDevice(

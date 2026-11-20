@@ -66,51 +66,84 @@ export async function placeCafeOrder(
   merchantId: string,
   menuEntryIds: readonly string[] = ["item_taro", "item_cookie"],
 ): Promise<string> {
+  const placed = await placePickupOrder(
+    merchantId,
+    CAFE_STOREFRONT_ID,
+    menuEntryIds.map((menuEntryId) => ({
+      kind: "menu" as const,
+      menuId: "menu_cafe_main",
+      menuEntryId,
+      modifierOptionIds: [],
+      quantity: 1,
+    })),
+    { key: "refund", email: "buyer-private@example.test" },
+  );
+  return placed.orderId;
+}
+
+type PickupOrderLine =
+  | Readonly<{
+      kind: "menu";
+      menuId: string;
+      menuEntryId: string;
+      modifierOptionIds: readonly string[];
+      quantity: number;
+    }>
+  | Readonly<{ kind: "catalog"; variantId: string; quantity: number }>;
+
+/**
+ * One paid pickup order of a guest buyer through a storefront's buyer API,
+ * from the cart to the reconciled payment. Its checkout holds the stock.
+ * `key` names the order's idempotency keys.
+ */
+export async function placePickupOrder(
+  merchantId: string,
+  storefrontId: string,
+  lines: readonly PickupOrderLine[],
+  order: Readonly<{ key: string; email: string }>,
+) {
   const buyer = new CommerceStorefrontClient({
     baseUrl: "http://underclerk.test",
     fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
   });
-  const line = (menuEntryId: string) => ({
-    kind: "menu" as const,
-    menuId: "menu_cafe_main",
-    menuEntryId,
-    modifierOptionIds: [],
-    quantity: 1,
-  });
   const session = await required(
-    buyer.createSession(merchantId, CAFE_STOREFRONT_ID, {
+    buyer.createSession(merchantId, storefrontId, {
       schemaVersion: "underclerk.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
   const cart = await required(
-    buyer.createCart(merchantId, CAFE_STOREFRONT_ID, session.token, {
+    buyer.createCart(merchantId, storefrontId, session.token, {
       schemaVersion: "underclerk.create-buyer-cart.v1",
-      idempotencyKey: "cart-refund",
-      lines: menuEntryIds.map(line),
+      idempotencyKey: `cart-${order.key}`,
+      lines: lines.map((line) =>
+        line.kind === "menu"
+          ? { ...line, modifierOptionIds: [...line.modifierOptionIds] }
+          : line,
+      ),
     }),
   );
   const checkout = await required(
-    buyer.createPickupCheckout(merchantId, CAFE_STOREFRONT_ID, session.token, {
+    buyer.createPickupCheckout(merchantId, storefrontId, session.token, {
       schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
-      idempotencyKey: "checkout-refund",
+      idempotencyKey: `checkout-${order.key}`,
       cartId: cart.cartId,
       cartRevision: cart.revision,
       buyer: {
         kind: "guest",
-        contact: { kind: "email", email: "buyer-private@example.test" },
+        contact: { kind: "email", email: order.email },
       },
     }),
   );
   const payment = await required(
     buyer.createPaymentSession(
       merchantId,
-      CAFE_STOREFRONT_ID,
+      storefrontId,
       checkout.checkoutId,
       session.token,
       {
         schemaVersion: "underclerk.create-buyer-payment-session.v1",
-        idempotencyKey: "payment-refund",
+        idempotencyKey: `payment-${order.key}`,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
         returnUrl: "https://underclerk.test/return",
@@ -121,12 +154,12 @@ export async function placeCafeOrder(
   const placed = await required(
     buyer.reconcilePayment(
       merchantId,
-      CAFE_STOREFRONT_ID,
+      storefrontId,
       checkout.checkoutId,
       session.token,
       {
         schemaVersion: "underclerk.reconcile-buyer-payment.v1",
-        idempotencyKey: "payment-refund",
+        idempotencyKey: `payment-${order.key}`,
         checkoutRevision: payment.checkoutRevision,
         quoteDigest: checkout.quote.quoteDigest,
         confirmation: { kind: "provider_ui_completed" },
@@ -134,7 +167,7 @@ export async function placeCafeOrder(
     ),
   );
   if (placed.state !== "placed") throw new Error(`Payment ${placed.state}`);
-  return placed.orderId;
+  return placed;
 }
 
 /** A guest buyer's card payment that the provider declines: no order is placed. */

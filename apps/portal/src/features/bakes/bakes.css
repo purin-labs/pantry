@@ -1,0 +1,94 @@
+/* The Bakes page: two quiet lists, with a row's facts in a side drawer.
+   Colors come from the portal theme tokens. */
+.bakes {
+  display: grid;
+  gap: 32px;
+  max-inline-size: 1080px;
+  min-width: 0;
+}
+
+.bakes-section {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bakes-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bakes-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.bakes-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 15px;
+}
+
+.bakes-state {
+  font-weight: 500;
+}
+
+.bakes-state-open {
+  color: var(--pantry-accent-text);
+}
+
+.bakes-state-rejected,
+.bakes-state-ended {
+  color: var(--ink-2);
+}
+
+.bakes-form {
+  display: grid;
+  gap: 16px;
+}
+
+.bakes-field {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bakes-field input,
+.bakes-field textarea {
+  font: inherit;
+  font-weight: 400;
+}
+
+.bakes-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 0;
+  font-size: 15px;
+}
+
+.bakes-facts dt {
+  color: var(--ink-2);
+}
+
+.bakes-facts dd {
+  margin: 0;
+}
+
+.bakes-refusal {
+  margin: 0;
+  color: var(--danger-text);
+  font-size: 14px;
+}
+
+.bakes-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}

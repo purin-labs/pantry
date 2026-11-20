@@ -33,6 +33,8 @@ export const PERMISSION_REQUESTABLE = [
   CAPABILITY_KEYS.deviceCameraRead,
   CAPABILITY_KEYS.jevFeaturesRead,
   CAPABILITY_KEYS.jevFeaturesManage,
+  CAPABILITY_KEYS.bakeRead,
+  CAPABILITY_KEYS.bakePropose,
 ] as const;
 
 export type RequestableCapability = (typeof PERMISSION_REQUESTABLE)[number];
@@ -109,9 +111,7 @@ type RequestableReadScope =
   | Readonly<{
       kind: "commerce_list";
       listId:
-        | "production_requests"
-        | "replenishment_queue"
-        | "supplier_directory";
+        "production_requests" | "replenishment_queue" | "supplier_directory";
     }>;
 
 export function requestableReadScope(

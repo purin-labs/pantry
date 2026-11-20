@@ -16,6 +16,7 @@ import {
   CommerceApiKeysRoute,
   CommerceEntityPlaneRoute,
   CostsPage,
+  BakesRoute,
   DevicesRoute,
   HomePage,
   IntegrationsRoute,
@@ -112,6 +113,7 @@ export const PAGES: Record<WorkspaceDetailPage, PageEntry> = {
   suppliers: { render: (page) => renderOrders(page) },
   "workflow-simulator": { render: (page) => renderWorkflowSimulator(page) },
   devices: { render: (page) => renderDevices(page) },
+  bakes: { render: (page) => renderBakes(page) },
   agents: { render: (page) => renderAgents(page) },
   brain: { render: (page) => renderBrain(page) },
   knowledge: { render: (page) => renderKnowledge(page) },
@@ -351,6 +353,16 @@ function renderDevices(page: PageContext): React.ReactNode {
           "chat",
         ),
       }}
+    />
+  );
+}
+
+function renderBakes(page: PageContext): React.ReactNode {
+  const { state } = page;
+  return (
+    <BakesRoute
+      key={state.organisation.organisation.organisationId}
+      organisationId={state.organisation.organisation.organisationId}
     />
   );
 }

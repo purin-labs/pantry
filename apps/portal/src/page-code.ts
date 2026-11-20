@@ -21,6 +21,7 @@ export const MenuDraftRoute = React.lazy(loadMenuDraftRoute);
 export const OrderQueueRoute = React.lazy(loadOrderQueueRoute);
 export const RegisterRoute = React.lazy(loadRegisterRoute);
 export const DevicesRoute = React.lazy(loadDevicesRoute);
+export const BakesRoute = React.lazy(loadBakesRoute);
 export const PaymentsRoute = React.lazy(loadPaymentsRoute);
 export const BankPayoutsRoute = React.lazy(loadBankPayoutsRoute);
 export const TerminalOperationsPanel = React.lazy(loadTerminalOperationsPanel);
@@ -141,6 +142,11 @@ async function loadPaymentsRoute() {
 async function loadDevicesRoute() {
   const { DevicesRoute } = await import("./features/devices/route");
   return { default: DevicesRoute };
+}
+
+async function loadBakesRoute() {
+  const { BakesRoute } = await import("./features/bakes/route");
+  return { default: BakesRoute };
 }
 
 async function loadOrderQueueRoute() {

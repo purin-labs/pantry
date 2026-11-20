@@ -74,6 +74,8 @@ export const CAPABILITY_KEYS = {
   deviceCameraRead: "device.camera.read",
   jevFeaturesRead: "jev.features.read",
   jevFeaturesManage: "jev.features.manage",
+  bakeRead: "kitchen.bake.read",
+  bakePropose: "kitchen.bake.propose",
 } as const;
 
 export const WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE = "active_cases";
@@ -464,6 +466,26 @@ const CAPABILITY_SEEDS = {
     description:
       "Propose to turn a Jev switch on or off. An admin approves each change on a card, because a switch that is on sends new data to TypeSafe.",
     category: "agent_operations",
+    risk: "propose",
+    target: "platform",
+    providerDependency: NONE,
+    policyModes: "enabled_disabled",
+  },
+  [CAPABILITY_KEYS.bakeRead]: {
+    label: "Read bake proposals",
+    description:
+      "Read the stock level of each fresh product on the Bakes page in Kitchen, and the bake proposals that a fall of the counter stock opened, with their decisions.",
+    category: "commerce",
+    risk: "read",
+    target: "platform",
+    providerDependency: NONE,
+    policyModes: "enabled_disabled",
+  },
+  [CAPABILITY_KEYS.bakePropose]: {
+    label: "Propose a bake or a stock level",
+    description:
+      "Propose a bake run of a fresh product, which an operator, an admin or the owner approves or rejects, or propose a stock level, which an admin confirms. The agent cannot approve a bake.",
+    category: "commerce",
     risk: "propose",
     target: "platform",
     providerDependency: NONE,

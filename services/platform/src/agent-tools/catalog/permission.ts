@@ -105,6 +105,12 @@ export function permissionRequestDefinition(
       (missing.includes(CAPABILITY_KEYS.recipeWorkflowPropose)
         ? ` When the work proposes a change to a recipe's workflow, ask for ${CAPABILITY_KEYS.recipeWorkflowPropose}.`
         : "") +
+      (missing.includes(CAPABILITY_KEYS.bakeRead)
+        ? ` When the work reads the Bakes page: the stock levels or the bake proposals, ask for ${CAPABILITY_KEYS.bakeRead}.`
+        : "") +
+      (missing.includes(CAPABILITY_KEYS.bakePropose)
+        ? ` When the work proposes a bake or a stock level, ask for ${CAPABILITY_KEYS.bakePropose}.`
+        : "") +
       (missing.includes(CAPABILITY_KEYS.devicePause)
         ? ` When the work pauses a shop device, ask for ${CAPABILITY_KEYS.devicePause}.`
         : "") +

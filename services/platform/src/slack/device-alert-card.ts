@@ -1,5 +1,6 @@
+import { cardDeliveryIds } from "./card-delivery-ids";
+import { workspacePortalUrl } from "./portal-links";
 import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
 
 /**
  * One Slack card for one device incident (Plan 85). A reconnect updates the
@@ -7,28 +8,23 @@ import { requirePublicOrigin } from "../public-origin";
  * codes, as plain text, so that a device cannot write to the channel.
  */
 
-const NOTICE_PREFIX = "device_alert_notice_";
-const UPDATE_PREFIX = "device_alert_update_";
+const DEVICE_ALERT_CARD = cardDeliveryIds("device_alert");
 
 export function deviceAlertNoticeDeliveryId(alertId: string): string {
-  return `${NOTICE_PREFIX}${alertId}`;
+  return DEVICE_ALERT_CARD.notice(alertId);
 }
 
 export function deviceAlertUpdateDeliveryId(alertId: string): string {
-  return `${UPDATE_PREFIX}${alertId}`;
+  return DEVICE_ALERT_CARD.update(alertId);
 }
 
 export function isDeviceAlertDelivery(deliveryId: string): boolean {
-  return (
-    deliveryId.startsWith(NOTICE_PREFIX) || deliveryId.startsWith(UPDATE_PREFIX)
-  );
+  return DEVICE_ALERT_CARD.isCard(deliveryId);
 }
 
 /** The notice that an update changes, if this delivery is an update. */
 export function deviceAlertNoticeOfUpdate(deliveryId: string): string | null {
-  return deliveryId.startsWith(UPDATE_PREFIX)
-    ? `${NOTICE_PREFIX}${deliveryId.slice(UPDATE_PREFIX.length)}`
-    : null;
+  return DEVICE_ALERT_CARD.noticeOfUpdate(deliveryId);
 }
 
 export function deviceAlertCardBlocks(
@@ -59,7 +55,5 @@ export function devicesPortalUrl(
   env: Env,
   address: Readonly<{ organisationHandle: string; workspaceHandle: string }>,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/devices`;
+  return workspacePortalUrl(env, address, "devices");
 }

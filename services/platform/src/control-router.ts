@@ -169,6 +169,11 @@ import {
   matchDeviceControlRoute,
   type DeviceControlRoute,
 } from "./control/routes/devices";
+import {
+  handleBakeControlRoute,
+  matchBakeControlRoute,
+  type BakeControlRoute,
+} from "./control/routes/bakes";
 import { handleChatSignalRoute } from "./control/routes/chat-signals";
 import {
   matchChatSignalRoute,
@@ -273,6 +278,7 @@ type ControlRoute =
   | MenuBoardControlRoute
   | (MenuBoardSocketRoute & Readonly<{ kind: "menuBoardSocket" }>)
   | DeviceControlRoute
+  | BakeControlRoute
   | ChatSignalRoute
   | WorkflowCanvasRoute
   | AccessControlRoute
@@ -355,6 +361,8 @@ export async function handleControlRequest(
       return handleMenuBoardSocketRoute(request, env, route);
     case "devices":
       return handleDeviceControlRoute(request, env, route);
+    case "bakes":
+      return handleBakeControlRoute(request, env, route);
     case "chatSignals":
       return handleChatSignalRoute(request, env, route);
     case "workflowCanvas":
@@ -631,6 +639,8 @@ function matchControlRoute(pathname: string): ControlRoute {
   if (menuBoardRoute !== null) return menuBoardRoute;
   const deviceRoute = matchDeviceControlRoute(pathname);
   if (deviceRoute !== null) return deviceRoute;
+  const bakeRoute = matchBakeControlRoute(pathname);
+  if (bakeRoute !== null) return bakeRoute;
   const chatSignalRoute = matchChatSignalRoute(pathname);
   if (chatSignalRoute !== null) return chatSignalRoute;
   const workflowCanvasRoute = matchWorkflowCanvasRoute(pathname);

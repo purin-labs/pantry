@@ -1,4 +1,7 @@
-import { parseCommerceCueEvent, type CommerceCueEvent } from "../../cues/engine";
+import {
+  parseCommerceCueEvent,
+  type CommerceCueEvent,
+} from "../../cues/engine";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
@@ -12,9 +15,7 @@ import {
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
-import type {
-  CommerceObservationDisposition,
-} from "@purin-labs/commerce-control-api";
+import type { CommerceObservationDisposition } from "@purin-labs/commerce-control-api";
 import type {
   ApplyCommerceDeliveryInput,
   CommerceCueFactForProjection,
@@ -40,6 +41,7 @@ import {
   projectionSelectSql,
   readProjection,
   storedInventoryQuantity,
+  type InventoryQuantity,
 } from "./validation";
 
 export function upsertProjection(
@@ -481,12 +483,6 @@ function reconstructMovementResultingAvailable(
   }
   return resulting;
 }
-
-type InventoryQuantity = Readonly<{
-  amount: number;
-  scale: number;
-  unit: string;
-}>;
 
 type InventoryPositionRecord = Readonly<{
   canonicalId: string;

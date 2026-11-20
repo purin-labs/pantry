@@ -143,7 +143,7 @@ import {
 import { controlError, readBoundedJsonRecord } from "../control/http";
 import type { Env } from "../env";
 import { parseOrganisationId, newRequestId, type OrganisationId } from "../ids";
-import { traceLog } from "../observability";
+import { traceLog, traceWarn } from "../observability";
 import type { Result } from "../result";
 import { admitActorRecovery, pinnedActorDatabase } from "./actor-activation";
 import {
@@ -193,6 +193,19 @@ import type {
   OrganisationStateError,
 } from "./organisation/types";
 import { OrganisationCommerce } from "./organisation/organisation-commerce";
+import {
+  bakeKitchenPorts,
+  counterStockChanges,
+  readBakeBoard,
+} from "./organisation/bake-kitchen";
+import {
+  readApprovedBakeProposal,
+  runBakeCommand,
+  type BakeCommand,
+} from "../kitchen/bakes/commands";
+import { setBakeStockLevel } from "../kitchen/bakes/levels";
+import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
+import type { InventoryStockChange } from "./commerce-projection/stock-changes";
 
 export class OrganisationDO extends OrganisationCommerce {
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
@@ -1270,6 +1283,95 @@ export class OrganisationDO extends OrganisationCommerce {
       Date.now(),
       scope,
     );
+  }
+
+  /**
+   * Plan 24 S1: the one entry to the bake proposals. The Portal, Slack, the
+   * agent and the bake run (S4: `{ kind: "end" }`) change a proposal through
+   * it, so every decision passes the same policy check.
+   */
+  async runBakeCommand(
+    input: Readonly<{ organisationId: OrganisationId; command: BakeCommand }>,
+  ) {
+    return this.command(input.organisationId, (scope) =>
+      runBakeCommand(
+        scope.database,
+        scope.organisationId,
+        input.command,
+        bakeKitchenPorts(this.env, scope, this.ctx.storage.sql),
+        Date.now(),
+      ),
+    );
+  }
+
+  /**
+   * Plan 24 S1: sets a stock level that an admin confirmed on an agent's
+   * configuration card. The Bakes page calls the same Kitchen function.
+   */
+  async setBakeStockLevel(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      level: BakeStockLevelInput;
+      setBy: string;
+    }>,
+  ) {
+    return this.command(input.organisationId, (scope) =>
+      setBakeStockLevel(
+        scope.database,
+        scope.organisationId,
+        input.level,
+        input.setBy,
+        Date.now(),
+      ),
+    );
+  }
+
+  /**
+   * Plan 24 S1: the approved proposal that a bake run starts from (S4), or
+   * null when the proposal is not approved.
+   */
+  async readApprovedBakeProposal(
+    input: Readonly<{ organisationId: OrganisationId; proposalId: string }>,
+  ) {
+    return this.command(input.organisationId, async (scope) => ({
+      ok: true as const,
+      value: await readApprovedBakeProposal(
+        scope.database,
+        scope.organisationId,
+        input.proposalId,
+      ),
+    }));
+  }
+
+  /** Plan 24 S1: the stock levels, the proposals and what a level may name. */
+  async readBakeBoard(input: Readonly<{ organisationId: OrganisationId }>) {
+    return this.command(input.organisationId, async (scope) => ({
+      ok: true as const,
+      value: await readBakeBoard(scope, this.ctx.storage.sql),
+    }));
+  }
+
+  protected override async afterCommerceStockChanges(
+    scope: OrganisationExecutionScope,
+    changes: readonly InventoryStockChange[],
+  ): Promise<void> {
+    const counted = counterStockChanges(changes);
+    if (counted.length === 0) return;
+    try {
+      await runBakeCommand(
+        scope.database,
+        scope.organisationId,
+        { kind: "stock_changes", changes: counted },
+        bakeKitchenPorts(this.env, scope, this.ctx.storage.sql),
+        Date.now(),
+      );
+    } catch (error) {
+      traceWarn("kitchen.bake_stock_check_failed", {
+        requestId: newRequestId(),
+        organisationId: scope.organisationId,
+        error: errorMessage(error),
+      });
+    }
   }
 
   /**

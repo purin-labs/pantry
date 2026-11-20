@@ -17,7 +17,10 @@ import type {
   BakeryWorkspaceViewAction,
 } from "@purin-labs/bakery-model/bakery-surface";
 import type { PageViewCommand } from "@purin-labs/control-api";
-import type { RecipeItem } from "@purin-labs/kitchen-control-api";
+import type {
+  BakeStockLevelInput,
+  RecipeItem,
+} from "@purin-labs/kitchen-control-api";
 import type { AgentRunSaveVerification } from "../../commerce/bakery/agent-run-save";
 import type { AgentScenarioSaveResult } from "../../commerce/bakery/agent-scenario-save";
 import type {
@@ -290,6 +293,22 @@ export type PageViewExecute = (
   callId: string,
 ) => Promise<unknown>;
 
+/** Plan 24 S1: a bake that the agent proposes; a person decides it. */
+export type BakeProposeRequest = Readonly<{
+  inventoryItemId: string;
+  /** The pieces to bake; null bakes the shortfall below the level. */
+  pieces: number | null;
+}>;
+
+type BakeReadTool = () => Promise<unknown>;
+type BakeProposeTool = (request: BakeProposeRequest) => Promise<unknown>;
+type BakeStockLevelProposeTool = (
+  request: BakeStockLevelInput,
+) => Promise<unknown>;
+
+/** A bake request that was refused, in words that the agent can act on. */
+export class BakeRequestError extends ToolRequestError {}
+
 /** What a turn gives to the Kitchen tools. */
 export type KitchenToolServices = {
   readonly readSavedBakeryRun: (
@@ -313,6 +332,9 @@ export type KitchenToolServices = {
   readonly editProductionPlan?: ProductionPlanEditTool;
   readonly readWorkflowCanvas: WorkflowCanvasReadTool;
   readonly moveWorkflowCanvasObject: WorkflowCanvasMoveTool;
+  readonly readBakes: BakeReadTool;
+  readonly proposeBake: BakeProposeTool;
+  readonly proposeBakeStockLevel: BakeStockLevelProposeTool;
 };
 
 export const defineKitchenTool =

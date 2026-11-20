@@ -1,3 +1,4 @@
+import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import type { WorkflowChangeCommand } from "../commerce/bakery/workflow-proposals";
 import type {
   AgentOperationInput,
@@ -45,9 +46,24 @@ export function presentConfigurationCommand(
     };
   if (draft.family === "workflow_change")
     return presentWorkflowChange(draft.change);
+  if (draft.family === "bake_stock_level")
+    return presentBakeStockLevel(draft.level);
   return draft.family === "offer_price_allowance"
     ? presentOfferPriceAllowance(draft.allowance)
     : presentAgentOperation(draft.operation);
+}
+
+/** A stock level names the product that Commerce counts and the admin's values. */
+function presentBakeStockLevel(
+  level: BakeStockLevelInput,
+): ConfigurationCommandPresentation {
+  return {
+    summary: `Set the counter stock level of ${level.productName} to ${level.levelPieces} pieces, with ${level.piecesPerGroup} pieces in each mould group. Recipe workflow: ${level.workflowId}. Kitchen: ${level.kitchenLocation}.`,
+    actionLabel: "Set stock level",
+    consequence:
+      "When the counter stock falls below this level, Seams Pantry opens one bake proposal. Nothing is baked until an operator, an admin or the owner approves a proposal.",
+    portalSection: "overview",
+  };
 }
 
 /** The words about the change come from the diff. Only the reason is the agent's. */

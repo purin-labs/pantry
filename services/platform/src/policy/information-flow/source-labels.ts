@@ -3,7 +3,10 @@ import { parseControlRole } from "../../data/control-plane";
 import { isUserId } from "@purin-labs/control-api";
 import { authorizeProject } from "../../projects/access";
 import { authorizeConversation } from "../../chat/conversation-access";
-import type { CapabilityDefinition, RequestAuthority } from "@purin-labs/contracts";
+import type {
+  CapabilityDefinition,
+  RequestAuthority,
+} from "@purin-labs/contracts";
 
 import {
   CAPABILITY_CATALOGUE,
@@ -54,6 +57,12 @@ type CurrentSourceFlowLabelInput =
   | Readonly<{
       /** A recipe's applied workflow and its findings, which every member may read. */
       kind: "recipe_workflow";
+      db: OrganisationDatabase;
+      authority: RequestAuthority;
+    }>
+  | Readonly<{
+      /** The Bakes page: stock levels and bake proposals, which every member may read. */
+      kind: "bake_board";
       db: OrganisationDatabase;
       authority: RequestAuthority;
     }>
@@ -113,6 +122,7 @@ export async function createCurrentSourceFlowLabel(
     case "saved_bakery_run":
     case "device_fleet":
     case "recipe_workflow":
+    case "bake_board":
     case "jev_settings":
       return createSavedBakeryRunLabel(input);
     case "ingress":
@@ -921,7 +931,11 @@ function nativeChatPolicy(
 async function createSavedBakeryRunLabel(
   input: Variant<
     CurrentSourceFlowLabelInput,
-    "saved_bakery_run" | "device_fleet" | "recipe_workflow" | "jev_settings"
+    | "saved_bakery_run"
+    | "device_fleet"
+    | "recipe_workflow"
+    | "bake_board"
+    | "jev_settings"
   >,
 ): Promise<Result<FlowLabel, CurrentSourceFlowLabelError>> {
   if (

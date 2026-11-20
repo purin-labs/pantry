@@ -318,6 +318,8 @@ function capabilityFromResourceScope(
     case CAPABILITY_KEYS.deviceCameraRead:
     case CAPABILITY_KEYS.jevFeaturesRead:
     case CAPABILITY_KEYS.jevFeaturesManage:
+    case CAPABILITY_KEYS.bakeRead:
+    case CAPABILITY_KEYS.bakePropose:
     case CAPABILITY_KEYS.marketingEmailDraftEdit:
     case CAPABILITY_KEYS.commerceActionPropose:
     case CAPABILITY_KEYS.messageAttachmentInspect:

@@ -288,6 +288,41 @@ export abstract class SessionProposalStaging extends SessionActorBase {
   }
 
   /**
+   * Plan 24 S1: stages a bake stock level, for the admin who asked to confirm
+   * on a card. An admin or the owner sets a level on the Bakes page, so only
+   * such a person may ask for one.
+   */
+  protected async proposeBakeStockLevelForEmbeddedHarness(
+    input: {
+      readonly execution: SessionExecutionAdmission;
+      readonly lease: HarnessTurnLease;
+      readonly assignment: CaseAssignment;
+    },
+    request: ToolServiceRequest<"kitchen", "proposeBakeStockLevel">,
+  ): Promise<unknown> {
+    const member = await liveDeviceMember(
+      input.execution.scope.database,
+      input.execution.scope.organisationId,
+      input.lease,
+    );
+    if (member === null || !roleMayConfigure(member.role))
+      throw new ToolRequestError(
+        "Only an admin or the owner sets a stock level, and the person who asked cannot. Nothing changed. Tell the person to ask an admin.",
+      );
+    const staging = await this.beginProposalStaging(
+      input,
+      "bake stock level proposal",
+      { portalChat: true },
+    );
+    return this.stageConfigurationDraft(
+      input,
+      staging,
+      { family: "bake_stock_level", level: request },
+      {},
+    );
+  }
+
+  /**
    * The identity and lease checks every proposal shares.
    *
    * Proposing is a write, so it needs a live turn lease and a requester the

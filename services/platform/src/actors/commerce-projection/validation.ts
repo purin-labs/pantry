@@ -1052,11 +1052,13 @@ function isCafeProjectionKind(
   );
 }
 
-type StoredInventoryQuantity = Readonly<{
+export type InventoryQuantity = Readonly<{
   amount: number;
   scale: number;
   unit: string;
-}> | null;
+}>;
+
+type StoredInventoryQuantity = InventoryQuantity | null;
 
 export function storedInventoryQuantity(raw: unknown): StoredInventoryQuantity {
   if (

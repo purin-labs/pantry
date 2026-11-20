@@ -220,6 +220,8 @@ import {
 } from "../../agent-tools/integrations/handlers";
 import {
   createSupplierForEmbeddedHarness,
+  proposeBakeForEmbeddedHarness,
+  readBakesForEmbeddedHarness,
   readRecipeWorkflowForEmbeddedHarness,
   readRecipesForEmbeddedHarness,
   readSuppliersForEmbeddedHarness,
@@ -1034,16 +1036,19 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           proposeEmailReply: tool(proposeEmailReplyForEmbeddedHarness),
           readEmailReplyDraft: tool(readEmailReplyDraftForEmbeddedHarness),
           editEmailReplyDraft: tool(editEmailReplyDraftForEmbeddedHarness),
-          proposeEmailOperational: tool(proposeEmailOperationalForEmbeddedHarness),
-          readWhatsAppSupport: tool(readWhatsAppSupportForEmbeddedHarness),
-          sendWhatsAppSupportReply: sendWhatsAppSupportReplyForEmbeddedHarness.bind(
-            null,
-            this.env,
-            input.execution,
-            input.lease,
-            assignment,
-            input.turnPrompt,
+          proposeEmailOperational: tool(
+            proposeEmailOperationalForEmbeddedHarness,
           ),
+          readWhatsAppSupport: tool(readWhatsAppSupportForEmbeddedHarness),
+          sendWhatsAppSupportReply:
+            sendWhatsAppSupportReplyForEmbeddedHarness.bind(
+              null,
+              this.env,
+              input.execution,
+              input.lease,
+              assignment,
+              input.turnPrompt,
+            ),
         },
         commerce: {
           readProductDescriptionDraft: tool(
@@ -1059,23 +1064,21 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           proposeMerchantPlugin: tool(proposeMerchantPluginForHarness),
           proposeOrderRefund: tool(proposeOrderRefundForHarness),
           proposeStockAction: tool(proposeStockActionForHarness),
-          proposeCafeMenuPublication: tool(proposeCafeMenuPublicationForHarness),
-          proposeCampaignBrief: this.proposeCampaignBriefForEmbeddedHarness.bind(
-            this,
-            {
+          proposeCafeMenuPublication: tool(
+            proposeCafeMenuPublicationForHarness,
+          ),
+          proposeCampaignBrief:
+            this.proposeCampaignBriefForEmbeddedHarness.bind(this, {
               execution: input.execution,
               lease: input.lease,
               assignment,
-            },
-          ),
-          proposeConfiguration: this.proposeConfigurationForEmbeddedHarness.bind(
-            this,
-            {
+            }),
+          proposeConfiguration:
+            this.proposeConfigurationForEmbeddedHarness.bind(this, {
               execution: input.execution,
               lease: input.lease,
               assignment,
-            },
-          ),
+            }),
         },
         cafe: {
           readOrderQueue: tool(readOrderQueueForEmbeddedHarness),
@@ -1132,14 +1135,20 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           readSuppliers: tool(readSuppliersForEmbeddedHarness),
           createSupplier: tool(createSupplierForEmbeddedHarness),
           readRecipeWorkflow: tool(readRecipeWorkflowForEmbeddedHarness),
-          proposeRecipeWorkflow: this.proposeRecipeWorkflowForEmbeddedHarness.bind(
-            this,
-            {
+          proposeRecipeWorkflow:
+            this.proposeRecipeWorkflowForEmbeddedHarness.bind(this, {
               execution: input.execution,
               lease: input.lease,
               assignment,
-            },
-          ),
+            }),
+          readBakes: tool(readBakesForEmbeddedHarness),
+          proposeBake: tool(proposeBakeForEmbeddedHarness),
+          proposeBakeStockLevel:
+            this.proposeBakeStockLevelForEmbeddedHarness.bind(this, {
+              execution: input.execution,
+              lease: input.lease,
+              assignment,
+            }),
         },
         devices: {
           readDevices: tool(readDevicesForEmbeddedHarness),
@@ -1153,11 +1162,14 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         },
         jev: {
           readJevFeatures: tool(readJevFeaturesForEmbeddedHarness),
-          proposeJevFeature: this.proposeJevFeatureForEmbeddedHarness.bind(this, {
-            execution: input.execution,
-            lease: input.lease,
-            assignment,
-          }),
+          proposeJevFeature: this.proposeJevFeatureForEmbeddedHarness.bind(
+            this,
+            {
+              execution: input.execution,
+              lease: input.lease,
+              assignment,
+            },
+          ),
         },
         menu: {
           readMenuDraft: tool(readMenuDraftForEmbeddedHarness),

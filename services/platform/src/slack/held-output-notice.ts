@@ -1,6 +1,6 @@
+import { workspacePortalUrl } from "./portal-links";
 import type { HeldOutputReason } from "../data/held-output-request";
 import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
 import { noticeCardBlocks } from "./notice-card";
 
 /**
@@ -55,10 +55,11 @@ export function heldOutputPortalUrl(
   address: Readonly<{ organisationHandle: string; workspaceHandle: string }>,
   requestId: string,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  const request = encodeURIComponent(requestId);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?heldOutput=${request}`;
+  return workspacePortalUrl(
+    env,
+    address,
+    `access?heldOutput=${encodeURIComponent(requestId)}`,
+  );
 }
 
 export function heldOutputNoticeText(reason: HeldOutputReason): string {

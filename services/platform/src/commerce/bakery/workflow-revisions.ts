@@ -4,7 +4,10 @@ import {
   parseWorkflowDocument,
   type BakeryWorkflowDocument,
 } from "@purin-labs/bakery-workflow";
-import { parseRunFindings, type RunFinding } from "@purin-labs/bakery-workflow/findings";
+import {
+  parseRunFindings,
+  type RunFinding,
+} from "@purin-labs/bakery-workflow/findings";
 import { admitScenario } from "@purin-labs/production-simulation";
 import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type { Env } from "../../env";
@@ -110,6 +113,38 @@ export async function readCurrentWorkflow(
   const parsed = parseWorkflowDocument(JSON.parse(content));
   if (!parsed.ok) throw new Error("A workflow revision is invalid.");
   return { document: parsed.value, receipt: { workflowId, ...row } };
+}
+
+export type AppliedWorkflowHead = Readonly<{
+  workflowId: string;
+  title: string;
+  revision: number;
+  digest: string;
+}>;
+
+/**
+ * The current revision of a recipe workflow, without its document. A bake
+ * proposal names it (Plan 24 S1). Null when nobody applied the recipe yet.
+ */
+export async function readAppliedWorkflowHead(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  workflowId: string,
+): Promise<AppliedWorkflowHead | null> {
+  const row = await db
+    .prepare(
+      `SELECT workflow.title AS title, revision.revision AS revision,
+              revision.digest AS digest
+         FROM bakery_workflow AS workflow
+         JOIN bakery_workflow_revision AS revision
+           ON revision.organisation_id = workflow.organisation_id
+          AND revision.workflow_id = workflow.workflow_id
+          AND revision.revision = workflow.current_revision
+        WHERE workflow.organisation_id = ? AND workflow.workflow_id = ?`,
+    )
+    .bind(organisationId, workflowId)
+    .first<Readonly<{ title: string; revision: number; digest: string }>>();
+  return row === null ? null : { workflowId, ...row };
 }
 
 /** A stored document by its digest: a revision or an open proposal. */

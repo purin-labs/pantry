@@ -1,10 +1,10 @@
+import { workspacePortalUrl } from "./portal-links";
 import {
   permissionLabels,
   type RequestableCapability,
   type RequestableEntityTypeRead,
 } from "../authorization/requestable-capabilities";
 import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
 
 /**
  * The one Slack card of a permission request. Its texts hold catalogue labels
@@ -96,10 +96,11 @@ export function permissionRequestPortalUrl(
   address: Readonly<{ organisationHandle: string; workspaceHandle: string }>,
   requestId: string,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  const request = encodeURIComponent(requestId);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?permissionRequest=${request}`;
+  return workspacePortalUrl(
+    env,
+    address,
+    `access?permissionRequest=${encodeURIComponent(requestId)}`,
+  );
 }
 
 export function permissionRequestNoticeText(

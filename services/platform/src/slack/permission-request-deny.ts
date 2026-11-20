@@ -1,3 +1,4 @@
+import { tellClicker } from "./interaction-reply";
 import { errorMessage } from "@purin-labs/std";
 
 import { resolveSlackApprover } from "../actors/action-mutation-execution";
@@ -10,7 +11,6 @@ import type { Env } from "../env";
 import type { OrganisationId, RequestId } from "../ids";
 import { traceLog, traceWarn } from "../observability";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { RequestDeadline } from "../request-deadline";
 import { releaseAgentPermissionDecision } from "./permission-request-release";
 
 const DENY_FAILED =
@@ -97,26 +97,4 @@ async function deny(
   // reconciliation hands it to the thread once Slack works.
   await releaseAgentPermissionDecision(env, scope.value, decided.value);
   return null;
-}
-
-/** A message that only the person who clicked sees. */
-async function tellClicker(responseUrl: string, text: string): Promise<void> {
-  const deadline = new RequestDeadline(5_000);
-  try {
-    const response = await fetch(responseUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json; charset=utf-8" },
-      signal: deadline.signal,
-      body: JSON.stringify({
-        response_type: "ephemeral",
-        replace_original: false,
-        text,
-      }),
-    });
-    await response.body?.cancel();
-  } catch {
-    // The click has no other answer; the card still shows the request.
-  } finally {
-    deadline.end();
-  }
 }

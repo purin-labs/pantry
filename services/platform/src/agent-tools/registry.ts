@@ -62,28 +62,27 @@ import {
 } from "./integrations/integrations";
 import { jevFeaturesManage, jevFeaturesRead } from "./jev/jev";
 import {
+  bakeProposal,
+  bakeRead,
+  bakeStockLevelProposal,
   costsPlanSave,
   costsRead,
   costsSheetEdit,
   lotCostSave,
-  supplyCostSave,
-} from "./kitchen/costs";
-import { PASTRY_BENCH_VIEW_TOOLS } from "./kitchen/pastry-bench";
-import {
+  PASTRY_BENCH_VIEW_TOOLS,
   productionPlanEdit,
   productionPlanRead,
-} from "./kitchen/production-plan";
-import {
+  recipeRead,
+  recipeSave,
   recipeWorkflowProposal,
   recipeWorkflowRead,
-} from "./kitchen/recipe-workflow";
-import { recipeRead, recipeSave } from "./kitchen/recipes";
-import { savedBakeryRunRead } from "./kitchen/saved-runs";
-import { supplierCreate, supplierRead } from "./kitchen/suppliers";
-import {
+  savedBakeryRunRead,
+  supplierCreate,
+  supplierRead,
+  supplyCostSave,
   workflowCanvasMove,
   workflowCanvasRead,
-} from "./kitchen/workflow-canvas";
+} from "./kitchen/tools";
 import { messageAttachmentInspect, messageLinkRead } from "./messages/messages";
 import { slackMessageProposal } from "./slack/slack";
 import { followUp, memoryProposal, sideCaseProposal } from "./turn/turn";
@@ -167,6 +166,9 @@ export const TOOLS = [
   workspaceQuery,
   messageAttachmentInspect,
   messageLinkRead,
+  bakeRead,
+  bakeProposal,
+  bakeStockLevelProposal,
   // The tools that a page command selects (Plan 87): the Kitchen workspace,
   // Costs & margins, the Pastry Bench and Café › Register.
   ...SURFACE_TOOL_LIST,
