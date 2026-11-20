@@ -1,6 +1,5 @@
 import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
-
 /** The age of the rows in one state of one machine. Times, never content. */
 export type MachineStateAge = Readonly<{
   /** The earliest `since` time of the rows in the state, or null. */
@@ -40,7 +39,11 @@ export async function actorMachineCensus(
   machines: readonly MachineDefinition[],
 ): Promise<readonly MachineCensus[]> {
   const alarm = await storage.getAlarm();
-  return censusOfActorMachines(storage.sql, { alarm, now: Date.now() }, machines);
+  return censusOfActorMachines(
+    storage.sql,
+    { alarm, now: Date.now() },
+    machines,
+  );
 }
 
 /**

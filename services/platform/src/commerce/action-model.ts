@@ -75,7 +75,6 @@ import type {
 } from "@purin-labs/control-api";
 import { commerceProjectionRevision } from "./contract/commerce-provider";
 
-
 export async function commerceActionMutationDigest(
   boundary: UnversionedControlMutationBoundary,
 ): Promise<string> {

@@ -5,7 +5,6 @@ export { parseVaultHandle, type VaultHandle } from "../ids";
 import type { VaultKeyVersion } from "./keyring";
 import type { Variant } from "@purin-labs/type-utils";
 
-
 /**
  * The formats of an opaque profile: the Codex sign-in and its device code
  * (Plan 72), and the "Sign in with ChatGPT" tokens and their open sign-in
@@ -98,4 +97,3 @@ export type VaultStoredSecret = {
   readonly keyVersion: VaultKeyVersion;
   readonly createdAt: number;
 };
-

@@ -1455,6 +1455,95 @@ the branch `refactor-17-table-owners`.
   voice Macs and the cue claim pass: 11 tests. `wrangler deploy --dry-run` passes
   for the six Workers. The full E2E suite did not run on the branch.
 
+**21 November 2026. The foundation crossings: ports, hooks and true modules,** on
+the branch `refactor-17-foundation-rest`. The work list was each pair whose source
+is a foundation module.
+
+- **The Session reads the conversation through a port.** The wiring gives
+  `conversation` (`actors/session/conversation-port.ts`): the fork history, the
+  side Case and the flow checks of the conversation. `chat/session-conversation.ts`
+  implements it. A side Case is a value with its instruction and its admission.
+  Slack gives the parser of its own proposals, so `chat/` imports no Slack file for
+  it. The access check of a Session turn is a hook that the Session class
+  registers (`actors/session-turn-access.ts`), because the Code Mode and
+  admission functions outside the class call it. The sink refusal type and
+  `sinkRefusalAsksPerson` are in `policy/information-flow/sinks.ts`.
+- **The census list is a part of the Worker.** `actors/actor-machines.ts` holds the
+  list of the machines in the order of before. The census takes it as an argument,
+  and the Case and the Session ask the Worker's class for it.
+- **Routes get parts from the router.** The Case context route gets the Inbox
+  check of a selection and the Portal screen observation route. The session
+  routes get the support role read of the Organisation area.
+- **Types and values at their owner.** The ids of the two Actor moves and the
+  policy placement check are in `data/organisation-placement.ts`. The Vault handle
+  is in `ids.ts`. `TypeSafeAuthority` is in the flow label types. The Code Mode
+  host types and the file tool result types are in `agent-tools/catalog/types.ts`.
+  The empty Memory reader is in `context/assembly`. The model route error map is in
+  `models/route.ts`. The action nonce check is in `approval-authentication.ts`.
+  The label of a native chat source gets the access checks of the conversation
+  with its input. A re-export keeps each old import.
+- **Two splits.** The mail receipt of a frozen relocation moved into
+  `actors/actor-relocation-mail.ts`, which is `surfaces/email`. The commerce
+  receipt of a frozen Organisation is `actors/organisation-relocation-receipt.ts`
+  (`areas/commerce`).
+- **True modules, with evidence.** Each file below imports nothing of its old
+  module that the new one cannot import, and its users are at or above the new
+  module. `case-goals.ts`, `fork-history.ts`, `execution-billing.ts`,
+  `organisation-runtime.ts`, `organisation-inference-selection.ts` and
+  `jev-features/paid-use.ts` are `foundation/agent`. `attachment-collection.ts`,
+  the Case command route, the Case context route and its metadata read, and
+  `action-mutation-execution.ts` are `foundation/conversation`.
+  `organisation-archive-cleanup.ts` and `organisation-regional-copy.ts` are
+  `foundation/actor-runtime`. `case-operations.ts` is `foundation/authority`.
+  `database-handles.ts` is `foundation/kernel`, and `boundary.ts` is
+  `foundation/contracts`. `account-platform/onboarding.ts` is
+  `areas/organisation`. `data/identity-link.ts` is `surfaces/slack`. Five tables
+  follow their only writer.
+- **Not changed:** no path, status code, error text, RPC method name, argument
+  shape, stored value, SQL text, schema step, tool definition or digest. The
+  `foundationOrder` did not change.
+- **Measures.** Layer crossings: 287 to 218. From the foundation: upward 68 to 51,
+  against the order 72 to 20, table writes 22 (no change). Copies: 878, no change.
+  Unused exports: 805, no change. Plain D1 handles: 63, no change; one count moved
+  with the policy placement check.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files) pass. The 79 journey files of
+  the brief ran in four groups: 78 pass and 1 is skipped (144 tests pass, 2 are
+  skipped). `wrangler deploy --dry-run` did not run. The full E2E suite did not run
+  on the branch.
+- **Still open, with what removes it.**
+  - Commerce (31). The agent operations (`data/agent-operations*`, the runner, the
+    operations route and activity, 12) and the cue engine (2) name commerce kinds
+    in the responsibility scope and the cue events. The scope needs an opaque
+    commerce part that a commerce parser checks at the input and the row read.
+    `context/assembly/commerce.ts` (5) is commerce code that Kitchen and the Inbox
+    import; it goes behind `CommerceToolReads`. The action ledger (3), the grant
+    compiler, the grants store and the entity type reads (4) and the two access
+    control routes (5) need an opaque commerce part of the grant target.
+  - The tenancy lifecycle (8 imports, 22 table writes). The Organisation creation,
+    the membership, the archive and the purge write rows of `connections`,
+    `authority`, `agent`, `conversation`, `organisation` and Slack in their own
+    batch. One lifecycle port with the statement builders of each owner removes
+    them. Its callers are the routes, the reconciliation and the unit and journey
+    files that call these functions, so it needs its own landing.
+  - The Case and the chat record (Slack 4, Kitchen 4, Portal 2, commerce 1): the
+    Case walk builds the Slack stream input, the output hold posts the Slack
+    notice, the sink asks Slack if a channel reaches outside, the chat parser checks
+    the Kitchen view of a message, and the Project references read a saved run.
+    Each needs a registry of the surface or the reference kind.
+  - The tool handlers to Slack (3): the follow-up posts the Slack card of a
+    permission request and a held effect.
+  - The routes of the approvals (Slack 2, Brain 1, conversation 1): step A2.1 owns
+    `agent-permission-requests.ts` and `held-output-requests.ts`.
+  - Single imports: the file grant statements of the grant code (2), the commerce
+    grant read of the entity type reads in `context/assembly`, the Case snapshot
+    type of `case-operations.ts`, the native chat audience of the context assembly,
+    the agent operation runner (2), the operations snapshot of the activity and the
+    files module of the access control mutations (2), the onboarding projection of a
+    configuration answer, the support references of the integration account, the
+    default agent id of the room presence, the collaboration ping of the socket
+    host and `UserId` of `control-api` in `ids.ts`.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
