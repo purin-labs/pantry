@@ -1,8 +1,8 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type {
-  AccountPlatformAccess,
-  AccountUserAuthority,
-} from "../account-platform/access";
+  OrganisationAccess,
+  OrganisationUserAuthority,
+} from "../organisation-access/access";
 import type {
   AuthorityPartition,
   CapabilityDefinition,
@@ -146,8 +146,8 @@ type ProjectedDiscoveryAccount = Readonly<{
 export async function readIntegrationDiscovery(
   input: Readonly<{
     db: OrganisationDatabase;
-    accountAccess: AccountPlatformAccess;
-    userAuthority: AccountUserAuthority;
+    accountAccess: OrganisationAccess;
+    userAuthority: OrganisationUserAuthority;
     organisationId: OrganisationId;
     requestAuthority: RequestAuthority;
     authorityPartition: AuthorityPartition;
@@ -272,8 +272,8 @@ export function parseIntegrationDiscoveryView(
 async function authorizeDiscovery(
   input: Readonly<{
     db: OrganisationDatabase;
-    accountAccess: AccountPlatformAccess;
-    userAuthority: AccountUserAuthority;
+    accountAccess: OrganisationAccess;
+    userAuthority: OrganisationUserAuthority;
     organisationId: OrganisationId;
     requestAuthority: RequestAuthority;
     authorityPartition: AuthorityPartition;

@@ -1,9 +1,8 @@
-import type { AccountPlatformBindings } from "./account-platform/config";
 import {
-  accountAccessOfOneRead,
-  createAccountPlatformAccess,
-  type AccountPlatformAccess,
-} from "./account-platform/access";
+  organisationAccessOfOneRead,
+  createOrganisationAccess,
+  type OrganisationAccess,
+} from "./organisation-access/access";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   resolveActiveOrganisationPlacementRecord,
@@ -32,8 +31,7 @@ export type OrganisationPlacementBindings = Pick<
   | "ORGANISATION_DB_WNAM"
   | "ORGANISATION_DB_APAC"
   | "ORGANISATION_DB_EU"
-> &
-  AccountPlatformBindings;
+>;
 
 function organisationActorsOf(
   env: OrganisationPlacementBindings,
@@ -79,7 +77,7 @@ export class OrganisationExecutionScope {
     readonly organisationId: OrganisationId,
     readonly placement: ActivePlacement["placement"],
     readonly fenceToken: ActivePlacement["fenceToken"],
-    readonly accountAccess: AccountPlatformAccess,
+    readonly accountAccess: OrganisationAccess,
     organisationActors: Env["ORGANISATION"] | null,
   ) {
     this.#database = database;
@@ -93,7 +91,7 @@ export class OrganisationExecutionScope {
   }
 
   /**
-   * This scope for one read of one request. See `accountAccessOfOneRead`: the
+   * This scope for one read of one request. See `organisationAccessOfOneRead`: the
    * read asks the account each question one time. A write keeps this scope.
    */
   ofOneRead(): OrganisationExecutionScope {
@@ -102,7 +100,7 @@ export class OrganisationExecutionScope {
       this.organisationId,
       this.placement,
       this.fenceToken,
-      accountAccessOfOneRead(this.accountAccess),
+      organisationAccessOfOneRead(this.accountAccess),
       this.#organisationActors,
     );
   }
@@ -139,7 +137,7 @@ export class OrganisationExecutionScope {
       organisationId,
       placement,
       active.value.fenceToken,
-      createAccountPlatformAccess(env, organisationId, database, {
+      createOrganisationAccess(env, organisationId, database, {
         placementEpoch: placement.placementEpoch,
         placementCellId: placement.placementCellId,
         fenceToken: active.value.fenceToken,
@@ -191,7 +189,7 @@ export class OrganisationExecutionScope {
       organisationId,
       active.value.placement,
       active.value.fenceToken,
-      createAccountPlatformAccess(env, organisationId, selected.value, {
+      createOrganisationAccess(env, organisationId, selected.value, {
         placementEpoch: active.value.placement.placementEpoch,
         placementCellId: active.value.placement.placementCellId,
         fenceToken: active.value.fenceToken,
@@ -240,13 +238,12 @@ export class OrganisationExecutionScope {
       env.DB.withSession("first-primary"),
       organisationId,
     );
-    const regionalRead =
-      sameBinding(selected.value, env.DB)
-        ? directoryRead
-        : resolveActiveOrganisationPlacementRecord(
-            selected.value.withSession("first-primary"),
-            organisationId,
-          );
+    const regionalRead = sameBinding(selected.value, env.DB)
+      ? directoryRead
+      : resolveActiveOrganisationPlacementRecord(
+          selected.value.withSession("first-primary"),
+          organisationId,
+        );
     const [directory, regional] = await Promise.all([
       directoryRead,
       regionalRead,
@@ -266,7 +263,7 @@ export class OrganisationExecutionScope {
         organisationId,
         directory.value.placement,
         directory.value.fenceToken,
-        createAccountPlatformAccess(env, organisationId, selected.value, {
+        createOrganisationAccess(env, organisationId, selected.value, {
           placementEpoch: directory.value.placement.placementEpoch,
           placementCellId: directory.value.placement.placementCellId,
           fenceToken: directory.value.fenceToken,

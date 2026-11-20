@@ -12,7 +12,7 @@ import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-conte
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../../database-handles";
 import { parseUserId, type OrganisationId } from "../../ids";
-import type { AccountPlatformAccess } from "../../account-platform/access";
+import type { OrganisationAccess } from "../../organisation-access/access";
 import { dispatchBakerySurfaceEffect } from "../../actors/bakery-surface-effect";
 import { timelineVisibleMessages } from "../../chat/conversation";
 import { readConversation } from "../../chat/store";
@@ -30,7 +30,7 @@ import { requireLiveBakeryAuthority } from "../bakery/handlers";
 export async function executeCostsViewForHarness(
   authority: {
     readonly db: OrganisationDatabase;
-    readonly accountAccess: AccountPlatformAccess;
+    readonly accountAccess: OrganisationAccess;
     readonly storage: DurableObjectStorage;
     readonly organisationId: OrganisationId;
     readonly sessionId: string;

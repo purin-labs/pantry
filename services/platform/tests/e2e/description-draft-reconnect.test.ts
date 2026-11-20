@@ -251,16 +251,15 @@ async function allowLikeAPrompt(owner: Member): Promise<void> {
 }
 
 /**
- * Makes each account check fail in its revision write, as a failed database
- * write would: the check cannot run, and it refuses nobody.
+ * Makes each access check fail in its read, as a failed database read would:
+ * the check reads the lifecycle of the Organisation, so it cannot run, and it
+ * refuses nobody.
  */
 async function failAccessChecks(organisationId: OrganisationId): Promise<void> {
   for (const db of await databases(organisationId))
     await db
       .prepare(
-        `CREATE TRIGGER e2e_access_check_unavailable
-         BEFORE INSERT ON account_service_access_revision
-         BEGIN SELECT RAISE(ABORT, 'forced account check failure'); END`,
+        "ALTER TABLE organisation_onboarding RENAME TO e2e_access_check_unavailable",
       )
       .run();
 }
@@ -270,7 +269,9 @@ async function restoreAccessChecks(
 ): Promise<void> {
   for (const db of await databases(organisationId))
     await db
-      .prepare("DROP TRIGGER IF EXISTS e2e_access_check_unavailable")
+      .prepare(
+        "ALTER TABLE e2e_access_check_unavailable RENAME TO organisation_onboarding",
+      )
       .run();
 }
 

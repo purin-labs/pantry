@@ -515,9 +515,7 @@ the reason: callers use 245 methods of the four Actors at 440 places, in about 1
 files. An interface for each module is a larger piece of work, and it belongs with the
 split of the Actor classes into modules. It is now a part of step A1.9.
 
-**20 November 2026. Step A1.3 is done on the branch
-`refactor-17-a1-3-tool-families`.** The branch starts at `origin/dev` `58b7e5e`. It
-is not on `dev`.
+**20 November 2026. Step A1.3 is done and on `dev`.**
 
 | Part          | What exists                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -757,8 +755,7 @@ No shape, parser or error text changed.
   `menu-board-reviews.ts`, `order-queue.ts`, `mail-*.ts`, `evals.ts` and
   `case-execution.ts`.
 
-**20 November 2026. Step A1.6 is done for the Connector**, on the branch
-`refactor-17-a1-6`. It is not on `dev`.
+**20 November 2026. Step A1.6 is done for the Connector, and it is on `dev`.**
 
 - **The port.** `actors/connector/channel-adapter.ts` defines `ChannelAdapter`:
   the tables of a channel, the due times of its alarm work, its work before

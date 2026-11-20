@@ -1,4 +1,4 @@
-import { authenticatedAccountConversationScope } from "../../account-platform/access";
+import { authenticatedConversationScope } from "../../organisation-access/access";
 import type { Env } from "../../env";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import {
@@ -60,7 +60,7 @@ export async function handleMemoryRoute(
         if (!authorized.ok) return authorized.response;
         const memories = await readMemoryViews(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),
@@ -85,7 +85,7 @@ export async function handleMemoryRoute(
         if (body === null) return controlError("memory_invalid", 400);
         const receipt = await commandMemoryAsOperator(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),

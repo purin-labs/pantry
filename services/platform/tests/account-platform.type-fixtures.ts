@@ -1,8 +1,5 @@
-import type { AccountUserAuthority } from "../src/account-platform/access";
-import {
-  AccountServiceGrantAcceptance,
-  AccountServiceGrantRevocation,
-} from "../src/account-platform/service-membership";
+import type { OrganisationUserAuthority } from "../src/organisation-access/access";
+import { AccountServiceGrantAcceptance } from "../src/account-platform/service-membership";
 import type {
   AccountFundsReservation,
   AccountUsageRequest,
@@ -11,15 +8,12 @@ import type {
 declare const reserved: Extract<AccountFundsReservation, { kind: "reserved" }>;
 declare const completedUsage: Extract<AccountUsageRequest, { quantity: 1 }>;
 declare const nativeSession: Extract<
-  AccountUserAuthority,
+  OrganisationUserAuthority,
   { kind: "authenticated_session" }
 >;
 
 // @ts-expect-error Only actual shared invitation acceptance can construct this receipt.
 export const constructedServiceAcceptance = new AccountServiceGrantAcceptance();
-
-// @ts-expect-error Only actual shared membership revocation can construct this receipt.
-export const constructedServiceRevocation = new AccountServiceGrantRevocation();
 
 // @ts-expect-error A reserved hold cannot carry a settled charge through a spread.
 export const reservedWithCharge: AccountFundsReservation = {
@@ -48,10 +42,9 @@ const mixedNativeOrigin = {
   nativeExternalUserId: "external_user_fixture",
 };
 // @ts-expect-error A native session cannot also claim a provider event.
-export const mixedOrigin: AccountUserAuthority = mixedNativeOrigin;
+export const mixedOrigin: OrganisationUserAuthority = mixedNativeOrigin;
 
 declare const acceptedGrant: AccountServiceGrantAcceptance;
-declare const revokedGrant: AccountServiceGrantRevocation;
 
 // @ts-expect-error A spread cannot reproduce the accepted shared receipt brand.
 export const spreadAcceptance: AccountServiceGrantAcceptance = {
@@ -64,21 +57,7 @@ export const constructedAcceptance: AccountServiceGrantAcceptance = {
   nativeUserId: acceptedGrant.nativeUserId,
   invitationId: acceptedGrant.invitationId,
   membership: acceptedGrant.membership,
-  authorityRevision: acceptedGrant.authorityRevision,
-  accessRevision: acceptedGrant.accessRevision,
   receiptId: acceptedGrant.receiptId,
-};
-
-// @ts-expect-error A spread cannot reproduce the revoked shared receipt brand.
-export const spreadRevocation: AccountServiceGrantRevocation = {
-  ...revokedGrant,
-};
-
-// @ts-expect-error Public revocation fields cannot replace the private shared receipt.
-export const constructedRevocation: AccountServiceGrantRevocation = {
-  organisationId: revokedGrant.organisationId,
-  nativeUserId: revokedGrant.nativeUserId,
-  membershipId: revokedGrant.membershipId,
 };
 
 // @ts-expect-error Membership availability accepts only the explicit wire states.

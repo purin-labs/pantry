@@ -2,7 +2,7 @@
 // approved or rejected action, and the notice that an agent's proposal waits
 // for approval. Each delivery checks the action's request authority again,
 // as it stands now, before the connector posts.
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import type { CaseDO } from "../actors/case";
 import type { CaseOutput } from "../actors/case/types";
 import { sinkRefusalAsksPerson } from "../actors/case-conversation-sink";
@@ -75,7 +75,7 @@ export async function deliverCommerceCaseOutput(
   const liveAuthority = await prepareTurnAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       authority.sessionId,
       authority.executionId,
     ),

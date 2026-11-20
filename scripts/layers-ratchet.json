@@ -2,8 +2,8 @@
   "totals": {
     "upward": 216,
     "areas": 214,
-    "order": 130,
-    "table": 118
+    "order": 127,
+    "table": 117
   },
   "crossings": {
     "areas/brain -> areas/inbox": 10,
@@ -122,7 +122,7 @@
     "foundation/tenancy -> foundation/authority": 4,
     "foundation/tenancy -> foundation/connections": 1,
     "foundation/tenancy -> foundation/control": 5,
-    "foundation/tenancy -> foundation/conversation": 7,
+    "foundation/tenancy -> foundation/conversation": 4,
     "foundation/tenancy -> surfaces/slack": 1,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,
@@ -163,7 +163,7 @@
     "table organisation_onboarding (foundation/tenancy) <- foundation/connections": 2,
     "table organisation_readiness_assessment (areas/organisation) <- foundation/tenancy": 2,
     "table organisation_workspace (foundation/agent) <- foundation/tenancy": 1,
-    "table portal_chat_directory (foundation/conversation) <- foundation/tenancy": 2,
+    "table portal_chat_directory (foundation/conversation) <- foundation/tenancy": 1,
     "table project (foundation/conversation) <- surfaces/portal": 1,
     "table project_member (foundation/conversation) <- foundation/tenancy": 1,
     "table provider_account_cleanup (areas/integrations) <- areas/organisation": 1,

@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { resolveSlackMessageCapability } from "../../actors/email-operational-capability";
 import {
   insertSlackMessageProposal,
@@ -48,7 +48,7 @@ export async function proposeSlackMessageForEmbeddedHarness(
   const authorized = await authorizeCapabilityUse({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),

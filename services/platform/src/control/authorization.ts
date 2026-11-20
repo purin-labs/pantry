@@ -1,3 +1,4 @@
+import type { OrganisationAdmissionAction } from "@purin-labs/contracts";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   activeOrganisationMembershipFencedRead,
@@ -38,12 +39,17 @@ type AuthenticatedControlResult =
   | { readonly ok: true; readonly value: AuthenticatedControlRequest }
   | { readonly ok: false; readonly response: Response };
 
+/**
+ * A mutation asks the access check for `execute` unless it names another
+ * action: a write that only opens a view for its reader asks for `disclose`.
+ */
 export async function authorizeOrganisationRequest(
   request: Request,
   env: Env,
   organisationIdRaw: string,
   role: ControlRole,
   mutation: boolean,
+  action: OrganisationAdmissionAction = mutation ? "execute" : "disclose",
 ): Promise<
   | AuthorizedOrganisationRequest
   | { readonly ok: false; readonly response: Response }
@@ -92,7 +98,7 @@ export async function authorizeOrganisationRequest(
   const authorization = await authorizeOrganisationControl({
     db: resolved.value.scope.database,
     accountAccess: resolved.value.scope.accountAccess,
-    action: mutation ? "execute" : "disclose",
+    action,
     session: authenticated.value.session,
     organisationId: organisationId.value,
     requiredRole: role,

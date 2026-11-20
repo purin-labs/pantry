@@ -954,7 +954,7 @@ function dispatchControlWrite(
 }
 
 type RemoteConnectorFixture = {
-  readonly accountAccess: import("../../src/account-platform/access").AccountPlatformAccess;
+  readonly accountAccess: import("../../src/organisation-access/access").OrganisationAccess;
   readonly nativeSessionId: string;
   readonly entry: CustomConnectorReadCatalogEntry;
   readonly effective: Extract<

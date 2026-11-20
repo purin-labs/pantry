@@ -66,7 +66,6 @@ import {
 } from "./case-execution-support";
 import {
   attachSharedAccountNativeOrganisation,
-  grantSharedAccountAutomation,
 } from "./shared-account-platform-fixture";
 import {
   FakeChatGpt,
@@ -321,12 +320,6 @@ async function prepareMailBudgetJourney() {
   });
   if (!registered.ok) throw new Error(registered.error.code);
   await installWorkMailbox(organisationId, accountId, owner.identity.userId, now);
-  // Each mailbox turn passes the account check of the mailbox agent.
-  await grantSharedAccountAutomation(organisationId, owner, {
-    kind: "agent_mailbox",
-    nativeId: "binding_work",
-    revision: 1,
-  });
   const grant = await createAccessGrant({
     db: fixtureDatabase(),
     organisationId,
@@ -3184,11 +3177,6 @@ async function runDraftOnlyJourney(
   });
   if (!registered.ok) throw new Error(registered.error.code);
   await installWorkMailbox(organisationId, account.value, owner.identity.userId, now);
-  await grantSharedAccountAutomation(organisationId, owner, {
-    kind: "agent_mailbox",
-    nativeId: "binding_work",
-    revision: 1,
-  });
   const merchantId = await seedPurchasingContext(
     organisationId,
     owner.identity.userId,
@@ -4801,13 +4789,6 @@ async function workJourney(): Promise<void> {
   });
   if (!registered.ok) throw new Error(registered.error.code);
   await installWorkMailbox(organisationId, accountId, owner.identity.userId, now);
-  // The agent of the mailbox reads purchasing records for the review, so the
-  // account authority must hold its grant.
-  await grantSharedAccountAutomation(organisationId, owner, {
-    kind: "agent_mailbox",
-    nativeId: "binding_work",
-    revision: 1,
-  });
   const actor = await resolveActiveCaseActor({
     env,
     namespace: env.CASE,
@@ -8779,11 +8760,6 @@ async function caseContextCollectionReplyJourney(
               laterPersonId: colleague.personId,
             },
           },
-  });
-  await grantSharedAccountAutomation(organisationId, owner, {
-    kind: "agent_mailbox",
-    nativeId: "binding_work",
-    revision: 1,
   });
   const merchantId = await seedPurchasingContext(
     organisationId,

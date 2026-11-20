@@ -1,5 +1,5 @@
 import { mailboxReplyDisposition } from "../mail-inbox/direct-reply";
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { runtimeFetch } from "../runtime-fetch";
 import { proposeEvalFromCorrection } from "../evals/access";
 import { proposeMemoryFromCorrection } from "../memory/access";
@@ -725,7 +725,7 @@ async function runEmailTurn(
     dependency: caseContextCollection.value,
     db: input.scope.database,
     accountAccess: input.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       sessionId.value,
       assignmentId.value,
     ),
@@ -818,7 +818,7 @@ async function runEmailTurn(
         dependency: caseContextCollection.value,
         db: input.scope.database,
         accountAccess: input.scope.accountAccess,
-        userAuthority: acceptedExecutionAccountAuthority(
+        userAuthority: acceptedExecutionAuthority(
           sessionId.value,
           assignmentId.value,
         ),
@@ -1027,7 +1027,7 @@ async function runEmailTurn(
     dependency: caseContextCollection.value,
     db: input.scope.database,
     accountAccess: input.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       sessionId.value,
       assignmentId.value,
     ),

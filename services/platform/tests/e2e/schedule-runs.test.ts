@@ -20,14 +20,12 @@ import { runScheduleDispatch } from "../../src/schedules/dispatch";
 import { executionRequest, readCaseTimeline } from "./case-execution-support";
 import { commerceClient } from "./commerce-support";
 import { network } from "./network";
-import { grantSharedAccountAutomation } from "./shared-account-platform-fixture";
 import {
   ORGANISATION_ID,
   createRequiredGrant,
   installSlackActorFixture,
   openRouterText,
   openRouterToolCall,
-  slackActorFixtureOwner,
 } from "./slack-journey-support";
 
 declare module "vitest" {
@@ -175,13 +173,8 @@ async function scheduleRuns({ task }: TestContext): Promise<void> {
     Date.now() - 2 * HOUR,
   );
 
-  // The owner lets the schedule act for the Organisation, read its Case and
-  // list the Organisation's integrations, as the Access page's grants do.
-  await grantSharedAccountAutomation(
-    ORGANISATION_ID,
-    await slackActorFixtureOwner(),
-    { kind: "workflow", nativeId: "schedule_stock_hourly", revision: 1 },
-  );
+  // The owner lets the schedule read its Case and list the Organisation's
+  // integrations, as the Access page's grants do.
   await createRequiredGrant({
     grantId: "grant_schedule_runs_case_read",
     subject: {

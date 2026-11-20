@@ -35,8 +35,8 @@ it(
 async function memoryAccessJourney({ task }: TestContext): Promise<void> {
   // The owner and a second administrator hold the context capability through
   // their roles. Role alone decides nothing further here. The third member's
-  // role carries no such grant. The account authority admits these three, so
-  // each of their control requests passes the real account check.
+  // role carries no such grant. Each of their control requests passes
+  // Pantry's access check.
   const {
     organisationId,
     organisation,
@@ -202,10 +202,9 @@ async function memoryAccessJourney({ task }: TestContext): Promise<void> {
     status: 404,
     body: { ok: false, error: "memory_unavailable" },
   });
-  // The account authority decides before Pantry reads a role. It does not
-  // admit the fourth person, who is an administrator of this Organisation
-  // with a valid control session. Each of their requests is refused in one
-  // way, whether the Memory exists or not.
+  // The fourth person has a valid control session and no role in this
+  // Organisation. Each of their requests is refused in one way, whether the
+  // Memory exists or not.
   const outsiderRefusals = {
     list: await postJson(outsider, MEMORIES, null),
     summary: await postJson(outsider, paths.brainSummary, null),
@@ -221,7 +220,7 @@ async function memoryAccessJourney({ task }: TestContext): Promise<void> {
   for (const refusal of Object.values(outsiderRefusals))
     expect(refusal).toEqual({
       status: 404,
-      body: { ok: false, error: "membership_ineligible" },
+      body: { ok: false, error: "organisation_membership_missing" },
     });
   // Nor can the reviewer cite a record they cannot read.
   expect(

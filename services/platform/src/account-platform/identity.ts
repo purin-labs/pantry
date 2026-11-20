@@ -6,13 +6,9 @@ import type { ActiveControlSession } from "../data/control-plane";
 import { createAccountPlatformClient } from "./client";
 import type { AccountPlatformBindings } from "./config";
 import {
-  accountInteger,
   readLinkedUser,
-  accountObject,
-  accountText,
   accountUnavailable,
   type AccountPlatformError,
-  type LinkedPantryAccountAutomation,
   type LinkedPantryAccountUser,
   type PantryAccountBinding,
 } from "./types";
@@ -34,12 +30,6 @@ export async function resolveLinkedPantryAccountUser(
     return accountUnavailable();
   }
 }
-
-export type PantryNativeAutomation = Readonly<{
-  kind: "workflow" | "agent_mailbox" | "whatsapp_support";
-  nativeId: string;
-  revision: number;
-}>;
 
 /** Register the verified login before the user selects or creates a Platform project. */
 export async function registerPantryOnboardingIdentity(
@@ -82,41 +72,6 @@ export async function registerPantryOnboardingIdentity(
     return { ok: false, error: { code: "scope_forbidden" } };
   return stored;
 }
-export async function resolveLinkedPantryAccountAutomation(
-  env: AccountPlatformBindings,
-  organisationId: string,
-  input: PantryNativeAutomation,
-): Promise<Result<LinkedPantryAccountAutomation, AccountPlatformError>> {
-  try {
-    const row = await env.DB.prepare(
-      `SELECT native_principal_id AS nativePrincipalId, automation_id AS automationId, grant_id AS grantId, authority_revision AS authorityRevision, expected_access_revision AS accessRevision FROM account_automation_link WHERE native_organisation_id = ? AND native_kind = ? AND native_id = ? AND native_revision = ? AND state = 'active'`,
-    )
-      .bind(organisationId, input.kind, input.nativeId, input.revision)
-      .first<unknown>();
-    if (row === null)
-      return { ok: false, error: { code: "membership_ineligible" } };
-    const r = accountObject(row, [
-      "nativePrincipalId",
-      "automationId",
-      "grantId",
-      "authorityRevision",
-      "accessRevision",
-    ]);
-    return {
-      ok: true,
-      value: {
-        nativePrincipalId: accountText(r.nativePrincipalId),
-        automationId: accountText(r.automationId),
-        grantId: accountText(r.grantId),
-        authorityRevision: accountInteger(r.authorityRevision, 1),
-        accessRevision: accountInteger(r.accessRevision, 1),
-      },
-    };
-  } catch {
-    return accountUnavailable();
-  }
-}
-
 /** The Google token is transient. Only the account's verified identity receipt is retained. */
 export async function linkPantryAccountUser(
   env: AccountPlatformBindings,

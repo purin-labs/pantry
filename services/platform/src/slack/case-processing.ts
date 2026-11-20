@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { turnMemoryReaderWithoutSubjects } from "../memory/access";
 import { ensureCaseProject } from "../projects/case-project";
 import { isSlackGoalMessage } from "./goal-command";
@@ -526,7 +526,7 @@ async function processAcceptedSlackCaseMessage(
         revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
           db: scope.database,
           accountAccess: scope.accountAccess,
-          userAuthority: acceptedExecutionAccountAuthority(body.target.sessionId, body.requestId),
+          userAuthority: acceptedExecutionAuthority(body.target.sessionId, body.requestId),
           action: "execute",
           organisationId: body.organisationId,
           requestAuthority: body.requestAuthority,
@@ -789,7 +789,7 @@ async function processAcceptedSlackCaseMessage(
     revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
       db: scope.database,
       accountAccess: scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(body.target.sessionId, body.requestId),
+      userAuthority: acceptedExecutionAuthority(body.target.sessionId, body.requestId),
       action: "execute",
       organisationId: body.organisationId,
       requestAuthority: body.requestAuthority,
@@ -1036,7 +1036,7 @@ function prepareSlackTurnAuthority(
   return prepareTurnAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(body.target.sessionId, body.requestId),
+    userAuthority: acceptedExecutionAuthority(body.target.sessionId, body.requestId),
     action: "execute",
     organisationId: body.organisationId,
     requestAuthority: body.requestAuthority,

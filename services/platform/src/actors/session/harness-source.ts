@@ -79,7 +79,7 @@ export async function resolveAcceptedTurnTools(input: {
   readonly scope: OrganisationExecutionScope;
   readonly organisationId: OrganisationId;
   readonly authority: RequestAuthority;
-  readonly userAuthority: import("../../account-platform/access").AccountUserAuthority;
+  readonly userAuthority: import("../../organisation-access/access").OrganisationUserAuthority;
   readonly assignment: CaseAssignment;
 }): Promise<Result<AcceptedTurnTools, CanonicalEmbeddedHarnessRunError>> {
   const authority = await resolveEffectiveGrantSetForAuthorityPartition({

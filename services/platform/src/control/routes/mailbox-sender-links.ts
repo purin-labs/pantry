@@ -70,12 +70,14 @@ async function readSenderLink(
   organisationIdRaw: string,
   integrationAccountIdRaw: string,
 ): Promise<Response> {
+  // The address travels in a POST body, but the request only reads.
   const authorized = await authorizeOrganisationRequest(
     request,
     env,
     organisationIdRaw,
     "viewer",
     true,
+    "disclose",
   );
   if (!authorized.ok) return authorized.response;
   const accountId = parseIntegrationAccountId(integrationAccountIdRaw);

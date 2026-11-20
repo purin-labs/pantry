@@ -1,8 +1,8 @@
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import {
-  acceptedExecutionAccountAuthority,
-  type AccountPlatformAccess,
-} from "../account-platform/access";
+  acceptedExecutionAuthority,
+  type OrganisationAccess,
+} from "../organisation-access/access";
 import type { HarnessTurnLease, RequestAuthority } from "@purin-labs/contracts";
 import {
   isProjectId,
@@ -323,7 +323,7 @@ export async function authorizeChatHarnessLease(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   lease: HarnessTurnLease,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
 ): Promise<boolean> {
   return authorizeSessionTurnExecution(
     globalDatabase,
@@ -339,7 +339,7 @@ export async function authorizeSessionTurnExecution(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   execution: SessionTurnExecution,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
 ): Promise<boolean> {
   if (execution.requestAuthority.organisationId !== organisationId)
     return false;
@@ -376,7 +376,7 @@ export async function authorizeSessionTurnExecution(
             kind: "authenticated_session",
             nativeSessionId: origin.controlSessionId,
           }
-        : acceptedExecutionAccountAuthority(
+        : acceptedExecutionAuthority(
             execution.sessionId,
             execution.turnId,
           ),

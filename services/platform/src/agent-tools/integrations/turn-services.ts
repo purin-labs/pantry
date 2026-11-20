@@ -1,5 +1,5 @@
 import { sha256Hex } from "@purin-labs/std";
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { sessionActionMutationExecution } from "../../actors/action-mutation-execution";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
@@ -85,7 +85,7 @@ async function proposeCustomConnectorWriteForEmbeddedHarness(
   const capability = await authorizeCapabilityUse({
     db: context.execution.scope.database,
     accountAccess: context.execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       context.lease.session.sessionId,
       context.lease.turn.turnId,
     ),

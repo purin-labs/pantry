@@ -18,7 +18,6 @@ import {
   type PlatformIdentityLinkV1,
   type PlatformPrincipalV1,
   type ServiceIdentityResolutionV1,
-  type ServiceEligibilityV1,
   type DurableSourceEvidenceV1 as AccountSourceEvidence,
   type PlatformScopeV1,
   type FundsReservationV1,
@@ -63,31 +62,21 @@ export type PantryAccountBinding = Readonly<{
   deploymentId: string;
   feePolicy: PantryFeePolicy;
 }>;
-export type LinkedPantryAccountAutomation = Readonly<{
-  nativePrincipalId: string;
-  automationId: string;
-  grantId: string;
-  authorityRevision: number;
-  accessRevision: number;
-}>;
 type StoredAccountScope<T> = T extends { readonly scope: PlatformScopeV1 }
   ? Omit<T, "scope"> & { readonly scope: AccountScope }
   : never;
 export type AccountPrincipal =
   | Variant<PlatformPrincipalV1, "automation">
-  | (Omit<
-      Variant<PlatformPrincipalV1, "user">,
-      "identity"
-    > & {
-      readonly identity: Variant<PlatformIdentityLinkV1, "verified_provider_subject"> & { readonly issuer: "https://accounts.google.com" };
+  | (Omit<Variant<PlatformPrincipalV1, "user">, "identity"> & {
+      readonly identity: Variant<
+        PlatformIdentityLinkV1,
+        "verified_provider_subject"
+      > & { readonly issuer: "https://accounts.google.com" };
     });
 export type AccountIdentityResolution = Omit<
   Pick<ServiceIdentityResolutionV1, keyof ServiceIdentityResolutionV1>,
   "principal"
 > & { readonly principal: AccountPrincipal };
-export type AccountEligibility = Omit<ServiceEligibilityV1, "principal"> & {
-  readonly principal: AccountPrincipal;
-};
 export type AccountFundsReservation = StoredAccountScope<FundsReservationV1>;
 export type AccountReserveRequest = Pick<
   ReserveFundsRequestV1,
@@ -98,20 +87,20 @@ export type AccountIndeterminateRequest = Pick<
   keyof MarkFundsIndeterminateRequestV1
 >;
 /** One Pantry turn on the test meter. */
-export type AccountTurnUsageRequest = PlatformUsageEventDataV1 & PantryTurnUsageV1;
+type AccountTurnUsageRequest = PlatformUsageEventDataV1 &
+  PantryTurnUsageV1;
 /** One UTC hour of Jev input tokens for one feature (Plan 88). */
 export type AccountJevUsageRequest = PlatformUsageEventDataV1 &
   PantryJevInputTokensUsageV1;
 export type AccountUsageRequest =
-  | AccountTurnUsageRequest
-  | AccountJevUsageRequest;
+  AccountTurnUsageRequest | AccountJevUsageRequest;
 
 export function accountInteger(input: unknown, minimum = 0): number {
   return integer(input, "account integer", minimum);
 }
 
 /** Pantry admits verified Google subjects; the shared wire format supports other services too. */
-export function assertPantryPrincipal(
+function assertPantryPrincipal(
   principal: PlatformPrincipalV1,
 ): asserts principal is AccountPrincipal {
   if (
@@ -138,33 +127,4 @@ export function readAccountIdentityResolution(
 }
 export function accountUnavailable<T>(): Result<T, AccountPlatformError> {
   return { ok: false, error: { code: "authority_unavailable" } };
-}
-
-export function parsePantryAccountBinding(
-  input: unknown,
-): Result<PantryAccountBinding, AccountPlatformError> {
-  try {
-    const r = accountObject(input, [
-      "version",
-      "instanceId",
-      "scope",
-      "nativeOrganisationId",
-      "deploymentId",
-      "feePolicy",
-    ]);
-    if (r.version !== 1) throw new Error("Invalid binding version");
-    return {
-      ok: true,
-      value: {
-        version: 1,
-        instanceId: accountText(r.instanceId),
-        scope: parseAccountScope(r.scope),
-        nativeOrganisationId: accountText(r.nativeOrganisationId),
-        deploymentId: accountText(r.deploymentId),
-        feePolicy: parsePantryFeePolicy(r.feePolicy),
-      },
-    };
-  } catch {
-    return accountUnavailable();
-  }
 }

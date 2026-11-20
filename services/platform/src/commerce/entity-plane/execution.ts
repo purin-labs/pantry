@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { CommerceCommandAuthorityContext } from "@purin-labs/commerce-contracts/relationship-authority";
 import { pantryCommerceAccess } from "../app-access";
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "../../chat/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
@@ -544,7 +544,7 @@ async function authorizeEntityPlaneAction(
   const granted = await authorizeCapabilityUse({
     db: input.execution.database,
     accountAccess: input.execution.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.action.action.sessionId,
       input.action.action.nonce.value,
     ),

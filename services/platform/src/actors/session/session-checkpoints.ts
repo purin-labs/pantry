@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { reconcilePantryExecutionBilling } from "../../account-platform/execution-billing";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import type { Outcome } from "@purin-labs/contracts";
@@ -128,7 +128,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
       db: execution.scope.database,
       accountAccess: execution.scope.accountAccess,
       authority: lease.requestAuthority,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         lease.session.sessionId,
         lease.turn.turnId,
       ),
@@ -175,7 +175,7 @@ export abstract class SessionCheckpoints extends SessionActorBase {
       db: execution.scope.database,
       accountAccess: execution.scope.accountAccess,
       authority: lease.requestAuthority,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         lease.session.sessionId,
         lease.turn.turnId,
       ),

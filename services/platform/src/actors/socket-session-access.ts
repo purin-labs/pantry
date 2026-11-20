@@ -1,4 +1,4 @@
-import type { AccountAdmissionAction } from "../account-platform/access";
+import type { OrganisationAdmissionAction } from "../organisation-access/access";
 import {
   authorizeOrganisationControl,
   resolveControlSessionById,
@@ -24,7 +24,7 @@ type SocketSessionCheck = Readonly<{
   scope: OrganisationExecutionScope;
   controlSessionId: ControlSessionId;
   userId: UserId;
-  action: AccountAdmissionAction;
+  action: OrganisationAdmissionAction;
   requiredRole: ControlRole;
 }>;
 

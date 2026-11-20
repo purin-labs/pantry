@@ -3,7 +3,7 @@ import { assertNever } from "@purin-labs/std";
 
 import type { Variant } from "@purin-labs/type-utils";
 
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { authorizeConversation } from "../chat/conversation-access";
 import { sideCaseProposalId, storeSideCaseProposal } from "../chat/side-cases";
 import { signalChat } from "../chat/signals";
@@ -78,7 +78,7 @@ export async function proposeSideCaseForHarness(
   const live = await validateLiveRequestAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.lease.session.sessionId,
       input.lease.turn.turnId,
     ),
@@ -172,7 +172,7 @@ async function proposeSlackSideCaseForHarness(
   const live = await validateLiveRequestAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.lease.session.sessionId,
       input.lease.turn.turnId,
     ),

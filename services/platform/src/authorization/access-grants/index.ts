@@ -62,6 +62,5 @@ export {
   type AuthorizedCapabilityUse,
   type CapabilityAuthorizationError,
   type CapabilityAuthorizationRequest,
-  type CompiledTurnAuthority,
   type TurnAuthorityCompileError,
 } from "./turn-authority";

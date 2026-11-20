@@ -3,7 +3,6 @@
 // process runs the built account Worker and binds it to the Worker under
 // test, so each request below passes through that binding.
 import { isRecord } from "../../packages/std/src/index";
-import { ensurePantryAccountAutomationGrant } from "../../services/platform/src/account-platform/automation";
 import { resolvePantryAccountBinding } from "../../services/platform/src/account-platform/binding";
 import { linkPantryAccountUser } from "../../services/platform/src/account-platform/identity";
 import { readPantryProvisionApplied } from "../../services/platform/src/account-platform/provisioning-boundary";
@@ -20,7 +19,6 @@ import {
 } from "../../services/platform/src/data/control-plane";
 import type { Env } from "../../services/platform/src/env";
 import type { OrganisationId } from "../../services/platform/src/ids";
-import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
 import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
 
 /** A person with a role in one Organisation and a control session. */
@@ -382,33 +380,4 @@ export async function attachToAccountAuthority(
         `Account member identity link failed: ${memberLinked.error.code}`,
       );
   }
-}
-
-/** The account authority admits the agent of one mailbox binding. */
-export async function admitMailboxAgent(
-  env: Env,
-  input: Readonly<{
-    organisationId: OrganisationId;
-    administrator: AccountPerson;
-    mailboxBindingId: string;
-    bindingRevision: number;
-  }>,
-): Promise<void> {
-  const scope = await OrganisationExecutionScope.resolve(
-    env,
-    input.organisationId,
-  );
-  if (!scope.ok) throw new Error(scope.error.code);
-  const granted = await ensurePantryAccountAutomationGrant({
-    env,
-    scope: scope.value,
-    session: input.administrator.session,
-    native: {
-      kind: "agent_mailbox",
-      nativeId: input.mailboxBindingId,
-      revision: input.bindingRevision,
-    },
-  });
-  if (!granted.ok)
-    throw new Error(`Account automation grant failed: ${granted.error.code}`);
 }

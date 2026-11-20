@@ -85,6 +85,10 @@ export type { HarnessTurnLeaseId } from "./types/HarnessTurnLeaseId";
 export type { PrincipalId } from "./types/PrincipalId";
 export type { ProcessingSession } from "./types/ProcessingSession";
 export type { RequestAuthority } from "./types/RequestAuthority";
+export type {
+  OrganisationAdmissionAction,
+  OrganisationUserAuthority,
+} from "./organisation-access.ts";
 export type { RuntimeLease } from "./types/RuntimeLease";
 export type { RunBudgetIndeterminateReason } from "./types/RunBudgetIndeterminateReason";
 export type { RunBudgetReservation } from "./types/RunBudgetReservation";

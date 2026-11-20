@@ -1,4 +1,4 @@
-import { authenticatedAccountConversationScope } from "../../account-platform/access";
+import { authenticatedConversationScope } from "../../organisation-access/access";
 import {
   MAX_CASE_EXECUTION_PAGE,
   MAX_CASE_TIMELINE_WINDOW,
@@ -148,7 +148,7 @@ export async function handleCaseExecutionRoute(
     false,
   );
   if (!authorized.ok) return authorized.response;
-  const scope = authenticatedAccountConversationScope(
+  const scope = authenticatedConversationScope(
     authorized.organisationId,
     authorized.authenticated.session,
   );

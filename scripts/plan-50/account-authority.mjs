@@ -1,18 +1,14 @@
 // Attaches the trial Organisation to the built shared account Worker, which
 // the runtime binds as ACCOUNT_PLATFORM (see account-worker.mjs). Each
 // control request and each turn then passes the real account check.
-import { ensurePantryAccountAutomationGrant } from "../../services/platform/src/account-platform/automation.ts";
 import { resolvePantryAccountBinding } from "../../services/platform/src/account-platform/binding.ts";
 import { linkPantryAccountUser } from "../../services/platform/src/account-platform/identity.ts";
 import { readPantryProvisionApplied } from "../../services/platform/src/account-platform/provisioning-boundary.ts";
 import { handleAccountPlatformRequest } from "../../services/platform/src/account-platform/routes.ts";
-import { acceptedExecutionAccountAuthority } from "../../services/platform/src/account-platform/access.ts";
+import { acceptedExecutionAuthority } from "../../services/platform/src/organisation-access/access.ts";
 import { accountText } from "../../services/platform/src/account-platform/types.ts";
 import { compileTurnAuthority } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
-import {
-  issueControlSession,
-  resolveControlSessionById,
-} from "../../services/platform/src/data/control-plane.ts";
+import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
 import {
   newControlSessionId,
   newUserId,
@@ -161,26 +157,6 @@ export async function attachTrialOrganisation(
   return owner;
 }
 
-/** The account grant of one workflow, as an administrator gives it. */
-export async function admitTrialWorkflow(env, organisationId, owner, native) {
-  const scope = await OrganisationExecutionScope.resolve(env, organisationId);
-  if (!scope.ok) throw new Error(scope.error.code);
-  const session = await resolveControlSessionById({
-    db: env.DB,
-    controlSessionId: owner.nativeSessionId,
-    now: Date.now(),
-  });
-  if (!session.ok) throw new Error("Trial owner session is not active");
-  const granted = await ensurePantryAccountAutomationGrant({
-    env,
-    scope: scope.value,
-    session: session.value,
-    native: { kind: "workflow", ...native },
-  });
-  if (!granted.ok)
-    throw new Error(`Account automation grant failed: ${granted.error.code}`);
-}
-
 /** The account access of the trial Organisation's current placement. */
 export async function trialAccountAccess(env, organisationId) {
   const scope = await OrganisationExecutionScope.resolve(env, organisationId);
@@ -198,10 +174,7 @@ export async function compileTrialTurnAuthority(env, input) {
   return compileTurnAuthority({
     db: scope.value.database,
     accountAccess: scope.value.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
-      input.sessionId,
-      input.turnId,
-    ),
+    userAuthority: acceptedExecutionAuthority(input.sessionId, input.turnId),
     action: "execute",
     organisationId: input.organisationId,
     requestAuthority: input.requestAuthority,
