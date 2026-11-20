@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 218,
+    "upward": 216,
     "areas": 215,
     "order": 130,
     "table": 118
@@ -80,7 +80,7 @@
     "foundation/agent -> areas/organisation": 4,
     "foundation/agent -> foundation/conversation": 29,
     "foundation/agent -> surfaces/portal": 1,
-    "foundation/agent -> surfaces/slack": 7,
+    "foundation/agent -> surfaces/slack": 5,
     "foundation/agent -> surfaces/whatsapp": 1,
     "foundation/agent -> workers/platform": 1,
     "foundation/agent-tools -> areas/cafe": 1,

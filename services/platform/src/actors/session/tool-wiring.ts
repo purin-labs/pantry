@@ -13,6 +13,7 @@ import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId, RequestId } from "../../ids";
 import type { Result } from "../../result";
 import type { HarnessToolArgumentObserver } from "../embedded-harness";
+import type { SlackThreadSideCase } from "./harness-source";
 
 /** What a person's browser gave with a message. The contracts own the form. */
 export type TurnPageContext = PageBrowserContext;
@@ -119,6 +120,8 @@ export interface SessionToolWiring {
   ): Promise<Result<readonly TurnTool[], Readonly<{ code: string }>>>;
   /** The services of each tool family that an area owns, by family name. */
   areaServices(turn: ToolTurnContext): ToolServiceSet;
+  /** The side Case of a Slack thread. Slack gives it. */
+  readonly slackThreadSideCase: SlackThreadSideCase;
   /** The effects on a person's page. Kitchen gives them. */
   readonly pageEffects: SessionPageEffects;
   /** Sees the arguments of a tool call while the model writes them. */

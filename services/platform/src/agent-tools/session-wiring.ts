@@ -24,6 +24,10 @@ import {
 } from "./kitchen/turn-services";
 import { stageConfigurationDraft } from "./organisation/configuration-draft";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
+import {
+  admitSlackSideCaseInformationFlow,
+  SLACK_SIDE_CASE_HARNESS_INSTRUCTION,
+} from "../slack/side-cases";
 import { slackToolServices } from "./slack/turn-services";
 
 /**
@@ -77,6 +81,10 @@ export const SESSION_TOOL_WIRING: SessionToolWiring = {
     };
   },
   pageEffects: KITCHEN_PAGE_EFFECTS,
+  slackThreadSideCase: {
+    harnessInstruction: SLACK_SIDE_CASE_HARNESS_INSTRUCTION,
+    admit: admitSlackSideCaseInformationFlow,
+  },
   // Plan 40B phase 7: a board edit shows on the board while the model writes
   // it.
   argumentObserver: createMenuBoardDraftPreview,

@@ -29,17 +29,12 @@ import {
   authorizeSideCaseAccess,
 } from "../../chat/side-cases";
 import { readSideCaseOrigin } from "../../chat/side-case-origin";
-import { admitSlackSideCaseInformationFlow } from "../../slack/side-cases";
 import {
   writeHarnessTurnContinuation,
   finishHarnessTurnContinuation,
 } from "../agent-session-continuation";
-import {
-  turnMayProposeMemory,
-} from "../harness-memory-proposal";
-import {
-  turnMayProposeSideCase,
-} from "../harness-side-case-proposal";
+import { turnMayProposeMemory } from "../harness-memory-proposal";
+import { turnMayProposeSideCase } from "../harness-side-case-proposal";
 import {
   requestPermissionForHarness,
   turnMayRequestPermission,
@@ -166,9 +161,7 @@ import {
   turnToolSelection,
 } from "./harness-source";
 import { projectWorkingHistory, requirePiHarnessLease } from "./model-context";
-import {
-  createEmbeddedHarnessModelRouteLease,
-} from "./model-route";
+import { createEmbeddedHarnessModelRouteLease } from "./model-route";
 import {
   acceptCanonicalRunModelUsage,
   combinedHarnessUsage,
@@ -355,9 +348,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     requestingOrganisationId: OrganisationId;
     lease: HarnessTurnLease;
     turnPrompt: string;
-    resolvedCatalog: Promise<
-      Result<AcceptedTurnTools, unknown>
-    > | null;
+    resolvedCatalog: Promise<Result<AcceptedTurnTools, unknown>> | null;
   }): Promise<
     Result<CanonicalEmbeddedHarnessInput, CanonicalEmbeddedHarnessInputError>
   > {
@@ -596,7 +587,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     );
     const sideCaseOrigin = await sideCaseRead;
     if (sideCaseOrigin?.kind === "slack_thread")
-      await admitSlackSideCaseInformationFlow(
+      await this.sessionTools().slackThreadSideCase.admit(
         this.ctx.storage,
         input.lease,
         sideCaseOrigin.proposal,
@@ -660,6 +651,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     const harnessInstructions = sideCaseHarnessInstructions(
       forkInstructions,
       sideCaseOrigin,
+      this.sessionTools().slackThreadSideCase,
     );
     const parsedSessionId = parseSessionId(
       session.value.lifecycle.state.identity.sessionId,
@@ -1824,18 +1816,20 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     phaseStartedAt = Date.now();
     const runtimePreflight =
       await resolveCanonicalEmbeddedHarnessCheckpointBinding({
-      registry: this.sessionTools().registry,
+        registry: this.sessionTools().registry,
         state: current.value.lifecycle,
         runtime: runtime.value,
         harnessInstructions: sideCaseHarnessInstructions(
           input.harnessInstructions,
           await sideCaseOrigin,
+          this.sessionTools().slackThreadSideCase,
         ),
         assignment,
         turnTools: acceptedTurnTools.value.turnTools,
-        bakerySurfaceCommands: this.sessionTools().pageEffects.authorizedCommands(
-          input.start.requestAuthority,
-        ),
+        bakerySurfaceCommands:
+          this.sessionTools().pageEffects.authorizedCommands(
+            input.start.requestAuthority,
+          ),
         memoryProposal: turnMayProposeMemory(input.start.requestAuthority),
         followUp: turnMayScheduleFollowUp(
           input.start.requestAuthority,
