@@ -63,10 +63,8 @@ import {
   resolveActiveSlackDestinationConnection,
 } from "../../../slack/organisation-routing";
 import { resolveOrganisationCommerceSystemAuthority } from "../../../data/organisation-commerce-system";
-import {
-  previewMerchantPluginAction,
-  type CommerceProviderExecutionError,
-} from "../../../commerce/provider-execution";
+import { previewMerchantPluginAction } from "../../../commerce/provider-execution";
+import type { CommerceProviderExecutionError } from "../../../commerce/commerce-provider";
 import { prepareTurnAuthority } from "../../../context/turn-context";
 import {
   parseCaseId,

@@ -41,6 +41,7 @@ import {
   type CommerceSystemSelection,
 } from "../../../data/organisation-commerce-system";
 import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/queue-messages";
+import { commerceProvider } from "../../../commerce/commerce-providers";
 import {
   newRequestId,
   parseIntegrationAccountId,
@@ -674,24 +675,7 @@ function parseCommerceSystemSelectionBody(
 }
 
 function commerceSystemWire(system: CommerceSystem): unknown {
-  switch (system.kind) {
-    case "satyr_commerce":
-      return {
-        kind: "satyr_commerce",
-        organisationId: system.organisationId,
-        bindingId: system.bindingId,
-        merchantId: system.merchantId,
-        revision: system.revision,
-      };
-    case "shopify":
-      return {
-        kind: "shopify",
-        organisationId: system.organisationId,
-        integrationAccountId: system.integrationAccountId,
-        shopDomain: system.shopDomain,
-        revision: system.revision,
-      };
-  }
+  return commerceProvider(system.kind).wire(system);
 }
 
 function commerceSystemErrorResponse(code: string): Response {

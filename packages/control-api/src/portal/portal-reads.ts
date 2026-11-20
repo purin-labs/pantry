@@ -4,7 +4,6 @@ import type {
   SupportDiagnostics,
 } from "./settings.ts";
 import {
-  assertNever,
   isRecord,
   nonNegativeIntegerOrNull,
   positiveIntegerOrNull,
@@ -21,6 +20,7 @@ import {
 } from "./portal-projection.ts";
 import { readApiError } from "./api-error.ts";
 import type {
+  CommerceSystemIdentityView,
   CommerceSystemSyncView,
   CommerceSystemView,
   OperatorOrganisationCase,
@@ -251,20 +251,6 @@ export function parseCommerceSystemResponse(
   return parseCommerceSystemView(raw.commerceSystem, raw.sync);
 }
 
-type CommerceSystemIdentityView =
-  | Readonly<{
-      kind: "satyr_commerce";
-      bindingId: string;
-      merchantId: string;
-      revision: number;
-    }>
-  | Readonly<{
-      kind: "shopify";
-      integrationAccountId: string;
-      shopDomain: string;
-      revision: number;
-    }>;
-
 export function parseCommerceSystemIdentity(
   raw: Record<string, unknown>,
 ): CommerceSystemIdentityView {
@@ -306,28 +292,10 @@ function parseCommerceSystemView(
   raw: Record<string, unknown>,
   syncRaw: Record<string, unknown>,
 ): CommerceSystemView {
-  const identity = parseCommerceSystemIdentity(raw);
-  const sync = parseCommerceSystemSyncView(syncRaw);
-  switch (identity.kind) {
-    case "satyr_commerce":
-      return {
-        kind: identity.kind,
-        bindingId: identity.bindingId,
-        merchantId: identity.merchantId,
-        revision: identity.revision,
-        sync,
-      };
-    case "shopify":
-      return {
-        kind: identity.kind,
-        integrationAccountId: identity.integrationAccountId,
-        shopDomain: identity.shopDomain,
-        revision: identity.revision,
-        sync,
-      };
-    default:
-      return assertNever(identity, "Unexpected portal state");
-  }
+  return {
+    ...parseCommerceSystemIdentity(raw),
+    sync: parseCommerceSystemSyncView(syncRaw),
+  };
 }
 
 function parseCommerceSystemSyncView(

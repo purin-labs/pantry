@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type {
-  CapabilityCommerceSystem,
+  CommerceSystemKind,
   CapabilityDefinition,
   OnboardingControlRole,
 } from "@purin-labs/contracts";
@@ -252,7 +252,7 @@ async function includeCommerceIntegration(
     organisationId: OrganisationId;
     integrations: readonly AccessControlIntegrationProjection[];
     commerceIntegrationAccountId: IntegrationAccountId | null;
-    availableCommerceSystems: readonly CapabilityCommerceSystem[];
+    availableCommerceSystems: readonly CommerceSystemKind[];
   }>,
 ): Promise<
   Result<readonly AccessControlIntegrationProjection[], AccessControlReadError>
@@ -327,7 +327,7 @@ async function readAvailableCommerceSystems(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
 ): Promise<
-  Result<readonly CapabilityCommerceSystem[], AccessControlReadError>
+  Result<readonly CommerceSystemKind[], AccessControlReadError>
 > {
   const selected = await resolveOrganisationCommerceSystem({ db, organisationId });
   if (!selected.ok) {
@@ -489,7 +489,7 @@ async function resourceProjections(
   grants: readonly AccessGrant[],
   integrations: readonly AccessControlIntegrationProjection[],
   commerceIntegrationAccountId: IntegrationAccountId | null,
-  availableCommerceSystems: readonly CapabilityCommerceSystem[],
+  availableCommerceSystems: readonly CommerceSystemKind[],
 ): Promise<
   Result<readonly AccessControlResourceProjection[], AccessControlReadError>
 > {

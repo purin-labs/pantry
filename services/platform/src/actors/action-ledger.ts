@@ -1,7 +1,8 @@
-import type {
-  AuthorityPartition,
-  CanonicalAction,
-  RequestAuthority,
+import {
+  isCommerceSystemKind,
+  type AuthorityPartition,
+  type CanonicalAction,
+  type RequestAuthority,
 } from "@purin-labs/contracts";
 import type { CommerceEntityPlaneEffect } from "@purin-labs/commerce-contracts";
 
@@ -1360,8 +1361,7 @@ function validateActionAuthority(authority: ActionAuthority): boolean {
   switch (authority.kind) {
     case "commerce_system":
       return (
-        (authority.system === "satyr_commerce" ||
-          authority.system === "shopify") &&
+        isCommerceSystemKind(authority.system) &&
         parseCommerceSystemRevision(authority.revision).ok
       );
     case "integration_account":
@@ -1378,7 +1378,7 @@ function parseActionAuthority(
     case "commerce_system": {
       const revision = parseCommerceSystemRevision(raw.revision);
       return Object.keys(raw).length === 3 &&
-        (raw.system === "satyr_commerce" || raw.system === "shopify") &&
+        isCommerceSystemKind(raw.system) &&
         revision.ok
         ? {
             kind: "commerce_system",

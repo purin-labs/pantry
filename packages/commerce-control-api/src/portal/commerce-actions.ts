@@ -1,4 +1,9 @@
 import {
+  isCommerceSystemKind,
+  type CommerceSystemKind,
+  type ActionState,
+} from "@purin-labs/contracts";
+import {
   parseStockOperationDetails,
   type StockOperationDetails,
 } from "@purin-labs/control-api/portal/stock-operation";
@@ -17,7 +22,6 @@ import type {
   CommerceShopifyProviderReceipt,
   CommerceEngineProviderReceipt,
 } from "@purin-labs/control-api";
-import type { ActionState } from "@purin-labs/contracts";
 import {
   parseMenuPriceDetails,
   type MenuPriceDetails,
@@ -26,7 +30,7 @@ import {
 type CommerceActionAuthority =
   | {
       readonly kind: "commerce_system";
-      readonly system: "satyr_commerce" | "shopify";
+      readonly system: CommerceSystemKind;
       readonly revision: number;
     }
   | {
@@ -895,7 +899,7 @@ function isCommerceActionAuthority(
     case "commerce_system":
       return (
         hasExactKeys(raw, ["kind", "system", "revision"]) &&
-        (raw.system === "satyr_commerce" || raw.system === "shopify") &&
+        isCommerceSystemKind(raw.system) &&
         isPositiveInteger(raw.revision)
       );
     case "integration_account":

@@ -1,3 +1,4 @@
+import type { CommerceSystemKind } from "@purin-labs/contracts";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import React from "react";
 import { CommerceActionTrace } from "./commerce-trace";
@@ -206,7 +207,7 @@ function setActionDecision(
   setDecision(decision);
 }
 
-function commerceSystemName(system: "satyr_commerce" | "shopify"): string {
+function commerceSystemName(system: CommerceSystemKind): string {
   switch (system) {
     case "satyr_commerce":
       return "Seams Checkout";

@@ -1,6 +1,7 @@
-import type {
-  CommerceCueFact,
-  CommerceProjection,
+import { commerceSystemSource } from "@purin-labs/contracts";
+import {
+  type CommerceCueFact,
+  type CommerceProjection,
 } from "@purin-labs/commerce-contracts";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
@@ -403,10 +404,8 @@ export function matchesCommerceSystemAuthority(
       if (observation.identity.source !== "lab") return false;
       continue;
     }
-    const expectedSource =
-      authority.kind === "satyr_commerce" ? "underclerk" : "shopify";
     if (
-      observation.identity.source !== expectedSource ||
+      observation.identity.source !== commerceSystemSource(authority.kind) ||
       authority.revision < 1
     )
       return false;

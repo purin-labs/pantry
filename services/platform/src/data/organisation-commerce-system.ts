@@ -1,4 +1,8 @@
 import type {
+  CommerceSystemKind,
+  CommerceSystemSource,
+} from "@purin-labs/contracts";
+import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
@@ -70,7 +74,7 @@ export type CommerceSystemError =
 
 export type CommerceSystemProviderAuthority = Readonly<{
   commerceSystem: CommerceSystem;
-  provider: "underclerk" | "shopify";
+  provider: CommerceSystemSource;
   integrationAccountId: IntegrationAccountId;
 }>;
 
@@ -462,7 +466,7 @@ async function persistCommerceSystemSelection(
 }
 
 function commerceSystemPersistenceFields(system: CommerceSystem): Readonly<{
-  systemKind: "satyr_commerce" | "shopify";
+  systemKind: CommerceSystemKind;
   underclerkBindingId: CommerceBindingId | null;
   shopifyIntegrationAccountId: IntegrationAccountId | null;
 }> {

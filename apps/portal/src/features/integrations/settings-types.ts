@@ -1,4 +1,5 @@
 import type { FirstOperationalTask, OnboardingActivation, OrganisationOnboardingLifecycle } from "@purin-labs/contracts";
+import type { CommerceSystemSyncView, CommerceSystemView } from "@purin-labs/control-api/portal/portal-types";
 import React from "react";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
 import type { CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
@@ -21,39 +22,9 @@ import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCo
 
 export type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];
 
-export type CommerceSystemSync =
-  | {
-      readonly kind: "syncing";
-      readonly acceptedResourceCount: number;
-      readonly requestedAt: number;
-      readonly previousLastSyncedAt: number | null;
-    }
-  | {
-      readonly kind: "delayed";
-      readonly acceptedResourceCount: number;
-      readonly lastSyncedAt: number;
-    }
-  | {
-      readonly kind: "ready";
-      readonly acceptedResourceCount: number;
-      readonly lastSyncedAt: number;
-    };
+export type CommerceSystemSync = CommerceSystemSyncView;
 
-export type CommerceSystem =
-  | {
-      readonly kind: "satyr_commerce";
-      readonly bindingId: string;
-      readonly merchantId: string;
-      readonly revision: number;
-      readonly sync: CommerceSystemSync;
-    }
-  | {
-      readonly kind: "shopify";
-      readonly integrationAccountId: string;
-      readonly shopDomain: string;
-      readonly revision: number;
-      readonly sync: CommerceSystemSync;
-    };
+export type CommerceSystem = CommerceSystemView;
 
 export type SlackWorkspaceCatalog = {
   readonly integrationAccountId: string;

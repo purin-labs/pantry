@@ -37,6 +37,8 @@ import { type ActorExportError } from "../actor-export";
 import {
   acceptShopifyLocationObservation,
   assignShopifyLocationClassification,
+  shopifyLocationClassificationAuthority,
+  shopifyLocationProjectionAuthority,
   type AssignShopifyLocationClassificationInput,
   type ShopifyLocationClassificationAssignmentError,
   type ShopifyLocationClassificationAssignmentResult,
@@ -650,18 +652,10 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
       db: scope.database,
       organisationId: input.organisationId,
     });
-    const projectionAuthority =
-      selected.ok &&
-      selected.value.provider === "shopify" &&
-      selected.value.integrationAccountId === input.integrationAccountId
-        ? {
-            kind: "selected" as const,
-            commerceSystem: {
-              kind: "shopify" as const,
-              revision: selected.value.commerceSystem.revision,
-            },
-          }
-        : { kind: "unselected" as const };
+    const projectionAuthority = shopifyLocationProjectionAuthority(
+      selected,
+      input.integrationAccountId,
+    );
     if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
       return organisationPlacementConflict();
     return this.ctx.storage.transactionSync(
@@ -696,16 +690,11 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
       db: scope.database,
       organisationId: input.organisationId,
     });
-    if (
-      !selected.ok ||
-      selected.value.provider !== "shopify" ||
-      selected.value.integrationAccountId !== input.integrationAccountId
-    ) {
-      return {
-        ok: false,
-        error: { code: "commerce_system_authority_mismatch" },
-      };
-    }
+    const commerceSystem = shopifyLocationClassificationAuthority(
+      selected,
+      input.integrationAccountId,
+    );
+    if (!commerceSystem.ok) return commerceSystem;
     if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
       return organisationPlacementConflict();
     return this.ctx.storage.transactionSync(
@@ -713,10 +702,7 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
         null,
         this.ctx.storage.sql,
         input,
-        {
-          kind: "shopify",
-          revision: selected.value.commerceSystem.revision,
-        },
+        commerceSystem.value,
       ),
     );
   }

@@ -1,4 +1,5 @@
 import type {
+  CommerceSystemKind,
   AuthorityPartition,
   CaseAssignmentLifecycle,
   CaseAssignmentStart,
@@ -465,7 +466,7 @@ export type CommerceCaseAuthority =
   | Readonly<{ kind: "lab" }>
   | Readonly<{
       kind: "commerce_system";
-      system: "satyr_commerce" | "shopify";
+      system: CommerceSystemKind;
       revision: CommerceSystemRevision;
       integrationAccountId: IntegrationAccountId;
     }>;
