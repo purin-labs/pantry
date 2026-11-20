@@ -181,7 +181,7 @@ type ToolSpec<Name extends string, Input extends TSchema, Request, Services> = {
    * did. It keeps the catalog digest of turns in flight; drop it in a release
    * that may change the digest.
    */
-  readonly strictFirst?: true;
+  readonly strictFirst?: true | "before_type";
 };
 
 /**
@@ -213,7 +213,7 @@ export type RegisteredTool<
   readonly unconfirmedFailure?: string;
   readonly guidance?: string;
   readonly parameters?: HarnessToolDefinition["parameters"];
-  readonly strictFirst: boolean;
+  readonly strictFirst: boolean | "before_type";
 };
 
 /** A tool of any family, as the registry and the executor hold it. */
@@ -293,7 +293,7 @@ export function defineToolFamily<Services>() {
         ...(spec.parameters === undefined
           ? {}
           : { parameters: spec.parameters }),
-        strictFirst: spec.strictFirst === true,
+        strictFirst: spec.strictFirst ?? false,
       };
     };
 }
@@ -347,6 +347,16 @@ export function modelToolDefinition<Name extends string>(
     tool.guidance === undefined
       ? tool.description
       : `${tool.description} ${tool.guidance}`;
+  if (tool.strictFirst === "before_type") {
+    // One mailbox definition was written with `strict` first.
+    return {
+      strict: true,
+      type: "function",
+      name: tool.name,
+      description,
+      parameters,
+    };
+  }
   return tool.strictFirst
     ? {
         type: "function",
