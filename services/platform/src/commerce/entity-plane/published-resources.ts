@@ -30,6 +30,7 @@ import type { Env } from "../../env";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { opaqueAccessTargetReference } from "../../access-control/references";
+import type { PublishedCommerceTarget } from "../../access-control/commerce-access-targets";
 import { commerceCanonicalResourceId } from "../contract/resource-ids";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
@@ -70,24 +71,6 @@ export function createPublishedResourceClient(
 
 type CommerceCommandTarget = Variant<AccessGrantTarget, "commerce_command">;
 type CommerceProviderTarget = Variant<AccessGrantTarget, "provider_resource">;
-
-type PublishedCommerceTarget =
-  | Readonly<{
-      kind: "list_entry";
-      target: CommerceCommandTarget;
-      providerTarget: CommerceProviderTarget;
-      targetRef: AccessTargetRef;
-      label: string;
-      detail: "Published commerce list entry";
-    }>
-  | Readonly<{
-      kind: "product";
-      target?: never;
-      providerTarget: CommerceProviderTarget;
-      targetRef: AccessTargetRef;
-      label: string;
-      detail: "Seams Checkout product";
-    }>;
 
 type PublishedCommerceTargetError = "unavailable";
 
