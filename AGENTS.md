@@ -264,11 +264,15 @@ Each Pantry feature is also a feature of the Portal chat agent. When a change
 lets a person do something new in the Portal or in Slack, the same change
 gives the agent a way to do it:
 
-- Add a tool as one `defineTool` value in a family module under
-  `services/platform/src/agent-tools/` and one line in its `registry.ts`. The
-  selection rule says when a turn offers it (a capability, a turn flag or a
-  Kitchen surface command), and the effect says what a call proves. The
-  catalog that selects and runs the tools is `agent-tools/catalog/`. Or add a
+- Add a tool with the definer of its family, for example `defineKitchenTool`,
+  in a family module under `services/platform/src/agent-tools/`, and one line
+  in `registry.ts` at the end of its group. A tool keeps its place: the session
+  pins a digest of the list. The services type of the family names what the
+  Session gives to the handler. The selection rule says when a turn offers
+  the tool (a capability, a turn flag or a page command), and the effect says
+  what a call proves. A refusal that the agent can act on is a
+  `ToolRequestError`. The catalog that selects and runs the tools is
+  `agent-tools/catalog/`: it imports no product area. Or add a
   Code Mode capability. The agent acts through the person's own role checks,
   approvals and receipts, and it reads only what the person can read
   ([Plan 81](docs/plan-81-agent-portal-control.md)).

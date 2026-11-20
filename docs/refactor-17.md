@@ -558,6 +558,71 @@ What the steps show:
 - The devices preview page had no CSRF cookie, so each write on it failed. It sets
   one now.
 
+**20 November 2026. Step A1.3 is done on the branch
+`refactor-17-a1-3-tool-families`.** The branch starts at `origin/dev` `58b7e5e`. It
+is not on `dev`.
+
+| Part          | What exists                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Errors        | `ToolRequestError` in `agent-tools/errors.ts`. The executor tests this one class, and each area error extends it. The base carries the message for the model and the read that a permission request may ask for                                                                                                                                                                                                 |
+| Families      | A tool belongs to one of 11 families: `kitchen`, `cafe`, `commerce`, `channels`, `drafts`, `devices`, `jev`, `integrations`, `files`, `messages`, `turn`. The area declares the services type of its family and defines each tool with the definer of the family. The host gives the services by family name. `CatalogToolAuthority` holds the registry, the services and the capability claim, and no callback |
+| One list      | `agent-tools/registry.ts` holds `TOOLS` in the order of the model definitions, and `ToolServices`, the type of all services. The catalog takes the list as a `ToolRegistry` value                                                                                                                                                                                                                               |
+| Selection     | A surface and its command are strings that the area checks                                                                                                                                                                                                                                                                                                                                                      |
+| Special cases | Fields of a tool definition: `result` and `parameters` (`commerce_entity_context`, now a registered tool), `readReceipt`, `succeeded` and `guidance` (the surface tools). A custom connector operation is a turn tool that `custom-connectors/catalog-tools.ts` builds, with its digest pin                                                                                                                     |
+| Types         | The types of the area tools moved from `agent-tools/catalog/types.ts` to the services file of each family                                                                                                                                                                                                                                                                                                       |
+
+The measures:
+
+| Measure                                                              | Before | After |
+| -------------------------------------------------------------------- | -----: | ----: |
+| Imports of area files in `agent-tools/catalog/` and `define-tool.ts` |     48 |     0 |
+| Layer crossings, in the tree and the ratchet                         |  1,350 | 1,295 |
+| `foundation/agent-tools` to an area                                  |     75 |    29 |
+| Unused exports                                                       |    819 |   810 |
+| Copies of product code                                               |    937 |   932 |
+| Registered tools                                                     |    116 |   117 |
+
+No pair grew. The branch removed 3,454 lines and added 2,783, the ratchet files
+included. No test file was deleted: the three unit files that build the tool host
+check outcomes of the executor (the capability gate, the screened failure text, the
+effect kind), and they pass with the same assertions.
+
+The catalog is the same bytes. The two digests and the name hash of the
+[baseline](#baseline) are equal, and also the two definition hashes that this step
+added there. A custom connector definition and its pin are equal to the output of
+`origin/dev` for a read and for a write operation.
+
+The checks on the branch: `pnpm lint` passes, and the three type checks give 0
+errors. The unit suite passes with 302 files and 1,732 tests. The E2E suite gives
+the counts of the baseline: 234 files pass and 3 are skipped, 455 tests pass and 6
+are skipped, in 59 min 33 s. Each of the seven Workers bundles in a Wrangler dry run.
+Not done: the health checks and the live Portal chat turn of the first release.
+
+Open after step A1.3:
+
+- **The handler does not take the turn context as a parameter.** The Session still
+  binds it to each handler with `withToolContext`, and it still names each handler
+  in `session-harness-turns.ts`, now in one group for each family. Step
+  A1.4 gives the context to `prepare` and `run`. Step A1.7 removes the names from
+  the Session.
+- **`agent-tools/registry.ts` imports each family:** 19 of the 29 crossings that
+  stay. It is a part of the Worker. It moves to `workers/platform` when the Worker
+  gives the registry to the Session (step A1.7). `session-support.ts` has 8
+  (step A1.4), and `files/handlers.ts` has 2.
+- **`channels/` and `drafts/` are not split by area.** A family follows its folder.
+  A split moves handlers between areas, and each move makes a new import between two
+  areas. Step A1.10 gives the contracts that such an import needs. For the same
+  reason the order queue tools read their request types from
+  `commerce/order-queue-commands.ts`, and the Session's staging methods read theirs
+  from `ToolServices`.
+- **`bakerySurfaceCommands` keeps its name** in `HarnessCatalogSelection` and in the
+  Session, and the digest key `customConnectorPins` keeps its name.
+- **A host that gives no service for a tool** (a check or an evaluation script, not
+  the Session) fails that call before the capability claim. Before, 14 tools failed
+  after the claim. The model sees the same failure text.
+- **The temporary catalog check is removed,** as the step ends. Step A1.4 writes it
+  again from the values of the baseline.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
@@ -610,8 +675,21 @@ stay the same:
 The widest selection has each capability and each surface command of `TOOLS` in
 `agent-tools/registry.ts`, in registry order, and each turn flag on (`memoryProposal`,
 `followUp`, `sideCaseProposal`, `permissionRequest`). No script computes it: the
-functions need the Vitest resolver. Step A1.3 adds a temporary check with these
-values and removes it at the end of step A1.
+functions need the Vitest resolver. A step that changes the registry adds a
+temporary test file with these values and removes it before its last commit. The
+check takes the definitions from `selectCatalogDefinitions(TOOL_REGISTRY, selection)`
+and hashes `JSON.stringify` of them with `sha256Hex`.
+
+Step A1.3 measured two more values on `origin/dev` `58b7e5e`, before its first
+change. They cover each byte of the definitions, not only the names:
+
+| Value                                                                                   | Result                                                             |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| SHA-256 of the definitions of the widest selection                                      | `aab68b96bb5053b81f9167c56796e949cd265a2cf2f01d78a89496f5ec3e497f` |
+| SHA-256 of the definitions of a selection with no capability and `permissionRequest` on | `00942772761126e3c80235cfa5ccd6f460638beab32e93e53c1eb99c008667b8` |
+
+Since step A1.3 the registry holds 117 tools: `commerce_entity_context` is a
+registered tool. The widest selection still has 117 definitions and 33 capabilities.
 
 The prune baseline of step A0.8:
 
