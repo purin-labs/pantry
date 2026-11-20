@@ -72,6 +72,9 @@ import {
 import { prepareReturnPrivateChatsToDefault } from "../projects/case-project";
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { encodeBase64Url, isPositiveInteger, isRecord } from "@purin-labs/std";
+import {
+  prepareConfigurationVersionBump,
+} from "./organisation-onboarding-row";
 
 export type ControlRole = OnboardingControlRole;
 export type AssignableControlRole = Exclude<ControlRole, "owner">;
@@ -1477,15 +1480,7 @@ export async function changeOrganisationServiceRole(input: {
         role: input.nextRole,
         now: input.now,
       }),
-      session
-        .prepare(
-          `UPDATE organisation_onboarding
-         SET configuration_version = configuration_version + 1,
-             projection_revision = projection_revision + 1,
-             updated_at = ?
-         WHERE organisation_id = ? AND configuration_version = ?`,
-        )
-        .bind(input.now, input.organisationId, state.configurationVersion),
+      prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
       session
         .prepare(
           `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
@@ -1646,15 +1641,7 @@ export async function applyAccountServiceGrantRevocation(input: {
         "UPDATE portal_chat_directory SET revision = revision + 1 WHERE organisation_id = ?",
       )
       .bind(input.organisationId),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET configuration_version = configuration_version + 1,
-           projection_revision = projection_revision + 1,
-           updated_at = ?
-       WHERE organisation_id = ? AND configuration_version = ?`,
-      )
-      .bind(input.now, input.organisationId, state.configurationVersion),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
     session
       .prepare(
         `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,

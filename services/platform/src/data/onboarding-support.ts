@@ -15,6 +15,9 @@ import type {
   OrganisationQuerySource,
   GlobalQuerySource,
 } from "./query-source";
+import {
+  prepareProjectionRevisionBump,
+} from "./organisation-onboarding-row";
 
 type ControlSupportRole =
   | {
@@ -228,13 +231,7 @@ export async function resolveOpenProviderSupportReferences(
 ): Promise<boolean> {
   const resolved = await prepareResolveOpenSupportReferences(db, input).run();
   if (resolved.meta.changes === 0) return false;
-  await db
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET projection_revision = projection_revision + 1
-     WHERE organisation_id = ?`,
-    )
-    .bind(input.organisationId)
+  await prepareProjectionRevisionBump(db, input.organisationId)
     .run();
   return true;
 }

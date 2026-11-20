@@ -32,6 +32,9 @@ import {
 import type { OrganisationEnvironment } from "./control-plane";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
+import {
+  prepareProjectionRevisionBump,
+} from "./organisation-onboarding-row";
 
 export type ConnectionProvider =
   | "airtable"
@@ -470,13 +473,7 @@ export async function createAuthorizingProviderAttempt(input: {
         input.now,
         input.expiresAt,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ? AND configuration_version = ?`,
-      )
-      .bind(input.organisationId, organisation.configurationVersion),
+    prepareProjectionRevisionBump(session, input.organisationId, { atConfigurationVersion: organisation.configurationVersion }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,
@@ -703,13 +700,7 @@ export async function expireProviderAttemptIfDue(input: {
       input.now,
       "expired",
     ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1, updated_at = ?
-       WHERE organisation_id = ?`,
-      )
-      .bind(input.now, input.organisationId),
+    prepareProjectionRevisionBump(session, input.organisationId, { updatedAt: input.now }),
     prepareOnboardingAuditEvent(session, identity, {
       organisationId: input.organisationId,
       environment: organisation.environment,
@@ -885,13 +876,7 @@ export async function consumeProviderAuthorizationState(input: {
         state.value.attemptId,
         callbackReceiptId,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ?`,
-      )
-      .bind(state.value.organisationId),
+    prepareProjectionRevisionBump(session, state.value.organisationId),
     input.scope.prepareMutationFence(),
   ]);
   if (results[0]?.meta.changes !== 1 || results[1]?.meta.changes !== 1) {
@@ -963,13 +948,7 @@ export async function beginProviderProvisioning(input: {
         input.attempt.attemptId,
         input.attempt.callbackReceiptId,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ?`,
-      )
-      .bind(input.attempt.organisationId),
+    prepareProjectionRevisionBump(session, input.attempt.organisationId),
     input.scope.prepareMutationFence(),
   ]);
   if (results[1]?.meta.changes !== 1) {
@@ -1135,13 +1114,7 @@ export async function completeProviderProvisioning(input: {
       input.now,
       "connected",
     ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ?`,
-      )
-      .bind(input.attempt.organisationId),
+    prepareProjectionRevisionBump(session, input.attempt.organisationId),
     prepareOnboardingEvent(session, eventIdentity, {
       eventId: eventIdentity.auditEventId,
       eventType: "provider_attempt_connected",
@@ -1421,13 +1394,7 @@ export async function failProviderAttempt(input: {
       input.now,
       "failed",
     ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ?`,
-      )
-      .bind(input.attempt.organisationId),
+    prepareProjectionRevisionBump(session, input.attempt.organisationId),
     prepareOnboardingEvent(session, eventIdentity, {
       eventId: eventIdentity.auditEventId,
       eventType: "provider_attempt_failed",
@@ -1612,13 +1579,7 @@ export async function cancelProviderAttempt(input: {
       input.now,
       "cancelled",
     ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ? AND configuration_version = ?`,
-      )
-      .bind(input.organisationId, organisation.configurationVersion),
+    prepareProjectionRevisionBump(session, input.organisationId, { atConfigurationVersion: organisation.configurationVersion }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

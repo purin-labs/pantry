@@ -53,6 +53,9 @@ import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
 } from "../slack/organisation-routing";
+import {
+  prepareProjectionRevisionBump,
+} from "./organisation-onboarding-row";
 
 type OnboardingReconciliationSubject =
   | "open_attempts"
@@ -970,13 +973,7 @@ async function reconcileSetupSnapshots(
     )
     .bind(organisation.organisationId)
     .run();
-  await db
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET projection_revision = projection_revision + 1, updated_at = ?
-     WHERE organisation_id = ?`,
-    )
-    .bind(now, organisation.organisationId)
+  await prepareProjectionRevisionBump(db, organisation.organisationId, { updatedAt: now })
     .run();
   return Math.max(result.meta.changes ?? 0, 1);
 }

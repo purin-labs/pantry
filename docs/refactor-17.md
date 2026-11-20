@@ -431,6 +431,22 @@ A1.8), on the branch `refactor-17-a1-8`. No code changed: the map changed.
   area `organisation` (1 import, and 12 writes of `organisation_onboarding`), the
   handle type of the Vault (1), and `tenancy` imports the account record (1).
 
+**20 November 2026. The configuration row has one owner of its counters** (the first
+table-owner step), on the branch `refactor-17-a1-8`.
+
+- `data/organisation-onboarding-row.ts` belongs to `tenancy`, and it owns the table
+  `organisation_onboarding`. Control routes of five modules read it.
+- 36 statements in 20 files updated the two counters of that row. 21 of them had one
+  of five texts. They now call `prepareProjectionRevisionBump` or
+  `prepareConfigurationVersionBump` of the owner, in the same batch as before.
+- The 15 other statements have their own conditions, for example a placement fence.
+  They stay, and the ratchet lists them: 10 writes from 4 modules.
+- The map shows 1,268 crossings, where it showed 1,294. Writes of a table outside
+  its owner went from 144 to 124.
+- Two copies went with it: one in `credential-lifecycle.ts`, and the wrapper
+  `bumpProjectionRevision`. The clone baseline holds 908 copies.
+- No behavior changed: each statement has the same text and the same values.
+
 The step is smaller than its first description. A count with the type checker gave
 the reason: callers use 245 methods of the four Actors at 440 places, in about 130
 files. An interface for each module is a larger piece of work, and it belongs with the

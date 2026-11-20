@@ -27,6 +27,9 @@ import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
 } from "../slack/organisation-routing";
+import {
+  prepareConfigurationVersionBump,
+} from "./organisation-onboarding-row";
 
 type RemoveIntegrationAccountError =
   | { readonly code: "integration_account_not_found" }
@@ -334,15 +337,7 @@ export async function removeIntegrationAccount(input: {
     );
   }
   statements.push(
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET configuration_version = configuration_version + 1,
-           projection_revision = projection_revision + 1,
-           updated_at = ?
-       WHERE organisation_id = ? AND configuration_version = ?`,
-      )
-      .bind(input.now, input.organisationId, state.configurationVersion),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

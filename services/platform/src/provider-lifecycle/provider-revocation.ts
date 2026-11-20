@@ -16,6 +16,9 @@ import { newRequestId, type IntegrationAccountId } from "../ids";
 import { traceLog, traceWarn } from "../observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
+import {
+  prepareConfigurationVersionBump,
+} from "../data/organisation-onboarding-row";
 
 type ProviderRevocationReason =
   "shopify_app_uninstalled" | "stripe_application_deauthorized";
@@ -89,15 +92,7 @@ export async function revokeAccountRemovedAtProvider(
     // The revocation stays committed; the Vault alert names a delayed policy.
     if (!activation.ok) policy = "pending";
   }
-  await db
-    .prepare(
-      `UPDATE organisation_onboarding
-       SET configuration_version = configuration_version + 1,
-           projection_revision = projection_revision + 1,
-           updated_at = ?
-       WHERE organisation_id = ?`,
-    )
-    .bind(input.now, organisationId)
+  await prepareConfigurationVersionBump(db, organisationId, input.now)
     .run();
   const trace = {
     requestId: newRequestId(),

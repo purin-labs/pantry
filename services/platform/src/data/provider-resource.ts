@@ -13,6 +13,9 @@ import type { ConnectionProvider } from "./provider-attempt";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
 import { isPositiveInteger } from "@purin-labs/std";
+import {
+  prepareProjectionRevisionBump,
+} from "./organisation-onboarding-row";
 
 export type DiscoveredProviderResource = {
   readonly canonicalResourceId: string;
@@ -135,13 +138,7 @@ export async function persistProviderResourceSnapshot(input: {
     queryHash,
   );
   statements.push(
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ?`,
-      )
-      .bind(input.organisationId),
+    prepareProjectionRevisionBump(session, input.organisationId),
   );
   await session.batch(statements);
   return snapshotRevision;
@@ -189,13 +186,7 @@ export async function refreshProviderResourceSnapshot(
     queryHash,
   );
   statements.push(
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET projection_revision = projection_revision + 1
-       WHERE organisation_id = ? AND configuration_version = ?`,
-      )
-      .bind(input.organisationId, state.configurationVersion),
+    prepareProjectionRevisionBump(session, input.organisationId, { atConfigurationVersion: state.configurationVersion }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

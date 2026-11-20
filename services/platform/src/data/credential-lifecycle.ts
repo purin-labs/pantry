@@ -1,4 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault";
 import {
   parseIntegrationAccountId,
@@ -28,6 +31,7 @@ import {
   type IntegrationAccountMutation,
   type ProviderConnection,
 } from "./integration-account";
+import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [
   "replacement_environment_mismatch",
@@ -622,6 +626,31 @@ export async function authorizeCredentialRevocation(input: {
   };
 }
 
+/**
+ * The two statements that settle a credential mutation in its batch: the
+ * counters of the configuration row move on, and the receipt holds the answer.
+ */
+function settledMutationStatements(
+  session: OrganisationDatabaseSession,
+  input: Readonly<{
+    organisationId: OrganisationId;
+    mutation: IntegrationAccountMutation;
+    receiptBody: Record<string, unknown>;
+    now: number;
+  }>,
+): readonly D1PreparedStatement[] {
+  return [
+    prepareConfigurationVersionBump(session, input.organisationId, input.now),
+    prepareControlMutationReceipt(session, {
+      scope: input.mutation.scope,
+      boundary: input.mutation.boundary,
+      identity: input.mutation.identity,
+      responseStatus: 200,
+      responseBody: input.receiptBody,
+    }),
+  ];
+}
+
 export async function recordCredentialRevocationMutation(input: {
   readonly db: OrganisationDatabase;
   readonly organisationId: OrganisationId;
@@ -633,22 +662,7 @@ export async function recordCredentialRevocationMutation(input: {
 }): Promise<void> {
   const session = input.db.withSession("first-primary");
   const statements = [
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-         SET configuration_version = configuration_version + 1,
-             projection_revision = projection_revision + 1,
-             updated_at = ?
-         WHERE organisation_id = ?`,
-      )
-      .bind(input.now, input.organisationId),
-    prepareControlMutationReceipt(session, {
-      scope: input.mutation.scope,
-      boundary: input.mutation.boundary,
-      identity: input.mutation.identity,
-      responseStatus: 200,
-      responseBody: input.receiptBody,
-    }),
+    ...settledMutationStatements(session, input),
     prepareOnboardingAuditEvent(session, input.mutation.identity, {
       organisationId: input.organisationId,
       environment: input.authorization.account.environment,
@@ -1091,22 +1105,7 @@ export async function commitCredentialRotation(input: {
         input.organisationId,
         input.rotation.credentialRotationId,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-         SET configuration_version = configuration_version + 1,
-             projection_revision = projection_revision + 1,
-             updated_at = ?
-         WHERE organisation_id = ?`,
-      )
-      .bind(input.now, input.organisationId),
-    prepareControlMutationReceipt(session, {
-      scope: input.mutation.scope,
-      boundary: input.mutation.boundary,
-      identity: input.mutation.identity,
-      responseStatus: 200,
-      responseBody: input.receiptBody,
-    }),
+    ...settledMutationStatements(session, input),
     prepareOnboardingAuditEvent(session, input.mutation.identity, {
       organisationId: input.organisationId,
       environment: input.rotation.account.environment,

@@ -18,6 +18,9 @@ import {
   parseActiveIntegrationProvider,
 } from "../provider-adapters/catalogue";
 import type { ActiveIntegrationProvider } from "../provider-adapters/domain";
+import {
+  prepareConfigurationVersionBump,
+} from "../data/organisation-onboarding-row";
 
 export async function reconcileProviderManifestObservations(input: {
   readonly env: Env;
@@ -182,14 +185,7 @@ async function updateObservedAccountLifecycle(input: {
         input.integrationAccountId,
         input.currentLifecycle,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET configuration_version = configuration_version + 1,
-           projection_revision = projection_revision + 1, updated_at = ?
-       WHERE organisation_id = ?`,
-      )
-      .bind(input.now, input.organisationId),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now),
     input.scope.prepareMutationFence(),
   ]);
 }

@@ -46,7 +46,13 @@ import {
 } from "../mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "./query-source";
-import { assertNever, isPositiveInteger, isRecord, isString } from "@purin-labs/std";
+import {
+  assertNever,
+  isPositiveInteger,
+  isRecord,
+  isString,
+} from "@purin-labs/std";
+import { prepareProjectionRevisionBump } from "./organisation-onboarding-row";
 
 export type IntegrationProvider = OnboardingProvider;
 
@@ -197,10 +203,7 @@ export type AccountLookupError =
     }
   | { readonly code: "integration_account_corrupt"; readonly field: string };
 
-type DisabledIntegrationAccount = Omit<
-  IntegrationAccount,
-  "lifecycle"
-> & {
+type DisabledIntegrationAccount = Omit<IntegrationAccount, "lifecycle"> & {
   readonly lifecycle: Variant<IntegrationAccountLifecycle, "disabled">;
 };
 
@@ -352,19 +355,6 @@ function bumpConfigurationRevision(
       `UPDATE organisation_onboarding
      SET configuration_version = configuration_version + 1,
          projection_revision = projection_revision + 1
-     WHERE organisation_id = ?`,
-    )
-    .bind(organisationId);
-}
-
-function bumpProjectionRevision(
-  session: OrganisationDatabaseSession,
-  organisationId: OrganisationId,
-): D1PreparedStatement {
-  return session
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET projection_revision = projection_revision + 1
      WHERE organisation_id = ?`,
     )
     .bind(organisationId);
@@ -809,7 +799,12 @@ function reconnectAuthorityStatements(
        WHERE organisation_id = ? AND provider = ? AND vault_handle = ?
          AND revoked_at IS NULL`,
       )
-      .bind(replacement, seed.organisationId, seed.provider, previous.credentialRef),
+      .bind(
+        replacement,
+        seed.organisationId,
+        seed.provider,
+        previous.credentialRef,
+      ),
   ];
 }
 
@@ -965,7 +960,7 @@ export async function finalizeConnectedIntegrationAccount(input: {
       provider: account.value.provider,
       now: input.now,
     }),
-    bumpProjectionRevision(session, input.organisationId),
+    prepareProjectionRevisionBump(session, input.organisationId),
   ]);
   const finalized = await resolveIntegrationAccount({
     db: session,
@@ -1335,7 +1330,11 @@ async function prepareDefaultAccountBindingTransition(
        ORDER BY snapshot.created_at DESC
        LIMIT 1`,
       )
-      .bind(next.integrationAccountId, next.integrationAccountId, next.organisationId)
+      .bind(
+        next.integrationAccountId,
+        next.integrationAccountId,
+        next.organisationId,
+      )
       .first<{ readonly capable: unknown }>();
     if (destination?.capable !== 1) {
       return { ok: false, error: { code: "default_account_target_incapable" } };
@@ -1632,7 +1631,11 @@ export async function listLiveProviderWebhookContexts(input: {
   const bound =
     input.providerAccountId === null
       ? statement.bind(input.organisationId, input.provider)
-      : statement.bind(input.organisationId, input.provider, input.providerAccountId);
+      : statement.bind(
+          input.organisationId,
+          input.provider,
+          input.providerAccountId,
+        );
   const rows = await bound.all<{
     integrationAccountId: unknown;
     providerAccountId: unknown;
@@ -1869,7 +1872,7 @@ export async function setIntegrationAccountLifecycle(input: {
         input.organisationId,
         input.integrationAccountId,
       ),
-    bumpProjectionRevision(session, input.organisationId),
+    prepareProjectionRevisionBump(session, input.organisationId),
   ]);
   const lifecycleUpdate = results[0];
   if (lifecycleUpdate === undefined || lifecycleUpdate.meta.changes !== 1) {
@@ -1967,7 +1970,7 @@ export async function upsertSurfaceInstallation(input: {
         JSON.stringify(input.scopes),
         input.installedAt,
       ),
-    bumpProjectionRevision(session, input.account.organisationId),
+    prepareProjectionRevisionBump(session, input.account.organisationId),
   ]);
 }
 
@@ -2027,7 +2030,7 @@ export async function upsertProviderWebhook(input: {
         input.now,
         input.environment,
       ),
-    bumpProjectionRevision(session, input.organisationId),
+    prepareProjectionRevisionBump(session, input.organisationId),
   ]);
   return {
     providerWebhookId,
@@ -2117,7 +2120,11 @@ function requireProviderConnectionRow(
     row.providerConnectionId,
     "providerConnectionId",
   );
-  const organisationId = requireParsed(parseOrganisationId, row.organisationId, "organisationId");
+  const organisationId = requireParsed(
+    parseOrganisationId,
+    row.organisationId,
+    "organisationId",
+  );
   const provider = requireProvider(row.provider);
   const environment = requireOrganisationEnvironment(row.environment);
   const createdByUserId = requireParsed(
@@ -2207,7 +2214,11 @@ function requireIntegrationAccountRow(
     row.integrationAccountId,
     "integrationAccountId",
   );
-  const organisationId = requireParsed(parseOrganisationId, row.organisationId, "organisationId");
+  const organisationId = requireParsed(
+    parseOrganisationId,
+    row.organisationId,
+    "organisationId",
+  );
   const providerConnectionId = requireParsed(
     parseProviderConnectionId,
     row.providerConnectionId,
@@ -2280,7 +2291,11 @@ function requireActiveProviderAccountTarget(row: {
   readonly integrationAccountId: unknown;
 }): ActiveProviderAccountTarget {
   return {
-    organisationId: requireParsed(parseOrganisationId, row.organisationId, "organisationId"),
+    organisationId: requireParsed(
+      parseOrganisationId,
+      row.organisationId,
+      "organisationId",
+    ),
     integrationAccountId: requireParsed(
       parseIntegrationAccountId,
       row.integrationAccountId,

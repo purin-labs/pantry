@@ -30,6 +30,9 @@ import {
   type ExistingCustomConnectorSetupKind,
 } from "./setup-target";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
+import {
+  prepareConfigurationVersionBump,
+} from "../data/organisation-onboarding-row";
 
 export type ActiveCustomConnectorAccount = {
   readonly source: {
@@ -302,19 +305,7 @@ export async function commitNewCustomConnectorAccount(input: {
              AND lifecycle IN ('draft', 'active')`,
         )
         .bind(input.now, attempt.organisationId, attempt.connectorId),
-      session
-        .prepare(
-          `UPDATE organisation_onboarding
-           SET configuration_version = configuration_version + 1,
-               projection_revision = projection_revision + 1,
-               updated_at = ?
-           WHERE organisation_id = ? AND configuration_version = ?`,
-        )
-        .bind(
-          input.now,
-          attempt.organisationId,
-          input.expectedConfigurationVersion,
-        ),
+      prepareConfigurationVersionBump(session, attempt.organisationId, input.now, { atConfigurationVersion: input.expectedConfigurationVersion }),
     ]);
   } catch {
     const concurrentDuplicate = await findCustomConnectorAccountByIdentity({
@@ -533,19 +524,7 @@ export async function commitExistingCustomConnectorAccount(input: {
            WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
         )
         .bind(input.now, attempt.organisationId, current.value.credentialRef),
-      session
-        .prepare(
-          `UPDATE organisation_onboarding
-           SET configuration_version = configuration_version + 1,
-               projection_revision = projection_revision + 1,
-               updated_at = ?
-           WHERE organisation_id = ? AND configuration_version = ?`,
-        )
-        .bind(
-          input.now,
-          attempt.organisationId,
-          input.expectedConfigurationVersion,
-        ),
+      prepareConfigurationVersionBump(session, attempt.organisationId, input.now, { atConfigurationVersion: input.expectedConfigurationVersion }),
     ]);
   } catch {
     return { ok: false, error: { code: "custom_connector_setup_conflict" } };
