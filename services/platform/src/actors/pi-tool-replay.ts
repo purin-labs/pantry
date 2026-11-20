@@ -1,6 +1,5 @@
 import { assertNever } from "@purin-labs/std";
-import { isBakerySurfaceHarnessToolName } from "../agent-tools/bakery/surface";
-import { registeredTool } from "../agent-tools/registry";
+import { TOOL_REGISTRY } from "../agent-tools/registry";
 
 /**
  * Who may run a tool call again after a lost process left it in flight.
@@ -17,11 +16,9 @@ type ToolRerun = "any_caller" | "script" | "none";
 export type ToolCaller = "model" | "script";
 
 function toolRerun(name: string): ToolRerun {
-  const registered = registeredTool(name);
+  const registered = TOOL_REGISTRY.find(name);
   if (registered !== undefined) return registered.rerun.kind;
-  return RERUN_BY_ANY_CALLER.has(name) || isBakerySurfaceHarnessToolName(name)
-    ? "any_caller"
-    : "none";
+  return RERUN_BY_ANY_CALLER.has(name) ? "any_caller" : "none";
 }
 
 /**
@@ -53,5 +50,4 @@ const RERUN_BY_ANY_CALLER = new Set([
   // A permission request is named by its turn and its capabilities, so a
   // repeated call returns the first request and posts no second notice.
   "request_permission",
-  "commerce_entity_context",
 ]);

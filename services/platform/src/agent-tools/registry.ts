@@ -1,23 +1,6 @@
-import type { HarnessToolDefinition } from "./catalog/types";
-import { COSTS_VIEW_TOOLS } from "./costs/view";
-import { PASTRY_BENCH_VIEW_TOOLS } from "./kitchen/pastry-bench";
-import { REGISTER_VIEW_TOOLS } from "./commerce/register-view";
-import { modelToolDefinition, type RegisteredTool } from "./define-tool";
-import {
-  counterSaleRead,
-  orderQueueAdvance,
-  orderQueueRead,
-  soldOutMark,
-  soldOutRead,
-} from "./commerce/order-queue";
-import { paymentsRead } from "./commerce/payments";
-import {
-  devicePause,
-  deviceProposal,
-  deviceRead,
-  deviceSnapshotRead,
-} from "./devices/devices";
-import { jevFeaturesManage, jevFeaturesRead } from "./jev/jev";
+import { createToolRegistry } from "./catalog/tool-registry";
+import type { RegisteredTool } from "./define-tool";
+import { SURFACE_TOOL_LIST } from "./bakery/surface";
 import {
   emailMailboxSearch,
   emailOperationalProposal,
@@ -30,19 +13,15 @@ import {
   whatsAppSupportRead,
   whatsAppSupportReplySend,
 } from "./channels/channels";
+import { commerceEntityContext } from "./commerce/entity-context";
 import {
-  recipeWorkflowProposal,
-  recipeWorkflowRead,
-} from "./kitchen/recipe-workflow";
-import { followUp, memoryProposal, sideCaseProposal } from "./turn/turn";
-import { SURFACE_TOOL_LIST } from "./bakery/surface";
-import { savedBakeryRunRead } from "./kitchen/saved-runs";
-import {
-  airtableApiRead,
-  airtableApiWrite,
-  integrationList,
-} from "./integrations/integrations";
-import { merchantReport } from "./commerce/reports";
+  counterSaleRead,
+  orderQueueAdvance,
+  orderQueueRead,
+  soldOutMark,
+  soldOutRead,
+} from "./commerce/order-queue";
+import { paymentsRead } from "./commerce/payments";
 import {
   campaignBriefProposal,
   commerceActionProposal,
@@ -52,16 +31,23 @@ import {
   orderRefundProposal,
   stockActionProposal,
 } from "./commerce/proposals";
-import { fileRead, fileSearch, workspaceQuery } from "./files/files";
-import { messageAttachmentInspect, messageLinkRead } from "./messages/messages";
+import { REGISTER_VIEW_TOOLS } from "./commerce/register-view";
+import { merchantReport } from "./commerce/reports";
+import { COSTS_VIEW_TOOLS } from "./costs/view";
+import {
+  devicePause,
+  deviceProposal,
+  deviceRead,
+  deviceSnapshotRead,
+} from "./devices/devices";
 import {
   emailDraftEdit,
   emailDraftRead,
+  menuBoardArchive,
   menuBoardComment,
+  menuBoardCreate,
   menuBoardEdit,
   menuBoardHistory,
-  menuBoardCreate,
-  menuBoardArchive,
   menuBoardRead,
   menuBoardStack,
   menuDraftEdit,
@@ -72,6 +58,13 @@ import {
   workflowCanvasMove,
   workflowCanvasRead,
 } from "./drafts/drafts";
+import { fileRead, fileSearch, workspaceQuery } from "./files/files";
+import {
+  airtableApiRead,
+  airtableApiWrite,
+  integrationList,
+} from "./integrations/integrations";
+import { jevFeaturesManage, jevFeaturesRead } from "./jev/jev";
 import {
   costsPlanSave,
   costsRead,
@@ -79,16 +72,44 @@ import {
   lotCostSave,
   supplyCostSave,
 } from "./kitchen/costs";
+import { PASTRY_BENCH_VIEW_TOOLS } from "./kitchen/pastry-bench";
+import {
+  recipeWorkflowProposal,
+  recipeWorkflowRead,
+} from "./kitchen/recipe-workflow";
 import { recipeRead, recipeSave } from "./kitchen/recipes";
+import { savedBakeryRunRead } from "./kitchen/saved-runs";
 import { supplierCreate, supplierRead } from "./kitchen/suppliers";
+import { messageAttachmentInspect, messageLinkRead } from "./messages/messages";
+import { followUp, memoryProposal, sideCaseProposal } from "./turn/turn";
 
 /**
- * The agent tools that have moved out of `actors/harness-tool-catalog.ts`
- * (Refactor 10, step 1). The order is the order of the model definitions in
- * the catalog: the session pins a digest of that list.
+ * The one list of the agent tools: each family gives its tools, and this list
+ * gives them their place. The order is the order of the model definitions.
+ * The session pins a digest of them, so a tool keeps its place: add a new
+ * tool at the end of its group, and move none.
+ *
+ * A turn offers the tools in three passes over this list: the tools that a
+ * capability selects, then the tools that a page command selects, then the
+ * tools of the turn's origin.
  */
-/** The tools that the catalog lists where the order queue tools were. */
-export const COMMERCE_TOOLS = [
+export const TOOLS = [
+  // The tools that a capability selects.
+  savedBakeryRunRead,
+  airtableApiRead,
+  airtableApiWrite,
+  integrationList,
+  emailMailboxSearch,
+  emailReplyProposal,
+  emailReplyDraftRead,
+  emailReplyDraftEdit,
+  productionPlanRead,
+  productionPlanEdit,
+  emailOperationalProposal,
+  slackMessageProposal,
+  whatsAppSupportRead,
+  whatsAppSupportReplySend,
+  commerceEntityContext,
   orderQueueRead,
   paymentsRead,
   orderQueueAdvance,
@@ -106,21 +127,13 @@ export const COMMERCE_TOOLS = [
   recipeWorkflowRead,
   recipeWorkflowProposal,
   counterSaleRead,
-] as const;
-
-/** The tools that the catalog lists where the device tools were. */
-export const DEVICE_TOOLS = [
   deviceRead,
   deviceSnapshotRead,
   devicePause,
   deviceProposal,
-] as const;
-
-/** The Jev settings tools, after the device tools (Plan 88). */
-export const JEV_TOOLS = [jevFeaturesRead, jevFeaturesManage] as const;
-
-/** The tools that the catalog lists where the draft tools were. */
-export const DRAFT_TOOLS = [
+  jevFeaturesRead,
+  jevFeaturesManage,
+  merchantReport,
   workflowCanvasRead,
   workflowCanvasMove,
   productDescriptionDraftRead,
@@ -137,37 +150,6 @@ export const DRAFT_TOOLS = [
   menuPriceProposal,
   emailDraftRead,
   emailDraftEdit,
-] as const;
-
-/** The tools that the catalog lists where the mail and channel tools were. */
-export const CHANNEL_TOOLS = [
-  emailMailboxSearch,
-  emailReplyProposal,
-  emailReplyDraftRead,
-  emailReplyDraftEdit,
-  productionPlanRead,
-  productionPlanEdit,
-  emailOperationalProposal,
-  slackMessageProposal,
-  whatsAppSupportRead,
-  whatsAppSupportReplySend,
-] as const;
-
-/** The catalog slot of the saved Kitchen run read, first in the catalog. */
-export const SAVED_RUN_TOOLS = [savedBakeryRunRead] as const;
-
-/** The catalog slot of Airtable and the integration list. */
-export const INTEGRATION_TOOLS = [
-  airtableApiRead,
-  airtableApiWrite,
-  integrationList,
-] as const;
-
-/** The catalog slot of the merchant report, after the device tools. */
-export const REPORT_TOOLS = [merchantReport] as const;
-
-/** The catalog slot of the commerce proposals, after the draft tools. */
-export const PROPOSAL_TOOLS = [
   campaignBriefProposal,
   configurationProposal,
   commerceActionProposal,
@@ -175,67 +157,57 @@ export const PROPOSAL_TOOLS = [
   orderRefundProposal,
   stockActionProposal,
   merchantPluginProposal,
-] as const;
-
-/** The catalog slot of the file and workspace reads. */
-export const FILE_TOOLS = [fileSearch, fileRead, workspaceQuery] as const;
-
-/** The catalog slot of the message attachment and link reads, last in the catalog. */
-export const MESSAGE_TOOLS = [
+  fileSearch,
+  fileRead,
+  workspaceQuery,
   messageAttachmentInspect,
   messageLinkRead,
-] as const;
-
-/**
- * The tools that a turn offers by its origin, after the Kitchen tools,
- * in this order.
- */
-export const TURN_TOOLS = [memoryProposal, followUp, sideCaseProposal] as const;
-
-/**
- * The surface tools, after the catalog tools: the Kitchen tools, then
- * the Costs & margins view commands (Plan 87 phase 4).
- */
-export const SURFACE_TOOLS = [
+  // The tools that a page command selects (Plan 87): the Kitchen workspace,
+  // Costs & margins, the Pastry Bench and Café › Register.
   ...SURFACE_TOOL_LIST,
   ...COSTS_VIEW_TOOLS,
   ...PASTRY_BENCH_VIEW_TOOLS,
   ...REGISTER_VIEW_TOOLS,
-];
-
-export const TOOLS = [
-  ...SURFACE_TOOLS,
-  ...TURN_TOOLS,
-  ...SAVED_RUN_TOOLS,
-  ...INTEGRATION_TOOLS,
-  ...REPORT_TOOLS,
-  ...PROPOSAL_TOOLS,
-  ...FILE_TOOLS,
-  ...MESSAGE_TOOLS,
-  ...CHANNEL_TOOLS,
-  ...COMMERCE_TOOLS,
-  ...DEVICE_TOOLS,
-  ...JEV_TOOLS,
-  ...DRAFT_TOOLS,
+  // The tools that a turn offers by its origin.
+  memoryProposal,
+  followUp,
+  sideCaseProposal,
 ] as const;
 
-export type RegisteredToolName = (typeof TOOLS)[number]["name"];
+export const TOOL_REGISTRY = createToolRegistry(TOOLS);
 
-const TOOL_BY_NAME: ReadonlyMap<string, RegisteredTool> = new Map(
-  TOOLS.map((tool) => [tool.name, tool]),
-);
+type Tool = (typeof TOOLS)[number];
 
-export function registeredTool(name: string): RegisteredTool | undefined {
-  return TOOL_BY_NAME.get(name);
-}
+type ServicesOf<T> =
+  T extends RegisteredTool<string, string, infer Services> ? Services : never;
 
-export function isRegisteredToolName(name: string): name is RegisteredToolName {
-  return TOOL_BY_NAME.has(name);
-}
+/**
+ * What a turn gives to the tools: the services of each family, under the
+ * family's name. Each family's area declares the type of its services. The
+ * Session gives the whole set, so a tool that the model sees has a handler.
+ */
+export type ToolServices = {
+  readonly [Family in Tool["family"]]: ServicesOf<
+    Extract<Tool, { readonly family: Family }>
+  >;
+};
 
-/** The model definitions of one group, in its order. */
-export function registeredModelDefinitions<Name extends RegisteredToolName>(
-  group: readonly RegisteredTool<Name>[],
-): readonly (HarnessToolDefinition & { readonly name: Name })[] {
-  return group.map(modelToolDefinition);
-}
+/** The services of a host that runs a part of the tools, for example a check. */
+export type PartialToolServices = {
+  readonly [Family in keyof ToolServices]?: Partial<ToolServices[Family]>;
+};
+
+/**
+ * The request of one service, for code that implements the service outside
+ * the family's own area.
+ */
+export type ToolServiceRequest<
+  Family extends keyof ToolServices,
+  Service extends keyof ToolServices[Family],
+> =
+  NonNullable<ToolServices[Family][Service]> extends (
+    request: infer Request,
+    ...rest: never[]
+  ) => unknown
+    ? Request
+    : never;

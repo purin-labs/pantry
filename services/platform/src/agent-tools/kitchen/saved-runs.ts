@@ -1,9 +1,10 @@
 import type { SavedBakeryRunQuery } from "../../commerce/bakery/saved-runs";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { defineTool, jsonSchema } from "../define-tool";
+import { jsonSchema } from "../define-tool";
+import { defineKitchenTool } from "./services";
 
-export const savedBakeryRunRead = defineTool({
+export const savedBakeryRunRead = defineKitchenTool({
   name: "bakery_saved_run_read",
   description:
     'Read saved Kitchen simulation assumptions with source identity and content revision, without navigation or physics. For the most recently saved run, use id="latest", cursor=null: this resolves and reads it in one call; no catalogue read is needed. For an identified run, use its exact ID and cursor=null. Ask which run when ambiguous. Use id=null to list up to eight runs, cursor=null for the first page. Compare selected orders with saved assumptions; real capacity remains unverified.',

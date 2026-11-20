@@ -8,7 +8,7 @@ import {
   digestCanonical,
   ObservationEvidence,
 } from "../../policy";
-import { JevFeatureRequestError } from "../catalog/types";
+import { JevFeatureRequestError } from "./services";
 import type { SessionToolContext } from "../context";
 import { liveDeviceMember } from "../session-support";
 

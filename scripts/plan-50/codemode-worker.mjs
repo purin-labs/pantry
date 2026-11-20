@@ -72,6 +72,7 @@ import {
 import { failSessionTurnStream } from "../../services/platform/src/actors/agent-session-turn-stream.ts";
 import { organisationId } from "./proposal-worker.mjs";
 import { installMcpFixture, mcpCatalog, readMcp } from "./mcp-fixture.mjs";
+import { customConnectorTurnTool } from "../../services/platform/src/custom-connectors/catalog-tools.ts";
 import { readSessionTurnFlowBinding } from "../../services/platform/src/actors/agent-session-information-flow.ts";
 import {
   toPiPrompt,
@@ -269,7 +270,7 @@ export class CandidateActor extends ProviderActor {
     this.mcp = await mcpCatalog(this.env, this.requestAuthority());
     return {
       allowedCapabilities: this.catalogCapabilities(),
-      customConnectorOperations: this.mcp.entries,
+      turnTools: this.mcp.entries.map(customConnectorTurnTool),
     };
   }
 

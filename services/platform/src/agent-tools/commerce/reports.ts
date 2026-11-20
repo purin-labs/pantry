@@ -1,10 +1,11 @@
 import { isMerchantReportName } from "../../commerce/entity-plane/merchant-reports";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import type { HarnessMerchantReportRequest } from "../catalog/types";
-import { defineTool, jsonSchema } from "../define-tool";
+import type { HarnessMerchantReportRequest } from "./services";
+import { jsonSchema } from "../define-tool";
+import { defineCommerceTool } from "./services";
 
-export const merchantReport = defineTool({
+export const merchantReport = defineCommerceTool({
   name: "commerce_merchant_report",
   description:
     "Run one named merchant report and return its headline number, the exact records behind it, " +
@@ -46,10 +47,10 @@ export const merchantReport = defineTool({
     capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
   },
   unavailable: "commerce merchant report is unavailable",
-  handler:
-    ({ readMerchantReport }) =>
-    (request) =>
-      readMerchantReport(request),
+  handler: ({ readMerchantReport }) =>
+    readMerchantReport === undefined
+      ? undefined
+      : (request) => readMerchantReport(request),
 });
 
 function parseMerchantReportArgs(

@@ -1,10 +1,10 @@
 import { Type } from "typebox";
 import { isPaymentWindow } from "../../commerce/payments-read";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { defineTool } from "../define-tool";
+import { defineCommerceTool } from "./services";
 import { ProposalArgumentError } from "../errors";
 
-export const paymentsRead = defineTool({
+export const paymentsRead = defineCommerceTool({
   name: "payments_read",
   description:
     "Read the shop's card payments of a time window, as staff see them on the Payments page: each payment that the provider answered, paid or declined, with its amount, channel, lines, the provider's reason for a decline and the pickup code of the order that a paid payment placed. " +

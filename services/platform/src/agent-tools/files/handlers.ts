@@ -21,13 +21,13 @@ import type { FileProviderCredentialStore } from "../../provider-workflows/file-
 import { readCanonicalSessionForPersistence } from "../../actors/agent-session-canonical";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type {
-  HarnessWorkspaceQuery,
-  HarnessWorkspaceQueryResult,
-} from "../../actors/embedded-harness-tool-host";
-import type {
   HarnessEmailMailboxSearchResult,
+} from "../channels/services";
+import type {
   HarnessFileRead,
   HarnessFileSearch,
+  HarnessWorkspaceQuery,
+  HarnessWorkspaceQueryResult,
 } from "../catalog/types";
 import {
   readGrantedFile,

@@ -3,9 +3,12 @@ import {
   REGISTER_SURFACE,
   type RegisterViewCommand,
 } from "@purin-labs/control-api";
-import { defineTool, noArguments } from "../define-tool";
-import { readBakerySurfaceReceiptId } from "../bakery/surface";
-import type { HarnessCostsViewExecute } from "../costs/view";
+import { noArguments } from "../define-tool";
+import { defineCafeTool, type CafeToolServices } from "./order-queue";
+import {
+  bakerySurfaceToolSucceeded,
+  readBakerySurfaceReceiptId,
+} from "../bakery/surface";
 
 const RERUN = {
   kind: "any_caller",
@@ -20,7 +23,7 @@ const SCREEN_RULE =
 
 const ID_FIELD = Type.String({ minLength: 1, maxLength: 200 });
 
-const registerAddItem = defineTool({
+const registerAddItem = defineCafeTool({
   name: "register_add_item",
   description: `Add a menu item (with optional modifier option IDs and quantity) to the operator's Café › Register basket. ${SCREEN_RULE}`,
   input: Type.Object(
@@ -49,9 +52,10 @@ const registerAddItem = defineTool({
   unavailable: UNAVAILABLE,
   handler: registerViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
-const registerUpdateLine = defineTool({
+const registerUpdateLine = defineCafeTool({
   name: "register_update_line",
   description: `Update the quantity of one line in the operator's Café › Register basket. ${SCREEN_RULE}`,
   input: Type.Object(
@@ -76,9 +80,10 @@ const registerUpdateLine = defineTool({
   unavailable: UNAVAILABLE,
   handler: registerViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
-const registerRemoveLine = defineTool({
+const registerRemoveLine = defineCafeTool({
   name: "register_remove_line",
   description: `Remove one line from the operator's Café › Register basket. ${SCREEN_RULE}`,
   input: Type.Object(
@@ -99,9 +104,10 @@ const registerRemoveLine = defineTool({
   unavailable: UNAVAILABLE,
   handler: registerViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
-const registerClearBasket = defineTool({
+const registerClearBasket = defineCafeTool({
   name: "register_clear_basket",
   description: `Clear all unstaged lines from the operator's Café › Register basket. ${SCREEN_RULE}`,
   input: noArguments(),
@@ -116,6 +122,7 @@ const registerClearBasket = defineTool({
   unavailable: UNAVAILABLE,
   handler: registerViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
 export const REGISTER_VIEW_TOOLS = [
@@ -126,12 +133,10 @@ export const REGISTER_VIEW_TOOLS = [
 ] as const;
 
 function registerViewHandler({
-  executeCostsViewCommand,
-}: {
-  readonly executeCostsViewCommand?: HarnessCostsViewExecute;
-}) {
-  return executeCostsViewCommand === undefined
+  executeRegisterViewCommand,
+}: Partial<CafeToolServices>) {
+  return executeRegisterViewCommand === undefined
     ? undefined
     : (command: RegisterViewCommand, call: { readonly callId: string }) =>
-        executeCostsViewCommand(command, call.callId);
+        executeRegisterViewCommand(command, call.callId);
 }

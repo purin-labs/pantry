@@ -2,13 +2,8 @@ import { prepareWorkflowProposal } from "../../commerce/bakery/workflow-proposal
 import { readDevice } from "../../devices/store";
 import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
 import { sessionActionMutationExecution } from "../action-mutation-execution";
-import {
-  DeviceRequestError,
-  JevFeatureRequestError,
-  RecipeWorkflowRequestError,
-  type RecipeWorkflowProposeRequest,
-  type DeviceProposeRequest,
-} from "../../agent-tools/catalog/types";
+import { ToolRequestError } from "../../agent-tools/errors";
+import type { ToolServiceRequest } from "../../agent-tools/registry";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { JevFeatureCommand } from "@purin-labs/control-api/portal/jev-features";
 import { parseCaseId, parseSessionId } from "../../ids";
@@ -20,10 +15,6 @@ import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../session-execution-admission";
-import type {
-  HarnessCampaignBriefRequest,
-  HarnessConfigurationProposalRequest,
-} from "../../agent-tools/catalog/types";
 import { sessionObservedCommerceEntity } from "../agent-session-information-flow";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
@@ -68,7 +59,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       readonly lease: HarnessTurnLease;
       readonly assignment: CaseAssignment;
     },
-    request: HarnessCampaignBriefRequest,
+    request: ToolServiceRequest<"commerce", "proposeCampaignBrief">,
   ): Promise<unknown> {
     const staging = await this.beginProposalStaging(input, "campaign brief");
     // A brief spends a merchant's budget against a merchant's catalogue; with
@@ -134,7 +125,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       readonly lease: HarnessTurnLease;
       readonly assignment: CaseAssignment;
     },
-    request: HarnessConfigurationProposalRequest,
+    request: ToolServiceRequest<"commerce", "proposeConfiguration">,
   ): Promise<unknown> {
     const staging = await this.beginProposalStaging(
       input,
@@ -155,13 +146,13 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       readonly lease: HarnessTurnLease;
       readonly assignment: CaseAssignment;
     },
-    request: RecipeWorkflowProposeRequest,
+    request: ToolServiceRequest<"kitchen", "proposeRecipeWorkflow">,
     operationId: string,
   ): Promise<unknown> {
     const { scope } = input.execution;
     const { lease } = input;
-    const refuse = (message: string): RecipeWorkflowRequestError =>
-      new RecipeWorkflowRequestError(`${message} Nothing was stored.`);
+    const refuse = (message: string): ToolRequestError =>
+      new ToolRequestError(`${message} Nothing was stored.`);
     if (lease.requestAuthority.kind !== "control")
       throw refuse("A person proposes a recipe change from the Portal chat.");
     const member = await liveDeviceMember(
@@ -215,7 +206,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       readonly lease: HarnessTurnLease;
       readonly assignment: CaseAssignment;
     },
-    request: DeviceProposeRequest,
+    request: ToolServiceRequest<"devices", "proposeDevice">,
   ): Promise<unknown> {
     const member = await liveDeviceMember(
       input.execution.scope.database,
@@ -223,7 +214,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       input.lease,
     );
     if (member === null || !roleMayOperate(member.role))
-      throw new DeviceRequestError(
+      throw new ToolRequestError(
         "A change to a device needs a person with the staff role or higher, and the person who asked does not have it now. Nothing changed. Tell the person.",
       );
     const device = await readDevice(
@@ -232,7 +223,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       request.deviceId,
     );
     if (device === null)
-      throw new DeviceRequestError(
+      throw new ToolRequestError(
         "That device does not exist. Nothing changed. Call device_read for the list.",
       );
     const staging = await this.beginProposalStaging(input, "device proposal", {
@@ -280,7 +271,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
       input.lease,
     );
     if (member === null || !roleMayConfigure(member.role))
-      throw new JevFeatureRequestError(
+      throw new ToolRequestError(
         "Only an owner or admin can change a Jev switch, and the person who asked cannot. Nothing changed. Tell the person to ask an owner or admin. Do not ask for a permission or retry.",
       );
     const staging = await this.beginProposalStaging(

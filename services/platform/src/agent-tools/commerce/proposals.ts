@@ -13,11 +13,18 @@ import {
 import type {
   HarnessCampaignBriefRequest,
   HarnessConfigurationProposalRequest,
-} from "../catalog/types";
-import { defineTool, jsonSchema } from "../define-tool";
+} from "./services";
+import { jsonSchema } from "../define-tool";
+import { defineCommerceTool } from "./services";
+import type { CommerceActionProposalOrigin } from "../catalog/types";
 import { ProposalArgumentError } from "../errors";
 
-export const campaignBriefProposal = defineTool({
+export type StockActionProposal = (
+  request: StockProposalRequest,
+  origin?: CommerceActionProposalOrigin,
+) => Promise<unknown>;
+
+export const campaignBriefProposal = defineCommerceTool({
   name: "commerce_propose_campaign_brief",
   description:
     "Draft one campaign brief for a person to review. This writes a draft and nothing else: " +
@@ -117,7 +124,7 @@ export const campaignBriefProposal = defineTool({
       : (request) => proposeCampaignBrief(request),
 });
 
-export const configurationProposal = defineTool({
+export const configurationProposal = defineCommerceTool({
   name: "configuration_propose",
   description:
     "Stage one setup change the operator asked for, so they can confirm it. " +
@@ -160,7 +167,7 @@ export const configurationProposal = defineTool({
       : (request) => proposeConfiguration(request),
 });
 
-export const commerceActionProposal = defineTool({
+export const commerceActionProposal = defineCommerceTool({
   name: "commerce_propose_action",
   description:
     "Propose one governed commerce action for the current Case. " +
@@ -275,7 +282,7 @@ export const commerceActionProposal = defineTool({
           proposeCommerceAction(request, { toolCallId: call.callId }),
 });
 
-export const menuPublicationProposal = defineTool({
+export const menuPublicationProposal = defineCommerceTool({
   name: "commerce_propose_menu_publication",
   description:
     "Propose that the shared menu draft goes live on the shop's screens and order page. " +
@@ -311,7 +318,7 @@ export const menuPublicationProposal = defineTool({
           proposeCafeMenuPublication(request, { toolCallId: call.callId }),
 });
 
-export const orderRefundProposal = defineTool({
+export const orderRefundProposal = defineCommerceTool({
   name: "commerce_propose_refund",
   description:
     "Propose a refund of a customer's order, for the whole order or for named lines. " +
@@ -364,7 +371,7 @@ export const orderRefundProposal = defineTool({
           proposeOrderRefund(request, { toolCallId: call.callId }),
 });
 
-export const stockActionProposal = defineTool({
+export const stockActionProposal = defineCommerceTool({
   name: "commerce_propose_stock_action",
   description:
     "Propose one change to stock, a production request or a purchase request, with the person's words as the reason. " +
@@ -478,7 +485,7 @@ export const stockActionProposal = defineTool({
           proposeStockAction(request, { toolCallId: call.callId }),
 });
 
-export const merchantPluginProposal = defineTool({
+export const merchantPluginProposal = defineCommerceTool({
   name: "commerce_propose_plugin",
   description:
     "Propose a merchant plugin for one requirement of the merchant's shop: a checkout rule (notice for a whole cake, a limit per buyer), an event handler (store credit at every third order), or an action that staff run (a goodwill credit). " +

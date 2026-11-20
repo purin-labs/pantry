@@ -271,7 +271,7 @@ export async function reauthorizeTransientEmail(
  */
 export function authorizedBakerySurfaceCommands(
   authority: HarnessTurnLease["requestAuthority"],
-): readonly import("../../agent-tools/define-tool").SurfaceToolCommandName[] {
+): readonly string[] {
   if (authority.kind !== "control") return [];
   if (authority.role === "admin" || authority.role === "owner") {
     return [

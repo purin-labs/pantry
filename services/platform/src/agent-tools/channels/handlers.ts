@@ -41,7 +41,7 @@ import {
   SlackDraftRequestError,
   EmailReplyDraftRequestError,
   ProductionPlanRequestError,
-} from "../catalog/types";
+} from "./services";
 import { readChatReplyProvenance } from "../../actors/email-chat-reply-sources";
 import type {
   EmailChatContext,
@@ -66,7 +66,7 @@ import type {
   HarnessWhatsAppSupportRead,
   HarnessWhatsAppSupportReplyReceipt,
   HarnessWhatsAppSupportReplySend,
-} from "../catalog/types";
+} from "./services";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
 import {

@@ -1,18 +1,7 @@
 import { Type, type Static, type TSchema } from "typebox";
-import type { BakerySurfaceToolCommandName } from "@purin-labs/bakery-model/bakery-surface";
-import type {
-  COSTS_SURFACE,
-  CostsViewCommandName,
-  KITCHEN_SURFACE,
-  PastryBenchViewCommandName,
-  REGISTER_SURFACE,
-  RegisterViewCommandName,
-} from "@purin-labs/control-api";
 import { Value } from "typebox/value";
-import type {
-  CatalogExecutionContext,
-  CatalogToolAuthority,
-} from "./catalog/execute";
+import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
+import type { CatalogExecutionContext } from "./catalog/execute";
 import type {
   HarnessCapabilityName,
   HarnessToolDefinition,
@@ -56,8 +45,9 @@ type TurnToolFlag = "memoryProposal" | "followUp" | "sideCaseProposal";
  * - `turn`: when the turn sets the flag, for example a Portal chat turn for
  *   the Memory proposal. The call claims no capability: its handler checks
  *   the turn's authority again.
- * - `surface`: when the attached Kitchen surface installs the command.
- *   The call claims no capability, as the catalog did before Refactor 10.
+ * - `surface`: when the attached page installs the command. The surface and
+ *   the command are names that the tool's own area checks. The call claims no
+ *   capability, as the catalog did before Refactor 10.
  */
 export type ToolSelection =
   | {
@@ -67,31 +57,10 @@ export type ToolSelection =
   | { readonly kind: "turn"; readonly flag: TurnToolFlag }
   | {
       readonly kind: "surface";
-      /** The page whose observation lists the command (Plan 87 phase 3/4). */
-      readonly surface: typeof KITCHEN_SURFACE;
-      readonly command:
-        | BakerySurfaceToolCommandName
-        | PastryBenchViewCommandName;
-    }
-  | {
-      readonly kind: "surface";
-      /** A Portal page with view commands (Plan 87 phase 4). */
-      readonly surface: typeof COSTS_SURFACE;
-      readonly command: CostsViewCommandName;
-    }
-  | {
-      readonly kind: "surface";
-      /** Café › Register basket staging commands (Plan 90). */
-      readonly surface: typeof REGISTER_SURFACE;
-      readonly command: RegisterViewCommandName;
+      /** The page whose observation lists the command (Plan 87). */
+      readonly surface: string;
+      readonly command: string;
     };
-
-/** A command that a surface tool sends: a Kitchen, Pastry Bench, Costs or Register command. */
-export type SurfaceToolCommandName =
-  | BakerySurfaceToolCommandName
-  | CostsViewCommandName
-  | PastryBenchViewCommandName
-  | RegisterViewCommandName;
 
 /** The identity of one call, for receipts and idempotent writes. */
 type ToolCall = {
@@ -107,8 +76,18 @@ type ToolHandler<Request> = (
   call: ToolCall,
 ) => Promise<unknown>;
 
+/**
+ * The result of a tool that keeps its own envelope in the accepted history.
+ * The executor uses it for each result of the tool, also for a call that the
+ * catalog refuses before the handler runs.
+ */
+type ToolResultEnvelope = {
+  readonly success: (value: unknown) => Promise<AuthorizedHarnessToolResult>;
+  readonly failure: (detail: string) => Promise<AuthorizedHarnessToolResult>;
+};
+
 /** The source of one tool: everything that the catalog knows about it. */
-type ToolSpec<Name extends string, Input extends TSchema, Request> = {
+type ToolSpec<Name extends string, Input extends TSchema, Request, Services> = {
   readonly name: Name;
   readonly description: string;
   /** The JSON schema that the model sees, and the structural check of a call. */
@@ -135,19 +114,40 @@ type ToolSpec<Name extends string, Input extends TSchema, Request> = {
   readonly directOnly?: true;
   /** The failure when the turn has no handler, for example outside a shop. */
   readonly unavailable: string;
+  /**
+   * The handler of one turn, from the services that the turn gives to the
+   * tool's family. A host may give only a part of them.
+   */
   readonly handler: (
-    authority: CatalogToolAuthority,
+    services: Partial<Services>,
   ) => ToolHandler<Request> | undefined;
   /**
-   * For a receipt tool: the receipt id in the handler's value. Default:
-   * the value's `receiptId`.
+   * For a receipt tool or a surface tool: the receipt id in the handler's
+   * value. Default: the value's `receiptId`.
    */
   readonly readReceipt?: (value: unknown) => string;
+  /**
+   * For a surface tool: true when the page completed the command. The
+   * receipt of a command that the page refused has the status `failed`.
+   */
+  readonly succeeded?: (value: unknown) => boolean;
+  /** For a tool that keeps its own result envelope. */
+  readonly result?: ToolResultEnvelope;
   /**
    * The failure text when the handler fails with no message for the agent,
    * for a tool whose change may have happened all the same.
    */
   readonly unconfirmedFailure?: string;
+  /**
+   * A note that the model definition adds after the description, for
+   * example how to call the tools of one page.
+   */
+  readonly guidance?: string;
+  /**
+   * The parameters exactly as the model sees them, for a definition whose
+   * pinned bytes are not the copy that `modelSchema` makes of `input`.
+   */
+  readonly parameters?: HarnessToolDefinition["parameters"];
   /**
    * The model definition lists `strict` before `description`, as the catalog
    * did. It keeps the catalog digest of turns in flight; drop it in a release
@@ -156,9 +156,18 @@ type ToolSpec<Name extends string, Input extends TSchema, Request> = {
   readonly strictFirst?: true;
 };
 
-/** A tool in the registry. `defineTool` keeps its input and request types. */
-export type RegisteredTool<Name extends string = string> = {
+/**
+ * A tool in the registry. `Family` names the services that its handler
+ * takes, and `Services` is their type. The executor holds each tool as
+ * `AnyRegisteredTool` and gives it the services of its family.
+ */
+export type RegisteredTool<
+  Name extends string = string,
+  Family extends string = string,
+  Services = never,
+> = {
   readonly name: Name;
+  readonly family: Family;
   readonly description: string;
   readonly input: TSchema;
   readonly effect: ToolEffect;
@@ -168,48 +177,76 @@ export type RegisteredTool<Name extends string = string> = {
   readonly unavailable: string;
   /** Checks the schema, then decodes. Throws before any capability claim. */
   readonly parse: (input: unknown) => unknown;
-  readonly handler: (
-    authority: CatalogToolAuthority,
-  ) => ToolHandler<unknown> | undefined;
+  readonly handler: (services: Services) => ToolHandler<unknown> | undefined;
   readonly readReceipt: (value: unknown) => string;
+  readonly succeeded?: (value: unknown) => boolean;
+  readonly result?: ToolResultEnvelope;
   readonly unconfirmedFailure?: string;
+  readonly guidance?: string;
+  readonly parameters?: HarnessToolDefinition["parameters"];
   readonly strictFirst: boolean;
 };
 
-export function defineTool<
-  const Name extends string,
-  Input extends TSchema,
-  Request,
->(spec: ToolSpec<Name, Input, Request>): RegisteredTool<Name> {
-  const parse = (input: unknown): Request => {
-    // The schema of a decode-only tool is a JSON schema: decode takes unknown.
-    if (spec.decodeOnly === true) {
-      return spec.decode(input as Static<Input>);
-    }
-    if (!Value.Check(spec.input, input)) {
-      throw new TypeError(`${spec.name} arguments are invalid`);
-    }
-    return spec.decode(input);
-  };
-  return {
-    name: spec.name,
-    description: spec.description,
-    input: spec.input,
-    effect: spec.effect,
-    rerun: spec.rerun,
-    selection: spec.selection,
-    directOnly: spec.directOnly === true,
-    unavailable: spec.unavailable,
-    parse,
-    // The registry calls a handler only with the request that this tool's own
-    // parse returned, so the erased request type is safe here.
-    handler: spec.handler as RegisteredTool<Name>["handler"],
-    readReceipt: spec.readReceipt ?? readReceiptId,
-    ...(spec.unconfirmedFailure === undefined
-      ? {}
-      : { unconfirmedFailure: spec.unconfirmedFailure }),
-    strictFirst: spec.strictFirst === true,
-  };
+/** A tool of any family, as the registry and the executor hold it. */
+export type AnyRegisteredTool = RegisteredTool<string, string, never>;
+
+/**
+ * Returns `defineTool` for one family of tools. A family is the set of tools
+ * that take the same services, for example the Kitchen tools. The area
+ * declares the services type, and the turn's host gives the services under
+ * the family's name.
+ */
+export function defineToolFamily<Services>() {
+  return <const Family extends string>(family: Family) =>
+    <const Name extends string, Input extends TSchema, Request>(
+      spec: ToolSpec<Name, Input, Request, Services>,
+    ): RegisteredTool<Name, Family, Services> => {
+      if (spec.effect === "surface" && spec.succeeded === undefined) {
+        throw new Error(
+          `${spec.name} is a surface tool with no outcome reader`,
+        );
+      }
+      const parse = (input: unknown): Request => {
+        // The schema of a decode-only tool is a JSON schema: decode takes unknown.
+        if (spec.decodeOnly === true) {
+          return spec.decode(input as Static<Input>);
+        }
+        if (!Value.Check(spec.input, input)) {
+          throw new TypeError(`${spec.name} arguments are invalid`);
+        }
+        return spec.decode(input);
+      };
+      return {
+        name: spec.name,
+        family,
+        description: spec.description,
+        input: spec.input,
+        effect: spec.effect,
+        rerun: spec.rerun,
+        selection: spec.selection,
+        directOnly: spec.directOnly === true,
+        unavailable: spec.unavailable,
+        parse,
+        // The executor calls a handler only with the request that this tool's
+        // own parse returned, so the erased request type is safe here.
+        handler: spec.handler as RegisteredTool<
+          Name,
+          Family,
+          Services
+        >["handler"],
+        readReceipt: spec.readReceipt ?? readReceiptId,
+        ...(spec.succeeded === undefined ? {} : { succeeded: spec.succeeded }),
+        ...(spec.result === undefined ? {} : { result: spec.result }),
+        ...(spec.unconfirmedFailure === undefined
+          ? {}
+          : { unconfirmedFailure: spec.unconfirmedFailure }),
+        ...(spec.guidance === undefined ? {} : { guidance: spec.guidance }),
+        ...(spec.parameters === undefined
+          ? {}
+          : { parameters: spec.parameters }),
+        strictFirst: spec.strictFirst === true,
+      };
+    };
 }
 
 /**
@@ -248,23 +285,27 @@ export function noArguments() {
  * session pins the SHA-256 of these definitions (`toolCatalogDigest`).
  */
 export function modelToolDefinition<Name extends string>(
-  tool: RegisteredTool<Name>,
+  tool: RegisteredTool<Name, string, never>,
 ): HarnessToolDefinition & { readonly name: Name } {
-  const parameters = modelSchema(
-    tool.input,
-  ) as HarnessToolDefinition["parameters"];
+  const parameters =
+    tool.parameters ??
+    (modelSchema(tool.input) as HarnessToolDefinition["parameters"]);
+  const description =
+    tool.guidance === undefined
+      ? tool.description
+      : `${tool.description} ${tool.guidance}`;
   return tool.strictFirst
     ? {
         type: "function",
         name: tool.name,
         strict: true,
-        description: tool.description,
+        description,
         parameters,
       }
     : {
         type: "function",
         name: tool.name,
-        description: tool.description,
+        description,
         strict: true,
         parameters,
       };
@@ -316,4 +357,3 @@ function modelSchema(schema: unknown): unknown {
   }
   return copy;
 }
-

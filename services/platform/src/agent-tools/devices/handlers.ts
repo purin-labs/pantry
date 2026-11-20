@@ -12,8 +12,8 @@ import {
   DeviceRequestError,
   type DevicePauseRequest,
   type DeviceToolRead,
-  type StaffPageToolReceipt,
-} from "../catalog/types";
+} from "./services";
+import type { StaffPageToolReceipt } from "../catalog/types";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {

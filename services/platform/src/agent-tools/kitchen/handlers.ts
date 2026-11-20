@@ -18,10 +18,10 @@ import {
   type RecipeWorkflowReadRequest,
   type RecipeSaveRequest,
   type RecipeToolRead,
-  type StaffPageToolReceipt,
   type SupplierCreateRequest,
   type SupplierToolRead,
-} from "../catalog/types";
+} from "./services";
+import type { StaffPageToolReceipt } from "../catalog/types";
 import { parseIntegrationAccountId } from "../../ids";
 import {
   requireSessionExecution,

@@ -1,8 +1,9 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import type { RecipeSaveRequest } from "../catalog/types";
+import type { RecipeSaveRequest } from "./services";
 import type { RecipeDraft } from "../../commerce/recipe-commands";
-import { defineTool, jsonSchema } from "../define-tool";
+import { jsonSchema } from "../define-tool";
+import { defineKitchenTool } from "./services";
 import { ProposalArgumentError } from "../errors";
 
 type RecipeQuantity = RecipeDraft["inputs"][number]["quantity"];
@@ -21,7 +22,7 @@ const RECIPE_QUANTITY_PARAMETER = {
   additionalProperties: false,
 } as const;
 
-export const recipeRead = defineTool({
+export const recipeRead = defineKitchenTool({
   name: "recipe_read",
   description:
     "Read the shop's recipes, as staff see them on the Recipes page: each recipe's recipeId, latest revision, name, ingredients and output, and the stock items that a recipe can use with their ids and base units.",
@@ -43,7 +44,7 @@ export const recipeRead = defineTool({
     readRecipes === undefined ? undefined : () => readRecipes(),
 });
 
-export const recipeSave = defineTool({
+export const recipeSave = defineKitchenTool({
   name: "recipe_save",
   description:
     "Add a recipe, or save a new revision of one, as staff do on the Recipes page. Give the whole recipe, because a save replaces it. " +

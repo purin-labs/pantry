@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { ACTION_REGISTRY } from "../action-registry/registry";
 import { harnessBaseCapabilities } from "../src/agent-tools/catalog/selection";
+import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import {
   CONTEXT_CASE_READ_CAPABILITY,
   CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY,
@@ -35,7 +36,7 @@ function capabilityCatalogueSuite(): void {
 }
 
 function hidesCaseContextCollections(): void {
-  expect(harnessBaseCapabilities()).not.toContain(
+  expect(harnessBaseCapabilities(TOOL_REGISTRY)).not.toContain(
     CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY,
   );
 }
@@ -79,7 +80,7 @@ function coversExecutableDefinitions(): void {
   expect(
     catalogueIds.has(CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY),
   ).toBe(true);
-  for (const capabilityId of harnessBaseCapabilities()) {
+  for (const capabilityId of harnessBaseCapabilities(TOOL_REGISTRY)) {
     expect(catalogueIds.has(capabilityId)).toBe(true);
     ownedIds.add(capabilityId);
   }

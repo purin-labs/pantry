@@ -1,0 +1,262 @@
+import type { WorkflowChange } from "@purin-labs/bakery-workflow/changes";
+import type {
+  BakeryFileAction,
+  BakeryFloorPlanResetAction,
+  BakeryPlaybackAction,
+  BakeryProductionControl,
+  BakeryProductionEdit,
+  BakeryProductionPanel,
+  BakeryRecordingAcceptanceReference,
+  BakeryRehearsalEdit,
+  BakeryStoreInteriorAction,
+  BakerySurfaceDraftReference,
+  BakerySurfaceEditOperation,
+  BakerySurfaceReceiptV1,
+  BakerySurfaceSelectionTarget,
+  BakeryWorkcellPreparation,
+  BakeryWorkspaceViewAction,
+} from "@purin-labs/bakery-model/bakery-surface";
+import type { PageViewCommand, RecipeItem } from "@purin-labs/control-api";
+import type { AgentRunSaveVerification } from "../../commerce/bakery/agent-run-save";
+import type { AgentScenarioSaveResult } from "../../commerce/bakery/agent-scenario-save";
+import type {
+  SavedBakeryRunQuery,
+  SavedBakeryRunResult,
+} from "../../commerce/bakery/saved-runs";
+import type { RecipeDraft } from "../../commerce/recipe-commands";
+import type { StaffPageToolReceipt } from "../catalog/types";
+import { defineToolFamily } from "../define-tool";
+import { ToolRequestError } from "../errors";
+import type {
+  CostsPlanSaveTool,
+  CostsReadTool,
+  CostsSheetEditTool,
+  LotCostSaveTool,
+  SupplyCostSaveTool,
+} from "./costs";
+import type { SUPPLIER_CREATE_FIELDS } from "./suppliers";
+
+export type HarnessBakerySurfaceToolRequest =
+  | Readonly<{ kind: "file_action"; action: BakeryFileAction }>
+  | Readonly<{ kind: "inspect_scenario_save" }>
+  | Readonly<{ kind: "inspect_run_save"; runKind: "rehearsal" | "production" }>
+  | Readonly<{
+      kind: "control_workspace_view";
+      action: BakeryWorkspaceViewAction;
+    }>
+  | Readonly<{ kind: "stop_simulation" }>
+  | Readonly<{ kind: "discard_candidate" }>
+  | Readonly<{
+      kind: "prepare_workcell";
+      preparation: BakeryWorkcellPreparation;
+    }>
+  | Readonly<{ kind: "show_production_panel"; panel: BakeryProductionPanel }>
+  | Readonly<{ kind: "control_baseline"; action: "pin" | "clear" }>
+  | Readonly<{ kind: "control_playback"; action: BakeryPlaybackAction }>
+  | Readonly<{
+      kind: "prepare_layout";
+      baseModelHash: string;
+      xMm: number;
+      yMm: number;
+    }>
+  | Readonly<{
+      kind: "prepare_production_control";
+      control: BakeryProductionControl;
+    }>
+  | Readonly<{ kind: "inspect_surface" }>
+  | Readonly<{ kind: "read_draft" }>
+  | Readonly<{
+      kind: "query_tasks";
+      text: string;
+      limit: number;
+    }>
+  | Readonly<{
+      kind: "set_view";
+      selection: BakerySurfaceSelectionTarget;
+      cursorSeconds: number;
+    }>
+  | Readonly<{
+      kind: "prepare_edit" | "run_shift";
+      baseDraft: BakerySurfaceDraftReference;
+      edits: readonly BakerySurfaceEditOperation[];
+    }>
+  | Readonly<{
+      kind: "select_item";
+      selection: Exclude<BakerySurfaceSelectionTarget, { kind: "operation" }>;
+    }>
+  | Readonly<{ kind: "rotate_equipment"; applianceId: string }>
+  | Readonly<{
+      kind: "set_equipment_angle";
+      applianceId: string;
+      yawDegrees: number;
+    }>
+  | Readonly<{
+      kind: "move_equipment";
+      applianceId: string;
+      xMm: number;
+      zMm: number;
+    }>
+  | Readonly<{
+      kind: "toggle_opening";
+      openingId: string;
+      open: boolean;
+    }>
+  | Readonly<{
+      kind: "select_floor_plan";
+      floorPlan: string;
+    }>
+  | Readonly<{
+      kind: "configure_interior";
+      action: BakeryStoreInteriorAction;
+    }>
+  | Readonly<{
+      kind: "reset_floor_plan";
+      action: BakeryFloorPlanResetAction;
+    }>
+  | Readonly<{ kind: "compare_shift"; mode: "normal" | "outage" }>
+  | Readonly<{ kind: "start_production"; preset: "procedure" | "one-batch" }>
+  | Readonly<{
+      kind: "list_saved_runs";
+      runKind: "rehearsal" | "production";
+      cursor: string | null;
+    }>
+  | Readonly<{ kind: "prepare_run_save"; name: string }>
+  | Readonly<{
+      kind: "prepare_run_open";
+      runKind: "rehearsal" | "production";
+      id: string;
+    }>
+  | Readonly<{ kind: "prepare_scenario_save"; name: string; note: string }>
+  | Readonly<{
+      kind: "simulate_workcell";
+      mode: "transfer" | "oven-cycle" | "rack-cycle";
+    }>
+  | Readonly<{
+      kind: "accept_candidate";
+      candidate: BakeryRecordingAcceptanceReference;
+    }>
+  | Readonly<{ kind: "edit_rehearsal"; edit: BakeryRehearsalEdit }>
+  | Readonly<{ kind: "edit_production"; edit: BakeryProductionEdit }>
+  | Readonly<{ kind: "preview_production" }>
+  | Readonly<{ kind: "apply_production" }>;
+
+export type HarnessBakerySurfaceToolResult = Readonly<{
+  receiptId: string;
+  receipt: BakerySurfaceReceiptV1;
+  saveVerification: AgentRunSaveVerification;
+  scenarioSaveResult: AgentScenarioSaveResult;
+}>;
+
+export class BakeryContextRequestError extends ToolRequestError {}
+
+type HarnessBakerySurfaceExecute = (
+  request: HarnessBakerySurfaceToolRequest,
+  callId: string,
+) => Promise<HarnessBakerySurfaceToolResult>;
+
+type RecipeReadTool = () => Promise<RecipeToolRead>;
+
+export type RecipeToolRead = Readonly<{
+  recipes: readonly Readonly<{
+    recipeId: string;
+    revision: number;
+    name: string;
+    inputs: RecipeDraft["inputs"];
+    output: RecipeDraft["output"];
+    state: string;
+  }>[];
+  items: readonly RecipeItem[];
+}>;
+
+/** A null recipe id means a new recipe. */
+export type RecipeSaveRequest = Omit<RecipeDraft, "recipeId"> &
+  Readonly<{ recipeId: string | null }>;
+
+type RecipeSaveTool = (
+  request: RecipeSaveRequest,
+  operationId: string,
+) => Promise<StaffPageToolReceipt>;
+
+export type SupplierToolRead = Readonly<{
+  suppliers: readonly Readonly<{
+    supplierId: string;
+    name: string;
+    leadTimeDays: number | null;
+    contactName: string | null;
+    email: string | null;
+    phone: string | null;
+    minimumOrderQuantity: string | null;
+    minimumOrderUnit: string | null;
+    purchasingNotes: string | null;
+  }>[];
+  /** More suppliers than this read returns. */
+  more: boolean;
+}>;
+
+type SupplierReadTool = () => Promise<SupplierToolRead>;
+
+/** The fields of the Add supplier form. The name gives the supplier's id. */
+export type SupplierCreateRequest = Readonly<
+  Record<(typeof SUPPLIER_CREATE_FIELDS)[number], unknown>
+>;
+
+type SupplierCreateTool = (
+  request: SupplierCreateRequest,
+  operationId: string,
+) => Promise<StaffPageToolReceipt>;
+
+export type RecipeWorkflowReadRequest = Readonly<{ workflowId: string | null }>;
+
+type RecipeWorkflowReadTool = (
+  request: RecipeWorkflowReadRequest,
+) => Promise<unknown>;
+
+export type RecipeWorkflowProposeRequest = Readonly<{
+  workflowId: string;
+  baseDigest: string;
+  changes: readonly WorkflowChange[];
+  reason: string;
+  findingIds: readonly string[];
+}>;
+
+type RecipeWorkflowProposeTool = (
+  request: RecipeWorkflowProposeRequest,
+  operationId: string,
+) => Promise<unknown>;
+
+/** A recipe workflow request that was refused, in words that the agent can act on. */
+export class RecipeWorkflowRequestError extends ToolRequestError {}
+
+/**
+ * A view command of a Portal page (Plan 87 phase 4). It runs in the person's
+ * browser as their own click does and saves nothing. The result is what the
+ * page shows after the command.
+ */
+export type PageViewExecute = (
+  command: PageViewCommand,
+  callId: string,
+) => Promise<unknown>;
+
+/** What a turn gives to the Kitchen tools. */
+export type KitchenToolServices = {
+  readonly readSavedBakeryRun: (
+    query: SavedBakeryRunQuery,
+  ) => Promise<SavedBakeryRunResult>;
+  readonly executeBakerySurface: HarnessBakerySurfaceExecute;
+  /** Runs the view commands of Costs & margins and of the Pastry Bench. */
+  readonly executeCostsViewCommand?: PageViewExecute;
+  readonly readRecipes: RecipeReadTool;
+  readonly saveRecipe: RecipeSaveTool;
+  readonly readCosts: CostsReadTool;
+  readonly saveSupplyCost: SupplyCostSaveTool;
+  readonly saveLotCost?: LotCostSaveTool;
+  readonly saveCostsPlan: CostsPlanSaveTool;
+  readonly editCostsSheet: CostsSheetEditTool;
+  readonly readSuppliers: SupplierReadTool;
+  readonly createSupplier: SupplierCreateTool;
+  readonly readRecipeWorkflow: RecipeWorkflowReadTool;
+  readonly proposeRecipeWorkflow: RecipeWorkflowProposeTool;
+};
+
+export const defineKitchenTool =
+  defineToolFamily<KitchenToolServices>()("kitchen");

@@ -3,10 +3,15 @@ import {
   COSTS_SURFACE,
   COSTS_TABS,
   type CostsViewCommand,
-  type PageViewCommand,
 } from "@purin-labs/control-api";
-import { defineTool } from "../define-tool";
-import { readBakerySurfaceReceiptId } from "../bakery/surface";
+import {
+  defineKitchenTool,
+  type KitchenToolServices,
+} from "../kitchen/services";
+import {
+  bakerySurfaceToolSucceeded,
+  readBakerySurfaceReceiptId,
+} from "../bakery/surface";
 
 /**
  * The agent's view commands on Costs & margins (Plan 87 phase 4). Each one
@@ -14,11 +19,6 @@ import { readBakerySurfaceReceiptId } from "../bakery/surface";
  * a save stays a tool with its own approval. The result is what the page
  * shows after the command.
  */
-export type HarnessCostsViewExecute = (
-  command: PageViewCommand,
-  callId: string,
-) => Promise<unknown>;
-
 const RERUN = {
   kind: "any_caller",
   reason: "A view command shows the same view when it runs again.",
@@ -30,7 +30,7 @@ const UNAVAILABLE =
 const SCREEN_RULE =
   "Use it only while the person's current message carries Costs & margins from their screen.";
 
-const costsViewOpenTab = defineTool({
+const costsViewOpenTab = defineKitchenTool({
   name: "costs_view_open_tab",
   description: `Open a tab of Costs & margins on the person's screen: margins, weekly, actuals, forecast or supplies. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
@@ -44,9 +44,10 @@ const costsViewOpenTab = defineTool({
   unavailable: UNAVAILABLE,
   handler: costsViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
-const costsViewFilterCategory = defineTool({
+const costsViewFilterCategory = defineKitchenTool({
   name: "costs_view_filter_category",
   description: `Filter the Costs & margins product tables by a category that the page shows, or by "all". ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
@@ -67,9 +68,10 @@ const costsViewFilterCategory = defineTool({
   unavailable: UNAVAILABLE,
   handler: costsViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
-const costsViewSelectProduct = defineTool({
+const costsViewSelectProduct = defineKitchenTool({
   name: "costs_view_select_product",
   description: `Show one product of Costs & margins on the person's screen: the page selects its row and the agent's label stays on it for 5 seconds. Give the product id that the page view lists. ${SCREEN_RULE} It saves nothing.`,
   input: Type.Object(
@@ -90,6 +92,7 @@ const costsViewSelectProduct = defineTool({
   unavailable: UNAVAILABLE,
   handler: costsViewHandler,
   readReceipt: readBakerySurfaceReceiptId,
+  succeeded: bakerySurfaceToolSucceeded,
 });
 
 export const COSTS_VIEW_TOOLS = [
@@ -100,9 +103,7 @@ export const COSTS_VIEW_TOOLS = [
 
 function costsViewHandler({
   executeCostsViewCommand,
-}: {
-  readonly executeCostsViewCommand?: HarnessCostsViewExecute;
-}) {
+}: Partial<KitchenToolServices>) {
   return executeCostsViewCommand === undefined
     ? undefined
     : (command: CostsViewCommand, call: { readonly callId: string }) =>

@@ -1,8 +1,24 @@
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { defineTool, jsonSchema } from "../define-tool";
+import type {
+  MessageAttachmentInspect,
+  MessageLinkRead,
+} from "../catalog/types";
+import { defineToolFamily, jsonSchema } from "../define-tool";
 
-export const messageAttachmentInspect = defineTool({
+/**
+ * What a turn gives to the message tools. Both are scoped to the turn's own
+ * message, so neither reaches a file or a link of another conversation.
+ */
+export type MessageToolServices = {
+  readonly inspectMessageAttachment: MessageAttachmentInspect;
+  readonly readMessageLink: MessageLinkRead;
+};
+
+const defineMessageTool =
+  defineToolFamily<MessageToolServices>()("messages");
+
+export const messageAttachmentInspect = defineMessageTool({
   name: "inspect_message_attachment",
   description:
     "Read bounded text or technical metadata from one file attached to the current message. " +
@@ -25,11 +41,13 @@ export const messageAttachmentInspect = defineTool({
     capability: CAPABILITY_KEYS.messageAttachmentInspect,
   },
   unavailable: "inspect message attachment is unavailable",
-  handler: (authority) => (request) =>
-    authority.inspectMessageAttachment(request),
+  handler: ({ inspectMessageAttachment }) =>
+    inspectMessageAttachment === undefined
+      ? undefined
+      : (request) => inspectMessageAttachment(request),
 });
 
-export const messageLinkRead = defineTool({
+export const messageLinkRead = defineMessageTool({
   name: "read_message_link",
   description:
     "Fetch a bounded read of one public HTTP(S) link carried by the current message. " +
@@ -52,10 +70,10 @@ export const messageLinkRead = defineTool({
     capability: CAPABILITY_KEYS.messageLinkRead,
   },
   unavailable: "read message link is unavailable",
-  handler:
-    ({ readMessageLink }) =>
-    (request) =>
-      readMessageLink(request),
+  handler: ({ readMessageLink }) =>
+    readMessageLink === undefined
+      ? undefined
+      : (request) => readMessageLink(request),
 });
 
 function parseAttachmentInspectArgs(args: readonly unknown[]): {

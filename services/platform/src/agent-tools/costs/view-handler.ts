@@ -16,7 +16,7 @@ import type { AccountPlatformAccess } from "../../account-platform/access";
 import { dispatchBakerySurfaceEffect } from "../../actors/bakery-surface-effect";
 import { timelineVisibleMessages } from "../../chat/conversation";
 import { readConversation } from "../../chat/store";
-import { BakeryContextRequestError } from "../catalog/types";
+import { BakeryContextRequestError } from "../kitchen/services";
 import { requireLiveBakeryAuthority } from "../bakery/handlers";
 
 /**

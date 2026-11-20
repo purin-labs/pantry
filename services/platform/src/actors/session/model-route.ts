@@ -460,10 +460,6 @@ export function admittedMessageLinkEgress(
   };
 }
 
-export function monotonicNanoseconds(): number {
-  return Math.trunc(performance.now() * 1_000_000);
-}
-
 export function authorizedTransientModelLease(
   lease: EmbeddedHarnessModelRouteLease,
   reauthorize: () => Promise<Result<null, Readonly<{ code: string }>>>,

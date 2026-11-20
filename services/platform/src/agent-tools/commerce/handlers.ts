@@ -1,14 +1,10 @@
 import { pantryCommerceAccess } from "../../commerce/app-access";
 import { isSystemCommerceEntity } from "@purin-labs/contracts";
 import type {
-  CounterSaleReadRequest,
-  CounterSaleToolRead,
-  OrderQueueAdvanceRequest,
-  OrderQueueToolRead,
   PaymentsReadRequest,
+} from "./services";
+import type {
   StaffPageToolReceipt,
-  SoldOutMarkRequest,
-  SoldOutToolRead,
 } from "../catalog/types";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
@@ -32,8 +28,14 @@ import {
   presentOrderQueueEntry,
   readCafeSoldOutMenu,
   setSoldOutMark,
+  type CounterSaleReadRequest,
+  type CounterSaleToolRead,
+  type OrderQueueAdvanceRequest,
   type OrderQueueAdvanceResult,
+  type OrderQueueToolRead,
+  type SoldOutMarkRequest,
   type SoldOutMarkResult,
+  type SoldOutToolRead,
 } from "../../commerce/order-queue-commands";
 import {
   presentPayments,
@@ -721,7 +723,7 @@ function soldOutMarkRefusal(marked: SoldOutMarkResult): string | null {
  */
 export async function readMerchantReportForEmbeddedHarness(
   context: SessionToolContext,
-  request: import("../catalog/types").HarnessMerchantReportRequest,
+  request: import("./services").HarnessMerchantReportRequest,
 ): Promise<
   import("../../commerce/entity-plane/merchant-reports").MerchantReportResult
 > {

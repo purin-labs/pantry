@@ -26,6 +26,7 @@ import { acceptedExecutionAccountAuthority } from "../../services/platform/src/a
 import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue.ts";
 import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
+import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import {
   createAccessGrant,
   revokeAccessGrant,
@@ -329,9 +330,13 @@ export class CandidateActor extends RecoveryActor {
     if (admission === null || !(await admission.isActive()))
       throw new Error("Proposal Session placement admission denied");
     const selection = await this.catalogSelection();
-    const catalogDigest = await catalogHarnessToolCatalogDigest(selection);
+    const catalogDigest = await catalogHarnessToolCatalogDigest(
+      TOOL_REGISTRY,
+      selection,
+    );
     const host = required(
       await createCatalogHarnessCodeMode({
+        registry: TOOL_REGISTRY,
         expectedCatalogDigest: catalogDigest,
         catalogSelection: selection,
         admission: createHarnessCodeModeAdmission({
@@ -342,28 +347,35 @@ export class CandidateActor extends RecoveryActor {
           catalogDigest,
         }),
         nativeSandbox: codeModeSandbox(this.env),
-        listIntegrations: unavailableTool,
-        readEntityContext: unavailableTool,
-        readMerchantReport: unavailableTool,
-        readWorkflowCanvas: this.readWorkflowCanvas.bind(this, lease),
-        moveWorkflowCanvasObject: this.moveWorkflowCanvas.bind(this, lease),
-        readProductDescriptionDraft: this.readProductDescriptionDraft.bind(
-          this,
-          lease,
-        ),
-        editProductDescriptionDraft: this.editProductDescriptionDraft.bind(
-          this,
-          lease,
-        ),
-        readMenuDraft: unavailableTool,
-        readEmailDraft: unavailableTool,
-        editEmailDraft: unavailableTool,
-        queryWorkspace: unavailableTool,
-        proposeCommerceAction: this.propose.bind(this, lease),
-        readCustomConnector: this.readCustomConnector.bind(this, lease),
+        services: {
+          integrations: {
+            listIntegrations: unavailableTool,
+            readCustomConnector: this.readCustomConnector.bind(this, lease),
+          },
+          commerce: {
+            readEntityContext: unavailableTool,
+            readMerchantReport: unavailableTool,
+            proposeCommerceAction: this.propose.bind(this, lease),
+          },
+          drafts: {
+            readWorkflowCanvas: this.readWorkflowCanvas.bind(this, lease),
+            moveWorkflowCanvasObject: this.moveWorkflowCanvas.bind(this, lease),
+            readProductDescriptionDraft: this.readProductDescriptionDraft.bind(
+              this,
+              lease,
+            ),
+            editProductDescriptionDraft: this.editProductDescriptionDraft.bind(
+              this,
+              lease,
+            ),
+            readMenuDraft: unavailableTool,
+            readEmailDraft: unavailableTool,
+            editEmailDraft: unavailableTool,
+          },
+          files: { queryWorkspace: unavailableTool },
+        },
         claimCapability: this.claimToolCapability.bind(this, lease),
         authorizeSources: this.authorizeToolSources.bind(this, lease),
-        nowNs,
       }),
     );
     return admittedSessionToolHost(
@@ -813,10 +825,6 @@ function isCommerceProposal(definition) {
 
 function prepareStatement(db, sql) {
   return db.prepare(sql);
-}
-
-function nowNs() {
-  return Date.now() * 1_000_000;
 }
 
 async function unavailableTool() {

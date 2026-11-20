@@ -1,5 +1,6 @@
 export * from "./accounts";
 export * from "./capabilities";
+export * from "./catalog-tools";
 export * from "./definition";
 export * from "./execution";
 export * from "./grants";

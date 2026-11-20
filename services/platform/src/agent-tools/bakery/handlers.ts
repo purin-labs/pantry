@@ -35,8 +35,8 @@ import { readLatestAgentScenarioSave } from "../../commerce/bakery/agent-scenari
 import type {
   HarnessBakerySurfaceToolRequest,
   HarnessBakerySurfaceToolResult,
-} from "../catalog/types";
-import { BakeryContextRequestError } from "../catalog/types";
+} from "../kitchen/services";
+import { BakeryContextRequestError } from "../kitchen/services";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,

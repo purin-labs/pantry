@@ -2,13 +2,25 @@ import { parseIntegrationAccountId } from "../../ids";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
+  FileRead,
+  FileSearch,
   HarnessFileRead,
   HarnessFileSearch,
   HarnessWorkspaceQuery,
+  WorkspaceQuery,
 } from "../catalog/types";
-import { defineTool, jsonSchema } from "../define-tool";
+import { defineToolFamily, jsonSchema } from "../define-tool";
 
-export const fileSearch = defineTool({
+/** What a turn gives to the file and workspace tools. */
+export type FileToolServices = {
+  readonly searchFiles: FileSearch;
+  readonly readFile: FileRead;
+  readonly queryWorkspace: WorkspaceQuery;
+};
+
+const defineFileTool = defineToolFamily<FileToolServices>()("files");
+
+export const fileSearch = defineFileTool({
   name: "file_search",
   description:
     "Search bounded text and metadata for files granted to the current Case authority. " +
@@ -28,13 +40,11 @@ export const fileSearch = defineTool({
   rerun: { kind: "none" },
   selection: { kind: "capability", capability: CAPABILITY_KEYS.fileRead },
   unavailable: "file search is unavailable",
-  handler:
-    ({ searchFiles }) =>
-    (request) =>
-      searchFiles(request),
+  handler: ({ searchFiles }) =>
+    searchFiles === undefined ? undefined : (request) => searchFiles(request),
 });
 
-export const fileRead = defineTool({
+export const fileRead = defineFileTool({
   name: "file_read",
   description:
     "Read up to eight contiguous segments from one canonical granted file reference. " +
@@ -63,13 +73,11 @@ export const fileRead = defineTool({
   rerun: { kind: "none" },
   selection: { kind: "capability", capability: CAPABILITY_KEYS.fileRead },
   unavailable: "file read is unavailable",
-  handler:
-    ({ readFile }) =>
-    (request) =>
-      readFile(request),
+  handler: ({ readFile }) =>
+    readFile === undefined ? undefined : (request) => readFile(request),
 });
 
-export const workspaceQuery = defineTool({
+export const workspaceQuery = defineFileTool({
   name: "workspace_query",
   description:
     "Read one exact file or search text in the current immutable workspace revision. " +
@@ -92,10 +100,8 @@ export const workspaceQuery = defineTool({
   rerun: { kind: "any_caller", reason: "A read changes nothing." },
   selection: { kind: "capability", capability: CAPABILITY_KEYS.workspaceQuery },
   unavailable: "workspace query is unavailable",
-  handler:
-    ({ queryWorkspace }) =>
-    (request) =>
-      queryWorkspace(request),
+  handler: ({ queryWorkspace }) =>
+    queryWorkspace === undefined ? undefined : (request) => queryWorkspace(request),
 });
 
 function parseFileSearchArgs(args: readonly unknown[]): HarnessFileSearch {

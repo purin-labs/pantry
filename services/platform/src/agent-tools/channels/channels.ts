@@ -19,13 +19,14 @@ import type {
   HarnessSlackMessagePropose,
   HarnessWhatsAppSupportRead,
   HarnessWhatsAppSupportReplySend,
-} from "../catalog/types";
+} from "./services";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { defineTool, jsonSchema } from "../define-tool";
+import { jsonSchema } from "../define-tool";
+import { defineChannelTool } from "./services";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 
-export const emailMailboxSearch = defineTool({
+export const emailMailboxSearch = defineChannelTool({
   name: "email_mailbox_search",
   description:
     "Search and read a bounded page from one connected Gmail mailbox granted to this turn. " +
@@ -49,13 +50,11 @@ export const emailMailboxSearch = defineTool({
     capability: CAPABILITY_KEYS.emailMailboxRead,
   },
   unavailable: "email mailbox search is unavailable",
-  handler:
-    ({ searchEmailMailbox }) =>
-    (request) =>
-      searchEmailMailbox(request),
+  handler: ({ searchEmailMailbox }) =>
+    searchEmailMailbox === undefined ? undefined : (request) => searchEmailMailbox(request),
 });
 
-export const emailReplyProposal = defineTool({
+export const emailReplyProposal = defineChannelTool({
   name: "email_reply_propose",
   description:
     "Create a visible Gmail reply draft for human approval. Use exact message and thread ids " +
@@ -102,14 +101,12 @@ export const emailReplyProposal = defineTool({
     capability: CAPABILITY_KEYS.emailReplyPropose,
   },
   unavailable: "email reply propose is unavailable",
-  handler:
-    ({ proposeEmailReply }) =>
-    (request) =>
-      proposeEmailReply(request),
+  handler: ({ proposeEmailReply }) =>
+    proposeEmailReply === undefined ? undefined : (request) => proposeEmailReply(request),
   readReceipt: readEmailProposalReceiptId,
 });
 
-export const emailReplyDraftRead = defineTool({
+export const emailReplyDraftRead = defineChannelTool({
   name: "email_reply_draft_read",
   description:
     "Read the shared draft of one Gmail reply that waits for review, with the Gmail version it was last saved as. " +
@@ -135,13 +132,11 @@ export const emailReplyDraftRead = defineTool({
     capability: CAPABILITY_KEYS.emailMailboxRead,
   },
   unavailable: "email reply draft read is unavailable",
-  handler:
-    ({ readEmailReplyDraft }) =>
-    (request) =>
-      readEmailReplyDraft(request),
+  handler: ({ readEmailReplyDraft }) =>
+    readEmailReplyDraft === undefined ? undefined : (request) => readEmailReplyDraft(request),
 });
 
-export const emailReplyDraftEdit = defineTool({
+export const emailReplyDraftEdit = defineChannelTool({
   name: "email_reply_draft_edit",
   description:
     "Replace one exact, unique passage in the shared draft of a Gmail reply. Use the exact text returned by " +
@@ -170,13 +165,14 @@ export const emailReplyDraftEdit = defineTool({
     capability: CAPABILITY_KEYS.emailReplyPropose,
   },
   unavailable: "email reply draft edit is unavailable",
-  handler:
-    ({ editEmailReplyDraft }) =>
-    (request, call) =>
-      editEmailReplyDraft(request, call.operationId, call.execution),
+  handler: ({ editEmailReplyDraft }) =>
+    editEmailReplyDraft === undefined
+      ? undefined
+      : (request, call) =>
+          editEmailReplyDraft(request, call.operationId, call.execution),
 });
 
-export const productionPlanRead = defineTool({
+export const productionPlanRead = defineChannelTool({
   name: "production_plan_read",
   description:
     "Read one location's shared production plan: each production request that waits for acceptance, its requested quantity, " +
@@ -198,13 +194,11 @@ export const productionPlanRead = defineTool({
     capability: CAPABILITY_KEYS.commerceProductionPlanEdit,
   },
   unavailable: "production plan read is unavailable",
-  handler:
-    ({ readProductionPlan }) =>
-    (request) =>
-      readProductionPlan(request),
+  handler: ({ readProductionPlan }) =>
+    readProductionPlan === undefined ? undefined : (request) => readProductionPlan(request),
 });
 
-export const productionPlanEdit = defineTool({
+export const productionPlanEdit = defineChannelTool({
   name: "production_plan_edit",
   description:
     "Set the planned quantity of one production request in a location's shared plan. Use a requestId from production_plan_read. " +
@@ -232,13 +226,14 @@ export const productionPlanEdit = defineTool({
     capability: CAPABILITY_KEYS.commerceProductionPlanEdit,
   },
   unavailable: "production plan edit is unavailable",
-  handler:
-    ({ editProductionPlan }) =>
-    (request, call) =>
-      editProductionPlan(request, call.operationId, call.execution),
+  handler: ({ editProductionPlan }) =>
+    editProductionPlan === undefined
+      ? undefined
+      : (request, call) =>
+          editProductionPlan(request, call.operationId, call.execution),
 });
 
-export const emailOperationalProposal = defineTool({
+export const emailOperationalProposal = defineChannelTool({
   name: "email_operational_propose",
   description:
     "Prepare one plain-text operational email for human approval using the exact Gmail accountRef returned by integration_list. Use an existing Customer or Supplier contact identity and revision from authorized context. A raw address alone is ineligible: ask for an existing contact or explain that it must be registered through the contact workflow. Never invent relationships, contact IDs, revisions or verification. " +
@@ -300,14 +295,12 @@ export const emailOperationalProposal = defineTool({
     capability: CAPABILITY_KEYS.emailOperationalPropose,
   },
   unavailable: "email operational propose is unavailable",
-  handler:
-    ({ proposeEmailOperational }) =>
-    (request) =>
-      proposeEmailOperational(request),
+  handler: ({ proposeEmailOperational }) =>
+    proposeEmailOperational === undefined ? undefined : (request) => proposeEmailOperational(request),
   readReceipt: readEmailOperationalProposalReceiptId,
 });
 
-export const slackMessageProposal = defineTool({
+export const slackMessageProposal = defineChannelTool({
   name: "slack_message_propose",
   description:
     "Draft one plain-text Slack message for a person to send, using the exact Slack accountRef returned by integration_list. " +
@@ -336,14 +329,12 @@ export const slackMessageProposal = defineTool({
     capability: CAPABILITY_KEYS.slackMessagePropose,
   },
   unavailable: "slack message propose is unavailable",
-  handler:
-    ({ proposeSlackMessage }) =>
-    (request) =>
-      proposeSlackMessage(request),
+  handler: ({ proposeSlackMessage }) =>
+    proposeSlackMessage === undefined ? undefined : (request) => proposeSlackMessage(request),
   readReceipt: readSlackMessageProposalReceiptId,
 });
 
-export const whatsAppSupportRead = defineTool({
+export const whatsAppSupportRead = defineChannelTool({
   name: "whatsapp_support_read",
   description:
     "Read the newest active WhatsApp support Cases from phone-number accounts granted to this turn. " +
@@ -366,13 +357,11 @@ export const whatsAppSupportRead = defineTool({
     capability: CAPABILITY_KEYS.whatsappSupportRead,
   },
   unavailable: "whatsapp support read is unavailable",
-  handler:
-    ({ readWhatsAppSupport }) =>
-    (request) =>
-      readWhatsAppSupport(request),
+  handler: ({ readWhatsAppSupport }) =>
+    readWhatsAppSupport === undefined ? undefined : (request) => readWhatsAppSupport(request),
 });
 
-export const whatsAppSupportReplySend = defineTool({
+export const whatsAppSupportReplySend = defineChannelTool({
   name: "whatsapp_support_reply_send",
   description:
     "Send one reply to an active WhatsApp support Case. The Case determines the recipient. " +
@@ -395,10 +384,8 @@ export const whatsAppSupportReplySend = defineTool({
     capability: CAPABILITY_KEYS.whatsappSupportReplySend,
   },
   unavailable: "whatsapp support reply send is unavailable",
-  handler:
-    ({ sendWhatsAppSupportReply }) =>
-    (request) =>
-      sendWhatsAppSupportReply(request),
+  handler: ({ sendWhatsAppSupportReply }) =>
+    sendWhatsAppSupportReply === undefined ? undefined : (request) => sendWhatsAppSupportReply(request),
   readReceipt: readWhatsAppReceiptId,
 });
 

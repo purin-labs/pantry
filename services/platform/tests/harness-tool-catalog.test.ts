@@ -8,7 +8,36 @@ import {
 
 import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
 import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../src/agent-tools/catalog/code-mode";
+import {
+  TOOL_REGISTRY,
+  type PartialToolServices,
+} from "../src/agent-tools/registry";
 import { requireIntegrationAccountId } from "./test-ids";
+
+/**
+ * The services that each case gives, with the case's own services over them.
+ * A fake only records or answers a call: the executor decides each outcome.
+ */
+function fixtureServices(
+  services: PartialToolServices = {},
+): PartialToolServices {
+  return {
+    ...services,
+    integrations: { listIntegrations, ...services.integrations },
+    commerce: { readEntityContext, readMerchantReport, ...services.commerce },
+    drafts: {
+      readWorkflowCanvas: rejectWorkflowCanvasTool,
+      moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
+      readProductDescriptionDraft: rejectProductDescriptionDraftRead,
+      editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
+      readMenuDraft: unavailableMenuDraft,
+      readEmailDraft: rejectEmailDraftRead,
+      editEmailDraft: rejectEmailDraftEdit,
+      ...services.drafts,
+    },
+    files: { queryWorkspace, ...services.files },
+  };
+}
 
 describe("Harness Code Mode authority", harnessCodeModeSuite);
 
@@ -68,23 +97,16 @@ async function executesProductionTools(): Promise<void> {
   };
   const calls: unknown[] = [];
   const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(selection),
+    registry: TOOL_REGISTRY,
+    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection),
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      kitchen: {
+        executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
   expect(created.value.definitions.map(readSurfaceToolName)).toEqual([
@@ -166,23 +188,16 @@ async function executesRehearsalEditTool(): Promise<void> {
   };
   const calls: unknown[] = [];
   const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(selection),
+    registry: TOOL_REGISTRY,
+    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection),
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      kitchen: {
+        executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
   expect(created.value.definitions.map(readSurfaceToolName)).toEqual([
@@ -240,23 +255,16 @@ async function executesBakerySurfaceTool(): Promise<void> {
   };
   const calls: unknown[] = [];
   const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(selection),
+    registry: TOOL_REGISTRY,
+    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection),
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      kitchen: {
+        executeBakerySurface: recordBakerySurfaceTool.bind(null, calls),
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
   expect(created.value.definitions.map(readSurfaceToolName)).toEqual([
@@ -392,24 +400,17 @@ async function executesAirtableTools(): Promise<void> {
   const selection = { allowedCapabilities: scopes.value };
   const claims: string[] = [];
   const created = await createCatalogHarnessCodeMode({
-    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(selection),
+    registry: TOOL_REGISTRY,
+    expectedCatalogDigest: await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection),
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    readAirtable: airtableReadFixture,
-    writeAirtable: airtableWriteFixture,
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      integrations: {
+        readAirtable: airtableReadFixture,
+        writeAirtable: airtableWriteFixture,
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
   const read = await created.value.executeTool(
@@ -478,27 +479,20 @@ async function executesWhatsAppSupportReplySend(): Promise<void> {
   if (!scopes.ok) return;
   const selection = { allowedCapabilities: scopes.value };
   const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
+    await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection);
   const claims: string[] = [];
   const sends: unknown[] = [];
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest,
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    sendWhatsAppSupportReply: recordWhatsAppSupportReplySend.bind(null, sends),
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      channels: {
+        sendWhatsAppSupportReply: recordWhatsAppSupportReplySend.bind(null, sends),
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
 
@@ -563,24 +557,14 @@ async function gatesMessageToolsByCapability(): Promise<void> {
     allowedCapabilities: ["integration.discovery.read"] as const,
   };
   const withoutDigest =
-    await catalogHarnessToolCatalogDigest(withoutMessageTools);
+    await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, withoutMessageTools);
   const absent = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest: withoutDigest,
     catalogSelection: withoutMessageTools,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices(),
   });
   if (!absent.ok) throw new Error(absent.error.code);
 
@@ -600,31 +584,24 @@ async function gatesMessageToolsByCapability(): Promise<void> {
     ] as const,
   };
   const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
+    await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection);
   const claims: string[] = [];
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest,
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    inspectMessageAttachment: async function inspect(input) {
-      return inlineToolOutput(`inspected:${input.attachmentId}`);
-    },
-    readMessageLink: async function read(input) {
-      return inlineToolOutput(`read:${input.url}`);
-    },
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      messages: {
+        inspectMessageAttachment: async function inspect(input) {
+          return inlineToolOutput(`inspected:${input.attachmentId}`);
+        },
+        readMessageLink: async function read(input) {
+          return inlineToolOutput(`read:${input.url}`);
+        },
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
 
@@ -670,25 +647,15 @@ async function executesIntegrationDiscovery(): Promise<void> {
     allowedCapabilities: ["integration.discovery.read"] as const,
   };
   const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
+    await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection);
   const claims: string[] = [];
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest,
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices(),
   });
   if (!created.ok) throw new Error(created.error.code);
 
@@ -720,7 +687,7 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     ] as const,
   };
   const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
+    await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection);
   const claims: string[] = [];
   const reads: unknown[] = [];
   const edits: Array<{
@@ -741,28 +708,23 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     },
   };
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest,
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: async (request) => {
-      reads.push(request);
-      return snapshot;
-    },
-    editProductDescriptionDraft: async (request, operationId) => {
-      edits.push({ request, operationId });
-      return snapshot;
-    },
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      drafts: {
+        readProductDescriptionDraft: async (request) => {
+          reads.push(request);
+          return snapshot;
+        },
+        editProductDescriptionDraft: async (request, operationId) => {
+          edits.push({ request, operationId });
+          return snapshot;
+        },
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
 
@@ -794,23 +756,18 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     allowedCapabilities: ["commerce.entity_plane.context"] as const,
   };
   const readOnly = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest:
-      await catalogHarnessToolCatalogDigest(readOnlySelection),
+      await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, readOnlySelection),
     catalogSelection: readOnlySelection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: async () => snapshot,
-    editProductDescriptionDraft: async () => snapshot,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      drafts: {
+        readProductDescriptionDraft: async () => snapshot,
+        editProductDescriptionDraft: async () => snapshot,
+      },
+    }),
   });
   if (!readOnly.ok) throw new Error(readOnly.error.code);
   const denied = await readOnly.value.executeTool(
@@ -827,23 +784,18 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
 }
 
 async function screensDirectFailure(): Promise<void> {
-  const expectedCatalogDigest = await catalogHarnessToolCatalogDigest();
+  const expectedCatalogDigest = await catalogHarnessToolCatalogDigest(TOOL_REGISTRY);
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest,
     admission: permissiveAdmission(),
     claimCapability: acceptFixtureCapabilityClaim,
-    listIntegrations,
-    readEntityContext: rejectInternalEntityContext,
-    readMerchantReport: rejectMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices({
+      commerce: {
+        readEntityContext: rejectInternalEntityContext,
+        readMerchantReport: rejectMerchantReport,
+      },
+    }),
   });
   if (!created.ok) throw new Error(created.error.code);
 
@@ -882,33 +834,26 @@ async function selectsCurrentMessageCatalog(): Promise<void> {
 
   const selection = { allowedCapabilities: scopes.value };
   const expectedCatalogDigest =
-    await catalogHarnessToolCatalogDigest(selection);
+    await catalogHarnessToolCatalogDigest(TOOL_REGISTRY, selection);
   const claims: string[] = [];
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest,
     catalogSelection: selection,
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    inspectMessageAttachment: async (input) => ({
-      outcome: "inspected",
-      attachmentId: input.attachmentId,
+    services: fixtureServices({
+      messages: {
+        inspectMessageAttachment: async (input) => ({
+          outcome: "inspected",
+          attachmentId: input.attachmentId,
+        }),
+        readMessageLink: async (input) => ({
+          outcome: "read",
+          url: input.url,
+        }),
+      },
     }),
-    readMessageLink: async (input) => ({
-      outcome: "read",
-      url: input.url,
-    }),
-    nowNs: monotonicClock(),
   });
   if (!created.ok) throw new Error(created.error.code);
 
@@ -920,21 +865,11 @@ async function selectsCurrentMessageCatalog(): Promise<void> {
 
 async function rejectsCatalogMismatch(): Promise<void> {
   const created = await createCatalogHarnessCodeMode({
+    registry: TOOL_REGISTRY,
     expectedCatalogDigest: "0".repeat(64),
     admission: permissiveAdmission(),
     claimCapability: acceptFixtureCapabilityClaim,
-    listIntegrations,
-    readEntityContext,
-    readMerchantReport,
-    readWorkflowCanvas: rejectWorkflowCanvasTool,
-    moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-    readProductDescriptionDraft: rejectProductDescriptionDraftRead,
-    editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-    readMenuDraft: unavailableMenuDraft,
-    readEmailDraft: rejectEmailDraftRead,
-    editEmailDraft: rejectEmailDraftEdit,
-    queryWorkspace,
-    nowNs: monotonicClock(),
+    services: fixtureServices(),
   });
 
   expect(created).toEqual({
@@ -1016,7 +951,7 @@ function readEntityContext(
 }
 
 function listIntegrations(
-  request: import("../src/agent-tools/catalog/types").HarnessIntegrationListRequest,
+  request: import("../src/agent-tools/integrations/services").HarnessIntegrationListRequest,
 ): Promise<import("@purin-labs/contracts").IntegrationDiscoveryView> {
   if (request.kind !== "list")
     throw new Error("integration list request invalid");
@@ -1038,9 +973,9 @@ function listIntegrations(
 
 function recordWhatsAppSupportReplySend(
   sends: unknown[],
-  request: import("../src/agent-tools/catalog/types").HarnessWhatsAppSupportReplySend,
+  request: import("../src/agent-tools/channels/services").HarnessWhatsAppSupportReplySend,
 ): Promise<
-  import("../src/agent-tools/catalog/types").HarnessWhatsAppSupportReplyReceipt
+  import("../src/agent-tools/channels/services").HarnessWhatsAppSupportReplyReceipt
 > {
   sends.push(request);
   return Promise.resolve({
@@ -1066,15 +1001,6 @@ function queryWorkspace(
   });
 }
 
-function monotonicClock(): () => number {
-  let value = 0;
-  return nextClockValue.bind(null, { value });
-}
-
-function nextClockValue(clock: { value: number }): number {
-  clock.value += 10;
-  return clock.value;
-}
 
 function authorizedJson(result: AuthorizedHarnessToolResult): unknown {
   if (

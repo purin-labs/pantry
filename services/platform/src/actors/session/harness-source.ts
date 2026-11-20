@@ -124,7 +124,7 @@ export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
   harnessInstructions: string;
   assignment: CaseAssignment;
   customConnectorOperations: readonly CustomConnectorCatalogEntry[];
-  bakerySurfaceCommands: readonly import("../../agent-tools/define-tool").SurfaceToolCommandName[];
+  bakerySurfaceCommands: readonly string[];
   memoryProposal: boolean;
   followUp: boolean;
   permissionRequest: boolean;

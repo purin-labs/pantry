@@ -30,6 +30,7 @@ import { preflightHarnessTurnLease } from "../../services/platform/src/actors/ag
 import { validateCanonicalSessionAdvance } from "../../services/platform/src/actor-wasm.ts";
 import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
+import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue.ts";
 import { renderHarnessHistoryContent } from "../../services/platform/src/actors/harness-history.ts";
 import { buildTextTurnCancellationStartedCommit } from "../../services/platform/src/actors/agent-session-text-turn.ts";
@@ -199,8 +200,11 @@ export class CandidateActor extends CanonicalActor {
     };
     return required(
       await createCatalogHarnessCodeMode({
-        expectedCatalogDigest:
-          await catalogHarnessToolCatalogDigest(catalogSelection),
+        registry: TOOL_REGISTRY,
+        expectedCatalogDigest: await catalogHarnessToolCatalogDigest(
+          TOOL_REGISTRY,
+          catalogSelection,
+        ),
         catalogSelection,
         admission: {
           begin: unavailableTool,
@@ -208,19 +212,30 @@ export class CandidateActor extends CanonicalActor {
           complete: unavailableTool,
           settle: unavailableTool,
         },
-        listIntegrations: unavailableTool,
-        readEntityContext: unavailableTool,
-        readMerchantReport: unavailableTool,
-        readWorkflowCanvas: rejectWorkflowCanvasTool,
-        moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-        readProductDescriptionDraft: this.readProductDraft.bind(this, lease),
-        editProductDescriptionDraft: this.editProductDraft.bind(this, lease),
-        readMenuDraft: unavailableTool,
-        readEmailDraft: unavailableTool,
-        editEmailDraft: unavailableTool,
-        queryWorkspace: unavailableTool,
+        services: {
+          integrations: { listIntegrations: unavailableTool },
+          commerce: {
+            readEntityContext: unavailableTool,
+            readMerchantReport: unavailableTool,
+          },
+          drafts: {
+            readWorkflowCanvas: rejectWorkflowCanvasTool,
+            moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
+            readProductDescriptionDraft: this.readProductDraft.bind(
+              this,
+              lease,
+            ),
+            editProductDescriptionDraft: this.editProductDraft.bind(
+              this,
+              lease,
+            ),
+            readMenuDraft: unavailableTool,
+            readEmailDraft: unavailableTool,
+            editEmailDraft: unavailableTool,
+          },
+          files: { queryWorkspace: unavailableTool },
+        },
         claimCapability: this.claimToolCapability.bind(this, lease),
-        nowNs: nowNs,
       }),
     );
   }
@@ -638,10 +653,6 @@ function isProductDraftRead(definition) {
 
 async function unavailableTool() {
   throw new Error("Tool is outside this trial's selected catalog");
-}
-
-function nowNs() {
-  return Date.now() * 1_000_000;
 }
 
 function validateRecoverableRead(sql, generation) {

@@ -3,11 +3,12 @@ import {
   type JevFeatureCommand,
 } from "@purin-labs/control-api/portal/jev-features";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { defineTool, jsonSchema } from "../define-tool";
+import { jsonSchema } from "../define-tool";
+import { defineJevTool } from "./services";
 import { ProposalArgumentError } from "../errors";
 
 /** Settings › Jev for the Portal chat agent (Plan 88 section 6). */
-export const jevFeaturesRead = defineTool({
+export const jevFeaturesRead = defineJevTool({
   name: "jev_features_read",
   description:
     "Read the Jev settings of this workspace, as Settings › Jev shows them: funding says who pays for Jev (satyr_platform is the key provided by Seams, organisation_byo is the workspace's own TypeSafe key), keyAvailable says if that key works, and each switch says if it is on: mailClassification with the mailboxes that Jev sorts, relatedCases with its mode, and screenRelevance. " +
@@ -30,7 +31,7 @@ export const jevFeaturesRead = defineTool({
     readJevFeatures === undefined ? undefined : () => readJevFeatures(),
 });
 
-export const jevFeaturesManage = defineTool({
+export const jevFeaturesManage = defineJevTool({
   name: "jev_features_manage",
   description:
     "Propose to turn one Jev switch on or off. It changes nothing: the admin who asked approves it on a card in this chat, because a switch that is on sends new data to TypeSafe. " +

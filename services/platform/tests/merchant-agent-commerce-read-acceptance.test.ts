@@ -16,7 +16,10 @@ import {
 
 import { catalogHarnessToolCatalogDigest } from "../src/agent-tools/catalog/selection";
 import { createCatalogHarnessCodeMode } from "../src/agent-tools/catalog/code-mode";
-import type { HarnessCodeModeAuthority } from "../src/agent-tools/catalog/types";
+import { TOOL_REGISTRY } from "../src/agent-tools/registry";
+import type {
+  HarnessCodeModeAuthority,
+} from "../src/agent-tools/catalog/types";
 import type { AccessGrant } from "../src/authorization/access-grants/types";
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";
@@ -101,8 +104,11 @@ async function acceptsCommerceReads(): Promise<void> {
     };
     const tools = required(
       await createCatalogHarnessCodeMode({
-        expectedCatalogDigest:
-          await catalogHarnessToolCatalogDigest(catalogSelection),
+        registry: TOOL_REGISTRY,
+        expectedCatalogDigest: await catalogHarnessToolCatalogDigest(
+          TOOL_REGISTRY,
+          catalogSelection,
+        ),
         catalogSelection,
         admission: {
           begin: unexpectedCapability,
@@ -112,18 +118,12 @@ async function acceptsCommerceReads(): Promise<void> {
           abandon: unexpectedCapability,
         },
         claimCapability: acceptCapability,
-        listIntegrations: unexpectedCapability,
-        readEntityContext: readContext.bind(null, fixture),
-        readMerchantReport: readReport.bind(null, fixture),
-        readWorkflowCanvas: rejectWorkflowCanvasTool,
-        moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
-        readProductDescriptionDraft: unexpectedCapability,
-        editProductDescriptionDraft: unexpectedCapability,
-        readMenuDraft: unavailableMenuDraft,
-        readEmailDraft: unexpectedCapability,
-        editEmailDraft: unexpectedCapability,
-        queryWorkspace: unexpectedCapability,
-        nowNs: clock,
+        services: {
+          commerce: {
+            readEntityContext: readContext.bind(null, fixture),
+            readMerchantReport: readReport.bind(null, fixture),
+          },
+        },
       }),
     );
 
@@ -934,9 +934,6 @@ function fixtureOrder(id: string): FixtureRecord {
 function paymentId(index: number): string {
   return `payment_${String(index).padStart(2, "0")}`;
 }
-function clock(): number {
-  return 1;
-}
 function recordId(
   entity: CommerceGraphQueryResult["entities"][number],
 ): string {
@@ -972,12 +969,4 @@ function parseToolGraph(output: unknown): CommerceGraphQueryResult {
   if (!isRecord(output) || output.ok !== true)
     throw new Error("Missing commerce tool result");
   return parseCommerceGraphResponse(output.result);
-}
-
-function unavailableMenuDraft(): Promise<never> {
-  throw new Error("Menu draft read is unavailable in this fixture");
-}
-
-function rejectWorkflowCanvasTool(): Promise<never> {
-  return Promise.reject(new Error("Workflow canvas is outside this fixture"));
 }

@@ -1,7 +1,8 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import type { SupplierCreateRequest } from "../catalog/types";
-import { defineTool, jsonSchema } from "../define-tool";
+import type { SupplierCreateRequest } from "./services";
+import { jsonSchema } from "../define-tool";
+import { defineKitchenTool } from "./services";
 
 export const SUPPLIER_CREATE_FIELDS = [
   "displayName",
@@ -17,7 +18,7 @@ export const SUPPLIER_CREATE_FIELDS = [
   "inventoryItemIds",
 ] as const;
 
-export const supplierRead = defineTool({
+export const supplierRead = defineKitchenTool({
   name: "supplier_read",
   description:
     "Read the shop's supplier directory, as staff see it on the Suppliers page: each supplier's id, name, contact, delivery time, minimum order and purchasing notes. It does not list the items that each supplier provides.",
@@ -39,7 +40,7 @@ export const supplierRead = defineTool({
     readSuppliers === undefined ? undefined : () => readSuppliers(),
 });
 
-export const supplierCreate = defineTool({
+export const supplierCreate = defineKitchenTool({
   name: "supplier_create",
   description:
     "Add one supplier to the directory, as staff do on the Suppliers page. Use inventoryItemIds from recipe_read for the items that it provides. leadTimeDays is the number of days that it takes to deliver. " +

@@ -326,3 +326,46 @@ function markUntil(
     )?.until ?? null
   );
 }
+
+// The requests and the reads of the order queue tools of the Portal chat
+// agent (Plan 81). The tool definitions and their handlers both read them.
+
+export type CounterSaleReadRequest = Readonly<{ checkoutId: string }>;
+
+export type CounterSaleToolRead = Readonly<{
+  checkoutId: string;
+  satyrLocationId: string;
+  state: string;
+  collectable: boolean;
+  orderId: string | null;
+  pickupCode: string | null;
+  paymentMethod: string | null;
+  tenderBrand: string | null;
+  providerRefundable: boolean | null;
+  amountMinor: number | null;
+  currency: string | null;
+  cashReceivedMinor: number | null;
+  changeDueMinor: number | null;
+  afterSale: Readonly<{
+    orderState: string;
+    paymentState: string;
+    fulfillmentState: string;
+    refundState: string;
+  }> | null;
+}>;
+
+export type OrderQueueToolRead = Readonly<{
+  entries: readonly OrderQueueEntry[];
+}>;
+
+export type OrderQueueAdvanceRequest = Readonly<{
+  fulfillmentId: string;
+  action: OrderQueueAction;
+}>;
+
+export type SoldOutToolRead = Readonly<{ items: readonly SoldOutItem[] }>;
+
+export type SoldOutMarkRequest = Readonly<{
+  variantId: string;
+  mark: SoldOutMark;
+}>;

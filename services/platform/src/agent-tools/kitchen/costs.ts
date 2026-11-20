@@ -31,7 +31,8 @@ import {
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { StaffPageToolReceipt } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { defineTool, jsonSchema } from "../define-tool";
+import { jsonSchema } from "../define-tool";
+import { defineKitchenTool } from "./services";
 
 const COST_UNITS: ReadonlySet<string> = new Set([
   "each",
@@ -47,7 +48,7 @@ const LOT_COST_BASES: ReadonlySet<string> = new Set([
   "weighted_lot",
 ]);
 
-export type CostsReadTarget = Readonly<{
+type CostsReadTarget = Readonly<{
   targetId: string;
   unitsPerDay: number;
 }>;
@@ -264,7 +265,7 @@ export type CostsSheetEditTool = (
   execution: CatalogExecutionContext,
 ) => Promise<CostsSheetEditResult>;
 
-export const costsRead = defineTool({
+export const costsRead = defineKitchenTool({
   name: "costs_read",
   description:
     "Read and model the shop's recipe sourcing costs, supply stock coverage (daysOfSupply, reorderSuggested) and SKU reach (usedInProductCount), Mon-Sun and daily batch budgets, fixed daily labor and rent, break-even volume, waste, included consumption tax, product margins, 7-day or 30-day Plan vs Actuals variance, and the 12-Week P&L & Cash Runway forecast (seasonal demand curves, bulk tier unlocks, step-shift labor, Net-30 payables + monthly rent cash troughs, and equipment capex payback), as staff see them on the Kitchen Costs & margins spreadsheet. " +
@@ -388,7 +389,7 @@ export const costsRead = defineTool({
     readCosts === undefined ? undefined : (request) => readCosts(request),
 });
 
-export const supplyCostSave = defineTool({
+export const supplyCostSave = defineKitchenTool({
   name: "supply_cost_save",
   description:
     "Save one stock item's supplier pack price, unit and optional 7-day bulk tier, as staff do on the Kitchen Costs & margins spreadsheet. " +
@@ -481,7 +482,7 @@ export const supplyCostSave = defineTool({
       : (request, call) => saveSupplyCost(request, call.operationId),
 });
 
-export const lotCostSave = defineTool({
+export const lotCostSave = defineKitchenTool({
   name: "lot_cost_save",
   description:
     "Record or update one received inventory lot's purchase invoice cost (invoiceTotalMinor, invoicedQuantity, invoicedUnit, optional invoiceReference and supplierId) for FIFO or weighted-average lot cost valuation on the Kitchen Costs & margins spreadsheet. " +
@@ -559,7 +560,7 @@ export const lotCostSave = defineTool({
       : (request, call) => saveLotCost(request, call.operationId),
 });
 
-export const costsPlanSave = defineTool({
+export const costsPlanSave = defineKitchenTool({
   name: "costs_plan_save",
   description:
     "Save the shop's fixed daily labor cost, fixed daily rent cost, and per-product Mon-Sun unit plans or spoilage overrides on the Kitchen Costs & margins spreadsheet. " +
@@ -699,7 +700,7 @@ export const costsPlanSave = defineTool({
       : (request, call) => saveCostsPlan(request, call.operationId),
 });
 
-export const costsSheetEdit = defineTool({
+export const costsSheetEdit = defineKitchenTool({
   name: "costs_sheet_edit",
   description:
     "Edit cells in the Organisation's shared multiplayer Costs & margins workbook draft so open Portal tabs see the changes and your cursor immediately before anyone clicks Save changes. " +

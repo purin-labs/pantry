@@ -1,13 +1,53 @@
 import { Type } from "typebox";
 import { isIanaTimezone } from "@purin-labs/control-api";
-import type { SoldOutMarkRequest } from "../catalog/types";
+import type {
+  CounterSaleReadRequest,
+  CounterSaleToolRead,
+  OrderQueueAdvanceRequest,
+  OrderQueueToolRead,
+  SoldOutMarkRequest,
+  SoldOutToolRead,
+} from "../../commerce/order-queue-commands";
+import type { StaffPageToolReceipt } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { defineTool, noArguments, stringEnum } from "../define-tool";
+import { defineToolFamily, noArguments, stringEnum } from "../define-tool";
+import type { PageViewExecute } from "../kitchen/services";
 import { ProposalArgumentError } from "../errors";
+
+type OrderQueueReadTool = () => Promise<OrderQueueToolRead>;
+
+type CounterSaleReadTool = (
+  request: CounterSaleReadRequest,
+) => Promise<CounterSaleToolRead>;
+
+type OrderQueueAdvanceTool = (
+  request: OrderQueueAdvanceRequest,
+  operationId: string,
+) => Promise<StaffPageToolReceipt>;
+
+type SoldOutReadTool = () => Promise<SoldOutToolRead>;
+
+type SoldOutMarkTool = (
+  request: SoldOutMarkRequest,
+  operationId: string,
+) => Promise<StaffPageToolReceipt>;
+
+/** What a turn gives to the order queue and Register tools. */
+export type CafeToolServices = {
+  readonly readOrderQueue: OrderQueueReadTool;
+  readonly readCounterSale?: CounterSaleReadTool;
+  readonly advanceOrderQueue: OrderQueueAdvanceTool;
+  readonly readSoldOut: SoldOutReadTool;
+  readonly markSoldOut: SoldOutMarkTool;
+  /** Stages items in the basket of Café › Register on the person's screen. */
+  readonly executeRegisterViewCommand?: PageViewExecute;
+};
+
+export const defineCafeTool = defineToolFamily<CafeToolServices>()("cafe");
 
 const ID_PATTERN = "^[A-Za-z0-9_:-]{1,128}$";
 
-export const orderQueueRead = defineTool({
+export const orderQueueRead = defineCafeTool({
   name: "order_queue_read",
   description:
     "Read the shop's open pickup orders, as staff see them on the order queue page: each order's pickup code, stage, preparation state, lines and fulfillmentId. It names no buyer.",
@@ -24,7 +64,7 @@ export const orderQueueRead = defineTool({
     readOrderQueue === undefined ? undefined : () => readOrderQueue(),
 });
 
-export const orderQueueAdvance = defineTool({
+export const orderQueueAdvance = defineCafeTool({
   name: "order_queue_advance",
   description:
     "Move one order through the shop's order queue, as staff do on the order queue page. Use a fulfillmentId from order_queue_read. " +
@@ -58,7 +98,7 @@ export const orderQueueAdvance = defineTool({
       : (request, call) => advanceOrderQueue(request, call.operationId),
 });
 
-export const soldOutRead = defineTool({
+export const soldOutRead = defineCafeTool({
   name: "sold_out_read",
   description:
     "Read the items of the café's published menu, as staff see them on the order queue page: each item's variantId, title and soldOutUntil. soldOutUntil is null for an item on sale.",
@@ -75,7 +115,7 @@ export const soldOutRead = defineTool({
     readSoldOut === undefined ? undefined : () => readSoldOut(),
 });
 
-export const soldOutMark = defineTool({
+export const soldOutMark = defineCafeTool({
   name: "sold_out_mark",
   description:
     "Mark one menu item sold out today, or clear its mark, as staff do on the order queue page. Use a variantId from sold_out_read. " +
@@ -128,7 +168,7 @@ export const soldOutMark = defineTool({
       : (request, call) => markSoldOut(request, call.operationId),
 });
 
-export const counterSaleRead = defineTool({
+export const counterSaleRead = defineCafeTool({
   name: "counter_sale_read",
   description:
     "Read one counter sale from Café › Register by checkoutId: its state, quote total, pickup code, payment method, cash change, and fulfillment stage. Read-only: agents cannot charge terminals, accept cash, kick drawers, or issue unapproved refunds.",

@@ -20,7 +20,7 @@ import {
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import type { HarnessIntegrationListRequest } from "../catalog/types";
+import type { HarnessIntegrationListRequest } from "./services";
 import {
   readIntegrationDiscovery,
   type IntegrationDiscoveryObservation,

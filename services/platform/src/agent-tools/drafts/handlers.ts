@@ -45,11 +45,11 @@ import {
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
-import { DescriptionDraftRequestError } from "../catalog/types";
+import { DescriptionDraftRequestError } from "./drafts";
 import type {
   MenuBoardArchiveRequest,
   MenuBoardCreateRequest,
-} from "../catalog/types";
+} from "./drafts";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
 import {

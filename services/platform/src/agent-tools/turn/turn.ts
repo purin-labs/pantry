@@ -5,10 +5,22 @@ import {
 } from "@purin-labs/control-api";
 import type {
   HarnessFollowUpRequest,
+  HarnessFollowUpSchedule,
+  HarnessMemoryProposal,
   HarnessMemoryProposalRequest,
+  HarnessSideCaseProposal,
   HarnessSideCaseProposalRequest,
 } from "../catalog/types";
-import { defineTool, jsonSchema } from "../define-tool";
+import { defineToolFamily, jsonSchema } from "../define-tool";
+
+/** What a turn gives to the tools that it offers by its origin. */
+export type TurnToolServices = {
+  readonly proposeMemory: HarnessMemoryProposal;
+  readonly scheduleFollowUp: HarnessFollowUpSchedule;
+  readonly proposeSideCase: HarnessSideCaseProposal;
+};
+
+const defineTurnTool = defineToolFamily<TurnToolServices>()("turn");
 
 /** The longest statement that the agent may propose as one Memory. */
 const MAX_MEMORY_PROPOSAL_CHARS = 600;
@@ -25,7 +37,7 @@ const MAX_FOLLOW_UP_MINUTES = 10_080;
  * authority again. It names no evidence: the platform cites the message
  * that started the turn.
  */
-export const memoryProposal = defineTool({
+export const memoryProposal = defineTurnTool({
   name: "propose_memory",
   description:
     "Propose one memory from a rule, a fact or a preference that the person stated in their current message and wants you to keep for later chats. The memory cites that message. It waits for a person's review in Brain and is not in use until someone accepts it, so tell the person that it waits for review. Do not call it for a question, a one-time request or your own inference. Call it directly after tool discovery, outside Code Mode. Use one call for each separate rule.",
@@ -71,7 +83,7 @@ export const memoryProposal = defineTool({
  * origin, not by a capability grant. The follow-up runs with the authority
  * of the same person, which is checked again when it runs.
  */
-export const followUp = defineTool({
+export const followUp = defineTurnTool({
   name: "schedule_follow_up",
   description:
     "Come back to this Slack thread later. After afterMinutes, Seams Pantry starts a new turn in this thread for the same person; in that turn you read your note in this call and answer in the thread. Use it when the person asks you to check back, to remind them, or when work must wait for something. Tell the person when you will come back. Call it directly, outside Code Mode. A thread holds at most three follow-ups that wait.",
@@ -118,7 +130,7 @@ export const followUp = defineTool({
  * only: a person starts the side Case from the chat's card or the thread's
  * Start button.
  */
-export const sideCaseProposal = defineTool({
+export const sideCaseProposal = defineTurnTool({
   name: "propose_side_case",
   description:
     "Propose separate work that you found while you work on the person's request, such as a fault, wrong data or a missing setup step. Seams Pantry shows the proposal in this chat or Slack thread, and a person may start it as a new chat or a new Slack thread whose first message is your brief. The new conversation does not hold this one's history, so write the brief to stand alone. Do not do that work in this turn, and do not propose the work that the person asked for now. Tell the person in one sentence that you proposed it. Call it directly, outside Code Mode. A conversation holds at most three proposals that wait.",

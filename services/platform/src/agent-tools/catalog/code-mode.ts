@@ -1,29 +1,6 @@
-import type {
-  WorkflowCanvasReadTool,
-  WorkflowCanvasMoveTool,
-} from "../../actors/workflow-canvas-tools";
-import type {
-  CostsPlanSaveTool,
-  CostsReadTool,
-  CostsSheetEditTool,
-  LotCostSaveTool,
-  SupplyCostSaveTool,
-} from "../kitchen/costs";
-import type {
-  SavedBakeryRunQuery,
-  SavedBakeryRunResult,
-} from "../../commerce/bakery/saved-runs";
-import type {
-  AirtableReadInput,
-  AirtableWriteInput,
-} from "../../actors/airtable-tool-input";
 import type { HarnessCodeModeSandbox } from "../../actors/embedded-harness";
 import type { Result } from "../../result";
 import { CONTEXT_CASE_READ_SCOPE } from "../../authorization/access-grants/turn-authority";
-import type {
-  FileReadToolResult,
-  FileSearchToolResult,
-} from "../../context/files";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
@@ -33,37 +10,22 @@ import {
 } from "../../authorization/capability-catalogue";
 import { parseCapabilityKey } from "../../authorization/access-grants/capability-key";
 import {
-  customConnectorCapabilityFromKey,
-  isReadEntry,
-  isWriteEntry,
-} from "./custom-connectors";
-import { executeCatalogTool, executeNativeCatalogTool } from "./execute";
+  type CatalogToolAuthority,
+  executeCatalogTool,
+  executeNativeCatalogTool,
+} from "./execute";
 import type { HarnessPermissionRequestTool } from "./permission";
 import {
   catalogHarnessToolCatalogDigest,
   harnessBaseCapabilities,
   selectCatalogDefinitions,
 } from "./selection";
+import {
+  toolHandler,
+  type ToolRegistry,
+  type ToolServiceSet,
+} from "./tool-registry";
 import type {
-  CafeMenuPublicationProposal,
-  CampaignBriefPropose,
-  CommerceActionProposal,
-  ConfigurationPropose,
-  DevicePauseTool,
-  DeviceProposeTool,
-  DeviceReadTool,
-  DeviceSnapshotReadTool,
-  EmailDraftEditTool,
-  EmailDraftReadTool,
-  EmailMailboxSearch,
-  EmailOperationalPropose,
-  EmailReplyDraftEdit,
-  EmailReplyDraftRead,
-  EmailReplyPropose,
-  EntityContextRead,
-  FileRead,
-  FileSearch,
-  HarnessBakerySurfaceExecute,
   HarnessCapabilityClaim,
   HarnessCapabilityClaimInput,
   HarnessCapabilityName,
@@ -71,112 +33,11 @@ import type {
   HarnessCodeModeAdmission,
   HarnessCodeModeAuthority,
   HarnessCodeModeConstructionError,
-  HarnessCustomConnectorRead,
-  HarnessCustomConnectorWriteProposal,
-  HarnessEmailMailboxSearchResult,
-  HarnessEmailOperationalProposalReceipt,
-  HarnessEmailReplyDraft,
-  HarnessEmailReplyProposalReceipt,
-  HarnessFollowUpSchedule,
-  HarnessMemoryProposal,
-  HarnessProductionPlan,
   HarnessResourceScopeError,
-  HarnessSideCaseProposal,
-  HarnessSlackMessageProposalReceipt,
   HarnessSourceAuthorization,
-  HarnessWhatsAppSupportInbox,
-  HarnessWhatsAppSupportReplyReceipt,
-  IntegrationList,
-  MenuBoardEditTool,
-  MenuBoardCreateTool,
-  MenuBoardArchiveTool,
-  MenuBoardReadTool,
-  MenuDraftEditTool,
-  MenuDraftReadTool,
-  MenuPriceProposal,
-  JevFeatureProposeTool,
-  JevFeaturesReadTool,
-  MerchantPluginProposal,
-  MerchantReportRead,
-  MessageAttachmentInspect,
-  MessageAttachmentInspectResult,
-  MessageLinkRead,
-  MessageLinkReadResult,
-  CounterSaleReadTool,
-  OrderQueueAdvanceTool,
-  OrderQueueReadTool,
-  OrderRefundProposal,
-  PaymentsReadTool,
-  ProductDescriptionDraftEdit,
-  ProductDescriptionDraftRead,
-  ProductionPlanEditTool,
-  ProductionPlanReadTool,
-  RecipeReadTool,
-  RecipeSaveTool,
-  RecipeWorkflowProposeTool,
-  RecipeWorkflowReadTool,
-  SlackMessagePropose,
-  SoldOutMarkTool,
-  SoldOutReadTool,
-  StockActionProposal,
-  SupplierCreateTool,
-  SupplierReadTool,
-  WhatsAppSupportRead,
-  WhatsAppSupportReplySend,
-  WorkspaceQuery,
 } from "./types";
 
 export const MAX_CODE_MODE_SOURCE_BYTES = 64 * 1024;
-
-async function unavailableAttachmentInspect(): Promise<MessageAttachmentInspectResult> {
-  throw new Error("message attachment inspection is unavailable");
-}
-
-async function unavailableMessageLinkRead(): Promise<MessageLinkReadResult> {
-  throw new Error("public link reading is unavailable");
-}
-
-async function unavailableFileSearch(): Promise<
-  readonly FileSearchToolResult[]
-> {
-  throw new Error("file search is unavailable");
-}
-
-async function unavailableFileRead(): Promise<FileReadToolResult> {
-  throw new Error("file read is unavailable");
-}
-
-async function unavailableEmailMailboxSearch(): Promise<HarnessEmailMailboxSearchResult> {
-  throw new Error("Email mailbox search is unavailable");
-}
-
-async function unavailableEmailReplyPropose(): Promise<HarnessEmailReplyProposalReceipt> {
-  throw new Error("Email reply proposal is unavailable");
-}
-
-async function unavailableEmailReplyDraft(): Promise<HarnessEmailReplyDraft> {
-  throw new Error("Email reply drafts are unavailable");
-}
-
-async function unavailableProductionPlan(): Promise<HarnessProductionPlan> {
-  throw new Error("Production plans are unavailable");
-}
-
-async function unavailableEmailOperationalPropose(): Promise<HarnessEmailOperationalProposalReceipt> {
-  throw new Error("Operational email proposal is unavailable");
-}
-
-async function unavailableSlackMessagePropose(): Promise<HarnessSlackMessageProposalReceipt> {
-  throw new Error("Slack message drafting is unavailable");
-}
-
-async function unavailableWhatsAppSupportRead(): Promise<HarnessWhatsAppSupportInbox> {
-  throw new Error("WhatsApp support read is unavailable");
-}
-
-async function unavailableWhatsAppSupportReplySend(): Promise<HarnessWhatsAppSupportReplyReceipt> {
-  throw new Error("WhatsApp support reply send is unavailable");
-}
 
 export function harnessCapabilitiesFromCapabilityKeys(
   capabilityKeys: readonly string[],
@@ -256,6 +117,8 @@ export function harnessCapabilitiesFromCapabilityKeys(
 }
 
 export async function createCatalogHarnessCodeMode(input: {
+  /** The tools of the Worker, in catalog order. */
+  readonly registry: ToolRegistry;
   readonly expectedCatalogDigest: string;
   readonly catalogSelection?: HarnessCatalogSelection;
   /**
@@ -265,235 +128,78 @@ export async function createCatalogHarnessCodeMode(input: {
   readonly nativeSandbox?: HarnessCodeModeSandbox | null;
   /** Required for native Code Mode. Without it every replayed result is denied. */
   readonly authorizeSources?: HarnessSourceAuthorization;
-  readonly listIntegrations: IntegrationList;
-  readonly readAirtable?: (input: AirtableReadInput) => Promise<unknown>;
-  readonly writeAirtable?: (input: AirtableWriteInput) => Promise<unknown>;
-  readonly searchEmailMailbox?: EmailMailboxSearch;
-  readonly proposeEmailReply?: EmailReplyPropose;
-  readonly readEmailReplyDraft?: EmailReplyDraftRead;
-  readonly editEmailReplyDraft?: EmailReplyDraftEdit;
-  readonly readProductionPlan?: ProductionPlanReadTool;
-  readonly editProductionPlan?: ProductionPlanEditTool;
-  readonly proposeEmailOperational?: EmailOperationalPropose;
-  readonly proposeSlackMessage?: SlackMessagePropose;
-  readonly readWhatsAppSupport?: WhatsAppSupportRead;
-  readonly sendWhatsAppSupportReply?: WhatsAppSupportReplySend;
-  readonly readEntityContext: EntityContextRead;
-  readonly readMerchantReport: MerchantReportRead;
-  readonly readWorkflowCanvas: WorkflowCanvasReadTool;
-  readonly moveWorkflowCanvasObject: WorkflowCanvasMoveTool;
-  readonly readProductDescriptionDraft: ProductDescriptionDraftRead;
-  readonly editProductDescriptionDraft: ProductDescriptionDraftEdit;
-  readonly readMenuDraft: MenuDraftReadTool;
-  readonly editMenuDraft?: MenuDraftEditTool;
-  readonly proposeCafeMenuPublication?: CafeMenuPublicationProposal;
-  readonly readMenuBoards?: MenuBoardReadTool;
-  readonly editMenuBoard?: MenuBoardEditTool;
-  readonly createMenuBoard?: MenuBoardCreateTool;
-  readonly archiveMenuBoard?: MenuBoardArchiveTool;
-  readonly proposeMenuPrice?: MenuPriceProposal;
-  readonly proposeOrderRefund?: OrderRefundProposal;
-  readonly proposeStockAction?: StockActionProposal;
-  readonly readOrderQueue?: OrderQueueReadTool;
-  readonly readCounterSale?: CounterSaleReadTool;
-  readonly readPayments?: PaymentsReadTool;
-  readonly advanceOrderQueue?: OrderQueueAdvanceTool;
-  readonly readSoldOut?: SoldOutReadTool;
-  readonly markSoldOut?: SoldOutMarkTool;
-  readonly readRecipes?: RecipeReadTool;
-  readonly saveRecipe?: RecipeSaveTool;
-  readonly readCosts?: CostsReadTool;
-  readonly saveSupplyCost?: SupplyCostSaveTool;
-  readonly saveLotCost?: LotCostSaveTool;
-  readonly saveCostsPlan?: CostsPlanSaveTool;
-  readonly editCostsSheet?: CostsSheetEditTool;
-  readonly readSuppliers?: SupplierReadTool;
-  readonly createSupplier?: SupplierCreateTool;
-  readonly readRecipeWorkflow?: RecipeWorkflowReadTool;
-  readonly proposeRecipeWorkflow?: RecipeWorkflowProposeTool;
-  readonly readDevices?: DeviceReadTool;
-  readonly pauseDevice?: DevicePauseTool;
-  readonly proposeDevice?: DeviceProposeTool;
-  readonly readDeviceSnapshots?: DeviceSnapshotReadTool;
-  readonly readJevFeatures?: JevFeaturesReadTool;
-  readonly proposeJevFeature?: JevFeatureProposeTool;
-  readonly readEmailDraft: EmailDraftReadTool;
-  readonly editEmailDraft: EmailDraftEditTool;
-  readonly proposeCampaignBrief?: CampaignBriefPropose;
-  readonly proposeConfiguration?: ConfigurationPropose;
-  readonly searchFiles?: FileSearch;
-  readonly readFile?: FileRead;
-  readonly inspectMessageAttachment?: MessageAttachmentInspect;
-  readonly readMessageLink?: MessageLinkRead;
-  readonly readCustomConnector?: HarnessCustomConnectorRead;
-  readonly proposeCustomConnectorWrite?: HarnessCustomConnectorWriteProposal;
-  readonly proposeCommerceAction?: CommerceActionProposal;
-  readonly proposeMerchantPlugin?: MerchantPluginProposal;
-  readonly queryWorkspace: WorkspaceQuery;
-  readonly readSavedBakeryRun?: (
-    query: SavedBakeryRunQuery,
-  ) => Promise<SavedBakeryRunResult>;
-  readonly executeBakerySurface?: HarnessBakerySurfaceExecute;
-  readonly executeCostsViewCommand?: import("../costs/view").HarnessCostsViewExecute;
-  readonly proposeMemory?: HarnessMemoryProposal;
-  readonly scheduleFollowUp?: HarnessFollowUpSchedule;
-  readonly proposeSideCase?: HarnessSideCaseProposal;
+  /**
+   * The services of each tool family, by family name. A tool whose service
+   * is absent fails with its `unavailable` text.
+   */
+  readonly services: ToolServiceSet;
   readonly requestPermission?: HarnessPermissionRequestTool;
   readonly admission: HarnessCodeModeAdmission;
   readonly claimCapability: HarnessCapabilityClaim;
-  readonly nowNs: () => number;
 }): Promise<
   Result<HarnessCodeModeAuthority, HarnessCodeModeConstructionError>
 > {
   const catalogSelection = input.catalogSelection ?? {
-    allowedCapabilities: harnessBaseCapabilities(),
+    allowedCapabilities: harnessBaseCapabilities(input.registry),
   };
-  const definitions = selectCatalogDefinitions(catalogSelection);
-  const catalogDigest = await catalogHarnessToolCatalogDigest(catalogSelection);
+  const definitions = selectCatalogDefinitions(
+    input.registry,
+    catalogSelection,
+  );
+  const catalogDigest = await catalogHarnessToolCatalogDigest(
+    input.registry,
+    catalogSelection,
+  );
   if (catalogDigest !== input.expectedCatalogDigest) {
     return {
       ok: false,
       error: { code: "embedded_harness_tool_catalog_digest_mismatch" },
     };
   }
-  if (
-    (catalogSelection.customConnectorOperations?.some(isReadEntry) ?? false) &&
-    input.readCustomConnector === undefined
-  ) {
+  // A catalog that offers a tool with no handler would fail at each call, so
+  // the host refuses it here: the read turn tools, then the surface tools,
+  // then the other turn tools, as the checks were before Refactor 17.
+  const turnTools = (catalogSelection.turnTools ?? []).map(({ tool }) => tool);
+  const unavailable = (tool: (typeof turnTools)[number]): boolean =>
+    toolHandler(tool, input.services) === undefined;
+  if (turnTools.some((tool) => tool.effect === "read" && unavailable(tool))) {
     return {
       ok: false,
       error: { code: "embedded_harness_custom_connector_unavailable" },
     };
   }
+  const surfaceCommands = new Set(catalogSelection.bakerySurfaceCommands ?? []);
   if (
-    (catalogSelection.bakerySurfaceCommands?.length ?? 0) > 0 &&
-    input.executeBakerySurface === undefined
+    input.registry.tools.some(
+      (tool) =>
+        tool.selection.kind === "surface" &&
+        surfaceCommands.has(tool.selection.command) &&
+        unavailable(tool),
+    )
   ) {
     return {
       ok: false,
       error: { code: "embedded_harness_surface_unavailable" },
     };
   }
-  if (
-    (catalogSelection.customConnectorOperations?.some(isWriteEntry) ?? false) &&
-    input.proposeCustomConnectorWrite === undefined
-  ) {
+  if (turnTools.some(unavailable)) {
     return {
       ok: false,
       error: { code: "embedded_harness_custom_connector_unavailable" },
     };
   }
-  const searchFiles = input.searchFiles ?? unavailableFileSearch;
-  const readFile = input.readFile ?? unavailableFileRead;
-  const inspectMessageAttachment =
-    input.inspectMessageAttachment ?? unavailableAttachmentInspect;
-  const readMessageLink = input.readMessageLink ?? unavailableMessageLinkRead;
-  const searchEmailMailbox =
-    input.searchEmailMailbox ?? unavailableEmailMailboxSearch;
-  const proposeEmailReply =
-    input.proposeEmailReply ?? unavailableEmailReplyPropose;
-  const readEmailReplyDraft =
-    input.readEmailReplyDraft ?? unavailableEmailReplyDraft;
-  const editEmailReplyDraft =
-    input.editEmailReplyDraft ?? unavailableEmailReplyDraft;
-  const readProductionPlan =
-    input.readProductionPlan ?? unavailableProductionPlan;
-  const editProductionPlan =
-    input.editProductionPlan ?? unavailableProductionPlan;
-  const proposeEmailOperational =
-    input.proposeEmailOperational ?? unavailableEmailOperationalPropose;
-  const proposeSlackMessage =
-    input.proposeSlackMessage ?? unavailableSlackMessagePropose;
-  const readWhatsAppSupport =
-    input.readWhatsAppSupport ?? unavailableWhatsAppSupportRead;
-  const sendWhatsAppSupportReply =
-    input.sendWhatsAppSupportReply ?? unavailableWhatsAppSupportReplySend;
   const claimedCapabilities: ClaimedCapabilities = new Map();
-  const authority = {
+  const authority: CatalogToolAuthority = {
+    registry: input.registry,
     definitions,
-    customConnectorOperations: catalogSelection.customConnectorOperations ?? [],
-    catalogDigest,
-    listIntegrations: input.listIntegrations,
-    readAirtable: input.readAirtable,
-    writeAirtable: input.writeAirtable,
-    searchEmailMailbox,
-    proposeEmailReply,
-    readEmailReplyDraft,
-    editEmailReplyDraft,
-    readProductionPlan,
-    editProductionPlan,
-    proposeEmailOperational,
-    proposeSlackMessage,
-    readWhatsAppSupport,
-    sendWhatsAppSupportReply,
-    readEntityContext: input.readEntityContext,
-    readMerchantReport: input.readMerchantReport,
-    readWorkflowCanvas: input.readWorkflowCanvas,
-    moveWorkflowCanvasObject: input.moveWorkflowCanvasObject,
-    readProductDescriptionDraft: input.readProductDescriptionDraft,
-    editProductDescriptionDraft: input.editProductDescriptionDraft,
-    readMenuDraft: input.readMenuDraft,
-    editMenuDraft: input.editMenuDraft,
-    readMenuBoards: input.readMenuBoards,
-    editMenuBoard: input.editMenuBoard,
-    createMenuBoard: input.createMenuBoard,
-    archiveMenuBoard: input.archiveMenuBoard,
-    proposeMenuPrice: input.proposeMenuPrice,
-    proposeCafeMenuPublication: input.proposeCafeMenuPublication,
-    proposeOrderRefund: input.proposeOrderRefund,
-    proposeStockAction: input.proposeStockAction,
-    readOrderQueue: input.readOrderQueue,
-    readCounterSale: input.readCounterSale,
-    readPayments: input.readPayments,
-    advanceOrderQueue: input.advanceOrderQueue,
-    readSoldOut: input.readSoldOut,
-    markSoldOut: input.markSoldOut,
-    readRecipes: input.readRecipes,
-    saveRecipe: input.saveRecipe,
-    readCosts: input.readCosts,
-    saveSupplyCost: input.saveSupplyCost,
-    saveLotCost: input.saveLotCost,
-    saveCostsPlan: input.saveCostsPlan,
-    editCostsSheet: input.editCostsSheet,
-    readSuppliers: input.readSuppliers,
-    createSupplier: input.createSupplier,
-    readRecipeWorkflow: input.readRecipeWorkflow,
-    proposeRecipeWorkflow: input.proposeRecipeWorkflow,
-    readDevices: input.readDevices,
-    pauseDevice: input.pauseDevice,
-    proposeDevice: input.proposeDevice,
-    readDeviceSnapshots: input.readDeviceSnapshots,
-    readJevFeatures: input.readJevFeatures,
-    proposeJevFeature: input.proposeJevFeature,
-    readEmailDraft: input.readEmailDraft,
-    editEmailDraft: input.editEmailDraft,
-    proposeCampaignBrief: input.proposeCampaignBrief,
-    proposeConfiguration: input.proposeConfiguration,
-    searchFiles,
-    readFile,
-    inspectMessageAttachment,
-    readMessageLink,
-    readCustomConnector: input.readCustomConnector,
-    proposeCustomConnectorWrite: input.proposeCustomConnectorWrite,
-    proposeCommerceAction: input.proposeCommerceAction,
-    proposeMerchantPlugin: input.proposeMerchantPlugin,
-    queryWorkspace: input.queryWorkspace,
-    readSavedBakeryRun: input.readSavedBakeryRun,
-    executeBakerySurface: input.executeBakerySurface,
-    ...(input.executeCostsViewCommand === undefined
-      ? {}
-      : { executeCostsViewCommand: input.executeCostsViewCommand }),
-    proposeMemory: input.proposeMemory,
-    scheduleFollowUp: input.scheduleFollowUp,
-    proposeSideCase: input.proposeSideCase,
+    turnTools,
+    services: input.services,
     requestPermission: input.requestPermission,
-    admission: input.admission,
     claimCapability: recordCapabilityClaim.bind(
       null,
       claimedCapabilities,
       input.claimCapability,
     ),
-    nowNs: input.nowNs,
   };
   return {
     ok: true,
@@ -700,4 +406,22 @@ function compareCapabilities(
   right: HarnessCapabilityName,
 ): number {
   return left.localeCompare(right);
+}
+
+function customConnectorCapabilityFromKey(
+  scope: string,
+):
+  | typeof CAPABILITY_KEYS.customConnectorRead
+  | typeof CAPABILITY_KEYS.customConnectorWrite
+  | null {
+  const parsed = parseCapabilityKey(scope);
+  if (parsed.ok && parsed.value.kind === "custom_connector_operation") {
+    if (parsed.value.capabilityId === CAPABILITY_KEYS.customConnectorRead) {
+      return CAPABILITY_KEYS.customConnectorRead;
+    }
+    if (parsed.value.capabilityId === CAPABILITY_KEYS.customConnectorWrite) {
+      return CAPABILITY_KEYS.customConnectorWrite;
+    }
+  }
+  return null;
 }

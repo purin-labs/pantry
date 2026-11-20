@@ -2,12 +2,13 @@ import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   DevicePauseRequest,
   DeviceProposeRequest,
-} from "../catalog/types";
+} from "./services";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { defineTool, jsonSchema } from "../define-tool";
+import { jsonSchema } from "../define-tool";
+import { defineDeviceTool } from "./services";
 import { ProposalArgumentError } from "../errors";
 
-export const deviceRead = defineTool({
+export const deviceRead = defineDeviceTool({
   name: "device_read",
   description:
     "Read the shop's gateways, kitchen devices and shop Macs, as staff see them on the Devices page: for each device its deviceId, name, station, readiness, connection, health, fault code and current work. readiness says if the device can take the next task. " +
@@ -28,7 +29,7 @@ export const deviceRead = defineTool({
     readDevices === undefined ? undefined : () => readDevices(),
 });
 
-export const deviceSnapshotRead = defineTool({
+export const deviceSnapshotRead = defineDeviceTool({
   name: "device_snapshot_read",
   description:
     "Read when the shop's cameras took a still image, and why: each snapshot's deviceId, the camera's deviceName, reason and takenAt. You receive no image. A person sees the image on the Devices page, so send the person there. Snapshots are off unless an admin turned them on.",
@@ -50,7 +51,7 @@ export const deviceSnapshotRead = defineTool({
     readDeviceSnapshots === undefined ? undefined : () => readDeviceSnapshots(),
 });
 
-export const devicePause = defineTool({
+export const devicePause = defineDeviceTool({
   name: "device_pause",
   description:
     "Stop new work on one kitchen device and ask its gateway to pause, as staff do on the Devices page. Use a deviceId from device_read. A person resumes the device. " +
@@ -78,7 +79,7 @@ export const devicePause = defineTool({
       : (request, call) => pauseDevice(request, call.operationId),
 });
 
-export const deviceProposal = defineTool({
+export const deviceProposal = defineDeviceTool({
   name: "device_propose",
   description:
     "Propose that a person restricts one kitchen device, or resumes a paused one. It changes nothing: the person who asked confirms it on a card in this chat. " +

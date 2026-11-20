@@ -1,11 +1,16 @@
 import type {
   DraftAgentEditRequest,
   DraftAgentReadArgs,
+  DraftAgentSnapshot,
 } from "../../actors/product-description-draft";
-import type { EmailDraftEditRequest } from "../../actors/email-draft";
+import type {
+  EmailDraftEditRequest,
+  EmailDraftRead,
+} from "../../actors/email-draft";
 import {
   MenuDraftRequestError,
   type MenuDraftEdit,
+  type MenuDraftRead,
 } from "../../actors/menu-draft";
 import {
   isMenuBoardFrameId,
@@ -30,12 +35,14 @@ import {
   isMenuBoardImageFit,
   isMenuBoardMediaId,
   isMenuBoardProductLook,
+  type MenuBoardLayout,
+  type MenuBoardStart,
   MENU_BOARD_PRODUCT_LOOKS,
   type MenuBoardProductLook,
 } from "@purin-labs/menu-board-crdt";
-import type { MenuBoardArchiveRequest, MenuBoardCreateRequest } from "../catalog/types";
 import type {
   MenuBoardEdit,
+  MenuBoardEditResult,
   MenuBoardLayoutEdit,
   MenuBoardStackEdit,
   MenuBoardStackSettings,
@@ -45,14 +52,111 @@ import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import {
   parseWorkflowCanvasMoveArgs,
   parseWorkflowCanvasReadArgs,
+  type WorkflowCanvasMoveTool,
+  type WorkflowCanvasReadTool,
 } from "../../actors/workflow-canvas-tools";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { CANVAS_BOUNDS } from "@purin-labs/workflow-canvas-crdt";
-import { defineTool, jsonSchema } from "../define-tool";
+import type { CatalogExecutionContext } from "../catalog/execute";
+import type { CommerceActionProposalOrigin } from "../catalog/types";
+import { defineToolFamily, jsonSchema } from "../define-tool";
+import { ToolRequestError } from "../errors";
+
+type ProductDescriptionDraftRead = (
+  request: DraftAgentReadArgs,
+) => Promise<DraftAgentSnapshot>;
+
+type ProductDescriptionDraftEdit = (
+  request: DraftAgentEditRequest,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<DraftAgentSnapshot>;
+
+type MenuDraftReadTool = () => Promise<MenuDraftRead>;
+
+type MenuDraftEditTool = (
+  edit: MenuDraftEdit,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<MenuDraftRead>;
+
+/** Plan 40B phase 4: the shop's boards and the live prices of their items. */
+type MenuBoardReadTool = (
+  request: Readonly<{ boardId: string | null }>,
+) => Promise<unknown>;
+
+type MenuBoardEditTool = (
+  request: Readonly<{ boardId: string; edit: MenuBoardEdit }>,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<MenuBoardEditResult>;
+
+/** Plan 40B, the start screen: a new board from a layout or a design. */
+export type MenuBoardCreateRequest = Readonly<{
+  title: string;
+  layout: MenuBoardLayout;
+  start: MenuBoardStart;
+}>;
+
+type MenuBoardCreateTool = (
+  request: MenuBoardCreateRequest,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<unknown>;
+
+/** Plan 40B, board removal: archive a board or restore an archived one. */
+export type MenuBoardArchiveRequest = Readonly<{
+  boardId: string;
+  archived: boolean;
+}>;
+
+type MenuBoardArchiveTool = (
+  request: MenuBoardArchiveRequest,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<unknown>;
+
+type MenuPriceProposal = (
+  request: MenuPriceProposalRequest,
+  origin?: CommerceActionProposalOrigin,
+) => Promise<unknown>;
+
+type EmailDraftReadTool = () => Promise<EmailDraftRead>;
+
+type EmailDraftEditTool = (
+  request: EmailDraftEditRequest,
+  operationId: string,
+  boundary: CatalogExecutionContext,
+) => Promise<EmailDraftRead>;
+
+/**
+ * A description draft request that the model can correct, such as a product
+ * id that names no product. Its message reaches the model.
+ */
+export class DescriptionDraftRequestError extends ToolRequestError {}
+
+/** What a turn gives to the shared draft tools. */
+export type DraftToolServices = {
+  readonly readWorkflowCanvas: WorkflowCanvasReadTool;
+  readonly moveWorkflowCanvasObject: WorkflowCanvasMoveTool;
+  readonly readProductDescriptionDraft: ProductDescriptionDraftRead;
+  readonly editProductDescriptionDraft: ProductDescriptionDraftEdit;
+  readonly readMenuDraft: MenuDraftReadTool;
+  readonly editMenuDraft: MenuDraftEditTool;
+  readonly readMenuBoards: MenuBoardReadTool;
+  readonly editMenuBoard: MenuBoardEditTool;
+  readonly createMenuBoard: MenuBoardCreateTool;
+  readonly archiveMenuBoard: MenuBoardArchiveTool;
+  readonly proposeMenuPrice: MenuPriceProposal;
+  readonly readEmailDraft: EmailDraftReadTool;
+  readonly editEmailDraft: EmailDraftEditTool;
+};
+
+const defineDraftTool = defineToolFamily<DraftToolServices>()("drafts");
 
 const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_:-]{1,256}$/;
 
-export const workflowCanvasRead = defineTool({
+export const workflowCanvasRead = defineDraftTool({
   name: "workflow_canvas_read",
   description:
     "Read shared workflow object IDs, step labels, positions, bounds, and the current document revision. Match named steps by label. documentId is run:<saved-run snapshot ID> from bakery_saved_run_read. Read again after a position conflict.",
@@ -71,13 +175,11 @@ export const workflowCanvasRead = defineTool({
     capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
   },
   unavailable: "workflow canvas read is unavailable",
-  handler:
-    ({ readWorkflowCanvas }) =>
-    (request) =>
-      readWorkflowCanvas(request),
+  handler: ({ readWorkflowCanvas }) =>
+    readWorkflowCanvas === undefined ? undefined : (request) => readWorkflowCanvas(request),
 });
 
-export const workflowCanvasMove = defineTool({
+export const workflowCanvasMove = defineDraftTool({
   name: "move_object",
   description:
     "Move one existing workflow object to an absolute canvas position. Use the revision from workflow_canvas_read. If a human changes an object, leave that object unchanged for the rest of this request. A position change preserves operational settings and relationships.",
@@ -110,13 +212,14 @@ export const workflowCanvasMove = defineTool({
     capability: CAPABILITY_KEYS.commerceWorkflowCanvasMove,
   },
   unavailable: "move object is unavailable",
-  handler:
-    ({ moveWorkflowCanvasObject }) =>
-    (request, call) =>
-      moveWorkflowCanvasObject(request, call.operationId, call.execution),
+  handler: ({ moveWorkflowCanvasObject }) =>
+    moveWorkflowCanvasObject === undefined
+      ? undefined
+      : (request, call) =>
+          moveWorkflowCanvasObject(request, call.operationId, call.execution),
 });
 
-export const productDescriptionDraftRead = defineTool({
+export const productDescriptionDraftRead = defineDraftTool({
   name: "product_description_draft_read",
   description:
     "Read the current Product projection and its description draft for one exact product. " +
@@ -144,13 +247,11 @@ export const productDescriptionDraftRead = defineTool({
     capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
   },
   unavailable: "product description draft read is unavailable",
-  handler:
-    ({ readProductDescriptionDraft }) =>
-    (request) =>
-      readProductDescriptionDraft(request),
+  handler: ({ readProductDescriptionDraft }) =>
+    readProductDescriptionDraft === undefined ? undefined : (request) => readProductDescriptionDraft(request),
 });
 
-export const productDescriptionDraftEdit = defineTool({
+export const productDescriptionDraftEdit = defineDraftTool({
   name: "product_description_draft_edit",
   description:
     "Replace one exact, unique passage in a product description draft. " +
@@ -175,13 +276,14 @@ export const productDescriptionDraftEdit = defineTool({
     capability: CAPABILITY_KEYS.commerceProductDescriptionDraftEdit,
   },
   unavailable: "product description draft edit is unavailable",
-  handler:
-    ({ editProductDescriptionDraft }) =>
-    (request, call) =>
-      editProductDescriptionDraft(request, call.operationId, call.execution),
+  handler: ({ editProductDescriptionDraft }) =>
+    editProductDescriptionDraft === undefined
+      ? undefined
+      : (request, call) =>
+          editProductDescriptionDraft(request, call.operationId, call.execution),
 });
 
-export const menuDraftRead = defineTool({
+export const menuDraftRead = defineDraftTool({
   name: "menu_draft_read",
   description:
     "Read the current organisation shared menu, including item positions, document identity, revision, and observation time. " +
@@ -201,13 +303,11 @@ export const menuDraftRead = defineTool({
     capability: CAPABILITY_KEYS.commerceMenuDraftRead,
   },
   unavailable: "menu draft read is unavailable",
-  handler:
-    ({ readMenuDraft }) =>
-    () =>
-      readMenuDraft(),
+  handler: ({ readMenuDraft }) =>
+    readMenuDraft === undefined ? undefined : () => readMenuDraft(),
 });
 
-export const menuDraftEdit = defineTool({
+export const menuDraftEdit = defineDraftTool({
   name: "menu_draft_edit",
   description:
     "Make one change to the organisation's shared menu draft, in the room that people edit, and get the menu back. Open Menus pages show the change at once. " +
@@ -273,7 +373,7 @@ export const menuDraftEdit = defineTool({
           editMenuDraft(request, call.operationId, call.execution),
 });
 
-export const menuBoardRead = defineTool({
+export const menuBoardRead = defineDraftTool({
   name: "menu_board_read",
   description:
     "Read the shop's menu boards, the Seams Pantry screens on TVs and tablets: each board's draft (title, layout, elements and their frames), its documentRevision, its newest release and its screen count. " +
@@ -305,7 +405,7 @@ export const menuBoardRead = defineTool({
       : (request) => readMenuBoards(request),
 });
 
-export const menuBoardEdit = defineTool({
+export const menuBoardEdit = defineDraftTool({
   name: "menu_board_edit",
   description:
     "Make one change to a menu board's draft, in the room that people edit, and get the board back with the element before and after. Open board editors show the change at once, and a person can change it again. " +
@@ -420,7 +520,7 @@ export const menuBoardEdit = defineTool({
  * runs through the board edit path, so it has the same checks as a board
  * edit, and it changes no board, release or screen.
  */
-export const menuBoardComment = defineTool({
+export const menuBoardComment = defineDraftTool({
   name: "menu_board_comment",
   description:
     "Comment on a menu board's element, reply to a comment, or resolve a thread, where the people who edit the board see it. menu_board_read lists each board's comment threads: threadId, the elementId that the thread is pinned to, whether that element is still on the board, and each comment with its author. " +
@@ -468,7 +568,7 @@ export const menuBoardComment = defineTool({
  * restore is one edit of the draft in the room that people edit; it saves
  * the draft first, so that another restore undoes it.
  */
-export const menuBoardHistory = defineTool({
+export const menuBoardHistory = defineDraftTool({
   name: "menu_board_history",
   description:
     "Save a named version of a menu board's draft, or restore a saved version. menu_board_read lists each board's versions, newest first: versionId, kind (created, named, published, before_restore or auto), label, documentRevision and time. " +
@@ -508,7 +608,7 @@ export const menuBoardHistory = defineTool({
  * Plan 40B, board removal: an owner or admin archives a board that no
  * screen shows, or restores an archived board. An archive deletes nothing.
  */
-export const menuBoardArchive = defineTool({
+export const menuBoardArchive = defineDraftTool({
   name: "menu_board_archive",
   description:
     "Archive a menu board, or restore an archived board, as an owner or admin does from the board menu. Give boardId and archived: true to archive, false to restore. " +
@@ -557,7 +657,7 @@ function parseMenuBoardArchiveArgs(raw: unknown): MenuBoardArchiveRequest {
  * free canvas or a designed menu, as a person makes one from Boards › New
  * board. It passes the same checks as menu_board_edit.
  */
-export const menuBoardCreate = defineTool({
+export const menuBoardCreate = defineDraftTool({
   name: "menu_board_create",
   description:
     "Make a new menu board for the shop's screens, as a person does from Boards, New board. Give title (the board's name), layout and start. " +
@@ -611,7 +711,7 @@ function parseMenuBoardCreateArgs(args: readonly unknown[]): MenuBoardCreateRequ
  * runs through the board edit path, with the same checks as
  * menu_board_edit.
  */
-export const menuBoardStack = defineTool({
+export const menuBoardStack = defineDraftTool({
   name: "menu_board_stack",
   description:
     "Arrange elements of a free canvas menu board (layout canvas_*) in an auto-layout stack, as in Figma. A stack places its elements one after another, down (vertical) or across (horizontal), with a gap between them and padding inside its rect; each element keeps its size along the stack, and across it the stack aligns them (start, center, end) or makes them fill it (stretch). In menu_board_read a stack is an element of kind stack, and each element in it has placement frameId stack with its stackId, order and size; canvasRects gives where each element shows. " +
@@ -673,7 +773,7 @@ export const menuBoardStack = defineTool({
           editMenuBoard(request, call.operationId, call.execution),
 });
 
-export const menuPriceProposal = defineTool({
+export const menuPriceProposal = defineDraftTool({
   name: "menu_board_propose_price",
   description:
     "Propose a new price for one item on the café menu, or a deal. The price shows on every board, screen and the QR order page after an owner or admin approves it. " +
@@ -711,7 +811,7 @@ export const menuPriceProposal = defineTool({
           proposeMenuPrice(request, { toolCallId: call.callId }),
 });
 
-export const emailDraftRead = defineTool({
+export const emailDraftRead = defineDraftTool({
   name: "email_draft_read",
   description:
     "Read the organisation's saved shared email draft after this Slack thread has been explicitly shared. " +
@@ -731,13 +831,11 @@ export const emailDraftRead = defineTool({
     capability: CAPABILITY_KEYS.marketingEmailDraftEdit,
   },
   unavailable: "email draft read is unavailable",
-  handler:
-    ({ readEmailDraft }) =>
-    () =>
-      readEmailDraft(),
+  handler: ({ readEmailDraft }) =>
+    readEmailDraft === undefined ? undefined : () => readEmailDraft(),
 });
 
-export const emailDraftEdit = defineTool({
+export const emailDraftEdit = defineDraftTool({
   name: "email_draft_edit",
   description:
     "Replace one exact, unique passage in one field of the shared email draft. " +
@@ -762,10 +860,11 @@ export const emailDraftEdit = defineTool({
     capability: CAPABILITY_KEYS.marketingEmailDraftEdit,
   },
   unavailable: "email draft edit is unavailable",
-  handler:
-    ({ editEmailDraft }) =>
-    (request, call) =>
-      editEmailDraft(request, call.operationId, call.execution),
+  handler: ({ editEmailDraft }) =>
+    editEmailDraft === undefined
+      ? undefined
+      : (request, call) =>
+          editEmailDraft(request, call.operationId, call.execution),
 });
 
 function parseProductDescriptionDraftReadArgs(
