@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import React from "react";
-import { SideDrawer } from "../../ui";
+import { Button, SideDrawer } from "../../ui";
 import "./order-list.css";
 
 // The orders page: JEV checks each open order against the shop's published
@@ -218,9 +218,7 @@ function HeldRow({
         </strong>
         <span> · {order.items}</span>
       </p>
-      <button type="button" className="secondary" onClick={open}>
-        {hold.action}
-      </button>
+      <Button onClick={open}>{hold.action}</Button>
       <p className="order-list-problem">{hold.problem}</p>
       {hold.update === null ? null : (
         <p className="order-list-update">
@@ -272,13 +270,13 @@ function OrderDetail({
           <blockquote>{hold.update.draft}</blockquote>
           {hold.update.state === "waits_for_you" ? (
             <div>
-              <button
-                type="button"
-                className="primary-button"
+              <Button
+                variant="primary"
+                size="lg"
                 onClick={() => approve(order.id)}
               >
                 Approve
-              </button>
+              </Button>
             </div>
           ) : null}
         </div>

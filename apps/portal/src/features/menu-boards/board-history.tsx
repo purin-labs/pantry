@@ -5,7 +5,7 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath } from "./menu-board-requests";
+import { controlPath } from "../../control-paths";
 import "./board-history.css";
 
 /**

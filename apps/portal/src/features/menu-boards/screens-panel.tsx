@@ -10,7 +10,7 @@ import { isRecord } from "@purin-labs/std";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { Select } from "../../ui/select";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath } from "./menu-board-requests";
+import { controlPath } from "../../control-paths";
 import "./menu-boards.css";
 
 /**

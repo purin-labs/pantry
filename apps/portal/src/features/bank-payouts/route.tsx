@@ -1,12 +1,10 @@
 import React from "react";
-import {
-  parseBankPayouts,
-  type BankPayout,
-  type BankPayoutSource,
-  type BankPayoutsWindow,
+import type {
+  BankPayout,
+  BankPayoutSource,
+  BankPayoutsWindow,
 } from "@purin-labs/control-api";
 
-import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import {
   nowIn,
@@ -19,12 +17,14 @@ import {
   usePeriodRange,
   usePeriodRead,
   type PeriodControl,
+  type PeriodWindow,
   type TimeLanesItem,
   type TimeLanesSection,
   type TimeLanesStatus,
   type TimeLanesStep,
   type TimeLanesTone,
 } from "../../ui";
+import { readBankPayouts } from "./requests";
 
 // The money from card sales that reaches the shop's bank: a bar from the first
 // sale that a payout pays out to the day that it arrives. Payouts are few, so
@@ -356,17 +356,12 @@ export function BankPayoutsRoute(props: {
   const { organisationId } = props;
   const control = usePeriod(Date.now(), "month");
   const reader = React.useCallback(
-    async (window: Readonly<{ from: number; to: number }>) => {
-      const params = new URLSearchParams({
-        from: localDay(window.from),
-        to: localDay(window.to),
-      });
-      return parseBankPayouts(
-        await controlRead(
-          `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/bank-payouts?${params.toString()}`,
-        ),
-      );
-    },
+    (window: PeriodWindow, signal: AbortSignal) =>
+      readBankPayouts(
+        organisationId,
+        { from: localDay(window.from), to: localDay(window.to) },
+        signal,
+      ),
     [organisationId],
   );
   const read = usePeriodRead(control.period, reader, {

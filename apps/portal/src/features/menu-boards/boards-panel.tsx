@@ -46,7 +46,8 @@ import { IMAGE_DRAG_TYPE, ImagesPanel, imageElement, parseShopImage, useShopImag
 import { StackChildFields, StackFields } from "./stack-fields";
 import { toCanvas, toFrames, toShape } from "./canvas-geometry";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath, readMenuDraft } from "./menu-board-requests";
+import { controlPath } from "../../control-paths";
+import { readMenuDraft } from "./menu-board-requests";
 import "./menu-boards.css";
 import "./board-workspace.css";
 

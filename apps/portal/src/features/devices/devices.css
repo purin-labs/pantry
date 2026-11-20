@@ -355,21 +355,6 @@
   gap: 8px;
 }
 
-button:not(:where(.pantry-select-trigger)).secondary.devices-action-danger {
-  color: var(--pantry-danger-text);
-  box-shadow: var(--pantry-danger-ring);
-}
-
-button:not(:where(.pantry-select-trigger)).secondary.devices-action-primary {
-  color: var(--pantry-on-primary);
-  background: var(--pantry-primary);
-  box-shadow: none;
-}
-
-button:not(:where(.pantry-select-trigger)).secondary.devices-action-primary:hover:not(:disabled) {
-  background: var(--pantry-primary-hover);
-}
-
 .devices-panel {
   display: grid;
   gap: 12px;
@@ -389,20 +374,6 @@ button:not(:where(.pantry-select-trigger)).secondary.devices-action-primary:hove
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-}
-
-.devices-link {
-  min-height: 40px;
-  padding: 0;
-  border: 0;
-  color: var(--pantry-link);
-  background: transparent;
-  box-shadow: none;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: left;
-  text-decoration: underline;
-  cursor: pointer;
 }
 
 .devices-fold {

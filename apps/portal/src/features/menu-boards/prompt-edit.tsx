@@ -10,7 +10,7 @@ import { captureBakeryBrowserContext } from "../bakery-browser-context";
 import { readChat } from "../chat/api";
 import { sendChat } from "../chat/screen-send";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath } from "./menu-board-requests";
+import { controlPath } from "../../control-paths";
 import type { MenuBoardClient } from "./board-client";
 import "./prompt-edit.css";
 import type { Variant } from "@purin-labs/type-utils";

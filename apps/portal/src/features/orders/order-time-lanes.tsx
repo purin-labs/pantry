@@ -1,8 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import { parseOrderTimes, type OrderTime } from "@purin-labs/control-api";
+import type { OrderTime } from "@purin-labs/control-api";
 
-import { controlRead } from "../../control-client";
 import { formatMoneyMinor } from "../../formatting";
 import {
   duration,
@@ -18,12 +17,14 @@ import {
   useWiderWhenEmpty,
   ViewSwitch,
   type PeriodControl,
+  type PeriodWindow,
   type TimeLanesItem,
   type TimeLanesSection,
   type TimeLanesStatus,
   type TimeLanesStep,
   type TimeLanesTone,
 } from "../../ui";
+import { readOrderTimes } from "./requests";
 
 // How long each order took: a bar from when it was placed to when its stage
 // began, or to now for an order that is still preparing. An order is late only
@@ -232,17 +233,8 @@ function OrderTimes(props: {
   const { organisationId } = props;
   const control = usePeriod();
   const reader = React.useCallback(
-    async (window: Readonly<{ from: number; to: number }>) => {
-      const params = new URLSearchParams({
-        from: String(window.from),
-        to: String(window.to),
-      });
-      return parseOrderTimes(
-        await controlRead(
-          `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/order-times?${params.toString()}`,
-        ),
-      );
-    },
+    (window: PeriodWindow, signal: AbortSignal) =>
+      readOrderTimes(organisationId, window, signal),
     [organisationId],
   );
   const read = usePeriodRead(control.period, reader, {
