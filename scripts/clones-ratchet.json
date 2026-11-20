@@ -226,7 +226,6 @@
     "services/platform/src/actors/mail-reply-draft.ts = services/platform/src/actors/product-description-draft.ts": 3,
     "services/platform/src/actors/mail-reply-draft.ts = services/platform/src/actors/production-plan.ts": 1,
     "services/platform/src/actors/menu-boards.ts = services/platform/src/actors/menu-boards.ts": 5,
-    "services/platform/src/actors/organisation-collaboration-rooms.ts = services/platform/src/actors/organisation-collaboration-rooms.ts": 6,
     "services/platform/src/actors/organisation.ts = services/platform/src/actors/organisation.ts": 1,
     "services/platform/src/actors/organisation/organisation-actor-base.ts = services/platform/src/actors/organisation/organisation-actor-base.ts": 1,
     "services/platform/src/actors/organisation/organisation-commerce.ts = services/platform/src/actors/organisation/organisation-commerce.ts": 6,

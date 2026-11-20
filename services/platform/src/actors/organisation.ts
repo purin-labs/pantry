@@ -67,11 +67,16 @@ import {
   type CostsSheetAgentEdit,
   type CostsSheetSettleInput,
 } from "./costs-sheet-draft";
+import { cafeCollaborationRooms } from "./cafe-collaboration-rooms";
 import {
-  dispatchOrganisationCollaborationFetch,
-  resolveOrganisationCollaborationSocket,
-  type OrganisationCollaborationRooms,
-} from "./organisation-collaboration-rooms";
+  dispatchCollaborationFetch,
+  resolveCollaborationSocket,
+  type CollaborationRoomRoute,
+  type CollaborationSocketRooms,
+} from "./collaboration-room-dispatch";
+import { commerceCollaborationRooms } from "./commerce-collaboration-rooms";
+import { inboxCollaborationRooms } from "./inbox-collaboration-rooms";
+import { kitchenCollaborationRooms } from "./kitchen-collaboration-rooms";
 import {
   ProductDescriptionDraftRooms,
   type DraftAgentEdit,
@@ -298,17 +303,47 @@ export class OrganisationDO extends OrganisationCommerce {
     return this.#socketRoom(socket);
   }
 
-  #collaborationRooms(): OrganisationCollaborationRooms {
-    return {
+  /**
+   * The shared document rooms. Each area gives its routes and its socket
+   * rooms. This class sets the order in which the dispatch tries the routes.
+   */
+  #collaborationRooms(): Readonly<{
+    routes: readonly CollaborationRoomRoute[];
+    sockets: CollaborationSocketRooms;
+  }> {
+    const kitchen = kitchenCollaborationRooms({
       costsSheets: this.#costsSheets,
-      descriptionDrafts: this.#descriptionDrafts,
-      emailDrafts: this.#emailDrafts,
-      mailReplyDrafts: this.#mailReplyDrafts,
-      menuBoards: this.#menuBoards,
-      menuDrafts: this.#menuDrafts,
       productionPlans: this.#productionPlans,
       workflowCanvases: this.#workflowCanvases,
       workflowDrafts: this.#workflowDrafts,
+    });
+    const commerce = commerceCollaborationRooms({
+      descriptionDrafts: this.#descriptionDrafts,
+    });
+    const inbox = inboxCollaborationRooms({
+      emailDrafts: this.#emailDrafts,
+      mailReplyDrafts: this.#mailReplyDrafts,
+    });
+    const cafe = cafeCollaborationRooms({
+      menuBoards: this.#menuBoards,
+      menuDrafts: this.#menuDrafts,
+    });
+    return {
+      routes: [
+        kitchen.routes.costsSheet,
+        commerce.routes.productDescription,
+        kitchen.routes.workflowDraft,
+        kitchen.routes.productionPlan,
+        inbox.routes.mailReplyDraft,
+        inbox.routes.emailDraft,
+        cafe.routes.menuDraft,
+      ],
+      sockets: {
+        ...kitchen.sockets,
+        ...commerce.sockets,
+        ...inbox.sockets,
+        ...cafe.sockets,
+      },
     };
   }
 
@@ -322,8 +357,8 @@ export class OrganisationDO extends OrganisationCommerce {
     if (row === undefined) return null;
     const organisationId = parseOrganisationId(row.organisation_id);
     if (!organisationId.ok) return null;
-    return resolveOrganisationCollaborationSocket(
-      this.#collaborationRooms(),
+    return resolveCollaborationSocket(
+      this.#collaborationRooms().sockets,
       organisationId.value,
       route,
     );
@@ -615,13 +650,13 @@ export class OrganisationDO extends OrganisationCommerce {
           return assertNever(canvasRoute.transport);
       }
     }
-    return dispatchOrganisationCollaborationFetch({
+    return dispatchCollaborationFetch({
       request,
       pathname,
       env: this.env,
       sql: this.ctx.storage.sql,
       scope,
-      rooms: this.#collaborationRooms(),
+      routes: this.#collaborationRooms().routes,
       validateOrganisation: validateActionOrganisation.bind(
         null,
         this.ctx.storage.sql,
