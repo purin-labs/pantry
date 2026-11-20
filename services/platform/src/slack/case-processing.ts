@@ -74,7 +74,7 @@ import { refreshSlackRequestAuthority } from "../request-authority";
 import {
   isDeferredSlackCaseWork,
   isSlackSideCaseWork,
-} from "../actors/connector-case-work";
+} from "../actors/connector-slack-case-work";
 import {
   parseControlRole,
   roleMayConfigure,

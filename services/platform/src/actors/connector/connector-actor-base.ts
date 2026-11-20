@@ -5,7 +5,6 @@ import {
 } from "../lifecycle/actor-alarm";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
-  connectorWarmActorSlots,
   createWarmActorSlotSchema,
   eraseWarmActorSlots,
   type WarmActorSlot,
@@ -39,7 +38,6 @@ import {
   readActivationExportSource,
   type ActorExportError,
 } from "../actor-export";
-import { actorStub } from "../actor-stubs";
 import {
   createConnectorEmailSchema,
   claimDueEmailReplyTurn,
@@ -83,18 +81,6 @@ import {
   createConnectorCaseWorkSchema,
   renewRunningConnectorCaseWorkLeases,
 } from "../connector-case-work";
-import {
-  startSlackSideCase,
-  type SlackSideCaseStartOutcome,
-} from "../connector-side-case";
-import {
-  createConnectorSlackStreamSchema,
-  parseConnectorCaseTurnStreamInput,
-  streamConnectorCaseTurn,
-  type ConnectorCaseStreamRelease,
-  type ConnectorCaseTurnStreamError,
-} from "../connector-slack-stream";
-import type { OngoingCaseWalkingConnector } from "../case-walking-path";
 import type { Result } from "../../result";
 import {
   claimDueWhatsAppCase,
@@ -131,56 +117,38 @@ import {
   maintainOperationalEmail,
   runEmailCaseContextDiscoveryWork,
 } from "./email-work";
-import { ignoreEarlierSideCaseStart, isPresentNoticeKey } from "./email";
+import { isPresentNoticeKey } from "./email";
 import {
-  ensureConnectorIdentity,
   ignoreUnusedCredentialRoute,
   parseDeliveryRequest,
   parseIngressRequest,
 } from "./ingress-parsers";
-import {
-  deliverSlackOutput,
-  startSlackThreadCredentialRoute,
-} from "./slack-delivery";
-import {
-  type ConnectorAdmission,
-  type LiveSlackTurn,
-  invalid,
-} from "./support";
+import { type ConnectorAdmission, invalid } from "./support";
 import {
   type ConnectorDeliveryRequest,
   type ConnectorDeliveryResult,
+  type ConnectorIngressAcceptance,
   type ConnectorResult,
   WHATSAPP_TURN_RETRY_MS,
 } from "./types";
 import { ConnectorCaseWorkDrain } from "./case-work-drain";
-import type { ConnectorDO } from "../connector";
+import type {
+  ConnectorChannelHost,
+  ConnectorChannels,
+} from "./channel-adapter";
 
 /**
- * The Connector actor's state, its alarm and its shared Case work helpers (Refactor 10, step 2.6). The layers above add WhatsApp, evals and email; `ConnectorDO` adds the Slack ingress and delivery RPC methods.
+ * The Connector actor's state, its alarm and its shared Case work helpers (Refactor 10, step 2.6). The layers above add WhatsApp, evals and email; `ConnectorDO` adds the Slack ingress and delivery RPC methods, and it gives the channels.
  */
 export abstract class ConnectorActorBase extends PlacedActor<null> {
+  /** The channels of this Connector. `ConnectorDO` gives them. */
+  protected abstract readonly channels: ConnectorChannels;
+
   protected activeMailOrganization: Promise<void> | null = null;
 
   protected activeCaseWorkDrain: Promise<void> | null = null;
 
   protected caseWorkDrain: ConnectorCaseWorkDrain | null = null;
-
-  /**
-   * The Session of each Slack turn that streams now, by turn id. A reply to a
-   * busy Case can steer that turn (Plan 71). It lives in memory: after a
-   * restart, replies wait for the next turn as before.
-   */
-  protected readonly liveSlackTurns = new Map<string, LiveSlackTurn>();
-
-  /**
-   * The start of each side Case that runs now, by proposal (Plan 74). A
-   * second click waits for the first start, so one start posts one thread.
-   */
-  protected readonly sideCaseStarts = new Map<
-    string,
-    Promise<SlackSideCaseStartOutcome>
-  >();
 
   protected readonly executions = new Set<
     Promise<Result<null, ActorExportError>>
@@ -220,7 +188,8 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
     this.ctx.storage.transactionSync(
       createConnectorCaseWorkSchema.bind(null, this.ctx.storage.sql),
     );
-    createConnectorSlackStreamSchema(this.ctx.storage.sql);
+    for (const channel of this.channels.adapters)
+      channel.createSchema(this.ctx.storage);
     createConnectorEmailSchema(this.ctx.storage.sql);
     createConnectorWhatsAppSchema(
       this.ctx.storage.sql,
@@ -281,27 +250,6 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
       : null;
   }
 
-  /**
-   * This Connector as its own drain uses it for one item. The drain holds the
-   * scope admitted for that item against the directory, so these calls do not
-   * resolve the scope again. Each reads the regional fence and the local
-   * barrier immediately before its write.
-   */
-  protected caseWorkConnector(
-    scope: OrganisationExecutionScope,
-  ): OngoingCaseWalkingConnector {
-    return {
-      acceptIngress: this.acceptIngressAtScope.bind(this, scope),
-      deliver: this.deliverAtScope.bind(this, scope),
-      streamCaseTurn: this.streamCaseTurnAtScope.bind(this, scope),
-      warmActorSlots: connectorWarmActorSlots(
-        this.ctx.storage,
-        scope.organisationId,
-        scope.placement,
-      ),
-    };
-  }
-
   /** The scope when it is active and this Connector is the named one. */
   protected async admitAtScope(
     scope: OrganisationExecutionScope,
@@ -346,14 +294,14 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
   protected acceptIngressAtScope(
     scope: OrganisationExecutionScope,
     raw: unknown,
-  ): ReturnType<ConnectorDO["acceptIngress"]> {
+  ): Promise<ConnectorIngressAcceptance> {
     return this.acceptAdmittedIngress(this.admitAtScope.bind(this, scope), raw);
   }
 
   protected async acceptAdmittedIngress(
     admit: ConnectorAdmission,
     raw: unknown,
-  ): ReturnType<ConnectorDO["acceptIngress"]> {
+  ): Promise<ConnectorIngressAcceptance> {
     const input = parseIngressRequest(raw);
     if (input === null) return invalid("connector_ingress_invalid");
     if ((await admit(input.identity)) === null)
@@ -363,107 +311,10 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
     );
   }
 
-  /** A start that waits for the start before it, which it then repeats. */
-  protected async startSideCaseAfter(
-    earlier: Promise<SlackSideCaseStartOutcome> | null,
-    context: Parameters<typeof startSlackSideCase>[0],
-    input: Parameters<typeof startSlackSideCase>[1],
-  ): Promise<SlackSideCaseStartOutcome> {
-    if (earlier !== null) await earlier.catch(ignoreEarlierSideCaseStart);
-    return this.trackExecution(
-      startSlackSideCase.bind(null, context, input, Date.now()),
-    );
-  }
-
-  protected streamCaseTurnAtScope(
-    scope: OrganisationExecutionScope,
-    raw: unknown,
-    release: ConnectorCaseStreamRelease,
-  ): Promise<
-    Result<
-      { readonly finalMessage: string; readonly canonicalMessage: string },
-      ConnectorCaseTurnStreamError
-    >
-  > {
-    return this.trackExecution(
-      this.prepareCaseTurnStream.bind(
-        this,
-        this.admitAtScope.bind(this, scope),
-        raw,
-        release,
-      ),
-    );
-  }
-
-  protected async prepareCaseTurnStream(
-    admit: ConnectorAdmission,
-    raw: unknown,
-    release: ConnectorCaseStreamRelease,
-  ): Promise<
-    Result<
-      { readonly finalMessage: string; readonly canonicalMessage: string },
-      ConnectorCaseTurnStreamError
-    >
-  > {
-    const input = parseConnectorCaseTurnStreamInput(raw);
-    if (input === null)
-      return {
-        ok: false,
-        error: { kind: "operational", code: "connector_stream_input_invalid" },
-      };
-    const scope = await admit(input.identity);
-    if (scope === null)
-      return {
-        ok: false,
-        error: { kind: "operational", code: "connector_placement_conflict" },
-      };
-    const identity = this.ctx.storage.transactionSync(
-      ensureConnectorIdentity.bind(null, this.ctx.storage.sql, input.identity),
-    );
-    if (!identity.ok)
-      return {
-        ok: false,
-        error: { kind: "operational", code: identity.error.code },
-      };
-    const session = actorStub(
-      this.env.SESSION,
-      input.sessionRoute.physicalObjectName,
-      input.sessionRoute.placement,
-    );
-    this.liveSlackTurns.set(input.turnId, {
-      sessionId: input.sessionId,
-      sessionRoute: input.sessionRoute,
-    });
-    // A reply that waits for this Case may steer the turn now.
-    this.caseWorkDrain?.accept(null);
-    let result: Awaited<ReturnType<typeof streamConnectorCaseTurn>>;
-    try {
-      result = await streamConnectorCaseTurn({
-        storage: this.ctx.storage,
-        env: this.env,
-        scope,
-        session,
-        stream: input,
-        release,
-      });
-    } finally {
-      this.liveSlackTurns.delete(input.turnId);
-    }
-    // A stream that returns a result read the fence after its last wait and
-    // has only written this Connector's storage since. Export can still close
-    // local admission in between.
-    if (result.ok && !actorExecutionAdmissionOpen(this.ctx.storage.sql))
-      return {
-        ok: false,
-        error: { kind: "operational", code: "connector_placement_conflict" },
-      };
-    return result;
-  }
-
   protected deliverAtScope(
     scope: OrganisationExecutionScope,
     raw: unknown,
-  ): ReturnType<ConnectorDO["deliver"]> {
+  ): Promise<ConnectorResult<ConnectorDeliveryResult>> {
     return this.trackExecution(
       this.deliverAdmittedOutput.bind(
         this,
@@ -485,16 +336,18 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
   ): Promise<ConnectorResult<ConnectorDeliveryResult>> {
     const input = parseDeliveryRequest(raw);
     if (input === null) return invalid("connector_delivery_invalid");
-    // The route of the bot credential decides nothing and reads no fence.
-    // Under a held scope it starts beside the admission. The post uses it
-    // only for the delivery it was read for. The credential's last reads
-    // follow the claim, beside the fence read of the post.
-    const startedRoute =
+    const channel = this.channels.delivery;
+    // A read that the send needs, such as the route of a bot credential,
+    // decides nothing and reads no fence. Under a held scope it starts beside
+    // the admission. The send uses it only for the delivery it was read for.
+    // The send's last reads follow the claim, beside the fence read of the
+    // send.
+    const startedRead =
       heldScope !== null &&
       heldScope.organisationId === input.identity.organisationId
-        ? startSlackThreadCredentialRoute(this.env, input)
+        ? channel.startRead(input)
         : null;
-    void startedRoute?.catch(ignoreUnusedCredentialRoute);
+    void startedRead?.catch(ignoreUnusedCredentialRoute);
     const scope = await admit(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
     const claim = this.ctx.storage.transactionSync(
@@ -507,15 +360,13 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
       delivery: claim.value.delivery,
       requestedAt: input.requestedAt,
     };
-    const delivered = await deliverSlackOutput(
-      this.env,
-      this.ctx.storage.sql,
+    const delivered = await channel.send(
       claimedInput,
       scope,
       scope === heldScope &&
         JSON.stringify(claimedInput.delivery.address) ===
           JSON.stringify(input.delivery.address)
-        ? startedRoute
+        ? startedRead
         : null,
     );
     return this.ctx.storage.transactionSync(
@@ -525,6 +376,7 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
         claimedInput,
         claim.value.attempt,
         delivered,
+        channel,
       ),
     );
   }
@@ -1438,16 +1290,29 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
     const drain = new ConnectorCaseWorkDrain({
       storage: this.ctx.storage,
       env: this.env,
-      connectorFor: this.caseWorkConnector.bind(this),
-      liveSlackTurn: this.liveSlackTurn.bind(this),
+      channel: this.channels.caseWork,
     });
     this.caseWorkDrain = drain;
     this.activeCaseWorkDrain = this.runCaseWorkDrain(drain, admitted);
     this.ctx.waitUntil(this.activeCaseWorkDrain);
   }
 
-  protected liveSlackTurn(turnId: string): LiveSlackTurn | null {
-    return this.liveSlackTurns.get(turnId) ?? null;
+  /** What this Connector gives to a channel. */
+  protected channelHost(): ConnectorChannelHost {
+    return {
+      storage: this.ctx.storage,
+      env: this.env,
+      trackExecution: this.trackExecution.bind(this),
+      admitAtScope: this.admitAtScope.bind(this),
+      acceptIngressAtScope: this.acceptIngressAtScope.bind(this),
+      deliverAtScope: this.deliverAtScope.bind(this),
+      wakeCaseWorkDrain: this.wakeCaseWorkDrain.bind(this),
+    };
+  }
+
+  /** A reply that waits for its Case may steer the Case's turn now. */
+  protected wakeCaseWorkDrain(): void {
+    this.caseWorkDrain?.accept(null);
   }
 
   protected async runCaseWorkDrain(

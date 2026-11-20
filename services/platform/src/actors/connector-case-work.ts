@@ -1,38 +1,68 @@
-import { isSideCaseProposalId } from "@purin-labs/control-api";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 
 import {
   parseConnectorId,
   parseRequestId,
   parseOrganisationId,
+  type OrganisationId,
   type RequestId,
 } from "../ids";
-import {
-  parseSlackCaseCommand,
-  type SlackCaseCommand,
-} from "../slack/case-command-message";
-import { parseStoredRequestAuthority } from "../request-authority";
-import type { SlackEventId } from "../slack/events";
 import { parseOrganisationPlacement } from "../placement";
+import type { Result } from "../result";
 import type { SessionActorRoute } from "./actor-router";
 import type { CountRow } from "./sql-rows";
 import {
   isNonBlankString,
   isNonNegativeInteger,
-  isPositiveInteger,
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
 
-export type ConnectorCaseWorkRequest = {
+/**
+ * What the queue reads of a command. A command is stored as its JSON, and
+ * the queue finds the Case of a stored command at `$.target.caseId`.
+ */
+export type CaseWorkCommand = Readonly<{
+  requestId: RequestId;
+  receivedAt: number;
+  organisationId: OrganisationId;
+  target: Readonly<{ caseId: string; connectorId: string }>;
+}>;
+
+/**
+ * How the queue reads the commands of the channel whose messages are Case
+ * work. The queue holds the rest of a command as an opaque value.
+ */
+export type CaseWorkCodec<Command extends CaseWorkCommand> = Readonly<{
+  /** Parses a stored command, or one that a caller sent. */
+  parse(value: unknown): Result<Command, unknown>;
+  /** The event of the command. It names the command's work in the queue. */
+  eventId(command: Command): string;
+  /** The provider's message, the same for each delivery of that message. */
+  nativeMessageId(command: Command): string;
+  /** The parts of a command that a repeated delivery of it keeps. */
+  stableJson(command: Command): string;
+}>;
+
+export type ConnectorCaseWorkRequest<Command extends CaseWorkCommand> = {
   readonly identity: ConnectorIdentity;
-  readonly command: SlackCaseCommand;
+  readonly command: Command;
 };
 
 type ConnectorCaseWorkRecoveryRequest = {
   readonly identity: ConnectorIdentity;
   readonly requestId: RequestId;
 };
+
+/** How one run of a claimed item ended. */
+export type CaseWorkOutcome =
+  | { readonly kind: "completed" }
+  | {
+      readonly kind: "retry";
+      readonly retryAt: number;
+      readonly reason: string;
+    }
+  | { readonly kind: "rejected"; readonly reason: string };
 
 export type ConnectorCaseWorkResult =
   | { readonly kind: "completed"; readonly completedAt: number }
@@ -47,8 +77,8 @@ export type ConnectorCaseWorkResult =
       readonly rejectedAt: number;
     };
 
-export type ConnectorCaseWorkClaim = {
-  readonly command: SlackCaseCommand;
+export type ConnectorCaseWorkClaim<Command extends CaseWorkCommand> = {
+  readonly command: Command;
   readonly attempt: number;
   /**
    * What this claim does. `turn` runs the message. `exhausted_notice` tells
@@ -76,12 +106,12 @@ export const CASE_WORK_ATTEMPTS_EXHAUSTED =
 export const CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED =
   "connector_case_work_exhausted_notice_undelivered";
 
-type ConnectorCaseWorkAcceptance = {
+export type ConnectorCaseWorkAcceptance = {
   readonly kind: "accepted" | "duplicate";
   readonly eventId: string;
 };
 
-type ConnectorCaseWorkError = { readonly code: string };
+export type ConnectorCaseWorkError = { readonly code: string };
 
 export type ConnectorCaseWorkEfficiency = {
   readonly activeRows: number;
@@ -149,8 +179,6 @@ export function createConnectorCaseWorkSchema(sql: SqlStorage): void {
   createConnectorCaseWorkReceiptTable(sql);
   createConnectorCaseNativeMessageTable(sql);
   createConnectorCaseSteeringTable(sql);
-  createConnectorParkedCaseWorkTable(sql);
-  createConnectorSideCaseTable(sql);
   sql.exec(
     `CREATE INDEX IF NOT EXISTS connector_case_work_due
      ON connector_case_work (due_at, created_at)`,
@@ -162,9 +190,10 @@ export function createConnectorCaseWorkSchema(sql: SqlStorage): void {
   );
 }
 
-export function parseConnectorCaseWorkRequest(
+export function parseConnectorCaseWorkRequest<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   value: unknown,
-): ConnectorCaseWorkRequest | null {
+): ConnectorCaseWorkRequest<Command> | null {
   if (
     !isRecord(value) ||
     !isRecord(value.identity) ||
@@ -175,7 +204,7 @@ export function parseConnectorCaseWorkRequest(
   }
   const organisationId = parseOrganisationId(value.identity.organisationId);
   const connectorId = parseConnectorId(value.identity.connectorId);
-  const parsed = parseSlackCaseCommand(value.command);
+  const parsed = codec.parse(value.command);
   if (!organisationId.ok || !connectorId.ok || !parsed.ok) return null;
   return {
     identity: {
@@ -212,9 +241,26 @@ export function parseConnectorCaseWorkRecoveryRequest(
     : null;
 }
 
-export function acceptConnectorCaseWork(
+export function parseIdentityRecord(value: unknown): ConnectorIdentity | null {
+  if (
+    !isRecord(value) ||
+    !isNonBlankString(value.organisationId) ||
+    !isNonBlankString(value.connectorId)
+  )
+    return null;
+  const organisationId = parseOrganisationId(value.organisationId);
+  const connectorId = parseConnectorId(value.connectorId);
+  if (!organisationId.ok || !connectorId.ok) return null;
+  return {
+    organisationId: organisationId.value,
+    connectorId: connectorId.value,
+  };
+}
+
+export function acceptConnectorCaseWork<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
-  input: ConnectorCaseWorkRequest,
+  input: ConnectorCaseWorkRequest<Command>,
 ):
   | { readonly ok: true; readonly value: ConnectorCaseWorkAcceptance }
   | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
@@ -227,14 +273,14 @@ export function acceptConnectorCaseWork(
       error: { code: "connector_case_work_identity_mismatch" },
     };
   }
-  const eventId = input.command.event.eventId;
-  const nativeMessageId = slackNativeMessageId(input.command);
+  const eventId = codec.eventId(input.command);
+  const nativeMessageId = codec.nativeMessageId(input.command);
   const mappedEventId = readConnectorCaseNativeEventId(sql, nativeMessageId);
   const persistedEventId = mappedEventId ?? eventId;
-  const steered = readSteeredCaseWork(sql, persistedEventId);
+  const steered = readSteeredCaseWork(codec, sql, persistedEventId);
   if (steered !== null)
     return steered.command !== null &&
-      sameSlackCaseCommand(steered.command, input.command)
+      codec.stableJson(steered.command) === codec.stableJson(input.command)
       ? duplicateAcceptance(eventId)
       : { ok: false, error: { code: "connector_case_work_conflict" } };
   const active = readConnectorCaseWork(sql, persistedEventId);
@@ -250,18 +296,17 @@ export function acceptConnectorCaseWork(
     return { ok: false, error: { code: "connector_case_work_conflict" } };
   }
   if (active !== undefined) {
-    const existingCommand = parseSlackCaseCommand(
-      parseJsonOrNull(active.payload),
-    );
+    const existingCommand = codec.parse(parseJsonOrNull(active.payload));
     return existingCommand.ok &&
       parseConnectorCaseWorkRow(active) !== null &&
-      sameSlackCaseCommand(existingCommand.value, input.command)
+      codec.stableJson(existingCommand.value) ===
+        codec.stableJson(input.command)
       ? duplicateAcceptance(eventId)
       : { ok: false, error: { code: "connector_case_work_conflict" } };
   }
   if (receipt !== undefined) {
     return parseConnectorCaseWorkReceipt(receipt) !== null &&
-      receipt.stable_command === stableSlackCaseCommandJson(input.command)
+      receipt.stable_command === codec.stableJson(input.command)
       ? duplicateAcceptance(eventId)
       : { ok: false, error: { code: "connector_case_work_conflict" } };
   }
@@ -284,14 +329,66 @@ export function acceptConnectorCaseWork(
 }
 
 /**
+ * Where the work of an event is: in the queue with its due time, settled
+ * with a receipt, or nowhere.
+ */
+export function caseWorkPresence(
+  sql: SqlStorage,
+  eventId: string,
+):
+  | Readonly<{ kind: "waiting"; dueAt: number }>
+  | Readonly<{
+      kind: "settled";
+    }>
+  | null {
+  const waiting = readConnectorCaseWork(sql, eventId);
+  if (waiting !== undefined) return { kind: "waiting", dueAt: waiting.due_at };
+  return readConnectorCaseWorkReceipt(sql, eventId) === undefined
+    ? null
+    : { kind: "settled" };
+}
+
+/** The command of an event whose turn runs now, or null. */
+export function readRunningCaseWorkCommand<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
+  sql: SqlStorage,
+  eventId: string,
+): Command | null {
+  const row = readConnectorCaseWork(sql, eventId);
+  if (row === undefined || parseConnectorCaseWorkRow(row)?.kind !== "running")
+    return null;
+  const command = codec.parse(parseJsonOrNull(row.payload));
+  return command.ok ? command.value : null;
+}
+
+/** How many items of one Case wait in the queue under an event id prefix. */
+export function countCaseWorkWithEventPrefix(
+  sql: SqlStorage,
+  prefix: string,
+  caseId: string,
+): number {
+  const row = sql
+    .exec<CountRow>(
+      `SELECT COUNT(*) AS count FROM connector_case_work
+       WHERE substr(event_id, 1, ?) = ?
+         AND json_extract(payload, '$.target.caseId') = ?`,
+      prefix.length,
+      prefix,
+      caseId,
+    )
+    .one();
+  return row.count;
+}
+
+/**
  * A reply that joined the running turn of its Case as a steering input
  * (Plan 71). It waits here, out of the work queue, until that turn ends.
  * The Session then says whether the turn read it: a placed reply settles as
  * completed, and a withdrawn one returns to the queue as the next turn.
  */
-type SteeredCaseWork = Readonly<{
+type SteeredCaseWork<Command extends CaseWorkCommand> = Readonly<{
   eventId: string;
-  command: SlackCaseCommand | null;
+  command: Command | null;
   runningEventId: string;
   sessionId: string;
   sessionRoute: SessionActorRoute | null;
@@ -317,11 +414,12 @@ function createConnectorCaseSteeringTable(sql: SqlStorage): void {
 }
 
 /** The pending replies of busy Cases, oldest first. */
-export function pendingCaseWorkForCases(
+export function pendingCaseWorkForCases<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
   caseIds: readonly string[],
   now: number,
-): readonly Readonly<{ eventId: string; command: SlackCaseCommand }>[] {
+): readonly Readonly<{ eventId: string; command: Command }>[] {
   if (caseIds.length === 0) return [];
   return sql
     .exec<ConnectorCaseWorkRow>(
@@ -335,7 +433,7 @@ export function pendingCaseWorkForCases(
     )
     .toArray()
     .flatMap(function pendingCommand(row) {
-      const parsed = parseSlackCaseCommand(parseJsonOrNull(row.payload));
+      const parsed = codec.parse(parseJsonOrNull(row.payload));
       return parsed.ok
         ? [{ eventId: row.event_id, command: parsed.value }]
         : [];
@@ -376,9 +474,10 @@ export function parkSteeredCaseWork(
 }
 
 /** The parked replies whose running turn has ended. */
-export function steeredCaseWorkToSettle(
+export function steeredCaseWorkToSettle<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
-): readonly SteeredCaseWork[] {
+): readonly SteeredCaseWork<Command>[] {
   return sql
     .exec<SteeredCaseWorkRow>(
       `SELECT steering.event_id, steering.payload, steering.running_event_id,
@@ -392,14 +491,17 @@ export function steeredCaseWorkToSettle(
        ORDER BY steering.steered_at, steering.event_id`,
     )
     .toArray()
-    .map(parseSteeredCaseWorkRow);
+    .map(function parseSteered(row): SteeredCaseWork<Command> {
+      return parseSteeredCaseWorkRow(codec, row);
+    });
 }
 
 /**
  * Settle a parked reply: `placed` gives it a completed receipt, `withdrawn`
  * returns it to the queue, due now.
  */
-export function settleSteeredCaseWork(
+export function settleSteeredCaseWork<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
   eventId: string,
   outcome: "placed" | "withdrawn",
@@ -413,11 +515,11 @@ export function settleSteeredCaseWork(
     )
     .toArray()[0];
   if (row === undefined) return;
-  const command = parseSlackCaseCommand(parseJsonOrNull(row.payload));
+  const command = codec.parse(parseJsonOrNull(row.payload));
   if (!command.ok) return;
   sql.exec("DELETE FROM connector_case_steering WHERE event_id = ?", eventId);
   if (outcome === "placed") {
-    settleConnectorCaseWork(sql, eventId, command.value, {
+    settleConnectorCaseWork(sql, eventId, codec.stableJson(command.value), {
       kind: "completed",
       settledAt: now,
     });
@@ -438,7 +540,11 @@ export function settleSteeredCaseWork(
  * Return a reply whose steer the Session refused to its place in the queue:
  * it waits for the next turn, as it did before the offer.
  */
-export function unparkRefusedSteer(sql: SqlStorage, eventId: string): void {
+export function unparkRefusedSteer<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
+  sql: SqlStorage,
+  eventId: string,
+): void {
   const row = sql
     .exec<SteeredCaseWorkRow>(
       `SELECT event_id, payload, running_event_id, session_id, session_route_json
@@ -447,7 +553,7 @@ export function unparkRefusedSteer(sql: SqlStorage, eventId: string): void {
     )
     .toArray()[0];
   if (row === undefined) return;
-  const command = parseSlackCaseCommand(parseJsonOrNull(row.payload));
+  const command = codec.parse(parseJsonOrNull(row.payload));
   if (!command.ok) return;
   sql.exec("DELETE FROM connector_case_steering WHERE event_id = ?", eventId);
   sql.exec(
@@ -461,10 +567,11 @@ export function unparkRefusedSteer(sql: SqlStorage, eventId: string): void {
   );
 }
 
-function readSteeredCaseWork(
+function readSteeredCaseWork<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
   eventId: string,
-): SteeredCaseWork | null {
+): SteeredCaseWork<Command> | null {
   const row = sql
     .exec<SteeredCaseWorkRow>(
       `SELECT event_id, payload, running_event_id, session_id, session_route_json
@@ -472,11 +579,14 @@ function readSteeredCaseWork(
       eventId,
     )
     .toArray()[0];
-  return row === undefined ? null : parseSteeredCaseWorkRow(row);
+  return row === undefined ? null : parseSteeredCaseWorkRow(codec, row);
 }
 
-function parseSteeredCaseWorkRow(row: SteeredCaseWorkRow): SteeredCaseWork {
-  const command = parseSlackCaseCommand(parseJsonOrNull(row.payload));
+function parseSteeredCaseWorkRow<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
+  row: SteeredCaseWorkRow,
+): SteeredCaseWork<Command> {
+  const command = codec.parse(parseJsonOrNull(row.payload));
   const route = parseJsonOrNull(row.session_route_json);
   const placement = isRecord(route)
     ? parseOrganisationPlacement(route.placement)
@@ -499,733 +609,18 @@ function parseSteeredCaseWorkRow(row: SteeredCaseWorkRow): SteeredCaseWork {
 }
 
 /**
- * The message of a follow-up turn. The agent's note is not in it: the note
- * stays in the Session's history of the turn that scheduled it, under that
- * turn's label, and the follow-up turn reads it there. An Access change in
- * between gives the person a new Session without that history; the turn then
- * works from the person's earlier request in the thread.
- */
-export const SLACK_FOLLOW_UP_TEXT =
-  "Scheduled follow-up. Earlier in this thread you called schedule_follow_up, and its time has come. Read the note of that call, do the follow-up now and answer in this thread. If that call is not in your history, do what the person asked earlier in this thread.";
-
-/** A Case holds at most this many follow-ups that wait for their time. */
-const MAX_PENDING_FOLLOW_UPS = 3;
-
-const FOLLOW_UP_EVENT_PREFIX = "followup_";
-
-/**
- * Work that Pantry queued for a person instead of a message of that person: a
- * follow-up, a request that continues after a permission was allowed, or the
- * first work of a side Case that a person started. Its requester's authority
- * is read again when it runs.
- */
-export function isDeferredSlackCaseWork(eventId: string): boolean {
-  return (
-    eventId.startsWith(FOLLOW_UP_EVENT_PREFIX) ||
-    eventId.startsWith(PERMISSION_EVENT_PREFIX) ||
-    isSlackSideCaseWork(eventId)
-  );
-}
-
-export type SlackFollowUpRequest = {
-  readonly identity: ConnectorIdentity;
-  /** The Slack event of the running turn that schedules the follow-up. */
-  readonly sourceEventId: string;
-  /** Stable for one call of the tool, so a replayed call schedules nothing more. */
-  readonly followUpId: string;
-  readonly dueAt: number;
-};
-
-export type SlackFollowUpAcceptance =
-  | { readonly kind: "scheduled" | "duplicate"; readonly dueAt: number }
-  | { readonly kind: "limit_reached"; readonly dueAt?: never };
-
-export function parseSlackFollowUpRequest(
-  value: unknown,
-): SlackFollowUpRequest | null {
-  if (
-    !isRecord(value) ||
-    !isRecord(value.identity) ||
-    !isNonBlankString(value.identity.organisationId) ||
-    !isNonBlankString(value.identity.connectorId) ||
-    !isNonBlankString(value.sourceEventId) ||
-    typeof value.followUpId !== "string" ||
-    !/^[0-9a-f]{32}$/u.test(value.followUpId) ||
-    !isPositiveInteger(value.dueAt)
-  )
-    return null;
-  const organisationId = parseOrganisationId(value.identity.organisationId);
-  const connectorId = parseConnectorId(value.identity.connectorId);
-  if (!organisationId.ok || !connectorId.ok) return null;
-  return {
-    identity: {
-      organisationId: organisationId.value,
-      connectorId: connectorId.value,
-    },
-    sourceEventId: value.sourceEventId,
-    followUpId: value.followUpId,
-    dueAt: value.dueAt,
-  };
-}
-
-/**
- * Queue a follow-up turn for the thread of a running turn. The follow-up is
- * that turn's command again, with a new event and the follow-up message, due
- * at its time. It keeps the requester and the request authority, which the
- * turn checks again when it runs. It waits in the Connector's Case work like
- * any message: it runs once, after the Case's earlier work, with retries.
- */
-export function acceptSlackFollowUp(
-  sql: SqlStorage,
-  input: SlackFollowUpRequest,
-):
-  | { readonly ok: true; readonly value: SlackFollowUpAcceptance }
-  | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
-  const eventId = `${FOLLOW_UP_EVENT_PREFIX}${input.followUpId}`;
-  const waiting = readConnectorCaseWork(sql, eventId);
-  if (waiting !== undefined)
-    return { ok: true, value: { kind: "duplicate", dueAt: waiting.due_at } };
-  if (readConnectorCaseWorkReceipt(sql, eventId) !== undefined)
-    return { ok: true, value: { kind: "duplicate", dueAt: input.dueAt } };
-  const source = readConnectorCaseWork(sql, input.sourceEventId);
-  const sourceCommand =
-    source !== undefined &&
-    parseConnectorCaseWorkRow(source)?.kind === "running"
-      ? parseSlackCaseCommand(parseJsonOrNull(source.payload))
-      : null;
-  if (sourceCommand === null || !sourceCommand.ok)
-    return {
-      ok: false,
-      error: { code: "connector_follow_up_source_unavailable" },
-    };
-  if (
-    pendingFollowUpCount(sql, sourceCommand.value.target.caseId) >=
-    MAX_PENDING_FOLLOW_UPS
-  )
-    return { ok: true, value: { kind: "limit_reached" } };
-  // The work is stored in the boundary parser's form, as admitted messages are.
-  const followUp = parseSlackCaseCommand(
-    parseJsonOrNull(
-      JSON.stringify(
-        slackFollowUpCommand(sourceCommand.value, eventId, input.dueAt, [
-          { kind: "text", text: SLACK_FOLLOW_UP_TEXT },
-        ]),
-      ),
-    ),
-  );
-  if (!followUp.ok)
-    return { ok: false, error: { code: "connector_follow_up_invalid" } };
-  const accepted = acceptConnectorCaseWork(sql, {
-    identity: input.identity,
-    command: followUp.value,
-  });
-  if (!accepted.ok) return accepted;
-  return {
-    ok: true,
-    value: {
-      kind: accepted.value.kind === "accepted" ? "scheduled" : "duplicate",
-      dueAt: input.dueAt,
-    },
-  };
-}
-
-function slackFollowUpCommand(
-  source: SlackCaseCommand,
-  eventId: string,
-  dueAt: number,
-  authored: SlackCaseCommand["event"]["authored"],
-): SlackCaseCommand {
-  // A Slack timestamp of the due second. Its fraction makes it differ from the
-  // thread's root, so the turn finds the thread's Case.
-  const ts = `${Math.floor(dueAt / 1_000)}.${eventId.slice(-6).replace(/[^0-9]/gu, "0")}`;
-  // The parser checks both identifiers when the work is stored.
-  return {
-    ...source,
-    requestId: eventId as RequestId,
-    receivedAt: dueAt,
-    event: {
-      ...source.event,
-      trigger: "mention",
-      eventId: eventId as SlackEventId,
-      eventTs: ts,
-      messageTs: ts,
-      authored,
-      files: [],
-    },
-  };
-}
-
-/**
- * The message of the turn that continues a request after a person allowed
- * the permission it needed. The new turn may run in a new Session, so the
- * person's own words follow the notice instead of a reference to the call.
- */
-export const SLACK_PERMISSION_RESUME_TEXT =
-  "Permission allowed. Earlier in this thread you asked an owner or admin for permission, and they allowed it. Do the person's request below now and answer in this thread. The request was:";
-
-const PERMISSION_EVENT_PREFIX = "permission_";
-
-export type SlackPermissionParkRequest = {
-  readonly identity: ConnectorIdentity;
-  /** The Slack event of the running turn that asks for the permission. */
-  readonly sourceEventId: string;
-  /** Stable for one call of the tool, so a replayed call parks nothing more. */
-  readonly requestId: string;
-};
-
-type SlackPermissionNotice = {
-  readonly identity: ConnectorIdentity;
-  readonly requestId: string;
-  /** Fixed platform text for the thread; it holds no model output. */
-  readonly noticeText: string;
-  /** A permission request's card. A held step's notice stays plain text. */
-  readonly card: boolean;
-};
-
-export type SlackPermissionRelease = {
-  readonly identity: ConnectorIdentity;
-  readonly requestId: string;
-  readonly decision: "allow" | "deny";
-  /**
-   * For an allow: the requester's authority now. An Access change supersedes
-   * the authority of the asking turn, so the continued turn carries this one.
-   */
-  readonly requestAuthority: SlackCaseCommand["requestAuthority"] | null;
-  /** Fixed platform text for the thread; it holds no model output. */
-  readonly noticeText: string;
-  /** The decision updates a permission request's card. */
-  readonly card: boolean;
-};
-
-export function parseSlackPermissionParkRequest(
-  value: unknown,
-): SlackPermissionParkRequest | null {
-  if (
-    !isRecord(value) ||
-    !isNonBlankString(value.sourceEventId) ||
-    !isPermissionRequestId(value.requestId)
-  )
-    return null;
-  const identity = parseIdentityRecord(value.identity);
-  if (identity === null) return null;
-  return {
-    identity,
-    sourceEventId: value.sourceEventId,
-    requestId: value.requestId,
-  };
-}
-
-export function parseSlackPermissionNotice(
-  value: unknown,
-): SlackPermissionNotice | null {
-  if (
-    !isRecord(value) ||
-    !isPermissionRequestId(value.requestId) ||
-    !isPermissionNoticeText(value.noticeText)
-  )
-    return null;
-  const identity = parseIdentityRecord(value.identity);
-  if (identity === null) return null;
-  return {
-    identity,
-    requestId: value.requestId,
-    noticeText: value.noticeText,
-    card: value.card === true,
-  };
-}
-
-export function parseSlackPermissionRelease(
-  value: unknown,
-): SlackPermissionRelease | null {
-  if (
-    !isRecord(value) ||
-    !isPermissionRequestId(value.requestId) ||
-    (value.decision !== "allow" && value.decision !== "deny") ||
-    !isPermissionNoticeText(value.noticeText)
-  )
-    return null;
-  const identity = parseIdentityRecord(value.identity);
-  if (identity === null) return null;
-  const requestAuthority = parseSlackRequestAuthority(value.requestAuthority);
-  if ((value.decision === "allow") !== (requestAuthority !== null)) return null;
-  return {
-    identity,
-    requestId: value.requestId,
-    decision: value.decision,
-    requestAuthority,
-    noticeText: value.noticeText,
-    card: value.card === true,
-  };
-}
-
-function parseSlackRequestAuthority(
-  value: unknown,
-): SlackCaseCommand["requestAuthority"] | null {
-  const parsed = parseStoredRequestAuthority(value);
-  if (!parsed.ok) return null;
-  const authority = parsed.value.requestAuthority;
-  return authority.kind === "direct_conversation" ||
-    authority.kind === "shared_conversation"
-    ? authority
-    : null;
-}
-
-function isPermissionRequestId(value: unknown): value is string {
-  return typeof value === "string" && /^[0-9a-f]{32}$/u.test(value);
-}
-
-function isPermissionNoticeText(value: unknown): value is string {
-  return isNonBlankString(value) && value.length <= 1_000;
-}
-
-export function parseIdentityRecord(value: unknown): ConnectorIdentity | null {
-  if (
-    !isRecord(value) ||
-    !isNonBlankString(value.organisationId) ||
-    !isNonBlankString(value.connectorId)
-  )
-    return null;
-  const organisationId = parseOrganisationId(value.organisationId);
-  const connectorId = parseConnectorId(value.connectorId);
-  if (!organisationId.ok || !connectorId.ok) return null;
-  return { organisationId: organisationId.value, connectorId: connectorId.value };
-}
-
-/**
- * Requests that wait for a person's decision. Each keeps the command of the
- * turn that asked, outside the work queue, so it never runs by itself. A
- * decision is stored once: a repeated release answers from it.
- */
-function createConnectorParkedCaseWorkTable(sql: SqlStorage): void {
-  sql.exec(`CREATE TABLE IF NOT EXISTS connector_parked_case_work (
-    request_id TEXT PRIMARY KEY CHECK (length(request_id) = 32),
-    payload TEXT NOT NULL CHECK (json_valid(payload)),
-    created_at INTEGER NOT NULL CHECK (created_at >= 0),
-    decision TEXT CHECK (decision IS NULL OR decision IN ('allow', 'deny')),
-    decided_at INTEGER CHECK (decided_at IS NULL OR decided_at >= created_at),
-    CHECK ((decision IS NULL) = (decided_at IS NULL))
-  )`);
-}
-
-type ParkedCaseWorkRow = {
-  readonly payload: string;
-  readonly decision: string | null;
-  readonly decided_at: number | null;
-};
-
-/**
- * Keep the command of a running Slack turn until a person decides on the
- * permission that it asks for. It returns that command, whose thread gets the
- * notice. A repeated call returns the first one.
- */
-export function parkSlackPermissionRequest(
-  sql: SqlStorage,
-  input: SlackPermissionParkRequest,
-  now: number,
-):
-  | {
-      readonly ok: true;
-      readonly value: Readonly<{
-        kind: "parked" | "duplicate";
-        command: SlackCaseCommand;
-      }>;
-    }
-  | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
-  const parked = readParkedCaseWork(sql, input.requestId);
-  if (parked !== undefined) {
-    const command = parseSlackCaseCommand(parseJsonOrNull(parked.payload));
-    return command.ok
-      ? { ok: true, value: { kind: "duplicate", command: command.value } }
-      : { ok: false, error: { code: "connector_permission_invalid" } };
-  }
-  const source = readConnectorCaseWork(sql, input.sourceEventId);
-  const sourceCommand =
-    source !== undefined &&
-    parseConnectorCaseWorkRow(source)?.kind === "running"
-      ? parseSlackCaseCommand(parseJsonOrNull(source.payload))
-      : null;
-  if (sourceCommand === null || !sourceCommand.ok)
-    return {
-      ok: false,
-      error: { code: "connector_permission_source_unavailable" },
-    };
-  if (
-    sourceCommand.value.organisationId !== input.identity.organisationId ||
-    sourceCommand.value.target.connectorId !== input.identity.connectorId
-  )
-    return {
-      ok: false,
-      error: { code: "connector_case_work_identity_mismatch" },
-    };
-  sql.exec(
-    `INSERT INTO connector_parked_case_work (request_id, payload, created_at)
-     VALUES (?, ?, ?)`,
-    input.requestId,
-    JSON.stringify(sourceCommand.value),
-    now,
-  );
-  return { ok: true, value: { kind: "parked", command: sourceCommand.value } };
-}
-
-/**
- * Settle a parked request. Allow queues the turn that continues it, due now;
- * deny keeps nothing to run. The first decision is stored, and a repeated
- * release queues the same work again, which the queue answers as a
- * duplicate. It returns the asking command, whose thread gets the answer.
- */
-export function releaseParkedSlackPermission(
-  sql: SqlStorage,
-  input: SlackPermissionRelease,
-  now: number,
-):
-  | {
-      readonly ok: true;
-      readonly value: Readonly<{
-        kind: "allowed" | "denied";
-        command: SlackCaseCommand;
-      }>;
-    }
-  | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
-  const parked = readParkedCaseWork(sql, input.requestId);
-  if (parked === undefined)
-    return { ok: false, error: { code: "connector_permission_not_found" } };
-  const source = parseSlackCaseCommand(parseJsonOrNull(parked.payload));
-  if (!source.ok)
-    return { ok: false, error: { code: "connector_permission_invalid" } };
-  let decision = parked.decision;
-  let decidedAt = parked.decided_at;
-  if (decision === null || decidedAt === null) {
-    decision = input.decision;
-    decidedAt = now;
-    sql.exec(
-      `UPDATE connector_parked_case_work SET decision = ?, decided_at = ?
-       WHERE request_id = ? AND decision IS NULL`,
-      decision,
-      decidedAt,
-      input.requestId,
-    );
-  }
-  if (decision !== input.decision)
-    return { ok: false, error: { code: "connector_permission_decided" } };
-  if (decision === "deny")
-    return { ok: true, value: { kind: "denied", command: source.value } };
-  const eventId = `${PERMISSION_EVENT_PREFIX}${input.requestId}`;
-  // The continued turn is queued once; a repeated release finds it.
-  if (
-    readConnectorCaseWork(sql, eventId) !== undefined ||
-    readConnectorCaseWorkReceipt(sql, eventId) !== undefined
-  )
-    return { ok: true, value: { kind: "allowed", command: source.value } };
-  const authority = input.requestAuthority;
-  if (
-    authority === null ||
-    authority.kind !== source.value.requestAuthority.kind ||
-    authority.requesterPersonId !==
-      source.value.requestAuthority.requesterPersonId ||
-    authority.connectorId !== source.value.requestAuthority.connectorId ||
-    authority.integrationAccountId !==
-      source.value.requestAuthority.integrationAccountId ||
-    authority.conversationId !== source.value.requestAuthority.conversationId
-  )
-    return { ok: false, error: { code: "connector_permission_authority_invalid" } };
-  const resumed = parseSlackCaseCommand(
-    parseJsonOrNull(
-      JSON.stringify({
-        ...slackFollowUpCommand(source.value, eventId, decidedAt, [
-          { kind: "text", text: SLACK_PERMISSION_RESUME_TEXT },
-          ...source.value.event.authored,
-        ]),
-        requestAuthority: authority,
-      }),
-    ),
-  );
-  if (!resumed.ok)
-    return { ok: false, error: { code: "connector_permission_invalid" } };
-  const accepted = acceptConnectorCaseWork(sql, {
-    identity: input.identity,
-    command: resumed.value,
-  });
-  if (!accepted.ok) return accepted;
-  return { ok: true, value: { kind: "allowed", command: source.value } };
-}
-
-/** The command of the turn that asked, or null when nothing is parked. */
-export function readParkedSlackPermission(
-  sql: SqlStorage,
-  requestId: string,
-): SlackCaseCommand | null {
-  const parked = readParkedCaseWork(sql, requestId);
-  if (parked === undefined) return null;
-  const command = parseSlackCaseCommand(parseJsonOrNull(parked.payload));
-  return command.ok ? command.value : null;
-}
-
-function readParkedCaseWork(
-  sql: SqlStorage,
-  requestId: string,
-): ParkedCaseWorkRow | undefined {
-  return sql
-    .exec<ParkedCaseWorkRow>(
-      `SELECT payload, decision, decided_at FROM connector_parked_case_work
-       WHERE request_id = ?`,
-      requestId,
-    )
-    .toArray()[0];
-}
-
-const SIDE_CASE_EVENT_PREFIX = "sidecase_";
-
-/**
- * The first work of a side Case (Plan 74): its brief, which the agent wrote.
- * It is not a person's message, so it is never read as a command.
- */
-export function isSlackSideCaseWork(eventId: string): boolean {
-  return eventId.startsWith(SIDE_CASE_EVENT_PREFIX);
-}
-
-/**
- * Side Cases that an agent proposed in a thread of this Connector. Each keeps
- * the command of the proposing turn, outside the work queue: a start copies
- * it for the new thread. The Slack timestamps of the three posts of a side
- * Case are kept here, so a repeated step posts nothing more.
- */
-function createConnectorSideCaseTable(sql: SqlStorage): void {
-  sql.exec(`CREATE TABLE IF NOT EXISTS connector_side_case (
-    proposal_id TEXT PRIMARY KEY CHECK (length(proposal_id) = 32),
-    payload TEXT NOT NULL CHECK (json_valid(payload)),
-    created_at INTEGER NOT NULL CHECK (created_at >= 0),
-    proposal_ts TEXT,
-    thread_ts TEXT,
-    link_ts TEXT
-  )`);
-}
-
-export type SlackSideCaseParkRequest = {
-  readonly identity: ConnectorIdentity;
-  /** The Slack event of the running turn that proposes the side Case. */
-  readonly sourceEventId: string;
-  /** Stable for one call of the tool, so a replayed call parks nothing more. */
-  readonly proposalId: string;
-};
-
-export function parseSlackSideCaseParkRequest(
-  value: unknown,
-): SlackSideCaseParkRequest | null {
-  if (
-    !isRecord(value) ||
-    !isNonBlankString(value.sourceEventId) ||
-    !isSideCaseProposalId(value.proposalId)
-  )
-    return null;
-  const identity = parseIdentityRecord(value.identity);
-  if (identity === null) return null;
-  return {
-    identity,
-    sourceEventId: value.sourceEventId,
-    proposalId: value.proposalId,
-  };
-}
-
-/**
- * Keep the command of a running Slack turn that proposes a side Case. It
- * returns that command, whose thread holds the proposal. A repeated call
- * returns the first one.
- */
-export function parkSlackSideCaseCommand(
-  sql: SqlStorage,
-  input: SlackSideCaseParkRequest,
-  now: number,
-):
-  | { readonly ok: true; readonly value: SlackCaseCommand }
-  | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
-  const parked = readParkedSlackSideCase(sql, input.proposalId);
-  if (parked !== null) return { ok: true, value: parked.command };
-  const source = readConnectorCaseWork(sql, input.sourceEventId);
-  const sourceCommand =
-    source !== undefined &&
-    parseConnectorCaseWorkRow(source)?.kind === "running"
-      ? parseSlackCaseCommand(parseJsonOrNull(source.payload))
-      : null;
-  if (sourceCommand === null || !sourceCommand.ok)
-    return {
-      ok: false,
-      error: { code: "connector_side_case_source_unavailable" },
-    };
-  if (
-    sourceCommand.value.organisationId !== input.identity.organisationId ||
-    sourceCommand.value.target.connectorId !== input.identity.connectorId
-  )
-    return {
-      ok: false,
-      error: { code: "connector_case_work_identity_mismatch" },
-    };
-  sql.exec(
-    `INSERT INTO connector_side_case (proposal_id, payload, created_at)
-     VALUES (?, ?, ?)`,
-    input.proposalId,
-    JSON.stringify(sourceCommand.value),
-    now,
-  );
-  return { ok: true, value: sourceCommand.value };
-}
-
-export type ParkedSlackSideCase = Readonly<{
-  command: SlackCaseCommand;
-  /** The proposal message in the proposing thread. */
-  proposalTs: string | null;
-  /** The root of the side Case's own thread. */
-  threadTs: string | null;
-  /** The line in the proposing thread that links to the new thread. */
-  linkTs: string | null;
-}>;
-
-type SlackSideCasePost = "proposal" | "thread" | "link";
-
-type ConnectorSideCaseRow = Record<string, SqlStorageValue> & {
-  readonly payload: string;
-  readonly proposal_ts: string | null;
-  readonly thread_ts: string | null;
-  readonly link_ts: string | null;
-};
-
-export function readParkedSlackSideCase(
-  sql: SqlStorage,
-  proposalId: string,
-): ParkedSlackSideCase | null {
-  const row = sql
-    .exec<ConnectorSideCaseRow>(
-      `SELECT payload, proposal_ts, thread_ts, link_ts FROM connector_side_case
-       WHERE proposal_id = ?`,
-      proposalId,
-    )
-    .toArray()[0];
-  if (row === undefined) return null;
-  const command = parseSlackCaseCommand(parseJsonOrNull(row.payload));
-  if (!command.ok) throw new Error("connector_side_case_corrupt");
-  return {
-    command: command.value,
-    proposalTs: row.proposal_ts,
-    threadTs: row.thread_ts,
-    linkTs: row.link_ts,
-  };
-}
-
-/** Keep the timestamp of one post of a side Case. The first one stays. */
-export function recordSlackSideCasePost(
-  sql: SqlStorage,
-  proposalId: string,
-  post: SlackSideCasePost,
-  ts: string,
-): void {
-  const column = SIDE_CASE_POST_COLUMNS[post];
-  sql.exec(
-    `UPDATE connector_side_case SET ${column} = ?
-     WHERE proposal_id = ? AND ${column} IS NULL`,
-    ts,
-    proposalId,
-  );
-}
-
-const SIDE_CASE_POST_COLUMNS: Readonly<Record<SlackSideCasePost, string>> = {
-  proposal: "proposal_ts",
-  thread: "thread_ts",
-  link: "link_ts",
-};
-
-/**
- * The first work of a side Case: the proposing turn's command, copied to the
- * new thread. Its message is the brief, its requester is the person who
- * started the side Case, and its event is named by the proposal, so a
- * repeated start queues it once. The requester's authority is read again
- * when it runs, as for a follow-up.
- */
-export function slackSideCaseCommand(
-  source: SlackCaseCommand,
-  input: Readonly<{
-    proposalId: string;
-    brief: string;
-    receivedAt: number;
-    threadTs: string;
-    thread: Pick<SlackCaseCommand["event"], "sessionId" | "threadKey">;
-    starter: Pick<
-      SlackCaseCommand,
-      "principalId" | "userId" | "requestAuthority"
-    > &
-      Readonly<{ author: SlackCaseCommand["event"]["author"] }>;
-    target: SlackCaseCommand["target"];
-  }>,
-): SlackCaseCommand {
-  const eventId = `${SIDE_CASE_EVENT_PREFIX}${input.proposalId}`;
-  // The parser checks both identifiers when the work is stored.
-  return {
-    ...source,
-    requestId: eventId as RequestId,
-    receivedAt: input.receivedAt,
-    principalId: input.starter.principalId,
-    userId: input.starter.userId,
-    requestAuthority: input.starter.requestAuthority,
-    event: {
-      ...source.event,
-      trigger: "mention",
-      sessionId: input.thread.sessionId,
-      threadKey: input.thread.threadKey,
-      eventId: eventId as SlackEventId,
-      eventTs: input.threadTs,
-      messageTs: input.threadTs,
-      threadTs: input.threadTs,
-      author: input.starter.author,
-      authored: [{ kind: "text", text: input.brief }],
-      files: [],
-    },
-    target: input.target,
-  };
-}
-
-/**
- * Queue the first work of a side Case in the boundary parser's form, as
- * admitted messages are stored. A repeated call answers as a duplicate.
- */
-export function acceptSlackSideCaseWork(
-  sql: SqlStorage,
-  identity: ConnectorIdentity,
-  command: SlackCaseCommand,
-):
-  | { readonly ok: true; readonly value: ConnectorCaseWorkAcceptance }
-  | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
-  if (!isSlackSideCaseWork(String(command.event.eventId)))
-    return { ok: false, error: { code: "connector_side_case_invalid" } };
-  const parsed = parseSlackCaseCommand(parseJsonOrNull(JSON.stringify(command)));
-  if (!parsed.ok)
-    return { ok: false, error: { code: "connector_side_case_invalid" } };
-  return acceptConnectorCaseWork(sql, { identity, command: parsed.value });
-}
-
-function pendingFollowUpCount(sql: SqlStorage, caseId: string): number {
-  const row = sql
-    .exec<CountRow>(
-      `SELECT COUNT(*) AS count FROM connector_case_work
-       WHERE substr(event_id, 1, ?) = ?
-         AND json_extract(payload, '$.target.caseId') = ?`,
-      FOLLOW_UP_EVENT_PREFIX.length,
-      FOLLOW_UP_EVENT_PREFIX,
-      caseId,
-    )
-    .one();
-  return row.count;
-}
-
-/**
  * Claim the earliest due item. An item whose Case is listed as busy is left
  * for later, so the messages of one Case never run at the same time.
  */
-export function claimConnectorCaseWork(
+export function claimConnectorCaseWork<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
   now: number,
   busyCaseIds: readonly string[] = [],
 ):
   | {
       readonly ok: true;
-      readonly value: ConnectorCaseWorkQuery<ConnectorCaseWorkClaim | null>;
+      readonly value: ConnectorCaseWorkQuery<ConnectorCaseWorkClaim<Command> | null>;
     }
   | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
   let rowsRead = 0;
@@ -1251,29 +646,39 @@ export function claimConnectorCaseWork(
     if (state === null)
       return { ok: false, error: { code: "connector_case_work_corrupt" } };
     const attempt = previousAttempt(state) + 1;
-    const parsed = parseSlackCaseCommand(parseJsonOrNull(row.payload));
+    const parsed = codec.parse(parseJsonOrNull(row.payload));
     if (!parsed.ok)
       return { ok: false, error: { code: "connector_case_work_corrupt" } };
     const canonicalEventId = readConnectorCaseNativeEventId(
       sql,
-      slackNativeMessageId(parsed.value),
+      codec.nativeMessageId(parsed.value),
     );
     if (canonicalEventId !== undefined && canonicalEventId !== row.event_id) {
-      settleConnectorCaseWork(sql, row.event_id, parsed.value, {
-        kind: "rejected",
-        reason: "connector_case_work_duplicate_native_message",
-        settledAt: now,
-      });
+      settleConnectorCaseWork(
+        sql,
+        row.event_id,
+        codec.stableJson(parsed.value),
+        {
+          kind: "rejected",
+          reason: "connector_case_work_duplicate_native_message",
+          settledAt: now,
+        },
+      );
       continue;
     }
     // Only a notice claim whose lease ran out comes this far. Its post has
     // no known result, so the receipt says that the thread was not told.
     if (attempt > CASE_WORK_MAX_ATTEMPTS + CASE_WORK_NOTICE_ATTEMPTS) {
-      settleConnectorCaseWork(sql, row.event_id, parsed.value, {
-        kind: "rejected",
-        reason: CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED,
-        settledAt: now,
-      });
+      settleConnectorCaseWork(
+        sql,
+        row.event_id,
+        codec.stableJson(parsed.value),
+        {
+          kind: "rejected",
+          reason: CASE_WORK_EXHAUSTED_NOTICE_UNDELIVERED,
+          settledAt: now,
+        },
+      );
       continue;
     }
     sql.exec(
@@ -1311,14 +716,16 @@ function placeholder(): string {
   return "?";
 }
 
-export function finalizeConnectorCaseWork(
+export function finalizeConnectorCaseWork<Command extends CaseWorkCommand>(
+  codec: CaseWorkCodec<Command>,
   sql: SqlStorage,
-  claim: ConnectorCaseWorkClaim,
+  claim: ConnectorCaseWorkClaim<Command>,
   result: ConnectorCaseWorkResult,
 ):
   | { readonly ok: true; readonly value: null }
   | { readonly ok: false; readonly error: ConnectorCaseWorkError } {
-  const row = readConnectorCaseWork(sql, claim.command.event.eventId);
+  const eventId = codec.eventId(claim.command);
+  const row = readConnectorCaseWork(sql, eventId);
   const state = row === undefined ? null : parseConnectorCaseWorkRow(row);
   if (
     row === undefined ||
@@ -1336,21 +743,31 @@ export function finalizeConnectorCaseWork(
          WHERE event_id = ?`,
         result.retryAt,
         result.reason,
-        claim.command.event.eventId,
+        eventId,
       );
       return { ok: true, value: null };
     case "completed":
-      settleConnectorCaseWork(sql, row.event_id, claim.command, {
-        kind: "completed",
-        settledAt: result.completedAt,
-      });
+      settleConnectorCaseWork(
+        sql,
+        row.event_id,
+        codec.stableJson(claim.command),
+        {
+          kind: "completed",
+          settledAt: result.completedAt,
+        },
+      );
       return { ok: true, value: null };
     case "rejected":
-      settleConnectorCaseWork(sql, row.event_id, claim.command, {
-        kind: "rejected",
-        reason: result.reason,
-        settledAt: result.rejectedAt,
-      });
+      settleConnectorCaseWork(
+        sql,
+        row.event_id,
+        codec.stableJson(claim.command),
+        {
+          kind: "rejected",
+          reason: result.reason,
+          settledAt: result.rejectedAt,
+        },
+      );
       return { ok: true, value: null };
   }
 }
@@ -1410,7 +827,7 @@ function duplicateAcceptance(eventId: string): {
 function settleConnectorCaseWork(
   sql: SqlStorage,
   eventId: string,
-  command: SlackCaseCommand,
+  stableCommand: string,
   receipt: ConnectorCaseWorkReceipt,
 ): void {
   sql.exec(
@@ -1418,61 +835,12 @@ function settleConnectorCaseWork(
        event_id, stable_command, outcome, reason, settled_at
      ) VALUES (?, ?, ?, ?, ?)`,
     eventId,
-    stableSlackCaseCommandJson(command),
+    stableCommand,
     receipt.kind,
     receipt.kind === "rejected" ? receipt.reason : null,
     receipt.settledAt,
   );
   sql.exec("DELETE FROM connector_case_work WHERE event_id = ?", eventId);
-}
-
-function sameSlackCaseCommand(
-  left: SlackCaseCommand,
-  right: SlackCaseCommand,
-): boolean {
-  return stableSlackCaseCommandJson(left) === stableSlackCaseCommandJson(right);
-}
-
-function stableSlackCaseCommandJson(command: SlackCaseCommand): string {
-  return JSON.stringify({
-    type: command.type,
-    organisationId: command.organisationId,
-    integrationAccountId: command.integrationAccountId,
-    event: stableSlackCaseEvent(command),
-    principalId: command.principalId,
-    requestAuthority: command.requestAuthority,
-    target: {
-      caseId: command.target.caseId,
-      connectorId: command.target.connectorId,
-      sessionId: command.target.sessionId,
-      assignmentId: command.target.assignmentId,
-    },
-  });
-}
-
-function slackNativeMessageId(command: SlackCaseCommand): string {
-  const event = command.event;
-  return `slack_message:${event.workspaceId}:${event.channelId}:${event.messageTs}`;
-}
-
-function stableSlackCaseEvent(
-  command: SlackCaseCommand,
-): Omit<SlackCaseCommand["event"], "eventId" | "trigger"> {
-  const event = command.event;
-  return {
-    surfaceKind: event.surfaceKind,
-    appId: event.appId,
-    workspaceId: event.workspaceId,
-    channelId: event.channelId,
-    sessionId: event.sessionId,
-    threadKey: event.threadKey,
-    eventTs: event.eventTs,
-    messageTs: event.messageTs,
-    threadTs: event.threadTs,
-    author: event.author,
-    authored: event.authored,
-    files: event.files,
-  };
 }
 
 function previousAttempt(state: ConnectorCaseWorkState): number {

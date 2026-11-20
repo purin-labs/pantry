@@ -18,19 +18,6 @@ import {
 import { digestEmailBody } from "../../mail/reply-target";
 import { createEmailProposalDraft } from "../email-case-processing";
 import {
-  acceptConnectorCaseWork,
-  acceptSlackFollowUp,
-  parkSlackPermissionRequest,
-  releaseParkedSlackPermission,
-  parkSlackSideCaseCommand,
-  type SlackSideCaseParkRequest,
-  type SlackPermissionParkRequest,
-  type SlackPermissionRelease,
-  type ConnectorCaseWorkRequest,
-  type SlackFollowUpAcceptance,
-  type SlackFollowUpRequest,
-} from "../connector-case-work";
-import {
   type EmailReplyProposalCreateRequest,
   parseEmailChangeRequest,
 } from "./email-parsers";
@@ -147,76 +134,6 @@ export async function createConnectorEmailReplyProposal(
     { kind: "session_turn", execution: input.request.execution },
   );
   return created.ok ? created : invalid(created.error.code);
-}
-
-export function acceptCaseWorkTransaction(
-  sql: SqlStorage,
-  input: ConnectorCaseWorkRequest,
-): ConnectorResult<{
-  readonly kind: "accepted" | "duplicate";
-  readonly eventId: string;
-}> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return acceptConnectorCaseWork(sql, input);
-}
-
-export type SlackPermissionParked = Readonly<{
-  caseId: string;
-  workspaceId: string;
-  channelId: string;
-  threadTs: string;
-  requesterUserId: string | null;
-}>;
-
-export function parkSlackPermissionTransaction(
-  sql: SqlStorage,
-  input: SlackPermissionParkRequest,
-  now: number,
-): ReturnType<typeof parkSlackPermissionRequest> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return parkSlackPermissionRequest(sql, input, now);
-}
-
-/** The later start repeats the work of an earlier one that failed. */
-export function ignoreEarlierSideCaseStart(): void {}
-
-export type SlackSideCaseParked = Readonly<{
-  caseId: string;
-  workspaceId: string;
-  channelId: string;
-  threadTs: string;
-  requesterPersonId: string;
-}>;
-
-export function parkSlackSideCaseTransaction(
-  sql: SqlStorage,
-  input: SlackSideCaseParkRequest,
-  now: number,
-): ReturnType<typeof parkSlackSideCaseCommand> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return parkSlackSideCaseCommand(sql, input, now);
-}
-
-export function releaseSlackPermissionTransaction(
-  sql: SqlStorage,
-  input: SlackPermissionRelease,
-  now: number,
-): ReturnType<typeof releaseParkedSlackPermission> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return releaseParkedSlackPermission(sql, input, now);
-}
-
-export function acceptSlackFollowUpTransaction(
-  sql: SqlStorage,
-  input: SlackFollowUpRequest,
-): ConnectorResult<SlackFollowUpAcceptance> {
-  const identity = ensureConnectorIdentity(sql, input.identity);
-  if (!identity.ok) return identity;
-  return acceptSlackFollowUp(sql, input);
 }
 
 export function acceptConnectorEmailChange(

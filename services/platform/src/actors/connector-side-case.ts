@@ -40,14 +40,14 @@ import {
 } from "../slack/side-cases";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import { decideStoredFlowConversationSink } from "./case-conversation-sink";
+import { parseIdentityRecord } from "./connector-case-work";
 import {
   acceptSlackSideCaseWork,
-  parseIdentityRecord,
   readParkedSlackSideCase,
   recordSlackSideCasePost,
   slackSideCaseCommand,
   type ParkedSlackSideCase,
-} from "./connector-case-work";
+} from "./connector-slack-case-work";
 
 /**
  * The Slack side of a side Case (Plan 74, Phase 2), in the Connector of the

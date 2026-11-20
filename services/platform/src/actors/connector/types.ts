@@ -21,6 +21,11 @@ export type ConnectorIngressRequest = {
   readonly attachments: readonly StoredMessageAttachment[];
 };
 
+export type ConnectorIngressAcceptance = ConnectorResult<{
+  readonly kind: "accepted" | "duplicate";
+  readonly caseId: string;
+}>;
+
 export type ConnectorIngressRecord = ConnectorIngress & {
   readonly attachments: readonly StoredMessageAttachment[];
 };
@@ -117,11 +122,6 @@ export type ConnectorDeliveryClaim =
       readonly attempt: number;
       readonly delivery: ConnectorDelivery;
     };
-
-export type SlackDeliveryResponse =
-  | { readonly kind: "delivered"; readonly timestamp: string }
-  | { readonly kind: "rejected"; readonly reason: string }
-  | { readonly kind: "invalid" };
 
 /** How long a Case waits before a turn that produced no outcome is retried. */
 export const WHATSAPP_TURN_RETRY_MS = 60_000;
