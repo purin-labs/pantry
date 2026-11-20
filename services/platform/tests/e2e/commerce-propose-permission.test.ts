@@ -1,6 +1,6 @@
 import { expect, it, type TestContext } from "vitest";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { commerceCanonicalResourceId } from "../../src/commerce/provider";
+import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import {
   PROPOSE,
   accessCapability,

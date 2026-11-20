@@ -64,6 +64,9 @@ import {
 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
 import { decodeBase64Url, isPositiveInteger } from "@purin-labs/std";
+import {
+  commerceCanonicalResourceId,
+} from "./contract/resource-ids";
 
 export interface CommerceDeliveryVerifier {
   verify(
@@ -851,23 +854,6 @@ export async function reconcileCommerceCatalogPublication(
     receipt.resource.id === input.offerId
     ? { kind: "committed", receipt }
     : { kind: "indeterminate" };
-}
-
-export function commerceCanonicalResourceId(
-  merchantId: string,
-  resourceId: string,
-): string {
-  return `underclerk:${merchantId}:${resourceId}`;
-}
-
-export function commerceProviderResourceId(
-  merchantId: string,
-  canonicalResourceId: string,
-): string | null {
-  const prefix = `underclerk:${merchantId}:`;
-  if (!canonicalResourceId.startsWith(prefix)) return null;
-  const resourceId = canonicalResourceId.slice(prefix.length);
-  return resourceId.length === 0 ? null : resourceId;
 }
 
 function readEntityPlaneObservations(

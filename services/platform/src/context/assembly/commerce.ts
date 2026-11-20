@@ -27,7 +27,7 @@ import {
   CommerceGraphReader,
   type CommerceGraphReaderError,
 } from "../../commerce/entity-plane/graph-reader";
-import { sensitivityAtMost } from "../../commerce/sensitivity";
+import { sensitivityAtMost } from "../../commerce/contract/sensitivity";
 
 export type CommerceContextAssemblyError =
   | CommerceGraphReaderError

@@ -45,7 +45,7 @@ import {
   createCommerceDeliveryQueueMessage,
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "../commerce/queue-messages";
+} from "../commerce/contract/queue-messages";
 import type { EmailChangeQueueMessage } from "../mail/queue-messages";
 import type { IngressQueueMessageError } from "../queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";

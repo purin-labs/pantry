@@ -191,13 +191,13 @@ import type {
 } from "./activation-types";
 import type {
   CafeCommerceAcceptanceFaultConsumption,
-  CafeCommerceAcceptanceFaultRecord,
   CommerceQueryPlanReadError,
   OrganisationApplyCommerceDeliveryInput,
   ReadCommerceQueryPlanInput,
   ReadCommerceQueryPlanValue,
   ReadCommerceRelationshipStepInput,
 } from "./commerce-types";
+import type { CafeCommerceAcceptanceFaultRecord } from "../../commerce/contract/types";
 import type { CodeModeOrganisationActorError } from "./code-mode-types";
 import type {
   OrganisationCutoverCueSettlementError,

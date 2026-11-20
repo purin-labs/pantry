@@ -28,7 +28,7 @@ import { buildControlAuthority } from "../../src/request-authority";
 import { readNamedCommerceQuery } from "../../src/context/assembly/commerce";
 import { CommerceGraphReader } from "../../src/commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../../src/commerce/entity-plane/commerce-source";
-import { createCommerceEntityPlaneClient } from "../../src/commerce/outbox-worker";
+import { createCommerceEntityPlaneClient } from "../../src/commerce/contract/client";
 import { resolveOrganisationCommerceSystemAuthority } from "../../src/data/organisation-commerce-system";
 import { createFinancierSample } from "../../src/commerce/bakery/sample";
 

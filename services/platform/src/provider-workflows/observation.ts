@@ -16,8 +16,8 @@ import {
 } from "../provider-adapters/stripe";
 import type { ProviderObservationRequest } from "../provider-adapters/domain";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
-import { linkStripePaymentAccount } from "../commerce/stripe-link";
-import { resolveCommerceMerchant } from "../commerce/square-link";
+import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
+import { resolveCommerceMerchant } from "../commerce/contract/square-link";
 
 export type { ProviderObservationRequest } from "../provider-adapters/domain";
 

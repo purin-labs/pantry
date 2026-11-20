@@ -1,15 +1,17 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { commerceClientConfig, type CommerceCaller } from "./app-access";
+import {
+  createCommerceClient,
+  createCommerceEntityPlaneClient,
+} from "./contract/client";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
 } from "../organisation-execution-scope";
 import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
-import {
+import type {
   CommerceAdminClient,
-  CommerceEntityPlaneClient,
-  type CommerceClientResult,
-  type CommerceReceivedDeliveryV1,
+  CommerceClientResult,
+  CommerceReceivedDeliveryV1,
 } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
@@ -29,7 +31,7 @@ import type { Env, OrganisationActorStub } from "../env";
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "./queue-messages";
+} from "./contract/queue-messages";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import {
@@ -731,34 +733,6 @@ async function enqueueRecoverableCues(
     if (!marked.ok) return { ok: false, code: marked.error.code };
   }
   return { ok: true };
-}
-
-export function createCommerceClient(
-  env: Parameters<typeof commerceClientConfig>[0],
-  fetcher: typeof fetch | undefined,
-  caller: CommerceCaller,
-): CommerceAdminClient | null {
-  const config = commerceClientConfig(env, fetcher, caller);
-  if (config === null) return null;
-  try {
-    return new CommerceAdminClient(config);
-  } catch {
-    return null;
-  }
-}
-
-export function createCommerceEntityPlaneClient(
-  env: Env,
-  fetcher: typeof fetch | undefined,
-  caller: CommerceCaller,
-): CommerceEntityPlaneClient | null {
-  const config = commerceClientConfig(env, fetcher, caller);
-  if (config === null) return null;
-  try {
-    return new CommerceEntityPlaneClient(config);
-  } catch {
-    return null;
-  }
 }
 
 /**

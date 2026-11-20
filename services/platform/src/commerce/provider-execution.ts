@@ -9,10 +9,10 @@ import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 import {
   buildCommerceLabDelivery,
   commerceActionExpectedRevision,
-  commerceProjectionRevision,
   parseCommerceActionPath,
   type CommerceActionPath,
 } from "./action-model";
+import { commerceProjectionRevision } from "./contract/commerce-provider";
 import {
   admitCommerceCapability,
   type CommerceCapability,
@@ -33,7 +33,7 @@ import {
   type CommerceProviderOperation,
   type CommerceProviderReconcileInput,
   type CommerceProviderReconciliation,
-} from "./commerce-provider";
+} from "./contract/commerce-provider";
 import {
   commerceProvider,
   commerceProviderOfPermit,
@@ -43,7 +43,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "./outbox-worker";
+} from "./contract/client";
 import {
   cancelOrderThroughCommerce,
   publishCatalogListingThroughCommerce,
@@ -56,8 +56,8 @@ import {
   reconcileCommerceCatalogPublication,
   reconcileCommerceProductDescriptionUpdate,
   reconcileCommerceOrderCancellation,
-  commerceProviderResourceId,
 } from "./provider";
+import { commerceProviderResourceId } from "./contract/resource-ids";
 import { authorizeCapabilityUse } from "../authorization/access-grants/turn-authority";
 import type { ProviderCapabilityDefinition } from "../authorization/access-grants/capability-key";
 import { parseStoredRequestAuthority } from "../request-authority";
@@ -87,7 +87,7 @@ import {
   type StockExecution,
 } from "./stock-action-execution";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
-import { createCommerceOutboxReconcileQueueMessage } from "./queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 

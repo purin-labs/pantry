@@ -1,4 +1,4 @@
-import { resolveCommerceMerchant } from "../../../commerce/square-link";
+import { resolveCommerceMerchant } from "../../../commerce/contract/square-link";
 import { runtimeFetch } from "../../../runtime-fetch";
 import {
   fetchWithOrganisationPlacement,

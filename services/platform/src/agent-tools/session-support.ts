@@ -50,8 +50,8 @@ import {
   recordCommerceObservationEntities,
   type CommerceObservationEntity,
 } from "../actors/agent-session-information-flow";
-import { createCommerceOutboxReconcileQueueMessage } from "../commerce/queue-messages";
-import { createCommerceClient } from "../commerce/outbox-worker";
+import { createCommerceOutboxReconcileQueueMessage } from "../commerce/contract/queue-messages";
+import { createCommerceClient } from "../commerce/contract/client";
 import type { OrderQueueContext } from "../commerce/order-queue-commands";
 import {
   readControlMutationReplay,

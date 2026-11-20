@@ -21,7 +21,7 @@ import {
 import {
   resolveMerchantControlContext,
   type MerchantControlContext,
-} from "../commerce-merchant";
+} from "../../commerce/contract/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

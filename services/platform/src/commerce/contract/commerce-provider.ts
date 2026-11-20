@@ -18,16 +18,16 @@ import type {
   ActionExecutionRetryEvidence,
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
-} from "../actors/action-ledger";
-import type { OrganisationDatabase } from "../database-handles";
-import type { CommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import type { ActiveProviderAccountContext } from "../data/integration-account";
-import type { CommerceSystem } from "../data/organisation-commerce-system";
-import type { Env } from "../env";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { FlowDecision } from "../policy";
-import type { Result } from "../result";
-import type { CommerceActionError, CommerceActionPath } from "./action-model";
+} from "../../actors/action-ledger";
+import type { OrganisationDatabase } from "../../database-handles";
+import type { CommerceMerchantBinding } from "../../data/commerce-merchant-binding";
+import type { ActiveProviderAccountContext } from "../../data/integration-account";
+import type { CommerceSystem } from "../../data/organisation-commerce-system";
+import type { Env } from "../../env";
+import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { FlowDecision } from "../../policy/index";
+import type { Result } from "../../result";
+import type { CommerceActionError, CommerceActionPath } from "../action-model";
 
 export type CommerceProviderExecutionError =
   | CommerceActionError
@@ -160,4 +160,11 @@ export function commerceProviderUnsupported(): Result<
   CommerceProviderExecutionError
 > {
   return { ok: false, error: { code: "commerce_action_provider_unsupported" } };
+}
+
+/** The revision of a projection, which a provider action compares. */
+export function commerceProjectionRevision(
+  projection: CommerceProjection,
+): number {
+  return projection.projection.provenance.revision;
 }

@@ -30,7 +30,7 @@ import { expireAbandonedCueClaims } from "../cue-delivery";
 import type { OrganisationCutoverQuiescence } from "../organisation-cutover-quiescence";
 import { isNonNegativeInteger } from "@purin-labs/std";
 import type { ActivationExecutionFailure } from "./activation-types";
-import type { CafeCommerceAcceptanceFaultRecord } from "./commerce-types";
+import type { CafeCommerceAcceptanceFaultRecord } from "../../commerce/contract/types";
 
 export const CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY =
   "acceptance:cafe-commerce-fault:v1";

@@ -2,8 +2,12 @@
 // This file holds their types, their constructors and their parsers.
 // `ingress-queue.ts` calls the parsers when it reads the event queue.
 
-import type { JsonObject } from "../http";
-import type { IntegrationAccountId, OrganisationId, RequestId } from "../ids";
+import type { JsonObject } from "../../http";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+  RequestId,
+} from "../../ids";
 import {
   isJsonArrayString,
   isJsonObjectString,
@@ -13,8 +17,8 @@ import {
   readRequiredNumber,
   readRequiredString,
   type IngressQueueMessageError,
-} from "../queue-fields";
-import type { Result } from "../result";
+} from "../../queue-fields";
+import type { Result } from "../../result";
 
 export type CommerceDeliveryQueueMessage = {
   type: "commerce.delivery.v1";

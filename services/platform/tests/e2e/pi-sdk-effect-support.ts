@@ -16,7 +16,7 @@ import {
 } from "../../src/data/control-plane";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
-import { commerceCanonicalResourceId } from "../../src/commerce/provider";
+import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import { requireUserId } from "../test-ids";
 import {
   ORGANISATION_ID,

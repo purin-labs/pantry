@@ -3,7 +3,7 @@ import { parseMenuHours } from "@purin-labs/control-api";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { Env } from "../../env";
 import { sha256Hex } from "@purin-labs/std";
-import { resolveMerchantControlContext } from "../commerce-merchant";
+import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {

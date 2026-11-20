@@ -7,7 +7,7 @@ import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { commerceCanonicalResourceId } from "../../src/commerce/provider";
+import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import { mutationHeaders } from "./access-route-support";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";

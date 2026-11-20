@@ -11,7 +11,7 @@ import type { Env } from "../../env";
 import { handlePantryOnboarding } from "../../account-platform/onboarding";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import { commerceSystemReadiness } from "../../commerce/system-readiness";
+import { commerceSystemReadiness } from "../../commerce/contract/system-readiness";
 import {
   ensureCurrentReadiness,
   ensureCurrentReadinessFromSignals,

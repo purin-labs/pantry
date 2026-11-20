@@ -18,10 +18,12 @@ import { isRecord } from "@purin-labs/std";
 import {
   COMMERCE_API_SCOPES,
   COMMERCE_APP_TOKEN_PREFIX,
+  CommerceAdminClient,
+  CommerceEntityPlaneClient,
   commerceAppInstallationToken,
-  type CommerceAdminClient,
   type CommerceCredential,
 } from "@purin-labs/commerce-client";
+import type { Env } from "../../env";
 
 const SATYR_UNDERCLERK_APP_ID = "satyr";
 
@@ -146,6 +148,35 @@ export function pantryCommerceAccess(
       return installed.ok ? commerceFetch(retry, init) : response;
     },
   };
+}
+
+/** A client of Commerce for `caller`, or null when Commerce is not configured. */
+export function createCommerceClient(
+  env: Parameters<typeof commerceClientConfig>[0],
+  fetcher: typeof fetch | undefined,
+  caller: CommerceCaller,
+): CommerceAdminClient | null {
+  const config = commerceClientConfig(env, fetcher, caller);
+  if (config === null) return null;
+  try {
+    return new CommerceAdminClient(config);
+  } catch {
+    return null;
+  }
+}
+
+export function createCommerceEntityPlaneClient(
+  env: Env,
+  fetcher: typeof fetch | undefined,
+  caller: CommerceCaller,
+): CommerceEntityPlaneClient | null {
+  const config = commerceClientConfig(env, fetcher, caller);
+  if (config === null) return null;
+  try {
+    return new CommerceEntityPlaneClient(config);
+  } catch {
+    return null;
+  }
 }
 
 /**

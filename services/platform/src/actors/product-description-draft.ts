@@ -29,8 +29,8 @@ import {
   readExactCommerceProjectionReference,
   COMMERCE_PROJECTION_STALE_AFTER_MS,
 } from "./commerce-projection";
-import { createCommerceClient } from "../commerce/outbox-worker";
-import { commerceCanonicalResourceId } from "../commerce/provider";
+import { createCommerceClient } from "../commerce/contract/client";
+import { commerceCanonicalResourceId } from "../commerce/contract/resource-ids";
 import {
   parseCaseId,
   parseUserId,

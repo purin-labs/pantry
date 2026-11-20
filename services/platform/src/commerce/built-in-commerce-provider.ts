@@ -1,7 +1,7 @@
 // The `CommerceProvider` of the built-in commerce engine (Seams Checkout and
 // the commerce engine Worker). Its records have the source `underclerk`.
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import type { CommerceProvider } from "./commerce-provider";
+import type { CommerceProvider } from "./contract/commerce-provider";
 import {
   executeBuiltInCommerceAction,
   reconcileBuiltInCommerceAction,

@@ -1,17 +1,17 @@
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
-import { createCommerceClient } from "../commerce/outbox-worker";
+import { createCommerceClient } from "./client";
 import {
   resolveOrganisationCommerceMerchantBinding,
   type CommerceMerchantBinding,
-} from "../data/commerce-merchant-binding";
-import type { Env } from "../env";
-import type { IntegrationAccountId } from "../ids";
+} from "../../data/commerce-merchant-binding";
+import type { Env } from "../../env";
+import type { IntegrationAccountId } from "../../ids";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "./authorization";
-import { controlError } from "./http";
-import { readOrganisationEnvironment } from "./organisation-runtime";
+} from "../../control/authorization";
+import { controlError } from "../../control/http";
+import { readOrganisationEnvironment } from "../../control/organisation-runtime";
 
 export type MerchantControlContext = Readonly<{
   merchantId: string;

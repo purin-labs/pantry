@@ -42,7 +42,7 @@ import {
 import type { Env } from "../../env";
 import { newRequestId } from "../../ids";
 import { traceWarn } from "../../observability";
-import { createCommerceEntityPlaneClient } from "../../commerce/outbox-worker";
+import { createCommerceEntityPlaneClient } from "../../commerce/contract/client";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {
   finishInventoryOperation,

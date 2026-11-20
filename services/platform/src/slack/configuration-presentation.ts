@@ -8,7 +8,7 @@ import type {
   DeviceDraftCommand,
   OperatorDraftCommand,
 } from "../data/operator-configuration-draft";
-import type { OfferPriceAllowanceCommand } from "../data/offer-price-allowance";
+import type { OfferPriceAllowanceCommand } from "../commerce/contract/offer-price-allowance";
 import { presentJevDraftCommand } from "../jev-features/agent-draft";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

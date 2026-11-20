@@ -1,5 +1,5 @@
 {
-  "about": "Refactor 17, step A0.2: the layer and the module of each source file. scripts/check-layers.mjs reads this file. The longest rule that starts a path gives its module, and a line in files wins over a rule. covers: the folders whose imports the check reads. packages: the module of each workspace package. contracts: the packages that are the contract of their area; a package of another area may depend on them. placement: the place in the target layout of each tracked folder that is outside covers and packages; the check does not read its imports. The key `*` is each file of the root, and `scripts/*` is each file directly in scripts/. tables: the owner module of each D1 table.",
+  "about": "Refactor 17, step A0.2: the layer and the module of each source file. scripts/check-layers.mjs reads this file. The longest rule that starts a path gives its module, and a line in files wins over a rule. covers: the folders whose imports the check reads. packages: the module of each workspace package. contracts: the public parts of the areas (step A1.10). A workspace package in the list is the contract of its area, and a package of another area may depend on it. A source file, or a folder with a final /, is a public file: another area may import it, and it imports no file of its own area that is not public, except with import type. placement: the place in the target layout of each tracked folder that is outside covers and packages; the check does not read its imports. The key `*` is each file of the root, and `scripts/*` is each file directly in scripts/. tables: the owner module of each D1 table.",
   "review": "Second version, 2026-11-20. The Platform list started from name rules. Reviewed after that: each explicit line was read by name, each file that `node scripts/check-layers.mjs --misfits` flags was read, and the writers of each D1 table were compared with the module of the table (`--tables`). The Portal list was placed by hand. A file is not proven right by this review: a wrong line shows as a crossing with no reason. The module foundation/connections holds the account, attempt and resource records of a connection (step A1.8); it sits below authority in the order, because the access model and the Vault read those records. A client of an outside provider that imports no module above the kernel belongs to foundation/connections, or to the one module that uses it.",
   "covers": ["services/platform/src/", "apps/portal/src/"],
   "layers": ["foundation", "areas", "surfaces", "workers"],
@@ -53,7 +53,14 @@
     "services/platform": "workers/platform",
     "scripts/punter": "workers/punter"
   },
-  "contracts": ["packages/commerce-contracts"],
+  "contracts": [
+    "packages/commerce-contracts",
+    "services/platform/src/commerce/contract/",
+    "apps/portal/src/features/commerce/entity-plane/api.ts",
+    "apps/portal/src/features/commerce/stock-status.ts",
+    "apps/portal/src/features/commerce/operations.ts",
+    "apps/portal/src/features/governed-actions/commerce.ts"
+  ],
   "mixed": {
     "services/platform/src/agent-tools/registry.ts": "The one list of the agent tools. It imports each family, so it is a part of the Worker. The class SessionDO gives it to the Session (step A1.7).",
     "services/platform/src/agent-tools/session-support.ts": "Holds the exit check of the foundation and helpers of four areas. Split in step A1.4.",
@@ -353,7 +360,7 @@
     "apps/portal/src/features/checkout-profiles/": "areas/commerce",
     "apps/portal/src/features/collaboration/": "foundation/collaboration",
     "apps/portal/src/features/commerce/": "areas/commerce",
-    "apps/portal/src/features/content-studio/": "areas/commerce",
+    "apps/portal/src/features/content-studio/": "areas/cafe",
     "apps/portal/src/features/costs/": "areas/kitchen",
     "apps/portal/src/features/devices/": "areas/devices",
     "apps/portal/src/features/ecommerce/": "areas/commerce",
@@ -833,7 +840,6 @@
     "services/platform/src/control/agent-operation-activity.ts": "foundation/control",
     "services/platform/src/control/authorization.ts": "foundation/control",
     "services/platform/src/control/commerce-graph.ts": "areas/commerce",
-    "services/platform/src/control/commerce-merchant.ts": "areas/commerce",
     "services/platform/src/control/credential-revocation-policy.ts": "foundation/control",
     "services/platform/src/control/email-review-headlines.ts": "areas/inbox",
     "services/platform/src/control/email-review.ts": "areas/inbox",
@@ -979,7 +985,6 @@
     "services/platform/src/data/integration-provider-directory.ts": "foundation/connections",
     "services/platform/src/data/merchant-agent-preset.ts": "areas/commerce",
     "services/platform/src/data/merchant-agent-skills.ts": "areas/commerce",
-    "services/platform/src/data/offer-price-allowance.ts": "areas/commerce",
     "services/platform/src/data/onboarding-projection.ts": "areas/organisation",
     "services/platform/src/data/onboarding-reconciliation.ts": "areas/organisation",
     "services/platform/src/data/onboarding-support-audit.ts": "areas/organisation",

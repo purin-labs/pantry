@@ -49,7 +49,7 @@ import {
   type JsonObject,
 } from "../http";
 import { cueSnapshotKey, parseCueSnapshot } from "../cues/engine";
-import { createCommerceDeliveryQueueMessage } from "../commerce/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
 import {
   newRequestId,
   parseIntegrationAccountId,

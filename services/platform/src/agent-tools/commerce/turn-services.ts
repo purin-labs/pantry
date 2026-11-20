@@ -21,9 +21,9 @@ import {
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../../commerce/outbox-worker";
+} from "../../commerce/contract/client";
 import { proposeCampaignBrief } from "../../data/campaign-brief";
-import { readOfferPriceAllowanceView } from "../../data/offer-price-allowance";
+import { readOfferPriceAllowanceView } from "../../commerce/contract/offer-price-allowance";
 import { withToolContext, type SessionToolContext } from "../context";
 import {
   editProductDescriptionDraftForEmbeddedHarness,

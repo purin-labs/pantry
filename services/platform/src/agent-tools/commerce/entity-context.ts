@@ -9,7 +9,7 @@ import {
 } from "../../actors/commerce-context-tool-result";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
-import { COMMERCE_SENSITIVITIES } from "../../commerce/sensitivity";
+import { COMMERCE_SENSITIVITIES } from "../../commerce/contract/sensitivity";
 import { jsonSchema } from "../define-tool";
 import { ToolRequestError } from "../errors";
 import { defineCommerceTool } from "./services";

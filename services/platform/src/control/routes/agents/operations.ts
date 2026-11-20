@@ -12,7 +12,7 @@ import {
   isPublishedResourceBoundaryError,
   runAgentOperation,
 } from "../../../data/agent-operation-runner";
-import type { PublishedResourceBoundaryError } from "../../../commerce/entity-plane/published-resources";
+import type { PublishedResourceBoundaryError } from "../../../commerce/contract/types";
 import { readAgentOperationsWithActivity } from "../../agent-operation-activity";
 import { admitUserMutation } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";

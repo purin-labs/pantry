@@ -52,12 +52,12 @@ import {
   buildMerchantPluginActionDraft,
   buildCommerceCancellationActionDraft,
   commerceActionExpectedRevision,
-  commerceProjectionRevision,
   commerceTrackingAttachmentTargetMatches,
   type CommerceActionError,
   type CommerceActionRequest,
   slackMayApproveAction,
 } from "../commerce/action-model";
+import { commerceProjectionRevision } from "../commerce/contract/commerce-provider";
 import {
   resolveOrganisationCommerceSystemAuthority,
   type CommerceSystemProviderAuthority,
@@ -66,7 +66,7 @@ import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-bindin
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../commerce/outbox-worker";
+} from "../commerce/contract/client";
 import { deliverCommerceCaseOutput } from "../commerce/case-commerce-delivery";
 import {
   CAFE_MENU_ID,
@@ -89,14 +89,12 @@ import {
 } from "../commerce/stock-action-plan";
 import { stockOperationResourceId } from "../commerce/stock-action";
 import { traceWarn } from "../observability";
-import {
-  resolveCommerceCancellationAuthority,
-  commerceProviderResourceId,
-} from "../commerce/provider";
+import { resolveCommerceCancellationAuthority } from "../commerce/provider";
+import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
 import { authorizeCapabilityUse } from "../authorization/access-grants/turn-authority";
 import type { ProviderCapabilityDefinition } from "../authorization/access-grants/capability-key";
 import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
-import { readOfferPriceAllowanceView } from "../data/offer-price-allowance";
+import { readOfferPriceAllowanceView } from "../commerce/contract/offer-price-allowance";
 import {
   commerceActionPortalUrl,
   commerceChangeSummary,
@@ -105,6 +103,7 @@ import {
 } from "../slack/commerce-approval-card";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "../slack/card-only-reply";
 import type { SessionToolContext } from "../agent-tools/context";
+import type { MenuPriceProposalRequest } from "../commerce/contract/types";
 
 function commerceActionProjectionTarget(action: CommerceActionRequest): {
   readonly kind: "product" | "offer" | "commerce_order" | "fulfillment";
@@ -891,13 +890,6 @@ export async function proposeMenuPriceForHarness(
   });
   return { ...recorded, itemName: action.itemName, before, after };
 }
-
-export type MenuPriceProposalRequest = Readonly<{
-  itemId: string;
-  priceMinor: number;
-  /** True keeps the current price on the boards as the earlier price. */
-  deal: boolean;
-}>;
 
 /**
  * Proposes a refund of an order that the session read. It reads the order and

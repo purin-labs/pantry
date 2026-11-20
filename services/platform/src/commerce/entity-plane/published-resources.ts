@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../app-access";
+import { pantryCommerceAccess } from "../contract/client";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   parseEntityPlanePublishedResourceMetadataRequest,
@@ -30,9 +30,12 @@ import type { Env } from "../../env";
 import type { IntegrationAccountId, OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { opaqueAccessTargetReference } from "../../access-control/references";
-import { commerceCanonicalResourceId } from "../provider";
+import { commerceCanonicalResourceId } from "../contract/resource-ids";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
+import type { PublishedResourceBoundaryError } from "../contract/types";
+
+export type { PublishedResourceBoundaryError };
 
 type PublishedResourceEnumeration = Variant<
   CommerceEntityPlanePublishedResourceMetadataResponse,
@@ -43,21 +46,6 @@ type PublishedResourceResolution = Variant<
   CommerceEntityPlanePublishedResourceMetadataResponse,
   "resolved"
 >;
-
-export type PublishedResourceBoundaryError =
-  | Readonly<{
-      readonly code:
-        | "invalid_reference"
-        | "not_published"
-        | "organisation_mismatch"
-        | "merchant_mismatch"
-        | "unavailable";
-    }>
-  | Readonly<{
-      readonly code: "revision_conflict";
-      readonly expected: number;
-      readonly actual: number;
-    }>;
 
 type PublishedResourceClientConfig = Readonly<{
   readonly baseUrl: string;
