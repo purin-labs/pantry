@@ -51,24 +51,10 @@ import {
   requireSessionExecution,
   type SessionExecutionAdmission,
 } from "./session-execution-admission";
-
-/** The turn of a Slack message is `turn_` and its Case ingress id. */
-export const SLACK_TURN_PREFIX = "turn_ingress_slack_";
-
-/**
- * Whether a turn is offered the follow-up tool: a turn of a message in a
- * Slack thread. The follow-up is Case work of that thread's Connector.
- */
-export function turnMayScheduleFollowUp(
-  authority: HarnessTurnLease["requestAuthority"],
-  turnId: string,
-): boolean {
-  return (
-    (authority.kind === "direct_conversation" ||
-      authority.kind === "shared_conversation") &&
-    turnId.startsWith(SLACK_TURN_PREFIX)
-  );
-}
+import {
+  SLACK_TURN_PREFIX,
+  turnMayScheduleFollowUp,
+} from "./session/turn-tool-offers";
 
 /**
  * Schedule a new turn in this turn's Slack thread. The thread's Connector

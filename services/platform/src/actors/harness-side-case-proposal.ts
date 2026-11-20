@@ -1,4 +1,3 @@
-import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 
 
@@ -10,9 +9,6 @@ import { readAdmittedChatInput } from "../chat/turn-access";
 import { parseUserId } from "../ids";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
-import {
-  turnMayScheduleFollowUp,
-} from "./harness-follow-up";
 import type {
   HarnessSideCaseProposalRequest,
   HarnessSideCaseProposalResult,
@@ -22,25 +18,6 @@ import {
 } from "./session-execution-admission";
 import type { SessionToolContext } from "../agent-tools/context";
 import type { SlackThreadSideCase } from "./session/harness-source";
-
-/**
- * Whether a turn is offered the side Case tool (Plan 74): a step of a Portal
- * chat that a person's message started, or a turn of a Slack thread.
- * `conversationSession` is true when the Session runs the steps of a Portal
- * chat. The call checks the chat or the thread again.
- */
-export function turnMayProposeSideCase(
-  authority: HarnessTurnLease["requestAuthority"],
-  turnId: string,
-  conversationSession: boolean,
-): boolean {
-  return (
-    turnMayScheduleFollowUp(authority, turnId) ||
-    (authority.kind === "control" &&
-      conversationSession &&
-      turnId.startsWith("turn_trigger_"))
-  );
-}
 
 /**
  * The agent's proposal of separate work as a side Case of this chat.

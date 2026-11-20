@@ -2,7 +2,7 @@
   "totals": {
     "upward": 147,
     "areas": 153,
-    "order": 87,
+    "order": 79,
     "table": 117
   },
   "crossings": {
@@ -76,7 +76,6 @@
     "foundation/agent -> areas/integrations": 1,
     "foundation/agent -> areas/organisation": 4,
     "foundation/agent -> foundation/conversation": 22,
-    "foundation/agent -> foundation/tool-handlers": 8,
     "foundation/agent -> surfaces/portal": 1,
     "foundation/agent-tools -> foundation/agent": 3,
     "foundation/authority -> areas/commerce": 7,

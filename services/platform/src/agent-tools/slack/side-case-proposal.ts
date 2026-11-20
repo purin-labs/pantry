@@ -7,7 +7,7 @@ import { decideCaseConversationSink } from "../../actors/case-conversation-sink"
 import {
   SLACK_TURN_PREFIX,
   turnMayScheduleFollowUp,
-} from "../../actors/harness-follow-up";
+} from "../../actors/session/turn-tool-offers";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,

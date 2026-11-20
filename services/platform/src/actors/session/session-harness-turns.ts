@@ -33,13 +33,11 @@ import {
   writeHarnessTurnContinuation,
   finishHarnessTurnContinuation,
 } from "../agent-session-continuation";
-import { turnMayProposeMemory } from "../harness-memory-proposal";
-import { turnMayProposeSideCase } from "../harness-side-case-proposal";
 import {
-  requestPermissionForHarness,
-  turnMayRequestPermission,
+  turnMayProposeMemory,
+  turnMayProposeSideCase,
   turnMayScheduleFollowUp,
-} from "../harness-follow-up";
+} from "./turn-tool-offers";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { parseSessionId, type RequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
@@ -131,10 +129,6 @@ import {
 } from "../agent-session-information-flow";
 import { sha256Hex } from "@purin-labs/std";
 import {
-  settleToolEffect,
-  type ToolEffect,
-} from "../../agent-tools/session-support";
-import {
   materializeAcceptedAttachment,
   materializeEmbeddedHarnessUserInput,
   readSessionTurnAttachments,
@@ -198,7 +192,6 @@ import type {
   CanonicalHarnessCheckpointCommitError,
 } from "./types";
 import { SessionCheckpoints } from "./session-checkpoints";
-import { sessionOwnToolServices } from "./own-tool-services";
 import type {
   ToolTurnContext,
   TurnPageContext,
@@ -789,7 +782,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
     );
     if (!harnessInput.ok) return harnessInput;
     phaseStartedAt = Date.now();
-    const permissionRequest = await turnMayRequestPermission({
+    const permissionRequest = await this.sessionTools().mayRequestPermission({
       db: input.execution.scope.database,
       organisationId: String(input.execution.scope.organisationId),
       authority: input.lease.requestAuthority,
@@ -888,7 +881,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       // the services of the families that the foundation owns.
       services: {
         ...tools.areaServices(toolTurn),
-        ...sessionOwnToolServices(toolTurn, {
+        ...tools.ownServices(toolTurn, {
           persistence: this.persistence,
           wiring: tools,
           attachments: canonicalInput.value.attachments,
@@ -897,17 +890,13 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       },
       // The one place of the exit check: `prepare` of an effect tool returns
       // the effect, and this turn's authority settles it.
-      settleEffect: (effect) =>
-        settleToolEffect(
-          {
-            env: this.env,
-            storage: this.ctx.storage,
-            execution: input.execution,
-            lease: input.lease,
-          },
-          effect as ToolEffect,
-        ),
-      requestPermission: requestPermissionForHarness.bind(null, {
+      settleEffect: tools.settleEffect.bind(null, {
+        env: this.env,
+        storage: this.ctx.storage,
+        execution: input.execution,
+        lease: input.lease,
+      }),
+      requestPermission: tools.requestPermission.bind(null, {
         env: this.env,
         execution: input.execution,
         lease: input.lease,
@@ -1836,7 +1825,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
           input.start.requestAuthority,
           String(input.start.turnId),
         ),
-        ...(await turnToolSelection({
+        ...(await turnToolSelection(this.sessionTools().mayRequestPermission, {
           db: execution.scope.database,
           organisationId: String(execution.scope.organisationId),
           authority: input.start.requestAuthority,

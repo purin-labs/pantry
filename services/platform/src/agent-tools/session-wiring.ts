@@ -31,6 +31,12 @@ import {
 import { proposeSlackSideCaseForHarness } from "./slack/side-case-proposal";
 import { proposeMemoryFromInstruction } from "../memory/access";
 import { slackToolServices } from "./slack/turn-services";
+import { sessionOwnToolServices } from "../actors/session/own-tool-services";
+import {
+  requestPermissionForHarness,
+  turnMayRequestPermission,
+} from "../actors/harness-follow-up";
+import { settleToolEffect, type ToolEffect } from "./session-support";
 
 /**
  * The services of the families that an area owns. With the families of the
@@ -83,6 +89,12 @@ export const SESSION_TOOL_WIRING: SessionToolWiring = {
     };
   },
   proposeMemory: proposeMemoryFromInstruction,
+  ownServices: sessionOwnToolServices,
+  // An effect of a registered tool is a `ToolEffect`: its family defined it.
+  settleEffect: (context, effect) =>
+    settleToolEffect(context, effect as ToolEffect),
+  mayRequestPermission: turnMayRequestPermission,
+  requestPermission: requestPermissionForHarness,
   pageEffects: KITCHEN_PAGE_EFFECTS,
   slackThreadSideCase: {
     harnessInstruction: SLACK_SIDE_CASE_HARNESS_INSTRUCTION,

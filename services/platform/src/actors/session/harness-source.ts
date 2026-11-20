@@ -1,8 +1,7 @@
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { SIDE_CASE_HARNESS_INSTRUCTION } from "../../chat/side-cases";
 import type { SideCaseOrigin } from "../../chat/side-case-origin";
-import { turnMayProposeSideCase } from "../harness-side-case-proposal";
-import { turnMayRequestPermission } from "../harness-follow-up";
+import { turnMayProposeSideCase } from "./turn-tool-offers";
 import type {
   AcceptedHarnessEventCursor,
   AcceptedInputRef,
@@ -500,9 +499,10 @@ export function sideCaseHarnessInstructions(
  * binding once.
  */
 export async function turnToolSelection(
-  input: Parameters<typeof turnMayRequestPermission>[0],
+  mayRequestPermission: SessionToolWiring["mayRequestPermission"],
+  input: Parameters<SessionToolWiring["mayRequestPermission"]>[0],
 ): Promise<{ permissionRequest: boolean; sideCaseProposal: boolean }> {
-  const permissionRequest = await turnMayRequestPermission(input);
+  const permissionRequest = await mayRequestPermission(input);
   return {
     permissionRequest,
     sideCaseProposal: turnMayProposeSideCase(

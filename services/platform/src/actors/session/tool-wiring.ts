@@ -13,8 +13,16 @@ import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId, RequestId } from "../../ids";
 import type { Result } from "../../result";
 import type { HarnessToolArgumentObserver } from "../embedded-harness";
-import type { MemoryProposalPort } from "../harness-memory-proposal";
 import type { SlackThreadSideCase } from "./harness-source";
+import type { StoredMessageAttachment } from "@purin-labs/contracts";
+import type { AgentSessionPersistence } from "../agent-session-schema";
+import type { PreparedEffect } from "../../agent-tools/tool-effect";
+import type {
+  HarnessPermissionRequest,
+  HarnessPermissionRequestResult,
+} from "../../agent-tools/catalog/permission";
+import type { FlowLabel } from "../../policy/information-flow";
+import type { Env } from "../../env";
 
 /** What a person's browser gave with a message. The contracts own the form. */
 export type TurnPageContext = PageBrowserContext;
@@ -102,6 +110,59 @@ export interface ToolTurnContext extends SessionToolContext {
 }
 
 /**
+ * Stores a Memory candidate that cites one instruction of a person. Brain
+ * owns the Memory records and gives this function through the Worker.
+ */
+export type MemoryProposalPort = (
+  input: Readonly<{
+    env: SessionToolContext["env"];
+    execution: SessionToolContext["execution"]["scope"];
+    organisationId: SessionToolContext["execution"]["scope"]["organisationId"];
+    agent: Readonly<{
+      caseId: string;
+      assignmentId: string;
+      sessionId: string;
+    }>;
+    instruction: Readonly<{
+      kind: "operator_instruction";
+      caseId: string;
+      entryId: string;
+      digest: string;
+    }>;
+    turnLabel: FlowLabel;
+    memoryKind: "fact" | "preference";
+    statement: string;
+    now: number;
+  }>,
+) => Promise<
+  Result<
+    Readonly<{
+      kind: "proposed" | "already_proposed";
+      memoryId: string;
+      revision: number;
+    }>,
+    Readonly<{
+      code:
+        | "memory_evidence_unavailable"
+        | "memory_evidence_invalid"
+        | "memory_invalid"
+        | "memory_capacity_exceeded"
+        | "memory_unavailable";
+    }>
+  >
+>;
+
+/** What the Session gives for the tool families that the foundation owns. */
+export type OwnToolServicesSession = Readonly<{
+  persistence: AgentSessionPersistence;
+  /** The parts of the areas, for the tools of a turn that need one. */
+  wiring: Pick<SessionToolWiring, "proposeMemory" | "slackThreadSideCase">;
+  /** The files and the links of the turn's own message. */
+  attachments: readonly StoredMessageAttachment[];
+  links: readonly string[];
+}>;
+
+/**
  * What the Worker gives to the Session: the one list of the agent tools and
  * the parts that the product areas give for a turn. The Session names no
  * tool family of an area. It asks this value.
@@ -127,6 +188,45 @@ export interface SessionToolWiring {
   readonly proposeMemory: MemoryProposalPort;
   /** The effects on a person's page. Kitchen gives them. */
   readonly pageEffects: SessionPageEffects;
+  /**
+   * The services of the tool families that the foundation owns: files, the
+   * turn's own message and the tools that a turn offers by its origin.
+   */
+  ownServices(
+    turn: ToolTurnContext,
+    session: OwnToolServicesSession,
+  ): ToolServiceSet;
+  /**
+   * Runs the exit check of an effect tool, with the authority of the turn,
+   * and then the effect.
+   */
+  settleEffect(
+    context: Pick<
+      SessionToolContext,
+      "env" | "storage" | "execution" | "lease"
+    >,
+    effect: PreparedEffect,
+  ): Promise<unknown>;
+  /** Whether a turn may ask a person for a permission. */
+  mayRequestPermission(
+    input: Readonly<{
+      db: OrganisationDatabase;
+      organisationId: string;
+      authority: HarnessTurnLease["requestAuthority"];
+      sessionId: string;
+      turnId: string;
+    }>,
+  ): Promise<boolean>;
+  /** Stores the permission request of a turn and tells the person. */
+  requestPermission(
+    input: Readonly<{
+      env: Env;
+      execution: SessionToolContext["execution"];
+      lease: HarnessTurnLease;
+      caseId: string;
+    }>,
+    request: HarnessPermissionRequest,
+  ): Promise<HarnessPermissionRequestResult>;
   /** Sees the arguments of a tool call while the model writes them. */
   argumentObserver(turn: SessionToolContext): HarnessToolArgumentObserver;
 }

@@ -1,4 +1,3 @@
-import type { AgentSessionPersistence } from "../agent-session-schema";
 import {
   queryWorkspaceForEmbeddedHarness,
   readFileForEmbeddedHarness,
@@ -21,7 +20,7 @@ import {
   admittedMessageLinkEgress,
   recordMessageAttachmentObservation,
 } from "./model-route";
-import type { SessionToolWiring, ToolTurnContext } from "./tool-wiring";
+import type { OwnToolServicesSession, ToolTurnContext } from "./tool-wiring";
 
 /**
  * The services of the tool families that the foundation owns: files, the
@@ -35,16 +34,7 @@ export type SessionOwnToolServices = Readonly<{
 
 export function sessionOwnToolServices(
   turn: ToolTurnContext,
-  session: Readonly<{
-    persistence: AgentSessionPersistence;
-    /** The parts of the areas, for the tools of a turn that need one. */
-    wiring: Pick<SessionToolWiring, "proposeMemory" | "slackThreadSideCase">;
-    /** The files and the links of the turn's own message. */
-    attachments: Parameters<
-      typeof createAttachmentInspectionTool
-    >[0]["attachments"];
-    links: Parameters<typeof createMessageLinkTool>[0]["links"];
-  }>,
+  session: OwnToolServicesSession,
 ): SessionOwnToolServices {
   const tool = withToolContext(turn);
   return {

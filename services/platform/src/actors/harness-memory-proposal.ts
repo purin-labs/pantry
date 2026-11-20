@@ -1,4 +1,3 @@
-import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 
 import { acceptedExecutionAuthority } from "../organisation-access/access";
@@ -13,66 +12,9 @@ import {
   requireSessionExecution,
 } from "./session-execution-admission";
 import type { SessionToolContext } from "../agent-tools/context";
-import type { FlowLabel } from "../policy/information-flow";
-import type { Result } from "../result";
+import { turnMayProposeMemory } from "./session/turn-tool-offers";
+import type { MemoryProposalPort } from "./session/tool-wiring";
 
-/**
- * Stores a Memory candidate that cites one instruction of a person. Brain
- * owns the Memory records and gives this function through the Worker.
- */
-export type MemoryProposalPort = (
-  input: Readonly<{
-    env: SessionToolContext["env"];
-    execution: SessionToolContext["execution"]["scope"];
-    organisationId: SessionToolContext["execution"]["scope"]["organisationId"];
-    agent: Readonly<{
-      caseId: string;
-      assignmentId: string;
-      sessionId: string;
-    }>;
-    instruction: Readonly<{
-      kind: "operator_instruction";
-      caseId: string;
-      entryId: string;
-      digest: string;
-    }>;
-    turnLabel: FlowLabel;
-    memoryKind: "fact" | "preference";
-    statement: string;
-    now: number;
-  }>,
-) => Promise<
-  Result<
-    Readonly<{
-      kind: "proposed" | "already_proposed";
-      memoryId: string;
-      revision: number;
-    }>,
-    Readonly<{
-      code:
-        | "memory_evidence_unavailable"
-        | "memory_evidence_invalid"
-        | "memory_invalid"
-        | "memory_capacity_exceeded"
-        | "memory_unavailable";
-    }>
-  >
->;
-
-/**
- * Whether a turn is offered the Memory proposal tool. It is the rule of the
- * Memory commands of the Portal: a signed-in owner or admin. The call itself
- * checks that the authority is still live and that the turn started from a
- * message in a Portal conversation.
- */
-export function turnMayProposeMemory(
-  authority: HarnessTurnLease["requestAuthority"],
-): boolean {
-  return (
-    authority.kind === "control" &&
-    (authority.role === "admin" || authority.role === "owner")
-  );
-}
 
 /**
  * The agent's proposal of one Memory from what a person told it in a Portal
