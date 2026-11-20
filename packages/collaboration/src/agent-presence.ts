@@ -27,7 +27,7 @@ export type CollaborationAgent = Readonly<{
  * hold after an accepted edit (`applied`). It names no pointer travel: a
  * cursor shows only at the rect or the elements of a real edit.
  */
-export type CollaborationAgentActionKind =
+type CollaborationAgentActionKind =
   | "create"
   | "move"
   | "resize"
@@ -37,7 +37,7 @@ export type CollaborationAgentActionKind =
   | "comment"
   | "history";
 
-export type CollaborationAgentRect = Readonly<{
+type CollaborationAgentRect = Readonly<{
   x: number;
   y: number;
   width: number;
@@ -71,7 +71,7 @@ export type CollaborationAgentActivity = Readonly<{
 /** At most this many elements, as a person's drag presence. */
 export const COLLABORATION_AGENT_ACTION_ELEMENTS = 12;
 /** An action fits in the same space as a person's drag presence. */
-export const COLLABORATION_AGENT_ACTION_BYTES = 900;
+const COLLABORATION_AGENT_ACTION_BYTES = 900;
 /** A draft text is at most as long as a board text prop. */
 export const COLLABORATION_AGENT_DRAFT_TEXT_LIMIT = 280;
 const ACTION_KINDS: ReadonlySet<string> = new Set<CollaborationAgentActionKind>(

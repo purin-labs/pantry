@@ -12,7 +12,6 @@ import type {
   CommerceSnapshotRevision,
   CommerceTimestamp,
   CustomCommerceEntityId,
-  CustomCommerceEntityRef,
   CustomCommerceEntityTypeId,
   CustomCommerceRelationshipRef,
   ListEntryAttributeValue,
@@ -208,13 +207,6 @@ export function parseEntityRef(value: unknown): CommerceEntityRef {
         enumValue(object.typeId, "entityRef.typeId", SYSTEM_KINDS),
         object.entityId,
       );
-}
-
-export function parseCustomEntityRef(value: unknown): CustomCommerceEntityRef {
-  const reference = parseEntityRef(value);
-  if (reference.origin !== "custom")
-    throw new Error("custom entity reference is required");
-  return reference;
 }
 
 export function parseSystemEntityRef(
@@ -721,7 +713,7 @@ function isRevisionBrand<T extends number>(value: number): value is T {
   return Number.isSafeInteger(value) && value > 0;
 }
 
-export function brandNonNegativeRevision<T extends number>(
+function brandNonNegativeRevision<T extends number>(
   value: unknown,
   field: string,
 ): T {

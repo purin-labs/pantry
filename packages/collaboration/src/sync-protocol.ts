@@ -47,7 +47,7 @@ export type SyncMessageFields = Readonly<{
  * The room fields of a sync response, between `missingUpdate` and `access`,
  * in this order on the wire.
  */
-export type SyncRoomMetadata = SyncMessageFields;
+type SyncRoomMetadata = SyncMessageFields;
 
 const DOCUMENT_REVISION: SyncRoomMetadata = {
   fields: ["documentRevision"],
@@ -92,7 +92,7 @@ type SyncSignal<Kind extends string> = Kind extends string
   : never;
 
 /** The failures that the room itself adds to a document's own failures. */
-export type SyncRoomFailureCode =
+type SyncRoomFailureCode =
   "invalid_message" | "access_revoked" | "storage_unavailable" | "room_full";
 
 export type SyncFailureCode<DocumentCode extends string> =

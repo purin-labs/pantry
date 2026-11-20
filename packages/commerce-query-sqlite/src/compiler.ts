@@ -23,13 +23,13 @@ import { assertNever } from "@purin-labs/std";
 
 export type CommerceSqliteBinding = string | number | bigint | null;
 
-export type CommerceSqliteStatement = Readonly<{
+type CommerceSqliteStatement = Readonly<{
   sql: string;
   bindings: readonly CommerceSqliteBinding[];
   execution: CommerceSqliteExecution;
 }>;
 
-export type CommerceSqliteExecution =
+type CommerceSqliteExecution =
   | Readonly<{
       kind: "exact";
       requestedLimit: 1;
@@ -84,14 +84,6 @@ export type CommerceSqliteRelationshipTraversalCompileInput = Readonly<{
   frontier: readonly CommerceEntityRef[];
   remaining: number;
 }>;
-
-export function canonicalCommerceRelationshipId(
-  definitionId: string,
-  sourceEntityId: string,
-  targetEntityId: string,
-): string {
-  return `system:${definitionId}:${sourceEntityId}:${targetEntityId}`;
-}
 
 /**
  * Compiles one bounded, undirected adjacency step. The caller owns BFS state;

@@ -5,14 +5,14 @@ import { fileResourceScopeSchema } from "./access-control.ts";
 // Rust only serializes these types, so they carry no parser of their own;
 // goal.ts keeps its own TypeScript checks.
 
-export const caseGoalStateSchema = Type.Union([
+const caseGoalStateSchema = Type.Union([
   Type.Object({ kind: Type.Literal("active") }),
   Type.Object({ kind: Type.Literal("paused") }),
   Type.Object({ kind: Type.Literal("budget_limited") }),
   Type.Object({ kind: Type.Literal("completed"), evidence: Type.String() }),
   Type.Object({ kind: Type.Literal("cleared") }),
 ]);
-export const caseGoalSchema = Type.Object({
+const caseGoalSchema = Type.Object({
   goalId: Type.String(),
   organisationId: Type.String(),
   caseId: Type.String(),
@@ -23,7 +23,7 @@ export const caseGoalSchema = Type.Object({
   unknownOperations: Type.Number(),
   state: caseGoalStateSchema,
 });
-export const caseGoalSnapshotSchema = Type.Union([
+const caseGoalSnapshotSchema = Type.Union([
   Type.Object({ kind: Type.Literal("none"), revision: Type.Number() }),
   Type.Object({
     kind: Type.Literal("present"),
@@ -31,7 +31,7 @@ export const caseGoalSnapshotSchema = Type.Union([
     goal: caseGoalSchema,
   }),
 ]);
-export const caseGoalCommandSchema = Type.Union([
+const caseGoalCommandSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("set"),
     objective: Type.String(),
@@ -46,7 +46,7 @@ export const caseGoalCommandSchema = Type.Union([
   Type.Object({ kind: Type.Literal("complete"), evidence: Type.String() }),
   Type.Object({ kind: Type.Literal("clear") }),
 ]);
-export const caseGoalOperationOutcomeSchema = Type.Union([
+const caseGoalOperationOutcomeSchema = Type.Union([
   Type.Object({ kind: Type.Literal("unknown") }),
   Type.Object({
     kind: Type.Literal("reported"),
@@ -68,7 +68,7 @@ const portalChatStreamFailureSchema = Type.Object({
   code: Type.String(),
   retryable: Type.Boolean(),
 });
-export const portalChatStreamRecordSchema = Type.Union([
+const portalChatStreamRecordSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("assistant_text_delta"),
     sequence: Type.Number(),
@@ -110,18 +110,18 @@ export const portalChatStreamRecordSchema = Type.Union([
   }),
 ]);
 
-export const fileContextProviderSchema = Type.Union([
+const fileContextProviderSchema = Type.Union([
   Type.Literal("dropbox"),
   Type.Literal("google_drive"),
 ]);
-export const fileResourceGrantTargetSchema = Type.Object({
+const fileResourceGrantTargetSchema = Type.Object({
   kind: Type.Literal("file_resource"),
   capabilityId: Type.String(),
   capabilityVersion: Type.Number(),
   integrationAccountId: Type.String(),
   scope: fileResourceScopeSchema,
 });
-export const providerFileRevisionSchema = Type.Union([
+const providerFileRevisionSchema = Type.Union([
   Type.Object({ kind: Type.Literal("dropbox"), rev: Type.String() }),
   Type.Object({
     kind: Type.Literal("gdrive"),
@@ -130,7 +130,7 @@ export const providerFileRevisionSchema = Type.Union([
     headRevisionId: Type.Union([Type.String(), Type.Null()]),
   }),
 ]);
-export const canonicalContextSourceRefSchema = Type.Union([
+const canonicalContextSourceRefSchema = Type.Union([
   Type.Object({
     kind: Type.Literal("case_entry"),
     caseId: Type.String(),
@@ -144,7 +144,7 @@ export const canonicalContextSourceRefSchema = Type.Union([
     segmentIndex: Type.Number(),
   }),
 ]);
-export const contextSourceRevisionSchema = Type.Union([
+const contextSourceRevisionSchema = Type.Union([
   Type.Object({ kind: Type.Literal("case_entry"), sequence: Type.Number() }),
   Type.Object({
     kind: Type.Literal("file"),
@@ -152,7 +152,7 @@ export const contextSourceRevisionSchema = Type.Union([
     providerRevision: providerFileRevisionSchema,
   }),
 ]);
-export const fileGrantSyncStateSchema = Type.Union([
+const fileGrantSyncStateSchema = Type.Union([
   Type.Object({ kind: Type.Literal("pending"), nextRunAt: Type.Number() }),
   Type.Object({
     kind: Type.Literal("reconciling"),
@@ -178,11 +178,11 @@ export const fileGrantSyncStateSchema = Type.Union([
     cappedAt: Type.Number(),
   }),
 ]);
-export const providerFileCursorSchema = Type.Union([
+const providerFileCursorSchema = Type.Union([
   Type.Object({ kind: Type.Literal("dropbox"), cursor: Type.String() }),
   Type.Object({ kind: Type.Literal("gdrive"), pageToken: Type.String() }),
 ]);
-export const fileGrantAdmissionSchema = Type.Object({
+const fileGrantAdmissionSchema = Type.Object({
   grantId: Type.String(),
   grantRevision: Type.Number(),
   integrationAccountId: Type.String(),
@@ -190,12 +190,6 @@ export const fileGrantAdmissionSchema = Type.Object({
   providerFileId: Type.String(),
   containingScopeKey: Type.String(),
   providerRevision: providerFileRevisionSchema,
-});
-const fileExtractionBudgetSchema = Type.Object({
-  integrationAccountId: Type.String(),
-  utcDay: Type.String(),
-  admittedSourceBytes: Type.Number(),
-  maximumSourceBytes: Type.Number(),
 });
 
 export type CaseGoalStateValue = Static<typeof caseGoalStateSchema>;
@@ -220,4 +214,3 @@ export type ContextSourceRevision = Static<typeof contextSourceRevisionSchema>;
 export type FileGrantSyncState = Static<typeof fileGrantSyncStateSchema>;
 export type ProviderFileCursor = Static<typeof providerFileCursorSchema>;
 export type FileGrantAdmission = Static<typeof fileGrantAdmissionSchema>;
-export type FileExtractionBudget = Static<typeof fileExtractionBudgetSchema>;

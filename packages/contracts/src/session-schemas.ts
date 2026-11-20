@@ -37,13 +37,13 @@ function variant<Kind extends string, Fields extends Record<string, TSchema>>(
 const actorId = () => text("actor_identity");
 const sha256 = () => text("sha256");
 
-export const sessionIdentitySchema = StrictObject({
+const sessionIdentitySchema = StrictObject({
   organisationId: text("organisation_id"),
   sessionId: actorId(),
   streamId: actorId(),
 });
 
-export const sessionContractSchema = StrictObject({
+const sessionContractSchema = StrictObject({
   policyVersion: text("bounded_identity"),
   budgetRevision: actorId(),
   runtimeRevision: actorId(),
@@ -51,7 +51,7 @@ export const sessionContractSchema = StrictObject({
   lastEventSequence: counter(),
 });
 
-export const runtimeLeaseSchema = StrictObject({
+const runtimeLeaseSchema = StrictObject({
   generation: positive(),
   leaseId: actorId(),
 });
@@ -65,7 +65,7 @@ const causationRefSchema = Type.Union([
   variant("migration", { migrationId: actorId() }),
 ]);
 
-export const workspaceRevisionReceiptSchema = StrictObject({
+const workspaceRevisionReceiptSchema = StrictObject({
   receiptId: actorId(),
   outcome: Type.Union([
     Type.Literal("accepted"),
@@ -84,7 +84,7 @@ const sessionBudgetUsageSchema = StrictObject({
   capabilityCalls: counter(),
 });
 
-export const verifiedSessionCheckpointSchema = StrictObject({
+const verifiedSessionCheckpointSchema = StrictObject({
   checkpointId: actorId(),
   stateDigest: sha256(),
   lastEventSequence: counter(),
@@ -98,19 +98,19 @@ export const verifiedSessionCheckpointSchema = StrictObject({
   workspaceRevisionReceipt: workspaceRevisionReceiptSchema,
 });
 
-export const sessionResumePointSchema = Type.Union([
+const sessionResumePointSchema = Type.Union([
   variant("new", { workspaceRevisionReceipt: workspaceRevisionReceiptSchema }),
   variant("checkpoint", { checkpoint: verifiedSessionCheckpointSchema }),
 ]);
 
-export const turnIdentitySchema = StrictObject({
+const turnIdentitySchema = StrictObject({
   turnId: actorId(),
   inputId: actorId(),
   turnLeaseGeneration: positive(),
   budgetRevision: actorId(),
 });
 
-export const turnLifecycleSchema = Type.Union([
+const turnLifecycleSchema = Type.Union([
   variant("admitted", {
     state: StrictObject({
       identity: turnIdentitySchema,
@@ -158,14 +158,14 @@ const harnessHistoryCursorSchema = StrictObject({
   lastEntryDigest: sha256(),
 });
 
-export const harnessTaskContinuationSchema = variant("pi", {
+const harnessTaskContinuationSchema = variant("pi", {
   harnessTaskId: actorId(),
   submissionId: actorId(),
   harnessBuild: actorId(),
   historyCursor: harnessHistoryCursorSchema,
 });
 
-export const sessionRecoveryActionSchema = Type.Union([
+const sessionRecoveryActionSchema = Type.Union([
   variant("resume_task", {}),
   variant("retry_at", { retryAt: counter() }),
   variant("await_evidence", {
@@ -219,13 +219,13 @@ const cancellationLeaseSchema = Type.Union([
   }),
 ]);
 
-export const sleepingSessionSchema = StrictObject({
+const sleepingSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   resumePoint: sessionResumePointSchema,
 });
 
-export const activatingSessionSchema = StrictObject({
+const activatingSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   turnId: actorId(),
@@ -234,7 +234,7 @@ export const activatingSessionSchema = StrictObject({
   runtimeGeneration: positive(),
 });
 
-export const processingSessionSchema = StrictObject({
+const processingSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   resumePoint: sessionResumePointSchema,
@@ -242,7 +242,7 @@ export const processingSessionSchema = StrictObject({
   activeTurn: turnLifecycleSchema,
 });
 
-export const recoveringSessionSchema = StrictObject({
+const recoveringSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   resumePoint: sessionResumePointSchema,
@@ -252,7 +252,7 @@ export const recoveringSessionSchema = StrictObject({
   action: sessionRecoveryActionSchema,
 });
 
-export const checkpointingSessionSchema = StrictObject({
+const checkpointingSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   runtimeLease: runtimeLeaseSchema,
@@ -264,7 +264,7 @@ export const checkpointingSessionSchema = StrictObject({
   workspaceRevisionReceipt: workspaceRevisionReceiptSchema,
 });
 
-export const cancellingSessionSchema = StrictObject({
+const cancellingSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   plan: Type.Union([
@@ -281,7 +281,7 @@ export const cancellingSessionSchema = StrictObject({
   ]),
 });
 
-export const quarantinedSessionSchema = StrictObject({
+const quarantinedSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   reason: quarantineReasonSchema,
@@ -296,7 +296,7 @@ export const quarantinedSessionSchema = StrictObject({
   ]),
 });
 
-export const terminalSessionSchema = StrictObject({
+const terminalSessionSchema = StrictObject({
   identity: sessionIdentitySchema,
   contract: sessionContractSchema,
   reason: terminalReasonSchema,
@@ -314,7 +314,7 @@ export const agentSessionLifecycleSchema = Type.Union([
   variant("terminal", { state: terminalSessionSchema }),
 ]);
 
-export const acceptedInputRefSchema = Type.Union([
+const acceptedInputRefSchema = Type.Union([
   variant("case", {
     inputId: actorId(),
     caseId: actorId(),
@@ -366,7 +366,7 @@ const codeModeExecutionRequestSchema = StrictObject({
   workspaceRevisionReceipt: workspaceRevisionReceiptSchema,
 });
 
-export const codeModeExecutionReceiptSchema = StrictObject({
+const codeModeExecutionReceiptSchema = StrictObject({
   executionId: actorId(),
   turn: turnIdentitySchema,
   admissionDigest: sha256(),
@@ -575,11 +575,9 @@ export type HarnessTaskContinuation = Static<
   typeof harnessTaskContinuationSchema
 >;
 export type SessionRecoveryAction = Static<typeof sessionRecoveryActionSchema>;
-export type SleepingSession = Static<typeof sleepingSessionSchema>;
 export type ActivatingSession = Static<typeof activatingSessionSchema>;
 export type ProcessingSession = Static<typeof processingSessionSchema>;
 export type RecoveringSession = Static<typeof recoveringSessionSchema>;
-export type CheckpointingSession = Static<typeof checkpointingSessionSchema>;
 export type CancellingSession = Static<typeof cancellingSessionSchema>;
 export type QuarantinedSession = Static<typeof quarantinedSessionSchema>;
 export type TerminalSession = Static<typeof terminalSessionSchema>;
@@ -589,7 +587,6 @@ export type CodeModeExecutionReceipt = Static<
   typeof codeModeExecutionReceiptSchema
 >;
 export type SessionCommand = Static<typeof sessionCommandSchema>;
-export type SessionImportEvidence = Static<typeof sessionImportEvidenceSchema>;
 export type SessionTransition = Static<typeof sessionTransitionSchema>;
 export type HarnessCheckpointRecord = Static<
   typeof harnessCheckpointRecordSchema

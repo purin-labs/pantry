@@ -130,7 +130,7 @@ export function parseCommerceQueryProjection(
     },
   };
 }
-export const commerceOrderingIntentSchema = Type.Union([
+const commerceOrderingIntentSchema = Type.Union([
   OpenObject({ kind: Type.Literal("scan") }),
   OpenObject({
     kind: Type.Literal("presentation"),
