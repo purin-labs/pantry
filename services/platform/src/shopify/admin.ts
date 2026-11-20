@@ -1,11 +1,9 @@
 import { runtimeFetch } from "../runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
-  readChannelIdPath,
   readIntegrationAccountIdField,
   readStringField,
   readOrganisationIdField,
-  readWorkspaceIdField,
   type FieldError,
 } from "../boundary";
 import {
@@ -28,7 +26,6 @@ import {
 } from "../http";
 import {
   newRequestId,
-  parseThreadKey,
 } from "../ids";
 import {
   traceLog,
@@ -58,7 +55,13 @@ import {
 } from "../credential-vault";
 import { assertNever } from "@purin-labs/std";
 import { createActiveAdminIntegration } from "../integrations/contract/admin-integration";
-import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, parsePublicServiceUrl } from "../gateway/request-helpers";
+import {
+  fieldErrorResponse,
+  isAuthorizedOrganisationAdminRequest,
+  jsonBodyErrorResponse,
+  parsePublicServiceUrl,
+  readCueChannelRequest,
+} from "../gateway/request-helpers";
 
 export async function handleConfigureShopifyCredential(
   request: Request,
@@ -544,69 +547,18 @@ export async function handleConfigureShopifyCues(
   request: Request,
   env: Env,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return methodNotAllowed(["POST"]);
-  }
-
-  if (!isAuthorizedOrganisationAdminRequest(request, env)) {
-    return notFound();
-  }
-
-  const body = await readJsonObject(request);
-
-  if (!body.ok) {
-    return jsonBodyErrorResponse(body.error);
-  }
-
-  const organisationId = readOrganisationIdField(body.value);
-  const workspaceId = readWorkspaceIdField(body.value);
-  const channelIdRaw = readStringField(body.value, "channelId");
-
-  if (!organisationId.ok) {
-    return fieldErrorResponse(organisationId.error);
-  }
-
-  const execution = await OrganisationExecutionScope.resolve(
-    env,
-    organisationId.value,
-  );
-  if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
-  }
-  const scope = execution.value;
-
-  if (!workspaceId.ok) {
-    return fieldErrorResponse(workspaceId.error);
-  }
-
-  if (!channelIdRaw.ok) {
-    return fieldErrorResponse(channelIdRaw.error);
-  }
-
-  const channelId = readChannelIdPath(channelIdRaw.value);
-  const threadKey = parseThreadKey(
-    `slack:${workspaceId.value}:${channelIdRaw.value}:channel`,
-  );
-
-  if (!channelId.ok) {
-    return fieldErrorResponse(channelId.error);
-  }
-
-  if (!threadKey.ok) {
-    return errorResponse("invalid_field", "Cue thread is invalid.", 422);
-  }
+  const cueRequest = await readCueChannelRequest(request, env);
+  if (!cueRequest.ok) return cueRequest.error;
+  const { scope, organisationId, workspaceId, channelId, threadKey } =
+    cueRequest.value;
 
   await writeTierOneShopifySubscription({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionId: "shopify-order-created-main",
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
-    threadKey: threadKey.value,
+    workspaceId,
+    channelId,
+    threadKey,
     eventType: "orders/create",
     template:
       "A Shopify order was created. Review fulfillment and customer risk before proposing the next action.",
@@ -616,11 +568,11 @@ export async function handleConfigureShopifyCues(
   });
   await writeTierOneShopifySubscription({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionId: "shopify-inventory-level-updated-main",
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
-    threadKey: threadKey.value,
+    workspaceId,
+    channelId,
+    threadKey,
     eventType: "inventory_levels/update",
     template:
       "Shopify inventory changed. Review the affected item and location for stock risk.",
@@ -631,13 +583,13 @@ export async function handleConfigureShopifyCues(
   const snapshot = await compileAndStoreCueSnapshot({
     db: scope.database,
     kv: env.POLICY_KV,
-    organisationId: organisationId.value,
+    organisationId,
     now: Date.now(),
   });
 
   return jsonResponse({
     ok: true,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionIds: [
       "shopify-order-created-main",
       "shopify-inventory-level-updated-main",

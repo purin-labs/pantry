@@ -1,18 +1,36 @@
 import type { SurfaceKind } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
-import { parseSurfaceKind, type FieldError } from "../boundary";
+import {
+  parseSurfaceKind,
+  readChannelIdPath,
+  readOrganisationIdField,
+  readStringField,
+  readWorkspaceIdField,
+  type FieldError,
+} from "../boundary";
 import type { Env } from "../env";
 import {
   authorizeConfiguredBearer,
   authorizeFaultInjectionBearer,
 } from "../fault-injection-auth";
-import { errorResponse, type JsonBodyError, type JsonObject } from "../http";
+import {
+  errorResponse,
+  methodNotAllowed,
+  notFound,
+  readJsonObject,
+  type JsonBodyError,
+  type JsonObject,
+} from "../http";
 import {
   parseOrganisationId,
+  parseThreadKey,
   parseWorkspaceId,
+  type ChannelId,
   type OrganisationId,
+  type ThreadKey,
   type WorkspaceId,
 } from "../ids";
+import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 
 /**
@@ -237,4 +255,95 @@ export function routeParamErrorResponse(error: RouteParamError): Response {
     default:
       return assertNever(error);
   }
+}
+
+/** The Slack channel that an admin cue route sets the cues of. */
+export type CueChannelRequest = Readonly<{
+  scope: OrganisationExecutionScope;
+  organisationId: OrganisationId;
+  workspaceId: WorkspaceId;
+  channelId: ChannelId;
+  threadKey: ThreadKey;
+}>;
+
+/**
+ * The head of an admin route that sets the cues of one Slack channel: a POST
+ * with the admin bearer and a JSON object with `organisationId`,
+ * `workspaceId` and `channelId`. A failure is the answer of the route.
+ */
+export async function readCueChannelRequest(
+  request: Request,
+  env: Env,
+): Promise<Result<CueChannelRequest, Response>> {
+  if (request.method !== "POST") {
+    return { ok: false, error: methodNotAllowed(["POST"]) };
+  }
+
+  if (!isAuthorizedOrganisationAdminRequest(request, env)) {
+    return { ok: false, error: notFound() };
+  }
+
+  const body = await readJsonObject(request);
+
+  if (!body.ok) {
+    return { ok: false, error: jsonBodyErrorResponse(body.error) };
+  }
+
+  const organisationId = readOrganisationIdField(body.value);
+  const workspaceId = readWorkspaceIdField(body.value);
+  const channelIdRaw = readStringField(body.value, "channelId");
+
+  if (!organisationId.ok) {
+    return { ok: false, error: fieldErrorResponse(organisationId.error) };
+  }
+
+  const execution = await OrganisationExecutionScope.resolve(
+    env,
+    organisationId.value,
+  );
+  if (!execution.ok) {
+    return {
+      ok: false,
+      error: errorResponse(
+        execution.error.code,
+        "The organisation region is unavailable.",
+        503,
+      ),
+    };
+  }
+
+  if (!workspaceId.ok) {
+    return { ok: false, error: fieldErrorResponse(workspaceId.error) };
+  }
+
+  if (!channelIdRaw.ok) {
+    return { ok: false, error: fieldErrorResponse(channelIdRaw.error) };
+  }
+
+  const channelId = readChannelIdPath(channelIdRaw.value);
+  const threadKey = parseThreadKey(
+    `slack:${workspaceId.value}:${channelIdRaw.value}:channel`,
+  );
+
+  if (!channelId.ok) {
+    return { ok: false, error: fieldErrorResponse(channelId.error) };
+  }
+
+  if (!threadKey.ok) {
+    return {
+      ok: false,
+      error: errorResponse("invalid_field", "Cue thread is invalid.", 422),
+    };
+  }
+
+  return {
+    ok: true,
+    value: {
+      scope: execution.value,
+      organisationId: organisationId.value,
+      workspaceId: workspaceId.value,
+      channelId: channelId.value,
+      threadKey: threadKey.value,
+    },
+  };
 }
