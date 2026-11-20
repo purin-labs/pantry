@@ -664,8 +664,7 @@ One placement waits for step A1.7: `agent-tools/registry.ts` is a part of the Wo
 (21 crossings), but three Session files import it. The Worker must give the registry to
 the Session first.
 
-**20 November 2026. Step A1.4 is done on the branch `refactor-17-a1-4b`.** The
-branch starts at the local branch `refactor-17-b`. It is not on `dev`.
+**20 November 2026. Step A1.4 is done and on `dev`.**
 
 - **Two parts.** Each of the 27 `draft`, `receipt` and `scheduled` tools defines
   `prepare` in place of `handler`. `prepare` does the live checks and the reads, and
@@ -691,7 +690,7 @@ branch starts at the local branch `refactor-17-b`. It is not on `dev`.
   `pnpm portal:build` and the unit suite (302 files) pass. 92 journey files ran: 90
   pass and 1 is skipped. `counter-receipt-printer.test.ts` failed one time in the
   group run and passed alone; it tests the receipt printer and reads no agent tool.
-  Not run: the full E2E suite.
+  The full E2E suite passed on the merge with `dev`: 236 files, 457 tests.
 - **Still open:** a handler takes the turn context from the Session
   (`withToolContext`), not from the executor. Step A1.7 owns it.
 
