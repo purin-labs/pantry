@@ -16,6 +16,7 @@ import {
 } from "../../ui";
 import { Select } from "../../ui/select";
 import { decideBake, readBakes, refusalText, saveBakeLevel } from "./requests";
+import { BakeRunPanel } from "./run-panel";
 import "./bakes.css";
 
 /**
@@ -138,6 +139,7 @@ export function BakesRoute(
         key={proposal?.proposalId ?? "none"}
         organisationId={organisationId}
         proposal={proposal}
+        hasRun={board.runs.some((run) => run.proposalId === proposalId)}
         mayDecide={mayDecide}
         close={() => setProposalId(null)}
         decided={() => void reload()}
@@ -439,6 +441,7 @@ function ProposalDrawer(
   props: Readonly<{
     organisationId: string;
     proposal: BakeProposalView | null;
+    hasRun: boolean;
     mayDecide: boolean;
     close: () => void;
     decided: () => void;
@@ -566,6 +569,12 @@ function ProposalDrawer(
             <p className="bakes-refusal" role="alert">
               {refusalText(state.error)}
             </p>
+          ) : null}
+          {props.hasRun ? (
+            <BakeRunPanel
+              organisationId={props.organisationId}
+              proposalId={proposal.proposalId}
+            />
           ) : null}
         </div>
       )}

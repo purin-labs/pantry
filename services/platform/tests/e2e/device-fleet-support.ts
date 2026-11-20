@@ -50,10 +50,11 @@ export async function deviceShop(label: string) {
     organisationId,
     now: Date.now(),
   });
+  const merchantId = `merchant_${label}_${crypto.randomUUID().replaceAll("-", "")}`;
   await connectCommerceFixture(
     organisationId,
     owner.identity.userId,
-    `merchant_${label}_${crypto.randomUUID().replaceAll("-", "")}`,
+    merchantId,
   );
   await fixtureDatabase().batch(
     [
@@ -78,7 +79,7 @@ export async function deviceShop(label: string) {
     members: { operator: staff, privateMember: viewer },
   });
   await activateSharedAccountNativeTenant(organisationId);
-  return { owner, staff, viewer, organisationId };
+  return { owner, staff, viewer, organisationId, merchantId };
 }
 
 export function controlBase(organisationId: string): string {

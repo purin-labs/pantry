@@ -1,0 +1,270 @@
+import { Type, type Static, type TSchema } from "typebox";
+import { recordParser } from "@purin-labs/contract-schema";
+
+/**
+ * Plan 24 S4: one approved bake run with two cobots and the oven, as the
+ * Bakes page, the agent and the journeys read it. The canvas, the timeline
+ * and the positions of the mould groups all read `view`, so they agree on
+ * each task. Every observed value comes from a device receipt; a position
+ * that no receipt proves is `unknown`.
+ */
+
+const text = Type.String({ minLength: 1 });
+const time = Type.Integer({ minimum: 0 });
+const seconds = Type.Number();
+function nullable<T extends TSchema>(schema: T) {
+  return Type.Union([schema, Type.Null()]);
+}
+
+const placeSchema = Type.Object({
+  station: Type.Union([
+    Type.Literal("cold_rack"),
+    Type.Literal("oven"),
+    Type.Literal("cooling_rack"),
+  ]),
+  shelf: Type.Integer({ minimum: 1 }),
+});
+
+const taskSchema = Type.Union([
+  Type.Object({
+    kind: Type.Literal("move_mould_group"),
+    mouldGroup: Type.Integer({ minimum: 1 }),
+    from: placeSchema,
+    to: placeSchema,
+  }),
+  Type.Object({
+    kind: Type.Literal("bake"),
+    programSeconds: Type.Integer({ minimum: 1 }),
+    temperatureC: Type.Integer({ minimum: 1 }),
+  }),
+]);
+
+const carrierAt = Type.Union([
+  Type.Literal("source"),
+  Type.Literal("tool"),
+  Type.Literal("destination"),
+  Type.Literal("unknown"),
+]);
+
+const stepKind = Type.Union([
+  Type.Literal("load"),
+  Type.Literal("bake"),
+  Type.Literal("unload"),
+]);
+
+const taskViewSchema = Type.Object({
+  key: text,
+  kind: stepKind,
+  mouldGroup: nullable(Type.Integer({ minimum: 1 })),
+  sourceKey: text,
+  task: taskSchema,
+  requestId: nullable(text),
+  state: Type.Union([
+    Type.Literal("planned"),
+    Type.Literal("ready"),
+    Type.Literal("dispatched"),
+    Type.Literal("accepted"),
+    Type.Literal("running"),
+    Type.Literal("completed"),
+    Type.Literal("rejected"),
+    Type.Literal("failed"),
+  ]),
+  planned: Type.Object({ startSeconds: seconds, endSeconds: seconds }),
+  observed: Type.Object({
+    startSeconds: nullable(seconds),
+    endSeconds: nullable(seconds),
+    observedSeconds: nullable(seconds),
+  }),
+  phase: nullable(Type.String()),
+  progress: nullable(Type.Number()),
+  carrierAt: nullable(carrierAt),
+  reason: nullable(Type.String()),
+});
+export type BakeRunTaskView = Static<typeof taskViewSchema>;
+
+const positionSchema = Type.Union([
+  Type.Object({ kind: Type.Literal("place"), place: placeSchema }),
+  Type.Object({ kind: Type.Literal("tool"), sourceKey: text }),
+  Type.Object({ kind: Type.Literal("unknown") }),
+]);
+
+const viewSchema = Type.Object({
+  runId: text,
+  status: text,
+  logicalSeconds: seconds,
+  tasks: Type.Array(taskViewSchema),
+  groups: Type.Array(
+    Type.Object({
+      mouldGroup: Type.Integer({ minimum: 1 }),
+      position: positionSchema,
+      basis: Type.Union([Type.Literal("declared"), Type.Literal("receipt")]),
+    }),
+  ),
+  disposition: nullable(
+    Type.Object({
+      kind: Type.Literal("disposition"),
+      step: text,
+      requestId: Type.String(),
+      sourceKey: text,
+      carrierAt,
+      reason: text,
+    }),
+  ),
+});
+export type BakeRunView = Static<typeof viewSchema>;
+
+const holdSchema = Type.Object({
+  code: Type.Union([
+    Type.Literal("failed_attempt"),
+    Type.Literal("result_unknown"),
+    Type.Literal("stale_evidence"),
+    Type.Literal("evidence_lost"),
+    Type.Literal("device_fault"),
+    Type.Literal("device_not_ready"),
+    Type.Literal("dispatch_unsent"),
+    Type.Literal("engine_stop"),
+  ]),
+  message: text,
+  step: nullable(text),
+  requestId: nullable(text),
+  sourceKey: nullable(text),
+  at: time,
+});
+export type BakeRunHold = Static<typeof holdSchema>;
+
+const role = Type.Union([
+  Type.Literal("owner"),
+  Type.Literal("admin"),
+  Type.Literal("operator"),
+]);
+
+const runStateSchema = Type.Union([
+  Type.Literal("not_started"),
+  Type.Literal("running"),
+  Type.Literal("paused"),
+  Type.Literal("held"),
+  Type.Literal("completed"),
+  Type.Literal("stopped"),
+  Type.Literal("checked"),
+]);
+export type BakeRunState = Static<typeof runStateSchema>;
+
+const runSchema = Type.Object({
+  runId: text,
+  proposalId: Type.String({ pattern: "^bake_[a-f0-9]{24}$" }),
+  productName: text,
+  state: runStateSchema,
+  /** Why the run did not start, while it has not started. */
+  problem: nullable(Type.Object({ code: text, message: text })),
+  hold: nullable(holdSchema),
+  approval: nullable(
+    Type.Object({
+      by: text,
+      role,
+      via: Type.Union([Type.Literal("portal"), Type.Literal("slack")]),
+      at: time,
+    }),
+  ),
+  devices: Type.Array(
+    Type.Object({
+      deviceId: text,
+      sourceKey: text,
+      name: text,
+      role: Type.Union([Type.Literal("cobot"), Type.Literal("oven")]),
+    }),
+  ),
+  oven: nullable(
+    Type.Object({
+      programSeconds: Type.Integer({ minimum: 1 }),
+      temperatureC: Type.Integer({ minimum: 1 }),
+    }),
+  ),
+  startedAt: nullable(time),
+  endedAt: nullable(time),
+  check: nullable(
+    Type.Object({
+      by: text,
+      role,
+      at: time,
+      goodPieces: Type.Integer({ minimum: 0 }),
+      receiptId: text,
+    }),
+  ),
+  /** The dispatch record of each task the run sent, oldest first. */
+  dispatches: Type.Array(
+    Type.Object({
+      requestId: text,
+      step: text,
+      deviceId: text,
+      sourceKey: text,
+      task: taskSchema,
+      state: Type.Union([
+        Type.Literal("written"),
+        Type.Literal("refused"),
+        Type.Literal("sent"),
+        Type.Literal("unsent"),
+      ]),
+      writtenAt: time,
+      sentAt: nullable(time),
+    }),
+  ),
+  /** An unload that is later than its plan after the bake ended. */
+  unloadRisk: nullable(
+    Type.Object({ step: text, lateSeconds: Type.Number({ minimum: 0 }) }),
+  ),
+  view: nullable(viewSchema),
+});
+export type BakeRunRecord = Static<typeof runSchema>;
+
+const readSchema = Type.Object({
+  ok: Type.Literal(true),
+  run: runSchema,
+  access: Type.Object({ mayOperate: Type.Boolean() }),
+});
+export type BakeRunRead = Static<typeof readSchema>;
+
+const actionInputSchema = Type.Union([
+  Type.Object(
+    {
+      action: Type.Union([
+        Type.Literal("start"),
+        Type.Literal("pause"),
+        Type.Literal("resume"),
+        Type.Literal("stop"),
+      ]),
+    },
+    { additionalProperties: false },
+  ),
+  Type.Object(
+    {
+      action: Type.Literal("settle"),
+      decision: Type.Union([Type.Literal("continue"), Type.Literal("stop")]),
+    },
+    { additionalProperties: false },
+  ),
+  Type.Object(
+    {
+      action: Type.Literal("check"),
+      goodPieces: Type.Integer({ minimum: 0, maximum: 10_000 }),
+    },
+    { additionalProperties: false },
+  ),
+]);
+export type BakeRunActionInput = Static<typeof actionInputSchema>;
+
+const decodeRead = recordParser(readSchema);
+const decodeAction = recordParser(actionInputSchema);
+
+export function parseBakeRunRead(value: unknown): BakeRunRead {
+  const result = decodeRead(value);
+  if (!result.ok) throw new Error("The bake run answer is not valid.");
+  return result.value;
+}
+
+/** Null when the body is not a run action. */
+export function parseBakeRunActionInput(
+  value: unknown,
+): BakeRunActionInput | null {
+  const result = decodeAction(value);
+  return result.ok ? result.value : null;
+}

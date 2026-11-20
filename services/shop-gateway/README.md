@@ -36,6 +36,15 @@ a controller, a welcome or a restart, the adapter asks `status` for each open
 task; it never submits again. A pause, a resume or a stop gets its `ack` after
 the controller answers, or `refused` after 5 s. The controller simulator is
 [`crates/bakery-native/controller`](../../crates/bakery-native/controller/README.md).
+The types of the controller lines are in `crates/cobot-protocol`. The adapter
+and the simulator both use that crate.
+
+While the journal holds an open task, the adapter sends `cobot_clock` at most
+one time each second. A bake run needs the clocks before its first task, so
+Pantry sends `cobot_clock_read` with a `requestId`. The adapter answers at once
+with a `cobot_clock` that has the same `requestId` and the last clock of each
+controller. It asks no controller. If no controller has sent a clock, the
+adapter sends nothing and writes the reason to stderr.
 
 ## Receipt printer and cash drawer (Plan 90 Phase 5)
 

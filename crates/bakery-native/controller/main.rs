@@ -8,8 +8,8 @@
 #![deny(unsafe_code)]
 
 mod physics;
+mod port;
 mod sim;
-mod wire;
 
 use std::io::{BufRead, BufReader, Write};
 use std::net::{TcpListener, TcpStream};

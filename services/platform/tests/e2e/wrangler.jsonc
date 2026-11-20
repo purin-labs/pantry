@@ -57,6 +57,10 @@
         "name": "DEVICE_FLEET",
         "class_name": "DeviceFleetActor",
       },
+      {
+        "name": "BAKE_RUN",
+        "class_name": "BakeRunActor",
+      },
     ],
   },
   "exports": {
@@ -87,6 +91,10 @@
       "storage": "sqlite",
     },
     "DeviceFleetActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+    "BakeRunActor": {
       "type": "durable-object",
       "storage": "sqlite",
     },

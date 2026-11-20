@@ -35,6 +35,7 @@ export const PERMISSION_REQUESTABLE = [
   CAPABILITY_KEYS.jevFeaturesManage,
   CAPABILITY_KEYS.bakeRead,
   CAPABILITY_KEYS.bakePropose,
+  CAPABILITY_KEYS.bakeRunPause,
 ] as const;
 
 export type RequestableCapability = (typeof PERMISSION_REQUESTABLE)[number];

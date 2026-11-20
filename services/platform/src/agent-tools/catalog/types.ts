@@ -162,6 +162,7 @@ export type HarnessCapabilityName =
   | typeof CAPABILITY_KEYS.jevFeaturesManage
   | typeof CAPABILITY_KEYS.bakeRead
   | typeof CAPABILITY_KEYS.bakePropose
+  | typeof CAPABILITY_KEYS.bakeRunPause
   | typeof CAPABILITY_KEYS.marketingEmailDraftEdit
   | typeof CAPABILITY_KEYS.commerceActionPropose
   | typeof CAPABILITY_KEYS.fileRead

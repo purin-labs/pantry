@@ -1,0 +1,119 @@
+/* The bake run in a proposal's drawer (Plan 24 S4): one read of the run as a
+   task graph, a timeline and the place of each mould group. Colors come from
+   the portal theme tokens. */
+.bake-run {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.bake-run-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bake-run-head h3,
+.bake-run-block h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bake-run-block {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bake-run-state {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.bake-run-state-held,
+.bake-run-state-paused {
+  color: var(--pantry-accent-text);
+}
+
+.bake-run-alert {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  font-size: 14px;
+}
+
+.bake-run-note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.bake-run-check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+
+.bake-run-graph {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bake-run-node {
+  display: grid;
+  gap: 2px;
+  min-width: 112px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.bake-run-node-title {
+  font-weight: 600;
+}
+
+.bake-run-node-meta {
+  color: var(--ink-2);
+}
+
+.bake-run-node-running,
+.bake-run-node-accepted,
+.bake-run-node-dispatched {
+  border-color: var(--pantry-accent-text);
+}
+
+.bake-run-node-failed,
+.bake-run-node-rejected {
+  border-color: var(--danger-text);
+}
+
+.bake-run-groups {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.bake-run-groups li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bake-run-unknown {
+  color: var(--danger-text);
+  font-weight: 500;
+}

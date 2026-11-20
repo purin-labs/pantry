@@ -245,6 +245,23 @@ test and any fixture that exists only for the obsolete behavior.
   and the relay. The artifact is `output/plan-24/cobot-gateway-journey.json`.
   It needs the account Worker, `cargo`, and `PANTRY_COBOT_CONTROLLER_BINARY`
   or `MUJOCO_DIR`.
+- `e2e/bake-run.test.ts` is the exit journey of Plan 24 S4: one approved bake
+  on the server, through the real gateway relay and the controller simulator
+  with two cobots and the oven. An operator's Portal approval starts the run;
+  it loads with one cobot, bakes and unloads with the other, and no two moves
+  hold the oven door. Each task's observed times are its receipts' device
+  clocks, and the Portal read is the Organisation Actor's read. The stock does
+  not move during the run; a viewer cannot record the check, and an
+  operator's check raises the counter stock through Commerce and ends the
+  proposal. A second dispatch with the same identity sends nothing, and a
+  second delivery on the wire makes no second move. A second journey has the
+  Portal chat agent read a run and pause it for the owner with an answering
+  gateway; a viewer has no chat and the Bakes page refuses the viewer's
+  pause. `e2e/bake-support.ts` holds the counter shop and the chat helpers of
+  both Plan 24 journeys. The artifacts are
+  `output/plan-24/bake-run-journey.json` and
+  `output/plan-24/bake-run-agent.json`. It needs the account Worker, `cargo`
+  and `MUJOCO_DIR`.
 - `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E

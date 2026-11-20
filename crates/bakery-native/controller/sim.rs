@@ -11,14 +11,15 @@ use std::io::Write;
 use std::net::TcpStream;
 use std::path::PathBuf;
 
+use cobot_protocol::{
+    Capability, CarrierAt, CobotTask, ControlOp, ControlOutcome, ControllerDevice, ControllerEvent,
+    ControllerTaskState, DeviceOp, FaultCode, ObservedState, Place, RunState, Station, TaskState,
+};
 use serde::Serialize;
 use serde_json::{Value, json};
 
 use crate::physics::{End, Physics, Timeline};
-use crate::wire::{
-    CarrierAt, CobotTask, ControlOp, DeviceOp, Fault, FaultCode, Place, RunState, ScriptMove,
-    Station, TaskState,
-};
+use crate::port::{Fault, PortOp, ScriptMove};
 
 /// The default layout: two arms and the oven.
 pub const DEVICES: [&str; 3] = ["cobot-1", "cobot-2", "oven-1"];
@@ -119,17 +120,39 @@ impl Task {
         }
     }
 
-    fn event(&self) -> Value {
-        json!({
-            "event": "task",
-            "taskId": self.id,
-            "state": self.state,
-            "progress": self.progress().map(round_ms),
-            "phase": self.phase(),
-            "carrierAt": self.carrier_at,
-            "reason": self.reason,
-            "observedSeconds": self.observed_seconds(),
-        })
+    fn event(&self, sequence: u64, clock_ms: u64) -> ControllerEvent {
+        ControllerEvent::Task {
+            task_id: self.id.clone(),
+            state: self.state.into(),
+            progress: self.progress().map(round_ms),
+            phase: self.phase(),
+            carrier_at: self.carrier_at,
+            reason: self.reason.clone(),
+            observed_seconds: self.observed_seconds(),
+            sequence,
+            clock_ms,
+        }
+    }
+
+    /// The event of a task, or the shadow observation of a scripted move.
+    fn line(&self, sequence: u64, clock_ms: u64) -> ControllerEvent {
+        if !self.scripted {
+            return self.event(sequence, clock_ms);
+        }
+        let state = match self.state {
+            TaskState::Running => ObservedState::Started,
+            TaskState::Completed => ObservedState::Completed,
+            _ => ObservedState::Failed,
+        };
+        ControllerEvent::Observed {
+            move_id: self.id.clone(),
+            task: self.task.clone(),
+            state,
+            carrier_at: self.carrier_at,
+            reason: self.reason.clone(),
+            sequence,
+            clock_ms,
+        }
     }
 }
 
@@ -227,22 +250,29 @@ impl Sim {
         self.devices[device].subscribers.push(stream);
     }
 
-    /// Stamps one event with the device's next sequence and its clock, and
+    /// Makes one event with the device's next sequence and its clock, and
     /// writes it to every connection of the device. A frozen device sends
     /// nothing.
-    fn emit(&mut self, index: usize, mut body: Value) {
-        let device = &mut self.devices[index];
-        if device.frozen {
+    fn emit(&mut self, index: usize, event: impl FnOnce(&Self, u64, u64) -> ControllerEvent) {
+        if self.devices[index].frozen {
             return;
         }
-        device.sequence += 1;
-        body["sequence"] = json!(device.sequence);
-        body["clockMs"] = json!(device.clock_ms.floor() as u64);
-        let is_task = body["event"] == "task";
-        if body["event"] != "clock" {
+        self.devices[index].sequence += 1;
+        let sequence = self.devices[index].sequence;
+        let clock_ms = self.devices[index].clock_ms.floor() as u64;
+        let event = event(self, sequence, clock_ms);
+        let is_task = matches!(event, ControllerEvent::Task { .. });
+        if !matches!(event, ControllerEvent::Clock { .. }) {
             self.dirty = true;
         }
-        let line = body.to_string();
+        let line = match serde_json::to_string(&event) {
+            Ok(line) => line,
+            Err(error) => {
+                eprintln!("{}: an event did not serialize: {error}", DEVICES[index]);
+                return;
+            }
+        };
+        let device = &mut self.devices[index];
         device.sent.push_back((is_task, line.clone()));
         while device.sent.len() > SENT_KEPT {
             device.sent.pop_front();
@@ -281,32 +311,35 @@ impl Sim {
         *self.devices[index].ops.entry(op.name()).or_default() += 1;
         match op {
             DeviceOp::Hello => {
-                let body = self.hello(index);
-                self.emit(index, body);
+                self.emit(index, |sim, sequence, clock_ms| {
+                    sim.hello(index, sequence, clock_ms)
+                });
             }
             DeviceOp::Submit { task_id, task } => self.submit(index, task_id, task),
             DeviceOp::Status { task_id } => {
-                let body = match self.tasks.get(&task_id) {
-                    Some(task) => task.event(),
-                    None => json!({
-                        "event": "task",
-                        "taskId": task_id,
-                        "state": "unknown",
-                        "progress": null,
-                        "phase": null,
-                        "carrierAt": null,
-                        "reason": null,
-                        "observedSeconds": null,
-                    }),
-                };
-                self.emit(index, body);
+                self.emit(index, |sim, sequence, clock_ms| {
+                    match sim.tasks.get(&task_id) {
+                        Some(task) => task.event(sequence, clock_ms),
+                        None => ControllerEvent::Task {
+                            task_id,
+                            state: ControllerTaskState::Unknown,
+                            progress: None,
+                            phase: None,
+                            carrier_at: None,
+                            reason: None,
+                            observed_seconds: None,
+                            sequence,
+                            clock_ms,
+                        },
+                    }
+                });
             }
             DeviceOp::Pause => {
                 let done = !self.estop;
                 if done {
                     self.devices[index].paused = true;
                 }
-                self.control_answer(index, "pause", done);
+                self.control_answer(index, ControlOp::Pause, done);
             }
             DeviceOp::Resume => {
                 let done = !self.estop && self.devices[index].fault.is_none();
@@ -314,56 +347,66 @@ impl Sim {
                     self.devices[index].paused = false;
                     self.devices[index].stopped = false;
                 }
-                self.control_answer(index, "resume", done);
+                self.control_answer(index, ControlOp::Resume, done);
             }
             DeviceOp::Stop => {
                 if let Some(id) = self.open_task(index) {
                     self.end_open(&id, "stop_requested", None);
                 }
                 self.devices[index].stopped = true;
-                self.control_answer(index, "stop", true);
+                self.control_answer(index, ControlOp::Stop, true);
             }
         }
     }
 
-    fn control_answer(&mut self, index: usize, op: &str, done: bool) {
-        self.emit(
-            index,
-            json!({
-                "event": "control",
-                "op": op,
-                "outcome": if done { "done" } else { "refused" },
-            }),
-        );
+    fn control_answer(&mut self, index: usize, op: ControlOp, done: bool) {
+        let outcome = if done {
+            ControlOutcome::Done
+        } else {
+            ControlOutcome::Refused
+        };
+        self.emit(index, |_, sequence, clock_ms| ControllerEvent::Control {
+            op,
+            outcome,
+            sequence,
+            clock_ms,
+        });
     }
 
-    fn hello(&self, index: usize) -> Value {
+    fn hello(&self, index: usize, sequence: u64, clock_ms: u64) -> ControllerEvent {
         let device = &self.devices[index];
-        let (kind, model, capability) = if device.cobot {
+        let (kind, model, id, label) = if device.cobot {
             (
                 "cobot",
                 "FAIRINO FR10 (simulated)",
-                json!({ "id": "move_mould_group", "label": "Move a mould group", "revision": 1 }),
+                "move_mould_group",
+                "Move a mould group",
             )
         } else {
             (
                 "appliance",
                 "Deck oven (simulated)",
-                json!({ "id": "bake", "label": "Bake a program", "revision": 1 }),
+                "bake",
+                "Bake a program",
             )
         };
-        json!({
-            "event": "hello",
-            "device": {
-                "sourceKey": device.key,
-                "kind": kind,
-                "model": model,
-                "serial": format!("SIM-{}", device.key.to_uppercase()),
-                "firmware": FIRMWARE,
-                "capabilities": [capability],
+        ControllerEvent::Hello {
+            device: ControllerDevice {
+                source_key: device.key.into(),
+                kind: kind.into(),
+                model: model.into(),
+                serial: Some(format!("SIM-{}", device.key.to_uppercase())),
+                firmware: Some(FIRMWARE.into()),
+                capabilities: vec![Capability {
+                    id: id.into(),
+                    label: label.into(),
+                    revision: 1,
+                }],
             },
-            "state": self.run_state(index),
-        })
+            state: self.run_state(index),
+            sequence,
+            clock_ms,
+        }
     }
 
     fn open_task(&self, index: usize) -> Option<String> {
@@ -518,9 +561,10 @@ impl Sim {
 
     fn submit(&mut self, index: usize, id: String, task: CobotTask) {
         // A known task identity runs nothing: the answer is its state.
-        if let Some(known) = self.tasks.get(&id) {
-            let body = known.event();
-            self.emit(index, body);
+        if self.tasks.contains_key(&id) {
+            self.emit(index, |sim, sequence, clock_ms| {
+                sim.tasks[&id].event(sequence, clock_ms)
+            });
             return;
         }
         let mut refusal = self.refusal(index, &task).map(|reason| (reason, None));
@@ -552,9 +596,10 @@ impl Sim {
                 reason: Some(reason.into()),
                 rejected_by: evidence,
             };
-            let body = rejected.event();
-            self.tasks.insert(id, rejected);
-            self.emit(index, body);
+            self.tasks.insert(id.clone(), rejected);
+            self.emit(index, |sim, sequence, clock_ms| {
+                sim.tasks[&id].event(sequence, clock_ms)
+            });
             if blocked {
                 self.raise(index, FaultCode::DoorBlocked);
             }
@@ -574,45 +619,28 @@ impl Sim {
             reason: None,
             rejected_by: None,
         };
-        let body = accepted.event();
         self.tasks.insert(id.clone(), accepted);
-        self.devices[index].current = Some(id);
-        self.emit(index, body);
+        self.devices[index].current = Some(id.clone());
+        self.emit(index, |sim, sequence, clock_ms| {
+            sim.tasks[&id].event(sequence, clock_ms)
+        });
     }
 
     fn raise(&mut self, index: usize, code: FaultCode) {
         self.devices[index].fault = Some(code);
-        self.emit(
-            index,
-            json!({ "event": "fault", "code": code, "text": code.text() }),
-        );
-    }
-
-    /// The event of a task, or the shadow observation of a scripted move.
-    fn task_body(&self, id: &str) -> Option<Value> {
-        let task = self.tasks.get(id)?;
-        if !task.scripted {
-            return Some(task.event());
-        }
-        let state = match task.state {
-            TaskState::Running => "started",
-            TaskState::Completed => "completed",
-            _ => "failed",
-        };
-        Some(json!({
-            "event": "observed",
-            "moveId": task.id,
-            "task": task.task,
-            "state": state,
-            "carrierAt": task.carrier_at,
-            "reason": task.reason,
-        }))
+        self.emit(index, |_, sequence, clock_ms| ControllerEvent::Fault {
+            code: code.code().into(),
+            text: code.text().into(),
+            sequence,
+            clock_ms,
+        });
     }
 
     fn emit_task(&mut self, id: &str) {
-        if let Some(body) = self.task_body(id) {
-            let device = self.tasks[id].device;
-            self.emit(device, body);
+        if let Some(device) = self.tasks.get(id).map(|task| task.device) {
+            self.emit(device, |sim, sequence, clock_ms| {
+                sim.tasks[id].line(sequence, clock_ms)
+            });
         }
     }
 
@@ -739,7 +767,11 @@ impl Sim {
             if self.devices[index].since_clock >= CLOCK_EVERY {
                 self.devices[index].since_clock = 0.;
                 let state = self.run_state(index);
-                self.emit(index, json!({ "event": "clock", "state": state }));
+                self.emit(index, |_, sequence, clock_ms| ControllerEvent::Clock {
+                    state,
+                    sequence,
+                    clock_ms,
+                });
             }
             self.start_due_script(index);
             self.advance_task(index, dt);
@@ -882,19 +914,19 @@ impl Sim {
 
     /// One line on the control port. The answer is one JSON value.
     pub fn control(&mut self, line: &str) -> Value {
-        let op: ControlOp = match serde_json::from_str(line) {
+        let op: PortOp = match serde_json::from_str(line) {
             Ok(op) => op,
             Err(error) => return json!({ "ok": false, "error": error.to_string() }),
         };
         let device = |name: &str| DEVICES.iter().position(|key| *key == name);
         let unknown = |name: &str| json!({ "ok": false, "error": format!("no device {name}") });
         match op {
-            ControlOp::State => self.state(),
-            ControlOp::Reset => {
+            PortOp::State => self.state(),
+            PortOp::Reset => {
                 self.reset();
                 json!({ "ok": true })
             }
-            ControlOp::Inject {
+            PortOp::Inject {
                 device: name,
                 fault,
                 at_progress,
@@ -911,14 +943,14 @@ impl Sim {
                 self.inject(index, fault, at_progress);
                 json!({ "ok": true, "armed": self.devices[index].armed.is_some() })
             }
-            ControlOp::Clear { device: name } => {
+            PortOp::Clear { device: name } => {
                 let Some(index) = device(&name) else {
                     return unknown(&name);
                 };
                 self.clear(index);
                 json!({ "ok": true })
             }
-            ControlOp::Freeze { device: name } => {
+            PortOp::Freeze { device: name } => {
                 let Some(index) = device(&name) else {
                     return unknown(&name);
                 };
@@ -926,7 +958,7 @@ impl Sim {
                 self.dirty = true;
                 json!({ "ok": true })
             }
-            ControlOp::Stale { device: name } => {
+            PortOp::Stale { device: name } => {
                 let Some(index) = device(&name) else {
                     return unknown(&name);
                 };
@@ -945,7 +977,7 @@ impl Sim {
                     None => json!({ "ok": false, "error": "the device sent nothing yet" }),
                 }
             }
-            ControlOp::Script {
+            PortOp::Script {
                 device: name,
                 moves,
             } => {
@@ -1036,7 +1068,13 @@ impl Sim {
 
     fn cleared(&mut self, index: usize) {
         if let Some(code) = self.devices[index].fault.take() {
-            self.emit(index, json!({ "event": "fault_cleared", "code": code }));
+            self.emit(index, |_, sequence, clock_ms| {
+                ControllerEvent::FaultCleared {
+                    code: code.code().into(),
+                    sequence,
+                    clock_ms,
+                }
+            });
         }
     }
 

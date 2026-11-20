@@ -3,9 +3,14 @@
 //! Pantry sends named tasks (`cobot_task`, `cobot_inquire`) and `pause`,
 //! `resume` and `stop` for a cobot or the oven. This adapter translates them
 //! into the controller protocol: JSON lines over TCP, one connection for each
-//! device (`crates/bakery-native/controller` is the simulator). It translates
-//! the controller's events back. Pantry never talks to a controller. The
-//! controller addresses stay in this computer's `cobots.json`.
+//! device (`crates/bakery-native/controller` is the simulator). The
+//! `cobot-protocol` crate holds the types of those lines for both sides. The
+//! adapter translates the controller's events back. Pantry never talks to a
+//! controller. The controller addresses stay in this computer's `cobots.json`.
+//!
+//! `cobot_clock_read` asks the clock of each device now, before a bake run
+//! has an open task. The adapter answers at once with the last clock of each
+//! controller, as a `cobot_clock` with the same `requestId`.
 //!
 //! The journal `cobot-journal.json` records each dispatch before the
 //! `submit`. A second `cobot_task` with a known `requestId` answers from the
@@ -22,6 +27,10 @@ use std::sync::mpsc::{Receiver, RecvTimeoutError, Sender, channel};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use cobot_protocol::{
+    CarrierAt, CobotTask, ControlOp, ControlOutcome, ControllerDevice, ControllerEvent, DeviceOp,
+    RunState, TaskState,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
@@ -54,215 +63,6 @@ struct CobotsFile {
     controllers: Vec<ControllerAddress>,
 }
 
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum Station {
-    ColdRack,
-    Oven,
-    CoolingRack,
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct Place {
-    station: Station,
-    shelf: u8,
-}
-
-/// A named task. The gateway passes it to the controller as it is; it never
-/// holds joint angles, speeds or safety settings.
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(
-    tag = "kind",
-    rename_all = "snake_case",
-    rename_all_fields = "camelCase",
-    deny_unknown_fields
-)]
-enum CobotTask {
-    MoveMouldGroup {
-        mould_group: u8,
-        from: Place,
-        to: Place,
-    },
-    Bake {
-        program_seconds: u32,
-        temperature_c: u32,
-    },
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum TaskState {
-    Accepted,
-    Running,
-    Completed,
-    Rejected,
-    Indeterminate,
-}
-
-/// A controller's task state. `unknown` answers a `status` for a task that
-/// the controller never saw.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum ControllerTaskState {
-    Accepted,
-    Running,
-    Completed,
-    Rejected,
-    Indeterminate,
-    Unknown,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum CarrierAt {
-    Source,
-    Tool,
-    Destination,
-    Unknown,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum RunState {
-    Idle,
-    Busy,
-    Paused,
-    Stopped,
-    Estop,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum ControlOp {
-    Pause,
-    Resume,
-    Stop,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum ControlOutcome {
-    Done,
-    Refused,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-enum ObservedState {
-    Started,
-    Completed,
-    Failed,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct Capability {
-    id: String,
-    label: String,
-    revision: u32,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-#[serde(rename_all = "camelCase", deny_unknown_fields)]
-struct ControllerDevice {
-    source_key: String,
-    kind: String,
-    model: String,
-    serial: Option<String>,
-    firmware: Option<String>,
-    capabilities: Vec<Capability>,
-}
-
-/// One line from a controller. Each line has the device's `sequence`, which
-/// only rises, and its monotonic `clockMs`.
-#[derive(Debug, Deserialize)]
-#[serde(
-    tag = "event",
-    rename_all = "snake_case",
-    rename_all_fields = "camelCase",
-    deny_unknown_fields
-)]
-enum ControllerEvent {
-    Hello {
-        device: ControllerDevice,
-        state: RunState,
-        sequence: u64,
-        clock_ms: u64,
-    },
-    Task {
-        task_id: String,
-        state: ControllerTaskState,
-        progress: Option<f64>,
-        phase: Option<String>,
-        carrier_at: Option<CarrierAt>,
-        reason: Option<String>,
-        observed_seconds: Option<f64>,
-        sequence: u64,
-        clock_ms: u64,
-    },
-    Control {
-        op: ControlOp,
-        outcome: ControlOutcome,
-        sequence: u64,
-        clock_ms: u64,
-    },
-    Clock {
-        state: RunState,
-        sequence: u64,
-        clock_ms: u64,
-    },
-    Fault {
-        code: String,
-        text: String,
-        sequence: u64,
-        clock_ms: u64,
-    },
-    FaultCleared {
-        code: String,
-        sequence: u64,
-        clock_ms: u64,
-    },
-    Observed {
-        move_id: String,
-        task: CobotTask,
-        state: ObservedState,
-        carrier_at: Option<CarrierAt>,
-        reason: Option<String>,
-        sequence: u64,
-        clock_ms: u64,
-    },
-}
-
-impl ControllerEvent {
-    /// The device's sequence and clock on this line.
-    fn stamp(&self) -> (u64, u64) {
-        match self {
-            ControllerEvent::Hello {
-                sequence, clock_ms, ..
-            }
-            | ControllerEvent::Task {
-                sequence, clock_ms, ..
-            }
-            | ControllerEvent::Control {
-                sequence, clock_ms, ..
-            }
-            | ControllerEvent::Clock {
-                sequence, clock_ms, ..
-            }
-            | ControllerEvent::Fault {
-                sequence, clock_ms, ..
-            }
-            | ControllerEvent::FaultCleared {
-                sequence, clock_ms, ..
-            }
-            | ControllerEvent::Observed {
-                sequence, clock_ms, ..
-            } => (*sequence, *clock_ms),
-        }
-    }
-}
-
 /// What Pantry sends that this adapter answers.
 #[derive(Debug, Deserialize)]
 #[serde(
@@ -283,6 +83,8 @@ enum Request {
         request_id: String,
         source_key: String,
     },
+    /// The clock of each device now, for the start of a bake run.
+    CobotClockRead { request_id: String },
     Pause {
         request_id: String,
         source_key: String,
@@ -362,15 +164,11 @@ struct Dispatch {
 impl Dispatch {
     /// The controller has not ended it, as far as the journal knows.
     fn is_open(&self) -> bool {
-        self.last
-            .as_ref()
-            .is_none_or(|last| matches!(last.state, TaskState::Accepted | TaskState::Running))
+        self.last.as_ref().is_none_or(|last| last.state.is_open())
     }
 
     fn is_running(&self) -> bool {
-        self.last
-            .as_ref()
-            .is_some_and(|last| matches!(last.state, TaskState::Accepted | TaskState::Running))
+        self.last.as_ref().is_some_and(|last| last.state.is_open())
     }
 }
 
@@ -477,7 +275,7 @@ impl Cobots {
     /// `pause`, `resume` and `stop` are this adapter's only for its devices.
     pub fn handle(&mut self, message: &Value) -> Option<Result<Vec<Value>, String>> {
         match message.get("type").and_then(Value::as_str)? {
-            "cobot_task" | "cobot_inquire" => {}
+            "cobot_task" | "cobot_inquire" | "cobot_clock_read" => {}
             "pause" | "resume" | "stop" => {
                 let source_key = message.get("sourceKey").and_then(Value::as_str)?;
                 self.link_of(source_key)?;
@@ -508,7 +306,10 @@ impl Cobots {
                     let unknown = Report::gateway(TaskState::Rejected, "unknown_device");
                     return Ok(vec![unknown.message(&request_id, &source_key, false)]);
                 };
-                if self.send(index, &json!({ "op": "status", "taskId": request_id })) {
+                let status = DeviceOp::Status {
+                    task_id: request_id.clone(),
+                };
+                if self.send(index, &status) {
                     return Ok(Vec::new());
                 }
                 // The controller is away: the journal answers, and nothing is sent.
@@ -520,6 +321,20 @@ impl Cobots {
                         Report::gateway(TaskState::Indeterminate, "controller_offline")
                     });
                 Ok(vec![report.message(&request_id, &source_key, true)])
+            }
+            Request::CobotClockRead { request_id } => {
+                // The last clock of each controller answers; no controller
+                // is asked. With no clock there is nothing to send.
+                let clocks = self.clocks();
+                if clocks.is_empty() {
+                    eprintln!("cobot_clock_read {request_id}: no controller has sent its clock");
+                    return Ok(Vec::new());
+                }
+                Ok(vec![json!({
+                    "type": "cobot_clock",
+                    "requestId": request_id,
+                    "clocks": clocks,
+                })])
             }
             Request::Pause {
                 request_id,
@@ -576,10 +391,11 @@ impl Cobots {
         self.persist()?;
         if !offline {
             // A write that fails leaves the task open; the reconnect asks status.
-            self.send(
-                index,
-                &json!({ "op": "submit", "taskId": request_id, "task": task }),
-            );
+            let submit = DeviceOp::Submit {
+                task_id: request_id,
+                task,
+            };
+            self.send(index, &submit);
         }
         Ok(answer)
     }
@@ -589,7 +405,7 @@ impl Cobots {
     fn control(&mut self, request_id: String, source_key: &str, op: ControlOp) -> Vec<Value> {
         let sent = self
             .link_of(source_key)
-            .filter(|&index| self.send(index, &json!({ "op": op })));
+            .filter(|&index| self.send(index, &op.into()));
         match sent {
             Some(index) => {
                 self.links[index]
@@ -618,7 +434,12 @@ impl Cobots {
             .map(|(request_id, _)| request_id.clone())
             .collect();
         for request_id in open {
-            self.send(index, &json!({ "op": "status", "taskId": request_id }));
+            self.send(
+                index,
+                &DeviceOp::Status {
+                    task_id: request_id,
+                },
+            );
         }
     }
 
@@ -641,20 +462,7 @@ impl Cobots {
         }
         let running = self.journal.values().any(Dispatch::is_running);
         if running && self.last_clock.is_none_or(|at| at.elapsed() >= CLOCK_EVERY) {
-            let clocks: Vec<Value> = self
-                .links
-                .iter()
-                .filter_map(|link| {
-                    link.clock.map(|(sequence, clock_ms, state)| {
-                        json!({
-                            "sourceKey": link.address.source_key,
-                            "sequence": sequence,
-                            "deviceClockMs": clock_ms,
-                            "state": state,
-                        })
-                    })
-                })
-                .collect();
+            let clocks = self.clocks();
             if !clocks.is_empty() {
                 self.outbox
                     .push(json!({ "type": "cobot_clock", "clocks": clocks }));
@@ -664,11 +472,28 @@ impl Cobots {
         std::mem::take(&mut self.outbox)
     }
 
+    /// The last clock of each controller that sent one.
+    fn clocks(&self) -> Vec<Value> {
+        self.links
+            .iter()
+            .filter_map(|link| {
+                link.clock.map(|(sequence, clock_ms, state)| {
+                    json!({
+                        "sourceKey": link.address.source_key,
+                        "sequence": sequence,
+                        "deviceClockMs": clock_ms,
+                        "state": state,
+                    })
+                })
+            })
+            .collect()
+    }
+
     fn receive(&mut self, incoming: Incoming) {
         match incoming {
             Incoming::Connected(index, writer) => {
                 self.links[index].writer = Some(writer);
-                self.send(index, &json!({ "op": "hello" }));
+                self.send(index, &DeviceOp::Hello);
                 self.ask_open(index);
             }
             Incoming::Disconnected(index) => {
@@ -731,14 +556,10 @@ impl Cobots {
                 sequence,
                 clock_ms,
             } => {
-                let (state, reason) = match state {
-                    ControllerTaskState::Accepted => (TaskState::Accepted, reason),
-                    ControllerTaskState::Running => (TaskState::Running, reason),
-                    ControllerTaskState::Completed => (TaskState::Completed, reason),
-                    ControllerTaskState::Rejected => (TaskState::Rejected, reason),
-                    ControllerTaskState::Indeterminate => (TaskState::Indeterminate, reason),
+                let (state, reason) = match state.known() {
+                    Some(state) => (state, reason),
                     // The controller has no record. The task is never sent again.
-                    ControllerTaskState::Unknown => (
+                    None => (
                         TaskState::Indeterminate,
                         Some("controller_has_no_record".into()),
                     ),
@@ -830,12 +651,15 @@ impl Cobots {
         self.outbox.push(report.message(task_id, source_key, false));
     }
 
-    fn send(&mut self, index: usize, message: &Value) -> bool {
+    fn send(&mut self, index: usize, op: &DeviceOp) -> bool {
         let link = &mut self.links[index];
         let Some(writer) = link.writer.as_mut() else {
             return false;
         };
-        let written = writeln!(writer, "{message}").and_then(|()| writer.flush());
+        let Ok(line) = serde_json::to_string(op) else {
+            return false;
+        };
+        let written = writeln!(writer, "{line}").and_then(|()| writer.flush());
         if written.is_err() {
             // The connection thread sees the end and dials again.
             link.writer = None;

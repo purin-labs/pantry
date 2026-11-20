@@ -4,6 +4,10 @@ import {
   DEVICE_CONNECTION_QUIET_MS,
   DEVICE_GATEWAY_MESSAGE_BYTES,
   parseGatewayMessage,
+  type CobotClockEntry,
+  type CobotReport,
+  type CobotRunSignal,
+  type CobotTaskMessage,
   type CounterPrinterJob,
   type CounterReceiptPrinter,
   type DeviceAlertSetting,
@@ -38,8 +42,10 @@ import {
   recordDeviceEvent,
   recordGatewayHeard,
 } from "../devices/store";
+import { changeDeviceWork, type DeviceWorkChange } from "../devices/work";
 import type { Env } from "../env";
-import { parseOrganisationId, type OrganisationId } from "../ids";
+import { traceWarn } from "../observability";
+import { newRequestId, parseOrganisationId, type OrganisationId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   answerDeviceCommand,
@@ -62,6 +68,23 @@ import {
   reopenPrinterJobs,
   unsentPrinterJob,
 } from "./device-fleet-printer";
+import {
+  deleteGatewayCobotRecords,
+  insertCobotDispatch,
+  knownCobotRuns,
+  listRunDispatches,
+  markGatewayDispatchesUnknown,
+  pruneCobotDispatches,
+  readCobotDispatch,
+  recordCobotReport,
+  setCobotDispatchState,
+  unknownGatewayDispatches,
+  unwatchCobotRun,
+  watchCobotRun,
+  watchingRuns,
+  type CobotDispatchRecord,
+  type CobotDispatchState,
+} from "./device-fleet-cobot";
 import { runDeviceFleetSchemaMigrations } from "./device-fleet-schema";
 import {
   clearTerminalResultUnknown,
@@ -99,6 +122,16 @@ const OUTSIDE_HOURS_CHECK_MS = 5 * 60_000;
 const DAILY_MS = 24 * 60 * 60_000;
 /** A print waits this long for the gateway's answer, then shows `sent`. */
 const PRINTER_ANSWER_MS = 8_000;
+/** A clock read waits this long for the gateway's answer. */
+const CLOCK_ANSWER_MS = 5_000;
+
+/** Who approved a run, as each dispatch of the run names it (Plan 24). */
+export type CobotDispatchApproval = Readonly<{
+  by: string;
+  role: string;
+  via: string;
+  at: number;
+}>;
 
 /** The receipt printer that this location's counter uses. */
 type BoundPrinter = Readonly<{
@@ -128,6 +161,13 @@ export class DeviceFleetActor extends DurableObject<Env> {
   #erased = false;
   /** The calls that wait for a printer's answer, by request. */
   readonly #printerWaiters = new Map<string, (() => void)[]>();
+  /** The clock reads that wait for the gateway's answer, by request. */
+  readonly #clockWaiters = new Map<
+    string,
+    (clocks: readonly CobotClockEntry[]) => void
+  >();
+  /** The signals on their way to each run, in the gateway's order. */
+  readonly #forwards = new Map<string, Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -318,6 +358,7 @@ export class DeviceFleetActor extends DurableObject<Env> {
     deleteGatewayCommands(this.#sql, gatewayId);
     deleteGatewayTerminalCollections(this.#sql, gatewayId);
     deleteGatewayPrinterJobs(this.#sql, gatewayId);
+    deleteGatewayCobotRecords(this.#sql, gatewayId);
   }
 
   /**
@@ -498,6 +539,98 @@ export class DeviceFleetActor extends DurableObject<Env> {
     );
   }
 
+  /**
+   * Plan 24 S4: writes one cobot or oven task to the dispatch ledger, then
+   * sends it. A second dispatch with the same identity returns the stored
+   * state and sends nothing. A task that no socket carried stays `unsent`;
+   * only a person's settle of its run asks for it again, with the same
+   * identity, so the gateway's journal still makes it one move.
+   */
+  async dispatchCobotTask(
+    input: Readonly<{
+      gatewayId: string;
+      deviceId: string;
+      runActorId: string;
+      message: CobotTaskMessage;
+      approval: CobotDispatchApproval;
+    }>,
+  ): Promise<Readonly<{ state: CobotDispatchState; replayed: boolean }>> {
+    const { message } = input;
+    const now = Date.now();
+    const known = readCobotDispatch(this.#sql, message.requestId);
+    if (known !== null && known.state !== "unsent")
+      return { state: known.state, replayed: true };
+    if (known === null) {
+      const scope = await this.#scope();
+      if (scope === null) return { state: "unsent", replayed: false };
+      insertCobotDispatch(this.#sql, input, now);
+      await recordDeviceEvent(scope.database, {
+        organisationId: scope.organisationId,
+        subjectId: input.deviceId,
+        kind: "cobot_task_sent",
+        actor: { kind: "platform", id: null },
+        detail: {
+          requestId: message.requestId,
+          runId: message.runId,
+          taskId: message.taskId,
+          task: message.task,
+          approvedBy: input.approval.by,
+          approvedRole: input.approval.role,
+          approvedVia: input.approval.via,
+          approvedAt: input.approval.at,
+        },
+        idempotencyKey: null,
+        now,
+      });
+    }
+    const sent = this.sendToGateway(input.gatewayId, message);
+    const state: CobotDispatchState = sent ? "sent" : "unsent";
+    setCobotDispatchState(this.#sql, message.requestId, state, now);
+    return { state, replayed: false };
+  }
+
+  /** The dispatch ledger of one run, oldest first. */
+  cobotDispatches(runActorId: string): readonly CobotDispatchRecord[] {
+    return listRunDispatches(this.#sql, runActorId);
+  }
+
+  /**
+   * The clock of each cobot and oven of a gateway now, from the gateway's
+   * last line of each controller. Null when the gateway does not answer.
+   */
+  async readCobotClocks(
+    gatewayId: string,
+  ): Promise<readonly CobotClockEntry[] | null> {
+    const requestId = `clk_${crypto.randomUUID().replaceAll("-", "").slice(0, 24)}`;
+    const answer = new Promise<readonly CobotClockEntry[] | null>((resolve) => {
+      const timer = setTimeout(() => {
+        this.#clockWaiters.delete(requestId);
+        resolve(null);
+      }, CLOCK_ANSWER_MS);
+      this.#clockWaiters.set(requestId, (clocks) => {
+        clearTimeout(timer);
+        this.#clockWaiters.delete(requestId);
+        resolve(clocks);
+      });
+    });
+    if (!this.sendToGateway(gatewayId, { type: "cobot_clock_read", requestId }))
+      this.#clockWaiters.get(requestId)?.([]);
+    const clocks = await answer;
+    return clocks === null || clocks.length === 0 ? null : clocks;
+  }
+
+  /** A run gets the signals of these devices while it is active. */
+  watchCobotRun(
+    runActorId: string,
+    devices: readonly Readonly<{ gatewayId: string; sourceKey: string }>[],
+  ): void {
+    watchCobotRun(this.#sql, runActorId, devices);
+  }
+
+  unwatchCobotRun(runActorId: string): void {
+    unwatchCobotRun(this.#sql, runActorId);
+  }
+
   /** A task began or changed on one of this gateway's devices. */
   async refresh(): Promise<void> {
     await this.#armAlarm(Date.now());
@@ -531,10 +664,17 @@ export class DeviceFleetActor extends DurableObject<Env> {
     return eraseUnregisteredActorState(this.env, this.ctx.storage);
   }
 
-  /** The Organisation ended, so this Actor holds nothing after this call. */
+  /**
+   * The Organisation ended, so this Actor holds nothing after this call. It
+   * also empties the Durable Object of each bake run that it served.
+   */
   async erase(): Promise<void> {
     for (const socket of this.ctx.getWebSockets())
       closeSocket(socket, GATEWAY_REVOKED_CODE, "organisation_ended");
+    const runs = this.env.BAKE_RUN;
+    if (runs !== undefined && !this.#erased)
+      for (const runActorId of knownCobotRuns(this.#sql))
+        await runs.get(runs.idFromString(runActorId)).erase();
     this.#erased = true;
     await this.ctx.storage.deleteAlarm();
     await this.ctx.storage.deleteAll();
@@ -574,6 +714,13 @@ export class DeviceFleetActor extends DurableObject<Env> {
             paymentAttemptId: unknown.paymentAttemptId,
           });
         }
+        // A dispatch whose result became unknown is asked, never sent again.
+        for (const dispatch of unknownGatewayDispatches(this.#sql, gatewayId))
+          this.#send(socket, {
+            type: "cobot_inquire",
+            requestId: dispatch.requestId,
+            sourceKey: dispatch.sourceKey,
+          });
         await this.#applyHealth(scope, socket, gatewayId, message.health, now);
         this.#remember(gatewayId, now);
         await this.#announce(
@@ -606,13 +753,134 @@ export class DeviceFleetActor extends DurableObject<Env> {
         recordPrinterResult(this.#sql, gatewayId, message, now);
         this.#releasePrinterWaiters(message.requestId);
         return;
-      // A cobot's task reports, clocks and shadow observations (Plan 24 S3).
-      // They record nothing yet: S4 adds the dispatch ledger that settles them.
+      // A cobot's task reports, clocks and shadow observations (Plan 24).
       case "cobot_report":
+        await this.#applyCobotReport(scope, gatewayId, message, now);
+        return;
       case "cobot_clock":
+        if (message.requestId !== undefined) {
+          this.#clockWaiters.get(message.requestId)?.(message.clocks);
+          return;
+        }
+        for (const runActorId of watchingRuns(
+          this.#sql,
+          gatewayId,
+          message.clocks.map((entry) => entry.sourceKey),
+        ))
+          this.#forward(runActorId, { kind: "clock", clock: message });
+        return;
       case "cobot_observed":
+        for (const runActorId of watchingRuns(this.#sql, gatewayId, [
+          message.sourceKey,
+        ]))
+          this.#forward(runActorId, { kind: "observed", observed: message });
         return;
     }
+  }
+
+  /**
+   * A report settles the dispatch that has its identity, moves the device's
+   * Work fact on, and goes to the dispatch's run. A dispatch whose result
+   * became unknown keeps that Work fact until a person settles it.
+   */
+  async #applyCobotReport(
+    scope: OrganisationExecutionScope,
+    gatewayId: string,
+    report: CobotReport,
+    now: number,
+  ): Promise<void> {
+    const before = recordCobotReport(this.#sql, gatewayId, report, now);
+    if (before === null) return;
+    if (before.state !== "result_unknown" && before.state !== report.state) {
+      const to: DeviceWorkChange =
+        report.state === "accepted" || report.state === "running"
+          ? "running"
+          : report.state === "indeterminate"
+            ? "result_unknown"
+            : "idle";
+      await changeDeviceWork(this.env, scope, {
+        deviceId: before.deviceId,
+        taskRef: before.requestId,
+        to,
+        now,
+      });
+      if (to !== "running")
+        await recordDeviceEvent(scope.database, {
+          organisationId: scope.organisationId,
+          subjectId: before.deviceId,
+          kind: `cobot_task_${report.state}`,
+          actor: { kind: "gateway", id: gatewayId },
+          detail: {
+            requestId: before.requestId,
+            runId: before.runId,
+            taskId: before.taskId,
+            reason: report.reason,
+          },
+          idempotencyKey: null,
+          now,
+        });
+    }
+    this.#forward(before.runActorId, { kind: "report", report });
+  }
+
+  /** Each open dispatch of a lost gateway has an unknown result now. */
+  async #cobotConnectionLost(
+    scope: OrganisationExecutionScope,
+    gatewayId: string,
+    now: number,
+  ): Promise<void> {
+    const lost = markGatewayDispatchesUnknown(this.#sql, gatewayId, now);
+    const byRun = new Map<string, string[]>();
+    for (const dispatch of lost) {
+      await changeDeviceWork(this.env, scope, {
+        deviceId: dispatch.deviceId,
+        taskRef: dispatch.requestId,
+        to: "result_unknown",
+        now,
+      });
+      byRun.set(dispatch.runActorId, [
+        ...(byRun.get(dispatch.runActorId) ?? []),
+        dispatch.requestId,
+      ]);
+    }
+    for (const [runActorId, requestIds] of byRun)
+      this.#forward(runActorId, {
+        kind: "connection_lost",
+        requestIds,
+        at: now,
+      });
+  }
+
+  /**
+   * Gives one signal to a run's Durable Object, after the signals before it,
+   * so that the run reads the gateway's order. The run is known only by the
+   * id string that it gave with its dispatch or its watch.
+   */
+  #forward(runActorId: string, signal: CobotRunSignal): void {
+    const namespace = this.env.BAKE_RUN;
+    if (namespace === undefined) return;
+    const previous = this.#forwards.get(runActorId) ?? Promise.resolve();
+    const next = previous.then(async () => {
+      try {
+        await namespace
+          .get(namespace.idFromString(runActorId))
+          .receiveCobotSignal(signal);
+      } catch (error) {
+        traceWarn("devices.cobot_signal_undelivered", {
+          requestId: newRequestId(),
+          runActorId,
+          kind: signal.kind,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    });
+    this.#forwards.set(runActorId, next);
+    this.ctx.waitUntil(
+      next.then(() => {
+        if (this.#forwards.get(runActorId) === next)
+          this.#forwards.delete(runActorId);
+      }),
+    );
   }
 
   /**
@@ -710,6 +978,16 @@ export class DeviceFleetActor extends DurableObject<Env> {
       });
     for (const change of changes) {
       await syncDeviceFaultAlert(this.env, scope, change.device, now);
+      if (change.device.health === "fault" && change.previous !== "fault")
+        for (const runActorId of watchingRuns(this.#sql, gatewayId, [
+          change.device.sourceKey,
+        ]))
+          this.#forward(runActorId, {
+            kind: "fault",
+            sourceKey: change.device.sourceKey,
+            faultCode: change.device.faultCode,
+            at: now,
+          });
       if (change.device.health === "fault" && change.previous !== "fault")
         await requestFaultSnapshots(scope, {
           device: change.device,
@@ -841,6 +1119,7 @@ export class DeviceFleetActor extends DurableObject<Env> {
       this.#releasePrinterWaiters(requestId);
     if (!replaced) {
       markGatewayCollectionsUnknown(this.#sql, attachment.gatewayId, now);
+      await this.#cobotConnectionLost(scope, attachment.gatewayId, now);
       await this.#announce(
         scope,
         {
@@ -925,6 +1204,7 @@ export class DeviceFleetActor extends DurableObject<Env> {
     );
     pruneSettledDeviceCommands(this.#sql, now);
     prunePrinterJobs(this.#sql, now);
+    pruneCobotDispatches(this.#sql, now);
     this.#sql.exec(
       `INSERT INTO fleet_upkeep (singleton, pruned_at) VALUES (1, ?)
        ON CONFLICT (singleton) DO UPDATE SET pruned_at = excluded.pruned_at`,

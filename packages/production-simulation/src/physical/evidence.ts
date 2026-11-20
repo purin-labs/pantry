@@ -138,10 +138,16 @@ function deviceCheck(
   const device = ledger.devices[message.sourceKey];
   if (device === undefined)
     return { outcome: "refused", reason: "unknown_device" };
-  if (message.sequence <= device.sequence)
-    return device.seen[String(message.sequence)] === fingerprint(message)
+  if (message.sequence <= device.sequence) {
+    if (device.seen[String(message.sequence)] === fingerprint(message))
+      return { outcome: "duplicate", reason: null };
+    // The gateway builds each clock message from the device's last line, so
+    // a clock entry can repeat the sequence of a report that came first. It
+    // repeats time that the run already holds, and it says nothing new.
+    return !("type" in message) && message.deviceClockMs <= device.clockMs
       ? { outcome: "duplicate", reason: null }
       : { outcome: "refused", reason: "stale_sequence" };
+  }
   if (message.deviceClockMs < (ledger.origin[message.sourceKey] ?? 0))
     return { outcome: "refused", reason: "before_origin" };
   if (message.deviceClockMs < device.clockMs)

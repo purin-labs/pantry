@@ -320,6 +320,7 @@ function capabilityFromResourceScope(
     case CAPABILITY_KEYS.jevFeaturesManage:
     case CAPABILITY_KEYS.bakeRead:
     case CAPABILITY_KEYS.bakePropose:
+    case CAPABILITY_KEYS.bakeRunPause:
     case CAPABILITY_KEYS.marketingEmailDraftEdit:
     case CAPABILITY_KEYS.commerceActionPropose:
     case CAPABILITY_KEYS.messageAttachmentInspect:

@@ -1,5 +1,5 @@
 {
-  "files": ["services/platform/src/devices/work.ts"],
+  "files": [],
   "exports": [
     "apps/portal/src/console-sidebar.tsx#ConsoleSidebarNavigationItem",
     "apps/portal/src/console-tools.tsx#CanvasHome",
@@ -669,7 +669,6 @@
     "services/platform/src/data/whatsapp.ts#WhatsAppProposalDisposal",
     "services/platform/src/database-handles.ts#GlobalStatement",
     "services/platform/src/database-handles.ts#SingleDatabaseSession",
-    "services/platform/src/devices/views.ts#readKitchenDeviceView",
     "services/platform/src/gateway-routing/domain.ts#GatewayStaticRoute",
     "services/platform/src/generated/action-registry.ts#GENERATED_ACTION_TOOLS",
     "services/platform/src/generated/action-registry.ts#GeneratedActionTool",

@@ -64,6 +64,8 @@ import { jevFeaturesManage, jevFeaturesRead } from "./jev/jev";
 import {
   bakeProposal,
   bakeRead,
+  bakeRunPause,
+  bakeRunRead,
   bakeStockLevelProposal,
   costsPlanSave,
   costsRead,
@@ -169,6 +171,8 @@ export const TOOLS = [
   bakeRead,
   bakeProposal,
   bakeStockLevelProposal,
+  bakeRunRead,
+  bakeRunPause,
   // The tools that a page command selects (Plan 87): the Kitchen workspace,
   // Costs & margins, the Pastry Bench and Café › Register.
   ...SURFACE_TOOL_LIST,

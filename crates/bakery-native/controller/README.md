@@ -4,7 +4,9 @@
 FR10 arms (`cobot-1`, `cobot-2`) and one deck oven (`oven-1`) (Plan 24 S2,
 decisions D3 and D5). It runs as its own process on the gateway computer. The
 shop gateway's `cobot` adapter (`crates/shop-gateway/src/cobot.rs`) talks to
-it. It has no physical dispatch authority.
+it. It has no physical dispatch authority. The types of the device lines are in
+`crates/cobot-protocol`, which the adapter also uses. `port.rs` holds the lines
+of the control port, which only the simulator has.
 
 The source stays in `controller/`, outside `src/`, so the engine identity and
 the pinned browser bundle do not change (`pnpm lint:physics-bundle`).

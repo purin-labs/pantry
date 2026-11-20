@@ -506,4 +506,6 @@ function supplierRefusal(error: SupplierRegistrationError): string {
 export {
   proposeBakeForEmbeddedHarness,
   readBakesForEmbeddedHarness,
+  readBakeRunForEmbeddedHarness,
+  pauseBakeRunForEmbeddedHarness,
 } from "./bake-handlers";

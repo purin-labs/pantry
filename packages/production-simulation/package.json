@@ -61,6 +61,7 @@
     "@purin-labs/bakery-model": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "fflate": "0.8.3",

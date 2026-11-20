@@ -3,6 +3,7 @@ import { Value } from "typebox/value";
 
 import {
   cobotClockMessageSchema,
+  cobotClockReadMessageSchema,
   cobotInquireMessageSchema,
   cobotObservedMessageSchema,
   cobotReportMessageSchema,
@@ -360,6 +361,7 @@ export const platformGatewayMessageSchema = Type.Union([
   ),
   cobotTaskMessageSchema,
   cobotInquireMessageSchema,
+  cobotClockReadMessageSchema,
   deviceStopMessageSchema,
 ]);
 export type PlatformGatewayMessage = Static<

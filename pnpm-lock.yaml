@@ -632,6 +632,9 @@ importers:
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../control-api
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std

@@ -111,6 +111,9 @@ export function permissionRequestDefinition(
       (missing.includes(CAPABILITY_KEYS.bakePropose)
         ? ` When the work proposes a bake or a stock level, ask for ${CAPABILITY_KEYS.bakePropose}.`
         : "") +
+      (missing.includes(CAPABILITY_KEYS.bakeRunPause)
+        ? ` When the work pauses a bake run, ask for ${CAPABILITY_KEYS.bakeRunPause}.`
+        : "") +
       (missing.includes(CAPABILITY_KEYS.devicePause)
         ? ` When the work pauses a shop device, ask for ${CAPABILITY_KEYS.devicePause}.`
         : "") +

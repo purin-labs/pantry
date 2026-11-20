@@ -16,4 +16,10 @@ export { recipeRead, recipeSave } from "./recipes";
 export { savedBakeryRunRead } from "./saved-runs";
 export { supplierCreate, supplierRead } from "./suppliers";
 export { workflowCanvasMove, workflowCanvasRead } from "./workflow-canvas";
-export { bakeProposal, bakeRead, bakeStockLevelProposal } from "./bakes";
+export {
+  bakeProposal,
+  bakeRead,
+  bakeRunPause,
+  bakeRunRead,
+  bakeStockLevelProposal,
+} from "./bakes";

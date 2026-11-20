@@ -10,6 +10,10 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./device-cobot": {
+      "types": "./src/device-cobot.ts",
+      "default": "./src/device-cobot.ts"
+    },
     "./ids": {
       "types": "./src/ids.ts",
       "default": "./src/ids.ts"

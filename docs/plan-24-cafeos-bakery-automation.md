@@ -143,6 +143,37 @@ Exit: the gateway journey from Plan 85 runs with two simulated cobots behind the
 
 Exit: one approved bake runs to its end with two cobots, and the views agree on each task.
 
+State (21 November 2026, branch `plan-24-s4`, not released): built.
+
+- Start: the approval of a proposal (Portal or Slack) starts the run (D1). The run compiles from
+  the proposal, the recipe revision's bake time and the active devices at the kitchen: the first
+  two cobots by name with `move_mould_group` and the oven with `bake`. A device that is missing
+  or not ready leaves the run `not_started` with its reason on the Bakes page; an operator starts
+  it again with the same approval. The recipe holds no oven temperature yet, so the run uses
+  180 °C.
+- Run: `BakeRunActor` (Worker layer) gives Kitchen's `kitchen/bakes/run.ts` its storage, alarm
+  and ports. For each task the run writes its action record (approval, task, device, dispatch
+  identity) in its own SQLite, reserves the device through Plan 85, records the identity in its
+  evidence and then asks `DeviceFleetActor` to send. The commerce `action_ledger` needs an
+  integration account and an agent session, so the action record stays in the run's table.
+- Ledger: `DeviceFleetActor` writes each dispatch before `cobot_task`, answers a second dispatch
+  with the stored state, moves the Work fact on from each report, turns open dispatches into
+  `result_unknown` on a lost socket and sends `cobot_inquire` at the next hello. It gives each
+  report, clock, observed move and fault of a watched device to the run, by the id string of the
+  run's Durable Object. The run's logical zero is the answer to `cobot_clock_read`.
+- Holds: a refused or stale report, a failed attempt, an unknown result, a fault, 30 s with no
+  signal, a device that is not ready or a task that no socket carried stops the next dispatch,
+  and the run shows one hold that an operator settles (`continue` or `stop`).
+- Stock (D4): the run changes no stock. An operator's check of the good pieces raises the counter
+  stock through the commerce authority with its receipt, and the proposal ends.
+- Views: the Bakes page drawer reads one object (`GET .../bakes/proposals/:id/run`): the task
+  graph, the timeline of each cobot and the oven, and the place of each mould group. The
+  Three.js kitchen does not show the run yet.
+- Agent: `bake_run_read` and `bake_run_pause` (capability `kitchen.bake_run.pause`). The agent
+  cannot resume, settle, stop or dispatch.
+- Patch: `services/platform/scripts/plan-24-bake-run-d1-patch.sql`, and
+  `node scripts/capability-policy-backfill-sql.mjs` for the new capability.
+
 ### S5 — Shadow mode (2 days)
 
 - The controller simulator runs a bake from its own script, as a person at the teach pendant would.
@@ -166,6 +197,12 @@ Each case is one E2E journey with its own outcome:
 
 Exit: no move without an approval, no duplicate move, and each uncertain outcome stops the next
 dispatch with one visible disposition.
+
+## Steps done
+
+| Step | What exists | Proof |
+| --- | --- | --- |
+| S4 | The bake run Durable Object on the server: start at approval, the dispatch ledger in the device fleet Actor, holds that a person settles, pause, stop, the check that raises the stock, one read for the drawer's canvas, timeline and positions, and two agent tools | `services/platform/tests/e2e/bake-run.test.ts` (artifacts `output/plan-24/bake-run-journey.json`, `output/plan-24/bake-run-agent.json`) |
 
 ## Exit gate of the simulation phase
 

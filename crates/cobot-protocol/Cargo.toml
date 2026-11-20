@@ -1,0 +1,12 @@
+[package]
+name = "cobot-protocol"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+
+# The controller protocol of Plan 24 (part B): the JSON lines between the shop
+# gateway's `cobot` adapter and a cobot or oven controller. `bakery-native`
+# (outside the root workspace) takes it as a path dependency, so the versions
+# stay explicit.
+[dependencies]
+serde = { version = "1", features = ["derive"] }

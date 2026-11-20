@@ -195,6 +195,7 @@ import type {
 import { OrganisationCommerce } from "./organisation/organisation-commerce";
 import {
   bakeKitchenPorts,
+  readBakeRunOf,
   counterStockChanges,
   readBakeBoard,
 } from "./organisation/bake-kitchen";
@@ -1340,6 +1341,19 @@ export class OrganisationDO extends OrganisationCommerce {
         scope.organisationId,
         input.proposalId,
       ),
+    }));
+  }
+
+  /**
+   * Plan 24 S4: the one read of a proposal's bake run, which the canvas, the
+   * timeline and the 3D kitchen show. Null when the proposal has no run.
+   */
+  async readBakeRun(
+    input: Readonly<{ organisationId: OrganisationId; proposalId: string }>,
+  ) {
+    return this.command(input.organisationId, async (scope) => ({
+      ok: true as const,
+      value: await readBakeRunOf(this.env, scope, input.proposalId),
     }));
   }
 

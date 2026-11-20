@@ -127,6 +127,33 @@ const boardSchema = Type.Object({
   ok: Type.Literal(true),
   levels: Type.Array(stockLevelSchema),
   proposals: Type.Array(proposalSchema),
+  /** The bake run of each approved proposal (Plan 24 S4), newest first. */
+  runs: Type.Array(
+    Type.Object({
+      runId: Type.String({ minLength: 1 }),
+      proposalId: Type.String({ pattern: "^bake_[a-f0-9]{24}$" }),
+      state: Type.Union([
+        Type.Literal("not_started"),
+        Type.Literal("running"),
+        Type.Literal("paused"),
+        Type.Literal("held"),
+        Type.Literal("completed"),
+        Type.Literal("stopped"),
+        Type.Literal("checked"),
+      ]),
+      problem: Type.Union([
+        Type.Object({
+          code: Type.String({ minLength: 1 }),
+          message: Type.String({ minLength: 1 }),
+        }),
+        Type.Null(),
+      ]),
+      holdCode: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
+      startedAt: Type.Union([time, Type.Null()]),
+      endedAt: Type.Union([time, Type.Null()]),
+      goodPieces: Type.Union([Type.Integer({ minimum: 0 }), Type.Null()]),
+    }),
+  ),
   /** The counted products that a level may name. */
   products: Type.Array(
     Type.Object({

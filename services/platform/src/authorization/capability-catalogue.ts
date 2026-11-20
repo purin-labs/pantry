@@ -76,6 +76,7 @@ export const CAPABILITY_KEYS = {
   jevFeaturesManage: "jev.features.manage",
   bakeRead: "kitchen.bake.read",
   bakePropose: "kitchen.bake.propose",
+  bakeRunPause: "kitchen.bake_run.pause",
 } as const;
 
 export const WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE = "active_cases";
@@ -487,6 +488,16 @@ const CAPABILITY_SEEDS = {
       "Propose a bake run of a fresh product, which an operator, an admin or the owner approves or rejects, or propose a stock level, which an admin confirms. The agent cannot approve a bake.",
     category: "commerce",
     risk: "propose",
+    target: "platform",
+    providerDependency: NONE,
+    policyModes: "enabled_disabled",
+  },
+  [CAPABILITY_KEYS.bakeRunPause]: {
+    label: "Pause a bake run",
+    description:
+      "Request a pause of an approved bake run for an operator, an admin or the owner who asked: no next task goes to a cobot, and the run's cobots pause. A person resumes, settles or stops the run. The agent cannot approve, dispatch or settle.",
+    category: "commerce",
+    risk: "external_effect",
     target: "platform",
     providerDependency: NONE,
     policyModes: "enabled_disabled",

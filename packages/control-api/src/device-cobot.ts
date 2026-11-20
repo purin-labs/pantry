@@ -17,19 +17,23 @@ const reasonCode = Type.String({
   pattern: "^[a-z0-9_]+$",
 });
 
+export const cobotStationSchema = Type.Union([
+  Type.Literal("cold_rack"),
+  Type.Literal("oven"),
+  Type.Literal("cooling_rack"),
+]);
+export type CobotStation = Static<typeof cobotStationSchema>;
+
 const cobotPlaceSchema = Type.Object(
   {
-    station: Type.Union([
-      Type.Literal("cold_rack"),
-      Type.Literal("oven"),
-      Type.Literal("cooling_rack"),
-    ]),
+    station: cobotStationSchema,
     shelf: Type.Integer({ minimum: 1, maximum: 12 }),
   },
   strict,
 );
+export type CobotPlace = Static<typeof cobotPlaceSchema>;
 
-const cobotTaskSchema = Type.Union([
+export const cobotTaskSchema = Type.Union([
   Type.Object(
     {
       kind: Type.Literal("move_mould_group"),
@@ -50,13 +54,14 @@ const cobotTaskSchema = Type.Union([
 ]);
 export type CobotTask = Static<typeof cobotTaskSchema>;
 
-const cobotTaskStateSchema = Type.Union([
+export const cobotTaskStateSchema = Type.Union([
   Type.Literal("accepted"),
   Type.Literal("running"),
   Type.Literal("completed"),
   Type.Literal("rejected"),
   Type.Literal("indeterminate"),
 ]);
+export type CobotTaskState = Static<typeof cobotTaskStateSchema>;
 
 const carrierAtSchema = Type.Union([
   Type.Literal("source"),
@@ -64,6 +69,8 @@ const carrierAtSchema = Type.Union([
   Type.Literal("destination"),
   Type.Literal("unknown"),
 ]);
+/** Where the controller evidences the mould group. */
+export type CarrierAt = Static<typeof carrierAtSchema>;
 
 const deviceRunStateSchema = Type.Union([
   Type.Literal("idle"),
@@ -72,6 +79,7 @@ const deviceRunStateSchema = Type.Union([
   Type.Literal("stopped"),
   Type.Literal("estop"),
 ]);
+export type DeviceRunState = Static<typeof deviceRunStateSchema>;
 
 const counter = Type.Integer({ minimum: 0 });
 
@@ -87,6 +95,7 @@ export const cobotTaskMessageSchema = Type.Object(
   },
   strict,
 );
+export type CobotTaskMessage = Static<typeof cobotTaskMessageSchema>;
 
 /** Pantry -> gateway: the state of a task, from the controller. */
 export const cobotInquireMessageSchema = Type.Object(
@@ -95,6 +104,16 @@ export const cobotInquireMessageSchema = Type.Object(
     requestId: dispatchIdSchema,
     sourceKey,
   },
+  strict,
+);
+
+/**
+ * Pantry -> gateway: the clock of each cobot and oven now, before a run's
+ * first task. The gateway answers at once with `cobot_clock` and the same
+ * `requestId`, from the last clock line of each controller.
+ */
+export const cobotClockReadMessageSchema = Type.Object(
+  { type: Type.Literal("cobot_clock_read"), requestId: shortText },
   strict,
 );
 
@@ -132,28 +151,31 @@ export const cobotReportMessageSchema = Type.Object(
 );
 export type CobotReport = Static<typeof cobotReportMessageSchema>;
 
+const cobotClockEntrySchema = Type.Object(
+  {
+    sourceKey,
+    sequence: counter,
+    deviceClockMs: counter,
+    state: deviceRunStateSchema,
+  },
+  strict,
+);
+export type CobotClockEntry = Static<typeof cobotClockEntrySchema>;
+
 /**
  * Gateway -> Pantry: the clock of each cobot and oven, at most one message a
- * second, only while the gateway's journal holds an open task.
+ * second, only while the gateway's journal holds an open task. The answer to
+ * `cobot_clock_read` has its `requestId`; the periodic message has none.
  */
 export const cobotClockMessageSchema = Type.Object(
   {
     type: Type.Literal("cobot_clock"),
-    clocks: Type.Array(
-      Type.Object(
-        {
-          sourceKey,
-          sequence: counter,
-          deviceClockMs: counter,
-          state: deviceRunStateSchema,
-        },
-        strict,
-      ),
-      { minItems: 1, maxItems: 64 },
-    ),
+    requestId: Type.Optional(shortText),
+    clocks: Type.Array(cobotClockEntrySchema, { minItems: 1, maxItems: 64 }),
   },
   strict,
 );
+export type CobotClock = Static<typeof cobotClockMessageSchema>;
 
 /** Gateway -> Pantry: a move that the controller ran from its own script (S5). */
 export const cobotObservedMessageSchema = Type.Object(
@@ -174,3 +196,26 @@ export const cobotObservedMessageSchema = Type.Object(
   },
   strict,
 );
+export type CobotObserved = Static<typeof cobotObservedMessageSchema>;
+
+/**
+ * What the device fleet Actor gives a run's Durable Object about the run's
+ * devices (Plan 24 S4), in the order that the gateway sent it. A fault is the
+ * `health` report of a watched device; `connection_lost` names the open
+ * dispatches that a lost gateway socket left with an unknown result.
+ */
+export type CobotRunSignal =
+  | Readonly<{ kind: "report"; report: CobotReport }>
+  | Readonly<{ kind: "clock"; clock: CobotClock }>
+  | Readonly<{ kind: "observed"; observed: CobotObserved }>
+  | Readonly<{
+      kind: "fault";
+      sourceKey: string;
+      faultCode: string | null;
+      at: number;
+    }>
+  | Readonly<{
+      kind: "connection_lost";
+      requestIds: readonly string[];
+      at: number;
+    }>;

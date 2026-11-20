@@ -11,10 +11,9 @@ use bakery_native::assets::{Assets, Cell};
 use bakery_native::handoff::CycleDestination;
 use bakery_native::program::{self, Loaded, Preparation};
 use bakery_native::robot::Robot;
+use cobot_protocol::CarrierAt;
 use serde::Serialize;
 use serde_json::Value;
-
-use crate::wire::CarrierAt;
 
 /// How a physics run ended.
 #[derive(Clone, Debug, Serialize)]

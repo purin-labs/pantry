@@ -220,7 +220,9 @@ import {
 } from "../../agent-tools/integrations/handlers";
 import {
   createSupplierForEmbeddedHarness,
+  pauseBakeRunForEmbeddedHarness,
   proposeBakeForEmbeddedHarness,
+  readBakeRunForEmbeddedHarness,
   readBakesForEmbeddedHarness,
   readRecipeWorkflowForEmbeddedHarness,
   readRecipesForEmbeddedHarness,
@@ -1149,6 +1151,8 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
               lease: input.lease,
               assignment,
             }),
+          readBakeRun: tool(readBakeRunForEmbeddedHarness),
+          pauseBakeRun: tool(pauseBakeRunForEmbeddedHarness),
         },
         devices: {
           readDevices: tool(readDevicesForEmbeddedHarness),

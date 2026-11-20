@@ -6,6 +6,9 @@ import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import { BAKE_PROPOSAL_MACHINE } from "./bake-proposal.machine";
+import type { BakeRunError, RunActor } from "./run";
+import { bakeRunIdOf, readBakeRun, writeBakeRunCheck } from "./run-records";
+import { startProposalRun, type BakeRunLaunchPorts } from "./run-start";
 import {
   insertBakeProposal,
   openWaitingBakeProposal,
@@ -52,7 +55,27 @@ export type BakeKitchenPorts = Readonly<{
    * on the Bakes page when Slack is not there.
    */
   announce(proposal: BakeProposal): Promise<void>;
+  /** The devices and the run's Durable Object, for an approved run. */
+  launchRun: BakeRunLaunchPorts;
+  /** A pause, resume, stop or settle of a started run's Durable Object. */
+  controlRun(
+    runId: string,
+    action: BakeRunAction,
+    actor: RunActor,
+  ): Promise<Result<null, BakeRunError>>;
+  /**
+   * Raises the counter stock by the checked pieces through the commerce
+   * authority, once for each key, and returns its receipt.
+   */
+  raiseCounterStock(
+    proposal: BakeProposal,
+    input: Readonly<{ pieces: number; key: string; checkedBy: string }>,
+  ): Promise<Result<Readonly<{ receiptId: string }>, BakeCommandError>>;
 }>;
+
+export type BakeRunAction =
+  | Readonly<{ kind: "pause" | "resume" | "stop" }>
+  | Readonly<{ kind: "settle"; decision: "continue" | "stop" }>;
 
 export type BakeMemberRole = BakeDeciderRole | "viewer";
 
@@ -88,6 +111,30 @@ export type BakeCommand =
       kind: "end";
       proposalId: string;
       reason: string;
+    }>
+  | Readonly<{
+      /** Starts the run of an approved proposal again, with its approval. */
+      kind: "start_run";
+      proposalId: string;
+      requester: Readonly<{ userId: string; role: BakeMemberRole }>;
+    }>
+  | Readonly<{
+      /** A pause from a person or from the agent for the person who asked. */
+      kind: "run_action";
+      proposalId: string;
+      action: BakeRunAction;
+      requester: Readonly<{
+        userId: string;
+        role: BakeMemberRole;
+        via: "person" | "agent";
+      }>;
+    }>
+  | Readonly<{
+      /** The check of the released pieces, which raises the counter stock. */
+      kind: "check_run";
+      proposalId: string;
+      goodPieces: number;
+      checker: Readonly<{ userId: string; role: BakeMemberRole }>;
     }>;
 
 export type BakeCommandError = Readonly<{
@@ -102,7 +149,11 @@ export type BakeCommandError = Readonly<{
     | "bake_proposal_not_approved"
     | "bake_role_insufficient"
     | "bake_reason_required"
-    | "bake_oven_missing";
+    | "bake_oven_missing"
+    | "bake_run_missing"
+    | "bake_run_not_completed"
+    | "bake_run_refused"
+    | "bake_stock_unavailable";
   message: string;
 }>;
 
@@ -113,6 +164,14 @@ export type BakeCommandOutcome =
       kind: "decided" | "ended";
       proposal: BakeProposal;
       opened: BakeProposal | null;
+    }>
+  /** A run action or a start was accepted; read the run for its state. */
+  | Readonly<{ kind: "run"; proposal: BakeProposal }>
+  | Readonly<{
+      kind: "run_checked";
+      proposal: BakeProposal;
+      receiptId: string;
+      goodPieces: number;
     }>
   /** The proposal was decided or ended before: nothing changed. */
   | Readonly<{ kind: "unchanged"; proposal: BakeProposal }>;
@@ -179,6 +238,12 @@ export async function runBakeCommand(
         ports,
         now,
       );
+    case "start_run":
+      return restartBakeRun(db, organisationId, command, ports, now);
+    case "run_action":
+      return controlBakeRun(db, organisationId, command, ports);
+    case "check_run":
+      return checkBakeRun(db, organisationId, command, ports, now);
   }
 }
 
@@ -438,6 +503,10 @@ async function decideBakeProposal(
   if (!written)
     return { ok: true, value: { kind: "unchanged", proposal: decided } };
   await ports.announce(decided);
+  // The approval starts the run (D1). A run that cannot start keeps its
+  // reason for the Bakes page; the approval stands.
+  if (decided.state === "approved")
+    await startProposalRun(db, organisationId, decided, ports.launchRun, now);
   const opened =
     decided.state === "rejected"
       ? await openWaiting(
@@ -535,4 +604,190 @@ export async function readApprovedBakeProposal(
 ): Promise<BakeProposal | null> {
   const proposal = await readBakeProposal(db, organisationId, proposalId);
   return proposal?.state === "approved" ? proposal : null;
+}
+
+async function approvedProposal(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  proposalId: string,
+): Promise<Result<BakeProposal, BakeCommandError>> {
+  const proposal = await readBakeProposal(db, organisationId, proposalId);
+  if (proposal === null)
+    return refuse(
+      "bake_proposal_missing",
+      "This bake proposal does not exist.",
+    );
+  if (proposal.state !== "approved" && proposal.state !== "ended")
+    return refuse(
+      "bake_proposal_not_approved",
+      "Only an approved proposal has a bake run.",
+    );
+  return { ok: true, value: proposal };
+}
+
+/** A person starts a run that did not start, with the proposal's approval. */
+async function restartBakeRun(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  command: Variant<BakeCommand, "start_run">,
+  ports: BakeKitchenPorts,
+  now: number,
+): Promise<Result<BakeCommandOutcome, BakeCommandError>> {
+  if (!mayDecideBakes(command.requester.role))
+    return refuse(
+      "bake_role_insufficient",
+      "Only an operator, an admin or the owner may start a bake run.",
+    );
+  const proposal = await approvedProposal(
+    db,
+    organisationId,
+    command.proposalId,
+  );
+  if (!proposal.ok) return proposal;
+  const started = await startProposalRun(
+    db,
+    organisationId,
+    proposal.value,
+    ports.launchRun,
+    now,
+  );
+  if (!started.ok) return refuse("bake_run_refused", started.error.message);
+  return { ok: true, value: { kind: "run", proposal: proposal.value } };
+}
+
+/**
+ * A pause, a resume, a stop or a settle of a run. Each needs the operator
+ * role or a higher one now; the agent only pauses, for the person who asked.
+ */
+async function controlBakeRun(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  command: Variant<BakeCommand, "run_action">,
+  ports: BakeKitchenPorts,
+): Promise<Result<BakeCommandOutcome, BakeCommandError>> {
+  const { requester, action } = command;
+  if (!mayDecideBakes(requester.role))
+    return refuse(
+      "bake_role_insufficient",
+      "Only an operator, an admin or the owner may pause, resume, stop or settle a bake run.",
+    );
+  if (requester.via === "agent" && action.kind !== "pause")
+    return refuse(
+      "bake_role_insufficient",
+      "The agent may only request a pause. A person resumes, stops or settles a run.",
+    );
+  const proposal = await approvedProposal(
+    db,
+    organisationId,
+    command.proposalId,
+  );
+  if (!proposal.ok) return proposal;
+  const run = await readBakeRun(
+    db,
+    organisationId,
+    bakeRunIdOf(proposal.value.proposalId),
+  );
+  if (run === null || run.actorId === null)
+    return refuse(
+      "bake_run_missing",
+      "This proposal's bake run has not started.",
+    );
+  const done = await ports.controlRun(run.runId, action, {
+    kind: requester.via === "agent" ? "agent" : "person",
+    id: requester.userId,
+  });
+  if (!done.ok) return refuse("bake_run_refused", done.error.message);
+  return { ok: true, value: { kind: "run", proposal: proposal.value } };
+}
+
+/**
+ * The check of the released pieces (D4). Only this check raises the counter
+ * stock, through the commerce authority, with its receipt. Then the proposal
+ * ends. A second check changes nothing.
+ */
+async function checkBakeRun(
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  command: Variant<BakeCommand, "check_run">,
+  ports: BakeKitchenPorts,
+  now: number,
+): Promise<Result<BakeCommandOutcome, BakeCommandError>> {
+  const role = command.checker.role;
+  if (!mayDecideBakes(role))
+    return refuse(
+      "bake_role_insufficient",
+      "Only an operator, an admin or the owner may record the check of a bake.",
+    );
+  const proposal = await approvedProposal(
+    db,
+    organisationId,
+    command.proposalId,
+  );
+  if (!proposal.ok) return proposal;
+  const runId = bakeRunIdOf(proposal.value.proposalId);
+  const run = await readBakeRun(db, organisationId, runId);
+  if (run?.state === "checked" && run.check !== null)
+    return {
+      ok: true,
+      value: {
+        kind: "run_checked",
+        proposal: proposal.value,
+        receiptId: run.check.receiptId,
+        goodPieces: run.check.goodPieces,
+      },
+    };
+  if (run?.state !== "completed")
+    return refuse(
+      "bake_run_not_completed",
+      "The bake run has not completed. Check the pieces after the unload.",
+    );
+  if (
+    !Number.isInteger(command.goodPieces) ||
+    command.goodPieces < 0 ||
+    command.goodPieces > proposal.value.quantityPieces
+  )
+    return refuse(
+      "bake_quantity_invalid",
+      `Give the good pieces, from 0 to ${proposal.value.quantityPieces}.`,
+    );
+  const raised =
+    command.goodPieces === 0
+      ? { ok: true as const, value: { receiptId: `none_${runId}` } }
+      : await ports.raiseCounterStock(proposal.value, {
+          pieces: command.goodPieces,
+          key: `bake_check_${runId}`,
+          checkedBy: command.checker.userId,
+        });
+  if (!raised.ok) return raised;
+  if (!mayDecideBakes(role)) throw new Error("A guard let a viewer check.");
+  await writeBakeRunCheck(db, organisationId, {
+    runId,
+    by: command.checker.userId,
+    role,
+    goodPieces: command.goodPieces,
+    receiptId: raised.value.receiptId,
+    now,
+  });
+  await endBakeProposal(
+    db,
+    organisationId,
+    proposal.value.proposalId,
+    `Checked: ${command.goodPieces} good pieces reached the counter.`,
+    ports,
+    now,
+  );
+  const ended = await readBakeProposal(
+    db,
+    organisationId,
+    proposal.value.proposalId,
+  );
+  return {
+    ok: true,
+    value: {
+      kind: "run_checked",
+      proposal: ended ?? proposal.value,
+      receiptId: raised.value.receiptId,
+      goodPieces: command.goodPieces,
+    },
+  };
 }

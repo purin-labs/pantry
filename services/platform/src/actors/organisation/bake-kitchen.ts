@@ -1,4 +1,7 @@
-import type { BakeBoardRecords } from "@purin-labs/kitchen-control-api";
+import type {
+  BakeBoardRecords,
+  BakeRunRecord,
+} from "@purin-labs/kitchen-control-api";
 import {
   listAppliedWorkflows,
   readAppliedWorkflowHead,
@@ -12,10 +15,18 @@ import type {
   BakeKitchenPorts,
   CounterStockChange,
 } from "../../kitchen/bakes/commands";
+import type { BakeProposal } from "../../kitchen/bakes/records";
 import {
   listBakeProposals,
   listBakeStockLevels,
+  readBakeProposal,
 } from "../../kitchen/bakes/records";
+import {
+  bakeRunIdOf,
+  listBakeRuns,
+  readBakeRun,
+} from "../../kitchen/bakes/run-records";
+import { bakeRunKitchenPorts, bakeRunStub } from "../bake-run-ports";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { announceBakeProposal } from "../../slack/bake-proposal-announce";
 import {
@@ -65,6 +76,71 @@ export function bakeKitchenPorts(
     },
     announce: (proposal) =>
       announceBakeProposal(env, scope, proposal, Date.now()),
+    ...bakeRunKitchenPorts(env, scope),
+  };
+}
+
+/**
+ * The one read of a proposal's bake run: the run's Durable Object gives the
+ * engine view and the dispatch records, and the summary row gives the reason
+ * that it did not start and the check. Null when the proposal has no run.
+ */
+export async function readBakeRunOf(
+  env: Env,
+  scope: OrganisationExecutionScope,
+  proposalId: string,
+): Promise<BakeRunRecord | null> {
+  const db = scope.database;
+  const proposal = await readBakeProposal(db, scope.organisationId, proposalId);
+  if (proposal === null) return null;
+  const summary = await readBakeRun(
+    db,
+    scope.organisationId,
+    bakeRunIdOf(proposalId),
+  );
+  if (summary === null) return null;
+  const live =
+    summary.actorId === null
+      ? null
+      : await bakeRunStub(env, scope, summary.runId)?.read();
+  const check = summary.check;
+  const base = {
+    runId: summary.runId,
+    proposalId,
+    productName: proposal.productName,
+    problem: summary.problem,
+    check,
+  };
+  if (live === null || live === undefined)
+    return {
+      ...base,
+      state: summary.state,
+      hold: null,
+      approval:
+        proposal.decision === null ? null : approvalOf(proposal.decision),
+      devices: [],
+      oven: null,
+      startedAt: summary.startedAt,
+      endedAt: summary.endedAt,
+      dispatches: [],
+      unloadRisk: null,
+      view: null,
+    };
+  return {
+    ...live,
+    ...base,
+    state: summary.state === "checked" ? "checked" : live.state,
+  };
+}
+
+function approvalOf(
+  decision: NonNullable<BakeProposal["decision"]>,
+): BakeRunRecord["approval"] {
+  return {
+    by: decision.by,
+    role: decision.role,
+    via: decision.via,
+    at: decision.at,
   };
 }
 
@@ -93,11 +169,12 @@ export async function readBakeBoard(
 ): Promise<BakeBoardRecords> {
   const db = scope.database;
   const organisationId = scope.organisationId;
-  const [levels, proposals, workflows, gateways] = await Promise.all([
+  const [levels, proposals, workflows, gateways, runs] = await Promise.all([
     listBakeStockLevels(db, organisationId),
     listBakeProposals(db, organisationId),
     listAppliedWorkflows(db, organisationId),
     listGateways(db, organisationId),
+    listBakeRuns(db, organisationId),
   ]);
   const products = listCountedProducts(sql, organisationId);
   const recipes = await Promise.all(
@@ -122,6 +199,16 @@ export async function readBakeBoard(
       };
     }),
     proposals: proposals.map((proposal) => ({ ...proposal })),
+    runs: runs.map((run) => ({
+      runId: run.runId,
+      proposalId: run.proposalId,
+      state: run.state,
+      problem: run.problem,
+      holdCode: run.holdCode,
+      startedAt: run.startedAt,
+      endedAt: run.endedAt,
+      goodPieces: run.check?.goodPieces ?? null,
+    })),
     products: [...products],
     workflows: workflows.map((workflow) => ({
       workflowId: workflow.workflowId,

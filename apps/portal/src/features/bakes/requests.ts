@@ -1,6 +1,9 @@
 import {
   parseBakeBoard,
+  parseBakeRunRead,
   type BakeBoard,
+  type BakeRunActionInput,
+  type BakeRunRead,
   type BakeDecisionInput,
   type BakeStockLevelInput,
 } from "@purin-labs/kitchen-control-api";
@@ -55,6 +58,41 @@ export async function decideBake(
     ),
     "POST",
     decision,
+    undefined,
+    { kind: "prepared", idempotencyKey },
+  );
+}
+
+/** Plan 24 S4: the one read of a proposal's bake run. */
+export async function readBakeRun(
+  organisationId: string,
+  proposalId: string,
+  signal: AbortSignal,
+): Promise<BakeRunRead> {
+  return parseBakeRunRead(
+    await controlRead(
+      controlPath(
+        organisationId,
+        `bakes/proposals/${encodeURIComponent(proposalId)}/run`,
+      ),
+      signal,
+    ),
+  );
+}
+
+export async function actOnBakeRun(
+  organisationId: string,
+  proposalId: string,
+  action: BakeRunActionInput,
+  idempotencyKey: string,
+): Promise<void> {
+  await controlMutation(
+    controlPath(
+      organisationId,
+      `bakes/proposals/${encodeURIComponent(proposalId)}/run`,
+    ),
+    "POST",
+    action,
     undefined,
     { kind: "prepared", idempotencyKey },
   );

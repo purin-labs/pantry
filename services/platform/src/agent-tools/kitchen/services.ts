@@ -306,6 +306,14 @@ type BakeStockLevelProposeTool = (
   request: BakeStockLevelInput,
 ) => Promise<unknown>;
 
+/** Plan 24 S4: one proposal's bake run, for its read or a pause request. */
+export type BakeRunRequest = Readonly<{ proposalId: string }>;
+type BakeRunReadTool = (request: BakeRunRequest) => Promise<unknown>;
+type BakeRunPauseTool = (
+  request: BakeRunRequest,
+  operationId: string,
+) => Promise<PreparedEffect>;
+
 /** A bake request that was refused, in words that the agent can act on. */
 export class BakeRequestError extends ToolRequestError {}
 
@@ -335,6 +343,8 @@ export type KitchenToolServices = {
   readonly readBakes: BakeReadTool;
   readonly proposeBake: BakeProposeTool;
   readonly proposeBakeStockLevel: BakeStockLevelProposeTool;
+  readonly readBakeRun: BakeRunReadTool;
+  readonly pauseBakeRun: BakeRunPauseTool;
 };
 
 export const defineKitchenTool =
