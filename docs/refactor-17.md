@@ -869,6 +869,24 @@ The Inbox ports and the Slack imports stay open.
     notices: the channel adapter of step A1.6 owns them.
   - Brain, 1 import: `actors/harness-memory-proposal.ts`.
 
+**21 November 2026. Step A2.4 is done,** on the branch `refactor-17-a2-4`.
+
+| Page                                             | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The workflow demo                                | Production serves it with no sign-in at `/workflow-simulator`, `/bakery`, `/floor-plans` and `?demo=1`. Its frame (the sample Portal frame, the chat pane and the Kitchen page) is now `apps/portal/src/workflow-demo.tsx`, a surface module. It cannot go into the Kitchen folder, because an area imports no shell and no chat. `bootstrap.tsx` imports no file of `dev/` in a production build. `UNAVAILABLE_ACCESS` is in `features/access/` |
+| `/workflow-preview.html`                         | It stays a development fixture, because CI and 33 browser journeys of the index open it with no sign-in. `dev/workflow-preview.tsx` holds only the chat preview data and the mount call. CI and the journeys keep the address. Two journeys load the moved style sheet, and one reads the import addresses of both modules                                                                                                                       |
+| `/eagle-rehearsal.html`, `/linea-rehearsal.html` | No change. They are already Kitchen pages: `features/production-run/linea/espresso-rehearsal.ts`, with real reads through `controlRead` for `?organisation=<id>`. Production serves them, the Kitchen workspace opens them in a new window, and a journey opens them with no sign-in                                                                                                                                                             |
+
+`pnpm lint:kitchen-dom` (`scripts/check-kitchen-dom.mjs`) is in `pnpm lint`. It parses
+each source file of `bakery-model`, `bakery-workflow` and `production-simulation`, and
+fails on `window`, `document` or a global that `lib.dom.d.ts` declares and
+`lib.webworker.d.ts` does not. No file fails, so the check has no ratchet.
+
+Other preview pages in `dev/` still hold their own code. Production serves none of
+them. `appliances-preview.tsx` (1,545 lines) is an appliance viewer with its own
+Three.js loader, and `kitchen-chat-preview.tsx` builds the same frame as the workflow
+demo for a real Organisation. They are separate work.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
