@@ -1,6 +1,7 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Env } from "../env";
-import { readMemoryViews, type ShownMemoryRevision } from "../memory/access";
+import { readMemoryViews } from "../memory/access";
+import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
 import { resolveActiveCaseActor } from "../actors/actor-router";
 import {
   projectEmailReplyProposal,

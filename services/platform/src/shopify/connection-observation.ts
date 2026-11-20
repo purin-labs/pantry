@@ -1,12 +1,12 @@
 // The health check of a Shopify connection: the webhooks of the shop are
 // registered, and the shop answers with the stored credential.
 import type { ProviderManifestEvidence } from "../data/provider-attempt";
-import type { ProviderObservationRequest } from "../provider-adapters/domain";
-import { providerIngressOrigin } from "../provider-lifecycle/authorization";
+import type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
+import { providerIngressOrigin } from "../integrations/contract/provider-ingress";
 import {
   blockedEvidence,
   resolveStoredObservationBearer,
-} from "../provider-workflows/observation";
+} from "../integrations/contract/observation-evidence";
 import { isShopifyAdminDomain } from "./auth";
 import { registerShopifyWebhooks } from "./connector/webhook-registration";
 

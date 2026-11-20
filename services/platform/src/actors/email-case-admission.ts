@@ -1,5 +1,5 @@
 import { ensureCaseProject } from "../projects/case-project";
-import { gmailConnectorIdValue } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import type { Env } from "../env";
 import {
   parseCaseId,

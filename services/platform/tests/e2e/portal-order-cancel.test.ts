@@ -6,7 +6,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import { advanceOrderQueueEntry } from "../../src/commerce/order-queue-commands";
+import { advanceOrderQueueEntry } from "../../src/cafe/contract/order-queue-commands";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { parseIntegrationAccountId, parseRequestId } from "../../src/ids";

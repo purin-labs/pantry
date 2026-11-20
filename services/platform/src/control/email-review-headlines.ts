@@ -9,14 +9,14 @@ import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluatio
 import type { EmailReviewProjection } from "../data/email-review";
 import type { Env } from "../env";
 import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
-import { authorizeMailSource } from "../mail-inbox/authorization";
+import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { runtimeFetch } from "../runtime-fetch";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "./authorization";
-import { mailControlAuthority } from "./routes/mail-inbox";
+import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

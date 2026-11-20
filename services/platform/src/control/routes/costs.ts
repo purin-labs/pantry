@@ -49,7 +49,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 
 export async function handleCosts(
   request: Request,

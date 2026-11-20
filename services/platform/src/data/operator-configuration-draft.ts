@@ -26,7 +26,7 @@ import {
   parseJevDraftCommand,
   type JevDraftCommand,
   type JevDraftRefusal,
-} from "../jev-features/agent-draft";
+} from "../integrations/contract/jev-draft";
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,

@@ -3,7 +3,7 @@
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
-} from "../data/credential-lifecycle";
+} from "../integrations/contract/credential-lifecycle";
 import { runtimeFetch } from "../runtime-fetch";
 import { discoverShopifyIdentity } from "./provider-adapter";
 

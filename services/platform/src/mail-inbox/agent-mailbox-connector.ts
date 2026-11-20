@@ -1,10 +1,8 @@
 import type { Env, ConnectorActorStub } from "../env";
 import type { Result } from "../result";
 import { resolveActiveConnectorActor } from "../actors/actor-router";
-import {
-  gmailConnectorIdValue,
-  type MailboxIngressPolicy,
-} from "../data/email-mailbox";
+import { type MailboxIngressPolicy } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "./contract/connector-ids";
 import {
   parseConnectorId,
   type IntegrationAccountId,

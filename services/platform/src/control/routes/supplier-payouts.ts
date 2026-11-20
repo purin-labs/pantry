@@ -37,7 +37,9 @@ import { listAccessGrants } from "../../data/access-grants";
 import { selectActiveGrants } from "../../authorization/access-grants/compiler";
 import { evaluateFlowLabelSink } from "../../policy";
 import { supplierPayoutLabel } from "../../payouts/supplier-payout-access";
-import { mailControlAuthority } from "./mail-inbox";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

@@ -26,7 +26,7 @@ import {
 } from "../../data/whatsapp";
 import type { Env } from "../../env";
 import { newRequestId, parseIntegrationAccountId } from "../../ids";
-import { authorizeMailSource } from "../../mail-inbox/authorization";
+import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
 import { traceWarn } from "../../observability";
 import {
   authorizeWhatsAppSupportRead,
@@ -40,7 +40,9 @@ import {
 import { readEmailReplyHeadlines } from "../email-review-headlines";
 import { emailReviewQueueItemWire } from "../email-review";
 import { controlError, noStoreJson } from "../http";
-import { mailControlAuthority } from "./mail-inbox";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 
 export type InboxConversationsRoute = Readonly<{
   kind: "inboxConversations";

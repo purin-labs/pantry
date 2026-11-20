@@ -72,10 +72,10 @@ import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
   planCafeMenu,
-} from "../commerce/cafe-menu-publication";
+} from "../cafe/contract/menu-publication";
 import type { PublishCafeMenuAction } from "../commerce/cafe-menu-action";
-import { MenuDraftRequestError } from "./menu-draft";
-import { MenuBoardRequestError } from "./menu-boards";
+import { MenuDraftRequestError } from "../cafe/contract/request-errors";
+import { MenuBoardRequestError } from "../cafe/contract/request-errors";
 import type { ChangeMenuPriceAction } from "../commerce/menu-price-action";
 import {
   OrderRefundRequestError,
@@ -86,8 +86,8 @@ import {
 import {
   planStockOperation,
   type StockProposalRequest,
-} from "../commerce/stock-action-plan";
-import { stockOperationResourceId } from "../commerce/stock-action";
+} from "../kitchen/contract/stock-action-plan";
+import { stockOperationResourceId } from "../kitchen/contract/stock-action";
 import { traceWarn } from "../observability";
 import { resolveCommerceCancellationAuthority } from "../commerce/provider";
 import { commerceProviderResourceId } from "../commerce/contract/resource-ids";

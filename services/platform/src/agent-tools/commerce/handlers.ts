@@ -36,7 +36,7 @@ import {
   type SoldOutMarkRequest,
   type SoldOutMarkResult,
   type SoldOutToolRead,
-} from "../../commerce/order-queue-commands";
+} from "../../cafe/contract/order-queue-commands";
 import {
   presentPayments,
   type PaymentsToolRead,

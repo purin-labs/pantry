@@ -4,16 +4,16 @@ import {
 } from "../../actors/collaboration-agent";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import {
-  MenuDraftRequestError,
   type MenuDraftEdit,
   type MenuDraftRead,
 } from "../../actors/menu-draft";
+import { MenuDraftRequestError } from "../../cafe/contract/request-errors";
 import {
-  MenuBoardRequestError,
   type MenuBoardEdit,
   type MenuBoardEditResult,
 } from "../../actors/menu-boards";
-import { readCafeImages } from "../../commerce/cafe-media";
+import { MenuBoardRequestError } from "../../cafe/contract/request-errors";
+import { readCafeImages } from "../../cafe/contract/media";
 import { readPublishedCafeMenu } from "../../control/routes/menu-screens";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";

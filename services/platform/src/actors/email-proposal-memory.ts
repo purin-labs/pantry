@@ -1,9 +1,7 @@
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
-import {
-  readShownMemoryStanding,
-  type ShownMemoryRevision,
-} from "../memory/access";
+import { readShownMemoryStanding } from "../memory/access";
+import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 
 /**

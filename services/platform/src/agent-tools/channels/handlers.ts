@@ -72,10 +72,10 @@ import {
   WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
 } from "../../authorization/capability-catalogue";
 import {
-  gmailConnectorId,
   projectEmailReplyProposal,
   readEmailReplyProposalProjection,
 } from "../../data/email-mailbox";
+import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import {
   readWhatsAppCaseConversationWindowByCaseId,
   readWhatsAppReplyProposalProjection,

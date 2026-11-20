@@ -1,5 +1,5 @@
 import type { Env } from "../env";
-import { authorizeMailSource } from "./authorization";
+import { authorizeMailSource } from "./contract/mail-source-authorization";
 import { readMailHead } from "./store";
 import { readMailResponseOwner } from "./response-store";
 

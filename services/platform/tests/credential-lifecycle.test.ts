@@ -12,7 +12,7 @@ import {
   markCredentialRotationFailed,
   markCredentialRotationVerified,
   recordCredentialRevocationMutation,
-} from "../src/data/credential-lifecycle";
+} from "../src/integrations/contract/credential-lifecycle";
 import type { IntegrationProvider } from "../src/data/integration-account";
 import { d1Database } from "./sqlite-d1";
 import {

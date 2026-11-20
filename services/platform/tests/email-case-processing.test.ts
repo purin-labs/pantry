@@ -40,7 +40,7 @@ const orchestratorMocks = vi.hoisted(() => ({
   dispatchEmailReply: vi.fn(),
 }));
 
-vi.mock("../src/data/gmail-inference-eligibility", () => ({
+vi.mock("../src/mail-inbox/contract/gmail-inference-eligibility", () => ({
   readGmailInferenceEligibility:
     orchestratorMocks.readGmailInferenceEligibility,
 }));

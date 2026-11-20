@@ -9,7 +9,7 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 
 const NOTION_VERSION = "2026-03-11";
 const MANUAL_INSTRUCTION = "revoke_notion_access_in_notion" as const;

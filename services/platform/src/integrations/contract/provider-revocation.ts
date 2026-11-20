@@ -4,21 +4,21 @@
 // revoke: the account, its connection and its webhooks are revoked, the
 // Vault secret is revoked, and the revocation's policy is published, so no
 // later call sends the dead token. A repeated event changes nothing.
-import { revokeCredential } from "../credential-vault";
-import { activateRevocationPolicy } from "../control/credential-revocation-policy";
+import { revokeCredential } from "../../credential-vault";
+import { activateRevocationPolicy } from "../../control/credential-revocation-policy";
 import {
   resolveIntegrationAccount,
   resolveProviderConnection,
   type IntegrationProvider,
-} from "../data/integration-account";
-import type { Env } from "../env";
-import { newRequestId, type IntegrationAccountId } from "../ids";
-import { traceLog, traceWarn } from "../observability";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+} from "../../data/integration-account";
+import type { Env } from "../../env";
+import { newRequestId, type IntegrationAccountId } from "../../ids";
+import { traceLog, traceWarn } from "../../observability";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { Result } from "../../result";
 import {
   prepareConfigurationVersionBump,
-} from "../data/organisation-onboarding-row";
+} from "../../data/organisation-onboarding-row";
 
 type ProviderRevocationReason =
   "shopify_app_uninstalled" | "stripe_application_deauthorized";

@@ -115,7 +115,7 @@ import {
   type OnboardingActivationAcceptanceFaultInput,
   type OnboardingActivationAcceptanceFaultInspection,
   type OnboardingActivationAcceptanceFaultRecord,
-} from "../onboarding-activation-acceptance-fault";
+} from "../../organisation/contract/onboarding-activation-acceptance-fault";
 import {
   abandonCodeModeCapabilityCalls,
   claimCodeModeCapabilityCall,
@@ -182,7 +182,7 @@ import {
 import type {
   ActivationExecutionFailure,
   OnboardingActivationError,
-} from "./activation-types";
+} from "../../organisation/contract/activation-types";
 import type {
   CafeCommerceAcceptanceFaultConsumption,
   CommerceQueryPlanReadError,

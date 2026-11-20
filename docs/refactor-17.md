@@ -1316,6 +1316,85 @@ foundation/conversation`: 28 to 22. `foundation/authority -> foundation/agent`: 
 -> surfaces/slack` (3): the Slack notices of a permission request and of a held
   effect.
 
+**21 November 2026. Step A1.10 for the other areas: area contracts,** on the
+branch `refactor-17-area-contracts-2`. Each area got a contract, one at a time.
+
+- **Integrations.** `services/platform/src/integrations/contract/` holds the
+  provider adapter interface, the provider lifecycle types, the provisioning and
+  credential cutover steps, the provider revocation, the credential rotation
+  lifecycle, the Jev draft command, the provider ingress origin, the observation
+  evidence and the Google token revocation. Eight Portal modules are public in
+  place: the provider catalogue, the provider onboarding, the Jev requests and
+  paid use, the custom connector requests and three dialogs.
+- **Inbox.** `services/platform/src/mail-inbox/contract/` holds the Gmail
+  Connector ids, the mail source authorization, the two inference eligibility
+  checks and the control authority of a member request. Five Portal modules are
+  public: the mailbox, WhatsApp and email review requests, the email review panel
+  and the mailbox setup folder.
+- **Organisation.** `services/platform/src/organisation/contract/` holds the
+  activation types, the activation acceptance fault and the provider support
+  references. Seven Portal modules are public: the access requests, the
+  permission parts, the agent console parts and the account invitation link.
+- **Kitchen.** `services/platform/src/kitchen/contract/` holds the stock action
+  of Plan 81 (its record, plan and run), the inventory overview and the
+  inventory request checks. The services type of the Kitchen tools and the
+  Portal bakery browser context are public in place.
+- **Café.** `services/platform/src/cafe/contract/` holds the menu publication,
+  the board media library, the order queue commands and the two menu request
+  errors.
+- **Brain and devices.** `memory/contract/turn-memory.ts` holds the empty turn
+  Memory reader and the shown revision type. `devices/contract/fleet-stub.ts`
+  holds the stub helpers of the device fleet. The Brain and Case execution
+  requests and the Brain address are public in the Portal.
+- **Wrong lines in the map.** The onboarding reconciliation runner is a Worker
+  file. The Portal WhatsApp setup is an integrations page. The stock shortage
+  report is a commerce report. The mailbox turn Memory reader is an Inbox file,
+  and it moved to `mail-inbox/`.
+- **The rule for a public file.** Each public file imports only the foundation,
+  the contract packages and other public files. A function moved out of an
+  inside file with its body unchanged. A file that needs the inside of its area
+  stayed inside: `memory/access.ts` restores the branded revisions of the store,
+  so it is not public.
+- **Measures.** Layer crossings: 520 to 422. Between areas: 153 to 58.
+  Integrations to Inbox 25 to 5. Organisation to integrations 14 to 2. Commerce
+  to organisation 12 to 3. Inbox to Brain 10 to 7. Brain to Inbox 10 to 6.
+  Commerce to Kitchen 10 to 0. Shopify to integrations 9 to 0. Inbox to
+  integrations 7 to 0. Commerce to Café 7 to 1. Copies: 880, no change. Unused
+  exports: 807 to 805.
+- **Still open.** Each import below needs the inside of the other area, so it
+  needs a service interface that the Worker wires, or a later step.
+  - Inbox and Brain (13): the Inbox reads and proposes Memory and Evals through
+    `memory/access.ts` and `evals/access.ts`. The Eval run of an email case
+    (`eval-task-processing.ts`) runs the Inbox email case processing. Evals
+    read the verified contacts.
+  - Integrations to Inbox (5): the Gmail and WhatsApp connection workflows
+    register the mailbox and the phone number in the Inbox stores, and two
+    routes tear down the mailbox agent. A registration port in the integrations
+    contract is the host.
+  - Shopify (9): the provider catalogue lists the Shopify adapter (4), Shopify
+    reads the commerce projection (4), and commerce lists the Shopify provider
+    (1). This is step A2.5.
+  - Organisation (14): the commerce level of the Organisation actor runs the
+    activation steps (2), and the commerce actions route builds the onboarding
+    projection (1). The account removal, the archive cleanup and the operators
+    route erase or read Inbox and device records (5). The configuration draft runs
+    device commands and Kitchen workflow changes, and the Kitchen route
+    confirms the draft (3). The onboarding route and the account removal use
+    the provider catalogue, and the integrations route calls the account
+    removal (3). The account removal belongs to integrations by its content,
+    but a move adds its table writes to the integrations pairs.
+  - Devices and Café (4): the device fleet actor composes the Café terminal
+    collection module (step A1.9), and the devices route reads the menu screens.
+  - Into commerce (Inbox 5, Kitchen 2, Café 1, integrations 1) and from
+    commerce to Café (1): the draft presence component, the commerce graph
+    reads, the production plan reads, the Stripe setup part and the counter
+    register.
+  - Kitchen to Inbox (1) and Café to Kitchen (1): the supplier creation
+    registers the supplier email contact, and the Register view tool reads the
+    bakery surface receipt.
+  - The package `bakery-model` depends on `commerce-client` (1). Step A1.11
+    owns it.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

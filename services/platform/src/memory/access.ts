@@ -36,7 +36,7 @@ import type {
   TurnMemoryReader,
   TurnMemoryReadRequest,
 } from "../context/assembly";
-import { gmailConnectorId } from "../data/email-mailbox";
+import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env, CaseActorStub, OrganisationActorStub } from "../env";
 import {
   parseCaseId,
@@ -55,6 +55,10 @@ import {
 } from "../policy/information-flow";
 import type { Result } from "../result";
 import { memberMaySee } from "./member-view";
+import {
+  readNoTurnMemory,
+  type ShownMemoryRevision,
+} from "./contract/turn-memory";
 import {
   entityRefOrNull,
   memoryApplicabilityKey,
@@ -265,18 +269,6 @@ export function createTurnMemoryReader(
   }>,
 ): TurnMemoryReader {
   return { read: readTurnMemory.bind(null, input) };
-}
-
-/**
- * The reader for a turn with no verified subject that a Memory scope could
- * match. Nothing applies to such a turn, so it reads nothing.
- */
-export function turnMemoryReaderWithoutSubjects(): TurnMemoryReader {
-  return { read: readNoTurnMemory };
-}
-
-async function readNoTurnMemory(): Promise<TurnMemoryRead> {
-  return { kind: "read", candidates: [], more: false };
 }
 
 async function readTurnMemory(
@@ -523,12 +515,6 @@ async function readEvalTurnMemory(
       return assertNever(offered);
   }
 }
-
-/** One Memory revision a turn's model was shown. */
-export type ShownMemoryRevision = Readonly<{
-  memoryId: string;
-  revision: number;
-}>;
 
 /**
  * Whether Memory a turn was shown may still be relied on. Each revision must

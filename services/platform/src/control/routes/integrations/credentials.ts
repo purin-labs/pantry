@@ -13,8 +13,8 @@ import {
   markCredentialRotationFailed,
   markCredentialRotationVerified,
   recordCredentialRevocationMutation,
-} from "../../../data/credential-lifecycle";
-import { activateProviderCredentialCutover } from "../../../provider-lifecycle/credential-cutover";
+} from "../../../integrations/contract/credential-lifecycle";
+import { activateProviderCredentialCutover } from "../../../integrations/contract/credential-cutover";
 import {
   admitUserMutation,
   controlMutationIdentity,

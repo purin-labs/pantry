@@ -1,5 +1,5 @@
-import { parseRequestId, type RequestId } from "../ids";
-import type { Result } from "../result";
+import { parseRequestId, type RequestId } from "../../ids";
+import type { Result } from "../../result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonNegativeInteger } from "@purin-labs/std";
 

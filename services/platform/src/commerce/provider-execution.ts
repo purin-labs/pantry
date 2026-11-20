@@ -80,12 +80,12 @@ import {
   ORDER_REFUND_VERB,
   orderRefundAllocation,
 } from "./order-refund-action";
-import { isStockOperationVerb, stockOperationResourceId } from "./stock-action";
+import { isStockOperationVerb, stockOperationResourceId } from "../kitchen/contract/stock-action";
 import {
   executeStockOperation,
   reconcileStockOperation,
   type StockExecution,
-} from "./stock-action-execution";
+} from "../kitchen/contract/stock-action-execution";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
 import { newRequestId } from "../ids";

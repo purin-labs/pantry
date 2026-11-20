@@ -4,10 +4,12 @@ import {
 } from "@purin-labs/control-api";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import { mailControlAuthority } from "./mail-inbox";
-import { authorizeMailSource } from "../../mail-inbox/authorization";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
+import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
 import { resolveActiveConnectorActor } from "../../actors/actor-router";
-import { gmailConnectorId } from "../../data/email-mailbox";
+import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

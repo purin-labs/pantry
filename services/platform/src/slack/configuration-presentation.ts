@@ -9,7 +9,7 @@ import type {
   OperatorDraftCommand,
 } from "../data/operator-configuration-draft";
 import type { OfferPriceAllowanceCommand } from "../commerce/contract/offer-price-allowance";
-import { presentJevDraftCommand } from "../jev-features/agent-draft";
+import { presentJevDraftCommand } from "../integrations/contract/jev-draft";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 

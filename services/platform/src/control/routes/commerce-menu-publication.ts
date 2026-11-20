@@ -13,12 +13,12 @@ import {
   cafeProductPhotos,
   planCafeMenu,
   publishedCafeMenu,
-} from "../../commerce/cafe-menu-publication";
+} from "../../cafe/contract/menu-publication";
 
 export {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
-} from "../../commerce/cafe-menu-publication";
+} from "../../cafe/contract/menu-publication";
 
 /**
  * Publishes the shop's café menu from the Portal's shared menu draft. An

@@ -8,7 +8,7 @@ import {
   parseRequestId,
   type IntegrationAccountId,
 } from "../../ids";
-import { gmailConnectorIdValue } from "../../data/email-mailbox";
+import { gmailConnectorIdValue } from "../../mail-inbox/contract/connector-ids";
 import { parseEmailProposalTarget } from "../../data/email-operational";
 import {
   CAPABILITY_KEYS,

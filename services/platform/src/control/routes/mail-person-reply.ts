@@ -20,7 +20,7 @@ import {
 import { extractMailbox } from "../../mail/gmail-adapter";
 import type { Env } from "../../env";
 import { parseIntegrationAccountId } from "../../ids";
-import { authorizeMailSource } from "../../mail-inbox/authorization";
+import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
 import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
@@ -37,7 +37,9 @@ import {
   type JsonRecord,
 } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { mailControlAuthority } from "./mail-inbox";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 
 export type MailPersonReplyRoute = Readonly<{
   kind: "mailPersonReply";

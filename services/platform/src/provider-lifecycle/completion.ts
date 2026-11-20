@@ -18,7 +18,7 @@ import {
   parseProviderStartContext,
 } from "../provider-adapters/catalogue";
 import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
-import type { ProviderStartContext } from "../provider-adapters/domain";
+import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
 import type { Result } from "../result";
 import type {
   CompleteProviderInput,
@@ -26,7 +26,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "./domain";
+} from "../integrations/contract/provider-lifecycle";
 import { assertNever, isRecord } from "@purin-labs/std";
 
 export async function completeProviderOAuth(input: {

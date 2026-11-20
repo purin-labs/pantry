@@ -3,7 +3,7 @@ import type { Env } from "../../../env";
 import {
   authorizeCredentialRevocation,
   recordCredentialRevocationMutation,
-} from "../../../data/credential-lifecycle";
+} from "../../../integrations/contract/credential-lifecycle";
 import {
   assignAgentMailbox,
   parseMailboxIngressPolicyPublishRequest,
@@ -15,7 +15,7 @@ import {
 import { setIntegrationAccountLifecycle } from "../../../data/integration-account";
 import { revokeCredential } from "../../../credential-vault";
 import { resolveCredentialRevocationSecret } from "../../../credential-vault/credential-revocation-resolution";
-import { revokeGoogleOAuthToken } from "../../../provider-adapters/gmail";
+import { revokeGoogleOAuthToken } from "../../../integrations/contract/google-oauth-revocation";
 import { newRequestId, parseIntegrationAccountId } from "../../../ids";
 import { traceWarn } from "../../../observability";
 import { activateRevocationPolicy } from "../../credential-revocation-policy";

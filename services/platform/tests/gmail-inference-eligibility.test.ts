@@ -1,7 +1,7 @@
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { expect, it } from "vitest";
-import { readGmailInferenceEligibility } from "../src/data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "../src/mail-inbox/contract/gmail-inference-eligibility";
 import { parseOrganisationId } from "../src/ids";
 import { d1Database } from "./sqlite-d1";
 

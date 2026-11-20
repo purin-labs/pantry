@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "../../database-handles";
 import type { ModelRoute } from "@purin-labs/contracts";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "../../ids";
 import { isNonBlankString, isNonNegativeInteger } from "@purin-labs/std";
 
 type GmailInferenceEligibility =

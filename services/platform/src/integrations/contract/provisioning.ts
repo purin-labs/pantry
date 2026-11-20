@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
-import { storeOrganisationPlacementVaultSecret } from "../credential-vault/service";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { OrganisationDatabase } from "../../database-handles";
+import { storeOrganisationPlacementVaultSecret } from "../../credential-vault/service";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   completeProviderProvisioning,
   failProviderAttempt,
@@ -10,33 +10,33 @@ import {
   type ProvisioningProviderConnectionAttempt,
   type ProviderFailureEvidence,
   type ProviderManifestEvidence,
-} from "../data/provider-attempt";
+} from "../../data/provider-attempt";
 import {
   integrationAccountAllowsCredentialMutation,
   providerConnectionAllowsCredentialMutation,
   resolveIntegrationAccount,
   resolveProviderConnection,
-} from "../data/integration-account";
-import type { Env } from "../env";
-import type { ProviderConnectionId, OrganisationId } from "../ids";
+} from "../../data/integration-account";
+import type { Env } from "../../env";
+import type { ProviderConnectionId, OrganisationId } from "../../ids";
 import {
   activateProviderCredentialCutover,
   type ProviderCredentialCutoverError,
 } from "./credential-cutover";
-import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   parseVaultHandle,
   type VaultHandle,
   type VaultOAuthTokens,
-} from "../credential-vault";
-import type { Result } from "../result";
+} from "../../credential-vault";
+import type { Result } from "../../result";
 import type {
   CompleteProviderInput,
   OnboardingProvider,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "./provider-lifecycle";
 import { encodeBase64Url } from "@purin-labs/std";
 
 export async function advanceProviderPhase(

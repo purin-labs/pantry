@@ -9,11 +9,11 @@ import type {
   TurnMemoryReader,
   TurnMemoryReadRequest,
 } from "../context/assembly";
-import { readVerifiedMessageSender } from "../mail-inbox/verified-sender";
+import { readVerifiedMessageSender } from "./verified-sender";
 import type { Env } from "../env";
 import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { createTurnMemoryReader, type TurnMemoryDestination } from "./access";
+import { createTurnMemoryReader, type TurnMemoryDestination } from "../memory/access";
 
 /**
  * The Memory reader for one mailbox turn.

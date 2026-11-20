@@ -1,32 +1,33 @@
-import type { SquareDelegation } from "../commerce/contract/square-link";
-import type { OrganisationExecutionScope } from "../organisation-execution-scope";
+import type { SquareDelegation } from "../../commerce/contract/square-link";
+import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   VaultHandle,
   VaultSecret,
   VaultOAuthTokens,
-} from "../credential-vault";
-import type { Env } from "../env";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
+} from "../../credential-vault";
+import type { Env } from "../../env";
+import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { ActiveIntegrationProvider } from "../../data/integration-provider-directory";
 import type {
   ProvisioningProviderConnectionAttempt,
   ProviderManifestEvidence,
-} from "../data/provider-attempt";
+} from "../../data/provider-attempt";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
-import type { Result } from "../result";
-import type { ActiveCapabilityId } from "../authorization/capability-catalogue";
+} from "./provider-lifecycle";
+import type { Result } from "../../result";
+import type { ActiveCapabilityId } from "../../authorization/capability-catalogue";
 import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
-import type { GmailAuthorizationProduct } from "../mail/gmail-authorization";
+import type { GmailAuthorizationProduct } from "../../mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";
+import type { SquareApplication } from "../../provider-adapters/square";
 import type {
   MailIntegrationProvider,
   MailProviderAdapter,
-} from "../mail/provider-adapter";
+} from "../../mail/provider-adapter";
 
 type ProviderCleanupBase<P extends ActiveIntegrationProvider> = {
   readonly cleanupId: string;
@@ -129,7 +130,7 @@ export type ProviderAuthorizationConfigurationByProvider = {
   readonly notion: { readonly clientId: string };
   readonly shopify: { readonly clientId: string };
   readonly slack: { readonly clientId: string };
-  readonly square: import("./square").SquareApplication;
+  readonly square: SquareApplication;
   readonly stripe: { readonly clientId: string };
   readonly whatsapp: {
     readonly appId: string;
@@ -269,7 +270,7 @@ export type ProviderCleanupBindings = ProviderAdapterBindings &
     Pick<Env, "UNDERCLERK" | "UNDERCLERK_BASE_URL" | "UNDERCLERK_SERVICE_TOKEN">
   >;
 
-export type ProviderCleanupAdapterInput<P extends ActiveIntegrationProvider> = {
+type ProviderCleanupAdapterInput<P extends ActiveIntegrationProvider> = {
   readonly cleanup: ProviderCleanupByProvider[P];
   readonly env: ProviderCleanupBindings;
   readonly credentials: ProviderCleanupCredentials;

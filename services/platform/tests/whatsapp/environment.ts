@@ -25,7 +25,7 @@ import {
   type ProviderConnectionId,
   type OrganisationId,
 } from "../../src/ids";
-import { providerCredentialHandle } from "../../src/provider-lifecycle/provisioning";
+import { providerCredentialHandle } from "../../src/integrations/contract/provisioning";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

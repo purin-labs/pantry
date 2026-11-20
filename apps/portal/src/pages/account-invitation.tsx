@@ -83,18 +83,6 @@ function validInvitationValue(value: string | null): value is string {
   );
 }
 
-export function accountInvitationHref(
-  organisationId: string,
-  invitationId: string,
-  token: string,
-): string {
-  const url = new URL("/portal", window.location.origin);
-  url.searchParams.set("accountInvitationOrganisation", organisationId);
-  url.searchParams.set("accountInvitationId", invitationId);
-  url.hash = new URLSearchParams({ accountInvitationToken: token }).toString();
-  return url.href;
-}
-
 export function AccountInvitationPage(
   props: Readonly<{
     route: Exclude<AccountInvitationRoute, { kind: "none" }>;

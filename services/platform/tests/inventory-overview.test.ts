@@ -10,7 +10,7 @@ import {
   connectedStockOverview,
   inventoryOverview,
   inventoryStockStatus,
-} from "../src/commerce/inventory-overview";
+} from "../src/kitchen/contract/inventory-overview";
 import type {
   CommerceOfferV1,
   CommerceSalesChannelV1,

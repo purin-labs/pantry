@@ -41,7 +41,7 @@ const CONVERSATION_DELIVERIES = new Set([
   "services/platform/src/chat/information-flow.ts",
   "services/platform/src/control/routes/access-control-explain.ts",
   "services/platform/src/control/routes/supplier-payouts.ts",
-  "services/platform/src/mail-inbox/authorization.ts",
+  "services/platform/src/mail-inbox/contract/mail-source-authorization.ts",
   "services/platform/src/mail-inbox/chat-source-access.ts",
   "services/platform/src/mail-inbox/supplier-context.ts",
   "services/platform/src/whatsapp/read-authorization.ts",

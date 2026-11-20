@@ -17,8 +17,8 @@ import {
   type TypeSafeUsageAuthority,
 } from "../integrations/typesafe/evaluation-ledger";
 import { digestCanonical } from "../policy/information-flow/digest";
-import { authorizeMailSource } from "./authorization";
-import { mailInferenceEligible } from "./eligibility";
+import { authorizeMailSource } from "./contract/mail-source-authorization";
+import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import { JevMailRequest } from "./jev";
 import { mailClassificationEvidence } from "./evidence";
 import type { SchemaTransaction } from "../actors/schema-migrations";

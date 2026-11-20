@@ -3,7 +3,7 @@ import {
   type CancellableTask,
   type TaskCancellationReason,
 } from "@purin-labs/async-control/cancellable-task";
-import { readGmailInferenceEligibility } from "../../data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "../../mail-inbox/contract/gmail-inference-eligibility";
 import type { Env } from "../../env";
 import type { OrganisationId } from "../../ids";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";

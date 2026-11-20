@@ -7,7 +7,7 @@ import type {
   OrderQueueToolRead,
   SoldOutMarkRequest,
   SoldOutToolRead,
-} from "../../commerce/order-queue-commands";
+} from "../../cafe/contract/order-queue-commands";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { defineToolFamily, noArguments, stringEnum } from "../define-tool";
 import type { PageViewExecute } from "../kitchen/services";
