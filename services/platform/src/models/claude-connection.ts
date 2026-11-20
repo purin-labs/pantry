@@ -30,6 +30,7 @@ import type {
   ClaudeAuthorization,
   ClaudeAuthorizationState,
 } from "@purin-labs/control-api";
+import { prepareGuardedVaultSecretRevocation } from "../credential-vault/secret-revocation";
 export type { ClaudeConnection, ClaudeAuthorization } from "@purin-labs/control-api";
 
 /**
@@ -473,17 +474,12 @@ async function revokeHandle(
   handle: VaultHandle,
 ): Promise<void> {
   const placement = organisationPlacementPredicate(context.scope);
-  await context.scope.database
-    .prepare(
-      `UPDATE vault_secret SET revoked_at = ? WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL AND ${placement.sql}`,
-    )
-    .bind(
-      Date.now(),
-      context.scope.organisationId,
-      handle,
-      ...placement.bindings,
-    )
-    .run();
+  await prepareGuardedVaultSecretRevocation(context.scope.database, {
+    now: Date.now(),
+    organisationId: context.scope.organisationId,
+    handle,
+    guard: placement,
+  }).run();
 }
 
 function unavailable(): Readonly<{ ok: false; error: ConnectionError }> {

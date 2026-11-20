@@ -37,6 +37,9 @@ import { parseSlackUserId, type SlackUserId } from "./events";
 import type { Variant } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
+import { prepareDisconnectedAccountRevocation } from "../data/integration-account-writes";
+import { prepareDisconnectedAccountConnectionRevocation } from "../data/provider-connection-writes";
+import { prepareDisconnectedAccountGenerationsRevocation } from "../data/provider-credential-generation";
 
 type SlackInstallationSeed = {
   readonly installationId: SlackInstallationId;
@@ -1224,48 +1227,15 @@ export async function disconnectSlackInstallation(input: {
       };
     }
     const database = target.scope.database.withSession("first-primary");
+    const disconnected = {
+      now: input.disconnectedAt,
+      organisationId: target.scope.organisationId,
+      integrationAccountId: target.accountId,
+    };
     await database.batch([
-      database
-        .prepare(
-          `UPDATE integration_account SET lifecycle = 'revoked', lifecycle_reason_code = NULL,
-         updated_at = ?, revoked_at = ?, disabled_at = NULL, disabled_by_user_id = NULL
-         WHERE organisation_id = ? AND integration_account_id = ? AND lifecycle != 'revoked'`,
-        )
-        .bind(
-          input.disconnectedAt,
-          input.disconnectedAt,
-          target.scope.organisationId,
-          target.accountId,
-        ),
-      database
-        .prepare(
-          `UPDATE provider_connection SET lifecycle = 'revoked', updated_at = ?,
-         revoked_at = ?, disabled_at = NULL WHERE organisation_id = ? AND provider_connection_id IN (
-           SELECT provider_connection_id FROM integration_account
-           WHERE organisation_id = ? AND integration_account_id = ?
-         ) AND lifecycle != 'revoked'`,
-        )
-        .bind(
-          input.disconnectedAt,
-          input.disconnectedAt,
-          target.scope.organisationId,
-          target.scope.organisationId,
-          target.accountId,
-        ),
-      database
-        .prepare(
-          `UPDATE provider_credential_generation SET lifecycle = 'revoked', revoked_at = ?
-         WHERE organisation_id = ? AND provider_connection_id IN (
-           SELECT provider_connection_id FROM integration_account
-           WHERE organisation_id = ? AND integration_account_id = ?
-         ) AND lifecycle != 'revoked'`,
-        )
-        .bind(
-          input.disconnectedAt,
-          target.scope.organisationId,
-          target.scope.organisationId,
-          target.accountId,
-        ),
+      prepareDisconnectedAccountRevocation(database, disconnected),
+      prepareDisconnectedAccountConnectionRevocation(database, disconnected),
+      prepareDisconnectedAccountGenerationsRevocation(database, disconnected),
     ]);
   }
   if (!(await credentialScope.value.isActive())) {

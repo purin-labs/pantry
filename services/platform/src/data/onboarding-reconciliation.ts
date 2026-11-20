@@ -1,5 +1,6 @@
 import { purgeArchivedOrganisation } from "./organisation-purge";
 import {
+  prepareArchiveCleanupAwaitsPurge,
   prepareOrganisationLifecycleMove,
   ARCHIVE_CLEANUP_PLACEMENT_STATUSES,
   type LifecycleFence,
@@ -30,7 +31,10 @@ import { resolveActiveOrganisationPlacementRecord } from "./organisation-placeme
 import { purgeOrganisationWhatsAppConnectors } from "./whatsapp";
 import type { Env, SessionActorStub } from "../env";
 import { removeVoiceMacNames } from "../voice/dns";
-import { listVoiceMacNameIds } from "../voice/store";
+import {
+  listVoiceMacNameIds,
+  prepareArchivedOrganisationVoiceMacsRevocation,
+} from "../voice/store";
 import { purgeOrganisationDeviceFleets } from "../devices/purge";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { revokeOrganisationDevicesStatements } from "../devices/store";
@@ -50,11 +54,22 @@ import { ensureCurrentReadiness } from "./onboarding";
 import { expireProviderAttemptIfDue } from "./provider-attempt";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
+  prepareInvalidAccountsDegradation,
+  prepareMissingAccountDefaults,
+} from "./integration-account-writes";
+import { prepareArchivedOrganisationConnectionsRevocation } from "./provider-connection-writes";
+import { prepareArchivedOrganisationGenerationsRevocation } from "./provider-credential-generation";
+import {
+  prepareArchivedOrganisationCredentialRefsRevocation,
+  prepareArchivedOrganisationSecretsRevocation,
+} from "../credential-vault/secret-revocation";
+import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
 } from "../slack/organisation-routing";
 import {
   prepareProjectionRevisionBump,
+  prepareRepairConfigurationBump,
 } from "./organisation-onboarding-row";
 
 type OnboardingReconciliationSubject =
@@ -885,14 +900,12 @@ async function degradeInvalidAccounts(
   reasonCode: string,
   now: number,
 ): Promise<number> {
-  const result = await db
-    .prepare(
-      `UPDATE integration_account
-     SET lifecycle = 'degraded', lifecycle_reason_code = ?, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'active' AND (${predicate})`,
-    )
-    .bind(reasonCode, now, organisation.organisationId)
-    .run();
+  const result = await prepareInvalidAccountsDegradation(db, {
+    predicate,
+    reasonCode,
+    now,
+    organisationId: organisation.organisationId,
+  }).run();
   const changes = result.meta.changes ?? 0;
   if (changes > 0) {
     await bumpConfigurationForRepair(db, organisation.organisationId, now);
@@ -905,27 +918,10 @@ async function reconcileDefaultAccounts(
   organisation: RequiredOrganisationReconciliationState,
   now: number,
 ): Promise<number> {
-  const result = await db
-    .prepare(
-      `UPDATE integration_account
-     SET is_default_for_provider = 1, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'active' AND is_default_for_provider = 0
-       AND integration_account_id IN (
-         SELECT MIN(candidate.integration_account_id)
-         FROM integration_account AS candidate
-         WHERE candidate.organisation_id = ? AND candidate.lifecycle = 'active'
-           AND NOT EXISTS (
-             SELECT 1 FROM integration_account AS current_default
-             WHERE current_default.organisation_id = candidate.organisation_id
-               AND current_default.provider = candidate.provider
-               AND current_default.environment = candidate.environment
-               AND current_default.is_default_for_provider = 1
-           )
-         GROUP BY candidate.provider, candidate.environment
-       )`,
-    )
-    .bind(now, organisation.organisationId, organisation.organisationId)
-    .run();
+  const result = await prepareMissingAccountDefaults(db, {
+    now,
+    organisationId: organisation.organisationId,
+  }).run();
   const changes = result.meta.changes ?? 0;
   if (changes > 0) {
     await bumpConfigurationForRepair(db, organisation.organisationId, now);
@@ -1115,64 +1111,47 @@ async function reconcileArchivedOrganisation(
     // restore that commits first keeps what it restored (Refactor 15).
     const archived = `EXISTS (SELECT 1 FROM organisation_onboarding AS onboarding
       WHERE onboarding.organisation_id = ? AND onboarding.lifecycle = 'archived')`;
+    const stillArchived = {
+      sql: archived,
+      bindings: [organisation.organisationId],
+    };
     const results = await session.batch([
-      session
-        .prepare(
-          `UPDATE provider_credential_generation
-         SET lifecycle = 'revoked', revoked_at = ?
-         WHERE organisation_id = ? AND lifecycle IN ('active', 'superseded') AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
-      session
-        .prepare(
-          `UPDATE provider_connection
-         SET lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL, updated_at = ?
-         WHERE organisation_id = ? AND lifecycle != 'revoked' AND ${archived}`,
-        )
-        .bind(
-          now,
-          now,
-          organisation.organisationId,
-          organisation.organisationId,
-        ),
-      session
-        .prepare(
-          `UPDATE vault_secret SET revoked_at = ?
-         WHERE organisation_id = ? AND revoked_at IS NULL
-           AND vault_handle NOT IN (SELECT value FROM json_each(?)) AND ${archived}`,
-        )
-        .bind(
-          now,
-          organisation.organisationId,
-          sharedCredentials,
-          organisation.organisationId,
-        ),
-      session
-        .prepare(
-          `UPDATE credential_ref SET revoked_at = ?
-         WHERE organisation_id = ? AND revoked_at IS NULL AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
-      session
-        .prepare(
-          `UPDATE voice_mac
-         SET state = 'revoked', credential_sha256 = NULL, code_sha256 = NULL,
-             code_expires_at = NULL, private_address = NULL, revoked_at = ?
-         WHERE organisation_id = ? AND state != 'revoked' AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
+      prepareArchivedOrganisationGenerationsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationConnectionsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationSecretsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        sharedHandles: sharedCredentials,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationCredentialRefsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationVoiceMacsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
       ...revokeOrganisationDevicesStatements(
         session,
         organisation.organisationId,
         now,
       ),
-      session
-        .prepare(
-          `UPDATE organisation_archive_cleanup
-         SET status = 'pending_purge', updated_at = ?
-         WHERE organisation_id = ? AND status = 'pending_provider_cleanup' AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
+      prepareArchiveCleanupAwaitsPurge(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
     ]);
     for (const result of results) repaired += result.meta.changes;
     return repaired;
@@ -2430,16 +2409,7 @@ async function bumpConfigurationForRepair(
   organisationId: OrganisationId,
   now: number,
 ): Promise<void> {
-  await db
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET configuration_version = configuration_version + 1,
-         projection_revision = projection_revision + 1,
-         updated_at = ?
-     WHERE organisation_id = ? AND lifecycle NOT IN ('archived', 'purging', 'purged')`,
-    )
-    .bind(now, organisationId)
-    .run();
+  await prepareRepairConfigurationBump(db, organisationId, now).run();
 }
 
 async function startReconciliationRun(

@@ -80,3 +80,29 @@ export function prepareSlackInstallationDisconnectAuditEvent(
       input.occurredAt,
     );
 }
+
+/** Records a revocation event of a Slack installation. A repeated event stays as it is. */
+export function prepareSlackInstallationLifecycleEvent(
+  globalDatabase: Database,
+  input: Readonly<{
+    eventId: string;
+    installationId: string;
+    reason: string;
+    occurredAt: number;
+    recordedAt: number;
+  }>,
+): D1PreparedStatement {
+  return globalDatabase
+    .prepare(
+      `INSERT OR IGNORE INTO slack_installation_lifecycle_event (
+         event_id, installation_id, reason, occurred_at, recorded_at
+       ) VALUES (?, ?, ?, ?, ?)`,
+    )
+    .bind(
+      input.eventId,
+      input.installationId,
+      input.reason,
+      input.occurredAt,
+      input.recordedAt,
+    );
+}

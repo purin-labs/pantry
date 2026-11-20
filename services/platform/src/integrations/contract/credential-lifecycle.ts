@@ -32,7 +32,13 @@ import {
   type ProviderConnection,
 } from "../../data/integration-account";
 import { prepareConfigurationVersionBump } from "../../data/organisation-onboarding-row";
-import { prepareActiveCredentialGeneration } from "../../data/provider-credential-generation";
+import {
+  prepareActiveCredentialGeneration,
+  prepareCredentialGenerationSupersession,
+} from "../../data/provider-credential-generation";
+import { prepareDefaultAccountReplacement } from "../../data/integration-account-writes";
+import { prepareConnectionCredentialRotation } from "../../data/provider-connection-writes";
+import { prepareCredentialRefRotation } from "../../credential-vault/secret-revocation";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [
   "replacement_environment_mismatch",
@@ -693,29 +699,14 @@ export async function recordCredentialRevocationMutation(input: {
   ];
   if (input.authorization.replacementIntegrationAccountId !== null) {
     statements.unshift(
-      session
-        .prepare(
-          `UPDATE integration_account
-           SET is_default_for_provider = 0, updated_at = ?
-           WHERE organisation_id = ? AND integration_account_id = ?`,
-        )
-        .bind(
-          input.now,
-          input.organisationId,
+      ...prepareDefaultAccountReplacement(session, {
+        now: input.now,
+        organisationId: input.organisationId,
+        revokedIntegrationAccountId:
           input.authorization.account.integrationAccountId,
-        ),
-      session
-        .prepare(
-          `UPDATE integration_account
-           SET is_default_for_provider = 1, updated_at = ?
-           WHERE organisation_id = ? AND integration_account_id = ?
-             AND lifecycle = 'active'`,
-        )
-        .bind(
-          input.now,
-          input.organisationId,
+        replacementIntegrationAccountId:
           input.authorization.replacementIntegrationAccountId,
-        ),
+      }),
     );
   }
   await session.batch(statements);
@@ -1035,19 +1026,12 @@ export async function commitCredentialRotation(input: {
 }): Promise<void> {
   const session = input.db.withSession("first-primary");
   await session.batch([
-    session
-      .prepare(
-        `UPDATE provider_credential_generation
-         SET lifecycle = 'superseded', superseded_at = ?
-         WHERE organisation_id = ? AND provider_connection_id = ?
-           AND credential_generation = ? AND lifecycle = 'active'`,
-      )
-      .bind(
-        input.now,
-        input.organisationId,
-        input.rotation.connection.providerConnectionId,
-        input.rotation.authority.credentialGeneration,
-      ),
+    prepareCredentialGenerationSupersession(session, {
+      now: input.now,
+      organisationId: input.organisationId,
+      providerConnectionId: input.rotation.connection.providerConnectionId,
+      credentialGeneration: input.rotation.authority.credentialGeneration,
+    }),
     prepareActiveCredentialGeneration(session, {
       providerConnectionId: input.rotation.connection.providerConnectionId,
       credentialGeneration: input.rotation.authority.credentialGeneration + 1,
@@ -1059,34 +1043,19 @@ export async function commitCredentialRotation(input: {
       activatedAt: input.now,
       ifAbsent: true,
     }),
-    session
-      .prepare(
-        `UPDATE provider_connection
-         SET credential_generation = credential_generation + 1,
-             credential_ref = ?, updated_at = ?
-         WHERE organisation_id = ? AND provider_connection_id = ?
-           AND credential_generation = ? AND lifecycle = 'active'`,
-      )
-      .bind(
-        input.rotation.replacementHandle,
-        input.now,
-        input.organisationId,
-        input.rotation.connection.providerConnectionId,
-        input.rotation.authority.credentialGeneration,
-      ),
-    session
-      .prepare(
-        `UPDATE credential_ref
-         SET vault_handle = ?
-         WHERE organisation_id = ? AND provider = ? AND vault_handle = ?
-           AND revoked_at IS NULL`,
-      )
-      .bind(
-        input.rotation.replacementHandle,
-        input.organisationId,
-        input.rotation.connection.provider,
-        input.rotation.authority.credentialRef,
-      ),
+    prepareConnectionCredentialRotation(session, {
+      replacementHandle: input.rotation.replacementHandle,
+      now: input.now,
+      organisationId: input.organisationId,
+      providerConnectionId: input.rotation.connection.providerConnectionId,
+      credentialGeneration: input.rotation.authority.credentialGeneration,
+    }),
+    prepareCredentialRefRotation(session, {
+      replacementHandle: input.rotation.replacementHandle,
+      organisationId: input.organisationId,
+      provider: input.rotation.connection.provider,
+      handle: input.rotation.authority.credentialRef,
+    }),
     session
       .prepare(
         `UPDATE credential_rotation

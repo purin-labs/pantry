@@ -28,6 +28,10 @@ import {
   type UnversionedControlMutationBoundary,
 } from "../data/control-mutation";
 import { assertNever, errorMessage, isPositiveInteger } from "@purin-labs/std";
+import {
+  prepareAccessChangeRevision,
+  prepareAccessDefaultsRevision,
+} from "../data/organisation-onboarding-row";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;
@@ -137,12 +141,11 @@ export async function changeVersionedCapabilityPolicy(
   try {
     const [admission] = await session.batch([
       guardedCapabilityPolicyChange(session, input),
-      prepareRevisionBump(
-        session,
-        input.scope.organisationId,
-        input.expectedProjectionRevision,
-        input.identity.createdAt,
-      ),
+      prepareAccessChangeRevision(session, {
+        organisationId: input.scope.organisationId,
+        expectedProjectionRevision: input.expectedProjectionRevision,
+        updatedAt: input.identity.createdAt,
+      }),
       ...capabilitySettlement(
         session,
         input,
@@ -199,25 +202,17 @@ export async function applyVersionedAccessDefaults(
   const configurationVersion = state.value.configurationVersion + increment;
   const projectionRevision = state.value.projectionRevision + increment;
   const statements = [
-    session
-      .prepare(
-        `UPDATE organisation_onboarding SET configuration_version = configuration_version + ?,
-      projection_revision = projection_revision + ?, updated_at = CASE WHEN ? = 1 THEN ? ELSE updated_at END
-      WHERE organisation_id = ? AND projection_revision = ? AND EXISTS (SELECT 1 FROM organisation_placement
-        WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')`,
-      )
-      .bind(
-        increment,
-        increment,
-        increment,
-        input.identity.createdAt,
-        input.scope.organisationId,
-        input.expectedProjectionRevision,
-        input.scope.organisationId,
-        input.scope.placement.placementEpoch,
-        input.scope.placement.placementCellId,
-        input.scope.fenceToken,
-      ),
+    prepareAccessDefaultsRevision(session, {
+      increment,
+      now: input.identity.createdAt,
+      organisationId: input.scope.organisationId,
+      expectedProjectionRevision: input.expectedProjectionRevision,
+      placement: {
+        placementEpoch: input.scope.placement.placementEpoch,
+        placementCellId: input.scope.placement.placementCellId,
+        fenceToken: input.scope.fenceToken,
+      },
+    }),
     ...capabilitySettlement(
       session,
       input,
@@ -460,23 +455,6 @@ async function readCurrentPolicy(
       return { ok: true, value: policy };
   }
   return { ok: false, error: { code: "capability_policy_not_found" } };
-}
-
-function prepareRevisionBump(
-  db: Pick<OrganisationDatabase, "prepare">,
-  organisationId: OrganisationId,
-  expectedProjectionRevision: number,
-  now: number,
-): D1PreparedStatement {
-  return db
-    .prepare(
-      `UPDATE organisation_onboarding
-        SET configuration_version = configuration_version + 1,
-            projection_revision = projection_revision + 1,
-            updated_at = ?
-      WHERE organisation_id = ? AND projection_revision = ? AND changes() = 1`,
-    )
-    .bind(now, organisationId, expectedProjectionRevision);
 }
 
 function mutationResult(

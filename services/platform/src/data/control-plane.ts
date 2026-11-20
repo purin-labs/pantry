@@ -68,7 +68,10 @@ import {
   prepareBaseProjectRoleChange,
   prepareProjectMembershipRevocation,
 } from "../projects/default-project";
-import { prepareReturnPrivateChatsToDefault } from "../projects/case-project";
+import {
+  prepareChatDirectoryRevisionBump,
+  prepareReturnPrivateChatsToDefault,
+} from "../projects/case-project";
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { encodeBase64Url, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
@@ -1634,11 +1637,7 @@ export async function revokeOrganisationMembership(input: {
       now: input.now,
       guard: null,
     }),
-    session
-      .prepare(
-        "UPDATE portal_chat_directory SET revision = revision + 1 WHERE organisation_id = ?",
-      )
-      .bind(input.organisationId),
+    prepareChatDirectoryRevisionBump(session, input.organisationId),
     prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
     session
       .prepare(

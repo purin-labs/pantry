@@ -21,7 +21,6 @@ import {
   parseWorkspaceId,
   type UserId,
   type IntegrationAccountId,
-  type ProviderConnectionId,
   type OrganisationId,
   type WorkspaceId,
 } from "../ids";
@@ -31,10 +30,16 @@ import {
   type OrganisationPlacement,
 } from "../placement";
 import type { Result } from "../result";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault";
-import type {
-  IntegrationProvider,
-  ProviderAuthMode,
+import {
+  parseVaultHandle,
+  prepareReplacedSurfaceTokenRevocation,
+  type VaultHandle,
+} from "../credential-vault";
+import {
+  prepareSurfaceInstallConnectionRows,
+  prepareSurfaceReinstallConnectionRows,
+  type IntegrationProvider,
+  type ProviderAuthMode,
 } from "./integration-account";
 import { prepareReadAndProposeAccessDefaults } from "./capability-policy";
 import {
@@ -220,28 +225,24 @@ async function createOrganisationInstallWithInstallModelPolicy(
       name: seed.name,
       createdAt: seed.createdAt,
     }),
-    prepareProviderConnectionInsert(
-      session,
+    ...prepareSurfaceInstallConnectionRows(session, {
       providerConnectionId,
-      userId,
-      botTokenRef,
-      provider,
-      seed,
-    ),
-    prepareProviderCredentialGenerationInsert(
-      session,
-      providerConnectionId,
-      botTokenRef,
-      provider,
-      seed,
-    ),
-    prepareIntegrationAccountInsert(
-      session,
       integrationAccountId,
-      providerConnectionId,
+      organisationId: seed.organisationId,
       provider,
-      seed,
-    ),
+      authMode: surfaceAuthMode(provider),
+      botTokenRef,
+      scopesJson: JSON.stringify(seed.scopes),
+      userId,
+      workspaceId: seed.workspaceId,
+      accountKind: surfaceAccountKind(provider),
+      name: seed.name,
+      capabilitySetJson: JSON.stringify(surfaceCapabilities(seed.surfaceKind)),
+      audiencePolicyJson: JSON.stringify({ kind: "operator" }),
+      retentionPolicyJson: JSON.stringify({ kind: "organisation_default" }),
+      createdAt: seed.createdAt,
+      installedAt: seed.installedAt,
+    }),
     prepareSurfaceInstallationInsert(
       session,
       integrationAccountId,
@@ -322,101 +323,24 @@ async function updateOrganisationInstall(
       name: seed.name,
       guard: live,
     }),
-    session
-      .prepare(
-        `UPDATE provider_credential_generation
-       SET lifecycle = 'superseded', superseded_at = ?
-       WHERE provider_connection_id = (
-         SELECT provider_connection_id FROM integration_account
-         WHERE organisation_id = ? AND integration_account_id = ?
-       ) AND lifecycle = 'active' AND ${live.sql}`,
-      )
-      .bind(
-        seed.installedAt,
-        existing.organisationId,
-        existing.integrationAccountId,
-        ...live.bindings,
-      ),
-    session
-      .prepare(
-        `INSERT INTO provider_credential_generation (
-         provider_connection_id, credential_generation, organisation_id, provider,
-         environment, credential_ref, lifecycle, created_at, activated_at,
-         superseded_at, revoked_at, failed_at, failure_code
-       )
-       SELECT
-         connection.provider_connection_id, connection.credential_generation + 1,
-         connection.organisation_id, connection.provider, connection.environment,
-         ?, 'active', ?, ?, NULL, NULL, NULL, NULL
-       FROM provider_connection AS connection
-       JOIN integration_account AS account
-         ON account.provider_connection_id = connection.provider_connection_id
-       WHERE account.organisation_id = ? AND account.integration_account_id = ?
-         AND ${live.sql}`,
-      )
-      .bind(
-        seed.botTokenRef,
-        seed.installedAt,
-        seed.installedAt,
-        existing.organisationId,
-        existing.integrationAccountId,
-        ...live.bindings,
-      ),
-    session
-      .prepare(
-        `UPDATE provider_connection
-       SET credential_ref = ?, credential_generation = credential_generation + 1,
-           lifecycle = 'active', updated_at = ?, disabled_at = NULL, revoked_at = NULL
-       WHERE provider_connection_id = (
-         SELECT provider_connection_id FROM integration_account
-         WHERE organisation_id = ? AND integration_account_id = ?
-       ) AND ${live.sql}`,
-      )
-      .bind(
-        seed.botTokenRef,
-        seed.installedAt,
-        existing.organisationId,
-        existing.integrationAccountId,
-        ...live.bindings,
-      ),
-    session
-      .prepare(
-        `UPDATE integration_account
-       SET display_name = ?, lifecycle = 'active', lifecycle_reason_code = NULL,
-           capability_set = ?, audience_policy = ?, retention_policy = ?, updated_at = ?,
-           disabled_by_user_id = NULL, disabled_at = NULL, revoked_at = NULL
-       WHERE organisation_id = ? AND integration_account_id = ? AND ${live.sql}`,
-      )
-      .bind(
-        seed.name,
-        JSON.stringify(surfaceCapabilities(seed.surfaceKind)),
-        JSON.stringify({ kind: "operator" }),
-        JSON.stringify({ kind: "organisation_default" }),
-        seed.installedAt,
-        existing.organisationId,
-        existing.integrationAccountId,
-        ...live.bindings,
-      ),
-    session
-      .prepare(
-        `UPDATE vault_secret
-       SET revoked_at = ?
-       WHERE organisation_id = ?
-         AND vault_handle = (
-           SELECT bot_token_ref
-           FROM surface_installation
-           WHERE integration_account_id = ?
-         )
-         AND vault_handle <> ?
-         AND revoked_at IS NULL AND ${live.sql}`,
-      )
-      .bind(
-        seed.installedAt,
-        existing.organisationId,
-        existing.integrationAccountId,
-        seed.botTokenRef,
-        ...live.bindings,
-      ),
+    ...prepareSurfaceReinstallConnectionRows(session, {
+      organisationId: existing.organisationId,
+      integrationAccountId: existing.integrationAccountId,
+      botTokenRef: seed.botTokenRef,
+      name: seed.name,
+      capabilitySetJson: JSON.stringify(surfaceCapabilities(seed.surfaceKind)),
+      audiencePolicyJson: JSON.stringify({ kind: "operator" }),
+      retentionPolicyJson: JSON.stringify({ kind: "organisation_default" }),
+      installedAt: seed.installedAt,
+      live,
+    }),
+    prepareReplacedSurfaceTokenRevocation(session, {
+      installedAt: seed.installedAt,
+      organisationId: existing.organisationId,
+      integrationAccountId: existing.integrationAccountId,
+      botTokenRef: seed.botTokenRef,
+      guard: live,
+    }),
     prepareSurfaceInstallationUpdate(
       session,
       existing.integrationAccountId,
@@ -581,100 +505,6 @@ export async function listInstallLiveness(input: {
     .all<InstallLivenessRow>();
 
   return (rows.results ?? []).map(rowToInstallLivenessRecord);
-}
-
-function prepareProviderConnectionInsert(
-  session: OrganisationDatabaseSession,
-  providerConnectionId: ProviderConnectionId,
-  userId: UserId,
-  botTokenRef: VaultHandle,
-  provider: IntegrationProvider,
-  seed: OrganisationInstallSeed,
-): D1PreparedStatement {
-  return session
-    .prepare(
-      `INSERT INTO provider_connection (
-       provider_connection_id, organisation_id, provider, auth_mode, authority_kind,
-       credential_generation, credential_ref, lifecycle, granted_scopes,
-       created_by_user_id, created_at, updated_at, disabled_at,
-       revoked_at, environment, provider_subject_id
-     ) VALUES (
-       ?, ?, ?, ?, 'connection_credential', 1, ?, 'active', ?, ?, ?, ?, NULL, NULL,
-       'development', ?
-     )`,
-    )
-    .bind(
-      providerConnectionId,
-      seed.organisationId,
-      provider,
-      surfaceAuthMode(provider),
-      botTokenRef,
-      JSON.stringify(seed.scopes),
-      userId,
-      seed.createdAt,
-      seed.installedAt,
-      seed.workspaceId,
-    );
-}
-
-function prepareProviderCredentialGenerationInsert(
-  session: OrganisationDatabaseSession,
-  providerConnectionId: ProviderConnectionId,
-  botTokenRef: VaultHandle,
-  provider: IntegrationProvider,
-  seed: OrganisationInstallSeed,
-): D1PreparedStatement {
-  return session
-    .prepare(
-      `INSERT INTO provider_credential_generation (
-       provider_connection_id, credential_generation, organisation_id, provider,
-       environment, credential_ref, lifecycle, created_at, activated_at,
-       superseded_at, revoked_at, failed_at, failure_code
-     ) VALUES (?, 1, ?, ?, 'development', ?, 'active', ?, ?, NULL, NULL, NULL, NULL)`,
-    )
-    .bind(
-      providerConnectionId,
-      seed.organisationId,
-      provider,
-      botTokenRef,
-      seed.createdAt,
-      seed.installedAt,
-    );
-}
-
-function prepareIntegrationAccountInsert(
-  session: OrganisationDatabaseSession,
-  integrationAccountId: IntegrationAccountId,
-  providerConnectionId: ProviderConnectionId,
-  provider: IntegrationProvider,
-  seed: OrganisationInstallSeed,
-): D1PreparedStatement {
-  return session
-    .prepare(
-      `INSERT INTO integration_account (
-       integration_account_id, organisation_id, provider_connection_id, provider,
-       provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code,
-       capability_set, audience_policy, retention_policy, created_at, updated_at,
-       disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider
-     ) VALUES (
-       ?, ?, ?, ?, ?, ?, ?, 'active', NULL, ?, ?, ?, ?, ?,
-       NULL, NULL, NULL, 'development', 1
-     )`,
-    )
-    .bind(
-      integrationAccountId,
-      seed.organisationId,
-      providerConnectionId,
-      provider,
-      seed.workspaceId,
-      surfaceAccountKind(provider),
-      seed.name,
-      JSON.stringify(surfaceCapabilities(seed.surfaceKind)),
-      JSON.stringify({ kind: "operator" }),
-      JSON.stringify({ kind: "organisation_default" }),
-      seed.createdAt,
-      seed.installedAt,
-    );
 }
 
 function prepareSurfaceInstallationInsert(

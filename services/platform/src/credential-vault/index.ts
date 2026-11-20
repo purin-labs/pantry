@@ -1,3 +1,4 @@
+export { prepareReplacedSurfaceTokenRevocation } from "./secret-revocation";
 export {
   parseVaultHandle,
   type VaultHandle,
