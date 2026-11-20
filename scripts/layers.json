@@ -1093,6 +1093,7 @@
     "services/platform/src/ingress-queue.ts": "surfaces/webhooks",
     "services/platform/src/integration-gateway.ts": "workers/platform",
     "services/platform/src/isolate-location.ts": "foundation/kernel",
+    "services/platform/src/jev-features/paid-use.ts": "foundation/agent",
     "services/platform/src/lenient-base64.ts": "foundation/kernel",
     "services/platform/src/mail/gmail-adapter.ts": "foundation/connections",
     "services/platform/src/mail/gmail-authorization.ts": "foundation/connections",

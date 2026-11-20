@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 118,
+    "upward": 117,
     "areas": 56,
     "order": 20,
     "table": 25
@@ -53,7 +53,6 @@
     "areas/shopify -> surfaces/webhooks": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,
     "foundation/agent -> areas/commerce": 18,
-    "foundation/agent -> areas/integrations": 1,
     "foundation/agent -> foundation/conversation": 3,
     "foundation/authority -> areas/commerce": 7,
     "foundation/authority -> foundation/agent": 3,
