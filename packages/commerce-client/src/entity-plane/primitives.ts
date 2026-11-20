@@ -659,7 +659,7 @@ export function arrayValue(value: unknown, field: string): readonly unknown[] {
   return value;
 }
 
-export function normalizedText(value: unknown, field: string): string {
+function normalizedText(value: unknown, field: string): string {
   if (!isNormalizedText(value))
     throw new Error(`${field} must be normalized text`);
   return value;

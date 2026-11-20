@@ -26,10 +26,8 @@ import {
   type VariantShippingSpecification,
 } from "@purin-labs/commerce-contracts";
 import { parseCommerceStockSnapshotV1Record } from "@purin-labs/commerce-contracts/records/api-stock";
-import { exhaustiveList } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { type CommerceFoodServiceSnapshotV1 } from "./food-service.ts";
-import { requireBoundedText, requireEnum } from "./wire-readers.ts";
 import {
   parseCart as parseCartRecord,
   parseCheckout as parseCheckoutRecord,
@@ -44,54 +42,34 @@ import {
   parseVariantShippingSpecification as parseVariantShippingSpecificationRecord,
 } from "@purin-labs/commerce-contracts/records/commerce-records";
 import {
-  carrierServiceRecordSchema,
   checkoutProfileRecordReferenceSchema,
-  estimatedDeliverySnapshotSchema,
-  parsePackagePlanSnapshot as parsePackagePlanSnapshotRecord,
 } from "@purin-labs/commerce-contracts/records/commerce-records";
 import { parsePointOfSaleConfiguration as parsePointOfSaleConfigurationRecord } from "@purin-labs/commerce-contracts/records/point-of-sale-configuration";
 import {
-  compareAtPriceParser,
   fieldRecordParser,
-  parsedQuoteTotalsSchema,
-  parseCommerceBuyerV1 as parseCommerceBuyerV1Record,
   parseCommerceFulfillmentV1 as parseCommerceFulfillmentV1Record,
   parseCommerceInventoryItemV1 as parseCommerceInventoryItemV1Record,
   parseCommerceInventoryLotV1 as parseCommerceInventoryLotV1Record,
   parseCommerceInventoryMovementV1 as parseCommerceInventoryMovementV1Record,
   parseCommerceInventoryPositionV1 as parseCommerceInventoryPositionV1Record,
   parseCommerceInventoryReceiptPurchaseV1 as parseCommerceInventoryReceiptPurchaseV1Record,
-  parseCommerceInventoryTrackingV1 as parseCommerceInventoryTrackingV1Record,
   parseCommerceLocationV1 as parseCommerceLocationV1Record,
   parseCommerceMerchantSnapshotV1 as parseCommerceMerchantSnapshotV1Record,
   parseCommerceOfferV1 as parseCommerceOfferV1Record,
   parseCommerceOrderV1 as parseCommerceOrderV1Record,
   parseCommercePaymentV1 as parseCommercePaymentV1Record,
-  parseCommerceProductDetailsV1 as parseCommerceProductDetailsV1Record,
   parseCommerceProductV1 as parseCommerceProductV1Record,
   parseCommerceSalesChannelV1 as parseCommerceSalesChannelV1Record,
   parseCommerceShipmentV1 as parseCommerceShipmentV1Record,
-  parseCommerceVariantMediaV1 as parseCommerceVariantMediaV1Record,
-  parseCommerceVariantOptionV1 as parseCommerceVariantOptionV1Record,
   parseCommerceVariantV1 as parseCommerceVariantV1Record,
 } from "@purin-labs/commerce-contracts/records/api-resources";
 import {
-  wireInventoryLotExpirySchema,
   wireMoneySchema,
-  wireProtectedBuyerContactSchema,
   wireQuantitySchema,
 } from "@purin-labs/commerce-contracts/records/api-common";
 import { decodeRecord } from "./entity-plane/record-decoding.ts";
 import type * as ApiResources from "@purin-labs/commerce-contracts/records/api-resources";
 import type * as ApiResourcesB from "@purin-labs/commerce-contracts/records/api-common";
-
-const QUANTITY_UNITS = exhaustiveList<QuantityUnit>()([
-  "each",
-  "gram",
-  "kilogram",
-  "milliliter",
-  "liter",
-]);
 
 export type CommerceEngineTimestamp = string;
 
@@ -264,39 +242,6 @@ export type CommerceInventoryMovementV1 =
 
 export type CommerceProtectedBuyerContactV1 = ProtectedBuyerContact;
 
-export function validateQuotedLineAmounts(
-  quantity: number,
-  unitPrice: Readonly<{ amountMinor: number; currency: string }>,
-  lineTotal: Readonly<{ amountMinor: number; currency: string }>,
-  field: string,
-  /** A line discount, already taken from the line total. */
-  discount?: Readonly<{ amountMinor: number; currency: string }>,
-): void {
-  if (unitPrice.currency !== lineTotal.currency) {
-    throw new Error(`${field}.unitPrice and lineTotal currencies must match`);
-  }
-  if (discount !== undefined && discount.currency !== lineTotal.currency)
-    throw new Error(`${field}.discount must use the line currency`);
-  const expectedTotal =
-    BigInt(unitPrice.amountMinor) * BigInt(quantity) -
-    BigInt(discount?.amountMinor ?? 0);
-  if (expectedTotal !== BigInt(lineTotal.amountMinor)) {
-    throw new Error(
-      `${field}.lineTotal must equal unitPrice multiplied by quantity, less the discount`,
-    );
-  }
-}
-
-export function parseProtectedBuyerContact(
-  value: unknown,
-  field = "buyerContactAuthority.contact",
-): CommerceProtectedBuyerContactV1 {
-  return decodeRecord(
-    fieldRecordParser(wireProtectedBuyerContactSchema, field),
-    value,
-  );
-}
-
 export function parseMerchantSnapshot(
   value: unknown,
 ): CommerceMerchantSnapshotV1 {
@@ -305,16 +250,6 @@ export function parseMerchantSnapshot(
 
 export function parseInventoryLot(value: unknown): CommerceInventoryLotV1 {
   return decodeRecord(parseCommerceInventoryLotV1Record, value);
-}
-
-export function parseInventoryLotExpiry(
-  value: unknown,
-  field: string,
-): CommerceInventoryLotV1["expiry"] {
-  return decodeRecord(
-    fieldRecordParser(wireInventoryLotExpirySchema, field),
-    value,
-  );
 }
 
 export function parseInventoryMovement(
@@ -499,87 +434,10 @@ export function pointOfSaleQuantityCeiling(
 
 export type ParsedQuoteTotals = ApiResources.ParsedQuoteTotals;
 
-export function parseCheckoutQuoteTotals(
-  value: Record<string, unknown>,
-  field: string,
-): ParsedQuoteTotals {
-  return decodeRecord(fieldRecordParser(parsedQuoteTotalsSchema, field), value);
-}
-
-export function validateQuoteTotals(
-  lines: readonly Readonly<{
-    lineTotal: Readonly<{ amountMinor: number; currency: string }>;
-  }>[],
-  totals: ParsedQuoteTotals,
-  field: string,
-): void {
-  const currency = totals.subtotal.currency;
-  const moneyFields: readonly Readonly<{
-    amountMinor: number;
-    currency: string;
-  }>[] = [totals.tax, totals.duty, totals.shipping, totals.total];
-  for (const money of moneyFields) {
-    if (money.currency !== currency) {
-      throw new Error(`${field}.totals currencies must match`);
-    }
-  }
-  for (const line of lines) {
-    if (line.lineTotal.currency !== currency) {
-      throw new Error(`${field}.totals currencies must match`);
-    }
-  }
-  let subtotalMinor = 0n;
-  for (const line of lines) {
-    subtotalMinor += BigInt(line.lineTotal.amountMinor);
-  }
-  if (subtotalMinor !== BigInt(totals.subtotal.amountMinor)) {
-    throw new Error(`${field}.totals.subtotal must equal line totals`);
-  }
-  const expectedTotal =
-    BigInt(totals.subtotal.amountMinor) +
-    (totals.taxIncluded === true ? 0n : BigInt(totals.tax.amountMinor)) +
-    BigInt(totals.duty.amountMinor) +
-    BigInt(totals.shipping.amountMinor);
-  if (expectedTotal !== BigInt(totals.total.amountMinor)) {
-    throw new Error(`${field}.totals.total must equal its components`);
-  }
-}
-
 export function parseShippingQuoteSnapshot(
   value: unknown,
 ): ShippingQuoteSnapshot {
   return decodeRecord(parseShippingQuoteSnapshotRecord, value);
-}
-
-export function parseCarrierServiceSnapshot(
-  value: unknown,
-  field: string,
-): ShippingQuoteSnapshot["carrierRate"]["service"] {
-  return decodeRecord(
-    fieldRecordParser(carrierServiceRecordSchema, field),
-    value,
-  );
-}
-
-export function parseEstimatedDeliverySnapshot(
-  object: Record<string, unknown>,
-  kind: string,
-): ShippingQuoteSnapshot["estimatedDelivery"] {
-  // The reader takes the kind apart from the object; both parsers read them
-  // together.
-  return decodeRecord(
-    fieldRecordParser(
-      estimatedDeliverySnapshotSchema,
-      "shippingQuote.estimatedDelivery",
-    ),
-    { ...object, kind },
-  );
-}
-
-export function parsePackagePlanSnapshot(
-  value: unknown,
-): ShippingQuoteSnapshot["packagePlan"] {
-  return decodeRecord(parsePackagePlanSnapshotRecord, value);
 }
 
 export function parseLocation(value: unknown): CommerceLocationV1 {
@@ -596,21 +454,6 @@ export function parseProduct(value: unknown): CommerceProductV1 {
 
 // Callers that predate product editing send no details; they get the defaults
 // of a new product.
-export function parseProductDetails(
-  raw: Readonly<Record<string, unknown>>,
-): Pick<
-  CommerceProductV1,
-  "handle" | "productType" | "vendor" | "tags" | "status"
-> {
-  return decodeRecord(parseCommerceProductDetailsV1Record, raw);
-}
-
-export function requireHandle(value: unknown, field: string): string {
-  const handle = requireBoundedText(value, field, 255);
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(handle))
-    throw new Error(`${field} must be lowercase words joined by hyphens`);
-  return handle;
-}
 
 export function parseVariant(value: unknown): CommerceVariantV1 {
   return decodeRecord(parseCommerceVariantV1Record, value);
@@ -620,21 +463,8 @@ export function parseInventoryItem(value: unknown): CommerceInventoryItemV1 {
   return decodeRecord(parseCommerceInventoryItemV1Record, value);
 }
 
-export function parseInventoryTracking(
-  value: unknown,
-): CommerceInventoryItemV1["tracking"] {
-  return decodeRecord(parseCommerceInventoryTrackingV1Record, value);
-}
-
 export function parseOffer(value: unknown): CommerceOfferV1 {
   return decodeRecord(parseCommerceOfferV1Record, value);
-}
-
-export function parseCompareAtPrice(
-  value: unknown,
-  currency: unknown,
-): CommerceOfferV1["compareAtPrice"] {
-  return decodeRecord(compareAtPriceParser(currency), value);
 }
 
 export function parseInventoryPosition(
@@ -665,10 +495,6 @@ export function orderOriginCheckoutId(
   }
 }
 
-export function parseBuyer(value: unknown): CommerceBuyerV1 {
-  return decodeRecord(parseCommerceBuyerV1Record, value);
-}
-
 export function parseQuantity(
   value: unknown,
   field: string,
@@ -693,23 +519,4 @@ export function parseFulfillment(value: unknown): CommerceFulfillmentV1 {
 
 export function parseShipment(value: unknown): CommerceShipmentV1 {
   return decodeRecord(parseCommerceShipmentV1Record, value);
-}
-
-export function parseOption(
-  value: unknown,
-): Readonly<{ name: string; value: string }> {
-  return decodeRecord(parseCommerceVariantOptionV1Record, value);
-}
-
-export function parseMedia(
-  value: unknown,
-): CommerceVariantV1["media"][number] {
-  return decodeRecord(parseCommerceVariantMediaV1Record, value);
-}
-
-export function requireQuantityUnit(
-  value: unknown,
-  field: string,
-): CommerceQuantityUnit {
-  return requireEnum(value, field, QUANTITY_UNITS);
 }
