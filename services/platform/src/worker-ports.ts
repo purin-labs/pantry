@@ -22,6 +22,8 @@ import { connectedCommerceProviders } from "./commerce/contract/commerce-provide
 import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
 import { commerceGraphReads } from "./commerce/contract/graph-reads";
 import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
+import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
+import { commerceExceptionInbox } from "./control/agent-operation-activity";
 import {
   readNamedCommerceQuery,
   selectNamedCommerceQuerySourceGrant,
@@ -121,3 +123,7 @@ commerceGraphReads.register({
   controlCommerceSensitivityCeiling: (...input) =>
     controlCommerceSensitivityCeiling(...input),
 });
+
+commerceExceptionInbox.register((...input) =>
+  readCommerceExceptionInbox(...input),
+);

@@ -1145,6 +1145,7 @@
     "services/platform/src/port.ts": "foundation/kernel",
     "services/platform/src/worker-ports.ts": "workers/platform",
     "services/platform/src/slack/installation-store.ts": "foundation/authority",
-    "services/platform/src/slack/channel-baseline-grant.ts": "foundation/authority"
+    "services/platform/src/slack/channel-baseline-grant.ts": "foundation/authority",
+    "services/platform/src/data/merchant-agent-ids.ts": "foundation/agent"
   }
 }
