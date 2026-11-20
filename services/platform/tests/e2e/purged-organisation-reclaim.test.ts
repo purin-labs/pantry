@@ -20,7 +20,7 @@ import {
   slackRecordsNaming,
   slackTokensCheckedByReadiness,
   type SharedSlackWorkspace,
-} from "./purge-slack-support";
+} from "./slack-workspace-support";
 import {
   configurationVersion,
   erasedTableResidue,

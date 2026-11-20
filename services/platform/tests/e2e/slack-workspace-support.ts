@@ -62,6 +62,56 @@ export async function seedSharedSlackWorkspace(
   other: PurgeOwner,
 ): Promise<void> {
   const now = Date.now() - 10_000;
+  const installerConnection = await seedSlackWorkspace(
+    workspace,
+    installer,
+    [other],
+    now,
+  );
+  const installerAccount = await env.DB.prepare(
+    "SELECT integration_account_id AS id FROM slack_organisation_connection WHERE connection_id = ?",
+  )
+    .bind(installerConnection)
+    .first<string>("id");
+  await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO slack_dm_organisation_selection (
+         installation_id, external_user_id, connection_id, revision, selected_at
+       ) VALUES (?, ?, ?, 1, ?)`,
+    ).bind(
+      workspace.installationId,
+      workspace.dmUser,
+      installerConnection,
+      now,
+    ),
+    env.DB.prepare(
+      `INSERT INTO slack_thread_case_pin (
+         installation_id, channel_id, root_message_ts, connection_id,
+         organisation_id, integration_account_id, case_id,
+         routing_source_kind, routing_source_revision, pinned_at
+       ) VALUES (?, 'D0DMPERSON', '1700000000.000100', ?, ?, ?, ?, 'dm_selection', 1, ?)`,
+    ).bind(
+      workspace.installationId,
+      installerConnection,
+      installer.organisationId,
+      installerAccount,
+      `case_e2e_${workspace.key}`,
+      now,
+    ),
+  ]);
+}
+
+/**
+ * A Slack workspace that `installer` installed: its Vault holds the bot
+ * token, and it and each of `others` has an active connection. Answers the
+ * installer's connection.
+ */
+export async function seedSlackWorkspace(
+  workspace: SharedSlackWorkspace,
+  installer: PurgeOwner,
+  others: readonly PurgeOwner[] = [],
+  now: number = Date.now() - 10_000,
+): Promise<string> {
   const tokenRef = requiredVaultHandle(
     `vault:${installer.organisationId.toLowerCase()}:slack:${workspace.key}`,
   );
@@ -99,7 +149,10 @@ export async function seedSharedSlackWorkspace(
   const installerConnection = `connection_e2e_${workspace.key}_installer`;
   for (const [owner, connectionId] of [
     [installer, installerConnection],
-    [other, `connection_e2e_${workspace.key}_other`],
+    ...others.map(
+      (other, index) =>
+        [other, `connection_e2e_${workspace.key}_other_${index}`] as const,
+    ),
   ] as const) {
     const scope = await requireOrganisationExecutionScope(
       env,
@@ -138,37 +191,7 @@ export async function seedSharedSlackWorkspace(
       )
       .run();
   }
-  const installerAccount = await env.DB.prepare(
-    "SELECT integration_account_id AS id FROM slack_organisation_connection WHERE connection_id = ?",
-  )
-    .bind(installerConnection)
-    .first<string>("id");
-  await env.DB.batch([
-    env.DB.prepare(
-      `INSERT INTO slack_dm_organisation_selection (
-         installation_id, external_user_id, connection_id, revision, selected_at
-       ) VALUES (?, ?, ?, 1, ?)`,
-    ).bind(
-      workspace.installationId,
-      workspace.dmUser,
-      installerConnection,
-      now,
-    ),
-    env.DB.prepare(
-      `INSERT INTO slack_thread_case_pin (
-         installation_id, channel_id, root_message_ts, connection_id,
-         organisation_id, integration_account_id, case_id,
-         routing_source_kind, routing_source_revision, pinned_at
-       ) VALUES (?, 'D0DMPERSON', '1700000000.000100', ?, ?, ?, ?, 'dm_selection', 1, ?)`,
-    ).bind(
-      workspace.installationId,
-      installerConnection,
-      installer.organisationId,
-      installerAccount,
-      `case_e2e_${workspace.key}`,
-      now,
-    ),
-  ]);
+  return installerConnection;
 }
 
 /** The directory's Slack records that still name the Organisation. */

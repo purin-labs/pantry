@@ -211,6 +211,9 @@ with change, Square Terminal Japan cashless (`CARD_PRESENT`, `FELICA_ALL`,
 the display names, the code names, the repository name and the public address.
 [Plan 92](docs/plan-92-new-pantry-repository.md) owns the new repository and
 the cleanup of unused, duplicate and legacy code and weak tests.
+[Plan 96](docs/plan-96-gemini-models.md) owns the Gemini models: Gemini 4
+Hydrogen on the route that Seams pays for, and an Organisation's own Gemini
+API key for Hydrogen, Carbon, Argon and Neon, through the model exit Worker.
 Plan 60A owns
 equipment models. Its simulation phase is complete, with reference gaps accepted
 and physical calibration and robot load qualification deferred. Plans 61A–E define recipe
