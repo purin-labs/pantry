@@ -4,15 +4,17 @@ import { traceWarn } from "../../observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { CountRow } from "../sql-rows";
 import { scheduleCaseWorkAlarm } from "./alarm";
+import type { ChannelAlarmDue } from "./channel-adapter";
 // The pure parsers live in a module with no Actor imports, so that a module
 // outside the Connector can parse a stored delivery (Refactor 15).
 export { invalid, parseIngressContent } from "./ingress-content";
 
 export async function scheduleAcceptedCaseWorkAlarm(
   storage: DurableObjectStorage,
+  channels: readonly ChannelAlarmDue[],
   requestId: RequestId,
 ): Promise<void> {
-  const scheduled = await scheduleCaseWorkAlarm(storage, requestId);
+  const scheduled = await scheduleCaseWorkAlarm(storage, channels, requestId);
   if (scheduled.ok) return;
   traceWarn("connector.case_work_alarm_deferred", {
     requestId,
@@ -42,8 +44,3 @@ export function count(
       ?.count ?? 0
   );
 }
-
-export type EmailCaseContextCollectionAccess =
-  | Readonly<{ kind: "ready"; accessToken: string }>
-  | Readonly<{ kind: "inactive"; reason: string }>
-  | Readonly<{ kind: "retry"; reason: string }>;

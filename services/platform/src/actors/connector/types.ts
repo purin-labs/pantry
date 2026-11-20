@@ -5,10 +5,6 @@ import type {
   ConnectorIngress,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { EmailRuntimeSnapshot } from "../connector-email";
-import type { GmailMessageContent } from "../../mail/gmail-adapter";
-import type { EmailProposalDraftRecord } from "../email-case-processing";
-import type { EmailDisposalOutcome } from "../connector-email-proposal";
 import type { ConnectorCaseWorkEfficiency } from "../connector-case-work";
 
 export type ConnectorResult<T> =
@@ -57,36 +53,6 @@ export type ConnectorSnapshot = {
   readonly deliveries: readonly ConnectorDelivery[];
   readonly receipts: readonly ConnectorDeliveryReceipt[];
 };
-
-export type EmailMailboxDisposal = {
-  readonly proposalId: string;
-  readonly version: number;
-  readonly kind: EmailDisposalOutcome["kind"];
-};
-
-export type EmailMailboxRevocation = {
-  readonly watchStopped: boolean;
-  readonly disposals: readonly EmailMailboxDisposal[];
-};
-
-export type EmailRuntimeStatus = EmailRuntimeSnapshot & {
-  readonly usage: {
-    readonly activeCases: number;
-    readonly admittedLastHour: number;
-    readonly tokens: { readonly reserved: number; readonly consumed: number };
-    readonly nextEvaluationAt: number | null;
-  };
-};
-
-export type ConnectorEmailMailboxSearch = Readonly<{
-  integrationAccountId: string;
-  messages: readonly GmailMessageContent[];
-  truncated: boolean;
-}>;
-
-export type ConnectorEmailReplyProposal = Readonly<{
-  record: EmailProposalDraftRecord;
-}>;
 
 export type MetaRow = Record<string, SqlStorageValue> & {
   organisation_id: string;

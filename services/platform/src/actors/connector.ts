@@ -69,7 +69,6 @@ import {
 } from "./organisation-archive-cleanup";
 import { type PlacedActorExportSource } from "./lifecycle/placed-actor";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
-import { armConnectorAlarm } from "./connector/alarm";
 import { inspectConnector } from "./connector/delivery";
 import type { ConnectorChannels } from "./connector/channel-adapter";
 import { SlackConnectorChannel } from "./connector/slack-channel";
@@ -90,7 +89,7 @@ export class ConnectorDO extends ConnectorEmail {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 
   protected readonly channels: ConnectorChannels = {
-    adapters: [this.slack],
+    adapters: [this.slack, this.emailChannel()],
     caseWork: this.slack,
     delivery: this.slack,
   };
@@ -159,7 +158,7 @@ export class ConnectorDO extends ConnectorEmail {
     Result<PlacedActorExportSource, ActorExportError>
   > {
     // A drained alarm may have consumed its wakeup while durable work remains.
-    const armed = await armConnectorAlarm(this.ctx.storage);
+    const armed = await this.armAlarm();
     if (!armed.ok)
       return {
         ok: false,
@@ -207,7 +206,11 @@ export class ConnectorDO extends ConnectorEmail {
     );
     if (!accepted.ok) return accepted;
     this.ctx.waitUntil(
-      scheduleAcceptedCaseWorkAlarm(this.ctx.storage, input.command.requestId),
+      scheduleAcceptedCaseWorkAlarm(
+        this.ctx.storage,
+        this.alarmDue(),
+        input.command.requestId,
+      ),
     );
     this.startCaseWorkDrain(scope);
     return accepted;
@@ -285,7 +288,11 @@ export class ConnectorDO extends ConnectorEmail {
     );
     if (!accepted.ok) return accepted;
     this.ctx.waitUntil(
-      scheduleAcceptedCaseWorkAlarm(this.ctx.storage, work.command.requestId),
+      scheduleAcceptedCaseWorkAlarm(
+        this.ctx.storage,
+        this.alarmDue(),
+        work.command.requestId,
+      ),
     );
     this.startCaseWorkDrain(scope);
     return accepted;
@@ -303,7 +310,11 @@ export class ConnectorDO extends ConnectorEmail {
     );
     if (!identity.ok) return identity;
     this.ctx.waitUntil(
-      scheduleAcceptedCaseWorkAlarm(this.ctx.storage, input.requestId),
+      scheduleAcceptedCaseWorkAlarm(
+        this.ctx.storage,
+        this.alarmDue(),
+        input.requestId,
+      ),
     );
     this.startCaseWorkDrain();
     return { ok: true, value: { kind: "scheduled" } };
@@ -324,7 +335,7 @@ export class ConnectorDO extends ConnectorEmail {
       acceptSlackFollowUpTransaction.bind(null, this.ctx.storage.sql, input),
     );
     if (!accepted.ok || accepted.value.kind !== "scheduled") return accepted;
-    const armed = await armConnectorAlarm(this.ctx.storage);
+    const armed = await this.armAlarm();
     return armed.ok ? accepted : armed;
   }
 
@@ -420,7 +431,7 @@ export class ConnectorDO extends ConnectorEmail {
       input.noticeText,
     );
     if (released.value.kind === "allowed") {
-      const armed = await armConnectorAlarm(this.ctx.storage);
+      const armed = await this.armAlarm();
       if (!armed.ok) return armed;
       this.startCaseWorkDrain();
     }
@@ -505,7 +516,7 @@ export class ConnectorDO extends ConnectorEmail {
       input,
     );
     if (outcome.kind === "started") {
-      const armed = await armConnectorAlarm(this.ctx.storage);
+      const armed = await this.armAlarm();
       if (!armed.ok) return armed;
       this.startCaseWorkDrain();
     }

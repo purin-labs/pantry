@@ -20,7 +20,11 @@ import { scheduleCaseWorkAlarm } from "./alarm";
 import { steerAnswerLost } from "./steer-fault";
 import { caseWorkResult, readConnectorIdentity } from "./delivery";
 import { CASE_WORK_CONCURRENCY } from "./support";
-import type { CaseWorkChannel, LiveCaseTurn } from "./channel-adapter";
+import type {
+  CaseWorkChannel,
+  ChannelAlarmDue,
+  LiveCaseTurn,
+} from "./channel-adapter";
 
 type Claim = ConnectorCaseWorkClaim<CaseWorkCommand>;
 
@@ -51,6 +55,8 @@ export class ConnectorCaseWorkDrain {
       readonly env: Env;
       /** The channel whose messages are the Case work. */
       readonly channel: CaseWorkChannel<CaseWorkCommand>;
+      /** The due times of the work of each channel, for the alarm. */
+      readonly alarmDue: readonly ChannelAlarmDue[];
     },
   ) {}
 
@@ -103,7 +109,11 @@ export class ConnectorCaseWorkDrain {
       // is settled once nothing runs.
       await this.settleSteeredReplies();
       // Nothing runs. Leave the alarm at the next due item.
-      await scheduleCaseWorkAlarm(this.input.storage, newRequestId());
+      await scheduleCaseWorkAlarm(
+        this.input.storage,
+        this.input.alarmDue,
+        newRequestId(),
+      );
       if (
         this.state === "open" &&
         (this.busyCases.size > 0 || this.acceptedSinceLaunch)
@@ -183,7 +193,11 @@ export class ConnectorCaseWorkDrain {
     const { storage, channel } = this.input;
     try {
       const [scheduled, result] = await Promise.all([
-        scheduleCaseWorkAlarm(storage, claimed.command.requestId),
+        scheduleCaseWorkAlarm(
+          storage,
+          this.input.alarmDue,
+          claimed.command.requestId,
+        ),
         claimed.work.kind === "turn"
           ? channel.runTurn(claimed, scope, readConnectorIdentity(storage.sql))
           : channel.tellAttemptsExhausted(

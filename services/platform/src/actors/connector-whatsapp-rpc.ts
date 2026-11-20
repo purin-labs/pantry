@@ -73,7 +73,6 @@ import {
   type WhatsAppRuntimeSnapshot,
 } from "./connector-whatsapp";
 import { deliverWhatsAppOperatorNotice } from "./whatsapp-operator-notice";
-import { armConnectorAlarm } from "./connector/alarm";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
@@ -849,7 +848,8 @@ export async function editWhatsAppProposalFor(
 }
 
 export async function dispatchWhatsAppReplyFor(
-  deps: WhatsAppReplyExecutionDeps,
+  deps: WhatsAppReplyExecutionDeps &
+    Readonly<{ armAlarm: () => Promise<unknown> }>,
   input: Readonly<{
     proposalId: string;
     approvedVersion: number;
@@ -880,7 +880,7 @@ export async function dispatchWhatsAppReplyFor(
     approvedBy: input.approvedBy,
     now: input.now,
     fetcher: input.fetcher,
-    armAlarm: armConnectorAlarm.bind(null, deps.storage),
+    armAlarm: deps.armAlarm,
   });
   if (!dispatched.ok)
     return { ok: false, error: { code: dispatched.error.code } };

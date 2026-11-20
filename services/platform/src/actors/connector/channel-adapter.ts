@@ -6,6 +6,7 @@ import type {
 import type { Env, SessionActorStub } from "../../env";
 import type { SessionId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
+import type { AlarmReconciler } from "../lifecycle/actor-alarm";
 import type { SessionActorRoute } from "../actor-router";
 import type {
   CaseWorkCodec,
@@ -30,7 +31,36 @@ export interface ChannelAdapter {
   readonly name: string;
   /** Creates the channel's own tables. Each statement can run again. */
   createSchema(storage: DurableObjectStorage): void;
+  /** The due times of the channel's alarm work. */
+  readonly alarmDue?: ChannelAlarmDue;
+  /** Work of an alarm that runs before the Case work drain starts. */
+  beforeCaseWork?(scope: OrganisationExecutionScope): Promise<void>;
+  /** The channel's steps in one alarm. */
+  alarmSteps?(scope: OrganisationExecutionScope): ChannelAlarmSteps;
 }
+
+/**
+ * The due times of a channel's alarm work. It reads only the channel's own
+ * tables, so a caller with the storage alone can arm the alarm.
+ */
+export type ChannelAlarmDue = (sql: SqlStorage) => readonly AlarmReconciler[];
+
+/**
+ * The steps of a channel in one alarm. Each step runs only while the Actor
+ * serves the Organisation, and a failed step does not stop the others.
+ */
+export type ChannelAlarmSteps = Readonly<{
+  /** Steps that run at the same time as the other channels' steps of this kind. */
+  together: readonly ChannelAlarmStep[];
+  /** Steps that run one after another, after the steps that run together. */
+  inOrder: readonly ChannelAlarmStep[];
+}>;
+
+/** One named step of an alarm. Its name is in the log of a failed step. */
+export type ChannelAlarmStep = Readonly<{
+  name: string;
+  run: () => Promise<unknown>;
+}>;
 
 /** The channels of one Connector. */
 export type ConnectorChannels = Readonly<{

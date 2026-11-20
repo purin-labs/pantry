@@ -40,7 +40,6 @@ import type {
   WhatsAppDispatchOutcome,
   WhatsAppProposalPreviewOutcome,
 } from "../connector-whatsapp-proposal";
-import { armConnectorAlarm } from "./alarm";
 import { ensureConnectorIdentity } from "./ingress-parsers";
 import { invalid } from "./support";
 import { type ConnectorResult } from "./types";
@@ -95,7 +94,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
       input.now,
     );
     if (!accepted.ok) return invalid(accepted.error.code);
-    const armed = await armConnectorAlarm(this.ctx.storage);
+    const armed = await this.armAlarm();
     if (!armed.ok) return invalid(armed.error.code);
     return accepted;
   }
@@ -121,7 +120,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
           });
     });
     if (!activated.ok) return invalid(activated.error.code);
-    this.ctx.waitUntil(armConnectorAlarm(this.ctx.storage));
+    this.ctx.waitUntil(this.armAlarm());
     return activated;
   }
 
@@ -139,7 +138,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
       return disableWhatsAppRuntime(this.ctx.storage.sql, { now: input.now });
     });
     if (!disabled.ok) return invalid(disabled.error.code);
-    this.ctx.waitUntil(armConnectorAlarm(this.ctx.storage));
+    this.ctx.waitUntil(this.armAlarm());
     return { ok: true, value: null };
   }
 
@@ -157,7 +156,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
       return resumeWhatsAppRuntime(this.ctx.storage.sql, input);
     });
     if (!resumed.ok) return invalid(resumed.error.code);
-    this.ctx.waitUntil(armConnectorAlarm(this.ctx.storage));
+    this.ctx.waitUntil(this.armAlarm());
     return resumed;
   }
 
@@ -169,7 +168,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
     if (dueAt !== null && dueAt <= now) {
       this.ctx.waitUntil(this.recoverOverdueWhatsAppWork());
     } else {
-      this.ctx.waitUntil(armConnectorAlarm(this.ctx.storage));
+      this.ctx.waitUntil(this.armAlarm());
     }
     return {
       ok: true,
@@ -192,7 +191,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
     )
       return;
     await this.runDueWhatsAppTurns(admission.scope);
-    await armConnectorAlarm(this.ctx.storage);
+    await this.armAlarm();
   }
 
   async readWhatsAppConversationHeads(
@@ -325,7 +324,13 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
     );
     if (!identity.ok) return identity;
     const dispatched = await dispatchWhatsAppReplyFor(
-      { storage: this.ctx.storage, env: this.env, scope, origin: input.origin },
+      {
+        storage: this.ctx.storage,
+        env: this.env,
+        scope,
+        origin: input.origin,
+        armAlarm: this.armAlarm.bind(this),
+      },
       {
         proposalId: input.proposalId,
         approvedVersion: input.approvedVersion,
@@ -336,7 +341,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
       },
     );
     if (!dispatched.ok) return invalid(dispatched.error.code);
-    this.ctx.waitUntil(armConnectorAlarm(this.ctx.storage));
+    this.ctx.waitUntil(this.armAlarm());
     return dispatched;
   }
 
@@ -472,7 +477,7 @@ export abstract class ConnectorWhatsApp extends ConnectorActorBase {
       { caseId: input.caseId, now: input.now },
     );
     if (!closed.ok) return invalid(closed.error.code);
-    this.ctx.waitUntil(armConnectorAlarm(this.ctx.storage));
+    this.ctx.waitUntil(this.armAlarm());
     return closed;
   }
 }

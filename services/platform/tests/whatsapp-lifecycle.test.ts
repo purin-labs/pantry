@@ -47,6 +47,8 @@ import {
   type WhatsAppRpcDeps,
 } from "../src/actors/connector-whatsapp-rpc";
 import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
+import { armConnectorAlarm } from "../src/actors/connector/alarm";
+import { emailAlarmDue } from "../src/actors/connector/email";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
@@ -250,6 +252,7 @@ type LifecycleFixture = {
   readonly deps: WhatsAppRpcDeps & {
     readonly origin: { readonly kind: "operator" };
     readonly scope: import("../src/organisation-execution-scope").OrganisationExecutionScope;
+    readonly armAlarm: () => Promise<unknown>;
   };
   readonly sql: ReturnType<typeof sqlStorage>;
   readonly cipher: WhatsAppContentCipher;
@@ -310,6 +313,8 @@ async function createLifecycleFixture(): Promise<LifecycleFixture> {
       storage: testStorage(sql),
       env,
       scope: await requireOrganisationExecutionScope(env, world.organisationId),
+      // The Connector arms its alarm with the due work of each channel.
+      armAlarm: armConnectorAlarm.bind(null, testStorage(sql), [emailAlarmDue]),
     },
     sql,
     cipher: cipher.value,

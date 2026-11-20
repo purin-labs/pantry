@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 335,
+    "upward": 318,
     "areas": 217,
     "order": 134,
     "table": 118
@@ -113,13 +113,12 @@
     "foundation/control -> foundation/agent": 3,
     "foundation/control -> foundation/conversation": 3,
     "foundation/control -> surfaces/slack": 2,
-    "foundation/conversation -> areas/brain": 6,
+    "foundation/conversation -> areas/brain": 2,
     "foundation/conversation -> areas/commerce": 12,
-    "foundation/conversation -> areas/inbox": 19,
+    "foundation/conversation -> areas/inbox": 14,
     "foundation/conversation -> areas/integrations": 1,
     "foundation/conversation -> areas/kitchen": 10,
     "foundation/conversation -> areas/organisation": 1,
-    "foundation/conversation -> surfaces/email": 8,
     "foundation/conversation -> surfaces/portal": 7,
     "foundation/conversation -> surfaces/slack": 7,
     "foundation/conversation -> surfaces/whatsapp": 6,

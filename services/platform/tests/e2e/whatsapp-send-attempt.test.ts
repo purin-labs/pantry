@@ -5,7 +5,6 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
-import { armConnectorAlarm } from "../../src/actors/connector/alarm";
 import {
   latestWhatsAppProposal,
   readWhatsAppRuntime,
@@ -282,11 +281,9 @@ async function nextConnector(
   return next.value;
 }
 
-async function armAlarm(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await armConnectorAlarm(state.storage);
+/** Arms the alarm as the Connector does, with the due work of each channel. */
+async function armAlarm(instance: unknown): Promise<void> {
+  await (instance as ConnectorDO)["armAlarm"]();
 }
 
 /** Moves every stored time of the proposals two hours into the past. */
