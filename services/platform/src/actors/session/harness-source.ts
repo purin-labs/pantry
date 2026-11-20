@@ -34,6 +34,7 @@ import type { HarnessHistoryRead } from "../harness-history";
 import type { CanonicalHarnessCheckpointInput } from "../agent-session-harness-checkpoint";
 import { digestModelRoute } from "../../models/route";
 import { harnessToolCatalogDigest } from "../embedded-harness-tool-host";
+import type { ToolRegistry } from "../../agent-tools/catalog/tool-registry";
 import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessSource,
@@ -119,6 +120,8 @@ export async function resolveAcceptedCustomConnectorCatalog(input: {
 }
 
 export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
+  /** The one list of the agent tools. */
+  registry: ToolRegistry;
   state: Variant<AgentSessionLifecycle, "sleeping" | "processing">;
   runtime: CanonicalEmbeddedHarnessRuntimeSource;
   harnessInstructions: string;
@@ -160,6 +163,7 @@ export async function resolveCanonicalEmbeddedHarnessCheckpointBinding(input: {
     };
   }
   const currentCatalogDigest = await harnessToolCatalogDigest(
+    input.registry,
     capabilities.value,
     input.customConnectorOperations,
     input.bakerySurfaceCommands,

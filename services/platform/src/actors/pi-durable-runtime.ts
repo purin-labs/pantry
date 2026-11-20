@@ -1,4 +1,3 @@
-import { piToolReplay } from "./pi-tool-replay";
 import { PiToolArgumentStream } from "./pi-tool-argument-stream";
 import { persistedAnswerDeltas } from "./harness-answer";
 import {
@@ -323,7 +322,7 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
       this.input.toolHost,
       this.preflight.bind(this),
       this.input.turnLease.turn.turnId,
-      piToolReplay,
+      this.input.toolReplay,
     );
     const extension = defineExtension({ name: "satyr.tools", tools });
     const codeMode = this.input.toolHost.codeMode.kind === "enabled";

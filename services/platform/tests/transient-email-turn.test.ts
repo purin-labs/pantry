@@ -30,6 +30,8 @@ import {
   runTransientEmailTurn,
   type TransientEmailTeardownOutcome,
 } from "../src/actors/transient-email-turn";
+import { piToolReplay } from "../src/actors/pi-tool-replay";
+import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import type { Result } from "../src/result";
 
 const NOW = 1_784_016_325_277;
@@ -587,6 +589,7 @@ function constructionInput(): Omit<
       workspaceRevision: digest("workspace"),
       policyRevision: "1",
     },
+    toolReplay: piToolReplay.bind(null, TOOL_REGISTRY),
     toolHost: {
       mode: "hybrid",
       codeMode: { kind: "disabled" },

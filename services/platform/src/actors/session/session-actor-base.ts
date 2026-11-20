@@ -53,16 +53,24 @@ import {
   type TrackedTransientSessionExecution,
   sessionPlacementR2Keys,
 } from "./support";
+import type { SessionToolWiring } from "./tool-wiring";
 import type {
   CanonicalHarnessEventError,
   CheckpointPublicationError,
 } from "./types";
 
 /**
- * The Session actor's state and its Portal chat cleanup (Refactor 10, step 2.5). The layers above it add proposal staging, checkpoints, harness turns, recovery and transient turns; `SessionDO` adds the RPC methods.
+ * The Session actor's state and its Portal chat cleanup (Refactor 10, step 2.5). The layers above it add checkpoints, harness turns, recovery and transient turns; `SessionDO` adds the RPC methods.
  */
 export abstract class SessionActorBase extends PlacedActor<null> {
   protected persistence!: AgentSessionPersistence;
+
+  /**
+   * The agent tools and the parts of the product areas. The Worker's class
+   * gives them, so the Session names no area. It is a method, not a field:
+   * the constructor reads it before a field of the last class exists.
+   */
+  protected abstract sessionTools(): SessionToolWiring;
 
   protected portalChatCleanup: Promise<
     Result<void, PortalChatCleanupError>

@@ -11,10 +11,16 @@ import type {
   HarnessSourceAuthorization,
 } from "../agent-tools/catalog/types";
 import { type HarnessPermissionRequest, type HarnessPermissionRequestResult, type HarnessPermissionRequestTool, missingRequestableCapabilities } from "../agent-tools/catalog/permission";
-import { TOOL_REGISTRY, type ToolServices } from "../agent-tools/registry";
+import type {
+  ToolRegistry,
+  ToolServiceSet,
+} from "../agent-tools/catalog/tool-registry";
 import type { EffectSettle } from "../agent-tools/tool-effect";
 import { createHarnessCodeModeAdmission } from "./code-mode-admission";
-import type { HarnessToolHost } from "./embedded-harness";
+import type {
+  HarnessToolArgumentObserver,
+  HarnessToolHost,
+} from "./embedded-harness";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
   customConnectorTurnTool,
@@ -36,8 +42,9 @@ export type HarnessToolHostConstructionError =
     };
 
 export function harnessToolCatalogDigest(
+  registry: ToolRegistry,
   allowedCapabilities: readonly HarnessCapabilityName[] = harnessBaseCapabilities(
-    TOOL_REGISTRY,
+    registry,
   ),
   customConnectorOperations: readonly CustomConnectorCatalogEntry[] = [],
   bakerySurfaceCommands: readonly string[] = [],
@@ -46,7 +53,7 @@ export function harnessToolCatalogDigest(
   permissionRequest = false,
   sideCaseProposal = false,
 ): Promise<string> {
-  return catalogHarnessToolCatalogDigest(TOOL_REGISTRY, {
+  return catalogHarnessToolCatalogDigest(registry, {
     allowedCapabilities,
     turnTools: customConnectorOperations.map(customConnectorTurnTool),
     bakerySurfaceCommands,
@@ -74,11 +81,15 @@ export async function createCatalogHarnessToolHost(input: {
   readonly permissionRequest: boolean;
   /** True for a Portal chat or Slack thread turn, which may propose a side Case. */
   readonly sideCaseProposal: boolean;
+  /** The one list of the agent tools. The Worker gives it to the Session. */
+  readonly registry: ToolRegistry;
   /**
-   * The services of each tool family for this turn. The type names each
-   * service that a family needs, so a tool that the model sees has a handler.
+   * The services of each tool family for this turn, by family name. The
+   * Worker's wiring and the Session's own families give the whole set, and
+   * their types name each service, so a tool that the model sees has a
+   * handler.
    */
-  readonly services: ToolServices;
+  readonly services: ToolServiceSet;
   /** Runs the exit checks of an effect tool, with this turn's authority. */
   readonly settleEffect: EffectSettle;
   /**
@@ -102,7 +113,7 @@ export async function createCatalogHarnessToolHost(input: {
     };
   }
   const authority = await createCatalogHarnessCodeMode({
-    registry: TOOL_REGISTRY,
+    registry: input.registry,
     expectedCatalogDigest: input.expectedCatalogDigest,
     catalogSelection: {
       allowedCapabilities: capabilities.value,
@@ -171,6 +182,23 @@ function codeModeSandboxRemote(
   return {
     async execute(request, exchange) {
       await sandbox.execute(request, exchange);
+    },
+  };
+}
+
+/**
+ * A tool host whose calls wait for the argument frames already sent, so that
+ * a late frame never shows after its call.
+ */
+export function withSettledToolArguments(
+  host: HarnessToolHost,
+  observer: HarnessToolArgumentObserver,
+): HarnessToolHost {
+  return {
+    ...host,
+    async executeTool(name, inputJson, callId) {
+      await observer.settle();
+      return host.executeTool(name, inputJson, callId);
     },
   };
 }

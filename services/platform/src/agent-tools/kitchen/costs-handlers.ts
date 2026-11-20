@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "../../database-handles";
 import {
   FORECAST_CAPEX_MINOR_CELL_KEY,
   FORECAST_DEMAND_CURVE_CELL_KEY,
@@ -32,11 +32,13 @@ import {
   type CostUnit,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
-import type { CommerceAdminClient } from "@purin-labs/commerce-client";
-import type { CatalogExecutionContext } from "../agent-tools/catalog/execute";
-import type { StaffPageToolReceipt } from "../agent-tools/catalog/types";
-import { StaffPageRequestError } from "../agent-tools/errors";
-import { prepareCommerceReadForEmbeddedHarness } from "../agent-tools/commerce/handlers";
+import type {
+  CommerceAdminClient,
+  CommerceEntityPlaneClient,
+} from "@purin-labs/commerce-client";
+import type { CatalogExecutionContext } from "../catalog/execute";
+import type { StaffPageToolReceipt } from "../catalog/types";
+import { StaffPageRequestError } from "../errors";
 import type {
   CostsPlanSaveRequest,
   CostsPlanSaveTool,
@@ -50,7 +52,7 @@ import type {
   LotCostSaveTool,
   SupplyCostSaveRequest,
   SupplyCostSaveTool,
-} from "../agent-tools/kitchen/costs";
+} from "./costs";
 import {
   admitCommerceReadObservation,
   collaborationEditDeadline,
@@ -61,34 +63,29 @@ import {
   selectMerchantReportSourceGrant,
   type PreparedCommerceRead,
   type ToolEffect,
-} from "../agent-tools/session-support";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import { sessionTurnExecution } from "../chat/turn-access";
+} from "../session-support";
+import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { sessionTurnExecution } from "../../chat/turn-access";
 import {
   readCostsOverview,
   saveSupplyCostTerms,
   type SupplyCostSaveResult,
-} from "../commerce/cost-commands";
+} from "../../commerce/cost-commands";
 import {
   saveOrganisationCostPlan,
   saveOrganisationLotInvoiceCost,
   type CostPlanSaveResult,
   type LotCostSaveResult,
-} from "../commerce/cost-plan-store";
-import { CommerceReadRequestError } from "../context/assembly/commerce";
-import type { Env } from "../env";
+} from "../../commerce/cost-plan-store";
+import { CommerceReadRequestError } from "../../context/assembly/commerce";
+import type { Env } from "../../env";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
 import {
-  createCommerceClient,
-  createCommerceEntityPlaneClient,
-} from "../commerce/outbox-worker";
-import { requireActiveOrganisationActorAtPlacement } from "./actor-router";
-import { preflightHarnessTurnLease } from "./agent-session-harness-authority";
-import { resolveCollaborationAgent } from "./collaboration-agent";
-import {
-  admittedSessionOperation,
   requireSessionExecution,
   type SessionExecutionAdmission,
-} from "./session-execution-admission";
+} from "../../actors/session-execution-admission";
 
 const SUPPLY_COST_TERMS_SCOPE = "supply-cost-terms:shop";
 const LOT_INVOICE_COST_SCOPE = "bakery-lot-invoice-cost:shop";
@@ -102,11 +99,30 @@ type SessionCostsStaffWork = Readonly<{
   client: CommerceAdminClient;
 }>;
 
+/**
+ * What the costs tools need from commerce for one turn. Commerce gives it,
+ * and the Worker passes it, so Kitchen imports no file of commerce here.
+ */
+export type CostsCommerce = Readonly<{
+  /** Prepares one commerce read of this turn for the grant that is selected. */
+  prepareRead(
+    selectGrant: (
+      input: Parameters<typeof selectMerchantReportSourceGrant>[3],
+    ) => ReturnType<typeof selectMerchantReportSourceGrant>,
+    label: string,
+  ): Promise<PreparedCommerceRead>;
+  /**
+   * The Underclerk clients of one person of the Organisation, behind this
+   * turn's admission. Null when Underclerk is not configured.
+   */
+  adminClient(actor: string): CommerceAdminClient | null;
+  entityPlaneClient(actor: string): CommerceEntityPlaneClient | null;
+}>;
+
 type SessionCostsHost = Readonly<{
-  env: Env;
   database: OrganisationDatabase;
   organisationId: string;
-  admittedUnderclerkFetch: typeof fetch;
+  commerce: CostsCommerce;
   requireExecution: () => Promise<void>;
   readSheetDraftCells: () => Promise<readonly CostsSheetCell[]>;
   editSheetDraft: (
@@ -149,6 +165,7 @@ export function embeddedHarnessCostsTools(
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   assignment: CaseAssignment,
+  commerce: CostsCommerce,
 ): Readonly<{
   readCosts: CostsReadTool;
   saveSupplyCost: SupplyCostSaveTool;
@@ -158,14 +175,9 @@ export function embeddedHarnessCostsTools(
 }> {
   const organisationId = execution.scope.organisationId;
   return createEmbeddedHarnessCostsTools({
-    env,
     database: execution.scope.database,
     organisationId: String(organisationId),
-    admittedUnderclerkFetch: admittedSessionOperation(
-      execution,
-      lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
-    ),
+    commerce,
     requireExecution: requireSessionExecution.bind(null, execution, lease),
     readSheetDraftCells: async () => {
       try {
@@ -324,11 +336,7 @@ export function embeddedHarnessCostsTools(
       for (const read of requiredReads) {
         try {
           preparedReads.push(
-            await prepareCommerceReadForEmbeddedHarness(
-              env,
-              execution,
-              lease,
-              assignment,
+            await commerce.prepareRead(
               selectMerchantReportSourceGrant.bind(
                 null,
                 lease,
@@ -460,21 +468,8 @@ async function readCostsForSession(
       ? request.actualsWindowDays
       : null;
   const prepared = await host.prepareCostsReads(actualsWindowDays !== null);
-  const actorScope = {
-    kind: "organisation" as const,
-    organisationId: host.organisationId,
-    actor: prepared.personId,
-  };
-  const adminClient = createCommerceClient(
-    host.env,
-    host.admittedUnderclerkFetch,
-    actorScope,
-  );
-  const entityPlaneClient = createCommerceEntityPlaneClient(
-    host.env,
-    host.admittedUnderclerkFetch,
-    actorScope,
-  );
+  const adminClient = host.commerce.adminClient(prepared.personId);
+  const entityPlaneClient = host.commerce.entityPlaneClient(prepared.personId);
   if (adminClient === null || entityPlaneClient === null) {
     throw new Error("costs Underclerk unavailable");
   }
@@ -872,15 +867,7 @@ async function saveSupplyCostForSession(
       "The supplier pack price is saved. Stock counts and live menu prices did not change. Call costs_read to see the updated costs and margins.",
     refreshProjection: true,
     run: async (work, key) => {
-      const entityPlaneClient = createCommerceEntityPlaneClient(
-        host.env,
-        host.admittedUnderclerkFetch,
-        {
-          kind: "organisation",
-          organisationId: host.organisationId,
-          actor: work.personId,
-        },
-      );
+      const entityPlaneClient = host.commerce.entityPlaneClient(work.personId);
       if (entityPlaneClient === null) {
         throw new Error("supply cost Underclerk unavailable");
       }

@@ -51,6 +51,7 @@ import {
 } from "./code-mode-recovery";
 import { PI_DURABLE_BUILD } from "./pi-durable-checkpoint";
 import { mayRerunToolCall, type ToolCaller } from "./pi-tool-replay";
+import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
 import type { Result } from "../result";
 
 /** An unfinished Pi turn that the Session resumes. */
@@ -78,6 +79,7 @@ export type PiRecoveryLeaseRebind = StrictUnion<
 >;
 
 export function beginPiDurableRecovery(
+  registry: ToolRegistry,
   storage: DurableObjectStorage,
   now: number,
 ): boolean {
@@ -143,7 +145,12 @@ export function beginPiDurableRecovery(
       },
     };
   } else if (
-    (held = evidenceRequiredAction(sql, current.state.activeTurn, now)) !== null
+    (held = evidenceRequiredAction(
+      registry,
+      sql,
+      current.state.activeTurn,
+      now,
+    )) !== null
   ) {
     required(
       markRunBudgetIndeterminate(sql, {
@@ -433,11 +440,12 @@ function deliveryCursor(
  * `null` when the task may run again.
  */
 function evidenceRequiredAction(
+  registry: ToolRegistry,
   sql: SqlStorage,
   activeTurn: TurnLifecycle,
   now: number,
 ): SessionRecoveryAction | null {
-  if (hasUncertainTool(sql))
+  if (hasUncertainTool(registry, sql))
     return { kind: "blocked", reason: "implementation" };
   const action = codeModeRecoveryAction(
     classifyCodeModeRecovery(sql, activeTurn, now),
@@ -453,7 +461,7 @@ function evidenceRequiredAction(
  * failure that the call never produced. This guard stops the turn before Pi
  * does either for a call that its caller may not repeat.
  */
-function hasUncertainTool(sql: SqlStorage): boolean {
+function hasUncertainTool(registry: ToolRegistry, sql: SqlStorage): boolean {
   for (const row of sql
     .exec<{ record: string }>(
       "SELECT record FROM tasks WHERE kind = ? AND status <> 'terminal'",
@@ -470,7 +478,8 @@ function hasUncertainTool(sql: SqlStorage): boolean {
     if (task.state.checkpoint.phase !== "execute") continue;
     if (task.state.checkpoint.replay !== "safe") return true;
     const call = interruptedCall(sql, task.input);
-    if (call === null || !mayRerunToolCall(call.name, call.caller)) return true;
+    if (call === null || !mayRerunToolCall(registry, call.name, call.caller))
+      return true;
   }
   return false;
 }

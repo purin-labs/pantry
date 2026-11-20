@@ -66,12 +66,12 @@ import type {
   SessionStateError,
   TurnStateInvalidError,
 } from "./types";
-import { SessionProposalStaging } from "./session-proposal-staging";
+import { SessionActorBase } from "./session-actor-base";
 
 /**
  * Harness checkpoint restore, publication and finalization for accepted turns.
  */
-export abstract class SessionCheckpoints extends SessionProposalStaging {
+export abstract class SessionCheckpoints extends SessionActorBase {
   protected async scheduleCheckpointFinalization(): Promise<void> {
     const due = Date.now() + 1_000;
     await armAlarmBy(this.ctx.storage, due);

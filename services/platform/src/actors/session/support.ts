@@ -29,14 +29,6 @@ import type {
 } from "../agent-session-turn-start";
 import type { CanonicalEmbeddedHarnessTextTurnError } from "./types";
 
-/**
- * How long a staged change stays confirmable.
- *
- * Long enough for someone to read it and reply, short enough that a preview
- * nobody answered cannot be confirmed days later against state that moved.
- */
-export const OPERATOR_DRAFT_TTL_MS = 60 * 60 * 1000;
-
 /** The wait before a recovery repeats a lease rebind that an owner deferred. */
 export const CODE_MODE_LEASE_REBIND_RETRY_MS = 1_000;
 

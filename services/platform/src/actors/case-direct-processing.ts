@@ -80,7 +80,7 @@ import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { traceLog } from "../observability";
-import type { SessionDO } from "./agent-session";
+import type { SessionActor } from "./session/session-actor";
 import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,
@@ -388,7 +388,7 @@ async function recoverDirectCaseTurn(
     readonly assignmentId: AssignmentId;
     readonly digest: string;
   },
-  session: Pick<SessionDO, "inspectTurnStream" | "readCompletedTurn">,
+  session: Pick<SessionActor, "inspectTurnStream" | "readCompletedTurn">,
   caseActor: ConversationCaseActor,
   policy: PinnedSessionPolicy,
   surface: "conversation" | "command",

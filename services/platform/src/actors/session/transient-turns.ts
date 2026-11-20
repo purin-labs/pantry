@@ -58,6 +58,7 @@ export async function runTransientMailHarness(
     "manifest" | "responsePolicy" | "evidenceDependency" | "context"
   >,
   toolHost: HarnessToolHost,
+  toolReplay: (name: string) => "safe" | "unsafe",
   reauthorize: () => Promise<Result<null, Readonly<{ code: string }>>>,
 ): Promise<
   Result<
@@ -167,6 +168,7 @@ export async function runTransientMailHarness(
           workspaceRevision: input.workspaceRevision,
           policyRevision: String(contract.policyVersion),
         },
+        toolReplay,
         toolHost: admittedSessionToolHost(
           {
             kind: "transient",

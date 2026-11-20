@@ -59,7 +59,7 @@ import type {
   InitializedSessionCommit,
 } from "./actor-journal";
 import type { CanonicalEmbeddedHarnessTextTurnError } from "./session/types";
-import type { SessionDO } from "./agent-session";
+import type { SessionActor } from "./session/session-actor";
 import type { CaseDO } from "./case";
 import type { CaseOutput, CaseSnapshot } from "./case/types";
 import type { ConnectorDO } from "./connector";
@@ -118,7 +118,7 @@ export type OngoingCaseWalkingCase = CaseWalkingCase &
   Pick<CaseDO, "prepareOngoingTurn">;
 export type CaseWalkingSession = {
   initializeCaseSession(
-    input: Parameters<SessionDO["initializeCaseSession"]>[0],
+    input: Parameters<SessionActor["initializeCaseSession"]>[0],
   ): Promise<Result<unknown, { readonly code: string }>>;
   prepareSessionInformationFlow(input: {
     readonly requestingOrganisationId: OrganisationId;
@@ -133,7 +133,7 @@ export type CaseWalkingSession = {
     >
   >;
   startCanonicalEmbeddedHarnessTextTurn(
-    input: Parameters<SessionDO["startCanonicalEmbeddedHarnessTextTurn"]>[0],
+    input: Parameters<SessionActor["startCanonicalEmbeddedHarnessTextTurn"]>[0],
   ): Promise<
     Result<
       {
@@ -148,7 +148,7 @@ export type CaseWalkingSession = {
 };
 
 export type OngoingCaseWalkingSession = CaseWalkingSession &
-  Pick<SessionDO, "inspectTurnStream">;
+  Pick<SessionActor, "inspectTurnStream">;
 
 export type RevalidateTurnAuthority = () => Promise<
   Result<CompiledTurnAuthority, { readonly code: string }>
@@ -491,7 +491,7 @@ export type TransientEmailAssignmentInput = {
   readonly pinnedAgent: PinnedAgentProfile | null;
   readonly caseActor: CaseWalkingCase;
   readonly session: CaseWalkingSession &
-    Pick<SessionDO, "inspectCaseSessionInitialization">;
+    Pick<SessionActor, "inspectCaseSessionInitialization">;
   readonly organisationId: OrganisationId;
   readonly requestId: RequestId;
   readonly sessionId: SessionId;

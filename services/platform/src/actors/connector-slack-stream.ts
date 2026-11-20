@@ -52,7 +52,7 @@ import { resolveConfiguredSlackInstallationIdentity } from "../slack/installatio
 import { heldNoticeOfDecision } from "../slack/held-output-notice";
 import { permissionDecisionRequestId } from "../slack/permission-request-notice";
 import { applyAgentMessageAssemblyEvent } from "./agent-message-assembly";
-import type { SessionDO } from "./agent-session";
+import type { SessionActor } from "./session/session-actor";
 import {
   parseSessionTurnStreamRecord,
   type SessionTurnStreamRecord,
@@ -113,7 +113,7 @@ export type ConnectorCaseTurnStreamError =
   | { readonly kind: "operational"; readonly code: string };
 
 type ConnectorCaseTurnStreamSession = Pick<
-  SessionDO,
+  SessionActor,
   "replayStream" | "readSessionTurnFlowBinding"
 >;
 
