@@ -394,8 +394,7 @@ export async function attachSlackActorToAccountAuthority(
 
 /**
  * The owner that `installSlackActorFixture` gives the account authority, with
- * a fresh control session. A journey uses it for an owner's account changes,
- * such as the account grant of a mailbox agent.
+ * a fresh control session. A journey uses it for an owner's account changes.
  */
 export function slackActorFixtureOwner(now: number = Date.now()) {
   return googleClient("e2e-slack-owner", "E2E Slack Owner", now);

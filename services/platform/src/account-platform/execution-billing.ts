@@ -859,7 +859,10 @@ function paidOperation(
   };
 }
 
-function writeBilling(sql: SqlStorage, operation: PantryExecutionBilling): void {
+function writeBilling(
+  sql: SqlStorage,
+  operation: PantryExecutionBilling,
+): void {
   sql.exec(
     `INSERT INTO actor_outbox (effect_id, organisation_id, originating_event_id, request_envelope, state_kind, state_projection, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (effect_id) DO UPDATE SET state_kind = excluded.state_kind, state_projection = excluded.state_projection, updated_at = excluded.updated_at`,
     billingEffectId(operation.identity),
@@ -917,7 +920,7 @@ async function scheduleBilling(storage: DurableObjectStorage): Promise<void> {
   await armAlarmBy(storage, Date.now() + RETRY_MS);
 }
 
-export function readPantryExecutionBilling(
+function readPantryExecutionBilling(
   sql: SqlStorage,
   turnId: string,
 ): PantryExecutionBilling | null {

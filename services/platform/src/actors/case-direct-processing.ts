@@ -1,5 +1,5 @@
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import type { TurnMemoryReader } from "../context/assembly";
 import { turnMemoryReaderWithoutSubjects } from "../memory/access";
 import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
@@ -438,7 +438,7 @@ async function recoverDirectCaseTurn(
     globalDatabase: env.DB,
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(turn.sessionId, turnId),
+    userAuthority: acceptedExecutionAuthority(turn.sessionId, turnId),
     action: "execute",
     organisationId: command.organisationId,
     requestAuthority: command.requestAuthority,
@@ -588,7 +588,7 @@ async function prepareDirectCaseContext(
     prepareTurnContextRead({
       db: resources.scope.database,
       accountAccess: resources.scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         identities.sessionId,
         identities.assignmentId,
       ),
@@ -682,7 +682,7 @@ async function processDirectCaseWithIdentities(
       globalDatabase: env.DB,
       db: resources.scope.database,
       accountAccess: resources.scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         identities.sessionId,
         `turn_trigger_${identities.digest}`,
       ),
@@ -830,7 +830,7 @@ export async function processTwoSessionDirectCaseCommand(
     prepareTurnContext({
       db: scope.database,
       accountAccess: scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         participant.sessionId,
         participant.assignmentId,
       ),
@@ -899,7 +899,7 @@ export async function processTwoSessionDirectCaseCommand(
     revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
       db: scope.database,
       accountAccess: scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         coordinator.value.sessionId,
         coordinator.value.assignmentId,
       ),
@@ -1167,7 +1167,7 @@ async function authorizeDirectTurnExecution(
   input: Readonly<{
     globalDatabase: GlobalDatabase;
     db: OrganisationDatabase;
-    accountAccess: import("../account-platform/access").AccountPlatformAccess;
+    accountAccess: import("../organisation-access/access").OrganisationAccess;
     organisationId: OrganisationId;
     requestAuthority: RequestAuthority;
     sessionId: SessionId;

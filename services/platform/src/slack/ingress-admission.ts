@@ -3,7 +3,7 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
-import type { AccountUserAuthority } from "../account-platform/access";
+import type { OrganisationUserAuthority } from "../organisation-access/access";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "../actors/actor-schema-versions";
 import { actorPhysicalName } from "../actors/actor-registry";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
@@ -387,7 +387,7 @@ export async function authorizeSlackCaseIngressAtScope(input: {
 export function slackEventAccountAuthority(
   event: SlackMessageEvent,
   integrationAccountId: IntegrationAccountId,
-): AccountUserAuthority {
+): OrganisationUserAuthority {
   return {
     kind: "authenticated_provider_event",
     provider: "slack",

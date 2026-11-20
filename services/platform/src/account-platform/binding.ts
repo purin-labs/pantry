@@ -30,7 +30,7 @@ export async function resolvePantryAccountBinding(
 }
 
 /** The native binding alone. It names the instance and scope of an account request. */
-export async function readNativePantryAccountBinding(
+async function readNativePantryAccountBinding(
   env: AccountPlatformBindings,
   organisationId: string,
 ): Promise<Result<NativePantryAccountBinding, AccountPlatformError>> {

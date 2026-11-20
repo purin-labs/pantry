@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { AccountPlatformAccess } from "../account-platform/access";
+import type { OrganisationAccess } from "../organisation-access/access";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceSensitivity } from "@purin-labs/commerce-contracts";
@@ -98,7 +98,7 @@ type CustomConnectorReadTransport = typeof executeCustomConnectorTransport;
 
 export async function authorizeCustomConnectorRead(input: {
   readonly db: OrganisationDatabase;
-  readonly accountAccess: AccountPlatformAccess;
+  readonly accountAccess: OrganisationAccess;
   readonly effectiveGrants: EffectiveGrantSet;
   readonly acceptedEntry: CustomConnectorReadCatalogEntry;
   readonly rawArguments: unknown;

@@ -4,11 +4,6 @@ import type {
   ServiceOnboardingAssertionV1,
 } from "@seams-internal/console-shared/accountPlatform";
 import {
-  readAccountAutomationGrantV1 as readAutomationGrantReceipt,
-  type AccountAutomationGrantChangeV1,
-  type AccountAutomationGrantV1 as AccountAutomationGrantReceipt,
-} from "@seams-internal/console-shared/accountPlatform";
-import {
   readSatyrInstanceReleaseV1 as readPantryInstanceReleaseV1,
   type SatyrInstanceReleaseRequestV1 as PantryInstanceReleaseRequestV1,
   type SatyrInstanceReleaseV1 as PantryInstanceReleaseV1,
@@ -16,7 +11,6 @@ import {
 import {
   readReserveFundsResponseV1 as readReserveResponse,
   readSatyrServiceFeePolicyV1 as readFeePolicyResponse,
-  readServiceEligibilityV1,
   readAccountServiceErrorV1 as readAccountError,
   type ReserveFundsResponseV1 as ReserveResponse,
   type SatyrServiceFeePolicyV1 as FeePolicyResponse,
@@ -50,14 +44,16 @@ import {
 } from "@purin-labs/std";
 import { standardBase64 } from "../lenient-base64";
 import type { Result } from "../result";
-import type { AccountAdmissionAction, AccountUserAuthority } from "./access";
+import type {
+  OrganisationAdmissionAction,
+  OrganisationUserAuthority,
+} from "@purin-labs/contracts";
 import {
   parseAccountPlatformConfiguration,
   type AccountPlatformBindings,
   type AccountPlatformConfiguration,
 } from "./config";
 import {
-  assertPantryPrincipal,
   readLinkedUser,
   accountObject,
   accountUnavailable,
@@ -65,7 +61,6 @@ import {
   readAccountUsageReceipt,
   readAccountIdentityResolution,
   sameAccountScope,
-  type AccountEligibility,
   type AccountFundsReservation,
   type AccountIdentityResolution,
   type AccountIndeterminateRequest,
@@ -76,7 +71,6 @@ import {
   type AccountTerminalDelivery,
   type AccountUsageReceipt,
   type AccountUsageRequest,
-  type LinkedPantryAccountAutomation,
   type LinkedPantryAccountUser,
   type PantryAccountBinding,
 } from "./types";
@@ -87,29 +81,19 @@ type CheckedAccountBinding = Pick<PantryAccountBinding, "instanceId" | "scope">;
 type AccountUserCheck = Readonly<{
   binding: CheckedAccountBinding;
   user: LinkedPantryAccountUser;
-  authority: AccountUserAuthority;
-  action: AccountAdmissionAction;
-}>;
-type AccountAutomationCheck = Readonly<{
-  binding: CheckedAccountBinding;
-  automation: LinkedPantryAccountAutomation;
-  action: AccountAdmissionAction;
+  authority: OrganisationUserAuthority;
+  action: OrganisationAdmissionAction;
 }>;
 export type AccountMembershipActor = Readonly<{
   binding: PantryAccountBinding;
   user: LinkedPantryAccountUser;
-  authority: Variant<AccountUserAuthority, "authenticated_session">;
+  authority: Variant<OrganisationUserAuthority, "authenticated_session">;
 }>;
-type AccountAutomationGrantRequest = Omit<
-  AccountAutomationGrantChangeV1,
-  "instanceId"
->;
-export type { AccountAutomationGrantReceipt };
 type SignedRequest = Readonly<{
   binding: CheckedAccountBinding;
   nativePrincipalId: string;
   principal: AccountPrincipal;
-  action: AccountAdmissionAction;
+  action: OrganisationAdmissionAction;
   authorityRevision: number;
 }>;
 type CurrentAccountRequest = SignedRequest & Readonly<{ authorityRevision: 0 }>;
@@ -340,25 +324,6 @@ export class AccountPlatformClient {
     );
   }
 
-  setAutomationGrant(
-    input: AccountMembershipActor & AccountAutomationGrantRequest,
-  ): Promise<Result<AccountAutomationGrantReceipt, AccountPlatformError>> {
-    return this.signedPostUser(
-      "automation-grants/set",
-      {
-        version: 1,
-        instanceId: input.binding.instanceId,
-        automationId: input.automationId,
-        grantId: input.grantId,
-        nativePrincipalId: input.nativePrincipalId,
-        access: input.access,
-        expectedAccessRevision: input.expectedAccessRevision,
-      },
-      membershipCheck(input, "execute"),
-      readAutomationGrantReceipt,
-    );
-  }
-
   async linkUser(
     input: AccountUserCheck & Readonly<{ googleIdToken: string }>,
   ): Promise<Result<AccountIdentityResolution, AccountPlatformError>> {
@@ -375,38 +340,6 @@ export class AccountPlatformClient {
       readAccountIdentityResolution,
       assertion.value,
     );
-  }
-
-  async checkUser(
-    input: AccountUserCheck,
-  ): Promise<Result<AccountEligibility, AccountPlatformError>> {
-    if (
-      input.authority.kind === "disclosure_recipient" &&
-      input.action !== "disclose"
-    )
-      return scopeForbidden();
-    if (
-      input.authority.kind === "authenticated_provider_event" &&
-      input.action !== "execute"
-    )
-      return scopeForbidden();
-    return this.checkCurrent(userSignedRequest(input));
-  }
-
-  async checkAutomation(
-    input: AccountAutomationCheck,
-  ): Promise<Result<AccountEligibility, AccountPlatformError>> {
-    return this.checkCurrent({
-      binding: input.binding,
-      nativePrincipalId: input.automation.nativePrincipalId,
-      principal: {
-        kind: "automation",
-        automationId: input.automation.automationId,
-        grantId: input.automation.grantId,
-      },
-      action: input.action,
-      authorityRevision: 0,
-    });
   }
 
   async signedPostUser<T>(
@@ -447,33 +380,6 @@ export class AccountPlatformClient {
         authorityRevision: resolved.value.authorityRevision,
       },
     };
-  }
-
-  private async checkCurrent(
-    input: CurrentAccountRequest,
-  ): Promise<Result<AccountEligibility, AccountPlatformError>> {
-    const assertion = await signAccountAssertion(this.config, input);
-    if (!assertion.ok) return assertion;
-    const result = await this.post(
-      "eligibility/current",
-      {
-        version: 1,
-        instanceId: input.binding.instanceId,
-        principal: input.principal,
-        action: input.action,
-      },
-      readEligibility,
-      assertion.value,
-    );
-    if (!result.ok) return result;
-    if (
-      result.value.instanceId !== input.binding.instanceId ||
-      !sameAccountScope(result.value.scope, input.binding.scope) ||
-      result.value.action !== input.action ||
-      canonicalJson(result.value.principal) !== canonicalJson(input.principal)
-    )
-      return scopeForbidden();
-    return result;
   }
 
   private async post<T>(
@@ -618,18 +524,6 @@ function copyBuffer(bytes: Uint8Array): ArrayBuffer {
 }
 function scopeForbidden<T>(): Result<T, AccountPlatformError> {
   return { ok: false, error: { code: "scope_forbidden" } };
-}
-function readEligibility(input: unknown): AccountEligibility {
-  const eligibility = readServiceEligibilityV1(input);
-  assertPantryPrincipal(eligibility.principal);
-  return {
-    authorityRevision: eligibility.authorityRevision,
-    accessRevision: eligibility.accessRevision,
-    scope: eligibility.scope,
-    instanceId: eligibility.instanceId,
-    principal: eligibility.principal,
-    action: eligibility.action,
-  };
 }
 function membershipCheck(
   input: AccountMembershipActor,

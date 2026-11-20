@@ -33,9 +33,9 @@ it(
 );
 
 async function evalCommandJourney({ task }: TestContext): Promise<void> {
-  // The account authority admits the owner, a second administrator and a
-  // member whose role carries no context access. Each of their control
-  // requests passes the real account check.
+  // The owner, a second administrator and a member whose role carries no
+  // context access. Each of their control requests passes Pantry's access
+  // check.
   const {
     organisationId,
     organisation,
@@ -183,10 +183,9 @@ async function evalCommandJourney({ task }: TestContext): Promise<void> {
     kind: "accept",
     revision,
   });
-  // The account authority decides before Pantry reads a role. It does not
-  // admit the fourth person, who is an administrator of this Organisation
-  // with a valid control session. Their read and their decision are refused
-  // in one way, and the Eval stays a candidate.
+  // The fourth person has a valid control session and no role in this
+  // Organisation. Their read and their decision are refused in one way, and
+  // the Eval stays a candidate.
   const outsiderRefusals = {
     list: await postJson(outsider, EVALS, null),
     summary: await postJson(outsider, paths.brainSummary, null),
@@ -198,7 +197,7 @@ async function evalCommandJourney({ task }: TestContext): Promise<void> {
   for (const refusal of Object.values(outsiderRefusals))
     expect(refusal).toEqual({
       status: 404,
-      body: { ok: false, error: "membership_ineligible" },
+      body: { ok: false, error: "organisation_membership_missing" },
     });
   expect(await states(author, evalId)).toEqual(["candidate"]);
   expect(

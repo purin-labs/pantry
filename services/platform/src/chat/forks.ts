@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { AccountPlatformAccess } from "../account-platform/access";
+import type { OrganisationAccess } from "../organisation-access/access";
 import { decideChatFlowDelivery } from "./information-flow";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
@@ -646,7 +646,7 @@ export async function readChatForkHistoryForCase(
 
 export async function admitChatForkInformationFlow(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
   history: ChatForkHistory,

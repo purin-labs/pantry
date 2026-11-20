@@ -1,7 +1,7 @@
 import {
-  accountAccessOfOneRead,
-  type AccountConversationScope,
-} from "../account-platform/access";
+  organisationAccessOfOneRead,
+  type AuthorizedConversationScope,
+} from "../organisation-access/access";
 import { parseMemoryCommand } from "@purin-labs/control-api";
 import type {
   MemoryApplicability,
@@ -81,7 +81,7 @@ export type MemoryAccessError = Readonly<{
  */
 export type MemoryViewer = RecordScope &
   Readonly<{
-    scope: AccountConversationScope;
+    scope: AuthorizedConversationScope;
     authority: Variant<RequestAuthority, "control">;
   }>;
 
@@ -132,7 +132,7 @@ export const TURN_MEMORY_PAGE = 32;
  */
 export async function readMemoryViews(
   env: Env,
-  scope: AccountConversationScope,
+  scope: AuthorizedConversationScope,
   execution?: OrganisationExecutionScope,
 ): Promise<Result<readonly MemoryView[], MemoryAccessError>> {
   const viewer = await resolveMemoryViewer(env, scope, execution);
@@ -611,7 +611,7 @@ function memoryExcerpt(statement: string, validity: MemoryValidity): string {
  */
 export async function commandMemoryAsOperator(
   env: Env,
-  scope: AccountConversationScope,
+  scope: AuthorizedConversationScope,
   body: unknown,
 ): Promise<Result<MemoryCommandReceipt, MemoryAccessError>> {
   const command = parseMemoryCommand(body, entityRefOrNull);
@@ -669,7 +669,7 @@ function isMemoryCommandErrorCode(
  */
 export async function resolveMemoryViewer(
   env: Env,
-  scope: AccountConversationScope,
+  scope: AuthorizedConversationScope,
   execution?: OrganisationExecutionScope,
 ): Promise<MemoryViewer | null> {
   const resolved =
@@ -686,7 +686,7 @@ export async function resolveMemoryViewer(
   if (authority === null || !policy.ok) return null;
   // The gate of the request, the turn authority and the capability ask the
   // account the same question. This read asks it one time.
-  const accountAccess = accountAccessOfOneRead(resolved.value.accountAccess);
+  const accountAccess = organisationAccessOfOneRead(resolved.value.accountAccess);
   const compiled = await compileTurnAuthority({
     db,
     accountAccess,

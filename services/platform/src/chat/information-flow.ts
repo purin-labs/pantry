@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { AccountPlatformAccess } from "../account-platform/access";
+import type { OrganisationAccess } from "../organisation-access/access";
 import type { DisclosureDestination } from "./disclosure-evidence";
 import {
   ConversationAudienceProposal,
@@ -70,7 +70,7 @@ function memberForUser(userId: string, member: { userId: string }): boolean {
 
 export async function resolveNativeChatAudience(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   authority: Variant<RequestAuthority, "control">,
   label: FlowLabel,
   destination: DisclosureDestination,
@@ -252,7 +252,7 @@ export async function resolveNativeChatAudience(
 
 export async function decideChatFlowDelivery(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   binding: FlowBinding,
   authority: Variant<RequestAuthority, "control">,
   destination: DisclosureDestination = { kind: "current" },
@@ -268,7 +268,7 @@ export async function decideChatFlowDelivery(
 }
 export async function decideCurrentAuthorityFlowSink(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   input: {
     binding: FlowBinding;
     sink: ConversationDeliverySink | ToolEffectSink;
@@ -307,7 +307,7 @@ export async function decideCurrentAuthorityFlowSink(
 }
 export async function decideChatFlowSink(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   binding: FlowBinding,
   authority: Variant<RequestAuthority, "control">,
   sink:
@@ -341,7 +341,7 @@ export async function decideChatFlowSink(
 
 export async function evaluateChatFlowLabelSink(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   label: FlowLabel,
   authority: Variant<RequestAuthority, "control">,
   sink: ConversationDeliverySink | ToolEffectSink,

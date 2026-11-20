@@ -1,4 +1,4 @@
-import { authenticatedAccountConversationScope } from "../../../account-platform/access";
+import { authenticatedConversationScope } from "../../../organisation-access/access";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
 import { mailControlAuthority } from "../mail-inbox";
@@ -156,7 +156,7 @@ export async function handleEmailReply(
           });
         if (!delivery.ok) return controlError(delivery.error.code, 403);
         const current = preview.value.preview;
-        const memoryViewer = authenticatedAccountConversationScope(
+        const memoryViewer = authenticatedConversationScope(
           authorized.organisationId,
           authorized.authenticated.session,
         );

@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import {
   MAX_EVAL_REPLY_LENGTH,
   type EvalObservation,
@@ -462,7 +462,7 @@ export async function processEvalTask(
   const preparedContext = await prepareTurnContext({
     db: input.scope.database,
     accountAccess: input.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(sessionId.value, assignmentId.value),
+    userAuthority: acceptedExecutionAuthority(sessionId.value, assignmentId.value),
     action: "execute",
     organisationId: organisationId.value,
     caseId: caseId.value,
@@ -571,7 +571,7 @@ export async function processEvalTask(
     revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
       db: input.scope.database,
       accountAccess: input.scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(sessionId.value, assignmentId.value),
+      userAuthority: acceptedExecutionAuthority(sessionId.value, assignmentId.value),
       action: "execute",
       organisationId: organisationId.value,
       requestAuthority: authority,

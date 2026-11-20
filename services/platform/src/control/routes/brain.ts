@@ -1,4 +1,4 @@
-import { authenticatedAccountConversationScope } from "../../account-platform/access";
+import { authenticatedConversationScope } from "../../organisation-access/access";
 import { EMPTY_BRAIN_SUMMARY, type BrainSummary } from "@purin-labs/control-api";
 
 import { roleMayConfigure } from "../../data/control-plane";
@@ -72,7 +72,7 @@ export async function handleBrainRoute(
       return summaryResponse(EMPTY_BRAIN_SUMMARY);
     const viewer = await resolveMemoryViewer(
       env,
-      authenticatedAccountConversationScope(
+      authenticatedConversationScope(
         authorized.organisationId,
         authorized.authenticated.session,
       ),

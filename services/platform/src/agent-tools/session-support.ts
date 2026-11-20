@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
 import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { evaluateChatFlowLabelSink } from "../chat/information-flow";
 import { isConversationId, isProjectId } from "@purin-labs/control-api";
 import { validateLiveRequestAuthority } from "../request-authority";
@@ -459,10 +459,7 @@ async function settleStaffPageEffect(
   const decision = await evaluateHarnessFlowSink(
     execution.scope.database,
     execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
+    acceptedExecutionAuthority(lease.session.sessionId, lease.turn.turnId),
     { flowLabel: effect.flowLabel, sink: effect.sink },
   );
   const exit = {
@@ -722,10 +719,7 @@ export async function passSharedDraftExit(
   const decision = await evaluateHarnessFlowSink(
     execution.scope.database,
     execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
+    acceptedExecutionAuthority(lease.session.sessionId, lease.turn.turnId),
     { flowLabel, sink },
   );
   if (
@@ -828,7 +822,7 @@ export async function requireLiveBakeryReadAuthority(
   const live = await validateLiveRequestAuthority({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),
@@ -884,10 +878,7 @@ async function toolEffectPassesExit(
   const rules = await evaluateHarnessFlowSink(
     execution.scope.database,
     execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
+    acceptedExecutionAuthority(lease.session.sessionId, lease.turn.turnId),
     { flowLabel: await emptyFlowLabel(), sink: input.sink },
   );
   if (rules.kind !== "allow") {
@@ -936,8 +927,8 @@ async function toolEffectPassesExit(
 
 async function evaluateHarnessFlowSink(
   db: OrganisationDatabase,
-  accountAccess: import("../account-platform/access").AccountPlatformAccess,
-  userAuthority: import("../account-platform/access").AccountUserAuthority,
+  accountAccess: import("../organisation-access/access").OrganisationAccess,
+  userAuthority: import("../organisation-access/access").OrganisationUserAuthority,
   input: {
     flowLabel: import("../policy/information-flow").FlowLabel;
     sink: import("../policy/information-flow").ToolEffectSink;
@@ -1148,10 +1139,7 @@ export async function settleToolEffect(
       const decision = await evaluateHarnessFlowSink(
         execution.scope.database,
         execution.scope.accountAccess,
-        acceptedExecutionAccountAuthority(
-          lease.session.sessionId,
-          lease.turn.turnId,
-        ),
+        acceptedExecutionAuthority(lease.session.sessionId, lease.turn.turnId),
         { flowLabel, sink: effect.sink },
       );
       if (

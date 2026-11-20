@@ -31,7 +31,7 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import type { AccountPlatformAccess } from "../account-platform/access";
+import type { OrganisationAccess } from "../organisation-access/access";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -297,7 +297,7 @@ export async function readSideCaseSource(
  */
 export async function admitSideCaseInformationFlow(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
   proposal: SideCaseProposal,

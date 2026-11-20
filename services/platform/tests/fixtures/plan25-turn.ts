@@ -21,9 +21,9 @@ import {
 } from "../../src/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import {
-  createAccountPlatformAccess,
-  acceptedExecutionAccountAuthority,
-} from "../../src/account-platform/access";
+  createOrganisationAccess,
+  acceptedExecutionAuthority,
+} from "../../src/organisation-access/access";
 import type { SingleDatabase } from "../../src/database-handles";
 import { createMigratedDatabase } from "../sqlite-d1";
 
@@ -115,7 +115,7 @@ export function fixtureTurnAuthority(
     .update(JSON.stringify(partitionWithoutDigest))
     .digest("hex");
   return {
-    accountAccess: createAccountPlatformAccess(
+    accountAccess: createOrganisationAccess(
       { DB: fixtureAccountDatabase() },
       organisationId,
       fixtureAccountDatabase(),
@@ -125,7 +125,7 @@ export function fixtureTurnAuthority(
         fenceToken: "unconfigured-fixture",
       },
     ),
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       "session_fixture",
       "turn_fixture",
     ),

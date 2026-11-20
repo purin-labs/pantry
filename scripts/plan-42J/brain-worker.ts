@@ -51,11 +51,7 @@ import {
 import { resolveOrganisationModelRoute } from "../../services/platform/src/models/route";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
-import {
-  admitMailboxAgent,
-  attachToAccountAuthority,
-  fixturePeople,
-} from "./account-authority";
+import { attachToAccountAuthority, fixturePeople } from "./account-authority";
 
 export {
   OrganisationDO,
@@ -457,12 +453,6 @@ async function seed(env: Env) {
     now,
   });
   if (!assigned.ok) throw new Error(assigned.error.code);
-  await admitMailboxAgent(env, {
-    organisationId,
-    administrator: ownerPerson,
-    mailboxBindingId: "binding_work",
-    bindingRevision: 1,
-  });
 
   // The merchant the supplier belongs to, and the supplier's verified address.
   const merchantId = `merchant_brain_${crypto.randomUUID()}`;

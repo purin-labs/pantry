@@ -1,6 +1,6 @@
 import { prepareWorkflowProposal } from "../../commerce/bakery/workflow-proposals";
 import { readDevice } from "../../devices/store";
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { sessionActionMutationExecution } from "../action-mutation-execution";
 import { ToolRequestError } from "../../agent-tools/errors";
 import type { ToolServiceRequest } from "../../agent-tools/registry";
@@ -459,7 +459,7 @@ export abstract class SessionProposalStaging extends SessionActorBase {
     const capability = await authorizeCapabilityUse({
       db: input.execution.scope.database,
       accountAccess: input.execution.scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         input.lease.session.sessionId,
         input.lease.turn.turnId,
       ),

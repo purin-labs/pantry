@@ -6,7 +6,6 @@ import {
   assignAgentMailbox,
   publishMailboxIngressPolicy,
 } from "../src/data/email-mailbox";
-import { ensurePantryAccountAutomationGrant } from "../src/account-platform/automation";
 import { requireIntegrationAccountId } from "./test-ids";
 import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
 import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
@@ -519,7 +518,8 @@ async function turnInput(sql: ReturnType<typeof sqlStorage>) {
   const account = await connectRealAccountPlatform(
     platformEnv({
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     }),
     {
       organisationId: organisationId.value,
@@ -531,17 +531,6 @@ async function turnInput(sql: ReturnType<typeof sqlStorage>) {
     account.env,
     organisationId.value,
   );
-  const automation = await ensurePantryAccountAutomationGrant({
-    env: account.env,
-    scope,
-    session: session.session,
-    native: {
-      kind: "agent_mailbox",
-      nativeId: "mailbox_binding_turn",
-      revision: 2,
-    },
-  });
-  if (!automation.ok) throw new Error(JSON.stringify(automation.error));
   return {
     env: account.env,
     scope,

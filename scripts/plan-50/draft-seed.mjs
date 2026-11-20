@@ -9,11 +9,7 @@ import {
   parseOrganisationId,
   parseUserId,
 } from "../../services/platform/src/ids.ts";
-import {
-  admitTrialWorkflow,
-  attachTrialOrganisation,
-  ownerUser,
-} from "./account-authority.mjs";
+import { attachTrialOrganisation, ownerUser } from "./account-authority.mjs";
 
 const organisationId = required(
   parseOrganisationId("organisation_plan50_seams"),
@@ -169,13 +165,9 @@ export async function seedTrialWorkflowAccount(env) {
   )
     .bind(organisationId)
     .run();
-  const owner = await attachTrialOrganisation(env, {
+  await attachTrialOrganisation(env, {
     organisationId,
     ownerUserId: ownerUser,
     members: { operator: agentUser, privateMember: humanUser },
-  });
-  await admitTrialWorkflow(env, organisationId, owner, {
-    nativeId: "workflow_plan50_seams",
-    revision: 1,
   });
 }

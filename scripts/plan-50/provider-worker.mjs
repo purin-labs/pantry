@@ -35,7 +35,6 @@ import {
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import { readSessionBudgetAccount } from "../../services/platform/src/actors/agent-session-budget.ts";
 import {
-  admitTrialWorkflow,
   attachTrialOrganisation,
   compileTrialTurnAuthority,
   ownerUser,
@@ -94,17 +93,13 @@ export class ProposalOrganisation extends ProposalOrganisationOwner {
         "UPDATE organisation_onboarding SET lifecycle = 'active', capability_profile = 'approved_provider_writes', activation_receipt_id = 'receipt_native_provider_activation', activated_at = ? WHERE organisation_id = ?",
       ).bind(now, organisationId),
     ]);
-    const owner = await attachTrialOrganisation(this.env, {
+    await attachTrialOrganisation(this.env, {
       organisationId,
       ownerUserId: ownerUser,
       members: {
         operator: userId,
         privateMember: "user_22222222-2222-5222-8222-222222222222",
       },
-    });
-    await admitTrialWorkflow(this.env, organisationId, owner, {
-      nativeId: "workflow_plan50_seams",
-      revision: 1,
     });
     const client = new CommerceAdminClient({
       baseUrl: this.env.UNDERCLERK_BASE_URL,

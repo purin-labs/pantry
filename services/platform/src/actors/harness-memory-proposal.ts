@@ -1,7 +1,7 @@
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { readAdmittedChatInput } from "../chat/turn-access";
 import { proposeMemoryFromInstruction } from "../memory/access";
 import { validateLiveRequestAuthority } from "../request-authority";
@@ -53,7 +53,7 @@ export async function proposeMemoryForHarness(
   const live = await validateLiveRequestAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.lease.session.sessionId,
       input.lease.turn.turnId,
     ),

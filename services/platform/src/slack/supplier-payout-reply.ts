@@ -2,7 +2,7 @@ import type { Env } from "../env";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
-import type { AccountUserAuthority } from "../account-platform/access";
+import type { OrganisationUserAuthority } from "../organisation-access/access";
 import { decideCaseConversationSink } from "../actors/case-conversation-sink";
 import {
   compileTurnAuthority,
@@ -74,7 +74,7 @@ export async function replyToSupplierPayoutQuery(
       "direct_conversation" | "shared_conversation"
     >;
     /** The verified Slack event that asked. */
-    userAuthority: AccountUserAuthority;
+    userAuthority: OrganisationUserAuthority;
     /** The channel that the reply is posted to. */
     channelId: string;
     /** The thread's Case Session, which the reply's flow is bound to. */

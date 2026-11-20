@@ -12,7 +12,6 @@ import type { CapabilityMode } from "@purin-labs/contracts";
 
 import { readAccessControlView } from "../access-control/read-model";
 import { opaqueSubjectReference } from "../access-control/references";
-import { resolveLinkedPantryAccountAutomation } from "../account-platform/identity";
 import type { AccessGrant } from "../authorization/access-grants/types";
 import {
   CAPABILITY_KEYS,
@@ -170,8 +169,7 @@ export async function readMailboxSetupPlan(
   else propose(enable(CAPABILITY_KEYS.emailReplyPropose));
 
   // 3. The agent reads the Case of a thread. The grant names the assignment
-  //    and its revision, so a change of agent needs the grant again. The
-  //    account authority admits the same assignment through its own record.
+  //    and its revision, so a change of agent needs the grant again.
   if (assigned !== null && agent.view.state === "assigned") {
     const contextEnabled = enabled(CAPABILITY_KEYS.contextCaseRead);
     const granted = grants.value.some(
@@ -184,20 +182,7 @@ export async function readMailboxSetupPlan(
         grant.target.capabilityId === CAPABILITY_KEYS.contextCaseRead &&
         grant.target.capabilityVersion === 1,
     );
-    const admitted =
-      granted &&
-      (
-        await resolveLinkedPantryAccountAutomation(
-          input.env,
-          scope.organisationId,
-          {
-            kind: "agent_mailbox",
-            nativeId: assigned.mailboxBindingId,
-            revision: assigned.revision,
-          },
-        )
-      ).ok;
-    if (contextEnabled && admitted) met.add("agent_context");
+    if (contextEnabled && granted) met.add("agent_context");
     else if (!contextEnabled) propose(enable(CAPABILITY_KEYS.contextCaseRead));
     else
       propose({

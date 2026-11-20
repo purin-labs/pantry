@@ -22,7 +22,7 @@ import {
 } from "../src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../src/data/access-grants";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
-import { acceptedExecutionAccountAuthority } from "../src/account-platform/access";
+import { acceptedExecutionAuthority } from "../src/organisation-access/access";
 import {
   FlowBinding,
   InformationFlowContext,
@@ -627,7 +627,7 @@ async function entityExecutionAuthority(
   const authority = await compileTurnAuthority({
     db: native.scope.database,
     accountAccess: native.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       "session_execution",
       "nonce_execution",
     ),

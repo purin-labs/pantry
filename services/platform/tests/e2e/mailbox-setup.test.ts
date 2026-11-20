@@ -9,7 +9,7 @@ import {
   type MailboxSetupPlan,
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import { acceptedExecutionAccountAuthority } from "../../src/account-platform/access";
+import { acceptedExecutionAuthority } from "../../src/organisation-access/access";
 import { compileTurnAuthority } from "../../src/authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { readAgentMailboxBinding } from "../../src/data/email-mailbox";
@@ -360,7 +360,7 @@ async function turnAuthority(
   const compiled = await compileTurnAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       "session_mailbox_setup",
       "turn_mailbox_setup",
     ),

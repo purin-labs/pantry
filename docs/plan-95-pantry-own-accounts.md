@@ -1,7 +1,8 @@
 # Plan 95 — Pantry owns its accounts
 
-Status: accepted, 20 November 2026. The owner decided the five decisions on
-20 November 2026 (see "Decisions"). No step has started.
+Status: in progress, 20 November 2026. The owner decided the five decisions
+on 20 November 2026 (see "Decisions"). Step 1 is done (see "Step 1
+results"). Steps 2 to 6 are open.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -250,33 +251,41 @@ This table replaces the first rows of "Authority and ownership" in
   pending and not expired. One regional batch writes the `person`, the
   `service_role_grant` and the new state. A second accept answers the same
   membership.
-- Removal uses `applyAccountServiceGrantRevocation`
-  (`data/control-plane.ts` line 1550). It already returns private chats to the
-  default project and removes project memberships in the same batch. Only
-  the Console receipt goes.
+- Removal uses `revokeOrganisationMembership` (`data/control-plane.ts`). It
+  returns private chats to the default project and removes project
+  memberships in the same batch. Step 1 removed the Console receipt.
 - The final-owner trigger stays.
 
 ### Request eligibility
 
-- Keep the port `AccountPlatformAccess` (`account-platform/access.ts`
-  line 61) with its three methods, and rename it `OrganisationAccess`. The
-  51 callers keep their calls. Only import paths and type names change.
-- The new implementation only reads: one regional D1 batch, and one global
-  read for a session.
-  - The organisation: the placement fence is current (as
-    `acknowledgeAccountAccessRevision` checks today), `organisation.status`
-    is `active`, and the lifecycle is not `archived`. If not:
-    `instance_ineligible`.
+- Keep the port `AccountPlatformAccess` with its three methods, and rename
+  it `OrganisationAccess` (`organisation-access/access.ts`). The 51 callers
+  keep their calls. Only import paths and type names change.
+- The new implementation only reads: one regional D1 statement, and one
+  global read for a session.
+  - The organisation: the placement fence is current. If not:
+    `authority_unavailable`. `organisation.status` is `active` or `deleted`
+    (archived), and the lifecycle is not `purging` or `purged`. If not:
+    `instance_ineligible`. An archive writes the lifecycle, so an
+    organisation with no lifecycle row was never archived and is eligible.
+    An archived organisation stays
+    eligible until its purge, as the Console instance did, so that its owner
+    can read it and restore it. The lifecycle checks of the routes and
+    Actors refuse its other work, as today.
   - A person: an active `service_role_grant`. For `authenticated_session`,
     the live `control_session` of that person (`nativeSession`, no change).
     `disclosure_recipient` admits only `disclose`, and
     `authenticated_provider_event` admits only `execute` (the rules of
     `client.ts` lines 380–394). A `viewer` admits only `disclose` and
-    `replay`. If not: `membership_ineligible`.
-  - An automation: its native row is active at the requested revision, as
-    `nativeAutomationExists` reads it today (`automation.ts` lines 194–230).
-    If not: `membership_ineligible`. Pantry's own access grants
-    (`authorization/access-grants/`) keep their checks.
+    `replay`. If not: `membership_ineligible`. The role checks of most routes
+    and of Slack ingress refuse a viewer first. A POST that only reads asks
+    for `disclose`: `authorizeOrganisationRequest` takes the action as its
+    sixth argument.
+  - An automation: its native row is active at the requested revision: an
+    enabled `cue_subscription` or `schedule_binding`, or the current
+    revision of an agent mailbox or WhatsApp support binding with an active
+    integration account. If not: `membership_ineligible`. Pantry's own
+    access grants (`authorization/access-grants/`) keep their checks.
   - A D1 fault answers `authority_unavailable`. Access fails closed, as
     today.
 - The answer carries no `authorityRevision`. No caller outside the module
@@ -286,8 +295,7 @@ This table replaces the first rows of "Authority and ownership" in
 - The types `ServiceAdmissionActionV1` and `PlatformUserAuthorityV1` move from
   the vendored Console package into `@purin-labs/contracts`, as TypeBox
   schemas ([Plan 78](plan-78-contracts-in-typescript.md)).
-- The module stays in the layer `foundation/tenancy` (`scripts/layers.json`
-  line 374).
+- The module is in the layer `foundation/tenancy` (`scripts/layers.json`).
 
 ### Plans
 
@@ -394,6 +402,67 @@ Done on 20 November 2026. The owner took all five recommendations (see
     person are in the default project.
 - Checks: `check:types`, the Platform E2E suite, `pnpm lint:layers`.
 
+#### Step 1 results
+
+Done on 20 November 2026. What changed, and where the work differs from the
+list above:
+
+- `OrganisationAccess` (`services/platform/src/organisation-access/access.ts`)
+  reads Pantry's own records. The module moved in this step, so step 4 only
+  deletes. `access.ts`, `access-revision.ts` and `automation.ts` of
+  `account-platform/` are deleted, with the Console calls `checkUser`,
+  `checkAutomation` and `setAutomationGrant` of `client.ts`.
+- The types are `OrganisationAdmissionAction` and `OrganisationUserAuthority`
+  in `@purin-labs/contracts` (`organisation-access.ts`).
+- An archived organisation stays eligible (see "Request eligibility"). The
+  first rule refused it, and that rule blocked the owner's read and the
+  restore route.
+- The viewer rule stays. Seven routes admit the role `viewer` on a POST:
+  the canvas chat, the sender links, board presence, a held-output
+  decision, the Slack DM choice, the mail assistant and the mail inbox. The
+  Console refused a viewer's POST on them when Pantry had invited that
+  person as a viewer, so production behaviour does not change. The first
+  two POSTs only read, and now ask for `disclose`.
+- Test fixtures made states that only the Console could hold: a Pantry
+  admin whom the Console refused (the `finance` slot) and a Console editor
+  with the Pantry role `viewer`. The outsider of `memory-support.ts` is now
+  a signed-in person with no role. `memory-access`, `eval-commands` and
+  `mailbox-sender-supplier-link` expect `organisation_membership_missing`
+  for that outsider.
+- Removal is native in this step. The members route calls
+  `revokeOrganisationMembership` and no longer asks the Console. The Console
+  membership no longer gives access, so its removal is not needed. Steps 1 to
+  4 go to production in one release, so no release has the Console
+  membership without the native one.
+- Invitation acceptance stays on the Console until step 2. It no longer
+  writes `account_service_access_revision`. A membership change in the
+  Console dashboard no longer reaches Pantry.
+- The mailbox setup check reads the Pantry access grant only. The script
+  fixtures of Plans 42J and 50 lost their Console automation grant.
+- Deleted journeys, whose outcomes only the Console had:
+  `shared-account-platform.test.ts` (Console eligibility outage, Console
+  member removal, Console service disable and turn billing; step 3 deletes
+  the billing), `shared-account-automation.test.ts` (Console automation
+  grants) and `account-access-one-read.test.ts` (a count of Console
+  requests). `account-session-isolation.test.ts` lost its Console
+  eligibility faults; its sign-in and invitation checks stay for step 2.
+- The fixture `shared-account-platform-fixture.ts` lost the helpers of those
+  journeys (1,547 to 735 lines).
+- Journeys:
+  - J1 has no new journey. `bakery-agent-canvas.test.ts` already has it: a
+    viewer opens and reads the chat of a canvas, and the viewer's message is
+    refused. `slack-viewer-refusal.test.ts` refuses a viewer in Slack. No
+    journey sends a viewer's POST to the five routes that act.
+  - J2 is `organisation-archive-access.test.ts`: a mention during the archive
+    starts no turn, and the owner reads the archived organisation and
+    restores it through the routes. It has no mailbox turn.
+  - J3 is `member-removal-access.test.ts`. The removed person is an admin,
+    because the Portal chat needs the role `admin`. The next message and the
+    next read answer 404 `organisation_membership_missing`: the membership
+    read refuses before the access check. The private chat moves from the
+    person's project to the default project, and the person keeps no
+    project membership.
+
 ### 2. Organisation creation and invitations
 
 - `POST /v1/control/organisations` and the three-step setup dialog.
@@ -405,10 +474,10 @@ Done on 20 November 2026. The owner took all five recommendations (see
   `attachSharedAccountNativeOrganisation` (owner, and members by slot). It
   makes the organisation through the new route and adds each member through
   invite and accept, so the seed goes through the production authorities.
-  Port the 64 test files; most change one import. Each test whose outcome is
+  Port the test files; most change one import. Each test whose outcome is
   only a Console outcome gets a decision, not a repair
-  (`shared-account-platform.test.ts`, `shared-account-automation.test.ts`,
-  `account-session-isolation.test.ts`, `account-access-one-read.test.ts`).
+  (`account-session-isolation.test.ts`, `pantry-onboarding.test.ts`; step 1
+  deleted three others).
 - Update `organisation-setup-flow.md` and the sections "Account setup and
   Organisation creation" and "Team and invitation lifecycle" of
   `architecture/onboarding.md`.
@@ -439,9 +508,8 @@ Done on 20 November 2026. The owner took all five recommendations (see
 
 - Delete the rest of `account-platform/`: `client.ts`, `config.ts`,
   `binding.ts`, `provisioning.ts`, `provisioning-boundary.ts`, `routes.ts`,
-  `onboarding.ts`, `instance-release.ts` and the Console parts of
-  `service-membership.ts`. The eligibility module moves to
-  `services/platform/src/organisation-access/`, in the same layer. Delete the `/account-platform/v1/*` handling
+  `onboarding.ts`, `instance-release.ts`, `identity.ts`, `types.ts` and the
+  Console parts of `service-membership.ts`. Delete the `/account-platform/v1/*` handling
   (`integration-gateway.ts` line 200), the release pass (line 183),
   `handlePantryOnboarding` and `/v1/control/account-onboarding`.
 - Delete the binding from `services/platform/wrangler.jsonc` (local and

@@ -4,8 +4,6 @@ import {
 } from "@purin-labs/control-api";
 import { parseCommerceGraphQuery as parseCommerceGraphQueryResult } from "../../commerce/entity-plane/routes";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { ensurePantryAccountAutomationGrant } from "../../account-platform/automation";
-import type { PantryNativeAutomation } from "../../account-platform/identity";
 import type {
   AccessSubjectRef,
   AccessTargetRef,
@@ -25,6 +23,7 @@ import {
   createVersionedAccessGrant,
   revokeVersionedAccessGrant,
   type AccessGrantMutationError,
+  type AccessGrantMutationResult,
 } from "../../access-control/grant-mutations";
 import {
   resolveGrantSubjectReference,
@@ -34,7 +33,6 @@ import { resolvePublishedCommerceTarget } from "../../commerce/entity-plane/publ
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import type {
   AccessGrantTarget,
-  GrantSubject,
   FileResourceAccessGrantTarget,
 } from "../../authorization/access-grants/types";
 import { parseFileResourceScope } from "../../authorization/access-grants";
@@ -328,20 +326,7 @@ async function handleGrantCreate(
     operation: "access_control.grant.create",
   });
   if (!prepared.ok) return prepared.response;
-  if (prepared.replay !== null) {
-    const subject = await resolveGrantSubjectReference({
-      db: prepared.authorized.executionScope.database,
-      organisationId: prepared.authorized.organisationId,
-      subjectRef: parsed.value.subjectRef,
-    });
-    if (!subject.ok) return controlError(subject.error, 409);
-    const granted = await grantAccountAutomation(
-      env,
-      prepared.authorized,
-      subject.value,
-    );
-    return granted ?? prepared.replay;
-  }
+  if (prepared.replay !== null) return prepared.replay;
   const scope = await OrganisationExecutionScope.resolve(
     env,
     prepared.value.authorized.organisationId,
@@ -380,69 +365,7 @@ async function handleGrantCreate(
     identity: mutation.identity,
     boundary: mutation.boundary,
   });
-  if (!changed.ok) return accessGrantMutationErrorResponse(changed.error);
-  const granted = await grantAccountAutomation(
-    env,
-    mutation.authorized,
-    changed.value.grant.subject,
-  );
-  if (granted !== null) return granted;
-  const responseBody = {
-    ok: true,
-    revision: changed.value.projectionRevision,
-    configurationVersion: changed.value.configurationVersion,
-    grant: changed.value.grant,
-  };
-  return controlJson(responseBody);
-}
-
-async function grantAccountAutomation(
-  env: Env,
-  authorized: AuthorizedOrganisationRequest,
-  subject: GrantSubject,
-): Promise<Response | null> {
-  let native: PantryNativeAutomation;
-  switch (subject.kind) {
-    case "workflow":
-      native = {
-        kind: "workflow",
-        nativeId: subject.workflowId,
-        revision: subject.workflowRevision,
-      };
-      break;
-    case "agent_mailbox":
-      native = {
-        kind: "agent_mailbox",
-        nativeId: subject.mailboxBindingId,
-        revision: subject.bindingRevision,
-      };
-      break;
-    case "whatsapp_support":
-      native = {
-        kind: "whatsapp_support",
-        nativeId: subject.supportBindingId,
-        revision: subject.bindingRevision,
-      };
-      break;
-    case "organisation_role":
-    case "person":
-    case "conversation":
-      return null;
-    default:
-      return assertNever(subject);
-  }
-  const granted = await ensurePantryAccountAutomationGrant({
-    env,
-    scope: authorized.executionScope,
-    session: authorized.authenticated.session,
-    native,
-  });
-  return granted.ok
-    ? null
-    : controlError(
-        granted.error.code,
-        granted.error.code === "authority_unavailable" ? 503 : 403,
-      );
+  return accessGrantMutationResponse(changed);
 }
 
 async function handleGrantRevoke(
@@ -481,14 +404,7 @@ async function handleGrantRevoke(
     identity: mutation.identity,
     boundary: mutation.boundary,
   });
-  if (!changed.ok) return accessGrantMutationErrorResponse(changed.error);
-  const responseBody = {
-    ok: true,
-    revision: changed.value.projectionRevision,
-    configurationVersion: changed.value.configurationVersion,
-    grant: changed.value.grant,
-  };
-  return controlJson(responseBody);
+  return accessGrantMutationResponse(changed);
 }
 
 async function handleCapabilityChange(
@@ -1337,6 +1253,19 @@ async function publishCurrentPolicy(
   } catch {
     return { ok: false, error: "policy_activation_failed" };
   }
+}
+
+/** The answer of a grant that was created or revoked. */
+function accessGrantMutationResponse(
+  changed: Result<AccessGrantMutationResult, AccessGrantMutationError>,
+): Response {
+  if (!changed.ok) return accessGrantMutationErrorResponse(changed.error);
+  return controlJson({
+    ok: true,
+    revision: changed.value.projectionRevision,
+    configurationVersion: changed.value.configurationVersion,
+    grant: changed.value.grant,
+  });
 }
 
 function accessGrantMutationErrorResponse(

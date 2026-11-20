@@ -16,9 +16,7 @@ import {
   openRouterToolCall,
   openRouterText,
   ORGANISATION_ID,
-  slackActorFixtureOwner,
 } from "./slack-journey-support";
-import { grantSharedAccountAutomation } from "./shared-account-platform-fixture";
 import {
   parseUserId,
   parseSessionId,
@@ -764,13 +762,6 @@ async function fixture() {
       createdBy: userId,
       now,
     }),
-  );
-  // A reply draft acts for the mailbox agent, so the account authority must
-  // hold the agent's grant.
-  await grantSharedAccountAutomation(
-    ORGANISATION_ID,
-    await slackActorFixtureOwner(now),
-    { kind: "agent_mailbox", nativeId: "binding_mail_origin", revision: 1 },
   );
   required(
     await publishMailboxIngressPolicy({

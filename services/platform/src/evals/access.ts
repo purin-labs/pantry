@@ -19,7 +19,7 @@ import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
 } from "../actors/actor-router";
-import type { AccountConversationScope as ConversationScope } from "../account-platform/access";
+import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
 import { listVerifiedContactEndpoints } from "../data/contact-verification";
 import { gmailConnectorId } from "../data/email-mailbox";
 import type { Env, OrganisationActorStub } from "../env";
