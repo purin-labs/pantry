@@ -3,7 +3,7 @@
     "upward": 147,
     "areas": 153,
     "order": 103,
-    "table": 26
+    "table": 25
   },
   "crossings": {
     "areas/brain -> areas/inbox": 10,
@@ -120,7 +120,6 @@
     "table organisation_default_workspace (foundation/agent) <- foundation/tenancy": 1,
     "table organisation_readiness_assessment (areas/organisation) <- foundation/tenancy": 2,
     "table organisation_workspace (foundation/agent) <- foundation/tenancy": 1,
-    "table portal_chat_directory (foundation/conversation) <- foundation/tenancy": 1,
     "table project (foundation/conversation) <- surfaces/portal": 1,
     "table project_member (foundation/conversation) <- foundation/tenancy": 1,
     "table provider_account_cleanup (areas/integrations) <- areas/organisation": 1,
