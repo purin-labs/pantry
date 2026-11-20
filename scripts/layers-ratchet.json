@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 119,
+    "upward": 118,
     "areas": 56,
-    "order": 21,
+    "order": 20,
     "table": 25
   },
   "crossings": {
@@ -60,14 +60,12 @@
     "foundation/authority -> foundation/conversation": 1,
     "foundation/collaboration -> areas/commerce": 1,
     "foundation/connections -> areas/organisation": 1,
-    "foundation/connections -> foundation/authority": 1,
     "foundation/control -> areas/brain": 1,
     "foundation/control -> areas/commerce": 6,
     "foundation/control -> areas/organisation": 1,
     "foundation/control -> foundation/agent": 2,
     "foundation/control -> foundation/conversation": 1,
     "foundation/control -> surfaces/slack": 2,
-    "foundation/conversation -> areas/brain": 1,
     "foundation/conversation -> areas/commerce": 1,
     "foundation/conversation -> areas/kitchen": 4,
     "foundation/conversation -> surfaces/portal": 2,

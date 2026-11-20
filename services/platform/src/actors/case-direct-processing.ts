@@ -1,9 +1,9 @@
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
-import type { TurnMemoryReader } from "../context/assembly";
 import {
   turnMemoryReaderWithoutSubjects,
-} from "../memory/contract/turn-memory";
+  type TurnMemoryReader,
+} from "../context/assembly";
 import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
 import { admitProjectContext } from "../projects/context";
