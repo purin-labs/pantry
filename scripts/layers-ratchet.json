@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 43,
+    "upward": 36,
     "areas": 19,
     "order": 19,
     "table": 21
@@ -26,7 +26,7 @@
     "areas/organisation -> areas/kitchen": 1,
     "areas/organisation -> surfaces/portal": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,
-    "foundation/agent -> areas/commerce": 13,
+    "foundation/agent -> areas/commerce": 6,
     "foundation/agent -> foundation/conversation": 3,
     "foundation/authority -> areas/commerce": 1,
     "foundation/authority -> foundation/agent": 2,

@@ -1,12 +1,8 @@
-import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
+import { responsibilityScopeCommerce } from "./scope-commerce";
 import type {
   CommerceListEntryRef,
   CommerceRelationshipRef,
 } from "@purin-labs/commerce-contracts";
-import {
-  parseCommerceListEntryRef,
-  parseCommerceRelationshipRef,
-} from "@purin-labs/commerce-client";
 import type { Result } from "../../result";
 import {
   isScheduleWeekday,
@@ -48,21 +44,13 @@ export function parseResponsibilityScopeInput(
 function parseResponsibilityRelationship(
   raw: unknown,
 ): CommerceRelationshipRef | null {
-  try {
-    return parseCommerceRelationshipRef(raw);
-  } catch {
-    return null;
-  }
+  return responsibilityScopeCommerce.use().parseRelationship(raw);
 }
 
 function parseResponsibilityListEntry(
   raw: unknown,
 ): CommerceListEntryRef | null {
-  try {
-    return parseCommerceListEntryRef(raw);
-  } catch {
-    return null;
-  }
+  return responsibilityScopeCommerce.use().parseListEntry(raw);
 }
 
 export function parseResponsibilityRelationshipJson(
@@ -133,12 +121,14 @@ function parseResponsibilityScope(
         200,
       );
       const revision = positiveIntegerOrNull(raw.selector.revision);
-      const queryResult = parseCommerceGraphQuery(raw.selector.query);
-      return selectorId === null || revision === null || !queryResult.ok
+      const query = responsibilityScopeCommerce
+        .use()
+        .parseSelectorQuery(raw.selector.query);
+      return selectorId === null || revision === null || query === null
         ? null
         : {
             kind: "saved_selector",
-            selector: { selectorId, revision, query: queryResult.value },
+            selector: { selectorId, revision, query },
           };
     }
     default:

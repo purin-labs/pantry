@@ -21,6 +21,8 @@ import { slackMayApproveAction } from "./commerce/action-model";
 import { parseCommerceEntityPlaneEffect } from "./commerce/entity-plane/proposals";
 import { commerceGrantSelection } from "./authorization/access-grants/commerce-grant-selection";
 import { COMMERCE_ACCESS_TARGETS } from "./commerce/entity-plane/access-targets";
+import { RESPONSIBILITY_SCOPE_COMMERCE } from "./commerce/entity-plane/responsibility-scopes";
+import { responsibilityScopeCommerce } from "./data/agent-operations/scope-commerce";
 import { commerceGrantTargets } from "./authorization/access-grants/commerce-grant-targets";
 import { COMMERCE_GRANT_TARGETS } from "./commerce/entity-plane/grant-targets";
 import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
@@ -116,6 +118,7 @@ commerceDeliveryIntake.register({
 commerceGrantSelection.register(COMMERCE_GRANT_SELECTION);
 commerceGrantTargets.register(COMMERCE_GRANT_TARGETS);
 commerceAccessTargets.register(COMMERCE_ACCESS_TARGETS);
+responsibilityScopeCommerce.register(RESPONSIBILITY_SCOPE_COMMERCE);
 
 commerceGraphReads.register({
   selectNamedCommerceQuerySourceGrant: (...input) =>

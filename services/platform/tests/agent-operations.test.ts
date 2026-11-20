@@ -1,5 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { SingleDatabase } from "../src/database-handles";
 import { describe, expect, it } from "vitest";
 import {

@@ -13,21 +13,7 @@ export type MenuPriceProposalRequest = Readonly<{
   deal: boolean;
 }>;
 
-/** Why a published resource reference was refused. */
-export type PublishedResourceBoundaryError =
-  | Readonly<{
-      readonly code:
-        | "invalid_reference"
-        | "not_published"
-        | "organisation_mismatch"
-        | "merchant_mismatch"
-        | "unavailable";
-    }>
-  | Readonly<{
-      readonly code: "revision_conflict";
-      readonly expected: number;
-      readonly actual: number;
-    }>;
+export type { PublishedResourceBoundaryError } from "../../data/agent-operations/scope-commerce";
 
 /** The armed fault of the Café commerce acceptance journey. */
 export type CafeCommerceAcceptanceFaultRecord = Readonly<{
