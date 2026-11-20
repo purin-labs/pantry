@@ -62,5 +62,3 @@ export function EcommercePage(): React.JSX.Element {
     </div>
   );
 }
-
-export default EcommercePage;

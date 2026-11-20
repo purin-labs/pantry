@@ -1103,6 +1103,9 @@ const REHEARSAL_STATION_IDS: readonly StationId[] = [
  * Samples an obstacle-avoiding 3D room walk trajectory between `from` and `to`
  * on the active floor plan so `schedule.ts` computes real room walking distance
  * and travel time (`travelSeconds`) from live 3D station positions.
+ *
+ * @public `scripts/bakery-robots/verify-store-layout-browser.js` imports this
+ * module in the browser and calls this function at run time.
  */
 export function buildLiveRoomRoute(
   planId: BakeryFloorPlanId,

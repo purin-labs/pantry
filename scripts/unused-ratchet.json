@@ -1,10 +1,6 @@
 {
   "files": ["services/platform/src/devices/work.ts"],
   "exports": [
-    "apps/portal/src/features/ecommerce/page.tsx#default",
-    "apps/portal/src/features/integrations/settings-routes.tsx#connectionAttentionMessage",
-    "apps/portal/src/features/production-run/factory-places.ts#PIE_STATIONS",
-    "apps/portal/src/features/workflow-simulator/bakery-appliance-layout.ts#buildLiveRoomRoute",
     "packages/contracts/src/case-output.ts#caseContributionSourceSchema",
     "services/commerce/src/entity-plane/entity-types.ts#CommerceEntityTypeId",
     "services/commerce/src/entity-plane/entity-types.ts#CommerceGraphQuery",

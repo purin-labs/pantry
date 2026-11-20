@@ -251,7 +251,12 @@ const FINANCIER_STATIONS: readonly FactoryStationSource[] = [
   },
 ];
 
-/** Savoury pie bakery layout connecting the marble pastry bench to the Maruzen oven. */
+/**
+ * Savoury pie bakery layout connecting the marble pastry bench to the Maruzen oven.
+ *
+ * @public `scripts/production-simulation/verify-pastry-bench-browser.js` imports
+ * this name in the browser at run time.
+ */
 export const PIE_STATIONS: readonly FactoryStationSource[] = [
   {
     id: "station-scale",
