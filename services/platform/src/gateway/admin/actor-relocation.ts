@@ -3,7 +3,7 @@ import {
   type RelocationMailReceipt,
 } from "../../actors/actor-relocation-mail";
 import { parseCommerceProviderReceipt } from "../../commerce/action-model";
-import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import {
   readStringField,
   readOrganisationIdField,

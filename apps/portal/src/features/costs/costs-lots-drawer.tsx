@@ -9,7 +9,7 @@ import {
   type SupplyCostItem,
   type SupplyLotCost,
   type SupplyLotInvoiceCost,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import {
   lotInvoiceFieldCellKey,
   supplyFieldCellKey,

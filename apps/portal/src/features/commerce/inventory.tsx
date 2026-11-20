@@ -3,7 +3,7 @@ import {
   calculateBakeryCostsAndMargins,
   parseCostsOverview,
   type CalculatedProductMargin,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import {
   parseInventory,
   type ArchivedProduct,

@@ -11,7 +11,7 @@ import {
   type OrganisationCostPlan,
   type ProductCostPlanEntry,
   type SupplyLotInvoiceCost,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import {
   commerceCommandInput,
   type CommerceAdminClient,

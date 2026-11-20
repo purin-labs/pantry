@@ -4,9 +4,7 @@ import {
   parseCommerceExceptionInbox,
   parseTrackingBatchPreviewResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-operations";
-import type {
-  MissingTrackingException,
-} from "@purin-labs/commerce-control-api";
+import type { MissingTrackingException } from "@purin-labs/control-api";
 
 const BATCH_ID = `tracking_batch_${"a".repeat(64)}`;
 

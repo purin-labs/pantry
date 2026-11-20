@@ -27,7 +27,7 @@ import {
   type SupplyCostItem,
   type SupplyLotCost,
   type WeekUnits,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";

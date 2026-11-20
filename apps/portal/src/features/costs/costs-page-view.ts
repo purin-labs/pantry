@@ -6,7 +6,7 @@ import type {
   MeasuredWasteSummary,
   ProductPlanVsActualRow,
   SupplyCostItem,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import type {
   PortalPageViewFact,
   PortalPageViewSection,

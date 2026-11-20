@@ -158,7 +158,7 @@ import {
   FlowBinding,
 } from "../../policy";
 import { errorMessage } from "@purin-labs/std";
-import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import {
   CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY,
   activationExecutionFailure,

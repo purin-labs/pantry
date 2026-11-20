@@ -30,7 +30,7 @@ import {
 } from "./actor-relocation-exclusion";
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import type { RelocationMailReceipt } from "./actor-relocation-mail";
-import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { RelocationReceiptError } from "./actor-relocation-state";
 import {
   regionalCopyTables,

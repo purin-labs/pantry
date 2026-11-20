@@ -15,8 +15,8 @@ import { assertNever } from "@purin-labs/std";
 
 import type {
   AgentDefinition,
-  Skill,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
+import type { Skill } from "@purin-labs/control-api";
 import { isPrimaryNavigationClick } from "../../console-sidebar";
 import { formatAbsoluteTime, formatRelativeTime } from "../../formatting";
 import { EmptyState, StatusChip } from "../../page-components";

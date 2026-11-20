@@ -3,7 +3,7 @@ import { SlidersHorizontal } from "lucide-react";
 import type {
   BakeryCostCalculation,
   CostValuationBasis,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import type { ProjectedCostsSheet } from "./costs-sheet-draft";
 
 type CostAssumptions = ProjectedCostsSheet["assumptions"];

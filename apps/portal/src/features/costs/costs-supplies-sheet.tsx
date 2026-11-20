@@ -3,7 +3,7 @@ import type {
   CalculatedSupplyUsage,
   CostUnit,
   SupplyCostItem,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import { supplyFieldCellKey } from "@purin-labs/costs-sheet-crdt";
 import { formatMoneyMinor } from "../../formatting";
 import { CrmTable, CrmTag, Select, type CrmColumn } from "../../ui";

@@ -19,7 +19,7 @@ import {
   type SupplyCostItem,
   type SupplyLotCost,
   type WeekUnits,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import {
   FORECAST_CAPEX_MINOR_CELL_KEY,
   FORECAST_DEMAND_CURVE_CELL_KEY,

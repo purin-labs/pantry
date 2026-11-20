@@ -10,9 +10,9 @@ import type {
   AgentOperationsSnapshot,
   CueBinding,
   OperationalArea,
-  Skill,
   ScheduleBinding,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
+import type { Skill } from "@purin-labs/control-api";
 import {
   Notice,
   RecoverableError,

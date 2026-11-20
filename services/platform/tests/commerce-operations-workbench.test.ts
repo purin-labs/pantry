@@ -10,7 +10,7 @@ import {
   parseTrackingBatchPreviewRequest,
   previewTrackingBatch,
 } from "../src/commerce/operations-workbench";
-import type { CommerceExceptionInbox } from "@purin-labs/commerce-control-api";
+import type { CommerceExceptionInbox } from "@purin-labs/control-api";
 
 const OBSERVED_AT = "2026-08-29T00:00:00.000Z";
 const EXPECTED_BY = "2026-08-30T03:00:00.000Z";

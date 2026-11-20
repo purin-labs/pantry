@@ -33,7 +33,7 @@ import type { CaseContextReplayAuthority } from "../../context/projection";
 import { FlowBinding } from "../../policy";
 import type { SerializedFlowBinding } from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
-import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 
 export type CaseGmailReplyProposal = {
   readonly evidence: import("../../case-context-discovery/evidence").CaseContextCollectionProposalEvidence;

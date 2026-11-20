@@ -11,12 +11,12 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
+import type { CommerceActionFollowUp } from "../commerce.ts";
 import type {
-  CommerceActionFollowUp,
   CommerceProviderReceipt,
   CommerceShopifyProviderReceipt,
   CommerceEngineProviderReceipt,
-} from "../commerce.ts";
+} from "@purin-labs/control-api";
 import type { ActionState } from "@purin-labs/contracts";
 import {
   parseMenuPriceDetails,

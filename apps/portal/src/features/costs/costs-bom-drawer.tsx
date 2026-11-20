@@ -5,7 +5,7 @@ import type {
   CalculatedProductMargin,
   CalculatedRecipeCost,
   ProductPlanVsActualRow,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import {
   formatMoneyMinor,
   formatSignedMoneyRounded as formatSignedMinor,

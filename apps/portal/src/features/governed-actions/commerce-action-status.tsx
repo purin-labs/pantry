@@ -1,4 +1,4 @@
-import type { CommerceProviderReceipt } from "@purin-labs/commerce-control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import React from "react";
 import { CommerceActionTrace } from "./commerce-trace";
 import { CafeMenuPublicationDetails } from "./cafe-menu-details";

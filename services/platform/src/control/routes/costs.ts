@@ -26,7 +26,7 @@ import {
   type CostUnit,
   type CostsSheetWrite,
   type CostsSheetWriteResult,
-} from "@purin-labs/kitchen-control-api";
+} from "@purin-labs/control-api";
 import type { CommerceStockSnapshot } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import {

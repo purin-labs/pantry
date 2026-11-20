@@ -22,8 +22,8 @@ import { assertNever } from "@purin-labs/std";
 import type {
   CommerceActivityResource,
   CommerceActivitySourceName,
-  CommerceProviderReceipt,
 } from "@purin-labs/commerce-control-api";
+import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 
 export type CommerceActivityEvent =
   | Readonly<{

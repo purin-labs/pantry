@@ -64,11 +64,11 @@ import {
 } from "./agent-console-shared";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
+import type { TrackingBatchPreview } from "@purin-labs/commerce-control-api";
 import type {
   MissingTrackingException,
   TrackingActionTarget,
-  TrackingBatchPreview,
-} from "@purin-labs/commerce-control-api";
+} from "@purin-labs/control-api";
 import type { PermissionRequired } from "@purin-labs/control-api";
 
 export type {

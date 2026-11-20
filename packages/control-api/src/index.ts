@@ -5,6 +5,7 @@
  */
 export type * from "./access.ts";
 export type * from "./agents.ts";
+export type * from "./agent-operation-commands.ts";
 export * from "./chat.ts";
 export * from "./portal-page-view.ts";
 export * from "./surface-observation.ts";
@@ -16,6 +17,8 @@ export * from "./agent-permission-requests.ts";
 export * from "./permission-required.ts";
 export * from "./projects.ts";
 export * from "./project-context.ts";
+export type * from "./commerce-exceptions.ts";
+export type * from "./commerce-receipts.ts";
 export * from "./supplier-id.ts";
 export type * from "./home.ts";
 export type * from "./payouts.ts";
@@ -76,3 +79,4 @@ export * from "./voice.ts";
 export * from "./voice-engines.ts";
 export * from "./voice-text-check.ts";
 export * from "./devices.ts";
+export * from "./costs.ts";

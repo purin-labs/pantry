@@ -74,7 +74,7 @@ import type {
   CommerceLabProviderReceipt,
   CommerceShopifyProviderReceipt,
   CommerceEngineProviderReceipt,
-} from "@purin-labs/commerce-control-api";
+} from "@purin-labs/control-api";
 import {
   MERCHANT_PLUGIN_INSTALL_VERB,
   merchantPluginInstallation,

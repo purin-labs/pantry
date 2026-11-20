@@ -29,8 +29,8 @@ import { parseEntityRef } from "@purin-labs/commerce-client";
 import {
   parseAgentOperationsResponse,
   type AgentDefinition,
-  type Skill,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
+import { type Skill } from "@purin-labs/control-api";
 import { ControlApiError, lastControlRead } from "../../control-client";
 import { evalsPath, memoriesPath } from "../../control-paths";
 
