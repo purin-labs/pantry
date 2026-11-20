@@ -8,7 +8,9 @@ import {
   resolveIntegrationAccount,
   resolveProviderConnection,
 } from "../../../data/integration-account";
-import { recordProviderStartFailure } from "../../../data/onboarding-support";
+import {
+  recordProviderStartFailure,
+} from "../../../organisation/contract/provider-support-references";
 import {
   cancelProviderAttempt,
   expireProviderAttemptIfDue,

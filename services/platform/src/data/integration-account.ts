@@ -34,7 +34,9 @@ import {
   type ProviderWebhookId,
   type OrganisationId,
 } from "../ids";
-import { prepareResolveOpenSupportReferences } from "./onboarding-support";
+import {
+  prepareResolveOpenSupportReferences,
+} from "../organisation/contract/provider-support-references";
 import type { Result } from "../result";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import {

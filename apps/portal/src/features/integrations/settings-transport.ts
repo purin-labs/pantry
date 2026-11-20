@@ -4,7 +4,7 @@ import {
   controlMutation,
   controlSecretMutation,
 } from "../../control-client";
-import { accountInvitationHref } from "../../pages/account-invitation";
+import { accountInvitationHref } from "../../pages/account-invitation-link";
 import {
   mailboxPolicyWireBody,
   setUpMailbox,

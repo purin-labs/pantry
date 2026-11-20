@@ -21,7 +21,7 @@ import {
   consumeOnboardingActivationAcceptanceFault,
   inspectOnboardingActivationAcceptanceFault,
   type OnboardingActivationAcceptanceFaultStorage,
-} from "../src/actors/onboarding-activation-acceptance-fault";
+} from "../src/organisation/contract/onboarding-activation-acceptance-fault";
 import { newRequestId, type UserId, type OrganisationId } from "../src/ids";
 import {
   evaluateAndStoreReadiness,
@@ -31,10 +31,10 @@ import {
   selectSetupTemplates,
 } from "../src/data/onboarding";
 import { buildOnboardingProjection } from "../src/data/onboarding-projection";
+import { readMerchantSupportDiagnostics } from "../src/data/onboarding-support";
 import {
-  readMerchantSupportDiagnostics,
   recordProviderStartFailure,
-} from "../src/data/onboarding-support";
+} from "../src/organisation/contract/provider-support-references";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { isRecord } from "@purin-labs/std";

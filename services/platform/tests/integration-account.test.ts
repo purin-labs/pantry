@@ -23,7 +23,9 @@ import {
   type ConnectedIntegrationSeed,
   type IntegrationAccountMutation,
 } from "../src/data/integration-account";
-import { recordProviderStartFailure } from "../src/data/onboarding-support";
+import {
+  recordProviderStartFailure,
+} from "../src/organisation/contract/provider-support-references";
 import {
   type UserId,
   type ProviderConnectionId,

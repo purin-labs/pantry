@@ -35,7 +35,9 @@ import {
   type ControlMutationReceiptScope,
 } from "./control-mutation";
 import type { CapabilityProfile } from "./onboarding";
-import { prepareResolveOpenSupportReferences } from "./onboarding-support";
+import {
+  prepareResolveOpenSupportReferences,
+} from "../organisation/contract/provider-support-references";
 import {
   deriveFirstOperationalTask,
   prepareFirstOperationalTask,
