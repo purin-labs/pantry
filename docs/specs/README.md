@@ -26,7 +26,7 @@ each source file its module.
 - A new comment in code names a spec id.
 - An old comment names a plan number. The table below gives its spec.
   `pnpm lint:plan-numbers` fails when code names a number that the table lacks.
-- New work gets a plan in `docs/` with the next number: Plan 96, or Refactor 18.
+- New work gets a plan in `docs/` with the next number: Plan 97, or Refactor 18.
   When the work is in production, its content goes into a spec.
 
 ## The specs
@@ -176,6 +176,7 @@ Refactors 1 to 8 are also the numbers of the items of Refactor 15.
 | Plan 93 | A plan | [plan-93-clean-cutover.md](../plan-93-clean-cutover.md) | 6 |
 | Plan 94 | A plan | [plan-94-purin-labs-organisation.md](../plan-94-purin-labs-organisation.md) | 4 |
 | Plan 95 | A plan | [plan-95-pantry-own-accounts.md](../plan-95-pantry-own-accounts.md) | 0 |
+| Plan 96 | A plan | [plan-96-gemini-models.md](../plan-96-gemini-models.md) | 0 |
 | Refactor 1 | The archive | — | 6 |
 | Refactor 2 | The archive | — | 5 |
 | Refactor 3 | The archive | — | 11 |
