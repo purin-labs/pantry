@@ -418,6 +418,27 @@ the reason: callers use 245 methods of the four Actors at 440 places, in about 1
 files. An interface for each module is a larger piece of work, and it belongs with the
 split of the Actor classes into modules. It is now a part of step A1.9.
 
+**20 November 2026. Step A2.6 is done.**
+
+| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A2.6 | `defineSharedDoc` in `packages/collaboration/src/shared-doc.ts` gives a document package its checked encodings, the base of its document class (`state`, `stateVector`, `syncUpdate`, `apply`, and `mutate`, `mutateIfChanged` and `stage` for its operations) and `syncProtocol`. A package names its roots one time, and it keeps its shape check, its reads and its operations. `definePlainTextDoc` gives the whole document of one plain text: the product description and the mail reply were two copies of it. `defineSharedEncoding` gives the encodings and the protocol alone. The two documents of `workflow-canvas-crdt` use it and keep their own classes: the canvas takes its membership from the workflow owner, and the draft needs one Yjs document for its undo history. Their protocol files used `createSyncProtocol` since Refactor 10, step 5 |
+
+The clone count went from 937 to 917, and the copied lines from 17,423 to 17,107. The
+packages lost 1,961 lines and got 1,281. One copy stays: `sameBytes` in
+`actors/collaboration-room.ts` repeats the function in `yjs-encoding.ts`.
+
+The bytes did not change. A script ran each package through its public API on the old
+tree and on the new tree, with fixed client ids: 3,881 records with each state, update,
+state vector, sync frame and failure code, and each record was the same. Three wrong
+changes proved that the script sees a difference: one outer transaction for each
+operation, a staged copy that keeps its own client id, and a failure frame without the
+document codes.
+
+`collaboration` no longer exports `createSyncProtocol`, and `everyCode` is gone:
+`exhaustiveList` of `std` does the same. The result type of each package is now
+`SharedDocResult` with the codes of the package.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
