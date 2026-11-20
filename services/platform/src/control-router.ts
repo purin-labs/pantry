@@ -232,6 +232,7 @@ import {
   matchSessionControlRoute,
   type SessionControlRoute,
 } from "./control/routes/sessions";
+import { resolveControlSupportRole } from "./data/onboarding-support";
 import {
   handleWorkspaceControlRoute,
   matchWorkspaceControlRoute,
@@ -399,7 +400,9 @@ export async function handleControlRequest(
     case "session":
     case "rotateSession":
     case "logout":
-      return handleSessionControlRoute(request, env, route, url);
+      return handleSessionControlRoute(request, env, route, url, {
+        resolveSupportRole: resolveControlSupportRole,
+      });
     case "organisations":
     case "accountOnboarding":
     case "organisation":

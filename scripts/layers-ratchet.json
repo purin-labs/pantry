@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 124,
+    "upward": 119,
     "areas": 56,
-    "order": 25,
+    "order": 21,
     "table": 25
   },
   "crossings": {
@@ -52,11 +52,9 @@
     "areas/shopify -> areas/commerce": 4,
     "areas/shopify -> surfaces/webhooks": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,
-    "foundation/agent -> areas/commerce": 19,
+    "foundation/agent -> areas/commerce": 18,
     "foundation/agent -> areas/integrations": 1,
-    "foundation/agent -> areas/organisation": 4,
     "foundation/agent -> foundation/conversation": 3,
-    "foundation/agent-tools -> foundation/agent": 3,
     "foundation/authority -> areas/commerce": 7,
     "foundation/authority -> foundation/agent": 3,
     "foundation/authority -> foundation/conversation": 1,
@@ -66,7 +64,7 @@
     "foundation/control -> areas/brain": 1,
     "foundation/control -> areas/commerce": 6,
     "foundation/control -> areas/organisation": 1,
-    "foundation/control -> foundation/agent": 3,
+    "foundation/control -> foundation/agent": 2,
     "foundation/control -> foundation/conversation": 1,
     "foundation/control -> surfaces/slack": 2,
     "foundation/conversation -> areas/brain": 1,

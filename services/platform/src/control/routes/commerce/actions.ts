@@ -13,6 +13,7 @@ import {
 import {
   approvalActionBindingMatches,
   digestApprovalAction,
+  isCommerceActionNonce as isActionNonce,
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
 } from "../../../approval-authentication";
@@ -25,7 +26,6 @@ import {
   commerceActionExpectedRevision,
   commerceActionMutationDigest,
   commerceTrackingAttachmentTargetMatches,
-  isCommerceActionNonce as isActionNonce,
   parseCommerceActionPath,
   parseCommerceActionRequest,
   type CommerceActionError,
