@@ -4,9 +4,9 @@ import type {
   MessageAttachmentPreparationLimits,
   MessageAttachmentPreparationReceipt,
   MessageAttachmentPreparationState,
-  MessageAttachmentPreparationUsage,
   OrganisationAttachmentObjectKey,
 } from "./index.ts";
+import type { MessageAttachmentPreparationUsage } from "./attachment-preparation.ts";
 
 const identity = {
   organisationId: "organisation_1",

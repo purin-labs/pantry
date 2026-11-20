@@ -1,9 +1,6 @@
 import type {
   AgentSessionLifecycle,
-  CommandEnvelope,
   ConnectorAddress,
-  EventBody,
-  EffectLifecycle,
   HarnessCheckpointRecord,
   HarnessEventCursor,
   RequestAuthority,
@@ -11,6 +8,9 @@ import type {
   SessionCommand,
   TurnLifecycle,
 } from "./index";
+import type { CommandEnvelope } from "./types/CommandEnvelope";
+import type { EventBody } from "./types/EventBody";
+import type { EffectLifecycle } from "./types/EffectLifecycle";
 import type { Variant } from "@purin-labs/type-utils";
 
 // @ts-expect-error Direct conversation authority requires the resolved organisation role.
