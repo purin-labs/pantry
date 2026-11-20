@@ -17,9 +17,9 @@ import {
   type ChatContextDetails,
 } from "@purin-labs/control-api";
 import {
-  parseBakeryBrowserContext,
-  type BakeryBrowserContext,
-} from "@purin-labs/bakery-model/bakery-context";
+  parsePageBrowserContext,
+  type PageBrowserContext,
+} from "@purin-labs/contracts";
 import type { JsonRecord } from "../control/http";
 import type { Result } from "../result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
@@ -45,7 +45,7 @@ export type ConnectorCardTarget = ConversationCardTarget;
 /** The provider-neutral content that can be accepted into a conversation. */
 export type ChatInputPart =
   | { readonly kind: "project_context"; readonly snapshot: ProjectSnapshot }
-  | { readonly kind: "browser"; readonly context: BakeryBrowserContext }
+  | { readonly kind: "browser"; readonly context: PageBrowserContext }
   | { readonly kind: "text"; readonly text: string }
   /** The command was spoken; the text part holds its transcript (Plan 82). */
   | {
@@ -436,7 +436,7 @@ export function parseInputParts(
       continue;
     }
     if (item.kind === "browser") {
-      const context = parseBakeryBrowserContext(item.context);
+      const context = parsePageBrowserContext(item.context);
       if (context === null)
         return { ok: false, error: "timeline_input_invalid" };
       parts.push({ kind: "browser", context });
@@ -520,7 +520,7 @@ function isNotScreenPart(part: ChatInputPart): boolean {
   return part.kind !== "surface_observation";
 }
 
-function browserOfParts(parts: readonly ChatInputPart[]): BakeryBrowserContext {
+function browserOfParts(parts: readonly ChatInputPart[]): PageBrowserContext {
   for (const part of parts) if (part.kind === "browser") return part.context;
   return { kind: "unavailable" };
 }

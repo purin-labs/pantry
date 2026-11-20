@@ -2,7 +2,6 @@ import type { Env } from "../env";
 import { holdCaseOutput } from "./case-output-hold";
 import type { Outcome } from "@purin-labs/contracts";
 import type { ProjectSnapshot } from "@purin-labs/control-api";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignment,
@@ -13,6 +12,7 @@ import type {
   ConnectorIdentity,
   ConnectorIngress,
   EventPrincipal,
+  PageBrowserContext,
   RequestAuthority,
   SessionBudget,
   SessionBudgetExhaustion,
@@ -77,7 +77,7 @@ import {
 } from "../data/pinned-agent-profile";
 import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { TurnPageState } from "./session/tool-wiring";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
@@ -301,8 +301,8 @@ export type DirectCasePathInput = {
   readonly context: ContextAssemblyResult;
   readonly projectContext: ProjectSnapshot | null;
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: PageBrowserContext;
+  readonly surfaceContext: TurnPageState;
 };
 
 export type DirectCasePathResult =
@@ -447,8 +447,8 @@ type AssignedCaseSessionInput = {
   readonly context: ContextAssemblyResult;
   readonly projectContext: ProjectSnapshot | null;
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: PageBrowserContext;
+  readonly surfaceContext: TurnPageState;
   /**
    * Derived from the admitted content by `caseContentAttachments`, never
    * supplied alongside it. Keeping the derivation at the construction sites

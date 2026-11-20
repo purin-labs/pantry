@@ -12,7 +12,6 @@ import {
   type OperatorExecutionOrigin,
 } from "../chat/turn-access";
 import type { ProjectSnapshot } from "@purin-labs/control-api";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignmentLifecycle,
@@ -21,6 +20,7 @@ import type {
   ConnectorAddress,
   ConnectorIdentity,
   EventPrincipal,
+  PageBrowserContext,
   RequestAuthority,
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
@@ -76,7 +76,7 @@ import {
   prepareTurnContext,
 } from "../context/turn-context";
 import type { PinnedAgentProfile } from "../data/pinned-agent-profile";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { TurnPageState } from "./session/tool-wiring";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { traceLog } from "../observability";
@@ -131,8 +131,8 @@ type DirectCaseCommand = {
   readonly maxSessionBudgetTokens?: number | null;
   readonly requiredModelRoute?: OrganisationModelRoute;
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: PageBrowserContext;
+  readonly surfaceContext: TurnPageState;
   /** The installed agent this run was resolved for, when an automation owns it. */
   readonly pinnedAgent?: PinnedAgentProfile | null;
   /**
