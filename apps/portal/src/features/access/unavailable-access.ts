@@ -1,6 +1,7 @@
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 
-/** Previews have no Access backend; a permission prompt opens in explain mode. */
+/** A page with no Access backend (a preview, or the public workflow demo):
+ * a permission prompt opens in explain mode. */
 export const UNAVAILABLE_ACCESS: Pick<AccessRouteTransport, "read" | "mutate"> =
   {
     read: unavailable,

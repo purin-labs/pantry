@@ -10,7 +10,7 @@ import { workspacePageDescriptor } from "../route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { MenuDraftRoute } from "../features/content-studio/route";
 import PermissionRequestsDrawer from "../features/access/permission-requests-drawer";
-import { UNAVAILABLE_ACCESS } from "./unavailable-access";
+import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { createAccessRouteTransport } from "../features/access/api";
 import { controlMutation, controlRead } from "../control-client";
 
