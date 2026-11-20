@@ -628,7 +628,7 @@ document codes.
 `exhaustiveList` of `std` does the same. The result type of each package is now
 `SharedDocResult` with the codes of the package.
 
-**20 November 2026. Step A1.11, part 1, and nine structure changes.**
+**20 November 2026. Step A1.11, part 1, a part of step A1.8, and structure changes.**
 
 | Step                            | What exists                                                                                                                                                                                                                                                                                                                                                       |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -642,8 +642,11 @@ document codes.
 | Commerce delivery ids           | `actors/case/commerce-delivery-ids.ts` makes and reads the delivery ids of the approval notice and the outcome of a commerce action. The Slack card file held them                                                                                                                                                                                                |
 | Map: side Case start            | `chat/side-case-start.ts` and its route are Portal code: they start a new Portal chat                                                                                                                                                                                                                                                                             |
 | Map: sidebar, default workspace | `console-sidebar.tsx` is foundation UI code. `data/organisation-workspace.ts` and its two tables are agent foundation code, with the workspace revision store                                                                                                                                                                                                     |
+| A1.8: provider directory        | `data/integration-provider-directory.ts` holds the names of the active providers, their parser and their data classes, as data only. The read model of integration discovery reads it and no longer imports the provider catalogue. The catalogue takes the data classes from the directory                                                                       |
+| Session schema version          | `CANONICAL_SESSION_SCHEMA_VERSION` is in `actors/actor-schema-versions.ts` with the three other Actor versions. The Actor router no longer imports the Session schema file                                                                                                                                                                                        |
+| Map: room list, menu actions    | `actors/organisation-collaboration-rooms.ts` is a part of the Worker: only the class `OrganisationDO` imports it. `commerce/cafe-menu-action.ts` and `commerce/menu-price-action.ts` are commerce code: they are two variants of the commerce action                                                                                                              |
 
-The layer count is 847 (upward 370, between areas 222, order 137, tables 118). The
+The layer count is 821 (upward 352, between areas 217, order 134, tables 118). The
 re-export hid 15 imports of the commerce package from foundation files; the count
 shows them now.
 
@@ -652,6 +655,14 @@ places, and each name is commerce-specific (`CommerceGraphQuery`,
 `CommerceAuthorityScope`, `CommerceEntityTypeId` and others). No shared primitive is
 among them. So part 2 is not a move of names below both packages. It is the work of
 steps A1.7 and A1.8: the Session and the authority code read commerce through a port.
+
+What stays open in step A1.8: `access-control/decision-explanation.ts` reads the custom
+connector accounts, `credential-vault/webhook-resolution.ts` reads the Discord install,
+and `actors/organisation/organisation-policy.ts` reads four Jev feature files.
+
+One placement waits for step A1.7: `agent-tools/registry.ts` is a part of the Worker
+(21 crossings), but three Session files import it. The Worker must give the registry to
+the Session first.
 
 ## Baseline
 
