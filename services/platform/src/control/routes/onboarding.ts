@@ -52,7 +52,7 @@ import {
   resolveOrganisationModelRoute,
 } from "../../models/route";
 import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
-import { reconcileProviderManifestObservations } from "../../provider-lifecycle/observation";
+import { providerServices } from "../../integrations/contract/provider-services";
 import {
   admitUserMutation,
   controlMutationIdentity,
@@ -943,7 +943,7 @@ async function handleReadiness(
     return authorized.response;
   }
   const now = Date.now();
-  await reconcileProviderManifestObservations({
+  await providerServices.use().reconcileProviderManifestObservations({
     env,
     organisationId: authorized.organisationId,
     now,

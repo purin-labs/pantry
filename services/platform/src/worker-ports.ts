@@ -53,6 +53,9 @@ import { applyCommerceDelivery } from "./actors/commerce-projection";
 import { normalizeCommerceDelivery } from "./commerce/commerce-wasm";
 import { connectionParts } from "./integrations/contract/connection-parts";
 import { providerModules } from "./integrations/contract/provider-modules";
+import { providerServices } from "./integrations/contract/provider-services";
+import { readProviderCleanupContext } from "./provider-adapters/catalogue";
+import { reconcileProviderManifestObservations } from "./provider-lifecycle/observation";
 import { shopifyCommerceProvider } from "./shopify/commerce-provider";
 import { SHOPIFY_PROVIDER_MODULE } from "./shopify/provider-module";
 import { tearDownAgentMailboxForRemoval } from "./mail-inbox/agent-mailbox-teardown";
@@ -65,7 +68,10 @@ import {
 } from "./memory/access";
 import { memoryService } from "./memory/contract/memory-service";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "./slack/card-only-reply";
-import { slackConversationReachesOutside } from "./slack/conversation-facts";
+import {
+  readSlackConversationFact,
+  slackConversationReachesOutside,
+} from "./slack/conversation-facts";
 import {
   heldEffectNoticeText,
   heldOutputNoticeText,
@@ -165,6 +171,7 @@ slackSurfaceParts.register({
   permissionRequestNoticeText: (...input) =>
     permissionRequestNoticeText(...input),
   cardOnlyReplyInstruction: CARD_ONLY_REPLY_INSTRUCTION,
+  readConversationFact: (...input) => readSlackConversationFact(...input),
   conversationReachesOutside: (...input) =>
     slackConversationReachesOutside(...input),
   releaseAgentPermissionDecision: (...input) =>
@@ -177,4 +184,11 @@ onboardingProjection.register((input) => buildOnboardingProjection(input));
 bakeryRunSnapshots.register({
   prefix: (organisationId) => bakeryRunSnapshotPrefix(organisationId),
   summary: (prefix, object) => bakeryRunSnapshotSummary(prefix, object),
+});
+
+providerServices.register({
+  reconcileProviderManifestObservations: (...input) =>
+    reconcileProviderManifestObservations(...input),
+  readProviderCleanupContext: (...input) =>
+    readProviderCleanupContext(...input),
 });

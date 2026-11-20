@@ -1,12 +1,11 @@
 {
   "totals": {
-    "upward": 28,
-    "areas": 19,
+    "upward": 27,
+    "areas": 17,
     "order": 16,
     "table": 21
   },
   "crossings": {
-    "areas/brain -> surfaces/slack": 1,
     "areas/cafe -> areas/kitchen": 1,
     "areas/cafe -> surfaces/portal": 2,
     "areas/commerce -> areas/cafe": 1,
@@ -22,7 +21,6 @@
     "areas/kitchen -> areas/organisation": 1,
     "areas/organisation -> areas/devices": 1,
     "areas/organisation -> areas/inbox": 1,
-    "areas/organisation -> areas/integrations": 2,
     "areas/organisation -> areas/kitchen": 1,
     "areas/organisation -> surfaces/portal": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,

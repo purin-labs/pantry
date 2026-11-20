@@ -21,7 +21,7 @@ import {
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
 } from "./control-mutation";
-import { readProviderCleanupContext } from "../provider-adapters/catalogue";
+import { providerServices } from "../integrations/contract/provider-services";
 import { parseActiveIntegrationProvider } from "./integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
 import { sha256Hex } from "@purin-labs/std";
@@ -169,7 +169,7 @@ export async function removeIntegrationAccount(input: {
       );
   const providerContext = sharedSlackInstallation
     ? null
-    : await readProviderCleanupContext({
+    : await providerServices.use().readProviderCleanupContext({
         db: session,
         integrationAccountId: input.integrationAccountId,
         provider,

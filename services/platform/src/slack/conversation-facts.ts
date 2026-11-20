@@ -17,6 +17,7 @@ import {
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault/surface-installation-resolution";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
+import type { SlackConversationFact } from "./surface-parts";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";
 
@@ -25,16 +26,6 @@ const FACT_MAX_AGE_MS = 5 * 60 * 1000;
 const MEMBER_PAGE_LIMIT = 200;
 const MEMBER_PAGES = 5;
 
-/**
- * Slack's answer about one conversation. `memberIds` is null for a public
- * channel, which needs no list, and for a conversation whose members Pantry
- * could not read.
- */
-type SlackConversationFact = Readonly<{
-  isPrivate: boolean;
-  reachesOutside: boolean;
-  memberIds: readonly string[] | null;
-}>;
 
 /**
  * Reads the facts of a connected conversation, from Slack when the stored
