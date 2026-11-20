@@ -13,11 +13,9 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import {
-  observeProviderConnection,
-  parseActiveIntegrationProvider,
-} from "../provider-adapters/catalogue";
-import type { ActiveIntegrationProvider } from "../provider-adapters/domain";
+import { observeProviderConnection } from "../provider-adapters/catalogue";
+import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
+import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
 import {
   prepareConfigurationVersionBump,
 } from "../data/organisation-onboarding-row";

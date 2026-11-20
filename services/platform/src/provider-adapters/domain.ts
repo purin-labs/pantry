@@ -7,7 +7,7 @@ import type {
 } from "../credential-vault";
 import type { Env } from "../env";
 import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { IntegrationProvider } from "../data/integration-account";
+import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
 import type {
   ProvisioningProviderConnectionAttempt,
   ProviderManifestEvidence,
@@ -27,20 +27,6 @@ import type {
   MailIntegrationProvider,
   MailProviderAdapter,
 } from "../mail/provider-adapter";
-
-export type ActiveIntegrationProvider = Extract<
-  IntegrationProvider,
-  | "airtable"
-  | "dropbox"
-  | "gmail"
-  | "google_drive"
-  | "notion"
-  | "shopify"
-  | "slack"
-  | "square"
-  | "stripe"
-  | "whatsapp"
->;
 
 type ProviderCleanupBase<P extends ActiveIntegrationProvider> = {
   readonly cleanupId: string;

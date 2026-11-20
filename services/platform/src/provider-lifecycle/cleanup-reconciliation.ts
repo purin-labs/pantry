@@ -21,10 +21,10 @@ import type { Result } from "../result";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import {
   manualInstructionForProvider,
-  parseActiveIntegrationProvider,
   parseProviderCleanup,
   removeProviderConnection,
 } from "../provider-adapters/catalogue";
+import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
 import type {
   ProviderCleanupBindings,
   ProviderCleanup,

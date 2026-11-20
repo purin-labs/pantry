@@ -17,10 +17,8 @@ import {
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
 } from "./control-mutation";
-import {
-  parseActiveIntegrationProvider,
-  readProviderCleanupContext,
-} from "../provider-adapters/catalogue";
+import { readProviderCleanupContext } from "../provider-adapters/catalogue";
+import { parseActiveIntegrationProvider } from "./integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
 import { sha256Hex } from "@purin-labs/std";
 import {

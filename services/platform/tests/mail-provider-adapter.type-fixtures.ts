@@ -1,8 +1,6 @@
 import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
-import type {
-  ActiveIntegrationProvider,
-  ProviderAdapter,
-} from "../src/provider-adapters/domain";
+import type { ProviderAdapter } from "../src/provider-adapters/domain";
+import type { ActiveIntegrationProvider } from "../src/data/integration-provider-directory";
 import type { MailProviderAdapter } from "../src/mail/provider-adapter";
 import type { GmailAuthorizationProduct } from "../src/mail/gmail-authorization";
 

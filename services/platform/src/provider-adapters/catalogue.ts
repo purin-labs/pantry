@@ -70,7 +70,6 @@ import type {
 import type { Result } from "../result";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import {
-  type ActiveIntegrationProvider,
   type ProviderAuthorizationInput,
   type ProviderAuthorizationConfigurationByProvider,
   type ProviderAdapterByProvider,
@@ -83,12 +82,16 @@ import {
   type ProviderStartContext,
   type ProviderStartContextByProvider,
 } from "./domain";
+import {
+  PROVIDER_DATA_CLASSES,
+  type ActiveIntegrationProvider,
+} from "../data/integration-provider-directory";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 export const PROVIDER_ADAPTERS = {
   airtable: {
     provider: "airtable",
-    dataClasses: ["records"],
+    dataClasses: PROVIDER_DATA_CLASSES.airtable,
     capabilityIds: [
       CAPABILITY_KEYS.airtableApiRead,
       CAPABILITY_KEYS.airtableApiWrite,
@@ -102,7 +105,7 @@ export const PROVIDER_ADAPTERS = {
   },
   dropbox: {
     provider: "dropbox",
-    dataClasses: ["files"],
+    dataClasses: PROVIDER_DATA_CLASSES.dropbox,
     capabilityIds: [CAPABILITY_KEYS.fileRead],
     connectionFamily: { kind: "oauth_connection", pkce: "required" },
     onboarding: dropboxOnboardingAdapter,
@@ -114,7 +117,7 @@ export const PROVIDER_ADAPTERS = {
   gmail: {
     provider: "gmail",
     mail: gmailMailAdapter,
-    dataClasses: ["mail"],
+    dataClasses: PROVIDER_DATA_CLASSES.gmail,
     capabilityIds: [
       CAPABILITY_KEYS.emailMailboxRead,
       CAPABILITY_KEYS.emailReplyPropose,
@@ -129,7 +132,7 @@ export const PROVIDER_ADAPTERS = {
   },
   google_drive: {
     provider: "google_drive",
-    dataClasses: ["files"],
+    dataClasses: PROVIDER_DATA_CLASSES.google_drive,
     capabilityIds: [CAPABILITY_KEYS.fileRead],
     connectionFamily: { kind: "oauth_connection", pkce: "required" },
     onboarding: googleDriveOnboardingAdapter,
@@ -140,7 +143,7 @@ export const PROVIDER_ADAPTERS = {
   },
   notion: {
     provider: "notion",
-    dataClasses: ["records"],
+    dataClasses: PROVIDER_DATA_CLASSES.notion,
     capabilityIds: [],
     connectionFamily: { kind: "oauth_connection", pkce: "none" },
     onboarding: notionOnboardingAdapter,
@@ -151,7 +154,7 @@ export const PROVIDER_ADAPTERS = {
   },
   shopify: {
     provider: "shopify",
-    dataClasses: ["commerce"],
+    dataClasses: PROVIDER_DATA_CLASSES.shopify,
     capabilityIds: [
       CAPABILITY_KEYS.commerceEntityPlaneContext,
       CAPABILITY_KEYS.commerceEntityRead,
@@ -177,7 +180,7 @@ export const PROVIDER_ADAPTERS = {
   },
   slack: {
     provider: "slack",
-    dataClasses: ["messaging"],
+    dataClasses: PROVIDER_DATA_CLASSES.slack,
     capabilityIds: [CAPABILITY_KEYS.slackMessagePropose],
     connectionFamily: { kind: "oauth_connection", pkce: "none" },
     onboarding: slackOnboardingAdapter,
@@ -188,7 +191,7 @@ export const PROVIDER_ADAPTERS = {
   },
   square: {
     provider: "square",
-    dataClasses: ["payments"],
+    dataClasses: PROVIDER_DATA_CLASSES.square,
     capabilityIds: [],
     connectionFamily: { kind: "oauth_connection", pkce: "none" },
     onboarding: squareOnboardingAdapter,
@@ -199,7 +202,7 @@ export const PROVIDER_ADAPTERS = {
   },
   stripe: {
     provider: "stripe",
-    dataClasses: ["payments"],
+    dataClasses: PROVIDER_DATA_CLASSES.stripe,
     capabilityIds: [
       CAPABILITY_KEYS.stripeChargeCreate,
       CAPABILITY_KEYS.stripeRefundCreate,
@@ -219,7 +222,7 @@ export const PROVIDER_ADAPTERS = {
   },
   whatsapp: {
     provider: "whatsapp",
-    dataClasses: ["messaging"],
+    dataClasses: PROVIDER_DATA_CLASSES.whatsapp,
     capabilityIds: [
       CAPABILITY_KEYS.whatsappSupportRead,
       CAPABILITY_KEYS.whatsappSupportReplySend,
@@ -235,26 +238,6 @@ export const PROVIDER_ADAPTERS = {
     manualActionInstruction: whatsappCleanupAdapter.manualActionInstruction,
   },
 } satisfies ProviderAdapterByProvider;
-
-export function parseActiveIntegrationProvider(
-  value: unknown,
-): ActiveIntegrationProvider | null {
-  switch (value) {
-    case "airtable":
-    case "dropbox":
-    case "gmail":
-    case "google_drive":
-    case "notion":
-    case "shopify":
-    case "slack":
-    case "square":
-    case "stripe":
-    case "whatsapp":
-      return value;
-    default:
-      return null;
-  }
-}
 
 export function providerConfigurationIsValid(
   env: ProviderAdapterBindings,

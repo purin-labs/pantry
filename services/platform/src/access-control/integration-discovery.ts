@@ -43,9 +43,9 @@ import {
 } from "../policy";
 import {
   parseActiveIntegrationProvider,
-  PROVIDER_ADAPTERS,
-} from "../provider-adapters/catalogue";
-import type { ActiveIntegrationProvider } from "../provider-adapters/domain";
+  PROVIDER_DATA_CLASSES,
+  type ActiveIntegrationProvider,
+} from "../data/integration-provider-directory";
 import type { Result } from "../result";
 import {
   assertNever,
@@ -425,7 +425,7 @@ function candidateForIntegrationAccount(
     provider: discoveryProvider(provider),
     displayName: discoveryDisplayName(provider, account.displayName),
     connection: discoveryConnection(account.lifecycle),
-    configuredDataClasses: PROVIDER_ADAPTERS[provider].dataClasses,
+    configuredDataClasses: PROVIDER_DATA_CLASSES[provider],
   };
 }
 

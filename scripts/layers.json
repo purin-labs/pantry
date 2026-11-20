@@ -956,6 +956,7 @@
     "services/platform/src/data/identity-link.ts": "foundation/tenancy",
     "services/platform/src/data/integration-account-reads.ts": "foundation/connections",
     "services/platform/src/data/integration-account.ts": "foundation/connections",
+    "services/platform/src/data/integration-provider-directory.ts": "foundation/connections",
     "services/platform/src/data/merchant-agent-preset.ts": "areas/commerce",
     "services/platform/src/data/merchant-agent-skills.ts": "areas/commerce",
     "services/platform/src/data/offer-price-allowance.ts": "areas/commerce",

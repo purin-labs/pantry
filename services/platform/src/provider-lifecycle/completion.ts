@@ -15,9 +15,9 @@ import {
 import type { Env } from "../env";
 import {
   completeProviderConnection,
-  parseActiveIntegrationProvider,
   parseProviderStartContext,
 } from "../provider-adapters/catalogue";
+import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
 import type { ProviderStartContext } from "../provider-adapters/domain";
 import type { Result } from "../result";
 import type {

@@ -10,10 +10,8 @@ import type {
 import type { Env } from "../env";
 import type { WorkspaceId } from "../ids";
 import type { ProviderCredentialCutoverError } from "./credential-cutover";
-import type {
-  ActiveIntegrationProvider,
-  ProviderStartContext,
-} from "../provider-adapters/domain";
+import type { ProviderStartContext } from "../provider-adapters/domain";
+import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
 
 export type OnboardingProvider = ActiveIntegrationProvider;
 
