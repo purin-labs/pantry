@@ -1,3 +1,4 @@
+import type { OrganisationModuleHost } from "./module-host";
 import {
   authorizeActionMutationExecution,
   type ActionMutationExecution,
@@ -198,12 +199,6 @@ import type {
   OrganisationCutoverCueSettlementInput,
   OrganisationStateError,
 } from "./types";
-import { OrganisationActorBase } from "./organisation-actor-base";
-import type {
-  OrganisationActivatePolicyInput,
-  OrganisationPolicyActivation,
-  OrganisationPolicyActivationError,
-} from "./policy-types";
 import { armActionExecutionAlarm } from "../action-ledger";
 import {
   organisationPlacementConflict,
@@ -211,19 +206,24 @@ import {
 } from "./organisation-record";
 import { validateCodeModeOrganisation } from "./code-mode-organisation";
 
+/** What an onboarding activation needs from the rest of the Organisation. */
+type OnboardingActivationParts = Parameters<
+  typeof ensureActivationPlacementStep
+>[0] &
+  Parameters<typeof ensureActivationPolicyStep>[0];
+
 /**
  * Commerce actions, cues, the commerce lab, Code Mode leases, workspace executor allocation and onboarding activation for the Organisation.
  */
-export abstract class OrganisationCommerce extends OrganisationActorBase {
-  /**
-   * Activates a policy snapshot. The policy module owns it, and the class of
-   * the Worker gives it. The activation of the Organisation calls it.
-   */
-  abstract activatePolicy(
-    input: OrganisationActivatePolicyInput,
-  ): Promise<
-    Result<OrganisationPolicyActivation, OrganisationPolicyActivationError>
-  >;
+export class OrganisationCommerce {
+  constructor(
+    private readonly host: OrganisationModuleHost,
+    /**
+     * The two steps of an onboarding activation that other parts of the
+     * Organisation own: its record and its policy.
+     */
+    private readonly organisation: OnboardingActivationParts,
+  ) {}
 
   async advanceActivationSchema(
     input: ActorActivationSchemaAdvance,
@@ -233,28 +233,28 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       ActorActivationSchemaAdvanceError
     >
   > {
-    return this.ctx.storage.transactionSync(
-      advanceActorActivationSchema.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      advanceActorActivationSchema.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
   async proposeAction(
     input: ProposeActionInput & { execution: ActionMutationExecution },
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedProposeAction.bind(this, input),
     );
   }
 
-  protected async admittedProposeAction(
+  private async admittedProposeAction(
     input: ProposeActionInput & { execution: ActionMutationExecution },
     scope: OrganisationExecutionScope,
   ): Promise<
     Result<ActionLedgerEntry, OrganisationStateError | ActionLedgerError>
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -302,18 +302,18 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
 
     if (
       !(await authorizeActionMutationExecution(
-        this.env,
+        this.host.env,
         scope,
         input.execution,
       )) ||
-      !(await isOrganisationExecutionActive(this.ctx.storage.sql, scope))
+      !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
     )
       return {
         ok: false,
         error: { code: "invalid_action", field: "execution" },
       };
-    const result = this.ctx.storage.transactionSync(
-      proposeAction.bind(null, this.ctx.storage.sql, {
+    const result = this.host.ctx.storage.transactionSync(
+      proposeAction.bind(null, this.host.ctx.storage.sql, {
         organisationId: input.organisationId,
         integrationAccountId: input.integrationAccountId,
         requestAuthority: input.requestAuthority,
@@ -331,7 +331,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     );
     if (
       !(await authorizeActionMutationExecution(
-        this.env,
+        this.host.env,
         scope,
         input.execution,
       ))
@@ -346,20 +346,20 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
   async requestActionApproval(
     input: RequestActionApprovalInput & { execution: ActionMutationExecution },
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedRequestActionApproval.bind(this, input),
     );
   }
 
-  protected async admittedRequestActionApproval(
+  private async admittedRequestActionApproval(
     input: RequestActionApprovalInput & { execution: ActionMutationExecution },
     scope: OrganisationExecutionScope,
   ): Promise<
     Result<ActionLedgerEntry, OrganisationStateError | ActionLedgerError>
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -369,22 +369,22 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
 
     if (
       !(await authorizeActionMutationExecution(
-        this.env,
+        this.host.env,
         scope,
         input.execution,
       )) ||
-      !(await isOrganisationExecutionActive(this.ctx.storage.sql, scope))
+      !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
     )
       return {
         ok: false,
         error: { code: "invalid_action", field: "execution" },
       };
-    const result = this.ctx.storage.transactionSync(
-      requestActionApproval.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      requestActionApproval.bind(null, this.host.ctx.storage.sql, input),
     );
     if (
       !(await authorizeActionMutationExecution(
-        this.env,
+        this.host.env,
         scope,
         input.execution,
       ))
@@ -397,13 +397,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
   }
 
   async getAction(input: GetActionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedGetAction.bind(this, input),
     );
   }
 
-  protected async admittedGetAction(
+  private async admittedGetAction(
     input: GetActionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -415,7 +415,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -423,19 +423,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    return this.ctx.storage.transactionSync(
-      getAction.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      getAction.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
   async readActionActivity(input: ReadActionActivityInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadActionActivity.bind(this, input),
     );
   }
 
-  protected async admittedReadActionActivity(
+  private async admittedReadActionActivity(
     input: ReadActionActivityInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -447,23 +447,23 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    return readActionActivity(this.ctx.storage.sql, input);
+    return readActionActivity(this.host.ctx.storage.sql, input);
   }
 
   async signAction(input: SignActionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedSignAction.bind(this, input),
     );
   }
 
-  protected async admittedSignAction(
+  private async admittedSignAction(
     input: SignActionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -475,7 +475,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -483,19 +483,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    return this.ctx.storage.transactionSync(
-      signAction.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      signAction.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
   async rejectAction(input: RejectActionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedRejectAction.bind(this, input),
     );
   }
 
-  protected async admittedRejectAction(
+  private async admittedRejectAction(
     input: RejectActionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -507,23 +507,23 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
-      rejectAction.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      rejectAction.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
   async beginActionExecution(input: BeginActionExecutionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedBeginActionExecution.bind(this, input),
     );
   }
 
-  protected async admittedBeginActionExecution(
+  private async admittedBeginActionExecution(
     input: BeginActionExecutionInput,
     scope: OrganisationExecutionScope,
   ): Promise<
@@ -535,7 +535,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -543,26 +543,28 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    await armActionExecutionAlarm(this.ctx.storage, input.now);
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
+    await armActionExecutionAlarm(this.host.ctx.storage, input.now);
+    if (
+      !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
+    )
       return organisationPlacementConflict();
-    const result = this.ctx.storage.transactionSync(
-      beginActionExecution.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      beginActionExecution.bind(null, this.host.ctx.storage.sql, input),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
   async retryIndeterminateActionExecution(
     input: RetryIndeterminateActionExecutionInput,
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedRetryIndeterminateActionExecution.bind(this, input),
     );
   }
 
-  protected async admittedRetryIndeterminateActionExecution(
+  private async admittedRetryIndeterminateActionExecution(
     input: RetryIndeterminateActionExecutionInput,
     scope: OrganisationExecutionScope,
   ): Promise<
@@ -574,28 +576,34 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    await armActionExecutionAlarm(this.ctx.storage, input.now);
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
+    await armActionExecutionAlarm(this.host.ctx.storage, input.now);
+    if (
+      !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
+    )
       return organisationPlacementConflict();
-    const result = this.ctx.storage.transactionSync(
-      retryIndeterminateActionExecution.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      retryIndeterminateActionExecution.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
   async completeActionExecution(input: CompleteActionExecutionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedCompleteActionExecution.bind(this, input),
     );
   }
 
-  protected async admittedCompleteActionExecution(
+  private async admittedCompleteActionExecution(
     input: CompleteActionExecutionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -607,7 +615,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -615,23 +623,23 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    const result = this.ctx.storage.transactionSync(
-      completeActionExecution.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      completeActionExecution.bind(null, this.host.ctx.storage.sql, input),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
   async recordCommerceEntityPlaneEffect(
     input: RecordCommerceEntityPlaneEffectInput,
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedRecordCommerceEntityPlaneEffect.bind(this, input),
     );
   }
 
-  protected async admittedRecordCommerceEntityPlaneEffect(
+  private async admittedRecordCommerceEntityPlaneEffect(
     input: RecordCommerceEntityPlaneEffectInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -643,23 +651,27 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
-      recordCommerceEntityPlaneEffect.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      recordCommerceEntityPlaneEffect.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
   }
 
   async reconcileActionExecution(input: ReconcileActionExecutionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReconcileActionExecution.bind(this, input),
     );
   }
 
-  protected async admittedReconcileActionExecution(
+  private async admittedReconcileActionExecution(
     input: ReconcileActionExecutionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -671,7 +683,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -679,10 +691,10 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    const result = this.ctx.storage.transactionSync(
-      reconcileActionExecution.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      reconcileActionExecution.bind(null, this.host.ctx.storage.sql, input),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -699,13 +711,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       | { readonly code: "organisation_placement_conflict" }
     >
   > {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReconcileCommerceProviderReceipt.bind(this, input),
     );
   }
 
-  protected async admittedReconcileCommerceProviderReceipt(
+  private async admittedReconcileCommerceProviderReceipt(
     input: {
       readonly organisationId: OrganisationId;
       readonly nonce: string;
@@ -722,7 +734,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -730,7 +742,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    const action = getAction(this.ctx.storage.sql, {
+    const action = getAction(this.host.ctx.storage.sql, {
       organisationId: input.organisationId,
       nonce: input.nonce,
       now: input.now,
@@ -750,24 +762,30 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       };
     }
 
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
+    if (
+      !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
+    )
       return organisationPlacementConflict();
 
-    const result = this.ctx.storage.transactionSync(
-      reconcileCommerceProviderReceipt.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      reconcileCommerceProviderReceipt.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
   async claimCueDelivery(input: CueClaimInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedClaimCueDelivery.bind(this, input),
     );
   }
 
-  protected async admittedClaimCueDelivery(
+  private async admittedClaimCueDelivery(
     input: CueClaimInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -779,7 +797,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -787,21 +805,21 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    const claimed = this.ctx.storage.transactionSync(
-      claimCueDelivery.bind(null, this.ctx.storage.sql, input),
+    const claimed = this.host.ctx.storage.transactionSync(
+      claimCueDelivery.bind(null, this.host.ctx.storage.sql, input),
     );
-    if (claimed.ok && claimed.value.kind === "claimed") await this.rearm();
+    if (claimed.ok && claimed.value.kind === "claimed") await this.host.rearm();
     return claimed;
   }
 
   async completeClaimedCueDelivery(input: ClaimedCueCompletionInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedCompleteClaimedCueDelivery.bind(this, input),
     );
   }
 
-  protected async admittedCompleteClaimedCueDelivery(
+  private async admittedCompleteClaimedCueDelivery(
     input: ClaimedCueCompletionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -813,7 +831,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -821,22 +839,22 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       return organisation;
     }
 
-    const completed = this.ctx.storage.transactionSync(
-      completeClaimedCueDelivery.bind(null, this.ctx.storage.sql, input),
+    const completed = this.host.ctx.storage.transactionSync(
+      completeClaimedCueDelivery.bind(null, this.host.ctx.storage.sql, input),
     );
     // A completed claim needs no sweep; the alarm follows the claims left.
-    if (completed.ok) await this.rearm();
+    if (completed.ok) await this.host.rearm();
     return completed;
   }
 
   async applyCommerceDelivery(input: OrganisationApplyCommerceDeliveryInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedApplyCommerceDelivery.bind(this, input),
     );
   }
 
-  protected async admittedApplyCommerceDelivery(
+  private async admittedApplyCommerceDelivery(
     input: OrganisationApplyCommerceDeliveryInput,
     scope: OrganisationExecutionScope,
   ): Promise<
@@ -848,7 +866,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
@@ -872,12 +890,14 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
         };
       }
     }
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
+    if (
+      !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
+    )
       return organisationPlacementConflict();
-    return this.ctx.storage.transactionSync(
+    return this.host.ctx.storage.transactionSync(
       applyCommerceDelivery.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         input,
         input.commerceSystem,
       ),
@@ -889,13 +909,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     readonly limit: number;
     readonly retryBefore: number;
   }) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadRecoverableCommerceCues.bind(this, input),
     );
   }
 
-  protected async admittedReadRecoverableCommerceCues(
+  private async admittedReadRecoverableCommerceCues(
     input: {
       readonly organisationId: OrganisationId;
       readonly limit: number;
@@ -911,25 +931,25 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    return readRecoverableCommerceCues(this.ctx.storage.sql, input);
+    return readRecoverableCommerceCues(this.host.ctx.storage.sql, input);
   }
 
   async readCurrentCommerceProjection(
     input: ReadCurrentCommerceProjectionInput,
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadCurrentCommerceProjection.bind(this, input),
     );
   }
 
-  protected async admittedReadCurrentCommerceProjection(
+  private async admittedReadCurrentCommerceProjection(
     input: ReadCurrentCommerceProjectionInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -941,25 +961,25 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    return readCurrentCommerceProjection(this.ctx.storage.sql, input);
+    return readCurrentCommerceProjection(this.host.ctx.storage.sql, input);
   }
 
   async readCommerceProjectionHistory(
     input: ReadCommerceProjectionHistoryInput,
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadCommerceProjectionHistory.bind(this, input),
     );
   }
 
-  protected async admittedReadCommerceProjectionHistory(
+  private async admittedReadCommerceProjectionHistory(
     input: ReadCommerceProjectionHistoryInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -971,25 +991,25 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    return readCommerceProjectionHistory(this.ctx.storage.sql, input);
+    return readCommerceProjectionHistory(this.host.ctx.storage.sql, input);
   }
 
   async readExactCommerceProjectionReference(
     input: ReadExactCommerceProjectionReferenceInput,
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadExactCommerceProjectionReference.bind(this, input),
     );
   }
 
-  protected async admittedReadExactCommerceProjectionReference(
+  private async admittedReadExactCommerceProjectionReference(
     input: ReadExactCommerceProjectionReferenceInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -1001,11 +1021,14 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    return readExactCommerceProjectionReference(this.ctx.storage.sql, input);
+    return readExactCommerceProjectionReference(
+      this.host.ctx.storage.sql,
+      input,
+    );
   }
 
   async markCommerceCuesEnqueued(input: {
@@ -1013,13 +1036,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     readonly nativeIds: readonly string[];
     readonly enqueuedAt: number;
   }) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedMarkCommerceCuesEnqueued.bind(this, input),
     );
   }
 
-  protected async admittedMarkCommerceCuesEnqueued(
+  private async admittedMarkCommerceCuesEnqueued(
     input: {
       readonly organisationId: OrganisationId;
       readonly nativeIds: readonly string[];
@@ -1035,14 +1058,14 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    return this.ctx.storage.transactionSync(
-      markCommerceCuesEnqueued.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      markCommerceCuesEnqueued.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
@@ -1051,13 +1074,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     readonly nativeIds: readonly string[];
     readonly settledAt: number;
   }) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedSettleCommerceCues.bind(this, input),
     );
   }
 
-  protected async admittedSettleCommerceCues(
+  private async admittedSettleCommerceCues(
     input: {
       readonly organisationId: OrganisationId;
       readonly nativeIds: readonly string[];
@@ -1073,14 +1096,14 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    return this.ctx.storage.transactionSync(
-      settleCommerceCues.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      settleCommerceCues.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
@@ -1090,13 +1113,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       integrationAccountId: IntegrationAccountId;
     }>,
   ) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadAcceptedCommerceProjectionSequence.bind(this, input),
     );
   }
 
-  protected async admittedReadAcceptedCommerceProjectionSequence(
+  private async admittedReadAcceptedCommerceProjectionSequence(
     input: Readonly<{
       organisationId: OrganisationId;
       integrationAccountId: IntegrationAccountId;
@@ -1111,21 +1134,24 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    return readAcceptedCommerceProjectionSequence(this.ctx.storage.sql, input);
+    return readAcceptedCommerceProjectionSequence(
+      this.host.ctx.storage.sql,
+      input,
+    );
   }
 
   async readCommerceQueryPlan(input: ReadCommerceQueryPlanInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadCommerceQueryPlan.bind(this, input),
     );
   }
 
-  protected async admittedReadCommerceQueryPlan(
+  private async admittedReadCommerceQueryPlan(
     input: ReadCommerceQueryPlanInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -1137,12 +1163,12 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
     const acceptedSequence = readAcceptedCommerceProjectionSequence(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       {
         organisationId: input.organisationId,
         integrationAccountId: input.integrationAccountId,
@@ -1172,7 +1198,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       };
     }
 
-    const rawRows = this.ctx.storage.sql
+    const rawRows = this.host.ctx.storage.sql
       .exec<Record<string, SqlStorageValue>>(
         compiled.statement.sql,
         ...compiled.statement.bindings,
@@ -1218,7 +1244,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
           error: { code: "commerce_query_relation_corrupt" },
         };
       }
-      const relationText = this.ctx.storage.sql
+      const relationText = this.host.ctx.storage.sql
         .exec<Readonly<{ readonly count: number }>>(
           `SELECT COUNT(*) AS count
            FROM commerce_projection_relation_text
@@ -1237,7 +1263,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
         };
       }
       const hydrated = readExactCommerceProjectionReference(
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         {
           organisationId: input.organisationId,
           integrationAccountId: input.integrationAccountId,
@@ -1272,13 +1298,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
   }
 
   async readCommerceRelationshipStep(input: ReadCommerceRelationshipStepInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadCommerceRelationshipStep.bind(this, input),
     );
   }
 
-  protected async admittedReadCommerceRelationshipStep(
+  private async admittedReadCommerceRelationshipStep(
     input: ReadCommerceRelationshipStepInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -1290,12 +1316,12 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
     const acceptedSequence = readAcceptedCommerceProjectionSequence(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       {
         organisationId: input.organisationId,
         integrationAccountId: input.integrationAccountId,
@@ -1328,7 +1354,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
         },
       };
     }
-    const rawRows = this.ctx.storage.sql
+    const rawRows = this.host.ctx.storage.sql
       .exec<Record<string, SqlStorageValue>>(
         compiled.statement.sql,
         ...compiled.statement.bindings,
@@ -1353,13 +1379,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     readonly integrationAccountId: IntegrationAccountId;
     readonly now: number;
   }) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedReadCommerceSystemSyncStatus.bind(this, input),
     );
   }
 
-  protected async admittedReadCommerceSystemSyncStatus(
+  private async admittedReadCommerceSystemSyncStatus(
     input: {
       readonly organisationId: OrganisationId;
       readonly integrationAccountId: IntegrationAccountId;
@@ -1375,21 +1401,21 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    return readCommerceSystemSyncStatus(this.ctx.storage.sql, input);
+    return readCommerceSystemSyncStatus(this.host.ctx.storage.sql, input);
   }
 
   async validateCommerceSystemProjections(input: ValidateCommerceSystemInput) {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedValidateCommerceSystemProjections.bind(this, input),
     );
   }
 
-  protected async admittedValidateCommerceSystemProjections(
+  private async admittedValidateCommerceSystemProjections(
     input: ValidateCommerceSystemInput,
     _scope: OrganisationExecutionScope,
   ): Promise<
@@ -1401,13 +1427,55 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
-      validateCommerceSystemProjections.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      validateCommerceSystemProjections.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
+  }
+
+  /**
+   * Admits one command of the commerce lab: the Organisation of this Actor,
+   * an active placement of it, and the marker of the lab namespace.
+   */
+  private async admitCommerceLab(
+    input: Readonly<{ organisationId: OrganisationId; labNamespace: string }>,
+  ) {
+    const organisation = validateActionOrganisation(
+      this.host.ctx.storage.sql,
+      input.organisationId,
+    );
+    if (!organisation.ok) {
+      return organisation;
+    }
+    const admission = await admitActorRecovery(
+      this.host.env,
+      this.host.ctx.storage,
+    );
+    if (
+      admission.kind !== "admitted" ||
+      admission.scope.organisationId !== input.organisationId
+    ) {
+      return {
+        ok: false as const,
+        error: { code: "organisation_placement_conflict" as const },
+      };
+    }
+    const marker = await requireCommerceLabOrganisationMarker({
+      db: admission.scope.database,
+      organisationId: input.organisationId,
+      labNamespace: input.labNamespace,
+    });
+    if (!marker.ok) {
+      return marker;
+    }
+    return { ok: true as const, value: admission.scope };
   }
 
   async seedCommerceLab(
@@ -1421,30 +1489,12 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       | { readonly code: "organisation_placement_conflict" }
     >
   > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-    if (!organisation.ok) {
-      return organisation;
+    const admitted = await this.admitCommerceLab(input);
+    if (!admitted.ok) {
+      return admitted;
     }
-    const admission = await admitActorRecovery(this.env, this.ctx.storage);
-    if (
-      admission.kind !== "admitted" ||
-      admission.scope.organisationId !== input.organisationId
-    ) {
-      return { ok: false, error: { code: "organisation_placement_conflict" } };
-    }
-    const marker = await requireCommerceLabOrganisationMarker({
-      db: admission.scope.database,
-      organisationId: input.organisationId,
-      labNamespace: input.labNamespace,
-    });
-    if (!marker.ok) {
-      return marker;
-    }
-    return this.ctx.storage.transactionSync(
-      seedCommerceLab.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      seedCommerceLab.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
@@ -1459,30 +1509,12 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       | { readonly code: "organisation_placement_conflict" }
     >
   > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-    if (!organisation.ok) {
-      return organisation;
+    const admitted = await this.admitCommerceLab(input);
+    if (!admitted.ok) {
+      return admitted;
     }
-    const admission = await admitActorRecovery(this.env, this.ctx.storage);
-    if (
-      admission.kind !== "admitted" ||
-      admission.scope.organisationId !== input.organisationId
-    ) {
-      return { ok: false, error: { code: "organisation_placement_conflict" } };
-    }
-    const marker = await requireCommerceLabOrganisationMarker({
-      db: admission.scope.database,
-      organisationId: input.organisationId,
-      labNamespace: input.labNamespace,
-    });
-    if (!marker.ok) {
-      return marker;
-    }
-    return this.ctx.storage.transactionSync(
-      resetCommerceLab.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      resetCommerceLab.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
@@ -1499,37 +1531,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       | { readonly code: "organisation_placement_conflict" }
     >
   > {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      input.organisationId,
-    );
-    if (!organisation.ok) {
-      return organisation;
-    }
-    const admission = await admitActorRecovery(this.env, this.ctx.storage);
-    if (
-      admission.kind !== "admitted" ||
-      admission.scope.organisationId !== input.organisationId
-    ) {
-      return { ok: false, error: { code: "organisation_placement_conflict" } };
-    }
-    const marker = await requireCommerceLabOrganisationMarker({
-      db: admission.scope.database,
-      organisationId: input.organisationId,
-      labNamespace: input.labNamespace,
-    });
-    if (!marker.ok) {
-      return marker;
+    const admitted = await this.admitCommerceLab(input);
+    if (!admitted.ok) {
+      return admitted;
     }
     const runs = await listCommerceLabRuns({
-      db: admission.scope.database,
+      db: admitted.value.database,
       organisationId: input.organisationId,
       limit: input.limit,
     });
     if (!runs.ok) {
       return runs;
     }
-    return verifyCommerceLab(this.ctx.storage.sql, {
+    return verifyCommerceLab(this.host.ctx.storage.sql, {
       organisationId: input.organisationId,
       labNamespace: input.labNamespace,
       runs: runs.value,
@@ -1539,13 +1553,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
   async activateOnboarding(
     input: OnboardingActivationInput,
   ): Promise<Result<ActivationReceipt, OnboardingActivationError>> {
-    return this.command(
+    return this.host.command(
       input.organisationId,
       this.admittedActivateOnboarding.bind(this, input),
     );
   }
 
-  protected async admittedActivateOnboarding(
+  private async admittedActivateOnboarding(
     input: OnboardingActivationInput,
     scope: OrganisationExecutionScope,
   ): Promise<Result<ActivationReceipt, OnboardingActivationError>> {
@@ -1564,7 +1578,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     try {
       await ensureActivationReadinessStep(scope.database, context, input.now);
       await ensureActivationPlacementStep(
-        this,
+        this.organisation,
         scope.database,
         context,
         input.now,
@@ -1578,8 +1592,8 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
         return { ok: false, error: interrupted };
       }
       const policy = await ensureActivationPolicyStep(
-        this,
-        this.env,
+        this.organisation,
+        this.host.env,
         scope,
         context,
         input.now,
@@ -1597,7 +1611,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
         };
       }
       const cues = await ensureActivationCueStep(
-        this.env,
+        this.host.env,
         scope,
         context,
         input.now,
@@ -1656,7 +1670,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       OnboardingActivationAcceptanceFaultError
     >
   > {
-    return armOnboardingActivationAcceptanceFault(this.ctx.storage, input);
+    return armOnboardingActivationAcceptanceFault(this.host.ctx.storage, input);
   }
 
   async inspectOnboardingActivationAcceptanceFault(): Promise<
@@ -1665,11 +1679,11 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       OnboardingActivationAcceptanceFaultError
     >
   > {
-    return inspectOnboardingActivationAcceptanceFault(this.ctx.storage);
+    return inspectOnboardingActivationAcceptanceFault(this.host.ctx.storage);
   }
 
   async clearOnboardingActivationAcceptanceFault(): Promise<void> {
-    await clearOnboardingActivationAcceptanceFault(this.ctx.storage);
+    await clearOnboardingActivationAcceptanceFault(this.host.ctx.storage);
   }
 
   async armCafeCommerceAcceptanceFault(
@@ -1686,12 +1700,14 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       armedAt: input.armedAt,
       queueConsumedAt: null,
     };
-    await this.ctx.storage.put(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY, fault);
+    await this.host.ctx.storage.put(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY, fault);
     return fault;
   }
 
   async inspectCafeCommerceAcceptanceFault(): Promise<CafeCommerceAcceptanceFaultRecord | null> {
-    const raw = await this.ctx.storage.get(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY);
+    const raw = await this.host.ctx.storage.get(
+      CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY,
+    );
     return raw === undefined ? null : parseCafeCommerceAcceptanceFault(raw);
   }
 
@@ -1712,24 +1728,24 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       ...current,
       queueConsumedAt: input.consumedAt,
     };
-    await this.ctx.storage.put(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY, fault);
+    await this.host.ctx.storage.put(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY, fault);
     return { kind: "consumed", fault };
   }
 
   async clearCafeCommerceAcceptanceFault(): Promise<void> {
-    await this.ctx.storage.delete(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY);
+    await this.host.ctx.storage.delete(CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY);
   }
 
-  protected async interruptOnboardingActivationForAcceptance(
+  private async interruptOnboardingActivationForAcceptance(
     scope: OrganisationExecutionScope,
     context: ActivationContext,
     now: number,
   ): Promise<ActivationExecutionFailure | null> {
-    if (!hasOnboardingActivationAcceptanceFaultsEnabled(this.env)) {
+    if (!hasOnboardingActivationAcceptanceFaultsEnabled(this.host.env)) {
       return null;
     }
     const consumed = await consumeOnboardingActivationAcceptanceFault(
-      this.ctx.storage,
+      this.host.ctx.storage,
       now,
     );
     if (!consumed.ok) {
@@ -1764,7 +1780,7 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
     );
 
@@ -1773,10 +1789,10 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     }
 
     const inspection = inspectOrganisationCutoverQuiescence({
-      sql: this.ctx.storage.sql,
+      sql: this.host.ctx.storage.sql,
       organisationId: input.organisationId,
       inspectedAt: input.settledAt,
-      alarmAt: await this.ctx.storage.getAlarm(),
+      alarmAt: await this.host.ctx.storage.getAlarm(),
     });
 
     if (
@@ -1789,10 +1805,10 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
       };
     }
 
-    const settled = this.ctx.storage.transactionSync(
+    const settled = this.host.ctx.storage.transactionSync(
       settleExpiredOrganisationCutoverCue.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         input.organisationId,
         input.settledAt,
       ),
@@ -1806,10 +1822,10 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     }
 
     const finalInspection = inspectOrganisationCutoverQuiescence({
-      sql: this.ctx.storage.sql,
+      sql: this.host.ctx.storage.sql,
       organisationId: input.organisationId,
       inspectedAt: Date.now(),
-      alarmAt: await this.ctx.storage.getAlarm(),
+      alarmAt: await this.host.ctx.storage.getAlarm(),
     });
 
     return finalInspection.ok && finalInspection.value.kind === "quiescent"
@@ -1823,17 +1839,21 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeOrganisationReservation, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       true,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    const result = this.ctx.storage.transactionSync(
-      reserveCodeModeOrganisationBudget.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      reserveCodeModeOrganisationBudget.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -1843,17 +1863,21 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeOrganisationReservation, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    const result = this.ctx.storage.transactionSync(
-      settleCodeModeOrganisationBudget.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      settleCodeModeOrganisationBudget.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -1863,13 +1887,13 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeCapabilityCounter, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       true,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
-      claimCodeModeCapabilityCall.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      claimCodeModeCapabilityCall.bind(null, this.host.ctx.storage.sql, input),
     );
   }
 
@@ -1883,13 +1907,17 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeCapabilityCounter, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
-      abandonCodeModeCapabilityCalls.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      abandonCodeModeCapabilityCalls.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
   }
 
@@ -1903,15 +1931,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeOrganisationReservation, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       true,
     );
     if (!organisation.ok) return organisation;
-    const result = this.ctx.storage.transactionSync(
-      rebindCodeModeOrganisationLease.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      rebindCodeModeOrganisationLease.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -1921,13 +1953,17 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeCapabilityCounter, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
-      completeCodeModeCapabilityCall.bind(null, this.ctx.storage.sql, input),
+    return this.host.ctx.storage.transactionSync(
+      completeCodeModeCapabilityCall.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
   }
 
@@ -1940,19 +1976,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       true,
     );
     if (!organisation.ok) return organisation;
-    const result = this.ctx.storage.transactionSync(
+    const result = this.host.ctx.storage.transactionSync(
       reserveWorkspaceExecutorOrganisationAllocation.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         input,
       ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -1965,19 +2001,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) return organisation;
-    const result = this.ctx.storage.transactionSync(
+    const result = this.host.ctx.storage.transactionSync(
       settleWorkspaceExecutorOrganisationAllocation.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         input,
       ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -1990,19 +2026,19 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     >
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) return organisation;
-    const result = this.ctx.storage.transactionSync(
+    const result = this.host.ctx.storage.transactionSync(
       cancelWorkspaceExecutorOrganisationAllocation.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         input,
       ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -2012,17 +2048,21 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeOrganisationReservation, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) {
       return organisation;
     }
-    const result = this.ctx.storage.transactionSync(
-      cancelCodeModeOrganisationBudget.bind(null, this.ctx.storage.sql, input),
+    const result = this.host.ctx.storage.transactionSync(
+      cancelCodeModeOrganisationBudget.bind(
+        null,
+        this.host.ctx.storage.sql,
+        input,
+      ),
     );
-    await this.rearm();
+    await this.host.rearm();
     return result;
   }
 
@@ -2032,17 +2072,72 @@ export abstract class OrganisationCommerce extends OrganisationActorBase {
     Result<CodeModeOrganisationReservation, CodeModeOrganisationActorError>
   > {
     const organisation = validateCodeModeOrganisation(
-      this.ctx.storage.sql,
+      this.host.ctx.storage.sql,
       input.organisationId,
       false,
     );
     if (!organisation.ok) return organisation;
-    return this.ctx.storage.transactionSync(
+    return this.host.ctx.storage.transactionSync(
       reconcileCodeModeOrganisationBudget.bind(
         null,
-        this.ctx.storage.sql,
+        this.host.ctx.storage.sql,
         input,
       ),
     );
   }
 }
+
+/** The RPC methods of this module. The Actor class has one method for each. */
+export type OrganisationCommerceRpc = Pick<
+  OrganisationCommerce,
+  | "advanceActivationSchema"
+  | "proposeAction"
+  | "requestActionApproval"
+  | "getAction"
+  | "readActionActivity"
+  | "signAction"
+  | "rejectAction"
+  | "beginActionExecution"
+  | "retryIndeterminateActionExecution"
+  | "completeActionExecution"
+  | "recordCommerceEntityPlaneEffect"
+  | "reconcileActionExecution"
+  | "reconcileCommerceProviderReceipt"
+  | "claimCueDelivery"
+  | "completeClaimedCueDelivery"
+  | "applyCommerceDelivery"
+  | "readRecoverableCommerceCues"
+  | "readCurrentCommerceProjection"
+  | "readCommerceProjectionHistory"
+  | "readExactCommerceProjectionReference"
+  | "markCommerceCuesEnqueued"
+  | "settleCommerceCues"
+  | "readAcceptedCommerceProjectionSequence"
+  | "readCommerceQueryPlan"
+  | "readCommerceRelationshipStep"
+  | "readCommerceSystemSyncStatus"
+  | "validateCommerceSystemProjections"
+  | "seedCommerceLab"
+  | "resetCommerceLab"
+  | "verifyCommerceLab"
+  | "activateOnboarding"
+  | "armOnboardingActivationAcceptanceFault"
+  | "inspectOnboardingActivationAcceptanceFault"
+  | "clearOnboardingActivationAcceptanceFault"
+  | "armCafeCommerceAcceptanceFault"
+  | "inspectCafeCommerceAcceptanceFault"
+  | "consumeCafeCommerceAcceptanceFault"
+  | "clearCafeCommerceAcceptanceFault"
+  | "settleCutoverCue"
+  | "reserveCodeModeBudget"
+  | "settleCodeModeBudget"
+  | "claimCodeModeCapability"
+  | "abandonCodeModeCapabilityCalls"
+  | "rebindCodeModeLease"
+  | "completeCodeModeCapability"
+  | "reserveWorkspaceExecutorAllocation"
+  | "settleWorkspaceExecutorAllocation"
+  | "cancelWorkspaceExecutorAllocation"
+  | "cancelCodeModeBudget"
+  | "reconcileCodeModeBudget"
+>;
