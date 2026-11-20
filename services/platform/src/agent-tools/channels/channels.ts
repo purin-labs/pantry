@@ -99,7 +99,7 @@ export const emailReplyProposal = defineChannelTool({
     capability: CAPABILITY_KEYS.emailReplyPropose,
   },
   unavailable: "email reply propose is unavailable",
-  handler: ({ proposeEmailReply }) =>
+  prepare: ({ proposeEmailReply }) =>
     proposeEmailReply === undefined ? undefined : (request) => proposeEmailReply(request),
   readReceipt: readEmailProposalReceiptId,
 });
@@ -163,7 +163,7 @@ export const emailReplyDraftEdit = defineChannelTool({
     capability: CAPABILITY_KEYS.emailReplyPropose,
   },
   unavailable: "email reply draft edit is unavailable",
-  handler: ({ editEmailReplyDraft }) =>
+  prepare: ({ editEmailReplyDraft }) =>
     editEmailReplyDraft === undefined
       ? undefined
       : (request, call) =>
@@ -232,7 +232,7 @@ export const emailOperationalProposal = defineChannelTool({
     capability: CAPABILITY_KEYS.emailOperationalPropose,
   },
   unavailable: "email operational propose is unavailable",
-  handler: ({ proposeEmailOperational }) =>
+  prepare: ({ proposeEmailOperational }) =>
     proposeEmailOperational === undefined ? undefined : (request) => proposeEmailOperational(request),
   readReceipt: readEmailOperationalProposalReceiptId,
 });

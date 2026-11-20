@@ -6,6 +6,7 @@ import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { IntegrationAccountReference } from "../../access-control/integration-discovery";
 import { defineToolFamily, jsonSchema } from "../define-tool";
 import { ToolRequestError } from "../errors";
+import type { PreparedEffect } from "../tool-effect";
 
 /**
  * A Slack draft the model can correct, such as one for a channel that is not
@@ -30,7 +31,7 @@ export type HarnessSlackMessageProposalReceipt = Readonly<{
 
 type SlackMessagePropose = (
   request: HarnessSlackMessagePropose,
-) => Promise<HarnessSlackMessageProposalReceipt>;
+) => Promise<PreparedEffect>;
 
 /** What a turn gives to the Slack message tool. */
 export type SlackToolServices = {
@@ -68,7 +69,7 @@ export const slackMessageProposal = defineSlackTool({
     capability: CAPABILITY_KEYS.slackMessagePropose,
   },
   unavailable: "slack message propose is unavailable",
-  handler: ({ proposeSlackMessage }) =>
+  prepare: ({ proposeSlackMessage }) =>
     proposeSlackMessage === undefined ? undefined : (request) => proposeSlackMessage(request),
   readReceipt: readSlackMessageProposalReceiptId,
 });

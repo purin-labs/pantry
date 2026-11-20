@@ -46,3 +46,20 @@ export function toolHandler(tool: AnyRegisteredTool, services: ToolServiceSet) {
   // them may be absent, so an absent family is an empty one.
   return tool.handler((services[tool.family] ?? {}) as never);
 }
+
+/** The `prepare` of an effect tool for one turn, or undefined. */
+export function toolPrepare(tool: AnyRegisteredTool, services: ToolServiceSet) {
+  return tool.prepare?.((services[tool.family] ?? {}) as never);
+}
+
+/** True when the turn can run the tool. */
+export function toolAvailable(
+  tool: AnyRegisteredTool,
+  services: ToolServiceSet,
+): boolean {
+  return (
+    (tool.prepare === undefined
+      ? toolHandler(tool, services)
+      : toolPrepare(tool, services)) !== undefined
+  );
+}

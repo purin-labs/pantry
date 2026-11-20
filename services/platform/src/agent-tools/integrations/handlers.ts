@@ -36,7 +36,6 @@ import { customConnectorFetchOf } from "../../custom-connectors/egress";
 import type { CapabilityDefinition } from "../../authorization/access-grants/capability-key";
 import {
   admitSessionInformationFlowObservation,
-  readSessionInformationFlow,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "../../actors/agent-session-information-flow";
 import {
@@ -52,11 +51,10 @@ import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   type EmailMailboxReadScope,
-  evaluateHarnessFlowSink,
   readAccessGrantId,
   requireCurrentEmailToolLease,
   selectProviderResourceGrants,
-  toolEffectPassesExit,
+  type ToolEffect,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
@@ -446,7 +444,7 @@ async function discoverAirtableForHarness(
 export async function writeAirtableForHarness(
   context: SessionToolContext,
   input: AirtableWriteInput,
-): Promise<unknown> {
+): Promise<ToolEffect> {
   const { env, storage, execution, lease, assignment } = context;
   const organisationId = execution.scope.organisationId;
   const scope = await authorizeAirtableTool(
@@ -463,83 +461,59 @@ export async function writeAirtableForHarness(
     input.integrationAccountId,
     "write",
   );
-  const flow = await readSessionInformationFlow(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-  });
-  if (
-    !flow.ok ||
-    flow.value === null ||
-    flow.value.context.authorityPartitionDigest !==
-      lease.authorityPartitionDigest
-  ) {
-    throw new Error("Airtable effect context unavailable");
-  }
-  const sink = {
-    kind: "tool_effect",
-    destinationAuthority: lease.requestAuthority,
-    capabilityId: CAPABILITY_KEYS.airtableApiWrite,
-    integrationAccountId: input.integrationAccountId,
-    resourceScope: airtableBaseScope(input),
-    approvalSatisfied: false,
-  } as const;
-  const decision = await evaluateHarnessFlowSink(
-    execution.scope.database,
-    execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
-    { flowLabel: flow.value.context.workLabel, sink },
-  );
-  if (
-    !(await toolEffectPassesExit(env, execution, lease, {
-      decision,
-      flowLabel: flow.value.context.workLabel,
-      sink,
-      action: { operation: "airtable.write", arguments: input },
-    }))
-  ) {
-    throw new Error(
-      `Airtable write requires policy resolution: ${decision.kind}`,
-    );
-  }
-  await authorizeAirtableTool(
-    execution,
-    storage,
-    lease,
-    assignment,
-    input,
-    CAPABILITY_KEYS.airtableApiWrite,
-  );
-  const receiptId = `airtable_write_${await digestCanonical({ turnId: lease.turn.turnId, input })}`;
-  await storage.transaction(
-    claimAirtableWrite.bind(null, receiptId, organisationId, input),
-  );
-  try {
-    await requireSessionExecution(execution, lease);
-  } catch (error) {
-    // This attempt has no provider request to reconcile.
-    await storage.delete(receiptId);
-    throw error;
-  }
-  const result = await callAirtableApi(credential, input.request);
-  await storage.put(receiptId, {
-    kind: "completed",
-    organisationId,
-    result,
-    completedAt: Date.now(),
-  });
-  await authorizeAirtableTool(
-    execution,
-    storage,
-    lease,
-    assignment,
-    input,
-    CAPABILITY_KEYS.airtableApiWrite,
-  );
-  await commitAirtableObservation(storage, execution, lease, scope, result);
-  return { receiptId, result };
+  return {
+    kind: "effect",
+    label: { source: "work", unavailable: "Airtable effect context unavailable" },
+    sink: {
+      kind: "tool_effect",
+      destinationAuthority: lease.requestAuthority,
+      capabilityId: CAPABILITY_KEYS.airtableApiWrite,
+      integrationAccountId: input.integrationAccountId,
+      resourceScope: airtableBaseScope(input),
+      approvalSatisfied: false,
+    },
+    action: { operation: "airtable.write", arguments: input },
+    refusal: (decision) =>
+      `Airtable write requires policy resolution: ${decision}`,
+    run: async () => {
+      await authorizeAirtableTool(
+        execution,
+        storage,
+        lease,
+        assignment,
+        input,
+        CAPABILITY_KEYS.airtableApiWrite,
+      );
+      const receiptId = `airtable_write_${await digestCanonical({ turnId: lease.turn.turnId, input })}`;
+      await storage.transaction(
+        claimAirtableWrite.bind(null, receiptId, organisationId, input),
+      );
+      try {
+        await requireSessionExecution(execution, lease);
+      } catch (error) {
+        // This attempt has no provider request to reconcile.
+        await storage.delete(receiptId);
+        throw error;
+      }
+      const result = await callAirtableApi(credential, input.request);
+      await storage.put(receiptId, {
+        kind: "completed",
+        organisationId,
+        result,
+        completedAt: Date.now(),
+      });
+      await authorizeAirtableTool(
+        execution,
+        storage,
+        lease,
+        assignment,
+        input,
+        CAPABILITY_KEYS.airtableApiWrite,
+      );
+      await commitAirtableObservation(storage, execution, lease, scope, result);
+      return { receiptId, result };
+    },
+  };
 }
 
 async function claimAirtableWrite(

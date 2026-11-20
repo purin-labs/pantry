@@ -20,8 +20,9 @@ import {
   harnessBaseCapabilities,
   selectCatalogDefinitions,
 } from "./selection";
+import type { EffectSettle } from "../tool-effect";
 import {
-  toolHandler,
+  toolAvailable,
   type ToolRegistry,
   type ToolServiceSet,
 } from "./tool-registry";
@@ -134,6 +135,8 @@ export async function createCatalogHarnessCodeMode(input: {
    */
   readonly services: ToolServiceSet;
   readonly requestPermission?: HarnessPermissionRequestTool;
+  /** Runs the exit checks of an effect tool. A Session gives it. */
+  readonly settleEffect?: EffectSettle;
   readonly admission: HarnessCodeModeAdmission;
   readonly claimCapability: HarnessCapabilityClaim;
 }): Promise<
@@ -161,7 +164,7 @@ export async function createCatalogHarnessCodeMode(input: {
   // then the other turn tools, as the checks were before Refactor 17.
   const turnTools = (catalogSelection.turnTools ?? []).map(({ tool }) => tool);
   const unavailable = (tool: (typeof turnTools)[number]): boolean =>
-    toolHandler(tool, input.services) === undefined;
+    !toolAvailable(tool, input.services);
   if (turnTools.some((tool) => tool.effect === "read" && unavailable(tool))) {
     return {
       ok: false,
@@ -195,6 +198,9 @@ export async function createCatalogHarnessCodeMode(input: {
     turnTools,
     services: input.services,
     requestPermission: input.requestPermission,
+    ...(input.settleEffect === undefined
+      ? {}
+      : { settleEffect: input.settleEffect }),
     claimCapability: recordCapabilityClaim.bind(
       null,
       claimedCapabilities,

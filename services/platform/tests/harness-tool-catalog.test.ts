@@ -12,6 +12,7 @@ import {
   TOOL_REGISTRY,
   type PartialToolServices,
 } from "../src/agent-tools/registry";
+import { uncheckedEffect } from "../src/agent-tools/tool-effect";
 import { requireIntegrationAccountId } from "./test-ids";
 
 /**
@@ -415,7 +416,9 @@ async function executesAirtableTools(): Promise<void> {
     services: fixtureServices({
       integrations: {
         readAirtable: airtableReadFixture,
-        writeAirtable: airtableWriteFixture,
+        // An effect tool gives its effect; the fake has no exit check.
+        writeAirtable: async (input) =>
+          uncheckedEffect(() => airtableWriteFixture(input)),
       },
     }),
   });

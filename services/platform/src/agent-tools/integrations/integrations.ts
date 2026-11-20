@@ -51,7 +51,7 @@ export const airtableApiWrite = defineIntegrationTool({
     capability: CAPABILITY_KEYS.airtableApiWrite,
   },
   unavailable: "Airtable writing is unavailable",
-  handler: ({ writeAirtable }) =>
+  prepare: ({ writeAirtable }) =>
     writeAirtable === undefined
       ? undefined
       : (request) => writeAirtable(request),

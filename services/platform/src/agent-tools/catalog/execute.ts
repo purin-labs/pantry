@@ -12,8 +12,10 @@ import {
   requestDeniedRead,
 } from "./permission";
 import { isSelectedCatalogToolName } from "./selection";
+import { type EffectSettle, settleWithoutSession } from "../tool-effect";
 import {
   toolHandler,
+  toolPrepare,
   type ToolRegistry,
   type ToolServiceSet,
 } from "./tool-registry";
@@ -60,6 +62,11 @@ export type CatalogToolAuthority = {
   readonly services: ToolServiceSet;
   readonly requestPermission?: HarnessPermissionRequestTool;
   readonly claimCapability: HarnessCapabilityClaim;
+  /**
+   * Runs the exit checks of an effect tool, then its effect. Absent in a host
+   * with no Session: an effect with a check is then refused.
+   */
+  readonly settleEffect?: EffectSettle;
 };
 
 export function executeNativeCatalogTool(
@@ -192,8 +199,15 @@ async function executeSelectedTool(
   if (tool.directOnly && execution.kind !== "direct") {
     throw new TypeError(`${tool.name} requires a direct call`);
   }
-  const handler = toolHandler(tool, authority.services);
-  if (handler === undefined) {
+  // An effect tool has two parts. `prepare` does the live checks and the
+  // reads. The host then reads the label, runs the exit checks and calls
+  // `run`: one place for the exit check of every effect tool.
+  const prepare = toolPrepare(tool, authority.services);
+  const handler =
+    tool.prepare === undefined
+      ? toolHandler(tool, authority.services)
+      : undefined;
+  if (prepare === undefined && handler === undefined) {
     throw new Error(tool.unavailable);
   }
   const request = tool.parse(input);
@@ -204,11 +218,19 @@ async function executeSelectedTool(
       tool.selection.capability,
     );
   }
-  return handler(request, {
+  const call = {
     callId,
     execution,
     operationId: logicalToolOperationId(execution, callId),
-  });
+  };
+  if (prepare !== undefined) {
+    const settle = authority.settleEffect ?? settleWithoutSession;
+    return settle(await prepare(request, call));
+  }
+  if (handler === undefined) {
+    throw new Error(tool.unavailable);
+  }
+  return handler(request, call);
 }
 
 async function claimDirectCapability(

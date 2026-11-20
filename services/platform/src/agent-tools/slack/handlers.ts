@@ -26,7 +26,8 @@ import {
   SLACK_MESSAGE_RESOURCE_SCOPE,
 } from "../../authorization/capability-catalogue";
 import {
-  authorizeToolEffectInformationFlow,
+  proposalFlowEffect,
+  type ToolEffect,
   requireCurrentEmailToolLease,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
@@ -39,7 +40,7 @@ import type { SessionToolContext } from "../context";
 export async function proposeSlackMessageForEmbeddedHarness(
   context: SessionToolContext,
   request: HarnessSlackMessagePropose,
-): Promise<HarnessSlackMessageProposalReceipt> {
+): Promise<ToolEffect<HarnessSlackMessageProposalReceipt>> {
   const { env, storage, execution, lease, assignment } = context;
   await requireSessionExecution(execution, lease);
   const organisationId = execution.scope.organisationId;
@@ -70,64 +71,62 @@ export async function proposeSlackMessageForEmbeddedHarness(
       `Slack drafting authority rejected: ${authorized.error.code}`,
     );
   }
-  await authorizeToolEffectInformationFlow(
-    env,
-    execution,
-    storage,
-    organisationId,
+  return proposalFlowEffect(
     lease,
     {
       capabilityId: CAPABILITY_KEYS.slackMessagePropose,
       integrationAccountId: capability.integrationAccountId,
       resourceScope: SLACK_MESSAGE_RESOURCE_SCOPE,
     },
+    async () => {
+      const options = await readSlackChannelOptions({
+        globalDatabase: env.DB,
+        db: execution.scope.database,
+        organisationId,
+        integrationAccountId: capability.integrationAccountId,
+      });
+      if (options === null || options.channels.length === 0) {
+        throw new SlackDraftRequestError(
+          "No Slack channel is connected to Seams Pantry in this workspace. Ask an owner or admin to connect a channel in Integrations.",
+        );
+      }
+      // An unknown channel is refused without naming the connected ones: their
+      // names have not entered this turn.
+      const matched =
+        request.channel === null
+          ? null
+          : matchSlackChannel(options, request.channel);
+      if (request.channel !== null && matched === null) {
+        throw new SlackDraftRequestError(
+          "That channel is not connected to Seams Pantry. Set channel to null so the person chooses on the card.",
+        );
+      }
+      const bodyDigest = await slackMessageBodyDigest(request.text);
+      const proposalId = `proposal_slack_message_${lease.turn.turnId}_${bodyDigest.slice(0, 16)}`;
+      await requireSessionExecution(execution, lease);
+      const saved = await insertSlackMessageProposal({
+        scope: execution.scope,
+        proposalId,
+        caseId,
+        integrationAccountId: capability.integrationAccountId,
+        sessionId: lease.session.sessionId,
+        turnId: lease.turn.turnId,
+        channelHint: request.channel,
+        channelId: matched?.channelId ?? null,
+        body: request.text,
+        now: Date.now(),
+      });
+      if (!saved.ok) {
+        throw new Error(`Slack draft failed: ${saved.error.code}`);
+      }
+      await requireSessionExecution(execution, lease);
+      requireCurrentEmailToolLease(storage, lease, assignment);
+      return {
+        kind: "proposed",
+        proposalId: saved.value.proposalId,
+        version: saved.value.version,
+        channel: matched === null ? null : request.channel,
+      };
+    },
   );
-  const options = await readSlackChannelOptions({
-    globalDatabase: env.DB,
-    db: execution.scope.database,
-    organisationId,
-    integrationAccountId: capability.integrationAccountId,
-  });
-  if (options === null || options.channels.length === 0) {
-    throw new SlackDraftRequestError(
-      "No Slack channel is connected to Seams Pantry in this workspace. Ask an owner or admin to connect a channel in Integrations.",
-    );
-  }
-  // An unknown channel is refused without naming the connected ones: their
-  // names have not entered this turn.
-  const matched =
-    request.channel === null
-      ? null
-      : matchSlackChannel(options, request.channel);
-  if (request.channel !== null && matched === null) {
-    throw new SlackDraftRequestError(
-      "That channel is not connected to Seams Pantry. Set channel to null so the person chooses on the card.",
-    );
-  }
-  const bodyDigest = await slackMessageBodyDigest(request.text);
-  const proposalId = `proposal_slack_message_${lease.turn.turnId}_${bodyDigest.slice(0, 16)}`;
-  await requireSessionExecution(execution, lease);
-  const saved = await insertSlackMessageProposal({
-    scope: execution.scope,
-    proposalId,
-    caseId,
-    integrationAccountId: capability.integrationAccountId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-    channelHint: request.channel,
-    channelId: matched?.channelId ?? null,
-    body: request.text,
-    now: Date.now(),
-  });
-  if (!saved.ok) {
-    throw new Error(`Slack draft failed: ${saved.error.code}`);
-  }
-  await requireSessionExecution(execution, lease);
-  requireCurrentEmailToolLease(storage, lease, assignment);
-  return {
-    kind: "proposed",
-    proposalId: saved.value.proposalId,
-    version: saved.value.version,
-    channel: matched === null ? null : request.channel,
-  };
 }

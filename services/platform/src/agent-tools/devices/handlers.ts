@@ -7,7 +7,6 @@ import { listDevices } from "../../devices/store";
 import { readKitchenDeviceViews } from "../../devices/views";
 import { readShopMacDevices } from "../../voice/mac-devices";
 import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
 import {
   DeviceRequestError,
   type DevicePauseRequest,
@@ -25,10 +24,8 @@ import { digestCanonical } from "../../policy";
 import { roleMayOperate } from "../../data/control-plane";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import {
-  currentTurnFlowLabel,
-  evaluateHarnessFlowSink,
   liveDeviceMember,
-  toolEffectPassesExit,
+  type ToolEffect,
   untrustedDeviceText,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
@@ -261,8 +258,8 @@ export async function pauseDeviceForEmbeddedHarness(
   context: SessionToolContext,
   request: DevicePauseRequest,
   operationId: string,
-): Promise<StaffPageToolReceipt> {
-  const { env, storage, execution, lease } = context;
+): Promise<ToolEffect<StaffPageToolReceipt>> {
+  const { env, execution, lease } = context;
   await requireSessionExecution(execution, lease);
   const { scope } = execution;
   const member = await liveDeviceMember(
@@ -275,65 +272,51 @@ export async function pauseDeviceForEmbeddedHarness(
       "A pause needs a person with the staff role or higher, and the person who asked does not have it now. Nothing changed. Tell the person. Do not ask for a permission or retry.",
     );
   }
-  const flowLabel = await currentTurnFlowLabel(
-    storage,
-    execution,
-    lease,
-    "device pause",
-  );
-  const sink = {
-    kind: "tool_effect" as const,
-    destinationAuthority: lease.requestAuthority,
-    capabilityId: CAPABILITY_KEYS.devicePause,
-    integrationAccountId: "platform",
-    resourceScope: `device:${request.deviceId}`,
-    approvalSatisfied: false,
-  };
-  const decision = await evaluateHarnessFlowSink(
-    scope.database,
-    scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
-    { flowLabel, sink },
-  );
-  if (
-    !(await toolEffectPassesExit(env, execution, lease, {
-      decision,
-      flowLabel,
-      sink,
-      action: { operation: "device.pause", arguments: request },
-    }))
-  ) {
-    throw new Error(`Device pause is not authorized: ${decision.kind}`);
-  }
-  const digest = await digestCanonical({
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-    operationId,
-    deviceId: request.deviceId,
-  });
-  const key = `agent_${digest.replace(/[^0-9a-f]/gu, "").slice(-40)}`;
-  const result = await runDeviceCommand({
-    env,
-    scope,
-    subjectId: request.deviceId,
-    command: { kind: "pause" },
-    actor: { kind: "agent", id: member.userId },
-    idempotencyKey: key,
-    now: Date.now(),
-  });
-  if (!result.ok) {
-    throw new DeviceRequestError(
-      result.code === "device_not_found"
-        ? "That device does not exist. Nothing changed. Call device_read for the list."
-        : "That device cannot pause now: it is already paused, not confirmed or revoked. Nothing changed. Call device_read to see it.",
-    );
-  }
   return {
-    receiptId: result.receiptId,
-    result:
-      "New work on this device stopped, and its gateway has the request. A person resumes it. Emergency stop stays on the machine.",
+    kind: "effect",
+    label: {
+      source: "turn",
+      unavailable: "device pause information-flow authority unavailable",
+    },
+    sink: {
+      kind: "tool_effect" as const,
+      destinationAuthority: lease.requestAuthority,
+      capabilityId: CAPABILITY_KEYS.devicePause,
+      integrationAccountId: "platform",
+      resourceScope: `device:${request.deviceId}`,
+      approvalSatisfied: false,
+    },
+    action: { operation: "device.pause", arguments: request },
+    refusal: (decision) => `Device pause is not authorized: ${decision}`,
+    run: async () => {
+      const digest = await digestCanonical({
+        sessionId: lease.session.sessionId,
+        turnId: lease.turn.turnId,
+        operationId,
+        deviceId: request.deviceId,
+      });
+      const key = `agent_${digest.replace(/[^0-9a-f]/gu, "").slice(-40)}`;
+      const result = await runDeviceCommand({
+        env,
+        scope,
+        subjectId: request.deviceId,
+        command: { kind: "pause" },
+        actor: { kind: "agent", id: member.userId },
+        idempotencyKey: key,
+        now: Date.now(),
+      });
+      if (!result.ok) {
+        throw new DeviceRequestError(
+          result.code === "device_not_found"
+            ? "That device does not exist. Nothing changed. Call device_read for the list."
+            : "That device cannot pause now: it is already paused, not confirmed or revoked. Nothing changed. Call device_read to see it.",
+        );
+      }
+      return {
+        receiptId: result.receiptId,
+        result:
+          "New work on this device stopped, and its gateway has the request. A person resumes it. Emergency stop stays on the machine.",
+      };
+    },
   };
 }

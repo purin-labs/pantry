@@ -10,6 +10,7 @@ import type { EmailReplyCitation } from "../../mail-inbox/reply-sources";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import { defineToolFamily } from "../define-tool";
 import { ToolRequestError } from "../errors";
+import type { PreparedEffect } from "../tool-effect";
 
 /**
  * Plan 40D: a reply draft request the model can correct, such as a read from
@@ -113,7 +114,7 @@ type EmailMailboxSearch = (
 
 type EmailReplyPropose = (
   request: HarnessEmailReplyPropose,
-) => Promise<HarnessEmailReplyProposalReceipt>;
+) => Promise<PreparedEffect>;
 
 /** Plan 40D: one Gmail reply's shared draft, which people may edit too. */
 export type HarnessEmailReplyDraftRead = Readonly<{
@@ -141,11 +142,11 @@ type EmailReplyDraftEdit = (
   request: HarnessEmailReplyDraftEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<HarnessEmailReplyDraft>;
+) => Promise<PreparedEffect>;
 
 type EmailOperationalPropose = (
   request: HarnessEmailOperationalPropose,
-) => Promise<HarnessEmailOperationalProposalReceipt>;
+) => Promise<PreparedEffect>;
 
 type WhatsAppSupportRead = (
   request: HarnessWhatsAppSupportRead,
