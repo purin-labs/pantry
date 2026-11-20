@@ -83,7 +83,11 @@ import {
   type ConnectorResult,
   type ConnectorSnapshot,
 } from "./connector/types";
-import { ConnectorEmail } from "./connector/connector-email-actor";
+import {
+  ConnectorEmail,
+  type ConnectorEmailRpc,
+} from "./connector/connector-email-actor";
+import { ConnectorActorBase } from "./connector/connector-actor-base";
 import {
   ConnectorWhatsApp,
   type ConnectorWhatsAppRpc,
@@ -94,8 +98,8 @@ import {
 } from "./connector/connector-evals";
 
 export class ConnectorDO
-  extends ConnectorEmail
-  implements ConnectorEvalsRpc, ConnectorWhatsAppRpc
+  extends ConnectorActorBase
+  implements ConnectorEvalsRpc, ConnectorWhatsAppRpc, ConnectorEmailRpc
 {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 
@@ -104,6 +108,209 @@ export class ConnectorDO
 
   /** The WhatsApp channel of this Connector. */
   protected readonly whatsApp = new ConnectorWhatsApp(this.moduleHost);
+
+  /** The email channel of this Connector: the mailboxes and their replies. */
+  protected readonly email = new ConnectorEmail(this.moduleHost, this.evals);
+
+  reconcileRelocationMailReceipt(
+    ...input: Parameters<ConnectorEmail["reconcileRelocationMailReceipt"]>
+  ) {
+    return this.email.reconcileRelocationMailReceipt(...input);
+  }
+
+  mailAssistant(...input: Parameters<ConnectorEmail["mailAssistant"]>) {
+    return this.email.mailAssistant(...input);
+  }
+
+  readMailOrganization(
+    ...input: Parameters<ConnectorEmail["readMailOrganization"]>
+  ) {
+    return this.email.readMailOrganization(...input);
+  }
+
+  readMailClassifiedPage(
+    ...input: Parameters<ConnectorEmail["readMailClassifiedPage"]>
+  ) {
+    return this.email.readMailClassifiedPage(...input);
+  }
+
+  readMailDecision(...input: Parameters<ConnectorEmail["readMailDecision"]>) {
+    return this.email.readMailDecision(...input);
+  }
+
+  manageMailOrganization(
+    ...input: Parameters<ConnectorEmail["manageMailOrganization"]>
+  ) {
+    return this.email.manageMailOrganization(...input);
+  }
+
+  acceptEmailChange(...input: Parameters<ConnectorEmail["acceptEmailChange"]>) {
+    return this.email.acceptEmailChange(...input);
+  }
+
+  checkEmailChange(...input: Parameters<ConnectorEmail["checkEmailChange"]>) {
+    return this.email.checkEmailChange(...input);
+  }
+
+  activateEmailProcessing(
+    ...input: Parameters<ConnectorEmail["activateEmailProcessing"]>
+  ) {
+    return this.email.activateEmailProcessing(...input);
+  }
+
+  disableEmailProcessing(
+    ...input: Parameters<ConnectorEmail["disableEmailProcessing"]>
+  ) {
+    return this.email.disableEmailProcessing(...input);
+  }
+
+  resumeEmailProcessing(
+    ...input: Parameters<ConnectorEmail["resumeEmailProcessing"]>
+  ) {
+    return this.email.resumeEmailProcessing(...input);
+  }
+
+  reconnectEmailProcessing(
+    ...input: Parameters<ConnectorEmail["reconnectEmailProcessing"]>
+  ) {
+    return this.email.reconnectEmailProcessing(...input);
+  }
+
+  renewEmailWatch(...input: Parameters<ConnectorEmail["renewEmailWatch"]>) {
+    return this.email.renewEmailWatch(...input);
+  }
+
+  inspectEmailRuntime(
+    ...input: Parameters<ConnectorEmail["inspectEmailRuntime"]>
+  ) {
+    return this.email.inspectEmailRuntime(...input);
+  }
+
+  searchEmailMailbox(
+    ...input: Parameters<ConnectorEmail["searchEmailMailbox"]>
+  ) {
+    return this.email.searchEmailMailbox(...input);
+  }
+
+  createEmailReplyProposal(
+    ...input: Parameters<ConnectorEmail["createEmailReplyProposal"]>
+  ) {
+    return this.email.createEmailReplyProposal(...input);
+  }
+
+  createEmailOperationalProposal(
+    ...input: Parameters<ConnectorEmail["createEmailOperationalProposal"]>
+  ) {
+    return this.email.createEmailOperationalProposal(...input);
+  }
+
+  editEmailOperationalProposal(
+    ...input: Parameters<ConnectorEmail["editEmailOperationalProposal"]>
+  ) {
+    return this.email.editEmailOperationalProposal(...input);
+  }
+
+  previewEmailOperationalProposal(
+    ...input: Parameters<ConnectorEmail["previewEmailOperationalProposal"]>
+  ) {
+    return this.email.previewEmailOperationalProposal(...input);
+  }
+
+  dispatchEmailOperational(
+    ...input: Parameters<ConnectorEmail["dispatchEmailOperational"]>
+  ) {
+    return this.email.dispatchEmailOperational(...input);
+  }
+
+  rejectEmailOperational(
+    ...input: Parameters<ConnectorEmail["rejectEmailOperational"]>
+  ) {
+    return this.email.rejectEmailOperational(...input);
+  }
+
+  revokeEmailOperationalProposals(
+    ...input: Parameters<ConnectorEmail["revokeEmailOperationalProposals"]>
+  ) {
+    return this.email.revokeEmailOperationalProposals(...input);
+  }
+
+  previewEmailProposal(
+    ...input: Parameters<ConnectorEmail["previewEmailProposal"]>
+  ) {
+    return this.email.previewEmailProposal(...input);
+  }
+
+  authorizeEmailProposalDelivery(
+    ...input: Parameters<ConnectorEmail["authorizeEmailProposalDelivery"]>
+  ) {
+    return this.email.authorizeEmailProposalDelivery(...input);
+  }
+
+  dispatchEmailReply(
+    ...input: Parameters<ConnectorEmail["dispatchEmailReply"]>
+  ) {
+    return this.email.dispatchEmailReply(...input);
+  }
+
+  readEmailReplyProvenance(
+    ...input: Parameters<ConnectorEmail["readEmailReplyProvenance"]>
+  ) {
+    return this.email.readEmailReplyProvenance(...input);
+  }
+
+  recordEmailReplyEditProvenance(
+    ...input: Parameters<ConnectorEmail["recordEmailReplyEditProvenance"]>
+  ) {
+    return this.email.recordEmailReplyEditProvenance(...input);
+  }
+
+  editReviewedEmailReply(
+    ...input: Parameters<ConnectorEmail["editReviewedEmailReply"]>
+  ) {
+    return this.email.editReviewedEmailReply(...input);
+  }
+
+  readEmailReplyCorrection(
+    ...input: Parameters<ConnectorEmail["readEmailReplyCorrection"]>
+  ) {
+    return this.email.readEmailReplyCorrection(...input);
+  }
+
+  previewEmailRelationship(
+    ...input: Parameters<ConnectorEmail["previewEmailRelationship"]>
+  ) {
+    return this.email.previewEmailRelationship(...input);
+  }
+
+  correctEmailRelationship(
+    ...input: Parameters<ConnectorEmail["correctEmailRelationship"]>
+  ) {
+    return this.email.correctEmailRelationship(...input);
+  }
+
+  dispatchReviewedEmailReply(
+    ...input: Parameters<ConnectorEmail["dispatchReviewedEmailReply"]>
+  ) {
+    return this.email.dispatchReviewedEmailReply(...input);
+  }
+
+  resolveEmailProposal(
+    ...input: Parameters<ConnectorEmail["resolveEmailProposal"]>
+  ) {
+    return this.email.resolveEmailProposal(...input);
+  }
+
+  disposeEmailProposal(
+    ...input: Parameters<ConnectorEmail["disposeEmailProposal"]>
+  ) {
+    return this.email.disposeEmailProposal(...input);
+  }
+
+  revokeEmailMailbox(
+    ...input: Parameters<ConnectorEmail["revokeEmailMailbox"]>
+  ) {
+    return this.email.revokeEmailMailbox(...input);
+  }
 
   acceptWhatsAppEvent(
     ...input: Parameters<ConnectorWhatsApp["acceptWhatsAppEvent"]>
@@ -224,7 +431,7 @@ export class ConnectorDO
   protected readonly channels: ConnectorChannels = {
     adapters: [
       this.slack,
-      this.emailChannel(),
+      this.email.emailChannel(),
       this.whatsApp.whatsAppChannel(),
     ],
     caseWork: this.slack,

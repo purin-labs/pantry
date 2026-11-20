@@ -202,7 +202,7 @@
     "services/platform/src/actors/connector-whatsapp-rpc.ts = services/platform/src/actors/connector-whatsapp-rpc.ts": 2,
     "services/platform/src/actors/connector-whatsapp.ts = services/platform/src/data/email-mailbox.ts": 1,
     "services/platform/src/actors/connector/connector-actor-base.ts = services/platform/src/actors/organisation/organisation-actor-base.ts": 1,
-    "services/platform/src/actors/connector/connector-email-actor.ts = services/platform/src/actors/connector/connector-email-actor.ts": 28,
+    "services/platform/src/actors/connector/connector-email-actor.ts = services/platform/src/actors/connector/connector-email-actor.ts": 13,
     "services/platform/src/actors/costs-sheet-draft.ts = services/platform/src/actors/email-draft.ts": 1,
     "services/platform/src/actors/costs-sheet-draft.ts = services/platform/src/actors/menu-boards.ts": 1,
     "services/platform/src/actors/costs-sheet-draft.ts = services/platform/src/actors/menu-draft.ts": 1,
