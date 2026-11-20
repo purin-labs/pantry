@@ -31,6 +31,13 @@ import { commerceGraphReads } from "./commerce/contract/graph-reads";
 import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
 import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
 import { commerceExceptionInbox } from "./control/agent-operation-activity";
+import { onboardingProjection } from "./control/admission/control-mutation";
+import { buildOnboardingProjection } from "./data/onboarding-projection";
+import {
+  bakeryRunSnapshotPrefix,
+  bakeryRunSnapshotSummary,
+} from "./commerce/bakery/saved-runs";
+import { bakeryRunSnapshots } from "./projects/references";
 import {
   readNamedCommerceQuery,
   selectNamedCommerceQuerySourceGrant,
@@ -163,4 +170,11 @@ slackSurfaceParts.register({
   releaseAgentPermissionDecision: (...input) =>
     releaseAgentPermissionDecision(...input),
   releaseHeldOutputDecision: (...input) => releaseHeldOutputDecision(...input),
+});
+
+onboardingProjection.register((input) => buildOnboardingProjection(input));
+
+bakeryRunSnapshots.register({
+  prefix: (organisationId) => bakeryRunSnapshotPrefix(organisationId),
+  summary: (prefix, object) => bakeryRunSnapshotSummary(prefix, object),
 });

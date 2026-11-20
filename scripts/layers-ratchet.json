@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 30,
+    "upward": 28,
     "areas": 19,
     "order": 16,
     "table": 21
@@ -33,10 +33,9 @@
     "foundation/authority -> foundation/conversation": 1,
     "foundation/connections -> areas/organisation": 1,
     "foundation/control -> areas/brain": 1,
-    "foundation/control -> areas/organisation": 1,
     "foundation/control -> foundation/agent": 1,
     "foundation/control -> foundation/conversation": 1,
-    "foundation/conversation -> areas/kitchen": 4,
+    "foundation/conversation -> areas/kitchen": 3,
     "foundation/conversation -> surfaces/portal": 2,
     "foundation/conversation -> surfaces/slack": 2,
     "foundation/kernel -> foundation/contracts": 1,
