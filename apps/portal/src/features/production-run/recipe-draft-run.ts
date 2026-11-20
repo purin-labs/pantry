@@ -12,7 +12,7 @@ import { isRecord } from "@purin-labs/std";
 import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import { openExecutionWorker, type ExecutionWorker } from "./execution-client";
 
-export type DraftRunResult = Readonly<{
+type DraftRunResult = Readonly<{
   status: string;
   endSeconds: number;
   completedTasks: number;

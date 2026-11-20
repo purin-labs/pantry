@@ -58,7 +58,7 @@ import {
   updateDeformablePastryBufferGeometry,
 } from "../../production-run/pastry-bench/pastry-shell-visual";
 
-export type FactoryStationModel =
+type FactoryStationModel =
   | "prep-table"
   | "cooling-table"
   | "oven"

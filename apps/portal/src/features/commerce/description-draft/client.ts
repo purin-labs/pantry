@@ -48,7 +48,7 @@ type DescriptionTextClient = TextCollaborationClient<
 type Metadata = ProductDescriptionRoomMetadata &
   Readonly<{ access: "read" | "edit" }>;
 
-export type DraftInitialization =
+type DraftInitialization =
   | Readonly<{ kind: "uninitialized" }>
   | Readonly<{ kind: "initialized"; metadata: Metadata }>;
 

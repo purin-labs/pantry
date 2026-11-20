@@ -15,7 +15,7 @@ import {
 } from "../control-client";
 import { parsePreferenceResponse } from "@purin-labs/control-api/portal/preferences";
 
-export type PendingEdit = Readonly<{
+type PendingEdit = Readonly<{
   edit: UserPreferenceEdit;
   sequence: number;
 }>;
@@ -250,7 +250,7 @@ export class UserPreferenceOwner {
   }
 }
 
-export function preferencePath(area: PreferenceArea): string {
+function preferencePath(area: PreferenceArea): string {
   return `/v1/control/user/preferences/${area}`;
 }
 
@@ -258,7 +258,7 @@ export function cacheKey(userId: UserId, area: PreferenceArea): string {
   return `satyr:preferences:${userId}:${area}`;
 }
 
-export function readPreferenceCache(
+function readPreferenceCache(
   userId: UserId,
   area: PreferenceArea,
 ): UserPreferenceDocument | null {
@@ -272,7 +272,7 @@ export function readPreferenceCache(
   }
 }
 
-export function writePreferenceCache(document: UserPreferenceDocument): void {
+function writePreferenceCache(document: UserPreferenceDocument): void {
   try {
     localStorage.setItem(
       cacheKey(document.userId, document.area),

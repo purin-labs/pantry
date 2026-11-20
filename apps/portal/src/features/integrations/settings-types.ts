@@ -20,7 +20,7 @@ import type { MailboxSetupAgentChoice, MailboxSetupPlan } from "@purin-labs/cont
 import type { MailboxSetupRequest } from "./mailbox-actions";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
-export type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];
+type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];
 
 export type CommerceSystemSync = CommerceSystemSyncView;
 
@@ -54,7 +54,7 @@ export type SettingsMouseHandler = (
   event: React.MouseEvent<HTMLButtonElement>,
 ) => Promise<void>;
 
-export type SettingsFormHandler = (
+type SettingsFormHandler = (
   event: React.FormEvent<HTMLFormElement>,
 ) => Promise<void>;
 

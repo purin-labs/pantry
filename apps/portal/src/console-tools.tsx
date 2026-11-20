@@ -22,7 +22,7 @@ type ConsoleTools = Readonly<{
   search: (() => void) | null;
 }>;
 
-export type CanvasHome = Readonly<{ href: string; open: () => void }>;
+type CanvasHome = Readonly<{ href: string; open: () => void }>;
 
 /** What a canvas page draws in place of the rail and the top bar. */
 export type CanvasChrome = Readonly<{

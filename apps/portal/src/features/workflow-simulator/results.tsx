@@ -238,7 +238,7 @@ type DeadlineProps = {
   readonly onInspect: (interval: Interval) => void;
 };
 
-export class BatchDeadline extends React.PureComponent<DeadlineProps> {
+class BatchDeadline extends React.PureComponent<DeadlineProps> {
   render(): React.ReactNode {
     const { run, batch } = this.props;
     const finish = finishTime(run, batch.id);

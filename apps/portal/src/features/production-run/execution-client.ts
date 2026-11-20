@@ -32,7 +32,7 @@ export type ExecutionWorker = Readonly<{
   terminate(): void;
 }>;
 
-export type ExecutionWorkerProblem =
+type ExecutionWorkerProblem =
   | ResolveProblem
   | ManifestProblem
   | Readonly<{ code: "worker_not_started"; detail: unknown }>

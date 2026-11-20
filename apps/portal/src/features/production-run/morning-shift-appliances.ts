@@ -75,7 +75,7 @@ export type SynchronizedApplianceState = Readonly<{
   fault: ApplianceFaultRecord | null;
 }>;
 
-export type CobotCascadeHoldRecord = Readonly<{
+type CobotCascadeHoldRecord = Readonly<{
   heldByAppliance: MorningShiftApplianceCode;
   heldByFaultCode: string;
   affectedBatches: readonly string[];
@@ -84,7 +84,7 @@ export type CobotCascadeHoldRecord = Readonly<{
   checkpointDigest: string;
 }>;
 
-export type MorningShiftBatchCascadeItem = Readonly<{
+type MorningShiftBatchCascadeItem = Readonly<{
   batchId: string;
   workflowLabel: string;
   cellId: "tea-pan-cell" | "espresso-cell" | "pour-over-cell";
@@ -107,7 +107,7 @@ export type MorningShiftFaultCascadeSummary = Readonly<{
   sourceFaults: readonly ApplianceFaultRecord[];
 }>;
 
-export type MorningShiftLotMassRecord = Readonly<{
+type MorningShiftLotMassRecord = Readonly<{
   batchId: string;
   workflowLabel: string;
   gateTaskId: string;
@@ -141,7 +141,7 @@ export type MorningShiftMassAccountingSummary = Readonly<{
   lots: readonly MorningShiftLotMassRecord[];
 }>;
 
-export type HvacPsychrometricTelemetry = Readonly<{
+type HvacPsychrometricTelemetry = Readonly<{
   roomDryBulbC: number;
   relativeHumidityPercent: number;
   wetBulbC: number;
@@ -156,7 +156,7 @@ export type HvacPsychrometricTelemetry = Readonly<{
   status: "nominal" | "humid-plume" | "high-sensible-load";
 }>;
 
-export type FacilityAcousticVibrationTelemetry = Readonly<{
+type FacilityAcousticVibrationTelemetry = Readonly<{
   roomCompositeNoiseDba: number;
   peakApplianceNoiseDba: number;
   peakVibrationMmPerSecRms: number;
@@ -165,7 +165,7 @@ export type FacilityAcousticVibrationTelemetry = Readonly<{
   isoVibrationClass: "nominal" | "elevated-rotary" | "iso-alert";
 }>;
 
-export type MorningShiftChillerDoorInfiltrationEvent = Readonly<{
+type MorningShiftChillerDoorInfiltrationEvent = Readonly<{
   cycleIndex: number;
   taskId: string;
   batchLabel: string;
@@ -185,7 +185,7 @@ export type MorningShiftChillerDoorInfiltrationEvent = Readonly<{
   condensateDrainedMl: number;
 }>;
 
-export type MorningShiftChillerColdCellTelemetry = Readonly<{
+type MorningShiftChillerColdCellTelemetry = Readonly<{
   phase:
     | "refrigerating"
     | "door-infiltration-pulldown"
@@ -207,7 +207,7 @@ export type MorningShiftChillerColdCellTelemetry = Readonly<{
   events: readonly MorningShiftChillerDoorInfiltrationEvent[];
 }>;
 
-export type MorningShiftDishwasherCycleEvent = Readonly<{
+type MorningShiftDishwasherCycleEvent = Readonly<{
   cycleIndex: number;
   taskId: string;
   vesselLabel: string;
@@ -230,7 +230,7 @@ export type MorningShiftDishwasherCycleEvent = Readonly<{
   recoveryEfficiencyPercent: number;
 }>;
 
-export type MorningShiftDishwasherTelemetry = Readonly<{
+type MorningShiftDishwasherTelemetry = Readonly<{
   status: "sanitizing-nominal" | "high-soil-dosing" | "heat-recovery-active";
   completedCycles: number;
   totalCycles: number;
@@ -251,7 +251,7 @@ export type MorningShiftDishwasherTelemetry = Readonly<{
   cycles: readonly MorningShiftDishwasherCycleEvent[];
 }>;
 
-export type MorningShiftEspressoShotEvent = Readonly<{
+type MorningShiftEspressoShotEvent = Readonly<{
   shotIndex: number;
   taskId: string;
   orderLabel: string;
@@ -267,7 +267,7 @@ export type MorningShiftEspressoShotEvent = Readonly<{
   steamRecoverySeconds: number;
 }>;
 
-export type MorningShiftEspressoBoilerTelemetry = Readonly<{
+type MorningShiftEspressoBoilerTelemetry = Readonly<{
   status: "pid-locked" | "back-to-back-recovery" | "steam-draw-recovery";
   brewBoilerSetpointC: number;
   brewBoilerTempC: number;
@@ -281,7 +281,7 @@ export type MorningShiftEspressoBoilerTelemetry = Readonly<{
   shots: readonly MorningShiftEspressoShotEvent[];
 }>;
 
-export type MorningShiftOvenDeckEvent = Readonly<{
+type MorningShiftOvenDeckEvent = Readonly<{
   cycleIndex: number;
   taskId: string;
   batchLabel: string;
@@ -298,7 +298,7 @@ export type MorningShiftOvenDeckEvent = Readonly<{
   surfaceWaterActivityAw: number;
 }>;
 
-export type MorningShiftOvenVentingRadiantTelemetry = Readonly<{
+type MorningShiftOvenVentingRadiantTelemetry = Readonly<{
   status: "damper-venting" | "steam-pulse-closed" | "hotspot-scorching-alert";
   nominalDeckFluxKwPerSqM: number;
   hotspotDeckFluxKwPerSqM: number;
@@ -309,7 +309,7 @@ export type MorningShiftOvenVentingRadiantTelemetry = Readonly<{
   decks: readonly MorningShiftOvenDeckEvent[];
 }>;
 
-export type MorningShiftHobCycleEvent = Readonly<{
+type MorningShiftHobCycleEvent = Readonly<{
   cycleIndex: number;
   taskId: string;
   appliance: "maruzen-mih-02c" | "vollrath-59500p";
@@ -323,7 +323,7 @@ export type MorningShiftHobCycleEvent = Readonly<{
   evaporatedGrams: number;
 }>;
 
-export type MorningShiftHobCoilThermalTelemetry = Readonly<{
+type MorningShiftHobCoilThermalTelemetry = Readonly<{
   status: "igbt-coupled" | "browning-high-gradient" | "simmer-duty-modulated";
   meanCouplingEfficiencyPercent: number;
   maxRadialGradientC: number;
@@ -333,7 +333,7 @@ export type MorningShiftHobCoilThermalTelemetry = Readonly<{
   cycles: readonly MorningShiftHobCycleEvent[];
 }>;
 
-export type MorningShiftScaleWeighEvent = Readonly<{
+type MorningShiftScaleWeighEvent = Readonly<{
   weighIndex: number;
   taskId: string;
   ingredientLabel: string;
@@ -346,7 +346,7 @@ export type MorningShiftScaleWeighEvent = Readonly<{
   stabilityStatus: "locked-stable" | "draft-filtered";
 }>;
 
-export type MorningShiftPrecisionScaleTelemetry = Readonly<{
+type MorningShiftPrecisionScaleTelemetry = Readonly<{
   status: "locked-stable" | "draft-filtered";
   totalWeighings: number;
   meanSettlingTimeSeconds: number;
@@ -357,7 +357,7 @@ export type MorningShiftPrecisionScaleTelemetry = Readonly<{
   weighings: readonly MorningShiftScaleWeighEvent[];
 }>;
 
-export type MorningShiftMixerCycleEvent = Readonly<{
+type MorningShiftMixerCycleEvent = Readonly<{
   cycleIndex: number;
   taskId: string;
   batchLabel: string;
@@ -371,7 +371,7 @@ export type MorningShiftMixerCycleEvent = Readonly<{
   emulsionIndex: number;
 }>;
 
-export type MorningShiftPlanetaryMixerTelemetry = Readonly<{
+type MorningShiftPlanetaryMixerTelemetry = Readonly<{
   status: "emulsifying" | "guard-interlock-open" | "homogenized-ready";
   totalSpecificWorkWhPerKg: number;
   peakShaftTorqueNm: number;
@@ -381,7 +381,7 @@ export type MorningShiftPlanetaryMixerTelemetry = Readonly<{
   cycles: readonly MorningShiftMixerCycleEvent[];
 }>;
 
-export type MorningShiftFrotherCycleEvent = Readonly<{
+type MorningShiftFrotherCycleEvent = Readonly<{
   cycleIndex: number;
   taskId: string;
   drinkLabel: string;
@@ -394,7 +394,7 @@ export type MorningShiftFrotherCycleEvent = Readonly<{
   windowStatus: "optimal-microfoam-window" | "under-aerated" | "scald-risk";
 }>;
 
-export type MorningShiftMilkFrotherTelemetry = Readonly<{
+type MorningShiftMilkFrotherTelemetry = Readonly<{
   status: "optimal-microfoam-window" | "vortex-aerating";
   meanMicrofoamOverrunPercent: number;
   peakVortexShearRateInverseSec: number;
@@ -404,7 +404,7 @@ export type MorningShiftMilkFrotherTelemetry = Readonly<{
   cycles: readonly MorningShiftFrotherCycleEvent[];
 }>;
 
-export type MorningShiftCarrierPoolId =
+type MorningShiftCarrierPoolId =
   | "moulds"
   | "cooling-grids"
   | "shared-pans"
@@ -412,7 +412,7 @@ export type MorningShiftCarrierPoolId =
   | "tea-receivers"
   | "beverage-jugs";
 
-export type MorningShiftCarrierPoolRecord = Readonly<{
+type MorningShiftCarrierPoolRecord = Readonly<{
   poolId: MorningShiftCarrierPoolId;
   label: string;
   carrierCount: number;
@@ -442,7 +442,7 @@ export type MorningShiftContinuousWaveTelemetry = Readonly<{
   pools: readonly MorningShiftCarrierPoolRecord[];
 }>;
 
-export type MorningShiftFactoryStationId =
+type MorningShiftFactoryStationId =
   | "station-oven"
   | "station-chiller"
   | "station-wash"
@@ -451,7 +451,7 @@ export type MorningShiftFactoryStationId =
   | "station-scale"
   | "station-sesame-prep";
 
-export type MorningShiftHandoffEvent = Readonly<{
+type MorningShiftHandoffEvent = Readonly<{
   handoffId: string;
   stationId: MorningShiftFactoryStationId;
   stationLabel: string;
@@ -476,7 +476,7 @@ export type MorningShiftBreakHandoffTelemetry = Readonly<{
   handoffs: readonly MorningShiftHandoffEvent[];
 }>;
 
-export type MorningShiftAisleTransitEvent = Readonly<{
+type MorningShiftAisleTransitEvent = Readonly<{
   transitId: string;
   corridorLabel: string;
   fromStation: string;
@@ -2294,7 +2294,7 @@ export function summarizeContinuousWaveCarrierReturnTelemetry(
   };
 }
 
-export function summarizePlanetaryMixerTelemetry(
+function summarizePlanetaryMixerTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftPlanetaryMixerTelemetry {
   const mixer = appliances.find((a) => a.appliance === "hobart-hl200");
@@ -2343,7 +2343,7 @@ export function summarizePlanetaryMixerTelemetry(
   };
 }
 
-export function summarizeMilkFrotherTelemetry(
+function summarizeMilkFrotherTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftMilkFrotherTelemetry {
   const frother = appliances.find((a) => a.appliance === "severin-sm-3587");
@@ -2388,7 +2388,7 @@ export function summarizeMilkFrotherTelemetry(
   };
 }
 
-export function summarizeHobCoilThermalTelemetry(
+function summarizeHobCoilThermalTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftHobCoilThermalTelemetry {
   const mih = appliances.find((a) => a.appliance === "maruzen-mih-02c");
@@ -2464,7 +2464,7 @@ export function summarizeHobCoilThermalTelemetry(
   };
 }
 
-export function summarizePrecisionScaleTelemetry(
+function summarizePrecisionScaleTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftPrecisionScaleTelemetry {
   const scale = appliances.find((a) => a.appliance === "ohaus-ranger-3000");
@@ -2532,7 +2532,7 @@ export function summarizePrecisionScaleTelemetry(
   };
 }
 
-export function summarizeEspressoBoilerTelemetry(
+function summarizeEspressoBoilerTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftEspressoBoilerTelemetry {
   const linea = appliances.find(
@@ -2587,7 +2587,7 @@ export function summarizeEspressoBoilerTelemetry(
   };
 }
 
-export function summarizeOvenVentingRadiantTelemetry(
+function summarizeOvenVentingRadiantTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftOvenVentingRadiantTelemetry {
   const oven = appliances.find((a) => a.appliance === "maruzen-mbco-5e");
@@ -2673,7 +2673,7 @@ export function summarizeOvenVentingRadiantTelemetry(
   };
 }
 
-export function summarizeDishwasherWarewashTelemetry(
+function summarizeDishwasherWarewashTelemetry(
   appliances: readonly SynchronizedApplianceState[],
 ): MorningShiftDishwasherTelemetry {
   const dishwasher = appliances.find((a) => a.appliance === "winterhalter-uc-l");
@@ -2797,7 +2797,7 @@ export function summarizeDishwasherWarewashTelemetry(
   };
 }
 
-export function summarizeChillerColdCellTelemetry(
+function summarizeChillerColdCellTelemetry(
   appliances: readonly SynchronizedApplianceState[],
   roomDryBulbC = 22.1,
   relativeHumidityPercent = 52.0,

@@ -13,7 +13,7 @@ export type ReconciliationScope = Readonly<{
   positionId: string;
   kind: "count" | "adjustment";
 }>;
-export type ReconciliationBody = Readonly<{
+type ReconciliationBody = Readonly<{
   merchantRevision: number;
   inventoryPositionId: string;
   inventoryPositionRevision: number;

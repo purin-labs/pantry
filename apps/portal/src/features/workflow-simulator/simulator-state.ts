@@ -412,7 +412,7 @@ export type SimulatorShift =
 
 export type SimulatorDock = BakeryShiftDock;
 
-export type RunSourceState = Readonly<{
+type RunSourceState = Readonly<{
   baseline: Run;
   shift: SimulatorShift;
   variant: ScheduleVariant;
@@ -429,7 +429,7 @@ export type ProcedureLoadState =
   | Readonly<{ kind: "loading" }>
   | Readonly<{ kind: "failed"; message: string }>;
 
-export type ScenarioDraftState = Readonly<{
+type ScenarioDraftState = Readonly<{
   assumptionDraft: ReadonlyMap<SettingsField, string>;
   draftRevision: number;
   surfaceEditProposal: BakerySurfaceEditProposalV1 | null;

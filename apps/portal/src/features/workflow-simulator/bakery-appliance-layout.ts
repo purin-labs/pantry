@@ -258,35 +258,6 @@ export function getColdStorageStandPoint(planId: BakeryFloorPlanId): Readonly<{
   };
 }
 
-export function getOutfittedRehearsalStations(
-  planId: BakeryFloorPlanId = floorPlanWorkspace.getActivePlan(),
-  baseStations: readonly Station[],
-): readonly (Station & Readonly<{ rotY: number }>)[] {
-  return baseStations.map((st) => {
-    const pose = floorPlanWorkspace.getPose(planId, st.id);
-    return {
-      ...st,
-      position: [pose.x, st.position[1], pose.z] as const,
-      handoff: getApplianceHandoffPoint(planId, st.id),
-      rotY: pose.rotY,
-    };
-  });
-}
-
-export function getOutfittedRehearsalStation(
-  id: StationId,
-  planId: BakeryFloorPlanId = floorPlanWorkspace.getActivePlan(),
-  baseStation: Station,
-): Station & Readonly<{ rotY: number }> {
-  const pose = floorPlanWorkspace.getPose(planId, id);
-  return {
-    ...baseStation,
-    position: [pose.x, baseStation.position[1], pose.z] as const,
-    handoff: getApplianceHandoffPoint(planId, id),
-    rotY: pose.rotY,
-  };
-}
-
 export function getOutfittedFactoryStations(
   planId: BakeryFloorPlanId,
   baseStations: readonly FactoryStationSource[],
@@ -578,7 +549,7 @@ function getWorkerRoomBoundsAndObstacles(
  * Projects a single worker coordinate `(x, z)` outside all room walls,
  * columns, plumbing fixtures, and active tables/appliances by `workerRadius`.
  */
-export function resolveWorkerObstaclePoint(
+function resolveWorkerObstaclePoint(
   planId: BakeryFloorPlanId,
   x: number,
   z: number,

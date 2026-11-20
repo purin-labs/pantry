@@ -171,7 +171,7 @@ export function clock(microseconds: number): string {
 }
 
 /** The recurring financier bakery, along a back counter and a front counter. */
-export const FINANCIER_STATIONS: readonly FactoryStationSource[] = [
+const FINANCIER_STATIONS: readonly FactoryStationSource[] = [
   {
     id: "station-preparation",
     label: "Preparation",

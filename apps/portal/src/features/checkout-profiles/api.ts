@@ -20,7 +20,7 @@ type CheckoutProfileWithLifecycle<
     lifecycle: VariantBy<CheckoutProfile["lifecycle"], "state", TState>;
   }>;
 
-export type CheckoutProfileSummaryWithLifecycle<
+type CheckoutProfileSummaryWithLifecycle<
   TState extends CheckoutProfile["lifecycle"]["state"],
 > = Omit<CheckoutProfileSummary, "profile"> &
   Readonly<{ profile: CheckoutProfileWithLifecycle<TState> }>;

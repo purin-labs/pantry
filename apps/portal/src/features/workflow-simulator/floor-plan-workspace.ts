@@ -39,7 +39,7 @@ export type {
   SimulatorHistoryTimelineEntry,
 };
 
-export const FLOOR_PLAN_WORKSPACE_STORAGE_KEY = "satyr:floor-plan-workspace:v1";
+const FLOOR_PLAN_WORKSPACE_STORAGE_KEY = "satyr:floor-plan-workspace:v1";
 
 function isFloorPlanId(value: unknown): value is BakeryFloorPlanId {
   for (const id of BAKERY_FLOOR_PLAN_ORDER) {
@@ -578,11 +578,6 @@ export const canUndo = floorPlanWorkspace.canUndo;
 export const canRedo = floorPlanWorkspace.canRedo;
 export const undo = floorPlanWorkspace.undo;
 export const redo = floorPlanWorkspace.redo;
-export const jumpToSimulatorHistory = floorPlanWorkspace.jumpToHistory;
-export const clearSimulatorHistory = floorPlanWorkspace.clearHistory;
-export const resetSimulatorToInitialLayout =
-  floorPlanWorkspace.resetToInitialLayout;
-export const subscribeSimulatorHistory = floorPlanWorkspace.subscribeHistory;
 
 export function useSimulatorHistory(): SimulatorHistorySnapshot &
   Readonly<{

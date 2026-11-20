@@ -22,8 +22,7 @@ import {
 
 const SYNC_RETRY_LIMIT = 3;
 
-export type ProductionPlanPresence =
-  DocumentParticipant<ProductionPlanSelection>;
+type ProductionPlanPresence = DocumentParticipant<ProductionPlanSelection>;
 
 export type ProductionPlanView = Readonly<{
   /** Draft quantity by request id. */

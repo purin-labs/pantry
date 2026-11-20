@@ -33,7 +33,7 @@ export type MenuDraftView = Readonly<{
     | Readonly<{ kind: "failed"; message: string }>
   );
 
-export type MenuDraftPresenceView = DocumentParticipant<MenuPresenceSelection>;
+type MenuDraftPresenceView = DocumentParticipant<MenuPresenceSelection>;
 
 export class MenuDraftClient {
   readonly #client: DocumentClient<

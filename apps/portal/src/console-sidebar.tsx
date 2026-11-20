@@ -32,7 +32,7 @@ type ConsoleSidebarIconProps = React.SVGProps<SVGSVGElement> & {
 
 type ConsoleSidebarIcon = React.ComponentType<ConsoleSidebarIconProps>;
 
-export type ConsoleSidebarNavigationItem = {
+type ConsoleSidebarNavigationItem = {
   readonly id: string;
   readonly label: string;
   readonly to: string;

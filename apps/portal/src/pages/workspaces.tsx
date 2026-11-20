@@ -31,7 +31,7 @@ import { AgentModal } from "./agent-modal";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
 import { assertNever } from "@purin-labs/std";
 
-export type OrganisationWorkspaceListItem = {
+type OrganisationWorkspaceListItem = {
   readonly workspaceId: string;
   readonly workspaceHandle: string;
   readonly name: string;
@@ -64,7 +64,7 @@ export type WorkspaceRouteTarget = {
   readonly workspaceHandle: string;
 };
 
-export type WorkspaceSupportCase = {
+type WorkspaceSupportCase = {
   readonly organisationId: string;
   readonly environment: OnboardingEnvironment;
   readonly lifecycle: string;

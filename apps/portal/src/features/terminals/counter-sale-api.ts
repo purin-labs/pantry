@@ -204,21 +204,6 @@ export async function cancelCounterSaleCollection(
   return parseEnvelope(raw);
 }
 
-export async function manualCashRefundCounterSale(
-  organisationId: string,
-  checkoutId: string,
-  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
-  reason?: string,
-): Promise<CounterSale> {
-  const raw = await mutate(
-    `${counterSalesPath(organisationId)}/${encodeURIComponent(checkoutId)}/manual-cash-refund`,
-    "POST",
-    reason === undefined ? {} : { reason },
-    `counter-manual-cash-refund:${checkoutId}`,
-  );
-  return parseEnvelope(raw);
-}
-
 export function defaultCounterSaleMutate(
   path: string,
   method: "POST",

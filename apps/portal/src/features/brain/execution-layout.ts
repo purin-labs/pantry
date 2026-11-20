@@ -81,7 +81,7 @@ const PADDING = 28;
 /** The greatest height over which a request sits between its lanes. */
 const FAN_OUT_SPAN = 640;
 
-export type LaidOutNode = Readonly<{
+type LaidOutNode = Readonly<{
   node: CaseExecutionNode;
   x: number;
   y: number;
@@ -91,7 +91,7 @@ export type LaidOutNode = Readonly<{
   lane: number;
 }>;
 
-export type ExecutionLane = Readonly<{
+type ExecutionLane = Readonly<{
   lane: number;
   /** The assignment of the lane, or null for the records with none. */
   assignmentNodeId: string | null;
@@ -99,13 +99,13 @@ export type ExecutionLane = Readonly<{
   height: number;
 }>;
 
-export type StageHeading = Readonly<{
+type StageHeading = Readonly<{
   stage: ExecutionStage;
   x: number;
   width: number;
 }>;
 
-export type LaidOutEdge = Readonly<{
+type LaidOutEdge = Readonly<{
   /** Stable for the pair of places that the curve joins. */
   key: string;
   /** The records that the curve joins. A folded end names no record. */
@@ -131,7 +131,7 @@ export type ExecutionFold = Readonly<{
 }>;
 
 /** A stack longer than this is folded. */
-export const EXECUTION_STACK_LIMIT = 6;
+const EXECUTION_STACK_LIMIT = 6;
 
 export type ExecutionLayout = Readonly<{
   width: number;
