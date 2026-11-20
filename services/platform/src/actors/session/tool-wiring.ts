@@ -14,6 +14,7 @@ import type { OrganisationId, RequestId } from "../../ids";
 import type { Result } from "../../result";
 import type { HarnessToolArgumentObserver } from "../embedded-harness";
 import type { SlackThreadSideCase } from "./harness-source";
+import type { SessionConversation } from "./conversation-port";
 import type { StoredMessageAttachment } from "@purin-labs/contracts";
 import type { AgentSessionPersistence } from "../agent-session-schema";
 import type { PreparedEffect } from "../../agent-tools/tool-effect";
@@ -182,8 +183,13 @@ export interface SessionToolWiring {
   ): Promise<Result<readonly TurnTool[], Readonly<{ code: string }>>>;
   /** The services of each tool family that an area owns, by family name. */
   areaServices(turn: ToolTurnContext): ToolServiceSet;
-  /** The side Case of a Slack thread. Slack gives it. */
+  /** The proposal of a side Case in a Slack thread. Slack gives it. */
   readonly slackThreadSideCase: SlackThreadSideCase;
+  /**
+   * The fork, the side Case and the flow checks of the conversation of a
+   * turn. The conversation module gives them.
+   */
+  readonly conversation: SessionConversation;
   /** Stores a Memory candidate. Brain gives it. */
   readonly proposeMemory: MemoryProposalPort;
   /** The effects on a person's page. Kitchen gives them. */

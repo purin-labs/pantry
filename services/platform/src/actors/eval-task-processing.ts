@@ -27,7 +27,12 @@ import {
   resolveCaseTurnAgentProfile,
 } from "../data/pinned-agent-profile";
 import type { Env } from "../env";
-import { readEvalRunFixture } from "../evals/access";
+import type {
+  ClaimedEvalTask,
+  EvalTaskEnd,
+  EvalTaskServices,
+  SettledEvalTask,
+} from "../evals/contract/eval-task";
 import { scoreEvalScenario } from "../evals/scorer";
 import type { GmailMessageContent } from "../mail/gmail-adapter";
 import {
@@ -39,7 +44,6 @@ import {
   parseSessionId,
 } from "../ids";
 import { supplierReplyRecipient } from "../mail-inbox/verified-sender";
-import { createEvalTurnMemoryReader } from "../memory/access";
 import {
   digestModelRoute,
   resolveOrganisationModelRouteForSelection,
@@ -69,20 +73,13 @@ import {
 } from "./case-walking-path";
 import {
   emailTokenWindowTotals,
+  readEmailRuntime,
   releaseEmailReservation,
   reserveEmailTokens,
   settleAbandonedEmailReservation,
   settleEmailReservation,
   utcDayKey,
 } from "./connector-email";
-import {
-  EVAL_RUN_TOKEN_BUDGET,
-  EVAL_TASK_TOKEN_ALLOWANCE,
-  evalRunTokensUsed,
-  settleEvalTask,
-  type ClaimedEvalTask,
-  type SettledEvalTask,
-} from "./connector-eval";
 import { emailTurnDestinationMayReceive } from "./email-case-context-collection-evidence";
 import {
   EMAIL_HARNESS_INSTRUCTIONS,
@@ -121,23 +118,9 @@ type EvalTaskInput = Readonly<{
   mailboxPolicyVersion: number;
   dailyTokenBudget: number;
   claim: ClaimedEvalTask;
+  evals: EvalTaskServices;
   now: number;
 }>;
-
-/**
- * How one claim of a task ended. `settled` is recorded already. `deferred`
- * leaves the task claimed for another try, and names what it ends with if no
- * tries are left.
- */
-export type EvalTaskEnd =
-  | Readonly<{ kind: "settled"; outcome: EvalTaskOutcome }>
-  | Readonly<{
-      kind: "deferred";
-      retryAt: number;
-      exhausted: EvalTaskOutcome;
-    }>
-  /** The Connector stopped being the active instance. Nothing was changed. */
-  | Readonly<{ kind: "inactive" }>;
 
 type TaskRecord = Readonly<{
   execution: EvalTaskExecution | null;
@@ -153,7 +136,63 @@ const NO_RECORD: TaskRecord = {
   flowLabel: null,
 };
 
-export async function processEvalTask(
+/**
+ * Runs one claimed task of an eval run as a turn of this Connector's mailbox
+ * agent. A mailbox with no active agent or no binding settles the task as
+ * unavailable.
+ */
+export async function runMailboxEvalTask(
+  env: Env,
+  sql: SqlStorage,
+  scope: OrganisationExecutionScope,
+  claim: ClaimedEvalTask,
+  evals: EvalTaskServices,
+  now: number,
+): Promise<EvalTaskEnd> {
+  const agentUnavailable = (): EvalTaskEnd => {
+    const outcome = {
+      kind: "unavailable",
+      reason: "agent_unavailable",
+    } as const;
+    evals.settleEvalTask(sql, {
+      runId: claim.run.runId,
+      taskId: claim.task.taskId,
+      result: { outcome, execution: null, pins: null, totalTokens: null },
+      flowLabel: null,
+    });
+    return { kind: "settled", outcome };
+  };
+  const runtime = readEmailRuntime(sql);
+  if (runtime === null || runtime.disabledAt !== null)
+    return agentUnavailable();
+  const binding = await scope.database
+    .prepare(
+      `SELECT mailbox_binding_id AS mailboxBindingId, current_revision AS currentRevision
+         FROM agent_mailbox_binding WHERE organisation_id = ? AND integration_account_id = ?`,
+    )
+    .bind(runtime.organisationId, runtime.integrationAccountId)
+    .first<{
+      readonly mailboxBindingId: string;
+      readonly currentRevision: number;
+    }>();
+  if (!(await isActorExecutionActive(sql, scope))) return { kind: "inactive" };
+  if (binding === null) return agentUnavailable();
+  return processEvalTask(env, {
+    scope,
+    connectorSql: sql,
+    organisationId: runtime.organisationId,
+    integrationAccountId: runtime.integrationAccountId,
+    mailboxBindingId: binding.mailboxBindingId,
+    bindingRevision: binding.currentRevision,
+    mailboxPolicyVersion: runtime.policyVersion,
+    dailyTokenBudget: runtime.limits.dailyTokenBudget,
+    claim,
+    evals,
+    now,
+  });
+}
+
+async function processEvalTask(
   env: Env,
   input: EvalTaskInput,
 ): Promise<EvalTaskEnd> {
@@ -180,7 +219,11 @@ export async function processEvalTask(
       },
       flowLabel: record.flowLabel,
     };
-    settleEvalTask(sql, { runId: run.runId, taskId: task.taskId, ...settled });
+    input.evals.settleEvalTask(sql, {
+      runId: run.runId,
+      taskId: task.taskId,
+      ...settled,
+    });
     return { kind: "settled", outcome };
   };
   const unavailable = (reason: EvalUnavailableReason) =>
@@ -315,7 +358,7 @@ export async function processEvalTask(
     for (const name of earlierReservations) releaseEmailReservation(sql, name);
   }
 
-  const read = await readEvalRunFixture({
+  const read = await input.evals.readEvalRunFixture({
     env,
     execution: input.scope,
     organisationId: organisationId.value,
@@ -375,8 +418,8 @@ export async function processEvalTask(
   const window = emailTokenWindowTotals(sql, utcDayKey(input.now));
   const allowance = Math.min(
     input.dailyTokenBudget - window.reserved - window.consumed,
-    EVAL_RUN_TOKEN_BUDGET - evalRunTokensUsed(sql, run.runId),
-    EVAL_TASK_TOKEN_ALLOWANCE,
+    input.evals.runTokenBudget - input.evals.evalRunTokensUsed(sql, run.runId),
+    input.evals.taskTokenAllowance,
   );
   if (allowance <= 0) return unavailable("budget_exhausted");
 
@@ -475,7 +518,7 @@ export async function processEvalTask(
     tailReader: caseActor.value,
     replyRecipient: recipient,
     memoryDeadlineMs: BACKGROUND_MEMORY_DEADLINE_MS,
-    memoryReader: createEvalTurnMemoryReader({
+    memoryReader: input.evals.createEvalTurnMemoryReader({
       env,
       execution: input.scope,
       organisationId: organisationId.value,

@@ -475,3 +475,23 @@ function parseGeneratedId<TValue>(
 
   return parsed.value;
 }
+
+declare const vaultHandleBrand: unique symbol;
+const VAULT_HANDLE_PATTERN = /^vault:[a-z0-9][a-z0-9:_-]*$/;
+
+/** The opaque name of a secret in the Vault. */
+export type VaultHandle = string & {
+  readonly [vaultHandleBrand]: "VaultHandle";
+};
+
+export function parseVaultHandle(
+  raw: string,
+): Result<VaultHandle, { readonly code: "invalid_vault_handle" }> {
+  const value = raw.trim();
+
+  if (!VAULT_HANDLE_PATTERN.test(value)) {
+    return { ok: false, error: { code: "invalid_vault_handle" } };
+  }
+
+  return { ok: true, value: value as VaultHandle };
+}

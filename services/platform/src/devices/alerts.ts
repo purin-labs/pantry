@@ -10,7 +10,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import {
   deviceAlertNoticeDeliveryId,
   deviceAlertUpdateDeliveryId,
-} from "../slack/device-alert-card";
+} from "./contract/alert-delivery";
 import {
   listGatewayDevices,
   readDeviceAlertSetting,

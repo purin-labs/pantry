@@ -14,7 +14,6 @@ import {
   createEmailProposalFlowSchema,
   nextEmailCaseContextCollectionDraftCleanupAt,
 } from "./email-case-context-collection-evidence";
-import { createConnectorEvalSchema } from "./connector-eval";
 import { createEmailProposalMemorySchema } from "./email-proposal-memory";
 import { createEmailProposalSourceSchema } from "./email-proposal-sources";
 /**
@@ -85,11 +84,18 @@ const EMAIL_CASE_CONTEXT_DISCOVERY_RETRY_DELAYS_MS = [
   6 * 60 * 60_000,
 ] as const;
 
-export function createConnectorEmailSchema(sql: SqlStorage): void {
+/**
+ * Creates the tables of the mailbox. The Eval level of the Connector gives
+ * the tables of its runs, which keep their place in this order.
+ */
+export function createConnectorEmailSchema(
+  sql: SqlStorage,
+  createEvalSchema: (sql: SqlStorage) => void,
+): void {
   createEmailProposalFlowSchema(sql);
   createEmailProposalMemorySchema(sql);
   createEmailProposalSourceSchema(sql);
-  createConnectorEvalSchema(sql);
+  createEvalSchema(sql);
   createMailOrganizationSchema(sql);
   createEmailCommerceSchema(sql);
   sql.exec(`CREATE TABLE IF NOT EXISTS connector_email_runtime (

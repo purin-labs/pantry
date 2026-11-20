@@ -27,6 +27,7 @@ import {
   utcDayKey,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
+import { createConnectorEvalSchema } from "../src/actors/connector-eval";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const NOW = 1_784_016_325_277;
@@ -105,7 +106,7 @@ function reconnectCursorTest(): void {
 function setup(): ReturnType<typeof sqlStorage> {
   const fixture = emptySqliteFixture();
   const sql = sqlStorage(fixture.storage);
-  createConnectorEmailSchema(sql);
+  createConnectorEmailSchema(sql, createConnectorEvalSchema);
   return sql;
 }
 

@@ -24,6 +24,7 @@ import {
   type WhatsAppPhoneNumber,
   type WhatsAppReplyProposalProjection,
 } from "../../data/whatsapp";
+import { whatsappConnector } from "../../mail-inbox/agent-mailbox-connector";
 import type { Env } from "../../env";
 import { newRequestId, parseIntegrationAccountId } from "../../ids";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
@@ -32,7 +33,6 @@ import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,
 } from "../../whatsapp/read-authorization";
-import { whatsappConnector } from "../../whatsapp/control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

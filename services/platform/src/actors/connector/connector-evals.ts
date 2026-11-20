@@ -1,5 +1,5 @@
 import type { ConnectorModuleHost } from "./channel-adapter";
-import { readEmailRuntime } from "../connector-email";
+import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   admitEvalRun,
   cancelEvalRun,
@@ -13,23 +13,59 @@ import {
   readSettledEvalRun,
   settleEvalTask,
   type ClaimedEvalTask,
+  type EvalTaskEnd,
+  EVAL_RUN_TOKEN_BUDGET,
+  EVAL_TASK_TOKEN_ALLOWANCE,
+  evalRunTokensUsed,
 } from "../connector-eval";
-import { processEvalTask, type EvalTaskEnd } from "../eval-task-processing";
-import { publishEvalRunResult } from "../../evals/access";
+import type { EvalTaskServices } from "../../evals/contract/eval-task";
+import { publishEvalRunResult, readEvalRunFixture } from "../../evals/access";
+import { createEvalTurnMemoryReader } from "../../memory/access";
 import { newRequestId } from "../../ids";
 import { traceWarn } from "../../observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isActorExecutionActive } from "../actor-execution-quiescence";
 import { invalid } from "./support";
 import { type ConnectorResult } from "./types";
-import { type ConnectorEmailIdentityRequest } from "./whatsapp-parsers";
-import type { ConnectorDO } from "../connector";
+
+/** The parts of an eval run that the agent turn of a task uses. */
+const EVAL_TASK_SERVICES: EvalTaskServices = {
+  readEvalRunFixture,
+  createEvalTurnMemoryReader,
+  settleEvalTask,
+  evalRunTokensUsed,
+  runTokenBudget: EVAL_RUN_TOKEN_BUDGET,
+  taskTokenAllowance: EVAL_TASK_TOKEN_ALLOWANCE,
+};
+
+type ConnectorEmailIdentityRequest = {
+  readonly identity: ConnectorIdentity;
+  readonly now: number;
+};
 
 /**
- * Eval runs and their settlement for the Connector.
+ * Eval runs and their settlement for the Connector. The mailbox level gives
+ * the agent that an eval tries: it says if the agent is on, and it runs one
+ * task as a turn of that agent.
  */
+/** The mailbox agent that an eval tries. The email channel gives it. */
+export type EvalAgent = Readonly<{
+  /** True when the mailbox agent that an eval tries is active. */
+  evalAgentActive(): boolean;
+  /** Runs one claimed task as a turn of the mailbox agent. */
+  runEvalTask(
+    scope: OrganisationExecutionScope,
+    claim: ClaimedEvalTask,
+    evals: EvalTaskServices,
+    now: number,
+  ): Promise<EvalTaskEnd>;
+}>;
+
 export class ConnectorEvals {
-  constructor(private readonly host: ConnectorModuleHost) {}
+  constructor(
+    private readonly host: ConnectorModuleHost,
+    private readonly agent: EvalAgent,
+  ) {}
 
   /**
    * Starts one eval run of this mailbox's agent. The caller has checked who
@@ -56,13 +92,11 @@ export class ConnectorEvals {
   }
 
   private async admittedStartEvalRun(
-    input: Parameters<ConnectorDO["startEvalRun"]>[0],
+    input: Parameters<ConnectorEvals["startEvalRun"]>[0],
   ): Promise<ConnectorResult<Readonly<{ runId: string; caseId: string }>>> {
     const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const runtime = readEmailRuntime(this.host.ctx.storage.sql);
-    if (runtime === null || runtime.disabledAt !== null)
-      return invalid("eval_unavailable");
+    if (!this.agent.evalAgentActive()) return invalid("eval_unavailable");
     const admitted = this.host.ctx.storage.transactionSync(
       admitEvalRun.bind(null, this.host.ctx.storage.sql, {
         runId: input.runId,
@@ -105,7 +139,7 @@ export class ConnectorEvals {
   }
 
   private async admittedReadEvalRunCommand(
-    input: Parameters<ConnectorDO["readEvalRunCommand"]>[0],
+    input: Parameters<ConnectorEvals["readEvalRunCommand"]>[0],
   ): Promise<
     ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
   > {
@@ -137,7 +171,7 @@ export class ConnectorEvals {
   }
 
   private async admittedCancelEvalRun(
-    input: Parameters<ConnectorDO["cancelEvalRun"]>[0],
+    input: Parameters<ConnectorEvals["cancelEvalRun"]>[0],
   ): Promise<
     ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
   > {
@@ -168,7 +202,7 @@ export class ConnectorEvals {
   }
 
   private async admittedReadEvalRunProgress(
-    input: Parameters<ConnectorDO["readEvalRunProgress"]>[0],
+    input: Parameters<ConnectorEvals["readEvalRunProgress"]>[0],
   ): Promise<ConnectorResult<ReturnType<typeof readEvalRunProgress>>> {
     const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
@@ -189,13 +223,13 @@ export class ConnectorEvals {
       if (claim === null) break;
       // A task that throws leaves its turn's end unknown. The next claim
       // reads what it left on the Case.
-      const end = await this.runEvalTask(scope, claim, now).catch(
-        (): EvalTaskEnd => ({
+      const end = await this.agent
+        .runEvalTask(scope, claim, EVAL_TASK_SERVICES, now)
+        .catch((): EvalTaskEnd => ({
           kind: "deferred",
           retryAt: now + 30_000,
           exhausted: { kind: "indeterminate", code: "eval_task_failed" },
-        }),
-      );
+        }));
       if (end.kind === "inactive") return;
       if (end.kind !== "deferred") continue;
       const key = { runId: claim.run.runId, taskId: claim.task.taskId };
@@ -223,55 +257,6 @@ export class ConnectorEvals {
       );
     }
     await this.publishSettledEvalRuns(scope);
-  }
-
-  private async runEvalTask(
-    scope: OrganisationExecutionScope,
-    claim: ClaimedEvalTask,
-    now: number,
-  ): Promise<EvalTaskEnd> {
-    const sql = this.host.ctx.storage.sql;
-    const agentUnavailable = (): EvalTaskEnd => {
-      const outcome = {
-        kind: "unavailable",
-        reason: "agent_unavailable",
-      } as const;
-      settleEvalTask(sql, {
-        runId: claim.run.runId,
-        taskId: claim.task.taskId,
-        result: { outcome, execution: null, pins: null, totalTokens: null },
-        flowLabel: null,
-      });
-      return { kind: "settled", outcome };
-    };
-    const runtime = readEmailRuntime(sql);
-    if (runtime === null || runtime.disabledAt !== null)
-      return agentUnavailable();
-    const binding = await scope.database
-      .prepare(
-        `SELECT mailbox_binding_id AS mailboxBindingId, current_revision AS currentRevision
-         FROM agent_mailbox_binding WHERE organisation_id = ? AND integration_account_id = ?`,
-      )
-      .bind(runtime.organisationId, runtime.integrationAccountId)
-      .first<{
-        readonly mailboxBindingId: string;
-        readonly currentRevision: number;
-      }>();
-    if (!(await isActorExecutionActive(sql, scope)))
-      return { kind: "inactive" };
-    if (binding === null) return agentUnavailable();
-    return processEvalTask(this.host.env, {
-      scope,
-      connectorSql: sql,
-      organisationId: runtime.organisationId,
-      integrationAccountId: runtime.integrationAccountId,
-      mailboxBindingId: binding.mailboxBindingId,
-      bindingRevision: binding.currentRevision,
-      mailboxPolicyVersion: runtime.policyVersion,
-      dailyTokenBudget: runtime.limits.dailyTokenBudget,
-      claim,
-      now,
-    });
   }
 
   /**

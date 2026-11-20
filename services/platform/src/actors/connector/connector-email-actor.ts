@@ -86,6 +86,12 @@ import {
   type EmailReplyCorrection,
   type EmailRuntimeSnapshot,
 } from "../connector-email";
+import type {
+  ClaimedEvalTask,
+  EvalTaskEnd,
+  EvalTaskServices,
+} from "../../evals/contract/eval-task";
+import { runMailboxEvalTask } from "../eval-task-processing";
 import {
   establishConnectorEmailWatch,
   readConnectorEmailHistoryId,
@@ -180,7 +186,6 @@ import {
   type ConnectorEmailIdentityRequest,
   type EmailReplyProvenance,
 } from "./whatsapp-parsers";
-import type { ConnectorDO } from "../connector";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
@@ -203,6 +208,27 @@ export class ConnectorEmail {
    * first already wrote and return idempotently.
    */
   private readonly emailProposalWork = createKeyedContinueSerialQueue<string>();
+
+  evalAgentActive(): boolean {
+    const runtime = readEmailRuntime(this.host.ctx.storage.sql);
+    return runtime !== null && runtime.disabledAt === null;
+  }
+
+  runEvalTask(
+    scope: OrganisationExecutionScope,
+    claim: ClaimedEvalTask,
+    evals: EvalTaskServices,
+    now: number,
+  ): Promise<EvalTaskEnd> {
+    return runMailboxEvalTask(
+      this.host.env,
+      this.host.ctx.storage.sql,
+      scope,
+      claim,
+      evals,
+      now,
+    );
+  }
 
   /**
    * Names this instance of the Actor on the reply turns it claims. One
@@ -1249,7 +1275,7 @@ export class ConnectorEmail {
   }
 
   private async admittedReadEmailReplyProvenance(
-    input: Parameters<ConnectorDO["readEmailReplyProvenance"]>[0],
+    input: Parameters<ConnectorEmail["readEmailReplyProvenance"]>[0],
   ): Promise<ConnectorResult<EmailReplyProvenance>> {
     const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
@@ -1288,7 +1314,7 @@ export class ConnectorEmail {
   }
 
   private async admittedRecordEmailReplyEditProvenance(
-    input: Parameters<ConnectorDO["recordEmailReplyEditProvenance"]>[0],
+    input: Parameters<ConnectorEmail["recordEmailReplyEditProvenance"]>[0],
   ): Promise<ConnectorResult<null>> {
     const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
@@ -1338,7 +1364,7 @@ export class ConnectorEmail {
   }
 
   private async admittedEditReviewedEmailReply(
-    input: Parameters<ConnectorDO["editReviewedEmailReply"]>[0],
+    input: Parameters<ConnectorEmail["editReviewedEmailReply"]>[0],
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
     if (input.authority.organisationId !== input.identity.organisationId)
       return invalid("connector_email_proposal_request_invalid");
@@ -1387,7 +1413,7 @@ export class ConnectorEmail {
   }
 
   private async admittedReadEmailReplyCorrection(
-    input: Parameters<ConnectorDO["readEmailReplyCorrection"]>[0],
+    input: Parameters<ConnectorEmail["readEmailReplyCorrection"]>[0],
   ): Promise<ConnectorResult<EmailReplyCorrection | null>> {
     const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
@@ -1447,7 +1473,7 @@ export class ConnectorEmail {
   }
 
   private async admittedPreviewEmailRelationship(
-    input: Parameters<ConnectorDO["previewEmailRelationship"]>[0],
+    input: Parameters<ConnectorEmail["previewEmailRelationship"]>[0],
   ): Promise<ConnectorResult<EmailRelationshipPreview>> {
     if (input.authority.organisationId !== input.identity.organisationId)
       return invalid("connector_email_proposal_request_invalid");
@@ -1490,7 +1516,7 @@ export class ConnectorEmail {
   }
 
   private async admittedCorrectEmailRelationship(
-    input: Parameters<ConnectorDO["correctEmailRelationship"]>[0],
+    input: Parameters<ConnectorEmail["correctEmailRelationship"]>[0],
   ): Promise<ConnectorResult<EmailReplyEditReceipt>> {
     if (input.authority.organisationId !== input.identity.organisationId)
       return invalid("connector_email_proposal_request_invalid");

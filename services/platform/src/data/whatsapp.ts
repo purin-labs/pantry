@@ -10,7 +10,6 @@ import { listOrganisationActorRegistryEntries } from "../actors/actor-registry";
 import { actorStub } from "../actors/actor-stubs";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
-  D1DatabaseSession,
   D1PreparedStatement,
 } from "@cloudflare/workers-types";
 
@@ -1779,47 +1778,6 @@ export async function purgeOrganisationWhatsAppConnectors(input: {
   return purged;
 }
 
-export function whatsappErasureStatements(
-  session: D1DatabaseSession,
-  scope:
-    | {
-        readonly kind: "account";
-        readonly integrationAccountId: IntegrationAccountId;
-      }
-    | {
-        readonly kind: "organisation";
-        readonly organisationId: OrganisationId;
-      },
-): readonly D1PreparedStatement[] {
-  const column =
-    scope.kind === "account" ? "integration_account_id" : "organisation_id";
-  const value =
-    scope.kind === "account"
-      ? scope.integrationAccountId
-      : scope.organisationId;
-  const tables = [
-    "whatsapp_delivery_status",
-    "whatsapp_message_receipt",
-    "whatsapp_reply_proposal",
-    "whatsapp_case_conversation_window",
-    "whatsapp_ingress_policy_revision",
-    "whatsapp_ingress_policy",
-    "whatsapp_support_binding_revision",
-    "whatsapp_support_binding",
-    "whatsapp_phone_number_account",
-  ] as const;
-  return tables.map((table) => {
-    // The binding-revision table is keyed by its binding, not by the account.
-    const where =
-      table === "whatsapp_support_binding_revision" && scope.kind === "account"
-        ? `support_binding_id IN (
-           SELECT support_binding_id FROM whatsapp_support_binding
-           WHERE integration_account_id = ?
-         )`
-        : `${column} = ?`;
-    return session.prepare(`DELETE FROM ${table} WHERE ${where}`).bind(value);
-  });
-}
 
 export async function recordWhatsAppDeliveryStatus(input: {
   readonly db: OrganisationDatabase;

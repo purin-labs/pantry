@@ -1,4 +1,5 @@
 import { SESSION_TOOL_WIRING } from "../agent-tools/session-wiring";
+import { authorizeChatHarnessLease } from "../chat/turn-access";
 import type {
   SessionInboxTurnsRpc,
   TransientEmailTurnRequest,
@@ -12,8 +13,13 @@ import {
   prepareTransientMailAssistant,
   prepareTransientWhatsAppTurn,
 } from "./inbox-turns/session-turns";
+import { ACTOR_MACHINES } from "./actor-machines";
 import { SessionActor } from "./session/session-actor";
 import type { SessionToolWiring } from "./session/tool-wiring";
+import { registerSessionTurnAccess } from "./session-turn-access";
+
+// The conversation module owns the access rule of a Session turn.
+registerSessionTurnAccess(authorizeChatHarnessLease);
 
 /**
  * The Session Durable Object class of the Worker. It keeps the deployed class
@@ -25,6 +31,10 @@ import type { SessionToolWiring } from "./session/tool-wiring";
 export class SessionDO extends SessionActor implements SessionInboxTurnsRpc {
   protected sessionTools(): SessionToolWiring {
     return SESSION_TOOL_WIRING;
+  }
+
+  protected actorMachines() {
+    return ACTOR_MACHINES;
   }
 
   // The transient turns of the Inbox (`actors/inbox-turns/`).

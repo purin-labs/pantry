@@ -1,7 +1,10 @@
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import { resolveCaseReference } from "../../access-control/references";
 import type { ConversationScope } from "../../chat/store";
-import { readCaseContextCollectionMetadata } from "../../case-context-discovery/metadata";
+import {
+  readCaseContextCollectionMetadata,
+  type CaseContextSelectionVerification,
+} from "../../case-context-discovery/metadata";
 import { parseCaseContextCollectionReviewCommand } from "../../case-context-discovery/relationships";
 import type {
   CaseContextCollectionMetadataView,
@@ -17,7 +20,6 @@ import {
   type OrganisationId,
 } from "../../ids";
 import { authorizeOrganisationRequest } from "../authorization";
-import { handleCaseScreenObservationsRoute } from "./case-screen-observations";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { assertNever } from "@purin-labs/std";
 import type { Result } from "../../result";
@@ -101,10 +103,24 @@ function parseCaseContextCollectionOperation(
     : { ...base, operation: "caseContextCollection", caseContextCollectionId };
 }
 
+/**
+ * What the Worker gives to the route: the Inbox check of a selection, and
+ * the Portal route of the screen observations of a Case.
+ */
+export type CaseContextDiscoveryParts = Readonly<{
+  verifySelection: CaseContextSelectionVerification;
+  screenObservations: (
+    request: Request,
+    env: Env,
+    scope: ConversationScope,
+  ) => Promise<Response>;
+}>;
+
 export async function handleCaseContextDiscoveryRoute(
   request: Request,
   env: Env,
   route: CaseContextDiscoveryRoute,
+  parts: CaseContextDiscoveryParts,
 ): Promise<Response> {
   const mutation = caseContextCollectionMutation(route, request.method);
   if (mutation === null) return controlError("method_not_allowed", 405);
@@ -120,7 +136,7 @@ export async function handleCaseContextDiscoveryRoute(
       case "screen_observations":
         if (authorized.identity.kind !== "user")
           return controlError("case_screen_observations_unavailable", 404);
-        return await handleCaseScreenObservationsRoute(request, env, {
+        return await parts.screenObservations(request, env, {
           organisationId: authorized.organisationId,
           userId: authorized.identity.userId,
         });
@@ -141,6 +157,7 @@ export async function handleCaseContextDiscoveryRoute(
             userId: authorized.identity.userId,
           },
           route,
+          parts.verifySelection,
         );
       case "configuration":
         break;
@@ -176,6 +193,7 @@ async function handleCaseContextDiscoveryMetadataRoute(
   env: Env,
   scope: ConversationScope,
   route: CaseContextDiscoveryMetadataRoute,
+  verifySelection: CaseContextSelectionVerification,
 ): Promise<Response> {
   const actor = await requireActiveOrganisationActor({
     env,
@@ -220,6 +238,7 @@ async function handleCaseContextDiscoveryMetadataRoute(
           env,
           scope,
           caseContextCollection,
+          verifySelection,
         );
         if (view !== null) caseContextCollections.push(view);
       }
@@ -231,6 +250,7 @@ async function handleCaseContextDiscoveryMetadataRoute(
         env,
         scope,
         route.caseContextCollectionId,
+        verifySelection,
       );
       return result.ok
         ? controlJson({ ok: true, caseContextCollections: [result.value] })
@@ -246,6 +266,7 @@ async function handleCaseContextDiscoveryMetadataRoute(
         env,
         scope,
         route.caseContextCollectionId,
+        verifySelection,
       );
       if (!current.ok) return caseContextCollectionResult(current);
       const result = await actor.reviewCaseContextCollectionRelationship({
@@ -266,6 +287,7 @@ async function readAuthorizedCaseContextCollection(
   env: Env,
   scope: ConversationScope,
   caseContextCollectionId: string,
+  verifySelection: CaseContextSelectionVerification,
 ): Promise<
   Result<CaseContextCollectionMetadataView, Readonly<{ code: string }>>
 > {
@@ -278,6 +300,7 @@ async function readAuthorizedCaseContextCollection(
     env,
     scope,
     result.value,
+    verifySelection,
   );
   return view === null
     ? {

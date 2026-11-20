@@ -16,6 +16,7 @@ import {
   type MailEvaluationInput,
 } from "../../mail-inbox/evaluation";
 import { reconcileAdmittedOrganisationArchiveCleanup } from "../../data/onboarding-reconciliation";
+import { ARCHIVE_CLEANUP_PARTS } from "../../archive-cleanup-parts";
 import {
   AdmittedOrganisationArchiveCleanup,
   readOrganisationArchiveCleanup,
@@ -565,6 +566,7 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
     if (!database.ok) throw new Error(database.error.code);
     const repaired = await reconcileAdmittedOrganisationArchiveCleanup({
       env: this.env,
+      parts: ARCHIVE_CLEANUP_PARTS,
       db: database.value,
       directory: this.env.DB,
       archive: this.env.ARCHIVE,

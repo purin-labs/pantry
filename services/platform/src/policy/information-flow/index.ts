@@ -35,6 +35,8 @@ export {
   type FlowSinkCheck,
   approvedOutputDecision,
   toolEffectAsksAfterOutsideText,
+  sinkRefusalAsksPerson,
+  type CaseConversationSinkRefusal,
 } from "./sinks";
 export {
   organisationAuthzFromPolicy,

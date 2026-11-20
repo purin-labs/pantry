@@ -47,7 +47,10 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "../../ids";
-import { resolveOrganisationModelRoute } from "../../models/route";
+import {
+  activationModelRouteError,
+  resolveOrganisationModelRoute,
+} from "../../models/route";
 import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
 import { reconcileProviderManifestObservations } from "../../provider-lifecycle/observation";
 import {
@@ -73,7 +76,6 @@ import {
 } from "../http";
 import {
   activationErrorStatus,
-  activationModelRouteError,
   runtimeAdmissionStatus,
 } from "../onboarding-runtime";
 import {

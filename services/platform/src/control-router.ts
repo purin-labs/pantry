@@ -94,6 +94,8 @@ import {
   matchCaseContextDiscoveryRoute,
   type CaseContextDiscoveryRoute,
 } from "./control/routes/case-context-discovery";
+import { resolveCaseContextCollectionSelectionVerification } from "./case-context-discovery/source";
+import { handleCaseScreenObservationsRoute } from "./control/routes/case-screen-observations";
 import {
   handleMemoryRoute,
   matchMemoryRoute,
@@ -230,6 +232,7 @@ import {
   matchSessionControlRoute,
   type SessionControlRoute,
 } from "./control/routes/sessions";
+import { resolveControlSupportRole } from "./data/onboarding-support";
 import {
   handleWorkspaceControlRoute,
   matchWorkspaceControlRoute,
@@ -342,7 +345,10 @@ export async function handleControlRequest(
     case "jevFeatures":
       return handleJevFeaturesRoute(request, env, route);
     case "caseContextCollections":
-      return handleCaseContextDiscoveryRoute(request, env, route);
+      return handleCaseContextDiscoveryRoute(request, env, route, {
+        verifySelection: resolveCaseContextCollectionSelectionVerification,
+        screenObservations: handleCaseScreenObservationsRoute,
+      });
     case "memories":
       return handleMemoryRoute(request, env, route);
     case "vaultItems":
@@ -421,7 +427,9 @@ export async function handleControlRequest(
     case "session":
     case "rotateSession":
     case "logout":
-      return handleSessionControlRoute(request, env, route, url);
+      return handleSessionControlRoute(request, env, route, url, {
+        resolveSupportRole: resolveControlSupportRole,
+      });
     case "organisations":
     case "accountOnboarding":
     case "organisation":

@@ -41,12 +41,13 @@ import { parsePersonId, type PersonId } from "../data/person-authz";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { FlowBinding } from "../policy/information-flow";
 import { parseSlackUserId, type SlackUserId } from "./events";
+import type { SessionSideCase } from "../actors/session/conversation-port";
 
 /** The `action_id` of the Start button of a proposal message. */
 export const SLACK_SIDE_CASE_START_ACTION = "satyr_side_case_start";
 
 /** Added to the harness instructions of each turn of a Slack side Case. */
-export const SLACK_SIDE_CASE_HARNESS_INSTRUCTION =
+const SLACK_SIDE_CASE_HARNESS_INSTRUCTION =
   "This thread started from a side Case proposal in another Slack thread. The first message is that proposal's brief. Do the work that the brief describes. Approvals and effects in the other thread do not authorize actions here.";
 
 export type SlackSideCaseStatus = "open" | "starting" | "started";
@@ -272,7 +273,7 @@ export async function settleSlackSideCaseStart(
  * authority is a person in the proposal's channel, and the label must allow
  * that channel now.
  */
-export async function admitSlackSideCaseInformationFlow(
+async function admitSlackSideCaseInformationFlow(
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
   proposal: SlackSideCaseProposal,
@@ -398,8 +399,29 @@ function contextBlock(text: string): Record<string, unknown> {
   return { type: "context", elements: [mrkdwn(text)] };
 }
 
+/**
+ * The side Case of a Slack thread, as a turn of its Session uses it: the
+ * instruction of each turn and the admission of the proposal.
+ */
+export async function slackThreadSideCase(
+  raw: Record<string, unknown>,
+): Promise<SessionSideCase> {
+  const proposal = await parseSlackProposalRow(raw);
+  return {
+    instruction: SLACK_SIDE_CASE_HARNESS_INSTRUCTION,
+    admit: (input) =>
+      admitSlackSideCaseInformationFlow(
+        input.storage,
+        input.lease,
+        proposal,
+        input.authorizeCommit,
+        input.env,
+      ),
+  };
+}
+
 /** A stored Slack proposal. A row of a Portal proposal is refused. */
-export async function parseSlackProposalRow(
+async function parseSlackProposalRow(
   raw: Record<string, unknown>,
 ): Promise<SlackSideCaseProposal> {
   const {

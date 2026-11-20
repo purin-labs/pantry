@@ -2,6 +2,7 @@ import {
   actorMachineCensus,
   type MachineCensus,
 } from "./lifecycle/machine-census";
+import { ACTOR_MACHINES } from "./actor-machines";
 import { readWarmActorSlots } from "./warm-actor-slots";
 import { invalidateEmailCaseContextCollectionProposals } from "./email-case-context-collection-evidence";
 import type { Env } from "../env";
@@ -104,7 +105,10 @@ export class ConnectorDO
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 
   /** The eval runs of this Connector. */
-  protected readonly evals = new ConnectorEvals(this.moduleHost);
+  protected readonly evals = new ConnectorEvals(this.moduleHost, {
+    evalAgentActive: () => this.email.evalAgentActive(),
+    runEvalTask: (...input) => this.email.runEvalTask(...input),
+  });
 
   /** The WhatsApp channel of this Connector. */
   protected readonly whatsApp = new ConnectorWhatsApp(this.moduleHost);
@@ -440,7 +444,7 @@ export class ConnectorDO
 
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   machineCensus(): Promise<readonly MachineCensus[]> {
-    return actorMachineCensus(this.ctx.storage);
+    return actorMachineCensus(this.ctx.storage, ACTOR_MACHINES);
   }
 
   constructor(ctx: DurableObjectState, env: Env) {

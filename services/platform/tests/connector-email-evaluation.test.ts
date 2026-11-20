@@ -56,6 +56,7 @@ import {
   readEmailRuntime,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
+import { createConnectorEvalSchema } from "../src/actors/connector-eval";
 import { runConnectorEmailEvaluation } from "../src/actors/connector-email-evaluation";
 import { upsertUser } from "../src/data/control-plane";
 import {
@@ -122,7 +123,7 @@ function connectorEmailEvaluationSuite(): void {
 function caseContextDiscoveryWorkTest(): void {
   const sqlite = emptySqliteFixture();
   const sql = sqlStorage(sqlite.storage);
-  createConnectorEmailSchema(sql);
+  createConnectorEmailSchema(sql, createConnectorEvalSchema);
   recordEmailCaseContextDiscovery(sql, {
     organisationId: "organisation_case_context_collection_queue",
     integrationAccountId: "gmail_case_context_collection_queue",
@@ -606,7 +607,7 @@ function activate(
   fixture: Fixture,
   overrides: Partial<EmailIngressLimits> = {},
 ): void {
-  createConnectorEmailSchema(storage.sql);
+  createConnectorEmailSchema(storage.sql, createConnectorEvalSchema);
   const activated = activateEmailRuntime(storage.sql, {
     organisationId: fixture.organisationId,
     integrationAccountId: fixture.integrationAccountId,

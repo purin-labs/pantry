@@ -90,9 +90,3 @@ export type SessionSnapshot = {
   readonly membershipAvailability: ControlMembershipAvailability;
 };
 
-export type PendingCommerceApproval = {
-  readonly organisationId: string;
-  readonly actionNonce: string;
-  readonly returnPath: string;
-  readonly createdAt: number;
-};

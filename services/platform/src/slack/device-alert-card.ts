@@ -7,30 +7,6 @@ import { requirePublicOrigin } from "../public-origin";
  * codes, as plain text, so that a device cannot write to the channel.
  */
 
-const NOTICE_PREFIX = "device_alert_notice_";
-const UPDATE_PREFIX = "device_alert_update_";
-
-export function deviceAlertNoticeDeliveryId(alertId: string): string {
-  return `${NOTICE_PREFIX}${alertId}`;
-}
-
-export function deviceAlertUpdateDeliveryId(alertId: string): string {
-  return `${UPDATE_PREFIX}${alertId}`;
-}
-
-export function isDeviceAlertDelivery(deliveryId: string): boolean {
-  return (
-    deliveryId.startsWith(NOTICE_PREFIX) || deliveryId.startsWith(UPDATE_PREFIX)
-  );
-}
-
-/** The notice that an update changes, if this delivery is an update. */
-export function deviceAlertNoticeOfUpdate(deliveryId: string): string | null {
-  return deliveryId.startsWith(UPDATE_PREFIX)
-    ? `${NOTICE_PREFIX}${deliveryId.slice(UPDATE_PREFIX.length)}`
-    : null;
-}
-
 export function deviceAlertCardBlocks(
   text: string,
   devicesUrl: string | null,

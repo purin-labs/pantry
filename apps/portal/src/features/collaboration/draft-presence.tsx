@@ -1,7 +1,10 @@
 import React from "react";
 import { MousePointer2 } from "lucide-react";
-import { POINTER_IDLE_MS, type DraftPointer } from "@purin-labs/product-description-crdt/protocol";
-import "./styles.css";
+import {
+  COLLABORATION_POINTER_IDLE_MS as POINTER_IDLE_MS,
+  type CollaborationPointer as DraftPointer,
+} from "@purin-labs/collaboration";
+import "./draft-presence.css";
 
 export type DraftPresenceView = Readonly<{
   sessionId: string;

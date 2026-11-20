@@ -1,26 +1,5 @@
 import type { MachineDefinition } from "@purin-labs/std/state-machine";
 
-import { CASE_APPROVAL_WAIT_MACHINE } from "../case/approval-wait.machine";
-import { CASE_ASSIGNMENT_MACHINE } from "../case/assignment.machine";
-import { CASE_OUTPUT_MACHINE } from "../case/output.machine";
-import { CUE_DELIVERY_MACHINE } from "../cue-delivery.machine";
-import { DEVICE_COMMAND_MACHINE } from "../device-command.machine";
-import { STEERING_INPUT_MACHINE } from "../steering-input.machine";
-import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "../whatsapp-reply-proposal.machine";
-import { EMAIL_REPLY_PROPOSAL_MACHINE } from "../../data/email-reply-proposal.machine";
-
-/** The machines whose state lives in an Actor's SQLite (Refactor 15, S5). */
-const ACTOR_MACHINES: readonly MachineDefinition[] = [
-  CASE_APPROVAL_WAIT_MACHINE,
-  CASE_ASSIGNMENT_MACHINE,
-  CASE_OUTPUT_MACHINE,
-  CUE_DELIVERY_MACHINE,
-  DEVICE_COMMAND_MACHINE,
-  STEERING_INPUT_MACHINE,
-  EMAIL_REPLY_PROPOSAL_MACHINE,
-  WHATSAPP_REPLY_PROPOSAL_MACHINE,
-];
-
 /** The age of the rows in one state of one machine. Times, never content. */
 export type MachineStateAge = Readonly<{
   /** The earliest `since` time of the rows in the state, or null. */
@@ -50,12 +29,21 @@ export type MachineCensus = Readonly<{
 /** The Actor's alarm and the time of the census. */
 type CensusClock = Readonly<{ alarm: number | null; now: number }>;
 
-/** The census of an Actor's machines, read with its alarm and the time. */
+/**
+ * The census of an Actor's machines, read with its alarm and the time. The
+ * Worker gives the list of the machines whose state lives in an Actor's
+ * SQLite (`actors/actor-machines.ts`).
+ */
 export async function actorMachineCensus(
   storage: DurableObjectStorage,
+  machines: readonly MachineDefinition[],
 ): Promise<readonly MachineCensus[]> {
   const alarm = await storage.getAlarm();
-  return censusOfActorMachines(storage.sql, { alarm, now: Date.now() });
+  return censusOfActorMachines(
+    storage.sql,
+    { alarm, now: Date.now() },
+    machines,
+  );
 }
 
 /**
@@ -66,7 +54,7 @@ export async function actorMachineCensus(
 export function censusOfActorMachines(
   sql: SqlStorage,
   clock: CensusClock,
-  machines: readonly MachineDefinition[] = ACTOR_MACHINES,
+  machines: readonly MachineDefinition[],
 ): readonly MachineCensus[] {
   const tables = new Set(
     sql

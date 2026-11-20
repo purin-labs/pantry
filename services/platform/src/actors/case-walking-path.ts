@@ -36,11 +36,10 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import {
   decideCaseConversationSink,
-  sinkRefusalAsksPerson,
   type AllowFlowDecision,
 } from "./case-conversation-sink";
 import { traceLog } from "../observability";
-import { FlowBinding } from "../policy";
+import { FlowBinding, sinkRefusalAsksPerson } from "../policy";
 import type { SerializedFlowBinding } from "../policy";
 import type { SlackUserId } from "../slack/events";
 import {

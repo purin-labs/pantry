@@ -33,12 +33,13 @@ import {
   type ProviderConnectionId,
   type ProviderWebhookId,
   type OrganisationId,
+  parseVaultHandle,
+  type VaultHandle,
 } from "../ids";
 import {
   prepareResolveOpenSupportReferences,
 } from "../organisation/contract/provider-support-references";
 import type { Result } from "../result";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import {
   gmailProductFromScopes,
   parseGmailAuthorizationProduct,
