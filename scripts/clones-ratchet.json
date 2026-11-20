@@ -20,7 +20,6 @@
     "apps/portal/src/features/commerce/production-plan-client.ts = apps/portal/src/features/costs/costs-sheet-client.ts": 1,
     "apps/portal/src/features/costs/costs-sheet-draft.ts = apps/portal/src/features/costs/costs-sheet-draft.ts": 3,
     "apps/portal/src/features/costs/route.tsx = apps/portal/src/features/costs/route.tsx": 5,
-    "apps/portal/src/features/email-review/review.tsx = apps/portal/src/features/email-review/review.tsx": 1,
     "apps/portal/src/features/integrations/page-actions.ts = apps/portal/src/features/integrations/page-actions.ts": 2,
     "apps/portal/src/features/integrations/settings-routes.tsx = apps/portal/src/features/integrations/settings-routes.tsx": 1,
     "apps/portal/src/features/menu-boards/board-style-panel.tsx = apps/portal/src/features/menu-boards/board-style-panel.tsx": 1,
