@@ -12,6 +12,7 @@ import {
 import type { CredentialVaultBindings } from "./keyring";
 import { resolveVaultHandle, storeVaultSecret } from "./service";
 import type { OrganisationQuerySource } from "../data/query-source";
+import { prepareVaultSecretRevocation } from "./secret-revocation";
 
 const openAiApiKeyBrand: unique symbol = Symbol("OpenAiApiKey");
 const anthropicApiKeyBrand: unique symbol = Symbol("AnthropicApiKey");
@@ -70,13 +71,22 @@ type CredentialRefRow = {
 
 export function parseOpenAiApiKey(
   raw: unknown,
-): Result<OpenAiApiKey, { readonly code: "organisation_openai_credential_invalid" }> {
+): Result<
+  OpenAiApiKey,
+  { readonly code: "organisation_openai_credential_invalid" }
+> {
   if (typeof raw !== "string") {
-    return { ok: false, error: { code: "organisation_openai_credential_invalid" } };
+    return {
+      ok: false,
+      error: { code: "organisation_openai_credential_invalid" },
+    };
   }
   const value = raw.trim();
   if (value.length < 20 || value.length > OPENAI_API_KEY_MAX_LENGTH) {
-    return { ok: false, error: { code: "organisation_openai_credential_invalid" } };
+    return {
+      ok: false,
+      error: { code: "organisation_openai_credential_invalid" },
+    };
   }
   return { ok: true, value: value as OpenAiApiKey };
 }
@@ -139,7 +149,9 @@ export async function storeOrganisationOpenAiModelCredential(input: {
       error: { code: "organisation_openai_credential_binding_failed" },
     };
   }
-  const handle = newOrganisationOpenAiModelCredentialHandle(input.organisationId);
+  const handle = newOrganisationOpenAiModelCredentialHandle(
+    input.organisationId,
+  );
   const stored = await storeVaultSecret({
     db: input.db,
     keys: input.keys,
@@ -179,19 +191,20 @@ export async function storeOrganisationOpenAiModelCredential(input: {
   ];
   if (previousHandle !== null && previousHandle.ok) {
     statements.push(
-      session
-        .prepare(
-          `UPDATE vault_secret
-       SET revoked_at = ?
-       WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-        )
-        .bind(input.now, input.organisationId, previousHandle.value),
+      prepareVaultSecretRevocation(session, {
+        organisationId: input.organisationId,
+        handle: previousHandle.value,
+        now: input.now,
+      }),
     );
   }
   const results = await session.batch(statements);
   return results[0]?.meta.changes === 1
     ? { ok: true, value: handle }
-    : { ok: false, error: { code: "organisation_openai_credential_binding_failed" } };
+    : {
+        ok: false,
+        error: { code: "organisation_openai_credential_binding_failed" },
+      };
 }
 
 export async function resolveCurrentOrganisationOpenAiModelCredential(input: {
@@ -199,9 +212,13 @@ export async function resolveCurrentOrganisationOpenAiModelCredential(input: {
   readonly keys: CredentialVaultBindings;
   readonly organisationId: OrganisationId;
 }): Promise<
-  Result<OrganisationOpenAiModelCredential, OrganisationOpenAiModelCredentialError>
+  Result<
+    OrganisationOpenAiModelCredential,
+    OrganisationOpenAiModelCredentialError
+  >
 > {
-  const handle = await readCurrentOrganisationOpenAiModelCredentialHandle(input);
+  const handle =
+    await readCurrentOrganisationOpenAiModelCredentialHandle(input);
   if (!handle.ok) return handle;
   return resolveBoundOrganisationOpenAiModelCredential({
     ...input,
@@ -215,7 +232,10 @@ export async function resolveOrganisationOpenAiModelCredentialForRoute(input: {
   readonly organisationId: OrganisationId;
   readonly route: ModelRoute;
 }): Promise<
-  Result<OrganisationOpenAiModelCredential, OrganisationOpenAiModelCredentialError>
+  Result<
+    OrganisationOpenAiModelCredential,
+    OrganisationOpenAiModelCredentialError
+  >
 > {
   if (
     input.route.keySource !== "organisation_byo" ||
@@ -280,12 +300,18 @@ async function resolveBoundOrganisationOpenAiModelCredential(input: {
   readonly organisationId: OrganisationId;
   readonly handle: VaultHandle;
 }): Promise<
-  Result<OrganisationOpenAiModelCredential, OrganisationOpenAiModelCredentialError>
+  Result<
+    OrganisationOpenAiModelCredential,
+    OrganisationOpenAiModelCredentialError
+  >
 > {
   const secret = await resolveVaultHandle(input);
   if (!secret.ok) return secret;
   if (secret.value.kind !== "bearer") {
-    return { ok: false, error: { code: "organisation_openai_credential_invalid" } };
+    return {
+      ok: false,
+      error: { code: "organisation_openai_credential_invalid" },
+    };
   }
   const apiKey = parseOpenAiApiKey(secret.value.value);
   return apiKey.ok
@@ -300,12 +326,16 @@ async function resolveBoundOrganisationOpenAiModelCredential(input: {
     : apiKey;
 }
 
-function newOrganisationOpenAiModelCredentialHandle(organisationId: OrganisationId): VaultHandle {
+function newOrganisationOpenAiModelCredentialHandle(
+  organisationId: OrganisationId,
+): VaultHandle {
   const parsed = parseVaultHandle(
     `vault:${organisationId.toLowerCase()}:openai:model:${crypto.randomUUID().toLowerCase()}`,
   );
   if (!parsed.ok)
-    throw new Error("generated organisation OpenAI credential handle is invalid");
+    throw new Error(
+      "generated organisation OpenAI credential handle is invalid",
+    );
   return parsed.value;
 }
 
@@ -343,7 +373,9 @@ export async function storeOrganisationAnthropicModelCredential(input: {
       error: { code: "organisation_anthropic_credential_binding_failed" },
     };
   }
-  const handle = newOrganisationAnthropicModelCredentialHandle(input.organisationId);
+  const handle = newOrganisationAnthropicModelCredentialHandle(
+    input.organisationId,
+  );
   const stored = await storeVaultSecret({
     db: input.db,
     keys: input.keys,
@@ -379,13 +411,11 @@ export async function storeOrganisationAnthropicModelCredential(input: {
   ];
   if (previousHandle !== null && previousHandle.ok) {
     statements.push(
-      session
-        .prepare(
-          `UPDATE vault_secret
-       SET revoked_at = ?
-       WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-        )
-        .bind(input.now, input.organisationId, previousHandle.value),
+      prepareVaultSecretRevocation(session, {
+        organisationId: input.organisationId,
+        handle: previousHandle.value,
+        now: input.now,
+      }),
     );
   }
   const results = await session.batch(statements);
@@ -407,7 +437,8 @@ export async function resolveCurrentOrganisationAnthropicModelCredential(input: 
     OrganisationAnthropicModelCredentialError
   >
 > {
-  const handle = await readCurrentOrganisationAnthropicModelCredentialHandle(input);
+  const handle =
+    await readCurrentOrganisationAnthropicModelCredentialHandle(input);
   if (!handle.ok) return handle;
   return resolveBoundOrganisationAnthropicModelCredential({
     ...input,
@@ -469,7 +500,11 @@ async function readCurrentOrganisationAnthropicModelCredentialHandle(input: {
        AND host_pattern = ? AND revoked_at IS NULL
      LIMIT 1`,
     )
-    .bind(input.organisationId, ANTHROPIC_MODEL_CREDENTIAL_NAME, ANTHROPIC_API_HOST)
+    .bind(
+      input.organisationId,
+      ANTHROPIC_MODEL_CREDENTIAL_NAME,
+      ANTHROPIC_API_HOST,
+    )
     .first<CredentialRefRow>();
   if (row === null || typeof row.vaultHandle !== "string") {
     return {
@@ -492,12 +527,18 @@ async function resolveBoundOrganisationAnthropicModelCredential(input: {
   readonly organisationId: OrganisationId;
   readonly handle: VaultHandle;
 }): Promise<
-  Result<OrganisationAnthropicModelCredential, OrganisationAnthropicModelCredentialError>
+  Result<
+    OrganisationAnthropicModelCredential,
+    OrganisationAnthropicModelCredentialError
+  >
 > {
   const secret = await resolveVaultHandle(input);
   if (!secret.ok) return secret;
   if (secret.value.kind !== "bearer") {
-    return { ok: false, error: { code: "organisation_anthropic_credential_invalid" } };
+    return {
+      ok: false,
+      error: { code: "organisation_anthropic_credential_invalid" },
+    };
   }
   const apiKey = parseAnthropicApiKey(secret.value.value);
   return apiKey.ok
@@ -519,6 +560,8 @@ function newOrganisationAnthropicModelCredentialHandle(
     `vault:${organisationId.toLowerCase()}:anthropic:model:${crypto.randomUUID().toLowerCase()}`,
   );
   if (!parsed.ok)
-    throw new Error("generated organisation Anthropic credential handle is invalid");
+    throw new Error(
+      "generated organisation Anthropic credential handle is invalid",
+    );
   return parsed.value;
 }

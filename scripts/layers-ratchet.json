@@ -3,7 +3,7 @@
     "upward": 502,
     "areas": 337,
     "order": 139,
-    "table": 125
+    "table": 122
   },
   "crossings": {
     "areas/brain -> areas/commerce": 5,
@@ -223,11 +223,10 @@
     "table state_object_relocation (foundation/tenancy) <- foundation/actor-runtime": 3,
     "table surface_installation (foundation/tenancy) <- areas/organisation": 1,
     "table surface_installation (foundation/tenancy) <- foundation/connections": 2,
-    "table vault_secret (foundation/authority) <- areas/integrations": 3,
+    "table vault_secret (foundation/authority) <- areas/integrations": 1,
     "table vault_secret (foundation/authority) <- areas/organisation": 1,
     "table vault_secret (foundation/authority) <- foundation/agent": 1,
     "table vault_secret (foundation/authority) <- foundation/tenancy": 1,
-    "table vault_secret (foundation/authority) <- surfaces/slack": 1,
     "table voice_mac (surfaces/voice) <- areas/organisation": 1
   }
 }

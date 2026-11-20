@@ -36,6 +36,7 @@ import type { Result } from "../result";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import type { Variant } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
+import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
 
 type SlackInstallationSeed = {
   readonly installationId: SlackInstallationId;
@@ -472,7 +473,10 @@ export async function createSlackOrganisationConnection(
   env: OrganisationPlacementBindings,
   seed: SlackOrganisationConnectionSeed,
 ): Promise<SlackOrganisationConnectionId> {
-  const resolved = await OrganisationExecutionScope.resolve(env, seed.organisationId);
+  const resolved = await OrganisationExecutionScope.resolve(
+    env,
+    seed.organisationId,
+  );
   if (!resolved.ok) throw new Error(resolved.error.code);
   const scope = resolved.value;
   const account = await scope.database
@@ -503,7 +507,8 @@ export async function createSlackOrganisationConnection(
     )
     .bind(seed.organisationId)
     .all<{ readonly integrationAccountId: string }>();
-  if (!(await scope.isActive())) throw new Error("organisation_placement_conflict");
+  if (!(await scope.isActive()))
+    throw new Error("organisation_placement_conflict");
   const directory = env.DB.withSession("first-primary");
   const statements: D1PreparedStatement[] = [];
   // Keep revoked directory records so existing thread pins cannot reactivate.
@@ -578,7 +583,8 @@ export async function createSlackOrganisationConnection(
   );
   if (connectionId === null)
     throw new Error("slack_organisation_connection_not_created");
-  if (!(await scope.isActive())) throw new Error("organisation_placement_conflict");
+  if (!(await scope.isActive()))
+    throw new Error("organisation_placement_conflict");
   return connectionId;
 }
 
@@ -622,12 +628,29 @@ export async function bindUnboundSetupChannel(
          AND installation.workspace_id = ?
          AND installation.lifecycle = 'active'`,
   )
-    .bind(input.organisationId, input.environment, input.appId, input.workspaceId)
-    .first<{ readonly installationId: unknown; readonly connectionId: unknown }>();
-  const installationId = parseStringId(row?.installationId, parseSlackInstallationId);
-  const connectionId = parseStringId(row?.connectionId, parseSlackOrganisationConnectionId);
+    .bind(
+      input.organisationId,
+      input.environment,
+      input.appId,
+      input.workspaceId,
+    )
+    .first<{
+      readonly installationId: unknown;
+      readonly connectionId: unknown;
+    }>();
+  const installationId = parseStringId(
+    row?.installationId,
+    parseSlackInstallationId,
+  );
+  const connectionId = parseStringId(
+    row?.connectionId,
+    parseSlackOrganisationConnectionId,
+  );
   if (installationId === null || connectionId === null)
-    return { ok: false, error: { code: "slack_destination_connection_inactive" } };
+    return {
+      ok: false,
+      error: { code: "slack_destination_connection_inactive" },
+    };
   const change = {
     kind: "bind_unbound",
     installationId,
@@ -637,8 +660,16 @@ export async function bindUnboundSetupChannel(
     boundByUserId: input.userId,
     changedAt: input.changedAt,
   } as const;
-  if (!(await userMayChangeSlackChannelDefault(env, { userId: input.userId, change })))
-    return { ok: false, error: { code: "slack_channel_default_authority_missing" } };
+  if (
+    !(await userMayChangeSlackChannelDefault(env, {
+      userId: input.userId,
+      change,
+    }))
+  )
+    return {
+      ok: false,
+      error: { code: "slack_channel_default_authority_missing" },
+    };
   const configured = await configureSlackChannelDefault(env.DB, change);
   return configured.ok
     ? { ok: true, value: { change, channelDefault: configured.value } }
@@ -652,7 +683,10 @@ export function prepareSlackRoutingAuditEvent(
     readonly change: SlackChannelDefaultChange;
     readonly revision: number;
     readonly nextConnectionId: SlackChannelDefaultChange["destinationConnectionId"];
-    readonly mutationIdentity: Readonly<{ auditEventId: string; receiptId: string }>;
+    readonly mutationIdentity: Readonly<{
+      auditEventId: string;
+      receiptId: string;
+    }>;
   },
 ): D1PreparedStatement {
   return db
@@ -964,7 +998,10 @@ export async function resolveActiveSlackDestinationConnection(
       error: { code: "slack_destination_connection_inactive" },
     };
   }
-  const scope = await OrganisationExecutionScope.resolve(env, input.organisationId);
+  const scope = await OrganisationExecutionScope.resolve(
+    env,
+    input.organisationId,
+  );
   if (!scope.ok) {
     return {
       ok: false,
@@ -1036,9 +1073,18 @@ export async function userMayChangeSlackChannelDefault(
   const requiredOrganisationIds =
     input.change.kind === "bind_unbound"
       ? [input.change.destinationOrganisationId]
-      : [input.change.sourceOrganisationId, input.change.destinationOrganisationId];
+      : [
+          input.change.sourceOrganisationId,
+          input.change.destinationOrganisationId,
+        ];
   for (const organisationId of new Set(requiredOrganisationIds)) {
-    if (!(await userMayAdministerSlackOrganisation(env, input.userId, organisationId)))
+    if (
+      !(await userMayAdministerSlackOrganisation(
+        env,
+        input.userId,
+        organisationId,
+      ))
+    )
       return false;
   }
   return true;
@@ -1063,7 +1109,11 @@ export async function userMayDisconnectSlackInstallation(
     const organisationId = parseOrganisationId(row.organisationId);
     if (
       !organisationId.ok ||
-      !(await userMayAdministerSlackOrganisation(env, input.userId, organisationId.value))
+      !(await userMayAdministerSlackOrganisation(
+        env,
+        input.userId,
+        organisationId.value,
+      ))
     )
       return false;
   }
@@ -1141,7 +1191,10 @@ export async function disconnectSlackInstallation(input: {
     readonly accountId: IntegrationAccountId;
   }[] = [];
   for (const row of rows.results) {
-    const organisationId = parseStringId(row.organisationId, parseOrganisationId);
+    const organisationId = parseStringId(
+      row.organisationId,
+      parseOrganisationId,
+    );
     const accountId = parseStringId(row.accountId, parseIntegrationAccountId);
     if (organisationId === null || accountId === null) {
       return {
@@ -1149,7 +1202,10 @@ export async function disconnectSlackInstallation(input: {
         error: { code: "slack_installation_disconnect_conflict" },
       };
     }
-    const scope = await OrganisationExecutionScope.resolve(input.env, organisationId);
+    const scope = await OrganisationExecutionScope.resolve(
+      input.env,
+      organisationId,
+    );
     if (!scope.ok) {
       return {
         ok: false,
@@ -1218,13 +1274,11 @@ export async function disconnectSlackInstallation(input: {
       error: { code: "slack_installation_disconnect_conflict" },
     };
   }
-  await credentialScope.value.database
-    .prepare(
-      `UPDATE vault_secret SET revoked_at = ?
-     WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-    )
-    .bind(input.disconnectedAt, credentialOrganisationId, tokenRef.value)
-    .run();
+  await prepareVaultSecretRevocation(credentialScope.value.database, {
+    organisationId: credentialOrganisationId,
+    handle: tokenRef.value,
+    now: input.disconnectedAt,
+  }).run();
   await directory.batch([
     directory
       .prepare(
@@ -1581,10 +1635,7 @@ function parseSlackChannelDefaultRow(
   );
   const organisationId = parseStringId(row.organisationId, parseOrganisationId);
   const channelId = parseStringId(row.channelId, parseChannelId);
-  const boundByUserId = parseStringId(
-    row.boundByUserId,
-    parseUserId,
-  );
+  const boundByUserId = parseStringId(row.boundByUserId, parseUserId);
   if (
     installationId === null ||
     connectionId === null ||

@@ -34,6 +34,7 @@ import type {
 } from "../provider-adapters/domain";
 import type { Variant } from "@purin-labs/type-utils";
 import { backoffDelay, isString } from "@purin-labs/std";
+import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
 
 type ProviderCleanupEnvironment = ProviderCleanupBindings &
   CredentialVaultBindings &
@@ -440,12 +441,11 @@ function providerCredentialRevocationStatements(
          WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
         )
         .bind(now, cleanup.organisationId, handle),
-      session
-        .prepare(
-          `UPDATE vault_secret SET revoked_at = ?
-         WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-        )
-        .bind(now, cleanup.organisationId, handle),
+      prepareVaultSecretRevocation(session, {
+        organisationId: cleanup.organisationId,
+        handle: handle,
+        now: now,
+      }),
     );
   }
   return statements;

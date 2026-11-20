@@ -19,6 +19,7 @@ import {
   resolveVaultHandle,
   storeOrganisationPlacementVaultSecret,
 } from "./service";
+import { prepareVaultSecretRevocation } from "./secret-revocation";
 
 /**
  * Vault items (Plan 79). The visible record lives in `vault_item`; a login's
@@ -494,12 +495,11 @@ async function revokeHandles(
   await db
     .batch(
       handles.map((handle) =>
-        db
-          .prepare(
-            `UPDATE vault_secret SET revoked_at = ?
-             WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-          )
-          .bind(input.now, input.scope.organisationId, handle),
+        prepareVaultSecretRevocation(db, {
+          organisationId: input.scope.organisationId,
+          handle: handle,
+          now: input.now,
+        }),
       ),
     )
     .catch(() => undefined);

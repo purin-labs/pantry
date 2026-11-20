@@ -37,6 +37,7 @@ import {
   resolveVaultHandle,
   storeOrganisationPlacementVaultSecret,
 } from "./service";
+import { prepareVaultSecretRevocation } from "./secret-revocation";
 
 /**
  * The Vault's stores (Plan 79). An Organisation keeps its items in Pantry
@@ -677,12 +678,11 @@ function revokeStatement(
   input: Readonly<{ scope: OrganisationExecutionScope; now: number }>,
   handle: VaultHandle,
 ): D1PreparedStatement {
-  return input.scope.database
-    .prepare(
-      `UPDATE vault_secret SET revoked_at = ?
-       WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-    )
-    .bind(input.now, input.scope.organisationId, handle);
+  return prepareVaultSecretRevocation(input.scope.database, {
+    organisationId: input.scope.organisationId,
+    handle: handle,
+    now: input.now,
+  });
 }
 
 function unavailable(): Result<never, VaultItemStoreError> {
