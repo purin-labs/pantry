@@ -1,7 +1,7 @@
 {
   "totals": {
     "upward": 68,
-    "areas": 36,
+    "areas": 31,
     "order": 20,
     "table": 23
   },
@@ -19,7 +19,6 @@
     "areas/inbox -> areas/commerce": 3,
     "areas/inbox -> surfaces/whatsapp": 1,
     "areas/integrations -> areas/commerce": 1,
-    "areas/integrations -> areas/inbox": 5,
     "areas/integrations -> areas/organisation": 1,
     "areas/integrations -> areas/shopify": 4,
     "areas/integrations -> surfaces/slack": 4,
