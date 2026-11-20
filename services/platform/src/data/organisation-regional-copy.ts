@@ -9,7 +9,7 @@ import { prepareRetiredCellOrganisationRow } from "./shared-rows/organisation-ro
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import type { Result } from "../result";
 import { encodeBase64, isRecord } from "@purin-labs/std";
-import type { ActorRelocationId } from "../actors/actor-relocation";
+import type { ActorRelocationId } from "./organisation-placement";
 import type { OrganisationId } from "../ids";
 import type {
   ActorExportEnvelopeV1,

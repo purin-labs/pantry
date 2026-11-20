@@ -74,6 +74,7 @@ import {
   type ReservedOrganisationPlacementMove,
   type OrganisationPlacementError,
   type OrganisationPlacementMoveTarget,
+  type ActorRelocationId,
 } from "../data/organisation-placement";
 import {
   freezeOrganisationPlacementMove,
@@ -115,11 +116,7 @@ import {
 
 export const ACTOR_RELOCATION_RETENTION_MS = 7 * 24 * 60 * 60 * 1_000;
 
-declare const actorRelocationIdBrand: unique symbol;
-
-export type ActorRelocationId = string & {
-  readonly [actorRelocationIdBrand]: "ActorRelocationId";
-};
+export type { ActorRelocationId };
 
 export type RelocationPreflightInventory = {
   readonly checkedAt: number;

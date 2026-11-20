@@ -1,8 +1,8 @@
 {
   "totals": {
-    "upward": 128,
+    "upward": 127,
     "areas": 56,
-    "order": 48,
+    "order": 35,
     "table": 25
   },
   "crossings": {
@@ -78,15 +78,10 @@
     "foundation/conversation -> areas/kitchen": 4,
     "foundation/conversation -> surfaces/portal": 2,
     "foundation/conversation -> surfaces/slack": 4,
-    "foundation/kernel -> foundation/contracts": 2,
-    "foundation/kernel -> foundation/tenancy": 1,
-    "foundation/tenancy -> foundation/actor-runtime": 7,
-    "foundation/tenancy -> foundation/agent": 1,
-    "foundation/tenancy -> foundation/authority": 4,
+    "foundation/kernel -> foundation/contracts": 1,
+    "foundation/tenancy -> foundation/authority": 3,
     "foundation/tenancy -> foundation/connections": 1,
-    "foundation/tenancy -> foundation/control": 2,
     "foundation/tenancy -> foundation/conversation": 4,
-    "foundation/tenancy -> surfaces/slack": 1,
     "foundation/tool-handlers -> surfaces/slack": 3,
     "package packages/bakery-model -> @purin-labs/commerce-client": 1,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1,

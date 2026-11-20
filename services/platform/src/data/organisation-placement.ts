@@ -1,5 +1,17 @@
-import type { ActorRelocationId } from "../actors/actor-relocation";
-import type { ActorRestoreId } from "../actors/actor-restore";
+declare const actorRelocationIdBrand: unique symbol;
+declare const actorRestoreIdBrand: unique symbol;
+
+/**
+ * The ids of the two moves of an Organisation's Actors. A placement row
+ * names the move that holds it, so the ids are types of the placement. The
+ * Actor runtime makes and parses them.
+ */
+export type ActorRelocationId = string & {
+  readonly [actorRelocationIdBrand]: "ActorRelocationId";
+};
+export type ActorRestoreId = string & {
+  readonly [actorRestoreIdBrand]: "ActorRestoreId";
+};
 import type { OrganisationId } from "../ids";
 import {
   parseOrganisationPlacement,
@@ -545,4 +557,32 @@ export function samePlacement(
     (right.kind === "residency" &&
       left.residencyJurisdiction === right.residencyJurisdiction)
   );
+}
+
+/** The placement that a policy command of the Organisation runs at. */
+export type OrganisationPolicyPlacement = Readonly<{
+  placement: OrganisationPlacement;
+  fenceToken: OrganisationPlacementFenceToken;
+}>;
+
+/** Whether the policy placement is still the active one, read from the primary. */
+export async function isOrganisationPolicyPlacementActive(
+  db: D1Database,
+  organisationId: OrganisationId,
+  expected: OrganisationPolicyPlacement,
+): Promise<boolean> {
+  const row = await db
+    .withSession("first-primary")
+    .prepare(
+      `SELECT 1 FROM organisation_placement WHERE organisation_id = ?
+     AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active'`,
+    )
+    .bind(
+      organisationId,
+      expected.placement.placementEpoch,
+      expected.placement.placementCellId,
+      expected.fenceToken,
+    )
+    .first();
+  return row !== null;
 }
