@@ -1,6 +1,6 @@
 # Plan 86 — Satyr Kitchen Costs and Margins
 
-Status: **Phases 1–8 implemented and released** (2026-11-14): spreadsheet, multiplayer, two-way solvers and `fx` formulas, lot costs from purchase invoices, the inline BOM cost chain, plan vs. actuals, and the 12-week forecast.
+Status: **Phases 1–8 and UI simplification complete and released** (2026-11-14; UI simplification and unified `CostsBomDrawer` 2026-11-19): spreadsheet, multiplayer, two-way solvers and `fx` formulas, lot costs from purchase invoices, the unified BOM cost drawer, plan vs. actuals, and the 12-week forecast. Only workflow labor and energy costs remain deferred (see Future features).
 
 Release (2026-11-14): Phases 1–8 are in production. Phase 6 shipped in satyr-edge
 `70693f99` (release commit `58aad4ef8`, ref `refs/backup/released-2026-11-14-plan-86-phase-6`).
@@ -9,6 +9,12 @@ Phases 7 and 8 shipped in satyr-edge `7e8454a3` (release commit `f40e5cc5f`, ref
 `bakery_cost_plan.forecast_json` from `plan-86-costs-plan-d1-patch.sql` was added to the
 production regional database, and the production schema check then passed. No signed-in
 check of the Costs & margins page ran against the new version.
+
+Release (2026-11-19): The UI simplification and unified `CostsBomDrawer` (`a72798d`)
+shipped in production `satyr-edge` `f518b9a6` (deployed from `origin/dev` `b85200a`,
+together with the Plan 91 `PANTRY_*` environment variable rename). Production D1 matched
+the schema before upload, and `/healthz` and `/portal` returned HTTP 200 after the deploy.
+No signed-in check of the Costs & margins page ran yet.
 
 ## Goal
 
