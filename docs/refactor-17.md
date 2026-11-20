@@ -400,9 +400,9 @@ the reason: callers use 245 methods of the four Actors at 440 places, in about 1
 files. An interface for each module is a larger piece of work, and it needs the
 environment parts to have an effect. It is now a part of step A1.2.
 
-**20 November 2026. Steps A2.2 and A2.3 are done in the Portal,** on the branch
-`refactor-17-a2-2-portal-hooks`. They are not on `dev` yet. The surface registry
-of step A2.3 is open: it changes the Platform too.
+**20 November 2026. Steps A2.2 and A2.3 are done in the Portal,** and the commits
+are on `dev` since that day. The surface registry of step A2.3 is open: it changes
+the Platform too.
 
 | Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
