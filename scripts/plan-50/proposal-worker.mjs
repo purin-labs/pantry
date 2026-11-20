@@ -16,13 +16,12 @@ import {
 } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { authorizeCapabilityUse } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
 import {
-  admitTrialWorkflow,
   attachTrialOrganisation,
   compileTrialTurnAuthority,
   ownerUser,
   trialAccountAccess,
 } from "./account-authority.mjs";
-import { acceptedExecutionAccountAuthority } from "../../services/platform/src/account-platform/access.ts";
+import { acceptedExecutionAuthority } from "../../services/platform/src/organisation-access/access.ts";
 import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue.ts";
 import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
@@ -152,17 +151,13 @@ export class ProposalOrganisation extends OrganisationDO {
 
   // The account Worker admits the trial's workflow turns.
   async attachTrialAccount() {
-    const owner = await attachTrialOrganisation(this.env, {
+    await attachTrialOrganisation(this.env, {
       organisationId,
       ownerUserId: ownerUser,
       members: {
         operator: userId,
         privateMember: "user_22222222-2222-5222-8222-222222222222",
       },
-    });
-    await admitTrialWorkflow(this.env, organisationId, owner, {
-      nativeId: authority.workflowId,
-      revision: authority.workflowRevision,
     });
   }
 
@@ -414,7 +409,7 @@ export class CandidateActor extends RecoveryActor {
     return authorizeCapabilityUse({
       db: this.env.DB,
       accountAccess: await trialAccountAccess(this.env, organisationId),
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         lease.session.sessionId,
         lease.turn.turnId,
       ),

@@ -1,13 +1,9 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
-import {
-  acceptedExecutionAccountAuthority,
-} from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import { registerEmailSelfTest } from "../../data/email-self-test";
-import {
-  resolveEmailOperationalCapability,
-} from "../../actors/email-operational-capability";
+import { resolveEmailOperationalCapability } from "../../actors/email-operational-capability";
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env, ConnectorActorStub } from "../../env";
@@ -30,9 +26,7 @@ import {
   requireSessionExecution,
   admittedSessionOperation,
 } from "../../actors/session-execution-admission";
-import {
-  preflightHarnessTurnLease,
-} from "../../actors/agent-session-harness-authority";
+import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import { EmailReplyDraftRequestError } from "./services";
 import { readChatReplyProvenance } from "../../actors/email-chat-reply-sources";
@@ -55,16 +49,12 @@ import type {
   HarnessWhatsAppSupportReplyReceipt,
   HarnessWhatsAppSupportReplySend,
 } from "./services";
-import {
-  authorizeCapabilityUse,
-} from "../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
 import {
   parseCapabilityKey,
   type CapabilityDefinition,
 } from "../../authorization/access-grants/capability-key";
-import {
-  admitSessionInformationFlowObservation,
-} from "../../actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -212,7 +202,7 @@ async function authorizeEmailMailboxRead(
   const authorized = await authorizeCapabilityUse({
     db: input.execution.scope.database,
     accountAccess: input.execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.lease.session.sessionId,
       input.lease.turn.turnId,
     ),
@@ -445,7 +435,7 @@ export async function editEmailReplyDraftForEmbeddedHarness(
   const authorized = await authorizeCapabilityUse({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),
@@ -496,7 +486,9 @@ export async function editEmailReplyDraftForEmbeddedHarness(
         now: Date.now(),
       });
       if (!recorded.ok) {
-        throw new Error(`Email reply draft edit refused: ${recorded.error.code}`);
+        throw new Error(
+          `Email reply draft edit refused: ${recorded.error.code}`,
+        );
       }
       const organisation = await requireActiveOrganisationActorAtPlacement({
         env,
@@ -737,7 +729,7 @@ export async function proposeEmailReplyForEmbeddedHarness(
   const authorized = await authorizeCapabilityUse({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),
@@ -820,7 +812,9 @@ export async function proposeEmailReplyForEmbeddedHarness(
         now,
       });
       if (!caseActor.ok) {
-        throw new Error(`Email reply Case is unavailable: ${caseActor.error.code}`);
+        throw new Error(
+          `Email reply Case is unavailable: ${caseActor.error.code}`,
+        );
       }
       await requireSessionExecution(execution, lease);
       const accepted = await caseActor.value.acceptEmailProposal(
@@ -885,7 +879,7 @@ export async function proposeEmailOperationalForEmbeddedHarness(
   const authorized = await authorizeCapabilityUse({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),
@@ -946,7 +940,9 @@ export async function proposeEmailOperationalForEmbeddedHarness(
           request: request.target,
         });
         if (!registered.ok) {
-          throw new Error(`Self-test recipient rejected: ${registered.error.code}`);
+          throw new Error(
+            `Self-test recipient rejected: ${registered.error.code}`,
+          );
         }
         target = registered.value;
       } else {
@@ -984,7 +980,9 @@ export async function proposeEmailOperationalForEmbeddedHarness(
             )
             .run();
         }
-        throw new Error(`Operational email proposal failed: ${created.error.code}`);
+        throw new Error(
+          `Operational email proposal failed: ${created.error.code}`,
+        );
       }
       await requireSessionExecution(execution, lease);
       const caseActor = await resolveActiveCaseActorAtPlacement({
@@ -1400,7 +1398,7 @@ export async function readWhatsAppSupportForEmbeddedHarness(
     const authorized = await authorizeCapabilityUse({
       db: execution.scope.database,
       accountAccess: execution.scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         lease.session.sessionId,
         lease.turn.turnId,
       ),

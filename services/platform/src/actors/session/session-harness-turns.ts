@@ -2,9 +2,9 @@ import { readAcceptedCheckpointFinalization } from "../agent-session-finalizatio
 import { executeCostsViewForHarness } from "../../agent-tools/costs/view-handler";
 import { collaborationAgentLabel } from "../collaboration-agent";
 import {
-  acceptedExecutionAccountAuthority,
-  accountAccessOfOneRead,
-} from "../../account-platform/access";
+  acceptedExecutionAuthority,
+  organisationAccessOfOneRead,
+} from "../../organisation-access/access";
 import {
   admitPantryExecutionBilling,
   markPantryExecutionDispatched,
@@ -464,7 +464,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         execution.scope.database,
         input.requestingOrganisationId,
         input.lease,
-        accountAccessOfOneRead(execution.scope.accountAccess),
+        organisationAccessOfOneRead(execution.scope.accountAccess),
       ))
     )
       return { ok: false, error: { code: "invalid_persisted_state" } };
@@ -568,7 +568,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
         ? await authorizeCapabilityUse({
             db: execution.scope.database,
             accountAccess: execution.scope.accountAccess,
-            userAuthority: acceptedExecutionAccountAuthority(
+            userAuthority: acceptedExecutionAuthority(
               input.lease.session.sessionId,
               input.lease.turn.turnId,
             ),
@@ -773,7 +773,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
             scope: input.execution.scope,
             organisationId: input.requestingOrganisationId,
             authority: input.lease.requestAuthority,
-            userAuthority: acceptedExecutionAccountAuthority(
+            userAuthority: acceptedExecutionAuthority(
               input.lease.session.sessionId,
               input.lease.turn.turnId,
             ),
@@ -2126,7 +2126,7 @@ export abstract class SessionHarnessTurns extends SessionCheckpoints {
       scope: execution.scope,
       organisationId: input.requestingOrganisationId,
       authority: input.start.requestAuthority,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         assignment.sessionId,
         input.start.turnId,
       ),

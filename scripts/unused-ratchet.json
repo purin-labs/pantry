@@ -352,7 +352,6 @@
     "services/platform/src/access-control/view.ts#AccessControlIntegrationView",
     "services/platform/src/access-control/view.ts#AccessControlSourcePolicyView",
     "services/platform/src/access-control/view.ts#AccessControlViewActions",
-    "services/platform/src/account-platform/access.ts#CurrentAccountEligibility",
     "services/platform/src/account-platform/provisioning-boundary.ts#PantryProvisionBinding",
     "services/platform/src/account-platform/provisioning-boundary.ts#PantryProvisionCommand",
     "services/platform/src/account-platform/provisioning-boundary.ts#PantryProvisionDelivery",

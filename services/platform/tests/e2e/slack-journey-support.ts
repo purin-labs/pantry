@@ -394,8 +394,7 @@ export async function attachSlackActorToAccountAuthority(
 
 /**
  * The owner that `installSlackActorFixture` gives the account authority, with
- * a fresh control session. A journey uses it for an owner's account changes,
- * such as the account grant of a mailbox agent.
+ * a fresh control session. A journey uses it for an owner's account changes.
  */
 export function slackActorFixtureOwner(now: number = Date.now()) {
   return googleClient("e2e-slack-owner", "E2E Slack Owner", now);
@@ -425,6 +424,8 @@ async function googleClient(subject: string, displayName: string, now: number) {
 export async function installDiscoveryActorFixture(): Promise<{
   readonly selectedIntegrationAccountId: string;
   readonly otherIntegrationAccountId: string;
+  /** The Organisation owner's Portal session. */
+  readonly ownerSession: IssuedControlSession;
 }> {
   const base = await installSlackActorFixture();
   const now = Date.now();
@@ -760,6 +761,7 @@ export async function installDiscoveryActorFixture(): Promise<{
   return {
     selectedIntegrationAccountId: base.selectedIntegrationAccountId,
     otherIntegrationAccountId: otherInstall.integrationAccountId,
+    ownerSession: base.ownerSession,
   };
 }
 

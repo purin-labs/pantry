@@ -1,4 +1,4 @@
-import { authenticatedAccountConversationScope } from "../../account-platform/access";
+import { authenticatedConversationScope } from "../../organisation-access/access";
 import type { Env } from "../../env";
 import {
   commandEvalAsOperator,
@@ -77,7 +77,7 @@ export async function handleEvalRoute(
         if (!authorized.ok) return authorized.response;
         const evals = await readEvalViews(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),
@@ -102,7 +102,7 @@ export async function handleEvalRoute(
         if (body === null) return controlError("eval_invalid", 400);
         const receipt = await commandEvalAsOperator(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),
@@ -125,7 +125,7 @@ export async function handleEvalRoute(
         if (!authorized.ok) return authorized.response;
         const runs = await readEvalRunViews(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),
@@ -150,7 +150,7 @@ export async function handleEvalRoute(
         if (!authorized.ok) return authorized.response;
         const contacts = await readEvalSenderChoices(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),
@@ -175,7 +175,7 @@ export async function handleEvalRoute(
         if (body === null) return controlError("eval_invalid", 400);
         const receipt = await commandEvalRunAsOperator(
           env,
-          authenticatedAccountConversationScope(
+          authenticatedConversationScope(
             authorized.organisationId,
             authorized.authenticated.session,
           ),

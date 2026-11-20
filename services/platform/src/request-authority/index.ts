@@ -1,9 +1,9 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type {
-  AccountPlatformAccess,
-  AccountAdmissionAction,
-  AccountUserAuthority,
-} from "../account-platform/access";
+  OrganisationAccess,
+  OrganisationAdmissionAction,
+  OrganisationUserAuthority,
+} from "../organisation-access/access";
 import type {
   ConnectorId,
   PrincipalId,
@@ -606,9 +606,9 @@ export async function validateLiveRequestAuthority(
   input: Readonly<{
     readonly db: OrganisationDatabase;
     readonly authority: RequestAuthority;
-    readonly accountAccess: AccountPlatformAccess;
-    readonly userAuthority: AccountUserAuthority;
-    readonly action: AccountAdmissionAction;
+    readonly accountAccess: OrganisationAccess;
+    readonly userAuthority: OrganisationUserAuthority;
+    readonly action: OrganisationAdmissionAction;
   }>,
 ): Promise<Result<null, LiveRequestAuthorityValidationError>> {
   // Both checks only read, so they run at once. The account answer decides
@@ -644,8 +644,8 @@ export async function validateLiveAutomationAuthority(
       RequestAuthority,
       "workflow" | "agent_mailbox" | "whatsapp_support"
     >;
-    accountAccess: AccountPlatformAccess;
-    action: AccountAdmissionAction;
+    accountAccess: OrganisationAccess;
+    action: OrganisationAdmissionAction;
   }>,
 ): Promise<Result<null, LiveRequestAuthorityValidationError>> {
   // Both checks only read, so they run at once. The account answer decides

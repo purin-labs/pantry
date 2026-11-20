@@ -30,10 +30,8 @@ import {
   WORKSPACE_ID,
   installSlackActorFixture,
   openRouterText,
-  slackActorFixtureOwner,
   slackSimulator,
 } from "./slack-journey-support";
-import { grantSharedAccountAutomation } from "./shared-account-platform-fixture";
 
 const NAMESPACE = "lab_pi_sdk_release";
 const OWNER = requireUserId("user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab");
@@ -104,11 +102,6 @@ async function acceptsCommerceLab(context: TestContext): Promise<void> {
       now: Date.now(),
     });
     if (!grant.ok) throw new Error(grant.error.code);
-    await grantSharedAccountAutomation(
-      ORGANISATION_ID,
-      await slackActorFixtureOwner(),
-      { kind: "workflow", nativeId: subscriptionId, revision: 1 },
-    );
   }
   await compileAndStoreCueSnapshot({
     db: fixtureDatabase(),

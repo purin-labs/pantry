@@ -59,12 +59,15 @@ export async function authorizeWorkflowCanvasRequest(
         ok: false as const,
         response: controlError("method_not_allowed", 405),
       };
+    // A POST opens the reader's view of the canvas chat and starts no turn,
+    // so a viewer may send it.
     return authorizeOrganisationRequest(
       request,
       env,
       route.organisationId,
       "viewer",
       request.method === "POST",
+      "disclose",
     );
   }
   if (

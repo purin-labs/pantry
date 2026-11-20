@@ -1,9 +1,9 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type {
-  AccountPlatformAccess,
-  AccountAdmissionAction,
-  AccountUserAuthority,
-} from "../../account-platform/access";
+  OrganisationAccess,
+  OrganisationAdmissionAction,
+  OrganisationUserAuthority,
+} from "../../organisation-access/access";
 import type {
   AuthorityPartition,
   AuthorityPartitionKey,
@@ -54,9 +54,9 @@ export const CONTEXT_CASE_READ_SCOPE = encodeCapabilityKey({
 });
 
 export type CompiledTurnAuthority = Readonly<{
-  readonly accountAccess: AccountPlatformAccess;
-  readonly userAuthority: AccountUserAuthority;
-  readonly action: AccountAdmissionAction;
+  readonly accountAccess: OrganisationAccess;
+  readonly userAuthority: OrganisationUserAuthority;
+  readonly action: OrganisationAdmissionAction;
   readonly requestAuthority: RequestAuthority;
   readonly authorityPartition: AuthorityPartition;
   readonly effectiveGrantSet: Readonly<{
@@ -123,9 +123,9 @@ type AuthorityPartitionWithoutDigest = Omit<AuthorityPartition, "digest">;
 export async function compileTurnAuthority(
   input: Readonly<{
     readonly db: OrganisationDatabase;
-    readonly accountAccess: AccountPlatformAccess;
-    readonly userAuthority: AccountUserAuthority;
-    readonly action: AccountAdmissionAction;
+    readonly accountAccess: OrganisationAccess;
+    readonly userAuthority: OrganisationUserAuthority;
+    readonly action: OrganisationAdmissionAction;
     readonly organisationId: OrganisationId;
     readonly requestAuthority: RequestAuthority;
     /**
@@ -315,9 +315,9 @@ export type CurrentEffectiveGrantAuthority = Readonly<{
 export async function resolveEffectiveGrantSetForAuthorityPartition(
   input: Readonly<{
     readonly db: OrganisationDatabase;
-    readonly accountAccess: AccountPlatformAccess;
-    readonly userAuthority: AccountUserAuthority;
-    readonly action: AccountAdmissionAction;
+    readonly accountAccess: OrganisationAccess;
+    readonly userAuthority: OrganisationUserAuthority;
+    readonly action: OrganisationAdmissionAction;
     readonly organisationId: OrganisationId;
     readonly authority: RequestAuthority;
     readonly authorityPartition: AuthorityPartition;
@@ -496,9 +496,9 @@ function ignoreUnusedRecords(): void {}
 export async function authorizeCapabilityUse(
   input: Readonly<{
     readonly db: OrganisationDatabase;
-    readonly accountAccess: AccountPlatformAccess;
-    readonly userAuthority: AccountUserAuthority;
-    readonly action: AccountAdmissionAction;
+    readonly accountAccess: OrganisationAccess;
+    readonly userAuthority: OrganisationUserAuthority;
+    readonly action: OrganisationAdmissionAction;
     readonly organisationId: OrganisationId;
     readonly authority: RequestAuthority;
     readonly authorityPartition: AuthorityPartition;

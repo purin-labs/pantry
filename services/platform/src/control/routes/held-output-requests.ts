@@ -4,7 +4,7 @@ import {
   type HeldOutputView,
 } from "@purin-labs/control-api";
 
-import { authenticatedAccountConversationScope } from "../../account-platform/access";
+import { authenticatedConversationScope } from "../../organisation-access/access";
 import { resolveActiveCaseActorAtPlacement } from "../../actors/actor-router";
 import { capabilityDefinitionById } from "../../authorization/capability-catalogue";
 import { readChatControlAuthority } from "../../chat/information-flow";
@@ -181,7 +181,7 @@ async function memberViewer(
   env: Env,
   authorized: AuthorizedOrganisationRequest,
 ): Promise<MemberViewer | null> {
-  const scope = authenticatedAccountConversationScope(
+  const scope = authenticatedConversationScope(
     authorized.organisationId,
     authorized.authenticated.session,
   );

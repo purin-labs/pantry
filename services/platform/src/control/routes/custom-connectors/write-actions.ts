@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../../organisation-access/access";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { decideCurrentAuthorityFlowSink } from "../../../chat/information-flow";
@@ -338,7 +338,7 @@ async function executeCustomConnectorWriteAction(
   const authorized = await authorizeCapabilityUse({
     db: context.executionScope.database,
     accountAccess: context.executionScope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       existing.value.action.sessionId,
       existing.value.action.nonce.value,
     ),
@@ -422,7 +422,7 @@ async function executeCustomConnectorWriteAction(
       {
         db: context.executionScope.database,
         accountAccess: context.executionScope.accountAccess,
-        userAuthority: acceptedExecutionAccountAuthority(
+        userAuthority: acceptedExecutionAuthority(
           existing.value.action.sessionId,
           existing.value.action.nonce.value,
         ),

@@ -9,10 +9,6 @@ import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { prepareBaseProjectMembership } from "../projects/default-project";
 import {
-  acknowledgeAccountAccessRevision,
-  prepareAccountAccessRevisionAcknowledgement,
-} from "./access-revision";
-import {
   createAccountPlatformClient,
   type AccountMembershipActor,
   type AccountPlatformClient,
@@ -60,7 +56,7 @@ export async function resolveAccountMembershipContext(
   };
 }
 
-/** Only an actual shared token acceptance and a fresh eligibility result can create this receipt. */
+/** Only an actual shared token acceptance can create this receipt. */
 export class AccountServiceGrantAcceptance {
   readonly #acceptedSharedInvitation = true;
 
@@ -69,8 +65,6 @@ export class AccountServiceGrantAcceptance {
     readonly nativeUserId: UserId,
     readonly invitationId: string,
     readonly membership: Variant<AccountMembership, "active">,
-    readonly authorityRevision: number,
-    readonly accessRevision: number,
     readonly receiptId: string,
   ) {
     Object.freeze(this.membership);
@@ -95,13 +89,6 @@ export class AccountServiceGrantAcceptance {
       accepted.value.userId !== context.actor.user.platformUserId
     )
       return { ok: false, error: { code: "scope_forbidden" } };
-    const current = await context.client.checkUser({
-      binding: context.actor.binding,
-      user: context.actor.user,
-      authority: context.actor.authority,
-      action: "execute",
-    });
-    if (!current.ok) return current;
     return {
       ok: true,
       value: new AccountServiceGrantAcceptance(
@@ -109,8 +96,6 @@ export class AccountServiceGrantAcceptance {
         context.nativeUserId,
         invitationId,
         accepted.value,
-        current.value.authorityRevision,
-        current.value.accessRevision,
         invitationId,
       ),
     };
@@ -121,97 +106,6 @@ export class AccountServiceGrantAcceptance {
       typeof value === "object" &&
       value !== null &&
       #acceptedSharedInvitation in value
-    );
-  }
-}
-
-export class AccountServiceGrantRevocation {
-  readonly #revokedSharedMembership = true;
-
-  private constructor(
-    readonly organisationId: OrganisationId,
-    readonly nativeUserId: UserId,
-    readonly membershipId: string,
-  ) {
-    Object.freeze(this);
-  }
-
-  static async revoke(
-    context: AccountMembershipContext,
-    execution: OrganisationExecutionScope,
-    nativeUserId: UserId,
-    expectedConfigurationVersion: number,
-  ): Promise<
-    Result<
-      AccountServiceGrantRevocation,
-      | AccountPlatformError
-      | {
-          readonly code:
-            | "organisation_final_owner_required"
-            | "configuration_version_conflict"
-            | "organisation_membership_not_found";
-        }
-    >
-  > {
-    const row = await execution.database
-      .prepare(
-        `SELECT g.platform_membership_id AS membershipId, g.role,
-        o.configuration_version AS configurationVersion,
-        (SELECT COUNT(*) FROM service_role_grant own WHERE own.organisation_id = g.organisation_id
-          AND own.role = 'owner' AND own.status = 'active') AS ownerCount
-       FROM service_role_grant g JOIN organisation_onboarding o ON o.organisation_id = g.organisation_id
-       WHERE g.organisation_id = ? AND g.user_id = ? AND g.status = 'active'`,
-      )
-      .bind(execution.organisationId, nativeUserId)
-      .first<{
-        membershipId: unknown;
-        role: unknown;
-        configurationVersion: unknown;
-        ownerCount: unknown;
-      }>();
-    if (row === null || typeof row.membershipId !== "string")
-      return {
-        ok: false,
-        error: { code: "organisation_membership_not_found" },
-      };
-    if (row.configurationVersion !== expectedConfigurationVersion)
-      return { ok: false, error: { code: "configuration_version_conflict" } };
-    if (row.role === "owner" && row.ownerCount === 1)
-      return {
-        ok: false,
-        error: { code: "organisation_final_owner_required" },
-      };
-    if (context.actor.binding.nativeOrganisationId !== execution.organisationId)
-      return { ok: false, error: { code: "scope_forbidden" } };
-    const revoked = await context.client.revokeMembership({
-      binding: context.actor.binding,
-      user: context.actor.user,
-      authority: context.actor.authority,
-      membershipId: row.membershipId,
-    });
-    if (!revoked.ok) return revoked;
-    if (
-      revoked.value.membership.id !== row.membershipId ||
-      revoked.value.membership.orgId !==
-        context.actor.binding.scope.organizationId ||
-      revoked.value.membership.kind !== "removed"
-    )
-      return { ok: false, error: { code: "scope_forbidden" } };
-    return {
-      ok: true,
-      value: new AccountServiceGrantRevocation(
-        execution.organisationId,
-        nativeUserId,
-        row.membershipId,
-      ),
-    };
-  }
-
-  static is(value: unknown): value is AccountServiceGrantRevocation {
-    return (
-      typeof value === "object" &&
-      value !== null &&
-      #revokedSharedMembership in value
     );
   }
 }
@@ -246,17 +140,6 @@ export async function applyAccountServiceGrantAcceptance(
       invitation?.acceptedUserId !== receipt.nativeUserId)
   )
     return { ok: false, error: { code: "scope_forbidden" } };
-  const revision = {
-    database: execution.database,
-    organisationId: execution.organisationId,
-    userId: receipt.nativeUserId,
-    accessRevision: receipt.accessRevision,
-    fence: {
-      placementEpoch: execution.placement.placementEpoch,
-      placementCellId: execution.placement.placementCellId,
-      fenceToken: execution.fenceToken,
-    },
-  };
   if (invitation.acceptedUserId !== null) {
     const existing = await execution.database
       .prepare(
@@ -267,8 +150,6 @@ export async function applyAccountServiceGrantAcceptance(
       .first<{ membershipId: unknown }>();
     if (existing?.membershipId !== receipt.membership.id)
       return { ok: false, error: { code: "membership_ineligible" } };
-    const acknowledged = await acknowledgeAccountAccessRevision(revision);
-    if (!acknowledged.ok) return acknowledged;
     const granted = await readActiveOrganisationMembership(
       execution.database,
       execution.organisationId,
@@ -303,8 +184,8 @@ export async function applyAccountServiceGrantAcceptance(
     execution.database
       .prepare(
         `INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at,
-        revoked_at, platform_membership_id, account_access_revision, account_acceptance_receipt_id)
-       SELECT ?, ?, ?, ?, 'active', ?, NULL, ?, ?, ?
+        revoked_at, platform_membership_id, account_acceptance_receipt_id)
+       SELECT ?, ?, ?, ?, 'active', ?, NULL, ?, ?
        WHERE EXISTS (SELECT 1 FROM account_service_invitation_role i
          JOIN organisation_onboarding o ON o.organisation_id = i.native_organisation_id
          WHERE i.native_organisation_id = ? AND i.platform_invitation_id = ? AND i.accepted_at IS NULL
@@ -313,9 +194,7 @@ export async function applyAccountServiceGrantAcceptance(
          role = CASE WHEN service_role_grant.status = 'active' AND service_role_grant.role = 'owner'
            THEN 'owner' ELSE excluded.role END,
          status = 'active', revoked_at = NULL, platform_membership_id = excluded.platform_membership_id,
-         account_access_revision = excluded.account_access_revision,
-         account_acceptance_receipt_id = excluded.account_acceptance_receipt_id
-       WHERE excluded.account_access_revision >= service_role_grant.account_access_revision`,
+         account_acceptance_receipt_id = excluded.account_acceptance_receipt_id`,
       )
       .bind(
         execution.organisationId,
@@ -324,20 +203,15 @@ export async function applyAccountServiceGrantAcceptance(
         role.value,
         input.now,
         receipt.membership.id,
-        receipt.accessRevision,
         receipt.receiptId,
         execution.organisationId,
         receipt.invitationId,
       ),
-    ...prepareAccountAccessRevisionAcknowledgement(revision, input.now),
     ...prepareBaseProjectMembership(execution.database, {
       organisationId: execution.organisationId,
       userId: receipt.nativeUserId,
       role: role.value,
       now: input.now,
-      platformMembershipId: receipt.membership.id,
-      accountAccessRevision: receipt.accessRevision,
-      accountAcceptanceReceiptId: receipt.receiptId,
     }),
     execution.database
       .prepare(
@@ -347,7 +221,7 @@ export async function applyAccountServiceGrantAcceptance(
            JOIN organisation_onboarding o ON o.organisation_id = g.organisation_id
            WHERE g.organisation_id = account_service_invitation_role.native_organisation_id
              AND g.user_id = ? AND g.status = 'active' AND g.platform_membership_id = ?
-             AND g.account_access_revision = ? AND g.account_acceptance_receipt_id = ?
+             AND g.account_acceptance_receipt_id = ?
              AND o.lifecycle NOT IN ('activating', 'archived'))`,
       )
       .bind(
@@ -357,25 +231,19 @@ export async function applyAccountServiceGrantAcceptance(
         receipt.invitationId,
         receipt.nativeUserId,
         receipt.membership.id,
-        receipt.accessRevision,
         receipt.receiptId,
       ),
   ]);
   const applied = await execution.database
     .prepare(
       `SELECT 1 AS found FROM service_role_grant g
-     JOIN account_service_access_revision a ON a.native_organisation_id = g.organisation_id
-       AND a.native_user_id = g.user_id AND a.access_revision = g.account_access_revision
-       AND a.cleanup_pending = 0
      WHERE g.organisation_id = ? AND g.user_id = ? AND g.status = 'active'
-       AND g.platform_membership_id = ? AND g.account_access_revision = ?
-       AND g.account_acceptance_receipt_id = ?`,
+       AND g.platform_membership_id = ? AND g.account_acceptance_receipt_id = ?`,
     )
     .bind(
       execution.organisationId,
       receipt.nativeUserId,
       receipt.membership.id,
-      receipt.accessRevision,
       receipt.receiptId,
     )
     .first<{ found: unknown }>();

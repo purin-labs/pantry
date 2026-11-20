@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { sessionActionMutationExecution } from "./action-mutation-execution";
 import {
   requireSessionExecution,
@@ -1260,7 +1260,7 @@ async function recordCommerceProposal(
   const providerAuthority = await authorizeCapabilityUse({
     db: input.execution.scope.database,
     accountAccess: input.execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.lease.session.sessionId,
       input.lease.turn.turnId,
     ),

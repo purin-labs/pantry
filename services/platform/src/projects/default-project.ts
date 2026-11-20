@@ -103,9 +103,6 @@ export function prepareBaseProjectMembership(
     userId: UserId;
     role: OnboardingControlRole;
     now: number;
-    platformMembershipId: string;
-    accountAccessRevision: number;
-    accountAcceptanceReceiptId: string;
   }>,
 ): D1PreparedStatement[] {
   return [
@@ -119,12 +116,7 @@ export function prepareBaseProjectMembership(
          WHERE d.organisation_id = ?
            AND EXISTS (
              SELECT 1 FROM service_role_grant g
-             JOIN account_service_access_revision a ON a.native_organisation_id = g.organisation_id
-               AND a.native_user_id = g.user_id AND a.access_revision = g.account_access_revision
-               AND a.cleanup_pending = 0
              WHERE g.organisation_id = d.organisation_id AND g.user_id = ? AND g.status = 'active'
-               AND g.platform_membership_id = ? AND g.account_access_revision = ?
-               AND g.account_acceptance_receipt_id = ?
            )
            AND json_array_length(p.references_json) = 0
            AND NOT EXISTS (
@@ -140,9 +132,6 @@ export function prepareBaseProjectMembership(
         baseProjectRole(input.role),
         input.organisationId,
         input.userId,
-        input.platformMembershipId,
-        input.accountAccessRevision,
-        input.accountAcceptanceReceiptId,
       ),
     ...prepareBaseProjectAccessChange(database, input),
   ];

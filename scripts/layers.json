@@ -381,6 +381,7 @@
     "apps/portal/src/ui/": "foundation/ui",
     "services/platform/src/access-control/": "foundation/authority",
     "services/platform/src/account-platform/": "foundation/tenancy",
+    "services/platform/src/organisation-access/": "foundation/tenancy",
     "services/platform/src/actors/actor-journal/": "foundation/agent",
     "services/platform/src/actors/case/": "foundation/conversation",
     "services/platform/src/actors/commerce-projection/": "areas/commerce",

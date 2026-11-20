@@ -7,12 +7,11 @@ import {
 import { prepareBootstrapReceiptPublication } from "./shared-rows/mutation-receipt";
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import type { ControlMembershipAvailability } from "@purin-labs/control-api";
-import { AccountServiceGrantRevocation } from "../account-platform/service-membership";
 import type {
-  AccountPlatformAccess,
-  AccountAdmissionAction,
-  AccountEligibilityFailure,
-} from "../account-platform/access";
+  OrganisationAccess,
+  OrganisationAdmissionAction,
+  OrganisationAccessFailure,
+} from "../organisation-access/access";
 import {
   OrganisationExecutionScope,
   configuredOrganisationDatabases,
@@ -214,7 +213,7 @@ export type ControlSessionError =
   | { readonly code: "control_session_rotation_conflict" };
 
 type ControlAuthorizationError =
-  | AccountEligibilityFailure
+  | OrganisationAccessFailure
   | ControlSessionError
   | { readonly code: "csrf_invalid" }
   | {
@@ -663,8 +662,8 @@ export async function validateControlCsrf(input: {
 
 export async function authorizeOrganisationControl(input: {
   readonly db: OrganisationQuerySource;
-  readonly accountAccess: AccountPlatformAccess;
-  readonly action: AccountAdmissionAction;
+  readonly accountAccess: OrganisationAccess;
+  readonly action: OrganisationAdmissionAction;
   readonly session: ActiveControlSession;
   readonly organisationId: OrganisationId;
   readonly requiredRole: ControlRole;
@@ -1542,8 +1541,12 @@ export async function changeOrganisationServiceRole(input: {
   };
 }
 
-export async function applyAccountServiceGrantRevocation(input: {
-  readonly receipt: AccountServiceGrantRevocation;
+/**
+ * Remove a member. One batch revokes the role, returns the member's private
+ * chats to the default Project and removes the member from each Project, so
+ * the member's next request is refused (Plan 95).
+ */
+export async function revokeOrganisationMembership(input: {
   readonly execution: OrganisationExecutionScope;
   readonly organisationId: OrganisationId;
   readonly targetUserId: UserId;
@@ -1558,12 +1561,7 @@ export async function applyAccountServiceGrantRevocation(input: {
     OrganisationMembershipMutationError
   >
 > {
-  if (
-    !AccountServiceGrantRevocation.is(input.receipt) ||
-    input.receipt.organisationId !== input.organisationId ||
-    input.execution.organisationId !== input.organisationId ||
-    input.receipt.nativeUserId !== input.targetUserId
-  )
+  if (input.execution.organisationId !== input.organisationId)
     return { ok: false, error: { code: "organisation_membership_not_found" } };
   const session = input.execution.database.withSession("first-primary");
   const state = await readOrganisationMembershipMutationState(

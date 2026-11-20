@@ -34,10 +34,8 @@ import {
   installSlackActorFixture,
   openRouterText,
   openRouterToolCall,
-  slackActorFixtureOwner,
   slackSimulator,
 } from "./slack-journey-support";
-import { grantSharedAccountAutomation } from "./shared-account-platform-fixture";
 import { network } from "./network";
 import {
   readCanonicalToolResults,
@@ -179,11 +177,6 @@ it("joins two assignments that ran side by side into one proposal, one approval 
     workflowId: COMBINED_WORKFLOW,
     workflowRevision: 1,
   } as const;
-  await grantSharedAccountAutomation(
-    ORGANISATION_ID,
-    await slackActorFixtureOwner(),
-    { kind: "workflow", nativeId: COMBINED_WORKFLOW, revision: 1 },
-  );
   await createRequiredGrant({
     grantId: "grant_combined_case_read",
     subject: workflow,

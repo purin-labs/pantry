@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { AccountPlatformAccess } from "../account-platform/access";
+import type { OrganisationAccess } from "../organisation-access/access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 import type { RequestAuthority } from "@purin-labs/contracts";
@@ -119,7 +119,7 @@ function projectBriefText(name: string, brief: string): string {
 
 export async function admitProjectContext(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   authority: RequestAuthority,
   context: ContextAssemblyResult,
   snapshot: ProjectSnapshot | null,
@@ -195,7 +195,7 @@ type ProjectObservationError = Readonly<{
 
 async function projectObservationItem(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   authority: Variant<RequestAuthority, "control">,
   caseId: string,
   snapshotDigest: string,
@@ -264,7 +264,7 @@ async function projectObservationItem(
 
 export async function authorizeProjectContextDisclosure(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   authority: Variant<RequestAuthority, "control">,
   caseId: string,
   snapshot: ProjectSnapshot | null,

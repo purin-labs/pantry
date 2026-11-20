@@ -59,7 +59,7 @@ import type { Variant } from "@purin-labs/type-utils";
  */
 export async function conversationAudienceMayReceive(
   db: OrganisationDatabase,
-  accountAccess: import("../account-platform/access").AccountPlatformAccess,
+  accountAccess: import("../organisation-access/access").OrganisationAccess,
   scope: ConversationScope,
   conversationId: ConversationId,
   label: FlowLabel,

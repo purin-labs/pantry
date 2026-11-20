@@ -62,8 +62,7 @@ export type MemoryFixture = Readonly<{
   /** A member whose role carries no context access. */
   viewer: Member;
   /**
-   * An administrator of the Organisation whom the account authority does not
-   * admit. Their role and their control session are valid in Pantry.
+   * A person with a valid control session and no role in the Organisation.
    */
   outsider: Member;
   route: ModelRoute;
@@ -83,9 +82,8 @@ export function controlPaths(organisationId: OrganisationId) {
 }
 
 /**
- * An active Organisation that the shared account authority knows, with a
- * published policy and a simulated model. Each control request of its people
- * passes the real account check.
+ * An active Organisation with a published policy and a simulated model. Each
+ * control request of its people passes Pantry's access check.
  */
 export async function installMemoryFixture(): Promise<MemoryFixture> {
   const owner = await commerceClient("memory-owner");
@@ -96,15 +94,11 @@ export async function installMemoryFixture(): Promise<MemoryFixture> {
     "admin",
   );
   const viewer = await nativeMember(organisationId, "memory-viewer", "viewer");
-  const outsider = await nativeMember(
-    organisationId,
-    "memory-outsider",
-    "admin",
-  );
+  const outsider = await commerceClient("memory-outsider");
   await attachSharedAccountNativeOrganisation({
     organisationId,
     owner,
-    members: { operator: reviewer, privateMember: viewer, finance: outsider },
+    members: { operator: reviewer, privateMember: viewer },
   });
   const route = await selectSharedAccountModelRoute(
     organisationId,
@@ -130,7 +124,12 @@ export async function installMemoryFixture(): Promise<MemoryFixture> {
     author: await member(organisationId, owner),
     reviewer: await member(organisationId, reviewer),
     viewer: await member(organisationId, viewer),
-    outsider: await member(organisationId, outsider),
+    outsider: {
+      ...outsider,
+      organisationId,
+      userId: outsider.identity.userId,
+      personId: `person_${crypto.randomUUID()}`,
+    },
     route,
     paths: controlPaths(organisationId),
   };

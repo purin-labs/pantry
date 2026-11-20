@@ -234,7 +234,7 @@ async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
     },
     outsider: {
       status: 404,
-      body: { ok: false, error: "membership_ineligible" },
+      body: { ok: false, error: "organisation_membership_missing" },
     },
     missingSupplier: {
       status: 404,
@@ -254,7 +254,7 @@ async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
     },
     outsiderRead: {
       status: 404,
-      body: { ok: false, error: "membership_ineligible" },
+      body: { ok: false, error: "organisation_membership_missing" },
     },
   });
   expect(await read(owner, linksPath, SENDER)).toEqual(unlinked);
@@ -422,7 +422,6 @@ async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
       substituted: ["Gmail", "the model provider (OpenRouter)"],
       real: [
         "Platform Worker and Actors",
-        "account authority (built account Worker)",
         "Underclerk supplier records",
         "mail admission, reply turn, correction and learning turn",
       ],

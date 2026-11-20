@@ -1,9 +1,9 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type {
-  AccountPlatformAccess,
-  AccountUserAuthority,
-  AccountAdmissionAction,
-} from "../account-platform/access";
+  OrganisationAccess,
+  OrganisationUserAuthority,
+  OrganisationAdmissionAction,
+} from "../organisation-access/access";
 import type { RequestAuthority } from "@purin-labs/contracts";
 
 import {
@@ -61,9 +61,9 @@ export const BACKGROUND_MEMORY_DEADLINE_MS = 5_000;
 export async function prepareTurnContext(
   input: Readonly<{
     readonly db: OrganisationDatabase;
-    readonly accountAccess: AccountPlatformAccess;
-    readonly userAuthority: AccountUserAuthority;
-    readonly action: AccountAdmissionAction;
+    readonly accountAccess: OrganisationAccess;
+    readonly userAuthority: OrganisationUserAuthority;
+    readonly action: OrganisationAdmissionAction;
     readonly organisationId: OrganisationId;
     readonly caseId: CaseId;
     readonly assignmentId: AssignmentId;
@@ -109,9 +109,9 @@ export async function prepareTurnContextRead(
 export async function prepareTurnAuthority(
   input: Readonly<{
     readonly db: OrganisationDatabase;
-    readonly accountAccess: AccountPlatformAccess;
-    readonly userAuthority: AccountUserAuthority;
-    readonly action: AccountAdmissionAction;
+    readonly accountAccess: OrganisationAccess;
+    readonly userAuthority: OrganisationUserAuthority;
+    readonly action: OrganisationAdmissionAction;
     readonly organisationId: OrganisationId;
     readonly requestAuthority: RequestAuthority;
     readonly policy:

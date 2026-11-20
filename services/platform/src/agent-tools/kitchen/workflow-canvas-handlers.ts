@@ -1,5 +1,5 @@
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas-source";
 import type {
   WorkflowCanvasReadRequest,
@@ -75,7 +75,7 @@ async function prepareWorkflowCanvasRead(
   const allowed = await authorizeCapabilityUse({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),

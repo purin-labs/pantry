@@ -31,7 +31,7 @@ type AccessControlMutationState = Readonly<{
   projectionRevision: number;
 }>;
 
-type AccessGrantMutationResult = Readonly<{
+export type AccessGrantMutationResult = Readonly<{
   grant: AccessGrant;
   environment: OrganisationEnvironment;
   configurationVersion: number;

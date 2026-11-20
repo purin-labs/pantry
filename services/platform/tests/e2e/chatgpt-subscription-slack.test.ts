@@ -23,6 +23,7 @@ import {
   type ChatGptModelRequest,
 } from "./chatgpt-subscription-support";
 import { network } from "./network";
+import { archiveAsOwner } from "./purge-support";
 import {
   ORGANISATION_ID,
   installDiscoveryActorFixture,
@@ -36,6 +37,8 @@ import {
  * refresh is older than seven days one time, and leaves a newer one alone. A Slack turn that needs a
  * token while that refresh runs waits for it, and OpenAI sees one refresh.
  * When OpenAI refuses the weekly refresh, Portal asks for a new sign-in.
+ * After the owner archives the Organisation, its sign-in stays until the
+ * purge, and the cron does not refresh it.
  */
 it(
   "refreshes a week-old ChatGPT sign-in once at the cron, beside a Slack turn",
@@ -346,7 +349,7 @@ function authorizeParams(url: URL | undefined): Record<string, string> {
 }
 
 async function weeklyRefreshJourney(test: TestContext): Promise<void> {
-  await installDiscoveryActorFixture();
+  const fixture = await installDiscoveryActorFixture();
   const openai = new FakeOpenAiSignIn();
   openai.install();
   const slack = slackSimulator();
@@ -410,6 +413,22 @@ async function weeklyRefreshJourney(test: TestContext): Promise<void> {
     connection: { kind: "action_required", reason: "authorization_expired" },
   });
 
+  // The owner signs in again and then archives the Organisation. The sign-in
+  // stays for the 30 days before the purge, but OpenAI sees no refresh for
+  // an Organisation that its owner archived.
+  openai.refuseRefresh = false;
+  await connectChatGptSignIn(openai, { reconnect: true });
+  await ageSignIn(8);
+  await archiveAsOwner({
+    organisationId: ORGANISATION_ID,
+    userId: fixture.ownerSession.session.userId,
+  });
+  const beforeArchivedCron = await readConnection();
+  await runWeeklyChatGptLoginRefresh(env, Date.now());
+  expect(openai.refreshCount()).toBe(3);
+  const afterArchivedCron = await readConnection();
+  expect(afterArchivedCron).toEqual(beforeArchivedCron);
+
   Object.assign(test.task.meta, {
     plan72WeeklyRefresh: {
       refreshes: openai.refreshCount(),
@@ -417,6 +436,7 @@ async function weeklyRefreshJourney(test: TestContext): Promise<void> {
       weeklyThread: threadAnswers(slack.messages, WEEKLY_THREAD),
       modelRequests: openai.modelRequestCount(),
       afterRefusal: portal,
+      afterArchivedCron,
     },
   });
 }

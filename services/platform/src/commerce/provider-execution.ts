@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { AccountPlatformAccess } from "../account-platform/access";
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import type { OrganisationAccess } from "../organisation-access/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { runtimeFetch } from "../runtime-fetch";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
@@ -192,7 +192,7 @@ export async function validateCommerceActionAuthorityBeforeExecution(
   const liveAuthority = await authorizeCapabilityUse({
     db: input.scope.database,
     accountAccess: input.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       input.action.sessionId,
       input.action.nonce.value,
     ),
@@ -2517,7 +2517,7 @@ function commerceCancellationReceipt(
 
 async function authorizeCommerceEffectSink(
   db: OrganisationDatabase,
-  accountAccess: AccountPlatformAccess,
+  accountAccess: OrganisationAccess,
   action: LedgerCanonicalAction,
 ): Promise<
   Result<Variant<FlowDecision, "allow">, CommerceProviderExecutionError>

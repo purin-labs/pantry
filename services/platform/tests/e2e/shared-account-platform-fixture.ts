@@ -1,53 +1,14 @@
-import type { OrganisationDatabase } from "../../src/database-handles";
-import { decodeBase64, encodeBase64Url, isRecord } from "@purin-labs/std";
+import { isRecord } from "@purin-labs/std";
 import { organisationDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
-import { http, HttpResponse } from "msw";
-import { network } from "./network";
-import { createActiveConnectedIntegration } from "../../src/data/integration-account";
-import { createAccessGrant } from "../../src/data/access-grants";
-import { encodeContextVisibility } from "../../src/authorization/access-grants/visibility";
-import {
-  replaceFileGrantAdmissions,
-  createFileProjectionCommand,
-  applyFileProjectionCommand,
-} from "../../src/context/files";
-import { ProviderFileProjectionSourceReader } from "../../src/context/files/provider-source";
-import { upsertFileResourceSource } from "../../src/context/files/persistence";
-import type { CanonicalFileReference } from "../../src/context/files/tools";
-import { storeFilePlacementCredential } from "../../src/provider-workflows/file-context-credential";
-import type {
-  ModelRoute,
-  OrganisationCapabilityPolicy,
-} from "@purin-labs/contracts";
+import type { ModelRoute } from "@purin-labs/contracts";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import {
-  authorizeCapabilityUse,
-  compileTurnAuthority,
-  type CompiledTurnAuthority,
-} from "../../src/authorization/access-grants";
-import { buildControlAuthority } from "../../src/request-authority";
-import {
-  readOrganisationCapabilityPolicies,
-  writeOrganisationCapabilityPolicy,
-} from "../../src/data/capability-policy";
-import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
-import {
-  newConversationId,
-  type ConversationId,
-  type ProjectId,
-} from "@purin-labs/control-api";
 import {
   accountInteger,
   accountObject,
   accountText,
   parseAccountScope,
   type AccountScope,
-  type AccountPrincipal,
-  type LinkedPantryAccountUser,
-  type PantryAccountBinding,
-  type AccountTurnUsageRequest,
 } from "../../src/account-platform/types";
 import {
   readPantryProvisionApplied,
@@ -57,27 +18,11 @@ import {
 } from "../../src/account-platform/provisioning-boundary";
 import { createAccountPlatformClient } from "../../src/account-platform/client";
 import { resolvePantryAccountBinding } from "../../src/account-platform/binding";
-import { ensurePantryAccountAutomationGrant } from "../../src/account-platform/automation";
-import {
-  linkPantryAccountUser,
-  type PantryNativeAutomation,
-} from "../../src/account-platform/identity";
-import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harness-authority";
-import { authenticatedAccountConversationScope } from "../../src/account-platform/access";
-import {
-  readPantryExecutionBilling,
-  type PantryExecutionBilling,
-} from "../../src/account-platform/execution-billing";
-import {
-  requireActiveOrganisationActor,
-  resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+import { linkPantryAccountUser } from "../../src/account-platform/identity";
+import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { parseSessionId, parseUserId } from "../../src/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
-  parseVaultHandle,
-  storeVaultSecret,
   parseOpenAiApiKey,
   storeOrganisationOpenAiModelCredential,
 } from "../../src/credential-vault";
@@ -86,13 +31,8 @@ import {
   selectOrganisationInferenceSelection,
 } from "../../src/data/organisation-inference-selection";
 import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
-import { parseConversation } from "../../src/chat/conversation";
-import { readConversation, saveConversation } from "../../src/chat/store";
 import type { OrganisationId } from "../../src/ids";
-import {
-  readActiveOrganisationMembership,
-  readActiveOrganisationMembershipRevision,
-} from "../../src/data/control-plane";
+import { readActiveOrganisationMembership } from "../../src/data/control-plane";
 import {
   commerceClient,
   commerceHeaders,
@@ -234,12 +174,16 @@ export async function addNativeServiceMember(
   const personId = `person_${crypto.randomUUID()}`;
   const organisationDb = organisationDatabase(organisationId);
   await organisationDb.batch([
-    organisationDb.prepare(
-      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?)",
-    ).bind(organisationId, personId, client.identity.displayName),
-    organisationDb.prepare(
-      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, ?, 'active', ?)",
-    ).bind(organisationId, client.identity.userId, personId, role, Date.now()),
+    organisationDb
+      .prepare(
+        "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?)",
+      )
+      .bind(organisationId, personId, client.identity.displayName),
+    organisationDb
+      .prepare(
+        "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, ?, 'active', ?)",
+      )
+      .bind(organisationId, client.identity.userId, personId, role, Date.now()),
   ]);
 }
 
@@ -420,25 +364,6 @@ async function nativeSlotMember(
   };
 }
 
-/**
- * Let the account authority admit one native automation, as the grant of an
- * administrator does through the access-control route.
- */
-export async function grantSharedAccountAutomation(
-  organisationId: OrganisationId,
-  administrator: SharedAccountNativeClient,
-  native: PantryNativeAutomation,
-): Promise<void> {
-  const granted = await ensurePantryAccountAutomationGrant({
-    env,
-    scope: await requireOrganisationExecutionScope(env, organisationId),
-    session: administrator.session.session,
-    native,
-  });
-  if (!granted.ok)
-    throw new Error(`Account automation grant failed: ${granted.error.code}`);
-}
-
 async function auxiliaryNativeOwner(label: string): Promise<
   Readonly<{
     organisationId: OrganisationId;
@@ -522,7 +447,14 @@ export function readSharedAccountFixture(input: unknown): SharedAccountFixture {
   const members = accountObject(
     record.members,
     isRecord(record.members) && Object.hasOwn(record.members, "extra")
-      ? ["owner", "foreignOwner", "finance", "operator", "privateMember", "extra"]
+      ? [
+          "owner",
+          "foreignOwner",
+          "finance",
+          "operator",
+          "privateMember",
+          "extra",
+        ]
       : ["owner", "foreignOwner", "finance", "operator", "privateMember"],
   );
   const owner = accountObject(members.owner, ["platformUserId"]);
@@ -556,7 +488,7 @@ export function readSharedAccountFixture(input: unknown): SharedAccountFixture {
   };
 }
 
-export async function nativeProvisionRequest(
+async function nativeProvisionRequest(
   operation: "provision" | "status",
   body: unknown,
 ): Promise<Response> {
@@ -591,7 +523,7 @@ export async function applyAccountFixtureProvision(
   return applied;
 }
 
-export async function linkAccountFixtureMember(
+async function linkAccountFixtureMember(
   organisationId: OrganisationId,
   client: SharedAccountNativeClient,
   setup: SharedAccountFixture,
@@ -732,128 +664,6 @@ export async function selectSharedAccountModelRoute(
   return route.value;
 }
 
-export async function createSharedAccountConversation(
-  organisationId: OrganisationId,
-  client: SharedAccountNativeClient,
-  route: ModelRoute,
-  projectId: ProjectId | null,
-): Promise<ConversationId> {
-  const conversationId = newConversationId();
-  const conversation = parseConversation({
-    id: conversationId,
-    title: "Private account acceptance",
-    lineage: { kind: "original" },
-    historyBindings: [],
-    modelRoute: route,
-    documents: [],
-    work: { kind: "ready" },
-    completedRequests: [],
-    timeline: [],
-    pendingInputs: [],
-    latestSequence: 0,
-    lastReadSequence: 0,
-    surfaceEventCursor: 0,
-    draftText: "",
-    draftUpdatedAt: null,
-    effort: null,
-  });
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const saved =
-    projectId === null
-      ? await saveConversation(scope, client.identity.userId, conversation, 0)
-      : await saveConversation(scope, client.identity.userId, conversation, 0, {
-          projectId,
-        });
-  if (saved.kind !== "saved")
-    throw new Error(`Native conversation fixture failed: ${saved.kind}`);
-  return conversationId;
-}
-
-export function chatPath(organisationId: OrganisationId): string {
-  return `/v1/control/organisations/${organisationId}/chat`;
-}
-
-export function startSharedAccountTurn(
-  organisationId: OrganisationId,
-  client: SharedAccountNativeClient,
-  conversationId: ConversationId,
-  route: ModelRoute,
-  requestId: string,
-): Promise<Response> {
-  return nativeAccountRequest(client, chatPath(organisationId), {
-    kind: "message",
-    conversationId,
-    requestId,
-    model: route.model,
-    text: "Return a short acknowledgement. Do not call tools.",
-    surfaceContext: null,
-    browserContext: { kind: "unavailable" },
-  });
-}
-
-export async function nativeConversationWork(
-  organisationId: OrganisationId,
-  client: SharedAccountNativeClient,
-  conversationId: ConversationId,
-): Promise<string | null> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const stored = await readConversation(
-    scope.database,
-    authenticatedAccountConversationScope(
-      organisationId,
-      client.session.session,
-    ),
-    conversationId,
-  );
-  return stored?.conversation.work.kind ?? null;
-}
-
-export async function sharedAccountSessionActor(
-  organisationId: OrganisationId,
-  client: SharedAccountNativeClient,
-  conversationId: ConversationId,
-) {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const stored = await readConversation(
-    scope.database,
-    authenticatedAccountConversationScope(
-      organisationId,
-      client.session.session,
-    ),
-    conversationId,
-  );
-  const work = stored?.conversation.work;
-  const binding =
-    work?.kind === "running" || work?.kind === "cancelling"
-      ? work.stream
-      : stored?.conversation.historyBindings.at(-1);
-  if (binding === undefined)
-    throw new Error("Native accepted history binding missing");
-  const sessionId = parseSessionId(binding.sessionId);
-  if (!sessionId.ok) throw new Error(sessionId.error.code);
-  const resolved = await resolveActiveSessionActor({
-    env,
-    namespace: env.SESSION,
-    organisationId,
-    sessionId: sessionId.value,
-    now: Date.now(),
-  });
-  if (!resolved.ok) throw new Error(resolved.error.code);
-  return {
-    actor: resolved.value,
-    sessionId: sessionId.value,
-    turnId: binding.turnId,
-  };
-}
-
-export function inspectNativeAccountBilling(
-  turnId: string,
-  _actor: unknown,
-  state: DurableObjectState,
-): PantryExecutionBilling | null {
-  return readPantryExecutionBilling(state.storage.sql, turnId);
-}
-
 export function fixtureRows(
   snapshot: Record<string, unknown>,
   table: string,
@@ -869,7 +679,7 @@ export function fixtureRows(
   return rows;
 }
 
-export function accountProducerRequest(
+function accountProducerRequest(
   path: "usage" | "funds/reserve" | "fee-policy" | "eligibility",
   body: unknown,
   assertion: string | null = null,
@@ -887,365 +697,6 @@ export function accountProducerRequest(
   );
 }
 
-export function completedNativeUsage(
-  operation: PantryExecutionBilling | null,
-): AccountTurnUsageRequest {
-  if (
-    operation === null ||
-    operation.kind !== "isolated_e2e_completed_turn" ||
-    operation.phase.kind !== "delivered" ||
-    operation.phase.terminal.kind !== "completed"
-  )
-    throw new Error("A real completed paid native turn is required");
-  const identity = operation.identity;
-  const terminal = operation.phase.terminal;
-  return {
-    version: 1,
-    eventId: JSON.stringify([
-      "satyr",
-      identity.instanceId,
-      identity.sessionId,
-      identity.turnId,
-      "terminal",
-    ]),
-    instanceId: identity.instanceId,
-    occurredAt: new Date(terminal.occurredAt).toISOString(),
-    meterId: "satyr.completed_turn.test",
-    quantity: 1,
-    unit: "turn",
-    evidence: {
-      kind: "satyr_turn",
-      sessionId: identity.sessionId,
-      turnId: identity.turnId,
-      terminalOutcome: "completed",
-      reservationId: operation.phase.hold.reservationId,
-      sourceRecordId: terminal.sourceRecordId,
-      sourceDigest: terminal.sourceDigest,
-      funding: identity.funding,
-    },
-  };
-}
-
-export function abortSharedAccountActor(
-  _actor: unknown,
-  state: DurableObjectState,
-): void {
-  state.abort("Shared account financial uncertainty interruption");
-}
-
-export interface SharedAccountSourceProbe {
-  metadataReads: number;
-  bodyReads: number;
-}
-
-export async function installSharedAccountSource(
-  organisationId: OrganisationId,
-  owner: SharedAccountFixtureNativeMember,
-  peer: SharedAccountFixtureNativeMember,
-  probe: SharedAccountSourceProbe,
-): Promise<CanonicalFileReference> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const now = Date.now();
-  const handle = parseVaultHandle("vault:dropbox:shared-account");
-  if (!handle.ok) throw new Error(handle.error.code);
-  const integration = await createActiveConnectedIntegration(scope.database, {
-    organisationId,
-    provider: "dropbox",
-    providerSubjectId: "dbid:shared-account",
-    environment: "development",
-    authMode: "shared_satyr_app",
-    authority: { kind: "connection_credential", credentialRef: handle.value },
-    grantedScopes: ["files.metadata.read", "files.content.read"],
-    createdByUserId: requireFixtureUserId(owner.nativeUserId),
-    providerAccountId: "dbid:shared-account",
-    accountKind: "account",
-    displayName: "Shared account source fixture",
-    capabilities: ["file.read"],
-    audiencePolicy: { kind: "operator" },
-    retentionPolicy: { kind: "organisation_default" },
-    now,
-  });
-  const secret = await storeVaultSecret({
-    db: scope.database,
-    keys: env,
-    organisationId,
-    handle: handle.value,
-    secret: {
-      kind: "oauth_tokens",
-      accessToken: "shared-account-source-fixture",
-      refreshToken: "shared-account-source-refresh",
-      expiry: { kind: "provider_managed" },
-    },
-    now,
-  });
-  if (!secret.ok) throw new Error(secret.error.code);
-  const reference: CanonicalFileReference = {
-    integrationAccountId: integration.account.integrationAccountId,
-    provider: "dropbox",
-    providerFileId: "id:shared-account-source",
-  };
-  await addSharedAccountFileGrant(
-    organisationId,
-    owner.nativePersonId,
-    reference,
-    "id:shared-account-source",
-    "grant_shared_account_source",
-  );
-  await addSharedAccountFileGrant(
-    organisationId,
-    peer.nativePersonId,
-    reference,
-    "id:unrelated-shared-account-source",
-    "grant_shared_account_other_source",
-  );
-  await scope.database.batch([
-    scope.database
-      .prepare(
-        "INSERT INTO provider_resource_snapshot (snapshot_revision, organisation_id, integration_account_id, provider, environment, query_hash, created_at) VALUES ('snapshot_shared_account', ?, ?, 'dropbox', 'development', 'shared-account', ?)",
-      )
-      .bind(organisationId, reference.integrationAccountId, now),
-    scope.database
-      .prepare(
-        "INSERT INTO provider_discovered_resource (snapshot_revision, canonical_resource_id, provider_resource_id, provider_account_id, display_label, access_state, provider_revision, resource_kind) VALUES ('snapshot_shared_account', 'resource_shared_account', ?, 'dbid:shared-account', 'Restricted account supplier.pdf', 'accessible', 'shared-account-revision1', 'dropbox_file')",
-      )
-      .bind(reference.providerFileId),
-  ]);
-  await replaceFileGrantAdmissions({
-    db: scope.database,
-    organisationId,
-    grantId: "grant_shared_account_source",
-    grantRevision: 1,
-    admissions: [
-      {
-        grantId: "grant_shared_account_source",
-        grantRevision: 1,
-        integrationAccountId: reference.integrationAccountId,
-        provider: "dropbox",
-        providerFileId: reference.providerFileId,
-        containingScopeKey: `dropbox_file:${reference.providerFileId}`,
-        providerRevision: { kind: "dropbox", rev: "shared-account-revision1" },
-      },
-    ],
-    admittedAt: now,
-  });
-  const command = createFileProjectionCommand({
-    organisationId,
-    grantId: "grant_shared_account_source",
-    grantRevision: 1,
-    integrationAccountId: reference.integrationAccountId,
-    provider: "dropbox",
-    providerFileId: reference.providerFileId,
-    sourceSequence: 1,
-    providerRevision: { kind: "dropbox", rev: "shared-account-revision1" },
-    visibilityKey: encodeContextVisibility({
-      kind: "person",
-      personId: owner.nativePersonId,
-    }),
-  });
-  network.use(
-    http.post("https://api.dropboxapi.com/oauth2/token", sourceRefreshToken),
-    http.post(
-      "https://api.dropboxapi.com/2/users/get_current_account",
-      sourceDropboxAccount,
-    ),
-    http.post(
-      "https://api.dropboxapi.com/2/files/get_metadata",
-      sourceDropboxMetadata.bind(null, probe),
-    ),
-    http.post(
-      "https://content.dropboxapi.com/2/files/download",
-      unexpectedSourceBody.bind(null, probe),
-    ),
-  );
-  const reader = new ProviderFileProjectionSourceReader({
-    env: {
-      ...env,
-      DROPBOX_OAUTH_CLIENT_ID: "shared-account-source-client",
-      DROPBOX_OAUTH_CLIENT_SECRET: "shared-account-source-secret",
-    },
-    db: scope.database,
-    storeCredential: storeFilePlacementCredential.bind(null, env, scope),
-    command,
-    fetcher: fetch,
-    now,
-  });
-  const metadata = await reader.readMetadata(command);
-  if (!metadata.ok) throw new Error(metadata.error.code);
-  await upsertFileResourceSource({
-    scope,
-    metadata: {
-      integrationAccountId: reference.integrationAccountId,
-      provider: "dropbox",
-      providerFileId: reference.providerFileId,
-      providerRevision: metadata.value.providerRevision,
-      displayName: metadata.value.displayName,
-      displayPath: metadata.value.displayPath,
-      mediaType: metadata.value.mediaType,
-      deepLink: metadata.value.deepLink,
-      observedAt: now,
-    },
-    now,
-  });
-  const projection = await applyFileProjectionCommand({
-    scope,
-    command,
-    sourceReader: reader,
-    now,
-  });
-  if (projection.kind !== "applied")
-    throw new Error("Source projection did not apply");
-  return reference;
-}
-
-async function addSharedAccountFileGrant(
-  organisationId: OrganisationId,
-  personId: string,
-  reference: CanonicalFileReference,
-  providerFileId: string,
-  grantId: string,
-): Promise<void> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const grant = await createAccessGrant({
-    db: scope.database,
-    organisationId,
-    grantId,
-    subject: { kind: "person", personId },
-    target: {
-      kind: "file_resource",
-      capabilityId: "file.read",
-      capabilityVersion: 1,
-      integrationAccountId: reference.integrationAccountId,
-      scope: {
-        kind: "dropbox_file",
-        providerFileId,
-        pathDisplay: "/Restricted account supplier.pdf",
-      },
-    },
-    provenance: {
-      kind: "baseline",
-      profile: "read_and_propose",
-      profileVersion: 1,
-      materializationReceiptId: `receipt_${grantId}`,
-    },
-    now: Date.now(),
-  });
-  if (!grant.ok) throw new Error(grant.error.code);
-}
-
-function sourceRefreshToken(): Response {
-  return HttpResponse.json({
-    access_token: "shared-account-source-refreshed",
-    expires_in: 14400,
-  });
-}
-
-function sourceDropboxAccount(): Response {
-  return HttpResponse.json({
-    account_id: "dbid:shared-account",
-    email: "source@example.invalid",
-    name: { display_name: "Source fixture owner" },
-    root_info: { home_namespace_id: "shared-account-home" },
-  });
-}
-
-function sourceDropboxMetadata(probe: SharedAccountSourceProbe): Response {
-  probe.metadataReads += 1;
-  return HttpResponse.json({
-    ".tag": "file",
-    id: "id:shared-account-source",
-    name: "Restricted account supplier.pdf",
-    path_display: "/Restricted account supplier.pdf",
-    rev: "shared-account-revision1",
-    server_modified: "2026-10-03T00:00:00Z",
-    size: 100,
-    is_downloadable: true,
-  });
-}
-
-function unexpectedSourceBody(probe: SharedAccountSourceProbe): Response {
-  probe.bodyReads += 1;
-  return new Response("Metadata acceptance must not request source content.", {
-    status: 500,
-  });
-}
-
-function requireFixtureUserId(input: string) {
-  const parsed = parseUserId(input);
-  if (!parsed.ok) throw new Error(parsed.error.code);
-  return parsed.value;
-}
-
-/** Sign a deliberately expired boundary request with the real dedicated test key. */
-export async function expiredFixtureUserAssertion(
-  binding: PantryAccountBinding,
-  user: LinkedPantryAccountUser,
-  nativeSessionId: string,
-): Promise<string> {
-  const pkcs8 = decodeBase64(
-    accountText(env.ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U)
-      .replaceAll("-", "+")
-      .replaceAll("_", "/"),
-  );
-  if (pkcs8 === null) throw new Error("Invalid test assertion key");
-  const buffer = new ArrayBuffer(pkcs8.byteLength);
-  new Uint8Array(buffer).set(pkcs8);
-  const key = await crypto.subtle.importKey(
-    "pkcs8",
-    buffer,
-    { name: "Ed25519" },
-    false,
-    ["sign"],
-  );
-  const header = encodeBase64Url(
-    new TextEncoder().encode(
-      JSON.stringify({
-        alg: "EdDSA",
-        typ: "JWT",
-        kid: env.ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID,
-      }),
-    ),
-  );
-  const payload = encodeBase64Url(
-    new TextEncoder().encode(
-      JSON.stringify({
-        version: 1,
-        issuer: env.ACCOUNT_PLATFORM_ASSERTION_ISSUER,
-        audience: env.ACCOUNT_PLATFORM_ASSERTION_AUDIENCE,
-        principal: fixtureUserPrincipal(user, nativeSessionId),
-        nativePrincipalId: user.nativeUserId,
-        scope: binding.scope,
-        instanceId: binding.instanceId,
-        action: "disclose",
-        expiresAt: new Date(Date.now() - 60_000).toISOString(),
-        authorityRevision: 0,
-      }),
-    ),
-  );
-  const signature = await crypto.subtle.sign(
-    "Ed25519",
-    key,
-    new TextEncoder().encode(`${header}.${payload}`),
-  );
-  return `${header}.${payload}.${encodeBase64Url(new Uint8Array(signature))}`;
-}
-
-export function fixtureUserPrincipal(
-  user: LinkedPantryAccountUser,
-  nativeSessionId: string,
-): AccountPrincipal {
-  return {
-    kind: "user",
-    identity: {
-      kind: "verified_provider_subject",
-      userId: user.platformUserId,
-      issuer: user.issuer,
-      subject: user.subject,
-      verificationReceiptId: user.verificationReceiptId,
-    },
-    authority: { kind: "authenticated_session", nativeSessionId },
-  };
-}
-
 function fixtureFailureMessage(payload: unknown): string {
   if (
     isRecord(payload) &&
@@ -1254,69 +705,6 @@ function fixtureFailureMessage(payload: unknown): string {
   )
     return payload.message;
   return "invalid response";
-}
-
-export function inspectNativeAcceptedTurn(
-  sessionId: string,
-  turnId: string,
-  _actor: unknown,
-  state: DurableObjectState,
-) {
-  const checkpoint = readLatestHarnessCheckpoint(state.storage.sql, sessionId);
-  if (!checkpoint.ok) throw new Error(checkpoint.error.code);
-  const streams = state.storage.sql
-    .exec<{
-      turn_id: string;
-      state: string;
-      last_sequence: number;
-      error_detail: string | null;
-    }>(
-      "SELECT turn_id, state, last_sequence, error_detail FROM session_turn_stream WHERE turn_id = ?",
-      turnId,
-    )
-    .toArray();
-  return {
-    checkpoint: checkpoint.value,
-    streams,
-    billing: readPantryExecutionBilling(state.storage.sql, turnId),
-  };
-}
-
-export interface SharedNativePortalInvitation {
-  readonly invitationId: string;
-  readonly token: string;
-  readonly role: "admin" | "operator" | "viewer";
-}
-
-export function readSharedNativePortalInvitation(
-  input: unknown,
-): SharedNativePortalInvitation {
-  const response = accountObject(input, ["ok", "invitation", "token"]);
-  if (response.ok !== true)
-    throw new Error("Native shared invitation was not issued");
-  const invitation = accountObject(response.invitation, [
-    "organisationInvitationId",
-    "invitedEmail",
-    "role",
-    "createdAt",
-    "expiresAt",
-    "kind",
-  ]);
-  if (
-    invitation.kind !== "pending" ||
-    (invitation.role !== "admin" &&
-      invitation.role !== "operator" &&
-      invitation.role !== "viewer")
-  )
-    throw new Error("Invalid native invitation state");
-  accountText(invitation.invitedEmail);
-  accountInteger(invitation.createdAt, 1);
-  accountInteger(invitation.expiresAt, 1);
-  return {
-    invitationId: accountText(invitation.organisationInvitationId),
-    token: accountText(response.token),
-    role: invitation.role,
-  };
 }
 
 export async function nativeServiceMemberMutation(
@@ -1344,204 +732,4 @@ export async function nativeServiceMemberMutation(
     `https://localhost/v1/control/organisations/${organisationId}/members/${target.identity.userId}`,
     { method, headers, body: JSON.stringify(body) },
   );
-}
-
-export async function readNativeServiceGrant(
-  organisationId: OrganisationId,
-  client: SharedAccountNativeClient,
-): Promise<Record<string, unknown>> {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const raw = await scope.database
-    .prepare(
-      "SELECT role, status, platform_membership_id AS platformMembershipId, account_access_revision AS accountAccessRevision, account_acceptance_receipt_id AS accountAcceptanceReceiptId FROM service_role_grant WHERE organisation_id = ? AND user_id = ?",
-    )
-    .bind(organisationId, client.identity.userId)
-    .first<unknown>();
-  return accountObject(raw, [
-    "role",
-    "status",
-    "platformMembershipId",
-    "accountAccessRevision",
-    "accountAcceptanceReceiptId",
-  ]);
-}
-
-export async function sharedAccountPolicySupersession(
-  organisationId: OrganisationId,
-  owner: SharedAccountNativeClient,
-) {
-  const scope = await requireOrganisationExecutionScope(env, organisationId);
-  const original = await compileSharedOwnerAuthority(scope, owner);
-  const initialClaim = await sharedDiscoveryClaim(scope, owner, original);
-  if (!initialClaim.ok) throw new Error(initialClaim.error.code);
-  const disabled = await setSharedDiscoveryPolicy(scope, owner, "disabled");
-  await publishSharedNativePolicy(organisationId, scope.database);
-  const staleAfterDisable = await sharedDiscoveryClaim(scope, owner, original);
-  if (
-    staleAfterDisable.ok ||
-    staleAfterDisable.error.code !== "organisation_policy_superseded"
-  )
-    throw new Error("A pinned capability survived native policy supersession");
-  const disabledAuthority = await compileSharedOwnerAuthority(scope, owner);
-  const disabledClaim = await sharedDiscoveryClaim(
-    scope,
-    owner,
-    disabledAuthority,
-  );
-  if (disabledClaim.ok)
-    throw new Error("A fresh authority admitted a disabled capability");
-  await setSharedDiscoveryPolicy(scope, owner, "enabled");
-  await publishSharedNativePolicy(organisationId, scope.database);
-  const staleAfterRestore = await sharedDiscoveryClaim(
-    scope,
-    owner,
-    disabledAuthority,
-  );
-  if (
-    staleAfterRestore.ok ||
-    staleAfterRestore.error.code !== "organisation_policy_superseded"
-  )
-    throw new Error(
-      "An additive native policy change preserved a pinned authority",
-    );
-  const current = await compileSharedOwnerAuthority(scope, owner);
-  const restoredClaim = await sharedDiscoveryClaim(scope, owner, current);
-  if (!restoredClaim.ok) throw new Error(restoredClaim.error.code);
-  return {
-    initialVersion: original.authorityPartition.policyVersion,
-    disabledRevision: disabled.revision,
-    disabledVersion: disabledAuthority.authorityPartition.policyVersion,
-    restoredVersion: current.authorityPartition.policyVersion,
-    initialClaim: initialClaim.ok,
-    staleAfterDisable: staleAfterDisable.error.code,
-    disabledClaim: disabledClaim.error.code,
-    staleAfterRestore: staleAfterRestore.error.code,
-    restoredClaim: restoredClaim.ok,
-    initialDigest: original.authorityPartition.digest,
-    restoredDigest: current.authorityPartition.digest,
-  };
-}
-
-async function compileSharedOwnerAuthority(
-  scope: OrganisationExecutionScope,
-  owner: SharedAccountNativeClient,
-): Promise<CompiledTurnAuthority> {
-  const membership = await readActiveOrganisationMembership(
-    scope.database,
-    scope.organisationId,
-    owner.identity.userId,
-  );
-  const revision = await readActiveOrganisationMembershipRevision({
-    db: scope.database,
-    organisationId: scope.organisationId,
-  });
-  const policy = await readCurrentOrganisationPolicySnapshot(
-    scope.database,
-    scope.organisationId,
-  );
-  if (membership === null || revision === null || !policy.ok)
-    throw new Error("Current owner authority is unavailable");
-  const authority = buildControlAuthority({
-    organisationId: scope.organisationId,
-    userId: owner.identity.userId,
-    requesterPersonId: membership.personId,
-    membershipRevision: revision,
-    role: membership.role,
-  }).requestAuthority;
-  const compiled = await compileTurnAuthority({
-    db: scope.database,
-    accountAccess: scope.accountAccess,
-    userAuthority: {
-      kind: "authenticated_session",
-      nativeSessionId: owner.session.session.controlSessionId,
-    },
-    action: "execute",
-    organisationId: scope.organisationId,
-    requestAuthority: authority,
-    policy: { version: policy.value.version },
-  });
-  if (!compiled.ok) throw new Error(compiled.error.code);
-  return compiled.value;
-}
-
-function sharedDiscoveryClaim(
-  scope: OrganisationExecutionScope,
-  owner: SharedAccountNativeClient,
-  compiled: CompiledTurnAuthority,
-) {
-  return authorizeCapabilityUse({
-    db: scope.database,
-    accountAccess: scope.accountAccess,
-    userAuthority: {
-      kind: "authenticated_session",
-      nativeSessionId: owner.session.session.controlSessionId,
-    },
-    action: "execute",
-    organisationId: scope.organisationId,
-    authority: compiled.requestAuthority,
-    authorityPartition: compiled.authorityPartition,
-    request: {
-      capabilities: [
-        {
-          kind: "platform_capability",
-          capabilityId: CAPABILITY_KEYS.integrationDiscoveryRead,
-          capabilityVersion: 1,
-        },
-      ],
-    },
-  });
-}
-
-async function setSharedDiscoveryPolicy(
-  scope: OrganisationExecutionScope,
-  owner: SharedAccountNativeClient,
-  mode: "enabled" | "disabled",
-) {
-  const policies = await readOrganisationCapabilityPolicies({
-    db: scope.database,
-    organisationId: scope.organisationId,
-  });
-  if (!policies.ok) throw new Error(policies.error.code);
-  const current = policies.value.find(sharedDiscoveryPolicy);
-  if (current === undefined)
-    throw new Error("Native baseline discovery policy missing");
-  const written = await writeOrganisationCapabilityPolicy({
-    scope,
-    write: {
-      kind: "change",
-      capabilityId: CAPABILITY_KEYS.integrationDiscoveryRead,
-      expectedRevision: current.revision,
-      mode,
-      provenance: {
-        kind: "operator",
-        userId: owner.identity.userId,
-        mutationReceiptId: `shared_account_policy_${mode}`,
-      },
-      now: Date.now(),
-    },
-  });
-  if (!written.ok) throw new Error(written.error.code);
-  return written.value;
-}
-
-function sharedDiscoveryPolicy(policy: OrganisationCapabilityPolicy): boolean {
-  return policy.capabilityId === CAPABILITY_KEYS.integrationDiscoveryRead;
-}
-
-async function publishSharedNativePolicy(
-  organisationId: OrganisationId,
-  database: OrganisationDatabase,
-): Promise<void> {
-  const organisation = await requireActiveOrganisationActor({
-    env,
-    organisationId,
-    now: Date.now(),
-  });
-  const published = await compilePublishAndActivateOrganisationPolicy({
-    bindings: { db: database, kv: env.POLICY_KV },
-    organisationId,
-    organisation,
-    now: Date.now(),
-  });
-  if (!published.ok) throw new Error(published.error.code);
 }

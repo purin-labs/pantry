@@ -22,8 +22,7 @@ const portability = process.argv[4] === "portability";
 const draft = process.argv[4] === "draft";
 const proposal = process.argv[4] === "proposal";
 const effectCancellation = process.argv[4] === "effect-cancel";
-const codeModeTrial =
-  process.argv[4] === "codemode" || effectCancellation;
+const codeModeTrial = process.argv[4] === "codemode" || effectCancellation;
 const draftBrowser = process.argv[4] === "draft-browser";
 // The draft trial runs the draft collaboration Worker on the provider stack.
 const providerTrial =
@@ -1222,9 +1221,9 @@ async function evaluateDraftBrowserScenario(scenario) {
       fixture.providerCommitted.receiptId,
     );
     assert.equal(fixture.mutations, 1);
-    const product = (
-      await commerceRecords(fixture, ["product"])
-    ).product.find((row) => row.resource_id === "product_financier");
+    const product = (await commerceRecords(fixture, ["product"])).product.find(
+      (row) => row.resource_id === "product_financier",
+    );
     assert.equal(
       product.description,
       fixture.browserEvidence.recovered.draft.description,
@@ -2849,10 +2848,7 @@ async function postProviderControl(
 }
 
 async function providerOwnerEvidence(fixture) {
-  const records = await commerceRecords(fixture, [
-    "offer",
-    "command_receipt",
-  ]);
+  const records = await commerceRecords(fixture, ["offer", "command_receipt"]);
   const offer = records.offer
     .filter((row) => row.resource_id === "offer_financier")
     .map((row) => ({

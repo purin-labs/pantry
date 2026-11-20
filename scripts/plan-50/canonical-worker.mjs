@@ -158,7 +158,9 @@ export class CandidateActor extends SeamActor {
   }
 
   initialState() {
-    return initializedState(required(resolvePantryPlatformModelRoute(this.env)));
+    return initializedState(
+      required(resolvePantryPlatformModelRoute(this.env)),
+    );
   }
 
   turnRequest(now, startId, nextTurnId, generation) {

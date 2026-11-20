@@ -4,7 +4,6 @@ import { runtimeFetch } from "../../runtime-fetch";
 import {
   resolveAccountMembershipContext,
   AccountServiceGrantAcceptance,
-  AccountServiceGrantRevocation,
   applyAccountServiceGrantAcceptance,
 } from "../../account-platform/service-membership";
 import type { OrganizationInvitation as AccountInvitation } from "@seams-internal/console-shared/accountPlatform";
@@ -31,7 +30,7 @@ import {
   parseAssignableControlRole,
   parseControlRole,
   parseOrganisationInvitationEmail,
-  applyAccountServiceGrantRevocation,
+  revokeOrganisationMembership,
 } from "../../data/control-plane";
 import {
   prepareOnboardingEvent,
@@ -580,22 +579,8 @@ async function handleMember(
             : 409,
         );
   }
-  const context = await resolveAccountMembershipContext(
-    env,
-    authorized.organisationId,
-    authorized.authenticated.session,
-  );
-  if (!context.ok) return accountMembershipError(context.error.code);
-  const receipt = await AccountServiceGrantRevocation.revoke(
-    context.value,
-    authorized.executionScope,
-    targetUserId.value,
-    boundary.expectedConfigurationVersion,
-  );
-  if (!receipt.ok) return accountMembershipError(receipt.error.code);
-  const revoked = await applyAccountServiceGrantRevocation({
+  const revoked = await revokeOrganisationMembership({
     execution: authorized.executionScope,
-    receipt: receipt.value,
     organisationId: authorized.organisationId,
     targetUserId: targetUserId.value,
     revokedByUserId: identity.userId,

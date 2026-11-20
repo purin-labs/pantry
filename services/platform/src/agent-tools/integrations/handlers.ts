@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import {
   airtableBaseScope,
   type AirtableAccountRequest,
@@ -223,7 +223,7 @@ export async function listIntegrationsForEmbeddedHarness(
   const discovered = await readIntegrationDiscovery({
     db: execution.scope.database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),
@@ -299,7 +299,7 @@ async function authorizeAirtableTool(
   const authorized = await authorizeCapabilityUse({
     db: database,
     accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
+    userAuthority: acceptedExecutionAuthority(
       lease.session.sessionId,
       lease.turn.turnId,
     ),

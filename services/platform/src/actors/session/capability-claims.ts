@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import {
@@ -163,7 +163,7 @@ async function validateCapabilityClaimAuthority(input: {
       const validated = await authorizeCapabilityUse({
         db: input.executionScope.database,
         accountAccess: input.executionScope.accountAccess,
-        userAuthority: acceptedExecutionAccountAuthority(
+        userAuthority: acceptedExecutionAuthority(
           input.lease.session.sessionId,
           input.lease.turn.turnId,
         ),
@@ -183,7 +183,7 @@ async function validateCapabilityClaimAuthority(input: {
     const validated = await authorizeCapabilityUse({
       db: input.executionScope.database,
       accountAccess: input.executionScope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         input.lease.session.sessionId,
         input.lease.turn.turnId,
       ),
@@ -207,7 +207,7 @@ async function validateCapabilityClaimAuthority(input: {
       const validated = await authorizeCapabilityUse({
         db: input.executionScope.database,
         accountAccess: input.executionScope.accountAccess,
-        userAuthority: acceptedExecutionAccountAuthority(
+        userAuthority: acceptedExecutionAuthority(
           input.lease.session.sessionId,
           input.lease.turn.turnId,
         ),
@@ -233,7 +233,7 @@ async function validateCapabilityClaimAuthority(input: {
     const validated = await authorizeCapabilityUse({
       db: input.executionScope.database,
       accountAccess: input.executionScope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(
+      userAuthority: acceptedExecutionAuthority(
         input.lease.session.sessionId,
         input.lease.turn.turnId,
       ),

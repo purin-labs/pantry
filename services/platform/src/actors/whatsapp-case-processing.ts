@@ -1,4 +1,4 @@
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { turnMemoryReaderWithoutSubjects } from "../memory/access";
 import type { SqlStorage } from "@cloudflare/workers-types";
 import type { WhatsAppAgentMode } from "@purin-labs/control-api";
@@ -416,7 +416,7 @@ async function prepareReservedWhatsAppTurn(
   const preparedContext = await prepareTurnContext({
     db: input.scope.database,
     accountAccess: input.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(identity.sessionId, identity.assignmentId),
+    userAuthority: acceptedExecutionAuthority(identity.sessionId, identity.assignmentId),
     action: "execute",
     organisationId: identity.organisationId,
     caseId: identity.caseId,
@@ -458,7 +458,7 @@ async function prepareReservedWhatsAppTurn(
     revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
       db: input.scope.database,
       accountAccess: input.scope.accountAccess,
-      userAuthority: acceptedExecutionAccountAuthority(identity.sessionId, identity.assignmentId),
+      userAuthority: acceptedExecutionAuthority(identity.sessionId, identity.assignmentId),
       action: "execute",
       organisationId: identity.organisationId,
       requestAuthority: authority,

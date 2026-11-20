@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "../database-handles";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
-import { acceptedExecutionAccountAuthority } from "../account-platform/access";
+import { acceptedExecutionAuthority } from "../organisation-access/access";
 import type { Env } from "../env";
 import { parseConnectorId } from "../ids";
 import { validateLiveRequestAuthority } from "../request-authority";
@@ -100,7 +100,7 @@ export async function scheduleFollowUpForHarness(
   const live = await validateLiveRequestAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(sessionId, turnId),
+    userAuthority: acceptedExecutionAuthority(sessionId, turnId),
     action: "execute",
     authority,
   });
@@ -236,7 +236,7 @@ export async function requestPermissionForHarness(
   const live = await validateLiveRequestAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(sessionId, turnId),
+    userAuthority: acceptedExecutionAuthority(sessionId, turnId),
     action: "execute",
     authority,
   });
