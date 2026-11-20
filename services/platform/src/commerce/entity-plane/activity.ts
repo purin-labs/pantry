@@ -13,7 +13,7 @@ import type {
   CaseSnapshot,
 } from "../../actors/case/types";
 import type { ActionLedgerActivity as OrganisationActionLedgerActivity } from "../../actors/action-ledger";
-import type { OrganisationDO } from "../../actors/organisation";
+import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
 import type { CommerceProjectionHistoryEntry } from "../../actors/commerce-projection";
@@ -156,7 +156,7 @@ export type CommerceActivityReadResult = Readonly<{
 }>;
 
 type CommerceActivityOrganisationReader = Pick<
-  OrganisationDO,
+  OrganisationCommerce,
   "readCommerceProjectionHistory" | "readActionActivity"
 >;
 

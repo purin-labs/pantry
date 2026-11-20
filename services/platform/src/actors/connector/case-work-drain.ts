@@ -1,4 +1,4 @@
-import type { Env } from "../../env";
+import type { Env, SessionActorStub } from "../../env";
 import { resolveActiveSlackThreadCredential } from "../../credential-vault";
 import { newRequestId, parseSessionId } from "../../ids";
 import { slackAuthoredText } from "../../slack/events";
@@ -8,7 +8,7 @@ import type { OrganisationExecutionScope } from "../../organisation-execution-sc
 import { actorExecutionAdmissionOpen } from "../actor-execution-quiescence";
 import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
 import { admitActorRecovery } from "../actor-activation";
-import { sessionActorStub } from "../actor-router";
+import { actorStub } from "../actor-stubs";
 import { buildSlackUserMessage } from "../../slack/user-message";
 import {
   CASE_WORK_ATTEMPTS_EXHAUSTED,
@@ -47,7 +47,6 @@ import {
 import {
   CASE_WORK_CONCURRENCY,
   type LiveSlackTurn,
-  type SessionStub,
   replyMaySteer,
 } from "./support";
 import type { Variant } from "@purin-labs/type-utils";
@@ -314,10 +313,10 @@ export class ConnectorCaseWorkDrain {
     );
     if (!parked) return;
     let steered: Awaited<
-      ReturnType<SessionStub["steerCanonicalEmbeddedHarnessTurn"]>
+      ReturnType<SessionActorStub["steerCanonicalEmbeddedHarnessTurn"]>
     >;
     try {
-      steered = await sessionActorStub(
+      steered = await actorStub(
         env.SESSION,
         live.sessionRoute.physicalObjectName,
         live.sessionRoute.placement,
@@ -369,7 +368,7 @@ export class ConnectorCaseWorkDrain {
         outcome = "withdrawn";
       else {
         try {
-          const read = await sessionActorStub(
+          const read = await actorStub(
             env.SESSION,
             steered.sessionRoute.physicalObjectName,
             steered.sessionRoute.placement,

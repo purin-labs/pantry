@@ -22,7 +22,7 @@ import {
   normalizeConversationTimeline,
   type Conversation,
 } from "./conversation";
-import type { Env } from "../env";
+import type { Env, CaseActorStub } from "../env";
 import {
   deriveDirectCaseIdentities,
   type ConversationCaseActor,
@@ -33,7 +33,6 @@ import {
   resolveActiveSessionActorAtScope,
 } from "../actors/actor-router";
 import type { ConversationExecution } from "./execution";
-import type { CaseDO } from "../actors/case";
 import {
   resolveControlSessionById,
   readActiveOrganisationMembership,
@@ -143,7 +142,7 @@ export async function scheduleConversationExecution(
   );
   if (!identity.ok) throw new Error(identity.error.code);
   const identityReadyAt = Date.now();
-  let actor: DurableObjectStub<CaseDO>;
+  let actor: CaseActorStub;
   let sessionPreparation: Promise<void> = Promise.resolve();
   switch (input.conversation.work.kind) {
     case "running":

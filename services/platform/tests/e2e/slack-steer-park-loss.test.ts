@@ -5,10 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import {
-  connectorActorStub,
-  sessionActorStub,
-} from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { STEER_ANSWER_LOST_FAULT_KEY } from "../../src/actors/connector/steer-fault";
 import { fixtureDatabase } from "./organisation-database";
 import { network } from "./network";
@@ -210,10 +207,10 @@ async function actorOf(
   );
   if (entry === undefined) throw new Error(`${kind} registry entry missing`);
   return kind === "connector"
-    ? connectorActorStub(
+    ? actorStub(
         env.CONNECTOR,
         entry.physicalObjectName,
         entry.placement,
       )
-    : sessionActorStub(env.SESSION, entry.physicalObjectName, entry.placement);
+    : actorStub(env.SESSION, entry.physicalObjectName, entry.placement);
 }

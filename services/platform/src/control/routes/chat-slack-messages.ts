@@ -10,7 +10,11 @@ import type { GlobalDatabase } from "../../database-handles";
 import { signalChat } from "../../chat/signals";
 import { isConversationId } from "@purin-labs/control-api";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
-import { resolveActiveConnectorActorAtPlacement } from "../../actors/actor-router";
+import {
+  resolveActiveConnectorActorAtPlacement,
+  type ActorResolutionError,
+} from "../../actors/actor-router";
+import type { Result } from "../../result";
 import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
 import { conversationCaseIdentity } from "../../chat/conversation-access";
 import type { ConversationScope } from "../../chat/store";
@@ -28,7 +32,7 @@ import {
   type SlackChannelOptions,
   type SlackMessageProposal,
 } from "../../data/slack-message-proposal";
-import type { Env } from "../../env";
+import type { Env, ConnectorActorStub } from "../../env";
 import { parseConnectorId } from "../../ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { authorizeOrganisationRequest } from "../authorization";
@@ -311,9 +315,7 @@ async function deliverDraft(
   if (!connectorId.ok)
     return { kind: "failed", code: "connector_invalid", final: false };
   const requestedAt = Date.now();
-  let connector: Awaited<
-    ReturnType<typeof resolveActiveConnectorActorAtPlacement>
-  >;
+  let connector: Result<ConnectorActorStub, ActorResolutionError>;
   try {
     connector = await resolveActiveConnectorActorAtPlacement({
       env,

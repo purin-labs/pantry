@@ -97,11 +97,9 @@ import {
 } from "./actor-copy";
 import {
   actorStubForRegistryEntry,
-  organisationActorStub,
-  connectorActorStub,
-  sessionActorStub,
   type ActorNamespaces,
 } from "./actor-router";
+import { actorStub } from "./actor-stubs";
 import { currentActorSchemaVersion } from "./current-actor-schema-version";
 import { quiescePlacementExecution } from "./portal-chat-cleanup";
 import type { VariantBy } from "@purin-labs/type-utils";
@@ -638,7 +636,7 @@ export async function reconcileActorRelocationReceipt(input: {
   if (!source.ok) return source;
   for (const entry of source.value.entries) {
     if (entry.identity.objectKind !== "organisation") continue;
-    const organisation = organisationActorStub(
+    const organisation = actorStub(
       input.env.ORGANISATION,
       entry.physicalObjectName,
       entry.placement,
@@ -670,7 +668,7 @@ export async function reconcileActorRelocationMailReceipt(input: {
       entry.identity.logicalObjectId !== input.receipt.connectorId
     )
       continue;
-    const connector = connectorActorStub(
+    const connector = actorStub(
       input.env.CONNECTOR,
       entry.physicalObjectName,
       entry.placement,
@@ -1017,7 +1015,7 @@ export async function resumeActorRelocation(input: {
         entry.identity.objectKind !== "session"
       )
         continue;
-      const session = sessionActorStub(
+      const session = actorStub(
         input.env.SESSION,
         entry.physicalObjectName,
         entry.placement,

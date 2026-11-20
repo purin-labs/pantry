@@ -21,11 +21,9 @@ import {
 } from "./actor-registry";
 import { eraseUnregisteredActorState } from "./unregistered-actor-erasure";
 import {
-  caseActorStub,
-  connectorActorStub,
-  sessionActorStub,
   type SessionActorRoute,
 } from "./actor-router";
+import { actorStub } from "./actor-stubs";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
 
 /**
@@ -280,7 +278,7 @@ export async function startSessionBeforeItsTurn(input: {
   readonly route: SessionActorRoute;
 }): Promise<void> {
   try {
-    await sessionActorStub(
+    await actorStub(
       input.env.SESSION,
       input.route.physicalObjectName,
       input.route.placement,
@@ -558,19 +556,19 @@ function callResident(
 ): Promise<void> {
   switch (resident.kind) {
     case "connector":
-      return connectorActorStub(
+      return actorStub(
         env.CONNECTOR,
         resident.physicalObjectName,
         placement,
       ).keepResident();
     case "case":
-      return caseActorStub(
+      return actorStub(
         env.CASE,
         resident.physicalObjectName,
         placement,
       ).keepResident();
     case "session":
-      return sessionActorStub(
+      return actorStub(
         env.SESSION,
         resident.physicalObjectName,
         placement,

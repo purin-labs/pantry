@@ -15,7 +15,7 @@ import {
 } from "../../data/slack-message-proposal";
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env, ConnectorActorStub } from "../../env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -111,7 +111,7 @@ import {
 } from "../../context/assembly/commerce";
 import { parseProductionRequestFields } from "@purin-labs/commerce-client";
 import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
-import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import {
   type DraftThreadLink,
@@ -1713,12 +1713,6 @@ const WHATSAPP_DIRECTED_REPLY_MAX_CHARS = 4_000;
 
 const WHATSAPP_DIRECTED_REPLY_TTL_MS = 4 * 3_600_000;
 
-type ResolvedWhatsAppConnector = VariantBy<
-  Awaited<ReturnType<typeof resolveActiveConnectorActorAtPlacement>>,
-  "ok",
-  true
->["value"];
-
 export async function sendWhatsAppSupportReplyForEmbeddedHarness(
   env: Env,
   execution: SessionExecutionAdmission,
@@ -1894,7 +1888,7 @@ function hasWhatsAppReplyCapability(
 }
 
 async function editDirectedWhatsAppAgentProposal(
-  connector: ResolvedWhatsAppConnector,
+  connector: ConnectorActorStub,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   connectorId: string,
@@ -1933,7 +1927,7 @@ async function editDirectedWhatsAppAgentProposal(
 }
 
 async function composeDirectedWhatsAppHumanReply(
-  connector: ResolvedWhatsAppConnector,
+  connector: ConnectorActorStub,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
   connectorId: string,

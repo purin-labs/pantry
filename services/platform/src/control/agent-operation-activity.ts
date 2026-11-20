@@ -1,9 +1,8 @@
 import { readActiveCaseOperations } from "../actors/case-operations";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { ActionLedgerActivity } from "../actors/action-ledger";
-import type { OrganisationDO } from "../actors/organisation";
 import type { AgentOperationsSnapshot } from "../data/agent-operations";
-import type { Env } from "../env";
+import type { Env, OrganisationActorStub } from "../env";
 import type { OrganisationId } from "../ids";
 import { readCommerceExceptionInbox } from "../commerce/operations-workbench";
 import type { CommerceExceptionInbox } from "@purin-labs/control-api";
@@ -19,7 +18,7 @@ export async function readAgentOperationsWithActivity(
   operations: AgentOperationsSnapshot,
 ): Promise<AgentOperationsWithActivity | null> {
   const now = Date.now();
-  let organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+  let organisation: OrganisationActorStub;
   try {
     organisation = await requireActiveOrganisationActor({
       env,
@@ -41,7 +40,7 @@ async function readAgentOperationsWithActivityFromOrganisation(
   env: Env,
   organisationId: OrganisationId,
   operations: AgentOperationsSnapshot,
-  organisation: DurableObjectStub<OrganisationDO>,
+  organisation: OrganisationActorStub,
 ): Promise<AgentOperationsWithActivity | null> {
   const now = Date.now();
   const activity = await readRecentActionActivity(organisation, organisationId);
@@ -64,11 +63,11 @@ async function readAgentOperationsWithActivityFromOrganisation(
 }
 
 type RecentActionActivity = Awaited<
-  ReturnType<DurableObjectStub<OrganisationDO>["readActionActivity"]>
+  ReturnType<OrganisationActorStub["readActionActivity"]>
 >;
 
 function readRecentActionActivity(
-  organisation: DurableObjectStub<OrganisationDO>,
+  organisation: OrganisationActorStub,
   organisationId: OrganisationId,
 ): Promise<RecentActionActivity> {
   return organisation.readActionActivity({
@@ -87,7 +86,7 @@ function commerceActionLedger(
 
 /** The commerce actions of the ledger alone, for a page that shows only them. */
 export async function readCommerceActionLedger(
-  organisation: DurableObjectStub<OrganisationDO>,
+  organisation: OrganisationActorStub,
   organisationId: OrganisationId,
 ): Promise<readonly ActionLedgerActivity[]> {
   return commerceActionLedger(

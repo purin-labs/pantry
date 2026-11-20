@@ -9,10 +9,7 @@ import {
   listPlacementActorRegistryEntries,
   type ActorRegistryEntry,
 } from "../../src/actors/actor-registry";
-import {
-  connectorActorStub,
-  sessionActorStub,
-} from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import {
   resumeActorRelocation,
   startActorRelocation,
@@ -770,7 +767,7 @@ async function connectorOf(connectorId: string, placementEpoch = 1) {
     },
   );
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
+  return actorStub(
     env.CONNECTOR,
     entry.physicalObjectName,
     entry.placement,
@@ -787,7 +784,7 @@ async function threadSession(placementEpoch = 1) {
   if (entry === undefined) throw new Error("Session registry entry missing");
   return {
     sessionId: requiredSessionId(entry.identity.logicalObjectId),
-    stub: sessionActorStub(
+    stub: actorStub(
       env.SESSION,
       entry.physicalObjectName,
       entry.placement,

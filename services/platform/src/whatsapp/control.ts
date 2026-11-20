@@ -40,7 +40,7 @@ import {
   type WhatsAppIngressPolicy,
   type WhatsAppPhoneNumber,
 } from "../data/whatsapp";
-import type { Env } from "../env";
+import type { Env, ConnectorActorStub } from "../env";
 import { permissionRequiredResponse } from "../control/permission-required";
 import { mailControlAuthority } from "../control/routes/mail-inbox";
 import {
@@ -125,7 +125,7 @@ export function isWhatsAppCaseAction(
 }
 
 type WhatsAppConnectorHandle = {
-  readonly stub: DurableObjectStub<import("../actors/connector").ConnectorDO>;
+  readonly stub: ConnectorActorStub;
   readonly identity: {
     readonly organisationId: OrganisationId;
     readonly connectorId: string;

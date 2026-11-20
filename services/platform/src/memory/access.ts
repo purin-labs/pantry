@@ -22,6 +22,7 @@ import {
   requireActiveOrganisationActorAtScope,
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
+  type ActorResolutionError,
 } from "../actors/actor-router";
 import {
   authorizeCapabilityUse,
@@ -36,7 +37,7 @@ import type {
   TurnMemoryReadRequest,
 } from "../context/assembly";
 import { gmailConnectorId } from "../data/email-mailbox";
-import type { Env } from "../env";
+import type { Env, CaseActorStub, OrganisationActorStub } from "../env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -83,10 +84,6 @@ export type MemoryViewer = RecordScope &
     scope: AccountConversationScope;
     authority: Variant<RequestAuthority, "control">;
   }>;
-
-export type OrganisationStub = Awaited<
-  ReturnType<typeof requireActiveOrganisationActorAtPlacement>
->;
 
 /** Where a cited record is read from. */
 export type RecordScope = Readonly<{
@@ -168,7 +165,7 @@ export async function readMemoryViews(
  */
 export async function countMemoriesToReview(
   viewer: MemoryViewer,
-  organisation: OrganisationStub,
+  organisation: OrganisationActorStub,
   review: ReviewMemo,
 ): Promise<number | null> {
   const stored = await organisation.readMemories({
@@ -198,7 +195,7 @@ export async function countMemoriesToReview(
 export type ReviewMemo = Readonly<{
   labels: Map<string, Promise<boolean>>;
   records: Map<string, ReturnType<typeof citedRecord>>;
-  caseActors: Map<string, ReturnType<typeof resolveActiveCaseActorAtPlacement>>;
+  caseActors: Map<string, Promise<Result<CaseActorStub, ActorResolutionError>>>;
 }>;
 
 export function createReviewMemo(): ReviewMemo {
@@ -735,7 +732,7 @@ export async function resolveMemoryViewer(
  */
 export function organisationActor(
   viewer: MemoryViewer,
-): Promise<OrganisationStub> {
+): Promise<OrganisationActorStub> {
   return requireActiveOrganisationActorAtScope({
     env: viewer.env,
     scope: viewer.execution,
@@ -749,7 +746,7 @@ export function organisationActor(
  */
 export async function inspectableMemory(
   viewer: MemoryViewer,
-  organisation: OrganisationStub,
+  organisation: OrganisationActorStub,
   memoryId: string,
 ): Promise<Memory | null> {
   const stored = await organisation.readMemories({

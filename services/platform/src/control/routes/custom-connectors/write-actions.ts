@@ -3,7 +3,7 @@ import { OrganisationExecutionScope } from "../../../organisation-execution-scop
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { decideCurrentAuthorityFlowSink } from "../../../chat/information-flow";
 import { customConnectorFetchOf } from "../../../custom-connectors/egress";
-import type { Env } from "../../../env";
+import type { Env, OrganisationActorStub } from "../../../env";
 import { requireActiveOrganisationActor } from "../../../actors/actor-router";
 import {
   approvalActionBindingMatches,
@@ -577,7 +577,7 @@ type WriteMutationContext = Readonly<{
   executionScope: OrganisationExecutionScope;
   authorized: AuthorizedOrganisationRequest;
   identity: User;
-  organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+  organisation: OrganisationActorStub;
   boundary: UnversionedControlMutationBoundary;
   scope: ControlMutationReceiptScope;
   body: JsonRecord;

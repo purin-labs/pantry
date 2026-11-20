@@ -23,15 +23,12 @@ import {
 } from "../actors/actor-registry";
 import {
   resolveActiveOrganisationActor,
-  sessionActorStub,
 } from "../actors/actor-router";
-import type { SessionDO } from "../actors/agent-session";
-import type { OrganisationDO } from "../actors/organisation";
+import { actorStub } from "../actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
-import type { ConnectorDO } from "../actors/connector";
 import { purgeOrganisationWhatsAppConnectors } from "./whatsapp";
-import type { Env } from "../env";
+import type { Env, SessionActorStub } from "../env";
 import { removeVoiceMacNames } from "../voice/dns";
 import { listVoiceMacNameIds } from "../voice/store";
 import { purgeOrganisationDeviceFleets } from "../devices/purge";
@@ -148,9 +145,9 @@ export async function reconcileOrganisationOnboarding(input: {
   readonly env: OrganisationPlacementBindings;
   readonly db: OrganisationDatabase;
   readonly archive: R2Bucket;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
-  readonly connectorNamespace: DurableObjectNamespace<ConnectorDO>;
-  readonly organisationNamespace: DurableObjectNamespace<OrganisationDO>;
+  readonly sessionNamespace: Env["SESSION"];
+  readonly connectorNamespace: Env["CONNECTOR"];
+  readonly organisationNamespace: Env["ORGANISATION"];
   readonly organisationId: OrganisationId;
   readonly now: number;
 }): Promise<
@@ -229,7 +226,7 @@ export async function inspectOrganisationHarnessHistory(input: {
   readonly db: OrganisationDatabase;
   // The global directory, which holds the relocation and restore journals.
   readonly directory: GlobalDatabase;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
+  readonly sessionNamespace: Env["SESSION"];
   readonly organisationId: OrganisationId;
   readonly inspectedAt: number;
 }): Promise<
@@ -257,7 +254,7 @@ export async function inspectOrganisationHarnessHistory(input: {
     for (const entry of registryInventory.entries.filter(
       isErasableSessionRegistryEntry,
     )) {
-      const actor = sessionActorStub(
+      const actor = actorStub(
         input.sessionNamespace,
         entry.physicalObjectName,
         entry.placement,
@@ -588,9 +585,9 @@ async function reconcileSubject(input: {
   readonly env: OrganisationPlacementBindings;
   readonly db: OrganisationDatabase;
   readonly archive: R2Bucket;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
-  readonly connectorNamespace: DurableObjectNamespace<ConnectorDO>;
-  readonly organisationNamespace: DurableObjectNamespace<OrganisationDO>;
+  readonly sessionNamespace: Env["SESSION"];
+  readonly connectorNamespace: Env["CONNECTOR"];
+  readonly organisationNamespace: Env["ORGANISATION"];
   readonly organisation: RequiredOrganisationReconciliationState;
   readonly subject: OnboardingReconciliationSubject;
   readonly portalSubjectHash: string;
@@ -699,9 +696,9 @@ async function executeReconciliationSubject(
   env: OrganisationPlacementBindings,
   db: OrganisationDatabase,
   archive: R2Bucket,
-  sessionNamespace: DurableObjectNamespace<SessionDO>,
-  connectorNamespace: DurableObjectNamespace<ConnectorDO>,
-  organisationNamespace: DurableObjectNamespace<OrganisationDO>,
+  sessionNamespace: Env["SESSION"],
+  connectorNamespace: Env["CONNECTOR"],
+  organisationNamespace: Env["ORGANISATION"],
   organisation: RequiredOrganisationReconciliationState,
   subject: OnboardingReconciliationSubject,
   now: number,
@@ -991,8 +988,8 @@ export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
   // relocation and restore journals.
   readonly directory: GlobalDatabase;
   readonly archive: R2Bucket;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
-  readonly connectorNamespace: DurableObjectNamespace<ConnectorDO>;
+  readonly sessionNamespace: Env["SESSION"];
+  readonly connectorNamespace: Env["CONNECTOR"];
   readonly request: AdmittedOrganisationArchiveCleanup;
 }): Promise<number> {
   const organisation = await requireOrganisationReconciliationState(
@@ -1041,8 +1038,8 @@ async function reconcileArchivedOrganisation(
   db: OrganisationDatabase,
   directory: GlobalDatabase,
   archive: R2Bucket,
-  sessionNamespace: DurableObjectNamespace<SessionDO>,
-  connectorNamespace: DurableObjectNamespace<ConnectorDO>,
+  sessionNamespace: Env["SESSION"],
+  connectorNamespace: Env["CONNECTOR"],
   organisation: RequiredOrganisationReconciliationState,
   request: AdmittedOrganisationArchiveCleanup,
 ): Promise<number> {
@@ -1366,7 +1363,7 @@ async function reconcileOrganisationHarnessErasure(input: {
   readonly db: OrganisationDatabase;
   readonly directory: GlobalDatabase;
   readonly archive: R2Bucket;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
+  readonly sessionNamespace: Env["SESSION"];
   readonly organisationId: OrganisationId;
   readonly placement: AdmittedOrganisationArchiveCleanup["placement"];
   readonly archiveReceiptId: string;
@@ -1449,7 +1446,7 @@ async function reconcileOrganisationHarnessErasure(input: {
       if (entry === undefined) {
         throw new Error("organisation_harness_erasure_registry_entry_missing");
       }
-      const actor = sessionActorStub(
+      const actor = actorStub(
         input.sessionNamespace,
         entry.physicalObjectName,
         entry.placement,
@@ -1879,7 +1876,7 @@ async function readOrganisationHarnessErasureSessions(
 }
 
 async function inspectSessionHarnessReferences(
-  actor: Pick<DurableObjectStub<SessionDO>, "inspectHarnessHistoryReferences">,
+  actor: Pick<SessionActorStub, "inspectHarnessHistoryReferences">,
   organisationId: OrganisationId,
 ): Promise<readonly string[]> {
   const inspected = await actor.inspectHarnessHistoryReferences({

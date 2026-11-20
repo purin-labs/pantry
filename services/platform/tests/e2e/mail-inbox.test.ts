@@ -276,6 +276,7 @@ import type { CaseAssignment } from "@purin-labs/contracts";
 import type { CaseGmailReplyProposal } from "../../src/actors/case/types";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
+import type { OrganisationActorStub } from "../../src/env";
 
 async function prepareMailBudgetJourney() {
   const owner = await client("mail-budget-pi-owner");
@@ -10067,7 +10068,7 @@ type SupplierMemoryFixture = Awaited<ReturnType<typeof seedSupplierMemory>>;
  */
 async function seedSupplierMemory(
   input: Readonly<{
-    organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+    organisation: OrganisationActorStub;
     organisationId: OrganisationId;
     rawAccount: string;
     merchantId: string;
@@ -14541,7 +14542,7 @@ async function stopMailTurnSession(
 async function verifySupplierMemoryTurn(
   input: Readonly<{
     context: TestContext;
-    organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+    organisation: OrganisationActorStub;
     organisationId: OrganisationId;
     owner: Awaited<ReturnType<typeof client>>;
     admission: Awaited<ReturnType<typeof verifySupplierAdmissionBinding>>;

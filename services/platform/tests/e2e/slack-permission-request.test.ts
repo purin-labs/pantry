@@ -6,7 +6,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import { connectorActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-case-work";
 import { createGrant, enableCapability } from "./access-route-support";
 import { network } from "./network";
@@ -280,7 +280,7 @@ async function connectorWork(connectorId: string) {
       candidate.identity.logicalObjectId === connectorId,
   );
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  const stub = connectorActorStub(
+  const stub = actorStub(
     env.CONNECTOR,
     entry.physicalObjectName,
     entry.placement,

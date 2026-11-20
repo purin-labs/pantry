@@ -42,7 +42,7 @@ import {
   parseSystemSchemaRevision,
 } from "@purin-labs/commerce-client";
 import type { CommerceQueryPlanReadError, OrganisationStateError } from "../../actors/organisation/types";
-import type { OrganisationDO } from "../../actors/organisation";
+import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import {
   COMMERCE_PROJECTION_STALE_AFTER_MS,
   type CommerceProjectionKind,
@@ -64,7 +64,7 @@ import type {
 } from "./commerce-source";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
 export type BlotterOrganisationReader = Pick<
-  OrganisationDO,
+  OrganisationCommerce,
   | "readCommerceQueryPlan"
   | "readAcceptedCommerceProjectionSequence"
   | "readCommerceRelationshipStep"

@@ -50,8 +50,8 @@ import {
 import { codeModePlatformGovernor } from "./code-mode-platform-governor-stub";
 import {
   requireActiveOrganisationActorAtPlacement,
-  organisationActorStub,
 } from "./actor-router";
+import { actorStub } from "./actor-stubs";
 import { SessionExecutionAdmission } from "./session-execution-admission";
 import { readActivationExportSource } from "./actor-export";
 import {
@@ -187,7 +187,7 @@ export async function reconcileFrozenCodeModeSettlements(
   if (!entries.ok) return rejectedFrozenSettlement();
   const organisationEntry = entries.value.find(isOrganisationSettlementEntry);
   if (organisationEntry === undefined) return rejectedFrozenSettlement();
-  const organisation = organisationActorStub(
+  const organisation = actorStub(
     env.ORGANISATION,
     organisationEntry.physicalObjectName,
     organisationEntry.placement,

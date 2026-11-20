@@ -18,23 +18,12 @@ import {
   type ExactActiveActorRegistryError,
 } from "./actor-registry";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "./agent-session-schema";
-import {
-  actorStub,
-  caseActorStub,
-  connectorActorStub,
-  organisationActorStub,
-  sessionActorStub,
-  type ActorClass,
-} from "./actor-stubs";
+import { actorStub, type PlacedActorRpc } from "./actor-stubs";
 import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,
   ORGANISATION_ACTOR_SCHEMA_VERSION,
 } from "./actor-schema-versions";
-import type { SessionDO } from "./agent-session";
-import type { CaseDO } from "./case";
-import type { ConnectorDO } from "./connector";
-import type { OrganisationDO } from "./organisation";
 import type { CaseId, ConnectorId, SessionId, OrganisationId } from "../ids";
 import type { OrganisationPlacement } from "../placement";
 import type { Result } from "../result";
@@ -44,41 +33,15 @@ import {
   type ActorPlacementAdmission,
 } from "./actor-placement-admission";
 
-export {
-  caseActorStub,
-  connectorActorStub,
-  organisationActorStub,
-  sessionActorStub,
-};
-
-type ActorStub =
-  | DurableObjectStub<OrganisationDO>
-  | DurableObjectStub<SessionDO>
-  | DurableObjectStub<CaseDO>
-  | DurableObjectStub<ConnectorDO>;
-
-export type ImportedCanonicalSessionActorStub = Pick<
-  DurableObjectStub<SessionDO>,
-  | "inspectImportedCanonicalSession"
-  | "initializeCanonicalSession"
-  | "acceptCanonicalInput"
-  | "activateCanonicalRuntime"
-  | "acceptCanonicalHarnessEvent"
-  | "commitCanonicalHarnessCheckpoint"
-  | "cancelCanonicalEmbeddedHarnessTurn"
-  | "interruptCanonicalEmbeddedHarnessTurn"
-  | "startCanonicalEmbeddedHarnessTextTurn"
-  | "prepareSessionInformationFlow"
-  | "readSessionTurnFlowBinding"
-  | "inspectCutoverQuiescence"
-  | "inspectCanonicalSessionState"
->;
-
+/**
+ * The namespaces of the four placed Actors, for code that treats each Actor
+ * the same way: relocation, copy, restore and registry repair.
+ */
 export type ActorNamespaces = {
-  readonly organisation: DurableObjectNamespace<OrganisationDO>;
-  readonly session: DurableObjectNamespace<SessionDO>;
-  readonly case: DurableObjectNamespace<CaseDO>;
-  readonly connector: DurableObjectNamespace<ConnectorDO>;
+  readonly organisation: DurableObjectNamespace<PlacedActorRpc>;
+  readonly session: DurableObjectNamespace<PlacedActorRpc>;
+  readonly case: DurableObjectNamespace<PlacedActorRpc>;
+  readonly connector: DurableObjectNamespace<PlacedActorRpc>;
 };
 
 export type ActorResolutionError =
@@ -92,10 +55,13 @@ export type SessionActorRoute = {
   readonly placement: OrganisationPlacement;
 };
 
-type ActiveCaseSessionActors = {
-  readonly caseActor: DurableObjectStub<CaseDO>;
+type ActiveCaseSessionActors<
+  TCase extends PlacedActorRpc,
+  TSession extends PlacedActorRpc,
+> = {
+  readonly caseActor: DurableObjectStub<TCase>;
   readonly caseRoute: SessionActorRoute;
-  readonly sessionActor: DurableObjectStub<SessionDO>;
+  readonly sessionActor: DurableObjectStub<TSession>;
   readonly sessionRoute: SessionActorRoute;
   readonly registryActivation: ActorRegistryPublication;
   readonly timing: ActorPairResolutionTiming;
@@ -125,13 +91,15 @@ class ActorResolutionFailure extends Error {
   }
 }
 
-export async function requireActiveOrganisationActor(input: {
+export async function requireActiveOrganisationActor<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings & {
-    readonly ORGANISATION: DurableObjectNamespace<OrganisationDO>;
+    readonly ORGANISATION: DurableObjectNamespace<TActor>;
   };
   readonly organisationId: OrganisationId;
   readonly now: number;
-}): Promise<DurableObjectStub<OrganisationDO>> {
+}): Promise<DurableObjectStub<TActor>> {
   const result = await resolveActiveOrganisationActor({
     env: input.env,
     namespace: input.env.ORGANISATION,
@@ -144,14 +112,16 @@ export async function requireActiveOrganisationActor(input: {
   return result.value;
 }
 
-export async function requireActiveOrganisationActorAtPlacement(input: {
+export async function requireActiveOrganisationActorAtPlacement<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings & {
-    readonly ORGANISATION: DurableObjectNamespace<OrganisationDO>;
+    readonly ORGANISATION: DurableObjectNamespace<TActor>;
   };
   readonly organisationId: OrganisationId;
   readonly placement: OrganisationPlacement;
   readonly now: number;
-}): Promise<DurableObjectStub<OrganisationDO>> {
+}): Promise<DurableObjectStub<TActor>> {
   const result = await resolveActiveActorAtPlacement({
     env: input.env,
     namespace: input.env.ORGANISATION,
@@ -171,13 +141,15 @@ export async function requireActiveOrganisationActorAtPlacement(input: {
  * reservation checks the placement in its own batch, so the directory is not
  * read again.
  */
-export async function requireActiveOrganisationActorAtScope(input: {
+export async function requireActiveOrganisationActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: {
-    readonly ORGANISATION: DurableObjectNamespace<OrganisationDO>;
+    readonly ORGANISATION: DurableObjectNamespace<TActor>;
   };
   readonly scope: OrganisationExecutionScope;
   readonly now: number;
-}): Promise<DurableObjectStub<OrganisationDO>> {
+}): Promise<DurableObjectStub<TActor>> {
   const result = await resolveActiveActorAtScope({
     scope: input.scope,
     namespace: input.env.ORGANISATION,
@@ -191,14 +163,16 @@ export async function requireActiveOrganisationActorAtScope(input: {
   return result.value;
 }
 
-export async function requireActiveSessionActor(input: {
+export async function requireActiveSessionActor<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings & {
-    readonly SESSION: DurableObjectNamespace<SessionDO>;
+    readonly SESSION: DurableObjectNamespace<TActor>;
   };
   readonly organisationId: OrganisationId;
   readonly sessionId: SessionId;
   readonly now: number;
-}): Promise<DurableObjectStub<SessionDO>> {
+}): Promise<DurableObjectStub<TActor>> {
   const result = await resolveActiveSessionActor({
     env: input.env,
     namespace: input.env.SESSION,
@@ -212,12 +186,14 @@ export async function requireActiveSessionActor(input: {
   return result.value;
 }
 
-export function resolveActiveOrganisationActor(input: {
+export function resolveActiveOrganisationActor<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<OrganisationDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<OrganisationDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActor({
     env: input.env,
     namespace: input.namespace,
@@ -227,13 +203,15 @@ export function resolveActiveOrganisationActor(input: {
   });
 }
 
-export function resolveActiveSessionActor(input: {
+export function resolveActiveSessionActor<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<SessionDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly sessionId: SessionId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<SessionDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActor({
     env: input.env,
     namespace: input.namespace,
@@ -243,12 +221,14 @@ export function resolveActiveSessionActor(input: {
   });
 }
 
-export function resolveActiveSessionActorAtScope(input: {
+export function resolveActiveSessionActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<SessionDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly sessionId: SessionId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<SessionDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActorAtScope({
     scope: input.scope,
     namespace: input.namespace,
@@ -258,12 +238,14 @@ export function resolveActiveSessionActorAtScope(input: {
   });
 }
 
-export function resolveActiveConnectorActorAtScope(input: {
+export function resolveActiveConnectorActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<ConnectorDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly connectorId: ConnectorId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<ConnectorDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActorAtScope({
     scope: input.scope,
     namespace: input.namespace,
@@ -273,12 +255,14 @@ export function resolveActiveConnectorActorAtScope(input: {
   });
 }
 
-export function resolveActiveCaseActorAtScope(input: {
+export function resolveActiveCaseActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<CaseDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly caseId: CaseId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<CaseDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActorAtScope({
     scope: input.scope,
     namespace: input.namespace,
@@ -294,11 +278,13 @@ export function resolveActiveCaseActorAtScope(input: {
  * directory itself. Null means the caller must resolve the Case through the
  * placement path, which checks the directory before it creates anything.
  */
-export async function findActiveCaseActorAtScope(input: {
+export async function findActiveCaseActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<CaseDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly caseId: CaseId;
-}): Promise<DurableObjectStub<CaseDO> | null> {
+}): Promise<DurableObjectStub<TActor> | null> {
   return (await findActiveCaseRouteAtScope(input))?.actor ?? null;
 }
 
@@ -306,12 +292,14 @@ export async function findActiveCaseActorAtScope(input: {
  * {@link findActiveCaseActorAtScope} with the name the registry gives the
  * Case. A Case that started in a warm slot has the slot's name.
  */
-export async function findActiveCaseRouteAtScope(input: {
+export async function findActiveCaseRouteAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<CaseDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly caseId: CaseId;
 }): Promise<{
-  readonly actor: DurableObjectStub<CaseDO>;
+  readonly actor: DurableObjectStub<TActor>;
   readonly route: SessionActorRoute;
 } | null> {
   const entry = await readExactActiveActorRegistryEntry({
@@ -322,7 +310,7 @@ export async function findActiveCaseRouteAtScope(input: {
   });
   if (!entry.ok) return null;
   return {
-    actor: caseActorStub(
+    actor: actorStub(
       input.namespace,
       entry.value.physicalObjectName,
       entry.value.placement,
@@ -338,10 +326,12 @@ export async function findActiveCaseRouteAtScope(input: {
  * The Organisation counterpart of {@link findActiveCaseActorAtScope}, for a
  * read that must create nothing.
  */
-export async function findActiveOrganisationActorAtScope(input: {
+export async function findActiveOrganisationActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<OrganisationDO>;
-}): Promise<DurableObjectStub<OrganisationDO> | null> {
+  readonly namespace: DurableObjectNamespace<TActor>;
+}): Promise<DurableObjectStub<TActor> | null> {
   const entry = await readExactActiveActorRegistryEntry({
     db: input.scope.database,
     identity: organisationIdentity(input.scope.organisationId),
@@ -349,7 +339,7 @@ export async function findActiveOrganisationActorAtScope(input: {
     schemaVersion: ORGANISATION_ACTOR_SCHEMA_VERSION,
   });
   return entry.ok
-    ? organisationActorStub(
+    ? actorStub(
         input.namespace,
         entry.value.physicalObjectName,
         entry.value.placement,
@@ -358,12 +348,14 @@ export async function findActiveOrganisationActorAtScope(input: {
 }
 
 /** The Session counterpart of {@link findActiveCaseActorAtScope}. */
-export async function findActiveSessionActorAtScope(input: {
+export async function findActiveSessionActorAtScope<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly namespace: DurableObjectNamespace<SessionDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly sessionId: SessionId;
 }): Promise<{
-  readonly actor: DurableObjectStub<SessionDO>;
+  readonly actor: DurableObjectStub<TActor>;
   readonly route: SessionActorRoute;
 } | null> {
   const entry = await readExactActiveActorRegistryEntry({
@@ -374,7 +366,7 @@ export async function findActiveSessionActorAtScope(input: {
   });
   if (!entry.ok) return null;
   return {
-    actor: sessionActorStub(
+    actor: actorStub(
       input.namespace,
       entry.value.physicalObjectName,
       entry.value.placement,
@@ -386,14 +378,16 @@ export async function findActiveSessionActorAtScope(input: {
   };
 }
 
-export function resolveActiveSessionActorAtPlacement(input: {
+export function resolveActiveSessionActorAtPlacement<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<SessionDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly sessionId: SessionId;
   readonly placement: OrganisationPlacement;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<SessionDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActorAtPlacement({
     env: input.env,
     namespace: input.namespace,
@@ -404,13 +398,23 @@ export function resolveActiveSessionActorAtPlacement(input: {
   });
 }
 
-export async function resolveImportedCanonicalSessionActor(input: {
+/**
+ * The Session that the registry lists as active, with nothing reserved or
+ * activated. The caller names the methods that it needs through the type of
+ * the namespace.
+ */
+export async function resolveImportedCanonicalSessionActor<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<SessionDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly sessionId: SessionId;
-}): Promise<Result<ImportedCanonicalSessionActorStub, ActorResolutionError>> {
-  const scope = await OrganisationExecutionScope.resolve(input.env, input.organisationId);
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
+  const scope = await OrganisationExecutionScope.resolve(
+    input.env,
+    input.organisationId,
+  );
   if (!scope.ok) return scope;
   const entry = await readExactActiveActorRegistryEntry({
     db: scope.value.database,
@@ -421,7 +425,7 @@ export async function resolveImportedCanonicalSessionActor(input: {
   return entry.ok
     ? {
         ok: true,
-        value: sessionActorStub(
+        value: actorStub(
           input.namespace,
           entry.value.physicalObjectName,
           entry.value.placement,
@@ -430,25 +434,13 @@ export async function resolveImportedCanonicalSessionActor(input: {
     : entry;
 }
 
-export function importedCanonicalSessionActorStub(input: {
-  readonly namespace: DurableObjectNamespace<SessionDO>;
-  readonly physicalObjectName: string;
-  readonly placement: OrganisationPlacement;
-}): ImportedCanonicalSessionActorStub {
-  return sessionActorStub(
-    input.namespace,
-    input.physicalObjectName,
-    input.placement,
-  );
-}
-
-export function resolveActiveCaseActor(input: {
+export function resolveActiveCaseActor<TActor extends PlacedActorRpc>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<CaseDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly caseId: CaseId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<CaseDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActor({
     env: input.env,
     namespace: input.namespace,
@@ -458,13 +450,15 @@ export function resolveActiveCaseActor(input: {
   });
 }
 
-export function resolveActiveConnectorActor(input: {
+export function resolveActiveConnectorActor<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<ConnectorDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly connectorId: ConnectorId;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<ConnectorDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActor({
     env: input.env,
     namespace: input.namespace,
@@ -474,14 +468,16 @@ export function resolveActiveConnectorActor(input: {
   });
 }
 
-export async function resolveActiveConnectorActorAtPlacement(input: {
+export async function resolveActiveConnectorActorAtPlacement<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<ConnectorDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly connectorId: ConnectorId;
   readonly placement: OrganisationPlacement;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<ConnectorDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   const identity = connectorIdentity(input.organisationId, input.connectorId);
   return resolveActiveActorAtPlacement({
     env: input.env,
@@ -493,14 +489,16 @@ export async function resolveActiveConnectorActorAtPlacement(input: {
   });
 }
 
-export function resolveActiveCaseActorAtPlacement(input: {
+export function resolveActiveCaseActorAtPlacement<
+  TActor extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly namespace: DurableObjectNamespace<CaseDO>;
+  readonly namespace: DurableObjectNamespace<TActor>;
   readonly organisationId: OrganisationId;
   readonly caseId: CaseId;
   readonly placement: OrganisationPlacement;
   readonly now: number;
-}): Promise<Result<DurableObjectStub<CaseDO>, ActorResolutionError>> {
+}): Promise<Result<DurableObjectStub<TActor>, ActorResolutionError>> {
   return resolveActiveActorAtPlacement({
     env: input.env,
     namespace: input.namespace,
@@ -511,16 +509,21 @@ export function resolveActiveCaseActorAtPlacement(input: {
   });
 }
 
-export async function resolveActiveCaseSessionActorsAtPlacement(input: {
+export async function resolveActiveCaseSessionActorsAtPlacement<
+  TCase extends PlacedActorRpc,
+  TSession extends PlacedActorRpc,
+>(input: {
   readonly env: OrganisationPlacementBindings;
-  readonly caseNamespace: DurableObjectNamespace<CaseDO>;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
+  readonly caseNamespace: DurableObjectNamespace<TCase>;
+  readonly sessionNamespace: DurableObjectNamespace<TSession>;
   readonly organisationId: OrganisationId;
   readonly caseId: CaseId;
   readonly sessionId: SessionId;
   readonly placement: OrganisationPlacement;
   readonly now: number;
-}): Promise<Result<ActiveCaseSessionActors, ActorResolutionError>> {
+}): Promise<
+  Result<ActiveCaseSessionActors<TCase, TSession>, ActorResolutionError>
+> {
   const scope = await OrganisationExecutionScope.resolveAtPlacement(
     input.env,
     input.organisationId,
@@ -537,10 +540,13 @@ export async function resolveActiveCaseSessionActorsAtPlacement(input: {
   });
 }
 
-export async function resolveActiveCaseSessionActorsAtScope(input: {
+export async function resolveActiveCaseSessionActorsAtScope<
+  TCase extends PlacedActorRpc,
+  TSession extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
-  readonly caseNamespace: DurableObjectNamespace<CaseDO>;
-  readonly sessionNamespace: DurableObjectNamespace<SessionDO>;
+  readonly caseNamespace: DurableObjectNamespace<TCase>;
+  readonly sessionNamespace: DurableObjectNamespace<TSession>;
   readonly caseId: CaseId;
   readonly sessionId: SessionId;
   readonly now: number;
@@ -549,7 +555,9 @@ export async function resolveActiveCaseSessionActorsAtScope(input: {
    * exists keeps its own name.
    */
   readonly warmSlots?: { readonly case: string; readonly session: string };
-}): Promise<Result<ActiveCaseSessionActors, ActorResolutionError>> {
+}): Promise<
+  Result<ActiveCaseSessionActors<TCase, TSession>, ActorResolutionError>
+> {
   const admission = actorExecutionAdmission(input.scope);
   const reservationStartedAt = Date.now();
   const reserved = await reserveActorPair({
@@ -582,12 +590,12 @@ export async function resolveActiveCaseSessionActorsAtScope(input: {
   ) {
     return { ok: false, error: { code: "registry_entry_corrupt" } };
   }
-  const caseActor = caseActorStub(
+  const caseActor = actorStub(
     input.caseNamespace,
     caseEntry.physicalObjectName,
     caseEntry.placement,
   );
-  const sessionActor = sessionActorStub(
+  const sessionActor = actorStub(
     input.sessionNamespace,
     sessionEntry.physicalObjectName,
     sessionEntry.placement,
@@ -633,7 +641,7 @@ export async function resolveActiveCaseSessionActorsAtScope(input: {
   };
 }
 
-async function timedActivation<TObject extends ActorClass>(
+async function timedActivation<TObject extends PlacedActorRpc>(
   object: DurableObjectStub<TObject>,
   entry: ActorRegistryEntry,
   now: number,
@@ -672,28 +680,28 @@ export async function publishActorRegistryActivation(input: {
 export function actorStubForRegistryEntry(input: {
   readonly namespaces: ActorNamespaces;
   readonly entry: ActorRegistryEntry;
-}): ActorStub {
+}): DurableObjectStub<PlacedActorRpc> {
   switch (input.entry.identity.objectKind) {
     case "organisation":
-      return organisationActorStub(
+      return actorStub(
         input.namespaces.organisation,
         input.entry.physicalObjectName,
         input.entry.placement,
       );
     case "session":
-      return sessionActorStub(
+      return actorStub(
         input.namespaces.session,
         input.entry.physicalObjectName,
         input.entry.placement,
       );
     case "case":
-      return caseActorStub(
+      return actorStub(
         input.namespaces.case,
         input.entry.physicalObjectName,
         input.entry.placement,
       );
     case "connector":
-      return connectorActorStub(
+      return actorStub(
         input.namespaces.connector,
         input.entry.physicalObjectName,
         input.entry.placement,
@@ -703,7 +711,7 @@ export function actorStubForRegistryEntry(input: {
   }
 }
 
-async function resolveActiveActor<TObject extends ActorClass>(input: {
+async function resolveActiveActor<TObject extends PlacedActorRpc>(input: {
   readonly env: OrganisationPlacementBindings;
   readonly namespace: DurableObjectNamespace<TObject>;
   readonly identity: ActorIdentity;
@@ -725,7 +733,7 @@ async function resolveActiveActor<TObject extends ActorClass>(input: {
 }
 
 async function resolveActiveActorAtPlacement<
-  TObject extends ActorClass,
+  TObject extends PlacedActorRpc,
 >(input: {
   readonly env: OrganisationPlacementBindings;
   readonly namespace: DurableObjectNamespace<TObject>;
@@ -749,7 +757,9 @@ async function resolveActiveActorAtPlacement<
   });
 }
 
-async function resolveActiveActorAtScope<TObject extends ActorClass>(input: {
+async function resolveActiveActorAtScope<
+  TObject extends PlacedActorRpc,
+>(input: {
   readonly scope: OrganisationExecutionScope;
   readonly namespace: DurableObjectNamespace<TObject>;
   readonly identity: ActorIdentity;
@@ -825,7 +835,7 @@ function traceActorResolution(
   );
 }
 
-async function activateReservedActor<TObject extends ActorClass>(
+async function activateReservedActor<TObject extends PlacedActorRpc>(
   object: DurableObjectStub<TObject>,
   entry: ActorRegistryEntry,
   now: number,
@@ -878,7 +888,11 @@ async function publishActorActivations(
 }
 
 function organisationIdentity(organisationId: OrganisationId): ActorIdentity {
-  return { objectKind: "organisation", organisationId, logicalObjectId: organisationId };
+  return {
+    objectKind: "organisation",
+    organisationId,
+    logicalObjectId: organisationId,
+  };
 }
 
 function sessionIdentity(
@@ -888,7 +902,10 @@ function sessionIdentity(
   return { objectKind: "session", organisationId, logicalObjectId: sessionId };
 }
 
-function caseIdentity(organisationId: OrganisationId, caseId: CaseId): ActorIdentity {
+function caseIdentity(
+  organisationId: OrganisationId,
+  caseId: CaseId,
+): ActorIdentity {
   return { objectKind: "case", organisationId, logicalObjectId: caseId };
 }
 
@@ -896,5 +913,9 @@ function connectorIdentity(
   organisationId: OrganisationId,
   connectorId: ConnectorId,
 ): ActorIdentity {
-  return { objectKind: "connector", organisationId, logicalObjectId: connectorId };
+  return {
+    objectKind: "connector",
+    organisationId,
+    logicalObjectId: connectorId,
+  };
 }

@@ -23,10 +23,9 @@ import type {
 import { assertNever } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
-import type { ConnectorDO } from "../actors/connector";
 import { parseDelivery } from "../actors/connector/ingress-parsers";
 import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
+import type { Env, ConnectorActorStub } from "../env";
 import {
   newRequestId,
   parseChannelId,
@@ -321,7 +320,7 @@ async function sendToConnector(
 ): Promise<ConnectorOutcome> {
   const connector = await connectors.resolve(row.connectorId);
   if (!connector.ok) return { kind: "failed", reason: connector.error };
-  let result: Awaited<ReturnType<DurableObjectStub<ConnectorDO>["deliver"]>>;
+  let result: Awaited<ReturnType<ConnectorActorStub["deliver"]>>;
   try {
     result = await connector.value.deliver({
       identity: {
@@ -367,7 +366,7 @@ async function sendToConnector(
 class ConnectorStubs {
   readonly #stubs = new Map<
     ConnectorId,
-    Promise<Result<DurableObjectStub<ConnectorDO>, string>>
+    Promise<Result<ConnectorActorStub, string>>
   >();
 
   constructor(
@@ -378,7 +377,7 @@ class ConnectorStubs {
 
   resolve(
     connectorId: ConnectorId,
-  ): Promise<Result<DurableObjectStub<ConnectorDO>, string>> {
+  ): Promise<Result<ConnectorActorStub, string>> {
     let stub = this.#stubs.get(connectorId);
     if (stub === undefined) {
       stub = this.load(connectorId);
@@ -389,7 +388,7 @@ class ConnectorStubs {
 
   private async load(
     connectorId: ConnectorId,
-  ): Promise<Result<DurableObjectStub<ConnectorDO>, string>> {
+  ): Promise<Result<ConnectorActorStub, string>> {
     try {
       const connector = await resolveActiveConnectorActorAtPlacement({
         env: this.env,

@@ -81,10 +81,10 @@ import { OrganisationExecutionScope } from "../../src/organisation-execution-sco
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import {
   actorStubForRegistryEntry,
-  caseActorStub,
   requireActiveSessionActor,
   requireActiveOrganisationActorAtPlacement,
 } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { parseSessionId } from "../../src/ids";
 import {
   listPlacementActorRegistryEntries,
@@ -2211,7 +2211,7 @@ async function verifyClosedCaseAdmission(
   if (!registry.ok) throw new Error(registry.error.code);
   const entry = registry.value.find(isCaseRegistryEntry);
   if (entry === undefined) throw new Error("Missing source Case");
-  const actor = caseActorStub(
+  const actor = actorStub(
     env.CASE,
     entry.physicalObjectName,
     entry.placement,

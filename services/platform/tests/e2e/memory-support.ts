@@ -39,6 +39,7 @@ import {
   type SharedAccountNativeClient,
 } from "./shared-account-platform-fixture";
 import { openRouterText } from "./slack-journey-support";
+import type { OrganisationActorStub } from "../../src/env";
 
 export const CUTOFF_INSTRUCTION =
   "Remember that our primary supplier closes next-day orders at noon Sydney time.";
@@ -53,7 +54,7 @@ export type Member = SharedAccountNativeClient &
 
 export type MemoryFixture = Readonly<{
   organisationId: OrganisationId;
-  organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+  organisation: OrganisationActorStub;
   /** The owner. */
   author: Member;
   /** A second administrator. */

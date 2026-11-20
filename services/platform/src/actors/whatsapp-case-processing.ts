@@ -9,7 +9,7 @@ import {
   type WhatsAppReplyAuthor,
 } from "../data/whatsapp";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import type { Env } from "../env";
+import type { Env, CaseActorStub, SessionActorStub } from "../env";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   newRequestId,
@@ -179,24 +179,12 @@ type PreparedWhatsAppAssignment = VariantBy<
   true
 >["value"];
 
-type ActiveCaseActorStub = VariantBy<
-  Awaited<ReturnType<typeof resolveActiveCaseActorAtPlacement>>,
-  "ok",
-  true
->["value"];
-
-type ActiveSessionActorStub = VariantBy<
-  Awaited<ReturnType<typeof resolveActiveSessionActorAtPlacement>>,
-  "ok",
-  true
->["value"];
-
 type PreparedWhatsAppTurn = Readonly<{
   authority: ReturnType<
     typeof buildWhatsAppSupportAuthority
   >["requestAuthority"];
-  caseActor: ActiveCaseActorStub;
-  session: ActiveSessionActorStub;
+  caseActor: CaseActorStub;
+  session: SessionActorStub;
   preparedAssignment: PreparedWhatsAppAssignment;
   objective: string;
   workspaceRevision: string;

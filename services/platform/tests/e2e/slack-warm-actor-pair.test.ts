@@ -4,7 +4,7 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { connectorActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { CaseDO } from "../../src/actors/case";
 import {
   conversationResidencyStub,
@@ -342,7 +342,7 @@ async function connectorName(connectorId: string): Promise<string> {
 }
 
 async function connectorOf(connectorId: string) {
-  return connectorActorStub(
+  return actorStub(
     env.CONNECTOR,
     await connectorName(connectorId),
     requiredPlacement(),

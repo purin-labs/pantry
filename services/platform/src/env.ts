@@ -179,3 +179,14 @@ export interface Env {
    */
   SHOP_ORDER_PAGE_ORIGIN?: string;
 }
+
+/**
+ * The stub of each placed Actor, as its binding gives it (Refactor 17, step
+ * A1.1). Code outside the Actor's own file names these types and not the
+ * class. Step A1.2 gives each module its own part of the environment, with
+ * the RPC interface that the module needs.
+ */
+export type OrganisationActorStub = ReturnType<Env["ORGANISATION"]["get"]>;
+export type SessionActorStub = ReturnType<Env["SESSION"]["get"]>;
+export type CaseActorStub = ReturnType<Env["CASE"]["get"]>;
+export type ConnectorActorStub = ReturnType<Env["CONNECTOR"]["get"]>;

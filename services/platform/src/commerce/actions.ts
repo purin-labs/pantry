@@ -1,9 +1,9 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env, OrganisationActorStub } from "../env";
 import type { Result } from "../result";
-import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement, requireActiveOrganisationActor } from "../actors/actor-router";
+import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "../actors/actor-router";
 import type { ActionLedgerEntry } from "../actors/action-ledger";
-import type { OrganisationDO } from "../actors/organisation";
+import type { OrganisationCommerce } from "../actors/organisation/organisation-commerce";
 import type { MerchantActionRejectionEvidence } from "../approval-authentication";
 import { parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceActionError, type CommerceEntityPlaneActionPath, type CommerceActionPath, type CommerceActionRequest } from "./action-model";
 import { executeCommerceEntityPlaneAction, type CommerceEntityPlaneExecutionOutcome } from "./entity-plane/execution";
@@ -81,7 +81,7 @@ export async function executeCommerceAction(
   input: Readonly<{
     env: Env;
     executionScope: OrganisationExecutionScope;
-    organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+    organisation: OrganisationActorStub;
     action: ActionLedgerEntry;
     actionNonce: string;
     now: number;
@@ -196,7 +196,7 @@ export async function executeCommerceAction(
   });
   if (!authority.ok)
     return { ok: false, error: { kind: "provider", error: authority.error } };
-  let begun: Awaited<ReturnType<OrganisationDO["beginActionExecution"]>>;
+  let begun: Awaited<ReturnType<OrganisationCommerce["beginActionExecution"]>>;
   if (input.action.state === "indeterminate") {
     const reconciliation = await reconcileCommerceProviderAction({
       env,

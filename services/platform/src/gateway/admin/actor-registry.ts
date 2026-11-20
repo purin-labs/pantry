@@ -10,7 +10,6 @@ import {
   readStringField,
   readOrganisationIdField,
 } from "../../boundary";
-import type { OrganisationDO } from "../../actors/organisation";
 import type { OrganisationMetaInput } from "../../actors/organisation/types";
 import {
   advanceActiveActorRegistrySchema,
@@ -31,7 +30,11 @@ import type {
 } from "../../actors/actor-activation";
 import { currentActorSchemaVersion } from "../../actors/current-actor-schema-version";
 import { codeModePlatformGovernor } from "../../actors/code-mode-platform-governor-stub";
-import type { Env } from "../../env";
+import type {
+  Env,
+  OrganisationActorStub,
+  SessionActorStub,
+} from "../../env";
 import {
   inspectOrganisationActorRegistry,
   reconcileOrganisationActorRegistry,
@@ -40,17 +43,13 @@ import {
 } from "../../actors/actor-registry-reconciliation";
 import type { CaseSnapshot } from "../../actors/case/types";
 import {
-  caseActorStub,
-  connectorActorStub,
-  importedCanonicalSessionActorStub,
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActor,
   resolveImportedCanonicalSessionActor,
-  organisationActorStub,
-  sessionActorStub,
   type ActorNamespaces,
-  type ImportedCanonicalSessionActorStub,
+  type ActorResolutionError,
 } from "../../actors/actor-router";
+import { actorStub } from "../../actors/actor-stubs";
 import {
   errorResponse,
   jsonResponse,
@@ -149,8 +148,29 @@ type ActorRegistryAdminRequestError = {
   readonly field: string;
 };
 
+/**
+ * What this admin code may call on a Session that an import brought in. The
+ * list is narrow on purpose: a method that is not here needs a decision.
+ */
+type ImportedCanonicalSessionActorStub = Pick<
+  SessionActorStub,
+  | "inspectImportedCanonicalSession"
+  | "initializeCanonicalSession"
+  | "acceptCanonicalInput"
+  | "activateCanonicalRuntime"
+  | "acceptCanonicalHarnessEvent"
+  | "commitCanonicalHarnessCheckpoint"
+  | "cancelCanonicalEmbeddedHarnessTurn"
+  | "interruptCanonicalEmbeddedHarnessTurn"
+  | "startCanonicalEmbeddedHarnessTextTurn"
+  | "prepareSessionInformationFlow"
+  | "readSessionTurnFlowBinding"
+  | "inspectCutoverQuiescence"
+  | "inspectCanonicalSessionState"
+>;
+
 type ActorSchemaAdvanceStub = Pick<
-  DurableObjectStub<OrganisationDO>,
+  OrganisationActorStub,
   "advanceActivationSchema"
 >;
 
@@ -309,17 +329,17 @@ function registeredActorObjectId(
   const name = entry.physicalObjectName;
   switch (entry.identity.objectKind) {
     case "session":
-      return sessionActorStub(env.SESSION, name, entry.placement).id.toString();
+      return actorStub(env.SESSION, name, entry.placement).id.toString();
     case "case":
-      return caseActorStub(env.CASE, name, entry.placement).id.toString();
+      return actorStub(env.CASE, name, entry.placement).id.toString();
     case "connector":
-      return connectorActorStub(
+      return actorStub(
         env.CONNECTOR,
         name,
         entry.placement,
       ).id.toString();
     case "organisation":
-      return organisationActorStub(
+      return actorStub(
         env.ORGANISATION,
         name,
         entry.placement,
@@ -436,7 +456,7 @@ async function erasePurgedConnectorResponse(
     initialActorPhysicalName(entry.identity),
   ]);
   for (const name of names) {
-    const erased = await connectorActorStub(
+    const erased = await actorStub(
       env.CONNECTOR,
       name,
       entry.placement,
@@ -518,7 +538,7 @@ async function discardQuarantinedCaseResponse(
       409,
     );
   }
-  const actor = caseActorStub(
+  const actor = actorStub(
     env.CASE,
     entry.physicalObjectName,
     entry.placement,
@@ -595,12 +615,13 @@ async function interruptActiveSessionResponse(
   env: Env,
   input: VariantBy<ActorRegistryAdminRequest, "command", "interrupt_session">,
 ): Promise<Response> {
-  const actor = await resolveImportedCanonicalSessionActor({
-    env: env,
-    namespace: env.SESSION,
-    organisationId: input.organisationId,
-    sessionId: input.sessionId,
-  });
+  const actor: Result<ImportedCanonicalSessionActorStub, ActorResolutionError> =
+    await resolveImportedCanonicalSessionActor({
+      env: env,
+      namespace: env.SESSION,
+      organisationId: input.organisationId,
+      sessionId: input.sessionId,
+    });
   if (!actor.ok) {
     return actorResolutionErrorResponse(actor.error);
   }
@@ -861,13 +882,13 @@ function actorSchemaAdvanceStub(
 ): ActorSchemaAdvanceStub {
   switch (entry.identity.objectKind) {
     case "organisation":
-      return organisationActorStub(
+      return actorStub(
         env.ORGANISATION,
         entry.physicalObjectName,
         entry.placement,
       );
     case "connector":
-      return connectorActorStub(
+      return actorStub(
         env.CONNECTOR,
         entry.physicalObjectName,
         entry.placement,
@@ -1186,7 +1207,7 @@ async function inspectOrganisationActorRegistryResponse(
       }
       let activation: ActorActivationInspection;
       try {
-        activation = await caseActorStub(
+        activation = await actorStub(
           env.CASE,
           exactEntry.physicalObjectName,
           exactEntry.placement,
@@ -1216,7 +1237,7 @@ async function inspectOrganisationActorRegistryResponse(
       });
     }
     try {
-      const inspected = await caseActorStub(
+      const inspected = await actorStub(
         env.CASE,
         entry.physicalObjectName,
         entry.placement,
@@ -1576,11 +1597,11 @@ async function inspectActiveSessionRegistryEntry(input: {
   const unavailable = unavailableSessionInspection.bind(null, input.entry);
   let actor: ImportedCanonicalSessionActorStub;
   try {
-    actor = importedCanonicalSessionActorStub({
-      namespace: input.env.SESSION,
-      physicalObjectName: input.entry.physicalObjectName,
-      placement: input.entry.placement,
-    });
+    actor = actorStub(
+      input.env.SESSION,
+      input.entry.physicalObjectName,
+      input.entry.placement,
+    );
   } catch {
     return unavailable({ code: "actor_unreachable" });
   }

@@ -12,13 +12,12 @@ import {
 } from "@purin-labs/std";
 import { parseCaseId, parseOrganisationId, type RequestId } from "../ids";
 import type { Result } from "../result";
-import type { Env } from "../env";
+import type { Env, CaseActorStub } from "../env";
 import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActor,
 } from "./actor-router";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { CaseDO } from "./case";
 import {
   preflightHarnessTurnLease,
   parsePersistedHarnessTurnLease,
@@ -92,7 +91,7 @@ export class StartedGoalExecution {
     lease: HarnessTurnLease,
     assignment: CaseAssignment,
     requestId: RequestId,
-    servedCase: Promise<DurableObjectStub<CaseDO> | null>,
+    servedCase: Promise<CaseActorStub | null>,
   ): StartedGoalExecution {
     return new StartedGoalExecution(
       servedCase
@@ -149,7 +148,7 @@ export async function findServedGoalCase(
   env: Env,
   scope: OrganisationExecutionScope,
   assignment: CaseAssignment,
-): Promise<DurableObjectStub<CaseDO> | null> {
+): Promise<CaseActorStub | null> {
   const caseId = parseCaseId(assignment.caseId);
   if (
     !caseId.ok ||
@@ -172,7 +171,7 @@ export async function createSessionGoalExecution(
   lease: HarnessTurnLease,
   assignment: CaseAssignment,
   requestId: RequestId,
-  servedCase: DurableObjectStub<CaseDO> | null,
+  servedCase: CaseActorStub | null,
 ): Promise<GoalExecution> {
   if (
     assignment.sessionId !== lease.session.sessionId ||
@@ -276,7 +275,7 @@ async function closeTransient(
   context: GoalUsageContext,
   runId: string,
   binding: ExecutionBinding,
-  owner: DurableObjectStub<CaseDO>,
+  owner: CaseActorStub,
 ): Promise<void> {
   context.liveRuns.delete(runId);
   for (const operation of readIntents(context.storage.sql, {
@@ -423,7 +422,7 @@ function goalStopForSnapshot(
 
 async function settle(
   context: GoalUsageContext,
-  owner: DurableObjectStub<CaseDO>,
+  owner: CaseActorStub,
   ticket: GoalModelCallTicket,
   outcome: CaseGoalOperationOutcome,
 ): Promise<void> {
@@ -513,7 +512,7 @@ function executionBinding(
 async function bindExecution(
   context: GoalUsageContext,
   binding: ExecutionBinding,
-  owner: DurableObjectStub<CaseDO>,
+  owner: CaseActorStub,
 ): Promise<CaseGoalSnapshot> {
   context.liveRuns.add(binding.request.executionId);
   try {
@@ -537,7 +536,7 @@ async function bindExecution(
 async function closeExecution(
   context: GoalUsageContext,
   binding: ExecutionBinding,
-  owner: DurableObjectStub<CaseDO>,
+  owner: CaseActorStub,
 ): Promise<void> {
   context.liveRuns.delete(binding.request.executionId);
   await scheduleGoalUsage(context.storage, Date.now() + 1000);
@@ -607,7 +606,7 @@ async function reconcileOperation(
   context: GoalUsageContext,
   operation: Pending,
   forceAdmission: boolean,
-  owner: DurableObjectStub<CaseDO>,
+  owner: CaseActorStub,
 ): Promise<void> {
   const { intent, phase } = operation;
   if (phase.kind === "settled") return;
@@ -721,7 +720,7 @@ async function caseOwner(
   env: Env,
   rawOrganisationId: string,
   rawCaseId: string,
-): Promise<DurableObjectStub<CaseDO>> {
+): Promise<CaseActorStub> {
   const organisationId = parseOrganisationId(rawOrganisationId);
   const caseId = parseCaseId(rawCaseId);
   if (!organisationId.ok || !caseId.ok)

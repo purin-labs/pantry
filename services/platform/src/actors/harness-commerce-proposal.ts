@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/std";
 import type { CommerceOrderV1 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Env } from "../env";
+import type { Env, OrganisationActorStub } from "../env";
 import type { Result } from "../result";
 import {
   newRequestId,
@@ -1125,7 +1125,7 @@ async function orderRefundPolicyId(
  */
 async function proposalChangeFacts(
   input: AgentProposalInput,
-  organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>,
+  organisation: OrganisationActorStub,
   request: CommerceActionRequest,
   current: CommerceProjection,
 ): Promise<CommerceChangeFacts> {
@@ -1157,7 +1157,7 @@ async function proposalChangeFacts(
 
 async function proposalProductTitle(
   input: AgentProposalInput,
-  organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>,
+  organisation: OrganisationActorStub,
   request: CommerceActionRequest,
   current: CommerceProjection,
 ): Promise<string | null> {
@@ -1207,7 +1207,7 @@ async function recordCommerceProposal(
   input: AgentProposalInput,
   origin: CommerceActionProposalOrigin | undefined,
   shared: Readonly<{
-    organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+    organisation: OrganisationActorStub;
     request: CommerceActionRequest;
     integrationAccountId: IntegrationAccountId;
     commerceAuthority: CommerceSystemProviderAuthority;

@@ -1,20 +1,40 @@
-import type { SessionDO } from "./agent-session";
-import type { CaseDO } from "./case";
-import type { ConnectorDO } from "./connector";
-import type { OrganisationDO } from "./organisation";
 import type { OrganisationPlacement } from "../placement";
+import type { PlacedActor } from "./lifecycle/placed-actor";
 
-export type ActorClass = OrganisationDO | SessionDO | CaseDO | ConnectorDO;
+/**
+ * Typed access to an Actor (Refactor 17, step A1.1).
+ *
+ * This file names no Actor class. The type of a stub follows the type of the
+ * namespace that the caller gives, so the Actor router and the relocation
+ * code work for each Actor without an import of its class. The class of an
+ * Actor belongs to the Worker: it combines the code of several modules.
+ */
+
+/**
+ * The placement lifecycle of {@link PlacedActor}, which each placed Actor has:
+ * activation, relocation readiness, export, import and erasure. The Actor
+ * router and the relocation code need no other method of an Actor.
+ */
+export type PlacedActorRpc = Rpc.DurableObjectBranded &
+  Pick<
+    PlacedActor<unknown>,
+    | "activate"
+    | "inspectRelocationReadiness"
+    | "exportPlacementState"
+    | "importPlacementState"
+    | "eraseUnregisteredState"
+    | "eraseInactivePlacementState"
+  >;
 
 /**
  * The stub of an Actor at its placement. This module imports types only, so
  * a Worker that calls one Actor does not load the Actor router with it.
  */
-export function actorStub<TObject extends ActorClass>(
-  namespace: DurableObjectNamespace<TObject>,
+export function actorStub<TActor extends Rpc.DurableObjectBranded | undefined>(
+  namespace: DurableObjectNamespace<TActor>,
   physicalObjectName: string,
   placement: OrganisationPlacement,
-): DurableObjectStub<TObject> {
+): DurableObjectStub<TActor> {
   const placedNamespace =
     placement.kind === "residency"
       ? namespace.jurisdiction(placement.residencyJurisdiction)
@@ -22,36 +42,4 @@ export function actorStub<TObject extends ActorClass>(
   return placedNamespace.get(placedNamespace.idFromName(physicalObjectName), {
     locationHint: placement.locationHint,
   });
-}
-
-export function organisationActorStub(
-  namespace: DurableObjectNamespace<OrganisationDO>,
-  physicalObjectName: string,
-  placement: OrganisationPlacement,
-): DurableObjectStub<OrganisationDO> {
-  return actorStub(namespace, physicalObjectName, placement);
-}
-
-export function sessionActorStub(
-  namespace: DurableObjectNamespace<SessionDO>,
-  physicalObjectName: string,
-  placement: OrganisationPlacement,
-): DurableObjectStub<SessionDO> {
-  return actorStub(namespace, physicalObjectName, placement);
-}
-
-export function caseActorStub(
-  namespace: DurableObjectNamespace<CaseDO>,
-  physicalObjectName: string,
-  placement: OrganisationPlacement,
-): DurableObjectStub<CaseDO> {
-  return actorStub(namespace, physicalObjectName, placement);
-}
-
-export function connectorActorStub(
-  namespace: DurableObjectNamespace<ConnectorDO>,
-  physicalObjectName: string,
-  placement: OrganisationPlacement,
-): DurableObjectStub<ConnectorDO> {
-  return actorStub(namespace, physicalObjectName, placement);
 }

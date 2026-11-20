@@ -16,13 +16,8 @@ import {
 } from "./actor-registry";
 import type { ActorExportError } from "./actor-export";
 import { isMovedRegistryEntry } from "./actor-relocation-exclusion";
-import {
-  sessionActorStub,
-  caseActorStub,
-  organisationActorStub,
-  connectorActorStub,
-  type ActorNamespaces,
-} from "./actor-router";
+import { actorStub } from "./actor-stubs";
+import type { Env } from "../env";
 
 export type PortalChatCleanupRequest = Readonly<{
   requestingOrganisationId: OrganisationId;
@@ -189,12 +184,20 @@ export function eraseActorContentSql(sql: SqlStorage): void {
     sql.exec(`DELETE FROM "${table.name.replace(/"/g, '""')}"`);
 }
 
+/**
+ * The namespaces of the four Actors that stop their work for a move. Each
+ * Actor has its own stop method, so the types come from the bindings.
+ */
+export type PlacementExecutionNamespaces = Readonly<{
+  organisation: Env["ORGANISATION"];
+  session: Env["SESSION"];
+  case: Env["CASE"];
+  connector: Env["CONNECTOR"];
+}>;
+
 export async function quiescePlacementExecution(
   db: OrganisationDatabase,
-  namespaces: Pick<
-    ActorNamespaces,
-    "organisation" | "session" | "case" | "connector"
-  >,
+  namespaces: PlacementExecutionNamespaces,
   move: FrozenOrganisationPlacementMove,
 ): Promise<Result<null, ActorRegistryError | ActorExportError>> {
   const entries = await listPlacementActorRegistryEntries({
@@ -206,7 +209,7 @@ export async function quiescePlacementExecution(
   for (const entry of entries.value) {
     if (!isMovedRegistryEntry(entry)) continue;
     if (entry.identity.objectKind !== "organisation") continue;
-    const actor = organisationActorStub(
+    const actor = actorStub(
       namespaces.organisation,
       entry.physicalObjectName,
       entry.placement,
@@ -219,7 +222,7 @@ export async function quiescePlacementExecution(
   for (const entry of entries.value) {
     if (!isMovedRegistryEntry(entry)) continue;
     if (entry.identity.objectKind !== "session") continue;
-    const actor = sessionActorStub(
+    const actor = actorStub(
       namespaces.session,
       entry.physicalObjectName,
       entry.placement,
@@ -232,7 +235,7 @@ export async function quiescePlacementExecution(
   for (const entry of entries.value) {
     if (!isMovedRegistryEntry(entry)) continue;
     if (entry.identity.objectKind !== "case") continue;
-    const actor = caseActorStub(
+    const actor = actorStub(
       namespaces.case,
       entry.physicalObjectName,
       entry.placement,
@@ -245,7 +248,7 @@ export async function quiescePlacementExecution(
   for (const entry of entries.value) {
     if (!isMovedRegistryEntry(entry)) continue;
     if (entry.identity.objectKind !== "connector") continue;
-    const actor = connectorActorStub(
+    const actor = actorStub(
       namespaces.connector,
       entry.physicalObjectName,
       entry.placement,

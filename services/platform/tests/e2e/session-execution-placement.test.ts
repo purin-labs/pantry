@@ -9,10 +9,9 @@ import { SessionDO } from "../../src/actors/agent-session";
 import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
 import {
-  sessionActorStub,
-  caseActorStub,
   requireActiveOrganisationActor,
 } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import {
   resumeActorRelocation,
   startActorRelocation,
@@ -178,7 +177,7 @@ async function slackExecutionPlacementJourney({
     const parent = entries.value.find(isCaseEntry);
     if (source === undefined || parent === undefined)
       throw new Error("Missing Slack execution Actors");
-    const sourceActor = sessionActorStub(
+    const sourceActor = actorStub(
       env.SESSION,
       source.physicalObjectName,
       source.placement,
@@ -202,7 +201,7 @@ async function slackExecutionPlacementJourney({
     });
     expect(completed.ok).toBe(true);
     await evictDurableObject(
-      caseActorStub(env.CASE, parent.physicalObjectName, parent.placement),
+      actorStub(env.CASE, parent.physicalObjectName, parent.placement),
     );
     await evictDurableObject(sourceActor);
     expect(await runInDurableObject(sourceActor, sourceAdmission)).toBe(false);
@@ -301,7 +300,7 @@ async function preparationPlacementJourney({
     if (!entries.ok) throw new Error(entries.error.code);
     const source = entries.value.find(isSessionEntry);
     if (source === undefined) throw new Error("Missing preparation Session");
-    const sourceActor = sessionActorStub(
+    const sourceActor = actorStub(
       env.SESSION,
       source.physicalObjectName,
       source.placement,
@@ -355,7 +354,7 @@ async function preparationPlacementJourney({
     const parent = entries.value.find(isCaseEntry);
     if (parent === undefined) throw new Error("Missing source Case");
     await evictDurableObject(
-      caseActorStub(env.CASE, parent.physicalObjectName, parent.placement),
+      actorStub(env.CASE, parent.physicalObjectName, parent.placement),
     );
     await evictDurableObject(sourceActor);
     expect(await runInDurableObject(sourceActor, sourceAdmission)).toBe(false);
@@ -466,7 +465,7 @@ async function executionPlacementJourney({ task }: TestContext): Promise<void> {
   const source = entries.value.find(isSessionEntry);
   if (source === undefined || source.identity.objectKind !== "session")
     throw new Error("Missing source Session");
-  const sourceActor = sessionActorStub(
+  const sourceActor = actorStub(
     env.SESSION,
     source.physicalObjectName,
     source.placement,
@@ -510,7 +509,7 @@ async function executionPlacementJourney({ task }: TestContext): Promise<void> {
   if (!freshEntries.ok) throw new Error(freshEntries.error.code);
   const fresh = freshEntries.value.find(isSessionEntry);
   if (fresh === undefined) throw new Error("Missing relocated Session");
-  const freshActor = sessionActorStub(
+  const freshActor = actorStub(
     env.SESSION,
     fresh.physicalObjectName,
     fresh.placement,
@@ -613,7 +612,7 @@ async function cancelledExecutionPlacementJourney({
     const parent = entries.value.find(isCaseEntry);
     if (source === undefined || parent === undefined)
       throw new Error("Missing source execution Actors");
-    const sourceActor = sessionActorStub(
+    const sourceActor = actorStub(
       env.SESSION,
       source.physicalObjectName,
       source.placement,
@@ -642,7 +641,7 @@ async function cancelledExecutionPlacementJourney({
     expect(model.requests).toBe(2);
     expect(await readSourceTurnState(sourceActor)).toBe("failed");
     await evictDurableObject(
-      caseActorStub(env.CASE, parent.physicalObjectName, parent.placement),
+      actorStub(env.CASE, parent.physicalObjectName, parent.placement),
     );
     await evictDurableObject(sourceActor);
     expect(await runInDurableObject(sourceActor, sourceAdmission)).toBe(false);

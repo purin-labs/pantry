@@ -35,14 +35,12 @@ import {
   admittedCaseHoldsAssignment,
   type OngoingCaseWalkingConnector,
 } from "../actors/case-walking-path";
-import type { CaseDO } from "../actors/case";
-import type { SessionDO } from "../actors/agent-session";
 import { resolveActiveSlackThreadCredential } from "../credential-vault";
 import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
 } from "../data/organisation-workspace";
-import type { Env } from "../env";
+import type { Env, CaseActorStub, SessionActorStub } from "../env";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -423,7 +421,7 @@ async function processAcceptedSlackCaseMessage(
   // A new pair takes the Connector's warm slots where it has them: a Case and
   // a Session object that are in memory already (Plan 55F).
   const caseResolutionStartedAt = Date.now();
-  let caseActor: DurableObjectStub<CaseDO>;
+  let caseActor: CaseActorStub;
   let createdPair: CreatedCaseActors | null = null;
   if (activeCase.value !== null) {
     caseActor = activeCase.value.actor;
@@ -1160,9 +1158,9 @@ function partitionSlackTarget(
 /** The Case and Session a turn runs on, with the cost of creating them. */
 type CreatedCaseActors = {
   readonly kind: "ready";
-  readonly caseActor: DurableObjectStub<CaseDO>;
+  readonly caseActor: CaseActorStub;
   readonly caseRoute: SessionActorRoute;
-  readonly session: DurableObjectStub<SessionDO>;
+  readonly session: SessionActorStub;
   readonly sessionRoute: SessionActorRoute;
   /** Null when both Actors were found active and nothing was created. */
   readonly creation:
@@ -1256,9 +1254,9 @@ async function resolveCaseActors(
 ): Promise<
   | {
       readonly kind: "ready";
-      readonly caseActor: DurableObjectStub<CaseDO>;
+      readonly caseActor: CaseActorStub;
       readonly caseRoute: SessionActorRoute;
-      readonly session: DurableObjectStub<SessionDO>;
+      readonly session: SessionActorStub;
       readonly sessionRoute: SessionActorRoute;
       readonly registryActivation: ActorRegistryPublication;
       readonly timing: ActorPairResolutionTiming;

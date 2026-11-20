@@ -22,7 +22,7 @@ import {
 import type { AccountConversationScope as ConversationScope } from "../account-platform/access";
 import { listVerifiedContactEndpoints } from "../data/contact-verification";
 import { gmailConnectorId } from "../data/email-mailbox";
-import type { Env } from "../env";
+import type { Env, OrganisationActorStub } from "../env";
 import { parseIntegrationAccountId, type OrganisationId } from "../ids";
 import {
   citedRecord,
@@ -37,7 +37,6 @@ import {
   viewerMayRead,
   type MemoryAccessError,
   type MemoryViewer,
-  type OrganisationStub,
 } from "../memory/access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
@@ -102,7 +101,7 @@ export async function readEvalViews(
  */
 export async function countEvalsToReview(
   viewer: MemoryViewer,
-  organisation: OrganisationStub,
+  organisation: OrganisationActorStub,
   review: ReviewMemo,
 ): Promise<number | null> {
   const stored = await organisation.readEvals({

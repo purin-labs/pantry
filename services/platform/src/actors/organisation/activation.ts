@@ -29,7 +29,6 @@ import { expireCodeModeOrganisationReservations } from "../code-mode-budget";
 import { expireAbandonedCueClaims } from "../cue-delivery";
 import type { OrganisationCutoverQuiescence } from "../organisation-cutover-quiescence";
 import { isNonNegativeInteger } from "@purin-labs/std";
-import type { OrganisationDO } from "../organisation";
 import type {
   ActivationExecutionFailure,
   CafeCommerceAcceptanceFaultRecord,
@@ -84,8 +83,21 @@ export async function ensureActivationReadinessStep(
   });
 }
 
+/** The one method of the Organisation actor that the placement step calls. */
+type OrganisationRecordWriter = Readonly<{
+  ensureOrganisation(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      name: string;
+      plan: "beta";
+      status: "active";
+      createdAt: number;
+    }>,
+  ): Promise<unknown>;
+}>;
+
 export async function ensureActivationPlacementStep(
-  organisation: Pick<OrganisationDO, "ensureOrganisation">,
+  organisation: OrganisationRecordWriter,
   db: OrganisationDatabase,
   context: ActivationContext,
   now: number,

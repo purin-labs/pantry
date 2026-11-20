@@ -36,7 +36,7 @@ import type {
   CaseResult,
   CommerceEntityPlaneCaseProposal,
 } from "../../actors/case/types";
-import type { OrganisationDO } from "../../actors/organisation";
+import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
 import {
   authorizeCapabilityUse,
   selectActiveGrants,
@@ -108,7 +108,7 @@ export type CommerceEntityPlaneExecutionOutcome = Readonly<{
 }>;
 
 type EntityPlaneExecutorOrganisation = Pick<
-  OrganisationDO,
+  OrganisationCommerce,
   | "beginActionExecution"
   | "retryIndeterminateActionExecution"
   | "completeActionExecution"

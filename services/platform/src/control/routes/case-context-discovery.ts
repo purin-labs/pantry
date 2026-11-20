@@ -8,7 +8,7 @@ import type {
   UserId,
 } from "@purin-labs/control-api";
 import { identifier } from "../../case-context-discovery/policy";
-import type { Env } from "../../env";
+import type { Env, OrganisationActorStub } from "../../env";
 import { authorizeConfiguredBearer } from "../../fault-injection-auth";
 import {
   parseCaseId,
@@ -262,7 +262,7 @@ async function handleCaseContextDiscoveryMetadataRoute(
 }
 
 async function readAuthorizedCaseContextCollection(
-  actor: Awaited<ReturnType<typeof requireActiveOrganisationActor>>,
+  actor: OrganisationActorStub,
   env: Env,
   scope: ConversationScope,
   caseContextCollectionId: string,

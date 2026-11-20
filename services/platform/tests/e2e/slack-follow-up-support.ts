@@ -6,7 +6,7 @@ import {
   listPlacementActorRegistryEntries,
   type ActorRegistryEntry,
 } from "../../src/actors/actor-registry";
-import { connectorActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { ORGANISATION_ID } from "./slack-journey-support";
 
 /** Each follow-up of the Connector: when it is due, or how it settled. */
@@ -116,7 +116,7 @@ export async function connectorOf(connectorId: string) {
     );
   });
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
+  return actorStub(
     env.CONNECTOR,
     entry.physicalObjectName,
     entry.placement,

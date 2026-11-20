@@ -269,19 +269,19 @@ These rules continue the rules of [Refactor 10](refactor-10.md):
 Each step defines one port in the foundation and moves the area code behind it. The
 files stay in their folders.
 
-| Step  | Port                        | Work                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Closes |
-| ----- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| A1.1  | Typed actor access          | Each actor module declares an RPC interface for its methods, for example `ProductionPlanRoomRpc`. A helper gives a typed stub for one interface. The class implements each interface. Today `env.ts` types each binding with its class, and 62 typed stubs name `CaseDO`, `OrganisationDO`, `SessionDO` or `ConnectorDO`                                                                                                                                                                                                                                                                                                             | —      |
-| A1.2  | Environment parts           | Each foundation module declares the part of the environment that it needs. The full `Env` type belongs to the Worker entry                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | —      |
-| A1.3  | Tool families               | The executor names no area. One base class, `ToolRequestError`, replaces the 17 error classes. A handler gets a tool context of the foundation (the Session, the lease, the scope) and the services of its own area. This replaces `CatalogToolAuthority`, one object with a callback for each tool of each area. `ToolSelection` names no Kitchen type: a surface command is a string that the area checks. The special cases in `execute.ts` (`commerce_entity_context`, `requestableRead`, the bakery receipt reader) become fields of their tool definitions. The tool families register through one list, in the order of today | F1     |
-| A1.4  | Effect in two parts         | A `draft`, `receipt` or `scheduled` tool (27 tools) defines `prepare` and `run`. `prepare` does the live checks and the reads, then returns the sink, the action and `run`. The executor reads the label, runs the exit check and calls `run`. This is the shape of `settleStaffPageEffect` today, for every effect tool. A staff page effect keeps its second check. The step first lists what each `proposal` tool (13) and each `surface` tool (43) does today, and it keeps that. `lint:layers` then refuses an effect tool with no `prepare`                                                                                    | F1     |
-| A1.5  | One tool host               | The mailbox and WhatsApp hosts dispatch through the registry, with the selection rules `agent_mailbox` and `whatsapp_support`. Capability claims for them are a separate decision (D6)                                                                                                                                                                                                                                                                                                                                                                                                                                               | F2     |
-| A1.6  | Channel adapter             | Slack, email, WhatsApp and the Portal chat stream register as channel adapters. The Case and Connector kernels import no card, no mailbox row and no stream                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | —      |
-| A1.7  | Session ports               | The Session names no area: integration reads, Inbox reads, commerce proposals and Kitchen effects arrive as ports                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | —      |
-| A1.8  | Authority ports             | The access-control read model gets the integration accounts and the provider catalogue through a port                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | —      |
-| A1.9  | Actor modules               | A Durable Object class composes modules. The class chains end: `ConnectorDO` over `ConnectorEmail`, `ConnectorEvals` and `ConnectorWhatsApp`, and the 6 levels of `SessionDO`. Each class keeps one ordered list of schema steps. A module gives its steps, and the class sets their order, so the stored versions do not change                                                                                                                                                                                                                                                                                                     | F2     |
-| A1.10 | Area contracts              | Each area marks its public files in the targets: its schemas and its service interfaces. The 275 imports between areas go through them. A call goes through a service interface that the Worker wires. No cycle between two contracts                                                                                                                                                                                                                                                                                                                                                                                                | —      |
-| A1.11 | Contracts and `control-api` | `contracts` stops its `export *` of `commerce-contracts`: each of its 40 import sites names what it needs. The shared primitives move below both. `control-api` loses its 6 dependencies on area packages: each area slice of it becomes a part of that area's public files. `bakery-model` reads commerce through the commerce contract                                                                                                                                                                                                                                                                                             | F6     |
+| Step  | Port                                 | Work                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Closes |
+| ----- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| A1.1  | Typed actor access                   | No code outside the Worker entry and `env.ts` imports the class of an Actor. The Actor router and the stub helper are generic: the type of a stub follows the type of the namespace that the caller gives. `env.ts` gives one stub type for each binding, and a caller names that type. Done on 2026-11-20 ([Steps done](#steps-done))                                                                                                                                                                                                                                                                                               | —      |
+| A1.2  | Environment parts and RPC interfaces | Each module declares the part of the environment that it needs. For an Actor binding, the part names the RPC interface of the module, for example `ProductionPlanRoomRpc`, and not the class. A module that holds a part of the class chain gives its interface as a list of the methods of that part. A module whose methods are in the class file of `OrganisationDO` declares its interface with full signatures, and the class implements it. The full `Env` type belongs to the Worker entry. Callers use 245 methods of the four Actors, so this step is done one module at a time                                             | —      |
+| A1.3  | Tool families                        | The executor names no area. One base class, `ToolRequestError`, replaces the 17 error classes. A handler gets a tool context of the foundation (the Session, the lease, the scope) and the services of its own area. This replaces `CatalogToolAuthority`, one object with a callback for each tool of each area. `ToolSelection` names no Kitchen type: a surface command is a string that the area checks. The special cases in `execute.ts` (`commerce_entity_context`, `requestableRead`, the bakery receipt reader) become fields of their tool definitions. The tool families register through one list, in the order of today | F1     |
+| A1.4  | Effect in two parts                  | A `draft`, `receipt` or `scheduled` tool (27 tools) defines `prepare` and `run`. `prepare` does the live checks and the reads, then returns the sink, the action and `run`. The executor reads the label, runs the exit check and calls `run`. This is the shape of `settleStaffPageEffect` today, for every effect tool. A staff page effect keeps its second check. The step first lists what each `proposal` tool (13) and each `surface` tool (43) does today, and it keeps that. `lint:layers` then refuses an effect tool with no `prepare`                                                                                    | F1     |
+| A1.5  | One tool host                        | The mailbox and WhatsApp hosts dispatch through the registry, with the selection rules `agent_mailbox` and `whatsapp_support`. Capability claims for them are a separate decision (D6)                                                                                                                                                                                                                                                                                                                                                                                                                                               | F2     |
+| A1.6  | Channel adapter                      | Slack, email, WhatsApp and the Portal chat stream register as channel adapters. The Case and Connector kernels import no card, no mailbox row and no stream                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | —      |
+| A1.7  | Session ports                        | The Session names no area: integration reads, Inbox reads, commerce proposals and Kitchen effects arrive as ports                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | —      |
+| A1.8  | Authority ports                      | The access-control read model gets the integration accounts and the provider catalogue through a port                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | —      |
+| A1.9  | Actor modules                        | A Durable Object class composes modules. The class chains end: `ConnectorDO` over `ConnectorEmail`, `ConnectorEvals` and `ConnectorWhatsApp`, and the 6 levels of `SessionDO`. Each class keeps one ordered list of schema steps. A module gives its steps, and the class sets their order, so the stored versions do not change                                                                                                                                                                                                                                                                                                     | F2     |
+| A1.10 | Area contracts                       | Each area marks its public files in the targets: its schemas and its service interfaces. The 275 imports between areas go through them. A call goes through a service interface that the Worker wires. No cycle between two contracts                                                                                                                                                                                                                                                                                                                                                                                                | —      |
+| A1.11 | Contracts and `control-api`          | `contracts` stops its `export *` of `commerce-contracts`: each of its 40 import sites names what it needs. The shared primitives move below both. `control-api` loses its 6 dependencies on area packages: each area slice of it becomes a part of that area's public files. `bakery-model` reads commerce through the commerce contract                                                                                                                                                                                                                                                                                             | F6     |
 
 ### A2 — The faults that need no port
 
@@ -372,6 +372,32 @@ What the map shows that the first measure did not:
   each import of them from a lower module counts as upward.
 
 Open for the owner: the pre-push hook.
+
+**20 November 2026. Step A1.1 is done**, on the branch `refactor-17-a1-1`.
+
+- `actors/actor-stubs.ts` and `actors/actor-router.ts` name no Actor class. Each
+  router function is generic, and its result has the type of the namespace that the
+  caller gives. The four stub helpers, one for each class, are one helper:
+  `actorStub`.
+- `env.ts` gives `OrganisationActorStub`, `SessionActorStub`, `CaseActorStub` and
+  `ConnectorActorStub` from its bindings. 25 source files and 2 test support files
+  name these types, where they named a class or the result type of a router
+  function. The change touches 43 source files and 13 test files.
+- The commerce code takes its method lists from `OrganisationCommerce`, the part of
+  the Actor that the commerce area owns. The activation step has its own interface
+  with one method. The admin code keeps its list of 13 methods for an imported
+  Session.
+- The layer ratchet went from 1,350 crossings to 1,330: 13 fewer upward and 7 fewer
+  against the foundation order. The 4 imports of the class files that stay are in
+  `env.ts`, and step A1.2 removes them.
+- No behavior changed: the change is types, imports and the name of one helper.
+  The type checks of the source, the unit tests and the journeys pass. The unit
+  suite passes (302 files, 1,732 tests).
+
+The step is smaller than its first description. A count with the type checker gave
+the reason: callers use 245 methods of the four Actors at 440 places, in about 130
+files. An interface for each module is a larger piece of work, and it needs the
+environment parts to have an effect. It is now a part of step A1.2.
 
 ## Baseline
 
@@ -651,7 +677,7 @@ Stage A changes code, not paths. These steps have the highest risk:
 
 | Step       | Risk                                                                                                       | Check                                                                                                                                                                      |
 | ---------- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A1.1       | A wrong interface hides a method. The type check finds it                                                  | The type checks and the E2E suite                                                                                                                                          |
+| A1.1, A1.2 | A wrong stub type or interface hides a method. The type check finds it                                     | The type checks and the E2E suite                                                                                                                                          |
 | A1.4       | The executor runs the exit check at a different point than a handler did. A tool can start to ask, or stop | Before the change, record for each of the 27 tools: the checks, their order and their result in one allowed and one refused journey. Compare after. Report each difference |
 | A1.5       | A mailbox turn gets a different tool list or a different catalog digest                                    | The mailbox and WhatsApp journeys. The digest of the mailbox host                                                                                                          |
 | A1.6, A1.9 | The class chains hold shared state. A module can lose a field that a parent class gave it                  | The actor journeys, the relocation journey and the idle tenant journey                                                                                                     |
@@ -747,18 +773,18 @@ moved files more than it inverted imports.
 
 The count of work for Stage A:
 
-| Work                                          |                                                                   Count |
-| --------------------------------------------- | ----------------------------------------------------------------------: |
-| Imports to remove or invert                   | 1,224 (671 upward, 377 between areas, 176 against the foundation order) |
-| Table writes to move to the owner             |                                    126, in 69 pairs of table and module |
-| Ports                                         |                                                                      11 |
-| Effect tools to give two parts                |                                                                      27 |
-| Typed stubs to move to an interface           |                                                                      62 |
-| Class chains to compose                       |                                                                       3 |
-| Landings, each with a full E2E run            |                                                             at least 25 |
-| Test files to judge when their module changes |                329 test files that are not journeys (43 with `vi.mock`) |
-| Journeys that import the inside of the Worker |                                                                     178 |
-| Specs to write                                |                                                                      33 |
+| Work                                                 |                                                                   Count |
+| ---------------------------------------------------- | ----------------------------------------------------------------------: |
+| Imports to remove or invert                          | 1,224 (671 upward, 377 between areas, 176 against the foundation order) |
+| Table writes to move to the owner                    |                                    126, in 69 pairs of table and module |
+| Ports                                                |                                                                      11 |
+| Effect tools to give two parts                       |                                                                      27 |
+| Actor methods to put in an RPC interface (step A1.2) |                                               245, called at 440 places |
+| Class chains to compose                              |                                                                       3 |
+| Landings, each with a full E2E run                   |                                                             at least 25 |
+| Test files to judge when their module changes        |                329 test files that are not journeys (43 with `vi.mock`) |
+| Journeys that import the inside of the Worker        |                                                                     178 |
+| Specs to write                                       |                                                                      33 |
 
 A full run of the E2E suite takes 54 minutes on the owner's Mac
 ([Baseline](#baseline)), so 25 landings need about 23 hours of suite time. CI runs
@@ -1016,35 +1042,57 @@ if (!passed) {
 return effect.run(operationId);
 ```
 
-### Typed actor access (A1.1)
+### Typed actor access (A1.1 and A1.2)
 
-Today a tool handler calls a method of the class, and `env.ts` imports the class:
+Before step A1.1, a caller named the class, and so did the router:
 
 ```ts
-// env.ts
-import type { OrganisationDO } from "./actors/organisation";
-ORGANISATION: DurableObjectNamespace<OrganisationDO>;
+// actors/actor-router.ts
+import type { OrganisationDO } from "./organisation";
+export function requireActiveOrganisationActor(input: {
+  env: { ORGANISATION: DurableObjectNamespace<OrganisationDO> };
+}): Promise<DurableObjectStub<OrganisationDO>>;
 
-// agent-tools/channels/handlers.ts
-const result = await organisation.editProductionPlan(input);
+// memory/access.ts
+type OrganisationStub = Awaited<
+  ReturnType<typeof requireActiveOrganisationActorAtPlacement>
+>;
 ```
 
-After, the module declares its interface, and the class implements it:
+After step A1.1, the router is generic, and the type comes from the binding:
 
 ```ts
-// actors/production-plan.ts (the module)
-export interface ProductionPlanRoomRpc {
-  editProductionPlan(
-    input: ProductionPlanEdit,
-  ): Promise<ProductionPlanEditResult>;
-}
+// actors/actor-router.ts: no import of a class
+export function requireActiveOrganisationActor<
+  TActor extends PlacedActorRpc,
+>(input: {
+  env: { ORGANISATION: DurableObjectNamespace<TActor> };
+}): Promise<DurableObjectStub<TActor>>;
 
-// the caller
-const room = actorRpc<ProductionPlanRoomRpc>(scope, "organisation");
-const result = await room.editProductionPlan(input);
+// env.ts
+export type OrganisationActorStub = ReturnType<Env["ORGANISATION"]["get"]>;
+
+// memory/access.ts
+import type { OrganisationActorStub } from "../env";
+```
+
+Step A1.2 gives each module its part of the environment. The router does not change:
+its result follows the narrower namespace type.
+
+```ts
+// memory/rpc.ts (the module declares what it needs of the Actor)
+export interface MemoryActorRpc {
+  readMemories(input: ReadMemoriesInput): Promise<MemoryPage>;
+  commandMemory(input: MemoryCommand): Promise<MemoryCommandResult>;
+}
+export type MemoryEnv = {
+  ORGANISATION: DurableObjectNamespace<
+    MemoryActorRpc & Rpc.DurableObjectBranded
+  >;
+};
 
 // actors/organisation.ts (the class)
 export class OrganisationDO
-  extends PlacedActor
-  implements ProductionPlanRoomRpc, CommerceProjectionRpc {}
+  extends OrganisationCommerce
+  implements MemoryActorRpc {}
 ```

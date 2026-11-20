@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env, ConnectorActorStub } from "../env";
 import type { Result } from "../result";
 import { resolveActiveConnectorActor } from "../actors/actor-router";
 import {
@@ -31,7 +31,7 @@ export function emailLimitsFromPolicy(
 }
 
 export type AgentMailboxConnectorHandle = {
-  readonly stub: DurableObjectStub<import("../actors/connector").ConnectorDO>;
+  readonly stub: ConnectorActorStub;
   readonly identity: {
     readonly organisationId: OrganisationId;
     readonly connectorId: string;

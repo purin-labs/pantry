@@ -8,7 +8,7 @@ import { errorMessage } from "@purin-labs/std";
 import { waitUntil } from "cloudflare:workers";
 
 import { actorPhysicalName } from "../actors/actor-registry";
-import { organisationActorStub } from "../actors/actor-stubs";
+import { actorStub } from "../actors/actor-stubs";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -56,7 +56,7 @@ async function sendSignal(
     // An Actor that holds chat sockets is active at the scope's placement,
     // so its stub needs no registry reservation. An Actor that holds none
     // drops the signal.
-    const organisation = organisationActorStub(
+    const organisation = actorStub(
       actors,
       actorPhysicalName(
         {

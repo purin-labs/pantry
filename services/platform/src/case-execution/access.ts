@@ -28,7 +28,6 @@ import {
   findActiveOrganisationActorAtScope,
   findActiveSessionActorAtScope,
 } from "../actors/actor-router";
-import type { OrganisationDO } from "../actors/organisation";
 import {
   authorizeConversation,
   VISIBLE_CONVERSATIONS_SQL,
@@ -38,7 +37,7 @@ import {
   parseConversationActorIdentity,
 } from "../chat/conversation-actor-identity";
 import type { AccountConversationScope as ConversationScope } from "../account-platform/access";
-import type { Env } from "../env";
+import type { Env, CaseActorStub, OrganisationActorStub } from "../env";
 import { parseCaseId, parseSessionId, type CaseId } from "../ids";
 import {
   resolveMemoryViewer,
@@ -345,9 +344,7 @@ type OpenedCase = Readonly<{
   env: Env;
   viewer: MemoryViewer;
   caseId: CaseId;
-  caseActor: NonNullable<
-    Awaited<ReturnType<typeof findActiveCaseActorAtScope>>
-  >;
+  caseActor: CaseActorStub;
   records: CaseExecutionCaseRecords;
   part: ProjectedPart;
   basis: string;
@@ -432,7 +429,7 @@ async function openCaseExecution(
   // active. None is reserved or activated for a read. Without one, the
   // effects are absent and the page says so.
   let ledger: Awaited<
-    ReturnType<DurableObjectStub<OrganisationDO>["readCaseExecutionEffects"]>
+    ReturnType<OrganisationActorStub["readCaseExecutionEffects"]>
   > | null = null;
   try {
     const organisation = await findActiveOrganisationActorAtScope({

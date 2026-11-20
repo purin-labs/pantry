@@ -1,7 +1,7 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
 import { readChatForkAttachmentKeys } from "../chat/fork-history";
-import { caseActorStub, sessionActorStub } from "../actors/actor-router";
+import { actorStub } from "../actors/actor-stubs";
 import {
   listOrganisationActorRegistryEntries,
   type ActorRegistryEntry,
@@ -275,13 +275,13 @@ async function reachableKeysOf(
 ): Promise<readonly string[]> {
   switch (entry.identity.objectKind) {
     case "case":
-      return caseActorStub(
+      return actorStub(
         namespaces.CASE,
         entry.physicalObjectName,
         entry.placement,
       ).listReachableAttachmentObjectKeys();
     case "session":
-      return sessionActorStub(
+      return actorStub(
         namespaces.SESSION,
         entry.physicalObjectName,
         entry.placement,

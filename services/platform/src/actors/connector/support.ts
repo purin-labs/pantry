@@ -5,7 +5,6 @@ import { traceWarn } from "../../observability";
 import type { SlackCaseCommand } from "../../ingress-queue";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { SessionActorRoute } from "../actor-router";
-import type { SessionDO } from "../agent-session";
 import type { CountRow } from "../sql-rows";
 import { scheduleCaseWorkAlarm } from "./alarm";
 // The pure parsers live in a module with no Actor imports, so that a module
@@ -59,8 +58,6 @@ export function count(
       ?.count ?? 0
   );
 }
-
-export type SessionStub = DurableObjectStub<SessionDO>;
 
 /**
  * A reply may steer the running turn of its Case when the turn's requester

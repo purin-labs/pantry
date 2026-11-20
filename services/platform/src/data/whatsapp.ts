@@ -7,7 +7,7 @@ import {
   type WhatsAppAgentMode,
 } from "@purin-labs/control-api";
 import { listOrganisationActorRegistryEntries } from "../actors/actor-registry";
-import { connectorActorStub } from "../actors/actor-router";
+import { actorStub } from "../actors/actor-stubs";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
   D1DatabaseSession,
@@ -38,7 +38,6 @@ import {
   type WhatsAppCustomerId,
   type WhatsAppPhoneNumberId,
 } from "../whatsapp/identifiers";
-import type { ConnectorDO } from "../actors/connector";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { parseVaultHandle, revokeCredential } from "../credential-vault";
 import type { OrganisationEnvironment } from "./control-plane";
@@ -49,6 +48,7 @@ import {
   positiveIntegerOrNull,
 } from "@purin-labs/std";
 import type { WhatsAppProviderHealth } from "@purin-labs/control-api";
+import type { Env } from "../env";
 
 /**
  * Durable WhatsApp metadata. Every row here holds identifiers, digests,
@@ -1732,7 +1732,7 @@ export async function listWhatsAppReplyProposalProjections(input: {
  */
 export async function purgeOrganisationWhatsAppConnectors(input: {
   readonly db: OrganisationDatabase;
-  readonly namespace: DurableObjectNamespace<ConnectorDO>;
+  readonly namespace: Env["CONNECTOR"];
   readonly organisationId: OrganisationId;
   readonly now: number;
 }): Promise<number> {
@@ -1771,7 +1771,7 @@ export async function purgeOrganisationWhatsAppConnectors(input: {
               `${input.organisationId}:${connectorId.value}`,
             ),
           )
-        : connectorActorStub(
+        : actorStub(
             input.namespace,
             entry.physicalObjectName,
             entry.placement,

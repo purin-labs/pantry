@@ -1,6 +1,5 @@
 import { actorPhysicalName } from "../actors/actor-registry";
-import { connectorActorStub } from "../actors/actor-stubs";
-import type { ConnectorDO } from "../actors/connector";
+import { actorStub } from "../actors/actor-stubs";
 import type { ConnectorSlackIngressOutcome } from "../actors/connector-slack-ingress";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import type { RequestId } from "../ids";
@@ -12,11 +11,12 @@ import {
   type PendingSlackIngressCredential,
 } from "./ingress-admission";
 import type { ResolvedSlackThreadRoute } from "./organisation-routing";
+import type { Env } from "../env";
 
 /** What a Worker needs to hand a Slack message to its Connector. */
 export type ConnectorSlackIngressBindings = OrganisationPlacementBindings &
   CredentialVaultBindings & {
-    readonly CONNECTOR: DurableObjectNamespace<ConnectorDO>;
+    readonly CONNECTOR: Env["CONNECTOR"];
   };
 
 /**
@@ -59,7 +59,7 @@ export async function decideSlackCaseAtConnector(
     event,
   );
   if (!identities.ok) return null;
-  const connector = connectorActorStub(
+  const connector = actorStub(
     env.CONNECTOR,
     actorPhysicalName(
       {

@@ -1,4 +1,3 @@
-import type { SessionDO } from "../../actors/agent-session";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { chatUserMessage } from "../attachments";
 import {
@@ -22,7 +21,7 @@ import {
   type Conversation,
   type ChatCommand,
 } from "../conversation";
-import type { Env } from "../../env";
+import type { Env, SessionActorStub } from "../../env";
 import { parseRequestId } from "../../ids";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
 import type { OrganisationModelRoute } from "../../models/route";
@@ -338,10 +337,10 @@ const STEERING_SAVE_ATTEMPTS = 5;
 
 /** A Session that cannot answer leaves the message to the cancel path. */
 async function steerSession(
-  actor: Pick<SessionActor, "steerCanonicalEmbeddedHarnessTurn">,
-  input: Parameters<SessionActor["steerCanonicalEmbeddedHarnessTurn"]>[0],
+  actor: Pick<SessionActorStub, "steerCanonicalEmbeddedHarnessTurn">,
+  input: Parameters<SessionActorStub["steerCanonicalEmbeddedHarnessTurn"]>[0],
 ): Promise<
-  | Awaited<ReturnType<SessionActor["steerCanonicalEmbeddedHarnessTurn"]>>
+  | Awaited<ReturnType<SessionActorStub["steerCanonicalEmbeddedHarnessTurn"]>>
   | { readonly ok: false }
 > {
   try {
@@ -350,8 +349,6 @@ async function steerSession(
     return { ok: false };
   }
 }
-
-type SessionActor = DurableObjectStub<SessionDO>;
 
 /**
  * A message joins the running turn natively when it adds only text: it is

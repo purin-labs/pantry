@@ -3,7 +3,7 @@ import { ensureCaseProject } from "../../../projects/case-project";
 import type { OrganisationPlacementBindings } from "../../../organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env, OrganisationActorStub } from "../../../env";
 import type { Result } from "../../../result";
 import type { CommerceGraphQuery, RequestAuthority } from "@purin-labs/contracts";
 import {
@@ -17,7 +17,6 @@ import {
 } from "../../../actors/actor-router";
 import type { ActionLedgerEntry } from "../../../actors/action-ledger";
 import type { CaseSnapshot } from "../../../actors/case/types";
-import type { OrganisationDO } from "../../../actors/organisation";
 import { authorizeCapabilityUse } from "../../../authorization/access-grants/turn-authority";
 import { authorizeCommerceEntityPlaneCommand } from "../../../commerce/entity-plane/execution";
 import { readCommerceActivity } from "../../../commerce/entity-plane/activity";
@@ -183,7 +182,7 @@ export async function handleCommerceExportPreset(
     client,
   });
   if (!published.ok) return commerceExportPresetErrorResponse(published.error);
-  let organisation: DurableObjectStub<OrganisationDO>;
+  let organisation: OrganisationActorStub;
   try {
     organisation = await requireActiveOrganisationActor({
       env,
@@ -378,7 +377,7 @@ export async function handleCommerceBoardPresence(
     request.method === "POST",
   );
   if (!authorized.ok) return authorized.response;
-  let organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+  let organisation: OrganisationActorStub;
   try {
     organisation = await requireActiveOrganisationActor({
       env,
@@ -1219,7 +1218,7 @@ export async function handleCommerceGraphActivity(
       parsed.error.code,
       commerceActivityErrorStatus(parsed.error),
     );
-  let organisation: Awaited<ReturnType<typeof requireActiveOrganisationActor>>;
+  let organisation: OrganisationActorStub;
   try {
     organisation = await requireActiveOrganisationActor({
       env,

@@ -38,7 +38,7 @@ import {
   type ActorRegistryEntry,
 } from "../../src/actors/actor-registry";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { organisationActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { readOrganisationHarnessErasureReceipts } from "../../src/data/onboarding-reconciliation";
 import {
   readOrganisationArchiveCleanup,
@@ -1078,7 +1078,7 @@ async function organisationArchiveCleanupRace(owner: Member) {
   );
   if (organisationEntry === undefined)
     throw new Error("Missing current Organisation Actor");
-  const routed = organisationActorStub(
+  const routed = actorStub(
     env.ORGANISATION,
     organisationEntry.physicalObjectName,
     organisationEntry.placement,

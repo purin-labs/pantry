@@ -8,7 +8,7 @@ import {
 } from "../placement";
 import { newWarmActorSlotName, type WarmActorKind } from "./actor-registry";
 import { CASE_ACTOR_SCHEMA_VERSION } from "./actor-schema-versions";
-import { caseActorStub, sessionActorStub } from "./actor-stubs";
+import { actorStub } from "./actor-stubs";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "./agent-session-schema";
 
 /**
@@ -241,13 +241,13 @@ async function eraseWarmActorSlot(
   slot: WarmActorSlot,
 ): Promise<void> {
   if (slot.kind === "case")
-    await caseActorStub(
+    await actorStub(
       env.CASE,
       slot.physicalObjectName,
       slot.placement,
     ).eraseUnregisteredState();
   else
-    await sessionActorStub(
+    await actorStub(
       env.SESSION,
       slot.physicalObjectName,
       slot.placement,

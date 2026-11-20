@@ -25,7 +25,7 @@ import {
   createCueQueueMessage,
   ensureCommerceLowStockCueSnapshot,
 } from "../cues/engine";
-import type { Env } from "../env";
+import type { Env, OrganisationActorStub } from "../env";
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
@@ -679,9 +679,7 @@ async function reconcilePurchasingAfterCommerceDelivery(
 
 async function completeCommerceSync(
   input: Readonly<{
-    organisation: Awaited<
-      ReturnType<typeof requireActiveOrganisationActorAtPlacement>
-    >;
+    organisation: OrganisationActorStub;
     message: CommerceOutboxReconcileQueueMessage;
     validatedAt: number;
     acknowledged: number;
@@ -708,9 +706,7 @@ async function enqueueRecoverableCues(
   input: Readonly<{
     env: Env;
     message: CommerceOutboxReconcileQueueMessage;
-    organisation: Awaited<
-      ReturnType<typeof requireActiveOrganisationActorAtPlacement>
-    >;
+    organisation: OrganisationActorStub;
     recoverableCues: readonly PendingCommerceCue[];
     enqueuedAt: number;
   }>,

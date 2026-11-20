@@ -10,7 +10,7 @@ import {
   type ActorRegistryEntry,
 } from "../../src/actors/actor-registry";
 import { resumeActorRelocation } from "../../src/actors/actor-relocation";
-import { connectorActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import { network } from "./network";
 import { freezePlacement, type PlacementRace } from "./placement-race-support";
 import {
@@ -384,7 +384,7 @@ async function activeConnector(connectorId: string, placementEpoch: number) {
   if (!entries.ok) throw new Error(entries.error.code);
   const entry = entries.value.find(isConnector.bind(null, connectorId));
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
+  return actorStub(
     env.CONNECTOR,
     entry.physicalObjectName,
     entry.placement,

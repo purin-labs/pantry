@@ -16,10 +16,14 @@ import {
 } from "../authorization/access-grants/turn-authority";
 import { canonicalJson, sha256Hex, isRecord } from "@purin-labs/std";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import { resolveActiveSessionActor } from "../actors/actor-router";
+import {
+  resolveActiveSessionActor,
+  type ActorResolutionError,
+} from "../actors/actor-router";
+import type { Result } from "../result";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
-import type { Env } from "../env";
+import type { Env, SessionActorStub } from "../env";
 import { parseSessionId, type OrganisationId, type UserId } from "../ids";
 import { FlowBinding, ObservationEvidence } from "../policy/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
@@ -553,7 +557,7 @@ export async function materializeForkHistory(
   // one Actor resolution, so a long chat waits for one Actor wake.
   const actors = new Map<
     string,
-    ReturnType<typeof resolveActiveSessionActor>
+    Promise<Result<SessionActorStub, ActorResolutionError>>
   >();
   const turns = await Promise.all(
     bindings.map(
@@ -570,7 +574,7 @@ async function materializeBoundTurn(
   env: Env,
   scope: ConversationScope,
   inherited: ChatForkHistory,
-  actors: Map<string, ReturnType<typeof resolveActiveSessionActor>>,
+  actors: Map<string, Promise<Result<SessionActorStub, ActorResolutionError>>>,
   binding: ChatHistoryBinding,
 ): Promise<ChatForkHistory> {
   const previous = inherited.entries.filter(

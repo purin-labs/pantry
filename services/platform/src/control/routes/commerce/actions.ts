@@ -2,15 +2,13 @@ import type { OrganisationDatabase } from "../../../database-handles";
 import { ensureCaseProject } from "../../../projects/case-project";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env, CaseActorStub, OrganisationActorStub } from "../../../env";
 import type { Result } from "../../../result";
 import type { CaseBinding, CommerceSource } from "@purin-labs/contracts";
 import {
   resolveActiveCaseActor,
   requireActiveOrganisationActor,
 } from "../../../actors/actor-router";
-import type { CaseDO } from "../../../actors/case";
-import type { OrganisationDO } from "../../../actors/organisation";
 import {
   approvalActionBindingMatches,
   digestApprovalAction,
@@ -760,7 +758,7 @@ async function proposePayoutAction(
     request: Request;
     env: Env;
     authorized: AuthorizedOrganisationRequest;
-    organisation: DurableObjectStub<OrganisationDO>;
+    organisation: OrganisationActorStub;
     identity: Readonly<{
       issuer: string;
       subject: string;
@@ -1026,7 +1024,7 @@ async function attachMerchantActionDestination(input: {
   readonly execution: OrganisationExecutionScope;
   readonly membership: ActiveOrganisationMembership;
   readonly caseId: CaseId;
-  readonly caseActor: DurableObjectStub<CaseDO>;
+  readonly caseActor: CaseActorStub;
   readonly mutationIdentity: Readonly<{
     auditEventId: string;
     receiptId: string;

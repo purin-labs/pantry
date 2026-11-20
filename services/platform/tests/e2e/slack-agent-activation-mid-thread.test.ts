@@ -5,7 +5,7 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { sessionActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
@@ -327,7 +327,7 @@ async function checkpointInstructionDigest(
     );
   });
   if (entry === undefined) throw new Error("Session registry entry missing");
-  const inspected = await sessionActorStub(
+  const inspected = await actorStub(
     env.SESSION,
     entry.physicalObjectName,
     entry.placement,

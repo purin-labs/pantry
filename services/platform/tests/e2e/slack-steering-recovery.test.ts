@@ -5,7 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import { connectorActorStub } from "../../src/actors/actor-router";
+import { actorStub } from "../../src/actors/actor-stubs";
 import {
   DISCOVER_INTEGRATION_LIST,
   countCalls,
@@ -311,7 +311,7 @@ async function connectorOf() {
     return candidate.identity.objectKind === "connector";
   });
   if (entry === undefined) throw new Error("Connector registry entry missing");
-  return connectorActorStub(
+  return actorStub(
     env.CONNECTOR,
     entry.physicalObjectName,
     entry.placement,

@@ -39,7 +39,7 @@ import {
   readActivationExportSource,
   type ActorExportError,
 } from "../actor-export";
-import { sessionActorStub } from "../actor-router";
+import { actorStub } from "../actor-stubs";
 import {
   createConnectorEmailSchema,
   claimDueEmailReplyTurn,
@@ -425,7 +425,7 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
         ok: false,
         error: { kind: "operational", code: identity.error.code },
       };
-    const session = sessionActorStub(
+    const session = actorStub(
       this.env.SESSION,
       input.sessionRoute.physicalObjectName,
       input.sessionRoute.placement,
