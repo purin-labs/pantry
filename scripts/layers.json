@@ -849,7 +849,7 @@
     "services/platform/src/control/routes/access-control-mutations.ts": "foundation/control",
     "services/platform/src/control/routes/access-control.ts": "foundation/control",
     "services/platform/src/control/routes/agent-permission-requests.ts": "foundation/control",
-    "services/platform/src/control/routes/agents.ts": "foundation/agent",
+    "services/platform/src/control/routes/agents.ts": "workers/platform",
     "services/platform/src/control/routes/agents/campaign-briefs.ts": "areas/commerce",
     "services/platform/src/control/routes/agents/case-command.ts": "foundation/agent",
     "services/platform/src/control/routes/agents/codex.ts": "foundation/agent",

@@ -34,12 +34,21 @@ import { readInstallationPins } from "../../installation-pins";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { readIntegrationAccountReasonCode } from "../../../data/integration-account-reads";
-import type { AgentMailboxRouteAction } from "../agents";
 import {
   agentMailboxConnector,
   emailLimitsFromPolicy,
 } from "../../../mail-inbox/agent-mailbox-connector";
 import { readAgentMailboxProjection } from "../../../mail-inbox/agent-mailbox-projection";
+
+/** The action of a mailbox route. The route matcher of the Worker reads it. */
+export type AgentMailboxRouteAction =
+  | "bind"
+  | "policy"
+  | "resume"
+  | "skip-and-resume"
+  | "reconnect"
+  | "disable"
+  | "revoke";
 
 type AgentMailboxAction = AgentMailboxRouteAction;
 

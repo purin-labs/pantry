@@ -35,21 +35,16 @@ import {
 } from "./agents/email-operational";
 import { handleEmailReply, handleEmailReviewQueue } from "./agents/email-reply";
 import { handleOrganisationInference } from "./agents/inference";
-import { handleAgentMailbox, handleAgentMailboxCheck } from "./agents/mailbox";
+import {
+  handleAgentMailbox,
+  handleAgentMailboxCheck,
+  type AgentMailboxRouteAction,
+} from "./agents/mailbox";
 import {
   handleAgentOperationRevisions,
   handleAgentOperations,
 } from "./agents/operations";
 import { handleMerchantAgentInstallation } from "./agents/merchant-agent";
-
-export type AgentMailboxRouteAction =
-  | "bind"
-  | "policy"
-  | "resume"
-  | "skip-and-resume"
-  | "reconnect"
-  | "disable"
-  | "revoke";
 
 export type AgentControlRoute =
   | Readonly<{ kind: "organisationCodex"; organisationIdRaw: string }>
