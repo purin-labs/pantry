@@ -186,24 +186,16 @@ import type {
   SessionSteerTurnInput,
   SessionSteerTurnResult,
   SessionTurnInspection,
-  TransientEmailTurnReply,
-  TransientEmailTurnRequest,
-  TransientEvalTurnReply,
-  TransientEvalTurnRequest,
-  TransientMailAssistantRequest,
-  TransientModelTurnError,
-  TransientWhatsAppTurnRequest,
-  TransientWhatsAppTurnResult,
   TurnStateInvalidError,
 } from "./types";
-import { SessionTransientTurns } from "./session-transient-turns";
+import { SessionTurnRecovery } from "./session-turn-recovery";
 
 /**
  * The Session actor: the RPC methods over the layers of `actors/session/`.
  * It names no product area. The class of the Worker, `SessionDO`, gives it
  * the agent tools and the parts of the areas.
  */
-export abstract class SessionActor extends SessionTransientTurns {
+export abstract class SessionActor extends SessionTurnRecovery {
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   async machineCensus(): Promise<readonly MachineCensus[]> {
     const census = await actorMachineCensus(this.ctx.storage);
@@ -1128,61 +1120,6 @@ export abstract class SessionActor extends SessionTransientTurns {
       turnPrompt: input.turnPrompt,
       resolvedCatalog: null,
     });
-  }
-
-  /**
-   * One transient_email turn: runs under the session's pinned inference
-   * route and authority partition, reads admitted content only through the
-   * purpose-bound email tools, and returns one validated plain-text body.
-   * Transcripts stay out of accepted history, checkpoints, and Actor storage.
-   * Goal accounting metadata persists. The native thread is deleted before the
-   * turn reports complete, and a cleanup failure supersedes the outcome.
-   */
-  async runTransientEmailTurn(
-    input: TransientEmailTurnRequest,
-  ): Promise<
-    import("../../result").Result<
-      TransientEmailTurnReply,
-      TransientModelTurnError
-    >
-  > {
-    return this.trackTransientTurn(
-      this.prepareTransientEmailTurn.bind(this, input),
-    );
-  }
-
-  /**
-   * One transient eval turn. It runs the mailbox reply harness on a reviewed
-   * scenario and returns what the agent chose. Nothing reaches the mailbox:
-   * the scenario is the only message, and the outcome is only reported.
-   */
-  async runTransientEvalTurn(
-    input: TransientEvalTurnRequest,
-  ): Promise<Result<TransientEvalTurnReply, TransientModelTurnError>> {
-    return this.trackTransientTurn(
-      this.prepareTransientEvalTurn.bind(this, input),
-    );
-  }
-
-  async runTransientMailAssistant(input: TransientMailAssistantRequest) {
-    return this.trackTransientTurn(
-      this.prepareTransientMailAssistant.bind(this, input),
-    );
-  }
-
-  /**
-   * One transient WhatsApp support turn. The reply is produced through the
-   * `whatsapp_reply_propose` capability rather than the harness's final
-   * message, so a turn that ends without a proposal or handoff is a failed
-   * turn and leaves the Case retryable. Transcripts remain ephemeral;
-   * goal-operation metadata persists in the Session outbox.
-   */
-  async runTransientWhatsAppTurn(
-    input: TransientWhatsAppTurnRequest,
-  ): Promise<TransientWhatsAppTurnResult> {
-    return this.trackTransientTurn(
-      this.prepareTransientWhatsAppTurn.bind(this, input),
-    );
   }
 
   async readConfirmedContextObservations(input: {

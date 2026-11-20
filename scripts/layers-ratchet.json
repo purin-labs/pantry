@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 234,
+    "upward": 218,
     "areas": 215,
     "order": 130,
     "table": 118
@@ -75,7 +75,7 @@
     "foundation/actor-runtime -> surfaces/email": 2,
     "foundation/agent -> areas/brain": 1,
     "foundation/agent -> areas/commerce": 21,
-    "foundation/agent -> areas/inbox": 27,
+    "foundation/agent -> areas/inbox": 11,
     "foundation/agent -> areas/integrations": 1,
     "foundation/agent -> areas/organisation": 4,
     "foundation/agent -> foundation/conversation": 29,

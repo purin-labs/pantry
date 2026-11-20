@@ -23,8 +23,6 @@ import type { TransientSessionExecution } from "./support";
 import type {
   CanonicalEmbeddedHarnessTextTurnError,
   TransientModelTurnError,
-  TransientWhatsAppTurnReply,
-  TransientWhatsAppTurnResult,
 } from "./types";
 
 export async function commitCheckpointAndAlarm(
@@ -204,40 +202,5 @@ export function startNoTransientTeardown(
 function settledTransientTeardown(
   completion: Promise<Result<null, { readonly detail: string }>>,
 ): Promise<Result<null, { readonly detail: string }>> {
-  return completion;
-}
-
-export function completeTransientWhatsAppTurn(
-  toolHost: import("../whatsapp-harness-tools").WhatsAppHarnessToolHost,
-): Result<TransientWhatsAppTurnReply["outcome"], { detail: string }> {
-  const outcome = toolHost.outcome();
-  return outcome.kind === "none"
-    ? { ok: false, error: { detail: "outcome_missing" } }
-    : { ok: true, value: outcome };
-}
-
-export function startTransientWhatsAppSessionLifecycle(
-  completion: Promise<TransientWhatsAppTurnResult>,
-  transient: TransientSessionExecution,
-): CancellableTask<TransientWhatsAppTurnResult, TransientWhatsAppTurnResult> {
-  return createCancellableTask({
-    completion,
-    cancel: cancelTransientWhatsAppSessionLifecycle.bind(
-      null,
-      completion,
-      transient,
-    ),
-  });
-}
-
-async function cancelTransientWhatsAppSessionLifecycle(
-  completion: Promise<TransientWhatsAppTurnResult>,
-  transient: TransientSessionExecution,
-  _reason: TaskCancellationReason,
-): Promise<TransientWhatsAppTurnResult> {
-  if (transient.state.kind === "running") {
-    const cancelled = await transient.state.turn.cancel();
-    if (!cancelled.ok) throw new Error(cancelled.error.detail);
-  }
   return completion;
 }

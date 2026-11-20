@@ -385,6 +385,7 @@
     "services/platform/src/actors/case/": "foundation/conversation",
     "services/platform/src/actors/commerce-projection/": "areas/commerce",
     "services/platform/src/actors/lifecycle/": "foundation/actor-runtime",
+    "services/platform/src/actors/inbox-turns/": "areas/inbox",
     "services/platform/src/actors/session/": "foundation/agent",
     "services/platform/src/agent-tools/bakery/": "areas/kitchen",
     "services/platform/src/agent-tools/catalog/": "foundation/agent-tools",

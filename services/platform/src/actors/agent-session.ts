@@ -1,15 +1,56 @@
 import { SESSION_TOOL_WIRING } from "../agent-tools/session-wiring";
+import type {
+  SessionInboxTurnsRpc,
+  TransientEmailTurnRequest,
+  TransientEvalTurnRequest,
+  TransientMailAssistantRequest,
+  TransientWhatsAppTurnRequest,
+} from "./inbox-turns/rpc";
+import {
+  prepareTransientEmailTurn,
+  prepareTransientEvalTurn,
+  prepareTransientMailAssistant,
+  prepareTransientWhatsAppTurn,
+} from "./inbox-turns/session-turns";
 import { SessionActor } from "./session/session-actor";
 import type { SessionToolWiring } from "./session/tool-wiring";
 
 /**
  * The Session Durable Object class of the Worker. It keeps the deployed class
- * name. The Session actor holds the logic and names no product area: this
- * class gives it the one list of the agent tools and the parts of the areas.
+ * name and the RPC method names. The Session actor holds the logic and names
+ * no product area. This class gives it the one list of the agent tools and
+ * the parts of the areas, and it registers the modules of the areas: each
+ * RPC method of a module calls one function of that module.
  */
-export class SessionDO extends SessionActor {
+export class SessionDO extends SessionActor implements SessionInboxTurnsRpc {
   protected sessionTools(): SessionToolWiring {
     return SESSION_TOOL_WIRING;
+  }
+
+  // The transient turns of the Inbox (`actors/inbox-turns/`).
+
+  async runTransientEmailTurn(input: TransientEmailTurnRequest) {
+    return this.trackTransientTurn(
+      prepareTransientEmailTurn.bind(null, this.transientHost(), input),
+    );
+  }
+
+  async runTransientEvalTurn(input: TransientEvalTurnRequest) {
+    return this.trackTransientTurn(
+      prepareTransientEvalTurn.bind(null, this.transientHost(), input),
+    );
+  }
+
+  async runTransientMailAssistant(input: TransientMailAssistantRequest) {
+    return this.trackTransientTurn(
+      prepareTransientMailAssistant.bind(null, this.transientHost(), input),
+    );
+  }
+
+  async runTransientWhatsAppTurn(input: TransientWhatsAppTurnRequest) {
+    return this.trackTransientTurn(
+      prepareTransientWhatsAppTurn.bind(null, this.transientHost(), input),
+    );
   }
 }
 
