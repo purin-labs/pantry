@@ -841,7 +841,10 @@ async function resolveChatGptProfile(
  * Refresh each ChatGPT sign-in that has not refreshed for a week, also when
  * no turn uses it. A turn refreshes only near access-token expiry, and OpenAI
  * publishes no refresh-token lifetime. `verified_at` records the last sign-in
- * or refresh, so the due check reads no Vault secret.
+ * or refresh, so the due check reads no Vault secret. Only an active
+ * Organisation refreshes: an archived one keeps its sign-in for the 30 days
+ * before its purge, and Pantry does not use the person's ChatGPT account for
+ * it.
  */
 export async function runWeeklyChatGptLoginRefresh(
   env: Env,
@@ -852,12 +855,14 @@ export async function runWeeklyChatGptLoginRefresh(
     const due = await database
       .withSession("first-primary")
       .prepare(
-        `SELECT organisation_id AS organisationId, revision,
-         auth_profile_generation AS generation
-       FROM organisation_codex_connection
-       WHERE verified_at <= ? AND refresh_lease IS NULL
-         AND (lifecycle = 'connected' OR action_required_reason = 'allowance_exhausted')
-       ORDER BY verified_at LIMIT ?`,
+        `SELECT c.organisation_id AS organisationId, c.revision,
+         c.auth_profile_generation AS generation
+       FROM organisation_codex_connection c
+       JOIN organisation o ON o.organisation_id = c.organisation_id
+       WHERE c.verified_at <= ? AND c.refresh_lease IS NULL
+         AND (c.lifecycle = 'connected' OR c.action_required_reason = 'allowance_exhausted')
+         AND o.status = 'active'
+       ORDER BY c.verified_at LIMIT ?`,
       )
       .bind(dueBefore, WEEKLY_REFRESH_BATCH)
       .all<WeeklyRefreshRow>();

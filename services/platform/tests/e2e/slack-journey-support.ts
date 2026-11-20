@@ -425,6 +425,8 @@ async function googleClient(subject: string, displayName: string, now: number) {
 export async function installDiscoveryActorFixture(): Promise<{
   readonly selectedIntegrationAccountId: string;
   readonly otherIntegrationAccountId: string;
+  /** The Organisation owner's Portal session. */
+  readonly ownerSession: IssuedControlSession;
 }> {
   const base = await installSlackActorFixture();
   const now = Date.now();
@@ -760,6 +762,7 @@ export async function installDiscoveryActorFixture(): Promise<{
   return {
     selectedIntegrationAccountId: base.selectedIntegrationAccountId,
     otherIntegrationAccountId: otherInstall.integrationAccountId,
+    ownerSession: base.ownerSession,
   };
 }
 
