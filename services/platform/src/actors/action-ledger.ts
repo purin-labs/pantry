@@ -43,6 +43,7 @@ import { parseCommerceEntityPlaneEffect } from "../commerce/entity-plane/proposa
 import { slackMayApproveAction } from "../commerce/action-model";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isRecord, isSha256Hex } from "@purin-labs/std";
+import { armAlarmBy } from "./lifecycle/actor-alarm";
 
 export type CanonicalActionDraft = {
   host: string;
@@ -114,7 +115,7 @@ type ActionExecutionLease = Readonly<{
   expiresAt: number;
 }>;
 
-export const ACTION_EXECUTION_LEASE_DURATION_MS = 5 * 60_000;
+const ACTION_EXECUTION_LEASE_DURATION_MS = 5 * 60_000;
 
 type UnsignedAction = ActionIdentity & {
   approval?: never;
@@ -1736,4 +1737,15 @@ function requireExecutionLease(
     throw new Error("invalid_action_ledger_execution_lease");
   }
   return { leaseId, expiresAt };
+}
+
+/** Arms the alarm of the actor for the end of an action execution lease. */
+export async function armActionExecutionAlarm(
+  storage: DurableObjectStorage,
+  now: number,
+): Promise<void> {
+  const deadline = now + ACTION_EXECUTION_LEASE_DURATION_MS;
+  if (!Number.isSafeInteger(now) || now < 0 || !Number.isSafeInteger(deadline))
+    return;
+  await armAlarmBy(storage, deadline);
 }

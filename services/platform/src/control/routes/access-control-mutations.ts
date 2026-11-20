@@ -53,8 +53,7 @@ import {
 } from "../../data/control-mutation";
 import { resolveIntegrationAccount } from "../../data/integration-account";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
-import { resolveActiveCustomConnectorAccount } from "../../custom-connectors/accounts";
-import { resolveCustomConnectorRevision } from "../../custom-connectors/revisions";
+import type { AccessControlParts } from "./access-control-explain";
 import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,
@@ -190,6 +189,7 @@ export async function handleAccessControlMutationRoute(
   request: Request,
   env: Env,
   route: AccessControlMutationRoute,
+  parts: AccessControlParts,
 ): Promise<Response> {
   if (route.kind === "accessControlBudget" && request.method === "GET") {
     const authorized = await authorizeOrganisationRequest(
@@ -221,7 +221,7 @@ export async function handleAccessControlMutationRoute(
     case "accessControlBudget":
       return handleBudgetChange(request, env, route, body.value);
     case "accessControlGrantCreate":
-      return handleGrantCreate(request, env, route, body.value);
+      return handleGrantCreate(request, env, route, body.value, parts);
     case "accessControlGrantRevoke":
       return handleGrantRevoke(request, env, route, body.value);
     case "accessControlCapabilityChange":
@@ -314,6 +314,7 @@ async function handleGrantCreate(
   env: Env,
   route: Variant<AccessControlMutationRoute, "accessControlGrantCreate">,
   raw: JsonRecord,
+  parts: AccessControlParts,
 ): Promise<Response> {
   const parsed = parseCreateGrantRequest(raw);
   if (!parsed.ok) return controlError(parsed.error, 422);
@@ -345,6 +346,7 @@ async function handleGrantCreate(
   );
   if (!resolvedTarget.ok) return controlError(resolvedTarget.error, 409);
   const target = await validateGrantTarget(
+    parts,
     env,
     scope.value,
     resolvedTarget.value,
@@ -874,6 +876,7 @@ function isCommerceActionPropose(definition: CapabilityDefinition): boolean {
 }
 
 async function validateGrantTarget(
+  parts: AccessControlParts,
   env: Env,
   scope: OrganisationExecutionScope,
   target: AccessGrantTarget,
@@ -934,7 +937,7 @@ async function validateGrantTarget(
       if (!integrationAccountId.ok) {
         return { ok: false, error: "access_grant_target_invalid" };
       }
-      const account = await resolveActiveCustomConnectorAccount({
+      const account = await parts.customConnectorAccount({
         db: scope.database,
         organisationId,
         integrationAccountId: integrationAccountId.value,
@@ -950,7 +953,7 @@ async function validateGrantTarget(
       ) {
         return { ok: false, error: "access_grant_target_unavailable" };
       }
-      const revision = await resolveCustomConnectorRevision({
+      const revision = await parts.customConnectorRevision({
         db: scope.database,
         organisationId,
         connectorId: account.value.source.connectorId,

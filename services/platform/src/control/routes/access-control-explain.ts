@@ -14,13 +14,6 @@ import {
   type CustomConnectorAccountRead,
 } from "../../access-control/decision-explanation";
 
-/**
- * The parts of the product areas that the access control routes read. The
- * Worker router gives them.
- */
-export type AccessControlParts = Readonly<{
-  customConnectorAccount: CustomConnectorAccountRead;
-}>;
 import type { Env } from "../../env";
 import type { Result } from "../../result";
 import { authorizeOrganisationRequest } from "../authorization";
@@ -32,6 +25,53 @@ import {
   type JsonRecord,
 } from "../http";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
+import type {
+  CustomConnectorId,
+  CustomConnectorRevision,
+} from "../../custom-connectors/identity";
+import type { OrganisationDatabase } from "../../database-handles";
+import type { IntegrationAccountId, OrganisationId } from "../../ids";
+
+/**
+ * The parts of the product areas that the access control routes read. The
+ * Worker router gives them.
+ */
+export type AccessControlParts = Readonly<{
+  customConnectorAccount: CustomConnectorAccountRead;
+  /** One revision of a custom connector, with its review state. */
+  customConnectorRevision(
+    input: Readonly<{
+      db: OrganisationDatabase;
+      organisationId: OrganisationId;
+      connectorId: CustomConnectorId;
+      revision: CustomConnectorRevision;
+    }>,
+  ): Promise<
+    Result<
+      | Readonly<{
+          reviewState: "approved";
+          definition: Readonly<{
+            operations: readonly Readonly<{
+              id: string;
+              effect: Readonly<{ kind: string }>;
+            }>[];
+          }>;
+        }>
+      | Readonly<{
+          reviewState: "draft" | "validated" | "rejected" | "retired";
+        }>,
+      unknown
+    >
+  >;
+  /** The Airtable token of an integration account, for one operation. */
+  airtableAccountToken(
+    env: Env,
+    organisationId: OrganisationId,
+    integrationAccountId: IntegrationAccountId,
+    operation: "read" | "write",
+  ): Promise<string>;
+}>;
+
 const MAX_SOURCE_REFERENCES = 20;
 
 export type AccessControlExplainRoute = Readonly<{

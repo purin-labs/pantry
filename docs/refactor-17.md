@@ -1215,6 +1215,53 @@ fewer areas and surfaces.
     (`turnMemoryReaderWithoutSubjects`). It is a value of the port
     `TurnMemoryReader` in `context/assembly`, so it can move there.
 
+**21 November 2026. Step A1.9 for the Organisation actor, the second part,** on the
+branch `refactor-17-a1-9-organisation-2`. This entry replaces the two "Still open"
+points of the entry above where it names them.
+
+- **The Case context collection is an Inbox module.**
+  `actors/organisation/case-context-collection-commands.ts` (area `inbox`) holds the
+  eight collection commands as functions that take an `OrganisationCollectionHost`,
+  and declares `OrganisationCaseContextCollectionRpc`. `case-context-collection.ts`
+  and `case-context-discovery/source.ts` are the Gmail source of a collection, and
+  the map counts them as `areas/inbox`. The discovery commands of the policy read
+  the source through `PolicyCaseContextSourcePort`.
+- **The policy level is a module.** The class `OrganisationPolicy` is gone.
+  `organisation-policy.ts` holds the seven policy commands as functions that take
+  an `OrganisationPolicyHost`, and declares `OrganisationPolicyRpc`. The chain has
+  three levels: `OrganisationActorBase`, `OrganisationCommerce`, `OrganisationDO`.
+  `OrganisationDO` implements three RPC interfaces: policy, Jev and collection.
+- **The helper file.** `actors/organisation/support.ts` lost the helpers of other
+  modules. `organisation-record.ts` (`foundation/tenancy`) holds the Organisation
+  record read, its check and the placement conflict answer. Three copies of that
+  answer are one.
+- **A1.8, the access control routes.** `AccessControlParts` holds three reads of the
+  integrations area: the custom connector account, the custom connector revision
+  and the Airtable token. `control/access-control-parts.ts`, a Worker file, gives
+  the value.
+- **Not changed:** no RPC method name, argument shape, result, schema step, stored
+  value or constructor.
+- **Measures.** Layer crossings: 635 to 621. `foundation/agent` to Inbox: 5 to 1.
+  `foundation/control` to integrations: 3 to 0. `foundation/authority` to the Worker:
+  3 to 0. `foundation/authority` to `foundation/agent`: 14 to 11. Copies: 881, no
+  change. Unused exports: 808, no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages` and the
+  unit suite pass. 64 journey files ran in four groups, with the idle tenant
+  journey and the onboarding journeys: 63 pass and 1 is skipped. The full E2E suite
+  did not run on the branch.
+- **Still open: the commerce level and the base of the chain.**
+  `OrganisationCommerce` has 2,048 lines and 50 RPC methods. 27 of them have the
+  one form `this.command(...)` that a script can move. 23 have their own form.
+  `OrganisationActorBase` (742 lines) holds the commands of Memory, Evals, screen
+  relevance and the Shopify location, and `OrganisationDO` holds 2,302 lines. The
+  class is not yet a list of modules. The schema steps are one ordered list in
+  `actors/organisation/schema.ts`, and this step did not change it.
+- **Still open: the commerce imports of the access control routes (5).** The access
+  grant model of the foundation names types of the commerce contract. A port for
+  the routes needs those types in `contracts` first.
+- **Still open: 1 Inbox import.** `case-context-discovery/metadata.ts` reads the
+  verification of a selection for a conversation.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

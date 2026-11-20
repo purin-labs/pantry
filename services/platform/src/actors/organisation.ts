@@ -174,18 +174,21 @@ import { cleanupTypeSafeCredentials } from "../integrations/typesafe/connection"
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import { expireOrganisationLeases } from "./organisation/activation";
-import { deliverCaseContextCollectionInvalidations } from "./organisation/case-context-collection";
-import { createOrganisationSchema } from "./organisation/schema";
 import {
-  organisationPlacementConflict,
+  CASE_CONTEXT_SOURCE_FOR_POLICY,
+  deliverCaseContextCollectionInvalidations,
+} from "./organisation/case-context-collection";
+import {
+  createOrganisationSchema,
+  schemaTransaction,
+} from "./organisation/schema";
+import {
   organisationRowToMeta,
   pruneCommerceBoardPresence,
   readCommerceBoardPresence,
-  readOrganisationMetaRow,
   resolveOrganisationActorDatabase,
   socketSweepInterval,
   sweepSafely,
-  validateActionOrganisation,
 } from "./organisation/support";
 import type {
   CommerceBoardPresenceRead,
@@ -198,7 +201,29 @@ import type {
   OrganisationStateError,
 } from "./organisation/types";
 import { OrganisationCommerce } from "./organisation/organisation-commerce";
-import type { PolicyJevPort } from "./organisation/organisation-policy";
+import {
+  activateOrganisationPolicy,
+  admittedEvaluateCaseContextDiscovery,
+  admittedManageTypeSafeConnection,
+  admittedPublishCaseContextDiscoveryConfiguration,
+  admittedReadCaseContextDiscoveryConfiguration,
+  admittedReadCaseContextDiscoverySourceReadiness,
+  admittedReadTypeSafeConnectionConfiguration,
+  type OrganisationPolicyHost,
+  type OrganisationPolicyRpc,
+} from "./organisation/organisation-policy";
+import {
+  admittedCommitCaseContextCollectionEffectFence,
+  admittedEraseCaseContextCollectionSource,
+  admittedInvalidateCaseContextCollectionVerification,
+  admittedPrepareCaseContextCollectionEvidence,
+  admittedReadCaseContextCollection,
+  admittedReadCaseContextCollectionsForCase,
+  admittedReviewCaseContextCollectionRelationship,
+  admittedValidateCaseContextCollectionEvidence,
+  type OrganisationCaseContextCollectionRpc,
+  type OrganisationCollectionHost,
+} from "./organisation/case-context-collection-commands";
 import {
   JEV_FOR_POLICY,
   manageJevFeatureForOrganisation,
@@ -207,16 +232,278 @@ import {
   type OrganisationJevHost,
   type OrganisationJevRpc,
 } from "../jev-features/organisation-settings";
+import type {
+  OrganisationActivatePolicyInput,
+  OrganisationPolicyActivation,
+  OrganisationPolicyActivationError,
+} from "./organisation/policy-types";
+import {
+  organisationPlacementConflict,
+  readOrganisationMetaRow,
+  validateActionOrganisation,
+} from "./organisation/organisation-record";
 
 export class OrganisationDO
   extends OrganisationCommerce
-  implements OrganisationJevRpc
+  implements
+    OrganisationPolicyRpc,
+    OrganisationJevRpc,
+    OrganisationCaseContextCollectionRpc
 {
-  // The Jev settings of the integrations area (`jev-features/`).
+  // The policy of the Organisation (`actors/organisation/organisation-policy.ts`):
+  // the policy activation, the TypeSafe connection and the Case context
+  // discovery configuration. The Inbox gives the source of a collection, and
+  // the integrations area gives the Jev parts.
 
-  protected jevForPolicy(): PolicyJevPort {
-    return JEV_FOR_POLICY;
+  #policyHost(): OrganisationPolicyHost {
+    return {
+      env: this.env,
+      storage: this.ctx.storage,
+      transaction: () =>
+        schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
+      rearm: () => this.rearm(),
+      jev: JEV_FOR_POLICY,
+      caseContextSource: CASE_CONTEXT_SOURCE_FOR_POLICY,
+    };
   }
+
+  async readCaseContextDiscoveryConfiguration(
+    input: Readonly<{ organisationId: OrganisationId }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextDiscoveryConfiguration.bind(
+        null,
+        this.#policyHost(),
+      ),
+    );
+  }
+
+  async readTypeSafeConnectionConfiguration(
+    input: Readonly<{ organisationId: OrganisationId }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadTypeSafeConnectionConfiguration.bind(
+        null,
+        this.#policyHost(),
+      ),
+    );
+  }
+
+  async manageTypeSafeConnection(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedManageTypeSafeConnection.bind(null, this.#policyHost(), input),
+    );
+  }
+
+  async readCaseContextDiscoverySourceReadiness(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      source: "gmail" | "whatsapp" | "commerce";
+      integrationAccountId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextDiscoverySourceReadiness.bind(
+        null,
+        this.#policyHost(),
+        input,
+      ),
+    );
+  }
+
+  async publishCaseContextDiscoveryConfiguration(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedPublishCaseContextDiscoveryConfiguration.bind(
+        null,
+        this.#policyHost(),
+        input,
+      ),
+    );
+  }
+
+  async evaluateCaseContextDiscovery(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      request: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedEvaluateCaseContextDiscovery.bind(
+        null,
+        this.#policyHost(),
+        input,
+      ),
+    );
+  }
+
+  async activatePolicy(
+    input: OrganisationActivatePolicyInput,
+  ): Promise<
+    Result<OrganisationPolicyActivation, OrganisationPolicyActivationError>
+  > {
+    return activateOrganisationPolicy(this.#policyHost(), input);
+  }
+
+  // The Case context collection of the Inbox
+  // (`actors/organisation/case-context-collection-commands.ts`).
+
+  #collectionHost(): OrganisationCollectionHost {
+    return {
+      env: this.env,
+      storage: this.ctx.storage,
+      transaction: () =>
+        schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
+      validateOrganisation: validateActionOrganisation.bind(
+        null,
+        this.ctx.storage.sql,
+      ),
+      rearm: () => this.rearm(),
+    };
+  }
+
+  async prepareCaseContextCollectionEvidence(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      caseId: string;
+      integrationAccountId: string;
+      triggeringMessageId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedPrepareCaseContextCollectionEvidence.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async validateCaseContextCollectionEvidence(
+    input: Readonly<{ organisationId: OrganisationId; dependency: unknown }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedValidateCaseContextCollectionEvidence.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async commitCaseContextCollectionEffectFence(
+    input: Readonly<{ organisationId: OrganisationId; attempt: unknown }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedCommitCaseContextCollectionEffectFence.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async invalidateCaseContextCollectionVerification(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      verificationId: string;
+      revision: number;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedInvalidateCaseContextCollectionVerification.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async eraseCaseContextCollectionSource(
+    input: Readonly<{ organisationId: OrganisationId; selection: unknown }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedEraseCaseContextCollectionSource.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async readCaseContextCollection(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      caseContextCollectionId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextCollection.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async readCaseContextCollectionsForCase(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      caseId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextCollectionsForCase.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async reviewCaseContextCollectionRelationship(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      caseContextCollectionId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReviewCaseContextCollectionRelationship.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  // The Jev settings of the integrations area (`jev-features/`).
 
   #jevHost(): OrganisationJevHost {
     return {
@@ -227,7 +514,10 @@ export class OrganisationDO
         this.ctx.storage.sql,
       ),
       publishCaseContextDiscoveryConfiguration:
-        this.admittedPublishCaseContextDiscoveryConfiguration.bind(this),
+        admittedPublishCaseContextDiscoveryConfiguration.bind(
+          null,
+          this.#policyHost(),
+        ),
     };
   }
 

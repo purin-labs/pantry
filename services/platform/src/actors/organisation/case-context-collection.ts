@@ -36,9 +36,10 @@ import type {
 import { identifier } from "../../case-context-discovery/policy";
 import { assertNever, isRecord } from "@purin-labs/std";
 import type { CaseContextCollectionReviewCommand } from "@purin-labs/control-api";
-import { organisationPlacementConflict } from "./support";
+import type { PolicyCaseContextSourcePort } from "./organisation-policy";
+import { organisationPlacementConflict } from "./organisation-record";
 
-export function parseOperationalCaseContextDiscoverySourceRequest(
+function parseOperationalCaseContextDiscoverySourceRequest(
   raw: unknown,
 ): OperationalCaseContextDiscoverySourceRequest | null {
   if (
@@ -144,7 +145,7 @@ export async function caseContextCollectionSourceAccess(
   return { ok: true as const, value: { authority, label: label.value } };
 }
 
-export async function verifiedOperationalCaseContextDiscoveryRequest(
+async function verifiedOperationalCaseContextDiscoveryRequest(
   input: Readonly<{
     scope: OrganisationExecutionScope;
     sql: SqlStorage;
@@ -519,8 +520,16 @@ export async function deliverCaseContextCollectionInvalidations(
   }
 }
 
-export function unsupportedCaseContextCollectionReplySource(
+function unsupportedCaseContextCollectionReplySource(
   source: Readonly<{ source: string }>,
 ): boolean {
   return source.source !== "gmail";
 }
+
+/** The source functions that the discovery commands of the policy call. */
+export const CASE_CONTEXT_SOURCE_FOR_POLICY: PolicyCaseContextSourcePort = {
+  unsupportedReplySource: unsupportedCaseContextCollectionReplySource,
+  sourceAccess: caseContextCollectionSourceAccess,
+  parseSourceRequest: parseOperationalCaseContextDiscoverySourceRequest,
+  verifiedRequest: verifiedOperationalCaseContextDiscoveryRequest,
+};

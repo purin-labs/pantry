@@ -179,12 +179,6 @@ import {
   parseCommerceQueryCount,
   validateOrganisationCommercePlan,
 } from "./commerce-query";
-import {
-  armActionExecutionAlarm,
-  organisationPlacementConflict,
-  validateActionOrganisation,
-  validateCodeModeOrganisation,
-} from "./support";
 import type {
   ActivationExecutionFailure,
   OnboardingActivationError,
@@ -204,12 +198,33 @@ import type {
   OrganisationCutoverCueSettlementInput,
   OrganisationStateError,
 } from "./types";
-import { OrganisationPolicy } from "./organisation-policy";
+import { OrganisationActorBase } from "./organisation-actor-base";
+import type {
+  OrganisationActivatePolicyInput,
+  OrganisationPolicyActivation,
+  OrganisationPolicyActivationError,
+} from "./policy-types";
+import { armActionExecutionAlarm } from "../action-ledger";
+import {
+  organisationPlacementConflict,
+  validateActionOrganisation,
+} from "./organisation-record";
+import { validateCodeModeOrganisation } from "./code-mode-organisation";
 
 /**
  * Commerce actions, cues, the commerce lab, Code Mode leases, workspace executor allocation and onboarding activation for the Organisation.
  */
-export abstract class OrganisationCommerce extends OrganisationPolicy {
+export abstract class OrganisationCommerce extends OrganisationActorBase {
+  /**
+   * Activates a policy snapshot. The policy module owns it, and the class of
+   * the Worker gives it. The activation of the Organisation calls it.
+   */
+  abstract activatePolicy(
+    input: OrganisationActivatePolicyInput,
+  ): Promise<
+    Result<OrganisationPolicyActivation, OrganisationPolicyActivationError>
+  >;
+
   async advanceActivationSchema(
     input: ActorActivationSchemaAdvance,
   ): Promise<
