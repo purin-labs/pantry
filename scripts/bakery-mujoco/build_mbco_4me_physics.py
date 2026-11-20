@@ -135,7 +135,8 @@ def export_blender_meshes_and_xml() -> None:
     ET.SubElement(
         defaults,
         "geom",
-        friction="0.45 0.005 0.0001",
+        condim="4",
+        friction="0.60 0.015 0.003",
         solref="0.004 1",
         solimp="0.95 0.99 0.001",
     )
@@ -152,7 +153,7 @@ def export_blender_meshes_and_xml() -> None:
         size="1.6 1.6 0.05",
         rgba="0.28 0.30 0.33 1",
         contype="1",
-        conaffinity="3",
+        conaffinity="1",
     )
 
     bodies: dict[str, ET.Element] = {}
@@ -197,6 +198,14 @@ def export_blender_meshes_and_xml() -> None:
     damper = bodies["mbco4_damper"]
     tray = bodies["mbco4_tray"]
 
+    col_base_rgba = "0.20 0.75 0.35 0.45"
+    col_wall_rgba = "0.25 0.55 0.90 0.45"
+    col_artic_rgba = "0.95 0.55 0.15 0.50"
+    col_tray_rgba = "0.90 0.80 0.15 0.50"
+    site_support_rgba = "0.15 0.80 0.85 0.35"
+    site_grasp_rgba = "0.95 0.25 0.25 0.40"
+    y_axis_quat = numbers((math.cos(math.pi / 4), math.sin(math.pi / 4), 0.0, 0.0))
+
     # Four 50 mm stainless adjustable feet touching Z = 0.0000 m (CAD: 100 mm from front, 60 mm from rear)
     for foot_name, fx, fy in (
         ("mbco4_foot_fl_col", -0.2950, -0.2500),
@@ -211,31 +220,84 @@ def export_blender_meshes_and_xml() -> None:
             type="cylinder",
             pos=numbers((fx, fy, 0.0250)),
             size="0.0210 0.0250",
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=col_base_rgba,
         )
 
-    # Cabinet & chamber structural colliders (530 mm body Z in [0.050, 0.580]; 450 x 330 x 350 mm chamber)
+    # Top-rear exhaust stack (+120 mm above roof) and rear plumbing/power fittings
+    ET.SubElement(
+        oven,
+        "geom",
+        name="mbco4_exhaust_collar_col",
+        type="cylinder",
+        pos="0.2750 0.3050 0.5825",
+        size="0.0305 0.0025",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=col_base_rgba,
+    )
+    flue_tilt = 0.13
+    ET.SubElement(
+        oven,
+        "geom",
+        name="mbco4_exhaust_flue_col",
+        type="cylinder",
+        pos="0.2750 0.2980 0.6405",
+        quat=numbers((math.cos(flue_tilt / 2), math.sin(flue_tilt / 2), 0.0, 0.0)),
+        size="0.0235 0.0565",
+        contype="1",
+        conaffinity="1",
+        group="3",
+        rgba=col_base_rgba,
+    )
+    for fit_name, fpos, fsize in (
+        ("mbco4_rear_water_inlet_col", (0.2150, 0.3630, 0.1150), (0.0140, 0.0130)),
+        ("mbco4_rear_drain_stub_col", (-0.0550, 0.3640, 0.0950), (0.0135, 0.0140)),
+        ("mbco4_rear_power_gland_col", (0.2150, 0.3610, 0.1500), (0.0115, 0.0110)),
+    ):
+        ET.SubElement(
+            oven,
+            "geom",
+            name=fit_name,
+            type="cylinder",
+            pos=numbers(fpos),
+            quat=y_axis_quat,
+            size=numbers(fsize),
+            contype="1",
+            conaffinity="1",
+            group="3",
+            rgba=col_base_rgba,
+        )
+
+    # Cabinet & chamber structural colliders (sealed 1 mm overlap across wall/floor/roof/plenum seams;
+    # plus front ruby fascia, strike jamb, drip gutter, and top front cap)
     cabinet_colliders = [
-        ("mbco4_left_wall_col", (-0.3325, 0.0160, 0.3125), (0.0175, 0.3340, 0.2625)),
-        ("mbco4_right_cabinet_col", (0.2410, 0.0160, 0.3125), (0.1060, 0.3340, 0.2625)),
-        ("mbco4_chamber_floor_col", (-0.0900, 0.0160, 0.0950), (0.2230, 0.3340, 0.0450)),
-        ("mbco4_chamber_roof_col", (-0.0900, 0.0160, 0.5350), (0.2230, 0.3340, 0.0450)),
-        ("mbco4_rear_plenum_col", (-0.0900, 0.2200, 0.3150), (0.2230, 0.1300, 0.1730)),
-        ("mbco4_baffle_stop_col", (-0.0900, 0.0265, 0.3150), (0.2100, 0.0020, 0.1680)),
+        ("mbco4_left_wall_col", (-0.3325, 0.0160, 0.3150), (0.0175, 0.3340, 0.2650), col_base_rgba),
+        ("mbco4_right_cabinet_col", (0.2425, 0.0160, 0.3150), (0.1075, 0.3340, 0.2650), col_base_rgba),
+        ("mbco4_chamber_floor_col", (-0.0900, 0.0160, 0.0950), (0.2260, 0.3340, 0.0450), col_base_rgba),
+        ("mbco4_chamber_roof_col", (-0.0900, 0.0160, 0.5350), (0.2260, 0.3340, 0.0450), col_base_rgba),
+        ("mbco4_rear_plenum_col", (-0.0900, 0.2200, 0.3150), (0.2260, 0.1300, 0.1760), col_base_rgba),
+        ("mbco4_top_front_cap_col", (0.0, -0.3330, 0.5765), (0.3500, 0.0170, 0.0035), col_base_rgba),
+        ("mbco4_front_fascia_col", (0.2795, -0.33325, 0.3190), (0.0675, 0.01525, 0.2540), col_base_rgba),
+        ("mbco4_strike_jamb_col", (0.1750, -0.3270, 0.3190), (0.0370, 0.0100, 0.2540), col_base_rgba),
+        ("mbco4_front_drip_gutter_col", (-0.0730, -0.3329, 0.05725), (0.2750, 0.0169, 0.00725), col_base_rgba),
+        ("mbco4_front_right_plinth_col", (0.2750, -0.3300, 0.0575), (0.0730, 0.0140, 0.0075), col_base_rgba),
+        ("mbco4_baffle_stop_col", (-0.0900, 0.0265, 0.3150), (0.2100, 0.0020, 0.1680), col_wall_rgba),
     ]
     # 4 pairs of L-channel tray rails at 80 mm pitch (Z_top = 0.185, 0.265, 0.345, 0.425 m)
     for idx, rz in enumerate(RAIL_LEVELS_Z, 1):
         cabinet_colliders.extend(
             [
-                (f"mbco4_rail_{idx}_left_ledge_col", (-0.2890, -0.1400, rz - 0.0020), (0.0130, 0.1530, 0.0020)),
-                (f"mbco4_rail_{idx}_right_ledge_col", (0.1090, -0.1400, rz - 0.0020), (0.0130, 0.1530, 0.0020)),
-                (f"mbco4_rail_{idx}_left_guide_col", (-0.3005, -0.1400, rz + 0.0110), (0.0030, 0.1510, 0.0110)),
-                (f"mbco4_rail_{idx}_right_guide_col", (0.1205, -0.1400, rz + 0.0110), (0.0030, 0.1510, 0.0110)),
+                (f"mbco4_rail_{idx}_left_ledge_col", (-0.2890, -0.1400, rz - 0.0020), (0.0130, 0.1530, 0.0020), col_wall_rgba),
+                (f"mbco4_rail_{idx}_right_ledge_col", (0.1090, -0.1400, rz - 0.0020), (0.0130, 0.1530, 0.0020), col_wall_rgba),
+                (f"mbco4_rail_{idx}_left_guide_col", (-0.3005, -0.1400, rz + 0.0110), (0.0030, 0.1510, 0.0110), col_wall_rgba),
+                (f"mbco4_rail_{idx}_right_guide_col", (0.1205, -0.1400, rz + 0.0110), (0.0030, 0.1510, 0.0110), col_wall_rgba),
             ]
         )
-    for cname, cpos, csize in cabinet_colliders:
+    for cname, cpos, csize, crgba in cabinet_colliders:
         ET.SubElement(
             oven,
             "geom",
@@ -243,12 +305,13 @@ def export_blender_meshes_and_xml() -> None:
             type="box",
             pos=numbers(cpos),
             size=numbers(csize),
-            contype="2",
+            contype="1",
             conaffinity="1",
             group="3",
+            rgba=crgba,
         )
 
-    # Operational sites on mbco4_oven
+    # Operational sites on mbco4_oven (group 4, visible semi-transparent rgba)
     for idx, rz in enumerate(RAIL_LEVELS_Z, 1):
         ET.SubElement(
             oven,
@@ -256,7 +319,8 @@ def export_blender_meshes_and_xml() -> None:
             name=f"mbco4_rail{idx}_site",
             pos=numbers((-0.0900, -0.1400, rz)),
             size="0.008",
-            group="3",
+            group="4",
+            rgba=site_support_rgba,
         )
     ET.SubElement(
         oven,
@@ -265,7 +329,8 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="-0.0900 -0.1400 0.2650",
         size="0.2050 0.1520 0.0035",
-        group="3",
+        group="4",
+        rgba=site_support_rgba,
     )
     ET.SubElement(
         oven,
@@ -273,7 +338,8 @@ def export_blender_meshes_and_xml() -> None:
         name="mbco4_chamber_center",
         pos="-0.0900 -0.1400 0.3150",
         size="0.010",
-        group="3",
+        group="4",
+        rgba=site_support_rgba,
     )
 
     # Left-hinged double-glazed door (`mbco4_door_hinge`, axis="0 0 -1", range 0 .. 1.92 rad / 110 deg)
@@ -287,6 +353,7 @@ def export_blender_meshes_and_xml() -> None:
         range="0 1.92",
         damping="2.2",
         armature="0.025",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         door,
@@ -295,9 +362,10 @@ def export_blender_meshes_and_xml() -> None:
         type="box",
         pos="0.2680 0.0025 0",
         size="0.2700 0.0140 0.2440",
-        contype="2",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=col_artic_rgba,
     )
 
     # Rotary push-to-close door handle (`mbco4_handle_latch`, child of `mbco4_door`, axis="0 1 0", range -0.52 .. 0.52 rad)
@@ -312,28 +380,29 @@ def export_blender_meshes_and_xml() -> None:
         stiffness="1.2",
         damping="0.18",
         armature="0.001",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         handle,
         "geom",
         name="mbco4_handle_col",
         type="box",
-        pos="0 -0.0280 -0.0620",
-        size="0.0130 0.0110 0.0680",
-        contype="2",
+        pos="0 -0.0290 -0.0620",
+        size="0.0150 0.0130 0.0700",
+        contype="1",
         conaffinity="1",
         group="3",
+        rgba=col_artic_rgba,
     )
 
-    # Chamber rear Y-blade reversible convection fan (`mbco4_fan_spin`, axis="0 1 0", range -1000 .. 1000 rad)
+    # Chamber rear Y-blade reversible convection fan (`mbco4_fan_spin`, continuous unlimited rotation about +Y)
     ET.SubElement(
         fan,
         "joint",
         name="mbco4_fan_spin",
         type="hinge",
         axis="0 1 0",
-        limited="true",
-        range="-1000 1000",
+        limited="false",
         damping="0.012",
         armature="0.002",
     )
@@ -342,12 +411,13 @@ def export_blender_meshes_and_xml() -> None:
         "geom",
         name="mbco4_fan_col",
         type="cylinder",
-        pos="0 0.0040 0",
-        quat=numbers((math.cos(math.pi / 4), math.sin(math.pi / 4), 0.0, 0.0)),
-        size="0.0950 0.0080",
-        contype="0",
-        conaffinity="0",
+        pos="0 0.0010 0",
+        quat=y_axis_quat,
+        size="0.1020 0.0150",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=col_artic_rgba,
     )
 
     # Top/rear motorized auto exhaust damper (`mbco4_damper_hinge`, axis="1 0 0", range 0 .. 0.785 rad)
@@ -361,17 +431,21 @@ def export_blender_meshes_and_xml() -> None:
         range="0 0.785",
         damping="0.25",
         armature="0.001",
+        frictionloss="0.06",
+        solreffriction="0.004 1",
+        solreflimit="0.005 1",
     )
     ET.SubElement(
         damper,
         "geom",
         name="mbco4_damper_col",
         type="box",
-        pos="0 0.0240 0.0055",
-        size="0.0320 0.0240 0.0030",
-        contype="0",
-        conaffinity="0",
+        pos="0 0.0220 0.0055",
+        size="0.0360 0.0270 0.0035",
+        contype="1",
+        conaffinity="1",
         group="3",
+        rgba=col_artic_rgba,
     )
 
     # 6-DOF free 400 x 300 x 20 mm European aluminum baking tray (`mbco4_tray` on rail pair #2)
@@ -391,8 +465,9 @@ def export_blender_meshes_and_xml() -> None:
             pos=numbers(tpos),
             size=numbers(tsize),
             contype="1",
-            conaffinity="2",
+            conaffinity="1",
             group="3",
+            rgba=col_tray_rgba,
         )
     ET.SubElement(
         tray,
@@ -400,7 +475,8 @@ def export_blender_meshes_and_xml() -> None:
         name="vessel_socket",
         pos="0 -0.1450 0.0160",
         size="0.006",
-        group="3",
+        group="4",
+        rgba=site_grasp_rgba,
     )
     payload = ET.SubElement(tray, "body", name="ingredient_payload", pos="0 0 0")
     ET.SubElement(
@@ -423,6 +499,16 @@ def export_blender_meshes_and_xml() -> None:
         rgba="0.86 0.64 0.34 0",
         mass="0",
     )
+
+    contact = ET.SubElement(app, "contact")
+    for ex_name, b1, b2 in (
+        ("exclude_oven_door", "mbco4_oven", "mbco4_door"),
+        ("exclude_door_handle", "mbco4_door", "mbco4_handle"),
+        ("exclude_oven_handle", "mbco4_oven", "mbco4_handle"),
+        ("exclude_oven_fan", "mbco4_oven", "mbco4_fan"),
+        ("exclude_oven_damper", "mbco4_oven", "mbco4_damper"),
+    ):
+        ET.SubElement(contact, "exclude", name=ex_name, body1=b1, body2=b2)
 
     actuators = ET.SubElement(app, "actuator")
     ET.SubElement(
@@ -485,6 +571,37 @@ def export_blender_meshes_and_xml() -> None:
     write_xml(ASSETS / "appliance.xml", app)
     write_xml(ASSETS / "scene.xml", app)
 
+    # Emit standalone MjSpec.attach-ready oven model.xml (no floor, no freejoint tray)
+    import copy
+
+    oven_model = ET.Element("mujoco", model="mbco4_oven")
+    ET.SubElement(oven_model, "compiler", angle="radian")
+    oven_model.append(copy.deepcopy(defaults))
+    oven_model.append(copy.deepcopy(asset))
+    oven_world = ET.SubElement(oven_model, "worldbody")
+    oven_world.append(copy.deepcopy(oven))
+    oven_model.append(copy.deepcopy(contact))
+    oven_sensors = ET.SubElement(oven_model, "sensor")
+    for sensor_el in sensors:
+        if sensor_el.get("name") != "mbco4_tray_sense":
+            oven_sensors.append(copy.deepcopy(sensor_el))
+    write_xml(ASSETS / "model.xml", oven_model)
+
+    # Emit standalone MjSpec.attach-ready tray_model.xml (zero transform, no freejoint)
+    tray_model = ET.Element("mujoco", model="mbco4_tray")
+    ET.SubElement(tray_model, "compiler", angle="radian")
+    tray_model.append(copy.deepcopy(defaults))
+    tray_model.append(copy.deepcopy(asset))
+    tray_world = ET.SubElement(tray_model, "worldbody")
+    tray_copy = copy.deepcopy(tray)
+    tray_copy.set("pos", "0 0 0")
+    tray_copy.set("quat", "1 0 0 0")
+    for child in list(tray_copy):
+        if child.tag == "freejoint":
+            tray_copy.remove(child)
+    tray_world.append(tray_copy)
+    write_xml(ASSETS / "tray_model.xml", tray_model)
+
     (ASSETS / "physics-export.json").write_text(
         json.dumps(
             {
@@ -500,7 +617,7 @@ def export_blender_meshes_and_xml() -> None:
                 "chamber_dimensions_m": [0.450, 0.330, 0.350],
                 "tray_rail_levels_z_m": list(RAIL_LEVELS_Z),
                 "tray_dimensions_m": [0.400, 0.300, 0.020],
-                "scope": "Articulated MuJoCo 3.13 mechanical, PID thermal, reversible Y-fan, steam humidification, auto damper, and 6-DOF tray model.",
+                "scope": "Articulated MuJoCo 4.0 Filament PBR, mechanical, PID thermal, reversible Y-fan, steam humidification, auto damper, and 6-DOF tray model.",
             },
             indent=2,
         )
@@ -535,9 +652,19 @@ def export_and_verify_native_xml(mujoco, np) -> None:
     used_materials = {geom.get("material") for geom in root.iter("geom")}
     assets = root.find("asset")
     if assets is not None:
+        used_textures: set[str] = set()
         for asset in list(assets):
-            if (asset.tag == "mesh" and asset.get("name") not in used_meshes) or (
-                asset.tag == "material" and asset.get("name") not in used_materials
+            if asset.tag == "material" and asset.get("name") in used_materials:
+                for layer in asset.findall("layer"):
+                    if layer.get("texture"):
+                        used_textures.add(layer.get("texture"))
+                if asset.get("texture"):
+                    used_textures.add(asset.get("texture"))
+        for asset in list(assets):
+            if (
+                (asset.tag == "mesh" and asset.get("name") not in used_meshes)
+                or (asset.tag == "material" and asset.get("name") not in used_materials)
+                or (asset.tag == "texture" and asset.get("name") not in used_textures)
             ):
                 assets.remove(asset)
     for actuator in root.iter("general"):
@@ -611,7 +738,10 @@ def verify_frames_and_motions(mujoco, evidence_dir: Path) -> tuple[dict, dict]:
         jid = native_model.joint(joint_name).id
         jtype = int(native_model.jnt_type[jid])
         kind = "hinge" if jtype == int(mujoco.mjtJoint.mjJNT_HINGE) else "slide"
-        low, high = native_model.jnt_range[jid]
+        if native_model.jnt_limited[jid]:
+            low, high = native_model.jnt_range[jid]
+        else:
+            low, high = -math.pi, math.pi
         bid = int(native_model.jnt_bodyid[jid])
         samples = []
         for idx in range(21):
