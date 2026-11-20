@@ -12,7 +12,7 @@ import {
   reserveActor,
 } from "../src/actors/actor-registry";
 import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
 import {
   parseCaseId,
   parseSessionId,

@@ -13,13 +13,13 @@ import {
   TURN_DELIVERY_SEGMENT_COLUMNS,
 } from "./agent-session-harness-authority";
 import { createSessionTurnContextSchema } from "./actor-journal";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
 import { createSessionInformationFlowSchema } from "./agent-session-information-flow";
 import { createMessagePreparationSchema } from "./message-preparation-store";
 import { runSessionOutboxSchemaMigrations } from "./agent-session-outbox-schema";
 import { runTurnContinuationSchemaMigrations } from "./agent-session-continuation";
 
 const SESSION_SCHEMA_KEY = "session_hot_schema";
-export const CANONICAL_SESSION_SCHEMA_VERSION = 33;
 
 const ACTOR_JOURNAL_COLUMNS = [
   "organisation_id",

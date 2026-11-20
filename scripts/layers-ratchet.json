@@ -2,7 +2,7 @@
   "totals": {
     "upward": 370,
     "areas": 222,
-    "order": 137,
+    "order": 134,
     "table": 118
   },
   "crossings": {
@@ -66,7 +66,7 @@
     "foundation/actor-runtime -> areas/commerce": 1,
     "foundation/actor-runtime -> areas/devices": 1,
     "foundation/actor-runtime -> areas/inbox": 2,
-    "foundation/actor-runtime -> foundation/agent": 5,
+    "foundation/actor-runtime -> foundation/agent": 2,
     "foundation/actor-runtime -> foundation/authority": 2,
     "foundation/actor-runtime -> foundation/collaboration": 1,
     "foundation/actor-runtime -> foundation/connections": 1,

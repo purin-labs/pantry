@@ -9,7 +9,7 @@ import {
 import { newWarmActorSlotName, type WarmActorKind } from "./actor-registry";
 import { CASE_ACTOR_SCHEMA_VERSION } from "./actor-schema-versions";
 import { actorStub } from "./actor-stubs";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "./agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
 
 /**
  * Warm Case and Session slots of one Connector (Plan 55F).

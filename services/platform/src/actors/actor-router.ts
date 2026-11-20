@@ -17,7 +17,7 @@ import {
   type ActorRegistryError,
   type ExactActiveActorRegistryError,
 } from "./actor-registry";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "./agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
 import { actorStub, type PlacedActorRpc } from "./actor-stubs";
 import {
   CASE_ACTOR_SCHEMA_VERSION,

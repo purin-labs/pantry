@@ -37,7 +37,7 @@ import {
   parseActorRestoreManifest,
   canonicalActorRestoreManifestJson,
 } from "../../src/actors/actor-restore-manifest";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../src/actors/agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
 import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,

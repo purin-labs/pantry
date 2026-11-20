@@ -40,7 +40,7 @@ import {
 } from "../src/actors/actor-router";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { CaseDO } from "../src/actors/case";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
 import {
   d1Database,
   readMigration,

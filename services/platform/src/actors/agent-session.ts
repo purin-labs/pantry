@@ -60,10 +60,8 @@ import {
 import { traceLog } from "../observability";
 import { verifyWorkspaceRevisionReceipt } from "../workspace-revision-store";
 import type { Result } from "../result";
-import {
-  CANONICAL_SESSION_SCHEMA_VERSION,
-  initializeAgentSessionPersistence,
-} from "./agent-session-schema";
+import { initializeAgentSessionPersistence } from "./agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
 import {
   inspectAgentSessionCutoverQuiescence,
   type SessionCutoverInspectionError,

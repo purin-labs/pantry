@@ -16,11 +16,9 @@ import {
 import { createActorActivationSchema } from "../../services/platform/src/actors/actor-activation.ts";
 import { seedTrialWorkflowAccount } from "./draft-seed.mjs";
 import { canonicalStopNotice } from "../../services/platform/src/actors/pi-durable-history.ts";
-import { eraseActorContentSql } from "../../services/platform/src/actors/portal-chat-cleanup.ts";
-import {
-  createSessionSchema,
-  CANONICAL_SESSION_SCHEMA_VERSION,
-} from "../../services/platform/src/actors/agent-session-schema.ts";
+import { eraseActorContentSql } from "../../services/platform/src/actors/placement-execution-quiescence.ts";
+import { createSessionSchema } from "../../services/platform/src/actors/agent-session-schema.ts";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../services/platform/src/actors/actor-schema-versions.ts";
 import {
   commitInitializedSession,
   commitAcceptedSessionInput,

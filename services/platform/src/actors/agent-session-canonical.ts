@@ -14,10 +14,8 @@ import { validateCanonicalSessionRestore } from "../actor-wasm";
 import { parseSessionModelRoute } from "../policy-snapshot";
 import type { Result } from "../result";
 import { parseWorkspaceReceipt } from "../workspace-revision-store";
-import {
-  CANONICAL_SESSION_SCHEMA_VERSION,
-  type AgentSessionPersistence,
-} from "./agent-session-schema";
+import { type AgentSessionPersistence } from "./agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,

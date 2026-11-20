@@ -14,7 +14,7 @@ import {
   type ActorRegistryId,
 } from "../src/actors/actor-registry";
 import type { ActorActivationInspection } from "../src/actors/actor-activation";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/agent-session-schema";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
 import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,
