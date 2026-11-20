@@ -1,12 +1,11 @@
 {
   "totals": {
     "upward": 68,
-    "areas": 44,
+    "areas": 36,
     "order": 20,
     "table": 23
   },
   "crossings": {
-    "areas/brain -> areas/inbox": 1,
     "areas/brain -> surfaces/slack": 1,
     "areas/cafe -> areas/kitchen": 1,
     "areas/cafe -> surfaces/portal": 2,
@@ -17,7 +16,6 @@
     "areas/commerce -> workers/platform": 1,
     "areas/devices -> areas/cafe": 4,
     "areas/devices -> surfaces/voice": 2,
-    "areas/inbox -> areas/brain": 7,
     "areas/inbox -> areas/commerce": 3,
     "areas/inbox -> surfaces/whatsapp": 1,
     "areas/integrations -> areas/commerce": 1,

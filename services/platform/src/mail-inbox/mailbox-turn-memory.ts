@@ -13,7 +13,10 @@ import { readVerifiedMessageSender } from "./verified-sender";
 import type { Env } from "../env";
 import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { createTurnMemoryReader, type TurnMemoryDestination } from "../memory/access";
+import {
+  memoryService,
+  type TurnMemoryDestination,
+} from "../memory/contract/memory-service";
 
 /**
  * The Memory reader for one mailbox turn.
@@ -52,14 +55,17 @@ async function readMailboxTurnMemory(
   // about what Memory applies to this turn.
   if (supplier.kind === "unreadable") return { kind: "unavailable" };
   if (supplier.kind === "supplier") applicability.push(supplier.scope);
-  return createTurnMemoryReader({
-    env: input.env,
-    execution: input.execution,
-    organisationId: input.organisationId,
-    subjects: { applicability },
-    destinationMayReceive: input.destinationMayReceive,
-    now: input.now,
-  }).read(request);
+  return memoryService
+    .use()
+    .createTurnMemoryReader({
+      env: input.env,
+      execution: input.execution,
+      organisationId: input.organisationId,
+      subjects: { applicability },
+      destinationMayReceive: input.destinationMayReceive,
+      now: input.now,
+    })
+    .read(request);
 }
 
 type VerifiedSupplier =

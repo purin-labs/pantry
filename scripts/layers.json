@@ -1141,6 +1141,8 @@
     "services/platform/src/whatsapp/identifiers.ts": "foundation/connections",
     "services/platform/src/whatsapp/read-authorization.ts": "areas/inbox",
     "services/platform/src/workspace-executor-container.ts": "foundation/agent",
-    "services/platform/src/workspace-revision-store.ts": "foundation/agent"
+    "services/platform/src/workspace-revision-store.ts": "foundation/agent",
+    "services/platform/src/port.ts": "foundation/kernel",
+    "services/platform/src/worker-ports.ts": "workers/platform"
   }
 }

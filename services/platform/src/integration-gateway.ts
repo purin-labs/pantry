@@ -106,6 +106,8 @@ import {
   handleStripeWebhook,
 } from "./stripe/webhooks";
 import { handleWhatsAppWebhook } from "./whatsapp/webhook-route";
+// The Worker registers the ports of the lower modules (`worker-ports.ts`).
+import "./worker-ports";
 
 export { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-governor";
 
@@ -157,10 +159,7 @@ export default {
     // Durable Object.
     if (controller.cron === "*/5 * * * *") {
       ctx.waitUntil(
-        runScheduledCommerceOutboxReconciliation(
-          env,
-          controller.scheduledTime,
-        ),
+        runScheduledCommerceOutboxReconciliation(env, controller.scheduledTime),
       );
       return;
     }
