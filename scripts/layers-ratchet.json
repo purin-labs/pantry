@@ -1,9 +1,9 @@
 {
   "totals": {
-    "upward": 394,
+    "upward": 390,
     "areas": 248,
     "order": 136,
-    "table": 119
+    "table": 118
   },
   "crossings": {
     "areas/brain -> areas/inbox": 10,
@@ -126,7 +126,7 @@
     "foundation/conversation -> areas/organisation": 2,
     "foundation/conversation -> surfaces/email": 8,
     "foundation/conversation -> surfaces/portal": 9,
-    "foundation/conversation -> surfaces/slack": 30,
+    "foundation/conversation -> surfaces/slack": 26,
     "foundation/conversation -> surfaces/whatsapp": 6,
     "foundation/conversation -> workers/platform": 3,
     "foundation/kernel -> foundation/contracts": 1,
@@ -213,7 +213,6 @@
     "table slack_dm_organisation_selection (surfaces/slack) <- foundation/tenancy": 1,
     "table slack_installation (surfaces/slack) <- foundation/authority": 2,
     "table slack_installation_lifecycle_event (areas/organisation) <- surfaces/webhooks": 1,
-    "table slack_thread_case_pin (surfaces/slack) <- foundation/conversation": 1,
     "table slack_thread_case_pin (surfaces/slack) <- foundation/tenancy": 1,
     "table state_object_relocation (foundation/tenancy) <- foundation/actor-runtime": 3,
     "table surface_installation (foundation/tenancy) <- areas/organisation": 1,

@@ -573,7 +573,7 @@
     "services/platform/src/actors/connector-email-proposal.ts": "surfaces/email",
     "services/platform/src/actors/connector-email.ts": "surfaces/email",
     "services/platform/src/actors/connector-eval.ts": "areas/brain",
-    "services/platform/src/actors/connector-side-case.ts": "foundation/conversation",
+    "services/platform/src/actors/connector-side-case.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-ingress.ts": "surfaces/slack",
     "services/platform/src/actors/connector-slack-stream.ts": "surfaces/slack",
     "services/platform/src/actors/connector-whatsapp-proposal.ts": "surfaces/whatsapp",
