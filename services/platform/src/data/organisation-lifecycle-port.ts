@@ -15,10 +15,7 @@
  * serves a request or starts an Actor. A read before that is a programmer
  * error.
  */
-import type {
-  OnboardingControlRole,
-  SurfaceKind,
-} from "@purin-labs/contracts";
+import type { OnboardingControlRole, SurfaceKind } from "@purin-labs/contracts";
 import type {
   GlobalDatabase,
   OrganisationDatabase,
