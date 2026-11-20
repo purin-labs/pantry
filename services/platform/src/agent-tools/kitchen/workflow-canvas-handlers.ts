@@ -1,10 +1,6 @@
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
-import {
-  acceptedExecutionAccountAuthority,
-} from "../../account-platform/access";
-import {
-  workflowCanvasDocumentId,
-} from "@purin-labs/bakery-model/bakery-canvas-source";
+import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas-source";
 import type {
   WorkflowCanvasReadRequest,
   WorkflowCanvasMoveRequest,
@@ -13,29 +9,19 @@ import {
   authorizeCanvasTurnDocument,
   sessionTurnExecution,
 } from "../../chat/turn-access";
-import { buildControlAuthority } from "../../request-authority";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
-import { newRequestId, type OrganisationId } from "../../ids";
+import { newRequestId } from "../../ids";
 import { traceWarn } from "../../observability";
-import {
-  requireActiveOrganisationActorAtPlacement,
-} from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
-import {
-  preflightHarnessTurnLease,
-} from "../../actors/agent-session-harness-authority";
+import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
-import {
-  authorizeCapabilityUse,
-} from "../../authorization/access-grants/turn-authority";
-import {
-  admitSessionInformationFlowObservation,
-  readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
-} from "../../actors/agent-session-information-flow";
+import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -43,18 +29,13 @@ import {
   type FlowLabel,
 } from "../../policy";
 import { digestCanonical } from "../../policy";
-import {
-  readActiveOrganisationMembershipRevision,
-  type OrganisationMember,
-} from "../../data/control-plane";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { sha256Hex } from "@purin-labs/std";
 import {
   collaborationEditDeadline,
   collaborationMember,
-  evaluateHarnessFlowSink,
   requireLiveBakeryReadAuthority,
-  toolEffectPassesExit,
+  type ToolEffect,
 } from "../session-support";
 import type { SessionToolContext } from "../context";
 
@@ -243,7 +224,7 @@ export async function moveWorkflowCanvasForEmbeddedHarness(
   request: WorkflowCanvasMoveRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-) {
+): Promise<ToolEffect> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -292,127 +273,78 @@ export async function moveWorkflowCanvasForEmbeddedHarness(
     before.value.documentRevision,
     "workflow canvas move",
   );
-  await authorizeWorkflowCanvasDisclosure(
-    env,
-    storage,
-    organisationId,
-    lease,
+  return {
+    kind: "shared_draft",
     member,
-    prepared,
-  );
-  const logicalOperationId = await sha256Hex(
-    JSON.stringify([lease.session.sessionId, lease.turn.turnId, operationId]),
-  );
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(
-      `Workflow canvas move authority expired: ${active.error.code}`,
-    );
-  }
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.moveWorkflowCanvasObject({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    organisationId,
-    reference: request.reference,
-    userId: member.userId,
-    deadlineAt,
-    execution: sessionTurnExecution(lease),
-    request: {
-      documentId: workflowCanvasDocumentId(request.reference),
-      operationId: logicalOperationId,
-      expectedRevision: request.expectedRevision,
-      objectId: request.destination.objectId,
-      x: request.destination.x,
-      y: request.destination.y,
+    unavailable: "Workflow canvas information-flow authority unavailable",
+    draft: {
+      shared: "every_member",
+      edit: {
+        draft: "Workflow canvas",
+        capabilityId: CAPABILITY_KEYS.commerceWorkflowCanvasMove,
+        integrationAccountId: "platform",
+        resourceScope: `bakery-run:${prepared.snapshotId}:canvas`,
+      },
+      refused: (decision) => {
+        traceWarn("session.workflow_canvas_disclosure_denied", {
+          requestId: newRequestId(),
+          organisation_id: organisationId,
+          session_id: lease.session.sessionId,
+          turn_id: lease.turn.turnId,
+          decision_kind: decision.kind,
+          reason_code: "reason" in decision ? decision.reason.code : null,
+          restriction_rule_id:
+            "reason" in decision ? decision.reason.ruleId : null,
+        });
+      },
     },
-  });
-  if (!result.ok) {
-    throw new Error(`Workflow canvas move denied: ${result.error.code}`);
-  }
-  const revision =
-    result.value.kind === "accepted"
-      ? result.value.receipt.documentRevision
-      : before.value.documentRevision;
-  await admitWorkflowCanvasObservation(
-    storage,
-    lease,
-    prepared,
-    result.value,
-    revision,
-    "workflow canvas move",
-  );
-  return result.value;
-}
-
-async function authorizeWorkflowCanvasDisclosure(
-  env: Env,
-  storage: DurableObjectStorage,
-  organisationId: OrganisationId,
-  lease: HarnessTurnLease,
-  member: OrganisationMember,
-  prepared: PreparedWorkflowCanvasRead,
-): Promise<void> {
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error("Workflow canvas information-flow authority unavailable");
-  }
-  const flowLabel = current.value.binding.flowLabel;
-  const revision = await readActiveOrganisationMembershipRevision({
-    db: prepared.execution.scope.database,
-    organisationId,
-  });
-  if (revision === null) {
-    throw new Error("Workflow canvas membership unavailable");
-  }
-  const destination = buildControlAuthority({
-    organisationId,
-    requesterPersonId: member.personId,
-    userId: member.userId,
-    membershipRevision: revision,
-    role: member.role,
-  });
-  const sink = {
-    kind: "tool_effect" as const,
-    destinationAuthority: destination.requestAuthority,
-    capabilityId: CAPABILITY_KEYS.commerceWorkflowCanvasMove,
-    integrationAccountId: "platform",
-    resourceScope: `bakery-run:${prepared.snapshotId}:canvas`,
-    approvalSatisfied: false,
-    readByEveryMember: { sharedWith: [] },
+    run: async () => {
+      const logicalOperationId = await sha256Hex(
+        JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+      );
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Workflow canvas move authority expired: ${active.error.code}`,
+        );
+      }
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.moveWorkflowCanvasObject({
+        agent: await resolveCollaborationAgent(execution.scope, assignment),
+        organisationId,
+        reference: request.reference,
+        userId: member.userId,
+        deadlineAt,
+        execution: sessionTurnExecution(lease),
+        request: {
+          documentId: workflowCanvasDocumentId(request.reference),
+          operationId: logicalOperationId,
+          expectedRevision: request.expectedRevision,
+          objectId: request.destination.objectId,
+          x: request.destination.x,
+          y: request.destination.y,
+        },
+      });
+      if (!result.ok) {
+        throw new Error(`Workflow canvas move denied: ${result.error.code}`);
+      }
+      const revision =
+        result.value.kind === "accepted"
+          ? result.value.receipt.documentRevision
+          : before.value.documentRevision;
+      await admitWorkflowCanvasObservation(
+        storage,
+        lease,
+        prepared,
+        result.value,
+        revision,
+        "workflow canvas move",
+      );
+      return result.value;
+    },
   };
-  const decision = await evaluateHarnessFlowSink(
-    prepared.execution.scope.database,
-    prepared.execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
-    { flowLabel, sink },
-  );
-  if (
-    !(await toolEffectPassesExit(env, prepared.execution, lease, {
-      decision,
-      flowLabel,
-      sink,
-    }))
-  ) {
-    traceWarn("session.workflow_canvas_disclosure_denied", {
-      requestId: newRequestId(),
-      organisation_id: organisationId,
-      session_id: lease.session.sessionId,
-      turn_id: lease.turn.turnId,
-      decision_kind: decision.kind,
-      reason_code: "reason" in decision ? decision.reason.code : null,
-      restriction_rule_id: "reason" in decision ? decision.reason.ruleId : null,
-    });
-    throw new Error("Workflow canvas disclosure is not authorized");
-  }
 }

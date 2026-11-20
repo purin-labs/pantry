@@ -399,27 +399,6 @@ export function untrustedDeviceText(value: string): string {
   return normalizeUntrustedCommerceText(value, "display_name").text;
 }
 
-export async function currentTurnFlowLabel(
-  storage: DurableObjectStorage,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  label: string,
-): Promise<StoredFlowLabel> {
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId: execution.scope.organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error(`${label} information-flow authority unavailable`);
-  }
-  return current.value.binding.flowLabel;
-}
-
 /** The commerce projection reads the saved recipe now, as after the page's save. */
 export async function refreshRecipeProjection(
   env: Env,
@@ -446,21 +425,21 @@ export async function refreshRecipeProjection(
 
 /** One step of a staff page: its sink, its receipt scope and its command. */
 type StaffPageEffect = Readonly<{
-    flowLabel: StoredFlowLabel;
-    sink: import("../policy/information-flow").ToolEffectSink;
-    route: string;
-    operation: string;
-    body: unknown;
-    operationId: string;
-    result: string;
-    /**
-     * The check of content that the page's readers will see, if it has one.
-     * The effect's own check asks the writer question, with the action.
-     */
-    exit?: (mode: "pass_or_ask", writerRule: "asked") => Promise<void>;
-    run: (key: string) => Promise<string | null>;
-    /** What must see the step at once, after its receipt. */
-    settled: () => Promise<void>;
+  flowLabel: StoredFlowLabel;
+  sink: import("../policy/information-flow").ToolEffectSink;
+  route: string;
+  operation: string;
+  body: unknown;
+  operationId: string;
+  result: string;
+  /**
+   * The check of content that the page's readers will see, if it has one.
+   * The effect's own check asks the writer question, with the action.
+   */
+  exit?: (mode: "pass_or_ask", writerRule: "asked") => Promise<void>;
+  run: (key: string) => Promise<string | null>;
+  /** What must see the step at once, after its receipt. */
+  settled: () => Promise<void>;
 }>;
 
 /**
@@ -470,7 +449,7 @@ type StaffPageEffect = Readonly<{
  * queue's stage, which refuses a step that already happened. A refusal runs no
  * command and stores no receipt, so the agent can read and try again.
  */
-export async function settleStaffPageEffect(
+async function settleStaffPageEffect(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -616,6 +595,7 @@ type SharedDraftEdit = Readonly<{
     | typeof CAPABILITY_KEYS.marketingEmailDraftEdit
     | typeof CAPABILITY_KEYS.commerceProductionPlanEdit
     | typeof CAPABILITY_KEYS.commerceMenuDraftEdit
+    | typeof CAPABILITY_KEYS.commerceWorkflowCanvasMove
     | typeof CAPABILITY_KEYS.commerceRecipeSave
     | typeof CAPABILITY_KEYS.commerceSupplyCostSave
     | typeof CAPABILITY_KEYS.commerceSupplierCreate;
@@ -688,57 +668,6 @@ export type SharedDraftChat = Readonly<{
 }>;
 
 /**
- * Whether the turn's work may enter a draft that every organisation role
- * reads. Work that some role may not read comes from a conversation, and an
- * owner or admin must have shared that conversation with the draft. The share
- * adds that conversation to the draft's audience, and the turn's label stays as
- * it is. Internal content enters. Other private content asks a person (Plan 27C).
- */
-export async function authorizeSharedDraftEdit(
-  env: Env,
-  storage: DurableObjectStorage,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  member: OrganisationMember,
-  edit: SharedDraftEdit,
-): Promise<void> {
-  const organisationId = execution.scope.organisationId;
-  const current = await readPersistedSessionTurnFlowBinding(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-  });
-  if (
-    !current.ok ||
-    current.value === null ||
-    current.value.authorityPartitionDigest !== lease.authorityPartitionDigest
-  ) {
-    throw new Error(`${edit.draft} information-flow authority unavailable`);
-  }
-  const flowLabel = current.value.binding.flowLabel;
-  const everyRoleReads = (
-    ["owner", "admin", "operator", "viewer"] as const
-  ).every((role) =>
-    labelAllowsAudiences(flowLabel, [{ kind: "organisation_role", role }]),
-  );
-  const sharedWith = everyRoleReads
-    ? []
-    : await draftSharedReaders(organisationId, lease, edit);
-  if (sharedWith === null) {
-    throw new Error(edit.notConnected);
-  }
-  await passSharedDraftExit(
-    env,
-    execution,
-    lease,
-    member,
-    edit,
-    flowLabel,
-    sharedWith,
-  );
-}
-
-/**
  * The exit check of content that goes into a draft that every member reads.
  * Content that a member may not read raises the approval prompt.
  */
@@ -763,6 +692,8 @@ export async function passSharedDraftExit(
    * own check asks the writer question with its action (Plan 89).
    */
   writerRule: "ask" | "asked" = "ask",
+  /** Sees the decision of a check that does not pass, for a trace. */
+  refused?: (decision: FlowSinkDecision) => void,
 ): Promise<void> {
   const organisationId = execution.scope.organisationId;
   const revision = await readActiveOrganisationMembershipRevision({
@@ -814,6 +745,7 @@ export async function passSharedDraftExit(
       mode,
     ))
   ) {
+    refused?.(decision);
     throw new Error(`${edit.draft} disclosure is not authorized`);
   }
 }
@@ -915,7 +847,7 @@ export async function requireLiveBakeryReadAuthority(
  * through, and the Organisation's capability rules still apply to it. A
  * first block raises `ExitApprovalRequestedError`, which the agent reads.
  */
-export async function toolEffectPassesExit(
+async function toolEffectPassesExit(
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -1002,7 +934,7 @@ export async function toolEffectPassesExit(
   return true;
 }
 
-export async function evaluateHarnessFlowSink(
+async function evaluateHarnessFlowSink(
   db: OrganisationDatabase,
   accountAccess: import("../account-platform/access").AccountPlatformAccess,
   userAuthority: import("../account-platform/access").AccountUserAuthority,
@@ -1076,6 +1008,11 @@ export function proposalFlowEffect<Result>(
   };
 }
 
+/** The decision of an exit check, before a pass or an ask. */
+export type FlowSinkDecision = Awaited<
+  ReturnType<typeof evaluateHarnessFlowSink>
+>;
+
 /** The draft that a content check names: what `passSharedDraftExit` reads. */
 type SharedDraftSink = Pick<
   SharedDraftEdit,
@@ -1119,8 +1056,18 @@ export type ToolEffect<Result = unknown> =
        * must be shared with the draft, and its readers join the audience.
        */
       draft:
-        | Readonly<{ shared: "every_member"; edit: SharedDraftSink }>
-        | Readonly<{ shared: "lookup"; edit: SharedDraftEdit }>;
+        | Readonly<{
+            shared: "every_member";
+            edit: SharedDraftSink;
+            /** Sees the decision of a check that does not pass, for a trace. */
+            refused?: (decision: FlowSinkDecision) => void;
+          }>
+        | Readonly<{
+            shared: "lookup";
+            edit: SharedDraftEdit;
+            /** The error of a conversation that is not shared, if not a plain one. */
+            notShared?: (message: string) => Error;
+          }>;
       run: () => Promise<Result>;
     }>
   | Readonly<{
@@ -1240,7 +1187,10 @@ export async function settleToolEffect(
               draft.edit,
             );
         if (readers === null) {
-          throw new Error(draft.edit.notConnected);
+          throw (
+            draft.notShared?.(draft.edit.notConnected) ??
+            new Error(draft.edit.notConnected)
+          );
         }
         sharedWith = readers;
       }
@@ -1252,6 +1202,9 @@ export async function settleToolEffect(
         draft.edit,
         flowLabel,
         sharedWith,
+        "pass_or_ask",
+        "ask",
+        draft.shared === "every_member" ? draft.refused : undefined,
       );
       return effect.run();
     }

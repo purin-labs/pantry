@@ -12,6 +12,7 @@ import type {
   HarnessSideCaseProposalRequest,
 } from "../catalog/types";
 import { defineToolFamily, jsonSchema } from "../define-tool";
+import { uncheckedEffect } from "../tool-effect";
 
 /** What a turn gives to the tools that it offers by its origin. */
 export type TurnToolServices = {
@@ -118,10 +119,11 @@ export const followUp = defineTurnTool({
   selection: { kind: "turn", flag: "followUp" },
   directOnly: true,
   unavailable: "Follow-ups are unavailable",
-  handler: ({ scheduleFollowUp }) =>
+  // No exit check today (Refactor 17, Appendix C): the effect has other rules.
+  prepare: ({ scheduleFollowUp }) =>
     scheduleFollowUp === undefined
       ? undefined
-      : (request) => scheduleFollowUp(request),
+      : async (request) => uncheckedEffect(() => scheduleFollowUp(request)),
 });
 
 /**

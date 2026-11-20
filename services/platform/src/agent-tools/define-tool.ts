@@ -221,7 +221,17 @@ export function defineToolFamily<Services>() {
       spec: ToolSpec<Name, Input, Request, Services>,
     ): RegisteredTool<Name, Family, Services> => {
       if ((spec.handler === undefined) === (spec.prepare === undefined)) {
-        throw new Error(`${spec.name} needs a handler or prepare, and not both`);
+        throw new Error(
+          `${spec.name} needs a handler or prepare, and not both`,
+        );
+      }
+      if (
+        (spec.effect === "draft" ||
+          spec.effect === "receipt" ||
+          spec.effect === "scheduled") &&
+        spec.prepare === undefined
+      ) {
+        throw new Error(`${spec.name} has an effect, so it needs prepare`);
       }
       if (spec.effect === "surface" && spec.succeeded === undefined) {
         throw new Error(

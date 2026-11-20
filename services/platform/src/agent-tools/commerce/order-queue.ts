@@ -8,11 +8,11 @@ import type {
   SoldOutMarkRequest,
   SoldOutToolRead,
 } from "../../commerce/order-queue-commands";
-import type { StaffPageToolReceipt } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { defineToolFamily, noArguments, stringEnum } from "../define-tool";
 import type { PageViewExecute } from "../kitchen/services";
 import { ProposalArgumentError } from "../errors";
+import type { PreparedEffect } from "../tool-effect";
 
 type OrderQueueReadTool = () => Promise<OrderQueueToolRead>;
 
@@ -23,14 +23,14 @@ type CounterSaleReadTool = (
 type OrderQueueAdvanceTool = (
   request: OrderQueueAdvanceRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 type SoldOutReadTool = () => Promise<SoldOutToolRead>;
 
 type SoldOutMarkTool = (
   request: SoldOutMarkRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 /** What a turn gives to the order queue and Register tools. */
 export type CafeToolServices = {
@@ -92,7 +92,7 @@ export const orderQueueAdvance = defineCafeTool({
     capability: CAPABILITY_KEYS.commerceOrderQueueAdvance,
   },
   unavailable: "order queue move is unavailable",
-  handler: ({ advanceOrderQueue }) =>
+  prepare: ({ advanceOrderQueue }) =>
     advanceOrderQueue === undefined
       ? undefined
       : (request, call) => advanceOrderQueue(request, call.operationId),
@@ -162,7 +162,7 @@ export const soldOutMark = defineCafeTool({
     capability: CAPABILITY_KEYS.commerceSoldOutMark,
   },
   unavailable: "sold out mark is unavailable",
-  handler: ({ markSoldOut }) =>
+  prepare: ({ markSoldOut }) =>
     markSoldOut === undefined
       ? undefined
       : (request, call) => markSoldOut(request, call.operationId),

@@ -63,7 +63,7 @@ export const workflowCanvasMove = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceWorkflowCanvasMove,
   },
   unavailable: "move object is unavailable",
-  handler: ({ moveWorkflowCanvasObject }) =>
+  prepare: ({ moveWorkflowCanvasObject }) =>
     moveWorkflowCanvasObject === undefined
       ? undefined
       : (request, call) =>

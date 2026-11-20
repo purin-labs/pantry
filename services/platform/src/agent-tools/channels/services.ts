@@ -162,7 +162,7 @@ type EmailDraftEditTool = (
   request: EmailDraftEditRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<EmailDraftRead>;
+) => Promise<PreparedEffect>;
 
 /** What a turn gives to the mail and WhatsApp tools. */
 export type ChannelToolServices = {

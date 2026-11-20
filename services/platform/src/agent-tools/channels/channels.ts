@@ -20,6 +20,7 @@ import type {
 } from "./services";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
+import { uncheckedEffect } from "../tool-effect";
 import { defineChannelTool } from "./services";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
@@ -287,8 +288,12 @@ export const whatsAppSupportReplySend = defineChannelTool({
     capability: CAPABILITY_KEYS.whatsappSupportReplySend,
   },
   unavailable: "whatsapp support reply send is unavailable",
-  handler: ({ sendWhatsAppSupportReply }) =>
-    sendWhatsAppSupportReply === undefined ? undefined : (request) => sendWhatsAppSupportReply(request),
+  // No exit check today (Refactor 17, Appendix C): the effect has other rules.
+  prepare: ({ sendWhatsAppSupportReply }) =>
+    sendWhatsAppSupportReply === undefined
+      ? undefined
+      : async (request) =>
+          uncheckedEffect(() => sendWhatsAppSupportReply(request)),
   readReceipt: readWhatsAppReceiptId,
 });
 

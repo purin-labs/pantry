@@ -1,26 +1,18 @@
-import {
-  acceptedExecutionAccountAuthority,
-} from "../../account-platform/access";
-import {
-  resolveSlackMessageCapability,
-} from "../../actors/email-operational-capability";
+import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import { resolveSlackMessageCapability } from "../../actors/email-operational-capability";
 import {
   insertSlackMessageProposal,
   matchSlackChannel,
   readSlackChannelOptions,
   slackMessageBodyDigest,
 } from "../../data/slack-message-proposal";
-import {
-  requireSessionExecution,
-} from "../../actors/session-execution-admission";
+import { requireSessionExecution } from "../../actors/session-execution-admission";
 import {
   SlackDraftRequestError,
   type HarnessSlackMessagePropose,
   type HarnessSlackMessageProposalReceipt,
 } from "./slack";
-import {
-  authorizeCapabilityUse,
-} from "../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
 import {
   CAPABILITY_KEYS,
   SLACK_MESSAGE_RESOURCE_SCOPE,

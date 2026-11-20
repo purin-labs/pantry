@@ -3,16 +3,12 @@ import { sessionTurnExecution } from "../../chat/turn-access";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
 import { parseCaseId, parseIntegrationAccountId } from "../../ids";
-import {
-  requireActiveOrganisationActorAtPlacement,
-} from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
-import {
-  preflightHarnessTurnLease,
-} from "../../actors/agent-session-harness-authority";
+import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import {
   ProductionPlanRequestError,
@@ -34,10 +30,10 @@ import {
   type PreparedCommerceRead,
   type SharedDraftChat,
   admitCommerceReadObservation,
-  authorizeSharedDraftEdit,
   collaborationEditDeadline,
   collaborationMember,
   prepareSharedCommerceObservation,
+  type ToolEffect,
 } from "../session-support";
 import { prepareCommerceReadForEmbeddedHarness } from "../commerce/handlers";
 import type { SessionToolContext } from "../context";
@@ -251,7 +247,7 @@ export async function editProductionPlanForEmbeddedHarness(
   request: HarnessProductionPlanEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
-): Promise<HarnessProductionPlan> {
+): Promise<ToolEffect<HarnessProductionPlan>> {
   const { env, storage, execution, lease, assignment } = context;
   const deadlineAt = collaborationEditDeadline(
     storage,
@@ -296,71 +292,83 @@ export async function editProductionPlanForEmbeddedHarness(
     "edit",
   );
   const prepared = before.prepared;
-  await authorizeSharedDraftEdit(env, storage, execution, lease, member, {
-    draft: PLAN_DRAFT,
-    caseId: assignment.caseId,
-    capabilityId: CAPABILITY_KEYS.commerceProductionPlanEdit,
-    integrationAccountId: prepared.integrationAccountId,
-    resourceScope: prepared.resourceScope,
-    readSharedThread: readProductionPlanThread.bind(
-      null,
-      env,
-      execution,
-      lease,
-      request.locationId,
-    ),
-    readSharedChat: readProductionPlanChat.bind(
-      null,
-      env,
-      execution,
-      lease,
-      request.locationId,
-    ),
-    notConnected: PLAN_NOT_SHARED,
-  }).catch(correctablePlanRefusal);
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(
-      `Production plan edit authority expired: ${active.error.code}`,
-    );
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editProductionPlan({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    execution: sessionTurnExecution(lease),
-    organisationId,
-    locationId: request.locationId,
-    requestId: request.requestId,
-    quantity: request.quantity,
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: member.userId,
-    deadlineAt,
-  });
-  if (!result.ok) {
-    throw new Error(
-      `Production plan edit failed: ${result.error.code}. Read the plan again before choosing a new edit.`,
-    );
-  }
-  const planned = new Map<string, string>();
-  for (const line of result.value.lines) {
-    planned.set(line.requestId, line.quantity);
-  }
   return {
-    ...before.plan,
-    requests: before.plan.requests.map((line) => ({
-      ...line,
-      plannedQuantity: planned.get(line.requestId) ?? null,
-    })),
+    kind: "shared_draft",
+    member,
+    unavailable: `${PLAN_DRAFT} information-flow authority unavailable`,
+    draft: {
+      shared: "lookup",
+      edit: {
+        draft: PLAN_DRAFT,
+        caseId: assignment.caseId,
+        capabilityId: CAPABILITY_KEYS.commerceProductionPlanEdit,
+        integrationAccountId: prepared.integrationAccountId,
+        resourceScope: prepared.resourceScope,
+        readSharedThread: readProductionPlanThread.bind(
+          null,
+          env,
+          execution,
+          lease,
+          request.locationId,
+        ),
+        readSharedChat: readProductionPlanChat.bind(
+          null,
+          env,
+          execution,
+          lease,
+          request.locationId,
+        ),
+        notConnected: PLAN_NOT_SHARED,
+      },
+      // The agent can explain this refusal to the person. It names no source.
+      notShared: (message) => new ProductionPlanRequestError(message),
+    },
+    run: async () => {
+      const active = preflightHarnessTurnLease(storage, lease, Date.now());
+      if (!active.ok) {
+        throw new Error(
+          `Production plan edit authority expired: ${active.error.code}`,
+        );
+      }
+      const organisation = await requireActiveOrganisationActorAtPlacement({
+        env,
+        organisationId,
+        placement: execution.scope.placement,
+        now: Date.now(),
+      });
+      await requireSessionExecution(execution, lease);
+      const result = await organisation.editProductionPlan({
+        agent: await resolveCollaborationAgent(execution.scope, assignment),
+        execution: sessionTurnExecution(lease),
+        organisationId,
+        locationId: request.locationId,
+        requestId: request.requestId,
+        quantity: request.quantity,
+        operationId: JSON.stringify([
+          lease.session.sessionId,
+          lease.turn.turnId,
+          operationId,
+        ]),
+        userId: member.userId,
+        deadlineAt,
+      });
+      if (!result.ok) {
+        throw new Error(
+          `Production plan edit failed: ${result.error.code}. Read the plan again before choosing a new edit.`,
+        );
+      }
+      const planned = new Map<string, string>();
+      for (const line of result.value.lines) {
+        planned.set(line.requestId, line.quantity);
+      }
+      return {
+        ...before.plan,
+        requests: before.plan.requests.map((line) => ({
+          ...line,
+          plannedQuantity: planned.get(line.requestId) ?? null,
+        })),
+      };
+    },
   };
 }
 
@@ -368,17 +376,6 @@ const PLAN_DRAFT = "Production plan";
 
 const PLAN_NOT_SHARED =
   "This conversation is not shared with this location's plan. An owner or admin shares a Slack thread or a Project chat with the plan before an agent may change it from there.";
-
-/**
- * The refusal that the agent can explain to the person: the conversation is
- * not shared with the plan. It names no source. Other failures stay generic.
- */
-function correctablePlanRefusal(error: unknown): never {
-  if (error instanceof Error && error.message === PLAN_NOT_SHARED) {
-    throw new ProductionPlanRequestError(error.message);
-  }
-  throw error;
-}
 
 async function readProductionPlanShare(
   env: Env,

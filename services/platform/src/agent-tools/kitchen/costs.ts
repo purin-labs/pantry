@@ -29,10 +29,10 @@ import {
   type WeekUnits,
 } from "@purin-labs/control-api";
 import type { CatalogExecutionContext } from "../catalog/execute";
-import type { StaffPageToolReceipt } from "../catalog/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
 import { defineKitchenTool } from "./services";
+import type { PreparedEffect } from "../../agent-tools/tool-effect";
 
 const COST_UNITS: ReadonlySet<string> = new Set([
   "each",
@@ -216,7 +216,7 @@ export type SupplyCostSaveRequest = Readonly<{
 export type SupplyCostSaveTool = (
   request: SupplyCostSaveRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 export type LotCostSaveRequest = Readonly<{
   lotId: string;
@@ -233,7 +233,7 @@ export type LotCostSaveRequest = Readonly<{
 export type LotCostSaveTool = (
   request: LotCostSaveRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 export type CostsPlanSaveRequest = Readonly<{
   expectedPlanRevision: number | null;
@@ -246,7 +246,7 @@ export type CostsPlanSaveRequest = Readonly<{
 export type CostsPlanSaveTool = (
   request: CostsPlanSaveRequest,
   operationId: string,
-) => Promise<StaffPageToolReceipt>;
+) => Promise<PreparedEffect>;
 
 export type CostsSheetEditRequest = Readonly<{
   changes: readonly CostsSheetCellChange[];
@@ -263,7 +263,7 @@ export type CostsSheetEditTool = (
   request: CostsSheetEditRequest,
   operationId: string,
   execution: CatalogExecutionContext,
-) => Promise<CostsSheetEditResult>;
+) => Promise<PreparedEffect>;
 
 export const costsRead = defineKitchenTool({
   name: "costs_read",
@@ -476,7 +476,7 @@ export const supplyCostSave = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceSupplyCostSave,
   },
   unavailable: "supply cost save is unavailable",
-  handler: ({ saveSupplyCost }) =>
+  prepare: ({ saveSupplyCost }) =>
     saveSupplyCost === undefined
       ? undefined
       : (request, call) => saveSupplyCost(request, call.operationId),
@@ -554,7 +554,7 @@ export const lotCostSave = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceSupplyCostSave,
   },
   unavailable: "lot cost save is unavailable",
-  handler: ({ saveLotCost }) =>
+  prepare: ({ saveLotCost }) =>
     saveLotCost === undefined
       ? undefined
       : (request, call) => saveLotCost(request, call.operationId),
@@ -694,7 +694,7 @@ export const costsPlanSave = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceSupplyCostSave,
   },
   unavailable: "costs plan save is unavailable",
-  handler: ({ saveCostsPlan }) =>
+  prepare: ({ saveCostsPlan }) =>
     saveCostsPlan === undefined
       ? undefined
       : (request, call) => saveCostsPlan(request, call.operationId),
@@ -748,7 +748,7 @@ export const costsSheetEdit = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceSupplyCostSave,
   },
   unavailable: "costs sheet edit is unavailable",
-  handler: ({ editCostsSheet }) =>
+  prepare: ({ editCostsSheet }) =>
     editCostsSheet === undefined
       ? undefined
       : (request, call) =>

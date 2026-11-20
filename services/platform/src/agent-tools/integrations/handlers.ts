@@ -463,7 +463,10 @@ export async function writeAirtableForHarness(
   );
   return {
     kind: "effect",
-    label: { source: "work", unavailable: "Airtable effect context unavailable" },
+    label: {
+      source: "work",
+      unavailable: "Airtable effect context unavailable",
+    },
     sink: {
       kind: "tool_effect",
       destinationAuthority: lease.requestAuthority,

@@ -729,10 +729,11 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
           reads.push(request);
           return snapshot;
         },
-        editProductDescriptionDraft: async (request, operationId) => {
-          edits.push({ request, operationId });
-          return snapshot;
-        },
+        editProductDescriptionDraft: async (request, operationId) =>
+          uncheckedEffect(async () => {
+            edits.push({ request, operationId });
+            return snapshot;
+          }),
       },
     }),
   });
@@ -775,7 +776,8 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     services: fixtureServices({
       commerce: {
         readProductDescriptionDraft: async () => snapshot,
-        editProductDescriptionDraft: async () => snapshot,
+        editProductDescriptionDraft: async () =>
+          uncheckedEffect(async () => snapshot),
       },
     }),
   });

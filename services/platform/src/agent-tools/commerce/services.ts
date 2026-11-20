@@ -20,6 +20,7 @@ import type { CommerceActionProposalOrigin } from "../catalog/types";
 import { ToolRequestError } from "../errors";
 import { defineToolFamily } from "../define-tool";
 import type { StockActionProposal } from "./proposals";
+import type { PreparedEffect } from "../../agent-tools/tool-effect";
 
 type CommerceActionProposal = (
   request: CommerceActionRequest,
@@ -110,7 +111,7 @@ type ProductDescriptionDraftEdit = (
   request: DraftAgentEditRequest,
   operationId: string,
   boundary: CatalogExecutionContext,
-) => Promise<DraftAgentSnapshot>;
+) => Promise<PreparedEffect>;
 
 /**
  * A description draft request that the model can correct, such as a product

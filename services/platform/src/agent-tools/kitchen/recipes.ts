@@ -116,7 +116,7 @@ export const recipeSave = defineKitchenTool({
     capability: CAPABILITY_KEYS.commerceRecipeSave,
   },
   unavailable: "recipe save is unavailable",
-  handler: ({ saveRecipe }) =>
+  prepare: ({ saveRecipe }) =>
     saveRecipe === undefined
       ? undefined
       : (request, call) => saveRecipe(request, call.operationId),
