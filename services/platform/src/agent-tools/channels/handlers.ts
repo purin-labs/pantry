@@ -1,18 +1,13 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
-import { acceptedExecutionAccountAuthority } from "../../account-platform/access";
+import {
+  acceptedExecutionAccountAuthority,
+} from "../../account-platform/access";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import { registerEmailSelfTest } from "../../data/email-self-test";
 import {
   resolveEmailOperationalCapability,
-  resolveSlackMessageCapability,
 } from "../../actors/email-operational-capability";
-import {
-  insertSlackMessageProposal,
-  matchSlackChannel,
-  readSlackChannelOptions,
-  slackMessageBodyDigest,
-} from "../../data/slack-message-proposal";
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env, ConnectorActorStub } from "../../env";
@@ -35,13 +30,11 @@ import {
   requireSessionExecution,
   admittedSessionOperation,
 } from "../../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
-import type { CatalogExecutionContext } from "../catalog/execute";
 import {
-  SlackDraftRequestError,
-  EmailReplyDraftRequestError,
-  ProductionPlanRequestError,
-} from "./services";
+  preflightHarnessTurnLease,
+} from "../../actors/agent-session-harness-authority";
+import type { CatalogExecutionContext } from "../catalog/execute";
+import { EmailReplyDraftRequestError } from "./services";
 import { readChatReplyProvenance } from "../../actors/email-chat-reply-sources";
 import type {
   EmailChatContext,
@@ -54,28 +47,23 @@ import type {
   HarnessEmailReplyDraft,
   HarnessEmailReplyDraftEdit,
   HarnessEmailReplyDraftRead,
-  HarnessProductionPlan,
-  HarnessProductionPlanEdit,
-  HarnessProductionPlanRead,
   HarnessEmailReplyProposalReceipt,
   HarnessEmailOperationalPropose,
   HarnessEmailOperationalProposalReceipt,
-  HarnessSlackMessagePropose,
-  HarnessSlackMessageProposalReceipt,
   HarnessWhatsAppSupportInbox,
   HarnessWhatsAppSupportRead,
   HarnessWhatsAppSupportReplyReceipt,
   HarnessWhatsAppSupportReplySend,
 } from "./services";
-import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
-import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+import {
+  authorizeCapabilityUse,
+} from "../../authorization/access-grants/turn-authority";
 import {
   parseCapabilityKey,
   type CapabilityDefinition,
 } from "../../authorization/access-grants/capability-key";
 import {
   admitSessionInformationFlowObservation,
-  readSessionInformationFlow,
 } from "../../actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
@@ -86,13 +74,11 @@ import {
 import { digestCanonical } from "../../policy";
 import { listAccessGrants } from "../../data/access-grants";
 import { selectActiveGrants } from "../../authorization/access-grants/compiler";
-import type { AccessGrant } from "../../authorization/access-grants/types";
 import { listOrganisationMembers } from "../../data/control-plane";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
-  SLACK_MESSAGE_RESOURCE_SCOPE,
   WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
 } from "../../authorization/capability-catalogue";
 import {
@@ -105,440 +91,19 @@ import {
   readWhatsAppReplyProposalProjection,
   whatsappConnectorId,
 } from "../../data/whatsapp";
-import {
-  CommerceReadRequestError,
-  readNamedCommerceQuery,
-} from "../../context/assembly/commerce";
-import { parseProductionRequestFields } from "@purin-labs/commerce-client";
-import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
 import type { Variant } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import {
-  type DraftThreadLink,
   type EmailMailboxReadScope,
-  type PreparedCommerceRead,
-  type SharedDraftChat,
-  admitCommerceReadObservation,
-  authorizeSharedDraftEdit,
+  authorizeToolEffectInformationFlow,
   collaborationEditDeadline,
   collaborationMember,
-  evaluateHarnessFlowSink,
-  prepareSharedCommerceObservation,
   readAccessGrantId,
   requireCurrentEmailToolLease,
   selectProviderResourceGrants,
-  toolEffectPassesExit,
 } from "../session-support";
-import { prepareCommerceReadForEmbeddedHarness } from "../commerce/handlers";
 import { emailAttachmentForHarness } from "../files/handlers";
 import type { SessionToolContext } from "../context";
-
-/**
- * Plan 40D: the production requests of a location, read under a read grant
- * for the `production_requests` list. When no grant admits the read, a
- * permission request may ask for that grant.
- */
-function requestableProductionRead(error: unknown): never {
-  if (
-    error instanceof CommerceReadRequestError &&
-    error.failure.code === "commerce_context_authority_denied"
-  ) {
-    throw new CommerceReadRequestError(error.failure, "production_requests");
-  }
-  throw error;
-}
-
-function productionRequestsQuery(locationId: string) {
-  return parseCommerceGraphQuery({
-    kind: "commerce_list_page",
-    listId: "production_requests",
-    filter: {
-      kind: "attribute",
-      filter: {
-        operator: "equals",
-        attributeId: "location_id",
-        value: { kind: "short_text", value: locationId },
-      },
-    },
-    sorts: [],
-    pagination: { limit: 100, cursor: null },
-  });
-}
-
-function selectProductionRequestsSourceGrant(
-  lease: HarnessTurnLease,
-  locationId: string,
-  input: Readonly<{
-    organisationId: string;
-    merchantId: string;
-    grants: readonly AccessGrant[];
-    now: string;
-  }>,
-) {
-  const query = productionRequestsQuery(locationId);
-  if (!query.ok) {
-    return query;
-  }
-  return selectNamedCommerceQuerySourceGrant({
-    organisationId: input.organisationId,
-    merchantId: input.merchantId,
-    grants: input.grants,
-    now: input.now,
-    requestAuthority: lease.requestAuthority,
-    causationId: String(lease.turn.turnId),
-    query: query.value,
-    allowedSensitivity: "internal",
-  });
-}
-
-type ProductionPlanSources = Readonly<{
-  prepared: PreparedCommerceRead;
-  plan: HarnessProductionPlan;
-  merchantRevision: number;
-}>;
-
-/**
- * Reads the location's waiting requests from Commerce and the shared
- * plan's draft quantities. The plan is an edit of those requests, so the read
- * carries the requests' label: a person who may read the requests may read
- * the plan.
- */
-async function readProductionPlanSources(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  assignment: CaseAssignment,
-  locationId: string,
-  label: string,
-): Promise<ProductionPlanSources> {
-  const organisationId = execution.scope.organisationId;
-  const source = await prepareCommerceReadForEmbeddedHarness(
-    env,
-    execution,
-    lease,
-    assignment,
-    selectProductionRequestsSourceGrant.bind(null, lease, locationId),
-    label,
-  ).catch(requestableProductionRead);
-  const prepared = await prepareSharedCommerceObservation(source);
-  const query = productionRequestsQuery(locationId);
-  if (!query.ok) {
-    throw new Error(`${label} query invalid`);
-  }
-  const read = await readNamedCommerceQuery({
-    organisationId: String(organisationId),
-    merchantId: prepared.merchantId,
-    grants: prepared.grants,
-    requestAuthority: lease.requestAuthority,
-    causationId: String(lease.turn.turnId),
-    query: query.value,
-    allowedSensitivity: "internal",
-    reader: prepared.reader,
-    now: prepared.now,
-  });
-  if (!read.ok) {
-    requestableProductionRead(new CommerceReadRequestError(read.error));
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const stored = await organisation.readProductionPlan({
-    organisationId,
-    locationId,
-  });
-  if (!stored.ok) {
-    throw new Error(`${label} unavailable: ${stored.error.code}`);
-  }
-  const planned = new Map<string, string>();
-  for (const line of stored.value.lines) {
-    planned.set(line.requestId, line.quantity);
-  }
-  // The read returns each entry's item with the entries, under the same grant.
-  const itemNames = new Map<string, string>();
-  for (const entity of read.value.entities) {
-    if (
-      entity.reference.origin === "system" &&
-      entity.reference.typeId === "inventory_item"
-    ) {
-      itemNames.set(String(entity.reference.entityId), entity.displayName);
-    }
-  }
-  const requests: HarnessProductionPlan["requests"][number][] = [];
-  for (const entry of read.value.listEntries) {
-    let fields: ReturnType<typeof parseProductionRequestFields>;
-    try {
-      fields = parseProductionRequestFields(entry.attributeValues);
-    } catch {
-      continue;
-    }
-    if (fields.status !== "requested" || fields.locationId !== locationId) {
-      continue;
-    }
-    const requestId = String(entry.entryId);
-    requests.push({
-      requestId,
-      inventoryItemId: String(entry.entityRef.entityId),
-      itemName: itemNames.get(String(entry.entityRef.entityId)) ?? null,
-      recipeId: fields.recipeId,
-      requestedQuantity: quantityText(fields.quantity),
-      unit: fields.quantity.unit,
-      neededBy: fields.neededBy,
-      plannedQuantity: planned.get(requestId) ?? null,
-    });
-  }
-  return {
-    prepared,
-    plan: {
-      locationId,
-      requests,
-      truncated: read.value.nextCursor !== null,
-    },
-    merchantRevision: Number(read.value.merchantRevision),
-  };
-}
-
-/** The exact decimal text of a quantity, without trailing zeros. */
-function quantityText(
-  quantity: Readonly<{ amount: number; scale: number }>,
-): string {
-  const digits = String(quantity.amount).padStart(quantity.scale + 1, "0");
-  const whole = digits.slice(0, digits.length - quantity.scale);
-  const fraction = digits
-    .slice(digits.length - quantity.scale)
-    .replace(/0+$/u, "");
-  return fraction.length === 0 ? whole : `${whole}.${fraction}`;
-}
-
-export async function readProductionPlanForEmbeddedHarness(
-  context: SessionToolContext,
-  request: HarnessProductionPlanRead,
-): Promise<HarnessProductionPlan> {
-  const { env, storage, execution, lease, assignment } = context;
-  const read = await readProductionPlanSources(
-    env,
-    execution,
-    lease,
-    assignment,
-    request.locationId,
-    "production plan",
-  );
-  await admitCommerceReadObservation(
-    storage,
-    lease,
-    read.prepared,
-    read.plan,
-    read.merchantRevision,
-    "production plan",
-  );
-  return read.plan;
-}
-
-export async function editProductionPlanForEmbeddedHarness(
-  context: SessionToolContext,
-  request: HarnessProductionPlanEdit,
-  operationId: string,
-  boundary: CatalogExecutionContext,
-): Promise<HarnessProductionPlan> {
-  const { env, storage, execution, lease, assignment } = context;
-  const deadlineAt = collaborationEditDeadline(
-    storage,
-    lease,
-    boundary,
-    Date.now(),
-  );
-  const organisationId = execution.scope.organisationId;
-  const before = await readProductionPlanSources(
-    env,
-    execution,
-    lease,
-    assignment,
-    request.locationId,
-    "production plan edit",
-  );
-  await admitCommerceReadObservation(
-    storage,
-    lease,
-    before.prepared,
-    before.plan,
-    before.merchantRevision,
-    "production plan edit",
-  );
-  const target = before.plan.requests.find(
-    (candidate) => candidate.requestId === request.requestId,
-  );
-  if (target === undefined) {
-    throw new ProductionPlanRequestError(
-      "That request does not wait for acceptance at this location. Read the plan again before choosing a new edit.",
-    );
-  }
-  if (target.unit === "each" && request.quantity.includes(".")) {
-    throw new ProductionPlanRequestError(
-      "This request counts whole pieces. Use a whole number.",
-    );
-  }
-  const member = await collaborationMember(
-    execution.scope.database,
-    organisationId,
-    lease,
-    "edit",
-  );
-  const prepared = before.prepared;
-  await authorizeSharedDraftEdit(env, storage, execution, lease, member, {
-    draft: PLAN_DRAFT,
-    caseId: assignment.caseId,
-    capabilityId: CAPABILITY_KEYS.commerceProductionPlanEdit,
-    integrationAccountId: prepared.integrationAccountId,
-    resourceScope: prepared.resourceScope,
-    readSharedThread: readProductionPlanThread.bind(
-      null,
-      env,
-      execution,
-      lease,
-      request.locationId,
-    ),
-    readSharedChat: readProductionPlanChat.bind(
-      null,
-      env,
-      execution,
-      lease,
-      request.locationId,
-    ),
-    notConnected: PLAN_NOT_SHARED,
-  }).catch(correctablePlanRefusal);
-  const active = preflightHarnessTurnLease(storage, lease, Date.now());
-  if (!active.ok) {
-    throw new Error(
-      `Production plan edit authority expired: ${active.error.code}`,
-    );
-  }
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const result = await organisation.editProductionPlan({
-    agent: await resolveCollaborationAgent(execution.scope, assignment),
-    execution: sessionTurnExecution(lease),
-    organisationId,
-    locationId: request.locationId,
-    requestId: request.requestId,
-    quantity: request.quantity,
-    operationId: JSON.stringify([
-      lease.session.sessionId,
-      lease.turn.turnId,
-      operationId,
-    ]),
-    userId: member.userId,
-    deadlineAt,
-  });
-  if (!result.ok) {
-    throw new Error(
-      `Production plan edit failed: ${result.error.code}. Read the plan again before choosing a new edit.`,
-    );
-  }
-  const planned = new Map<string, string>();
-  for (const line of result.value.lines) {
-    planned.set(line.requestId, line.quantity);
-  }
-  return {
-    ...before.plan,
-    requests: before.plan.requests.map((line) => ({
-      ...line,
-      plannedQuantity: planned.get(line.requestId) ?? null,
-    })),
-  };
-}
-
-const PLAN_DRAFT = "Production plan";
-
-const PLAN_NOT_SHARED =
-  "This conversation is not shared with this location's plan. An owner or admin shares a Slack thread or a Project chat with the plan before an agent may change it from there.";
-
-/**
- * The refusal that the agent can explain to the person: the conversation is
- * not shared with the plan. It names no source. Other failures stay generic.
- */
-function correctablePlanRefusal(error: unknown): never {
-  if (error instanceof Error && error.message === PLAN_NOT_SHARED) {
-    throw new ProductionPlanRequestError(error.message);
-  }
-  throw error;
-}
-
-async function readProductionPlanShare(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  locationId: string,
-) {
-  const organisationId = execution.scope.organisationId;
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId,
-    placement: execution.scope.placement,
-    now: Date.now(),
-  });
-  await requireSessionExecution(execution, lease);
-  const share = await organisation.readProductionPlanShare({
-    organisationId,
-    locationId,
-  });
-  return share.ok ? share.value : null;
-}
-
-async function readProductionPlanThread(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  locationId: string,
-): Promise<DraftThreadLink | null> {
-  const share = await readProductionPlanShare(
-    env,
-    execution,
-    lease,
-    locationId,
-  );
-  if (share === null || share.kind !== "slack_thread") {
-    return null;
-  }
-  const caseId = parseCaseId(share.caseId);
-  const account = parseIntegrationAccountId(share.integrationAccountId);
-  return caseId.ok && account.ok
-    ? {
-        caseId: caseId.value,
-        integrationAccountId: account.value,
-        conversationId: share.conversationId,
-      }
-    : null;
-}
-
-async function readProductionPlanChat(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  lease: HarnessTurnLease,
-  locationId: string,
-): Promise<SharedDraftChat | null> {
-  const share = await readProductionPlanShare(
-    env,
-    execution,
-    lease,
-    locationId,
-  );
-  return share !== null && share.kind === "portal_chat"
-    ? {
-        caseId: share.caseId,
-        conversationId: share.conversationId,
-        projectId: share.projectId,
-        approverPersonId: share.approverPersonId,
-      }
-    : null;
-}
 
 export async function searchEmailMailboxForEmbeddedHarness(
   context: SessionToolContext,
@@ -1480,107 +1045,6 @@ export async function proposeEmailOperationalForEmbeddedHarness(
   };
 }
 
-/**
- * Saves a Slack message draft for a person to send from the conversation's
- * card. The draft goes only to a channel that the organisation connected,
- * and nothing is posted here: Send on the card posts it.
- */
-export async function proposeSlackMessageForEmbeddedHarness(
-  context: SessionToolContext,
-  request: HarnessSlackMessagePropose,
-): Promise<HarnessSlackMessageProposalReceipt> {
-  const { env, storage, execution, lease, assignment } = context;
-  await requireSessionExecution(execution, lease);
-  const organisationId = execution.scope.organisationId;
-  const caseId = requireCurrentEmailToolLease(storage, lease, assignment);
-  const capability = await resolveSlackMessageCapability(
-    organisationId,
-    assignment.authorityPartition.capabilityKeys,
-    request.accountRef,
-  );
-  if (capability === null) {
-    throw new Error("Slack drafting is outside the granted scope");
-  }
-  const authorized = await authorizeCapabilityUse({
-    db: execution.scope.database,
-    accountAccess: execution.scope.accountAccess,
-    userAuthority: acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
-    action: "execute",
-    organisationId,
-    authority: lease.requestAuthority,
-    authorityPartition: assignment.authorityPartition,
-    request: { capabilities: [capability] },
-  });
-  if (!authorized.ok) {
-    throw new Error(
-      `Slack drafting authority rejected: ${authorized.error.code}`,
-    );
-  }
-  await authorizeToolEffectInformationFlow(
-    env,
-    execution,
-    storage,
-    organisationId,
-    lease,
-    {
-      capabilityId: CAPABILITY_KEYS.slackMessagePropose,
-      integrationAccountId: capability.integrationAccountId,
-      resourceScope: SLACK_MESSAGE_RESOURCE_SCOPE,
-    },
-  );
-  const options = await readSlackChannelOptions({
-    globalDatabase: env.DB,
-    db: execution.scope.database,
-    organisationId,
-    integrationAccountId: capability.integrationAccountId,
-  });
-  if (options === null || options.channels.length === 0) {
-    throw new SlackDraftRequestError(
-      "No Slack channel is connected to Seams Pantry in this workspace. Ask an owner or admin to connect a channel in Integrations.",
-    );
-  }
-  // An unknown channel is refused without naming the connected ones: their
-  // names have not entered this turn.
-  const matched =
-    request.channel === null
-      ? null
-      : matchSlackChannel(options, request.channel);
-  if (request.channel !== null && matched === null) {
-    throw new SlackDraftRequestError(
-      "That channel is not connected to Seams Pantry. Set channel to null so the person chooses on the card.",
-    );
-  }
-  const bodyDigest = await slackMessageBodyDigest(request.text);
-  const proposalId = `proposal_slack_message_${lease.turn.turnId}_${bodyDigest.slice(0, 16)}`;
-  await requireSessionExecution(execution, lease);
-  const saved = await insertSlackMessageProposal({
-    scope: execution.scope,
-    proposalId,
-    caseId,
-    integrationAccountId: capability.integrationAccountId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-    channelHint: request.channel,
-    channelId: matched?.channelId ?? null,
-    body: request.text,
-    now: Date.now(),
-  });
-  if (!saved.ok) {
-    throw new Error(`Slack draft failed: ${saved.error.code}`);
-  }
-  await requireSessionExecution(execution, lease);
-  requireCurrentEmailToolLease(storage, lease, assignment);
-  return {
-    kind: "proposed",
-    proposalId: saved.value.proposalId,
-    version: saved.value.version,
-    channel: matched === null ? null : request.channel,
-  };
-}
-
 async function authorizeOperationalEmailInformationFlow(
   env: Env,
   execution: SessionExecutionAdmission,
@@ -1601,67 +1065,6 @@ async function authorizeOperationalEmailInformationFlow(
       resourceScope: EMAIL_OPERATIONAL_RESOURCE_SCOPE,
     },
   );
-}
-
-/**
- * The turn's cumulative label may flow into this proposal tool's effect. The
- * effect still waits for a person, so approval is not yet satisfied.
- */
-async function authorizeToolEffectInformationFlow(
-  env: Env,
-  execution: SessionExecutionAdmission,
-  storage: DurableObjectStorage,
-  organisationId: OrganisationId,
-  lease: HarnessTurnLease,
-  effect: Readonly<{
-    capabilityId:
-      | typeof CAPABILITY_KEYS.emailReplyPropose
-      | typeof CAPABILITY_KEYS.emailOperationalPropose
-      | typeof CAPABILITY_KEYS.slackMessagePropose;
-    integrationAccountId: IntegrationAccountId;
-    resourceScope: string;
-  }>,
-): Promise<void> {
-  const flow = await readSessionInformationFlow(storage.sql, {
-    organisationId,
-    sessionId: lease.session.sessionId,
-  });
-  if (
-    !flow.ok ||
-    flow.value === null ||
-    flow.value.context.authorityPartitionDigest !==
-      lease.authorityPartitionDigest
-  ) {
-    throw new Error("Proposal information-flow context unavailable");
-  }
-  const sink = {
-    kind: "tool_effect",
-    destinationAuthority: lease.requestAuthority,
-    capabilityId: effect.capabilityId,
-    integrationAccountId: effect.integrationAccountId,
-    resourceScope: effect.resourceScope,
-    approvalSatisfied: false,
-  } as const;
-  const decision = await evaluateHarnessFlowSink(
-    execution.scope.database,
-    execution.scope.accountAccess,
-    acceptedExecutionAccountAuthority(
-      lease.session.sessionId,
-      lease.turn.turnId,
-    ),
-    { flowLabel: flow.value.context.workLabel, sink },
-  );
-  if (
-    !(await toolEffectPassesExit(env, execution, lease, {
-      decision,
-      flowLabel: flow.value.context.workLabel,
-      sink,
-    }))
-  ) {
-    throw new Error(
-      `The proposal requires policy resolution: ${decision.kind}`,
-    );
-  }
 }
 
 function readEmailMailboxCapability(

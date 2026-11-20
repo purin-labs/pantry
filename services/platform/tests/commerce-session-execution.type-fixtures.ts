@@ -1,9 +1,11 @@
 import {
   readWorkflowCanvasForEmbeddedHarness,
   moveWorkflowCanvasForEmbeddedHarness,
+} from "../src/agent-tools/kitchen/workflow-canvas-handlers";
+import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,
-} from "../src/agent-tools/drafts/handlers";
+} from "../src/agent-tools/commerce/description-draft-handlers";
 import type { OrganisationId } from "../src/ids";
 
 type WorkflowReadAdmission = Parameters<

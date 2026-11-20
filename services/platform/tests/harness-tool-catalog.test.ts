@@ -24,16 +24,23 @@ function fixtureServices(
   return {
     ...services,
     integrations: { listIntegrations, ...services.integrations },
-    commerce: { readEntityContext, readMerchantReport, ...services.commerce },
-    drafts: {
-      readWorkflowCanvas: rejectWorkflowCanvasTool,
-      moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
+    commerce: {
+      readEntityContext,
+      readMerchantReport,
       readProductDescriptionDraft: rejectProductDescriptionDraftRead,
       editProductDescriptionDraft: rejectProductDescriptionDraftEdit,
-      readMenuDraft: unavailableMenuDraft,
+      ...services.commerce,
+    },
+    kitchen: {
+      readWorkflowCanvas: rejectWorkflowCanvasTool,
+      moveWorkflowCanvasObject: rejectWorkflowCanvasTool,
+      ...services.kitchen,
+    },
+    menu: { readMenuDraft: unavailableMenuDraft, ...services.menu },
+    channels: {
       readEmailDraft: rejectEmailDraftRead,
       editEmailDraft: rejectEmailDraftEdit,
-      ...services.drafts,
+      ...services.channels,
     },
     files: { queryWorkspace, ...services.files },
   };
@@ -714,7 +721,7 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, claims),
     services: fixtureServices({
-      drafts: {
+      commerce: {
         readProductDescriptionDraft: async (request) => {
           reads.push(request);
           return snapshot;
@@ -763,7 +770,7 @@ async function executesProductDescriptionDraftTools(): Promise<void> {
     admission: permissiveAdmission(),
     claimCapability: recordAcceptedCapabilityClaim.bind(null, []),
     services: fixtureServices({
-      drafts: {
+      commerce: {
         readProductDescriptionDraft: async () => snapshot,
         editProductDescriptionDraft: async () => snapshot,
       },

@@ -1,12 +1,3 @@
-import type {
-  DraftAgentEditRequest,
-  DraftAgentReadArgs,
-  DraftAgentSnapshot,
-} from "../../actors/product-description-draft";
-import type {
-  EmailDraftEditRequest,
-  EmailDraftRead,
-} from "../../actors/email-draft";
 import {
   MenuDraftRequestError,
   type MenuDraftEdit,
@@ -47,30 +38,14 @@ import type {
   MenuBoardStackEdit,
   MenuBoardStackSettings,
 } from "../../actors/menu-boards";
-import type { MenuPriceProposalRequest } from "../../actors/harness-commerce-proposal";
+import type {
+  MenuPriceProposalRequest,
+} from "../../actors/harness-commerce-proposal";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
-import {
-  parseWorkflowCanvasMoveArgs,
-  parseWorkflowCanvasReadArgs,
-  type WorkflowCanvasMoveTool,
-  type WorkflowCanvasReadTool,
-} from "../../actors/workflow-canvas-tools";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { CANVAS_BOUNDS } from "@purin-labs/workflow-canvas-crdt";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { CommerceActionProposalOrigin } from "../catalog/types";
 import { defineToolFamily, jsonSchema } from "../define-tool";
-import { ToolRequestError } from "../errors";
-
-type ProductDescriptionDraftRead = (
-  request: DraftAgentReadArgs,
-) => Promise<DraftAgentSnapshot>;
-
-type ProductDescriptionDraftEdit = (
-  request: DraftAgentEditRequest,
-  operationId: string,
-  boundary: CatalogExecutionContext,
-) => Promise<DraftAgentSnapshot>;
 
 type MenuDraftReadTool = () => Promise<MenuDraftRead>;
 
@@ -121,26 +96,8 @@ type MenuPriceProposal = (
   origin?: CommerceActionProposalOrigin,
 ) => Promise<unknown>;
 
-type EmailDraftReadTool = () => Promise<EmailDraftRead>;
-
-type EmailDraftEditTool = (
-  request: EmailDraftEditRequest,
-  operationId: string,
-  boundary: CatalogExecutionContext,
-) => Promise<EmailDraftRead>;
-
-/**
- * A description draft request that the model can correct, such as a product
- * id that names no product. Its message reaches the model.
- */
-export class DescriptionDraftRequestError extends ToolRequestError {}
-
-/** What a turn gives to the shared draft tools. */
-export type DraftToolServices = {
-  readonly readWorkflowCanvas: WorkflowCanvasReadTool;
-  readonly moveWorkflowCanvasObject: WorkflowCanvasMoveTool;
-  readonly readProductDescriptionDraft: ProductDescriptionDraftRead;
-  readonly editProductDescriptionDraft: ProductDescriptionDraftEdit;
+/** What a turn gives to the shared menu and menu board tools. */
+export type MenuToolServices = {
   readonly readMenuDraft: MenuDraftReadTool;
   readonly editMenuDraft: MenuDraftEditTool;
   readonly readMenuBoards: MenuBoardReadTool;
@@ -148,142 +105,11 @@ export type DraftToolServices = {
   readonly createMenuBoard: MenuBoardCreateTool;
   readonly archiveMenuBoard: MenuBoardArchiveTool;
   readonly proposeMenuPrice: MenuPriceProposal;
-  readonly readEmailDraft: EmailDraftReadTool;
-  readonly editEmailDraft: EmailDraftEditTool;
 };
 
-const defineDraftTool = defineToolFamily<DraftToolServices>()("drafts");
+const defineMenuTool = defineToolFamily<MenuToolServices>()("menu");
 
-const PRODUCT_ID_PATTERN = /^[A-Za-z0-9_:-]{1,256}$/;
-
-export const workflowCanvasRead = defineDraftTool({
-  name: "workflow_canvas_read",
-  description:
-    "Read shared workflow object IDs, step labels, positions, bounds, and the current document revision. Match named steps by label. documentId is run:<saved-run snapshot ID> from bakery_saved_run_read. Read again after a position conflict.",
-  input: jsonSchema({
-    type: "object",
-    properties: { documentId: { type: "string", maxLength: 256 } },
-    required: ["documentId"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseWorkflowCanvasReadArgs([input]),
-  effect: "read",
-  rerun: { kind: "any_caller", reason: "A read changes nothing." },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
-  },
-  unavailable: "workflow canvas read is unavailable",
-  handler: ({ readWorkflowCanvas }) =>
-    readWorkflowCanvas === undefined ? undefined : (request) => readWorkflowCanvas(request),
-});
-
-export const workflowCanvasMove = defineDraftTool({
-  name: "move_object",
-  description:
-    "Move one existing workflow object to an absolute canvas position. Use the revision from workflow_canvas_read. If a human changes an object, leave that object unchanged for the rest of this request. A position change preserves operational settings and relationships.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      documentId: { type: "string", maxLength: 256 },
-      objectId: { type: "string", pattern: "^[A-Za-z][A-Za-z0-9_-]{0,99}$" },
-      expectedRevision: { type: "integer", minimum: 1 },
-      x: {
-        type: "number",
-        minimum: CANVAS_BOUNDS.minX,
-        maximum: CANVAS_BOUNDS.maxX,
-      },
-      y: {
-        type: "number",
-        minimum: CANVAS_BOUNDS.minY,
-        maximum: CANVAS_BOUNDS.maxY,
-      },
-    },
-    required: ["documentId", "objectId", "expectedRevision", "x", "y"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseWorkflowCanvasMoveArgs([input]),
-  effect: "draft",
-  rerun: { kind: "none" },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.commerceWorkflowCanvasMove,
-  },
-  unavailable: "move object is unavailable",
-  handler: ({ moveWorkflowCanvasObject }) =>
-    moveWorkflowCanvasObject === undefined
-      ? undefined
-      : (request, call) =>
-          moveWorkflowCanvasObject(request, call.operationId, call.execution),
-});
-
-export const productDescriptionDraftRead = defineDraftTool({
-  name: "product_description_draft_read",
-  description:
-    "Read the current Product projection and its description draft for one exact product. " +
-    "The result includes the product id, source revision and draft state used for a subsequent edit. " +
-    "In a Slack thread that an owner connected to a draft, pass productId null to read that draft.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      productId: {
-        type: ["string", "null"],
-        pattern: "^[A-Za-z0-9_:-]{1,256}$",
-        description:
-          "The shop's plain product id, or null for the draft connected to this Slack thread.",
-      },
-    },
-    required: ["productId"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseProductDescriptionDraftReadArgs([input]),
-  effect: "read",
-  rerun: { kind: "any_caller", reason: "A read changes nothing." },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.commerceEntityPlaneContext,
-  },
-  unavailable: "product description draft read is unavailable",
-  handler: ({ readProductDescriptionDraft }) =>
-    readProductDescriptionDraft === undefined ? undefined : (request) => readProductDescriptionDraft(request),
-});
-
-export const productDescriptionDraftEdit = defineDraftTool({
-  name: "product_description_draft_edit",
-  description:
-    "Replace one exact, unique passage in a product description draft. " +
-    "Use the exact text returned by product_description_draft_read; the draft actor rejects " +
-    "missing or ambiguous passages and preserves all other text.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      productId: { type: "string", pattern: "^[A-Za-z0-9_:-]{1,256}$" },
-      oldText: { type: "string", maxLength: 10000 },
-      newText: { type: "string", maxLength: 10000 },
-    },
-    required: ["productId", "oldText", "newText"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseProductDescriptionDraftEditArgs([input]),
-  effect: "draft",
-  rerun: { kind: "none" },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.commerceProductDescriptionDraftEdit,
-  },
-  unavailable: "product description draft edit is unavailable",
-  handler: ({ editProductDescriptionDraft }) =>
-    editProductDescriptionDraft === undefined
-      ? undefined
-      : (request, call) =>
-          editProductDescriptionDraft(request, call.operationId, call.execution),
-});
-
-export const menuDraftRead = defineDraftTool({
+export const menuDraftRead = defineMenuTool({
   name: "menu_draft_read",
   description:
     "Read the current organisation shared menu, including item positions, document identity, revision, and observation time. " +
@@ -307,7 +133,7 @@ export const menuDraftRead = defineDraftTool({
     readMenuDraft === undefined ? undefined : () => readMenuDraft(),
 });
 
-export const menuDraftEdit = defineDraftTool({
+export const menuDraftEdit = defineMenuTool({
   name: "menu_draft_edit",
   description:
     "Make one change to the organisation's shared menu draft, in the room that people edit, and get the menu back. Open Menus pages show the change at once. " +
@@ -373,7 +199,7 @@ export const menuDraftEdit = defineDraftTool({
           editMenuDraft(request, call.operationId, call.execution),
 });
 
-export const menuBoardRead = defineDraftTool({
+export const menuBoardRead = defineMenuTool({
   name: "menu_board_read",
   description:
     "Read the shop's menu boards, the Seams Pantry screens on TVs and tablets: each board's draft (title, layout, elements and their frames), its documentRevision, its newest release and its screen count. " +
@@ -405,7 +231,7 @@ export const menuBoardRead = defineDraftTool({
       : (request) => readMenuBoards(request),
 });
 
-export const menuBoardEdit = defineDraftTool({
+export const menuBoardEdit = defineMenuTool({
   name: "menu_board_edit",
   description:
     "Make one change to a menu board's draft, in the room that people edit, and get the board back with the element before and after. Open board editors show the change at once, and a person can change it again. " +
@@ -520,7 +346,7 @@ export const menuBoardEdit = defineDraftTool({
  * runs through the board edit path, so it has the same checks as a board
  * edit, and it changes no board, release or screen.
  */
-export const menuBoardComment = defineDraftTool({
+export const menuBoardComment = defineMenuTool({
   name: "menu_board_comment",
   description:
     "Comment on a menu board's element, reply to a comment, or resolve a thread, where the people who edit the board see it. menu_board_read lists each board's comment threads: threadId, the elementId that the thread is pinned to, whether that element is still on the board, and each comment with its author. " +
@@ -568,7 +394,7 @@ export const menuBoardComment = defineDraftTool({
  * restore is one edit of the draft in the room that people edit; it saves
  * the draft first, so that another restore undoes it.
  */
-export const menuBoardHistory = defineDraftTool({
+export const menuBoardHistory = defineMenuTool({
   name: "menu_board_history",
   description:
     "Save a named version of a menu board's draft, or restore a saved version. menu_board_read lists each board's versions, newest first: versionId, kind (created, named, published, before_restore or auto), label, documentRevision and time. " +
@@ -608,7 +434,7 @@ export const menuBoardHistory = defineDraftTool({
  * Plan 40B, board removal: an owner or admin archives a board that no
  * screen shows, or restores an archived board. An archive deletes nothing.
  */
-export const menuBoardArchive = defineDraftTool({
+export const menuBoardArchive = defineMenuTool({
   name: "menu_board_archive",
   description:
     "Archive a menu board, or restore an archived board, as an owner or admin does from the board menu. Give boardId and archived: true to archive, false to restore. " +
@@ -657,7 +483,7 @@ function parseMenuBoardArchiveArgs(raw: unknown): MenuBoardArchiveRequest {
  * free canvas or a designed menu, as a person makes one from Boards › New
  * board. It passes the same checks as menu_board_edit.
  */
-export const menuBoardCreate = defineDraftTool({
+export const menuBoardCreate = defineMenuTool({
   name: "menu_board_create",
   description:
     "Make a new menu board for the shop's screens, as a person does from Boards, New board. Give title (the board's name), layout and start. " +
@@ -711,7 +537,7 @@ function parseMenuBoardCreateArgs(args: readonly unknown[]): MenuBoardCreateRequ
  * runs through the board edit path, with the same checks as
  * menu_board_edit.
  */
-export const menuBoardStack = defineDraftTool({
+export const menuBoardStack = defineMenuTool({
   name: "menu_board_stack",
   description:
     "Arrange elements of a free canvas menu board (layout canvas_*) in an auto-layout stack, as in Figma. A stack places its elements one after another, down (vertical) or across (horizontal), with a gap between them and padding inside its rect; each element keeps its size along the stack, and across it the stack aligns them (start, center, end) or makes them fill it (stretch). In menu_board_read a stack is an element of kind stack, and each element in it has placement frameId stack with its stackId, order and size; canvasRects gives where each element shows. " +
@@ -773,7 +599,7 @@ export const menuBoardStack = defineDraftTool({
           editMenuBoard(request, call.operationId, call.execution),
 });
 
-export const menuPriceProposal = defineDraftTool({
+export const menuPriceProposal = defineMenuTool({
   name: "menu_board_propose_price",
   description:
     "Propose a new price for one item on the café menu, or a deal. The price shows on every board, screen and the QR order page after an owner or admin approves it. " +
@@ -810,101 +636,6 @@ export const menuPriceProposal = defineDraftTool({
       : (request, call) =>
           proposeMenuPrice(request, { toolCallId: call.callId }),
 });
-
-export const emailDraftRead = defineDraftTool({
-  name: "email_draft_read",
-  description:
-    "Read the organisation's saved shared email draft after this Slack thread has been explicitly shared. " +
-    "The result includes subject, preview, body, observation time, and the revision required for an edit.",
-  input: jsonSchema({
-    type: "object",
-    properties: {},
-    required: [],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseEmailDraftReadArgs([input]),
-  effect: "read",
-  rerun: { kind: "any_caller", reason: "A read changes nothing." },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.marketingEmailDraftEdit,
-  },
-  unavailable: "email draft read is unavailable",
-  handler: ({ readEmailDraft }) =>
-    readEmailDraft === undefined ? undefined : () => readEmailDraft(),
-});
-
-export const emailDraftEdit = defineDraftTool({
-  name: "email_draft_edit",
-  description:
-    "Replace one exact, unique passage in one field of the shared email draft. " +
-    "Use the field text and expectedRevision returned by email_draft_read.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      field: { type: "string", enum: ["subject", "preview", "body"] },
-      oldText: { type: "string", maxLength: 50000 },
-      newText: { type: "string", maxLength: 50000 },
-      expectedRevision: { type: "integer", minimum: 0 },
-    },
-    required: ["field", "oldText", "newText", "expectedRevision"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseEmailDraftEditArgs([input]),
-  effect: "draft",
-  rerun: { kind: "none" },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.marketingEmailDraftEdit,
-  },
-  unavailable: "email draft edit is unavailable",
-  handler: ({ editEmailDraft }) =>
-    editEmailDraft === undefined
-      ? undefined
-      : (request, call) =>
-          editEmailDraft(request, call.operationId, call.execution),
-});
-
-function parseProductDescriptionDraftReadArgs(
-  args: readonly unknown[],
-): DraftAgentReadArgs {
-  if (
-    args.length !== 1 ||
-    !isRecord(args[0]) ||
-    !hasExactKeys(args[0], ["productId"]) ||
-    (args[0].productId !== null &&
-      (typeof args[0].productId !== "string" ||
-        !PRODUCT_ID_PATTERN.test(args[0].productId)))
-  ) {
-    throw new TypeError("product_description_draft_read arguments are invalid");
-  }
-  return { productId: args[0].productId };
-}
-
-function parseProductDescriptionDraftEditArgs(
-  args: readonly unknown[],
-): DraftAgentEditRequest {
-  if (
-    args.length !== 1 ||
-    !isRecord(args[0]) ||
-    !hasExactKeys(args[0], ["productId", "oldText", "newText"]) ||
-    typeof args[0].productId !== "string" ||
-    !PRODUCT_ID_PATTERN.test(args[0].productId) ||
-    typeof args[0].oldText !== "string" ||
-    args[0].oldText.length > 10_000 ||
-    typeof args[0].newText !== "string" ||
-    args[0].newText.length > 10_000
-  ) {
-    throw new TypeError("product_description_draft_edit arguments are invalid");
-  }
-  return {
-    productId: args[0].productId,
-    oldText: args[0].oldText,
-    newText: args[0].newText,
-  };
-}
 
 function parseMenuDraftReadArgs(
   args: readonly unknown[],
@@ -1547,46 +1278,4 @@ function parseMenuPriceProposalArgs(
     throw new TypeError("menu_board_propose_price arguments are invalid");
   }
   return { itemId: raw.itemId, priceMinor: raw.priceMinor, deal: raw.deal };
-}
-
-function parseEmailDraftReadArgs(
-  args: readonly unknown[],
-): Readonly<Record<string, never>> {
-  if (args.length !== 1 || !isRecord(args[0]) || !hasExactKeys(args[0], [])) {
-    throw new TypeError("email_draft_read arguments are invalid");
-  }
-  return {};
-}
-
-function parseEmailDraftEditArgs(
-  args: readonly unknown[],
-): EmailDraftEditRequest {
-  if (
-    args.length !== 1 ||
-    !isRecord(args[0]) ||
-    !hasExactKeys(args[0], [
-      "field",
-      "oldText",
-      "newText",
-      "expectedRevision",
-    ]) ||
-    (args[0].field !== "subject" &&
-      args[0].field !== "preview" &&
-      args[0].field !== "body") ||
-    typeof args[0].oldText !== "string" ||
-    args[0].oldText.length > 50_000 ||
-    typeof args[0].newText !== "string" ||
-    args[0].newText.length > 50_000 ||
-    typeof args[0].expectedRevision !== "number" ||
-    !Number.isSafeInteger(args[0].expectedRevision) ||
-    args[0].expectedRevision < 0
-  ) {
-    throw new TypeError("email_draft_edit arguments are invalid");
-  }
-  return {
-    field: args[0].field,
-    oldText: args[0].oldText,
-    newText: args[0].newText,
-    expectedRevision: args[0].expectedRevision,
-  };
 }

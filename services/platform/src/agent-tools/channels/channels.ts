@@ -1,6 +1,7 @@
-import { isPlanQuantity } from "@purin-labs/production-plan-crdt";
 import { parseReplyCitations } from "../../mail-inbox/reply-sources";
-import { parseIntegrationAccountReference } from "../../access-control/integration-discovery";
+import {
+  parseIntegrationAccountReference,
+} from "../../access-control/integration-discovery";
 import { parseIntegrationAccountId } from "../../ids";
 import { parseOperationalEmailTarget } from "../../data/email-operational";
 import {
@@ -14,9 +15,6 @@ import type {
   HarnessEmailReplyDraftEdit,
   HarnessEmailReplyDraftRead,
   HarnessEmailReplyPropose,
-  HarnessProductionPlanEdit,
-  HarnessProductionPlanRead,
-  HarnessSlackMessagePropose,
   HarnessWhatsAppSupportRead,
   HarnessWhatsAppSupportReplySend,
 } from "./services";
@@ -172,67 +170,6 @@ export const emailReplyDraftEdit = defineChannelTool({
           editEmailReplyDraft(request, call.operationId, call.execution),
 });
 
-export const productionPlanRead = defineChannelTool({
-  name: "production_plan_read",
-  description:
-    "Read one location's shared production plan: each production request that waits for acceptance, its requested quantity, " +
-    "and the planned quantity in the shared plan. People may edit the plan while you work.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      locationId: { type: "string", pattern: "^[A-Za-z0-9_:.-]{1,200}$" },
-    },
-    required: ["locationId"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseProductionPlanReadArgs([input]),
-  effect: "read",
-  rerun: { kind: "any_caller", reason: "A read changes nothing." },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.commerceProductionPlanEdit,
-  },
-  unavailable: "production plan read is unavailable",
-  handler: ({ readProductionPlan }) =>
-    readProductionPlan === undefined ? undefined : (request) => readProductionPlan(request),
-});
-
-export const productionPlanEdit = defineChannelTool({
-  name: "production_plan_edit",
-  description:
-    "Set the planned quantity of one production request in a location's shared plan. Use a requestId from production_plan_read. " +
-    "The quantity is a positive decimal in the request's unit; pieces take whole numbers. " +
-    "This changes the shared draft only: a person reviews the plan and accepts it.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      locationId: { type: "string", pattern: "^[A-Za-z0-9_:.-]{1,200}$" },
-      requestId: { type: "string", pattern: "^[A-Za-z0-9_:.-]{1,200}$" },
-      quantity: {
-        type: "string",
-        pattern: "^(0|[1-9][0-9]{0,8})(\\.[0-9]{1,6})?$",
-      },
-    },
-    required: ["locationId", "requestId", "quantity"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseProductionPlanEditArgs([input]),
-  effect: "draft",
-  rerun: { kind: "none" },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.commerceProductionPlanEdit,
-  },
-  unavailable: "production plan edit is unavailable",
-  handler: ({ editProductionPlan }) =>
-    editProductionPlan === undefined
-      ? undefined
-      : (request, call) =>
-          editProductionPlan(request, call.operationId, call.execution),
-});
-
 export const emailOperationalProposal = defineChannelTool({
   name: "email_operational_propose",
   description:
@@ -298,40 +235,6 @@ export const emailOperationalProposal = defineChannelTool({
   handler: ({ proposeEmailOperational }) =>
     proposeEmailOperational === undefined ? undefined : (request) => proposeEmailOperational(request),
   readReceipt: readEmailOperationalProposalReceiptId,
-});
-
-export const slackMessageProposal = defineChannelTool({
-  name: "slack_message_propose",
-  description:
-    "Draft one plain-text Slack message for a person to send, using the exact Slack accountRef returned by integration_list. " +
-    "Set channel to a connected channel's name (such as 'general') or ID when the user named one; otherwise set null and the person chooses on the card. " +
-    "If the user did not say where the message goes, ask them first. The platform never posts through this tool: the conversation shows the draft on a card, where a person can edit it, send it or discard it. " +
-    "After you call it, tell the user that the draft is ready on the card and do not repeat the whole text.",
-  input: jsonSchema({
-    type: "object",
-    properties: {
-      accountRef: {
-        type: "string",
-        pattern: "^integration_ref_[0-9a-f]{64}$",
-      },
-      channel: { type: ["string", "null"], maxLength: 200 },
-      text: { type: "string", minLength: 1, maxLength: 8000 },
-    },
-    required: ["accountRef", "channel", "text"],
-    additionalProperties: false,
-  }),
-  decodeOnly: true,
-  decode: (input) => parseSlackMessageProposeArgs([input]),
-  effect: "receipt",
-  rerun: { kind: "none" },
-  selection: {
-    kind: "capability",
-    capability: CAPABILITY_KEYS.slackMessagePropose,
-  },
-  unavailable: "slack message propose is unavailable",
-  handler: ({ proposeSlackMessage }) =>
-    proposeSlackMessage === undefined ? undefined : (request) => proposeSlackMessage(request),
-  readReceipt: readSlackMessageProposalReceiptId,
 });
 
 export const whatsAppSupportRead = defineChannelTool({
@@ -464,45 +367,6 @@ function parseEmailReplyProposeArgs(
   };
 }
 
-const PLAN_ID_PATTERN = /^[A-Za-z0-9_:.-]{1,200}$/u;
-
-function parseProductionPlanReadArgs(
-  args: readonly unknown[],
-): HarnessProductionPlanRead {
-  if (
-    args.length !== 1 ||
-    !isRecord(args[0]) ||
-    !hasExactKeys(args[0], ["locationId"]) ||
-    typeof args[0].locationId !== "string" ||
-    !PLAN_ID_PATTERN.test(args[0].locationId)
-  ) {
-    throw new TypeError("production_plan_read arguments are invalid");
-  }
-  return { locationId: args[0].locationId };
-}
-
-function parseProductionPlanEditArgs(
-  args: readonly unknown[],
-): HarnessProductionPlanEdit {
-  if (
-    args.length !== 1 ||
-    !isRecord(args[0]) ||
-    !hasExactKeys(args[0], ["locationId", "requestId", "quantity"]) ||
-    typeof args[0].locationId !== "string" ||
-    !PLAN_ID_PATTERN.test(args[0].locationId) ||
-    typeof args[0].requestId !== "string" ||
-    !PLAN_ID_PATTERN.test(args[0].requestId) ||
-    !isPlanQuantity(args[0].quantity)
-  ) {
-    throw new TypeError("production_plan_edit arguments are invalid");
-  }
-  return {
-    locationId: args[0].locationId,
-    requestId: args[0].requestId,
-    quantity: args[0].quantity,
-  };
-}
-
 function parseEmailReplyDraftReadArgs(
   args: readonly unknown[],
 ): HarnessEmailReplyDraftRead {
@@ -604,34 +468,6 @@ function parseEmailOperationalProposeArgs(
   };
 }
 
-function parseSlackMessageProposeArgs(
-  args: readonly unknown[],
-): HarnessSlackMessagePropose {
-  if (
-    args.length !== 1 ||
-    !isRecord(args[0]) ||
-    !hasExactKeys(args[0], ["accountRef", "channel", "text"]) ||
-    typeof args[0].text !== "string" ||
-    args[0].text.trim().length === 0 ||
-    args[0].text.length > 8000 ||
-    (args[0].channel !== null &&
-      (typeof args[0].channel !== "string" || args[0].channel.length > 200))
-  ) {
-    throw new TypeError("slack_message_propose arguments are invalid");
-  }
-  const accountRef = parseIntegrationAccountReference(args[0].accountRef);
-  if (accountRef === null) {
-    throw new TypeError("slack_message_propose account is invalid");
-  }
-  const channel =
-    args[0].channel === null ? "" : args[0].channel.trim().replace(/^#/u, "");
-  return {
-    accountRef,
-    channel: channel.length === 0 ? null : channel,
-    text: args[0].text.trim(),
-  };
-}
-
 function parseWhatsAppSupportReadArgs(
   args: readonly unknown[],
 ): HarnessWhatsAppSupportRead {
@@ -703,18 +539,6 @@ function readEmailOperationalProposalReceiptId(value: unknown): string {
     !SHA256_PATTERN.test(value.snapshotDigest)
   ) {
     throw new TypeError("Operational email proposal receipt is invalid");
-  }
-  return value.proposalId;
-}
-
-function readSlackMessageProposalReceiptId(value: unknown): string {
-  if (
-    !isRecord(value) ||
-    value.kind !== "proposed" ||
-    typeof value.proposalId !== "string" ||
-    value.proposalId.length === 0
-  ) {
-    throw new TypeError("Slack message proposal receipt is invalid");
   }
   return value.proposalId;
 }

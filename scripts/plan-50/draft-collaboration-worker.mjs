@@ -8,7 +8,7 @@ import { organisationId, userId, accountId } from "./proposal-worker.mjs";
 import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,
-} from "../../services/platform/src/agent-tools/drafts/handlers.ts";
+} from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
 import { createCommerceClient } from "../../services/platform/src/commerce/outbox-worker.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/provider.ts";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants.ts";

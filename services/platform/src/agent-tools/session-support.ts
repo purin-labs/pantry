@@ -10,7 +10,10 @@ import {
 } from "../actors/harness-follow-up";
 import type { HeldOutputReason } from "../data/held-output-request";
 import type { EffectAction } from "./effect-action";
-import type { StaffPageToolReceipt } from "./catalog/types";
+import type {
+  HarnessCapabilityName,
+  StaffPageToolReceipt,
+} from "./catalog/types";
 import { StaffPageRequestError } from "./errors";
 import type { DraftSharedThread } from "../actors/product-description-draft";
 import {
@@ -29,6 +32,7 @@ import {
   parseIntegrationAccountId,
   newRequestId,
   type CaseId,
+  type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
 import {
@@ -57,6 +61,7 @@ import { isRequestableEntityTypeRead } from "../authorization/requestable-capabi
 import type { CapabilityDefinition } from "../authorization/access-grants/capability-key";
 import {
   admitSessionInformationFlowObservation,
+  readSessionInformationFlow,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "../actors/agent-session-information-flow";
 import {
@@ -1031,4 +1036,62 @@ export async function evaluateHarnessFlowSink(
     return { kind: "unavailable" as const };
   }
   return evaluateFlowLabelSink(check.value);
+}
+
+/**
+ * The turn's cumulative label may flow into this proposal tool's effect. The
+ * effect still waits for a person, so approval is not yet satisfied.
+ */
+export async function authorizeToolEffectInformationFlow(
+  env: Env,
+  execution: SessionExecutionAdmission,
+  storage: DurableObjectStorage,
+  organisationId: OrganisationId,
+  lease: HarnessTurnLease,
+  effect: Readonly<{
+    capabilityId: HarnessCapabilityName;
+    integrationAccountId: IntegrationAccountId;
+    resourceScope: string;
+  }>,
+): Promise<void> {
+  const flow = await readSessionInformationFlow(storage.sql, {
+    organisationId,
+    sessionId: lease.session.sessionId,
+  });
+  if (
+    !flow.ok ||
+    flow.value === null ||
+    flow.value.context.authorityPartitionDigest !==
+      lease.authorityPartitionDigest
+  ) {
+    throw new Error("Proposal information-flow context unavailable");
+  }
+  const sink = {
+    kind: "tool_effect",
+    destinationAuthority: lease.requestAuthority,
+    capabilityId: effect.capabilityId,
+    integrationAccountId: effect.integrationAccountId,
+    resourceScope: effect.resourceScope,
+    approvalSatisfied: false,
+  } as const;
+  const decision = await evaluateHarnessFlowSink(
+    execution.scope.database,
+    execution.scope.accountAccess,
+    acceptedExecutionAccountAuthority(
+      lease.session.sessionId,
+      lease.turn.turnId,
+    ),
+    { flowLabel: flow.value.context.workLabel, sink },
+  );
+  if (
+    !(await toolEffectPassesExit(env, execution, lease, {
+      decision,
+      flowLabel: flow.value.context.workLabel,
+      sink,
+    }))
+  ) {
+    throw new Error(
+      `The proposal requires policy resolution: ${decision.kind}`,
+    );
+  }
 }

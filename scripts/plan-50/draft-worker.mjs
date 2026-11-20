@@ -10,7 +10,7 @@ export { ProposalCase } from "./provider-worker.mjs";
 export { CodeModePlatformGovernorActor } from "./codemode-worker.mjs";
 import { organisationId, userId } from "./proposal-worker.mjs";
 import { humanUser } from "./draft-seed.mjs";
-import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/platform/src/agent-tools/drafts/handlers.ts";
+import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { issueControlSession } from "../../services/platform/src/data/control-plane.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
