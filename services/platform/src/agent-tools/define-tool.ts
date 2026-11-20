@@ -49,6 +49,7 @@ type TurnToolFlag = "memoryProposal" | "followUp" | "sideCaseProposal";
  * - `surface`: when the attached page installs the command. The surface and
  *   the command are names that the tool's own area checks. The call claims no
  *   capability, as the catalog did before Refactor 10.
+ * - `host`: when the turn runs in the named host. No other host offers it.
  */
 export type ToolSelection =
   | {
@@ -61,6 +62,15 @@ export type ToolSelection =
       /** The page whose observation lists the command (Plan 87). */
       readonly surface: string;
       readonly command: string;
+    }
+  | {
+      /**
+       * Only the named tool host offers the tool, in the host's own registry:
+       * the mailbox agent or the WhatsApp agent. The call claims no
+       * capability: the host's turn holds the whole authority of its tools.
+       */
+      readonly kind: "host";
+      readonly host: string;
     };
 
 /** The identity of one call, for receipts and idempotent writes. */
@@ -91,7 +101,7 @@ type ToolPrepare<Request> = (
  * The executor uses it for each result of the tool, also for a call that the
  * catalog refuses before the handler runs.
  */
-type ToolResultEnvelope = {
+export type ToolResultEnvelope = {
   readonly success: (value: unknown) => Promise<AuthorizedHarnessToolResult>;
   readonly failure: (detail: string) => Promise<AuthorizedHarnessToolResult>;
 };

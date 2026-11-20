@@ -3,7 +3,7 @@ import type {
   HarnessToolOutput,
 } from "@purin-labs/contracts";
 import { errorMessage, sha256Hex } from "@purin-labs/std";
-import type { AnyRegisteredTool } from "../define-tool";
+import type { AnyRegisteredTool, ToolResultEnvelope } from "../define-tool";
 import { ToolRequestError } from "../errors";
 import {
   type HarnessPermissionRequestTool,
@@ -51,6 +51,23 @@ export type CatalogExecutionContext =
       readonly executionLease: HarnessCodeModeExecutionLease;
     };
 
+/**
+ * What a host with its own result format gives to the executor: the mailbox
+ * agent and the WhatsApp agent (Refactor 17, step A1.5). Their results are
+ * plain text, and their refusals have their own words.
+ *
+ * With a profile the executor gives a tool the input text as it is, because
+ * these tools parse it themselves and refuse it in their own words. It asks
+ * for no call id. An error that is not a `ToolRequestError` leaves the
+ * executor as it is thrown.
+ */
+type ToolHostProfile = Readonly<{
+  /** The result of every tool of the host, also of a refused call. */
+  envelope: ToolResultEnvelope;
+  /** The refusal of a name that this turn's catalog does not hold. */
+  outsideCatalog: (name: string) => string;
+}>;
+
 /** What a catalog tool call can use: the dependencies of one turn. */
 export type CatalogToolAuthority = {
   readonly registry: ToolRegistry;
@@ -67,6 +84,8 @@ export type CatalogToolAuthority = {
    * with no Session: an effect with a check is then refused.
    */
   readonly settleEffect?: EffectSettle;
+  /** For a host with its own result format. Absent in the Session's host. */
+  readonly profile?: ToolHostProfile;
 };
 
 export function executeNativeCatalogTool(
@@ -98,22 +117,28 @@ export async function executeCatalogTool(
     authority.registry.find(name);
   // A tool with its own envelope keeps it for each result, also for a call
   // that this turn's catalog did not select.
-  const envelope = authority.registry.find(name)?.result;
+  const { profile } = authority;
+  const envelope = profile?.envelope ?? authority.registry.find(name)?.result;
   const failed = (detail: string): Promise<AuthorizedHarnessToolResult> =>
     envelope === undefined
       ? authorizedRead(failedToolOutput(detail), "failed")
       : envelope.failure(detail);
   if (
-    callId.length === 0 ||
+    (profile === undefined && callId.length === 0) ||
     !isSelectedCatalogToolName(authority.definitions, name)
   ) {
-    return failed("Tool request exceeded its accepted boundary");
+    return failed(
+      profile?.outsideCatalog(name) ??
+        "Tool request exceeded its accepted boundary",
+    );
   }
-  let input: unknown;
-  try {
-    input = JSON.parse(inputJson);
-  } catch {
-    return failed("Tool input was not valid JSON");
+  let input: unknown = inputJson;
+  if (profile === undefined) {
+    try {
+      input = JSON.parse(inputJson);
+    } catch {
+      return failed("Tool input was not valid JSON");
+    }
   }
 
   let codeModeValue: unknown;
@@ -130,6 +155,10 @@ export async function executeCatalogTool(
       return await envelope.success(codeModeValue);
     }
   } catch (error) {
+    if (profile !== undefined) {
+      if (!(error instanceof ToolRequestError)) throw error;
+      return failed(error.message);
+    }
     logCapabilityFailure(name, callId, error);
     let failure = CAPABILITY_FAILURE_TEXT;
     if (error instanceof ToolRequestError) {
