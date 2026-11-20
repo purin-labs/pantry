@@ -1,4 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
+import { prepareSlackInstallationLifecycleEvent } from "../data/slack-installation-records";
 import { runtimeFetch } from "../runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Track } from "@purin-labs/contracts";
@@ -198,19 +199,13 @@ export async function handleSlackInstallationRevoked(
       );
     }
   }
-  await env.DB.prepare(
-    `INSERT OR IGNORE INTO slack_installation_lifecycle_event (
-         event_id, installation_id, reason, occurred_at, recorded_at
-       ) VALUES (?, ?, ?, ?, ?)`,
-  )
-    .bind(
-      event.eventId,
-      installation.installationId,
-      event.reason,
-      event.occurredAt,
-      receivedAt,
-    )
-    .run();
+  await prepareSlackInstallationLifecycleEvent(env.DB, {
+    eventId: event.eventId,
+    installationId: installation.installationId,
+    reason: event.reason,
+    occurredAt: event.occurredAt,
+    recordedAt: receivedAt,
+  }).run();
   traceLog("integration_gateway.slack.installation_revoked", {
     requestId,
     workspace_id: event.workspaceId,

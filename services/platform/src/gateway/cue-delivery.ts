@@ -1,4 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
+import { prepareCueLogEntry } from "../cues/cue-log";
 import { pantryCommerceAccess } from "../commerce/contract/client";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
@@ -703,29 +704,19 @@ async function writeCueLog(
   input: CueDeliveryLogInput,
 ): Promise<void> {
   const target = cueDeliveryTarget(input);
-  await db
-    .prepare(
-      `INSERT OR IGNORE INTO cue_log (
-         organisation_id, integration_account_id, cue_id, source, native_id,
-         decision, reason, session_id, at,
-         parent_cue_id, surface_kind, surface_thread_id, actor_person_id,
-         response_text
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, NULL, NULL)`,
-    )
-    .bind(
-      input.organisationId,
-      cueLogIntegrationAccountId(input.event),
-      input.cueId,
-      input.event.source,
-      input.event.nativeId,
-      input.decision,
-      input.reason,
-      input.at,
-      input.parentCueId,
-      target.surfaceKind,
-      target.threadId,
-    )
-    .run();
+  await prepareCueLogEntry(db, {
+    organisationId: input.organisationId,
+    integrationAccountId: cueLogIntegrationAccountId(input.event),
+    cueId: input.cueId,
+    source: input.event.source,
+    nativeId: input.event.nativeId,
+    decision: input.decision,
+    reason: input.reason,
+    at: input.at,
+    parentCueId: input.parentCueId,
+    surfaceKind: target.surfaceKind,
+    surfaceThreadId: target.threadId,
+  }).run();
 }
 
 export function cueLogIntegrationAccountId(

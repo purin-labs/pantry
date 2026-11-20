@@ -16,7 +16,10 @@ import {
   placementMoveOpenOfOtherKind,
   prepareRecoveryRelocationStart,
   prepareRelocationAbandon,
+  prepareRelocationDataVerified,
   prepareRelocationFreezeRelease,
+  prepareRelocationRetentionWaiver,
+  prepareRelocationSourceQuiesced,
   prepareRelocationStart,
   unresolvedProviderWorkQuery,
   type PlacementMoveOpenError,
@@ -846,13 +849,10 @@ export async function waiveActorRelocationRetention(input: {
   switch (operation.value.status) {
     case "retained":
     case "cleaning":
-      await input.env.DB.prepare(
-        `UPDATE state_object_relocation
-         SET retention_waived_at = COALESCE(retention_waived_at, ?)
-         WHERE relocation_id = ? AND status IN ('retained', 'cleaning')`,
-      )
-        .bind(input.now, input.relocationId)
-        .run();
+      await prepareRelocationRetentionWaiver(input.env.DB, {
+        now: input.now,
+        relocationId: input.relocationId,
+      }).run();
       return readRelocationById(input.env.DB, input.relocationId);
     case "complete":
       return operation;
@@ -1040,11 +1040,10 @@ export async function resumeActorRelocation(input: {
       input.now,
     );
     if (!recorded.ok) return recorded;
-    await input.env.DB.prepare(
-      "UPDATE state_object_relocation SET source_quiesced_at = ? WHERE relocation_id = ? AND status IN ('frozen', 'copying')",
-    )
-      .bind(input.now, operation.relocationId)
-      .run();
+    await prepareRelocationSourceQuiesced(input.env.DB, {
+      now: input.now,
+      relocationId: operation.relocationId,
+    }).run();
     const provisioned = await provisionRegionalMoveTarget({
       sourceDatabase: sourceDatabase.value,
       targetDatabase: targetDatabase.value,
@@ -1106,11 +1105,11 @@ export async function resumeActorRelocation(input: {
       return copied;
     }
 
-    await input.env.DB.prepare(
-      "UPDATE state_object_relocation SET data_verified_at = ?, data_table_count = ? WHERE relocation_id = ? AND status = 'copying'",
-    )
-      .bind(input.now, copyTables.length, operation.relocationId)
-      .run();
+    await prepareRelocationDataVerified(input.env.DB, {
+      now: input.now,
+      tableCount: copyTables.length,
+      relocationId: operation.relocationId,
+    }).run();
 
     const publicationNow = input.now + Date.now() - resumeStartedAt;
     if (

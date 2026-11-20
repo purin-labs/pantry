@@ -1,4 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
+import { prepareCommerceCueLogDelete } from "../cues/cue-log";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
   LabCatalogOptionV1,
@@ -1167,14 +1168,7 @@ export async function deleteCommerceCueEvidence(
   providerEventId: string,
 ): Promise<void> {
   const prefix = `commerce:${providerEventId}:`;
-  await db
-    .prepare(
-      `DELETE FROM cue_log
-     WHERE organisation_id = ? AND source = 'commerce'
-       AND substr(native_id, 1, length(?)) = ?`,
-    )
-    .bind(organisationId, prefix, prefix)
-    .run();
+  await prepareCommerceCueLogDelete(db, { organisationId, prefix }).run();
 }
 
 async function readProposalCueRows(

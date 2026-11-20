@@ -534,3 +534,41 @@ export function preparePlacementMovePublication(
          WHERE restore_id = ? AND status IN (${publish.from}) AND changes() = 1`;
   return directory.prepare(sql).bind(input.now, input.operationId);
 }
+
+/** Waives the retention of a retained or cleaning relocation. A waiver keeps its time. */
+export function prepareRelocationRetentionWaiver(
+  globalDatabase: GlobalDatabase,
+  input: Readonly<{ now: number; relocationId: string }>,
+): D1PreparedStatement {
+  return globalDatabase
+    .prepare(
+      `UPDATE state_object_relocation
+         SET retention_waived_at = COALESCE(retention_waived_at, ?)
+         WHERE relocation_id = ? AND status IN ('retained', 'cleaning')`,
+    )
+    .bind(input.now, input.relocationId);
+}
+
+/** Records that the source of a frozen or copying relocation stopped work. */
+export function prepareRelocationSourceQuiesced(
+  globalDatabase: GlobalDatabase,
+  input: Readonly<{ now: number; relocationId: string }>,
+): D1PreparedStatement {
+  return globalDatabase
+    .prepare(
+      "UPDATE state_object_relocation SET source_quiesced_at = ? WHERE relocation_id = ? AND status IN ('frozen', 'copying')",
+    )
+    .bind(input.now, input.relocationId);
+}
+
+/** Records the verified copy of the data of a copying relocation. */
+export function prepareRelocationDataVerified(
+  globalDatabase: GlobalDatabase,
+  input: Readonly<{ now: number; tableCount: number; relocationId: string }>,
+): D1PreparedStatement {
+  return globalDatabase
+    .prepare(
+      "UPDATE state_object_relocation SET data_verified_at = ?, data_table_count = ? WHERE relocation_id = ? AND status = 'copying'",
+    )
+    .bind(input.now, input.tableCount, input.relocationId);
+}
