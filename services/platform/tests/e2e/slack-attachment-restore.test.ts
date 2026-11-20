@@ -129,6 +129,9 @@ it("preserves the exact canonical message across actor eviction", async () => {
   const restoredPrompt = JSON.stringify(model.requests[1]);
   expect(restoredPrompt).toContain("quote.pdf");
   expect(restoredPrompt).toContain("class=document");
+  // The follow-up answer reaches the thread. The turn then ends inside the
+  // test, and not while the test environment closes.
+  await expect.poll(slack.visibleMessageCount, { timeout: 15_000 }).toBe(2);
 });
 
 /** Evicts the connector, case, and session so the next read must rehydrate. */
