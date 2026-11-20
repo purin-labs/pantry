@@ -869,6 +869,68 @@ The Inbox ports and the Slack imports stay open.
     notices: the channel adapter of step A1.6 owns them.
   - Brain, 1 import: `actors/harness-memory-proposal.ts`.
 
+**21 November 2026. The leftovers of steps A1.11 and A1.7, and the first Session
+module of step A1.9,** on the branch `refactor-17-a1-9-session`. This entry replaces
+the "Costs" row and the open points of the two entries above where it names them.
+
+- **A1.11: `control-api` names no area package.** `costs.ts`, `costs-actuals.ts`,
+  `costs-forecast.ts` and `costs-formulas.ts` moved to
+  `@purin-labs/kitchen-control-api`. A codemod rewrote the import lines of 20 files.
+  `@purin-labs/control-api` no longer depends on `@purin-labs/commerce-contracts`.
+- **A1.7: the browser context is a contract.** `PageBrowserContext`, its binding and
+  the two parsers are in `@purin-labs/contracts`: they name no Kitchen concept, and a
+  turn of the Session carries them. `@purin-labs/bakery-model` keeps its names as
+  aliases, so its other users did not change.
+- **A1.7: the page state and the effect receipt are opaque.** They name Kitchen
+  concepts, so the Session holds them as `unknown`. Kitchen parses them where it
+  did before: `settleBakerySurfaceEffect` takes the receipt as the page sent it.
+- **A1.7: two fields of a tool definition.** `modelOnly`: a Code Mode script does not
+  get the tool. `structuredOutput`: the schema of the value that a script receives.
+  The 38 Kitchen surface tools set the first, and `commerce_entity_context` sets the
+  second. The Pi tools read them through `toolRules`, an input of the harness
+  runtime, and `actors/pi-durable-tools.ts` names no tool. A result with a typed
+  value is a `StructuredToolResult` (`agent-tools/structured-result.ts`). The model
+  definitions do not hold the fields, so the catalog digests are equal.
+- **A1.7: the Slack side Case is a port.** The wiring gives `slackThreadSideCase`:
+  the instruction text and the admission of a side Case that a Slack thread
+  started. No file of `actors/session/` imports a Slack file.
+- **A1.9: the Inbox turns are a module.** The mailbox turn, the eval turn, the mail
+  assistant turn and the WhatsApp turn were methods of the class layer
+  `SessionTransientTurns`. They are functions of `actors/inbox-turns/` (area
+  `inbox`). Each one takes a `SessionTransientHost`
+  (`actors/session/transient-host.ts`). `actors/inbox-turns/rpc.ts` declares
+  `SessionInboxTurnsRpc` with the request and reply types. The class `SessionDO`
+  implements it: each RPC method calls one function of the module. The class layer
+  is deleted, so the chain has 5 levels and not 6. The RPC method names, the
+  argument shapes and the results did not change.
+- **The schema steps.** `agent-session-schema.ts` already holds one ordered list:
+  `createSessionExecutionSchema` calls the schema function of each part in a fixed
+  order. This step did not change it, and no stored version changed.
+- **Measures.** Layer crossings: 703 to 679. `foundation/agent` to Inbox: 27 to 11,
+  and no Session file is among the 11. To Kitchen: 4 to 0. To commerce: 22 to 21. To
+  Slack: 7 to 5. Copies: 890 to 889. Unused exports: 809, no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (302 files) pass. 88 journey files ran in
+  five groups: 87 pass and 1 is skipped. The full E2E suite did not run on the
+  branch.
+- **Still open: the rest of the class chain.** `SessionActorBase`,
+  `SessionCheckpoints`, `SessionHarnessTurns`, `SessionTurnRecovery` and
+  `SessionActor` are still one chain of 5,159 lines. They are all `foundation/agent`
+  and import no area, so the layer count does not need the split. They share 9
+  fields of the base (`canonicalTurn`, `checkpointPublication`,
+  `startedCheckpointPayload`, `activeEmbeddedHarnessTurn`,
+  `activeMessagePreparation`, `transientExecutions`, `liveGoalRuns` and the two
+  Portal chat cleanup promises) and call each other through `this`. Each one needs
+  its own landing with the actor journeys, the relocation journey and the idle
+  tenant journey.
+- **Still open: 4 Slack imports and 1 Brain import.** `actors/harness-follow-up.ts`
+  (3) posts the Slack card of a permission request and of a held effect through the
+  Connector. It is Slack code with a foundation label: the exit check in
+  `agent-tools/session-support.ts` calls it. `actors/harness-side-case-proposal.ts`
+  (1) stores the Slack side Case proposal. `actors/harness-memory-proposal.ts` (1)
+  calls `memory/access.ts`. Each needs a port through the tool effect and the turn
+  tools.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
