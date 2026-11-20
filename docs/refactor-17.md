@@ -483,6 +483,28 @@ of step A2.5), on the branch `refactor-17-a1-8`.
   system kind in the other files (`graph-reader.ts`, the access model, the cue
   engine), and one definition of the `CommerceSystem` union.
 
+**20 November 2026. More files have their true module, and two more tables have one
+writer function**, on the branch `refactor-17-a1-8`.
+
+- The map got 14 corrections after a read of each file that foundation modules import
+  from an area or a surface. Examples: the commerce system record and the merchant
+  binding are connection records; the evaluation client and the file source clients
+  belong to the agent module; the Gmail client is a connection client; the stop code
+  of a placement move is in the actor runtime.
+- `prepareVaultSecretRevocation` replaces 7 copies of one statement, 3 of them outside
+  the Vault. `prepareActiveCredentialGeneration` replaces 3 insert statements.
+- The map shows 1,097 crossings. It showed 1,350 at the start of the day.
+
+What the day showed about the method:
+
+- A wrong line in the map hides a true crossing or shows a false one. The hub list
+  (the files of areas and surfaces that foundation modules import most) finds wrong
+  lines faster than the misfit report.
+- A statement builder in the owner module removes a table crossing only when the
+  caller may import the owner. A caller in a lower module needs a hook instead.
+- A baseline with one fingerprint for each copy does not hold. The clone ratchet now
+  counts copies for each pair of files.
+
 The step is smaller than its first description. A count with the type checker gave
 the reason: callers use 245 methods of the four Actors at 440 places, in about 130
 files. An interface for each module is a larger piece of work, and it belongs with the
