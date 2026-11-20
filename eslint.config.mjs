@@ -426,7 +426,7 @@ export default [
   {
     // Each Actor reads its own execution records for the execution
     // projection. Every other file reaches them through that projection.
-    files: ["services/platform/src/actors/case.ts"],
+    files: ["services/platform/src/actors/case/case-actor.ts"],
     rules: {
       "no-restricted-imports": [
         "error",

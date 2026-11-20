@@ -60,7 +60,7 @@ import type {
 } from "./actor-journal";
 import type { CanonicalEmbeddedHarnessTextTurnError } from "./session/types";
 import type { SessionActor } from "./session/session-actor";
-import type { CaseDO } from "./case";
+import type { CaseActor } from "./case/case-actor";
 import type { CaseOutput, CaseSnapshot } from "./case/types";
 import type { ConnectorDO } from "./connector";
 import type { SessionActorRoute } from "./actor-router";
@@ -100,7 +100,7 @@ export type OngoingCaseWalkingConnector = CaseWalkingConnector & {
   readonly warmActorSlots: ConnectorWarmActorSlots;
 };
 export type CaseWalkingCase = Pick<
-  CaseDO,
+  CaseActor,
   | "prepareDirectTurn"
   | "assignSession"
   | "beginAssignment"
@@ -115,7 +115,7 @@ export type CaseWalkingCase = Pick<
   | "transitionEmailProposal"
 >;
 export type OngoingCaseWalkingCase = CaseWalkingCase &
-  Pick<CaseDO, "prepareOngoingTurn">;
+  Pick<CaseActor, "prepareOngoingTurn">;
 export type CaseWalkingSession = {
   initializeCaseSession(
     input: Parameters<SessionActor["initializeCaseSession"]>[0],
@@ -1207,7 +1207,7 @@ export async function admitOngoingCaseTurn(
   input: Readonly<{
     connector: Pick<ConnectorDO, "acceptIngress">;
     connectorIdentity: ConnectorIdentity;
-    caseActor: Pick<CaseDO, "prepareOngoingTurn">;
+    caseActor: Pick<CaseActor, "prepareOngoingTurn">;
     organisationId: OrganisationId;
     ingress: ConnectorIngress;
     binding: CaseBinding;
@@ -1879,7 +1879,7 @@ async function holdRefusedOutput(
     Readonly<{
       connector: Pick<ConnectorDO, "deliver">;
       connectorIdentity: ConnectorIdentity;
-      caseActor: Pick<CaseDO, "holdOutput">;
+      caseActor: Pick<CaseActor, "holdOutput">;
     }>,
   output: CaseOutput,
   refusal: CaseWalkingPathError,
@@ -1910,7 +1910,7 @@ export async function deliverAndSettleCaseOutput(
     | "ingress"
   > & {
     readonly caseActor: Pick<
-      CaseDO,
+      CaseActor,
       "acceptDeliveryReceipt" | "holdOutput" | "rejectOutput"
     >;
   },

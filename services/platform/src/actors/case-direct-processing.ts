@@ -85,10 +85,10 @@ import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,
 } from "./case/abandoned-assignments";
-import type { CaseDO } from "./case";
+import type { CaseActor } from "./case/case-actor";
 
 export type ConversationCaseActor = DirectCasePathInput["caseActor"] &
-  Pick<CaseDO, "readTail">;
+  Pick<CaseActor, "readTail">;
 
 type DirectCaseIdentities = VariantBy<
   Awaited<ReturnType<typeof deriveDirectCaseIdentities>>,

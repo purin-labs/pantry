@@ -555,7 +555,7 @@
     "services/platform/src/actors/case-output-hold.ts": "foundation/conversation",
     "services/platform/src/actors/case-schema.ts": "foundation/conversation",
     "services/platform/src/actors/case-walking-path.ts": "foundation/conversation",
-    "services/platform/src/actors/case.ts": "foundation/conversation",
+    "services/platform/src/actors/case.ts": "workers/platform",
     "services/platform/src/actors/chat-signal-sockets.ts": "foundation/conversation",
     "services/platform/src/actors/code-mode-admission.ts": "foundation/agent",
     "services/platform/src/actors/code-mode-budget.ts": "foundation/agent",

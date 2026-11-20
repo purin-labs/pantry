@@ -12,7 +12,7 @@ import { heldOutputNoticeText } from "../slack/held-output-notice";
 import type { CaseOutput } from "./case/types";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { ConnectorDO } from "./connector";
-import type { CaseDO } from "./case";
+import type { CaseActor } from "./case/case-actor";
 import { traceWarn } from "../observability";
 
 /**
@@ -30,7 +30,7 @@ export async function holdCaseOutput(
     organisationId: string;
     connector: Pick<ConnectorDO, "deliver">;
     connectorIdentity: ConnectorIdentity;
-    caseActor: Pick<CaseDO, "holdOutput">;
+    caseActor: Pick<CaseActor, "holdOutput">;
     output: CaseOutput;
     refusal: string;
     requestAuthority: RequestAuthority;
