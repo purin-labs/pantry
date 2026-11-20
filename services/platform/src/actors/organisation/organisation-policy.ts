@@ -1,8 +1,7 @@
 import { runtimeFetch } from "../../runtime-fetch";
-import { resolveCaseContextCollectionSelectionVerification } from "../../case-context-discovery/source";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
-import { newRequestId, parseCaseId, type OrganisationId } from "../../ids";
+import { newRequestId, type OrganisationId } from "../../ids";
 import { traceLog, traceWarn } from "../../observability";
 import {
   isOrganisationPolicyPlacementActive,
@@ -15,16 +14,6 @@ import {
   readCaseContextDiscoveryPolicy,
 } from "../../case-context-discovery/evaluation-store";
 import {
-  commitCaseContextCollectionEffectFence,
-  evidenceForCaseContextCollection,
-  eraseCaseContextCollectionSource,
-  parseCaseContextCollectionEffectAttempt,
-  parseCaseContextCollectionEvidenceDependency,
-  validateCaseContextCollectionEvidence,
-  replayCaseContextCollectionEffectFence,
-  invalidateCaseContextCollectionVerification,
-} from "../../case-context-discovery/evidence";
-import {
   readTypeSafeConnection,
   mutateTypeSafeConnection,
 } from "../../integrations/typesafe/connection";
@@ -35,16 +24,6 @@ import {
   sameTypeSafeAuthority,
   type TypeSafeAuthority,
 } from "../../integrations/typesafe/authority";
-import {
-  decideCaseContextCollectionRelationship,
-  listCaseContextCollectionIdsForCase,
-  listMemberCaseContextCollectionIdsForCase,
-  parseCaseContextCollectionReviewCommand,
-  parseCaseContextCollectionSelection,
-  readCaseContextCollection,
-  replayCaseContextCollectionRelationshipCommand,
-  type CaseContextCollection,
-} from "../../case-context-discovery/relationships";
 import { evaluateOperationalCaseContextDiscovery } from "../../case-context-discovery/operational-evaluation";
 import {
   caseContextDiscoveryReadiness,
@@ -55,13 +34,6 @@ import {
 } from "../../case-context-discovery/policy";
 import { digestCanonical } from "../../policy/information-flow/digest";
 import { errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
-import {
-  caseContextCollectionReviewDecision,
-  caseContextCollectionSourceAccess,
-  parseOperationalCaseContextDiscoverySourceRequest,
-  unsupportedCaseContextCollectionReplySource,
-  verifiedOperationalCaseContextDiscoveryRequest,
-} from "./case-context-collection";
 import { schemaTransaction } from "./schema";
 import {
   existingPolicyActivation,
@@ -78,6 +50,12 @@ import type {
 } from "./policy-types";
 import { OrganisationActorBase } from "./organisation-actor-base";
 import type { Env } from "../../env";
+import type { RequestAuthority } from "@purin-labs/contracts";
+import type { FlowLabel } from "../../policy/information-flow";
+import type {
+  OperationalCaseContextDiscoveryRequest,
+  OperationalCaseContextDiscoverySourceRequest,
+} from "../../case-context-discovery/operational-evaluation";
 
 /**
  * Policy activation, credentials, TypeSafe and Case context discovery for the Organisation.
@@ -113,9 +91,60 @@ export type PolicyJevPort = Readonly<{
   ): Promise<unknown>;
 }>;
 
+/**
+ * What the Case context discovery commands of the policy need from the
+ * source of a collection. The Inbox owns the source, a Gmail mailbox, and
+ * the class of the Worker gives these functions.
+ */
+export type PolicyCaseContextSourcePort = Readonly<{
+  /** True for a source that cannot hold the reply of a party. */
+  unsupportedReplySource(source: Readonly<{ source: string }>): boolean;
+  /** The authority and the label under which the source is read. */
+  sourceAccess(
+    scope: OrganisationExecutionScope,
+    sql: SqlStorage,
+    accountId: string,
+  ): Promise<
+    Result<
+      Readonly<{ authority: RequestAuthority; label: FlowLabel }>,
+      Readonly<{
+        code:
+          | "case_context_collection_relationship_invalid"
+          | "case_context_collection_relationship_unavailable"
+          | "organisation_placement_conflict";
+      }>
+    >
+  >;
+  parseSourceRequest(
+    raw: unknown,
+  ): OperationalCaseContextDiscoverySourceRequest | null;
+  /** Checks the request against the verified contact of its anchor. */
+  verifiedRequest(
+    input: Readonly<{
+      scope: OrganisationExecutionScope;
+      sql: SqlStorage;
+      request: OperationalCaseContextDiscoverySourceRequest;
+    }>,
+  ): Promise<
+    Result<
+      OperationalCaseContextDiscoveryRequest,
+      Readonly<{
+        code:
+          | "case_context_collection_relationship_invalid"
+          | "case_context_collection_relationship_unavailable"
+          | "case_context_collection_relationship_conflict"
+          | "organisation_placement_conflict";
+      }>
+    >
+  >;
+}>;
+
 export abstract class OrganisationPolicy extends OrganisationActorBase {
   /** The Jev parts that two policy commands call. */
   protected abstract jevForPolicy(): PolicyJevPort;
+
+  /** The source of a Case context collection, for the discovery commands. */
+  protected abstract caseContextSourceForPolicy(): PolicyCaseContextSourcePort;
 
   async readCaseContextDiscoveryConfiguration(
     input: Readonly<{ organisationId: OrganisationId }>,
@@ -379,7 +408,9 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
     if (!policy.ok) return policy;
     if (
       policy.value.mode === "party_context" &&
-      policy.value.sources.some(unsupportedCaseContextCollectionReplySource)
+      policy.value.sources.some(
+        this.caseContextSourceForPolicy().unsupportedReplySource,
+      )
     ) {
       return {
         ok: false as const,
@@ -417,7 +448,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
       }
       if (policy.value.mode === "party_context") {
         for (const source of policy.value.sources) {
-          const access = await caseContextCollectionSourceAccess(
+          const access = await this.caseContextSourceForPolicy().sourceAccess(
             scope,
             this.ctx.storage.sql,
             source.integrationAccountId,
@@ -472,7 +503,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
       scope.organisationId,
     );
     if (!organisation.ok) return organisation;
-    const request = parseOperationalCaseContextDiscoverySourceRequest(
+    const request = this.caseContextSourceForPolicy().parseSourceRequest(
       input.request,
     );
     if (request === null) {
@@ -481,7 +512,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
         error: { code: "case_context_discovery_evaluation_invalid" as const },
       };
     }
-    const scoped = await verifiedOperationalCaseContextDiscoveryRequest({
+    const scoped = await this.caseContextSourceForPolicy().verifiedRequest({
       scope,
       sql: this.ctx.storage.sql,
       request,
@@ -492,7 +523,7 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
         error: { code: "organisation_placement_conflict" as const },
       };
     if (!scoped.ok) return scoped;
-    const sourceAccess = await caseContextCollectionSourceAccess(
+    const sourceAccess = await this.caseContextSourceForPolicy().sourceAccess(
       scope,
       this.ctx.storage.sql,
       scoped.value.anchor.selection.integrationAccountId,
@@ -537,572 +568,6 @@ export abstract class OrganisationPolicy extends OrganisationActorBase {
       signal: new AbortController().signal,
       fetcher: runtimeFetch,
       now: Date.now,
-    });
-    await this.rearm();
-    return result;
-  }
-
-  async prepareCaseContextCollectionEvidence(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      caseId: string;
-      integrationAccountId: string;
-      triggeringMessageId: string;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedPrepareCaseContextCollectionEvidence.bind(this, input),
-    );
-  }
-
-  protected async admittedPrepareCaseContextCollectionEvidence(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      caseId: string;
-      integrationAccountId: string;
-      triggeringMessageId: string;
-    }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    if (
-      !identifier(input.caseId) ||
-      !identifier(input.integrationAccountId) ||
-      !identifier(input.triggeringMessageId)
-    )
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_invalid" as const },
-      };
-    const policy = readCaseContextDiscoveryPolicy(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (policy.policy.mode !== "party_context")
-      return { ok: true as const, value: { kind: "source_only" as const } };
-    const ids = listMemberCaseContextCollectionIdsForCase(
-      this.ctx.storage.sql,
-      scope.organisationId,
-      input.caseId,
-    );
-    if (ids.length !== 1)
-      return { ok: true as const, value: { kind: "source_only" as const } };
-    const caseContextCollection = readCaseContextCollection(
-      this.ctx.storage.sql,
-      scope.organisationId,
-      ids[0]!,
-    );
-    if (
-      caseContextCollection === null ||
-      caseContextCollection.lifecycle !== "open"
-    )
-      return { ok: true as const, value: { kind: "source_only" as const } };
-    const verified = await resolveCaseContextCollectionSelectionVerification(
-      scope.database,
-      scope.organisationId,
-      caseContextCollection.anchorSelection,
-    );
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    if (
-      !verified.ok ||
-      verified.value.endpoint.channel !== "gmail" ||
-      verified.value.integrationAccountId !== input.integrationAccountId
-    )
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_stale" as const },
-      };
-    const target = verified.value.target;
-    if (target.kind !== "supplier_contact")
-      return { ok: true as const, value: { kind: "source_only" as const } };
-    const recipient = {
-      organisationId: scope.organisationId,
-      merchantId: verified.value.merchantId,
-      integrationAccountId: input.integrationAccountId,
-      partyKind: "supplier" as const,
-      partyId: target.supplierId,
-      contactId: target.contactId,
-      contactRevision: target.contactRevision,
-      verificationId: verified.value.verificationId,
-      verificationRevision: verified.value.revision,
-      endpointDigest: await digestCanonical(verified.value.endpoint.address),
-      purpose: "supplier_reply" as const,
-    };
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    const dependency = evidenceForCaseContextCollection(
-      caseContextCollection,
-      policy.revision,
-      recipient,
-      Date.now(),
-    );
-    if (dependency === null)
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_stale" as const },
-      };
-    const receipt = await scope.database
-      .prepare(
-        `SELECT admitted_at FROM email_message_receipt WHERE organisation_id = ? AND integration_account_id = ? AND provider_message_id = ? AND case_id = ? AND contact_verification_id = ? AND contact_verification_revision = ?`,
-      )
-      .bind(
-        scope.organisationId,
-        input.integrationAccountId,
-        input.triggeringMessageId,
-        input.caseId,
-        recipient.verificationId,
-        recipient.verificationRevision,
-      )
-      .first<{ admitted_at: number }>();
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    if (receipt === null)
-      return { ok: true as const, value: { kind: "source_only" as const } };
-    const valid = await this.admittedValidateCaseContextCollectionEvidence(
-      {
-        organisationId: scope.organisationId,
-        dependency,
-      },
-      scope,
-    );
-    return valid.ok ? { ok: true as const, value: dependency } : valid;
-  }
-
-  async validateCaseContextCollectionEvidence(
-    input: Readonly<{ organisationId: OrganisationId; dependency: unknown }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedValidateCaseContextCollectionEvidence.bind(this, input),
-    );
-  }
-
-  protected async admittedValidateCaseContextCollectionEvidence(
-    input: Readonly<{ organisationId: OrganisationId; dependency: unknown }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const dependency = parseCaseContextCollectionEvidenceDependency(
-      input.dependency,
-    );
-    if (dependency?.kind !== "case_context_collection_evidence")
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_invalid" as const },
-      };
-    const source = await caseContextCollectionSourceAccess(
-      scope,
-      this.ctx.storage.sql,
-      dependency.recipient.integrationAccountId,
-    );
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    const credential = await resolveTypeSafeCredential({
-      sql: this.ctx.storage.sql,
-      db: scope.database,
-      keys: this.env,
-      organisationId: scope.organisationId,
-    });
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    const policy = readCaseContextDiscoveryPolicy(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (
-      !source.ok ||
-      policy.policy.mode !== "party_context" ||
-      credential === null ||
-      !sameTypeSafeAuthority(
-        credential.authority,
-        caseContextDiscoveryRouteAuthority(policy.policy.route),
-      )
-    )
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_stale" as const },
-      };
-    for (const selection of dependency.selections) {
-      const verified = await resolveCaseContextCollectionSelectionVerification(
-        scope.database,
-        scope.organisationId,
-        selection.source,
-      );
-      if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-        return organisationPlacementConflict();
-      if (
-        !verified.ok ||
-        verified.value.endpoint.channel !== "gmail" ||
-        verified.value.target.contactId !== dependency.recipient.contactId ||
-        verified.value.target.contactRevision !==
-          dependency.recipient.contactRevision
-      )
-        return {
-          ok: false as const,
-          error: { code: "case_context_collection_evidence_stale" as const },
-        };
-      const endpointDigest = await digestCanonical(
-        verified.value.endpoint.address,
-      );
-      if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-        return organisationPlacementConflict();
-      if (endpointDigest !== dependency.recipient.endpointDigest)
-        return {
-          ok: false as const,
-          error: { code: "case_context_collection_evidence_stale" as const },
-        };
-    }
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    return validateCaseContextCollectionEvidence({
-      sql: this.ctx.storage.sql,
-      organisationId: scope.organisationId,
-      dependency,
-      now: Date.now(),
-    });
-  }
-
-  async commitCaseContextCollectionEffectFence(
-    input: Readonly<{ organisationId: OrganisationId; attempt: unknown }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedCommitCaseContextCollectionEffectFence.bind(this, input),
-    );
-  }
-
-  protected async admittedCommitCaseContextCollectionEffectFence(
-    input: Readonly<{ organisationId: OrganisationId; attempt: unknown }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const attempt = parseCaseContextCollectionEffectAttempt(input.attempt);
-    if (attempt === null)
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_invalid" as const },
-      };
-    const replay = await replayCaseContextCollectionEffectFence({
-      sql: this.ctx.storage.sql,
-      scope,
-      attempt,
-      now: Date.now,
-    });
-    if (!replay.ok) return replay;
-    if (replay.value !== null)
-      return { ok: true as const, value: replay.value };
-    const valid = await this.admittedValidateCaseContextCollectionEvidence(
-      {
-        organisationId: scope.organisationId,
-        dependency: attempt.dependency,
-      },
-      scope,
-    );
-    if (!valid.ok) return valid;
-    return commitCaseContextCollectionEffectFence({
-      sql: this.ctx.storage.sql,
-      transaction: schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
-      scope,
-      attempt,
-      now: Date.now,
-    });
-  }
-
-  async invalidateCaseContextCollectionVerification(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      verificationId: string;
-      revision: number;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedInvalidateCaseContextCollectionVerification.bind(
-        this,
-        input,
-      ),
-    );
-  }
-
-  protected async admittedInvalidateCaseContextCollectionVerification(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      verificationId: string;
-      revision: number;
-    }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    if (
-      !identifier(input.verificationId) ||
-      !integerIn(input.revision, 1, Number.MAX_SAFE_INTEGER)
-    )
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_invalid" as const },
-      };
-    this.ctx.storage.transactionSync(
-      invalidateCaseContextCollectionVerification.bind(null, {
-        sql: this.ctx.storage.sql,
-        organisationId: scope.organisationId,
-        verificationId: input.verificationId,
-        revision: input.revision,
-      }),
-    );
-    await this.rearm();
-    return { ok: true as const, value: null };
-  }
-
-  async eraseCaseContextCollectionSource(
-    input: Readonly<{ organisationId: OrganisationId; selection: unknown }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedEraseCaseContextCollectionSource.bind(this, input),
-    );
-  }
-
-  protected async admittedEraseCaseContextCollectionSource(
-    input: Readonly<{ organisationId: OrganisationId; selection: unknown }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const selection = parseCaseContextCollectionSelection(input.selection);
-    if (selection === null)
-      return {
-        ok: false as const,
-        error: { code: "case_context_collection_evidence_invalid" as const },
-      };
-    eraseCaseContextCollectionSource({
-      sql: this.ctx.storage.sql,
-      transaction: schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
-      organisationId: scope.organisationId,
-      selection,
-      now: Date.now(),
-    });
-    await this.rearm();
-    return { ok: true as const, value: null };
-  }
-
-  async readCaseContextCollection(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      caseContextCollectionId: string;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedReadCaseContextCollection.bind(this, input),
-    );
-  }
-
-  protected async admittedReadCaseContextCollection(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      caseContextCollectionId: string;
-    }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    if (!identifier(input.caseContextCollectionId)) {
-      return {
-        ok: false as const,
-        error: {
-          code: "case_context_collection_relationship_invalid" as const,
-        },
-      };
-    }
-    const caseContextCollection = readCaseContextCollection(
-      this.ctx.storage.sql,
-      scope.organisationId,
-      input.caseContextCollectionId,
-    );
-    return caseContextCollection === null
-      ? {
-          ok: false as const,
-          error: {
-            code: "case_context_collection_relationship_unavailable" as const,
-          },
-        }
-      : { ok: true as const, value: caseContextCollection };
-  }
-
-  async readCaseContextCollectionsForCase(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      caseId: string;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedReadCaseContextCollectionsForCase.bind(this, input),
-    );
-  }
-
-  protected async admittedReadCaseContextCollectionsForCase(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      caseId: string;
-    }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const caseId = parseCaseId(input.caseId);
-    if (!caseId.ok) {
-      return {
-        ok: false as const,
-        error: {
-          code: "case_context_collection_relationship_invalid" as const,
-        },
-      };
-    }
-    const caseContextCollectionIds = listCaseContextCollectionIdsForCase(
-      this.ctx.storage.sql,
-      scope.organisationId,
-      caseId.value,
-      Date.now(),
-    );
-    const caseContextCollections: CaseContextCollection[] = [];
-    for (const caseContextCollectionId of caseContextCollectionIds) {
-      const caseContextCollection = readCaseContextCollection(
-        this.ctx.storage.sql,
-        scope.organisationId,
-        caseContextCollectionId,
-      );
-      if (caseContextCollection === null) {
-        return {
-          ok: false as const,
-          error: {
-            code: "case_context_collection_relationship_unavailable" as const,
-          },
-        };
-      }
-      caseContextCollections.push(caseContextCollection);
-    }
-    return {
-      ok: true as const,
-      value: { caseId: caseId.value, caseContextCollections },
-    };
-  }
-
-  async reviewCaseContextCollectionRelationship(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      actorId: string;
-      caseContextCollectionId: string;
-      body: unknown;
-    }>,
-  ) {
-    return this.command(
-      input.organisationId,
-      this.admittedReviewCaseContextCollectionRelationship.bind(this, input),
-    );
-  }
-
-  protected async admittedReviewCaseContextCollectionRelationship(
-    input: Readonly<{
-      organisationId: OrganisationId;
-      actorId: string;
-      caseContextCollectionId: string;
-      body: unknown;
-    }>,
-    scope: OrganisationExecutionScope,
-  ) {
-    const organisation = validateActionOrganisation(
-      this.ctx.storage.sql,
-      scope.organisationId,
-    );
-    if (!organisation.ok) return organisation;
-    const command = parseCaseContextCollectionReviewCommand(input.body);
-    if (
-      !identifier(input.caseContextCollectionId) ||
-      !identifier(input.actorId) ||
-      command === null
-    ) {
-      return {
-        ok: false as const,
-        error: {
-          code: "case_context_collection_relationship_invalid" as const,
-        },
-      };
-    }
-    const requestDigest = await digestCanonical({
-      actorId: input.actorId,
-      caseContextCollectionId: input.caseContextCollectionId,
-      command,
-    });
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    const replayed = replayCaseContextCollectionRelationshipCommand({
-      sql: this.ctx.storage.sql,
-      organisationId: scope.organisationId,
-      commandId: command.commandId,
-      requestDigest,
-    });
-    if (!replayed.ok || replayed.value !== null) return replayed;
-    const caseContextCollection = readCaseContextCollection(
-      this.ctx.storage.sql,
-      scope.organisationId,
-      input.caseContextCollectionId,
-    );
-    if (caseContextCollection === null) {
-      return {
-        ok: false as const,
-        error: {
-          code: "case_context_collection_relationship_unavailable" as const,
-        },
-      };
-    }
-    const decision = await caseContextCollectionReviewDecision({
-      db: scope.database,
-      organisationId: scope.organisationId,
-      caseContextCollection,
-      command: command.decision,
-    });
-    if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
-      return organisationPlacementConflict();
-    if (!decision.ok) return decision;
-    const result = decideCaseContextCollectionRelationship({
-      sql: this.ctx.storage.sql,
-      transaction: schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
-      organisationId: scope.organisationId,
-      commandId: command.commandId,
-      requestDigest,
-      caseContextCollectionId: input.caseContextCollectionId,
-      expectedRevision: command.expectedRevision,
-      actorId: input.actorId,
-      now: Date.now(),
-      decision: decision.value,
     });
     await this.rearm();
     return result;
