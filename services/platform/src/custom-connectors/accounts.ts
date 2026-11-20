@@ -32,6 +32,7 @@ import {
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import { prepareConfigurationVersionBump } from "../data/organisation-onboarding-row";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
+import { prepareActiveCredentialGeneration } from "../data/provider-credential-generation";
 
 export type ActiveCustomConnectorAccount = {
   readonly source: {
@@ -206,23 +207,16 @@ export async function commitNewCustomConnectorAccount(input: {
           attempt.attemptRevision,
           input.now,
         ),
-      session
-        .prepare(
-          `INSERT INTO provider_credential_generation (
-             provider_connection_id, credential_generation, organisation_id, provider,
-             environment, credential_ref, lifecycle, created_at, activated_at,
-             superseded_at, revoked_at, failed_at, failure_code
-           ) VALUES (?, 1, ?, 'custom_api', ?, ?, 'active', ?, ?,
-                     NULL, NULL, NULL, NULL)`,
-        )
-        .bind(
-          providerConnectionId,
-          attempt.organisationId,
-          attempt.environment,
-          input.authorization.candidateCredentialRef,
-          input.now,
-          input.now,
-        ),
+      prepareActiveCredentialGeneration(session, {
+        providerConnectionId,
+        credentialGeneration: 1,
+        organisationId: attempt.organisationId,
+        provider: "custom_api",
+        environment: attempt.environment,
+        credentialRef: input.authorization.candidateCredentialRef,
+        createdAt: input.now,
+        activatedAt: input.now,
+      }),
       session
         .prepare(
           `INSERT INTO integration_account (
@@ -409,24 +403,16 @@ export async function commitExistingCustomConnectorAccount(input: {
           current.value.credentialGeneration,
           current.value.credentialRef,
         ),
-      session
-        .prepare(
-          `INSERT INTO provider_credential_generation (
-             provider_connection_id, credential_generation, organisation_id, provider,
-             environment, credential_ref, lifecycle, created_at, activated_at,
-             superseded_at, revoked_at, failed_at, failure_code
-           ) VALUES (?, ?, ?, 'custom_api', ?, ?, 'active', ?, ?,
-                     NULL, NULL, NULL, NULL)`,
-        )
-        .bind(
-          current.value.providerConnectionId,
-          nextCredentialGeneration,
-          attempt.organisationId,
-          attempt.environment,
-          input.authorization.candidateCredentialRef,
-          input.now,
-          input.now,
-        ),
+      prepareActiveCredentialGeneration(session, {
+        providerConnectionId: current.value.providerConnectionId,
+        credentialGeneration: nextCredentialGeneration,
+        organisationId: attempt.organisationId,
+        provider: "custom_api",
+        environment: attempt.environment,
+        credentialRef: input.authorization.candidateCredentialRef,
+        createdAt: input.now,
+        activatedAt: input.now,
+      }),
       session
         .prepare(
           `UPDATE provider_connection

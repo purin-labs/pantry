@@ -32,6 +32,7 @@ import {
   type ProviderConnection,
 } from "./integration-account";
 import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
+import { prepareActiveCredentialGeneration } from "./provider-credential-generation";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [
   "replacement_environment_mismatch",
@@ -1046,25 +1047,17 @@ export async function commitCredentialRotation(input: {
         input.rotation.connection.providerConnectionId,
         input.rotation.authority.credentialGeneration,
       ),
-    session
-      .prepare(
-        `INSERT INTO provider_credential_generation (
-           provider_connection_id, credential_generation, organisation_id, provider,
-           environment, credential_ref, lifecycle, created_at, activated_at,
-           superseded_at, revoked_at, failed_at, failure_code
-         ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?, NULL, NULL, NULL, NULL)
-         ON CONFLICT (provider_connection_id, credential_generation) DO NOTHING`,
-      )
-      .bind(
-        input.rotation.connection.providerConnectionId,
-        input.rotation.authority.credentialGeneration + 1,
-        input.organisationId,
-        input.rotation.connection.provider,
-        input.rotation.connection.environment,
-        input.rotation.replacementHandle,
-        input.now,
-        input.now,
-      ),
+    prepareActiveCredentialGeneration(session, {
+      providerConnectionId: input.rotation.connection.providerConnectionId,
+      credentialGeneration: input.rotation.authority.credentialGeneration + 1,
+      organisationId: input.organisationId,
+      provider: input.rotation.connection.provider,
+      environment: input.rotation.connection.environment,
+      credentialRef: input.rotation.replacementHandle,
+      createdAt: input.now,
+      activatedAt: input.now,
+      ifAbsent: true,
+    }),
     session
       .prepare(
         `UPDATE provider_connection

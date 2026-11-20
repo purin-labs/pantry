@@ -3,7 +3,7 @@
     "upward": 502,
     "areas": 337,
     "order": 139,
-    "table": 122
+    "table": 119
   },
   "crossings": {
     "areas/brain -> areas/commerce": 5,
@@ -200,7 +200,7 @@
     "table provider_connection (foundation/connections) <- foundation/authority": 1,
     "table provider_connection (foundation/connections) <- foundation/tenancy": 5,
     "table provider_connection (foundation/connections) <- surfaces/slack": 1,
-    "table provider_credential_generation (foundation/connections) <- areas/integrations": 7,
+    "table provider_credential_generation (foundation/connections) <- areas/integrations": 4,
     "table provider_credential_generation (foundation/connections) <- areas/organisation": 2,
     "table provider_credential_generation (foundation/connections) <- foundation/authority": 1,
     "table provider_credential_generation (foundation/connections) <- foundation/tenancy": 5,

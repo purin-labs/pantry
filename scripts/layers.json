@@ -1020,6 +1020,7 @@
     "services/platform/src/data/placement-move.ts": "foundation/tenancy",
     "services/platform/src/data/provider-attempt.ts": "foundation/connections",
     "services/platform/src/data/provider-authorization-state.ts": "foundation/connections",
+    "services/platform/src/data/provider-credential-generation.ts": "foundation/connections",
     "services/platform/src/data/provider-resource.ts": "foundation/connections",
     "services/platform/src/data/purge-catalogue.ts": "foundation/tenancy",
     "services/platform/src/data/query-source.ts": "foundation/tenancy",
