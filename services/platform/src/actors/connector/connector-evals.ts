@@ -1,3 +1,4 @@
+import type { ConnectorModuleHost } from "./channel-adapter";
 import { readEmailRuntime } from "../connector-email";
 import {
   admitEvalRun,
@@ -23,12 +24,13 @@ import { invalid } from "./support";
 import { type ConnectorResult } from "./types";
 import { type ConnectorEmailIdentityRequest } from "./whatsapp-parsers";
 import type { ConnectorDO } from "../connector";
-import { ConnectorWhatsApp } from "./connector-whatsapp-actor";
 
 /**
  * Eval runs and their settlement for the Connector.
  */
-export abstract class ConnectorEvals extends ConnectorWhatsApp {
+export class ConnectorEvals {
+  constructor(private readonly host: ConnectorModuleHost) {}
+
   /**
    * Starts one eval run of this mailbox's agent. The caller has checked who
    * asks and what they may try. The same command sent again answers with the
@@ -48,19 +50,21 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
         startedByPersonId: string;
       }>,
   ): Promise<ConnectorResult<Readonly<{ runId: string; caseId: string }>>> {
-    return this.trackExecution(this.admittedStartEvalRun.bind(this, input));
+    return this.host.trackExecution(
+      this.admittedStartEvalRun.bind(this, input),
+    );
   }
 
-  protected async admittedStartEvalRun(
+  private async admittedStartEvalRun(
     input: Parameters<ConnectorDO["startEvalRun"]>[0],
   ): Promise<ConnectorResult<Readonly<{ runId: string; caseId: string }>>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const runtime = readEmailRuntime(this.ctx.storage.sql);
+    const runtime = readEmailRuntime(this.host.ctx.storage.sql);
     if (runtime === null || runtime.disabledAt !== null)
       return invalid("eval_unavailable");
-    const admitted = this.ctx.storage.transactionSync(
-      admitEvalRun.bind(null, this.ctx.storage.sql, {
+    const admitted = this.host.ctx.storage.transactionSync(
+      admitEvalRun.bind(null, this.host.ctx.storage.sql, {
         runId: input.runId,
         caseId: input.caseId,
         commandId: input.commandId,
@@ -77,7 +81,7 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
       return invalid("eval_command_conflict");
     if (admitted.kind === "capacity_exceeded")
       return invalid("eval_capacity_exceeded");
-    await this.armAlarm();
+    await this.host.armAlarm();
     return {
       ok: true,
       value: { runId: admitted.run.runId, caseId: admitted.run.caseId },
@@ -95,19 +99,19 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
   ): Promise<
     ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
   > {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedReadEvalRunCommand.bind(this, input),
     );
   }
 
-  protected async admittedReadEvalRunCommand(
+  private async admittedReadEvalRunCommand(
     input: Parameters<ConnectorDO["readEvalRunCommand"]>[0],
   ): Promise<
     ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
   > {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const earlier = findEvalRunCommand(this.ctx.storage.sql, input);
+    const earlier = findEvalRunCommand(this.host.ctx.storage.sql, input);
     if (earlier === null) return { ok: true, value: null };
     if (earlier.kind === "command_conflict")
       return invalid("eval_command_conflict");
@@ -127,25 +131,27 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
   ): Promise<
     ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
   > {
-    return this.trackExecution(this.admittedCancelEvalRun.bind(this, input));
+    return this.host.trackExecution(
+      this.admittedCancelEvalRun.bind(this, input),
+    );
   }
 
-  protected async admittedCancelEvalRun(
+  private async admittedCancelEvalRun(
     input: Parameters<ConnectorDO["cancelEvalRun"]>[0],
   ): Promise<
     ConnectorResult<Readonly<{ runId: string; caseId: string }> | null>
   > {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
-    const run = this.ctx.storage.transactionSync(() =>
-      cancelEvalRun(this.ctx.storage.sql, {
+    const run = this.host.ctx.storage.transactionSync(() =>
+      cancelEvalRun(this.host.ctx.storage.sql, {
         evalId: input.evalId,
         runId: input.runId,
         now: input.now,
       }),
     );
     if (run === null) return { ok: true, value: null };
-    await this.armAlarm();
+    await this.host.armAlarm();
     return { ok: true, value: { runId: run.runId, caseId: run.caseId } };
   }
 
@@ -156,30 +162,28 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
   async readEvalRunProgress(
     input: ConnectorEmailIdentityRequest & Readonly<{ evalId: string }>,
   ): Promise<ConnectorResult<ReturnType<typeof readEvalRunProgress>>> {
-    return this.trackExecution(
+    return this.host.trackExecution(
       this.admittedReadEvalRunProgress.bind(this, input),
     );
   }
 
-  protected async admittedReadEvalRunProgress(
+  private async admittedReadEvalRunProgress(
     input: Parameters<ConnectorDO["readEvalRunProgress"]>[0],
   ): Promise<ConnectorResult<ReturnType<typeof readEvalRunProgress>>> {
-    const scope = await this.admitExecution(input.identity);
+    const scope = await this.host.admitExecution(input.identity);
     if (scope === null) return invalid("connector_placement_conflict");
     return {
       ok: true,
-      value: readEvalRunProgress(this.ctx.storage.sql, input.evalId),
+      value: readEvalRunProgress(this.host.ctx.storage.sql, input.evalId),
     };
   }
 
-  protected async runDueEvalWork(
-    scope: OrganisationExecutionScope,
-  ): Promise<void> {
-    const sql = this.ctx.storage.sql;
+  async runDueEvalWork(scope: OrganisationExecutionScope): Promise<void> {
+    const sql = this.host.ctx.storage.sql;
     for (let processed = 0; processed < 4; processed += 1) {
       if (!(await isActorExecutionActive(sql, scope))) return;
       const now = Date.now();
-      const claim = this.ctx.storage.transactionSync(
+      const claim = this.host.ctx.storage.transactionSync(
         claimDueEvalTask.bind(null, sql, now),
       );
       if (claim === null) break;
@@ -196,7 +200,7 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
       if (end.kind !== "deferred") continue;
       const key = { runId: claim.run.runId, taskId: claim.task.taskId };
       if (claim.attempt >= EVAL_TASK_MAX_CLAIMS) {
-        this.ctx.storage.transactionSync(
+        this.host.ctx.storage.transactionSync(
           settleEvalTask.bind(null, sql, {
             ...key,
             result: {
@@ -214,19 +218,19 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
         });
         continue;
       }
-      this.ctx.storage.transactionSync(
+      this.host.ctx.storage.transactionSync(
         deferEvalTask.bind(null, sql, { ...key, availableAt: end.retryAt }),
       );
     }
     await this.publishSettledEvalRuns(scope);
   }
 
-  protected async runEvalTask(
+  private async runEvalTask(
     scope: OrganisationExecutionScope,
     claim: ClaimedEvalTask,
     now: number,
   ): Promise<EvalTaskEnd> {
-    const sql = this.ctx.storage.sql;
+    const sql = this.host.ctx.storage.sql;
     const agentUnavailable = (): EvalTaskEnd => {
       const outcome = {
         kind: "unavailable",
@@ -256,7 +260,7 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
     if (!(await isActorExecutionActive(sql, scope)))
       return { kind: "inactive" };
     if (binding === null) return agentUnavailable();
-    return processEvalTask(this.env, {
+    return processEvalTask(this.host.env, {
       scope,
       connectorSql: sql,
       organisationId: runtime.organisationId,
@@ -275,19 +279,19 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
    * receives the settled result alone. A run it cannot take now is tried
    * again later, with the same result.
    */
-  protected async publishSettledEvalRuns(
+  private async publishSettledEvalRuns(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
-    const sql = this.ctx.storage.sql;
+    const sql = this.host.ctx.storage.sql;
     for (let published = 0; published < 4; published += 1) {
       const now = Date.now();
-      const settled = this.ctx.storage.transactionSync(
+      const settled = this.host.ctx.storage.transactionSync(
         readSettledEvalRun.bind(null, sql, now),
       );
       if (settled === null) return;
       const runId = settled.result.runId;
       const outcome = await publishEvalRunResult({
-        env: this.env,
+        env: this.host.env,
         execution: scope,
         organisationId: scope.organisationId,
         result: settled.result,
@@ -295,7 +299,7 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
       }).catch(() => "unavailable" as const);
       if (!(await isActorExecutionActive(sql, scope))) return;
       if (outcome === "unavailable") {
-        this.ctx.storage.transactionSync(
+        this.host.ctx.storage.transactionSync(
           deferEvalRunPublication.bind(null, sql, {
             runId,
             publishAfter: now + 60_000,
@@ -308,9 +312,18 @@ export abstract class ConnectorEvals extends ConnectorWhatsApp {
           requestId: newRequestId(),
           reason: "eval_run_result_refused",
         });
-      this.ctx.storage.transactionSync(
+      this.host.ctx.storage.transactionSync(
         markEvalRunPublished.bind(null, sql, { runId, now }),
       );
     }
   }
 }
+
+/** The RPC methods of this module. The Actor class has one method for each. */
+export type ConnectorEvalsRpc = Pick<
+  ConnectorEvals,
+  | "startEvalRun"
+  | "readEvalRunCommand"
+  | "cancelEvalRun"
+  | "readEvalRunProgress"
+>;

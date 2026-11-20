@@ -178,13 +178,17 @@ import {
   type EmailReplyProvenance,
 } from "./whatsapp-parsers";
 import type { ConnectorDO } from "../connector";
-import { ConnectorEvals } from "./connector-evals";
+import type { ConnectorEvals } from "./connector-evals";
+import { ConnectorWhatsApp } from "./connector-whatsapp-actor";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
  * Email processing for the Connector: the mailbox, reply turns, operational proposals, correction learning and Case context discovery.
  */
-export abstract class ConnectorEmail extends ConnectorEvals {
+export abstract class ConnectorEmail extends ConnectorWhatsApp {
+  /** The evals module. `ConnectorDO` gives it. */
+  protected abstract readonly evals: ConnectorEvals;
+
   protected activeMailOrganization: Promise<void> | null = null;
 
   /**
@@ -1754,7 +1758,7 @@ export abstract class ConnectorEmail extends ConnectorEvals {
           name: "email_correction_learning",
           run: () => this.runDueEmailCorrectionLearning(scope),
         },
-        { name: "eval_work", run: () => this.runDueEvalWork(scope) },
+        { name: "eval_work", run: () => this.evals.runDueEvalWork(scope) },
         {
           name: "mail_organization",
           run: () => this.runDueMailOrganization(scope),

@@ -84,9 +84,36 @@ import {
   type ConnectorSnapshot,
 } from "./connector/types";
 import { ConnectorEmail } from "./connector/connector-email-actor";
+import {
+  ConnectorEvals,
+  type ConnectorEvalsRpc,
+} from "./connector/connector-evals";
 
-export class ConnectorDO extends ConnectorEmail {
+export class ConnectorDO extends ConnectorEmail implements ConnectorEvalsRpc {
   private readonly slack = new SlackConnectorChannel(this.channelHost());
+
+  /** The eval runs of this Connector. */
+  protected readonly evals = new ConnectorEvals(this.moduleHost);
+
+  startEvalRun(...input: Parameters<ConnectorEvals["startEvalRun"]>) {
+    return this.evals.startEvalRun(...input);
+  }
+
+  readEvalRunCommand(
+    ...input: Parameters<ConnectorEvals["readEvalRunCommand"]>
+  ) {
+    return this.evals.readEvalRunCommand(...input);
+  }
+
+  cancelEvalRun(...input: Parameters<ConnectorEvals["cancelEvalRun"]>) {
+    return this.evals.cancelEvalRun(...input);
+  }
+
+  readEvalRunProgress(
+    ...input: Parameters<ConnectorEvals["readEvalRunProgress"]>
+  ) {
+    return this.evals.readEvalRunProgress(...input);
+  }
 
   protected readonly channels: ConnectorChannels = {
     adapters: [this.slack, this.emailChannel(), this.whatsAppChannel()],
