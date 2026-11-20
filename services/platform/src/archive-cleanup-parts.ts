@@ -17,12 +17,19 @@ import {
  * voice Macs, Slack, the devices and the WhatsApp Connectors.
  */
 export const ARCHIVE_CLEANUP_PARTS: ArchiveCleanupParts = {
+  // Each part names its function when it runs, as the cleanup did before.
   removeVoiceMacNames: async (env, db, organisationId) =>
     removeVoiceMacNames(env, await listVoiceMacNameIds(db, organisationId)),
-  revokeSlackConnections: revokeSlackOrganisationConnections,
-  listSlackCredentialHandles: listSlackInstallationCredentialHandles,
-  prepareVoiceMacsRevocation: prepareArchivedOrganisationVoiceMacsRevocation,
-  revokeDevicesStatements: revokeOrganisationDevicesStatements,
-  purgeDeviceFleets: purgeOrganisationDeviceFleets,
-  purgeWhatsAppConnectors: purgeOrganisationWhatsAppConnectors,
+  revokeSlackConnections: (directory, input) =>
+    revokeSlackOrganisationConnections(directory, input),
+  listSlackCredentialHandles: (directory, organisationId) =>
+    listSlackInstallationCredentialHandles(directory, organisationId),
+  prepareVoiceMacsRevocation: (db, input) =>
+    prepareArchivedOrganisationVoiceMacsRevocation(db, input),
+  revokeDevicesStatements: (session, organisationId, now) =>
+    revokeOrganisationDevicesStatements(session, organisationId, now),
+  purgeDeviceFleets: (env, db, organisationId, placement) =>
+    purgeOrganisationDeviceFleets(env, db, organisationId, placement),
+  purgeWhatsAppConnectors: (input) =>
+    purgeOrganisationWhatsAppConnectors(input),
 };
