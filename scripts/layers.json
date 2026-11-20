@@ -769,6 +769,7 @@
     "services/platform/src/agent-tools/session-support.ts": "foundation/agent-tools",
     "services/platform/src/approval-authentication.ts": "foundation/authority",
     "services/platform/src/boundary.ts": "foundation/kernel",
+    "services/platform/src/case-execution/records.ts": "foundation/agent",
     "services/platform/src/case-identity.ts": "foundation/kernel",
     "services/platform/src/chat/application.ts": "surfaces/portal",
     "services/platform/src/chat/attachments.ts": "foundation/conversation",
@@ -795,7 +796,7 @@
     "services/platform/src/chat/input-admission.ts": "surfaces/portal",
     "services/platform/src/chat/input-parts.ts": "surfaces/portal",
     "services/platform/src/chat/kitchen-observation.ts": "surfaces/portal",
-    "services/platform/src/chat/origin.ts": "surfaces/portal",
+    "services/platform/src/chat/origin.ts": "foundation/conversation",
     "services/platform/src/chat/page-command-labels.ts": "surfaces/portal",
     "services/platform/src/chat/permission-items.ts": "surfaces/portal",
     "services/platform/src/chat/portal-stream.ts": "surfaces/portal",
@@ -817,6 +818,7 @@
     "services/platform/src/chat/thread-read-timing.ts": "surfaces/portal",
     "services/platform/src/chat/timeline.ts": "foundation/conversation",
     "services/platform/src/chat/turn-access.ts": "foundation/conversation",
+    "services/platform/src/chat/turn/model.ts": "foundation/conversation",
     "services/platform/src/chat/workspace-canvas.ts": "foundation/conversation",
     "services/platform/src/commerce/cafe-media.ts": "areas/cafe",
     "services/platform/src/commerce/cafe-menu-action.ts": "areas/cafe",
@@ -1082,6 +1084,7 @@
     "services/platform/src/request-deadline.ts": "foundation/kernel",
     "services/platform/src/result.ts": "foundation/kernel",
     "services/platform/src/runtime-fetch.ts": "foundation/kernel",
+    "services/platform/src/slack/installation-identity.ts": "foundation/connections",
     "services/platform/src/workspace-executor-container.ts": "foundation/agent",
     "services/platform/src/workspace-revision-store.ts": "foundation/agent"
   }
