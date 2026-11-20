@@ -1717,6 +1717,94 @@ is a foundation module.
     default agent id of the room presence, the collaboration ping of the socket
     host and `UserId` of `control-api` in `ids.ts`.
 
+**21 November 2026. The last ports: layer crossings 155 to 81,** on the branch
+`refactor-17-ports-rest`. This entry replaces the "Still open" lists of the two
+entries above where it names a crossing.
+
+- **One port pattern.** `port.ts` (`foundation/kernel`) defines `definePort`: a
+  lower module defines a port and reads it at the call, and `worker-ports.ts`
+  (`workers/platform`) registers each implementation once, when the Worker entry
+  loads. A read before the registration throws, because it is a programmer error.
+  The Session turn access check, the one registration of this kind before, uses
+  it. The E2E setup loads the registration. A unit test file that reaches a port
+  loads it too (16 files); a global setup file would load the modules before the
+  mocks of a test.
+- **Commerce in the foundation (33 to 7).** The commerce context read is commerce
+  code (`commerce/entity-plane/context-read.ts`), and its error class is in the
+  commerce contract. The commerce parts of the grant compiler and the parsers of
+  the commerce parts of a grant target are commerce files. The foundation asks
+  commerce through ports: the grant selection, the grant targets, the access
+  targets of the access-control routes, the action ledger rules, the
+  responsibility scope parts of the agent operations and the commerce exceptions
+  of the activity read. The id of Sous Chef's agent definition is
+  `data/merchant-agent-ids.ts` (`foundation/agent`).
+- **Memory.** `memory/contract/memory-service.ts` is the Memory service of Brain.
+  The Inbox reads Memory views, the standing of shown Memory and the mailbox turn
+  reader, and it proposes a Memory and an Eval, through it. `memory/access.ts`
+  stays private. The Eval reads verified contacts through the Inbox contract.
+- **Integrations and the Inbox.** `integrations/contract/connection-parts.ts` is a
+  registration port: the Inbox gives the mailbox part of a Gmail connection and the
+  WhatsApp part. `integrations/contract/provider-services.ts` gives the onboarding
+  route and the account removal the provider services.
+- **The Slack installation store.** `slack/installation-store.ts`
+  (`foundation/authority`) owns the installations, the Organisation connections,
+  the channel defaults and their audit rows, beside the Slack credential of the
+  Vault. The thread routes and the DM choice stay in `slack/organisation-routing.ts`,
+  because the purge and the side Case write those two tables. The store gets the
+  DM part through `slackDmSelection`. `slack/surface-parts.ts` is the port of the
+  other Slack parts: the card texts, the reply after a card, the conversation
+  facts, the reach check and the hand-over of a decision.
+- **Shopify.** The Worker registers the Shopify module in two lines: its commerce
+  provider and its provider module (the catalogue entry and the credential check).
+  The Shopify delivery normalizers are in `shopify/delivery-normalizers.ts`, and
+  they give their normalizer to the delivery intake of commerce. The commerce tool
+  reader uses `createCommerceGraphReader`, and the unread reader option
+  `commerceSystem` is gone. `shopify/REMOVE.md` names the new lines.
+- **Smaller pairs.** The onboarding projection of a configuration answer and the
+  saved runs of a Project reference are ports. Three agent operation files take the
+  module that they serve.
+- **Not changed:** no route, status code, error text, stored value, SQL text, bind
+  order, batch order, RPC shape, journal entry, delivery id, tool definition or
+  tool order. The catalog digest of the default selection and the hash of all
+  model definitions are the same as on the base (a temporary check, not
+  committed).
+- **Measures.** Layer crossings: 155 to 81. Upward 68 to 27, between areas 44 to
+  17, against the order 20 to 16, table writes 23 to 21 (the Slack installation row
+  of the Vault now has its owner). Copies: 876 to 875 (the check of a selected
+  grant is one helper). Unused exports: 805 to 797.
+- **What stays (81), with what removes it.**
+  - Table writes (21) and the tenancy order crossings (8): the lifecycle port,
+    which another worker builds.
+  - The cue engine and the scope types (7): `cues/engine.ts` and the types of a
+    responsibility scope and of the action ledger entry name commerce cue events,
+    references and effects. Remove: split the cue engine into its core and a
+    commerce cue source, and make the commerce part of a scope opaque.
+  - The chat record and the Kitchen (6): the chat record stores the Kitchen view of
+    a message, and the chat signal sockets reach the workflow canvas rooms.
+    Remove: the surface registry of Plan 87 for the state check, and a port in the
+    call of the Organisation actor.
+  - The Case walk to Slack (2): it builds the Slack stream input. Remove: the port
+    through `OngoingCaseWalkingConnector`.
+  - Single foundation imports (5): the Memory member view of the held output route,
+    the support references of the integration account, the collaboration ping of the
+    socket host, `UserId` of `control-api` in `ids.ts`, and the file grant, Case
+    snapshot and chat audience imports against the order (5 more).
+  - Area pairs (19): the device fleet composes the Café terminal module (step
+    A1.9); the commerce level of the Organisation actor (A1.9, the class chain that
+    another session changes); the commerce approval card text (the action gives
+    typed facts, and Slack builds the text); the Portal pages in the shell frame
+    and the Café prompt edit; the voice Mac devices; the WhatsApp send ladder; the
+    configuration draft; and the Stripe setup part, the counter sale view, the
+    Register receipt, the supplier contact and the Gmail pilot budget. Each needs a
+    service interface of the other area, wired by the Worker.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 114
+  journey files whose names hold a word of the brief, or project, onboarding,
+  held, permission, provider, inbox, eval, removal, grant, ledger or idle, ran in
+  ten groups: 113 pass and 1 is skipped (227 tests pass, 3 are skipped).
+  `wrangler deploy --dry-run` passes for the six Workers. The full E2E suite did
+  not run on the branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
