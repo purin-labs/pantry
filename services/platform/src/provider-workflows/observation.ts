@@ -1,7 +1,4 @@
-import {
-  resolveProviderManifestCredential,
-  resolveSlackHealthCheckCredential,
-} from "../credential-vault";
+import { resolveSlackHealthCheckCredential } from "../credential-vault";
 import type { ProviderManifestEvidence } from "../data/provider-attempt";
 import { newRequestId, parseWorkspaceId } from "../ids";
 import { traceWarn } from "../observability";
@@ -14,12 +11,13 @@ import {
   stripeCredentialEnvironment,
   verifyStripeConnectWebhook,
 } from "../provider-adapters/stripe";
-import type { ProviderObservationRequest } from "../provider-adapters/domain";
+import type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
+import { blockedEvidence } from "../integrations/contract/observation-evidence";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
 import { resolveCommerceMerchant } from "../commerce/contract/square-link";
 
-export type { ProviderObservationRequest } from "../provider-adapters/domain";
+export type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
 
 export async function observeSlackConnection(
   input: ProviderObservationRequest,
@@ -123,32 +121,6 @@ async function resolveSlackObservationBearer(
     : null;
 }
 
-/**
- * The bearer token of a provider whose credential is in the Vault, for a
- * provider module that checks its own connection. Null when there is none.
- */
-export async function resolveStoredObservationBearer(
-  input: ProviderObservationRequest,
-  provider: "shopify",
-): Promise<string | null> {
-  if (input.credentialRef === null) {
-    return null;
-  }
-  const credential = await resolveProviderManifestCredential({
-    db: input.scope.database,
-    keys: input.env,
-    organisationId: input.organisationId,
-    integrationAccountId: input.integrationAccountId,
-    provider,
-    environment: input.environment,
-    providerAccountId: input.providerAccountId,
-    credentialRef: input.credentialRef,
-  });
-  return credential.ok && credential.value.kind === "bearer"
-    ? credential.value.value
-    : null;
-}
-
 function traceSlackFailure(
   input: Pick<
     ProviderObservationRequest,
@@ -192,11 +164,4 @@ function traceSlackFailure(
         error_name: observation.errorName,
       });
   }
-}
-
-export function blockedEvidence(
-  reasonCode: string,
-  repairActions: readonly string[],
-): ProviderManifestEvidence {
-  return { kind: "blocked", reasonCode, repairActions };
 }

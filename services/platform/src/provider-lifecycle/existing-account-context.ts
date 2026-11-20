@@ -1,6 +1,6 @@
 import { parseGmailAuthorizationProduct } from "../mail/gmail-authorization";
-import type { OnboardingProvider } from "./domain";
-import type { ProviderStartContext } from "../provider-adapters/domain";
+import type { OnboardingProvider } from "../integrations/contract/provider-lifecycle";
+import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
 import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
 
 export function providerContextForExistingAccount(

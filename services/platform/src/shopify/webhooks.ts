@@ -2,7 +2,7 @@ import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { createCueQueueMessage } from "../cues/engine";
 import type { Env } from "../env";
 import type { JsonObject } from "../http";
-import { revokeAccountRemovedAtProvider } from "../provider-lifecycle/provider-revocation";
+import { revokeAccountRemovedAtProvider } from "../integrations/contract/provider-revocation";
 import {
   errorResponse,
   jsonResponse,

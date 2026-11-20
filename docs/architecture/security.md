@@ -154,7 +154,7 @@ and account removal: `organisation-model-resolution.ts`,
 
 ### Credential rotation and revocation
 
-A rotation (`data/credential-lifecycle.ts`) moves `credential_rotation`
+A rotation (`integrations/contract/credential-lifecycle.ts`) moves `credential_rotation`
 through `pending_verification`, `verified` and `committed`, or to `failed`. A
 non-mutating provider call verifies the replacement. The commit supersedes the
 old generation and activates a new one. `provider-credential-cutover.ts` then

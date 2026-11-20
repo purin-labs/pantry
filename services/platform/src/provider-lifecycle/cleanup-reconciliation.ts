@@ -31,7 +31,7 @@ import type {
   ProviderCleanupCredentials,
   ProviderCleanupReason,
   ProviderManualActionInstruction,
-} from "../provider-adapters/domain";
+} from "../integrations/contract/provider-adapter";
 import type { Variant } from "@purin-labs/type-utils";
 import { backoffDelay, isString } from "@purin-labs/std";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";

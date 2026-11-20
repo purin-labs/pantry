@@ -8,7 +8,7 @@ import { newControlMutationIdentity } from "../src/data/control-mutation";
 import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
 import { gmailProductFromScopes } from "../src/mail/gmail-authorization";
 import { parseWorkspaceId, type WorkspaceId } from "../src/ids";
-import type { ProviderStartContext } from "../src/provider-adapters/domain";
+import type { ProviderStartContext } from "../src/integrations/contract/provider-adapter";
 import {
   discoverSlackChannels,
   parseSlackChannelPage,

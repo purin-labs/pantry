@@ -751,7 +751,6 @@
     "services/platform/src/policy/information-flow/sinks.ts#INSIDE_CAPABILITIES",
     "services/platform/src/policy/information-flow/source-labels.ts#grantSubjectIsCurrent",
     "services/platform/src/policy/information-flow/types.ts#CaseEntryFlowSource",
-    "services/platform/src/provider-adapters/domain.ts#ProviderCleanupAdapterInput",
     "services/platform/src/provider-adapters/dropbox.ts#DropboxFolderMetadata",
     "services/platform/src/mail/provider-adapter.ts#MailProviderAdapterByProvider",
     "services/platform/src/request-authority/index.ts#WorkflowAuthorityKind",

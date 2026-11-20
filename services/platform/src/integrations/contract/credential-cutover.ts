@@ -1,16 +1,16 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "../../database-handles";
 import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
   OrganisationPolicyActivationError,
-} from "../actors/organisation/policy-types";
+} from "../../actors/organisation/policy-types";
 import {
   parseProviderConnectionId,
   type ProviderConnectionId,
   type OrganisationId,
-} from "../ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../policy-snapshot";
-import type { Result } from "../result";
+} from "../../ids";
+import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
+import type { Result } from "../../result";
 
 export type ProviderCredentialCutoverError = {
   readonly code: "provider_policy_activation_failed";

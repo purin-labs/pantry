@@ -1,8 +1,8 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault";
+} from "../../database-handles";
+import { parseVaultHandle, type VaultHandle } from "../../credential-vault";
 import {
   parseIntegrationAccountId,
   parseProviderConnectionId,
@@ -10,13 +10,13 @@ import {
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "../../ids";
+import type { Result } from "../../result";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
-} from "./control-mutation";
+} from "../../data/control-mutation";
 import {
   connectionCredentialAuthority,
   integrationAccountAllowsCredentialMutation,
@@ -30,9 +30,9 @@ import {
   type IntegrationAccount,
   type IntegrationAccountMutation,
   type ProviderConnection,
-} from "./integration-account";
-import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
-import { prepareActiveCredentialGeneration } from "./provider-credential-generation";
+} from "../../data/integration-account";
+import { prepareConfigurationVersionBump } from "../../data/organisation-onboarding-row";
+import { prepareActiveCredentialGeneration } from "../../data/provider-credential-generation";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [
   "replacement_environment_mismatch",

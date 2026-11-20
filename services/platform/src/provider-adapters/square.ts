@@ -9,7 +9,7 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 import type { DiscoveredProviderResource } from "../data/provider-resource";
 import type {
   SquareDelegation,

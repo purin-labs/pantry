@@ -35,7 +35,7 @@ import {
   whatsappConversationWindowCaseId,
 } from "../src/data/whatsapp";
 import { setIntegrationAccountLifecycle } from "../src/data/integration-account";
-import { providerCredentialHandle } from "../src/provider-lifecycle/provisioning";
+import { providerCredentialHandle } from "../src/integrations/contract/provisioning";
 import {
   validateNativeRequestAuthority,
   buildWhatsAppSupportAuthority,

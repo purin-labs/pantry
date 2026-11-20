@@ -16,7 +16,7 @@ import type {
   ProviderCleanupAdapter,
   ProviderCleanupResult,
   ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 
 const MANUAL_INSTRUCTION = "remove_whatsapp_access_in_meta" as const;
 const WHATSAPP_SCOPES = [

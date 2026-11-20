@@ -24,8 +24,8 @@ import {
   beginProviderOAuth,
   providerAuthorizationUrlForMutation,
 } from "../../../provider-lifecycle/authorization";
-import type { OnboardingProvider } from "../../../provider-lifecycle/domain";
-import type { ProviderStartContext } from "../../../provider-adapters/domain";
+import type { OnboardingProvider } from "../../../integrations/contract/provider-lifecycle";
+import type { ProviderStartContext } from "../../../integrations/contract/provider-adapter";
 import {
   type AdmittedMutation,
   admitUserMutation,

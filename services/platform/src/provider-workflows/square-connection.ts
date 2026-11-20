@@ -28,18 +28,18 @@ import {
   finishProviderCompletion,
   providerCredentialHandle,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   readSquareConfiguration,
   squareOnboardingAdapter,
 } from "../provider-adapters/square";
-import type { ProviderObservationRequest } from "../provider-adapters/domain";
+import type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
 import type { Result } from "../result";
 
 /**

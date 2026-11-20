@@ -3,7 +3,7 @@ import type { Env } from "../env";
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
-} from "../data/credential-lifecycle";
+} from "../integrations/contract/credential-lifecycle";
 import { validateExternalProviderToken } from "../external-records/records";
 import { validateShopifyReplacementCredential } from "../shopify/credential-replacement";
 import {

@@ -17,7 +17,7 @@ import {
   providerStateTtlMs,
   providerUsesPkce,
 } from "../provider-adapters/catalogue";
-import type { ProviderStartContext } from "../provider-adapters/domain";
+import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
 import type { Result } from "../result";
 import { requirePublicOrigin } from "../public-origin";
 import { readSquareConfiguration } from "../provider-adapters/square";
@@ -25,9 +25,9 @@ import type {
   OnboardingProvider,
   ProviderOnboardingError,
   ProviderOAuthStartEnv,
-} from "./domain";
+} from "../integrations/contract/provider-lifecycle";
 import { encodeBase64Url } from "@purin-labs/std";
-export type { ProviderOAuthStartEnv } from "./domain";
+export type { ProviderOAuthStartEnv } from "../integrations/contract/provider-lifecycle";
 
 type ProviderAuthorizationMutationFence = Pick<
   ProviderAttemptMutation,
@@ -262,24 +262,9 @@ type ProviderPublicOriginEnv = Pick<
   "PANTRY_OAUTH_CALLBACK_ORIGIN" | "PANTRY_PUBLIC_ORIGIN"
 >;
 
-type ProviderIngressOriginEnv = Pick<
-  Env,
-  | "PANTRY_OAUTH_CALLBACK_ORIGIN"
-  | "PANTRY_PROVIDER_INGRESS_ORIGIN"
-  | "PANTRY_PUBLIC_ORIGIN"
->;
-
 function providerPublicOrigin(env: ProviderPublicOriginEnv): string {
   return requirePublicOrigin(
     env.PANTRY_OAUTH_CALLBACK_ORIGIN ?? env.PANTRY_PUBLIC_ORIGIN,
-  );
-}
-
-export function providerIngressOrigin(env: ProviderIngressOriginEnv): string {
-  return requirePublicOrigin(
-    env.PANTRY_PROVIDER_INGRESS_ORIGIN ??
-      env.PANTRY_OAUTH_CALLBACK_ORIGIN ??
-      env.PANTRY_PUBLIC_ORIGIN,
   );
 }
 

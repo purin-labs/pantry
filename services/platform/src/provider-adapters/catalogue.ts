@@ -66,7 +66,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import type { Result } from "../result";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import {
@@ -81,7 +81,7 @@ import {
   type ProviderManualActionInstruction,
   type ProviderStartContext,
   type ProviderStartContextByProvider,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 import {
   PROVIDER_DATA_CLASSES,
   type ActiveIntegrationProvider,

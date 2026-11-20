@@ -23,7 +23,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -32,7 +32,7 @@ import {
   finishProviderCompletion,
   providerCredentialHandle,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 import { resolveWhatsAppEmbeddedSignupCredential } from "../whatsapp/application";
 import {

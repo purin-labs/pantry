@@ -9,7 +9,7 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import type { Result } from "../result";
