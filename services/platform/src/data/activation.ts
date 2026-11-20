@@ -24,6 +24,10 @@ import {
   type WorkspaceId,
 } from "../ids";
 import type { Result } from "../result";
+import {
+  prepareFirstActiveAccountDefaults,
+  preparePendingAccountsActivation,
+} from "./integration-account-writes";
 import type { OrganisationEnvironment } from "./control-plane";
 import {
   prepareControlMutationReceipt,
@@ -537,37 +541,14 @@ export async function activatePendingIntegrationAccounts(input: {
 }): Promise<number> {
   const session = input.db.withSession("first-primary");
   const results = await session.batch([
-    session
-      .prepare(
-        `UPDATE integration_account SET lifecycle = 'active', lifecycle_reason_code = NULL,
-         updated_at = ? WHERE organisation_id = ? AND lifecycle = 'pending_activation'`,
-      )
-      .bind(input.now, input.organisationId),
-    session
-      .prepare(
-        `UPDATE integration_account
-       SET is_default_for_provider = 1, updated_at = ?
-       WHERE organisation_id = ? AND lifecycle = 'active' AND is_default_for_provider = 0
-         AND integration_account_id = (
-           SELECT candidate.integration_account_id
-           FROM integration_account AS candidate
-           WHERE candidate.organisation_id = integration_account.organisation_id
-             AND candidate.provider = integration_account.provider
-             AND candidate.environment = integration_account.environment
-             AND candidate.lifecycle = 'active'
-           ORDER BY candidate.created_at, candidate.integration_account_id
-           LIMIT 1
-         )
-         AND NOT EXISTS (
-           SELECT 1
-           FROM integration_account AS current_default
-           WHERE current_default.organisation_id = integration_account.organisation_id
-             AND current_default.provider = integration_account.provider
-             AND current_default.environment = integration_account.environment
-             AND current_default.is_default_for_provider = 1
-         )`,
-      )
-      .bind(input.now, input.organisationId),
+    preparePendingAccountsActivation(session, {
+      now: input.now,
+      organisationId: input.organisationId,
+    }),
+    prepareFirstActiveAccountDefaults(session, {
+      now: input.now,
+      organisationId: input.organisationId,
+    }),
   ]);
   return results[0]?.meta.changes ?? 0;
 }

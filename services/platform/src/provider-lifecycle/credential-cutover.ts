@@ -11,6 +11,7 @@ import {
 } from "../ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../policy-snapshot";
 import type { Result } from "../result";
+import { prepareSupersededGenerationsRevocation } from "../data/provider-credential-generation";
 
 export type ProviderCredentialCutoverError = {
   readonly code: "provider_policy_activation_failed";
@@ -134,20 +135,10 @@ async function revokeSupersededCredentialGenerations(input: {
         input.organisationId,
         input.providerConnectionId,
       ),
-    session
-      .prepare(
-        `UPDATE provider_credential_generation
-       SET lifecycle = 'revoked',
-           revoked_at = COALESCE(revoked_at, ?),
-           superseded_at = COALESCE(superseded_at, ?)
-       WHERE organisation_id = ? AND provider_connection_id = ?
-         AND lifecycle = 'superseded'`,
-      )
-      .bind(
-        input.now,
-        input.now,
-        input.organisationId,
-        input.providerConnectionId,
-      ),
+    prepareSupersededGenerationsRevocation(session, {
+      now: input.now,
+      organisationId: input.organisationId,
+      providerConnectionId: input.providerConnectionId,
+    }),
   ]);
 }

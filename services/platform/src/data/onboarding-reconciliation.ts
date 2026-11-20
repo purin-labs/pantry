@@ -50,6 +50,12 @@ import { ensureCurrentReadiness } from "./onboarding";
 import { expireProviderAttemptIfDue } from "./provider-attempt";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
+  prepareInvalidAccountsDegradation,
+  prepareMissingAccountDefaults,
+} from "./integration-account-writes";
+import { prepareArchivedOrganisationConnectionsRevocation } from "./provider-connection-writes";
+import { prepareArchivedOrganisationGenerationsRevocation } from "./provider-credential-generation";
+import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
 } from "../slack/organisation-routing";
@@ -885,14 +891,12 @@ async function degradeInvalidAccounts(
   reasonCode: string,
   now: number,
 ): Promise<number> {
-  const result = await db
-    .prepare(
-      `UPDATE integration_account
-     SET lifecycle = 'degraded', lifecycle_reason_code = ?, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'active' AND (${predicate})`,
-    )
-    .bind(reasonCode, now, organisation.organisationId)
-    .run();
+  const result = await prepareInvalidAccountsDegradation(db, {
+    predicate,
+    reasonCode,
+    now,
+    organisationId: organisation.organisationId,
+  }).run();
   const changes = result.meta.changes ?? 0;
   if (changes > 0) {
     await bumpConfigurationForRepair(db, organisation.organisationId, now);
@@ -905,27 +909,10 @@ async function reconcileDefaultAccounts(
   organisation: RequiredOrganisationReconciliationState,
   now: number,
 ): Promise<number> {
-  const result = await db
-    .prepare(
-      `UPDATE integration_account
-     SET is_default_for_provider = 1, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'active' AND is_default_for_provider = 0
-       AND integration_account_id IN (
-         SELECT MIN(candidate.integration_account_id)
-         FROM integration_account AS candidate
-         WHERE candidate.organisation_id = ? AND candidate.lifecycle = 'active'
-           AND NOT EXISTS (
-             SELECT 1 FROM integration_account AS current_default
-             WHERE current_default.organisation_id = candidate.organisation_id
-               AND current_default.provider = candidate.provider
-               AND current_default.environment = candidate.environment
-               AND current_default.is_default_for_provider = 1
-           )
-         GROUP BY candidate.provider, candidate.environment
-       )`,
-    )
-    .bind(now, organisation.organisationId, organisation.organisationId)
-    .run();
+  const result = await prepareMissingAccountDefaults(db, {
+    now,
+    organisationId: organisation.organisationId,
+  }).run();
   const changes = result.meta.changes ?? 0;
   if (changes > 0) {
     await bumpConfigurationForRepair(db, organisation.organisationId, now);
@@ -1115,26 +1102,21 @@ async function reconcileArchivedOrganisation(
     // restore that commits first keeps what it restored (Refactor 15).
     const archived = `EXISTS (SELECT 1 FROM organisation_onboarding AS onboarding
       WHERE onboarding.organisation_id = ? AND onboarding.lifecycle = 'archived')`;
+    const stillArchived = {
+      sql: archived,
+      bindings: [organisation.organisationId],
+    };
     const results = await session.batch([
-      session
-        .prepare(
-          `UPDATE provider_credential_generation
-         SET lifecycle = 'revoked', revoked_at = ?
-         WHERE organisation_id = ? AND lifecycle IN ('active', 'superseded') AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
-      session
-        .prepare(
-          `UPDATE provider_connection
-         SET lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL, updated_at = ?
-         WHERE organisation_id = ? AND lifecycle != 'revoked' AND ${archived}`,
-        )
-        .bind(
-          now,
-          now,
-          organisation.organisationId,
-          organisation.organisationId,
-        ),
+      prepareArchivedOrganisationGenerationsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationConnectionsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
       session
         .prepare(
           `UPDATE vault_secret SET revoked_at = ?

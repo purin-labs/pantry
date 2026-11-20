@@ -15,6 +15,7 @@ import {
 } from "../ids";
 import { observeProviderConnection } from "../provider-adapters/catalogue";
 import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
+import { prepareObservedAccountLifecycle } from "../data/integration-account-writes";
 import type { ActiveIntegrationProvider } from "../data/integration-provider-directory";
 import {
   prepareConfigurationVersionBump,
@@ -168,21 +169,14 @@ async function updateObservedAccountLifecycle(input: {
   if (!shouldDegrade && !shouldRestore) return;
   const session = input.scope.database.withSession("first-primary");
   await session.batch([
-    session
-      .prepare(
-        `UPDATE integration_account
-       SET lifecycle = ?, lifecycle_reason_code = ?, updated_at = ?
-       WHERE organisation_id = ? AND integration_account_id = ?
-         AND lifecycle = ?`,
-      )
-      .bind(
-        shouldDegrade ? "degraded" : "active",
-        shouldDegrade ? "provider_manifest_unhealthy" : null,
-        input.now,
-        input.organisationId,
-        input.integrationAccountId,
-        input.currentLifecycle,
-      ),
+    prepareObservedAccountLifecycle(session, {
+      lifecycle: shouldDegrade ? "degraded" : "active",
+      lifecycleReasonCode: shouldDegrade ? "provider_manifest_unhealthy" : null,
+      now: input.now,
+      organisationId: input.organisationId,
+      integrationAccountId: input.integrationAccountId,
+      currentLifecycle: input.currentLifecycle,
+    }),
     prepareConfigurationVersionBump(session, input.organisationId, input.now),
     input.scope.prepareMutationFence(),
   ]);
