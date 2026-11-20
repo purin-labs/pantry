@@ -1,6 +1,7 @@
 # Plan 95 — Pantry owns its accounts
 
-Status: draft, 20 November 2026. No step has started.
+Status: accepted, 20 November 2026. The owner decided the five decisions on
+20 November 2026 (see "Decisions"). No step has started.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -239,10 +240,11 @@ This table replaces the first rows of "Authority and ownership" in
   or `revoked`), `accepted_user_id`, `accepted_at` and `revoked_at`. One
   pending invitation for each email in an organisation. It replaces
   `account_service_invitation_role`.
-- The routes keep their paths: `GET` and `POST
-/v1/control/organisations/:id/invitations`, accept and revoke. An admin or
+- The routes keep their paths: `GET` and `POST` on
+  `/v1/control/organisations/:id/invitations`, accept and revoke. An admin or
   the owner invites, as today. `POST` returns the link, and the Portal shows
-  it to copy, as today. Pantry sends no e-mail (decision 5).
+  it to copy, as today. Pantry sends no e-mail and has no mail provider
+  (decision 5).
 - To accept, the signed-in person must have a verified Google email equal to
   the invitation email. The token must match, and the invitation must be
   pending and not expired. One regional batch writes the `person`, the
@@ -299,9 +301,12 @@ This table replaces the first rows of "Authority and ownership" in
 
 ### Billing
 
-- One Stripe account bills Pantry organisations (decision 3). Pantry keeps no
-  card data: Stripe Checkout and the Stripe Customer Portal show each card
-  form.
+- One Purin Stripe account bills Pantry organisations (decision 3). Step 6
+  builds and tests in Stripe test mode. Paid use stays off in production
+  until the live account exists. Pantry keeps no card data: Stripe Checkout
+  and the Stripe Customer Portal show each card form.
+- Postpaid metered use is the only payment model (decision 2). There are no
+  prepaid credit packs and no balance ledger.
 - `organisation_billing_account` (regional): `organisation_id`,
   `stripe_customer_id`, `stripe_subscription_id`, `payment_state` (`none`,
   `active`, `past_due` or `canceled`), `last_stripe_event_created` and
@@ -328,8 +333,8 @@ This table replaces the first rows of "Authority and ownership" in
   of the month, the spending limit, "Set up payment" (Checkout) and "Manage
   payment" (the Customer Portal, for the card and the invoices). This closes
   the gap that Plan 88 phase 4 recorded.
-- Turns: production turns are unpriced today. Delete the turn billing record
-  (decision 4).
+- Turns stay unpriced, as in production today. Step 3 deletes the turn
+  billing record (decision 4). A later turn price uses the path of step 6.
 - Credit risk: at most the spending limit, and never more than $10, for each
   organisation in each month.
 - Capabilities: `billing.account.manage` (owner) for payment setup and the
@@ -365,7 +370,8 @@ production in one release (step 5). Step 6 does not block the Console split.
 
 ### 0. Decisions (no code)
 
-The owner answers "Decisions for the owner".
+Done on 20 November 2026. The owner took all five recommendations (see
+"Decisions").
 
 ### 1. Native request eligibility
 
@@ -420,7 +426,7 @@ The owner answers "Decisions for the owner".
 ### 3. Billing state off the Console
 
 - Delete `execution-billing.ts` and the billing calls of its six callers.
-  Turns stay unpriced.
+  Turns stay unpriced (decision 4).
 - Jev: free use and its hourly records stay local. Paid use reports
   `priced: false` until step 6, so "Turn on paid use" is disabled.
   `usage-records.ts` stops its send. The hour rows stay as the record of use.
@@ -463,7 +469,8 @@ The owner answers "Decisions for the owner".
 
 ### 5. Release and production proof
 
-- Deploy `satyr-edge` (the source account, as now) with steps 1 to 4, by the
+- Deploy `satyr-edge` (the source account, as now) with steps 1 to 4, before
+  the Plan 93 cutover (decision 1), by the
   [production deploy runbook](runbooks/platform-production-deploy.md).
 - Gate before the D1 patch, on production:
   - The owner makes an organisation in the Portal.
@@ -484,6 +491,8 @@ The owner answers "Decisions for the owner".
 - The plan catalog, `organisation_billing_account`, Checkout, the Customer
   Portal, meter events, the webhook, local admission, the Billing page, the
   two capabilities and the agent read tool, as in the design.
+- The owner makes the Purin Stripe account (decision 3). Its test-mode keys
+  are enough for this step.
 - Secrets: `PANTRY_STRIPE_BILLING_SECRET_KEY` and
   `PANTRY_STRIPE_BILLING_WEBHOOK_SECRET`; the price id is a var. Save each
   secret in `.env.local.production`.
@@ -497,15 +506,18 @@ The owner answers "Decisions for the owner".
     change it.
   - J7 live, before the release: in Stripe test mode, one Checkout with a
     test card, one meter event, and the upcoming invoice shows the charge.
-- Production: paid use stays off (`priced: false`) until the Stripe account
-  is live (decision 3).
+- Production: paid use stays off (`priced: false`) until the live Purin
+  Stripe account exists (decision 3). The switch to live keys is one
+  secret change and one live J7 run.
 
 ## Order with Plan 93 and Refactor 200
 
 - Plan 93 builds the new `pantry-*` stack. Refactor 200 puts Pantry in the
   Purin account, where no binding to the Console can work. So the new stack
   must start after step 4, with no `ACCOUNT_PLATFORM`.
-- Decision 1 sets whether step 5 goes to the current `satyr-edge` first.
+- Step 5 goes to the current `satyr-edge`, before the Plan 93 cutover
+  (decision 1). So the Console split and the retirement of the old Console
+  Worker do not wait for the brand cutover.
 
 ## Console-side changes (for Refactor 260)
 
@@ -547,29 +559,29 @@ Now, before step 5:
 | One person makes many organisations                                       | The limit of 5 for each person                                                                    |
 | Another session changes `account-platform/` during the work               | Announce step 1 to the open sessions. One step at a time on `dev`                                 |
 
-## Decisions for the owner
+## Decisions
 
-1. **Release order.** Recommendation: ship steps 1 to 5 to the current
+All five are decided. On 20 November 2026, the session "Seams console
+repository separation" asked the owner "Take the five Plan 95
+recommendations?". The owner answered "Take all five".
+
+1. **Release order. Decided:** ship steps 1 to 5 to the current
    `satyr-edge`, before the Plan 93 cutover. Cost: one more production
-   release, about half a day with the gate. Then the Console split and the
-   retirement of the old Console Worker do not wait for the brand cutover.
-   Default: before.
-2. **Billing model.** Recommendation: postpaid metered use on Stripe only.
-   This drops the prepaid credit packs of Plan 88 D13. Cost: a shop with no
-   card cannot pay first, and the credit risk is at most $10 for each
-   organisation in each month. It saves a balance ledger and a second
-   Checkout flow. Default: postpaid only.
-3. **Stripe account.** Recommendation: one Purin Stripe account for Pantry
-   billing. Build and test in test mode now, and keep paid use off in
-   production until the live account exists. The account and its business
-   details are your decision. Default: test mode only.
-4. **Turn price.** Recommendation: delete the turn billing record. Turns stay
+   release, about half a day with the gate.
+2. **Billing model. Decided:** postpaid metered use on Stripe only. This
+   drops the prepaid credit packs of Plan 88 D13. A shop with no card cannot
+   pay first, and the credit risk is at most $10 for each organisation in
+   each month.
+3. **Stripe account. Decided:** one Purin Stripe account for Pantry billing.
+   Build and test in test mode now. Paid use stays off in production until
+   the live account exists. The owner makes the account and gives its
+   business details.
+4. **Turn price. Decided:** delete the turn billing record. Turns stay
    unpriced, as in production today. A later turn price uses the path of
-   step 6. Cost: none now, and 1,207 lines go. Default: delete.
-5. **Invitation e-mail.** Recommendation: keep the link that the inviter
-   copies, as today, with no mail provider. The alternative is mail through
-   Resend from `info@purin.io`, which Refactor 200 verifies: about half a day
-   more, and free at this volume. Default: link only.
+   step 6.
+5. **Invitation e-mail. Decided:** keep the link that the inviter copies, as
+   today, with no mail provider. Mail through Resend from `info@purin.io`
+   stays possible later, as a separate change.
 
 ## Cost
 
@@ -583,8 +595,8 @@ Now, before step 5:
 
 - **Plan 88.** D12 (the Console grants a $10 credit limit at payment setup)
   becomes the highest spending limit of the plan catalog. D13 (prepaid or
-  postpaid) becomes postpaid only, if decision 2 holds. "Billing today"
-  becomes history. Step 6 updates the plan.
+  postpaid) becomes postpaid only (decision 2), so the prepaid credit packs
+  go. "Billing today" becomes history. Step 6 updates the plan.
 - **Plan 93.** The new stack has no `ACCOUNT_PLATFORM`. The step 3 check "a
   sign-up makes a new organisation through the Console" becomes "through
   Pantry". The `ACCOUNT_PLATFORM_*` values leave "Who uses the old
