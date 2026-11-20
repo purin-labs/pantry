@@ -8,7 +8,7 @@ import {
   completeCodeModeReceipt,
 } from "./pi-durable-code-receipt";
 export { CodeModeResult } from "./pi-durable-code-receipt";
-import type { Context } from "@earendil-works/chord";
+import type { Context } from "@earendil-works/chord/context";
 import type {
   HarnessNativeCodeMode,
   HarnessToolHost,
@@ -26,12 +26,13 @@ import {
   type ToolRegistration,
   type ToolExecutionApi,
   type ToolExecutionResult,
+  type ToolPark,
   type TaskId,
   type Tx,
 } from "@earendil-works/pi-durable";
 import { createCodemodeTool } from "@earendil-works/pi-durable/codemode";
 import { RemoteCodemodeSandbox } from "@earendil-works/pi-codemode/portable";
-import type { JsonValue } from "@earendil-works/chord";
+import type { JsonValue } from "@earendil-works/chord/json";
 import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
 import { Type } from "typebox";
 import { refuseChangedToolArguments } from "./pi-tool-arguments";
@@ -709,10 +710,10 @@ async function runScript(
   executionEntry(state, api.callId).resolve(live);
   let ran: Pick<ScriptRun, "result" | "failure">;
   try {
-    ran = {
-      result: await native.execute({ code: args.code }, api, context),
-      failure: null,
-    };
+    const outcome = await native.execute({ code: args.code }, api, context);
+    ran = isToolPark(outcome)
+      ? { result: null, failure: CODE_MODE_PARK_FAILURE }
+      : { result: outcome, failure: null };
   } catch (error) {
     ran = { result: null, failure: errorMessage(error) };
   } finally {
@@ -726,6 +727,20 @@ async function runScript(
   // Read after the calls ended: a call that the script left running can fail
   // its completion after the script.
   return { ...ran, observed, unconfirmedCalls: live.unconfirmed };
+}
+
+/**
+ * Pi 1.6 lets a tool park instead of returning a result. This host runs the
+ * script inline and cannot resume a parked script, and no Pantry tool parks,
+ * so a park ends the script as a failure.
+ */
+const CODE_MODE_PARK_FAILURE =
+  "Code Mode parked the script, and this host does not resume a parked script";
+
+function isToolPark(
+  outcome: ToolExecutionResult | ToolPark,
+): outcome is ToolPark {
+  return "sleep" in outcome || "wait" in outcome;
 }
 
 /** An execution that another catalog or policy admitted. No VM starts. */

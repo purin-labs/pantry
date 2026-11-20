@@ -24,7 +24,7 @@ type CodeModeRouteDecision = {
  * the Session Actor calls. Change it with the pin in `package.json`: an
  * execution that another package admitted does not resume.
  */
-const SANDBOX_PACKAGE_VERSION = "1.1.0-4270522473e6";
+const SANDBOX_PACKAGE_VERSION = "1.6.0";
 
 export async function routeCodeModeExecution(
   request: CodeModeRouteRequest,

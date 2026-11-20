@@ -8,7 +8,7 @@ import {
   unplacedSteeringInputs,
 } from "./harness-steering";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
-import type { Context } from "@earendil-works/chord";
+import type { Context } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";
 import {
   createAssistantMessageEventStream,
@@ -1194,7 +1194,7 @@ function initialTool(tool: ToolRegistration): boolean {
 function directTool(tool: ToolRegistration): boolean {
   return !searchTool(tool);
 }
-/** The opening of Pi's fixed compaction prompt (pi-durable 1.5.0). */
+/** The opening of Pi's fixed compaction prompt (pi-durable 1.6.0). */
 const COMPACTION_PROMPT_START = "You are a context summarization assistant.";
 
 function compactionRequest(context: TranscriptContext): boolean {
