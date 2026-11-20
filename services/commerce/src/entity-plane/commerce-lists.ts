@@ -29,10 +29,10 @@ import {
   parseAttributeValue,
   parseCommerceList,
   parseEntityRef,
-  parseEntityTypeId,
   parsePositiveRevision,
   parsePositiveText,
 } from "./parsers.ts";
+import { parseEntityTypeId } from "@purin-labs/commerce-client";
 import {
   commandJson,
   EntityPlaneSettlement,

@@ -16,13 +16,13 @@ import type {
 import { EntityPlaneHttpError } from "./http-error.ts";
 import {
   parseEntityRef,
-  parseEntityTypeId,
   parsePositiveRevision,
   parseRelationshipDefinitionId,
   parseRelationshipId,
   parseSnapshotRevision,
   parsePositiveText,
 } from "./parsers.ts";
+import { parseEntityTypeId } from "@purin-labs/commerce-client";
 import { readMerchant } from "./entities.ts";
 import { customRelationshipDefinitionReference } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 import { isRecord } from "@purin-labs/std";

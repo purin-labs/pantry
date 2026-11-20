@@ -29,12 +29,12 @@ import { EntityPlaneHttpError } from "./http-error.ts";
 import {
   parseCommerceList,
   parseEntityRef,
-  parseEntityTypeId,
   parsePositiveRevision,
   parseSavedCommerceView,
   parseSnapshotRevision,
   parsePositiveText,
 } from "./parsers.ts";
+import { parseEntityTypeId } from "@purin-labs/commerce-client";
 import { EXPORT_COORDINATION_PRESET } from "./presets.ts";
 import { readExactCommerceRelationship } from "./commerce-relationship-relation.ts";
 import { listRelationshipDefinitions } from "./relationships.ts";
