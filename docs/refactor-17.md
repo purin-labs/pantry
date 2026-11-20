@@ -119,7 +119,8 @@ surfaces/     portal · slack · email · whatsapp · webhooks · storefront · 
 areas/        commerce · cafe · kitchen · inbox · brain · integrations · devices · organisation
                  │ imports the foundation, and the contract of another area
 foundation/   std · kernel · contracts · tenancy · actor-runtime · authority · connections
-              control · agent-tools · agent · conversation · collaboration · ui · testing
+              control · agent-tools · agent · conversation · tool-handlers
+              collaboration · ui · testing
 workers/      the deployed Workers. Each one composes the three layers and holds no logic.
 ```
 
