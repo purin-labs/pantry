@@ -4,7 +4,7 @@ import {
   type CounterSaleReceipt,
 } from "@purin-labs/control-api";
 
-import { printOnPrinter, readSaleReceipt } from "./requests";
+import { printOnPrinter, readSaleReceipt } from "./receipt-requests";
 
 /**
  * "Print receipt" on the Register (Plan 90 Phase 5). With a bound receipt

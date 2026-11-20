@@ -6,8 +6,9 @@ import {
 } from "@purin-labs/control-api";
 
 import { controlMutation, controlRead } from "../../control-client";
+import { controlPath } from "../../control-paths";
 
-/** The Register's reads and changes of the Platform for a receipt. */
+/** The receipt control's calls to the Platform. */
 
 export async function readSaleReceipt(
   organisationId: string,
@@ -43,5 +44,8 @@ export async function printOnPrinter(
 }
 
 function salePath(organisationId: string, checkoutId: string): string {
-  return `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce/counter-sales/${encodeURIComponent(checkoutId)}`;
+  return controlPath(
+    organisationId,
+    `commerce/counter-sales/${encodeURIComponent(checkoutId)}`,
+  );
 }

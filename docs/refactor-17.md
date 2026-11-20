@@ -515,54 +515,6 @@ the reason: callers use 245 methods of the four Actors at 440 places, in about 1
 files. An interface for each module is a larger piece of work, and it belongs with the
 split of the Actor classes into modules. It is now a part of step A1.9.
 
-**20 November 2026. Step A2.6 is done.**
-
-| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A2.6 | `defineSharedDoc` in `packages/collaboration/src/shared-doc.ts` gives a document package its checked encodings, the base of its document class (`state`, `stateVector`, `syncUpdate`, `apply`, and `mutate`, `mutateIfChanged` and `stage` for its operations) and `syncProtocol`. A package names its roots one time, and it keeps its shape check, its reads and its operations. `definePlainTextDoc` gives the whole document of one plain text: the product description and the mail reply were two copies of it. `defineSharedEncoding` gives the encodings and the protocol alone. The two documents of `workflow-canvas-crdt` use it and keep their own classes: the canvas takes its membership from the workflow owner, and the draft needs one Yjs document for its undo history. Their protocol files used `createSyncProtocol` since Refactor 10, step 5 |
-
-The clone count went from 937 to 917, and the copied lines from 17,423 to 17,107. The
-packages lost 1,961 lines and got 1,281. One copy stays: `sameBytes` in
-`actors/collaboration-room.ts` repeats the function in `yjs-encoding.ts`.
-
-The bytes did not change. A script ran each package through its public API on the old
-tree and on the new tree, with fixed client ids: 3,881 records with each state, update,
-state vector, sync frame and failure code, and each record was the same. Three wrong
-changes proved that the script sees a difference: one outer transaction for each
-operation, a staged copy that keeps its own client id, and a failure frame without the
-document codes.
-
-`collaboration` no longer exports `createSyncProtocol`, and `everyCode` is gone:
-`exhaustiveList` of `std` does the same. The result type of each package is now
-`SharedDocResult` with the codes of the package.
-
-**20 November 2026. Steps A2.2 and A2.3 are done in the Portal,** on the branch
-`refactor-17-a2-2-portal-hooks`. They are not on `dev` yet. The surface registry
-of step A2.3 is open: it changes the Platform too.
-
-| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A2.2 | `useLatestRead` gives its read an `AbortSignal`, and it has `retry`, `pauseWhenHidden` and `reloadOn`. `useMutation` has `busy`. `usePeriodRead` is built on `useLatestRead`. The Devices page, the order queue, Payments, Payouts and the order timeline use the hooks, and each has a request module (`requests.ts`). `pnpm lint:portal-requests` (`scripts/check-portal-requests-ratchet.mjs`) counts the direct calls of the control client in component files: 99 in 46 files, from 106 in 50. It shares `scripts/lib/count-ratchet.mjs` with `lint:portal-fetch` |
-| A2.3 | `Button` in `ui/` on Base UI Button, with the variants `primary`, `secondary`, `danger` and `link`. The moved pages use it for 38 buttons; 1,291 raw `<button>` elements remain. `pnpm lint:file-size` reads style sheets: `apps/portal/src/styles.css` (11,106 lines) and `apps/storefront/src/styles.css` (3,907 lines) are in the ratchet. The agent colours of the menu canvas have one definition                                                                                                                                                                 |
-
-What the steps show:
-
-- The Organisation settings keep the `MutationLedger` of `mutation-state.ts`. It is
-  the state of the `Portal` class, and a Platform test reads it. `useMutation` has
-  no scope rule for two different writes of one record.
-- 30 custom properties have a definition in two or more style sheets. One group
-  was a copy: the three agent colours of the menu canvas, now merged. The others
-  differ by intent: 4 radii and 1 shadow of the Kitchen and menu workspaces, the width of
-  the sidebar by state, 13 `--navbar-*` values of the site page, 8 Portal aliases
-  in two preview pages, and 2 values that a host gives to a component. The design
-  tokens are in `packages/frontend-theme.css` and its theme files, and the Portal
-  aliases are in the first rule of `styles.css`.
-- A page rule for every raw button of a container, such as `.home-recovery button`,
-  also matches a `Button`. The rules of `button.css` have more specificity, and a
-  page sets a size with `button.pantry-button`.
-- The devices preview page had no CSRF cookie, so each write on it failed. It sets
-  one now.
-
 **20 November 2026. Step A1.3 is done on the branch
 `refactor-17-a1-3-tool-families`.** The branch starts at `origin/dev` `58b7e5e`. It
 is not on `dev`.
@@ -627,6 +579,54 @@ Open after step A1.3:
   after the claim. The model sees the same failure text.
 - **The temporary catalog check is removed,** as the step ends. Step A1.4 writes it
   again from the values of the baseline.
+
+**20 November 2026. Steps A2.2 and A2.3 are done in the Portal,** and the commits
+are on `dev` since that day. The surface registry of step A2.3 is open: it changes
+the Platform too.
+
+| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A2.2 | `useLatestRead` gives its read an `AbortSignal`, and it has `retry`, `pauseWhenHidden` and `reloadOn`. `useMutation` has `busy`. `usePeriodRead` is built on `useLatestRead`. The Devices page, the order queue, Payments, Payouts and the order timeline use the hooks, and each has a request module (`requests.ts`). `pnpm lint:portal-requests` (`scripts/check-portal-requests-ratchet.mjs`) counts the direct calls of the control client in component files: 99 in 46 files, from 106 in 50. It shares `scripts/lib/count-ratchet.mjs` with `lint:portal-fetch` |
+| A2.3 | `Button` in `ui/` on Base UI Button, with the variants `primary`, `secondary`, `danger` and `link`. The moved pages use it for 38 buttons; 1,291 raw `<button>` elements remain. `pnpm lint:file-size` reads style sheets: `apps/portal/src/styles.css` (11,106 lines) and `apps/storefront/src/styles.css` (3,907 lines) are in the ratchet. The agent colours of the menu canvas have one definition                                                                                                                                                                 |
+
+What the steps show:
+
+- The Organisation settings keep the `MutationLedger` of `mutation-state.ts`. It is
+  the state of the `Portal` class, and a Platform test reads it. `useMutation` has
+  no scope rule for two different writes of one record.
+- 30 custom properties have a definition in two or more style sheets. One group
+  was a copy: the three agent colours of the menu canvas, now merged. The others
+  differ by intent: 4 radii and 1 shadow of the Kitchen and menu workspaces, the width of
+  the sidebar by state, 13 `--navbar-*` values of the site page, 8 Portal aliases
+  in two preview pages, and 2 values that a host gives to a component. The design
+  tokens are in `packages/frontend-theme.css` and its theme files, and the Portal
+  aliases are in the first rule of `styles.css`.
+- A page rule for every raw button of a container, such as `.home-recovery button`,
+  also matches a `Button`. The rules of `button.css` have more specificity, and a
+  page sets a size with `button.pantry-button`.
+- The devices preview page had no CSRF cookie, so each write on it failed. It sets
+  one now.
+
+**20 November 2026. Step A2.6 is done.**
+
+| Step | What exists                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A2.6 | `defineSharedDoc` in `packages/collaboration/src/shared-doc.ts` gives a document package its checked encodings, the base of its document class (`state`, `stateVector`, `syncUpdate`, `apply`, and `mutate`, `mutateIfChanged` and `stage` for its operations) and `syncProtocol`. A package names its roots one time, and it keeps its shape check, its reads and its operations. `definePlainTextDoc` gives the whole document of one plain text: the product description and the mail reply were two copies of it. `defineSharedEncoding` gives the encodings and the protocol alone. The two documents of `workflow-canvas-crdt` use it and keep their own classes: the canvas takes its membership from the workflow owner, and the draft needs one Yjs document for its undo history. Their protocol files used `createSyncProtocol` since Refactor 10, step 5 |
+
+The clone count went from 937 to 917, and the copied lines from 17,423 to 17,107. The
+packages lost 1,961 lines and got 1,281. One copy stays: `sameBytes` in
+`actors/collaboration-room.ts` repeats the function in `yjs-encoding.ts`.
+
+The bytes did not change. A script ran each package through its public API on the old
+tree and on the new tree, with fixed client ids: 3,881 records with each state, update,
+state vector, sync frame and failure code, and each record was the same. Three wrong
+changes proved that the script sees a difference: one outer transaction for each
+operation, a staged copy that keeps its own client id, and a failure frame without the
+document codes.
+
+`collaboration` no longer exports `createSyncProtocol`, and `everyCode` is gone:
+`exhaustiveList` of `std` does the same. The result type of each package is now
+`SharedDocResult` with the codes of the package.
 
 ## Baseline
 
