@@ -3021,7 +3021,6 @@ CREATE TABLE organisation_codex_connection (
       'authorization_expired',
       'workspace_access_revoked',
       'device_authorization_unavailable',
-      'allowance_exhausted',
       'account_unavailable'
     )
   ),
