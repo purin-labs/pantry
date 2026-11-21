@@ -292,7 +292,7 @@ import. A module with no line for one of these has none.
 
 ## areas/integrations
 
-- Files: 156 in 22 folders
+- Files: 157 in 22 folders
   - `apps/portal/src/` 3
   - `apps/portal/src/features/integrations/` 38
   - `apps/portal/src/features/jev-features/` 3
@@ -314,13 +314,13 @@ import. A module with no line for one of these has none.
   - `services/platform/src/mail/` 1
   - `services/platform/src/provider-adapters/` 8
   - `services/platform/src/provider-lifecycle/` 6
-  - `services/platform/src/provider-workflows/` 10
+  - `services/platform/src/provider-workflows/` 11
 - Tables (8): `credential_rotation`, `custom_connector`, `custom_connector_account_binding`, `custom_connector_revision`, `custom_connector_setup_attempt`, `discord_interaction_install`, `mail_classification_eligibility`, `provider_account_cleanup`
 - Public files: `apps/portal/src/features/integrations/archive-confirm.tsx`, `apps/portal/src/features/integrations/connect-consent-dialog.tsx`, `apps/portal/src/features/integrations/connection-dialog.tsx`, `apps/portal/src/features/integrations/custom-connector-api.ts`, `apps/portal/src/features/jev-features/api.ts`, `apps/portal/src/features/jev-features/paid-use.tsx`, `apps/portal/src/integration-catalogue.ts`, `apps/portal/src/provider-onboarding.tsx`, `services/platform/src/integrations/contract/`, `services/platform/src/mail/gmail-oauth.ts`
 
 ## areas/kitchen
 
-- Files: 303 in 30 folders
+- Files: 304 in 30 folders
   - `apps/portal/src/features/` 4
   - `apps/portal/src/features/costs/` 15
   - `apps/portal/src/features/production-run/` 57
@@ -339,7 +339,7 @@ import. A module with no line for one of these has none.
   - `apps/portal/src/features/recipes/` 3
   - `apps/portal/src/features/workflow-simulator/` 75
   - `apps/portal/src/features/workflow-simulator/docks/` 10
-  - `apps/portal/src/features/workflow-simulator/spatial/` 30
+  - `apps/portal/src/features/workflow-simulator/spatial/` 31
   - `services/platform/src/actors/` 9
   - `services/platform/src/agent-tools/bakery/` 4
   - `services/platform/src/agent-tools/costs/` 2
