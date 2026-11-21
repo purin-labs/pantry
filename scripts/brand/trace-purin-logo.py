@@ -14,7 +14,7 @@ Needs Pillow, numpy, scipy and contourpy.
 The image has four flat colours, so three channel thresholds split it:
 luminance finds the cat, blue finds the pudding and green finds the caramel.
 Each layer becomes a mask, and `curve_fit.py` turns its outline into a few
-cubic curves.
+cubic curves. `eyes.py` makes the eyes a little taller than the eyes of the image.
 """
 
 import json
@@ -25,6 +25,7 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 from curve_fit import outlines as mask_outlines
+from eyes import eye_holes, eye_outline
 
 SOURCE = "docs/brand/purin-logo/source.jpg"
 OUTPUT = "docs/brand/purin-logo/paths.json"
@@ -56,12 +57,12 @@ def main():
     caramel = largest((green < 128) & pudding)
 
     # the eyes and the mouth: the holes in the cat
-    holes = ndi.binary_fill_holes(cat) & ~cat
-    labels, count = ndi.label(holes)
-    face = np.zeros_like(cat)
+    eyes = eye_holes(cat)
+    labels, count = ndi.label(ndi.binary_fill_holes(cat) & ~cat & ~eyes[0] & ~eyes[1])
+    mouth = np.zeros_like(cat)
     for i in range(1, count + 1):
         if (labels == i).sum() > 400:
-            face |= labels == i
+            mouth |= labels == i
 
     ys, xs = np.where(pudding)
     x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
@@ -101,7 +102,8 @@ def main():
         "puddingPivot": [unit((x0 + x1) / 2), unit(y1 + 0.5)],
         "bbox": [unit(min(cxs.min(), x0)), unit(cys.min()), unit(max(cxs.max(), x1)), unit(y1)],
         "cat": outlines(cat_full)[0],
-        "face": outlines(face),
+        # the left eye, the right eye, then the mouth
+        "face": [eye_outline(eye, scale, TOLERANCE) for eye in eyes] + outlines(mouth),
         "pudding": outlines(pudding)[0],
         "caramel": outlines(caramel_out),
         "gap": outlines(gap)[0],

@@ -117,6 +117,11 @@ def corners(p, k=7, threshold=48):
     ]
 
 
+def number(v):
+    """A coordinate of an SVG path: one decimal place, with no zero at the end."""
+    return ("%.1f" % v).rstrip("0").rstrip(".")
+
+
 def fit_closed(p, err):
     """One closed outline to an SVG path of cubic curves."""
     p = resample(p)
@@ -131,10 +136,9 @@ def fit_closed(p, err):
             q = np.array([p[j % n] for j in range(a, b + 1)])
             k = min(4, len(q) - 1)
             segs += fit(q, norm(q[k] - q[0]), norm(q[-1 - k] - q[-1]), err)
-    f = lambda v: ("%.1f" % v).rstrip("0").rstrip(".")
-    d = "M" + f(segs[0][0][0]) + " " + f(segs[0][0][1])
+    d = "M" + number(segs[0][0][0]) + " " + number(segs[0][0][1])
     for s in segs:
-        d += "C" + " ".join(f(v) for v in s[1:].ravel())
+        d += "C" + " ".join(number(v) for v in s[1:].ravel())
     return d + "Z"
 
 

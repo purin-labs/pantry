@@ -18,7 +18,7 @@ switch; `apps/portal/public/brand/README.md` describes the goat files.
 | File                      | What it is                                                                                                     |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `source.jpg`              | The image that the owner supplied                                                                              |
-| `paths.json`              | The traced curves, in a 1024 box                                                                               |
+| `paths.json`              | The traced curves, in a 1024 box. `face` holds the left eye, the right eye, then the mouth                     |
 | `purin-mark.svg`          | The mark on a transparent ground                                                                               |
 | `purin-mark-animated.svg` | The mark with its motion inside the file                                                                       |
 | `purin-icon.svg`          | The mark on its cream tile                                                                                     |
@@ -39,6 +39,12 @@ the icon: its tile carries its own cream ground.
 
 The cream gap round the pudding is a cut-out in the cat, so the ground shows
 through it. The eyes and the mouth are filled with cream on every ground.
+
+The eyes are a little taller than the eyes of the source images. The owner
+asked for this on 21 November 2026. `scripts/brand/eyes.py` holds the amount
+(`EYE_STRETCH`), and the two trace scripts use it, so the colour mark and the
+wordmark have the same eyes. Each eye is now about 20% taller than it is wide;
+in the source images it is about 8% taller.
 
 ## Icon pack
 
@@ -108,6 +114,7 @@ node scripts/brand/build-purin-logo.mjs
 
 The first command writes `paths.json`. It needs Pillow, numpy, scipy and
 contourpy. The second command writes every other file in this folder, and
-`purin-mark-paths.ts` and `purin-mark.css` in `apps/portal/src/ui`. To change
+`purin-mark-paths.ts` and `purin-mark.css` in `apps/portal/src/ui`. After a
+change to `eyes.py`, run `python3 scripts/brand/trace-purin-wordmark.py` too. To change
 a colour, a size or the motion, edit the constants at the top of
 `build-purin-logo.mjs` and run it again.
