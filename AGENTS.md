@@ -1,4 +1,4 @@
-# Satyr — Developer Guide
+# Seams Pantry — Developer Guide
 
 ## This codebase is yours
 
@@ -109,10 +109,9 @@ Seams is the company. These are its public names:
 - Seams Vault: the Vault store that Seams runs.
 
 Use "Seams Pantry" in the Portal, the site, the docs and agent text, and
-"Pantry" after the first use on a page. Kitchen is the area name. Code
-names follow the new names. Wire values such as `area: "BakeryOS"`, Worker
-names and plans keep the old names. The section "Old and new names" maps each
-old name.
+"Pantry" after the first use on a page. Kitchen is the area name. Code,
+Worker names and wire values use the new names (Plan 93); plans keep the old
+names. The section "Old and new names" maps each old name.
 
 The business reference is a pâtisserie selling fresh products and packaged gifts
 through shops and online channels, such as Noix de Beurre or Lenôtre. These are
@@ -129,7 +128,7 @@ Collaborative authoring is scoped by
 [Plan 40B](docs/plan-40B-collaborative-menu-editor.md), the collaborative
 menu editor: one live menu on every screen in the shop and on the QR order
 page. Seams builds no merchant websites; operators build their own sites with
-Claude or Codex on Underclerk. They replace the retired file-native plans. General desktop filesystem synchronization
+Claude or Codex on the commerce engine. They replace the retired file-native plans. General desktop filesystem synchronization
 remains deferred. Cloud agent profiles and Markdown playbooks belong to Plan 16.
 
 Plans 9, 15, and 16 own the active commerce and
@@ -211,6 +210,8 @@ with change, Square Terminal Japan cashless (`CARD_PRESENT`, `FELICA_ALL`,
 the display names, the code names, the repository name and the public address.
 [Plan 92](docs/plan-92-new-pantry-repository.md) owns the new repository and
 the cleanup of unused, duplicate and legacy code and weak tests.
+[Plan 93](docs/plan-93-clean-cutover.md) owns the clean cutover to the new
+`pantry-*` stack on `purin.io` domains, with no data move and no old name.
 [Plan 96](docs/plan-96-gemini-models.md) owns the Gemini models: Gemini 4
 Hydrogen on the route that Seams pays for, and an Organisation's own Gemini
 API key for Hydrogen, Carbon, Argon and Neon, through the model exit Worker.
@@ -225,41 +226,44 @@ workflow authoring later reuses the
 
 ## Old and new names
 
-[Plan 91](docs/plan-91-seams-atelier-rename.md) renames the brand. A name has
-four layers, and each layer has its own rule:
+[Plan 91](docs/plan-91-seams-atelier-rename.md) renamed the brand, and
+[Plan 93](docs/plan-93-clean-cutover.md) moved Pantry to a new stack with new
+names in every layer: display text, code, deployed names and wire values.
+The new stack started with empty storage, so no stored value, cookie, header,
+event kind or provider id keeps an old name, and no code reads one.
 
-- Display: page text, prompts, Slack cards, docs and error text. Use the new
-  name.
-- Code: identifiers, file and folder names, packages, CSS classes and lint
-  names. The Plan 91 codemod and the Pantry pass in `scripts/rename/`
-  changed them. New code uses the new names.
-- Deployed: Worker scripts, Durable Object classes, D1, R2, KV and queue
-  names, and Wrangler secrets and variables. They keep the old names.
-- Wire: event kinds, provider ids, area values, capability keys, headers, the
-  cookie and localStorage keys. A stored value keeps its old name. The cookie,
-  the `satyr:*` keys and the `x-satyr-*` headers get new names at the switch
-  to the new public origin.
+Plans, evidence and handoffs keep the names of their time. Do not rewrite
+them. If you read an old name there, use this table to find the new name.
 
-Plans and evidence keep the old names. Do not rewrite them. If you read an old
-name in a plan or in a stored value, use this table to find the new name.
+| Old name                                               | New name                                                                           |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Satyr, the product; Atelier (16 to 18 November 2026)   | Seams Pantry, then Pantry. Code: `pantry`, `Pantry*`, `PANTRY_*`                   |
+| Satyr, the company, the maker or the party that keeps data | Seams                                                                          |
+| Satyr, the agent; Urk                                  | Sous Chef                                                                          |
+| Satyr Agents                                           | Seams Pantry                                                                       |
+| CafeOS                                                 | Seams Pantry for the product; Café for the switcher area. Wire value `"cafe"`      |
+| Satyr Kitchen, BakeryOS                                | Kitchen. Wire value `"kitchen"`                                                    |
+| AgentCommerce                                          | Commerce, the switcher area. Wire value `"commerce"`                               |
+| Satyr Commerce                                         | Seams Checkout. Provider id `builtin_commerce`, code name `builtInCommerce`        |
+| Underclerk                                             | The commerce engine. Code `commerce`, `Commerce*`, `COMMERCE_*`; events `commerce.*.v1` |
+| Satyr Vault                                            | Seams Vault                                                                        |
+| Satyr identity, Satyr's AI, Jev from Satyr             | Seams Pay (payment approvals only), Seams AI, Jev from Seams                       |
+| Seams Commis                                           | Seams Gantry                                                                       |
+| `satyr-edge`, `underclerk`, `satyr-*` Workers          | `pantry`, `pantry-commerce`, `pantry-*` (Plan 93 tables)                           |
 
-| Old name                                                   | New display name                                                                        | The old name stays in                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Satyr, the product                                         | Seams Pantry, then Pantry                                                               | Code until the codemod: `satyr` and `Satyr*` identifiers, `@purin-labs/*` packages, `.satyr-*` CSS classes, the `satyr-edge` package name. Deployed: the Workers `satyr-edge`, `satyr-model-exit`, `satyr-chatgpt-exit`, `satyr-code-mode-sandbox` and `satyr-vault-onepassword`, the R2 bucket `satyr-repo-binaries-apac`, the launchd label `sh.seams.satyr.*` (`SATYR_*` variables are now `PANTRY_*`). Wire: the cookie `satyr_control_session`, the `satyr:*` keys, the `x-satyr-*` headers |
-| Satyr, the company, the maker or the party that keeps data | Seams                                                                                   | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| Satyr, the agent                                           | Sous Chef                                                                               | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| Satyr Agents                                               | Seams Pantry                                                                            | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| CafeOS                                                     | Seams Pantry for the product; Café for the switcher area (Menus, Order queue, Register) | Wire: the `WorkspaceSystem` value `"CafeOS"`. Code name after the codemod: `cafe`. Plan file names                                                                                                                                                                                                                                                                                                                                                                          |
-| Satyr Kitchen, BakeryOS                                    | Kitchen; "Kitchen in Seams Pantry" where the product is needed                          | Wire: the value `"BakeryOS"` and `area: "BakeryOS"`. Code name after the codemod: `kitchen`                                                                                                                                                                                                                                                                                                                                                                                 |
-| AgentCommerce                                              | Commerce, the switcher area                                                             | Wire: the value `"AgentCommerce"`. Code name after the codemod: `commerce`                                                                                                                                                                                                                                                                                                                                                                                                  |
-| Satyr Commerce                                             | Seams Checkout                                                                          | Wire: the provider id `satyr_commerce`. Code name after the codemod: `builtInCommerce`                                                                                                                                                                                                                                                                                                                                                                                      |
-| Underclerk                                                 | No display name: "the commerce engine", or Seams Checkout for the built-in checkout     | Code until the codemod: `services/commerce`, `@purin-labs/commerce-contracts`, `@purin-labs/commerce-client`, `pnpm lint:commerce-spec`. Deployed: the Worker `underclerk` and the `Underclerk*DO` classes. Wire: the event kinds `underclerk.*.v1`                                                                                                                                                                                                                                   |
-| Urk                                                        | Sous Chef                                                                               | Code until the codemod: `urk-*.ts` and `URK_*` (then `merchant-agent-*` and `MERCHANT_AGENT_*`). Stored agent rows with the name "Urk" change one time to "Sous Chef"                                                                                                                                                                                                                                                                                                       |
-| Satyr Vault                                                | Seams Vault                                                                             | Nothing                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| Satyr identity, Satyr's AI, Jev from Satyr                 | Seams Pay (payment approvals only), Seams AI, Jev from Seams                            | Plan file names                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| Atelier, the first new name (16 to 18 November 2026)       | Seams Pantry, then Pantry                                                               | Plans and evidence, the Plan 91 file name, the local clone folder `~/Dev/lowerarchy/seams-atelier`, and the archived repository `peitalin/satyr` (once `peitalin/seams-atelier`)                                                                                                                                                                                                                                                                                            |
-| Seams Commis                                               | Seams Gantry                                                                            | Plans                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| "Hey Satyr"                                                | Stays "Hey Satyr" until a "Hey Sous Chef" wake model passes                             | The wake model, its file `hey_satyr.onnx` and the voice prompts. The privacy text changes: "Seams keeps no audio."                                                                                                                                                                                                                                                                                                                                                          |
+Four things keep an old name on purpose, and `git grep` finds them:
+
+- The wake phrase "Hey Satyr", its model `hey_satyr.onnx` and its training
+  scripts, until a "Hey Sous Chef" wake model passes. The privacy text says
+  "Seams keeps no audio."
+- The Google Cloud project `satyr-gmail-dev` and its Pub/Sub topic of the
+  Gmail push channel: a project id cannot change.
+- The pinned Kitchen physics bundles in `apps/portal/public/bakery-physics`,
+  the native source that they hash, the browser folder
+  `satyr-physics-results` that the execution bundle holds, and the R2 file
+  names that `repo-binaries.json` and `scripts/bakery-mujoco` give. A saved
+  run names its bundle by hash.
+- The file names of plans, and the applied D1 patch scripts of the old stack.
 
 ## Agent access to features
 
@@ -288,7 +292,7 @@ gives the agent a way to do it:
 
 ## Cost of each tenant
 
-Satyr serves many Organisations, and each one pays every recurring cost again.
+Pantry serves many Organisations, and each one pays every recurring cost again.
 An Organisation where nothing changes must cost close to nothing. Cloudflare
 bills each written row of a Durable Object and of D1, each queue message, each
 KV write and each R2 write.
@@ -316,7 +320,7 @@ KV write and each R2 write.
 
 ## Active runtime
 
-Satyr’s production runtime is Cloudflare-native:
+Pantry’s production runtime is Cloudflare-native:
 
 - `services/platform` owns the Worker, HTTP routes, Slack ingress, OAuth,
   onboarding, D1 migrations, Durable Objects, queues, R2, KV, and container
@@ -328,36 +332,36 @@ Satyr’s production runtime is Cloudflare-native:
   sign-in (Plan 72). `organisation_byo` + `openai`, `anthropic` or
   `google` runs Pi with the organisation's purpose-bound, Vault-encrypted
   API key of that provider (Gemini 4 for `google`, Plan 96). `platform` +
-  `openai-compatible` runs Pi with Satyr's `OPENROUTER_API_KEY`; its default
+  `openai-compatible` runs Pi with the Seams `OPENROUTER_API_KEY`; its default
   model is Gemini 4 Hydrogen. Missing or exhausted authority fails the
   selected route.
-- The model exit Worker `satyr-model-exit` sends every direct model-provider
+- The model exit Worker `pantry-model-exit` sends every direct model-provider
   request from a data centre near AWS Tokyo (Plan 73): the ChatGPT sign-in
   and refresh, the BYO OpenAI, Anthropic and Gemini keys and the Claude
   account. OpenAI, Anthropic and the Gemini API refuse Hong Kong, where an
   `apac` Actor can run.
   chatgpt.com blocks every request from a Worker, so the ChatGPT model
   requests and allowance reads go through the ChatGPT exit Worker
-  `satyr-chatgpt-exit` and its one shared container (Plan 75). Use
+  `pantry-chatgpt-exit` and its one shared container (Plan 75). Use
   `modelProviderFetch(env)` for a new provider call; it picks the exit by
   host. Never patch `globalThis.fetch`. The OpenRouter route stays direct.
 - `crates/workspace-executor` and `services/workspace-executor` provide the
   on-demand heavy execution boundary.
 - `packages/commerce-contracts` (`@purin-labs/commerce-contracts`) owns the
   provider-neutral commerce contracts as TypeBox schemas and their parsers.
-  `packages/contracts` (`@purin-labs/contracts`) owns Satyr's contracts and
+  `packages/contracts` (`@purin-labs/contracts`) owns Pantry's contracts and
   re-exports the commerce ones.
 
-The deployed Worker remains named `satyr-edge` so its production hostname and
-OAuth callbacks remain stable. “Platform” is the source ownership boundary.
+The production Worker is `pantry`, on its one address `pantry.purin.io`
+(Plan 93). “Platform” is the source ownership boundary.
 
 ## Repository boundaries
 
-Underclerk owns commerce transactions in `services/commerce`. Its contracts
-live in `packages/commerce-contracts` and its typed client in
-`packages/commerce-client` (`@purin-labs/commerce-client`). Underclerk code
-imports no Satyr package, and Satyr code reaches Underclerk only through those
-packages or the built Worker; `pnpm lint:runtime-boundary` refuses a new
+The commerce engine owns commerce transactions in `services/commerce`. Its
+contracts live in `packages/commerce-contracts` and its typed client in
+`packages/commerce-client` (`@purin-labs/commerce-client`). Commerce code
+imports no Platform package, and Platform code reaches the commerce engine
+only through those packages or the built Worker `pantry-commerce`; `pnpm lint:runtime-boundary` refuses a new
 crossing. Platform code in `actors/`, `slack/` and `chat/` imports no
 file in `control/routes/`; the same lint refuses it. Put the code that a route
 and an actor share in a domain module, or in `control/admission/` for a request
@@ -365,18 +369,19 @@ check. A route file parses the request, checks authorization, calls one domain
 function and maps its result; it runs no D1 query (the same lint refuses one).
 A domain function returns a `Result` and knows no HTTP; code throws only for a
 programmer error. This rule applies to new and moved code; there is no mass
-rewrite. [The Underclerk commerce spec](services/commerce/docs/spec.md) is
+rewrite. [The commerce spec](services/commerce/docs/spec.md) is
 the contract for its behavior and API, with Shopify as the reference. A change
 to a route, a scope, an event kind or a rule updates the spec in the same
 commit; `pnpm lint:commerce-spec` refuses an API change that the spec does
-not list. [Plan 77](docs/plan-77-underclerk-modular-core.md) owns Underclerk's
+not list. [Plan 77](docs/plan-77-underclerk-modular-core.md) owns the commerce engine's
 modular core and plugins: built-in plugins, merchant plugins that agents write
 at run time, the payments module and checkout pipeline, state machines and one
 type source. [Plan 80](docs/plan-80-underclerk-multi-tenant-backend.md)
-owns Underclerk as a multi-tenant headless backend that Satyr exposes to
-many operators: one request shape, tenant isolation, attribution,
-merchant-managed keys, and Square and Stripe inside Underclerk with no
-payment path through Satyr. Urk's merchant-agent instructions and installation
+owns the commerce engine as a multi-tenant headless backend that Pantry
+exposes to many operators: one request shape, tenant isolation, attribution,
+merchant-managed keys, and Square and Stripe inside the commerce engine with
+no payment path through the Platform. Sous Chef's merchant-agent instructions
+and installation
 belong to `services/platform/src/data/merchant-agent-skills.ts` and `merchant-agent-preset.ts`.
 The Commerce Read Layer is Platform's projections and commerce-query code.
 Punter is the independent shopping acceptance package in `scripts/punter`.
@@ -392,6 +397,8 @@ Projects group Cases from every surface. General Project code lives in
 with no named Project is filed in the Organisation's default Project. See
 [`docs/refactor-9.md`](docs/refactor-9.md). A change to a D1 baseline ships
 with a patch script for deployed databases in `services/platform/scripts/`.
+The patch scripts there before Plan 93 are records of the old stack; the new
+databases loaded the baselines fresh.
 
 A source file over 3,000 lines may not grow, and a new source file may not pass
 3,000 lines; `pnpm lint:file-size` refuses both. The rule also holds for a
@@ -492,7 +499,7 @@ pnpm install
 cargo check --workspace
 ```
 
-Large files live in the R2 bucket `satyr-repo-binaries-apac`, not in git: the
+Large files live in the R2 bucket `pantry-repo-binaries-apac`, not in git: the
 Kitchen models in `assets/`, the Kitchen physics bundles in
 `apps/portal/public/bakery-physics` that no pin names (git keeps the pinned
 runtime bundle and its execution bundles; `pnpm lint:physics-bundle` checks it),
@@ -645,11 +652,13 @@ pnpm --filter @purin-labs/platform run deploy
 ```
 
 That command builds the contracts and portal. It then deploys six Workers in
-this order: the Code Mode sandbox Worker (`satyr-code-mode-sandbox`), the
-model exit Worker (`satyr-model-exit`), the ChatGPT exit Worker
-(`satyr-chatgpt-exit`) with its container, the 1Password store Worker
-(`satyr-vault-onepassword`, Plan 79), the Platform Worker with its
-configured containers, and the Slack ingress Worker. The Platform Worker binds
+this order: the Code Mode sandbox Worker (`pantry-code-sandbox`), the
+model exit Worker (`pantry-model-exit`), the ChatGPT exit Worker
+(`pantry-chatgpt-exit`) with its container, the 1Password store Worker
+(`pantry-vault-onepassword`, Plan 79), the Platform Worker (`pantry`) with its
+configured containers, and the Slack ingress Worker (`pantry-slack-ingress`).
+The commerce engine (`pantry-commerce`), the docs site (`pantry-docs`) and the
+shop (`purin-shop`) deploy with their own packages. The Platform Worker binds
 the sandbox class, both exit Workers and the 1Password store Worker by name,
 so they deploy first. A Platform upload to production refuses a Portal build
 without the shop gateway builds: before an upload of the Platform alone, run
@@ -659,11 +668,12 @@ before a release that changes the sandbox Worker or the pinned Pi packages.
 Read [Plan 73](docs/plan-73-model-exit-worker.md) and
 [Plan 75](docs/plan-75-chatgpt-exit-container.md) before a release that
 changes an exit Worker, its host list, its container or its placement.
-Never change
-the Worker name, public origin, or OAuth callback paths as part of a directory
-rename. Plan 91 changes the public origin in its own release, as a brand
-change: it adds each new OAuth callback at each provider first, and it keeps
-the old origin as a redirect for 90 days. The Worker names do not change.
+The release guard (Plan 93) refuses every deployment of a Worker that is not
+in `WORKER_NAMES` of `scripts/worker-environment.mjs`, a `workers.dev` or
+preview address, a route other than the Worker's custom domain, and a D1 or
+KV id that the stack has not made. Never add an old Worker name to that list.
+A change of a Worker name, a public origin or an OAuth callback path is a
+release of its own: add each new callback at each provider first.
 
 ## Persistence
 
@@ -695,7 +705,7 @@ and every route runs Pi. Organisation-funded `organisation_subscription` +
 sign-in, through the ChatGPT exit container. The Worker signs in with a device code, and the Session refreshes the
 token under a lease on `organisation_codex_connection`, because OpenAI rotates
 refresh tokens. Organisation-funded `organisation_byo` turns use a
-purpose-bound, Vault-encrypted API key of OpenAI, Anthropic or Google. Satyr-funded `platform` +
+purpose-bound, Vault-encrypted API key of OpenAI, Anthropic or Google. Seams-funded `platform` +
 `openai-compatible` turns use `OPENROUTER_API_KEY`. The Actor owns accepted
 history, Tool Host authority, checkpoints, budgets, cancellation, and delivery.
 Pi Durable owns Pi tasks in Actor SQLite and restores from the Actor-owned
