@@ -2071,6 +2071,41 @@ that it checks.
 - **Counts.** The Platform unit suite: 301 files and 1,730 tests before, 301 files and
   1,729 tests after.
 
+### The last crossings of the Portal and of the chat record (2026-11-21)
+
+On the branch `refactor-17-last10-portal`. Layer crossings: 10 to 3, in 2 pairs. This
+entry closes the Portal, Stripe and chat record pairs of the lists above.
+
+- **The Café board asks through a chat port.** The prompt edit of the menu board
+  reads and sends the chat through `features/menu-boards/board-chat.ts`. `portal.tsx`
+  and the two menu previews register the Portal chat with
+  `portal-board-chat.ts`, which loads the chat code at the first call. The read model
+  of the chat page, `ChatPageData`, is in `@purin-labs/control-api/portal/chat`, with
+  one type for a chat list entry in place of four copies.
+- **The integrations page gets the Stripe part.** The integrations route transport
+  carries the Stripe setup part, and `portal-transports.ts` gives it. The integrations
+  preview gives it too.
+- **The surface registry of the chat record.** The record keeps the page state of a
+  message as `ChatSurfaceState`, which shows only its digest. It reads the state check
+  through `chat/surface-registry.ts` (Plan 87, section 5), a port that
+  `worker-ports.ts` registers with the Kitchen entry `KITCHEN_CHAT_SURFACES` of
+  `chat/kitchen-observation.ts`. The registry also reads the old forms: the stored
+  `surface` part and the `surfaceContext` key of a tab from before Plan 87 phase 2.
+  The record reads the registry only for an observation with a state or for an old
+  form. The Portal code that needs the Kitchen form reads it with `kitchenState`.
+  `tests/portal-chat.test.ts` loads `worker-ports.ts`.
+- **Not changed:** no stored JSON, sent command, route, status code, error text or
+  visible Portal text.
+- **Measures.** Layer crossings 10 to 3: upward 7 to 1, between areas 3 to 2. Copies
+  825 and unused exports 17, no change.
+- **What stays (3).** The activation steps in the commerce module of the Organisation
+  actor (2) and the package `contracts` (1). Their reasons did not change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,729 tests) pass. The 58
+  journey files whose names hold a word of the brief ran in eight groups: 57 pass and
+  1 live journey is skipped (75 tests pass, 2 are skipped).
+  `wrangler deploy --dry-run` and the full E2E suite did not run on the branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
