@@ -156,7 +156,13 @@ import type { Env } from "../env";
 import { parseOrganisationId, newRequestId, type OrganisationId } from "../ids";
 import { traceLog } from "../observability";
 import type { Result } from "../result";
-import { admitActorRecovery, pinnedActorDatabase } from "./actor-activation";
+import {
+  admitActorRecovery,
+  advanceActorActivationSchema,
+  pinnedActorDatabase,
+  type ActorActivationSchemaAdvance,
+  type ActorActivationSchemaAdvanceError,
+} from "./actor-activation";
 import {
   exportActorPlacement,
   importActorExport,
@@ -279,12 +285,6 @@ export class OrganisationDO
     ensureOrganisation: (input) => this.ensureOrganisation(input),
     activatePolicy: (input) => this.activatePolicy(input),
   });
-
-  advanceActivationSchema(
-    ...input: Parameters<OrganisationCommerce["advanceActivationSchema"]>
-  ) {
-    return this.commerce.advanceActivationSchema(...input);
-  }
 
   proposeAction(...input: Parameters<OrganisationCommerce["proposeAction"]>) {
     return this.commerce.proposeAction(...input);
@@ -2176,6 +2176,19 @@ export class OrganisationDO
 
   protected acceptsActivation(): boolean {
     return true;
+  }
+
+  async advanceActivationSchema(
+    input: ActorActivationSchemaAdvance,
+  ): Promise<
+    Result<
+      { readonly kind: "advanced"; readonly stateVersion: number },
+      ActorActivationSchemaAdvanceError
+    >
+  > {
+    return this.ctx.storage.transactionSync(
+      advanceActorActivationSchema.bind(null, this.ctx.storage.sql, input),
+    );
   }
 
   async reconcileRelocationReceipt(request: RelocationReceiptRequest) {

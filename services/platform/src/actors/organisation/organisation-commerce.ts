@@ -92,12 +92,7 @@ import {
   type CommerceEntityRelationRow,
   type CommerceRelationshipRelationRow,
 } from "../commerce-query-schema";
-import {
-  advanceActorActivationSchema,
-  type ActorActivationSchemaAdvance,
-  type ActorActivationSchemaAdvanceError,
-  admitActorRecovery,
-} from "../actor-activation";
+import { admitActorRecovery } from "../actor-activation";
 import {
   abandonCodeModeCapabilityCalls,
   claimCodeModeCapabilityCall,
@@ -178,19 +173,6 @@ const CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY = "acceptance:cafe-commerce-fault:v1";
  */
 export class OrganisationCommerce {
   constructor(private readonly host: OrganisationModuleHost) {}
-
-  async advanceActivationSchema(
-    input: ActorActivationSchemaAdvance,
-  ): Promise<
-    Result<
-      { readonly kind: "advanced"; readonly stateVersion: number },
-      ActorActivationSchemaAdvanceError
-    >
-  > {
-    return this.host.ctx.storage.transactionSync(
-      advanceActorActivationSchema.bind(null, this.host.ctx.storage.sql, input),
-    );
-  }
 
   async proposeAction(
     input: ProposeActionInput & { execution: ActionMutationExecution },
@@ -1875,7 +1857,6 @@ export class OrganisationCommerce {
 /** The RPC methods of this module. The Actor class has one method for each. */
 export type OrganisationCommerceRpc = Pick<
   OrganisationCommerce,
-  | "advanceActivationSchema"
   | "proposeAction"
   | "requestActionApproval"
   | "getAction"
