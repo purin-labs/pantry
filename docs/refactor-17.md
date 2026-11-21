@@ -2111,7 +2111,7 @@ their reasons are gone.
   constructor write, wire shape or parser result of a caller.
 - **Measures.** Layer crossings 10 to 7: between areas 3 to 1, upward 7 to 6. Copies
   825 to 824. Unused exports: 17, no change. `organisation-commerce.ts`: 2,143 lines
-  to 1,974.
+  to 1,955.
 - **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
   `pnpm underclerk:check`, `pnpm portal:build` and the unit suite (301 files, 1,729
   tests) pass. The 41 journey files whose names hold `onboarding`, `activation`,
