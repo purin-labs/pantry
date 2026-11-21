@@ -65,7 +65,7 @@ function assertNoConsoleBillingRows(sql: SqlStorage): void {
     .exec<CountRow>(
       `SELECT COUNT(*) AS count FROM actor_outbox WHERE ${CONSOLE_BILLING_ROWS}`,
     )
-    .one().count;
+    .toArray()[0]?.count;
 
   if (left !== 0) {
     throw new Error(`schema_console_billing_rows_left:${left}`);
