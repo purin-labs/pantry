@@ -168,6 +168,8 @@ const SPECIFIC_RULES = [
   [/\bSatyr Vault\b/g, "Seams Vault"],
   [/\bSatyr Agents\b/g, "Seams Pantry"],
   [/\bJev from Satyr\b/g, "Jev from Seams"],
+  // The company pays for the platform route.
+  [/\bSatyr-funded\b/g, "Seams-funded"],
 
   // Cookies: the session, CSRF, OIDC state and approval cookies.
   [/satyr_control_/g, "pantry_"],
