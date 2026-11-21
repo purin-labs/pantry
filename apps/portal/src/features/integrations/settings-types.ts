@@ -312,8 +312,21 @@ export type IntegrationsCommandResult =
       readonly receipt: CredentialRevocationReceipt | null;
     };
 
+/**
+ * The Stripe setup part of the payment accounts. The Portal wiring gives it,
+ * so the integrations page imports no commerce file.
+ */
+type StripeSetupPart = React.ComponentType<{
+  readonly organisationId: string;
+  /** Null once a Stripe account is connected, or for a member who cannot. */
+  readonly connectExisting: (() => void) | null;
+  readonly connectBusy: boolean;
+  readonly connectFeedback: React.ReactNode;
+}>;
+
 export type IntegrationsPageProps = {
   readonly organisationId: string;
+  readonly stripeSetup: StripeSetupPart;
   readonly organisationHandle: string;
   readonly workspaceHandle: string;
   readonly commerceSystem: CommerceSystem | null;
@@ -446,6 +459,7 @@ export type IntegrationsRouteTransport = {
     proposalId: string,
   ) => Promise<EmailOperationalPreviewResult>;
   readonly whatsapp: WhatsAppRouteTransport;
+  readonly stripeSetup: StripeSetupPart;
 };
 
 /**
@@ -493,6 +507,7 @@ export type IntegrationsRouteProps = Omit<
   | "requestConfirm"
   | "actions"
   | "feedback"
+  | "stripeSetup"
 > & {
   readonly organisationId: string;
   readonly refreshKey: string;

@@ -47,6 +47,7 @@ import { installCustomConnectorPreview } from "./custom-connector-preview";
 import { MutationLedger, type MutationProvider } from "../mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { IntegrationsPage } from "../features/integrations/integrations-page";
+import { StripePaymentAccountSetup } from "../features/payment-accounts/stripe-account";
 import {
   IntegrationsRoute,
   MailboxSettingsRoute,
@@ -903,6 +904,7 @@ function buildProps(
 ): IntegrationsPageProps {
   return {
     organisationId: "organisation_preview",
+    stripeSetup: StripePaymentAccountSetup,
     organisationHandle: "nuki",
     workspaceHandle: "cafe",
     commerceSystem: previewCommerceSystem(),
@@ -1159,6 +1161,7 @@ function buildRouteTransport(
   const readState = { overviewCount: 0 };
   return {
     readOverview: readPreviewOverview.bind(null, scenario, data, readState),
+    stripeSetup: StripePaymentAccountSetup,
     readDetail:
       scenario === "loading"
         ? readPendingPreviewDetail

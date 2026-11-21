@@ -1,4 +1,3 @@
-import { StripePaymentAccountSetup } from "../payment-accounts/stripe-account";
 import type { ClaudeConnectionState } from "./claude-connection";
 import React from "react";
 import {
@@ -375,7 +374,7 @@ function integrationEntries(
             // One section: the shop's payments. A new account is the main
             // path; an owner who already uses Stripe connects it instead.
             <IntegrationSetup title={null}>
-              <StripePaymentAccountSetup
+              <props.stripeSetup
                 organisationId={props.organisationId}
                 connectExisting={
                   stripe.some(integrationAccountIsConnected)
