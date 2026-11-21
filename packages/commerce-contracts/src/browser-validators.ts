@@ -26,7 +26,11 @@ import {
   parseCommerceRelationshipShape,
   parseRelationshipDefinition,
 } from "./relationships.ts";
-import type { ContractDecodeResult } from "@purin-labs/contract-schema";
+import {
+  jsonSafeInteger,
+  UnsafeJsonIntegerError,
+  type ContractDecodeResult,
+} from "@purin-labs/contract-schema";
 
 export type {
   ContractDecodeError,
@@ -57,15 +61,13 @@ export function initializeBrowserValidators(): Promise<void> {
   return Promise.resolve();
 }
 
-class UnsafeIntegerError extends TypeError {}
-
 function jsonValue(value: unknown): unknown {
   let text: string | undefined;
   try {
-    text = JSON.stringify(value, safeInteger);
+    text = JSON.stringify(value, jsonSafeInteger);
   } catch (error) {
     throw new LexiconValidationError(
-      error instanceof UnsafeIntegerError
+      error instanceof UnsafeJsonIntegerError
         ? {
             code: "invalid_json_integer",
             reason: "contract integer exceeds the JavaScript safe range",
@@ -79,22 +81,6 @@ function jsonValue(value: unknown): unknown {
       reason: "value is not JSON serializable",
     });
   return JSON.parse(text);
-}
-
-function safeInteger(_key: string, value: unknown): unknown {
-  if (typeof value === "bigint") {
-    const number = Number(value);
-    if (!Number.isSafeInteger(number) || BigInt(number) !== value)
-      throw new UnsafeIntegerError();
-    return number;
-  }
-  if (
-    typeof value === "number" &&
-    Number.isInteger(value) &&
-    !Number.isSafeInteger(value)
-  )
-    throw new UnsafeIntegerError();
-  return value;
 }
 
 /** The Wasm module's output: plain JSON, with `integer` values as bigints. */

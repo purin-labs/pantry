@@ -88,7 +88,6 @@
     "packages/commerce-client/src/storefront-client.ts = packages/commerce-client/src/storefront-client.ts": 1,
     "packages/commerce-contracts/src/attribute-definition.ts = packages/commerce-contracts/src/entity-wire.ts": 2,
     "packages/commerce-contracts/src/attribute-value.ts = packages/commerce-contracts/src/cursor-values.ts": 1,
-    "packages/commerce-contracts/src/browser-validators.ts = packages/contracts/src/access-control.ts": 1,
     "packages/commerce-contracts/src/command-authority.ts = packages/commerce-contracts/src/relationship-authority.ts": 1,
     "packages/commerce-contracts/src/entity-command-authority.ts = packages/commerce-contracts/src/list-view-command-authority.ts": 1,
     "packages/commerce-contracts/src/payment-binding.ts = packages/commerce-contracts/src/payment-binding.ts": 1,

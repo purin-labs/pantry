@@ -1,6 +1,6 @@
 {
   "totals": {
-    "upward": 7,
+    "upward": 6,
     "areas": 1,
     "order": 0,
     "table": 0
@@ -9,8 +9,7 @@
     "areas/cafe -> surfaces/portal": 2,
     "areas/integrations -> areas/commerce": 1,
     "foundation/conversation -> areas/kitchen": 2,
-    "foundation/conversation -> surfaces/portal": 2,
-    "package packages/contracts -> @purin-labs/commerce-contracts": 1
+    "foundation/conversation -> surfaces/portal": 2
   },
   "reasons": {
     "areas/cafe -> surfaces/portal": {
@@ -28,10 +27,6 @@
     "foundation/conversation -> surfaces/portal": {
       "reason": "The same chat record calls chat/kitchen-observation.ts, the Portal adapter that makes the Kitchen view of a screen observation from its state.",
       "fix": "The surface registry of Plan 87, as for the Kitchen pair: the Portal registers the adapter, and the record calls it through the registry."
-    },
-    "package packages/contracts -> @purin-labs/commerce-contracts": {
-      "reason": "The records of contracts carry commerce types and schemas: OrganisationId (7 files), the commerce grant scope, the mutation target, the authority scope wire schemas and the browser validators.",
-      "fix": "Step A1.11, part 2: the shared primitives go to a package below both. The commerce parts of the records become opaque parts that commerce checks, as CommerceTypeParts does for the Platform."
     }
   }
 }

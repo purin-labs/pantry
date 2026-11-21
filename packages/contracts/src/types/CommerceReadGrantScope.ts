@@ -1,8 +1,9 @@
-import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
-import type { CommerceListId } from "@purin-labs/commerce-contracts";
-import type { PublishedCommerceSelector } from "@purin-labs/commerce-contracts";
+import type { ContractCommercePart } from "../commerce-parts.ts";
 
-export type CommerceReadGrantScope =
-  | { kind: "entity_type"; entityTypeId: CommerceEntityTypeId }
-  | { kind: "commerce_list"; listId: CommerceListId }
-  | { kind: "saved_selector"; selector: PublishedCommerceSelector };
+/** The read scope of a commerce grant: a record type, a list or a saved selector. */
+export type CommerceReadGrantScope = ContractCommercePart<
+  "readGrantScope",
+  | { kind: "entity_type"; entityTypeId: unknown }
+  | { kind: "commerce_list"; listId: unknown }
+  | { kind: "saved_selector"; selector: unknown }
+>;

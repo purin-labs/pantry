@@ -72,8 +72,7 @@ async function renderApplication(pathname: string): Promise<void> {
 }
 
 async function initializePortalValidators(): Promise<void> {
-  // Pantry's validator core also carries Commerce's commerce validators.
   const { initializeBrowserValidators } =
-    await import("@purin-labs/contracts/browser-validators");
+    await import("@purin-labs/commerce-contracts/browser-validators");
   await initializeBrowserValidators();
 }

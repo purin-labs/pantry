@@ -8,7 +8,7 @@ import type { EventSensitivity } from "./EventSensitivity";
 import type { EventSequence } from "./EventSequence";
 import type { EventStreamId } from "./EventStreamId";
 import type { IdempotencyKey } from "./IdempotencyKey";
-import type { OrganisationId } from "@purin-labs/commerce-contracts";
+import type { OrganisationId } from "@purin-labs/contract-schema";
 import type { PayloadVersion } from "./PayloadVersion";
 import type { RetentionClass } from "./RetentionClass";
 import type { RuntimeRevision } from "./RuntimeRevision";

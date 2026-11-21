@@ -95,8 +95,10 @@ export const fulfillmentEntityIdSchema = Type.Unsafe<
 >(Type.String());
 export type FulfillmentEntityId = Static<typeof fulfillmentEntityIdSchema>;
 
-export const integrationAccountIdSchema = Type.String();
-export type IntegrationAccountId = Static<typeof integrationAccountIdSchema>;
+export {
+  integrationAccountIdSchema,
+  type IntegrationAccountId,
+} from "@purin-labs/contract-schema";
 
 export const inventoryConsumptionPlanEntityIdSchema = Type.Unsafe<
   string & { readonly __brand: "InventoryConsumptionPlanEntityId" }
@@ -180,8 +182,10 @@ export const orderEntityIdSchema = Type.Unsafe<
 >(Type.String());
 export type OrderEntityId = Static<typeof orderEntityIdSchema>;
 
-export const organisationIdSchema = Type.String();
-export type OrganisationId = Static<typeof organisationIdSchema>;
+export {
+  organisationIdSchema,
+  type OrganisationId,
+} from "@purin-labs/contract-schema";
 
 export const paymentEntityIdSchema = Type.Unsafe<
   string & { readonly __brand: "PaymentEntityId" }

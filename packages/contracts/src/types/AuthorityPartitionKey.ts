@@ -1,5 +1,5 @@
 import type { MailboxReplyScope } from "./MailboxReplyScope";
-import type { OrganisationId } from "@purin-labs/commerce-contracts";
+import type { OrganisationId } from "@purin-labs/contract-schema";
 import type { PrincipalId } from "./PrincipalId";
 
 export type AuthorityPartitionKey =

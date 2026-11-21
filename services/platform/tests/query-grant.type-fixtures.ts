@@ -1,4 +1,7 @@
-import type { AccessGrantTarget, CommerceReadGrantScope } from "./index.ts";
+import type {
+  AccessGrantTarget,
+  CommerceReadGrantScope,
+} from "@purin-labs/contracts";
 import type {
   CommerceGraphQuery,
   PublishedCommerceSelector,

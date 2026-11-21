@@ -1,5 +1,4 @@
-import type { CommerceAuthorityScope } from "@purin-labs/commerce-contracts";
-import type { CommerceMutationTarget } from "@purin-labs/commerce-contracts";
+import type { ContractCommercePart } from "../commerce-parts.ts";
 import type { CommerceReadGrantScope } from "./CommerceReadGrantScope";
 import type { FileResourceScope } from "./FileResourceScope";
 
@@ -43,6 +42,6 @@ export type AccessGrantTarget =
       kind: "commerce_command";
       capabilityId: string;
       capabilityVersion: number;
-      scope: CommerceAuthorityScope;
-      target: CommerceMutationTarget;
+      scope: ContractCommercePart<"authorityScope">;
+      target: ContractCommercePart<"mutationTarget">;
     };
