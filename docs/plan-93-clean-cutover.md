@@ -383,8 +383,13 @@ removal" and of Refactor 260.
    tables and the layers page again, and it waives each renamed D1 baseline
    object in `d1-patch-waivers.txt`: no deployed database takes the
    rename. `--collisions` lists each new name that the tree already holds:
-   37 on dev `c69563a1`, and each one is a local name or a comment, not a
-   merge of two meanings.
+   112 pairs on the branch. Each one is a local name, a comment, or a name
+   in a document that lagged behind code renamed earlier (the
+   `--pantry-*` CSS tokens, package paths, the `x-commerce-signature` that
+   the spec already named). None merges two meanings. A renamed key can
+   move in the sort order, so the codemod sorts a sorted key list such as
+   `"deviceName,integrationAccountId,pantryLocationId,providerLocationId"`
+   again; the Square counter journey found that.
 4. AGENTS.md: the old-name table maps old names for readers of plans and no
    longer keeps old names in a layer; the runtime, boundary, setup and
    deployment sections name the new stack and the release guard.
@@ -536,6 +541,39 @@ Plan 92's test sweep removed the journeys that repaired stored states from
 releases before Refactor 15 or before a rename. Their adapter code stays
 until this cutover and has no test now. Remove it with the other adapters.
 The list is in Plan 92, "Phase 2 results: the low-impact test sweep".
+
+Step 2 removed them on branch `plan-93` (about 2,200 lines):
+
+- Removed: the purged Connector erase and its `tenant_id` reads; the lapse
+  of an approval wait with no ledger entry; the old Kitchen observation,
+  the v1 page view and `surfaceContext` (the chat parser now refuses those
+  keys, and the route's Kitchen digest check for the old key went too);
+  the Square token hand-over; the `public-links` erase; the menu board
+  `style` fallback (a release always carries `style`); the `codex_device`
+  allowance, pause and refresh (with the `unavailable` allowance and
+  `unknown` credits values that only they wrote); the start-time drop of
+  the old warning table.
+- Removed beyond the list, for the same reason: the erase of a Code Mode
+  governor with an earlier name; `erase_purged_organisation_rows` for
+  purges before the purge catalogue; the Case wake for old rows and the
+  `assigned_at` fallback; `'allowance_exhausted'` in the CHECK of
+  `organisation_codex_connection`; the start-time upgrade of the TypeSafe
+  evaluation table.
+- Kept: the quarantine end with no Code Mode settlement. Current code
+  quarantines a Session whose turn cannot end as failed, and this step
+  ends that quarantine.
+- Kept for separate work: the versioned migration steps of the Actor
+  schemas (`SchemaMigrationPlan`), about 30 steps in seven Actors (the
+  Case, cue delivery, commerce projection, device fleet, WhatsApp reply
+  proposal and Session outbox plans, and the commerce engine's outbox
+  signing migration). The new stack starts empty, so each plan can fold
+  its steps into one baseline. That is a change of its own, with its own
+  checks.
+
+Found on the way, not fixed: if a Session's process is lost while it is
+quarantined in a turn, its stream stays `running`, and the quarantine never
+ends by itself. Only the operator command `interrupt_session` clears it. The
+old quarantine journey hid this with a seed from an old release.
 
 ## Open item
 
