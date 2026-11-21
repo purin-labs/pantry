@@ -1,5 +1,5 @@
-import { parseSlackDrafts, type SlackDraftView } from "@purin-labs/control-api/portal/slack-drafts";
-import { parseConfigurationDrafts, type ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
+import { parseSlackDrafts } from "@purin-labs/control-api/portal/slack-drafts";
+import { parseConfigurationDrafts } from "@purin-labs/control-api/portal/configuration-drafts";
 import type { ChatPermissionDecision } from "@purin-labs/control-api";
 import type { ChatInputMode, SurfaceObservationV2 } from "@purin-labs/control-api";
 import {
@@ -11,19 +11,18 @@ import {
 } from "../../control-client";
 import { isConversationId } from "@purin-labs/control-api";
 import type { ConversationId, ProjectId } from "@purin-labs/control-api";
-import type { ChatDerivedThread } from "@purin-labs/control-api";
 import {
   parseChatSideCaseSource,
   parseChatSideCaseViews,
   type ChatSideCaseSource,
   type ChatSideCaseView,
 } from "@purin-labs/control-api";
-import { parseProjectDirectory, parseProjectContent, type ProjectReference, type ProjectDirectory, parseProjectCaseEntries, parseProjectCatalogue, type ChatDirectoryCommand, type ProjectCaseEntry, type ProjectCommand } from "@purin-labs/control-api";
+import { parseProjectDirectory, parseProjectContent, type ProjectReference, parseProjectCaseEntries, parseProjectCatalogue, type ChatDirectoryCommand, type ProjectCaseEntry, type ProjectCommand } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
-import { parseEmailReviewQueue, type EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
+import { parseEmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import type { ActiveConversationMetadata, ArchivedConversationMetadata, ChatEffort } from "@purin-labs/control-api";
-import { type Chat, type ChatConversationSummary, type ChatModelOption, type ChatWork, type PendingChatDeletion, parseChat, parseChatModelOptions, parseChatSummary, parseChatWork, parseDerivedThreads, parsePendingChatDeletions, parsePinnedConversations } from "@purin-labs/control-api/portal/chat";
+import type { ChatEffort } from "@purin-labs/control-api";
+import { type Chat, type ChatConversationSummary, type ChatPageData, type ChatWork, parseChat, parseChatModelOptions, parseChatSummary, parseChatWork, parseDerivedThreads, parsePendingChatDeletions, parsePinnedConversations } from "@purin-labs/control-api/portal/chat";
 
 declare const document: Readonly<{ cookie: string }>;
 
@@ -61,68 +60,6 @@ export class ChatDraftConflictError extends Error {
   }
 }
 
-export type ChatPageData = {
-  readonly derivedThreads: readonly ChatDerivedThread[];
-  readonly pinnedConversations: readonly ChatConversationSummary[];
-  readonly pendingDeletions: readonly PendingChatDeletion[];
-  readonly nextActiveCursor: string | null;
-  readonly nextArchivedCursor: string | null;
-  readonly projectDirectory: ProjectDirectory;
-  readonly model:
-    | {
-        readonly kind: "ready";
-        readonly selected: string;
-        readonly agent: "Pi" | "Claude";
-        readonly name: string;
-        readonly options: readonly ChatModelOption[];
-      }
-    | { readonly kind: "unavailable"; readonly message: string };
-  readonly configurationVersion: number;
-  readonly unreadCount: number;
-  readonly conversations: readonly (Readonly<
-    Pick<
-      ChatConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ActiveConversationMetadata)[];
-  readonly archivedConversations: readonly (Readonly<
-    Pick<
-      ChatConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ArchivedConversationMetadata)[];
-  readonly conversation: Chat | null;
-  readonly emailReview: EmailReviewQueue;
-  readonly slackDrafts: readonly SlackDraftView[];
-  readonly configurationDrafts: readonly ConfigurationDraftView[];
-  /** The side Case cards of the open chat, newest first. */
-  readonly sideCases: readonly ChatSideCaseView[];
-  /** Where the open chat came from, when it is a side Case. */
-  readonly sideCaseSource: ChatSideCaseSource | null;
-};
-
 export async function readChat(
   organisationId: string,
   conversationId: ConversationId | null,
@@ -153,46 +90,15 @@ export async function readChat(
     raw.unreadCount < 0
   )
     throw new Error("Could not read the conversation.");
-  const conversations: (Readonly<
-    Pick<
-      ChatConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ActiveConversationMetadata)[] = [];
+  const conversations: ChatPageData["conversations"][number][] = [];
   for (const item of raw.conversations) {
     const summary = parseChatSummary(item);
     if (summary.lifecycle !== "active")
       throw new Error("Invalid active conversation list.");
     conversations.push(summary);
   }
-  const archivedConversations: (Readonly<
-    Pick<
-      ChatConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ArchivedConversationMetadata)[] = [];
+  const archivedConversations: ChatPageData["archivedConversations"][number][] =
+    [];
   for (const item of raw.archivedConversations) {
     const summary = parseChatSummary(item);
     if (summary.lifecycle !== "archived")

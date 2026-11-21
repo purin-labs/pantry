@@ -572,7 +572,7 @@ function previewDelay(): Promise<void> {
 function resolvePreviewDelay(resolve: () => void): void {
   window.setTimeout(resolve, 600);
 }
-import type { ChatPageData } from "../features/chat/api";
+import type { ChatPageData } from "@purin-labs/control-api/portal/chat";
 import type { ChatModelCapabilities, ChatToolView } from "@purin-labs/control-api";
 const previewTool: ChatToolView = {
   toolCallId: "preview-documentation",

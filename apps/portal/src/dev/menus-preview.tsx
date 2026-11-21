@@ -3,11 +3,13 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import "../styles.css";
 import { MenuDraftRoute } from "../features/content-studio/route";
+import { registerPortalBoardChat } from "../portal-board-chat";
 
 // Menus (Items, Boards, Screens) against a Worker's control routes, for the
 // Plan 40B browser journey. `?organisation=<id>&tab=boards` picks the
 // Organisation and the first tab; the browser's own session cookie signs
 // each request.
+registerPortalBoardChat();
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV)
   throw new Error("Menus preview is development-only.");

@@ -31,6 +31,14 @@ import {
   parseChatContextDetails,
   type ChatContextDetails,
 } from "../index.ts";
+import type { ConfigurationDraftView } from "./configuration-drafts.ts";
+import type { EmailReviewQueue } from "./email-review.ts";
+import type { SlackDraftView } from "./slack-drafts.ts";
+import type {
+  ChatSideCaseSource,
+  ChatSideCaseView,
+  ProjectDirectory,
+} from "../index.ts";
 import {
   parseAuthoredConnector,
   type ConnectorAuthoringResult,
@@ -245,6 +253,56 @@ export type Chat = Readonly<{
   readonly work: ChatWork;
 }> &
   ChatMetadata;
+
+/** A chat in the chat list of the chat page. */
+type ChatListEntry = Readonly<
+  Pick<
+    ChatConversationSummary,
+    | "id"
+    | "title"
+    | "revision"
+    | "latestSequence"
+    | "lastReadSequence"
+    | "activity"
+    | "placement"
+    | "updatedAt"
+    | "sharing"
+    | "parentConversationId"
+    | "origin"
+  >
+>;
+
+/** The read model of the Portal chat page. */
+export type ChatPageData = {
+  readonly derivedThreads: readonly ChatDerivedThread[];
+  readonly pinnedConversations: readonly ChatConversationSummary[];
+  readonly pendingDeletions: readonly PendingChatDeletion[];
+  readonly nextActiveCursor: string | null;
+  readonly nextArchivedCursor: string | null;
+  readonly projectDirectory: ProjectDirectory;
+  readonly model:
+    | {
+        readonly kind: "ready";
+        readonly selected: string;
+        readonly agent: "Pi" | "Claude";
+        readonly name: string;
+        readonly options: readonly ChatModelOption[];
+      }
+    | { readonly kind: "unavailable"; readonly message: string };
+  readonly configurationVersion: number;
+  readonly unreadCount: number;
+  readonly conversations: readonly (ChatListEntry & ActiveConversationMetadata)[];
+  readonly archivedConversations: readonly (ChatListEntry &
+    ArchivedConversationMetadata)[];
+  readonly conversation: Chat | null;
+  readonly emailReview: EmailReviewQueue;
+  readonly slackDrafts: readonly SlackDraftView[];
+  readonly configurationDrafts: readonly ConfigurationDraftView[];
+  /** The side Case cards of the open chat, newest first. */
+  readonly sideCases: readonly ChatSideCaseView[];
+  /** Where the open chat came from, when it is a side Case. */
+  readonly sideCaseSource: ChatSideCaseSource | null;
+};
 
 export type ChatModelOption = {
   readonly id: string;

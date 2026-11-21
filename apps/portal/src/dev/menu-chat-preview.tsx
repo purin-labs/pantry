@@ -9,6 +9,7 @@ import { PageHeader } from "../page-components";
 import { workspacePageDescriptor } from "../route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { MenuDraftRoute } from "../features/content-studio/route";
+import { registerPortalBoardChat } from "../portal-board-chat";
 import PermissionRequestsDrawer from "../features/access/permission-requests-drawer";
 import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { createAccessRouteTransport } from "../features/access/api";
@@ -18,6 +19,7 @@ import { controlMutation, controlRead } from "../control-client";
 // Organisation of the Worker behind this server (`?organisation=<id>`) under
 // the browser's own session. An agent's edit reaches the page through the
 // room that people edit. A browser journey drives it.
+registerPortalBoardChat();
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV)
   throw new Error("Menu chat preview is development-only.");

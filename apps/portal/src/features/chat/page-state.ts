@@ -1,5 +1,5 @@
 import type { ConversationId } from "@purin-labs/control-api";
-import type { ChatPageData } from "./api";
+import type { ChatPageData } from "@purin-labs/control-api/portal/chat";
 
 /** The chat page as the route holds it. */
 export type PageState =

@@ -2,7 +2,7 @@ import React from "react";
 import { Check } from "lucide-react";
 import type { ChatEffort } from "@purin-labs/control-api";
 import type { Chat } from "@purin-labs/control-api/portal/chat";
-import type { ChatPageData } from "./api";
+import type { ChatPageData } from "@purin-labs/control-api/portal/chat";
 import { effortDescription, effortLabel } from "./effort-labels";
 
 export function selectedModelFromData(data: ChatPageData): string | null {

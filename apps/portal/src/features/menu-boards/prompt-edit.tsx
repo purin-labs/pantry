@@ -7,8 +7,7 @@ import {
   type MenuBoardSnapshot,
 } from "@purin-labs/menu-board-crdt/board";
 import { captureBakeryBrowserContext } from "../bakery-browser-context";
-import { readChat } from "../chat/api";
-import { sendChat } from "../chat/screen-send";
+import { boardChat } from "./board-chat";
 import { controlAnswer, controlRead, controlWrite } from "../../control-client";
 import { controlPath } from "../../control-paths";
 import type { MenuBoardClient } from "./board-client";
@@ -68,7 +67,7 @@ export function PromptEdit(props: Readonly<{
     if (conversationId === null || !waiting) return;
     let current = true;
     const timer = setInterval(() => {
-      void readChat(props.organisationId, conversationId, "", "observe").then((data) => {
+      void boardChat().read(props.organisationId, conversationId).then((data) => {
         const chat = data.conversation;
         if (!current || chat === null || chat.work.kind !== "ready") return;
         const answers = chat.messages.filter((message) => message.kind === "assistant");
@@ -102,12 +101,11 @@ export function PromptEdit(props: Readonly<{
   const sendWords = async (words: string, previous: Variant<Ask, "asked"> | null): Promise<void> => {
     setAsk({ kind: "sending" });
     try {
-      const data = await readChat(props.organisationId, previous?.conversationId ?? null, "", "observe");
+      const data = await boardChat().read(props.organisationId, previous?.conversationId ?? null);
       const model = data.conversation?.model ?? (data.model.kind === "ready" ? data.model.selected : null);
       if (model === null) throw new Error("Connect an AI before you ask the agent.");
       const id = previous?.conversationId ?? newConversationId();
-      await sendChat(props.organisationId, {
-        kind: "message",
+      await boardChat().send(props.organisationId, {
         conversationId: id,
         requestId: crypto.randomUUID(),
         model,
