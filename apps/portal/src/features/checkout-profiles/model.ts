@@ -41,7 +41,7 @@ type ReviewStatus =
   | Readonly<{ kind: "submitting" }>
   | Readonly<{ kind: "failed"; message: string }>;
 
-export type CheckoutProfilesOperation =
+type CheckoutProfilesOperation =
   | IdleOperation
   | Readonly<{ kind: "submitting"; action: "create" | "save" }>
   | Readonly<{

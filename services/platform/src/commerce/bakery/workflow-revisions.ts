@@ -11,7 +11,8 @@ import {
 import { admitScenario } from "@purin-labs/production-simulation";
 import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type { Env } from "../../env";
-import type { OrganisationId, UserId } from "../../ids";
+import type { OrganisationId } from "../../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 
 /**
  * Plan 84: a recipe's applied workflow. Each revision is immutable in R2 under its

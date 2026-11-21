@@ -8,7 +8,7 @@ export type OrganisationPing = {
   kind: "organisation";
 };
 
-export type OrganisationPlan = "beta";
+type OrganisationPlan = "beta";
 
 export type OrganisationStatus = "active" | "suspended" | "deleted" | "purged";
 

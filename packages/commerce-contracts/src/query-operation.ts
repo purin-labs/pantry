@@ -49,7 +49,7 @@ import {
 
 import { cursorRefusal } from "./cursor-values.ts";
 
-export const commerceRelationshipTraversalSubjectSchema = Type.Union([
+const commerceRelationshipTraversalSubjectSchema = Type.Union([
   OpenObject({ kind: Type.Literal("all") }),
   OpenObject({
     kind: Type.Literal("definition"),

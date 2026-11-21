@@ -155,8 +155,4 @@ export {
   parseDiscountOutput,
   parseLinesOutput,
   parseTendersOutput,
-  type DeliveryOutput,
-  type LinePrice,
-  type PluginDiscount,
-  type TenderRefusal,
 } from "@purin-labs/commerce-contracts/records/plugin-outputs";

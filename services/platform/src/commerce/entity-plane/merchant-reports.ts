@@ -44,10 +44,10 @@ export function isMerchantReportName(
  * returns; there is no time window to state, and reporting one would imply a
  * filter the query does not apply.
  */
-export type MerchantReportWindow = Readonly<{ kind: "current_state" }>;
+type MerchantReportWindow = Readonly<{ kind: "current_state" }>;
 
 /** The unit a headline value carries, so no number is presented bare. */
-export type MerchantReportUnit =
+type MerchantReportUnit =
   | Readonly<{ kind: "entity_count"; entityType: SystemCommerceEntityKind }>
   | Readonly<{ kind: "money"; currency: string }>;
 

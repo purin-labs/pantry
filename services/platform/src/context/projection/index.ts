@@ -26,7 +26,7 @@ import {
 
 export type { ContextVisibility } from "../../authorization/access-grants/types";
 
-export const CONTEXT_PROJECTION_COMMAND_TYPE = "context.projection.v1" as const;
+const CONTEXT_PROJECTION_COMMAND_TYPE = "context.projection.v1" as const;
 export const MAX_BOUNDED_CONTEXT_TEXT_CHARS = 4_096;
 
 export type Timestamp = number;
@@ -46,7 +46,7 @@ export type CaseContextSourceRef = {
   readonly entryId: string;
 };
 
-export type FileSegmentContextSourceRef = {
+type FileSegmentContextSourceRef = {
   readonly kind: "file_segment";
   readonly integrationAccountId: string;
   readonly provider: FileContextProvider;
@@ -135,7 +135,7 @@ type ReadyContextProjectionFields = {
   readonly provenance: ContextProjectionProvenance;
 };
 
-export type ReadyContextProjection =
+type ReadyContextProjection =
   | Readonly<
       ReadyContextProjectionFields & {
         readonly source: CaseContextSourceRef;
@@ -184,7 +184,7 @@ export interface ContextProjectionReader {
   ): Promise<readonly ContextProjectionSearchResult[]>;
 }
 
-export type ContextProjectionSkipReason =
+type ContextProjectionSkipReason =
   "source_missing" | "source_digest_mismatch" | "unsupported_content";
 
 export type ContextProjectionApplyResult =

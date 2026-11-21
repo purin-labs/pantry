@@ -164,30 +164,6 @@ export async function savePreparedAgentWorkspaceRun(
   );
 }
 
-export async function saveProductionWorkspaceRun(
-  organisationId: string,
-  mutate: CommerceMutationTransport,
-  name: string,
-  plan: ProductionWorkcells,
-  read: Read,
-  readDefinition: (
-    organisationId: string,
-    scenarioId: string,
-  ) => Promise<ProductionScenarioRead>,
-): Promise<WorkspaceRunSave> {
-  return savePreparedWorkspaceRun(
-    organisationId,
-    mutate,
-    await prepareProductionWorkspaceRun(
-      organisationId,
-      name,
-      plan,
-      readDefinition,
-    ),
-    read,
-  );
-}
-
 async function prepareSnapshot(
   snapshot: RunSnapshot,
 ): Promise<PreparedWorkspaceRun> {
@@ -633,7 +609,7 @@ export async function verifyProductionSource(
   return null;
 }
 
-export function workspaceRunPath(organisationId: string): string {
+function workspaceRunPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/bakery/runs`;
 }
 

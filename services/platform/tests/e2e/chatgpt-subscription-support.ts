@@ -20,7 +20,8 @@ import {
   selectOrganisationInferenceSelection,
   type OrganisationInferenceSelection,
 } from "../../src/data/organisation-inference-selection";
-import { parseUserId, type OrganisationId, type UserId } from "../../src/ids";
+import { type OrganisationId } from "../../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
@@ -863,7 +864,7 @@ async function pkceChallenge(verifier: string): Promise<string> {
  * "Sign in with ChatGPT" as an owner does it in Portal: start, approve at
  * OpenAI, paste the callback address. Returns the address that was pasted.
  */
-export async function signInWithChatGpt(
+async function signInWithChatGpt(
   openai: FakeOpenAiSignIn,
   input: Readonly<{
     organisationId: OrganisationId;

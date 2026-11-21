@@ -19,7 +19,6 @@ export type {
   CreateCommerceCompanyV1,
   PlaceCommerceDraftOrderOnTermsV1,
   RecordCommerceInvoicePaymentV1,
-  CommerceCompaniesV1,
   CommerceCompanyCommandV1,
   CommerceCompanyInvoiceV1,
   CommerceCompanyPaymentTermsV1,

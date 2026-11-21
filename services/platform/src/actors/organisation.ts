@@ -111,7 +111,11 @@ import {
   ProductionPlanRooms,
   type ProductionPlanAgentEdit,
 } from "./production-plan";
-import { WorkflowCanvasRooms } from "./workflow-canvas-rooms";
+import {
+  openCanvasPages,
+  signalCanvasChat,
+  WorkflowCanvasRooms,
+} from "./workflow-canvas-rooms";
 import type {
   DraftChangeSet,
   DraftSnapshot,
@@ -133,7 +137,8 @@ import {
   readSocketSweepDueAt,
   scheduleSocketSweep,
 } from "./hibernatable-sockets";
-import type { ControlSessionId, UserId } from "../ids";
+import type { ControlSessionId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   CanvasAgentRequest,
   CanvasMoveRequest,
@@ -1001,6 +1006,7 @@ export class OrganisationDO
           this.ctx.storage.sql,
           input.organisationId,
         ),
+      { open: openCanvasPages, signal: signalCanvasChat },
       input.kind === SURFACE_EFFECT_SIGNAL
         ? SURFACE_EFFECT_SIGNAL
         : CHAT_SIGNAL,

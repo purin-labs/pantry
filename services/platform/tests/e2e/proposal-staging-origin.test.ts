@@ -7,7 +7,7 @@ import {
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
 import { issueControlSession } from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeSessionTurnExecution } from "../../src/chat/turn-access";
 import { proposeCampaignBrief } from "../../src/data/campaign-brief";
 import { createOperatorConfigurationDraft } from "../../src/data/operator-configuration-draft";

@@ -12,10 +12,13 @@ import {
   type ProviderManifestEvidence,
 } from "../../data/provider-attempt";
 import {
+  finalizeConnectedIntegrationAccount,
   integrationAccountAllowsCredentialMutation,
   providerConnectionAllowsCredentialMutation,
+  requireConnectionCredentialAuthority,
   resolveIntegrationAccount,
   resolveProviderConnection,
+  type createConnectedIntegration,
 } from "../../data/integration-account";
 import type { Env } from "../../env";
 import type { ProviderConnectionId, OrganisationId } from "../../ids";
@@ -100,6 +103,50 @@ export async function finishProviderCompletion(
       returnPath: authorization.state.returnPath,
     },
   };
+}
+
+/**
+ * The end of a provider connection after its phases: the account becomes
+ * active, the new credential replaces the old one, and the attempt completes
+ * with this manifest evidence.
+ */
+export async function finalizeProviderConnection(
+  input: CompleteProviderInput,
+  authorization: ProviderOAuthAttempt,
+  current: ProvisioningProviderConnectionAttempt,
+  connected: Awaited<ReturnType<typeof createConnectedIntegration>>,
+  manifestEvidence: ProviderManifestEvidence,
+): Promise<Result<ProviderCompletion, ProviderOnboardingError>> {
+  const organisationId = authorization.state.attempt.organisationId;
+  const finalized = await finalizeConnectedIntegrationAccount({
+    db: input.scope.database,
+    organisationId,
+    integrationAccountId: connected.account.integrationAccountId,
+    now: input.now,
+  });
+  if (!finalized.ok) {
+    return failProviderCompletion(input, authorization, current, {
+      code: "provider_oauth_response_invalid",
+    });
+  }
+  const cutover = await completeProviderCredentialCutover(
+    input,
+    organisationId,
+    connected.connection.providerConnectionId,
+    requireConnectionCredentialAuthority(connected.connection)
+      .credentialGeneration,
+  );
+  if (!cutover.ok) {
+    return failProviderCompletion(input, authorization, current, cutover.error);
+  }
+  return finishProviderCompletion(
+    input,
+    authorization,
+    current,
+    connected.connection.providerConnectionId,
+    [finalized.value.integrationAccountId],
+    manifestEvidence,
+  );
 }
 
 export async function failProviderCompletion(

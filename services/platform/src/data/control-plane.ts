@@ -21,19 +21,16 @@ import {
   type OrganisationExecutionScopeError,
 } from "../organisation-execution-scope";
 import {
-  newUserId,
   newControlSessionId,
   newPersonId,
   newOrganisationId,
   newWorkspaceId,
-  parseUserId,
   parseControlSessionId,
   parseOrganisationHandle,
   parsePersonId,
   parseOrganisationId,
   parseWorkspaceHandle,
   parseWorkspaceId,
-  type UserId,
   type ControlSessionId,
   type OrganisationHandle,
   type PersonId,
@@ -41,6 +38,11 @@ import {
   type WorkspaceHandle,
   type WorkspaceId,
 } from "../ids";
+import {
+  newUserId,
+  parseUserId,
+  type UserId,
+} from "@purin-labs/control-api/ids";
 import {
   parseInitialOrganisationPlacement,
   type InitialOrganisationPlacement,
@@ -140,7 +142,7 @@ export type ActiveOrganisationMembership = {
   readonly createdAt: number;
 };
 
-export type OrganisationWorkspace = {
+type OrganisationWorkspace = {
   readonly workspaceId: WorkspaceId;
   readonly workspaceHandle: WorkspaceHandle;
   readonly name: string;

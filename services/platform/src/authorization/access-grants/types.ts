@@ -9,7 +9,7 @@ import type {
 } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
-export type WorkflowAuthorityKind = ContractWorkflowAuthorityKind;
+type WorkflowAuthorityKind = ContractWorkflowAuthorityKind;
 export type GrantSubject = Readonly<ContractGrantSubject>;
 
 export type ContextVisibility =
@@ -40,8 +40,7 @@ export type ContextVisibility =
       readonly bindingRevision: number;
     }>;
 
-export type AccessGrantId = string;
-export type AccessGrantRevision = number;
+type AccessGrantId = string;
 
 export type AccessGrantTarget = Readonly<ContractAccessGrantTarget>;
 export type CommerceReadGrantScope = Readonly<ContractCommerceReadGrantScope>;

@@ -24,10 +24,7 @@ export type CodeModeExchangeDenial = {
 };
 
 export type CodeModeRemoteCall = Extract<WorkerToHostMessage, { type: "call" }>;
-export type CodeModeRemoteResult = Extract<
-  HostToWorkerMessage,
-  { type: "result" }
->;
+type CodeModeRemoteResult = Extract<HostToWorkerMessage, { type: "result" }>;
 
 /**
  * How the VM of one attempt ended, as the sandbox reported it. Pi turns every

@@ -75,7 +75,7 @@ export type Draft = {
   eventsShared: boolean;
 };
 
-export type ScenarioIndex = Readonly<{
+type ScenarioIndex = Readonly<{
   dependencies: ReadonlyMap<TaskId, readonly TaskId[]>;
   workflows: ReadonlyMap<WorkflowId, WorkflowDefinition>;
   tasks: ReadonlyMap<WorkflowId, ReadonlyMap<TaskKey, TaskDefinition>>;

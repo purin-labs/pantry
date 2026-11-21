@@ -23,9 +23,9 @@ import type { CredentialVaultBindings, VaultKeyVersion } from "./keyring";
 import { resolveVaultHandle } from "./service";
 import { isRecord, isString, sha256Hex } from "@purin-labs/std";
 
-export const VAULT_BACKUP_SCHEMA_VERSION = "satyr.vault-backup.v1";
+const VAULT_BACKUP_SCHEMA_VERSION = "satyr.vault-backup.v1";
 
-export type VaultBackupVaultSecretRow = {
+type VaultBackupVaultSecretRow = {
   readonly organisationId: string;
   readonly vaultHandle: string;
   readonly keyVersion: string;
@@ -37,7 +37,7 @@ export type VaultBackupVaultSecretRow = {
   readonly revokedAt: number | null;
 };
 
-export type VaultBackupRotationJobRow = {
+type VaultBackupRotationJobRow = {
   readonly rotationId: string;
   readonly sourceKeyVersion: string;
   readonly targetKeyVersion: string;
@@ -57,7 +57,7 @@ export type VaultBackupRotationJobRow = {
   readonly failedAt: number | null;
 };
 
-export type VaultBackupCredentialRefRow = {
+type VaultBackupCredentialRefRow = {
   readonly organisationId: string;
   readonly provider: string;
   readonly name: string;
@@ -68,7 +68,7 @@ export type VaultBackupCredentialRefRow = {
   readonly revokedAt: number | null;
 };
 
-export type VaultBackupRevocationOperationRow = {
+type VaultBackupRevocationOperationRow = {
   readonly revocationId: string;
   readonly organisationId: string;
   readonly vaultHandle: string;
@@ -91,14 +91,14 @@ export type VaultBackupRevocationOperationRow = {
   readonly policyActivatedAt: number | null;
 };
 
-export type VaultBackupTables = {
+type VaultBackupTables = {
   readonly vaultSecrets: readonly VaultBackupVaultSecretRow[];
   readonly rootRotationJobs: readonly VaultBackupRotationJobRow[];
   readonly credentialRefs: readonly VaultBackupCredentialRefRow[];
   readonly credentialRevocationOperations: readonly VaultBackupRevocationOperationRow[];
 };
 
-export type VaultBackupScope = "all" | { readonly organisationId: string };
+type VaultBackupScope = "all" | { readonly organisationId: string };
 
 export type VaultBackupEnvelope = {
   readonly schemaVersion: "satyr.vault-backup.v1";
@@ -108,7 +108,7 @@ export type VaultBackupEnvelope = {
   readonly digest: string;
 };
 
-export type VaultBackupTableName =
+type VaultBackupTableName =
   | "vault_secret"
   | "vault_root_rotation_job"
   | "credential_ref"

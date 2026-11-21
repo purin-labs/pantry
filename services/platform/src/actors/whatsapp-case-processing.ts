@@ -65,7 +65,7 @@ import {
   whatsAppTokenWindowTotals,
   type WhatsAppIngressLimits,
 } from "./connector-whatsapp";
-import { invalidateOpenWhatsAppProposal } from "./connector-whatsapp-proposal";
+import { invalidateOpenWhatsAppProposal } from "./connector-whatsapp";
 import type { WhatsAppContentCipher } from "./whatsapp-active-content";
 import type { WhatsAppCaseMessage } from "./whatsapp-harness-tools";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";

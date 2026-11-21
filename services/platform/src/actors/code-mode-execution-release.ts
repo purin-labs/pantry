@@ -23,7 +23,7 @@ import {
  */
 
 /** What an owner holds for the reservation after the release. */
-export type ReleasedReservationState =
+type ReleasedReservationState =
   /** This release cancelled the live reservation. */
   | "cancelled"
   /** The owner holds no reservation for the execution. */

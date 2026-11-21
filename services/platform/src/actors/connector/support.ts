@@ -7,7 +7,7 @@ import { scheduleCaseWorkAlarm } from "./alarm";
 import type { ChannelAlarmDue } from "./channel-adapter";
 // The pure parsers live in a module with no Actor imports, so that a module
 // outside the Connector can parse a stored delivery (Refactor 15).
-export { invalid, parseIngressContent } from "./ingress-content";
+export { invalid } from "./ingress-content";
 
 export async function scheduleAcceptedCaseWorkAlarm(
   storage: DurableObjectStorage,

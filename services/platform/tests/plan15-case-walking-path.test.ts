@@ -58,7 +58,7 @@ import {
   caseContentInstruction,
 } from "../src/actors/case-content";
 import { actorPhysicalName } from "../src/actors/actor-registry";
-import { slackCaseTurnId } from "../src/actors/connector-slack-stream";
+import { slackCaseTurnId } from "../src/actors/case-turn-stream";
 import {
   authorizeCaseConversationOutput,
   runDirectCasePath,

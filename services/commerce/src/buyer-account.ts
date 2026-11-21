@@ -12,12 +12,12 @@ export type BuyerAccountIdentity = Readonly<{
   contact: CommerceBuyerContactV1;
 }>;
 
-export type BuyerSavedAddress = Readonly<{
+type BuyerSavedAddress = Readonly<{
   address: CommerceBuyerShippingAddressV1;
   addressValidationReference: string;
 }>;
 
-export type BuyerAccountResult<T> =
+type BuyerAccountResult<T> =
   Readonly<{ kind: "resolved"; value: T }> | Readonly<{ kind: "unavailable" }>;
 
 export type BuyerAccountGateway = Readonly<{

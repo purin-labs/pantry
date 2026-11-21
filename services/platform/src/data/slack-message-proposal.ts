@@ -12,7 +12,7 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
  * posted by the agent: a person sends it, edits it or discards it from the
  * card in the conversation that holds its Case.
  */
-export type SlackMessageProposalLifecycle =
+type SlackMessageProposalLifecycle =
   | "awaiting_approval"
   | "sending"
   | "sent"

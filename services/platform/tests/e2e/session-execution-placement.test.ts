@@ -28,7 +28,7 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { network } from "./network";

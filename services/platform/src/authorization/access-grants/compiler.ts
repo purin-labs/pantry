@@ -6,15 +6,10 @@ import {
   encodeCapabilityKey,
   type CapabilityDefinition,
   type FileCapabilityDefinition,
-  type PlatformCapabilityDefinition,
-  type ProviderCapabilityDefinition,
 } from "./capability-key";
 import { assertNever } from "@purin-labs/std";
 
 export type ImmutableCapabilityDefinition = CapabilityDefinition;
-export type PlatformCapability = PlatformCapabilityDefinition;
-export type ProviderCapability = ProviderCapabilityDefinition;
-export type FileCapability = FileCapabilityDefinition;
 
 export type EffectiveCapability = Readonly<{
   readonly definition: ImmutableCapabilityDefinition;

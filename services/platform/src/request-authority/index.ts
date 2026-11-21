@@ -13,7 +13,6 @@ import type {
 import type { GrantSubject } from "../authorization/access-grants/types";
 import {
   parseConnectorId,
-  parseUserId,
   parseIntegrationAccountId,
   parsePersonId,
   parseOrganisationId,
@@ -24,6 +23,7 @@ import {
   type OrganisationId,
   type WorkspaceId,
 } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
 import {
@@ -33,10 +33,7 @@ import {
   isRecord,
 } from "@purin-labs/std";
 
-export type {
-  GrantSubject,
-  WorkflowAuthorityKind,
-} from "../authorization/access-grants/types";
+export type { GrantSubject } from "../authorization/access-grants/types";
 
 type RawRecord = Record<string, unknown>;
 

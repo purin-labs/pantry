@@ -219,84 +219,18 @@ export type CommerceActionError =
   | { readonly code: "commerce_action_path_invalid" }
   | { readonly code: "commerce_action_event_invalid"; readonly field: string };
 
+/**
+ * The path of an approved action: the request, with the execution of a
+ * cancellation bound to its provider or to the full Underclerk refund.
+ */
 export type CommerceActionPath =
-  | InstallMerchantPluginAction
-  | PublishCafeMenuAction
-  | ChangeMenuPriceAction
-  | OrderRefundAction
-  | StockOperationAction
-  | {
-      readonly kind: "publish_catalog_listing";
-      readonly productId: string;
-      readonly productRevision: number;
-      readonly variantId: string;
-      readonly variantRevision: number;
-      readonly offerId: string;
-      readonly offerRevision: number;
-      readonly salesChannelId: string;
-      readonly salesChannelRevision: number;
-    }
-  | {
-      readonly kind: "update_product_description";
-      readonly productId: string;
-      readonly productRevision: number;
-      readonly description: string;
-    }
-  | {
-      readonly kind: "cancel_order";
-      readonly resourceId: string;
-      readonly expectedRevision: number;
-      readonly reason: CommerceCancellationRequest["reason"];
-      readonly refund: CommerceCancellationRequest["refund"];
-      readonly restock: boolean;
-      readonly notifyCustomer: boolean;
-      readonly note: string | null;
+  | Exclude<CommerceActionRequest, CommerceCancellationRequest>
+  | (CommerceCancellationRequest & {
       readonly execution: Readonly<{ readonly kind: "provider_managed" }>;
-    }
+    })
   | (CommerceCancellationPathFields & {
       readonly execution: CommerceCancellationAuthority;
-    })
-  | {
-      readonly kind: "attach_tracking";
-      readonly batchId: string;
-      readonly merchantRevision: number;
-      readonly orderId: string;
-      readonly fulfillmentId: string;
-      readonly fulfillmentRevision: number;
-      readonly shipmentId: string;
-      readonly shipmentRevision: number;
-      readonly trackingNumber: string;
-    }
-  | {
-      /**
-       * One immediate price change on a listed Offer.
-       *
-       * Both revisions are bound: the Offer the proposal was built against and
-       * the price policy the approval was given under. A change to either
-       * needs a new proposal, because the allowance the operator approved may
-       * no longer be the one that applies.
-       */
-      readonly kind: "adjust_offer_price";
-      readonly offerId: string;
-      readonly expectedOfferRevision: number;
-      readonly expectedPolicyRevision: number;
-      readonly proposedPriceMinor: number;
-      readonly currency: string;
-    }
-  | {
-      readonly kind: "submit_supplier_payout";
-      readonly payoutId: string;
-      readonly expectedPayoutRevision: number;
-      readonly approvalDigest: string;
-    }
-  | {
-      readonly kind: "resume_supplier_payout_funding";
-      readonly payoutId: string;
-      readonly expectedPayoutRevision: number;
-      readonly approvalDigest: string;
-      readonly attemptId: string;
-      readonly providerTransferId: string;
-    };
+    });
 
 export type CommerceEntityPlaneActionPath = {
   readonly kind: "patch_commerce_list_entry";

@@ -3,10 +3,12 @@
 Date: 2026-11-20. Revised two times on 2026-11-20: after a review of the first version,
 and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
-Status: accepted in part; step A0 and step S1 are done and on `dev` since 2026-11-20
-(see [Steps done](#steps-done) and [Baseline](#baseline)). The owner accepted the two stages, one decision
-API for approvals, specs by subsystem, and the prune of dead code, duplicate code and
-low-impact tests. The other decisions in [Decisions](#decisions) need the owner.
+Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Stage
+S (steps S2 and S3) waits for Plan 91, and Stage B waits for the Plan 93 cutover: the
+owner decided both waits on 2026-11-21. [What is left](#what-is-left) lists the open
+work. The owner accepted the two stages, one decision API for approvals, specs by
+subsystem, and the prune of dead code, duplicate code and low-impact tests. The other
+decisions in [Decisions](#decisions) use their defaults.
 Owner: the whole repository.
 Touches: every folder, every plan document, `AGENTS.md`, the lint scripts, the deploy
 scripts and each open branch.
@@ -335,15 +337,88 @@ physical bake. This refactor does not remove `schedule.ts`.
   it.
 - The owner decides Stage B.
 
+## What is left
+
+Updated on 2026-11-21, after Stage A landed on `dev` (`6373495d`). The handoff
+[`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
+the state of the branches and the way to continue.
+
+### The end of Stage A: the state of the exit list
+
+| Item                                                    | State                                                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| The ratchet of `lint:layers` is near zero, with reasons | Done: 10 crossings, each with a reason and a fix in `reasons` of `scripts/layers-ratchet.json`      |
+| Each area has a list of its files, tables, public files | Done: `node scripts/check-layers.mjs --areas` and [`docs/layers.md`](layers.md)                     |
+| No public export without a user in another module       | Done: 17 unused exports stay, each with a reason (the dead code entry of [Steps done](#steps-done)) |
+| No test file without a decision                         | Done: [`refactor-17-test-decisions.md`](refactor-17-test-decisions.md), 317 files                   |
+| The time of the first three ports is measured           | Done: [Cost](#cost)                                                                                 |
+| The owner decides Stage B                               | Decided on 2026-11-21: Stage B waits for the Plan 93 cutover ([D2](#decisions))                     |
+
+### Stage A: the tail
+
+1. **The 10 crossings.** Each one has a fix in its reason. In work on 2026-11-21, not on
+   `dev`: the branch `refactor-17-last10-portal` (the chat port of the Café prompt edit,
+   the Stripe part of the integrations page, and an opaque surface state of the chat
+   record with a surface registry for the Kitchen) and the branch
+   `refactor-17-last10-actor` (an activation module of `OrganisationDO`, and the
+   shared ids below both contract packages). Each needs a full E2E run on the merge and
+   the owner's agreement before a landing.
+2. **Owner decisions of step A2.1** ([Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)):
+   one look for each kind of decision (the reject label and its confirm, the approval
+   flow of a custom connector write, the two texts of a permission request, the three
+   button sets of an email reply), and a refusal for a custom connector write, which
+   has none today. The one Portal card keeps both looks through props until then.
+3. **The other preview pages of `apps/portal/src/dev/`.** Step A2.4 moved the public
+   workflow demo. The other pages still hold their own code; production serves none of
+   them. The largest is `appliances-preview.tsx` (1,545 lines).
+4. **Product code that the dead code step deleted** because no file used it: two
+   floor plan station helpers, a workspace run save helper, `verifyRevokedVaultSecret`,
+   three Code Mode workspace allocation wrappers and 14 commerce client resource
+   parsers. The owner may bring one back. `openCounterSale` and
+   `manualCashRefundCounterSale` stay, because Plan 90 names them.
+5. **Test follow-ups.** The search for a journey that has the outcome of a unit test
+   covered only the files with mock signals. Two candidates stay for a later pass:
+   `commerce-lab/scenario-catalog.test.ts` and the third case of
+   `commerce-lab/queue-projection-recovery.test.ts`.
+6. **Checks that did not run.** A real Portal chat turn, mailbox turn and WhatsApp turn
+   against the deployed Worker; a browser check of the one Portal decision card; CI for
+   any push of Stage A (GitHub did not start the jobs because of the account billing).
+7. **Outside this refactor.** `counter-receipt-printer.test.ts` fails under the load of
+   the machine: the device fleet waits 8 seconds for the printer (`PRINTER_ANSWER_MS`).
+   It belongs to Plan 90. Decision D6 (capability claims of the mailbox and WhatsApp
+   agents) stays with its default.
+
+### Stage S: waits for Plan 91
+
+Step S1 is done. Steps S2 (the 33 specs, one area at a time, each checked against the
+code before its plans move to `docs/history/`) and S3 (`AGENTS.md` under 250 lines, the
+plan index and the names table move out) start when Plan 91 phase 4 (the domain and
+the provider consoles) is done. The owner decided this on 2026-11-21.
+
+### Stage B: waits for the Plan 93 cutover
+
+Stage B starts after the cutover of [Plan 93](plan-93-clean-cutover.md), which was a
+draft at step 2 on 2026-11-21. Then, in this order:
+
+1. The trial of D1: one foundation module and one area as packages, with the `tsrs`
+   time, the Worker start and the Portal build.
+2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
+   journeys import the inside of the Worker.
+3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of
+   step A0.7, the type checks, a container build, one E2E shard).
+4. A move date for each module, told to the other sessions before.
+5. After the cutover, with its own decision each: one outbox table shape for the 5
+   outboxes, new names for classes and tables, and the deletion of each old-row adapter.
+
 ## Steps done
 
 **The state on `dev`, 21 November 2026.** Each entry below that names a branch is on
-`dev` now, up to and with the class chains of step A1.9 (`b5932670`). They landed in
-seven pushes; the owner agreed to each one. The full E2E suite passed on each merge
+`dev` now, up to and with the test decisions and the area page. They landed in eight
+pushes; the owner agreed to each one. The full E2E suite passed on each merge
 before its push: 236 files and 457 or 458 tests, with 3 files skipped (they need a
 real model). In two of those runs `counter-receipt-printer.test.ts` failed under the
-load of the machine and passed alone three times. The layer count on `dev` is 50
-(1,350 at the start of the refactor). An entry that says "the full E2E suite did not
+load of the machine and passed alone three times. The layer count on `dev` is 10
+(1,350 at the start of the refactor), and each of the 10 has a written reason. An entry that says "the full E2E suite did not
 run on the branch" is about the worker branch; the merge ran it.
 
 **20 November 2026. Step A0 and step S1 are done.** The owner agreed to the landing,
@@ -1943,6 +2018,134 @@ value, and it reads no field of the Actor class.
   policy, Jev, Memory and Evals parts of the Organisation were modules before this
   step.
 
+### The end of Stage A — Dead code after the ports (2026-11-21)
+
+No export is public without a user in another module, apart from the 15 that a
+reason keeps. A hand check came before each deletion.
+
+- **Unused exports: 797 to 15.** A name that only its own file uses lost `export`.
+  A declaration with no user is deleted, with what only it used. A re-export that
+  no file imports is gone from its barrel: the Vault, the access grants, the
+  context files and assembly, information flow, the Portal commerce barrel and the
+  commerce engine. A name that a doc or a plan names only in prose keeps its
+  declaration; it lost `export` or the barrel line.
+- **Two rules for knip.** `knip.json` ignores `services/platform/src/generated/`:
+  `scripts/generate-actions.ts` writes it and decides its exports (44 names). An
+  export that a reader outside the import graph needs has a `@public` tag with the
+  reader: `PIE_STATIONS` and `buildLiveRoomRoute` (two browser check scripts),
+  `INSIDE_CAPABILITIES` (`scripts/check-ifc-destinations.mjs` reads the source
+  text) and `outsideWrittenFlowLabel` (the IFC integration guide). The header of
+  `scripts/check-unused.mjs` gives both rules.
+- **What stays, with the reason.** `devices/work.ts` and `readKitchenDeviceView`:
+  Plan 24 calls them. Seven Vault names of `credential-vault/index.ts`: the Vault
+  API page of `apps/docs` gives them as the public API. `caseContributionSourceSchema`
+  of `packages/contracts/src/case-output.ts`: Plan 77 names it in that file; the
+  live parser is the one of `case-rpc.ts`. The six exports of
+  `tests/e2e/full-worker.ts`: a Worker harness of Plan 55 that no config starts, in
+  the test folder that another worker decides.
+- **`packages/contracts`.** 25 type re-exports had no user outside the package;
+  only its own type fixtures read them through the barrel. The fixtures now import
+  the source files, and the barrel drops the 25. The other 203 names of the barrel
+  have a user in another package.
+- **Copies: 842 to 825.** Merged: the admin cue route head of Shopify and Stripe
+  (`readCueChannelRequest` in `gateway/request-helpers.ts`), the rotation gizmo of
+  the two Kitchen floor scenes (`spatial/rotation-gizmo.ts`), the commerce action
+  path (derived from the request; a type check proved the two unions equal), the
+  chat list and search read, the end of the provider connection workflows
+  (`provider-managed-connection.ts`, `finalizeProviderConnection` and one
+  `scopesAreComplete`), the head of the two acceptance fault routes, and the entity
+  type parser of the commerce engine (it imports the client parser).
+- **Copies that stay.** The pour-over and siphon scenes: the gripper jaws have a
+  different geometry. `browser-physics-asset.ts`: `build-browser.mjs` writes its pin
+  data. The two Rust fetch crates: no shared crate exists, and one changes two
+  container builds. The refund and cancellation resolution of
+  `after-sale-cancellation.ts`, the recipe models, the Code Mode budget and governor
+  row parsers: each copy has its own types, errors or replay. The two CRDT draft
+  actors wait for step A2.6.
+- **Measures.** Layer crossings: 50, no change. Copies: 842 to 825. Unused
+  exports: 797 to 15, unused files: 1.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build`, `pnpm underclerk:check` and the unit suite (301 files, 1,730
+  tests) pass on the last code commit. No test file is deleted, and no old-row
+  adapter is deleted.
+
+### The end of Stage A: the last crossings and the area lists (2026-11-21)
+
+On the branch `refactor-17-last-crossings`. Layer crossings: 50 to 10, in 6 pairs.
+Each pair that stays has a written reason.
+
+- **Ports that `worker-ports.ts` registers.** The context assembly reads the native
+  chat audience (`context/assembly/native-chat-audience.ts`). The grant code reads
+  the file grant statements and the file target check (`file-grant-parts.ts`).
+  A connection flow gets the statements of the support references, the
+  communication destination and the credential reference from their owners
+  (`data/connection-flow-parts.ts`). Commerce gets the texts of its Slack approval
+  card (`commerce/contract/approval-card-texts.ts`), and devices get the shop Macs
+  (`devices/contract/shop-mac-devices.ts`). Each area contract has a service port:
+  `cafeServices`, `inboxServices`, `organisationServices`, `workflowChanges` and
+  `deviceCommands`. 12 unit test files that reach a port import `worker-ports.ts`.
+- **Moves with evidence.** `memberMaySee` is `chat/member-view.ts`
+  (`foundation/conversation`), and the held output route and the permission request
+  route are `foundation/conversation`. The device fleet terminal module is
+  `areas/devices`. The Organisation pages of the Portal get the shell frame as a
+  prop.
+- **Values and types at their owner.** The socket ping, pong and expiry are in
+  `@purin-labs/std`. `UserId` comes from `@purin-labs/control-api/ids`, so `ids.ts`
+  names no contracts module. The stream types and the turn ids of an ongoing Case
+  turn are `actors/case-turn-stream.ts`. The directory Slack record builders are in
+  `slack/organisation-routing.ts`. The WhatsApp proposal invalidation is in
+  `actors/connector-whatsapp.ts`. The Kitchen surface tool results are a public
+  file, `agent-tools/bakery/surface-result.ts`. `bakery-model` reads the graph query
+  parser of `commerce-contracts`, and `decodeRecord` is in `contract-schema`.
+- **The table scan.** A write is an upper-case SQL keyword, as in each SQL text of
+  the repository. The error text of the Portal is no longer a write. A probe write
+  in the Portal is still found.
+- **Written reasons.** `reasons` in `scripts/layers-ratchet.json` gives the reason
+  and the fix of each pair. `pnpm lint:layers` refuses a pair with no reason or no
+  fix, and a reason of a pair that is gone. The pairs that stay: the Café prompt
+  edit and the Portal chat (2), the activation steps in the commerce module of the
+  Organisation actor (2), the Kitchen view of the chat record (4), the Stripe part
+  of the integrations page (1) and the package `contracts` (1).
+- **The mixed notes.** `agent-tools/session-support.ts` imports no area, so its note
+  is gone. The other five notes name what each file joins today.
+- **The area lists.** `node scripts/check-layers.mjs --areas [module]` prints the
+  files by folder, the packages, the tables and the public files of each module.
+  [`docs/layers.md`](layers.md) holds the list. `pnpm lint:layers-page` fails when
+  the page is older than the map or the files.
+- **Not changed:** no SQL text, bind order, route, status code, error text, RPC
+  method name, stored value, tool definition or tool order.
+- **Measures.** Layer crossings 50 to 10: upward 19 to 7, between areas 17 to 3,
+  against the order 8 to 0, table writes 6 to 0. Copies 842 and unused exports 797,
+  no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 87
+  journey files whose names hold a word of the change ran in four groups: 86 pass
+  and 1 is skipped. `counter-receipt-printer` failed once in the first group (the
+  drawer task was `sent`, not yet `done`, while a lint ran beside it), and it
+  passed twice alone. `wrangler deploy --dry-run` and the full E2E suite did not
+  run on the branch.
+
+### The decision for each test file (2026-11-21)
+
+Each test file in scope has a decision: the 300 Platform unit test files, and the 17
+commerce test files that import a source file that Refactor 17 changed.
+[The table](refactor-17-test-decisions.md) has one row for each file, with the outcome
+that it checks.
+
+- **Result.** 316 files stay as they are. One file loses one case. No file is deleted.
+- **The one delete,** in its own commit: "sets the band when the price is the one that
+  was shown" in `offer-price-allowance.test.ts`. It asserted a call to a mock of the
+  test. The journey `e2e/pi-commerce-actions.test.ts` applies a price allowance through
+  the real route and the real commerce engine.
+- **Why so few.** Plan 92 removed the weak tests of this suite three days before. This
+  pass found no test that asserts the shape of a module, and no test whose only
+  assertion is a call to a mock that the test controls, other than the one above.
+- **The limit.** "Keep: the only check" does not prove that no journey has the outcome.
+  The search for a journey ran for the files with mock signals, not for each case.
+- **The protected list of Plan 92** did not change.
+- **Counts.** The Platform unit suite: 301 files and 1,730 tests before, 301 files and
+  1,729 tests after.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
@@ -2265,6 +2468,9 @@ General risks:
     stored data and no deployed name. Stage B and each change of stored data wait for
     the cutover. The spec text waits for the brand names.
   - Default: as recommended.
+  - Decided by the owner on 2026-11-21, after Stage A: Stage S (steps S2 and S3) waits
+    for Plan 91 phase 4, and Stage B waits for the Plan 93 cutover. The trial of D1 also
+    waits.
 - **D3. The commerce engine: an area or a foundation module.**
   - Recommendation: keep the engine whole in the area `commerce`. Its rule stays: it
     imports no Pantry package.
@@ -2347,6 +2553,22 @@ A full run of the E2E suite takes 54 minutes on the owner's Mac
 ([Baseline](#baseline)), so 25 landings need about 23 hours of suite time. CI runs
 the suite in 4 shards. Steps A1.1 to A1.3 give the time for one port. The estimate
 for the rest uses those two numbers.
+
+**Measured, 20 and 21 November 2026.** The times come from the commit log.
+
+| Work                                   | Time                                                                |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| Step A1.1 (typed actor access)         | about 2 hours of code, then about 1 hour of checks and the E2E run  |
+| Step A1.2 (environment parts)          | about 1 hour, in the same branch as the connections module          |
+| Step A1.3 (the executor names no area) | about 1.5 hours in a parallel session                               |
+| The rest of Stage A                    | about 17 hours of wall time, 20 November 17:00 to 21 November 10:00 |
+| Full E2E runs                          | 13 runs of 48 to 66 minutes; a run under machine load is slower     |
+
+Stage A ran as parallel work: one coordinator session, one long session and two to
+four CLI workers at a time, each in its own worktree. The coordinator merged their
+branches, ran one full E2E run on each merge, and pushed only with the agreement of
+the owner. The estimate of 25 landings was close: seven pushes carried 23 steps, and
+each push had its own full run.
 
 Runtime cost: none. The same Workers run the same code.
 

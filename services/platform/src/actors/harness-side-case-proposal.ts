@@ -6,7 +6,7 @@ import { authorizeConversation } from "../chat/conversation-access";
 import { storeSideCaseProposal } from "../chat/side-cases";
 import { signalChat } from "../chat/signals";
 import { readAdmittedChatInput } from "../chat/turn-access";
-import { parseUserId } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
 import type {

@@ -12,7 +12,7 @@ import { isRecord } from "@purin-labs/std";
 
 // Cursor identity validation is separate from decoding its versioned payload.
 // Pagination applies the identity rule; the query planner decodes the payload.
-export const commerceCursorSchema = Type.Unsafe<
+const commerceCursorSchema = Type.Unsafe<
   string & { readonly __brand: "CommerceCursor" }
 >(trimmedIdentityTextSchema);
 export const commercePaginationSchema = OpenObject({

@@ -213,47 +213,6 @@ function fileMutationApplied(result: D1Result): boolean {
   return d1Changes(result) > 0;
 }
 
-export async function listPendingFileProjectionOutbox(
-  input: Readonly<{
-    readonly db: OrganisationDatabase;
-    readonly organisationId: OrganisationId;
-    readonly limit: number;
-  }>,
-): Promise<readonly PendingFileProjectionOutboxEntry[]> {
-  const rows = await input.db
-    .prepare(
-      `SELECT outbox_id AS outboxId, command_json AS commandJson
-       FROM file_projection_outbox
-      WHERE organisation_id = ? AND delivered_at IS NULL
-      ORDER BY created_at, outbox_id LIMIT ?`,
-    )
-    .bind(input.organisationId, input.limit)
-    .all<{
-      readonly outboxId: unknown;
-      readonly commandJson: unknown;
-    }>();
-  const entries: PendingFileProjectionOutboxEntry[] = [];
-  for (const row of rows.results ?? []) {
-    if (typeof row.outboxId !== "string" || typeof row.commandJson !== "string")
-      continue;
-    let raw: unknown;
-    try {
-      raw = JSON.parse(row.commandJson);
-    } catch {
-      continue;
-    }
-    const command = parseFileProjectionCommand(raw);
-    if (command.ok) {
-      entries.push({
-        organisationId: input.organisationId,
-        outboxId: row.outboxId,
-        command: command.value,
-      });
-    }
-  }
-  return entries;
-}
-
 export async function listPendingFileProjectionOutboxGlobal(
   input: Readonly<{
     readonly db: OrganisationDatabase;

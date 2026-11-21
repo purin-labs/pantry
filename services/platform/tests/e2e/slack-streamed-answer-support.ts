@@ -26,7 +26,7 @@ export const ANSWER_PARTS = [
   "The counter opens when the first trays are cool enough to pack, and the gift boxes follow later in the morning.",
 ];
 export const ANSWER = ANSWER_PARTS.join("");
-export const PART_GAP_MS = 400;
+const PART_GAP_MS = 400;
 // The Connector checks the requester's live authority again 10 s after its
 // last check. This answer lasts longer, so the check falls inside it.
 export const SLOW_PART_GAP_MS = 2_500;
@@ -192,11 +192,11 @@ export function slowModel(parts: readonly string[], gapMs = PART_GAP_MS) {
   };
 }
 
-export function sse(chunk: Record<string, unknown>): string {
+function sse(chunk: Record<string, unknown>): string {
   return `data: ${JSON.stringify(chunk)}\n\n`;
 }
 
-export function textChunk(id: string, text: string): Record<string, unknown> {
+function textChunk(id: string, text: string): Record<string, unknown> {
   return {
     id,
     object: "chat.completion.chunk",
@@ -212,7 +212,7 @@ export function textChunk(id: string, text: string): Record<string, unknown> {
   };
 }
 
-export function stopChunk(id: string): Record<string, unknown> {
+function stopChunk(id: string): Record<string, unknown> {
   return {
     id,
     object: "chat.completion.chunk",

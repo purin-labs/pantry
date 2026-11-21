@@ -23,7 +23,7 @@ export type RackLayoutPresentation = Readonly<{
   checks: readonly FitFinding[];
 }>;
 
-export type TrayMarker = Readonly<{
+type TrayMarker = Readonly<{
   id: string;
   operationId: string;
   label: string;

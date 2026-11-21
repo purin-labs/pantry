@@ -8,7 +8,7 @@ import { saveConversation } from "../../src/chat/store";
 import { createAccessGrant } from "../../src/data/access-grants";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { newConversationId, newProjectId } from "@purin-labs/control-api";
-import type { UserId } from "../../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { requireDefaultProjectId } from "../fixtures/default-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { platformConversation } from "./chat-journey-support";

@@ -7,13 +7,12 @@ import {
   normalizeShopifyCommerceResourceDelivery,
 } from "./delivery-normalizers";
 import {
-  parseUserId,
   parseIntegrationAccountId,
   parseOrganisationId,
-  type UserId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type {
   CommerceSystemError,
@@ -46,7 +45,7 @@ type ShopifyLocationObservationProjectionAuthority =
       commerceSystem: Readonly<{ kind: "shopify"; revision: number }>;
     }>;
 
-export type ShopifyLocationObservationClassification =
+type ShopifyLocationObservationClassification =
   | {
       readonly state: "pending";
       readonly reason: "provider_location_kind_unmapped";
@@ -103,7 +102,7 @@ export type ShopifyLocationClassificationAssignmentResult = {
   readonly projection: AppliedCommerceDeliveryResult;
 };
 
-export type ShopifyLocationObservationDisposition =
+type ShopifyLocationObservationDisposition =
   "applied" | "duplicate" | "out_of_order";
 
 export type ShopifyLocationObservationResult = {

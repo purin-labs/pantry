@@ -10,7 +10,8 @@ import {
   issueGoogleApprovalGrant,
   type GoogleOidcConfig,
 } from "../../src/control/oidc";
-import { parseOrganisationId, type UserId } from "../../src/ids";
+import { parseOrganisationId } from "../../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 
 export async function completeCommerceApprovalFixture(input: {
   readonly db: GlobalDatabase;

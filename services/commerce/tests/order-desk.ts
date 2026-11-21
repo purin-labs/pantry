@@ -20,7 +20,7 @@ import {
 
 export const SMALL_SENCHA = "variant_tea_small_sencha";
 export const LARGE_SENCHA = "variant_tea_large_sencha";
-export const WEEK_LATER = "2026-08-21T10:00:00.000Z";
+const WEEK_LATER = "2026-08-21T10:00:00.000Z";
 
 export type PlacedOrder = Readonly<{
   orderId: string;

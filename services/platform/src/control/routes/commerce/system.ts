@@ -45,10 +45,10 @@ import { commerceProvider } from "../../../commerce/commerce-providers";
 import {
   newRequestId,
   parseIntegrationAccountId,
-  type UserId,
   type OrganisationId,
   organisationIdUniquePart,
 } from "../../../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { createCommerceClient } from "../../../commerce/contract/client";
 import {
   admitUserMutation,

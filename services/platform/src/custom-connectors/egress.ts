@@ -115,7 +115,7 @@ export type CustomConnectorOperationRequest =
     };
 
 /** A provider idempotency key in the header that the reviewed write names. */
-export type CustomConnectorIdempotency = {
+type CustomConnectorIdempotency = {
   readonly header: string;
   readonly key: string;
 };

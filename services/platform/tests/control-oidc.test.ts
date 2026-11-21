@@ -14,11 +14,11 @@ import {
   parseApprovalProofDigest,
 } from "../src/approval-authentication";
 import {
-  parseUserId,
   parseIntegrationAccountId,
   parseSessionId,
   parseOrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 
 const NOW = 1_783_987_896_426;

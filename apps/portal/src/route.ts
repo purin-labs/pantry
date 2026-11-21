@@ -51,7 +51,7 @@ export function navigationGroupTitle(
 
 export type AccessSubview = "access" | "capabilities" | "data_flow";
 
-export type WorkspacePageResource =
+type WorkspacePageResource =
   | { readonly kind: "none" }
   | {
       readonly kind: "detail";

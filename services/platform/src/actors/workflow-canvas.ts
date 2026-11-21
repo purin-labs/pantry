@@ -26,7 +26,7 @@ import {
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";

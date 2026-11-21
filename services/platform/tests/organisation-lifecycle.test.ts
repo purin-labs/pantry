@@ -13,12 +13,8 @@ import {
   restoreOrganisation,
   type ArchiveOrganisationMutation,
 } from "../src/data/organisation-lifecycle";
-import {
-  parseUserId,
-  parseOrganisationId,
-  type UserId,
-  type OrganisationId,
-} from "../src/ids";
+import { parseOrganisationId, type OrganisationId } from "../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,

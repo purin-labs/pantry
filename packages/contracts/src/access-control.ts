@@ -16,7 +16,7 @@ const u64 = Type.Integer({ minimum: 0, maximum: Number.MAX_SAFE_INTEGER });
 const strict = { additionalProperties: false } as const;
 
 const workflowAuthorityKindSchema = Type.Literal("cue_subscription");
-export const grantSubjectSchema = Type.Union([
+const grantSubjectSchema = Type.Union([
   Type.Object(
     { kind: Type.Literal("organisation_role"), role: Type.String() },
     strict,
@@ -168,7 +168,7 @@ const accessGrantTargetShape = Type.Union([
   ),
 ]);
 
-export const accessGrantLifecycleSchema = Type.Union([
+const accessGrantLifecycleSchema = Type.Union([
   Type.Object(
     { kind: Type.Literal("active"), revision: u32, activatedAt: u64 },
     strict,
@@ -225,7 +225,7 @@ const capabilityPolicyModesSchema = Type.Union([
   Type.Literal("enabled_approval_required_disabled"),
 ]);
 // serde ignores extra fields of a unit variant, even with deny_unknown_fields.
-export const capabilityProviderDependencySchema = Type.Union([
+const capabilityProviderDependencySchema = Type.Union([
   Type.Object({ kind: Type.Literal("none") }),
   Type.Object(
     {
@@ -242,7 +242,7 @@ export const capabilityProviderDependencySchema = Type.Union([
     strict,
   ),
 ]);
-export const capabilityDefinitionSchema = Type.Object(
+const capabilityDefinitionSchema = Type.Object(
   {
     capabilityId: Type.String(),
     capabilityVersion: u32,

@@ -1,10 +1,10 @@
 import type { ConversationId } from "@purin-labs/control-api";
 import {
-  parseUserId,
   parseControlSessionId,
   parseOrganisationId,
   type ControlSessionId,
 } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { ConversationScope } from "./store";
 import { isConversationId } from "@purin-labs/control-api";
 

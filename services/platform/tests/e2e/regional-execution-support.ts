@@ -18,7 +18,7 @@ import {
   revokeControlSession,
 } from "../../src/data/control-plane";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {

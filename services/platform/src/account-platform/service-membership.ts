@@ -4,7 +4,8 @@ import {
   type ActiveControlSession,
   type ActiveOrganisationMembership,
 } from "../data/control-plane";
-import { newPersonId, type OrganisationId, type UserId } from "../ids";
+import { newPersonId, type OrganisationId } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { organisationLifecycleParts } from "../data/organisation-lifecycle-port";

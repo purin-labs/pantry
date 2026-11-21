@@ -6,7 +6,8 @@ import {
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { OrganisationQuerySource } from "../data/query-source";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 
 const BASE_PROJECT_NAME = "Base";
 

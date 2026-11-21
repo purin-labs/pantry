@@ -278,7 +278,7 @@ export type ActorActivationSchemaAdvanceError =
   | { code: "activation_fence_mismatch" }
   | { code: "activation_schema_mismatch" };
 
-export type ActorActivationIdentityField =
+type ActorActivationIdentityField =
   | "registryId"
   | "activationToken"
   | "organisationId"

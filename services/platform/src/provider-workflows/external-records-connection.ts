@@ -1,8 +1,4 @@
-import {
-  createConnectedIntegration,
-  finalizeConnectedIntegrationAccount,
-  requireConnectionCredentialAuthority,
-} from "../data/integration-account";
+import { createConnectedIntegration } from "../data/integration-account";
 import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
 import {
   validateExternalProviderToken,
@@ -21,13 +17,13 @@ import type {
 } from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
-  completeProviderCredentialCutover,
   failProviderCompletion,
-  finishProviderCompletion,
   providerCredentialHandle,
   storeOAuthCredential,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
+import { finishProviderManagedConnection } from "./provider-managed-connection";
+import { scopesAreComplete } from "../provider-adapters/authorization";
 import type { Result } from "../result";
 
 export async function connectExternalRecordsOAuth(
@@ -145,71 +141,7 @@ export async function connectExternalRecordsOAuth(
     retentionPolicy: { kind: "organisation_default" },
     now: input.now,
   });
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "discovering_accounts",
-    {
-      integration_account_ids: [connected.account.integrationAccountId],
-    },
-    "reconciling_webhooks",
-  );
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "reconciling_webhooks",
-    {
-      webhook_count: 0,
-    },
-    "discovering_resources",
-  );
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "discovering_resources",
-    {
-      resource_selection_managed_by_provider: true,
-    },
-    "verifying_connection",
-  );
-  current = await advanceProviderPhase(
-    input,
-    current,
-    "verifying_connection",
-    {
-      provider_identity_verified: true,
-    },
-    "finalizing",
-  );
-  const finalized = await finalizeConnectedIntegrationAccount({
-    db: input.scope.database,
-    organisationId: base.organisationId,
-    integrationAccountId: connected.account.integrationAccountId,
-    now: input.now,
-  });
-  if (!finalized.ok) {
-    return failProviderCompletion(input, attempt, current, {
-      code: "provider_oauth_response_invalid",
-    });
-  }
-  const cutover = await completeProviderCredentialCutover(
-    input,
-    base.organisationId,
-    connected.connection.providerConnectionId,
-    requireConnectionCredentialAuthority(connected.connection)
-      .credentialGeneration,
-  );
-  if (!cutover.ok) {
-    return failProviderCompletion(input, attempt, current, cutover.error);
-  }
-  return finishProviderCompletion(
-    input,
-    attempt,
-    current,
-    connected.connection.providerConnectionId,
-    [finalized.value.integrationAccountId],
-    { kind: "healthy", evidenceCode: "callback_identity_verified" },
-  );
+  return finishProviderManagedConnection(input, attempt, current, connected);
 }
 
 function externalRecordsProvider(
@@ -229,20 +161,4 @@ function externalRecordsProvider(
     case "whatsapp":
       return null;
   }
-}
-
-function scopesAreComplete(
-  adapter: Readonly<{
-    requiredScopes: readonly string[];
-    scopeIsGranted: (
-      requiredScope: string,
-      grantedScopes: ReadonlySet<string>,
-    ) => boolean;
-  }>,
-  grantedScopes: readonly string[],
-): boolean {
-  const granted = new Set(grantedScopes);
-  return adapter.requiredScopes.every((requiredScope) =>
-    adapter.scopeIsGranted(requiredScope, granted),
-  );
 }

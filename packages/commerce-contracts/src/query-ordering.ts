@@ -19,12 +19,9 @@ const attributeId = Type.Unsafe<AttributeDefinitionId>(
   trimmedIdentityTextSchema,
 );
 
-export const commerceSortDirectionSchema = Type.Enum([
-  "ascending",
-  "descending",
-]);
+const commerceSortDirectionSchema = Type.Enum(["ascending", "descending"]);
 const commerceNullPlacementSchema = Type.Literal("last");
-export const commerceSortFieldSchema = Type.Union([
+const commerceSortFieldSchema = Type.Union([
   OpenObject({ kind: Type.Literal("attribute"), attributeId }),
   OpenObject({ kind: Type.Literal("display_name") }),
   OpenObject({ kind: Type.Literal("created_at") }),
@@ -35,12 +32,12 @@ export const commerceSortSchema = OpenObject({
   direction: commerceSortDirectionSchema,
 });
 const commerceOrderingLeadingFieldSchema = commerceSortFieldSchema;
-export const commerceOrderingLeadingKeySchema = OpenObject({
+const commerceOrderingLeadingKeySchema = OpenObject({
   field: commerceOrderingLeadingFieldSchema,
   direction: commerceSortDirectionSchema,
   nulls: commerceNullPlacementSchema,
 });
-export const commerceEntityIdTieBreakerSchema = OpenObject({
+const commerceEntityIdTieBreakerSchema = OpenObject({
   kind: Type.Literal("entity_id_ascending"),
 });
 export const commerceEffectiveOrderingSchema = OpenObject({

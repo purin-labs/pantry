@@ -45,7 +45,7 @@ const ALL_JAPAN_METHODS: readonly CounterRegisterPaymentMethod[] = [
   "qr_code",
 ];
 
-export type CounterSaleAfterSale = Readonly<{
+type CounterSaleAfterSale = Readonly<{
   order: Readonly<{
     id: string;
     revision: number;

@@ -11,8 +11,14 @@
 
 import type { IntegrationAccountId } from "@purin-labs/commerce-contracts";
 import type {
-  AttachmentDescriptor,
   AttachmentId,
+  StoredMessageAttachment,
+  OrganisationAttachmentObjectKey,
+  UserMessage,
+  UserMessagePart,
+} from "./index.ts";
+import type {
+  AttachmentDescriptor,
   AudioMediaType,
   DisplayFilename,
   DocumentMediaType,
@@ -30,12 +36,8 @@ import type {
   SlackFileRevision,
   SlackMessageTimestamp,
   SlackWorkspaceId,
-  StoredMessageAttachment,
-  OrganisationAttachmentObjectKey,
-  UserMessage,
-  UserMessagePart,
   VideoMediaType,
-} from "./index.ts";
+} from "./message.ts";
 
 const mintText = (value: string) => value as NonEmptyText;
 const mintUrl = (value: string) => value as HttpUrl;

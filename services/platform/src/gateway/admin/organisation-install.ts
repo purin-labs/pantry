@@ -193,38 +193,61 @@ export async function handleOrganisationPing(
   return jsonResponse(result);
 }
 
-export async function handleOnboardingActivationAcceptance(
+/** The actor class that the ORGANISATION binding names. */
+type OrganisationActor =
+  Env["ORGANISATION"] extends DurableObjectNamespace<infer TActor>
+    ? TActor
+    : never;
+
+/**
+ * The head of a route that arms, reads or clears an acceptance fault: GET,
+ * POST or DELETE, a local request or the fault injection bearer, and an
+ * Organisation in the development environment. A failure is the answer of
+ * the route.
+ */
+async function readAcceptanceFaultRequest(
   request: Request,
   env: Env,
   organisationIdRaw: string,
-): Promise<Response> {
-  if (
-    request.method !== "POST" &&
-    request.method !== "GET" &&
-    request.method !== "DELETE"
-  ) {
-    return methodNotAllowed(["POST", "GET", "DELETE"]);
+): Promise<
+  Result<
+    Readonly<{
+      method: "POST" | "GET" | "DELETE";
+      scope: OrganisationExecutionScope;
+      organisationId: OrganisationId;
+      organisation: DurableObjectStub<OrganisationActor>;
+      now: number;
+    }>,
+    Response
+  >
+> {
+  const method = request.method;
+  if (method !== "POST" && method !== "GET" && method !== "DELETE") {
+    return { ok: false, error: methodNotAllowed(["POST", "GET", "DELETE"]) };
   }
   if (
     !isLocalDebugRequest(request) &&
     !isAuthorizedFaultInjectionRequest(request, env)
   ) {
-    return notFound();
+    return { ok: false, error: notFound() };
   }
   const organisationId = parseOrganisationPath(organisationIdRaw);
   if (!organisationId.ok) {
-    return routeParamErrorResponse(organisationId.error);
+    return { ok: false, error: routeParamErrorResponse(organisationId.error) };
   }
   const execution = await OrganisationExecutionScope.resolve(
     env,
     organisationId.value,
   );
   if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
+    return {
+      ok: false,
+      error: errorResponse(
+        execution.error.code,
+        "The organisation region is unavailable.",
+        503,
+      ),
+    };
   }
   const scope = execution.value;
   const environment = await readOnboardingAcceptanceEnvironment(
@@ -232,7 +255,7 @@ export async function handleOnboardingActivationAcceptance(
     organisationId.value,
   );
   if (environment !== "development") {
-    return notFound();
+    return { ok: false, error: notFound() };
   }
   const now = Date.now();
   const organisation = await requireActiveOrganisationActorAtPlacement({
@@ -241,7 +264,31 @@ export async function handleOnboardingActivationAcceptance(
     placement: scope.placement,
     now,
   });
-  switch (request.method) {
+  return {
+    ok: true,
+    value: {
+      method,
+      scope,
+      organisationId: organisationId.value,
+      organisation,
+      now,
+    },
+  };
+}
+
+export async function handleOnboardingActivationAcceptance(
+  request: Request,
+  env: Env,
+  organisationIdRaw: string,
+): Promise<Response> {
+  const head = await readAcceptanceFaultRequest(
+    request,
+    env,
+    organisationIdRaw,
+  );
+  if (!head.ok) return head.error;
+  const { method, organisation, now } = head.value;
+  switch (method) {
     case "POST": {
       const armed = await organisation.armOnboardingActivationAcceptanceFault({
         requestId: newRequestId(),
@@ -271,7 +318,7 @@ export async function handleOnboardingActivationAcceptance(
       await organisation.clearOnboardingActivationAcceptanceFault();
       return jsonResponse({ ok: true, cleared: true });
     default:
-      return assertNever(request.method);
+      return assertNever(method);
   }
 }
 
@@ -280,62 +327,26 @@ export async function handleCafeCommerceAcceptance(
   env: Env,
   organisationIdRaw: string,
 ): Promise<Response> {
-  if (
-    request.method !== "POST" &&
-    request.method !== "GET" &&
-    request.method !== "DELETE"
-  ) {
-    return methodNotAllowed(["POST", "GET", "DELETE"]);
-  }
-  if (
-    !isLocalDebugRequest(request) &&
-    !isAuthorizedFaultInjectionRequest(request, env)
-  ) {
-    return notFound();
-  }
-  const organisationId = parseOrganisationPath(organisationIdRaw);
-  if (!organisationId.ok) {
-    return routeParamErrorResponse(organisationId.error);
-  }
-  const execution = await OrganisationExecutionScope.resolve(
+  const head = await readAcceptanceFaultRequest(
+    request,
     env,
-    organisationId.value,
+    organisationIdRaw,
   );
-  if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
-  }
-  const scope = execution.value;
-  const environment = await readOnboardingAcceptanceEnvironment(
-    scope.database,
-    organisationId.value,
-  );
-  if (environment !== "development") {
-    return notFound();
-  }
-  const now = Date.now();
-  const organisation = await requireActiveOrganisationActorAtPlacement({
-    env,
-    organisationId: organisationId.value,
-    placement: scope.placement,
-    now,
-  });
-  if (request.method === "GET") {
+  if (!head.ok) return head.error;
+  const { method, scope, organisationId, organisation, now } = head.value;
+  if (method === "GET") {
     return jsonResponse({
       ok: true,
       fault: await organisation.inspectCafeCommerceAcceptanceFault(),
     });
   }
-  if (request.method === "DELETE") {
+  if (method === "DELETE") {
     await organisation.clearCafeCommerceAcceptanceFault();
     return jsonResponse({ ok: true, cleared: true });
   }
   const authority = await resolveOrganisationCommerceSystemAuthority({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
   });
   if (
     !authority.ok ||

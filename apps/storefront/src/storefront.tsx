@@ -5553,7 +5553,7 @@ type ShippingQuoteEvidenceProps = Readonly<{
   quote: CommerceBuyerQuotedShippingCheckoutV1;
 }>;
 
-export function ShippingQuoteEvidence(
+function ShippingQuoteEvidence(
   props: ShippingQuoteEvidenceProps,
 ): React.ReactNode {
   const shipping = props.quote.quote.shipping;
@@ -9058,7 +9058,7 @@ type PaymentReviewCounts = Readonly<{
   complete: number;
 }>;
 
-export function paymentReviewPresentation(
+function paymentReviewPresentation(
   disputes: readonly CommerceBuyerPaymentDisputeStatusV1[],
   language: CafeLanguage,
 ): PaymentReviewPresentation | undefined {
@@ -9147,7 +9147,7 @@ function paymentReviewTimelineLabel(
   return copy.completeTimeline;
 }
 
-export function orderTimelineWithPaymentReview(
+function orderTimelineWithPaymentReview(
   base: OrderStatusPresentation,
   paymentReview: PaymentReviewPresentation | undefined,
   language: CafeLanguage,

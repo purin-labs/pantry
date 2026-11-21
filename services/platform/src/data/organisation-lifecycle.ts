@@ -8,7 +8,8 @@ import type {
   GlobalDatabase,
   OrganisationDatabaseSession,
 } from "../database-handles";
-import { parseOrganisationId, type UserId, type OrganisationId } from "../ids";
+import { parseOrganisationId, type OrganisationId } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   prepareControlMutationReceiptAfterWrite,

@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { SingleDatabase } from "../src/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
@@ -27,10 +29,10 @@ import {
   recordProviderStartFailure,
 } from "../src/organisation/contract/provider-support-references";
 import {
-  type UserId,
   type ProviderConnectionId,
   type OrganisationId,
 } from "../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { revokeCredential, type VaultHandle } from "../src/credential-vault";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

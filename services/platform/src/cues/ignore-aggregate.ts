@@ -6,7 +6,7 @@ import type {
 import type { OrganisationId } from "../ids";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 
-export type IgnoredCueSample = {
+type IgnoredCueSample = {
   nativeId: string;
   at: number;
 };

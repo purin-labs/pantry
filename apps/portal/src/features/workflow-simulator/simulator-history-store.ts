@@ -14,7 +14,7 @@ export type SimulatorHistoryActionFeedback = Readonly<{
   timestamp: number;
 }>;
 
-export type SimulatorHistoryTimelineEntry = Readonly<{
+type SimulatorHistoryTimelineEntry = Readonly<{
   index: number;
   role: "baseline" | "undo" | "redo";
   label: string;

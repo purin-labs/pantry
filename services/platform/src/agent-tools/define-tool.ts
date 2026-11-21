@@ -24,14 +24,14 @@ import type { PreparedEffect } from "./tool-effect";
  * - `surface`: the call sent a command to the attached Kitchen surface,
  *   and its value names the surface receipt and the command's outcome.
  */
-export type ToolEffect =
+type ToolEffect =
   "read" | "receipt" | "proposal" | "draft" | "scheduled" | "surface";
 
 /**
  * Who may run a call again after a lost process left it in flight. The same
  * three values as `ToolRerun` in `actors/pi-tool-replay.ts`.
  */
-export type ToolRerun =
+type ToolRerun =
   | { readonly kind: "any_caller"; readonly reason: string }
   | { readonly kind: "script"; readonly reason: string }
   | { readonly kind: "none" };
@@ -51,7 +51,7 @@ type TurnToolFlag = "memoryProposal" | "followUp" | "sideCaseProposal";
  *   capability, as the catalog did before Refactor 10.
  * - `host`: when the turn runs in the named host. No other host offers it.
  */
-export type ToolSelection =
+type ToolSelection =
   | {
       readonly kind: "capability";
       readonly capability: HarnessCapabilityName;

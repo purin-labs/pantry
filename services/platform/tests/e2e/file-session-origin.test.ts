@@ -15,11 +15,8 @@ import {
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
-import {
-  parseUserId,
-  parseSessionId,
-  type IntegrationAccountId,
-} from "../../src/ids";
+import { parseSessionId, type IntegrationAccountId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import {

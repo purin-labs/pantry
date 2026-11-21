@@ -234,7 +234,7 @@ export async function dropFromDraft(
   }
 }
 
-export function nextDraftMessage(
+function nextDraftMessage(
   socket: WebSocket,
   kind: string,
   send: () => void,
@@ -276,7 +276,7 @@ export function applied(
   if (!result.ok) throw new Error(result.error.code);
 }
 
-export function member(
+function member(
   userId: string,
   personId: string,
   role: "operator" | "viewer",
@@ -513,7 +513,7 @@ export async function actionState(nonce: string): Promise<unknown> {
 }
 
 /** Slack's answer to a click on a card, at its response URL. */
-export type ClickAnswer = Readonly<{
+type ClickAnswer = Readonly<{
   ephemeral: boolean;
   replaceOriginal: boolean;
   text: string;

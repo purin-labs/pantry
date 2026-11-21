@@ -19,7 +19,7 @@ type SlackStreamTarget = Readonly<{
   recipientUserId: string;
 }>;
 
-export type SlackStreamMethod =
+type SlackStreamMethod =
   "chat.startStream" | "chat.appendStream" | "chat.stopStream";
 
 export type SlackStreamError =

@@ -1,4 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
 import type { OrganisationId } from "../ids";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import {
@@ -496,35 +499,6 @@ export async function verifyStoredVaultSecret(input: {
           handle: input.stored.handle,
         },
       };
-}
-
-export async function verifyRevokedVaultSecret(input: {
-  readonly db: OrganisationDatabase;
-  readonly keys: CredentialVaultBindings;
-  readonly stored: VaultStoredSecret;
-}): Promise<
-  Result<
-    true,
-    | VaultResolveError
-    | {
-        readonly code: "vault_secret_not_revoked";
-      }
-  >
-> {
-  const resolved = await resolveVaultHandle({
-    db: input.db,
-    keys: input.keys,
-    organisationId: input.stored.organisationId,
-    handle: input.stored.handle,
-  });
-
-  if (!resolved.ok) {
-    return resolved.error.code === "vault_secret_revoked"
-      ? { ok: true, value: true }
-      : resolved;
-  }
-
-  return { ok: false, error: { code: "vault_secret_not_revoked" } };
 }
 
 export async function revokeVaultSecret(input: {
@@ -1296,4 +1270,32 @@ function vaultRootSelectionResolveError(
     default:
       return assertNever(error, "Unhandled Vault root-selection error");
   }
+}
+
+/**
+ * Points the credential reference of a reconnect at the new Vault handle. A
+ * connection flow puts it in its own batch.
+ */
+export function prepareCredentialRefReplacement(
+  session: Pick<OrganisationDatabaseSession, "prepare">,
+  input: Readonly<{
+    organisationId: string;
+    provider: string;
+    previousCredentialRef: string;
+    replacementCredentialRef: string;
+  }>,
+): D1PreparedStatement {
+  return session
+    .prepare(
+      `UPDATE credential_ref
+       SET vault_handle = ?, revoked_at = NULL
+       WHERE organisation_id = ? AND provider = ? AND vault_handle = ?
+         AND revoked_at IS NULL`,
+    )
+    .bind(
+      input.replacementCredentialRef,
+      input.organisationId,
+      input.provider,
+      input.previousCredentialRef,
+    );
 }

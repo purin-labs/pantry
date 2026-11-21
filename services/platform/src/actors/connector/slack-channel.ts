@@ -47,13 +47,15 @@ import {
   connectorSlackStreamPostedFailure,
   createConnectorSlackStreamSchema,
   parseConnectorCaseTurnStreamInput,
-  slackCaseStreamId,
-  slackCaseTurnId,
   stopOpenConnectorSlackStream,
   streamConnectorCaseTurn,
+} from "../connector-slack-stream";
+import {
+  slackCaseStreamId,
+  slackCaseTurnId,
   type ConnectorCaseStreamRelease,
   type ConnectorCaseTurnStreamError,
-} from "../connector-slack-stream";
+} from "../case-turn-stream";
 import { connectorWarmActorSlots } from "../warm-actor-slots";
 import type {
   CaseWorkChannel,

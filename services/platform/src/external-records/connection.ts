@@ -5,7 +5,8 @@ import {
   type ActiveIntegrationAccount,
 } from "../data/integration-account";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { UserId, OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle } from "../credential-vault";
 import { storeVaultSecret } from "../credential-vault";
 import {

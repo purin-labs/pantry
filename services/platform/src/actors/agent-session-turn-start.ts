@@ -20,7 +20,7 @@ import type {
 } from "./actor-journal";
 import type { Variant } from "@purin-labs/type-utils";
 
-export type CanonicalTextTurnOrigin =
+type CanonicalTextTurnOrigin =
   | {
       readonly kind: "command";
       readonly principal: EventPrincipal;

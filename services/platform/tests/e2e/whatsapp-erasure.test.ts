@@ -2,7 +2,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 
 import type { ConnectorDO } from "../../src/actors/connector";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { fixtureDatabase } from "./organisation-database";
 import { erasedTableResidue, purgeOrganisation } from "./purge-support";
 import { ORGANISATION_ID } from "./slack-journey-support";

@@ -37,7 +37,7 @@ const capabilityIds = Type.Array(attributeDefinitionIdSchema, {
   maxItems: 256,
   uniqueItems: true,
 });
-export const commerceAggregationCapabilitySchema = Type.Union([
+const commerceAggregationCapabilitySchema = Type.Union([
   OpenObject({ kind: Type.Literal("count_only") }),
   OpenObject({
     kind: Type.Literal("count_and_attributes"),
@@ -49,7 +49,7 @@ export const commerceAggregationCapabilitySchema = Type.Union([
     ageBucketAttributeIds: capabilityIds,
   }),
 ]);
-export const commerceCapabilityMatrixSchema = OpenObject({
+const commerceCapabilityMatrixSchema = OpenObject({
   filterableAttributeIds: capabilityIds,
   sortableAttributeIds: capabilityIds,
   aggregation: commerceAggregationCapabilitySchema,

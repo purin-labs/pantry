@@ -1737,7 +1737,7 @@ export function buildCheckoutQuote(
   };
 }
 
-export type CheckoutSelection = Readonly<{
+type CheckoutSelection = Readonly<{
   variant: CommerceResourcesV1["variants"][number];
   offer: CommerceOfferV1;
   consumptionPlan: InventoryConsumptionPlan;

@@ -39,7 +39,7 @@ export type WarmActorSlot = {
   readonly createdAt: number;
 };
 
-export type WarmActorSlotPair = {
+type WarmActorSlotPair = {
   readonly case: WarmActorSlot;
   readonly session: WarmActorSlot;
 };

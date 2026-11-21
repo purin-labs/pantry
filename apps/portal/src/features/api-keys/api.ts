@@ -8,7 +8,7 @@ import {
 import { type CommerceApiKey, parseKey, unexpected } from "@purin-labs/control-api/portal/api-keys";
 
 /** Scopes that no API key may hold; Commerce refuses them for a key. */
-export type KeyForbiddenScope = "payments:record" | "credentials:write";
+type KeyForbiddenScope = "payments:record" | "credentials:write";
 
 export type GrantableScope = Exclude<CommerceApiScope, KeyForbiddenScope>;
 

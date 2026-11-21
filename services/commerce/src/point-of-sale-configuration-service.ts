@@ -16,7 +16,7 @@ import {
  * was rung up under, so changing the counter's prices or tax cannot move a sale
  * that has already been accepted.
  */
-export type PointOfSaleConfigurationError =
+type PointOfSaleConfigurationError =
   | Readonly<{ code: "invalid_configuration"; field: string }>
   | Readonly<{ code: "merchant_not_found"; merchantId: string }>
   | Readonly<{

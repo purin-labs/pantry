@@ -36,8 +36,8 @@ import {
   type ControlSessionId,
   type IntegrationAccountId,
   type OrganisationId,
-  type UserId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { buildControlAuthority } from "../request-authority";
@@ -64,7 +64,7 @@ import {
 /** How long one participant's mailbox check stays valid in memory. */
 const PARTICIPANT_CHECK_TTL_MS = 30_000;
 
-export type MailReplyDraftAgentEditRequest = Readonly<{
+type MailReplyDraftAgentEditRequest = Readonly<{
   proposalId: string;
   oldText: string;
   newText: string;

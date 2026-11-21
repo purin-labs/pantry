@@ -16,12 +16,8 @@ import {
   CAPABILITY_KEYS,
 } from "../src/authorization/capability-catalogue";
 import { prepareReadAndProposeCapabilityPolicies } from "../src/data/capability-policy";
-import {
-  parseUserId,
-  parseOrganisationId,
-  type UserId,
-  type OrganisationId,
-} from "../src/ids";
+import { parseOrganisationId, type OrganisationId } from "../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { prepareInitialOrganisationPlacementInsert } from "../src/data/shared-rows/placement-row";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { d1Database } from "./sqlite-d1";

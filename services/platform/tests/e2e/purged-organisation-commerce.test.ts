@@ -5,7 +5,7 @@ import { isRecord } from "@purin-labs/std";
 import { commerceAppInstallationToken } from "@purin-labs/commerce-client";
 
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
-import type { UserId } from "../../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   archiveOrganisation,
   deleteArchivedOrganisation,

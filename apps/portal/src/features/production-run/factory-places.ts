@@ -149,7 +149,7 @@ export function instanceLabel(instance: string): string {
   return instance;
 }
 
-export function stepLabel(key: string): string {
+function stepLabel(key: string): string {
   const tray = /^tray-(\d+)\.(.+)$/u.exec(key);
   if (tray === null) return key.replaceAll("-", " ");
   return `tray ${tray[1] ?? ""} · ${(tray[2] ?? "").replaceAll("-", " ")}`;
@@ -171,7 +171,7 @@ export function clock(microseconds: number): string {
 }
 
 /** The recurring financier bakery, along a back counter and a front counter. */
-export const FINANCIER_STATIONS: readonly FactoryStationSource[] = [
+const FINANCIER_STATIONS: readonly FactoryStationSource[] = [
   {
     id: "station-preparation",
     label: "Preparation",
@@ -251,7 +251,12 @@ export const FINANCIER_STATIONS: readonly FactoryStationSource[] = [
   },
 ];
 
-/** Savoury pie bakery layout connecting the marble pastry bench to the Maruzen oven. */
+/**
+ * Savoury pie bakery layout connecting the marble pastry bench to the Maruzen oven.
+ *
+ * @public `scripts/production-simulation/verify-pastry-bench-browser.js` imports
+ * this name in the browser at run time.
+ */
 export const PIE_STATIONS: readonly FactoryStationSource[] = [
   {
     id: "station-scale",

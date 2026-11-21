@@ -96,11 +96,9 @@ import type { ProviderCapabilityDefinition } from "../authorization/access-grant
 import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
 import { readOfferPriceAllowanceView } from "../commerce/contract/offer-price-allowance";
 import {
-  commerceActionPortalUrl,
-  commerceChangeSummary,
-  commerceWaitingCardText,
+  commerceApprovalCardTexts,
   type CommerceChangeFacts,
-} from "../slack/commerce-approval-card";
+} from "../commerce/contract/approval-card-texts";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "../slack/card-only-reply";
 import type { SessionToolContext } from "../agent-tools/context";
 import type { MenuPriceProposalRequest } from "../commerce/contract/types";
@@ -1356,7 +1354,7 @@ async function recordCommerceProposal(
   });
   await requireSessionExecution(input.execution, input.lease);
   const portalUrl = address.ok
-    ? commerceActionPortalUrl(input.env, address.value, nonce)
+    ? commerceApprovalCardTexts.use().portalUrl(input.env, address.value, nonce)
     : null;
   const waiting = await caseActor.value.waitForCommerceApproval({
     execution: sessionActionMutationExecution(
@@ -1371,10 +1369,14 @@ async function recordCommerceProposal(
     // A Slack thread gets this notice whatever the agent writes.
     notice: {
       kind: "text",
-      text: commerceWaitingCardText(
-        commerceChangeSummary(shared.request, shared.changeFacts),
-        slackMayApproveAction(ledger.value.action),
-      ),
+      text: commerceApprovalCardTexts
+        .use()
+        .waitingCardText(
+          commerceApprovalCardTexts
+            .use()
+            .changeSummary(shared.request, shared.changeFacts),
+          slackMayApproveAction(ledger.value.action),
+        ),
     },
   });
   await requireSessionExecution(input.execution, input.lease);

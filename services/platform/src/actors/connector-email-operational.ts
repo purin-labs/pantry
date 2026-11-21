@@ -50,7 +50,7 @@ import { isNonNegativeInteger, isSha256Hex, sha256Hex } from "@purin-labs/std";
 const OPERATIONAL_EMAIL_PROJECTION_BATCH_SIZE = 100;
 const OPERATIONAL_EMAIL_PROJECTION_RETRY_MS = 60_000;
 
-export type OperationalEmailProposalState =
+type OperationalEmailProposalState =
   | "awaiting_approval"
   | "sent"
   | "send_indeterminate"
@@ -83,7 +83,7 @@ export type OperationalEmailProposalRecord = Readonly<{
   readonly updatedAt: number;
 }>;
 
-export type OperationalEmailProposalPreview = Readonly<{
+type OperationalEmailProposalPreview = Readonly<{
   readonly proposalId: string;
   readonly version: number;
   readonly caseId: string;

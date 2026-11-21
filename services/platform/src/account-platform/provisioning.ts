@@ -10,7 +10,8 @@ import {
   hashPortalSubject,
   newControlMutationIdentity,
 } from "../data/control-mutation";
-import { parseOrganisationId, parseUserId } from "../ids";
+import { parseOrganisationId } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { parseOrganisationPlacementCells } from "../placement";
 import type { Env } from "../env";

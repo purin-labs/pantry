@@ -13,7 +13,7 @@ import type { Variant } from "@purin-labs/type-utils";
  * One skill body an agent runs this turn, read at the exact revision its
  * definition revision pinned.
  */
-export type PinnedAgentSkill = Readonly<{
+type PinnedAgentSkill = Readonly<{
   skillId: string;
   revision: number;
   title: string;
@@ -40,7 +40,7 @@ export type PinnedAgentProfile = Readonly<{
   grantedCapabilities: readonly string[];
 }>;
 
-export type PinnedAgentProfileError = Readonly<{
+type PinnedAgentProfileError = Readonly<{
   code:
     | "pinned_agent_installation_not_found"
     | "pinned_agent_selection_ambiguous"

@@ -32,7 +32,7 @@ const PAYOUT_EVIDENCE_SOURCES = [
   "controlled_live",
 ] as const;
 
-export type PayoutEvidenceSource = (typeof PAYOUT_EVIDENCE_SOURCES)[number];
+type PayoutEvidenceSource = (typeof PAYOUT_EVIDENCE_SOURCES)[number];
 
 /**
  * What a payout rail must evidence.
@@ -53,8 +53,7 @@ export const PAYOUT_CERTIFICATION_CHECKS = [
   "fee_ceiling_enforcement",
 ] as const;
 
-export type PayoutCertificationCheck =
-  (typeof PAYOUT_CERTIFICATION_CHECKS)[number];
+type PayoutCertificationCheck = (typeof PAYOUT_CERTIFICATION_CHECKS)[number];
 
 export type SupplierPayoutCertification = Readonly<{
   testRunId: string;

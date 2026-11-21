@@ -222,7 +222,7 @@ export type ChatGptModelResponse = {
   readonly headers: Readonly<Record<string, string>>;
 };
 
-export type EmbeddedHarnessCheckpointBinding = {
+type EmbeddedHarnessCheckpointBinding = {
   readonly cursor: AcceptedHarnessEventCursor | null;
   readonly modelRouteDigest: string;
   readonly instructionDigest: string;
@@ -315,7 +315,7 @@ export type EmbeddedHarnessConstructionError =
       readonly detail: string;
     };
 
-export type EmbeddedHarnessUnaccountedTurnError = (
+type EmbeddedHarnessUnaccountedTurnError = (
   | { readonly code: "embedded_harness_input_unsupported" }
   | { readonly code: "embedded_harness_turn_failed"; readonly detail: string }
   | {

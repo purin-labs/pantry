@@ -1,4 +1,4 @@
-export type PageFreshness =
+type PageFreshness =
   | { readonly kind: "current" }
   | {
       readonly kind: "delayed";

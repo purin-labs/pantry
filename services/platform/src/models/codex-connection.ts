@@ -11,9 +11,9 @@ import {
   parseCodexAuthorizationAttemptId,
   parseOrganisationId,
   type CodexAuthorizationAttemptId,
-  type UserId,
   type OrganisationId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { traceWarn } from "../observability";
 import type { Env } from "../env";
 import type { Result } from "../result";
@@ -77,7 +77,7 @@ const WEEKLY_REFRESH_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 /** One cron run refreshes at most this many sign-ins in each database. */
 const WEEKLY_REFRESH_BATCH = 50;
 
-export type CodexActionRequiredReason =
+type CodexActionRequiredReason =
   | "authorization_expired"
   | "workspace_access_revoked"
   | "device_authorization_unavailable"
@@ -127,7 +127,7 @@ export type OrganisationCodexConnection =
       readonly observedAt: number;
     };
 
-export type CodexAuthorizationAttempt = {
+type CodexAuthorizationAttempt = {
   readonly attemptId: CodexAuthorizationAttemptId;
   /**
    * `device_code`: the person types `userCode` at OpenAI, and Pantry polls.

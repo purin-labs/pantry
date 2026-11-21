@@ -16,7 +16,8 @@ import {
   issueControlSession,
   type ActiveControlSession,
 } from "../../src/data/control-plane";
-import { parseCaseId, parseUserId } from "../../src/ids";
+import { parseCaseId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import { authorityPartitionKey } from "../../src/authorization/access-grants/turn-authority";
 import { fixtureFlowBinding } from "../fixtures/plan25-turn";

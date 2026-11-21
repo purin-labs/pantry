@@ -28,32 +28,11 @@ export function requireText(value: unknown, field: string): string {
   return text;
 }
 
-export function requireBoundedText(
-  value: unknown,
-  field: string,
-  maxLength: number,
-): string {
-  const text = requireText(value, field);
-  if (text.length > maxLength) throw new Error(`${field} is too long`);
-  return text;
-}
-
 export function requirePositiveInteger(value: unknown, field: string): number {
   if (typeof value !== "number" || !Number.isSafeInteger(value) || value < 1) {
     throw new Error(`${field} must be a positive safe integer`);
   }
   return value;
-}
-
-export function requireEnum<const T extends string>(
-  value: unknown,
-  field: string,
-  values: readonly T[],
-): T {
-  const text = requireText(value, field);
-  const match = values.find((candidate) => candidate === text);
-  if (match === undefined) throw new Error(`${field} is unsupported`);
-  return match;
 }
 
 export function requireBaseUrl(value: string): string {

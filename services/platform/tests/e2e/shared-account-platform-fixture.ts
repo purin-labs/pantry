@@ -49,7 +49,7 @@ export interface SharedAccountFixtureNativeMember {
   };
 }
 
-export interface SharedAccountFixtureSetup {
+interface SharedAccountFixtureSetup {
   readonly version: 1;
   readonly organisations: {
     readonly primary: {
@@ -381,12 +381,12 @@ async function auxiliaryNativeOwner(label: string): Promise<
   };
 }
 
-export interface SharedAccountFixtureInstance {
+interface SharedAccountFixtureInstance {
   readonly scope: AccountScope;
   readonly instanceId: string;
 }
 
-export interface SharedAccountFixtureMember {
+interface SharedAccountFixtureMember {
   readonly platformUserId: string;
   readonly membershipId: string;
 }

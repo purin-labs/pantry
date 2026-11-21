@@ -19,11 +19,13 @@ import {
 import { prepareOrganisationPurgeCredentialGenerations } from "./data/provider-credential-generation";
 import { prepareServiceInvitationAcceptance } from "./data/service-invitation-role";
 import {
-  directorySlackRecordCount,
-  directorySlackRecordDeletions,
   prepareSlackInstallationCredentialMove,
   prepareSlackInstallationRevocation,
 } from "./data/slack-installation-records";
+import {
+  directorySlackRecordCount,
+  directorySlackRecordDeletions,
+} from "./slack/organisation-routing";
 import {
   prepareChatDirectoryRevisionBump,
   prepareReturnPrivateChatsToDefault,

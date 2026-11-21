@@ -68,14 +68,8 @@ import { BuyerFamily } from "./commerce-authority/families/buyer.ts";
 export type { CommerceSigner } from "./commerce-authority/contracts.ts";
 
 export type {
-  BuyerCartMutation,
-  BuyerCheckoutCreation,
   BuyerPaymentResult,
-  BuyerPaymentSessionResult,
-  BuyerCheckoutRecovery,
-  BuyerShippingCheckoutCreation,
   BuyerStorefrontContext,
-  BuyerCheckoutProfileClaims,
 } from "./commerce-authority/buyer-checkout/types.ts";
 
 /**

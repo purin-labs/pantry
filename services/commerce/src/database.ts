@@ -1,6 +1,6 @@
 export type CommerceSqlValue = string | number | null;
 
-export type CommerceRunResult = Readonly<{ changes: number }>;
+type CommerceRunResult = Readonly<{ changes: number }>;
 
 /** A row from `SELECT COUNT(*) AS count`. */
 export type CountRow = Readonly<{ count: number }>;

@@ -24,7 +24,7 @@ import {
 import type { Env } from "../../env";
 import { parseActiveCapabilityId } from "../../data/capability-policy";
 import { parseCaseId } from "../../ids";
-import { memberMaySee, type MemberViewer } from "../../memory/member-view";
+import { memberMaySee, type MemberViewer } from "../../chat/member-view";
 import { FlowLabel } from "../../policy/information-flow";
 import { policyLevel } from "../../policy/information-flow/labels";
 import { slackSurfaceParts } from "../../slack/surface-parts";

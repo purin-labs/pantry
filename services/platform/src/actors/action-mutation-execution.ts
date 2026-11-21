@@ -1,11 +1,8 @@
 import type { OrganisationDatabase } from "../database-handles";
 import { parseOrganisationPlacement } from "../placement";
 import { parseOrganisationPlacementFenceToken } from "../data/organisation-placement";
-import {
-  parseOrganisationId,
-  parseControlSessionId,
-  parseUserId,
-} from "../ids";
+import { parseOrganisationId, parseControlSessionId } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
   assertNever,
@@ -25,7 +22,8 @@ import {
   type ActiveControlSession,
 } from "../data/control-plane";
 import type { Env } from "../env";
-import type { ControlSessionId, OrganisationId, UserId } from "../ids";
+import type { ControlSessionId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Variant } from "@purin-labs/type-utils";
 

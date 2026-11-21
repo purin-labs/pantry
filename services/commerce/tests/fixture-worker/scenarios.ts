@@ -193,7 +193,7 @@ export async function runFixtureScenario(context: FixtureScenarioContext, body: 
   }
 }
 
-export function readMerchantRevision(database: CommerceDatabase, merchantId: string): { merchantRevision: number } {
+function readMerchantRevision(database: CommerceDatabase, merchantId: string): { merchantRevision: number } {
   const row = database
     .prepare("SELECT revision FROM merchant WHERE merchant_id = ?")
     .get<{ revision: number }>(merchantId);
@@ -243,7 +243,7 @@ export type EffectEvidence = Readonly<{ mutations: number; receiptReads: number;
 const EMPTY_EFFECT_EVIDENCE: EffectEvidence = { mutations: 0, receiptReads: 0, committed: null };
 
 // The Worker's own signing key, for seeds that sign as Commerce does.
-export function fixtureSigner(env: Env): CommerceSigner {
+function fixtureSigner(env: Env): CommerceSigner {
   const privateKey = createPrivateKey({
     key: Buffer.from(env.UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64, "base64url"),
     format: "der",

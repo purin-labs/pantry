@@ -16,7 +16,7 @@ import {
 import { newRequestId } from "../ids";
 import { traceLog, traceWarn } from "../observability";
 
-export type CueMatchedDeliveryOutcome =
+type CueMatchedDeliveryOutcome =
   { kind: "complete" } | { kind: "retry"; retryAt: number };
 
 export type CueMatchedDelivery<TContext> = (

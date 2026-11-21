@@ -54,7 +54,7 @@ export type DropboxFileMetadata = Readonly<{
   readonly serverModified: string;
 }>;
 
-export type DropboxFolderMetadata = Readonly<{
+type DropboxFolderMetadata = Readonly<{
   readonly kind: "folder";
   readonly providerFolderId: string;
   readonly name: string;

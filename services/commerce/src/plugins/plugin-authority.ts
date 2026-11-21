@@ -139,7 +139,7 @@ export type PluginFailureCommand = Readonly<{
   failureId: string;
 }>;
 
-export type PluginCommand =
+type PluginCommand =
   | CommercePluginCommandV1
   | ConfigureCommercePluginV1
   | RunCommercePluginActionV1

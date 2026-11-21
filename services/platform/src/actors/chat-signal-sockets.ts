@@ -13,11 +13,10 @@ import { controlError } from "../control/http";
 import type { Env } from "../env";
 import {
   parseControlSessionId,
-  parseUserId,
   type ControlSessionId,
   type OrganisationId,
-  type UserId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   SOCKET_SILENCE_LIMIT_MS,
@@ -28,11 +27,22 @@ import {
   socketRouteTag,
 } from "./hibernatable-sockets";
 import { socketSessionAccess } from "./socket-session-access";
-import {
-  openCanvasPages,
-  signalCanvasChat,
-  type CanvasPage,
-} from "./workflow-canvas-rooms";
+
+/** An open canvas page: a socket of a canvas room, with its canvas and user. */
+type CanvasPage = Readonly<{
+  socket: WebSocket;
+  documentId: string;
+  userId: UserId;
+}>;
+
+/**
+ * The canvas pages of the Organisation actor, which the Kitchen owns. The
+ * actor gives them, so that a chat of a canvas reaches its canvas pages.
+ */
+export type CanvasChatPages = Readonly<{
+  open(ctx: DurableObjectState): readonly CanvasPage[];
+  signal(pages: readonly CanvasPage[]): void;
+}>;
 
 /**
  * The chat signal sockets of an Organisation: one for each open chat page.
@@ -103,6 +113,7 @@ export async function sendChatSignal(
   organisationId: OrganisationId,
   target: ChatSignalTarget,
   database: () => OrganisationDatabase | null,
+  canvasPages: CanvasChatPages,
   kind: ChatSignal["kind"] = CHAT_SIGNAL,
 ): Promise<void> {
   const signal = SIGNALS[kind];
@@ -115,7 +126,7 @@ export async function sendChatSignal(
       return;
     case "conversation": {
       const pages = openPages(ctx);
-      const canvases = openCanvasPages(ctx);
+      const canvases = canvasPages.open(ctx);
       if (pages.length === 0 && canvases.length === 0) return;
       const db = database();
       if (db === null) return;
@@ -133,7 +144,7 @@ export async function sendChatSignal(
           signal,
         );
       else
-        signalCanvasChat(
+        canvasPages.signal(
           canvases.filter(
             (canvas) =>
               canvas.documentId === audience.canvasDocumentId &&

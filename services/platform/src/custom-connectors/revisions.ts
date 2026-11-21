@@ -1,11 +1,7 @@
 import type { OrganisationDatabase } from "../database-handles";
 
-import {
-  parseUserId,
-  parseOrganisationId,
-  type UserId,
-  type OrganisationId,
-} from "../ids";
+import { parseOrganisationId, type OrganisationId } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   digestCanonical,
   serializeCanonical,

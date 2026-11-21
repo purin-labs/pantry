@@ -9,10 +9,7 @@ import type {
 import type { FlowLabel, ObservationEvidence } from "../../policy";
 import type { FileContextProvider } from "@purin-labs/contracts";
 
-export type {
-  ContextVisibility,
-  WorkflowAuthorityKind,
-} from "../../authorization/access-grants/types";
+export type { ContextVisibility } from "../../authorization/access-grants/types";
 
 export type {
   CanonicalContextSourceRef,
@@ -38,7 +35,7 @@ export type ContextBundleDisposition =
     };
 
 /** One exact accepted Memory revision. */
-export type ContextMemoryRef = Readonly<{
+type ContextMemoryRef = Readonly<{
   memoryId: string;
   revision: number;
 }>;
@@ -112,7 +109,7 @@ export type ContextBundle = {
 export type ModelContextSourceKind =
   "case_conversation" | "integration_file" | "project_context" | "memory";
 
-export type ModelContextProvenance =
+type ModelContextProvenance =
   | Readonly<{ kind: "project_context" | "native_chat_input" }>
   | (ContextMemoryRef & Readonly<{ kind: "memory" }>)
   | Readonly<{ readonly kind: "case_entry" }>

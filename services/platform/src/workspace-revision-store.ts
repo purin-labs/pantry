@@ -134,7 +134,7 @@ export type PreparedWorkspaceRevisionMutation = {
   readonly requestDigest: Sha256Digest;
 };
 
-export type WorkspaceRevisionManifestV1 = {
+type WorkspaceRevisionManifestV1 = {
   readonly schemaVersion: "workspace_revision_manifest.v1";
   readonly organisationId: string;
   readonly workspaceId: WorkspaceId;

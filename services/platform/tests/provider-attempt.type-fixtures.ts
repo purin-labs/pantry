@@ -1,11 +1,11 @@
 import type { OnboardingActivationInput } from "../src/data/activation";
 import type { ProviderConnectionAttempt } from "../src/data/provider-attempt";
 import {
-  parseUserId,
   parseProviderConnectionAttemptId,
   parseProviderStateId,
   parseOrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 
 const organisationId = requireParsed(
   parseOrganisationId("organisation_fixture"),

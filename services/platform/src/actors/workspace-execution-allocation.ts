@@ -15,7 +15,6 @@ import {
   type WorkspaceExecutorAllocationSettleInput,
 } from "./code-mode-budget";
 import { codeModePlatformGovernor } from "./code-mode-platform-governor-stub";
-import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
 import type { Variant } from "@purin-labs/type-utils";
 
 const CLEANUP_MARGIN_MS = 5_000;
@@ -32,7 +31,7 @@ export type WorkspaceAllocationAuthorityError =
       readonly reason: string;
     };
 
-export type ReservedWorkspaceExecutorAllocation = Variant<
+type ReservedWorkspaceExecutorAllocation = Variant<
   WorkspaceExecutorAllocationReservation,
   "reserved"
 >;
@@ -44,31 +43,6 @@ export type AttachmentPreparationWorkspaceExecutorAllocation =
       "attachment_preparation"
     >;
   };
-
-export async function reserveWorkspaceExecutorAllocation(input: {
-  readonly env: Env;
-  readonly organisationId: OrganisationId;
-  readonly executionLease: HarnessCodeModeExecutionLease;
-  readonly allocationDigest: string;
-  readonly executionDeadlineAt: number;
-  readonly now: number;
-}): Promise<
-  Result<
-    WorkspaceExecutorAllocationReservation,
-    WorkspaceAllocationAuthorityError
-  >
-> {
-  return reserveWorkspaceAllocationWithParent({
-    env: input.env,
-    organisationId: input.organisationId,
-    parent: codeModeExecutionParent(input.executionLease),
-    allocationId: workspaceAllocationId(input.executionLease.executionId),
-    idempotencyKey: `workspace-allocation-${input.executionLease.executionId}`,
-    allocationDigest: input.allocationDigest,
-    executionDeadlineAt: input.executionDeadlineAt,
-    now: input.now,
-  });
-}
 
 export async function reserveAttachmentPreparationAllocation(input: {
   readonly env: Env;
@@ -110,23 +84,6 @@ export async function reserveAttachmentPreparationAllocation(input: {
   });
 }
 
-export async function settleWorkspaceExecutorAllocation(input: {
-  readonly env: Env;
-  readonly organisationId: OrganisationId;
-  readonly settlement: WorkspaceExecutorAllocationSettleInput;
-}): Promise<
-  Result<
-    WorkspaceExecutorAllocationReservation,
-    WorkspaceAllocationAuthorityError
-  >
-> {
-  return settleWorkspaceAllocationWithParent(
-    input.env,
-    input.organisationId,
-    input.settlement,
-  );
-}
-
 export async function settleAttachmentPreparationAllocation(input: {
   readonly env: Env;
   readonly organisationId: OrganisationId;
@@ -150,28 +107,6 @@ export async function settleAttachmentPreparationAllocation(input: {
     input.organisationId,
     attachmentPreparationSettlementInput(input),
   );
-}
-
-export async function cancelWorkspaceExecutorAllocation(input: {
-  readonly env: Env;
-  readonly organisationId: OrganisationId;
-  readonly executionLease: HarnessCodeModeExecutionLease;
-  readonly reason: "admission_compensated" | "turn_cancelled";
-  readonly now: number;
-}): Promise<
-  Result<
-    WorkspaceExecutorAllocationReservation,
-    WorkspaceAllocationAuthorityError
-  >
-> {
-  return cancelWorkspaceAllocationWithParent(input.env, input.organisationId, {
-    requestId: newRequestId(),
-    organisationId: input.organisationId,
-    parent: codeModeExecutionParent(input.executionLease),
-    allocationId: workspaceAllocationId(input.executionLease.executionId),
-    reason: input.reason,
-    now: input.now,
-  });
 }
 
 export async function cancelAttachmentPreparationAllocation(input: {
@@ -330,22 +265,8 @@ async function cancelWorkspaceAllocationWithParent(
   return { ok: true, value: organisationCancelled.value };
 }
 
-function workspaceAllocationId(executionId: string): string {
-  return `wxa-${executionId.slice("cmx-".length)}`;
-}
-
 function attachmentPreparationAllocationId(preparationId: string): string {
   return `wxa-${preparationId}`;
-}
-
-function codeModeExecutionParent(
-  executionLease: HarnessCodeModeExecutionLease,
-): Variant<WorkspaceExecutorAllocationParent, "code_mode_execution"> {
-  return {
-    kind: "code_mode_execution",
-    executionId: executionLease.executionId,
-    leaseId: executionLease.leaseId,
-  };
 }
 
 function attachmentPreparationParent(

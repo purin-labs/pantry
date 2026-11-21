@@ -16,7 +16,8 @@ import type {
 } from "@purin-labs/bakery-model/bakery-surface";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "../../env";
-import { parseUserId, type RequestId, type OrganisationId } from "../../ids";
+import { type RequestId, type OrganisationId } from "../../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { traceLog } from "../../observability";
 import {
   SessionExecutionAdmission,

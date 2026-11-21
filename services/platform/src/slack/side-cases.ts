@@ -50,7 +50,7 @@ export const SLACK_SIDE_CASE_START_ACTION = "satyr_side_case_start";
 const SLACK_SIDE_CASE_HARNESS_INSTRUCTION =
   "This thread started from a side Case proposal in another Slack thread. The first message is that proposal's brief. Do the work that the brief describes. Approvals and effects in the other thread do not authorize actions here.";
 
-export type SlackSideCaseStatus = "open" | "starting" | "started";
+type SlackSideCaseStatus = "open" | "starting" | "started";
 
 export type SlackSideCaseProposal = Readonly<{
   proposalId: string;

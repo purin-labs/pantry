@@ -22,7 +22,7 @@ import type { Result } from "../result";
  * where it goes, why it waits and the label that decides who may answer, and
  * which content the pass covers.
  */
-export type HeldOutputStatus = "pending" | "allowed" | "denied" | "expired";
+type HeldOutputStatus = "pending" | "allowed" | "denied" | "expired";
 
 /**
  * Why it waits. `outside_written` is an effect of a Session that read text of

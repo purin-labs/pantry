@@ -237,7 +237,7 @@ function advanceMerchant(
  * The customer order that a mail sources journey cites. The journey's own
  * support module, which runs in the Worker, names the same identity.
  */
-export const MAIL_SOURCE_ORDER_ID = "order_1042";
+const MAIL_SOURCE_ORDER_ID = "order_1042";
 
 /** One confirmed shop order, written as Commerce writes an order. */
 export function seedMailOrder(

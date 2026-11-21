@@ -521,7 +521,7 @@ export function digestFlowBinding(binding: FlowBinding): Promise<string> {
   return digestCanonical(binding.toJSON());
 }
 
-export function canonicalInformationFlowContext(
+function canonicalInformationFlowContext(
   context: InformationFlowContext,
 ): SerializedInformationFlowContext {
   return {

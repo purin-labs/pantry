@@ -83,7 +83,7 @@ export type CommerceEntityRelationReadResult =
       capability: CommerceQueryPlanErrorCapability;
     }>;
 
-export type CommerceEntityRelationExecution =
+type CommerceEntityRelationExecution =
   | Readonly<{
       kind: "exact";
       requestedLimit: 1;
@@ -102,7 +102,7 @@ export type CommerceEntityRelationExecution =
       nextBoundary: CommerceCursorBoundary | null;
     }>;
 
-export type CommerceListEntryRelationRow = Readonly<{
+type CommerceListEntryRelationRow = Readonly<{
   merchantId: string;
   listId: string;
   entryId: string;

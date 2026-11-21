@@ -10,7 +10,6 @@ import type {
   CommerceCommandId,
   CommerceEntityPlaneCommand,
   CommerceEntityRef,
-  CommerceEntityTypeId,
   CommerceGraphQuery,
   CommerceList,
   CommerceSensitivity,
@@ -71,6 +70,7 @@ import {
 } from "./lexicon.ts";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { exhaustiveList, isNormalizedText, isRecord } from "@purin-labs/std";
+import { SYSTEM_KINDS } from "@purin-labs/commerce-client";
 
 type BoundaryRecord = { readonly [key: string]: unknown };
 type SystemCommerceEntityKind = SystemCommerceEntityRef["typeId"];
@@ -89,31 +89,6 @@ type MenuEntityId = VariantBy<
   "typeId",
   "menu"
 >["entityId"];
-
-const SYSTEM_KINDS = exhaustiveList<SystemCommerceEntityKind>()([
-  "location",
-  "product",
-  "sellable_variant",
-  "offer",
-  "inventory_item",
-  "stock_policy",
-  "menu",
-  "recipe_revision",
-  "preparation_ticket",
-  "production_batch",
-  "order",
-  "payment",
-  "fulfillment",
-  "shipment",
-  "sales_channel",
-  "inventory_position",
-  "inventory_movement",
-  "inventory_lot",
-  "inventory_consumption_plan",
-  "inventory_consumption_requirement",
-  "modifier_group_revision",
-  "preparation_station",
-]);
 
 const ATTRIBUTE_KINDS = exhaustiveList<AttributeValueKind>()([
   "short_text",
@@ -814,26 +789,6 @@ export function parseSystemEntityRef(
 export function parseCommerceList(value: unknown): CommerceList {
   validateCommerceListWithLexicon(value);
   return value;
-}
-
-export function parseEntityTypeId(value: unknown): CommerceEntityTypeId {
-  const object = objectValue(value, "entityTypeId");
-  const origin = enumValue(object.origin, "entityTypeId.origin", [
-    "system",
-    "custom",
-  ] as const);
-  return origin === "system"
-    ? {
-        origin,
-        typeId: enumValue(object.typeId, "entityTypeId.typeId", SYSTEM_KINDS),
-      }
-    : {
-        origin,
-        typeId: brandedText<CustomCommerceEntityTypeId>(
-          object.typeId,
-          "entityTypeId.typeId",
-        ),
-      };
 }
 
 function requireUniqueAttributeIds(

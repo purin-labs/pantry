@@ -97,7 +97,7 @@ export type SerializedFlowLabel = Readonly<{
   readonly writer?: FlowWriter;
 }>;
 
-export type CaseEntryFlowSource = Readonly<{
+type CaseEntryFlowSource = Readonly<{
   readonly kind: "case_entry";
   readonly caseId: string;
   readonly entryId: string;

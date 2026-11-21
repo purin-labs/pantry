@@ -86,8 +86,6 @@ import {
   publishSkillRevision,
 } from "./agent-operations/skills";
 
-export type { ScheduleSpec, ScheduleWeekday } from "@purin-labs/control-api";
-
 export type AgentLifecycle = "active" | "archived";
 
 export type InstallationLifecycle = "active" | "suspended" | "archived";
@@ -280,8 +278,7 @@ export type EscalationPolicy = {
   readonly updatedAt: number;
 };
 
-export type ConfigurationProposalTargetKind =
-  "agent_instructions" | "skill_markdown";
+type ConfigurationProposalTargetKind = "agent_instructions" | "skill_markdown";
 
 export type AgentConfigurationProposal = {
   readonly proposalId: string;
@@ -405,7 +402,7 @@ export type AgentOperationsError =
   | { readonly code: "agent_operation_not_found"; readonly field: string }
   | { readonly code: "agent_operation_persistence_failed" };
 
-export type AgentOperationCommandMetadata = Readonly<{
+type AgentOperationCommandMetadata = Readonly<{
   readonly operationId: string;
   readonly actorUserId: string;
   readonly now: number;
@@ -416,7 +413,7 @@ export type AgentResponsibilityScopePublicationEvidence = Variant<
   "resolved"
 >;
 
-export type PublishResponsibilityScopeInput = Variant<
+type PublishResponsibilityScopeInput = Variant<
   AgentOperationInput,
   "publish_responsibility_scope"
 >;

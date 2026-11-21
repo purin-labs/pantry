@@ -16,7 +16,8 @@ import {
   eraseEntryWhere,
   PURGE_CATALOGUE,
 } from "../../src/data/purge-catalogue";
-import type { OrganisationId, UserId } from "../../src/ids";
+import type { OrganisationId } from "../../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
@@ -135,9 +136,7 @@ export async function erasedTableResidue(
   return residue;
 }
 
-export async function cleanupStatus(
-  organisationId: OrganisationId,
-): Promise<unknown> {
+async function cleanupStatus(organisationId: OrganisationId): Promise<unknown> {
   const scope = await requireOrganisationExecutionScope(env, organisationId);
   return scope.database
     .prepare(

@@ -6,7 +6,6 @@ import {
 import {
   readPlatformScopeV1 as parseAccountScope,
   platformScopeFieldsEqual as sameAccountScope,
-  readSatyrFeePolicyV1 as parsePantryFeePolicy,
   readFundsReservationV1 as readAccountFundsReservation,
   readServiceIdentityResolutionV1,
   readPlatformUsageReceiptV1 as readAccountUsageReceipt,
@@ -18,7 +17,6 @@ import {
   type PlatformIdentityLinkV1,
   type PlatformPrincipalV1,
   type ServiceIdentityResolutionV1,
-  type DurableSourceEvidenceV1 as AccountSourceEvidence,
   type PlatformScopeV1,
   type FundsReservationV1,
   type ReserveFundsRequestV1,
@@ -38,17 +36,14 @@ export {
   accountText,
   parseAccountScope,
   sameAccountScope,
-  parsePantryFeePolicy,
   readAccountFundsReservation,
   readAccountUsageReceipt,
   readLinkedUser,
 };
 export type {
   AccountScope,
-  PantryFeePolicy,
   AccountPlatformError,
   LinkedPantryAccountUser,
-  AccountSourceEvidence,
   AccountTerminalDelivery,
   AccountExecutionFunding,
   AccountUsageReceipt,
@@ -90,7 +85,7 @@ export type AccountIndeterminateRequest = Pick<
 type AccountTurnUsageRequest = PlatformUsageEventDataV1 &
   PantryTurnUsageV1;
 /** One UTC hour of Jev input tokens for one feature (Plan 88). */
-export type AccountJevUsageRequest = PlatformUsageEventDataV1 &
+type AccountJevUsageRequest = PlatformUsageEventDataV1 &
   PantryJevInputTokensUsageV1;
 export type AccountUsageRequest =
   AccountTurnUsageRequest | AccountJevUsageRequest;

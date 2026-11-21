@@ -18,9 +18,9 @@ import "./order-list.css";
 // and every check. The page only shows what the caller gives it; it reads
 // nothing.
 
-export type OrderStage = "checking" | "ready" | "in_kitchen" | "out";
+type OrderStage = "checking" | "ready" | "in_kitchen" | "out";
 
-export type OrderCheck = {
+type OrderCheck = {
   label: string;
   // "running" is the check that JEV holds now; "pending" waits behind it.
   state: "passed" | "failed" | "warning" | "waiting" | "running" | "pending";
@@ -33,7 +33,7 @@ type CustomerUpdate = {
   state: "waits_for_you" | "approved" | "draft";
 };
 
-export type OrderHold = {
+type OrderHold = {
   // One sentence that says what is wrong.
   problem: string;
   tone: "danger" | "warning";

@@ -105,7 +105,7 @@ const listCache = new Map<
   }>
 >();
 
-export function isOnePasswordItemId(itemId: string): boolean {
+function isOnePasswordItemId(itemId: string): boolean {
   return /^[0-9a-z]{26}$/.test(itemId);
 }
 

@@ -6,13 +6,13 @@ import {
   parseCaseId,
   parseChannelId,
   parseConnectorId,
-  parseUserId,
   parseIntegrationAccountId,
   parseRequestId,
   parseSessionId,
   parseOrganisationId,
   parseWorkspaceId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../src/result";
 import {
   parseWhatsAppCustomerId,

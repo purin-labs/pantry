@@ -23,6 +23,7 @@ import {
   menuPriceChangeKind,
   type MenuPriceSide,
 } from "../commerce/menu-price-action";
+import type { CommerceChangeFacts } from "../commerce/contract/approval-card-texts";
 import type { Env } from "../env";
 import { decisionCardBlocks, type DecisionCardButton } from "./decision-card";
 import { assertNever } from "@purin-labs/std";
@@ -47,14 +48,6 @@ export function commerceActionPortalUrl(
     `operations?commerceAction=${encodeURIComponent(nonce)}`,
   );
 }
-
-/** What a proposal knows about the record that it changes. */
-export type CommerceChangeFacts = Readonly<{
-  /** The product's title, when this Session read that product. */
-  title: string | null;
-  fromPriceMinor: number | null;
-  allowedRange: Readonly<{ minimumMinor: number; maximumMinor: number }> | null;
-}>;
 
 const NO_FACTS: CommerceChangeFacts = {
   title: null,

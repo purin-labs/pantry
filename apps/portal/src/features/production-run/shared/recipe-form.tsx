@@ -5,7 +5,7 @@ import { Select } from "../../../ui/select";
 type Choice<Value extends string> = Readonly<{ value: Value; label: string }>;
 
 /** One item of a recipe dropdown. */
-export function renderChoice(item: Choice<string>): React.ReactNode {
+function renderChoice(item: Choice<string>): React.ReactNode {
   return (
     <Select.Item key={item.value} value={item.value}>
       {item.label}

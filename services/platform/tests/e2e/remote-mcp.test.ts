@@ -27,12 +27,8 @@ import {
   readAccessGrant,
   revokeAccessGrant,
 } from "../../src/data/access-grants";
-import {
-  parseCaseId,
-  parseUserId,
-  parseSessionId,
-  newUserId,
-} from "../../src/ids";
+import { parseCaseId, parseSessionId } from "../../src/ids";
+import { parseUserId, newUserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,
   type IssuedControlSession,

@@ -19,7 +19,7 @@ export type CommerceBindingId = string & {
 export type CommerceEngineMerchantId = string & {
   readonly [commerceMerchantIdBrand]: "CommerceEngineMerchantId";
 };
-export type CommerceSigningKeyId = string & {
+type CommerceSigningKeyId = string & {
   readonly [commerceSigningKeyIdBrand]: "CommerceSigningKeyId";
 };
 

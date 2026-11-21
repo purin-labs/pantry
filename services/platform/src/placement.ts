@@ -209,7 +209,7 @@ function invalidPlacement(path: string): Result<never, PlacementBoundaryError> {
   return { ok: false, error: { code: "invalid_organisation_placement", path } };
 }
 
-export type OrganisationDatabaseBinding =
+type OrganisationDatabaseBinding =
   "DB" | "ORGANISATION_DB_WNAM" | "ORGANISATION_DB_APAC" | "ORGANISATION_DB_EU";
 
 export type OrganisationPlacementCell = {

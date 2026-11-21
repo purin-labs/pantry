@@ -48,13 +48,13 @@ import { armAlarmBy } from "./lifecycle/actor-alarm";
  */
 
 /** How long the Actors stay in memory after the last turn that named them. */
-export const CONVERSATION_RESIDENCY_MS = 15 * 60_000;
+const CONVERSATION_RESIDENCY_MS = 15 * 60_000;
 /**
  * The time between two calls. It is below the 10 s after which an Actor can
  * leave memory. With 50 s between two calls, a Case had left memory at 31 of
  * 78 calls in production.
  */
-export const CONVERSATION_RESIDENCY_TICK_MS = 8_000;
+const CONVERSATION_RESIDENCY_TICK_MS = 8_000;
 /** The most Actors one Connector keeps: 32 conversations and itself. */
 const MAX_RESIDENTS = 65;
 const MAX_NAMES_PER_REQUEST = 8;

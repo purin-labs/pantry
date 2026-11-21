@@ -26,7 +26,7 @@ export type Provider = Extract<
   | "whatsapp"
 >;
 
-export type WorkspacePageFeedback = {
+type WorkspacePageFeedback = {
   readonly page: WorkspaceDetailPage;
   readonly message: string;
   readonly mutation: OrganisationMutation | null;

@@ -1,4 +1,4 @@
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 
 /**
  * Archived menu boards (Plan 40B, board removal). An owner or admin archives

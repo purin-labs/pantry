@@ -18,11 +18,7 @@ import {
   SUPPLY_COST_TERMS_VIEW_ID,
 } from "@purin-labs/commerce-client";
 
-export {
-  REPLENISHMENT_QUEUE_LIST_ID,
-  SUPPLIER_DIRECTORY_LIST_ID,
-  SUPPLY_COST_TERMS_LIST_ID,
-};
+export { REPLENISHMENT_QUEUE_LIST_ID };
 
 const SUPPLIER_INVENTORY_ITEM_DEFINITION = parseRelationshipDefinition({
   origin: "custom",

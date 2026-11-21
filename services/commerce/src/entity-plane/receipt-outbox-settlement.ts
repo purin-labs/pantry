@@ -32,7 +32,7 @@ export type EntityPlaneMutationRequest = Omit<
   "authority"
 >;
 type MutationTarget = CommerceMutationReceiptV1["target"];
-export type CommandKind = CommerceEntityPlaneCommand["kind"];
+type CommandKind = CommerceEntityPlaneCommand["kind"];
 export type CommandRequest<K extends CommandKind> = Omit<
   EntityPlaneMutationRequest,
   "command"

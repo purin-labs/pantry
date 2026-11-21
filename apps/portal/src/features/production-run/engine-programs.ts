@@ -24,7 +24,7 @@ import type { Variant } from "@purin-labs/type-utils";
  * earlier one-shot worker did, so each job keeps its requests and results.
  */
 
-export type JobMode =
+type JobMode =
   "transfer" | "oven-cycle" | "rack-cycle" | "loading" | "oven-handoff";
 
 export type JobTask =

@@ -24,11 +24,10 @@ import {
 import type { Env } from "../env";
 import {
   parseControlSessionId,
-  parseUserId,
   type ControlSessionId,
-  type UserId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { newRequestId } from "../ids";
 import { traceWarn } from "../observability";
 import type { Result } from "../result";
@@ -49,7 +48,7 @@ import {
   socketSessionMembership,
 } from "./socket-session-access";
 
-export type CollaborationRoomClientMessage<Update, StateVector, Selection> =
+type CollaborationRoomClientMessage<Update, StateVector, Selection> =
   | Readonly<{
       kind: "pointer_update";
       position: CollaborationPointerPosition | null;
@@ -197,7 +196,7 @@ type ActiveAgentOperation = {
 // After an accepted edit, the room keeps the agent's label on its target for
 // this long, or until the same agent starts its next edit. The label grants
 // nothing and is not checked again: the turn often ends inside the hold.
-export const AGENT_ACTIVITY_HOLD_MS = 5_000;
+const AGENT_ACTIVITY_HOLD_MS = 5_000;
 type HeldAgentActivity = Readonly<{
   activity: CollaborationAgentActivity;
   timer: ReturnType<typeof setTimeout>;

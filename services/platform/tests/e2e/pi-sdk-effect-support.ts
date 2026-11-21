@@ -219,7 +219,7 @@ export function providerClient(): CommerceAdminClient {
   });
 }
 
-export async function provisionProviderMerchant(): Promise<void> {
+async function provisionProviderMerchant(): Promise<void> {
   const provisioned = await providerClient().provisionMerchant({
     schemaVersion: "underclerk.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
@@ -229,9 +229,7 @@ export async function provisionProviderMerchant(): Promise<void> {
   if (!provisioned.ok) throw new Error(JSON.stringify(provisioned.error));
 }
 
-export async function seedProviderProduct(
-  loseFirstPublish = true,
-): Promise<void> {
+async function seedProviderProduct(loseFirstPublish = true): Promise<void> {
   const client = providerClient();
   const now = new Date().toISOString();
   await provisionProviderMerchant();
@@ -314,7 +312,7 @@ async function armLostPublish(): Promise<void> {
   if (!armed.ok) throw new Error(await armed.text());
 }
 
-export function seedProductProjection(
+function seedProductProjection(
   _actor: OrganisationDO,
   state: DurableObjectState,
 ): void {

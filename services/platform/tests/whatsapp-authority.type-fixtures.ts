@@ -11,7 +11,7 @@ import type {
 import type { WhatsAppSendOutcome } from "../src/whatsapp/graph";
 import type { WhatsAppWebhookEvent } from "../src/whatsapp/webhook";
 import { parseVaultHandle } from "../src/credential-vault";
-import { parseUserId } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   parseWhatsAppCustomerId,
   parseWhatsAppMessageId,

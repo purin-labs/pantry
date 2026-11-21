@@ -36,6 +36,7 @@ import {
   storeBearerCredential,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
+import { scopesAreComplete } from "../provider-adapters/authorization";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { slackInstallationOwnerIsLive } from "../credential-vault/slack-installation-credential";
@@ -351,20 +352,4 @@ function slackManifestEvidence(env: Env): ProviderManifestEvidence {
         reasonCode: "shared_application_subscription_unconfigured",
         repairActions: ["configure_slack_signing_secret"],
       };
-}
-
-function scopesAreComplete(
-  adapter: Readonly<{
-    requiredScopes: readonly string[];
-    scopeIsGranted: (
-      requiredScope: string,
-      grantedScopes: ReadonlySet<string>,
-    ) => boolean;
-  }>,
-  grantedScopes: readonly string[],
-): boolean {
-  const granted = new Set(grantedScopes);
-  return adapter.requiredScopes.every((requiredScope) =>
-    adapter.scopeIsGranted(requiredScope, granted),
-  );
 }

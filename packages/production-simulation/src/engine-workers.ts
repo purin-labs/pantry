@@ -8,14 +8,12 @@ import { advance, intervalContains, type LogicalTime } from "./time.ts";
 import {
   activeWorkerRoutes,
   travelDurationFromRoutes,
-  validTravelRouteReplacement,
   validWorkerTravelReplacement,
 } from "./worker-travel.ts";
 
 export {
   activeWorkerRoutes,
   travelDurationFromRoutes,
-  validTravelRouteReplacement,
   validWorkerTravelReplacement,
 };
 

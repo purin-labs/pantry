@@ -8,12 +8,12 @@ import {
   parseBakerySurfaceEffect,
   type BakerySurfaceEffectV1,
 } from "@purin-labs/bakery-model/bakery-surface";
-import { readOrganisationCodexConnection } from "../../src/models/codex-connection";
 import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseUserId, type OrganisationId } from "../../src/ids";
+import { type OrganisationId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import {
   requireActiveOrganisationActor,
@@ -123,22 +123,6 @@ export async function preparePortalChatJourney(
   return { session, fixture };
 }
 
-export function readConnection(reconcile: boolean) {
-  return readOrganisationCodexConnection({
-    env,
-    organisationId: ORGANISATION_ID,
-    now: Date.now(),
-    reconcile,
-  });
-}
-
-export async function readFailureReason(): Promise<string> {
-  const connection = await readConnection(false);
-  return connection.ok && connection.value.kind === "action_required"
-    ? connection.value.reason
-    : "none";
-}
-
 export async function readWork(session: IssuedControlSession): Promise<string> {
   const raw: unknown = await (await chat(session, null)).json();
   if (
@@ -160,13 +144,6 @@ export function chat(
     session,
     turn === null ? { kind: "read" } : { kind: "message", turn },
   );
-}
-
-export function retryChat(
-  session: IssuedControlSession,
-  turn: number,
-): Promise<Response> {
-  return requestChat(session, { kind: "retry", turn });
 }
 
 export function goalCommand(

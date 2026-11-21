@@ -7,7 +7,6 @@ import { parseVaultHandle } from "../src/credential-vault/domain";
 import {
   parseCaseId,
   parseChannelId,
-  parseUserId,
   parseIntegrationAccountId,
   parseSlackAppId,
   parseSlackInstallationId,
@@ -16,7 +15,6 @@ import {
   parseWorkspaceId,
   type CaseId,
   type ChannelId,
-  type UserId,
   type IntegrationAccountId,
   type SlackAppId,
   type SlackInstallationId,
@@ -24,6 +22,7 @@ import {
   type OrganisationId,
   type WorkspaceId,
 } from "../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseSlackUserId } from "../src/slack/events";
 import { parseInitialOrganisationPlacement } from "../src/placement";
 import {

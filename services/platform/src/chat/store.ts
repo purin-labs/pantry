@@ -25,7 +25,8 @@ import {
 } from "./conversation-machine";
 import { conversationProjectSnapshots } from "./project-context-binding";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { UserId, OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   latestPublicTimelineSequence,
   normalizeConversationTimeline,
@@ -114,7 +115,7 @@ type ConversationDirectory = Readonly<{
     ArchivedConversationMetadata)[];
 }>;
 
-export type ConversationSharing = Readonly<{
+type ConversationSharing = Readonly<{
   visibility: "private" | "shared";
   role: ProjectRole;
 }>;
@@ -740,14 +741,19 @@ function personalizeConversation(
   };
 }
 
+/**
+ * One page of the chat list. A search gives the normalized `title`; the
+ * page then holds only the chats whose title holds it.
+ */
 export async function listConversationDirectory(
   db: D1Database,
   scope: ConversationScope,
   cursors: ChatDirectoryCursors = { active: null, archived: null },
+  title = "",
 ): Promise<ConversationDirectory> {
   const [activeRows, archivedRows] = await Promise.all([
-    listConversationRows(db, scope, "active", "", cursors),
-    listConversationRows(db, scope, "archived", "", cursors),
+    listConversationRows(db, scope, "active", title, cursors),
+    listConversationRows(db, scope, "archived", title, cursors),
   ]);
   const active: (Readonly<
     Pick<
@@ -828,49 +834,7 @@ export async function searchConversationDirectory(
   const normalized = normalizeConversationTitle(query);
   if (normalized.length === 0)
     return listConversationDirectory(db, scope, cursors);
-  const [activeRows, archivedRows] = await Promise.all([
-    listConversationRows(db, scope, "active", normalized, cursors),
-    listConversationRows(db, scope, "archived", normalized, cursors),
-  ]);
-  const active: (Readonly<
-    Pick<
-      ConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ActiveConversationMetadata)[] = [];
-  for (const row of activeRows)
-    active.push(parseConversationSummary(row, "active"));
-  const archived: (Readonly<
-    Pick<
-      ConversationSummary,
-      | "id"
-      | "title"
-      | "revision"
-      | "latestSequence"
-      | "lastReadSequence"
-      | "activity"
-      | "placement"
-      | "updatedAt"
-      | "sharing"
-      | "parentConversationId"
-      | "origin"
-    >
-  > &
-    ArchivedConversationMetadata)[] = [];
-  for (const row of archivedRows)
-    archived.push(parseConversationSummary(row, "archived"));
-  return directoryPage(active, archived);
+  return listConversationDirectory(db, scope, cursors, normalized);
 }
 
 export async function updateConversationMetadata(

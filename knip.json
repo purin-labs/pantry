@@ -13,6 +13,7 @@
     },
     "services/platform": {
       "vitest": false,
+      "ignore": ["src/generated/**"],
       "entry": [
         "src/integration-gateway.ts",
         "src/{chatgpt-exit,code-mode-sandbox,model-exit,slack-ingress,vault-onepassword}/worker.ts",

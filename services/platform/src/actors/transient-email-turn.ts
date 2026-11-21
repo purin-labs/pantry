@@ -8,11 +8,7 @@ import {
   type TransientTurnInput,
 } from "./transient-turn";
 
-export {
-  createTransientHarnessSinks,
-  type TransientHarnessSinkUsage,
-  type TransientHarnessSinks,
-} from "./transient-turn";
+export { createTransientHarnessSinks } from "./transient-turn";
 
 /**
  * The email flavour of a transient turn: the reply body is the harness's

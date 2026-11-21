@@ -129,10 +129,7 @@ function interpolatePose(
   ];
 }
 
-export function setPhysicsPose(
-  object: THREE.Object3D,
-  pose: PhysicsPose,
-): void {
+function setPhysicsPose(object: THREE.Object3D, pose: PhysicsPose): void {
   object.position.set(pose[0], pose[1], pose[2]);
   object.quaternion.set(pose[4], pose[5], pose[6], pose[3]);
 }

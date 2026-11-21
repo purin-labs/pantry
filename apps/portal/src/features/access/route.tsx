@@ -1187,7 +1187,7 @@ function dataFlowQuestion(
   }
 }
 
-export function grantTarget(
+function grantTarget(
   draft: GrantDraft,
 ):
   | Readonly<{ ok: true; value: AccessGrantTargetSelection }>

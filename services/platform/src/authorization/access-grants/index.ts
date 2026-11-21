@@ -1,59 +1,21 @@
 export {
   encodeCapabilityKey,
-  encodeFileCapabilityKey,
-  encodePlatformCapabilityKey,
   encodeProviderCapabilityKey,
   parseCapabilityKey,
   parseFileResourceScope,
-  parseProviderCapabilityKey,
-  type CapabilityDefinition,
-  type CapabilityKeyParseError,
-  type FileCapabilityDefinition,
-  type PlatformCapabilityDefinition,
-  type ProviderCapabilityDefinition,
 } from "./capability-key";
 export {
   compileEffectiveGrantSet,
-  compileSelectedGrantSet,
   selectActiveGrants,
-  type CompileEffectiveGrantsInput,
-  type CompileSelectedGrantSetInput,
   type EffectiveCapability,
-  type EffectiveGrantCompileError,
   type EffectiveGrantSet,
   type ImmutableCapabilityDefinition,
-  type FileCapability,
-  type PlatformCapability,
-  type ProviderCapability,
-  type SelectActiveGrantsInput,
 } from "./compiler";
-export type {
-  AccessGrant,
-  AccessGrantId,
-  AccessGrantLifecycle,
-  AccessGrantRevision,
-  AccessGrantTarget,
-  CommerceReadGrantScope,
-  ContextVisibility,
-  GrantSubject,
-  WorkflowAuthorityKind,
-} from "./types";
-export {
-  contextVisibilityMatches,
-  encodeContextVisibility,
-  parseContextVisibility,
-  type ContextVisibilityParseError,
-} from "./visibility";
+export type { AccessGrant } from "./types";
+export { encodeContextVisibility } from "./visibility";
 export {
   authorityPartitionKey,
   authorizeCapabilityUse,
   compileTurnAuthority,
-  digestSelectedGrantSet,
   parseStoredAuthorityPartition,
-  type AuthorityPartitionParseError,
-  type AuthorizedCapabilityClaim,
-  type AuthorizedCapabilityUse,
-  type CapabilityAuthorizationError,
-  type CapabilityAuthorizationRequest,
-  type TurnAuthorityCompileError,
 } from "./turn-authority";

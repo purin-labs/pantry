@@ -13,7 +13,7 @@ import type { StageBinding } from "./recipe-graph";
  * engine's comparison stays the record of the draft's result: the animation is a
  * view, and it takes its proportions from the draft's durations.
  */
-export type AnimationSegment = Readonly<{
+type AnimationSegment = Readonly<{
   modelStartS: number;
   modelEndS: number;
   runStartS: number;

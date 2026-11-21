@@ -2,7 +2,8 @@ import type {
   ConnectedIntegrationSeed,
   IntegrationAccountLifecycle,
 } from "../src/data/integration-account";
-import { parseUserId, parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle } from "../src/credential-vault";
 
 const organisationId = requireParsed(

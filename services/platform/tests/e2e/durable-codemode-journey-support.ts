@@ -559,10 +559,7 @@ export function readProposedActions(
     .toArray();
 }
 
-export function readSessionExecution(
-  _actor: unknown,
-  state: DurableObjectState,
-) {
+function readSessionExecution(_actor: unknown, state: DurableObjectState) {
   const row = state.storage.sql
     .exec<{ request_envelope: string; state_kind: string }>(
       "SELECT request_envelope, state_kind FROM actor_outbox WHERE json_extract(request_envelope, '$.kind') = 'code_mode_execution.v1'",

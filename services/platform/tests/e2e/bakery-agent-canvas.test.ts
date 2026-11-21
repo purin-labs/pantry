@@ -21,7 +21,7 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";

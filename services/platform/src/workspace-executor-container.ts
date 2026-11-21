@@ -29,7 +29,7 @@ export type WorkspaceExecutorContainerError =
   | { readonly kind: "response_too_large" }
   | { readonly kind: "invalid_response"; readonly field: string };
 
-export type WorkspaceExecutorTrustedUsage = {
+type WorkspaceExecutorTrustedUsage = {
   readonly requestBytes: number;
   readonly responseBytes: number;
   readonly gatewayDurationMs: number;

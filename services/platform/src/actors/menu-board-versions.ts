@@ -1,6 +1,6 @@
 import type { MenuBoardVersionSummary } from "@purin-labs/control-api";
 
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 
 /**
  * The version history of a board's draft (Plan 40B phase 5, slice 7). A

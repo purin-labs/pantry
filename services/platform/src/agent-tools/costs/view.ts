@@ -11,7 +11,7 @@ import {
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
-} from "../bakery/surface";
+} from "../bakery/surface-result";
 
 /**
  * The agent's view commands on Costs & margins (Plan 87 phase 4). Each one

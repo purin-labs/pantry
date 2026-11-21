@@ -1,13 +1,12 @@
 import {
-  parseUserId,
   parseControlSessionId,
   parsePersonId,
   parseOrganisationId,
-  type UserId,
   type ControlSessionId,
   type PersonId,
   type OrganisationId,
 } from "./ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "./result";
 import type { NearEd25519PublicKey, SeamsIdentityId } from "./seams/nep413";
 import type { CanonicalAction } from "@purin-labs/contracts";
@@ -25,7 +24,7 @@ export type ApprovalProofDigest = string & {
   readonly [approvalProofDigestBrand]: "ApprovalProofDigest";
 };
 
-export type ApprovalPolicyBinding = {
+type ApprovalPolicyBinding = {
   readonly kind: "unversioned_default";
 };
 
@@ -39,14 +38,14 @@ export type ApprovalActionBinding = {
   readonly expiresAt: number;
 };
 
-export type ControlApprovalPrincipal = {
+type ControlApprovalPrincipal = {
   readonly kind: "app_user";
   readonly userId: UserId;
   readonly personId: PersonId;
   readonly role: "owner" | "admin";
 };
 
-export type SeamsApprovalPrincipal = {
+type SeamsApprovalPrincipal = {
   readonly kind: "seams_identity";
   readonly seamsIdentityId: SeamsIdentityId;
   readonly personId: PersonId;

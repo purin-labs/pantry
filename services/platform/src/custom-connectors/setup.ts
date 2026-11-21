@@ -11,13 +11,12 @@ import type { VaultHandle, VaultSecret } from "../credential-vault/domain";
 import { parseVaultHandle } from "../credential-vault/domain";
 import type { OrganisationEnvironment } from "../data/control-plane";
 import {
-  parseUserId,
   parseIntegrationAccountId,
   parseOrganisationId,
-  type UserId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   digestCanonical,
   serializeCanonical,
@@ -79,7 +78,7 @@ export type CustomConnectorIdentityTestExecutor = (
   >
 >;
 
-export type CustomConnectorVerification = {
+type CustomConnectorVerification = {
   readonly providerAccountId: string;
   readonly displayName: string;
   readonly resultSchemaDigest: string;

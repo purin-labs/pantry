@@ -13,12 +13,8 @@ import type {
   ContextVisibility,
 } from "../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import type {
-  UserId,
-  IntegrationAccountId,
-  PersonId,
-  OrganisationId,
-} from "../ids";
+import type { IntegrationAccountId, PersonId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { FlowLabel } from "../policy";
 import type { Result } from "../result";
 import type { ControlRole } from "../data/control-plane";
@@ -142,11 +138,11 @@ type AccessControlCapabilityActions =
 type AccessControlGrantActions =
   Readonly<{ kind: "read_only" }> | Readonly<{ kind: "revoke_grant" }>;
 
-export type AccessControlViewActions =
+type AccessControlViewActions =
   | Readonly<{ kind: "read_only" }>
   | Readonly<{ kind: "manage"; createGrant: true; applyDefaults: true }>;
 
-export type AccessControlCapabilityView = Readonly<{
+type AccessControlCapabilityView = Readonly<{
   definition: CapabilityDefinition;
   mode: CapabilityMode;
   provenance: CapabilityPolicyProvenance;
@@ -157,7 +153,7 @@ export type AccessControlCapabilityView = Readonly<{
   actions: AccessControlCapabilityActions;
 }>;
 
-export type AccessControlIntegrationView = Readonly<{
+type AccessControlIntegrationView = Readonly<{
   integrationAccountId: IntegrationAccountId;
   provider: string;
   displayName: string;
@@ -186,7 +182,7 @@ type AccessControlProvenanceView = Readonly<{
   label: string;
 }>;
 
-export type AccessControlGrantView = Readonly<{
+type AccessControlGrantView = Readonly<{
   grantId: AccessGrant["grantId"];
   revision: number;
   subject: AccessControlSubjectView;
@@ -202,7 +198,7 @@ export type AccessControlGrantView = Readonly<{
   actions: AccessControlGrantActions;
 }>;
 
-export type AccessControlSourcePolicyView = Readonly<{
+type AccessControlSourcePolicyView = Readonly<{
   sourceRefId: string;
   revision: number;
   capability: Readonly<{

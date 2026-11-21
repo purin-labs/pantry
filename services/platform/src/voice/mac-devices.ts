@@ -1,9 +1,6 @@
-import type {
-  DeviceConnection,
-  DeviceView,
-  VoiceEngineId,
-} from "@purin-labs/control-api";
+import type { DeviceConnection, DeviceView } from "@purin-labs/control-api";
 
+import type { ShopMacDevice } from "../devices/contract/shop-mac-devices";
 import type { OrganisationDatabase } from "../database-handles";
 import type { Env } from "../env";
 import type { OrganisationId } from "../ids";
@@ -12,13 +9,6 @@ import { listVoiceMacs, MAC_HEARTBEAT_FRESH_MS, type VoiceMac } from "./store";
 import type { Variant } from "@purin-labs/type-utils";
 
 type ShopMacDeviceView = Variant<DeviceView, "shop_mac">;
-
-/** A shop Mac as the Devices page and the agent's `device_read` see it. */
-type ShopMacDevice = Readonly<{
-  view: ShopMacDeviceView;
-  /** The engine that a manager chose. The Mac changes to it after its download. */
-  engineChoice: VoiceEngineId;
-}>;
 
 /**
  * The shop's Macs that are not revoked. Only a member who may configure the

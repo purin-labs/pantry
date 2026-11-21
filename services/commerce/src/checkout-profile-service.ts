@@ -34,7 +34,7 @@ export type {
 
 type CheckoutProfileState = CheckoutProfileLifecycle["state"];
 
-export type CheckoutProfileCommandError =
+type CheckoutProfileCommandError =
   | Readonly<{
       code: "invalid_profile";
       field: string;

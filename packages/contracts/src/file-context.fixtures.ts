@@ -1,11 +1,11 @@
 import type {
-  CanonicalContextSourceRef,
-  ContextSourceRevision,
   FileGrantSyncState,
   FileResourceGrantTarget,
   FileResourceScope,
   ProviderFileRevision,
 } from "./index.ts";
+import type { CanonicalContextSourceRef } from "./types/CanonicalContextSourceRef";
+import type { ContextSourceRevision } from "./types/ContextSourceRevision";
 
 export const dropboxFolderScope = {
   kind: "dropbox_folder",

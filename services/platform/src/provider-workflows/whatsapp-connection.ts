@@ -30,6 +30,7 @@ import {
   providerCredentialHandle,
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
+import { scopesAreComplete } from "../provider-adapters/authorization";
 import type { Result } from "../result";
 import { resolveWhatsAppEmbeddedSignupCredential } from "../whatsapp/application";
 import {
@@ -441,20 +442,4 @@ function whatsappAccountLabel(
   return number.verifiedName.length === 0
     ? number.displayPhoneNumber
     : `${number.verifiedName} (${number.displayPhoneNumber})`;
-}
-
-function scopesAreComplete(
-  adapter: Readonly<{
-    requiredScopes: readonly string[];
-    scopeIsGranted: (
-      requiredScope: string,
-      grantedScopes: ReadonlySet<string>,
-    ) => boolean;
-  }>,
-  grantedScopes: readonly string[],
-): boolean {
-  const granted = new Set(grantedScopes);
-  return adapter.requiredScopes.every((requiredScope) =>
-    adapter.scopeIsGranted(requiredScope, granted),
-  );
 }

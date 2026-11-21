@@ -17,7 +17,7 @@ import {
   type Result,
 } from "./document-client";
 
-export type TextCollaborationPresence<Field extends string> = Readonly<{
+type TextCollaborationPresence<Field extends string> = Readonly<{
   field: Field;
   range: TextSelectionRange;
 }>;

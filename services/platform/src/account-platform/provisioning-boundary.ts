@@ -1,22 +1,14 @@
 import { ServiceProvisionOwnerAssertionV1 } from "@seams-internal/console-shared/accountPlatform";
 import type { SatyrProvisionEnvelopeV1 as PantryProvisionEnvelope } from "@seams-internal/console-shared/accountPlatform";
 export {
-  readSatyrNativeScopeV1 as readPantryNativeScope,
-  readSatyrServiceTenantBindingV1 as readPantryServiceTenantBinding,
-  readSatyrProvisionDeliveryV1 as readPantryProvisionDelivery,
-  readSatyrProvisionOwnerV1 as readPantryProvisionOwner,
   readSatyrProvisionEnvelopeV1 as readPantryProvisionEnvelope,
   readSatyrProvisionAppliedV1 as readPantryProvisionApplied,
 } from "@seams-internal/console-shared/accountPlatform";
 export type {
   SatyrTenantScopeV1 as PantryNativeScope,
   SatyrServiceTenantBindingV1 as PantryServiceTenantBinding,
-  SatyrProvisionBindingV1 as PantryProvisionBinding,
-  SatyrProvisionCommandV1 as PantryProvisionCommand,
-  SatyrProvisionDeliveryV1 as PantryProvisionDelivery,
   SatyrProvisionOwnerV1 as PantryProvisionOwner,
   SatyrProvisionEnvelopeV1 as PantryProvisionEnvelope,
-  SatyrProvisionReceiptV1 as PantryProvisionReceipt,
   AccountProvisionedServiceOwnerV1 as PantryProvisionOwnerMapping,
   SatyrProvisionAppliedV1 as PantryProvisionApplied,
 } from "@seams-internal/console-shared/accountPlatform";

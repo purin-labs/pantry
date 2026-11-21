@@ -25,4 +25,4 @@ export type CaseAssignmentTerminalDisposition =
  * refactor 9). `never_started`: no turn began under it. `session_quiescent`:
  * its Session runs no turn, and the turn under it cannot finish.
  */
-export type CaseAssignmentAbandonReason = "never_started" | "session_quiescent";
+type CaseAssignmentAbandonReason = "never_started" | "session_quiescent";

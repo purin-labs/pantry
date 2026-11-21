@@ -9,10 +9,10 @@ import type {
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
-  type UserId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { OrganisationEnvironment } from "./control-plane";
 import {

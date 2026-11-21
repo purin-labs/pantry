@@ -25,7 +25,7 @@ export type SystemRecipient = Readonly<{
   grants: readonly AccessControlGrantView[];
 }>;
 
-export type AccessSystemKind = "integration" | "commerce" | "workspace";
+type AccessSystemKind = "integration" | "commerce" | "workspace";
 
 export type AccessSystem = Readonly<{
   key: string;

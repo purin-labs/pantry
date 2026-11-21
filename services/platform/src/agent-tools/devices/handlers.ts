@@ -5,7 +5,7 @@ import {
 } from "../../devices/snapshots";
 import { listDevices } from "../../devices/store";
 import { readKitchenDeviceViews } from "../../devices/views";
-import { readShopMacDevices } from "../../voice/mac-devices";
+import { shopMacDevices } from "../../devices/contract/shop-mac-devices";
 import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
 import {
   DeviceRequestError,
@@ -48,12 +48,12 @@ export function readDevicesForEmbeddedHarness(
         mayReadFaultText: roleMayOperate(member.role),
         now,
       });
-      const macs = await readShopMacDevices(
-        env,
-        scope.database,
-        scope.organisationId,
-        { mayReadNetwork: false, now },
-      );
+      const macs = await shopMacDevices
+        .use()
+        .readShopMacDevices(env, scope.database, scope.organisationId, {
+          mayReadNetwork: false,
+          now,
+        });
       const value: DeviceToolRead = {
         gateways: views.gateways.map((gateway) => ({
           gatewayId: gateway.deviceId,

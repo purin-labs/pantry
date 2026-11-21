@@ -10,12 +10,7 @@ import {
   readWorkflowFindings,
   writeWorkflowFindings,
 } from "../../commerce/bakery/workflow-revisions";
-import {
-  previewCode,
-  cancelOperatorConfigurationDraft,
-  confirmOperatorConfigurationDraft,
-  readOperatorDraft,
-} from "../../data/operator-configuration-draft";
+import { organisationServices } from "../../organisation/contract/organisation-services";
 import type { Env } from "../../env";
 import { newRequestId, type OrganisationId } from "../../ids";
 import { traceWarn } from "../../observability";
@@ -125,11 +120,13 @@ async function readProposal(
   );
   if (!authorized.ok) return authorized.response;
   try {
-    const stored = await readOperatorDraft(
-      authorized.executionScope.database,
-      authorized.organisationId,
-      draftId,
-    );
+    const stored = await organisationServices
+      .use()
+      .readOperatorDraft(
+        authorized.executionScope.database,
+        authorized.organisationId,
+        draftId,
+      );
     // Only the person who asked reads it, and for another person it does not exist.
     if (
       stored === null ||
@@ -179,7 +176,9 @@ async function decideProposal(
   const db = authorized.executionScope.database;
   const organisationId = authorized.organisationId;
   try {
-    const stored = await readOperatorDraft(db, organisationId, draftId);
+    const stored = await organisationServices
+      .use()
+      .readOperatorDraft(db, organisationId, draftId);
     const userId = authorized.authenticated.session.userId;
     if (
       stored === null ||
@@ -190,28 +189,34 @@ async function decideProposal(
       return controlError("bakery_workflow_not_found", 404);
     const now = Date.now();
     if (action === "decline") {
-      const cancelled = await cancelOperatorConfigurationDraft({
-        db,
-        organisationId,
-        draftId,
-        actorUserId: userId,
-        now,
-      });
+      const cancelled = await organisationServices
+        .use()
+        .cancelOperatorConfigurationDraft({
+          db,
+          organisationId,
+          draftId,
+          actorUserId: userId,
+          now,
+        });
       return cancelled.ok
         ? controlJson({ declined: true })
         : controlError("bakery_workflow_proposal_closed", 409);
     }
-    const confirmed = await confirmOperatorConfigurationDraft({
-      db,
-      env,
-      organisationId,
-      draftId,
-      actorUserId: userId,
-      actorRole: authorized.membership.role,
-      controlSessionId: authorized.authenticated.session.controlSessionId,
-      previewCode: previewCode(stored.commandDigest),
-      now,
-    });
+    const confirmed = await organisationServices
+      .use()
+      .confirmOperatorConfigurationDraft({
+        db,
+        env,
+        organisationId,
+        draftId,
+        actorUserId: userId,
+        actorRole: authorized.membership.role,
+        controlSessionId: authorized.authenticated.session.controlSessionId,
+        previewCode: organisationServices
+          .use()
+          .previewCode(stored.commandDigest),
+        now,
+      });
     if (!confirmed.ok)
       switch (confirmed.error.code) {
         case "workflow_revision_conflict":

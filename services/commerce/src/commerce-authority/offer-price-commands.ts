@@ -16,7 +16,7 @@ import {
   type OfferPricePolicy,
 } from "./offer-pricing";
 
-export type OfferPriceCommandRefusal = Readonly<{
+type OfferPriceCommandRefusal = Readonly<{
   code:
     | "offer_not_found"
     | "offer_not_listed"

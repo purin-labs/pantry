@@ -76,7 +76,7 @@ export type WhatsAppPauseReason =
       readonly caseId: string;
     };
 
-export type WhatsAppProcessingState =
+type WhatsAppProcessingState =
   | { readonly kind: "waiting" }
   | { readonly kind: "scheduled"; readonly at: number }
   | {
@@ -145,8 +145,6 @@ type WhatsAppEnvelopeEntry = {
   readonly bytes: number;
   readonly occurredAt: number;
 };
-
-export type { WhatsAppProposalState };
 
 export type WhatsAppProposalRow = {
   readonly proposalId: string;
@@ -1353,6 +1351,41 @@ export function sweepWhatsAppDeadlines(
     recoveredProcessing = true;
   }
   return { closedCaseIds: expired, recoveredProcessing };
+}
+
+/** The transition event of each terminal state of a disposed proposal. */
+export const WHATSAPP_DISPOSAL_EVENTS = {
+  rejected: "reject",
+  taken_over: "take_over",
+  revoked: "revoke",
+  expired: "expire",
+  superseded: "supersede",
+} as const;
+
+export function invalidateOpenWhatsAppProposal(
+  sql: SqlStorage,
+  caseId: string,
+  state: Extract<
+    WhatsAppProposalRow["state"],
+    "taken_over" | "revoked" | "superseded"
+  >,
+  now: number,
+):
+  | { readonly kind: "invalidated"; readonly proposalId: string }
+  | { readonly kind: "none" } {
+  let invalidated: string | null = null;
+  for (const open of openWhatsAppProposals(sql, caseId)) {
+    const moved = advanceWhatsAppProposal(
+      sql,
+      open,
+      { event: WHATSAPP_DISPOSAL_EVENTS[state] },
+      now,
+    );
+    if (moved.ok) invalidated ??= open.proposalId;
+  }
+  return invalidated === null
+    ? { kind: "none" }
+    : { kind: "invalidated", proposalId: invalidated };
 }
 
 function invalidateOpenWhatsAppProposalsForCase(

@@ -8,12 +8,12 @@ import { decodeBase64, encodeBase64 } from "@purin-labs/std";
  * The proposal row stores only ciphertext and keyed digests; the Case and
  * provider projections never receive the subject or body.
  */
-export type EmailContentSlot = Readonly<{
+type EmailContentSlot = Readonly<{
   readonly proposalId: string;
   readonly version: number;
 }>;
 
-export type EmailSealedContent = Readonly<{
+type EmailSealedContent = Readonly<{
   readonly nonceB64: string;
   readonly ciphertextB64: string;
   readonly bytes: number;

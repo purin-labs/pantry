@@ -7,7 +7,7 @@ import {
 import { controlError } from "../http";
 import { authorizeOrganisationSocket } from "./organisation-socket";
 
-export type MenuDraftTransport = "snapshot" | "socket" | "review";
+type MenuDraftTransport = "snapshot" | "socket" | "review";
 
 export type MenuDraftRoute = Readonly<{
   kind: "menuDraft";

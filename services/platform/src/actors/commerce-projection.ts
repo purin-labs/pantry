@@ -213,7 +213,7 @@ export type CommerceProjectionHistoryEntry = {
   readonly deliveryCount: number;
 };
 
-export type CommerceProjectionRecordBase<
+type CommerceProjectionRecordBase<
   TKind extends CommerceProjectionKind,
   TProjection extends CommerceProjection,
 > = {
@@ -358,7 +358,7 @@ export type UpsertProjectionIdentity = ProjectionIdentity & {
   readonly lifecycle: string;
 };
 
-export type InspectedCommerceUpsert = {
+type InspectedCommerceUpsert = {
   readonly kind: "upsert";
   readonly observationId: string;
   readonly observationJson: string;

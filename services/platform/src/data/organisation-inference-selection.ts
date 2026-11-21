@@ -1,5 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { OrganisationQuerySource } from "./query-source";
 import { isRecord } from "@purin-labs/std";

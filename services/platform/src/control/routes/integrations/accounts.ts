@@ -1,5 +1,5 @@
 import type { Env } from "../../../env";
-import { removeIntegrationAccount } from "../../../data/account-removal";
+import { organisationServices } from "../../../organisation/contract/organisation-services";
 import {
   disableIntegrationAccount,
   listIntegrationAccounts,
@@ -90,7 +90,7 @@ export async function handleRemoveAccount(
   if (mailboxTeardown.kind === "connector_unavailable") {
     return controlError("email_teardown_unavailable", 503);
   }
-  const removed = await removeIntegrationAccount({
+  const removed = await organisationServices.use().removeIntegrationAccount({
     db: authorized.executionScope.database,
     directory: env.DB,
     organisationId: authorized.organisationId,

@@ -68,7 +68,8 @@ import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import { resolveUser } from "../data/control-plane";
 import type { Env } from "../env";
-import type { ControlSessionId, OrganisationId, UserId } from "../ids";
+import type { ControlSessionId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
@@ -285,7 +286,7 @@ export type MenuBoardLayoutEdit = Exclude<
   MenuBoardCommentEdit | MenuBoardHistoryEdit
 >;
 
-export type MenuBoardCommentEdit =
+type MenuBoardCommentEdit =
   | Readonly<{ kind: "add_comment"; elementId: string; text: string }>
   | Readonly<{ kind: "reply_comment"; commentId: string; text: string }>
   | Readonly<{ kind: "resolve_comment"; commentId: string; resolved: boolean }>;
@@ -330,7 +331,7 @@ export type MenuBoardRead = Readonly<{
 }>;
 
 /** The element that an edit touched, before and after; null where it was none. */
-export type MenuBoardChange = Readonly<{
+type MenuBoardChange = Readonly<{
   elementId: string | null;
   before: MenuBoardChangeSide | null;
   after: MenuBoardChangeSide | null;

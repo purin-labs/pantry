@@ -41,7 +41,7 @@ export const DEFAULT_PASTRY_BENCH_RECIPE: PastryBenchRecipeConfig = {
   faultCheck: "none",
 };
 
-export type PastryBenchStageId =
+type PastryBenchStageId =
   | "press-dough"
   | "flour-bench"
   | "sheet-shortcrust"
@@ -57,7 +57,7 @@ export type PastryBenchStage = Readonly<{
   endS: number;
 }>;
 
-export type PastryBenchOvenTelemetry = Readonly<{
+type PastryBenchOvenTelemetry = Readonly<{
   peakChamberC: number;
   solverChamberC: number;
   heaterInputKJ: number;

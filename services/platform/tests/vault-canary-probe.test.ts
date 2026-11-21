@@ -40,7 +40,6 @@ import {
 import type { OrganisationInstallRecord } from "../src/data/organisation";
 import {
   parseCaseId,
-  parseUserId,
   parseControlSessionId,
   parseIntegrationAccountId,
   parsePersonId,
@@ -54,6 +53,7 @@ import {
   type OrganisationId,
   type WorkspaceId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import type { Result } from "../src/result";
 import { d1Database } from "./sqlite-d1";

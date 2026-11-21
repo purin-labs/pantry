@@ -133,12 +133,12 @@ export function StatusChip(props: {
   );
 }
 
-export type ResourceFact = {
+type ResourceFact = {
   readonly label: string;
   readonly value: React.ReactNode;
 };
 
-export type ResourceRowTarget =
+type ResourceRowTarget =
   | { readonly kind: "static" }
   | { readonly kind: "link"; readonly href: string };
 
@@ -203,7 +203,7 @@ export type WorkItemState =
   | { readonly kind: "blocked"; readonly label: string }
   | { readonly kind: "complete"; readonly label: string };
 
-export type WorkItemDue =
+type WorkItemDue =
   | { readonly kind: "none"; readonly label: string }
   | {
       readonly kind: "scheduled";

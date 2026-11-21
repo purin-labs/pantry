@@ -9,7 +9,7 @@ import type {
  * `result_unknown` on an indeterminate LAN timeout or socket drop until
  * inquired or explicitly cleared — never re-charging.
  */
-export type TerminalCollectionState =
+type TerminalCollectionState =
   | "collecting"
   | "result_unknown"
   | "captured"

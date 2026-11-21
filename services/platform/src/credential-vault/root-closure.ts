@@ -40,13 +40,13 @@ type ParsedRetainedVaultCiphertextRow = {
   readonly revokedAt: number | null;
 };
 
-export type RetainedVaultRootVersionSummary = {
+type RetainedVaultRootVersionSummary = {
   readonly keyVersion: VaultKeyVersion;
   readonly rowCount: number;
   readonly decryptedCount: number;
 };
 
-export type RetainedVaultRootClosureFinding =
+type RetainedVaultRootClosureFinding =
   | {
       readonly kind: "referenced_vault_root_unavailable";
       readonly keyVersion: VaultKeyVersion;

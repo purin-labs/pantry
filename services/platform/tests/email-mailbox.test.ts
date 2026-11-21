@@ -31,11 +31,8 @@ import {
   buildAgentMailboxAuthority,
   validateNativeRequestAuthority,
 } from "../src/request-authority";
-import {
-  type UserId,
-  type IntegrationAccountId,
-  type OrganisationId,
-} from "../src/ids";
+import { type IntegrationAccountId, type OrganisationId } from "../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import {

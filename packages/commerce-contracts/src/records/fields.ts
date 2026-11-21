@@ -14,9 +14,9 @@ export const normalizedTextSchema = Type.String({
 export type NormalizedText = Static<typeof normalizedTextSchema>;
 
 /**
- * Normalized text of at most `maxLength` UTF-16 code units, as the readers'
- * `text.length` counts them (`requireBoundedText`). A JSON Schema `maxLength`
- * counts code points, so it is not used here.
+ * Normalized text of at most `maxLength` UTF-16 code units, as `text.length`
+ * counts them. A JSON Schema `maxLength` counts code points, so it is not used
+ * here.
  */
 export function boundedTextSchema(maxLength: number) {
   return Type.Refine(

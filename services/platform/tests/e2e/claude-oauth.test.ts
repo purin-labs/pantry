@@ -12,7 +12,8 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseSessionId, parseUserId } from "../../src/ids";
+import { parseSessionId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveOrganisationModelRouteAtScope } from "../../src/models/route";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { network } from "./network";

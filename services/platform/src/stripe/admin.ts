@@ -1,11 +1,8 @@
 import { runtimeFetch } from "../runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
-  readChannelIdPath,
   readIntegrationAccountIdField,
-  readStringField,
   readOrganisationIdField,
-  readWorkspaceIdField,
 } from "../boundary";
 import {
   compileAndStoreCueSnapshot,
@@ -26,7 +23,6 @@ import {
 } from "../http";
 import {
   newRequestId,
-  parseThreadKey,
 } from "../ids";
 import { traceLog } from "../observability";
 import {
@@ -38,7 +34,13 @@ import {
   parseVaultHandle,
   storeVaultSecret,
 } from "../credential-vault";
-import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, parsePublicServiceUrl } from "../gateway/request-helpers";
+import {
+  fieldErrorResponse,
+  isAuthorizedOrganisationAdminRequest,
+  jsonBodyErrorResponse,
+  parsePublicServiceUrl,
+  readCueChannelRequest,
+} from "../gateway/request-helpers";
 
 export async function handleConfigureStripeConnector(
   request: Request,
@@ -233,69 +235,18 @@ export async function handleConfigureStripeFailureCues(
   request: Request,
   env: Env,
 ): Promise<Response> {
-  if (request.method !== "POST") {
-    return methodNotAllowed(["POST"]);
-  }
-
-  if (!isAuthorizedOrganisationAdminRequest(request, env)) {
-    return notFound();
-  }
-
-  const body = await readJsonObject(request);
-
-  if (!body.ok) {
-    return jsonBodyErrorResponse(body.error);
-  }
-
-  const organisationId = readOrganisationIdField(body.value);
-  const workspaceId = readWorkspaceIdField(body.value);
-  const channelIdRaw = readStringField(body.value, "channelId");
-
-  if (!organisationId.ok) {
-    return fieldErrorResponse(organisationId.error);
-  }
-
-  const execution = await OrganisationExecutionScope.resolve(
-    env,
-    organisationId.value,
-  );
-  if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
-  }
-  const scope = execution.value;
-
-  if (!workspaceId.ok) {
-    return fieldErrorResponse(workspaceId.error);
-  }
-
-  if (!channelIdRaw.ok) {
-    return fieldErrorResponse(channelIdRaw.error);
-  }
-
-  const channelId = readChannelIdPath(channelIdRaw.value);
-  const threadKey = parseThreadKey(
-    `slack:${workspaceId.value}:${channelIdRaw.value}:channel`,
-  );
-
-  if (!channelId.ok) {
-    return fieldErrorResponse(channelId.error);
-  }
-
-  if (!threadKey.ok) {
-    return errorResponse("invalid_field", "Cue thread is invalid.", 422);
-  }
+  const cueRequest = await readCueChannelRequest(request, env);
+  if (!cueRequest.ok) return cueRequest.error;
+  const { scope, organisationId, workspaceId, channelId, threadKey } =
+    cueRequest.value;
 
   await writeTierOneStripeSubscription({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionId: "stripe-charge-failed-main",
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
-    threadKey: threadKey.value,
+    workspaceId,
+    channelId,
+    threadKey,
     eventType: "charge.failed",
     template:
       "A Stripe test charge failed. Review the payment and propose the next safe action.",
@@ -305,11 +256,11 @@ export async function handleConfigureStripeFailureCues(
   });
   await writeTierOneStripeSubscription({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionId: "stripe-invoice-payment-failed-main",
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
-    threadKey: threadKey.value,
+    workspaceId,
+    channelId,
+    threadKey,
     eventType: "invoice.payment_failed",
     template:
       "A Stripe invoice payment failed. Review collection status and propose the next safe action.",
@@ -319,11 +270,11 @@ export async function handleConfigureStripeFailureCues(
   });
   await writeTierOneStripeSubscription({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionId: "stripe-refund-failed-main",
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
-    threadKey: threadKey.value,
+    workspaceId,
+    channelId,
+    threadKey,
     eventType: "refund.failed",
     template:
       "A Stripe refund failed. Review the refund and propose the next safe action.",
@@ -333,11 +284,11 @@ export async function handleConfigureStripeFailureCues(
   });
   await writeTierOneStripeSubscription({
     db: scope.database,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionId: "stripe-subscription-deleted-main",
-    workspaceId: workspaceId.value,
-    channelId: channelId.value,
-    threadKey: threadKey.value,
+    workspaceId,
+    channelId,
+    threadKey,
     eventType: "customer.subscription.deleted",
     template:
       "A Stripe subscription ended. Review the customer state and determine whether follow-up is needed.",
@@ -348,13 +299,13 @@ export async function handleConfigureStripeFailureCues(
   const snapshot = await compileAndStoreCueSnapshot({
     db: scope.database,
     kv: env.POLICY_KV,
-    organisationId: organisationId.value,
+    organisationId,
     now: Date.now(),
   });
 
   return jsonResponse({
     ok: true,
-    organisationId: organisationId.value,
+    organisationId,
     subscriptionIds: [
       "stripe-charge-failed-main",
       "stripe-invoice-payment-failed-main",

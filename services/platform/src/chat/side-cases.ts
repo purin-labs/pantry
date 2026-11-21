@@ -60,7 +60,7 @@ const SIDE_CASE_CARD_LIMIT = 20;
 export const SIDE_CASE_HARNESS_INSTRUCTION =
   "This chat started from a side Case proposal in another chat. The first message is that proposal's brief. Do the work that the brief describes. Approvals and effects in the other chat do not authorize actions here.";
 
-export type SideCaseStatus = "open" | "starting" | "started" | "dismissed";
+type SideCaseStatus = "open" | "starting" | "started" | "dismissed";
 
 export type SideCaseProposal = Readonly<{
   proposalId: string;

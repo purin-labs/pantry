@@ -12,7 +12,8 @@ import { SessionDO } from "../../src/actors/agent-session";
 import { OrganisationDO } from "../../src/actors/organisation";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import type { OrganisationId, UserId } from "../../src/ids";
+import type { OrganisationId } from "../../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import {
   bootstrapOrganisation,

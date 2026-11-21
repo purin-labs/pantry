@@ -15,7 +15,7 @@ import type { Result } from "../result";
 type CampaignBriefLifecycle = "draft" | "accepted" | "dismissed" | "expired";
 
 /** One commerce record the campaign is about, at the revision Sous Chef observed. */
-export type CampaignBriefTarget = Readonly<{
+type CampaignBriefTarget = Readonly<{
   entityType: "product" | "sellable_variant" | "offer";
   entityId: string;
   revision: number;

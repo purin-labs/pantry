@@ -89,7 +89,6 @@ export { beginProviderAuthorizationWatch, beginProviderCompletionListener, navig
 export { integrationsRouteRefreshFailure, readySettingsRouteContent, refreshingSettingsRouteContent, settingsRouteFailureContent } from "./route-loading";
 export { providerConnectionState } from "./settings-support";
 export type { IntegrationsPageActions, WorkspaceSettingsPageActions } from "./settings-types";
-export { connectionAttentionMessage } from "./setup";
 
 /**
  * The state, loads and mutations of the Integrations route. The Integrations

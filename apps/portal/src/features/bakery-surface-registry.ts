@@ -45,7 +45,7 @@ type LedgerEntry = Readonly<{
   receipt: Promise<BakerySurfaceReceiptV1>;
 }>;
 
-export class BakerySurfaceExecutionLedger {
+class BakerySurfaceExecutionLedger {
   private readonly entries = new Map<string, LedgerEntry>();
 
   async execute(
