@@ -14,7 +14,6 @@ const DEVICE_USER_CODE_URL = `${AUTH_ORIGIN}/api/accounts/deviceauth/usercode`;
 const DEVICE_TOKEN_URL = `${AUTH_ORIGIN}/api/accounts/deviceauth/token`;
 const DEVICE_VERIFICATION_URL = `${AUTH_ORIGIN}/codex/device`;
 const DEVICE_REDIRECT_URI = `${AUTH_ORIGIN}/deviceauth/callback`;
-const USAGE_URL = "https://chatgpt.com/backend-api/wham/usage";
 const JWT_AUTH_CLAIM = "https://api.openai.com/auth";
 
 /**
@@ -39,14 +38,6 @@ export type ChatGptDeviceAuthorizationStatus =
   | Readonly<{ kind: "awaiting_user"; profile?: never }>
   | Readonly<{ kind: "failed"; profile?: never }>
   | Readonly<{ kind: "authorized"; profile: ChatGptAuthProfile }>;
-
-/** What the ChatGPT backend reports about the included allowance. */
-type ChatGptAllowanceObservation = Readonly<{
-  planType: string | null;
-  allowance: CodexAllowance;
-  /** True when the backend refuses requests until a window resets. */
-  limitReached: boolean;
-}>;
 
 type ChatGptOAuthError = Readonly<{
   code: "chatgpt_oauth_provider_unavailable";
@@ -211,88 +202,6 @@ export async function pollChatGptDeviceAuthorization(
         accountId,
         file: { OPENAI_API_KEY: null },
       },
-    },
-  };
-}
-
-/**
- * Exchange the refresh token once. OpenAI rotates the refresh token, so the
- * caller must hold the connection's refresh lease and must never repeat an
- * exchange whose answer it did not read.
- */
-export async function refreshChatGptAuthProfile(
-  providerFetch: typeof fetch,
-  profile: ChatGptAuthProfile,
-): Promise<Result<ChatGptAuthProfile, ChatGptOAuthError>> {
-  const tokens = await requestTokens(providerFetch, {
-    grant_type: "refresh_token",
-    client_id: CLIENT_ID,
-    refresh_token: profile.refreshToken,
-  });
-  if (!tokens.ok) return tokens;
-  const accountId = chatGptAccountId(tokens.value.accessToken);
-  if (accountId === null) return unavailable();
-  return {
-    ok: true,
-    value: {
-      idToken: tokens.value.idToken ?? profile.idToken,
-      accessToken: tokens.value.accessToken,
-      refreshToken: tokens.value.refreshToken,
-      accountId,
-      file: profile.file,
-    },
-  };
-}
-
-/** The allowance read with no turn (`wham/usage`). */
-export async function readChatGptAllowance(
-  providerFetch: typeof fetch,
-  profile: Pick<ChatGptAuthProfile, "accessToken" | "accountId">,
-): Promise<Result<ChatGptAllowanceObservation, ChatGptOAuthError>> {
-  const read = await requestJson(providerFetch, USAGE_URL, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${profile.accessToken}`,
-      "chatgpt-account-id": profile.accountId,
-      originator: "pi",
-      Accept: "application/json",
-    },
-  });
-  if (!read.ok || read.value.status !== 200 || !isRecord(read.value.body))
-    return unavailable();
-  const body = read.value.body;
-  const limits = isRecord(body.rate_limit) ? body.rate_limit : {};
-  const primary = isRecord(limits.primary_window) ? limits.primary_window : {};
-  const secondary = isRecord(limits.secondary_window)
-    ? limits.secondary_window
-    : null;
-  const credits = isRecord(body.credits) ? body.credits : {};
-  const usedPercent = finiteNumber(primary.used_percent);
-  return {
-    ok: true,
-    value: {
-      planType: typeof body.plan_type === "string" ? body.plan_type : null,
-      allowance:
-        usedPercent === null
-          ? { kind: "unavailable" }
-          : {
-              kind: "available",
-              usedPercent,
-              resetsAt: unixMillis(primary.reset_at),
-              secondaryUsedPercent:
-                secondary === null
-                  ? null
-                  : finiteNumber(secondary.used_percent),
-              secondaryResetsAt:
-                secondary === null ? null : unixMillis(secondary.reset_at),
-              credits:
-                credits.unlimited === true || credits.has_credits === true
-                  ? "available"
-                  : credits.has_credits === false
-                    ? "exhausted"
-                    : "unknown",
-            },
-      limitReached: limits.limit_reached === true,
     },
   };
 }

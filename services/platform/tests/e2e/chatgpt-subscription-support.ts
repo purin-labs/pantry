@@ -36,13 +36,12 @@ import { network } from "./network";
 
 /**
  * A fake ChatGPT: the OpenAI authorization server that signs a person in
- * with a device code and refreshes tokens, and the ChatGPT backend that
- * answers the Codex Responses requests of pi-ai's `openai-codex` provider.
- * It only records each request and answers it. Like the real servers, it
- * refuses a token that it did not issue or that has expired, and it accepts
- * each refresh token one time. Like OpenAI for a request from Hong Kong, it
- * refuses each request that did not leave through the model exit Worker
- * (Plan 73).
+ * with a device code, and the ChatGPT backend that answers the Codex
+ * Responses requests of pi-ai's `openai-codex` provider. It only records
+ * each request and answers it. Like the real servers, it refuses a token
+ * that it did not issue or that has expired. Like OpenAI for a request from
+ * Hong Kong, it refuses each request that did not leave through the model
+ * exit Worker (Plan 73).
  */
 
 const CHATGPT_ACCOUNT_ID = "acct_e2e_chatgpt";
@@ -79,7 +78,6 @@ export class FakeChatGpt {
   ) => ChatGptAnswer | Promise<ChatGptAnswer> = textAnswer.bind(null, "Done.");
   approved = false;
   readonly #accessTokens = new Map<string, number>();
-  readonly #refreshTokens = new Set<string>();
   #issued = 0;
 
   install(): void {
@@ -99,10 +97,6 @@ export class FakeChatGpt {
       http.post(
         "https://chatgpt.com/backend-api/codex/responses",
         this.fromContainer(this.respond),
-      ),
-      http.get(
-        "https://chatgpt.com/backend-api/wham/usage",
-        this.fromContainer(this.readUsage),
       ),
     );
   }
@@ -222,25 +216,13 @@ export class FakeChatGpt {
     );
     if (form.client_id !== "app_EMoamEEZ73f0CkXaXp7hrann")
       return HttpResponse.json({ error: "invalid_client" }, { status: 401 });
-    if (form.grant_type === "authorization_code") {
-      return form.code === "authcode_e2e" &&
-        form.code_verifier === "verifier_e2e" &&
-        form.redirect_uri === "https://auth.openai.com/deviceauth/callback"
-        ? HttpResponse.json(this.issueTokens())
-        : HttpResponse.json({ error: "invalid_grant" }, { status: 400 });
-    }
-    if (form.grant_type !== "refresh_token")
+    if (form.grant_type !== "authorization_code")
       return HttpResponse.json({ error: "unsupported" }, { status: 400 });
-    // OpenAI rotates refresh tokens: each one works once.
-    if (
-      form.refresh_token === undefined ||
-      !this.#refreshTokens.delete(form.refresh_token)
-    )
-      return HttpResponse.json(
-        { error: "invalid_grant", error_description: "refresh token reused" },
-        { status: 400 },
-      );
-    return HttpResponse.json(this.issueTokens());
+    return form.code === "authcode_e2e" &&
+      form.code_verifier === "verifier_e2e" &&
+      form.redirect_uri === "https://auth.openai.com/deviceauth/callback"
+      ? HttpResponse.json(this.issueTokens())
+      : HttpResponse.json({ error: "invalid_grant" }, { status: 400 });
   }
 
   private async respond({
@@ -272,30 +254,6 @@ export class FakeChatGpt {
         },
       },
     );
-  }
-
-  private readUsage({ request }: Parameters<HttpResponseResolver>[0]) {
-    const authorization = request.headers.get("authorization") ?? undefined;
-    if (!this.accepts(authorization))
-      return HttpResponse.json({ detail: "Unauthorized" }, { status: 401 });
-    return HttpResponse.json({
-      plan_type: "pro",
-      rate_limit: {
-        limit_reached: false,
-        primary_window: {
-          used_percent: CODEX_USED_PERCENT,
-          limit_window_seconds: 604_800,
-          reset_after_seconds: 3_600,
-          reset_at: Math.floor(Date.now() / 1_000) + 3_600,
-        },
-        secondary_window: null,
-      },
-      credits: {
-        has_credits: true,
-        unlimited: false,
-        overage_limit_reached: false,
-      },
-    });
   }
 
   private allowanceHeaders(): Record<string, string> {
@@ -330,7 +288,6 @@ export class FakeChatGpt {
     });
     const refreshToken = `rt_e2e_${String(this.#issued)}`;
     this.#accessTokens.set(accessToken, expiresAt);
-    this.#refreshTokens.add(refreshToken);
     return {
       id_token: jwt({
         issued: this.#issued,

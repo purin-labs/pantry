@@ -137,7 +137,6 @@ function parseConnectedCodexFields(
 
 function parseCodexAllowance(raw: unknown): CodexAllowance | null {
   if (!isRecord(raw)) return null;
-  if (raw.kind === "unavailable") return { kind: "unavailable" };
   if (raw.kind === "not_reported") return { kind: "not_reported" };
   if (
     raw.kind !== "available" ||
@@ -147,12 +146,7 @@ function parseCodexAllowance(raw: unknown): CodexAllowance | null {
     !isNullableFiniteNumber(raw.secondaryResetsAt)
   )
     return null;
-  if (
-    raw.credits !== "available" &&
-    raw.credits !== "exhausted" &&
-    raw.credits !== "unknown"
-  )
-    return null;
+  if (raw.credits !== "available" && raw.credits !== "exhausted") return null;
   return {
     kind: "available",
     usedPercent: raw.usedPercent,
@@ -169,7 +163,6 @@ function parseCodexActionRequiredReason(
   return raw === "authorization_expired" ||
     raw === "workspace_access_revoked" ||
     raw === "device_authorization_unavailable" ||
-    raw === "allowance_exhausted" ||
     raw === "account_unavailable"
     ? raw
     : null;

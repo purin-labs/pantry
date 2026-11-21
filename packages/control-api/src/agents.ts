@@ -1,10 +1,9 @@
 /**
- * The ChatGPT allowance that Portal shows. `unavailable`: the last read
- * failed. `not_reported`: the sign-in has no allowance source; OpenAI
- * reports none to "Sign in with ChatGPT" (Plan 74B).
+ * The ChatGPT allowance that Portal shows. `available`: a model response
+ * reported it. `not_reported`: no response has reported it; OpenAI reports
+ * none to "Sign in with ChatGPT" (Plan 74B).
  */
 export type CodexAllowance =
-  | ({ readonly kind: "unavailable" } & NoAllowanceFigures)
   | ({ readonly kind: "not_reported" } & NoAllowanceFigures)
   | {
       readonly kind: "available";
@@ -12,7 +11,7 @@ export type CodexAllowance =
       readonly resetsAt: number | null;
       readonly secondaryUsedPercent: number | null;
       readonly secondaryResetsAt: number | null;
-      readonly credits: "available" | "exhausted" | "unknown";
+      readonly credits: "available" | "exhausted";
     };
 
 type NoAllowanceFigures = {

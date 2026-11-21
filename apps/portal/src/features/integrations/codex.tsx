@@ -434,13 +434,6 @@ function renderCodexAllowance(allowance: CodexAllowance): React.ReactNode {
       </p>
     );
   }
-  if (allowance.kind === "unavailable") {
-    return (
-      <p className="field-hint">
-        OpenAI included allowance information is currently unavailable.
-      </p>
-    );
-  }
   const remaining = Math.max(0, 100 - allowance.usedPercent);
   const percent = Math.round(remaining);
   return (
@@ -484,8 +477,6 @@ function codexActionRequiredMessage(
       return "This account no longer has access to its OpenAI workspace. Reconnect an eligible account.";
     case "device_authorization_unavailable":
       return "OpenAI device authorization is unavailable for this account or workspace.";
-    case "allowance_exhausted":
-      return "The included ChatGPT allowance is used up. Agent turns resume when it resets.";
     case "account_unavailable":
       return "OpenAI could not verify this account. Reconnect to resume agent turns.";
     default:

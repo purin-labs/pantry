@@ -41,8 +41,6 @@ import {
   chatGptPlanType,
   parseChatGptAuthProfile,
   pollChatGptDeviceAuthorization,
-  readChatGptAllowance,
-  refreshChatGptAuthProfile,
   serializeChatGptAuthProfile,
   startChatGptDeviceAuthorization,
   type ChatGptAuthProfile,
@@ -70,8 +68,6 @@ const AUTHORIZATION_TTL_MS = 15 * 60 * 1000;
 const ACCESS_TOKEN_REFRESH_MARGIN_MS = 5 * 60 * 1000;
 const REFRESH_LEASE_MS = 60_000;
 const REFRESH_WAIT_MS = 30_000;
-/** A Portal read asks the backend for the allowance at most this often. */
-const ALLOWANCE_READ_INTERVAL_MS = 5 * 60 * 1000;
 /** A sign-in that has not refreshed for this long refreshes at the cron. */
 const WEEKLY_REFRESH_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 /** One cron run refreshes at most this many sign-ins in each database. */
@@ -81,7 +77,6 @@ type CodexActionRequiredReason =
   | "authorization_expired"
   | "workspace_access_revoked"
   | "device_authorization_unavailable"
-  | "allowance_exhausted"
   | "account_unavailable";
 
 /**
@@ -237,9 +232,7 @@ export async function readOrganisationCodexConnection(input: {
 
 /**
  * The connection as Portal and the model route see it. With `reconcile`, an
- * open device-code sign-in polls the authorization server once, and a Codex
- * connection whose allowance was not read for a while reads it from the
- * ChatGPT backend.
+ * open device-code sign-in polls the authorization server once.
  */
 export async function readOrganisationCodexConnectionAtScope(input: {
   readonly env: Env;
@@ -312,45 +305,6 @@ export async function readOrganisationCodexConnectionAtScope(input: {
     connection,
     input.now,
   );
-  if (!parsed.ok) return parsed;
-  const current = parsed.value;
-  if (
-    current.kind === "action_required" &&
-    current.reason === "allowance_exhausted" &&
-    !input.reconcile &&
-    allowanceWindowReset(current.allowance, input.now)
-  ) {
-    await resumeExhaustedConnection(
-      { scope, keys: input.env },
-      { revision: current.revision, generation: current.authProfileGeneration },
-      current.allowance,
-      input.now,
-    );
-    return readOrganisationCodexConnectionAtScope({
-      ...input,
-      reconcile: false,
-    });
-  }
-  if (
-    input.reconcile &&
-    (current.kind === "connected" ||
-      (current.kind === "action_required" &&
-        current.reason === "allowance_exhausted")) &&
-    // OpenAI reports no allowance to "Sign in with ChatGPT" (Plan 74B).
-    current.signIn === "codex_device" &&
-    allowanceReadDue(connection, input.now)
-  ) {
-    const pin = {
-      revision: current.revision,
-      generation: current.authProfileGeneration,
-    };
-    if (await claimAllowanceRead(scope, pin, input.now))
-      await observeChatGptAllowance({ scope, keys: input.env }, pin, input.now);
-    return readOrganisationCodexConnectionAtScope({
-      ...input,
-      reconcile: false,
-    });
-  }
   return parsed;
 }
 
@@ -754,7 +708,7 @@ export async function resolveOrganisationChatGptAccessToken(
   context: ConnectionContext,
   pin: ChatGptConnectionPin,
 ): Promise<Result<string, CodexConnectionError>> {
-  const profile = await resolveChatGptProfile(context, pin, "connected");
+  const profile = await resolveChatGptProfile(context, pin);
   return profile.ok
     ? { ok: true, value: profile.value.profile.accessToken }
     : profile;
@@ -777,12 +731,10 @@ export async function readOrganisationChatGptSignIn(
 }
 
 /**
- * Store what one model response says about the allowance. A refused request
- * reads the allowance again: when its limit is reached and no credits are
- * left, the connection pauses until a window resets. A token that chatgpt.com
- * rejects asks for a new sign-in. For "Sign in with ChatGPT", OpenAI asks
- * agents to sign in again only after a refused refresh, so a rejected token
- * waits for its next refresh to decide (Plan 74B).
+ * Store what one model response says about the allowance. A token that
+ * chatgpt.com rejects asks for a new sign-in. For "Sign in with ChatGPT",
+ * OpenAI asks agents to sign in again only after a refused refresh, so a
+ * rejected token waits for its next refresh to decide (Plan 74B).
  */
 export async function recordOrganisationChatGptResponse(
   context: ConnectionContext,
@@ -799,11 +751,10 @@ export async function recordOrganisationChatGptResponse(
       context.scope.organisationId,
     );
     if (row !== null && signInOfRow(row) === "codex_device")
-      await markConnectionActionRequired(
+      await markAccountUnavailable(
         context.scope.database,
         context.scope.organisationId,
         pin,
-        "account_unavailable",
         now,
       );
     return;
@@ -811,17 +762,15 @@ export async function recordOrganisationChatGptResponse(
   const observed = chatGptAllowanceFromHeaders(response.headers);
   if (observed !== null)
     await writeAllowance(context.scope, pin, observed, now);
-  if (response.status === 429) await observeChatGptAllowance(context, pin, now);
 }
 
 async function resolveChatGptProfile(
   context: ConnectionContext,
   pin: ChatGptConnectionPin,
-  lifecycle: "connected" | "connected_or_exhausted",
 ): Promise<Result<ChatGptSignInProfile, CodexConnectionError>> {
   if (!(await context.scope.isActive()))
     return { ok: false, error: { code: "organisation_placement_conflict" } };
-  const pinned = await readPinnedProfile(context, pin, lifecycle);
+  const pinned = await readPinnedProfile(context, pin);
   if (!pinned.ok) return pinned;
   const { current, profile } = pinned.value;
   if (tokenFresh(profile)) return { ok: true, value: profile };
@@ -829,11 +778,11 @@ async function resolveChatGptProfile(
   if (current.lease !== null) {
     if (current.lease.until <= Date.now())
       return abandonRefresh(context, pin, current);
-    return waitForRefresh(context, pin, lifecycle);
+    return waitForRefresh(context, pin);
   }
   return (
     (await refreshUnderLease(context, pin, current, profile)) ??
-    waitForRefresh(context, pin, lifecycle)
+    waitForRefresh(context, pin)
   );
 }
 
@@ -860,8 +809,7 @@ export async function runWeeklyChatGptLoginRefresh(
        FROM organisation_codex_connection c
        JOIN organisation o ON o.organisation_id = c.organisation_id
        WHERE c.verified_at <= ? AND c.refresh_lease IS NULL
-         AND (c.lifecycle = 'connected' OR c.action_required_reason = 'allowance_exhausted')
-         AND o.status = 'active'
+         AND c.lifecycle = 'connected' AND o.status = 'active'
        ORDER BY c.verified_at LIMIT ?`,
       )
       .bind(dueBefore, WEEKLY_REFRESH_BATCH)
@@ -907,11 +855,7 @@ async function refreshWeekOldLogin(
 ): Promise<Result<void, CodexConnectionError>> {
   if (!(await context.scope.isActive()))
     return { ok: false, error: { code: "organisation_placement_conflict" } };
-  const pinned = await readPinnedProfile(
-    context,
-    pin,
-    "connected_or_exhausted",
-  );
+  const pinned = await readPinnedProfile(context, pin);
   // A turn signed in again, or refreshed after the due read: nothing is due.
   if (!pinned.ok)
     return pinned.error.code === "codex_connection_invalid"
@@ -938,7 +882,6 @@ async function refreshWeekOldLogin(
 async function readPinnedProfile(
   context: ConnectionContext,
   pin: ChatGptConnectionPin,
-  lifecycle: "connected" | "connected_or_exhausted",
   retried = false,
 ): Promise<
   Result<
@@ -954,14 +897,14 @@ async function readPinnedProfile(
     context.scope.database,
     context.scope.organisationId,
   );
-  const current = pinnedProfileRow(row, pin, lifecycle);
+  const current = pinnedProfileRow(row, pin);
   if (row === null || current === null)
     return { ok: false, error: { code: "codex_connection_invalid" } };
   const profile = await readProfile(context, current.handle);
   if (profile !== null) return { ok: true, value: { row, current, profile } };
   return retried
     ? { ok: false, error: { code: "codex_vault_unavailable" } }
-    : readPinnedProfile(context, pin, lifecycle, true);
+    : readPinnedProfile(context, pin, true);
 }
 
 /**
@@ -984,8 +927,7 @@ async function refreshUnderLease(
      SET refresh_lease = ?, refresh_until = ?
      WHERE organisation_id = ? AND revision = ? AND auth_profile_generation = ?
        AND auth_profile_handle = ? AND refresh_lease IS NULL
-       AND (lifecycle = 'connected' OR action_required_reason = 'allowance_exhausted')
-       AND ${placement.sql}`,
+       AND lifecycle = 'connected' AND ${placement.sql}`,
     )
     .bind(
       lease,
@@ -1069,21 +1011,18 @@ async function refreshUnderLease(
   return { ok: true, value: refreshed };
 }
 
-/** One refresh exchange of either sign-in; null when OpenAI refused it. */
+/**
+ * One refresh exchange; null when OpenAI refused it. The Codex device
+ * sign-in does not refresh: when its token expires, the person signs in with
+ * ChatGPT again.
+ */
 async function refreshSignInProfile(
   providerFetch: typeof fetch,
   current: ChatGptSignInProfile,
 ): Promise<ChatGptSignInProfile | null> {
   switch (current.kind) {
-    case "codex_device": {
-      const refreshed = await refreshChatGptAuthProfile(
-        providerFetch,
-        current.profile,
-      );
-      return refreshed.ok
-        ? { kind: current.kind, profile: refreshed.value }
-        : null;
-    }
+    case "codex_device":
+      return null;
     case "chatgpt_agent": {
       const refreshed = await refreshChatGptAgentProfile(
         providerFetch,
@@ -1129,7 +1068,6 @@ function profileSecret(
 async function waitForRefresh(
   context: ConnectionContext,
   pin: ChatGptConnectionPin,
-  lifecycle: "connected" | "connected_or_exhausted",
 ): Promise<Result<ChatGptSignInProfile, CodexConnectionError>> {
   const deadline = Date.now() + REFRESH_WAIT_MS;
   while (Date.now() < deadline) {
@@ -1140,7 +1078,7 @@ async function waitForRefresh(
       context.scope.database,
       context.scope.organisationId,
     );
-    const current = pinnedProfileRow(row, pin, lifecycle);
+    const current = pinnedProfileRow(row, pin);
     if (current === null)
       return { ok: false, error: { code: "codex_connection_invalid" } };
     if (current.lease !== null) {
@@ -1186,68 +1124,6 @@ async function abandonRefresh(
   return { ok: false, error: { code: "codex_authorization_expired" } };
 }
 
-/** Read the allowance with no turn, and pause or resume the connection. */
-async function observeChatGptAllowance(
-  context: ConnectionContext,
-  pin: ChatGptConnectionPin,
-  now: number,
-): Promise<void> {
-  const profile = await resolveChatGptProfile(
-    context,
-    pin,
-    "connected_or_exhausted",
-  );
-  // OpenAI reports no allowance to "Sign in with ChatGPT" (Plan 74B).
-  if (!profile.ok || profile.value.kind !== "codex_device") return;
-  const observed = await readChatGptAllowance(
-    modelProviderFetch(context.keys),
-    profile.value.profile,
-  );
-  if (!observed.ok) return;
-  const exhausted =
-    observed.value.limitReached &&
-    observed.value.allowance.credits !== "available";
-  if (exhausted) {
-    await writeAllowance(context.scope, pin, observed.value, now);
-    await markConnectionActionRequired(
-      context.scope.database,
-      context.scope.organisationId,
-      pin,
-      "allowance_exhausted",
-      now,
-    );
-    return;
-  }
-  await resumeExhaustedConnection(context, pin, observed.value.allowance, now);
-  await writeAllowance(context.scope, pin, observed.value, now);
-}
-
-async function resumeExhaustedConnection(
-  context: ConnectionContext,
-  pin: ChatGptConnectionPin,
-  allowance: CodexAllowance,
-  now: number,
-): Promise<void> {
-  await context.scope.database
-    .prepare(
-      `UPDATE organisation_codex_connection
-     SET lifecycle = 'connected', action_required_reason = NULL,
-       allowance_json = ?, observed_at = ?, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'action_required'
-       AND action_required_reason = 'allowance_exhausted'
-       AND revision = ? AND auth_profile_generation = ?`,
-    )
-    .bind(
-      JSON.stringify(allowance),
-      now,
-      now,
-      context.scope.organisationId,
-      pin.revision,
-      pin.generation,
-    )
-    .run();
-}
-
 async function writeAllowance(
   scope: OrganisationExecutionScope,
   pin: ChatGptConnectionPin,
@@ -1274,41 +1150,34 @@ async function writeAllowance(
     .run();
 }
 
-async function markConnectionActionRequired(
+async function markAccountUnavailable(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
   pin: ChatGptConnectionPin,
-  reason: "account_unavailable" | "allowance_exhausted",
   now: number,
 ): Promise<void> {
   await db
     .prepare(
       `UPDATE organisation_codex_connection
-     SET lifecycle = 'action_required', action_required_reason = ?,
+     SET lifecycle = 'action_required', action_required_reason = 'account_unavailable',
        observed_at = ?, updated_at = ?
      WHERE organisation_id = ? AND lifecycle = 'connected' AND revision = ?
        AND auth_profile_generation = ? AND refresh_lease IS NULL`,
     )
-    .bind(reason, now, now, organisationId, pin.revision, pin.generation)
+    .bind(now, now, organisationId, pin.revision, pin.generation)
     .run();
 }
 
 function pinnedProfileRow(
   row: ConnectionRow | null,
   pin: ChatGptConnectionPin,
-  lifecycle: "connected" | "connected_or_exhausted",
 ): PinnedProfileRow | null {
   if (
     row === null ||
     row.revision !== pin.revision ||
     row.authProfileGeneration !== pin.generation ||
     typeof row.authProfileHandle !== "string" ||
-    !(
-      row.lifecycle === "connected" ||
-      (lifecycle === "connected_or_exhausted" &&
-        row.lifecycle === "action_required" &&
-        row.actionRequiredReason === "allowance_exhausted")
-    )
+    row.lifecycle !== "connected"
   )
     return null;
   const handle = parseVaultHandle(row.authProfileHandle);
@@ -1389,50 +1258,6 @@ async function readAgentSignInReuse(
         idToken: profile.profile.idToken,
       }
     : null;
-}
-
-/**
- * Claim the Portal allowance read for this interval before it runs. A read
- * that fails still uses its interval, and of Portal reads that run at the
- * same time only one claims it. So a backend that refuses each read sees at
- * most one read in each interval, however often Portal asks.
- */
-async function claimAllowanceRead(
-  scope: OrganisationExecutionScope,
-  pin: ChatGptConnectionPin,
-  now: number,
-): Promise<boolean> {
-  const claimed = await scope.database
-    .prepare(
-      `UPDATE organisation_codex_connection SET observed_at = ?
-     WHERE organisation_id = ? AND revision = ? AND auth_profile_generation = ?
-       AND observed_at <= ?`,
-    )
-    .bind(
-      now,
-      scope.organisationId,
-      pin.revision,
-      pin.generation,
-      now - ALLOWANCE_READ_INTERVAL_MS,
-    )
-    .run();
-  return claimed.meta.changes === 1;
-}
-
-function allowanceReadDue(row: ConnectionRow, now: number): boolean {
-  return (
-    !isPositiveInteger(row.observedAt) ||
-    now - row.observedAt >= ALLOWANCE_READ_INTERVAL_MS
-  );
-}
-
-/** Whether every window that the exhausted allowance named has reset. */
-function allowanceWindowReset(allowance: CodexAllowance, now: number): boolean {
-  if (allowance.kind !== "available") return false;
-  const resets = [allowance.resetsAt, allowance.secondaryResetsAt].filter(
-    (resetAt): resetAt is number => resetAt !== null,
-  );
-  return resets.length > 0 && resets.every((resetAt) => resetAt <= now);
 }
 
 async function reconcileAttempt(
@@ -1532,7 +1357,7 @@ async function connectAuthorizedProfile(
   });
   if (!stored.ok)
     return { ok: false, error: { code: "codex_vault_unavailable" } };
-  const { planType, allowance } = await firstAllowance(env, profile);
+  const { planType, allowance } = firstAllowance(profile);
   const allowanceJson = JSON.stringify(allowance);
   const session = scope.database.withSession("first-primary");
   let results: D1Result[];
@@ -1622,36 +1447,17 @@ async function connectAuthorizedProfile(
 }
 
 /**
- * The plan and the allowance that a new connection starts with. The Codex
- * sign-in reads them from the ChatGPT backend. OpenAI reports no allowance
- * to "Sign in with ChatGPT".
+ * The plan and the allowance that a new connection starts with: the plan
+ * that the tokens name, and no allowance until a model response reports one.
  */
-async function firstAllowance(
-  env: Env,
+function firstAllowance(
   profile: ChatGptSignInProfile,
-): Promise<Readonly<{ planType: string; allowance: CodexAllowance }>> {
-  switch (profile.kind) {
-    case "codex_device": {
-      const usage = await readChatGptAllowance(
-        modelProviderFetch(env),
-        profile.profile,
-      );
-      return {
-        planType:
-          (usage.ok ? usage.value.planType : null) ??
-          chatGptPlanType(profile.profile) ??
-          "unknown",
-        allowance: usage.ok ? usage.value.allowance : { kind: "unavailable" },
-      };
-    }
-    case "chatgpt_agent":
-      return {
-        planType: chatGptAgentPlanType(profile.profile) ?? "unknown",
-        allowance: { kind: "not_reported" },
-      };
-    default:
-      return assertNever(profile, "Unhandled ChatGPT sign-in value");
-  }
+): Readonly<{ planType: string; allowance: CodexAllowance }> {
+  const planType =
+    profile.kind === "chatgpt_agent"
+      ? chatGptAgentPlanType(profile.profile)
+      : chatGptPlanType(profile.profile);
+  return { planType: planType ?? "unknown", allowance: { kind: "not_reported" } };
 }
 
 async function authorizingProjection(
@@ -1843,7 +1649,6 @@ function parseConnectionRow(
 function parseStoredAllowance(raw: string): CodexAllowance | null {
   const value = parseJsonOrNull(raw);
   if (!isRecord(value)) return null;
-  if (value.kind === "unavailable") return { kind: "unavailable" };
   if (value.kind === "not_reported") return { kind: "not_reported" };
   const credits = value.credits;
   return value.kind === "available" &&
@@ -1853,9 +1658,7 @@ function parseStoredAllowance(raw: string): CodexAllowance | null {
       typeof value.secondaryUsedPercent === "number") &&
     (value.secondaryResetsAt === null ||
       typeof value.secondaryResetsAt === "number") &&
-    (credits === "available" ||
-      credits === "exhausted" ||
-      credits === "unknown")
+    (credits === "available" || credits === "exhausted")
     ? {
         kind: "available",
         usedPercent: value.usedPercent,
@@ -1946,7 +1749,6 @@ function parseActionRequiredReason(
   return raw === "authorization_expired" ||
     raw === "workspace_access_revoked" ||
     raw === "device_authorization_unavailable" ||
-    raw === "allowance_exhausted" ||
     raw === "account_unavailable"
     ? raw
     : null;
