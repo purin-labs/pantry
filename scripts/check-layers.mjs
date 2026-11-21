@@ -358,12 +358,13 @@ const LAYERS_PAGE_HEAD = `# The modules of the three layers
 
 This page is made by \`node scripts/check-layers.mjs --areas --write\` from
 \`scripts/layers.json\` and the tracked files. Do not edit it. \`pnpm lint\`
-fails when the page is older than the map or the files: after a new file, a
+fails when the page is older than the map or the files: after a new folder, a
 new table or a changed line of the map, write the page again. Each section is
 one module, bottom-up: the foundation in its order, the areas, the surfaces
-and the Workers ([Refactor 17](refactor-17.md)). "Files" gives the count of
-the source files of the module and the folders that hold them, with the count
-in each folder. "Packages" gives its workspace packages. "Tables" gives the D1
+and the Workers ([Refactor 17](refactor-17.md)). "Folders" gives the folders
+that hold the source files of the module. The page gives no file counts, so a
+new file in a known folder does not make it old; \`--areas\` with no option
+prints the counts. "Packages" gives its workspace packages. "Tables" gives the D1
 tables that the module owns; only the owner writes a table. "Public files"
 gives the contract of an area: the files and folders that another area may
 import. A module with no line for one of these has none.
@@ -371,7 +372,7 @@ import. A module with no line for one of these has none.
 `;
 
 /** The files, packages, tables and public files of each module. */
-function moduleList(only) {
+function moduleList(only, counts) {
   const modules = new Set([
     ...Object.values(targets.rules),
     ...Object.values(targets.files),
@@ -400,11 +401,15 @@ function moduleList(only) {
         const folder = `${posix.dirname(path)}/`;
         folders.set(folder, (folders.get(folder) ?? 0) + 1);
       }
-      lines.push(`- Files: ${files.length} in ${folders.size} folders`);
+      lines.push(
+        counts
+          ? `- Files: ${files.length} in ${folders.size} folders`
+          : `- Folders: ${folders.size}`,
+      );
       for (const [folder, count] of [...folders].sort(([a], [b]) =>
         a < b ? -1 : 1,
       ))
-        lines.push(`  - \`${folder}\` ${count}`);
+        lines.push(counts ? `  - \`${folder}\` ${count}` : `  - \`${folder}\``);
     }
     const packages = Object.entries(targets.packages)
       .filter(([, owner]) => owner === module)
@@ -473,18 +478,20 @@ if (mode === "--report") {
 
 if (mode === "--areas") {
   const option = process.argv[3];
+  const page = option === "--write" || option === "--check";
   const text = moduleList(
     option === undefined || option.startsWith("--") ? null : option,
+    !page,
   );
-  if (option === "--write" || option === "--check") {
-    const page = `${LAYERS_PAGE_HEAD}${text}`;
+  if (page) {
+    const content = `${LAYERS_PAGE_HEAD}${text}`;
     const path = join(root, LAYERS_PAGE);
     if (option === "--write") {
-      writeFileSync(path, page);
+      writeFileSync(path, content);
       console.log(`wrote ${LAYERS_PAGE}`);
       process.exit(0);
     }
-    if (!existsSync(path) || readFileSync(path, "utf8") !== page) {
+    if (!existsSync(path) || readFileSync(path, "utf8") !== content) {
       console.error(
         `${LAYERS_PAGE} is older than the map. Run node scripts/check-layers.mjs --areas --write.`,
       );
