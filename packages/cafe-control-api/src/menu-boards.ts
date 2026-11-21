@@ -75,8 +75,8 @@ export type MenuBoardRelease = Readonly<{
   publishedAt: number;
   title: string;
   layout: MenuBoardLayout;
-  /** The board's style tokens (Plan 40B phase 5); absent in the default look. */
-  style?: MenuBoardStyle;
+  /** The board's style tokens (Plan 40B phase 5); empty in the default look. */
+  style: MenuBoardStyle;
   elements: readonly MenuBoardElement[];
   sections: readonly MenuBoardReleaseSection[];
   items: readonly MenuBoardReleaseItem[];
@@ -247,7 +247,7 @@ export function parseMenuBoardRelease(value: unknown): MenuBoardRelease | null {
       "publishedAt",
       "title",
       "layout",
-      ...(Object.hasOwn(value, "style") ? ["style"] : []),
+      "style",
       "elements",
       "sections",
       "items",
@@ -304,9 +304,7 @@ export function parseMenuBoardRelease(value: unknown): MenuBoardRelease | null {
       description: raw.description,
     });
   }
-  const style = Object.hasOwn(value, "style")
-    ? parseMenuBoardStyle(value.style)
-    : undefined;
+  const style = parseMenuBoardStyle(value.style);
   if (style === null) return null;
   // The Platform's screen media route, on the Portal's own origin.
   if (
@@ -324,7 +322,7 @@ export function parseMenuBoardRelease(value: unknown): MenuBoardRelease | null {
     publishedAt: value.publishedAt,
     title: value.title,
     layout: value.layout,
-    ...(style === undefined ? {} : { style }),
+    style,
     elements,
     sections,
     items,

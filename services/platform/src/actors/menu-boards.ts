@@ -930,8 +930,7 @@ export class MenuBoardRooms {
       return { ok: false, error: { code: "menu_board_empty" } };
     const copy = releaseCopy(snapshot, input.menu);
     if (!copy.ok) return copy;
-    // A release with an image names where the shop serves its media; the
-    // key goes only with an image, so an older TV reads other boards.
+    // Only a release with an image names where the shop serves its media.
     const hasImage = snapshot.elements.some((element) => element.kind === "image");
     const mediaBase = hasImage ? await input.mediaBase() : null;
     if (hasImage && mediaBase === null)
@@ -942,12 +941,7 @@ export class MenuBoardRooms {
       publishedAt: input.now,
       title: snapshot.title,
       layout: snapshot.layout,
-      // The style goes only with tokens, so that a TV player from before
-      // phase 5, which reads exact keys, still reads a board in the default
-      // look.
-      ...(Object.keys(snapshot.style).length > 0
-        ? { style: snapshot.style }
-        : {}),
+      style: snapshot.style,
       elements: snapshot.elements,
       sections: copy.value.sections,
       items: copy.value.items,
