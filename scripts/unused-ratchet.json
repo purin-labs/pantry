@@ -1,6 +1,8 @@
 {
   "files": ["services/platform/src/devices/work.ts"],
   "exports": [
+    "apps/portal/src/features/terminals/counter-sale-api.ts#manualCashRefundCounterSale",
+    "apps/portal/src/features/terminals/counter-sale-api.ts#openCounterSale",
     "packages/contracts/src/case-output.ts#caseContributionSourceSchema",
     "services/platform/src/credential-vault/external-import.ts#ExternalVaultSource",
     "services/platform/src/credential-vault/index.ts#ExternalVaultRead",

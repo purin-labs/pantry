@@ -204,6 +204,21 @@ export async function cancelCounterSaleCollection(
   return parseEnvelope(raw);
 }
 
+export async function manualCashRefundCounterSale(
+  organisationId: string,
+  checkoutId: string,
+  mutate: CounterSaleMutationTransport = defaultCounterSaleMutate,
+  reason?: string,
+): Promise<CounterSale> {
+  const raw = await mutate(
+    `${counterSalesPath(organisationId)}/${encodeURIComponent(checkoutId)}/manual-cash-refund`,
+    "POST",
+    reason === undefined ? {} : { reason },
+    `counter-manual-cash-refund:${checkoutId}`,
+  );
+  return parseEnvelope(raw);
+}
+
 export function defaultCounterSaleMutate(
   path: string,
   method: "POST",
@@ -282,6 +297,66 @@ async function mutateCounterSaleAfterSale(
     `counter-${action}:${checkoutId}`,
   );
   return parseEnvelope(raw);
+}
+
+export async function openCounterSale(
+  organisationId: string,
+  request: Readonly<{
+    satyrLocationId: string;
+    lines: readonly Readonly<{ variantId: string; quantity: number }>[];
+  }>,
+  mutate: CounterSaleMutationTransport,
+  read: CounterSaleReadTransport = controlRead,
+): Promise<CounterSale> {
+  const checkoutId = `checkout_counter_${crypto.randomUUID()}`;
+  const lines = buildCounterSaleLines(request.lines);
+  const raw = await mutate(
+    counterSalesPath(organisationId),
+    "POST",
+    {
+      satyrLocationId: request.satyrLocationId,
+      checkoutId,
+      lines,
+    },
+    `counter-open:${checkoutId}`,
+  );
+  const envelope = requireObject(raw, "counter sale open response");
+  requireExactKeys(
+    envelope,
+    ["ok", "counterSale"],
+    "counter sale open response",
+  );
+  const result = requireObject(
+    envelope.counterSale,
+    "counter sale open result",
+  );
+  if (envelope.ok !== true || result.outcome !== "applied") {
+    throw new Error("The counter sale could not be opened.");
+  }
+  return readCounterSale(organisationId, checkoutId, read);
+}
+
+type CounterSaleOpenLine = Readonly<{
+  cartLineId: string;
+  checkoutLineId: string;
+  source: Readonly<{ kind: "catalog"; variantId: string }>;
+  quantity: Readonly<{ amount: number; scale: 0; unit: "each" }>;
+}>;
+
+function buildCounterSaleLines(
+  selections: readonly Readonly<{ variantId: string; quantity: number }>[],
+): readonly CounterSaleOpenLine[] {
+  const lines: CounterSaleOpenLine[] = [];
+  for (const selection of selections) {
+    const lineId = `line_${crypto.randomUUID()}`;
+    lines.push({
+      cartLineId: `cart_${lineId}`,
+      checkoutLineId: lineId,
+      source: { kind: "catalog", variantId: selection.variantId },
+      quantity: { amount: selection.quantity, scale: 0, unit: "each" },
+    });
+  }
+  return lines;
 }
 
 /** What the till may offer for a sale in this state. */
