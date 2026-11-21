@@ -102,9 +102,9 @@ export class SessionTurnRecovery {
   }
 
   /**
-   * Ends the quarantine that an older release gave a Session when a process
-   * loss interrupted its turn. The Session ends as failed, as that turn does
-   * now, so its Case may end the assignment. A Session that holds an
+   * Ends the quarantine of an interrupted turn that could not end as a failed
+   * turn, or of a refused Code Mode settlement. The Session ends as failed,
+   * so its Case may end the assignment. A Session that holds an
    * indeterminate effect, or any work other than the billing of its turns,
    * stays quarantined: the effect may have happened, and a person decides it.
    */
@@ -142,8 +142,8 @@ export class SessionTurnRecovery {
         `quarantine:${lifecycle.state.reason}:${lifecycle.state.recovery.kind}`,
       );
     const now = Date.now();
-    // An old refused Code Mode settlement settles from the owners' records
-    // first; one that no record decides stays and keeps the quarantine.
+    // A refused Code Mode settlement settles from the owners' records first;
+    // one that no record decides stays and keeps the quarantine.
     await reconcileQuarantinedCodeModeSettlements({
       env: this.shared.env,
       storage: this.shared.ctx.storage,

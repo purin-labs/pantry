@@ -382,7 +382,7 @@ export abstract class SessionActor
         try {
           await this.recovery.resumePendingPiTurn();
         } finally {
-          // An old quarantine ends here too; its checks keep any other work.
+          // A kept quarantine ends here too; its checks keep any other work.
           await this.recovery.endInterruptedTurnQuarantine();
         }
       });
@@ -1531,7 +1531,7 @@ export abstract class SessionActor
             storage: this.ctx.storage,
           }),
       },
-      // An old quarantine settles its old Code Mode settlements and ends.
+      // A kept quarantine settles its refused Code Mode settlements and ends.
       {
         name: "quarantine_end",
         run: () => this.recovery.endInterruptedTurnQuarantine(),
