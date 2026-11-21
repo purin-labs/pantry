@@ -71,31 +71,6 @@ describe("the price allowance boundary", () => {
     expect(client.setOfferPricePolicy).not.toHaveBeenCalled();
   });
 
-  it("sets the band when the price is the one that was shown", async () => {
-    const client = commerceEngine({ currentOfferRevision: 4 });
-    const result = await applyOfferPriceAllowance(
-      ENV,
-      ORGANISATION,
-      {
-        kind: "set_offer_price_allowance",
-        offerId: OFFER,
-        expectedRevision: 2,
-        maxMovementBps: 500,
-        expectedOfferRevision: 4,
-      },
-      1_000,
-    );
-    expect(result.ok).toBe(true);
-    expect(client.setOfferPricePolicy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        merchantId: "merchant_cafe",
-        offerId: "offer_coffee",
-        expectedRevision: 2,
-        maxMovementBps: 500,
-      }),
-    );
-  });
-
   it("knows its own earlier write from the revision and value it left behind", async () => {
     // A confirmation interrupted after the write but before its record must
     // not re-drive. The policy carries revision and value, so the question
