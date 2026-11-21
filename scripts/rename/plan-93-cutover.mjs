@@ -152,6 +152,10 @@ const SPECIFIC_RULES = [
   ],
   [/(readWorkerEnvironment\()"underclerk"/g, '$1"commerce"'],
 
+  // A zero-padded test id keeps its length: a 1Password vault id has 26
+  // characters, and "pantry" is one longer than "satyr".
+  [/satyr0(0+)\b/g, "pantry$1"],
+
   // Package scope: the Platform packages are @purin-labs/* since Plan 94.
   [/@satyr\//g, "@purin-labs/"],
 
