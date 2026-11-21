@@ -389,10 +389,36 @@ removal" and of Refactor 260.
    the spec already named). None merges two meanings. A renamed key can
    move in the sort order, so the codemod sorts a sorted key list such as
    `"deviceName,integrationAccountId,pantryLocationId,providerLocationId"`
-   again; the Square counter journey found that.
+   again; the Square counter journey found that. A zero-padded test id
+   keeps its length (a 1Password vault id has 26 characters); the
+   1Password journey found that.
 4. AGENTS.md: the old-name table maps old names for readers of plans and no
    longer keeps old names in a layer; the runtime, boundary, setup and
    deployment sections name the new stack and the release guard.
+
+**Checks** (22 November 2026, on dev `79462c0f` plus the branch, with the
+codemod run). Pass: `check:types` and `check:test-types` of the Platform
+(E2E types included), `pnpm check:packages`, the commerce engine type
+check, `pnpm lint:static`, `pnpm lint:d1-patch`, `pnpm test:units` (the
+Platform suite: 301 files, 1,728 tests), `pnpm portal:build`,
+`cargo test --workspace` (47 tests) and `git diff --check`. The release
+guard passes for `pantry-commerce`, `pantry-docs`, `purin-shop` and the
+four Workers with no route, and refuses `pantry` and
+`pantry-slack-ingress` only for the step 3 placeholder ids.
+
+The Platform E2E suite ran in full on the branch before the second adapter
+pass and before the last two codemod fixes: 238 of 250 files passed (460 of
+484 journeys), 3 were skipped. The 9 failures: the Square counter journey
+and the 1Password journey, which found the two codemod faults above, and the
+7 cobot files, which need a MuJoCo SDK with its headers. On the final branch
+these 9 files, the journeys of the second adapter pass and the counter
+journeys ran again: 23 files and 52 journeys, all pass. The cobot files ran
+in a checkout outside the main clone: inside it, Cargo takes the main
+clone's workspace and cannot build `cobot-controller` (the nested-worktree
+trap). They need `MUJOCO_DIR` with the SDK headers.
+
+The `git grep`: 59 lines outside plans and records still say `satyr` or
+`underclerk`, and each one is an exception of the next list.
 
 **The freeze run.** When the owner opens the freeze, in the `plan-93`
 worktree:
