@@ -5,6 +5,7 @@ import type { ChatContextDetails } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { Env } from "../../env";
+import { kitchenState } from "../kitchen-observation";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
 import {
   conversationTimeline,
@@ -66,11 +67,11 @@ export function conversationRequestIds(
 
 export function currentUserSurfaceContext(
   conversation: Conversation,
-): Variant<ChatMessage, "user">["surfaceContext"] {
+): BakerySurfaceAttachmentV1 | null {
   const messages = timelineVisibleMessages(conversation);
   for (let index = messages.length - 1; index >= 0; index -= 1) {
     const message = messages[index];
-    if (message?.kind === "user") return message.surfaceContext;
+    if (message?.kind === "user") return kitchenState(message.surfaceContext);
   }
   throw new Error("chat_user_message_missing");
 }

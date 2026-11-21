@@ -45,6 +45,7 @@ import {
   restoreControlOrganisation,
 } from "./portal-reads";
 import { MAILBOX_SETUP_TRANSPORT } from "./portal-support";
+import { StripePaymentAccountSetup } from "./features/payment-accounts/stripe-account";
 
 export const AGENT_OPERATIONS_TRANSPORT: AgentOperationsTransport = {
   read: readAgentOperationsTransport,
@@ -95,6 +96,7 @@ export const INTEGRATIONS_ROUTE_TRANSPORT: IntegrationsRouteTransport = {
   readEmailReply: readEmailReplyPreview,
   readEmailOperational: readEmailOperationalPreview,
   whatsapp: WHATSAPP_ROUTE_TRANSPORT,
+  stripeSetup: StripePaymentAccountSetup,
 };
 
 export const WORKSPACE_SETTINGS_ROUTE_TRANSPORT: WorkspaceSettingsRouteTransport = {

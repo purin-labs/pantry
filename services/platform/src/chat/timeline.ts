@@ -24,12 +24,8 @@ import type { JsonRecord } from "../control/http";
 import type { Result } from "../result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
 import { parseCustomConnectorId } from "../custom-connectors/identity";
-import {
-  parseBakerySurfaceAttachment,
-  type BakerySurfaceAttachmentV1,
-} from "@purin-labs/bakery-model/bakery-surface";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import { withOldKitchenAttachment } from "./kitchen-observation";
+import { chatSurfaces, type ChatSurfaceState } from "./surface-registry";
 import {
   type ChatApproval,
   type ChatQuestion,
@@ -416,7 +412,7 @@ export function parseInputParts(
 ): Result<readonly ChatInputPart[], string> {
   const parts: ChatInputPart[] = [];
   let hasProjectContext = false;
-  let oldKitchen: BakerySurfaceAttachmentV1 | null = null;
+  let oldState: ChatSurfaceState | null = null;
   for (const item of raw) {
     if (!isRecord(item)) return { ok: false, error: "timeline_input_invalid" };
     if (item.kind === "project_context") {
@@ -469,10 +465,10 @@ export function parseInputParts(
     // A message stored before Plan 87 phase 2 holds a Kitchen
     // attachment beside its observation; both read as one observation.
     if (item.kind === "surface") {
-      const parsed = parseBakerySurfaceAttachment(item.surface);
-      if (parsed.kind === "invalid" || oldKitchen !== null)
+      const parsed = chatSurfaces.use().parseOldState(item.surface);
+      if (parsed === null || oldState !== null)
         return { ok: false, error: "timeline_input_invalid" };
-      oldKitchen = parsed.value;
+      oldState = parsed;
       continue;
     }
     if (
@@ -493,18 +489,18 @@ export function parseInputParts(
     }
     return { ok: false, error: "timeline_input_invalid" };
   }
-  return { ok: true, value: withOneScreenPart(parts, oldKitchen) };
+  return { ok: true, value: withOneScreenPart(parts, oldState) };
 }
 
 function withOneScreenPart(
   parts: readonly ChatInputPart[],
-  oldKitchen: BakerySurfaceAttachmentV1 | null,
+  oldState: ChatSurfaceState | null,
 ): readonly ChatInputPart[] {
-  if (oldKitchen === null) return parts;
+  if (oldState === null) return parts;
   const { surfaceObservation } = surfaceObservationFromParts(parts);
-  const observation = withOldKitchenAttachment(
+  const observation = chatSurfaces.use().withOldState(
     surfaceObservation,
-    oldKitchen,
+    oldState,
     browserOfParts(parts),
   );
   const others = parts.filter(isNotScreenPart);

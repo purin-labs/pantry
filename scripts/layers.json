@@ -856,6 +856,7 @@
     "services/platform/src/chat/side-cases.ts": "foundation/conversation",
     "services/platform/src/chat/signals.ts": "foundation/conversation",
     "services/platform/src/chat/store.ts": "foundation/conversation",
+    "services/platform/src/chat/surface-registry.ts": "foundation/conversation",
     "services/platform/src/chat/thread-read-timing.ts": "surfaces/portal",
     "services/platform/src/chat/timeline.ts": "foundation/conversation",
     "services/platform/src/chat/turn-access.ts": "foundation/conversation",

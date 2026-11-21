@@ -716,6 +716,7 @@ export function IntegrationsRouteView(props: {
           ) : null}
           <IntegrationsPage
             organisationId={props.props.organisationId}
+            stripeSetup={props.props.transport.stripeSetup}
             initialIntegrationId={
               props.requestedIntegration.kind === "detail"
                 ? props.requestedIntegration.integrationId

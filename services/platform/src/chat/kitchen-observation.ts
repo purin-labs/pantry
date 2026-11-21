@@ -7,11 +7,15 @@ import {
   type SurfaceObservationV2,
 } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
+import { isRecord } from "@purin-labs/std";
 import {
   bakerySurfaceAttachmentFromState,
+  parseBakerySurfaceAttachment,
+  verifyBakerySurfaceAttachment,
   type BakerySurfaceAttachmentV1,
   type BakerySurfaceContextV1,
 } from "@purin-labs/bakery-model/bakery-surface";
+import type { ChatSurfaceState, ChatSurfaces } from "./surface-registry";
 
 /**
  * The Kitchen behind the v2 screen observation (Plan 87 phase 2). The
@@ -31,7 +35,7 @@ const attachments = new WeakMap<
 >();
 
 /** The Kitchen view that an observation carries, for the Kitchen code. */
-export function kitchenAttachment(
+function kitchenAttachment(
   observation: SurfaceObservationV2 | undefined,
 ): BakerySurfaceAttachmentV1 | null {
   if (
@@ -53,7 +57,7 @@ export function kitchenAttachment(
  * the state breaks its contract, or names another surface session, epoch or
  * browser than the message.
  */
-export function admitKitchenState(
+function admitKitchenState(
   observation: SurfaceObservationV2,
   browser: BakeryBrowserContext,
 ): SurfaceObservationV2 | null {
@@ -77,7 +81,7 @@ export function admitKitchenState(
  * Whether an old tab's Kitchen attachment still has the digest of its view,
  * as the check before phase 2 required. The server keeps its own digest.
  */
-export function oldKitchenAttachmentIsIntact(
+function oldKitchenAttachmentIsIntact(
   attachment: BakerySurfaceAttachmentV1,
 ): boolean {
   return (
@@ -93,17 +97,73 @@ export function oldKitchenAttachmentIsIntact(
  * observation. A message that carried another page leaves the attachment
  * out, because that page was on screen and the Kitchen was not.
  */
-export function withOldKitchenAttachment(
+function withOldKitchenAttachment(
   observation: SurfaceObservationV2 | undefined,
-  attachment: BakerySurfaceAttachmentV1 | null,
+  attachment: BakerySurfaceAttachmentV1,
   browser: BakeryBrowserContext,
 ): SurfaceObservationV2 | undefined {
-  if (attachment === null) return observation;
   if (observation === undefined)
     return kitchenObservation(attachment, browser, undefined);
   if (observation.surface === KITCHEN_SURFACE && observation.state === null)
     return kitchenObservation(attachment, browser, observation);
   return observation;
+}
+
+/**
+ * The Kitchen form of a page state of the chat record, for the Kitchen code.
+ * Only the Kitchen page has a typed state now, so a state of another form
+ * reads as no Kitchen state.
+ */
+export function kitchenState(
+  state: ChatSurfaceState | null,
+): BakerySurfaceAttachmentV1 | null {
+  return state !== null && isKitchenAttachment(state) ? state : null;
+}
+
+/** Whether a page state is a Kitchen state with the digest of its view. */
+export async function verifiedKitchenState(
+  state: ChatSurfaceState,
+): Promise<boolean> {
+  const kitchen = kitchenState(state);
+  return kitchen !== null && (await verifyBakerySurfaceAttachment(kitchen));
+}
+
+function isKitchenAttachment(
+  state: ChatSurfaceState,
+): state is BakerySurfaceAttachmentV1 {
+  return Reflect.get(state, "kind") === "bakery-surface-context";
+}
+
+/**
+ * The Kitchen in the surface registry of the chat record. The Worker
+ * registers it (`worker-ports.ts`).
+ */
+export const KITCHEN_CHAT_SURFACES: ChatSurfaces<BakerySurfaceAttachmentV1> = {
+  admitState: admitKitchenState,
+  stateOf: kitchenAttachment,
+  parseOldState: (raw) => {
+    const parsed = parseBakerySurfaceAttachment(raw);
+    return parsed.kind === "valid" ? parsed.value : null;
+  },
+  oldStateIsIntact: oldKitchenAttachmentIsIntact,
+  withOldState: withOldKitchenAttachment,
+  historicalText: historicalKitchenText,
+};
+
+// A stored Kitchen snapshot that no longer parses stays readable as text,
+// without becoming live command authority.
+function historicalKitchenText(raw: unknown): string | null {
+  if (
+    !isRecord(raw) ||
+    raw.kind !== "bakery-surface-context" ||
+    typeof raw.digest !== "string" ||
+    !/^[a-f0-9]{64}$/.test(raw.digest) ||
+    !isRecord(raw.context) ||
+    raw.context.schemaVersion !== 1 ||
+    raw.context.kind !== "bakery-workspace"
+  )
+    return null;
+  return `Historical Kitchen context (read-only snapshot):\n${JSON.stringify(raw)}`;
 }
 
 function kitchenObservation(

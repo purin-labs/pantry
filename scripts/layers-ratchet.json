@@ -1,32 +1,10 @@
 {
   "totals": {
-    "upward": 6,
-    "areas": 1,
+    "upward": 0,
+    "areas": 0,
     "order": 0,
     "table": 0
   },
-  "crossings": {
-    "areas/cafe -> surfaces/portal": 2,
-    "areas/integrations -> areas/commerce": 1,
-    "foundation/conversation -> areas/kitchen": 2,
-    "foundation/conversation -> surfaces/portal": 2
-  },
-  "reasons": {
-    "areas/cafe -> surfaces/portal": {
-      "reason": "The Cafe prompt edit (apps/portal/src/features/menu-boards/prompt-edit.tsx) reads and sends a Portal chat with readChat and sendChat. Their types are the chat read model of features/chat/api.ts, which is Portal code.",
-      "fix": "Move the chat read model types to @purin-labs/control-api/portal/chat. Then give the board a chat port that portal.tsx registers."
-    },
-    "areas/integrations -> areas/commerce": {
-      "reason": "The integrations page of the Portal (features/integrations/entries.tsx) shows the Stripe setup part of the payment accounts (features/payment-accounts/stripe-account.tsx).",
-      "fix": "The Portal wiring gives the Stripe setup part to the integrations page through the settings transport (features/integrations/settings-transport.ts)."
-    },
-    "foundation/conversation -> areas/kitchen": {
-      "reason": "The chat record (chat/conversation.ts, chat/timeline.ts) parses and stores the Kitchen surface attachment of a message (BakerySurfaceAttachmentV1), also the form of a tab that loaded the Portal before Plan 87 phase 2.",
-      "fix": "The surface registry of Plan 87: the record keeps an opaque surface state, and the Kitchen registers its state check. The Plan 93 cutover can drop the old tab form."
-    },
-    "foundation/conversation -> surfaces/portal": {
-      "reason": "The same chat record calls chat/kitchen-observation.ts, the Portal adapter that makes the Kitchen view of a screen observation from its state.",
-      "fix": "The surface registry of Plan 87, as for the Kitchen pair: the Portal registers the adapter, and the record calls it through the registry."
-    }
-  }
+  "crossings": {},
+  "reasons": {}
 }

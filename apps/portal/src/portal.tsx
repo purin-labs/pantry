@@ -70,6 +70,7 @@ import {
   parseCommerceActionExecutionResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { BakerySurfaceEffectBridge } from "./features/bakery-surface-effect-bridge";
+import { registerPortalBoardChat } from "./portal-board-chat";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { CommerceActionStatus } from "./features/governed-actions/commerce-action-status";
@@ -126,6 +127,9 @@ import { PAGES } from "./pages";
 // The platform tests import these through this JSX module.
 export { executeIntegrationsRoute } from "./features/integrations/settings-transport";
 export { selectPreferredWorkspace } from "./portal-projection";
+
+// The Café board asks the agent through the Portal chat.
+registerPortalBoardChat();
 
 type ActivationProjectionTracking = {
   readonly organisationId: string;

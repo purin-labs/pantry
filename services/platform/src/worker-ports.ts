@@ -137,6 +137,8 @@ import {
   prepareRevokedDmSelectionRelease,
   selectSlackDmOrganisation,
 } from "./slack/organisation-routing";
+import { chatSurfaces } from "./chat/surface-registry";
+import { KITCHEN_CHAT_SURFACES } from "./chat/kitchen-observation";
 
 memoryService.register({
   readMemoryViews: (...input) => readMemoryViews(...input),
@@ -325,3 +327,7 @@ shopMacDevices.register({
 
 // The lifecycle batches of tenancy get the parts of the table owners.
 provideOrganisationLifecycleParts(ORGANISATION_LIFECYCLE_PARTS);
+
+// The page states that a chat message can carry (Plan 87): only the Kitchen
+// page has one now.
+chatSurfaces.register(KITCHEN_CHAT_SURFACES);

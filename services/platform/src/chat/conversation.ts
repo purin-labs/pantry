@@ -12,11 +12,11 @@ import {
 import type { ChatOrigin } from "@purin-labs/control-api";
 import { chatOrigin, chatOriginField } from "./origin";
 import {
-  admitKitchenState,
-  kitchenAttachment,
-  oldKitchenAttachmentIsIntact,
-  withOldKitchenAttachment,
-} from "./kitchen-observation";
+  admitSurfaceState,
+  chatSurfaces,
+  surfaceStateOf,
+  type ChatSurfaceState,
+} from "./surface-registry";
 import {
   isConversationId,
   parseChatPermissionRequest,
@@ -49,10 +49,6 @@ import {
   type ChatTimelineEvent,
   type PendingChatInput,
 } from "./timeline";
-import {
-  parseBakerySurfaceAttachment,
-  type BakerySurfaceAttachmentV1,
-} from "@purin-labs/bakery-model/bakery-surface";
 import type { Variant } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
@@ -78,7 +74,7 @@ export type ChatMessage =
       readonly id: string;
       readonly text: string;
       readonly browserContext: PageBrowserContext;
-      readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+      readonly surfaceContext: ChatSurfaceState | null;
       readonly attachments: readonly ChatAttachmentPart[];
       readonly inputMode?: ChatInputMode;
       /** The Portal page on the sender's screen at send time. */
@@ -225,7 +221,7 @@ export type ChatCommand =
       /** Sets the message as the chat's goal with this budget, before the turn starts. */
       readonly goalTokenBudget?: number;
       readonly browserContext: PageBrowserContext;
-      readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+      readonly surfaceContext: ChatSurfaceState | null;
       readonly attachments: readonly ChatAttachmentPart[];
       /** Present on a spoken command (Plan 82). */
       readonly inputMode?: ChatInputMode;
@@ -242,7 +238,7 @@ export type ChatCommand =
       readonly text: string;
       readonly effort?: ChatEffort;
       readonly browserContext: PageBrowserContext;
-      readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+      readonly surfaceContext: ChatSurfaceState | null;
       readonly attachments: readonly ChatAttachmentPart[];
       /** Present on a spoken command (Plan 82). */
       readonly inputMode?: ChatInputMode;
@@ -258,7 +254,7 @@ export type ChatCommand =
       readonly inputId: string;
       readonly effort?: ChatEffort;
       readonly browserContext: PageBrowserContext;
-      readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+      readonly surfaceContext: ChatSurfaceState | null;
       readonly attachments: readonly ChatAttachmentPart[];
       /** Present on a spoken command (Plan 82). */
       readonly inputMode?: ChatInputMode;
@@ -339,7 +335,7 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
   if (raw.effort !== undefined && effort === null)
     return { ok: false, error: "chat_message_invalid" };
   // A tab that loaded the Portal before Plan 87 phase 2 still sends the
-  // Kitchen view in its own key, until the tab reloads.
+  // page state in its own key, until the tab reloads.
   const oldTabSurfaceContext = parseSurfaceContext(raw.surfaceContext);
   if (oldTabSurfaceContext === undefined)
     return { ok: false, error: "chat_message_invalid" };
@@ -366,7 +362,7 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
     screen.observation === undefined
       ? {}
       : { surfaceObservation: screen.observation };
-  const surfaceContext = screen.kitchen;
+  const surfaceContext = screen.state;
   // The browser context and the screen are optional keys of a message.
   const browserKeyCount =
     (Object.hasOwn(raw, "browserContext") ? 1 : 0) +
@@ -522,34 +518,37 @@ function parseSurfaceObservationKey(
 }
 
 /**
- * The one screen observation of a message, and the Kitchen view that
- * it carries for the Kitchen code. Null when the Kitchen state breaks its
+ * The one screen observation of a message, and the page state that it
+ * carries for the code of its area. Null when the state breaks its
  * contract.
  */
 function commandScreen(
   observation: SurfaceObservationV2 | undefined,
-  oldTab: BakerySurfaceAttachmentV1 | null,
+  oldTab: ChatSurfaceState | null,
   browser: PageBrowserContext,
 ): Readonly<{
   observation: SurfaceObservationV2 | undefined;
-  kitchen: BakerySurfaceAttachmentV1 | null;
+  state: ChatSurfaceState | null;
 }> | null {
-  if (oldTab !== null && !oldKitchenAttachmentIsIntact(oldTab)) return null;
+  if (oldTab !== null && !chatSurfaces.use().oldStateIsIntact(oldTab))
+    return null;
   const admitted =
     observation === undefined
       ? undefined
-      : admitKitchenState(observation, browser);
+      : admitSurfaceState(observation, browser);
   if (admitted === null) return null;
-  const merged = withOldKitchenAttachment(admitted, oldTab, browser);
-  return { observation: merged, kitchen: kitchenAttachment(merged) };
+  const merged =
+    oldTab === null
+      ? admitted
+      : chatSurfaces.use().withOldState(admitted, oldTab, browser);
+  return { observation: merged, state: surfaceStateOf(merged) };
 }
 
 function parseSurfaceContext(
   raw: unknown,
-): BakerySurfaceAttachmentV1 | null | undefined {
+): ChatSurfaceState | null | undefined {
   if (raw === undefined || raw === null) return null;
-  const parsed = parseBakerySurfaceAttachment(raw);
-  return parsed.kind === "valid" ? parsed.value : undefined;
+  return chatSurfaces.use().parseOldState(raw) ?? undefined;
 }
 
 function isChatModelId(raw: unknown): raw is string {
@@ -742,12 +741,12 @@ function normalizeStoredSurfaceParts(raw: unknown): unknown {
     if (
       !isRecord(part) ||
       part.kind !== "surface" ||
-      parseBakerySurfaceAttachment(part.surface).kind === "valid"
+      chatSurfaces.use().parseOldState(part.surface) !== null
     ) {
       parts.push(part);
       continue;
     }
-    const text = historicalSurfaceText(part.surface);
+    const text = chatSurfaces.use().historicalText(part.surface);
     if (text === null) {
       parts.push(part);
       continue;
@@ -760,20 +759,6 @@ function normalizeStoredSurfaceParts(raw: unknown): unknown {
     parts.push(historical);
   }
   return { ...raw, parts };
-}
-
-function historicalSurfaceText(raw: unknown): string | null {
-  if (
-    !isRecord(raw) ||
-    raw.kind !== "bakery-surface-context" ||
-    typeof raw.digest !== "string" ||
-    !/^[a-f0-9]{64}$/.test(raw.digest) ||
-    !isRecord(raw.context) ||
-    raw.context.schemaVersion !== 1 ||
-    raw.context.kind !== "bakery-workspace"
-  )
-    return null;
-  return `Historical Kitchen context (read-only snapshot):\n${JSON.stringify(raw)}`;
 }
 
 function parseSequence(raw: unknown, fallback: number): number {
@@ -896,13 +881,13 @@ export function inputModeFromParts(
   return {};
 }
 
-// The Kitchen view travels inside the screen observation (Plan 87).
+// The page state travels inside the screen observation (Plan 87).
 function surfaceContextFromParts(
   parts: Variant<ChatTimelineEvent, "user">["parts"],
-): BakerySurfaceAttachmentV1 | null {
+): ChatSurfaceState | null {
   for (const part of parts)
     if (part.kind === "surface_observation")
-      return kitchenAttachment(part.observation);
+      return surfaceStateOf(part.observation);
   return null;
 }
 
