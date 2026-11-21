@@ -16,6 +16,7 @@ COPY crates/media-inspect /src/crates/media-inspect
 COPY crates/message-link-fetch /src/crates/message-link-fetch
 COPY crates/custom-connector-fetch /src/crates/custom-connector-fetch
 COPY crates/shop-gateway /src/crates/shop-gateway
+COPY crates/cobot-protocol /src/crates/cobot-protocol
 
 RUN cargo build --locked --release -p workspace-executor --bin workspace-executor
 
