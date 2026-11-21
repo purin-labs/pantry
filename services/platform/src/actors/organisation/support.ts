@@ -19,13 +19,20 @@ import {
 } from "../../ids";
 import { traceWarn } from "../../observability";
 import type { Result } from "../../result";
-import { readNextActionExecutionLeaseDeadline } from "../action-ledger";
+import {
+  expireDueActionExecutions,
+  readNextActionExecutionLeaseDeadline,
+} from "../action-ledger";
 import { admitActorRecovery } from "../actor-activation";
 import {
   readActivationExportSource,
   type ActorExportError,
 } from "../actor-export";
-import { readNextCodeModeOrganisationAlarmAt } from "../code-mode-budget";
+import {
+  expireCodeModeOrganisationReservations,
+  readNextCodeModeOrganisationAlarmAt,
+} from "../code-mode-budget";
+import { expireAbandonedCueClaims } from "../cue-delivery";
 import { errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import type { OrganisationMeta, OrganisationMetaRow } from "./types";
@@ -99,6 +106,17 @@ export function socketSweepInterval(ctx: DurableObjectState): number | null {
     rooms.add(key);
   }
   return SOCKET_SWEEP_INTERVAL_MS;
+}
+
+/** The lease step of the alarm: it ends the leases that are past their time. */
+export function expireOrganisationLeases(
+  sql: SqlStorage,
+  organisationId: OrganisationId,
+  now: number,
+): void {
+  expireDueActionExecutions(sql, organisationId, now);
+  expireCodeModeOrganisationReservations(sql, now);
+  expireAbandonedCueClaims(sql, organisationId, now);
 }
 
 export function readNextOrganisationAlarmAt(sql: SqlStorage): number | null {
