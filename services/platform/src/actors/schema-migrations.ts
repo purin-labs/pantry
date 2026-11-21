@@ -1,11 +1,17 @@
 import type { CountRow } from "./sql-rows";
 import { errorMessage } from "@purin-labs/std";
 
+/**
+ * How a step may change the row count of a preserved table. A preserved table
+ * that a step does not name keeps its row count exactly.
+ */
+type RowCountChange = "may_grow" | "may_shrink";
+
 type SchemaMigrationStep = {
   version: number;
   apply: (sql: SqlStorage) => void;
   validate: (sql: SqlStorage) => void;
-  rowCountGrowthAllowedTables?: readonly string[];
+  rowCountChanges?: Readonly<Record<string, RowCountChange>>;
 };
 
 /**
@@ -166,11 +172,7 @@ function executeMigrationStep(
 ): void {
   step.apply(sql);
   step.validate(sql);
-  assertPreservedRowCounts(
-    sql,
-    rowCounts,
-    step.rowCountGrowthAllowedTables ?? [],
-  );
+  assertPreservedRowCounts(sql, rowCounts, step.rowCountChanges ?? {});
   writeSchemaVersion(sql, plan.key, step.version);
   clearMigrationState(sql, plan.key);
 }
@@ -219,12 +221,12 @@ function validatePlan(plan: SchemaMigrationPlan): void {
   }
 
   for (const step of [plan.baseline, ...plan.steps]) {
-    for (const table of step.rowCountGrowthAllowedTables ?? []) {
+    for (const table of Object.keys(step.rowCountChanges ?? {})) {
       requireIdentifier(table);
 
       if (!plan.preservedTables.includes(table)) {
         throw new Error(
-          `schema_growth_policy_not_preserved:${plan.key}:${step.version}:${table}`,
+          `schema_row_count_policy_not_preserved:${plan.key}:${step.version}:${table}`,
         );
       }
     }
@@ -322,14 +324,19 @@ function readPreservedRowCounts(
 function assertPreservedRowCounts(
   sql: SqlStorage,
   expected: ReadonlyMap<string, number>,
-  growthAllowedTables: readonly string[],
+  changes: Readonly<Record<string, RowCountChange>>,
 ): void {
   for (const [table, count] of expected) {
     const current = readTableRowCount(sql, table);
+    const change = changes[table];
+    const kept =
+      change === "may_grow"
+        ? current >= count
+        : change === "may_shrink"
+          ? current <= count
+          : current === count;
 
-    if (
-      growthAllowedTables.includes(table) ? current < count : current !== count
-    ) {
+    if (!kept) {
       throw new Error(`schema_row_count_changed:${table}:${count}:${current}`);
     }
   }

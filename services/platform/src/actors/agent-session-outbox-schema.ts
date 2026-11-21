@@ -4,6 +4,7 @@ import {
   runSchemaMigrations,
   type SchemaMigrationPlan,
 } from "./schema-migrations";
+import type { CountRow } from "./sql-rows";
 
 /**
  * The Session's `actor_outbox` after Refactor 15: a terminal `quarantined`
@@ -45,15 +46,30 @@ const SESSION_OUTBOX_SCHEMA_PLAN: SchemaMigrationPlan = {
     {
       version: 3,
       apply: deleteConsoleBillingRows,
-      validate: (sql) => assertTableExists(sql, "actor_outbox"),
+      validate: assertNoConsoleBillingRows,
+      rowCountChanges: { actor_outbox: "may_shrink" },
     },
   ],
 };
 
+const CONSOLE_BILLING_ROWS = "effect_id GLOB 'account_execution:*'";
+
 function deleteConsoleBillingRows(sql: SqlStorage): void {
-  sql.exec(
-    "DELETE FROM actor_outbox WHERE effect_id GLOB 'account_execution:*'",
-  );
+  sql.exec(`DELETE FROM actor_outbox WHERE ${CONSOLE_BILLING_ROWS}`);
+}
+
+/** Only the billing rows leave; the row count check allows no other loss. */
+function assertNoConsoleBillingRows(sql: SqlStorage): void {
+  assertTableExists(sql, "actor_outbox");
+  const left = sql
+    .exec<CountRow>(
+      `SELECT COUNT(*) AS count FROM actor_outbox WHERE ${CONSOLE_BILLING_ROWS}`,
+    )
+    .one().count;
+
+  if (left !== 0) {
+    throw new Error(`schema_console_billing_rows_left:${left}`);
+  }
 }
 
 /** Runs after the Session plan, in the same transaction. */
