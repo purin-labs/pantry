@@ -8,7 +8,6 @@ export type UnregisteredActorKind =
   | "organisation"
   | "conversation_residency"
   | "device_fleet"
-  | "code_mode_governor"
   | "custom_connector_fetch";
 
 type UnregisteredActorErasureError =
@@ -34,7 +33,6 @@ export function isUnregisteredActorKind(
     value === "organisation" ||
     value === "conversation_residency" ||
     value === "device_fleet" ||
-    value === "code_mode_governor" ||
     value === "custom_connector_fetch"
   );
 }

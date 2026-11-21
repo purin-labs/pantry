@@ -197,7 +197,7 @@ type PurgeRewrite = (
   context: OrganisationPurgeContext,
 ) => readonly D1PreparedStatement[];
 
-/** The parts of the purge batch and of the erase of a purged Organisation. */
+/** The parts of the purge batch. */
 export type OrganisationPurgeParts = Readonly<{
   /** The rewrite of each pseudonymized connection table (connections). */
   pseudonymize: Readonly<{
@@ -210,11 +210,6 @@ export type OrganisationPurgeParts = Readonly<{
     directory: GlobalDatabase,
     organisationId: OrganisationId,
   ): readonly (readonly [table: string, statement: D1PreparedStatement])[];
-  /** How many of those records exist (Slack). */
-  directoryRecordCount(
-    directory: GlobalDatabase,
-    organisationId: OrganisationId,
-  ): D1PreparedStatement;
   /**
    * Before the purge erases the Vault: the revoke of an installation that no
    * other Organisation uses (Slack).

@@ -28,7 +28,6 @@ import type {
   ActorActivationSchemaAdvanceError,
 } from "../../actors/actor-activation";
 import { currentActorSchemaVersion } from "../../actors/current-actor-schema-version";
-import { codeModePlatformGovernor } from "../../actors/code-mode-platform-governor-stub";
 import type {
   Env,
   OrganisationActorStub,
@@ -68,8 +67,6 @@ import {
   type SessionId,
   type OrganisationId,
 } from "../../ids";
-import { releaseSlackInstallationCredentials } from "../../credential-vault/slack-installation-credential";
-import { erasePurgedOrganisationRows } from "../../data/organisation-purge";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import type { Result } from "../../result";
 import {
@@ -121,11 +118,6 @@ type ActorRegistryAdminRequest =
       readonly registryId: ActorRegistryId;
       readonly expectedQuarantinedAt: number;
       readonly expectedQuarantineReason: string;
-      readonly staleReservationAgeMs?: never;
-    }
-  | {
-      readonly command: "erase_purged_organisation_rows";
-      readonly organisationId: OrganisationId;
       readonly staleReservationAgeMs?: never;
     }
   | {
@@ -214,11 +206,6 @@ export async function handleAdministerActorRegistry(
       return recoverConnectorCaseWorkResponse(env, input.value);
     case "discard_quarantined_case":
       return discardQuarantinedCaseResponse(env, input.value);
-    case "erase_purged_organisation_rows":
-      return erasePurgedOrganisationRowsResponse(
-        env,
-        input.value.organisationId,
-      );
     case "erase_unregistered_actor":
       return eraseUnregisteredActorResponse(env, input.value);
     default:
@@ -280,8 +267,6 @@ async function eraseUnregisteredActorResponse(
       }
     }
   }
-  // The governor of this build keeps the Code Mode budget of the platform.
-  registered.add(codeModePlatformGovernor(env).id.toString());
   if (registered.has(input.objectId)) {
     return errorResponse(
       "actor_registered",
@@ -363,15 +348,6 @@ function unregisteredActorStub(
       return env.DEVICE_FLEET === undefined
         ? null
         : env.DEVICE_FLEET.get(env.DEVICE_FLEET.idFromString(objectId));
-    case "code_mode_governor":
-      try {
-        return env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.get(
-          env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.idFromString(objectId),
-        );
-      } catch {
-        // The identifier is of another class.
-        return null;
-      }
     case "custom_connector_fetch":
       try {
         return env.CUSTOM_CONNECTOR_FETCH.get(
@@ -384,68 +360,6 @@ function unregisteredActorStub(
     default:
       return assertNever(objectKind);
   }
-}
-
-/**
- * Erases the rows that a purge before the catalogue left of a purged
- * Organisation, after its Slack installations' bot tokens move to an
- * Organisation that still uses them.
- */
-async function erasePurgedOrganisationRowsResponse(
-  env: Env,
-  organisationId: OrganisationId,
-): Promise<Response> {
-  const execution = await OrganisationExecutionScope.resolve(
-    env,
-    organisationId,
-  );
-  if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
-  }
-  const erased = await erasePurgedOrganisationRows({
-    db: execution.value.database,
-    directory: env.DB,
-    organisationId,
-    releaseSharedCredentials: () =>
-      releaseSlackInstallationCredentials({
-        env,
-        directory: env.DB,
-        db: execution.value.database,
-        organisationId,
-        now: Date.now(),
-      }),
-  });
-  if (!erased.ok) {
-    switch (erased.error.code) {
-      case "organisation_not_purged":
-        return errorResponse(
-          erased.error.code,
-          "The organisation is not purged.",
-          409,
-        );
-      case "shared_credentials_not_released":
-        return errorResponse(
-          erased.error.code,
-          `The Slack bot tokens did not move (${erased.error.reason}). Nothing was erased.`,
-          409,
-        );
-      default:
-        return assertNever(erased.error);
-    }
-  }
-  return jsonResponse({
-    ok: true,
-    report: {
-      kind: "purged_organisation_rows_erased",
-      organisationId,
-      slackInstallationsReleased: erased.value.sharedCredentialsReleased,
-      erasedRows: erased.value.erasedRows,
-    },
-  });
 }
 
 async function discardQuarantinedCaseResponse(
@@ -925,10 +839,7 @@ function parseActorRegistryAdminRequest(
     return invalidActorRegistryAdminRequest("organisationId");
   }
 
-  if (
-    command.value === "bootstrap_organisation" ||
-    command.value === "erase_purged_organisation_rows"
-  ) {
+  if (command.value === "bootstrap_organisation") {
     return Object.keys(body).length === 2
       ? {
           ok: true,

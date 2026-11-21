@@ -677,21 +677,3 @@ export function directorySlackRecordDeletions(
     ],
   ];
 }
-
-/** How many of the records that `directorySlackRecordDeletions` deletes exist. */
-export function directorySlackRecordCount(
-  directory: GlobalDatabase,
-  organisationId: OrganisationId,
-): D1PreparedStatement {
-  return directory
-    .prepare(
-      `SELECT
-         (SELECT COUNT(*) FROM slack_dm_organisation_selection AS selection
-          JOIN slack_organisation_connection AS connection
-            ON connection.installation_id = selection.installation_id
-           AND connection.connection_id = selection.connection_id
-          WHERE connection.organisation_id = ?1 AND connection.lifecycle = 'revoked')
-       + (SELECT COUNT(*) FROM slack_thread_case_pin WHERE organisation_id = ?1) AS count`,
-    )
-    .bind(organisationId);
-}

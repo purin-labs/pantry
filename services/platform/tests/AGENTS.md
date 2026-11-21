@@ -50,14 +50,9 @@ test and any fixture that exists only for the obsolete behavior.
 - `e2e/unregistered-actors.test.ts` covers the operator's erase of an Actor by
   its object identifier: what is erased, and the two refusals that protect a
   registered Actor and one whose Organisation exists.
-- `e2e/purged-organisation-rows.test.ts` covers the operator's erase of the
-  rows that a purge before the catalogue left (`erase_purged_organisation_rows`):
-  a live Organisation is refused, the bot token of the shared Slack workspace
-  moves to the Organisation that still uses it before the Vault goes, its
-  Slack still checks out with that token, and a second run changes nothing.
-  `e2e/slack-workspace-support.ts` holds the Slack workspace that it shares
-  with `e2e/purged-organisation-reclaim.test.ts` and
-  `e2e/idle-tenant-cost.test.ts`.
+- `e2e/slack-workspace-support.ts` holds the Slack workspace that
+  `e2e/purged-organisation-reclaim.test.ts` and `e2e/idle-tenant-cost.test.ts`
+  share.
 - `e2e/message-link-fetch-placement.test.ts` follows a documentation read of
   a Portal chat and a link read of a Session to the link-fetch Actor of the
   Organisation's region.
@@ -105,11 +100,10 @@ test and any fixture that exists only for the obsolete behavior.
   delivery, the cutover no longer waits for it, and a replay delivers
   nothing twice (Refactor 15).
 - `e2e/session-quarantine-end.test.ts` quarantines two Sessions with a Code
-  Mode settlement that the Organisation refuses while a call is in flight.
-  A day later, the Session
-  whose reservation expired settles it from that record and ends, and its Case
-  abandons the assignment; the Session whose reservation moved to another
-  lease stays quarantined.
+  Mode settlement that the Organisation refuses while a call is in flight;
+  each turn fails and its Case settles the assignment. A day later, the
+  Session whose reservation expired settles it from that record and ends;
+  the Session whose reservation moved to another lease stays quarantined.
 - `e2e/device-commands.test.ts` follows the pauses that Satyr sends to a shop
   gateway: a refused snapshot of a paused camera leaves the pause unconfirmed
   until the gateway answers the pause, and a pause sent while the gateway is

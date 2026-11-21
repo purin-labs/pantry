@@ -8,9 +8,6 @@
  * The Actors, the attachments, the device fleets, the WhatsApp Connectors,
  * the Commerce merchant and the Slack installation credentials end before
  * this batch (see `reconcileArchivedOrganisation`).
- *
- * `erasePurgedOrganisationRows` is the operator's repair for an Organisation
- * that a purge before the catalogue left: it erases what that purge kept.
  */
 import type {
   GlobalDatabase,
@@ -18,7 +15,6 @@ import type {
   OrganisationDatabaseSession,
 } from "../database-handles";
 import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
 import { assertNever } from "@purin-labs/std";
 import { hashOpaqueSecret } from "./control-plane";
 import {
@@ -79,10 +75,6 @@ type EraseEntry = Extract<
   (typeof PURGE_CATALOGUE)[number],
   Readonly<{ action: "erase" }>
 >;
-
-const ERASE_ENTRIES: readonly EraseEntry[] = PURGE_CATALOGUE.filter(
-  (entry): entry is EraseEntry => entry.action === "erase",
-);
 
 /** Holds once the Organisation's lifecycle says purged. */
 function purgedGuard(organisationId: OrganisationId): RowGuard {
@@ -247,104 +239,6 @@ export async function purgeArchivedOrganisation(input: {
       .map(([, statement]) => statement),
   );
   return statements.length;
-}
-
-export type PurgedOrganisationRowsReport = Readonly<{
-  /** What `releaseSharedCredentials` moved before the erase. */
-  sharedCredentialsReleased: number;
-  /** The rows erased from each table that still held some. */
-  erasedRows: Readonly<Record<string, number>>;
-}>;
-
-export type PurgedOrganisationRowsError =
-  | Readonly<{ code: "organisation_not_purged" }>
-  | Readonly<{ code: "shared_credentials_not_released"; reason: string }>;
-
-/**
- * Erases what an earlier purge left of an Organisation that is purged: the
- * rows of each table that the catalogue marks erase, and the directory's
- * Slack records that name it. A purge before the catalogue (Refactor 15) left
- * such rows, and the purge runs the catalogue only on the move to purged, so
- * it never comes back for them.
- *
- * Its Vault can still hold a credential that a live Organisation uses: the
- * bot token of a shared Slack workspace. As the purge does, it first calls
- * `releaseSharedCredentials`, which moves each such credential and returns
- * the count; when that throws, it erases nothing. It counts before it
- * writes, so with nothing left it writes nothing, and it is safe to repeat.
- */
-export async function erasePurgedOrganisationRows(input: {
-  readonly db: OrganisationDatabase;
-  readonly directory: GlobalDatabase;
-  readonly organisationId: OrganisationId;
-  readonly releaseSharedCredentials: () => Promise<number>;
-}): Promise<Result<PurgedOrganisationRowsReport, PurgedOrganisationRowsError>> {
-  const parts = organisationLifecycleParts().purge;
-  const lifecycle = await input.db
-    .prepare(
-      "SELECT lifecycle FROM organisation_onboarding WHERE organisation_id = ?",
-    )
-    .bind(input.organisationId)
-    .first<unknown>("lifecycle");
-  if (lifecycle !== "purged")
-    return { ok: false, error: { code: "organisation_not_purged" } };
-  let sharedCredentialsReleased: number;
-  try {
-    sharedCredentialsReleased = await input.releaseSharedCredentials();
-  } catch (error) {
-    return {
-      ok: false,
-      error: {
-        code: "shared_credentials_not_released",
-        reason: error instanceof Error ? error.message : "unknown",
-      },
-    };
-  }
-  const regionalLeft = await input.db.batch<{ readonly count: unknown }>(
-    ERASE_ENTRIES.map((entry) =>
-      input.db
-        .prepare(
-          `SELECT COUNT(*) AS count FROM ${entry.table} WHERE (${eraseEntryWhere(entry)})`,
-        )
-        .bind(input.organisationId),
-    ),
-  );
-  const directoryLeft = await parts
-    .directoryRecordCount(input.directory, input.organisationId)
-    .first<unknown>("count");
-  const nothingLeft =
-    directoryLeft === 0 &&
-    regionalLeft.every((result) => result.results[0]?.count === 0);
-  if (nothingLeft)
-    return { ok: true, value: { sharedCredentialsReleased, erasedRows: {} } };
-  const session = input.db.withSession("first-primary");
-  const guard = purgedGuard(input.organisationId);
-  const regionalErased = await session.batch(
-    ERASE_ENTRIES.map((entry) =>
-      eraseStatement(session, guard, input.organisationId, entry),
-    ),
-  );
-  const directoryDeletions = parts.directoryRecordDeletions(
-    input.directory,
-    input.organisationId,
-  );
-  const directoryErased = await input.directory.batch(
-    directoryDeletions.map(([, statement]) => statement),
-  );
-  const tables = [
-    ...ERASE_ENTRIES.map((entry) => entry.table),
-    ...directoryDeletions.map(([table]) => table),
-  ];
-  const erasedRows: Record<string, number> = {};
-  for (const [index, result] of [
-    ...regionalErased,
-    ...directoryErased,
-  ].entries()) {
-    const table = tables[index];
-    if (table !== undefined && result.meta.changes > 0)
-      erasedRows[table] = result.meta.changes;
-  }
-  return { ok: true, value: { sharedCredentialsReleased, erasedRows } };
 }
 
 function requireString(raw: unknown, field: string): string {

@@ -7,7 +7,6 @@ import {
   resolveActiveConnectorActor,
 } from "../../src/actors/actor-router";
 import { listOrganisationActorRegistryEntries } from "../../src/actors/actor-registry";
-import { codeModePlatformGovernor } from "../../src/actors/code-mode-platform-governor-stub";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   conversationResidencyStub,
@@ -166,18 +165,6 @@ async function unregisteredActorJourney({ task }: TestContext) {
   const goneResidency = residency.get(residency.idFromName("residency:gone"));
   await storeResidency(goneResidency, GONE_ORGANISATION);
 
-  const earlierGovernor = env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.get(
-    env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.idFromName(
-      "code-mode-platform-governor:earlier",
-    ),
-  );
-  await runInDurableObject(
-    earlierGovernor,
-    async function storeLedgerMarker(_actor, state) {
-      await state.storage.put("journey-marker", "an earlier ledger");
-    },
-  );
-
   const served = {
     liveResidency: await outcome(
       erase("conversation_residency", liveResidency.id.toString()),
@@ -188,21 +175,11 @@ async function unregisteredActorJourney({ task }: TestContext) {
     goneResidency: await outcome(
       erase("conversation_residency", goneResidency.id.toString()),
     ),
-    // The governor of this build keeps the budget; one of an earlier name
-    // holds a ledger that nothing reads.
-    liveGovernor: await outcome(
-      erase("code_mode_governor", codeModePlatformGovernor(env).id.toString()),
-    ),
-    earlierGovernor: await outcome(
-      erase("code_mode_governor", earlierGovernor.id.toString()),
-    ),
   };
   expect(served).toEqual({
     liveResidency: { status: 409, code: "actor_registered" },
     strayResidency: { status: 409, code: "actor_owner_exists" },
     goneResidency: { status: 200, code: null },
-    liveGovernor: { status: 409, code: "actor_registered" },
-    earlierGovernor: { status: 200, code: null },
   });
   expect({
     live: await residents(liveResidency),
@@ -212,18 +189,6 @@ async function unregisteredActorJourney({ task }: TestContext) {
     live: { residents: 1, alarm: true },
     stray: { residents: 1, alarm: true },
     gone: { residents: null, alarm: false },
-  });
-
-  expect(
-    await runInDurableObject(
-      earlierGovernor,
-      function readLedgerMarker(_actor, state) {
-        return state.storage.get("journey-marker");
-      },
-    ),
-  ).toBeUndefined();
-  expect(await codeModePlatformGovernor(env).ping()).toMatchObject({
-    ok: true,
   });
 
   // The live Organisation's Actors still answer.

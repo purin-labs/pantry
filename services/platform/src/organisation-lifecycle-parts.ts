@@ -22,7 +22,6 @@ import {
   prepareSlackInstallationRevocation,
 } from "./data/slack-installation-records";
 import {
-  directorySlackRecordCount,
   directorySlackRecordDeletions,
 } from "./slack/organisation-routing";
 import {
@@ -113,8 +112,6 @@ export const ORGANISATION_LIFECYCLE_PARTS: OrganisationLifecycleParts = {
     },
     directoryRecordDeletions: (directory, organisationId) =>
       directorySlackRecordDeletions(directory, organisationId),
-    directoryRecordCount: (directory, organisationId) =>
-      directorySlackRecordCount(directory, organisationId),
     slackInstallationRevocation: (directory, input) =>
       prepareSlackInstallationRevocation(directory, input),
     slackInstallationCredentialMove: (directory, input) =>

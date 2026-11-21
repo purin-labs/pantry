@@ -287,16 +287,6 @@ export class CodeModePlatformGovernorActor extends DurableObject<Env> {
     );
   }
 
-  /**
-   * Empties a governor of an earlier name. The operator route calls it only
-   * for an object that is not the governor of this build.
-   */
-  async eraseUnregisteredState(): Promise<Result<null, never>> {
-    await this.ctx.storage.deleteAlarm();
-    await this.ctx.storage.deleteAll();
-    return { ok: true, value: null };
-  }
-
   async ping(): Promise<CodeModePlatformGovernorPing> {
     return { ok: true, kind: "code-mode-platform-governor" };
   }
