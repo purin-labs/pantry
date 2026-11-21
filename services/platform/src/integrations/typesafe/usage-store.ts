@@ -125,23 +125,6 @@ export function readTypeSafeInFlightCount(
 /** Called inside the owning Actor's synchronous schema transaction. */
 export function createTypeSafeUsageSchema(sql: SqlStorage): void {
   sql.exec(typeSafeEvaluationTable("typesafe_evaluation"));
-  // Plan 88: each row names who funds the call. Older rows read as the Organisation's key.
-  const columns = sql
-    .exec<{ name: string }>("PRAGMA table_info(typesafe_evaluation)")
-    .toArray();
-  if (!columns.some((column) => column.name === "funding"))
-    sql.exec(
-      "ALTER TABLE typesafe_evaluation ADD COLUMN funding TEXT CHECK (funding IN ('satyr_platform', 'organisation_byo'))",
-    );
-  // Plan 87 section 3A adds the purpose `screen_relevance`. SQLite cannot
-  // change a CHECK, so a table from before it is copied into a new one.
-  const stored = sql
-    .exec<{ sql: string }>(
-      "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'typesafe_evaluation'",
-    )
-    .toArray()[0];
-  if (stored !== undefined && !stored.sql.includes("'screen_relevance'"))
-    rebuildTypeSafeEvaluationTable(sql);
   sql.exec(`CREATE INDEX IF NOT EXISTS typesafe_evaluation_budget
     ON typesafe_evaluation (organisation_id, purpose, reserved_at)`);
   sql.exec(`CREATE INDEX IF NOT EXISTS typesafe_evaluation_funding_month
@@ -175,18 +158,6 @@ const TYPESAFE_EVALUATION_COLUMNS = [
   "settlement_state",
   "failure_code",
 ] as const;
-
-function rebuildTypeSafeEvaluationTable(sql: SqlStorage): void {
-  sql.exec(typeSafeEvaluationTable("typesafe_evaluation_next"));
-  const columns = TYPESAFE_EVALUATION_COLUMNS.join(", ");
-  sql.exec(
-    `INSERT INTO typesafe_evaluation_next (${columns}) SELECT ${columns} FROM typesafe_evaluation`,
-  );
-  sql.exec("DROP TABLE typesafe_evaluation");
-  sql.exec(
-    "ALTER TABLE typesafe_evaluation_next RENAME TO typesafe_evaluation",
-  );
-}
 
 function typeSafeEvaluationTable(name: string): string {
   // Withdrawn Plan 48 purposes stay in the CHECK so retained historical usage rows remain valid.
