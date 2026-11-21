@@ -94,7 +94,6 @@ import {
   runAlarmStepsTogether,
 } from "../lifecycle/actor-alarm";
 import {
-  APPROVAL_MISSING_ACTION_LAPSE_MS,
   caseAlarmReconcilers,
   caseWakeAlarmAt,
   commerceApprovalsToRead,
@@ -128,7 +127,6 @@ import {
   serializeCaseProposalAcceptance,
   serializeCaseSnapshot,
   serializeOutputLifecycle,
-  readCommerceApproval,
 } from "./context-source";
 import {
   acceptCaseProposalWithProjections,
@@ -161,7 +159,6 @@ import {
   acceptCommerceEntityPlaneProposal,
   acceptCommerceOutcome,
   acceptCommerceProposal,
-  lapseCommerceApproval,
   reconcileCommerceApprovalWait,
   resolveCommerceApproval,
   waitForCommerceApproval,
@@ -967,10 +964,7 @@ export abstract class CaseActor
       });
       return invalid("case_commerce_approval_ledger_unavailable");
     }
-    if (!action.ok)
-      return action.error.code === "action_not_found"
-        ? this.lapseApprovalWithoutAction(organisationId, caseId, actionNonce)
-        : invalid("case_commerce_approval_ledger_unavailable");
+    if (!action.ok) return invalid("case_commerce_approval_ledger_unavailable");
     if (this.discarded || !actorExecutionAdmissionOpen(this.ctx.storage.sql))
       return invalid("case_not_open");
     const entry = action.value;
@@ -998,50 +992,6 @@ export abstract class CaseActor
       value: {
         kind: reconciled.value.kind,
         revision: readMeta(this.ctx.storage.sql)?.revision ?? 0,
-      },
-    };
-  }
-
-  /**
-   * Lapses a wait whose action the ledger does not hold, so no person can
-   * decide it and no read can end it. A wait younger than
-   * APPROVAL_MISSING_ACTION_LAPSE_MS stays, so its ledger entry can land.
-   */
-  private async lapseApprovalWithoutAction(
-    organisationId: OrganisationId,
-    caseId: string,
-    actionNonce: string,
-  ): Promise<CaseResult<CommerceApprovalSync>> {
-    const sql = this.ctx.storage.sql;
-    const now = Date.now();
-    const record = readCommerceApproval(sql, actionNonce);
-    if (
-      record?.kind !== "waiting" ||
-      now - record.request.requestedAt < APPROVAL_MISSING_ACTION_LAPSE_MS
-    )
-      return invalid("case_commerce_approval_ledger_unavailable");
-    if (this.discarded || !actorExecutionAdmissionOpen(sql))
-      return invalid("case_not_open");
-    const lapsed = this.ctx.storage.transactionSync(() =>
-      lapseCommerceApproval(sql, { caseId, actionNonce, lapsedAt: now }),
-    );
-    if (!lapsed.ok) return lapsed;
-    if (lapsed.value.kind === "lapsed") {
-      traceLog("case.commerce_approval_reconciled", {
-        requestId: newRequestId(),
-        organisation_id: organisationId,
-        case_id: caseId,
-        action_nonce: actionNonce,
-        outcome: "lapsed",
-        ledger_state: "action_not_found",
-      });
-      await this.rearm();
-    }
-    return {
-      ok: true,
-      value: {
-        kind: lapsed.value.kind,
-        revision: readMeta(sql)?.revision ?? 0,
       },
     };
   }

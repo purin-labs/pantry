@@ -23,11 +23,6 @@ const APPROVAL_READ_LATER_MS = 15 * 60_000;
 const APPROVAL_READ_FIRST_WINDOW_MS = 10 * 60_000;
 /** The most approval waits that one alarm reads from the ledger. */
 const APPROVAL_READ_PAGE = 10;
-/**
- * An approval whose action the ledger does not hold lapses only after this
- * age, so a wait never lapses before its ledger entry is written.
- */
-export const APPROVAL_MISSING_ACTION_LAPSE_MS = APPROVAL_READ_FIRST_WINDOW_MS;
 
 /**
  * The Case's alarm reconcilers. Each one retries its stored work every

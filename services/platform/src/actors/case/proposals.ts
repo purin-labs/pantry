@@ -601,7 +601,7 @@ export function resolveCommerceApproval(
  * before it ran. Nobody can approve or reject an expired action, so without
  * this the Case stays waiting and refuses every later trigger.
  */
-export function lapseCommerceApproval(
+function lapseCommerceApproval(
   sql: SqlStorage,
   input: Readonly<{ caseId: string; actionNonce: string; lapsedAt: number }>,
 ): CaseResult<{ readonly kind: "lapsed" | "not_waiting" }> {
