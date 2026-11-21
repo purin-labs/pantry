@@ -164,6 +164,7 @@ const SPECIFIC_RULES = [
   [/satyr-commerce/g, "builtin-commerce"],
 
   // Display names of the brand (AGENTS.md, "Old and new names").
+  [/\bSatyr(?:'s)? (?:Kitchen|BakeryOS)\b/g, "Kitchen"],
   [/\bSatyr Vault\b/g, "Seams Vault"],
   [/\bSatyr Agents\b/g, "Seams Pantry"],
   [/\bJev from Satyr\b/g, "Jev from Seams"],

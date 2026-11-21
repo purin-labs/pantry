@@ -389,6 +389,22 @@ removal" and of Refactor 260.
    longer keeps old names in a layer; the runtime, boundary, setup and
    deployment sections name the new stack and the release guard.
 
+**The freeze run.** When the owner opens the freeze, in the `plan-93`
+worktree:
+
+1. `git fetch origin`, then `git rebase origin/dev` without the codemod run
+   commit (drop it first: it is the tip, "Plan 93: run the cutover
+   codemod"). Resolve a conflict in the hand-written commits by hand.
+2. `pnpm install --prefer-offline --frozen-lockfile`, then
+   `node scripts/rename/plan-93-cutover.mjs --collisions`. Read each new
+   pair against the list above.
+3. `node scripts/rename/plan-93-cutover.mjs --write`, then commit every
+   change as "Plan 93: run the cutover codemod".
+4. Run the checks below again, and the `git grep`.
+5. Before the push: step 3.2 copies the large files to
+   `pantry-repo-binaries-apac`, because the code now reads that bucket. A
+   file that is not in the local cache of a machine needs the new bucket.
+
 **What keeps an old name on purpose** (the `git grep` exceptions):
 
 - The wake phrase "Hey Satyr", `hey_satyr.onnx` and the wake training
