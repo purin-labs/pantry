@@ -1,4 +1,4 @@
-import { isSideCaseProposalId, isUserId } from "@purin-labs/control-api";
+import { isSideCaseProposalId } from "@purin-labs/control-api";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import { isNonBlankString, isRecord } from "@purin-labs/std";
 
@@ -6,10 +6,10 @@ import { resolveActiveSlackThreadCredential } from "../credential-vault";
 import { parsePersonId } from "../data/person-authz";
 import type { Env } from "../env";
 import { parseChannelId, parseOrganisationId, parseWorkspaceId } from "../ids";
-import { parseUserId } from "@purin-labs/control-api/ids";
 import type { SlackCaseCommand } from "../slack/case-command-message";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "../request-authority";
+import { resolveSlackLinkedMember } from "./action-mutation-execution";
 import { deriveSlackCaseRouteIdentities } from "../slack/case-routing";
 import {
   deriveSlackSessionId,
@@ -99,10 +99,7 @@ export async function postSlackSideCaseProposal(
   context: ConnectorSideCaseContext,
   input: SlackSideCaseProposalPost,
 ): Promise<boolean> {
-  const parked = readParkedSlackSideCase(
-    context.storage.sql,
-    input.proposalId,
-  );
+  const parked = readParkedSlackSideCase(context.storage.sql, input.proposalId);
   if (parked === null) throw new Error("connector_side_case_not_found");
   if (parked.proposalTs !== null) return true;
   const token = await threadToken(context, parked.command);
@@ -300,8 +297,7 @@ export async function startSlackSideCase(
 }
 
 type StepResult<T> =
-  | ({ readonly ok: true } & T)
-  | { readonly ok: false; readonly reason: string };
+  ({ readonly ok: true } & T) | { readonly ok: false; readonly reason: string };
 
 /** Post the root of the new thread, or find the one posted before. */
 async function ensureSideCaseThread(
@@ -419,49 +415,27 @@ async function resolveSideCaseStarter(
     source.event.author !== slackUserId
   )
     return null;
-  const row = await scope.database
-    .prepare(
-      `SELECT identity_link.user_id AS userId, membership.person_id AS personId,
-              membership.role AS role
-       FROM integration_account AS account
-       JOIN external_identity_link AS identity_link
-         ON identity_link.organisation_id = account.organisation_id
-        AND identity_link.workspace_connection_id = account.provider_connection_id
-        AND identity_link.workspace_id = ? AND identity_link.external_user_id = ?
-       JOIN service_role_grant AS membership
-         ON membership.organisation_id = identity_link.organisation_id
-        AND membership.user_id = identity_link.user_id AND membership.status = 'active'
-       WHERE account.organisation_id = ? AND account.integration_account_id = ?
-         AND account.provider = 'slack' AND account.lifecycle = 'active'`,
-    )
-    .bind(
-      source.event.workspaceId,
-      slackUserId,
-      source.organisationId,
-      source.integrationAccountId,
-    )
-    .first<{
-      readonly userId: unknown;
-      readonly personId: unknown;
-      readonly role: unknown;
-    }>();
-  if (row === null || !isUserId(row.userId)) return null;
-  const userId = parseUserId(row.userId);
-  const personId = parsePersonId(row.personId);
-  if (
-    !userId.ok ||
-    personId === null ||
-    (row.role !== "owner" && row.role !== "admin" && row.role !== "operator")
-  )
+  const member = await resolveSlackLinkedMember(scope.database, {
+    organisationId: source.organisationId,
+    integrationAccountId: source.integrationAccountId,
+    workspaceId: source.event.workspaceId,
+    slackUserId,
+  });
+  const personId = member === null ? null : parsePersonId(member.personId);
+  if (member === null || personId === null || member.role === "viewer")
     return null;
   const authority = await refreshSlackRequestAuthority(scope.database, {
     ...source.requestAuthority,
     requesterPersonId: personId,
-    role: row.role,
+    role: member.role,
   });
   return authority === null
     ? null
-    : { userId: userId.value, principalId: personId, requestAuthority: authority };
+    : {
+        userId: member.userId,
+        principalId: personId,
+        requestAuthority: authority,
+      };
 }
 
 /** The identities of the new thread's Case and of its first message. */

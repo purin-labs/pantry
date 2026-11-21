@@ -44,6 +44,10 @@ import {
   upsertProjectionTombstone,
 } from "./commerce-projection/cues";
 import {
+  PositionStockTracker,
+  type InventoryStockChange,
+} from "./commerce-projection/stock-changes";
+import {
   invalidEvent,
   isLabNamespace,
   isProjectionKind,
@@ -579,10 +583,16 @@ export function parseCommerceCueFacts(
   return { ok: true, value: facts };
 }
 
+/**
+ * Applies one canonical delivery. When `stockChanges` is given, each applied
+ * change of an inventory position's available stock is added to it, with the
+ * stock before and after the change (Plan 24: the bake stock levels).
+ */
 export function applyCommerceDelivery(
   sql: SqlStorage,
   input: ApplyCommerceDeliveryInput,
   commerceSystem: CommerceSystemStorageAuthority,
+  stockChanges?: InventoryStockChange[],
 ): Result<AppliedCommerceDeliveryResult, CommerceProjectionError> {
   if (!isNonNegativeInteger(input.processedAt)) {
     return invalidEvent("processedAt");
@@ -666,6 +676,7 @@ export function applyCommerceDelivery(
     readonly parsed: InspectedCommerceObservation;
     readonly disposition: CommerceObservationDisposition;
   }> = [];
+  const positions = new PositionStockTracker();
   for (const observation of parsed.value.observations) {
     const current = readProjection(
       sql,
@@ -740,6 +751,8 @@ export function applyCommerceDelivery(
       };
     }
     outcomes.push({ parsed: observation, disposition: "applied" });
+    const change = positions.change(current, observation);
+    if (change !== null) stockChanges?.push(change);
   }
 
   insertDeliveryReceipt(sql, input, parsed.value, commerceSystem);

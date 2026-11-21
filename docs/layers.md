@@ -321,8 +321,9 @@ import. A module with no line for one of these has none.
 
 ## areas/kitchen
 
-- Folders: 30
+- Folders: 32
   - `apps/portal/src/features/`
+  - `apps/portal/src/features/bakes/`
   - `apps/portal/src/features/costs/`
   - `apps/portal/src/features/production-run/`
   - `apps/portal/src/features/production-run/black-sesame/`
@@ -351,9 +352,10 @@ import. A module with no line for one of these has none.
   - `services/platform/src/control/admission/`
   - `services/platform/src/control/routes/`
   - `services/platform/src/data/`
+  - `services/platform/src/kitchen/bakes/`
   - `services/platform/src/kitchen/contract/`
 - Packages: `packages/bakery-model`, `packages/bakery-workflow`, `packages/costs-sheet-crdt`, `packages/kitchen-control-api`, `packages/production-plan-crdt`, `packages/production-simulation`, `packages/workflow-canvas-crdt`
-- Tables (9): `bakery_agent_run_save`, `bakery_agent_scenario_save`, `bakery_cost_plan`, `bakery_cost_product_plan`, `bakery_lot_invoice_cost`, `bakery_surface_effect_delivery`, `bakery_surface_timeline_event`, `bakery_workflow`, `bakery_workflow_revision`
+- Tables (13): `bake_authority`, `bake_proposal`, `bake_run`, `bake_stock_level`, `bakery_agent_run_save`, `bakery_agent_scenario_save`, `bakery_cost_plan`, `bakery_cost_product_plan`, `bakery_lot_invoice_cost`, `bakery_surface_effect_delivery`, `bakery_surface_timeline_event`, `bakery_workflow`, `bakery_workflow_revision`
 - Public files: `apps/portal/src/features/bakery-browser-context.ts`, `services/platform/src/agent-tools/bakery/surface-result.ts`, `services/platform/src/agent-tools/kitchen/services.ts`, `services/platform/src/kitchen/contract/`
 
 ## areas/organisation

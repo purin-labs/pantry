@@ -1,5 +1,5 @@
 {
-  "files": ["services/platform/src/devices/work.ts"],
+  "files": [],
   "exports": [
     "apps/portal/src/features/terminals/counter-sale-api.ts#manualCashRefundCounterSale",
     "apps/portal/src/features/terminals/counter-sale-api.ts#openCounterSale",
@@ -11,7 +11,6 @@
     "services/platform/src/credential-vault/index.ts#commandVaultItem",
     "services/platform/src/credential-vault/index.ts#createVaultItem",
     "services/platform/src/credential-vault/index.ts#listVaultItems",
-    "services/platform/src/devices/views.ts#readKitchenDeviceView",
     "services/platform/tests/e2e/full-worker.ts#CodeModePlatformGovernorActor",
     "services/platform/tests/e2e/full-worker.ts#FullCase",
     "services/platform/tests/e2e/full-worker.ts#FullClient",

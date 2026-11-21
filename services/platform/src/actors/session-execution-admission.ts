@@ -289,6 +289,7 @@ export function admittedSessionModelRoute(
     case "organisation_openai_api_key":
     case "organisation_claude_oauth":
     case "organisation_anthropic_api_key":
+    case "organisation_google_api_key":
       return {
         kind: route.kind,
         providerFetch: route.providerFetch,

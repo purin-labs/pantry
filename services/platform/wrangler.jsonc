@@ -55,6 +55,11 @@
       "type": "durable-object",
       "storage": "sqlite",
     },
+    // Plan 24 S4: one approved bake run with two cobots and the oven.
+    "BakeRunActor": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
     "WorkspaceExecutorContainer": {
       "type": "durable-object",
       "storage": "sqlite",
@@ -197,6 +202,10 @@
           {
             "name": "DEVICE_FLEET",
             "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "BAKE_RUN",
+            "class_name": "BakeRunActor",
           },
           {
             "name": "WORKSPACE_EXECUTOR",
@@ -464,6 +473,10 @@
           {
             "name": "DEVICE_FLEET",
             "class_name": "DeviceFleetActor",
+          },
+          {
+            "name": "BAKE_RUN",
+            "class_name": "BakeRunActor",
           },
           {
             "name": "WORKSPACE_EXECUTOR",

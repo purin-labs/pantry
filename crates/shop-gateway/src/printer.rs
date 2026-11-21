@@ -26,10 +26,13 @@ use std::fs;
 use std::io::{Read, Write};
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::path::{Path, PathBuf};
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
+
+use crate::journal::{self, now_seconds};
+use crate::str_field;
 
 /// Characters on one line of 72 mm print in the standard font.
 pub const COLUMNS: usize = 48;
@@ -426,9 +429,6 @@ struct JournalEntry {
     at_seconds: u64,
 }
 
-/// A request keeps its record for this long, longer than any socket drop.
-const JOURNAL_DAYS: u64 = 7;
-
 pub struct Printers {
     lan: Vec<LanPrinter>,
     simulated: Vec<SimulatedPrinter>,
@@ -440,24 +440,10 @@ pub struct Printers {
 
 impl Printers {
     pub fn load(folder: &Path, simulated: Vec<SimulatedPrinter>) -> Result<Self, String> {
-        let config = folder.join("printers.json");
-        let lan = if config.exists() {
-            let text = fs::read_to_string(&config)
-                .map_err(|error| format!("{}: {error}", config.display()))?;
-            serde_json::from_str(&text).map_err(|error| format!("{}: {error}", config.display()))?
-        } else {
-            Vec::new()
-        };
+        let lan = journal::load(&folder.join("printers.json"))?;
         let journal_path = folder.join("printer-journal.json");
-        let mut journal: BTreeMap<String, JournalEntry> = if journal_path.exists() {
-            let text = fs::read_to_string(&journal_path)
-                .map_err(|error| format!("{}: {error}", journal_path.display()))?;
-            serde_json::from_str(&text)
-                .map_err(|error| format!("{}: {error}", journal_path.display()))?
-        } else {
-            BTreeMap::new()
-        };
-        let oldest = now_seconds().saturating_sub(JOURNAL_DAYS * 24 * 60 * 60);
+        let mut journal: BTreeMap<String, JournalEntry> = journal::load(&journal_path)?;
+        let oldest = journal::oldest_kept();
         journal.retain(|_, entry| entry.at_seconds >= oldest);
         Ok(Self {
             lan,
@@ -518,16 +504,7 @@ impl Printers {
     }
 
     fn persist(&self) -> Result<(), String> {
-        if let Some(parent) = self.journal_path.parent() {
-            fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-        }
-        let body =
-            serde_json::to_string_pretty(&self.journal).map_err(|error| error.to_string())?;
-        // Write a new file and rename it, so a power cut leaves one whole journal.
-        let next = self.journal_path.with_extension("json.next");
-        fs::write(&next, body).map_err(|error| format!("{}: {error}", next.display()))?;
-        fs::rename(&next, &self.journal_path)
-            .map_err(|error| format!("{}: {error}", self.journal_path.display()))
+        journal::save(&self.journal_path, &self.journal)
     }
 
     /// Answers one `receipt_print` or `cash_drawer_kick` message. The answer is
@@ -752,18 +729,4 @@ fn result(
         "outcome": outcome.as_str(),
         "replayed": replayed,
     })
-}
-
-fn str_field<'a>(value: &'a Value, name: &str) -> Result<&'a str, String> {
-    value
-        .get(name)
-        .and_then(Value::as_str)
-        .ok_or_else(|| format!("missing {name}"))
-}
-
-fn now_seconds() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|elapsed| elapsed.as_secs())
-        .unwrap_or(0)
 }

@@ -13,6 +13,7 @@ import {
   signedSlackRequest,
   slackEnvelope,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 // Six parts of a long answer. They arrive 400 ms apart, so the Connector
 // releases them in several parts of about one second each.
@@ -200,7 +201,7 @@ function textChunk(id: string, text: string): Record<string, unknown> {
     id,
     object: "chat.completion.chunk",
     created: 1_787_500_000,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [
       {
         index: 0,
@@ -216,7 +217,7 @@ function stopChunk(id: string): Record<string, unknown> {
     id,
     object: "chat.completion.chunk",
     created: 1_787_500_000,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
     usage: { prompt_tokens: 20, completion_tokens: 120, total_tokens: 140 },
   };

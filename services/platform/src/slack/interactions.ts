@@ -17,7 +17,6 @@ import {
   type WorkspaceId,
 } from "../ids";
 import { traceLog, traceWarn } from "../observability";
-import { RequestDeadline } from "../request-deadline";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
 import { resolveOrClaimSlackThreadRoute } from "./organisation-routing";
@@ -27,8 +26,20 @@ import {
   SLACK_COMMERCE_DECLINE_ACTION,
 } from "./commerce-approval-card";
 import { decideCommerceActionFromSlack } from "./commerce-approval";
+import {
+  decideBakeProposalFromSlack,
+  type BakeDecisionClick,
+} from "./bake-proposal-decision";
+import {
+  SLACK_BAKE_APPROVE_ACTION,
+  SLACK_BAKE_REASON_ACTION,
+  SLACK_BAKE_REASON_BLOCK,
+  SLACK_BAKE_REJECT_ACTION,
+} from "./bake-proposal-card";
+import { SLACK_BAKE_RUN_PAUSE_ACTION } from "./bake-run-card";
 import { SLACK_PERMISSION_DENY_ACTION } from "./permission-request-notice";
 import { denyPermissionRequestFromSlack } from "./permission-request-deny";
+import { tellClicker } from "./interaction-reply";
 import { verifySlackSignature } from "./signature";
 
 /**
@@ -88,6 +99,9 @@ export async function handleSlackInteractions(
     ctx.waitUntil(decideFromClick(env, decision, requestId));
   const denial = parsePermissionDenyClick(rawBody);
   if (denial !== null) ctx.waitUntil(denyFromClick(env, denial, requestId));
+  const bake = parseBakeDecisionClick(rawBody);
+  if (bake !== null)
+    ctx.waitUntil(decideBakeProposalFromSlack(env, bake, requestId));
   return new Response(null, { status: 200 });
 }
 
@@ -133,10 +147,11 @@ function parseClickEnvelope(rawBody: string): ClickEnvelope | null {
     !payload.response_url.startsWith(SLACK_RESPONSE_URL_PREFIX)
   )
     return null;
-  // The message names its thread; the container names it too.
-  const threadTs = [payload.message, payload.container]
-    .map(threadOf)
-    .find(isSlackMessageTs);
+  // The message names its thread; the container names it too. A card that
+  // opens its own thread, such as a bake proposal's, is the thread's root.
+  const threadTs =
+    [payload.message, payload.container].map(threadOf).find(isSlackMessageTs) ??
+    [payload.message, payload.container].map(rootOf).find(isSlackMessageTs);
   if (threadTs === undefined) return null;
   const appId = parseSlackAppId(payload.api_app_id);
   const workspaceId = parseWorkspaceId(payload.team.id);
@@ -235,6 +250,63 @@ async function decideFromClick(
   });
 }
 
+/**
+ * A click on Approve or Reject of a bake proposal's card (Plan 24 S1), with
+ * the text of the card's reason field.
+ */
+function parseBakeDecisionClick(rawBody: string): BakeDecisionClick | null {
+  const envelope = parseClickEnvelope(rawBody);
+  const action = envelope?.actions.find(isBakeDecisionAction);
+  if (envelope === null || action === undefined) return null;
+  const { actions: _actions, ...fields } = envelope;
+  return {
+    ...fields,
+    proposalId: action.value,
+    action:
+      action.action_id === SLACK_BAKE_RUN_PAUSE_ACTION
+        ? { kind: "pause" }
+        : {
+            kind: "decide",
+            decision:
+              action.action_id === SLACK_BAKE_REJECT_ACTION
+                ? "reject"
+                : "approve",
+            reason: bakeReasonOf(rawBody),
+          },
+  };
+}
+
+/** Approve or Reject of a proposal's card, or Pause of its run's card. */
+function isBakeDecisionAction(
+  action: unknown,
+): action is Readonly<{ action_id: string; value: string }> {
+  return (
+    isRecord(action) &&
+    action.type === "button" &&
+    (action.action_id === SLACK_BAKE_APPROVE_ACTION ||
+      action.action_id === SLACK_BAKE_REJECT_ACTION ||
+      action.action_id === SLACK_BAKE_RUN_PAUSE_ACTION) &&
+    typeof action.value === "string" &&
+    BAKE_PROPOSAL_ID.test(action.value)
+  );
+}
+
+const BAKE_PROPOSAL_ID = /^bake_[a-f0-9]{24}$/u;
+
+/** The text of the card's reason field when the person clicked. */
+function bakeReasonOf(rawBody: string): string | null {
+  const payload = parseJsonOrNull(
+    new URLSearchParams(rawBody).get("payload") ?? "",
+  );
+  const values =
+    isRecord(payload) && isRecord(payload.state) ? payload.state.values : null;
+  const block = isRecord(values) ? values[SLACK_BAKE_REASON_BLOCK] : null;
+  const field = isRecord(block) ? block[SLACK_BAKE_REASON_ACTION] : null;
+  return isRecord(field) && typeof field.value === "string"
+    ? field.value
+    : null;
+}
+
 /** A click on Deny: the click's fields, with the permission request's id. */
 type PermissionDenyClick = Omit<SideCaseStartClick, "proposalId"> &
   Readonly<{ permissionRequestId: string }>;
@@ -294,6 +366,10 @@ async function denyFromClick(
 
 function threadOf(value: unknown): unknown {
   return isRecord(value) ? value.thread_ts : undefined;
+}
+
+function rootOf(value: unknown): unknown {
+  return isRecord(value) ? (value.message_ts ?? value.ts) : undefined;
 }
 
 function isSlackMessageTs(value: unknown): value is string {
@@ -424,27 +500,10 @@ async function tellStarter(
   requestId: RequestId,
   text: string,
 ): Promise<void> {
-  const deadline = new RequestDeadline(5_000);
-  try {
-    const response = await fetch(click.responseUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json; charset=utf-8" },
-      signal: deadline.signal,
-      body: JSON.stringify({
-        response_type: "ephemeral",
-        replace_original: false,
-        text,
-      }),
-    });
-    await response.body?.cancel();
-  } catch (error) {
+  if (!(await tellClicker(click.responseUrl, text)))
     traceWarn("integration_gateway.slack.side_case_notice_failed", {
       requestId,
       channel_id: click.channelId,
       proposal_id: click.proposalId,
-      detail: errorMessage(error),
     });
-  } finally {
-    deadline.end();
-  }
 }

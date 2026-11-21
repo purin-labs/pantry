@@ -298,6 +298,8 @@ function recipientName(
       return "OpenAI";
     case "anthropic":
       return "Anthropic";
+    case "google":
+      return "Google";
   }
 }
 function errorText(error: unknown): string {

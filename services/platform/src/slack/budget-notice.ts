@@ -1,6 +1,6 @@
+import { workspacePortalUrl } from "./portal-links";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
 import { noticeCardBlocks } from "./notice-card";
 
 /**
@@ -40,9 +40,7 @@ export function aiBudgetPortalUrl(
   env: Env,
   address: Readonly<{ organisationHandle: string; workspaceHandle: string }>,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/access?aiBudget=raise`;
+  return workspacePortalUrl(env, address, "access?aiBudget=raise");
 }
 
 /**

@@ -1,11 +1,16 @@
 import type { OrganisationDatabase } from "../database-handles";
-import type { DeviceAlertSetting, DeviceConnection } from "@purin-labs/control-api";
-import type { ConnectorDelivery } from "@purin-labs/contracts";
+import type {
+  DeviceAlertSetting,
+  DeviceConnection,
+} from "@purin-labs/control-api";
 
-import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
+import { deliverOperationsCard } from "../actors/operations-channel";
+import {
+  readOperationsDestination,
+  type OperationsDestination,
+} from "../data/operations-destination";
 import type { Env } from "../env";
-import { newRequestId, parseConnectorId, type OrganisationId } from "../ids";
-import { traceWarn } from "../observability";
+import type { OrganisationId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   deviceAlertNoticeDeliveryId,
@@ -278,18 +283,8 @@ export async function deliverDeviceAlerts(
     .bind(organisationId)
     .all<AlertRow>();
   if (rows.results.length === 0) return false;
-  const destination = await db
-    .prepare(
-      `SELECT integration_account_id, workspace_id, channel_id
-         FROM organisation_communication_destination
-        WHERE organisation_id = ?`,
-    )
-    .bind(organisationId)
-    .first<{
-      integration_account_id: string;
-      workspace_id: string;
-      channel_id: string;
-    }>();
+  const read = await readOperationsDestination(db, organisationId);
+  const destination = read.ok ? read.value : null;
   let remaining = false;
   for (const alert of rows.results) {
     // An incident that ended before its card went out needs no card. A shop
@@ -354,14 +349,10 @@ async function markDelivered(
     .run();
 }
 
-async function deliver(
+function deliver(
   env: Env,
   scope: OrganisationExecutionScope,
-  destination: Readonly<{
-    integration_account_id: string;
-    workspace_id: string;
-    channel_id: string;
-  }>,
+  destination: OperationsDestination,
   input: Readonly<{
     deliveryId: string;
     alertId: string;
@@ -370,61 +361,19 @@ async function deliver(
     now: number;
   }>,
 ): Promise<boolean> {
-  const connectorId = parseConnectorId(
-    `connector_slack_${destination.integration_account_id}`,
-  );
-  if (!connectorId.ok) return false;
-  const delivery = {
-    deliveryId: input.deliveryId,
-    bindingId: `device_alert_binding_${input.alertId}`,
-    address: {
-      kind: "slack_channel",
-      workspaceId: destination.workspace_id,
-      channelId: destination.channel_id,
+  return deliverOperationsCard(
+    env,
+    scope,
+    destination,
+    {
+      deliveryId: input.deliveryId,
+      bindingId: `device_alert_binding_${input.alertId}`,
+      caseId: `device_alert_case_${input.alertId}`,
+      caseRevision: input.revision,
+      text: input.text,
+      idempotencyKey: `device_alert:${input.deliveryId}`,
+      trace: "devices.alert",
     },
-    caseId: `device_alert_case_${input.alertId}`,
-    caseRevision: input.revision,
-    content: { kind: "text", text: input.text },
-    idempotencyKey: `device_alert:${input.deliveryId}`,
-    addressedAt: input.now,
-  } as ConnectorDelivery;
-  try {
-    const connector = await resolveActiveConnectorActorAtPlacement({
-      env,
-      namespace: env.CONNECTOR,
-      organisationId: scope.organisationId,
-      connectorId: connectorId.value,
-      placement: scope.placement,
-      now: input.now,
-    });
-    if (!connector.ok) return false;
-    const result = await connector.value.deliver({
-      identity: {
-        organisationId: scope.organisationId,
-        connectorId: connectorId.value,
-      },
-      delivery,
-      requestedAt: input.now,
-    });
-    if (
-      result.ok &&
-      (result.value.kind === "delivered" ||
-        result.value.kind === "already_delivered")
-    )
-      return true;
-    traceWarn("devices.alert_delivery_held", {
-      requestId: newRequestId(),
-      organisationId: scope.organisationId,
-      alertId: input.alertId,
-      outcome: result.ok ? result.value.kind : result.error.code,
-    });
-    return false;
-  } catch {
-    traceWarn("devices.alert_delivery_failed", {
-      requestId: newRequestId(),
-      organisationId: scope.organisationId,
-      alertId: input.alertId,
-    });
-    return false;
-  }
+    input.now,
+  ).then((ts) => ts !== null);
 }

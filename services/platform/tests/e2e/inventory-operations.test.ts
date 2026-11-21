@@ -13,7 +13,6 @@ import {
 } from "@purin-labs/kitchen-control-api";
 import {
   CommerceAdminClient,
-  CommerceStorefrontClient,
   CommerceEntityPlaneClient,
   parseCommerceGraphQuery,
   parseEntityPlaneCommand,
@@ -33,6 +32,7 @@ import {
   connectCommerceFixture,
 } from "./commerce-support";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
+import { placePickupOrder } from "./cafe-order-support";
 
 it(
   "reconciles supplier deliveries, counts, linked production and fulfilled or cancelled orders",
@@ -64,12 +64,16 @@ async function inventoryJourney(context: TestContext): Promise<void> {
     merchantId,
   );
   await fixtureDatabase().batch([
-    fixtureDatabase().prepare(
-      "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_inventory_viewer', 'Viewer')",
-    ).bind(organisationId),
-    fixtureDatabase().prepare(
-      "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_inventory_viewer', 'viewer', 'active', ?, NULL)",
-    ).bind(organisationId, viewer.identity.userId, Date.now()),
+    fixtureDatabase()
+      .prepare(
+        "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, 'person_inventory_viewer', 'Viewer')",
+      )
+      .bind(organisationId),
+    fixtureDatabase()
+      .prepare(
+        "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, 'person_inventory_viewer', 'viewer', 'active', ?, NULL)",
+      )
+      .bind(organisationId, viewer.identity.userId, Date.now()),
   ]);
   // Commerce routes admit only an Organisation that the account authority knows.
   await attachSharedAccountNativeOrganisation({
@@ -77,7 +81,11 @@ async function inventoryJourney(context: TestContext): Promise<void> {
     owner,
     members: { privateMember: viewer },
   });
-  const journey = new InventoryJourney(organisationId, merchantId, owner.session);
+  const journey = new InventoryJourney(
+    organisationId,
+    merchantId,
+    owner.session,
+  );
   await required(
     journey.native.provisionDemo({
       schemaVersion: "underclerk.provision-demo.v2",
@@ -778,77 +786,13 @@ class InventoryJourney {
       receivedAt: this.now,
     };
   }
-  async placeOrder(key: string, quantity: number) {
-    const buyer = new CommerceStorefrontClient({
-      baseUrl: "http://underclerk.test",
-      fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
-    });
-    const session = await required(
-      buyer.createSession(this.merchantId, "storefront_cafe", {
-        schemaVersion: "underclerk.create-buyer-session.v1",
-        buyer: { kind: "guest" },
-      }),
+  placeOrder(key: string, quantity: number) {
+    return placePickupOrder(
+      this.merchantId,
+      "storefront_cafe",
+      [{ kind: "catalog", variantId: "variant_sesame_cookie", quantity }],
+      { key, email: "buyer@example.test" },
     );
-    const cart = await required(
-      buyer.createCart(this.merchantId, "storefront_cafe", session.token, {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
-        idempotencyKey: `cart-${key}`,
-        lines: [
-          { kind: "catalog", variantId: "variant_sesame_cookie", quantity },
-        ],
-      }),
-    );
-    const checkout = await required(
-      buyer.createPickupCheckout(
-        this.merchantId,
-        "storefront_cafe",
-        session.token,
-        {
-          schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
-          idempotencyKey: `checkout-${key}`,
-          cartId: cart.cartId,
-          cartRevision: cart.revision,
-          buyer: {
-            kind: "guest",
-            contact: { kind: "email", email: "buyer@example.test" },
-          },
-        },
-      ),
-    );
-    const paymentSession = await required(
-      buyer.createPaymentSession(
-        this.merchantId,
-        "storefront_cafe",
-        checkout.checkoutId,
-        session.token,
-        {
-          schemaVersion: "underclerk.create-buyer-payment-session.v1",
-          idempotencyKey: `payment-${key}`,
-          checkoutRevision: checkout.revision,
-          quoteDigest: checkout.quote.quoteDigest,
-          returnUrl: "https://underclerk.test/return",
-        },
-      ),
-    );
-    if (paymentSession.state !== "ready")
-      throw new Error("Payment session unavailable");
-    const placed = await required(
-      buyer.reconcilePayment(
-        this.merchantId,
-        "storefront_cafe",
-        checkout.checkoutId,
-        session.token,
-        {
-          schemaVersion: "underclerk.reconcile-buyer-payment.v1",
-          idempotencyKey: `payment-${key}`,
-          checkoutRevision: paymentSession.checkoutRevision,
-          quoteDigest: checkout.quote.quoteDigest,
-          confirmation: { kind: "provider_ui_completed" },
-        },
-      ),
-    );
-    if (placed.state !== "placed") throw new Error(`Payment ${placed.state}`);
-    return placed;
   }
   async fulfill(orderId: string) {
     let target = await this.orderTarget(orderId);
@@ -1083,9 +1027,10 @@ async function verifyAdjustmentQueueFailure(
   ]);
   expect(await unread()).toHaveLength(0);
   // Lose the control receipt after native commit, then retry the frozen submission against fresh stock.
-  await fixtureDatabase().prepare(
-    "DELETE FROM control_mutation_receipt WHERE organisation_scope = ? AND idempotency_key = ?",
-  )
+  await fixtureDatabase()
+    .prepare(
+      "DELETE FROM control_mutation_receipt WHERE organisation_scope = ? AND idempotency_key = ?",
+    )
     .bind(journey.organisationId, "queue-failed-adjustment")
     .run();
   const refreshed = await journey.context(itemId);

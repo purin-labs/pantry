@@ -1,4 +1,5 @@
 import { deviceCommandSchemaStatements } from "./device-command";
+import { cobotDispatchSchemaStatements } from "./device-fleet-cobot";
 import { printerJobSchemaStatements } from "./device-fleet-printer";
 import { terminalCollectionSchemaStatements } from "./device-fleet-terminal";
 import {
@@ -13,7 +14,7 @@ import {
  * Actor created before it had a plan, so an Actor with those tables applies
  * the baseline as no change. Version 2 adds `device_command` (Refactor 15,
  * refactor 6), version 3 `terminal_collection` and version 4 `printer_job`
- * (Plan 90).
+ * (Plan 90). Version 5 adds `cobot_dispatch` and `cobot_run_watch` (Plan 24).
  */
 const DEVICE_FLEET_SCHEMA_V1: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS device_fleet_scope (
@@ -50,7 +51,7 @@ const DEVICE_FLEET_V1_TABLES = [
 
 const DEVICE_FLEET_SCHEMA_PLAN: SchemaMigrationPlan = {
   key: "device_fleet",
-  currentVersion: 4,
+  currentVersion: 5,
   preservedTables: DEVICE_FLEET_V1_TABLES,
   baseline: {
     version: 1,
@@ -125,6 +126,37 @@ const DEVICE_FLEET_SCHEMA_PLAN: SchemaMigrationPlan = {
           "created_at",
           "updated_at",
         ]);
+      },
+    },
+    {
+      // Plan 24 S4: the cobot dispatch ledger and the runs that watch devices.
+      version: 5,
+      apply: (sql) => {
+        for (const statement of cobotDispatchSchemaStatements())
+          sql.exec(statement);
+      },
+      validate: (sql) => {
+        validateV1(sql);
+        assertRequiredColumns(sql, "cobot_dispatch", [
+          "request_id",
+          "gateway_id",
+          "device_id",
+          "source_key",
+          "run_actor_id",
+          "run_id",
+          "task_id",
+          "message_json",
+          "state",
+          "last_report_json",
+          "created_at",
+          "updated_at",
+        ]);
+        assertRequiredColumns(sql, "cobot_run_watch", [
+          "run_actor_id",
+          "gateway_id",
+          "source_key",
+        ]);
+        assertRequiredColumns(sql, "cobot_run_known", ["run_actor_id"]);
       },
     },
   ],

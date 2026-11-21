@@ -8,6 +8,7 @@ import type {
 } from "../src/actors/embedded-harness";
 import type { CanonicalHarnessCheckpointInput } from "../src/actors/agent-session-harness-checkpoint";
 import type { CommitHarnessCheckpointInput } from "../src/actors/agent-session-harness-authority";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
 
 const invalidAuthorizedRead: AuthorizedHarnessToolResult = {
   kind: "read",
@@ -66,7 +67,7 @@ const modelRouteBranches: readonly ModelRoute[] = [
   {
     keySource: "platform",
     provider: "openai-compatible",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
   },
   {
     keySource: "organisation_byo",
@@ -94,7 +95,7 @@ const invalidPlatformModelProvider: ModelRoute = {
 const invalidOrganisationByoModelProvider: ModelRoute = {
   keySource: "organisation_byo",
   provider: "openai-compatible",
-  model: "moonshotai/kimi-k3",
+  model: PLATFORM_DEFAULT_PI_MODEL,
   byoKeyRef: "vault:organisation:model:openai:g1",
 };
 
@@ -118,7 +119,7 @@ const incompleteOrganisationOpenAiRoute: ModelRoute = {
 const mixedPlatformRoute: ModelRoute = {
   keySource: "platform",
   provider: "openai-compatible",
-  model: "moonshotai/kimi-k3",
+  model: PLATFORM_DEFAULT_PI_MODEL,
   byoKeyRef: "vault:organisation:model:openai:g1",
 };
 
@@ -135,7 +136,7 @@ const mixedSubscriptionRoute: ModelRoute = {
 const legacyOptionsRoute: ModelRoute = {
   keySource: "platform",
   provider: "openai-compatible",
-  model: "moonshotai/kimi-k3",
+  model: PLATFORM_DEFAULT_PI_MODEL,
   // @ts-expect-error Model routes have no options bag.
   options: null,
 };

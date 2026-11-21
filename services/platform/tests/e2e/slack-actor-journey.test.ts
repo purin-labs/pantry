@@ -21,6 +21,7 @@ import {
   slackEnvelope,
   slackSimulator,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 it(
   "composes duplicate and follow-up Slack work through one durable Case",
   acceptsSlackActorJourney,
@@ -121,7 +122,7 @@ async function acceptsSlackActorJourney(context: TestContext): Promise<void> {
   const actorState = await inspectSlackActors(fixture.connectorId);
   expect(model.requests).toHaveLength(2);
   expect(model.requests[0]).toMatchObject({
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     stream: true,
     provider: { sort: "throughput" },
   });
@@ -372,7 +373,7 @@ async function acceptsSlackActorJourney(context: TestContext): Promise<void> {
   }
   Object.assign(context.task.meta, {
     acceptance: {
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       providerSort: "throughput",
       sessionIds: model.sessionIds,
       modelRequestCount: model.requests.length,

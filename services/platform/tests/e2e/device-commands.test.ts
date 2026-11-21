@@ -126,7 +126,11 @@ async function nextMessage<Type extends "pause" | "snapshot">(
   const message = gateway.received
     .slice(before)
     .find((item) => item.type === type);
-  if (message === undefined || !("requestId" in message))
+  if (
+    message === undefined ||
+    !("requestId" in message) ||
+    !("sourceKey" in message)
+  )
     throw new Error(`No ${type}`);
   return { requestId: message.requestId, sourceKey: message.sourceKey };
 }

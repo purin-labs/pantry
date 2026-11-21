@@ -11,6 +11,41 @@ socket to the Platform. The shop opens no port.
 Run with no hardware: `shop-gateway run --simulate scripts/shop-gateway/simulation.json`.
 Plan 24 adds a typed adapter for each physical device.
 
+`shop-gateway relay` runs the same session as `run` on standard input and
+output, with no socket: each input line is one Platform message, or
+`{"relay":"connected"}` (the gateway sends its hello again) or
+`{"relay":"disconnected"}`. Each output line is one gateway message. The E2E
+journeys carry these lines to their simulated socket.
+
+## Cobots and the oven (Plan 24)
+
+The `cobot` adapter speaks the controller protocol: JSON lines over TCP, one
+connection for each device. Pantry sends named tasks (`cobot_task`,
+`cobot_inquire`) and `pause`, `resume` and `stop`; it never talks to a
+controller. Write `cobots.json` in the gateway's folder:
+
+```json
+{ "controllers": [{ "sourceKey": "cobot-1", "host": "127.0.0.1", "port": 47110 }] }
+```
+
+A `--simulate` file takes the same list as `cobots`. The adapter adds each
+controller's device to the hello. `cobot-journal.json` records each dispatch
+before the `submit`: a second `cobot_task` with the same `requestId` answers
+from the journal with `replayed: true` and sends nothing. After a reconnect to
+a controller, a welcome or a restart, the adapter asks `status` for each open
+task; it never submits again. A pause, a resume or a stop gets its `ack` after
+the controller answers, or `refused` after 5 s. The controller simulator is
+[`crates/bakery-native/controller`](../../crates/bakery-native/controller/README.md).
+The types of the controller lines are in `crates/cobot-protocol`. The adapter
+and the simulator both use that crate.
+
+While the journal holds an open task, the adapter sends `cobot_clock` at most
+one time each second. A bake run needs the clocks before its first task, so
+Pantry sends `cobot_clock_read` with a `requestId`. The adapter answers at once
+with a `cobot_clock` that has the same `requestId` and the last clock of each
+controller. It asks no controller. If no controller has sent a clock, the
+adapter sends nothing and writes the reason to stderr.
+
 ## Receipt printer and cash drawer (Plan 90 Phase 5)
 
 The gateway prints on a Star mC-Print3 (`MCP31LB`) over the shop LAN, and it

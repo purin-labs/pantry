@@ -80,6 +80,12 @@ type CurrentSourceFlowLabelInput =
       authority: RequestAuthority;
     }>
   | Readonly<{
+      /** The Bakes page: stock levels and bake proposals, which every member may read. */
+      kind: "bake_board";
+      db: OrganisationDatabase;
+      authority: RequestAuthority;
+    }>
+  | Readonly<{
       /** The Jev settings of Settings › Jev, which every member may read. */
       kind: "jev_settings";
       db: OrganisationDatabase;
@@ -136,6 +142,7 @@ export async function createCurrentSourceFlowLabel(
     case "saved_bakery_run":
     case "device_fleet":
     case "recipe_workflow":
+    case "bake_board":
     case "jev_settings":
       return createSavedBakeryRunLabel(input);
     case "ingress":
@@ -949,7 +956,11 @@ function nativeChatPolicy(
 async function createSavedBakeryRunLabel(
   input: Variant<
     CurrentSourceFlowLabelInput,
-    "saved_bakery_run" | "device_fleet" | "recipe_workflow" | "jev_settings"
+    | "saved_bakery_run"
+    | "device_fleet"
+    | "recipe_workflow"
+    | "bake_board"
+    | "jev_settings"
   >,
 ): Promise<Result<FlowLabel, CurrentSourceFlowLabelError>> {
   if (

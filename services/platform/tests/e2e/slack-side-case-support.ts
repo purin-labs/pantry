@@ -226,10 +226,14 @@ export async function signedButtonClick(
     value: string;
     user: string;
     channel: string;
-    threadTs: string;
+    /** Null for a card that is the root of its own thread. */
+    threadTs: string | null;
     proposalTs: string;
+    /** The values of the card's input fields when the person clicked. */
+    state?: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
   }>,
 ): Promise<Request> {
+  const thread = input.threadTs === null ? {} : { thread_ts: input.threadTs };
   const payload = {
     type: "block_actions",
     api_app_id: "A12345678",
@@ -240,13 +244,14 @@ export async function signedButtonClick(
       type: "message",
       message_ts: input.proposalTs,
       channel_id: input.channel,
-      thread_ts: input.threadTs,
+      ...thread,
     },
     message: {
       type: "message",
       ts: input.proposalTs,
-      thread_ts: input.threadTs,
+      ...thread,
     },
+    ...(input.state === undefined ? {} : { state: { values: input.state } }),
     trigger_id: "1787500200.trigger",
     response_url: `https://hooks.slack.com/actions/${WORKSPACE_ID}/1787500200/e2e-response`,
     actions: [

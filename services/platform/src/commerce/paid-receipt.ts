@@ -23,19 +23,14 @@ import { assertNever } from "@purin-labs/std";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import { parseDelivery } from "../actors/connector/ingress-parsers";
 import type { OrganisationDatabase } from "../database-handles";
+import { readOperationsDestination } from "../data/operations-destination";
 import type { Env, ConnectorActorStub } from "../env";
 import {
   newRequestId,
-  parseChannelId,
   parseConnectorId,
-  parseIntegrationAccountId,
   parseOrganisationId,
-  parseWorkspaceId,
-  type ChannelId,
   type ConnectorId,
-  type IntegrationAccountId,
   type OrganisationId,
-  type WorkspaceId,
 } from "../ids";
 import { traceWarn } from "../observability";
 import {
@@ -75,12 +70,6 @@ type PaidReceiptRow = Readonly<{
   createdAt: number;
 }>;
 
-type CommunicationDestination = Readonly<{
-  integrationAccountId: IntegrationAccountId;
-  workspaceId: WorkspaceId;
-  channelId: ChannelId;
-}>;
-
 /**
  * Records the receipt of each paid placement in one feed delivery, and tries
  * each new receipt once. Only a failed write is an error: the feed must not
@@ -98,28 +87,26 @@ export async function recordPaidReceipts(
 ): Promise<Result<{ recorded: number }, { code: string }>> {
   const placements = paidPlacements(input.delivery);
   if (placements.length === 0) return { ok: true, value: { recorded: 0 } };
-  const destination = await readCommunicationDestination(
+  const destination = await readOperationsDestination(
     input.scope.database,
     input.scope.organisationId,
   );
   if (!destination.ok) {
-    if (
-      destination.error === "underclerk_slack_receipt_destination_unavailable"
-    )
-      return { ok: false, error: { code: destination.error } };
+    if (destination.error === "operations_destination_unavailable")
+      return {
+        ok: false,
+        error: { code: "underclerk_slack_receipt_destination_unavailable" },
+      };
     // A shop with no Slack channel has no one to tell here; its staff see
     // the order in the queue. A damaged channel row is reported here.
-    if (destination.error === "underclerk_slack_receipt_destination_invalid")
+    if (destination.error === "operations_destination_invalid")
       traceWarn("underclerk.paid_receipt_destination_invalid", {
         requestId: newRequestId(),
         organisation_id: input.scope.organisationId,
       });
     return { ok: true, value: { recorded: 0 } };
   }
-  const connectorId = parseConnectorId(
-    `connector_slack_${destination.value.integrationAccountId}`,
-  );
-  if (!connectorId.ok) return { ok: true, value: { recorded: 0 } };
+  const connectorId = destination.value.connectorId;
   const rows = placements.map((placement) => {
     const delivery = paidPlacementConnectorDelivery({
       destination: destination.value,
@@ -132,7 +119,7 @@ export async function recordPaidReceipts(
       row: {
         organisationId: input.scope.organisationId,
         receiptId: delivery.deliveryId,
-        connectorId: connectorId.value,
+        connectorId,
         delivery,
         state: "pending",
         attempts: 0,
@@ -548,58 +535,4 @@ function parseReceiptRow(
     revision: row.revision,
     createdAt: row.createdAt,
   };
-}
-
-async function readCommunicationDestination(
-  database: OrganisationDatabase,
-  organisationId: OrganisationId,
-): Promise<
-  Result<
-    CommunicationDestination,
-    | "underclerk_slack_receipt_destination_missing"
-    | "underclerk_slack_receipt_destination_invalid"
-    | "underclerk_slack_receipt_destination_unavailable"
-  >
-> {
-  let row: Record<string, unknown> | null;
-  try {
-    row = await database
-      .prepare(
-        `SELECT integration_account_id AS integrationAccountId,
-                workspace_id AS workspaceId,
-                channel_id AS channelId
-         FROM organisation_communication_destination
-         WHERE organisation_id = ?`,
-      )
-      .bind(organisationId)
-      .first<Record<string, unknown>>();
-  } catch {
-    return {
-      ok: false,
-      error: "underclerk_slack_receipt_destination_unavailable",
-    };
-  }
-  if (row === null)
-    return { ok: false, error: "underclerk_slack_receipt_destination_missing" };
-  if (
-    typeof row.integrationAccountId !== "string" ||
-    typeof row.workspaceId !== "string" ||
-    typeof row.channelId !== "string"
-  )
-    return { ok: false, error: "underclerk_slack_receipt_destination_invalid" };
-  const integrationAccountId = parseIntegrationAccountId(
-    row.integrationAccountId,
-  );
-  const workspaceId = parseWorkspaceId(row.workspaceId);
-  const channelId = parseChannelId(row.channelId);
-  return integrationAccountId.ok && workspaceId.ok && channelId.ok
-    ? {
-        ok: true,
-        value: {
-          integrationAccountId: integrationAccountId.value,
-          workspaceId: workspaceId.value,
-          channelId: channelId.value,
-        },
-      }
-    : { ok: false, error: "underclerk_slack_receipt_destination_invalid" };
 }

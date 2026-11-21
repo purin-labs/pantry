@@ -79,6 +79,7 @@ import {
   slackSimulator,
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const BRIEF = "CONNECTED_FORK_BRIEF: proofing capacity is twelve trays.";
 const SOURCE_TEXT =
@@ -189,7 +190,7 @@ async function connectedForkJourney({
       kind: "message",
       conversationId: SOURCE_ID,
       requestId: REQUEST_ID,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       text: SOURCE_TEXT,
       browserContext: { kind: "unavailable" },
       surfaceContext: null,
@@ -698,7 +699,7 @@ async function continueFork(
         kind: "message",
         conversationId,
         requestId,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text: "Read the current shared menu and report its croissant order. Retain the files as historical context.",
         browserContext: { kind: "unavailable" },
         surfaceContext: null,

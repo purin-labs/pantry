@@ -1,5 +1,5 @@
+import { workspacePortalUrl } from "./portal-links";
 import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
 
 /**
  * One Slack card for one device incident (Plan 85). A reconnect updates the
@@ -35,7 +35,5 @@ export function devicesPortalUrl(
   env: Env,
   address: Readonly<{ organisationHandle: string; workspaceHandle: string }>,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/devices`;
+  return workspacePortalUrl(env, address, "devices");
 }

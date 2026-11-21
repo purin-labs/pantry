@@ -86,6 +86,7 @@ import {
   type ReadExactCommerceProjectionReferenceInput,
   type ValidateCommerceSystemInput,
 } from "../commerce-projection";
+import type { InventoryStockChange } from "../commerce-projection/stock-changes";
 import {
   parseCommerceEntityRelationRow,
   parseCommerceRelationshipRelationRow,
@@ -168,11 +169,27 @@ import { validateCodeModeOrganisation } from "./code-mode-organisation";
 
 const CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY = "acceptance:cafe-commerce-fault:v1";
 
+/** What follows a change of the counter stock, outside Commerce. */
+type StockChangeFollower = Readonly<{
+  afterStockChanges(
+    scope: OrganisationExecutionScope,
+    changes: readonly InventoryStockChange[],
+  ): Promise<void>;
+}>;
+
 /**
  * Commerce actions, cues, the commerce lab, Code Mode leases and workspace executor allocation for the Organisation.
  */
 export class OrganisationCommerce {
-  constructor(private readonly host: OrganisationModuleHost) {}
+  constructor(
+    private readonly host: OrganisationModuleHost,
+    /**
+     * The areas that follow the counter stock (Plan 24 S1: the bake stock
+     * levels). It runs after a delivery changed the available stock of a
+     * position, and it never fails the delivery.
+     */
+    private readonly stock: StockChangeFollower,
+  ) {}
 
   async proposeAction(
     input: ProposeActionInput & { execution: ActionMutationExecution },
@@ -830,14 +847,19 @@ export class OrganisationCommerce {
       !(await isOrganisationExecutionActive(this.host.ctx.storage.sql, scope))
     )
       return organisationPlacementConflict();
-    return this.host.ctx.storage.transactionSync(
+    const stockChanges: InventoryStockChange[] = [];
+    const applied = this.host.ctx.storage.transactionSync(
       applyCommerceDelivery.bind(
         null,
         this.host.ctx.storage.sql,
         input,
         input.commerceSystem,
+        stockChanges,
       ),
     );
+    if (applied.ok && stockChanges.length > 0)
+      await this.stock.afterStockChanges(scope, stockChanges);
+    return applied;
   }
 
   async readRecoverableCommerceCues(input: {

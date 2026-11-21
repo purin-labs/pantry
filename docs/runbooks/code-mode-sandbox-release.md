@@ -88,12 +88,12 @@ at that moment.
 | Engine, pinned Pi Code Mode package, tool catalog, policy, price book, budget | The admission digest at the Session, the Organisation, and the governor | Does not start again: "the tools of this runtime differ". No VM starts.         |
 | Runtime generation and lease                                                  | The Session, the Organisation, and the governor                         | Continues. The reservation moves to the lease of the next generation.           |
 
-Values on 2026-10-12:
+Values on 2026-11-21 (Plan 96 step B1, Pi 1.6.0):
 
 - Sandbox fingerprint: `quickjs-wasi 3.6.2, quickjs 0.17.0, prelude a5a5c307, deterministic 1, stack 262144, heap 33554432, budget 50000`.
-- Pi Code Mode module version: 2. Pinned package: `1.1.0-4270522473e6`.
-- Runtime revision of a reservation: `pi-codemode-sandbox-1.1.0-4270522473e6`.
-- Pi build of a checkpoint: `pi-durable-4270522473e6+actor.2`.
+- Pi Code Mode module version: 2. Pinned package: `1.6.0` (`SANDBOX_PACKAGE_VERSION` in `actors/code-mode-router.ts`).
+- Runtime revision of a reservation: `pi-codemode-sandbox-1.6.0`.
+- Pi build of a checkpoint: `pi-durable-1.6.0+actor.2` (`PI_DURABLE_BUILD`).
 
 These changes are incompatible: an edit of `src/code-mode-sandbox`, a change
 of the interrupt budget or the memory limit, a new pin of the Pi packages or
@@ -206,7 +206,7 @@ from the Sessions, the object cannot be moved: a new name is necessary.
   the scripts that were active end as the table above says. Deploy again.
 - **A fault appears after Sessions wrote checkpoints of the new build.**
   Freeze admission and keep the records. Repair with a build that keeps the
-  build name `pi-durable-4270522473e6+actor.2`. No build reads the checkpoint
+  build name `pi-durable-1.6.0+actor.2`. No build reads the checkpoint
   of another build: an earlier build, or a build with a new name, starts each
   Session on a fresh lineage without the values that scripts stored.
 

@@ -24,16 +24,14 @@ import {
   resolveOrganisationChatGptAccessToken,
 } from "../../models/codex-connection";
 import type { ChatGptSubscriptionApi } from "../embedded-harness";
-import {
-  resolveOrganisationAnthropicModelCredentialForRoute,
-  resolveOrganisationOpenAiModelCredentialForRoute,
-} from "../../credential-vault";
+import { resolveOrganisationModelCredentialForRoute } from "../../credential-vault";
 import { admitSessionInformationFlowObservation } from "../agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   ObservationEvidence,
 } from "../../policy";
 import { assertNever, errorMessage } from "@purin-labs/std";
+import type { VariantBy } from "@purin-labs/type-utils";
 
 /**
  * The lease reads the placement fence once, here. Its key resolver reads the
@@ -78,35 +76,11 @@ export async function createEmbeddedHarnessModelRouteLease(input: {
       },
     };
   }
-  if (
-    input.modelRoute.keySource === "organisation_byo" &&
-    input.modelRoute.provider === "openai"
-  ) {
+  if (input.modelRoute.keySource === "organisation_byo") {
     return {
       ok: true,
       value: {
-        kind: "organisation_openai_api_key",
-        providerFetch: modelProviderFetch(input.env),
-        resolveModelApiKey: resolveEmbeddedSessionModelApiKey.bind(
-          null,
-          input.env,
-          {
-            scope: input.scope,
-            sessionId: input.sessionId,
-            modelRoute: input.modelRoute,
-          },
-        ),
-      },
-    };
-  }
-  if (
-    input.modelRoute.keySource === "organisation_byo" &&
-    input.modelRoute.provider === "anthropic"
-  ) {
-    return {
-      ok: true,
-      value: {
-        kind: "organisation_anthropic_api_key",
+        kind: API_KEY_LEASE_KIND[input.modelRoute.provider],
         providerFetch: modelProviderFetch(input.env),
         resolveModelApiKey: resolveEmbeddedSessionModelApiKey.bind(
           null,
@@ -251,6 +225,18 @@ function traceChatGptAllowanceFailure(
   });
 }
 
+/** The lease of an Organisation's own key, for each provider. */
+const API_KEY_LEASE_KIND = {
+  openai: "organisation_openai_api_key",
+  anthropic: "organisation_anthropic_api_key",
+  google: "organisation_google_api_key",
+} as const satisfies Readonly<
+  Record<
+    VariantBy<ModelRoute, "keySource", "organisation_byo">["provider"],
+    EmbeddedHarnessModelRouteLease["kind"]
+  >
+>;
+
 async function resolveEmbeddedSessionModelApiKey(
   env: Env,
   authority: {
@@ -272,32 +258,14 @@ async function resolveEmbeddedSessionModelApiKey(
     }
     return key;
   }
-  if (
-    authority.modelRoute.keySource === "organisation_byo" &&
-    authority.modelRoute.provider === "openai"
-  ) {
-    const credential = await resolveOrganisationOpenAiModelCredentialForRoute({
+  if (authority.modelRoute.keySource === "organisation_byo") {
+    const credential = await resolveOrganisationModelCredentialForRoute({
       db: authority.scope.database,
       keys: env,
       organisationId: authority.scope.organisationId,
+      provider: authority.modelRoute.provider,
       route: authority.modelRoute,
     });
-    if (!credential.ok) {
-      throw new Error("embedded_harness_model_credential_unavailable");
-    }
-    return credential.value.apiKey;
-  }
-  if (
-    authority.modelRoute.keySource === "organisation_byo" &&
-    authority.modelRoute.provider === "anthropic"
-  ) {
-    const credential =
-      await resolveOrganisationAnthropicModelCredentialForRoute({
-        db: authority.scope.database,
-        keys: env,
-        organisationId: authority.scope.organisationId,
-        route: authority.modelRoute,
-      });
     if (!credential.ok) {
       throw new Error("embedded_harness_model_credential_unavailable");
     }
@@ -431,6 +399,7 @@ export function authorizedTransientModelLease(
     case "organisation_openai_api_key":
     case "organisation_claude_oauth":
     case "organisation_anthropic_api_key":
+    case "organisation_google_api_key":
       return {
         kind: lease.kind,
         providerFetch: lease.providerFetch,

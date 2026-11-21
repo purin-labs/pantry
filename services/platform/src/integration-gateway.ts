@@ -115,6 +115,7 @@ export { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-gover
 export { ConversationResidencyActor } from "./actors/conversation-residency";
 
 export { DeviceFleetActor } from "./actors/device-fleet";
+export { BakeRunActor } from "./actors/bake-run";
 
 export { SessionDO } from "./actors/agent-session";
 

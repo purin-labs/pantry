@@ -38,23 +38,13 @@ import {
   registerSupplier,
   type SupplierRegistrationError,
 } from "../../commerce/purchasing/supplier-creation";
-import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
-import {
-  createCurrentSourceFlowLabel,
-  decideContextAdmission,
-  ObservationEvidence,
-} from "../../policy";
-import { digestCanonical } from "../../policy";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
 import { assertNever } from "@purin-labs/std";
-import {
-  liveDeviceMember,
-  untrustedDeviceText,
-  type ToolEffect,
-} from "../session-support";
+import { untrustedDeviceText, type ToolEffect } from "../session-support";
 import type { KitchenToolContext } from "./services";
+import { readMemberRecord } from "../member-record-read";
 
 function stepFacts(document: BakeryWorkflowDocument) {
   const steps = [];
@@ -82,123 +72,76 @@ function stepFacts(document: BakeryWorkflowDocument) {
 }
 
 /** Plan 84: the recipe as the Workflow page shows it, after the same boundary as a page read. */
-export async function readRecipeWorkflowForEmbeddedHarness(
+export function readRecipeWorkflowForEmbeddedHarness(
   context: KitchenToolContext,
   request: RecipeWorkflowReadRequest,
 ): Promise<unknown> {
-  const { env, storage, execution, lease, assignment } = context;
-  await requireSessionExecution(execution, lease);
+  const { env, execution } = context;
   const { scope } = execution;
-  const member = await liveDeviceMember(
-    scope.database,
-    scope.organisationId,
-    lease,
-  );
-  if (member === null) {
-    throw new RecipeWorkflowRequestError(
-      "Only a member of this workspace can read its recipes. Nothing was read. Tell the person.",
-    );
-  }
-  const label = await createCurrentSourceFlowLabel({
-    kind: "recipe_workflow",
-    db: scope.database,
-    authority: lease.requestAuthority,
-  });
-  if (!label.ok) {
-    throw new Error("Recipe workflow source policy unavailable");
-  }
-  const admission = await decideContextAdmission({
-    subject: {
-      kind: "authority_derived",
-      requestAuthority: lease.requestAuthority,
-      caseId: String(assignment.caseId),
+  return readMemberRecord(context, {
+    source: "recipe_workflow",
+    recordId: "recipe_workflows",
+    refusal: () =>
+      new RecipeWorkflowRequestError(
+        "Only a member of this workspace can read its recipes. Nothing was read. Tell the person.",
+      ),
+    read: async (member) => {
+      const now = Date.now();
+      let value: unknown;
+      if (request.workflowId === null) {
+        value = {
+          recipes: (
+            await listAppliedWorkflows(scope.database, scope.organisationId)
+          ).map((entry) => ({
+            ...entry,
+            title: untrustedDeviceText(entry.title),
+          })),
+        };
+      } else {
+        const current = await readCurrentWorkflow(
+          env,
+          scope.database,
+          scope.organisationId,
+          request.workflowId,
+        );
+        if (current === null) {
+          throw new RecipeWorkflowRequestError(
+            "That recipe has no applied workflow. Nothing was read. Call this tool with null for the list.",
+          );
+        }
+        const findings = await readWorkflowFindings(
+          env,
+          scope.organisationId,
+          request.workflowId,
+          current.receipt.digest,
+        );
+        const open = await listOpenWorkflowProposals(
+          scope.database,
+          scope.organisationId,
+          request.workflowId,
+          member.userId,
+          now,
+        );
+        value = {
+          workflowId: request.workflowId,
+          title: untrustedDeviceText(current.document.title),
+          revision: current.receipt.revision,
+          digest: current.receipt.digest,
+          ...stepFacts(current.document),
+          lastRun:
+            findings === null
+              ? { kind: "not_run_yet" }
+              : {
+                  kind: "ran",
+                  ranAt: findings.ranAt,
+                  findings: findings.findings,
+                },
+          proposalsWaiting: open.length,
+        };
+      }
+      return value;
     },
-    inputLabel: label.value,
   });
-  if (admission.kind !== "admit") {
-    throw new Error("Recipe workflow context admission denied");
-  }
-  const now = Date.now();
-  let value: unknown;
-  if (request.workflowId === null) {
-    value = {
-      recipes: (
-        await listAppliedWorkflows(scope.database, scope.organisationId)
-      ).map((entry) => ({ ...entry, title: untrustedDeviceText(entry.title) })),
-    };
-  } else {
-    const current = await readCurrentWorkflow(
-      env,
-      scope.database,
-      scope.organisationId,
-      request.workflowId,
-    );
-    if (current === null) {
-      throw new RecipeWorkflowRequestError(
-        "That recipe has no applied workflow. Nothing was read. Call this tool with null for the list.",
-      );
-    }
-    const findings = await readWorkflowFindings(
-      env,
-      scope.organisationId,
-      request.workflowId,
-      current.receipt.digest,
-    );
-    const open = await listOpenWorkflowProposals(
-      scope.database,
-      scope.organisationId,
-      request.workflowId,
-      member.userId,
-      now,
-    );
-    value = {
-      workflowId: request.workflowId,
-      title: untrustedDeviceText(current.document.title),
-      revision: current.receipt.revision,
-      digest: current.receipt.digest,
-      ...stepFacts(current.document),
-      lastRun:
-        findings === null
-          ? { kind: "not_run_yet" }
-          : {
-              kind: "ran",
-              ranAt: findings.ranAt,
-              findings: findings.findings,
-            },
-      proposalsWaiting: open.length,
-    };
-  }
-  const evidence = await ObservationEvidence.create({
-    source: {
-      kind: "organisation_record",
-      organisationId: scope.organisationId,
-      recordId: "recipe_workflows",
-    },
-    sourceRevision: now,
-    contentDigest: await digestCanonical(value),
-    inputLabel: label.value,
-    observedAt: now,
-  });
-  if (!evidence.ok) {
-    throw new Error("Recipe workflow observation is invalid");
-  }
-  const admitted = await admitSessionInformationFlowObservation({
-    authorizeCommit: requireSessionExecution.bind(null, execution, lease),
-    sql: storage.sql,
-    transactionSync: storage.transactionSync.bind(storage),
-    organisationId: scope.organisationId,
-    sessionId: lease.session.sessionId,
-    turnId: lease.turn.turnId,
-    authorityPartitionDigest: lease.authorityPartitionDigest,
-    inputLabel: label.value,
-    observation: evidence.value,
-    observedAt: evidence.value.observedAt,
-  });
-  if (!admitted.ok) {
-    throw new Error("Recipe workflow observation admission failed");
-  }
-  await requireSessionExecution(execution, lease);
-  return value;
 }
 
 const RECIPE_LIBRARY_SCOPE = "recipe-library:shop";

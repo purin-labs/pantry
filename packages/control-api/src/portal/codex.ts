@@ -6,6 +6,7 @@ import type {
 } from "./settings.ts";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord, positiveIntegerOrNull } from "@purin-labs/std";
+import { parseInferenceSelection } from "./inference.ts";
 
 export function parseOrganisationInferenceSelectionResponse(
   raw: unknown,
@@ -13,20 +14,10 @@ export function parseOrganisationInferenceSelectionResponse(
   if (!isRecord(raw) || raw.ok !== true || !isRecord(raw.selection)) {
     throw new Error("The server returned an invalid inference selection.");
   }
-  switch (raw.selection.kind) {
-    case "claude_oauth":
-      return { kind: "claude_oauth" };
-    case "codex_subscription":
-      return { kind: "codex_subscription" };
-    case "satyr_platform":
-      return { kind: "satyr_platform" };
-    case "organisation_openai_api_key":
-      return { kind: "organisation_openai_api_key" };
-    case "organisation_anthropic_api_key":
-      return { kind: "organisation_anthropic_api_key" };
-    default:
-      throw new Error("The server returned an unknown inference selection.");
-  }
+  const selection = parseInferenceSelection(raw.selection.kind);
+  if (selection === null)
+    throw new Error("The server returned an unknown inference selection.");
+  return selection;
 }
 
 export function parseOrganisationCodexConnectionResponse(

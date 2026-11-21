@@ -343,6 +343,7 @@ export const INSIDE_CAPABILITIES: ReadonlySet<string> = new Set([
   CAPABILITY_KEYS.commerceSupplyCostSave,
   CAPABILITY_KEYS.commerceSupplierCreate,
   CAPABILITY_KEYS.devicePause,
+  CAPABILITY_KEYS.bakeRunPause,
   CAPABILITY_KEYS.customConnectorDraft,
   CAPABILITY_KEYS.marketingEmailDraftEdit,
   CAPABILITY_KEYS.messageLinkRead,

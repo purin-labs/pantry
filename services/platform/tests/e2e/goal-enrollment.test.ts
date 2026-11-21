@@ -17,6 +17,7 @@ import {
   signedSlackRequest,
   openRouterStream,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "serializes initial goal enrollment with an in-flight untracked turn across Case eviction",
@@ -138,7 +139,7 @@ function measuredResponse(): Response {
       id: "enroll",
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -151,7 +152,7 @@ function measuredResponse(): Response {
       id: "enroll",
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
       usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
     },

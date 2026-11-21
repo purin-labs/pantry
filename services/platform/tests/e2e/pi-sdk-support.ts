@@ -31,6 +31,7 @@ import {
   TEST_ACCEPTED_INPUT_CONTEXT,
   TEST_HARNESS_LEASE_AUTHORITY,
 } from "../fixtures/plan25-turn";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 export type PiSdkFixtureMode = "native" | "direct";
 
@@ -166,7 +167,7 @@ export function sdkInput(
       contentDigest: "a".repeat(64),
       workspaceRevision: "workspace_compaction",
     },
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     modelTokenAllowance: 65_536,
     goalModelCalls: { kind: "untracked" },
     harnessInstructions:

@@ -17,6 +17,13 @@ import { withToolContext } from "../context";
 import { executeCostsViewForHarness } from "../costs/view-handler";
 import { ToolRequestError } from "../errors";
 import { liveDeviceMember } from "../session-support";
+import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
+import {
+  pauseBakeRunForEmbeddedHarness,
+  proposeBakeForEmbeddedHarness,
+  readBakeRunForEmbeddedHarness,
+  readBakesForEmbeddedHarness,
+} from "./bake-handlers";
 import {
   embeddedHarnessCostsTools,
   type CostsCommerce,
@@ -127,7 +134,48 @@ export function kitchenToolServices(
       turn,
       stageConfigurationDraft,
     ),
+    readBakes: tool(readBakesForEmbeddedHarness),
+    proposeBake: tool(proposeBakeForEmbeddedHarness),
+    proposeBakeStockLevel: proposeBakeStockLevelForEmbeddedHarness.bind(
+      null,
+      turn,
+      stageConfigurationDraft,
+    ),
+    readBakeRun: tool(readBakeRunForEmbeddedHarness),
+    pauseBakeRun: tool(pauseBakeRunForEmbeddedHarness),
   };
+}
+
+/**
+ * Plan 24 S1: stages a bake stock level, for the admin who asked to confirm
+ * on a card. An admin or the owner sets a level on the Bakes page, so only
+ * such a person may ask for one.
+ */
+async function proposeBakeStockLevelForEmbeddedHarness(
+  turn: ToolTurnContext,
+  stageConfigurationDraft: StageConfigurationDraft,
+  request: BakeStockLevelInput,
+): Promise<unknown> {
+  const { scope } = turn.execution;
+  const member = await liveDeviceMember(
+    scope.database,
+    scope.organisationId,
+    turn.lease,
+  );
+  if (member === null || !roleMayConfigure(member.role))
+    throw new ToolRequestError(
+      "Only an admin or the owner sets a stock level, and the person who asked cannot. Nothing changed. Tell the person to ask an admin.",
+    );
+  const staging = await beginProposalStaging(
+    turn,
+    "bake stock level proposal",
+    { portalChat: true },
+  );
+  return stageConfigurationDraft(
+    staging,
+    { family: "bake_stock_level", level: request },
+    {},
+  );
 }
 
 /**

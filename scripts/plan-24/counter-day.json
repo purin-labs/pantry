@@ -1,0 +1,31 @@
+{
+  "about": "Plan 24 S1: a declared café morning of counter sales of one fresh product. The bake proposal journey (services/platform/tests/e2e/bake-proposal.test.ts) places each sale through the café's QR order path and each restock through Commerce, in this order. A checkpoint is where the journey stops to decide the proposals.",
+  "product": {
+    "inventoryItemId": "inventory_counter_financier",
+    "positionId": "position_counter_financier_cafe",
+    "productId": "product_counter_financier",
+    "variantId": "variant_counter_financier",
+    "name": "Financier",
+    "priceMinor": 380
+  },
+  "openingStock": 16,
+  "level": {
+    "levelPieces": 12,
+    "piecesPerGroup": 8,
+    "workflowId": "financier",
+    "kitchenLocation": "Main shop"
+  },
+  "events": [
+    { "at": "07:30", "kind": "sale", "quantity": 2 },
+    { "at": "07:45", "kind": "sale", "quantity": 3 },
+    { "at": "08:05", "kind": "sale", "quantity": 1 },
+    { "at": "08:20", "kind": "sale", "quantity": 2 },
+    { "at": "08:30", "kind": "checkpoint", "name": "first_fall" },
+    { "at": "09:00", "kind": "restock", "quantity": 6 },
+    { "at": "09:15", "kind": "sale", "quantity": 3 },
+    { "at": "09:20", "kind": "checkpoint", "name": "second_fall" },
+    { "at": "10:00", "kind": "restock", "quantity": 6 },
+    { "at": "10:20", "kind": "sale", "quantity": 6 },
+    { "at": "10:30", "kind": "checkpoint", "name": "fall_while_open" }
+  ]
+}

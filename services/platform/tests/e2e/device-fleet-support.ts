@@ -1,4 +1,4 @@
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import {
   parseDeviceList,
@@ -12,18 +12,75 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
+import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { commerceHeaders } from "./commerce-support";
+import {
+  commerceClient,
+  commerceHeaders,
+  commerceWorkspace,
+  connectCommerceFixture,
+} from "./commerce-support";
 import {
   PUBLIC_ORIGIN,
   controlReadHeaders,
 } from "./hibernatable-socket-support";
+import { fixtureDatabase } from "./organisation-database";
+import {
+  activateSharedAccountNativeTenant,
+  attachSharedAccountNativeOrganisation,
+} from "./shared-account-platform-fixture";
 
 /**
  * A simulated shop gateway for Plan 85's journeys. It speaks the real protocol
  * over the real socket route, and it only reports and answers. Product code
  * produces every outcome that a journey asserts.
  */
+
+/**
+ * A shop for a device journey: an owner, an operator (`staff`) and a viewer,
+ * with a commerce fixture and the account platform's members.
+ */
+export async function deviceShop(label: string) {
+  const owner = await commerceClient(`${label}-owner-${crypto.randomUUID()}`);
+  const staff = await commerceClient(`${label}-staff-${crypto.randomUUID()}`);
+  const viewer = await commerceClient(`${label}-viewer-${crypto.randomUUID()}`);
+  const organisationId = await commerceWorkspace(owner, `${label} café`);
+  await ensureCreatedOrganisationActor({
+    env,
+    organisationId,
+    now: Date.now(),
+  });
+  const merchantId = `merchant_${label}_${crypto.randomUUID().replaceAll("-", "")}`;
+  await connectCommerceFixture(
+    organisationId,
+    owner.identity.userId,
+    merchantId,
+  );
+  await fixtureDatabase().batch(
+    [
+      { user: staff, role: "operator", person: `person_${label}_staff` },
+      { user: viewer, role: "viewer", person: `person_${label}_viewer` },
+    ].flatMap(({ user, role, person }) => [
+      fixtureDatabase()
+        .prepare(
+          "INSERT INTO person (organisation_id, person_id, display_name) VALUES (?, ?, ?)",
+        )
+        .bind(organisationId, person, role),
+      fixtureDatabase()
+        .prepare(
+          "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at, revoked_at) VALUES (?, ?, ?, ?, 'active', ?, NULL)",
+        )
+        .bind(organisationId, user.identity.userId, person, role, Date.now()),
+    ]),
+  );
+  await attachSharedAccountNativeOrganisation({
+    organisationId,
+    owner,
+    members: { operator: staff, privateMember: viewer },
+  });
+  await activateSharedAccountNativeTenant(organisationId);
+  return { owner, staff, viewer, organisationId, merchantId };
+}
 
 export function controlBase(organisationId: string): string {
   return `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}`;

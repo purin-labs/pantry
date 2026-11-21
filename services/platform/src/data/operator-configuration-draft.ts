@@ -22,6 +22,11 @@ import {
 } from "../kitchen/contract/workflow-changes";
 import { deviceCommands } from "../devices/contract/device-commands";
 import {
+  parseBakeStockLevelInput,
+  type BakeStockLevelInput,
+} from "@purin-labs/kitchen-control-api";
+import { requireActiveOrganisationActor } from "../actors/actor-router";
+import {
   applyJevDraftCommand,
   jevDraftOperation,
   parseJevDraftCommand,
@@ -110,7 +115,9 @@ export type OperatorDraftCommand =
   | Readonly<{ family: "device_command"; command: DeviceDraftCommand }>
   | Readonly<{ family: "workflow_change"; change: WorkflowChangeCommand }>
   /** A Jev switch that the chat agent proposed (Plan 88). */
-  | Readonly<{ family: "jev_feature"; command: JevDraftCommand }>;
+  | Readonly<{ family: "jev_feature"; command: JevDraftCommand }>
+  /** A bake stock level that the chat agent proposed (Plan 24 S1). */
+  | Readonly<{ family: "bake_stock_level"; level: BakeStockLevelInput }>;
 
 type WorkflowApprover = Readonly<{
   userId: UserId;
@@ -150,7 +157,11 @@ type OperatorDraftError =
   /** A proposal needs a signed-in person, because it writes to the shared draft. */
   | Readonly<{ code: "workflow_approver_required" }>
   /** A Jev switch that could not turn on, in the words of Settings › Jev. */
-  | JevDraftRefusal;
+  | JevDraftRefusal
+  /** A bake stock level that the Bakes page would refuse too. */
+  | Readonly<{
+      code: "bake_level_invalid" | "bake_recipe_missing" | "bake_level_stale";
+    }>;
 
 /**
  * The commands a confirmation can carry out — every command the Portal can
@@ -643,6 +654,19 @@ async function applyClaimedDraft(
       boundary,
     );
   }
+  if (stored.command.family === "bake_stock_level") {
+    return applyClaimedBakeStockLevel(
+      env,
+      execution.value,
+      organisationId,
+      stored,
+      stored.command.level,
+      actorRole,
+      now,
+      scope,
+      boundary,
+    );
+  }
   if (stored.command.family === "jev_feature") {
     return applyClaimedJevFeature(
       env,
@@ -958,6 +982,12 @@ async function applyClaimedDeviceCommand(
   };
 }
 
+type DraftReceiptBoundary = Readonly<{
+  kind: "unversioned";
+  idempotencyKey: string;
+  requestHash: string;
+}>;
+
 /**
  * Applies one confirmed Jev switch change (Plan 88). The person who confirms
  * must be an owner or admin now, as on Settings › Jev, and the change runs as
@@ -972,16 +1002,14 @@ async function applyClaimedJevFeature(
   actorRole: ControlRole,
   now: number,
   scope: ControlMutationReceiptScope,
-  boundary: Readonly<{
-    kind: "unversioned";
-    idempotencyKey: string;
-    requestHash: string;
-  }>,
+  boundary: DraftReceiptBoundary,
 ): Promise<
   Result<OperatorDraftReceipt, OperatorDraftError | AgentOperationsError>
 > {
-  const db = execution.database;
-  const applied: Result<true, OperatorDraftError | AgentOperationsError> =
+  return settleClaimedChange(
+    execution,
+    organisationId,
+    stored,
     roleMayConfigure(actorRole)
       ? await applyJevDraftCommand(
           env,
@@ -992,7 +1020,83 @@ async function applyClaimedJevFeature(
       : {
           ok: false,
           error: { code: "agent_operation_invalid", field: "role" },
+        },
+    now,
+    scope,
+    boundary,
+  );
+}
+
+/**
+ * Applies one confirmed bake stock level (Plan 24 S1) through the
+ * Organisation Actor, the same function that the Bakes page calls. The person
+ * who confirms must be an admin or the owner now, as on the page.
+ */
+async function applyClaimedBakeStockLevel(
+  env: Env,
+  execution: OrganisationExecutionScope,
+  organisationId: OrganisationId,
+  stored: OperatorConfigurationDraft,
+  level: BakeStockLevelInput,
+  actorRole: ControlRole,
+  now: number,
+  scope: ControlMutationReceiptScope,
+  boundary: DraftReceiptBoundary,
+): Promise<
+  Result<OperatorDraftReceipt, OperatorDraftError | AgentOperationsError>
+> {
+  let applied: Result<true, OperatorDraftError | AgentOperationsError> = {
+    ok: false,
+    error: { code: "agent_operation_invalid", field: "role" },
+  };
+  if (roleMayConfigure(actorRole)) {
+    const organisation = await requireActiveOrganisationActor({
+      env,
+      organisationId,
+      now,
+    });
+    const set = await organisation.setBakeStockLevel({
+      organisationId,
+      level,
+      setBy: stored.actorUserId,
+    });
+    applied = set.ok
+      ? { ok: true, value: true }
+      : {
+          ok: false,
+          error: {
+            code:
+              set.error.code === "bake_recipe_missing" ||
+              set.error.code === "bake_level_stale"
+                ? set.error.code
+                : "bake_level_invalid",
+          },
         };
+  }
+  return settleClaimedChange(
+    execution,
+    organisationId,
+    stored,
+    applied,
+    now,
+    scope,
+    boundary,
+  );
+}
+
+/** Records the receipt and the settlement of a change that a draft applied. */
+async function settleClaimedChange(
+  execution: OrganisationExecutionScope,
+  organisationId: OrganisationId,
+  stored: OperatorConfigurationDraft,
+  applied: Result<true, OperatorDraftError | AgentOperationsError>,
+  now: number,
+  scope: ControlMutationReceiptScope,
+  boundary: DraftReceiptBoundary,
+): Promise<
+  Result<OperatorDraftReceipt, OperatorDraftError | AgentOperationsError>
+> {
+  const db = execution.database;
   if (!applied.ok) {
     await settleStatement(db, organisationId, stored, applied.error.code)
       .run()
@@ -1102,12 +1206,14 @@ function draftMutationScope(
       stored.command.family === "workflow_change"
         ? "bakery.workflow_change"
         : stored.command.family === "device_command"
-        ? `device.${stored.command.command.kind}`
-        : stored.command.family === "jev_feature"
-        ? jevDraftOperation(stored.command.command)
-        : stored.command.family === "offer_price_allowance"
-          ? `commerce.offer_price_allowance.${stored.command.allowance.kind}`
-          : `agent.operations.${stored.command.operation.kind}`,
+          ? `device.${stored.command.command.kind}`
+          : stored.command.family === "jev_feature"
+            ? jevDraftOperation(stored.command.command)
+            : stored.command.family === "bake_stock_level"
+              ? "kitchen.bake_level.set"
+              : stored.command.family === "offer_price_allowance"
+                ? `commerce.offer_price_allowance.${stored.command.allowance.kind}`
+                : `agent.operations.${stored.command.operation.kind}`,
   };
 }
 
@@ -1147,6 +1253,9 @@ function recordedFailure(
     case "jev_key_unavailable":
     case "jev_feature_source_unavailable":
     case "jev_feature_unavailable":
+    case "bake_level_invalid":
+    case "bake_recipe_missing":
+    case "bake_level_stale":
       return { code: receiptCode };
     case "agent_operation_conflict":
       return { code: "agent_operation_conflict", field: "record" };
@@ -1316,8 +1425,7 @@ function parseDeviceDraftCommand(raw: unknown): DeviceDraftCommand | null {
   const { kind, deviceId, deviceName, reason } = raw;
   if (typeof deviceId !== "string" || typeof deviceName !== "string")
     return null;
-  if (kind === "device_resume")
-    return { kind, deviceId, deviceName };
+  if (kind === "device_resume") return { kind, deviceId, deviceName };
   return kind === "device_restrict" && typeof reason === "string"
     ? { kind, deviceId, deviceName, reason }
     : null;
@@ -1336,6 +1444,15 @@ function parseDraftCommand(
             error: { code: "operator_draft_invalid", field: "change" },
           }
         : { ok: true, value: { family: "workflow_change", change } };
+    }
+    if (body.family === "bake_stock_level") {
+      const level = parseBakeStockLevelInput(body.level);
+      return level === null
+        ? {
+            ok: false,
+            error: { code: "operator_draft_invalid", field: "level" },
+          }
+        : { ok: true, value: { family: "bake_stock_level", level } };
     }
     if (body.family === "jev_feature") {
       const command = parseJevDraftCommand(body.command);

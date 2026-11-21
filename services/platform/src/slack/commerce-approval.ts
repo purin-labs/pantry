@@ -1,3 +1,4 @@
+import { replyToInteraction } from "./interaction-reply";
 import { errorMessage } from "@purin-labs/std";
 
 import {
@@ -13,14 +14,16 @@ import {
 } from "../approval-authentication";
 import { slackMayApproveAction } from "../commerce/action-model";
 import { syncCaseApprovalWait } from "../commerce/case-approval-sync";
-import { acceptAndDeliverCommerceOutcome, executeCommerceAction } from "../commerce/actions";
+import {
+  acceptAndDeliverCommerceOutcome,
+  executeCommerceAction,
+} from "../commerce/actions";
 import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
 import { parsePersonId } from "../data/person-authz";
 import type { Env } from "../env";
 import type { OrganisationId, RequestId } from "../ids";
 import { traceLog, traceWarn } from "../observability";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { RequestDeadline } from "../request-deadline";
 import {
   commerceActionCardText,
   commerceActionPortalUrl,
@@ -241,7 +244,10 @@ async function declineAction(
 ): Promise<DecisionOutcome> {
   // A change that someone decided first keeps that decision. A Case whose
   // earlier update was lost reads that decision now.
-  if (existing.state !== "proposed" && existing.state !== "approval_requested") {
+  if (
+    existing.state !== "proposed" &&
+    existing.state !== "approval_requested"
+  ) {
     await syncCaseApprovalWait(env, {
       organisationId: click.organisationId,
       caseId: existing.caseId,
@@ -368,23 +374,10 @@ async function respond(
   click: CommerceApprovalClick,
   body: Record<string, unknown>,
 ): Promise<void> {
-  const deadline = new RequestDeadline(5_000);
-  try {
-    const response = await fetch(click.responseUrl, {
-      method: "POST",
-      headers: { "content-type": "application/json; charset=utf-8" },
-      signal: deadline.signal,
-      body: JSON.stringify(body),
-    });
-    await response.body?.cancel();
-  } catch (error) {
+  if (!(await replyToInteraction(click.responseUrl, body)))
     traceWarn("integration_gateway.slack.commerce_approval_reply_failed", {
       requestId: click.requestId,
       organisation_id: click.organisationId,
       action_nonce: click.actionNonce,
-      detail: errorMessage(error),
     });
-  } finally {
-    deadline.end();
-  }
 }

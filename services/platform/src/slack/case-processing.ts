@@ -1,3 +1,4 @@
+import { workspacePortalUrl } from "./portal-links";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
@@ -273,10 +274,11 @@ function portalEmailReviewUrl(
   }>,
   proposalId: string,
 ): string {
-  const organisation = encodeURIComponent(address.organisationHandle);
-  const workspace = encodeURIComponent(address.workspaceHandle);
-  const proposal = encodeURIComponent(proposalId);
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/${organisation}/${workspace}/integrations#email-review-${proposal}`;
+  return workspacePortalUrl(
+    env,
+    address,
+    `integrations#email-review-${encodeURIComponent(proposalId)}`,
+  );
 }
 
 export function customConnectorSetupHandoff(input: {
@@ -528,7 +530,10 @@ async function processAcceptedSlackCaseMessage(
         revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
           db: scope.database,
           accountAccess: scope.accountAccess,
-          userAuthority: acceptedExecutionAuthority(body.target.sessionId, body.requestId),
+          userAuthority: acceptedExecutionAuthority(
+            body.target.sessionId,
+            body.requestId,
+          ),
           action: "execute",
           organisationId: body.organisationId,
           requestAuthority: body.requestAuthority,
@@ -791,7 +796,10 @@ async function processAcceptedSlackCaseMessage(
     revalidateTurnAuthority: prepareTurnAuthority.bind(null, {
       db: scope.database,
       accountAccess: scope.accountAccess,
-      userAuthority: acceptedExecutionAuthority(body.target.sessionId, body.requestId),
+      userAuthority: acceptedExecutionAuthority(
+        body.target.sessionId,
+        body.requestId,
+      ),
       action: "execute",
       organisationId: body.organisationId,
       requestAuthority: body.requestAuthority,
@@ -1038,7 +1046,10 @@ function prepareSlackTurnAuthority(
   return prepareTurnAuthority({
     db: scope.database,
     accountAccess: scope.accountAccess,
-    userAuthority: acceptedExecutionAuthority(body.target.sessionId, body.requestId),
+    userAuthority: acceptedExecutionAuthority(
+      body.target.sessionId,
+      body.requestId,
+    ),
     action: "execute",
     organisationId: body.organisationId,
     requestAuthority: body.requestAuthority,

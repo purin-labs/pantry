@@ -23,8 +23,8 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
-  parseOpenAiApiKey,
-  storeOrganisationOpenAiModelCredential,
+  parseModelApiKey,
+  storeOrganisationModelCredential,
 } from "../../src/credential-vault";
 import {
   readOrganisationInferenceSelection,
@@ -624,11 +624,13 @@ export async function selectSharedAccountModelRoute(
 ): Promise<ModelRoute> {
   const scope = await requireOrganisationExecutionScope(env, organisationId);
   if (selection === "organisation_openai_api_key") {
-    const key = parseOpenAiApiKey(
+    const key = parseModelApiKey(
+      "openai",
       "sk-project-shared-account-acceptance-1234567890",
     );
     if (!key.ok) throw new Error(key.error.code);
-    const stored = await storeOrganisationOpenAiModelCredential({
+    const stored = await storeOrganisationModelCredential({
+      provider: "openai",
       db: scope.database,
       keys: env,
       organisationId,

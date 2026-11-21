@@ -37,7 +37,7 @@ export const PI_DURABLE_CHECKPOINT_FORMAT = "satyr-pi-durable-sqlite-v1";
  * receipts name their continuation. No build reads the checkpoint of another
  * build: a Session starts a fresh lineage from its accepted history.
  */
-export const PI_DURABLE_BUILD = "pi-durable-1.5.0+actor.2";
+export const PI_DURABLE_BUILD = "pi-durable-1.6.0+actor.2";
 
 /** Create library tables inside the existing empty-target import transaction. */
 export const piDurableImportSchema: ActorImportSqlMigration = {

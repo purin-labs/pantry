@@ -69,6 +69,7 @@ import {
   updateConversationMetadata,
   type ConversationScope,
 } from "../../src/chat/store";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "organizes an owned directory atomically, preserving unseen chats and fencing competing tabs and retries",
@@ -123,7 +124,7 @@ async function directoryJourney(context: TestContext): Promise<void> {
     kind: "message",
     conversationId: fixtureConversationId(0),
     requestId: "stale_preparation",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Keep this literal task request.",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
@@ -652,7 +653,7 @@ async function verifyQueuedProjectBinding(
     kind: "message",
     conversationId: stored.conversation.id,
     requestId: "running_input",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "First task",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },
@@ -682,7 +683,7 @@ async function verifyQueuedProjectBinding(
     conversationId: first.id,
     requestId: "queued_input",
     inputId: "queued_project_input",
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Queued literal task",
     surfaceContext: null,
     browserContext: { kind: "unavailable" },

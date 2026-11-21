@@ -122,6 +122,8 @@ export function routeLabel(route: EvalRoute): string {
       return "Your OpenAI key";
     case "organisation_anthropic_api_key":
       return "Your Anthropic key";
+    case "organisation_google_api_key":
+      return "Your Gemini key";
     default:
       return assertNever(route, "Unexpected value");
   }

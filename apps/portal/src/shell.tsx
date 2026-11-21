@@ -8,6 +8,7 @@ import { chatRouteState, pageAddress, pageNavigation } from "./page-address";
 import {
   Activity,
   BookOpen,
+  CakeSlice,
   Calculator,
   ConciergeBell,
   Bot,
@@ -1750,6 +1751,8 @@ function workspaceNavigationIcon(page: WorkspaceDetailPage): LucideIcon {
       return Factory;
     case "devices":
       return Cpu;
+    case "bakes":
+      return CakeSlice;
     case "chat":
     case "agents":
       return Bot;

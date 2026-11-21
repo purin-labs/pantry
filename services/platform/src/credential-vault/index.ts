@@ -56,16 +56,12 @@ export {
 } from "./surface-installation-resolution";
 export { resolveAccountRemovalCredential } from "./account-removal-resolution";
 export {
-  parseOpenAiApiKey,
-  parseAnthropicApiKey,
-  resolveCurrentOrganisationOpenAiModelCredential,
-  resolveCurrentOrganisationAnthropicModelCredential,
-  resolveOrganisationOpenAiModelCredentialForRoute,
-  resolveOrganisationAnthropicModelCredentialForRoute,
-  storeOrganisationAnthropicModelCredential,
-  storeOrganisationOpenAiModelCredential,
-  type AnthropicApiKey,
-  type OpenAiApiKey,
+  parseModelApiKey,
+  resolveCurrentOrganisationModelCredential,
+  resolveOrganisationModelCredentialForRoute,
+  storeOrganisationModelCredential,
+  type ModelApiKey,
+  type ModelKeyProvider,
 } from "./organisation-model-resolution";
 export {
   importExternalVaultSecret,

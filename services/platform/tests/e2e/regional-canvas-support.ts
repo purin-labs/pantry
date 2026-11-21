@@ -17,6 +17,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 export type RegionalCanvas = Readonly<{
   url: string;
@@ -165,7 +166,7 @@ async function completeCanvasTurn(
         kind: "message",
         conversationId: id,
         requestId: `request_${id}`,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         text,
         surfaceContext: null,
         browserContext: { kind: "unavailable" },

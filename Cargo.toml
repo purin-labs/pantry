@@ -7,6 +7,7 @@ members = [
     "crates/workspace-executor",
     "crates/media-inspect",
     "crates/shop-gateway",
+    "crates/cobot-protocol",
 ]
 [workspace.package]
 edition = "2024"

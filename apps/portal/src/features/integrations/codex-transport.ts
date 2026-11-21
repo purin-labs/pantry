@@ -24,7 +24,8 @@ export function isOrganisationApiKeyInferenceCommand(
 ): command is Extract<SelectInferenceCommand, { readonly apiKey: string }> {
   return (
     command.selection.kind === "organisation_openai_api_key" ||
-    command.selection.kind === "organisation_anthropic_api_key"
+    command.selection.kind === "organisation_anthropic_api_key" ||
+    command.selection.kind === "organisation_google_api_key"
   );
 }
 

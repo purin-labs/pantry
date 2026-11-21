@@ -1244,7 +1244,9 @@ export function parseSessionModelRoute(
 
   if (
     raw.keySource === "organisation_byo" &&
-    (raw.provider === "openai" || raw.provider === "anthropic") &&
+    (raw.provider === "openai" ||
+      raw.provider === "anthropic" ||
+      raw.provider === "google") &&
     hasExactKeys(raw, ["keySource", "provider", "model", "byoKeyRef"]) &&
     typeof raw.byoKeyRef === "string" &&
     raw.byoKeyRef.length > 0

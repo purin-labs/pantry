@@ -145,7 +145,7 @@ export interface Env {
   TYPESAFE_API_KEY?: string;
   /**
    * The OpenRouter model of Pantry's paid route, one of PLATFORM_PI_MODELS.
-   * Unset in production, which runs PACKAGED_PI_MODEL; tests that call
+   * Unset in production, which runs PLATFORM_DEFAULT_PI_MODEL; tests that call
    * OpenRouter set a cheaper model.
    */
   PANTRY_PLATFORM_PI_MODEL?: string;

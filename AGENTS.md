@@ -325,14 +325,17 @@ Satyr’s production runtime is Cloudflare-native:
 - `AgentSessionActor` runs Pi on every route; its pinned model route selects
   the authority. `organisation_subscription` + `openai` runs Pi through
   pi-ai's legacy `openai-codex` provider with the organisation's ChatGPT
-  sign-in (Plan 72). `organisation_byo` + `openai` runs Pi with the
-  organisation's purpose-bound, Vault-encrypted OpenAI API key. `platform` +
-  `openai-compatible` runs Pi with Satyr's `OPENROUTER_API_KEY`. Missing or
-  exhausted authority fails the selected route.
+  sign-in (Plan 72). `organisation_byo` + `openai`, `anthropic` or
+  `google` runs Pi with the organisation's purpose-bound, Vault-encrypted
+  API key of that provider (Gemini 4 for `google`, Plan 96). `platform` +
+  `openai-compatible` runs Pi with Satyr's `OPENROUTER_API_KEY`; its default
+  model is Gemini 4 Hydrogen. Missing or exhausted authority fails the
+  selected route.
 - The model exit Worker `satyr-model-exit` sends every direct model-provider
   request from a data centre near AWS Tokyo (Plan 73): the ChatGPT sign-in
-  and refresh, the BYO OpenAI and Anthropic keys and the Claude account.
-  OpenAI and Anthropic refuse Hong Kong, where an `apac` Actor can run.
+  and refresh, the BYO OpenAI, Anthropic and Gemini keys and the Claude
+  account. OpenAI, Anthropic and the Gemini API refuse Hong Kong, where an
+  `apac` Actor can run.
   chatgpt.com blocks every request from a Worker, so the ChatGPT model
   requests and allowance reads go through the ChatGPT exit Worker
   `satyr-chatgpt-exit` and its one shared container (Plan 75). Use
@@ -624,6 +627,9 @@ row itself calls `publishGlobalOrganisation(id)` before it writes global rows
 that name the Organisation, as onboarding does.
 `check:test-types` stops before the E2E files while the baseline has type errors;
 run `pnpm exec tsrs -p tsconfig.e2e.json` in `services/platform`.
+The Plan 24 cobot journeys build the controller simulator: set `MUJOCO_DIR`
+to an SDK from `node scripts/bakery-robots/install-native-sdk.mjs <dir>`, or
+`PANTRY_COBOT_CONTROLLER_BINARY` to a built `cobot-controller`. CI does the same.
 
 Tests under `services/platform/tests` have additional guidance in their local
 `AGENTS.md`. Review fixtures before preserving them. Delete tests that encode
@@ -689,8 +695,8 @@ and every route runs Pi. Organisation-funded `organisation_subscription` +
 `openai` turns call the ChatGPT backend with the organisation's ChatGPT
 sign-in, through the ChatGPT exit container. The Worker signs in with a device code, and the Session refreshes the
 token under a lease on `organisation_codex_connection`, because OpenAI rotates
-refresh tokens. Organisation-funded `organisation_byo` + `openai` turns use a
-purpose-bound, Vault-encrypted OpenAI API key. Satyr-funded `platform` +
+refresh tokens. Organisation-funded `organisation_byo` turns use a
+purpose-bound, Vault-encrypted API key of OpenAI, Anthropic or Google. Satyr-funded `platform` +
 `openai-compatible` turns use `OPENROUTER_API_KEY`. The Actor owns accepted
 history, Tool Host authority, checkpoints, budgets, cancellation, and delivery.
 Pi Durable owns Pi tasks in Actor SQLite and restores from the Actor-owned

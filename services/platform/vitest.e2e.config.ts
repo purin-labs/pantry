@@ -11,6 +11,7 @@ import { unstable_readConfig } from "wrangler";
 
 import { commerceFixtureWorkerArtifact } from "./tests/commerce-fixture-worker";
 import { shopGatewayAdapters } from "./tests/shop-gateway-adapters";
+import { writeJourneyArtifact } from "./tests/journey-artifacts";
 
 const TEST_SECRET_BINDINGS = {
   AIRTABLE_OAUTH_CLIENT_SECRET: "airtable-e2e-secret",
@@ -241,6 +242,8 @@ async function cloudflareOptions() {
         },
         // The real shop gateway's printer and terminal adapters (Plan 90).
         SHOP_GATEWAY_ADAPTERS: shopGatewayAdapters,
+        // The writer of a journey's artifact under output/.
+        JOURNEY_ARTIFACTS: writeJourneyArtifact,
         ...accountPlatform.serviceBindings,
       },
     },
@@ -376,7 +379,8 @@ function sharedAccountPlatformTestRuntime() {
     ACCOUNT_PLATFORM_ASSERTION_AUDIENCE: ACCOUNT_PLATFORM_TEST_ORIGIN,
     GOOGLE_OIDC_CLIENT_ID: "shared-account-satyr-e2e",
     TEST_ACCOUNT_PLATFORM_BASE_URL: ACCOUNT_PLATFORM_TEST_ORIGIN,
-    TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-pantry-provision",
+    TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN:
+      "shared-account-e2e-pantry-provision",
   });
   serviceBindings.ACCOUNT_PLATFORM = { name: ACCOUNT_PLATFORM_TEST_WORKER };
   serviceBindings.ACCOUNT_PLATFORM_FIXTURE = {

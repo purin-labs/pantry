@@ -22,6 +22,7 @@ export type WorkspaceDetailPage =
   | "suppliers"
   | "workflow-simulator"
   | "devices"
+  | "bakes"
   | "agents"
   | "brain"
   | "knowledge"
@@ -175,7 +176,8 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     segment: "recipes",
     navigationLabel: "Recipes",
     title: "Recipes",
-    description: "Browse recipes, set ingredient quantities, and define each batch yield.",
+    description:
+      "Browse recipes, set ingredient quantities, and define each batch yield.",
     group: "BakeryOS",
     resource: { kind: "none" },
   },
@@ -252,7 +254,16 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
         "See contacts, purchasing terms, supplied items, and current replenishment work.",
     },
   },
-  "production-requests": { page: "production-requests", segment: "production-requests", navigationLabel: "Production requests", title: "Production requests", description: "Accept and schedule product demand and review confirmed output.", group: "BakeryOS", resource: { kind: "none" } },
+  "production-requests": {
+    page: "production-requests",
+    segment: "production-requests",
+    navigationLabel: "Production requests",
+    title: "Production requests",
+    description:
+      "Accept and schedule product demand and review confirmed output.",
+    group: "BakeryOS",
+    resource: { kind: "none" },
+  },
   "workflow-simulator": {
     page: "workflow-simulator",
     segment: "workflow-simulator",
@@ -272,6 +283,16 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     group: "BakeryOS",
     resource: { kind: "none" },
   },
+  bakes: {
+    page: "bakes",
+    segment: "bakes",
+    navigationLabel: "Bakes",
+    title: "Bakes",
+    description:
+      "Set the counter stock level of each fresh product, and decide the bake proposals.",
+    group: "BakeryOS",
+    resource: { kind: "none" },
+  },
   agents: {
     page: "agents",
     segment: "agents",
@@ -287,8 +308,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     segment: "integrations",
     navigationLabel: "Integrations",
     title: "Integrations",
-    description:
-      "Connect the apps your shop uses.",
+    description: "Connect the apps your shop uses.",
     group: "Settings",
     resource: { kind: "none" },
   },
@@ -402,9 +422,9 @@ const RETIRED_PAGE_SEGMENTS: readonly string[] = [
 ];
 
 /** Renamed pages; their old links open the page under its new name. */
-const RENAMED_PAGE_SEGMENTS: ReadonlyMap<string, WorkspaceDetailPage> = new Map([
-  ["takings", "payouts"],
-]);
+const RENAMED_PAGE_SEGMENTS: ReadonlyMap<string, WorkspaceDetailPage> = new Map(
+  [["takings", "payouts"]],
+);
 
 const WORKSPACE_PAGE_DESCRIPTOR_LIST = Object.values(
   WORKSPACE_PAGE_DESCRIPTORS,
@@ -422,7 +442,10 @@ export const WORKSPACE_NAVIGATION_GROUPS: readonly WorkspaceNavigationGroup[] =
       label: "AgentCommerce",
       pages: ["orders", "payments", "payouts", "products", "checkout"],
     },
-    { label: "CafeOS", pages: ["register", "menus", "order-queue", "terminals"] },
+    {
+      label: "CafeOS",
+      pages: ["register", "menus", "order-queue", "terminals"],
+    },
     {
       label: "BakeryOS",
       pages: [
@@ -433,6 +456,7 @@ export const WORKSPACE_NAVIGATION_GROUPS: readonly WorkspaceNavigationGroup[] =
         "inventory",
         "suppliers",
         "devices",
+        "bakes",
       ],
     },
     { label: "Agents", pages: ["agents", "knowledge"] },
