@@ -791,7 +791,6 @@
     "services/platform/src/actors/workflow-canvas.ts": "areas/kitchen",
     "services/platform/src/actors/workflow-draft.ts": "areas/kitchen",
     "services/platform/src/actors/workspace-execution-allocation.ts": "foundation/agent",
-    "services/platform/src/agent-old-names.ts": "foundation/agent",
     "services/platform/src/agent-tools/commerce/order-queue.ts": "areas/cafe",
     "services/platform/src/agent-tools/commerce/register-view.ts": "areas/cafe",
     "services/platform/src/agent-tools/context.ts": "foundation/agent",

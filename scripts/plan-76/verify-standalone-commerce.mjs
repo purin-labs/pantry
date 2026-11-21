@@ -22,8 +22,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const worker = join(root, "services/commerce");
 const output = resolve(root, process.argv[2] ?? "docs/evidence/plan-76-phase-1/standalone-underclerk.json");
 const COMMERCE_ENGINE = ["services/commerce/", "apps/storefront/", "packages/commerce-contracts/", "packages/commerce-client/", "packages/commerce-query-sqlite/"];
-const NEUTRAL = ["packages/std/", "packages/type-utils/"];
-const ALLOWED_WORKSPACE = /^@underclerk\/|^@lowerarchy\/(std|type-utils)$/;
+const NEUTRAL = ["packages/std/", "packages/type-utils/", "packages/contract-schema/"];
+const ALLOWED_WORKSPACE = /^@purin-labs\/(commerce-[\w-]+|storefront|std|type-utils|contract-schema)$/;
 
 const startedAt = new Date().toISOString();
 const evidence = {
@@ -60,9 +60,8 @@ evidence.dependencyGraph = {
   roots: graph.map((project) => project.name),
   packages: names.size,
   workspacePackages: workspaceInGraph,
-  satyrPackages: [...names].filter((name) => name.startsWith("@satyr/")),
   forbidden,
-  passed: forbidden.length === 0 && ![...names].some((name) => name.startsWith("@satyr/")),
+  passed: forbidden.length === 0,
 };
 
 // 2. Build the Worker. The storefront assets are not part of the bundle.
