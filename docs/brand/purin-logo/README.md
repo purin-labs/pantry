@@ -15,19 +15,19 @@ switch; `apps/portal/public/brand/README.md` describes the goat files.
 
 ## Files
 
-| File                      | What it is                                                                                                     |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `source.jpg`              | The image that the owner supplied                                                                              |
-| `paths.json`              | The traced curves, in a 1024 box. `face` holds the left eye, the right eye, then the mouth                     |
-| `purin-mark.svg`          | The mark on a transparent ground                                                                               |
-| `purin-mark-animated.svg` | The mark with its motion inside the file                                                                       |
-| `purin-icon.svg`          | The mark on its cream tile                                                                                     |
-| `purin-icon-animated.svg` | The tile with its motion inside the file                                                                       |
-| `icon-pack/`              | Favicons, application icons and PNG marks (see below)                                                          |
-| `purin-wordmark.svg`      | The cat and the word PURIN in one colour (`currentColor`), traced from `reference/wordmark-black-on-cream.jpg` |
-| `purin-mark-mono.svg`     | The cat of the wordmark alone, in one colour                                                                   |
-| `reference/`              | The images that the owner supplied on 21 November 2026: two colour marks and the black wordmark                |
-| `preview/`                | A GIF and an MP4 of the motion, recorded from `purin-mark-animated.svg`. The build script does not make them   |
+| File                      | What it is                                                                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `source.jpg`              | The image that the owner supplied                                                                                                     |
+| `paths.json`              | The traced curves, in a 1024 box. `face` holds the left eye, the right eye, then the mouth. `ears` says where each ear meets the head |
+| `purin-mark.svg`          | The mark on a transparent ground                                                                                                      |
+| `purin-mark-animated.svg` | The mark with its motion inside the file                                                                                              |
+| `purin-icon.svg`          | The mark on its cream tile                                                                                                            |
+| `purin-icon-animated.svg` | The tile with its motion inside the file                                                                                              |
+| `icon-pack/`              | Favicons, application icons and PNG marks (see below)                                                                                 |
+| `purin-wordmark.svg`      | The cat and the word PURIN in one colour (`currentColor`), traced from `reference/wordmark-black-on-cream.jpg`                        |
+| `purin-mark-mono.svg`     | The cat of the wordmark alone, in one colour                                                                                          |
+| `reference/`              | The images that the owner supplied on 21 November 2026: two colour marks and the black wordmark                                       |
+| `preview/`                | A GIF and an MP4 of the motion, recorded from `purin-mark-animated.svg`. The build script does not make them                          |
 
 `scripts/brand/trace-purin-wordmark.py` writes the two one-colour files. A page
 sets their colour, or uses one as a CSS mask, so they work on a light ground
@@ -83,7 +83,7 @@ import { PurinIcon, PurinMark } from "../../ui";
 <PurinMark animated className="welcome-mark" />
 ```
 
-`animated` makes the cat sway and the pudding jiggle. `label` gives the
+`animated` makes the cat sway, the pudding jiggle and the ears flick. `label` gives the
 accessible name; without it the mark is decoration. `size` sets the width and
 the height in pixels; without it, CSS sets them.
 
@@ -96,7 +96,18 @@ The cat is the cause and the pudding is the effect.
 - Each time the cat turns round, the pudding leans and squashes a little, at
   2.4 Hz, and comes to rest in about 1.7 seconds.
 - The cut-out moves with the pudding.
+- One ear flicks, then the other: the left ear first, and the right ear 0.55
+  seconds later. An ear leans away from the head and springs back in 0.45
+  seconds. The ears flick one time in two sways, so the full loop takes 9.6
+  seconds.
 - The less-motion setting of the device stops the motion.
+
+An ear is a part of the cat shape, not a second drawing. The trace script
+finds the point where each ear meets the top of the head (`ears` in
+`paths.json`). The files that move draw the cat shape three times, each time
+through a clip: the body, the left ear and the right ear. An ear leans about a
+line a little under its cut, so the ear stays joined to the head. The files
+that do not move draw the cat as one shape.
 
 The animated SVG files carry the motion as CSS, so they need no script and
 they move as a plain image.

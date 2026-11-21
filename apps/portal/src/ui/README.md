@@ -485,8 +485,8 @@ tile, so it reads on a light surface and on a dark surface.
 <PurinMark animated className="welcome-mark" />
 ```
 
-- `animated` makes the cat sway and the pudding jiggle. The less-motion
-  setting of the device stops the motion.
+- `animated` makes the cat sway, the pudding jiggle and the ears flick, one
+  then the other. The less-motion setting of the device stops the motion.
 - `label` gives the accessible name. Without it, the mark is decoration.
 - `size` sets the width and the height in pixels. Without it, CSS sets them.
 

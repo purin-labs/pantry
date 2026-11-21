@@ -9,6 +9,17 @@ export const PURIN_MARK = {
   box: 1024,
   catPivot: [496.6, 791.3],
   puddingPivot: [486.9, 893.7],
+  ears: {
+    cut: 281,
+    base: 285,
+    left: 410,
+    right: 584,
+  },
+  earClips: {
+    body: "M-2048 -2048H2048V2048H-2048ZM-2048 -2048H410V281H-2048ZM584 -2048H2048V281H584Z",
+    left: "M-2048 -2048H410V285H-2048Z",
+    right: "M584 -2048H2048V285H584Z",
+  },
   colours: {
     cat: "#301D17",
     cream: "#FBF0DC",

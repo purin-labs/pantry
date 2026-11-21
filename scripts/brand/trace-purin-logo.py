@@ -91,6 +91,19 @@ def main():
         grow[:-k] |= caramel[k:]
     caramel_out = caramel | (grow & ~ndi.binary_erosion(pudding, structure=disk(5)))
 
+    # The ears. The motion files cut the cat where each ear meets the top of the
+    # head, so that an ear can flick. `top` is the first row of the cat in a column.
+    columns = np.flatnonzero(cat.any(axis=0))
+    top = cat.argmax(axis=0)
+    middle = int((columns.min() + columns.max()) // 2)
+    tip_left = columns.min() + int(top[columns.min() : middle].argmin())
+    tip_right = middle + int(top[middle : columns.max() + 1].argmin())
+    # the lowest point of the outline between a tip and the middle; if some
+    # columns are equal, the one nearest the middle
+    join_left = middle - 1 - int(top[tip_left:middle][::-1].argmax())
+    join_right = middle + int(top[middle : tip_right + 1].argmax())
+    ear_cut = int(np.ceil(max(top[join_left], top[join_right]) * scale)) + 1
+
     def outlines(mask):
         return mask_outlines(mask, scale, TOLERANCE)
 
@@ -101,6 +114,15 @@ def main():
         "catPivot": [unit((cxs.min() + cxs.max()) / 2), unit(cat_bottom + 0.5)],
         "puddingPivot": [unit((x0 + x1) / 2), unit(y1 + 0.5)],
         "bbox": [unit(min(cxs.min(), x0)), unit(cys.min()), unit(max(cxs.max(), x1)), unit(y1)],
+        # An ear is the part of the cat over the line `cut`, to the left of `left`
+        # or to the right of `right`. It leans about the line `base`, a little
+        # under the cut, so that no gap opens between the ear and the head.
+        "ears": {
+            "cut": ear_cut,
+            "base": ear_cut + 4,
+            "left": int(round(join_left * scale)) + 1,
+            "right": int(round(join_right * scale)) - 1,
+        },
         "cat": outlines(cat_full)[0],
         # the left eye, the right eye, then the mouth
         "face": [eye_outline(eye, scale, TOLERANCE) for eye in eyes] + outlines(mouth),
