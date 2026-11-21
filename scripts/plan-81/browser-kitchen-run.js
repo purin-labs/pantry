@@ -61,9 +61,9 @@ async (page) => {
   const LAYOUT_ANSWER =
     "I selected Cooling, turned the cooling rack a quarter turn and opened the oven-outage comparison.";
   const FLOOR_PLAN =
-    "Switch the floor plan to Kinshicho, apply the Parisian Noix interior, open the rear corridor door, move the cooling rack to (100, -200) mm at 45 degrees and undo that angle.";
+    "Switch the floor plan to Kinshicho, apply the Parisian Noix interior, open the toilet door, move the cooling rack to (100, -200) mm at 45 degrees and undo that angle.";
   const FLOOR_PLAN_ANSWER =
-    "I switched to Kinshicho, applied the Parisian Noix interior, opened the rear corridor door, moved the cooling rack to (100, -200) mm, turned it to 45 degrees and undid the angle.";
+    "I switched to Kinshicho, applied the Parisian Noix interior, opened the toilet door, moved the cooling rack to (100, -200) mm, turned it to 45 degrees and undid the angle.";
   const FLOOR_PLAN_RESET = "Reset the floor plan to its initial layout.";
   const FLOOR_PLAN_RESET_ANSWER =
     "I reset the floor plan to its initial layout.";
@@ -581,10 +581,10 @@ async (page) => {
         .getByRole("button", { name: "3D view", exact: true })
         .click();
       this.check(
-        "The room switcher shows Kinshicho 61146",
+        "The room switcher shows Kinshicho 6992842011",
         await page
           .getByRole("button", {
-            name: "Floor plan room: Kinshicho 61146 (29.7 m²)",
+            name: "Floor plan room: Kinshicho 6992842011 (25.0 m²)",
             exact: true,
           })
           .isVisible(),

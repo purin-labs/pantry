@@ -14,13 +14,13 @@ from mathutils import Euler, Matrix, Vector
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO_ROOT / "assets" / "bakery-rooms"
-MODELS_DIR = REPO_ROOT / "output" / "bakery-assets" / "models"
+MODELS_DIR = REPO_ROOT / "apps" / "portal" / "src" / "features" / "production-run" / "models"
 MUJOCO_DIR = REPO_ROOT / "assets" / "bakery-mujoco"
 
 # Per-room gallery interior presets matching docs & Portal studio renders
 PLAN_PRESET_MAP = {
     "asakusabashi-t101940": "kuramae-artisan",
-    "kinshicho-61146": "noix-parisien",
+    "kinshicho-6992842011": "noix-parisien",
     "machiya-sun-reve": "kuramae-artisan",
     "hongo-8257562": "kiyosumi-minimal",
 }
@@ -1567,6 +1567,9 @@ def build_plan(plan: dict, placements: dict, presets: dict) -> dict:
 
     scene.camera = iso_cam
     bpy.ops.wm.save_as_mainfile(filepath=str(blend_path))
+    blend_backup = blend_path.with_suffix(".blend1")
+    if blend_backup.exists():
+        blend_backup.unlink()
 
     mesh_count = sum(1 for o in scene.objects if o.type == "MESH")
     return {

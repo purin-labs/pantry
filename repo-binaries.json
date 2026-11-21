@@ -1,6 +1,10 @@
 {
   "bucket": "satyr-repo-binaries-apac",
   "files": {
+    "docs/brand/storyboard-deck/seams_storyboard_deck.pdf": {
+      "sha256": "7eecfb3addd6d7de5b877fe5f14364259ff04e264fd5a18d0a7c4e7fcace4e94",
+      "bytes": 5977949
+    },
     "docs/evidence/experiment-1/sdk-adoption/actor-recovery-results.json": {
       "sha256": "2b6ae00ad78cc05e7fe084cbdab396cb08f0ab85d7bf94dae8670c12567a2ab4",
       "bytes": 1126571
@@ -13565,21 +13569,21 @@
           "sha256": "9d9d35ab49688e7c6f8cef065c46fdc25b9dfdc58e7340f8ed5330dd0564ecf2",
           "bytes": 32522608
         },
-        "kinshicho-61146/kinshicho-61146-iso.png": {
-          "sha256": "45b8482aa627865d2c009cd0916573b63607f3b988afa0353435fe58e7fcc5e8",
-          "bytes": 1179625
+        "kinshicho-6992842011/kinshicho-6992842011-iso.png": {
+          "sha256": "7b9e81dad32e8e99652ca74c76cbf31a25a12915b5cd471ffa35d66bd8947d90",
+          "bytes": 1151603
         },
-        "kinshicho-61146/kinshicho-61146-top.png": {
-          "sha256": "e466e33e4a763286a72e0e499fa885bce8e5d4ce39cab99064949957853c4836",
-          "bytes": 1066697
+        "kinshicho-6992842011/kinshicho-6992842011-top.png": {
+          "sha256": "9196ba31f03273a0d438eac7b03a49a5ad108cfbc12199cbe5adac54b64d11d3",
+          "bytes": 1149639
         },
-        "kinshicho-61146/kinshicho-61146.blend": {
-          "sha256": "feda445ebcfa5751c44507c9e059a07c26fb3d0bdeedf42358a7d18435a090a8",
-          "bytes": 15562949
+        "kinshicho-6992842011/kinshicho-6992842011.blend": {
+          "sha256": "4221fe82a123c2b1615c01bc4c987d1b64b0d53d075e52e00aa746b86ff91483",
+          "bytes": 20819886
         },
-        "kinshicho-61146/kinshicho-61146.glb": {
-          "sha256": "2a1de34aeb355f0226b5b3d1e94cedc68fdb6826b28e576a9afe0730e6af24f8",
-          "bytes": 32912288
+        "kinshicho-6992842011/kinshicho-6992842011.glb": {
+          "sha256": "96d07825caffb39cc32e5bd0d27d33adb4c4243f2d7e609d9193f055379b16ff",
+          "bytes": 37905592
         },
         "machiya-sun-reve/machiya-sun-reve-iso.png": {
           "sha256": "6ff8d4440df3edf8a78186adbbf61321656b9237b05eed355acf736c032253ed",
@@ -13598,8 +13602,100 @@
           "bytes": 33075396
         },
         "manifest.json": {
-          "sha256": "552bc0374d17da14d1a78152dfd764dfeab500a239f93de58b6ba7f492a0ebf5",
-          "bytes": 2230
+          "sha256": "0094e1488382d65aa8cef77930edf91ac7fdf0455f8e4decbb1ba13c20c8063e",
+          "bytes": 2277
+        }
+      }
+    },
+    "docs/brand/storyboard-deck/images/": {
+      "files": {
+        "slide-01-cover.jpg": {
+          "sha256": "dec4143d6bef9c0f3001b8e3efdf4333237e4a069cf87aadea51a57001386bd7",
+          "bytes": 545806
+        },
+        "slide-02-four-pain-points.jpg": {
+          "sha256": "be8186db784da44a7a921caebde2659acbf3412396148138cc55e8fca73c25a7",
+          "bytes": 706035
+        },
+        "slide-03-no-4am.jpg": {
+          "sha256": "7ed9e3c2f07360dcc97ab91822149c41f9579bc9f56498885c1e5c108aec6fc7",
+          "bytes": 620683
+        },
+        "slide-04-direct-to-pan.jpg": {
+          "sha256": "efdfcf0082e2bab95e7e215a366b8f7909c9951d2ccf0d733e5227516ce6ab11",
+          "bytes": 532262
+        },
+        "slide-05-25g-consistency.jpg": {
+          "sha256": "837386bbe38db03670a9ef5b4e9eb267de7213d4053d35c10c3770a8bcf65acc",
+          "bytes": 682998
+        },
+        "slide-06-washing.jpg": {
+          "sha256": "ab2b60bf1b938f635f912881ee0df7917e09d0b7e8d9152c3381af68b8f11022",
+          "bytes": 456026
+        },
+        "slide-07-sous-chef.jpg": {
+          "sha256": "0410e831ce06aa64a31b595143670b861a3b85d913a204a40a7fb73e7d7d5076",
+          "bytes": 409392
+        },
+        "slide-08-pantry-counter.jpg": {
+          "sha256": "7d8d71a983f44943b071c4feab44fd492304d44029b704eba2165c10077e9cbe",
+          "bytes": 664121
+        },
+        "slide-09-gantry-and-mitten.jpg": {
+          "sha256": "f617041a88dfe491c869e98344ae2b1e236682bb66470a9594f47e0f0ae8f810",
+          "bytes": 581428
+        },
+        "slide-10-six-pm-close.jpg": {
+          "sha256": "fe4fafc78a26338ddd5a16b38aed6d8f2ca58419224a7b851346f34f8f29a5dd",
+          "bytes": 596425
+        }
+      }
+    },
+    "docs/brand/storyboard-deck/references/": {
+      "files": {
+        "ref-01-lizard-flowers-pastel.jpg": {
+          "sha256": "89e9cac7ff0d36ab7251d0a77f043550e3342385886121d194521b168d8878ef",
+          "bytes": 44588
+        },
+        "ref-02-desk-window-blue.jpg": {
+          "sha256": "73281f9cbcc36ec16c0e1188e309c7326256bf3820c0116577a6d1983c8d8826",
+          "bytes": 86982
+        },
+        "ref-03-landscape-sky-pastel.jpg": {
+          "sha256": "aa054fd9695d4a686c3a11a637279390fec8a49e76101cd25ed29d3205d68432",
+          "bytes": 82070
+        },
+        "ref-04-character-turnaround-pink-yellow.jpg": {
+          "sha256": "93b6499d9549a49d2cda5b09a75a0a50d43bd2104f3947d405f34e7f2370fc4c",
+          "bytes": 68721
+        },
+        "ref-05-market-aisle-high-angle.jpg": {
+          "sha256": "d2d5a78741b55b68d4a267eaa753de040384770054f73d4945e7a0ba8a173853",
+          "bytes": 344737
+        },
+        "ref-06-market-chiller-profile.jpg": {
+          "sha256": "256fd7dc63e15ca93b39d77e8ed74238cb19e211457ec47d65b5035c4fa2c6f8",
+          "bytes": 123596
+        },
+        "ref-07-market-fisheye-wide.jpg": {
+          "sha256": "ebee373167f6553645b06ff015213bc3f3d6b1c30245c8767bd64aa9d18db61f",
+          "bytes": 131155
+        },
+        "ref-08-character-coat-braid.jpg": {
+          "sha256": "d6532d01b094853416c420cc0bd927846e3fb8b85356381a152b5a54df4def75",
+          "bytes": 65324
+        },
+        "ref-09-character-turnaround-mint.jpg": {
+          "sha256": "4484139e3adc3960e5f43e53589bb98f6a9ebcdf06dae1d2138f5545ace6d2bc",
+          "bytes": 102882
+        },
+        "ref-10-bunny-minimal-sketch.jpg": {
+          "sha256": "7c649abd48f5072c185e12537a4cb38161b8f799fa5032fd3739b965921c247e",
+          "bytes": 61014
+        },
+        "ref-11-lizard-lavender-shadow.jpg": {
+          "sha256": "90842bc72403013269ba18b612e31cc27c238bb6218df1a78956e20aa5317fd2",
+          "bytes": 283651
         }
       }
     },

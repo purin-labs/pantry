@@ -295,70 +295,75 @@ export const DEFAULT_ROOM_APPLIANCE_LAYOUTS: Readonly<
     "decor-planter": { id: "decor-planter", x: -1.68, z: 2.98, rotY: 0 },
   },
 
-  "kinshicho-61146": {
-    // Rehearsal / Workflow Simulator
-    stage: { id: "stage", x: -1.52, z: -0.05, rotY: HALF_PI },
-    portion: { id: "portion", x: -1.52, z: 1.58, rotY: HALF_PI },
-    bake: { id: "bake", x: 1.46, z: -0.55, rotY: -HALF_PI },
-    cool: { id: "cool", x: 1.55, z: 0.65, rotY: 0 },
-    pack: { id: "pack", x: 0.85, z: 2.65, rotY: 0 },
-    "robot-cell": { id: "robot-cell", x: 0.05, z: 1.25, rotY: 0 },
+  "kinshicho-6992842011": {
+    // Rehearsal / Workflow Simulator — wide double-shutter 1F hall (5.46 × 4.58 m)
+    stage: { id: "stage", x: -2.26, z: -0.46, rotY: HALF_PI },
+    portion: { id: "portion", x: -2.26, z: 1.04, rotY: HALF_PI },
+    bake: { id: "bake", x: 2.16, z: -0.9, rotY: -HALF_PI },
+    cool: { id: "cool", x: 2.22, z: 0.14, rotY: -HALF_PI },
+    pack: { id: "pack", x: 0.64, z: 0.62, rotY: 0 },
+    "robot-cell": { id: "robot-cell", x: -0.95, z: -0.7, rotY: 0 },
 
     // Morning Shift
-    "station-wash": { id: "station-wash", x: -0.85, z: -1.55, rotY: 0 },
-    "station-scale": { id: "station-scale", x: -1.52, z: -0.05, rotY: HALF_PI },
-    "station-mixer": { id: "station-mixer", x: -1.52, z: 1.58, rotY: HALF_PI },
+    "station-wash": { id: "station-wash", x: 0.92, z: -1.84, rotY: 0 },
+    "station-scale": { id: "station-scale", x: -2.26, z: -0.46, rotY: HALF_PI },
+    "station-mixer": { id: "station-mixer", x: -2.26, z: 1.04, rotY: HALF_PI },
+    "station-hob": { id: "station-hob", x: -1.12, z: -0.78, rotY: 0 },
     "station-sesame-prep": {
       id: "station-sesame-prep",
-      x: 0.25,
-      z: -0.82,
+      x: 0.42,
+      z: -0.78,
       rotY: 0,
     },
-    "station-hob": { id: "station-hob", x: 1.55, z: -0.62, rotY: -HALF_PI },
-    "station-oven": { id: "station-oven", x: 1.46, z: 1.02, rotY: -HALF_PI },
-    "station-chiller": { id: "station-chiller", x: 0.05, z: 0.22, rotY: 0 },
+    "station-oven": { id: "station-oven", x: 2.16, z: -0.72, rotY: -HALF_PI },
+    "station-chiller": {
+      id: "station-chiller",
+      x: 2.22,
+      z: 0.72,
+      rotY: -HALF_PI,
+    },
     "station-beverage-bar": {
       id: "station-beverage-bar",
-      x: 0.85,
-      z: 2.65,
+      x: 0.36,
+      z: 0.62,
       rotY: 0,
     },
-    "espresso-cell": { id: "espresso-cell", x: 0.59, z: 2.69, rotY: 0 },
+    "espresso-cell": { id: "espresso-cell", x: 0.1, z: 0.66, rotY: 0 },
     "pour-over-cell": {
       id: "pour-over-cell",
-      x: -1.52,
-      z: 2.82,
-      rotY: HALF_PI,
+      x: -1.06,
+      z: 0.62,
+      rotY: 0,
     },
-    "tea-pan-cell": { id: "tea-pan-cell", x: 0.05, z: 1.35, rotY: 0 },
-    "cell-1": { id: "cell-1", x: -0.55, z: 1.35, rotY: 0 },
-    "cell-2": { id: "cell-2", x: 0.65, z: 1.35, rotY: 0 },
+    "tea-pan-cell": { id: "tea-pan-cell", x: -0.18, z: -0.05, rotY: 0 },
+    "cell-1": { id: "cell-1", x: -0.72, z: -0.05, rotY: 0 },
+    "cell-2": { id: "cell-2", x: 0.56, z: -0.05, rotY: 0 },
 
     // Financier Factory
     "station-preparation": {
       id: "station-preparation",
-      x: -1.52,
-      z: -0.05,
+      x: -2.26,
+      z: -0.46,
       rotY: HALF_PI,
     },
     "station-mould-cooling": {
       id: "station-mould-cooling",
-      x: 0.15,
-      z: 0.22,
-      rotY: 0,
+      x: -2.26,
+      z: 1.04,
+      rotY: HALF_PI,
     },
     "station-cooling-rack": {
       id: "station-cooling-rack",
-      x: 1.55,
-      z: 2.0,
-      rotY: 0,
+      x: 2.22,
+      z: 0.14,
+      rotY: -HALF_PI,
     },
-    "station-packing": { id: "station-packing", x: 0.85, z: 2.65, rotY: 0 },
+    "station-packing": { id: "station-packing", x: 0.64, z: 0.62, rotY: 0 },
 
-    // Interior furnishings
-    "decor-bench": { id: "decor-bench", x: -0.41, z: 3.16, rotY: 0 },
-    "decor-vitrine": { id: "decor-vitrine", x: 0.15, z: 1.85, rotY: 0 },
-    "decor-planter": { id: "decor-planter", x: 1.72, z: 3.18, rotY: 0 },
+    // Interior furnishings along the south double-shutter frontage
+    "decor-vitrine": { id: "decor-vitrine", x: -0.86, z: 1.86, rotY: 0 },
+    "decor-bench": { id: "decor-bench", x: 1.36, z: 1.94, rotY: 0 },
+    "decor-planter": { id: "decor-planter", x: 2.36, z: 1.94, rotY: 0 },
   },
 
   "machiya-sun-reve": {

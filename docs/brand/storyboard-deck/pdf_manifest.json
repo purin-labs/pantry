@@ -1,0 +1,296 @@
+{
+  "brand": {
+    "company": "Seams",
+    "product": "Seams Pantry",
+    "short_product": "Pantry",
+    "agent": "Sous Chef",
+    "checkout": "Seams Checkout",
+    "gantry": "Seams Gantry",
+    "mitten": "Seams Mitten",
+    "host": "seams.sh",
+    "tagline": "The bakery operating system for modern pâtisseries & cafés.",
+    "wordmark_svg": "../../../apps/portal/public/ecommerce/seams-wordmark.svg",
+    "fonts_dir": "../../../apps/portal/public/ecommerce/fonts"
+  },
+  "deck": {
+    "title": "Seams Pantry — Craft Bakery Storyboard Deck",
+    "page_width_in": 16,
+    "page_height_in": 9
+  },
+  "pages": [
+    {
+      "number": 1,
+      "id": "cover",
+      "layout": "cover",
+      "pitch_cut_6": true,
+      "pitch_label": "Page 01 · Story",
+      "layer": "Seams Pantry · Bakery Operating System",
+      "kicker": "CRAFT PATISSERIE & CAFE STORYBOARD",
+      "headline": "Run a craft bakery without the 4:00 AM burnout.",
+      "body": "Mika bakes brown-butter financiers, savoury beef pies, and ribboned gift boxes in a single Tokyo shop. Seams Pantry connects her recipe bench, Sous Chef agents, and live counter so craft scales without chaos.",
+      "image": "images/slide-01-cover.jpg",
+      "caption": "Fig. 01 — Fresh morning financiers, savoury pies, gift boxes, and pour-over coffee on one bench.",
+      "pills": [
+        "Seams Pantry · Kitchen",
+        "Sous Chef · Voice & Chat",
+        "Seams Checkout · Counter & QR",
+        "Seams Gantry · Simulation First"
+      ]
+    },
+    {
+      "number": 2,
+      "id": "four-pain-points",
+      "layout": "split",
+      "pitch_cut_6": false,
+      "pitch_label": "Page 02 · Bench Reality",
+      "layer": "Seams Pantry · Target Operators",
+      "kicker": "1–3 SHOPS · 2–8 STAFF",
+      "tone": "amber",
+      "headline": "Four bench pressures quietly cap every independent bakery.",
+      "body": "Before software ever enters the picture, owner-makers like Mika and shift leads like Ken fight the same four physical bottlenecks every shift: brutal pre-dawn starts, hours of sequential prep, batch-to-batch drift, and sink mountains that keep staff past closing.",
+      "image": "images/slide-02-four-pain-points.jpg",
+      "caption": "Fig. 02 — Pre-dawn alarms, crowded prep benches, uneven bakes, and piled sinks.",
+      "facts": [
+        {
+          "label": "01 · Alarm",
+          "value": "04:00 AM starts for doughs, fillings, and bar concentrates"
+        },
+        {
+          "label": "02 · Prep & Drift",
+          "value": "Sequential bowls block the shift; eye-balled fills drift off-spec"
+        },
+        {
+          "label": "03 · Washing",
+          "value": "Unsequenced flavour mixes bury the sink by midday"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "no-4am",
+      "layout": "split",
+      "pitch_cut_6": true,
+      "pitch_label": "Page 03 · No 4 AM",
+      "layer": "Seams Pantry · Kitchen",
+      "kicker": "BENCH PAIN POINT 01 · NO 4:00 AM",
+      "tone": "evergreen",
+      "headline": "Replace the 4:00 AM wake-up with tracked afternoon mise-en-place.",
+      "body": "One baker runs the afternoon prep shift from 13:00 to 16:52 — cooking black sesame concentrate, ginger decoctions, pie shortcrust, and braised fillings into tracked cold holds. At the end of next morning's shift, every lot is 22–26 hours old and safely inside hold.",
+      "image": "images/slide-03-no-4am.jpg",
+      "caption": "Fig. 03 — Afternoon mise-en-place (13:00–16:52) chilled in tracked 48h and 72h lots.",
+      "facts": [
+        {
+          "label": "Afternoon run",
+          "value": "13:00–16:52 by one baker; morning only lines, fills, lids, and bakes"
+        },
+        {
+          "label": "48h cold holds",
+          "value": "Shortcrust dough (1,320 g), black sesame (1,520 g), ginger tea bases"
+        },
+        {
+          "label": "72h cold holds",
+          "value": "Steak & pepper and beef bourguignon fillings chilled at ≤5 °C"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "direct-to-pan",
+      "layout": "split",
+      "pitch_cut_6": false,
+      "pitch_label": "Page 04 · Parallel Prep",
+      "layer": "Seams Pantry · Kitchen",
+      "kicker": "BENCH PAIN POINT 02 · HOURS OF PREP",
+      "tone": "evergreen",
+      "headline": "Weigh direct to pan and run hobs, mixer, and chiller in parallel.",
+      "body": "Pantry compiles each recipe onto the shop's exact equipment — one Ohaus Ranger 3000 scale, one Hobart HL200 mixer, and four Vollrath induction units. Ingredients weigh straight into the braising pan so the 90-minute simmer never blocks financier batter or bar drinks.",
+      "image": "images/slide-04-direct-to-pan.jpg",
+      "caption": "Fig. 04 — Direct-to-pan weighing with four independent induction hobs running in parallel.",
+      "facts": [
+        {
+          "label": "Direct to pan",
+          "value": "780 g filling per 1 L induction pan (3 pies × 260 g) with zero transfer bowls"
+        },
+        {
+          "label": "Parallel lines",
+          "value": "4 Vollrath hobs braise while the HL200 mixes and the oven runs 170 °C"
+        },
+        {
+          "label": "Oven changeover",
+          "value": "Declared Maruzen MBCO-5E switch from 170\u00a0°C financiers to 200\u00a0°C pies"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "25g-consistency",
+      "layout": "split",
+      "pitch_cut_6": true,
+      "pitch_label": "Page 05 · 25g Consistency",
+      "layer": "Seams Pantry · Kitchen",
+      "kicker": "BENCH PAIN POINT 03 · BATCH DRIFT",
+      "tone": "evergreen",
+      "headline": "Lock crisp edges and tender crumb with 180 g butter and 25 g fill guards.",
+      "body": "Every financier batch starts from 180 g butter weighed before browning (~22 g water lost, never topped up) and portions at 25 g per cavity in Matsunaga shallow 8-cavity trays. Held-batch checks catch colour or crumb drift before a tray ever hits the counter.",
+      "image": "images/slide-05-25g-consistency.jpg",
+      "caption": "Fig. 05 — 25 g cavity fill checks on the scale with four signature flavour mix-ins.",
+      "facts": [
+        {
+          "label": "Pre-brown check",
+          "value": "180 g unsalted butter weighed raw; exact milligram mass balance"
+        },
+        {
+          "label": "Cavity guard",
+          "value": "25 g per Matsunaga shallow cavity (75–80% depth, 12–15 min first check)"
+        },
+        {
+          "label": "Four flavours",
+          "value": "Hazelnut ¥350 · Coffee ¥330 · Matcha ¥350 · Black sesame ¥330"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "washing",
+      "layout": "split",
+      "pitch_cut_6": true,
+      "pitch_label": "Page 06 · Washing",
+      "layer": "Seams Pantry · Kitchen",
+      "kicker": "BENCH PAIN POINT 04 · WASHING (洗い物)",
+      "tone": "evergreen",
+      "headline": "End the sink mountain with fewest-bowl ordering and scheduled wash cycles.",
+      "body": "Pantry sequences batches to minimize flavour carry-over and bowl swaps, then schedules Winterhalter UC-L undercounter warewasher turnarounds right between mixes. Pans come out steaming clean before the next batch needs them — never piled at 6:00 PM.",
+      "image": "images/slide-06-washing.jpg",
+      "caption": "Fig. 06 — Ordered mix-ins beside one clean bowl and a scheduled undercounter warewasher.",
+      "facts": [
+        {
+          "label": "Clean sequence",
+          "value": "Hazelnut → Coffee → Matcha → Black sesame prevents dark carry-over"
+        },
+        {
+          "label": "Wash turnaround",
+          "value": "Winterhalter UC-L cycles scheduled into the resource timeline"
+        },
+        {
+          "label": "Bench result",
+          "value": "Zero midday sink pile-up; spotless stainless before the afternoon prep"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "sous-chef",
+      "layout": "split",
+      "pitch_cut_6": false,
+      "pitch_label": "Page 07 · Sous Chef",
+      "layer": "Seams Pantry · Sous Chef",
+      "kicker": "VOICE, WORKFLOW CANVAS & MARGINS",
+      "tone": "evergreen",
+      "headline": "Hands-free Sous Chef agents keep workflow, stock, and margins in sync.",
+      "body": "Through Portal chat, Slack, and local shop voice, Sous Chef answers lot checks, proposes recipe workflow edits, and updates supplier pack costs and FIFO lot margins. Every action runs inside the operator's own permissions, approvals, and durable receipts.",
+      "image": "images/slide-07-sous-chef.jpg",
+      "caption": "Fig. 07 — Calm hands-free coordination linking ovens, chillers, recipes, and margin sheets.",
+      "facts": [
+        {
+          "label": "Synchronized views",
+          "value": "Recipe workflow canvas, resource timeline, and 3D bakery share one run"
+        },
+        {
+          "label": "Costs & margins",
+          "value": "Live multiplayer sheet tracks pack prices, FIFO lots, and product margins"
+        },
+        {
+          "label": "Governed action",
+          "value": "Typed policy checks, spoken or clicked approvals, and immutable receipts"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "id": "pantry-counter",
+      "layout": "split",
+      "pitch_cut_6": false,
+      "pitch_label": "Page 08 · Live Counter",
+      "layer": "Seams Checkout · Café & Commerce",
+      "kicker": "ONE LIVE MENU · COUNTER, QR & GIFTS",
+      "tone": "evergreen",
+      "headline": "One live menu across the Register, QR tables, and online gift boxes.",
+      "body": "When the last steak-and-pepper pie leaves the glass dome, Seams Checkout marks it SOLD OUT across the counter Register, table QR page, and online shop at once. Cash, Square Terminal cards, FeliCa, and gift box orders settle into one daily ledger.",
+      "image": "images/slide-08-pantry-counter.jpg",
+      "caption": "Fig. 08 — Live counter stock, table QR ordering, and ribboned gift boxes in sync.",
+      "facts": [
+        {
+          "label": "One live menu",
+          "value": "Collaborative menu editor updates counter, QR order page, and online"
+        },
+        {
+          "label": "Counter Register",
+          "value": "Cash with change plus Square Terminal Japan (card, FeliCa, QR)"
+        },
+        {
+          "label": "Gift economics",
+          "value": "High-margin boxed financiers and pies ship online beside daily coffee"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "gantry-and-mitten",
+      "layout": "split",
+      "pitch_cut_6": true,
+      "pitch_label": "Page 09 · Gantry & Mitten",
+      "layer": "Seams Gantry · Simulation First",
+      "kicker": "LOOKING AHEAD · SIMULATION FIRST (PLAN 24)",
+      "tone": "amber",
+      "headline": "Seams Gantry and Mitten rehearse every oven transfer in simulation first.",
+      "body": "Before a single physical arm enters the café kitchen, Seams Gantry rehearses ceiling cobots and smart ovens in MuJoCo simulation — paired with Seams Mitten heat-safe tray handling. Future machine dispatch uses the exact same human approvals and receipts as Sous Chef.",
+      "image": "images/slide-09-gantry-and-mitten.jpg",
+      "caption": "Fig. 09 — Ceiling-mounted cobot arm with heat-safe mitt gripper rehearsed in simulation.",
+      "facts": [
+        {
+          "label": "Simulation first",
+          "value": "MuJoCo workcell simulation validates tray clearance and timing first"
+        },
+        {
+          "label": "Seams Gantry",
+          "value": "Ceiling rail cobots and smart ovens keep precious floor bench clear"
+        },
+        {
+          "label": "Same governance",
+          "value": "Human, agent, and machine actions share one policy and receipt boundary"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "id": "six-pm-close",
+      "layout": "close",
+      "pitch_cut_6": true,
+      "pitch_label": "Page 10 · 6:00 PM Close",
+      "layer": "Seams Pantry · Every Shift Closed Clean",
+      "kicker": "THE DAILY PAYOFF · 18:00",
+      "headline": "Doors flip to CLOSED at 6:00 PM. Tomorrow is already chilled.",
+      "body": "The trays are empty, the warewasher finished its last cycle, daily margins are reconciled, and tomorrow's 48-hour cold holds rest at 5 °C. Mika locks the shop door on time.",
+      "image": "images/slide-10-six-pm-close.jpg",
+      "caption": "Fig. 10 — Quiet closing at 6:00 PM with a clean kitchen and tomorrow's mise-en-place chilled.",
+      "outcomes": [
+        {
+          "title": "No 4:00 AM",
+          "detail": "Afternoon mise-en-place holds 48h–72h"
+        },
+        {
+          "title": "Parallel bench",
+          "detail": "Direct-to-pan prep across 4 hobs"
+        },
+        {
+          "title": "25 g every bake",
+          "detail": "Exact butter, fill, and oven guards"
+        },
+        {
+          "title": "Zero sink pile-up",
+          "detail": "Fewest-bowl order + scheduled wash"
+        }
+      ]
+    }
+  ]
+}

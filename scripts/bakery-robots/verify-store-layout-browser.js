@@ -181,17 +181,17 @@ function disposalCounts(ids) {
 
 function seedCrowdedRoom() {
   const { workspace } = window.storeLayoutProbe;
-  workspace.resetPlacements("kinshicho-61146");
-  workspace.setPoses("kinshicho-61146", [
-    { id: "stage", x: -0.2, z: -2.2, rotY: 0 },
-    { id: "portion", x: -0.2, z: -1.1, rotY: 0 },
-    { id: "bake", x: 1, z: -1.1, rotY: 0 },
-    { id: "pack", x: -1.4, z: -1.1, rotY: 0 },
-    { id: "robot-cell", x: -1.3, z: 0.2, rotY: 0 },
-    { id: "decor-bench", x: 0, z: 0.2, rotY: 0 },
-    { id: "decor-vitrine", x: 1.3, z: 0.2, rotY: 0 },
-    { id: "cool", x: -1.4, z: -2.2, rotY: 0 },
-    { id: "decor-planter", x: 0.75, z: -2.2, rotY: 0 },
+  workspace.resetPlacements("kinshicho-6992842011");
+  workspace.setPoses("kinshicho-6992842011", [
+    { id: "stage", x: 1.55, z: -1.78, rotY: 0 },
+    { id: "cool", x: -0.95, z: -1.62, rotY: 0 },
+    { id: "portion", x: 1.55, z: -0.82, rotY: 0 },
+    { id: "bake", x: 0.25, z: -1.68, rotY: 0 },
+    { id: "pack", x: 0.25, z: -0.65, rotY: 0 },
+    { id: "robot-cell", x: 1.9, z: 0.25, rotY: 0 },
+    { id: "decor-bench", x: 0.65, z: 0.45, rotY: 0 },
+    { id: "decor-vitrine", x: -0.55, z: 0.35, rotY: 0 },
+    { id: "decor-planter", x: 2.38, z: -1.55, rotY: 0 },
   ]);
 }
 
@@ -397,45 +397,80 @@ async function verifyStoreLayoutBrowser(page) {
   }
 
   await selectStoreRoom(page, "Kinshicho");
+  const kinshichoCheck = await page.evaluate(() => {
+    const { workspace, layout, plans } = window.storeLayoutProbe;
+    const spec = plans["kinshicho-6992842011"];
+    const activePlan = workspace.getActivePlan();
+    const blockedCount = document.querySelectorAll(
+      '.spatial-floor-map [data-state="blocked"]',
+    ).length;
+    const uncheckedCount = document.querySelectorAll(
+      '.spatial-floor-map [data-state="unchecked"]',
+    ).length;
+    const walkLegs = layout.getLiveStationWalkLegs("kinshicho-6992842011");
+    return {
+      activePlan,
+      areaSqm: spec.areaSqm,
+      blockedCount,
+      uncheckedCount,
+      walkLegs: walkLegs.map((leg) => ({
+        from: leg.from,
+        to: leg.to,
+        distanceMeters: leg.distanceMeters,
+        walkSeconds: leg.walkSeconds,
+      })),
+    };
+  });
+  if (
+    kinshichoCheck.activePlan !== "kinshicho-6992842011" ||
+    kinshichoCheck.areaSqm !== 25 ||
+    kinshichoCheck.blockedCount !== 0 ||
+    kinshichoCheck.uncheckedCount !== 0 ||
+    kinshichoCheck.walkLegs.length !== 4 ||
+    kinshichoCheck.walkLegs.some((leg) => leg.distanceMeters <= 0)
+  ) {
+    throw new Error(
+      `Kinshicho 6992842011 layout or walk routing failed: ${JSON.stringify(kinshichoCheck)}`,
+    );
+  }
+  await page.screenshot({ path: `${evidence}/kinshicho-6992842011.png` });
   const closedCorridorRoute = await page.evaluate(() =>
     window.storeLayoutProbe.layout.buildLiveRoomRoute(
-      "kinshicho-61146",
-      [-1.4, -1.9],
-      [-1.4, -3.1],
+      "kinshicho-6992842011",
+      [-0.95, -1.62],
+      [-1.72, -1.72],
       [],
     ),
   );
-  if (closedCorridorRoute[closedCorridorRoute.length - 1][1] <= -2.65) {
+  if (closedCorridorRoute[closedCorridorRoute.length - 1][0] <= -1.39) {
     throw new Error(
-      `Worker route crossed a closed corridor door: ${JSON.stringify(closedCorridorRoute)}`,
+      `Worker route crossed a closed toilet door: ${JSON.stringify(closedCorridorRoute)}`,
     );
   }
-  const corridorDoor = map.locator(
-    '[data-opening="door:door-corridor-access"]',
-  );
+  const corridorDoor = map.locator('[data-opening="door:door-toilet"]');
   await corridorDoor.focus();
   await corridorDoor.press("Enter");
   await page.waitForFunction(
-    `(${readOpening.toString()})("door:door-corridor-access").progress === 1`,
+    `(${readOpening.toString()})("door:door-toilet").progress === 1`,
     null,
     { polling: "raf" },
   );
   const openCorridorRoute = await page.evaluate(() =>
     window.storeLayoutProbe.layout.buildLiveRoomRoute(
-      "kinshicho-61146",
-      [-1.4, -1.9],
-      [-1.4, -3.1],
+      "kinshicho-6992842011",
+      [-0.95, -1.62],
+      [-1.72, -1.72],
       [],
     ),
   );
-  if (openCorridorRoute[openCorridorRoute.length - 1][1] > -3.05) {
+  if (openCorridorRoute[openCorridorRoute.length - 1][0] > -1.55) {
     throw new Error(
-      `Worker route did not pass through the opened corridor door: ${JSON.stringify(openCorridorRoute)}`,
+      `Worker route did not pass through the opened toilet door: ${JSON.stringify(openCorridorRoute)}`,
     );
   }
   await corridorDoor.press("Enter");
   await page.waitForFunction(
-    `(${readOpening.toString()})("door:door-corridor-access").progress === 0`,
+    `(${readOpening.toString()})("door:door-toilet").progress === 0`,
     null,
     { polling: "raf" },
   );
@@ -445,49 +480,48 @@ async function verifyStoreLayoutBrowser(page) {
     scene.update(scene.frame);
   });
   await page
-    .getByText(
-      "Blocked: Cooling obstructs the swing arc of Rear corridor door.",
-      { exact: true },
-    )
+    .getByText("Blocked: Cooling obstructs the swing arc of Toilet door.", {
+      exact: true,
+    })
     .waitFor({ state: "attached" });
   await corridorDoor.focus();
   await corridorDoor.press("Enter");
   await page.waitForFunction(
-    `(() => { const o = (${readOpening.toString()})("door:door-corridor-access"); return !window.storeLayoutProbe.workspace.isAnimating() && o.progress > 0 && o.progress < 1; })()`,
+    `(() => { const o = (${readOpening.toString()})("door:door-toilet"); return !window.storeLayoutProbe.workspace.isAnimating() && o.progress > 0 && o.progress < 1; })()`,
     null,
     { polling: "raf" },
   );
   const clampedCorridorDoor = await page.evaluate(
     readOpening,
-    "door:door-corridor-access",
+    "door:door-toilet",
   );
   await page.evaluate(() => {
-    window.storeLayoutProbe.workspace.setPoses("kinshicho-61146", [
-      { id: "cool", x: -0.6, z: 0.2, rotY: 0 },
+    window.storeLayoutProbe.workspace.setPoses("kinshicho-6992842011", [
+      { id: "cool", x: -0.95, z: -0.5, rotY: 0 },
     ]);
   });
   await page.waitForFunction(
-    `(() => { const o = (${readOpening.toString()})("door:door-corridor-access"); return !window.storeLayoutProbe.workspace.isAnimating() && o.progress === 1; })()`,
+    `(() => { const o = (${readOpening.toString()})("door:door-toilet"); return !window.storeLayoutProbe.workspace.isAnimating() && o.progress === 1; })()`,
     null,
     { polling: "raf" },
   );
   const unclampedCorridorDoor = await page.evaluate(
     readOpening,
-    "door:door-corridor-access",
+    "door:door-toilet",
   );
   await page.evaluate(() => {
-    window.storeLayoutProbe.workspace.setPoses("kinshicho-61146", [
-      { id: "cool", x: -1.4, z: -2.2, rotY: 0 },
+    window.storeLayoutProbe.workspace.setPoses("kinshicho-6992842011", [
+      { id: "cool", x: -0.95, z: -1.62, rotY: 0 },
     ]);
   });
   await page.waitForFunction(
-    `(() => { const o = (${readOpening.toString()})("door:door-corridor-access"); return !window.storeLayoutProbe.workspace.isAnimating() && o.progress > 0 && o.progress < 1; })()`,
+    `(() => { const o = (${readOpening.toString()})("door:door-toilet"); return !window.storeLayoutProbe.workspace.isAnimating() && o.progress > 0 && o.progress < 1; })()`,
     null,
     { polling: "raf" },
   );
   const reclampedCorridorDoor = await page.evaluate(
     readOpening,
-    "door:door-corridor-access",
+    "door:door-toilet",
   );
   if (
     unclampedCorridorDoor.progress !== 1 ||
@@ -913,6 +947,7 @@ async function verifyStoreLayoutBrowser(page) {
     unclampedCorridorDoor,
     reclampedCorridorDoor,
     storageAndSurfaceCheck,
+    kinshichoCheck,
     machiyaCheck,
     hongoCheck,
     doorWalkRoutes: {

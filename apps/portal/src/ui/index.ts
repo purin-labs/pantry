@@ -119,6 +119,7 @@ export {
   type PromptToastView,
 } from "./prompt-toast";
 export { PantryMark } from "./pantry-mark";
+export { PurinIcon, PurinMark, type PurinMarkProps } from "./purin-mark";
 export { Popover } from "./popover";
 export { Select } from "./select";
 export { GrainField } from "./grain-field";

@@ -1096,11 +1096,81 @@ def convert_curves(bodies):
             replacement.name = name
 
 
+def _sanitize_xml_id(stem):
+    return "".join(ch if ch.isalnum() or ch == "_" else "_" for ch in stem)
+
+
+def _extract_material_pbr_layers(surface, directory):
+    """Inspect a Blender material's node tree for local PNG textures to wire as Filament PBR layers."""
+    layers = []
+    rgba_override = None
+    has_orm = False
+    has_roughness_map = False
+    has_metallic_map = False
+    if not surface.node_tree:
+        return layers, rgba_override, has_orm, has_roughness_map, has_metallic_map
+
+    def resolve_local_png(image):
+        if image is None:
+            return None
+        for candidate in (Path(image.filepath).name if image.filepath else "", image.name):
+            if candidate and (directory / candidate).is_file():
+                return candidate
+        return None
+
+    seen_roles = set()
+    for node in surface.node_tree.nodes:
+        if node.type != "TEX_IMAGE" or node.image is None:
+            continue
+        fname = resolve_local_png(node.image)
+        if not fname:
+            continue
+        targets = [
+            (link.to_node.type, link.to_socket.name)
+            for out in node.outputs
+            for link in out.links
+        ]
+        colorspace = (
+            "linear"
+            if node.image.colorspace_settings.name in {"Non-Color", "Linear", "Raw"}
+            else "sRGB"
+        )
+        role = None
+        if any(t_node == "BSDF_PRINCIPLED" and t_sock == "Base Color" for t_node, t_sock in targets):
+            role = "rgb"
+            colorspace = "sRGB"
+            rgba_override = (1.0, 1.0, 1.0, 1.0)
+        elif any(t_node == "MIX" for t_node, _ in targets):
+            role = "rgb"
+            colorspace = "sRGB"
+        elif any(t_node == "SEPARATE_COLOR" for t_node, _ in targets) or "orm" in fname.lower():
+            role = "orm"
+            colorspace = "linear"
+            has_orm = True
+        elif any(t_node == "NORMAL_MAP" for t_node, _ in targets) or "normal" in fname.lower():
+            role = "normal"
+            colorspace = "linear"
+        elif any(t_node == "BSDF_PRINCIPLED" and t_sock == "Roughness" for t_node, t_sock in targets):
+            role = "roughness"
+            colorspace = "linear"
+            has_roughness_map = True
+        elif any(t_node == "BSDF_PRINCIPLED" and t_sock == "Metallic" for t_node, t_sock in targets):
+            role = "metallic"
+            colorspace = "linear"
+            has_metallic_map = True
+        if role and role not in seen_roles:
+            seen_roles.add(role)
+            tex_name = "tex_" + _sanitize_xml_id(Path(fname).stem)
+            layers.append((tex_name, fname, colorspace, role))
+    return layers, rgba_override, has_orm, has_roughness_map, has_metallic_map
+
+
 def export_visual_meshes(bodies, directory):
-    """Export body-local OBJ groups; decorative surfaces never supply inertia."""
+    """Export body-local OBJ groups with UVs and Filament PBR textures; visual surfaces supply no inertia."""
     mesh_directory = directory / "meshes"
     mesh_directory.mkdir(exist_ok=True)
     assets = ET.Element("mujocoinclude")
+    written_textures = set()
     written_materials = set()
     depsgraph = bpy.context.evaluated_depsgraph_get()
     for body in bodies:
@@ -1113,7 +1183,12 @@ def export_visual_meshes(bodies, directory):
             name = body.name + "_" + surface_name
             lines = ["# Body-local visual mesh; decorative surfaces supply no inertia"]
             offset = 0
+            uv_offset = 0
             normal_offset = 0
+            has_uvs = any(
+                obj.type == "MESH" and obj.data.uv_layers.active is not None
+                for obj in objects
+            )
             for obj in objects:
                 evaluated = obj.evaluated_get(depsgraph)
                 mesh = evaluated.to_mesh()
@@ -1125,6 +1200,16 @@ def export_visual_meshes(bodies, directory):
                     lines.append(
                         "v " + " ".join(f"{value:.9f}" for value in coordinate)
                     )
+                if has_uvs:
+                    uv_layer = mesh.uv_layers.active
+                    if uv_layer is not None and len(uv_layer.data) == len(mesh.loops):
+                        for uv_item in uv_layer.data:
+                            lines.append(
+                                f"vt {uv_item.uv.x:.6f} {uv_item.uv.y:.6f}"
+                            )
+                    else:
+                        for _ in range(len(mesh.loops)):
+                            lines.append("vt 0.000000 0.000000")
                 for normal in mesh.corner_normals:
                     direction = (normal_transform @ normal.vector).normalized()
                     lines.append(
@@ -1133,11 +1218,18 @@ def export_visual_meshes(bodies, directory):
                 for polygon in mesh.loop_triangles:
                     face = []
                     for vertex, loop in zip(polygon.vertices, polygon.loops):
-                        face.append(
-                            f"{offset + vertex + 1}//{normal_offset + loop + 1}"
-                        )
+                        if has_uvs:
+                            face.append(
+                                f"{offset + vertex + 1}/{uv_offset + loop + 1}/{normal_offset + loop + 1}"
+                            )
+                        else:
+                            face.append(
+                                f"{offset + vertex + 1}//{normal_offset + loop + 1}"
+                            )
                     lines.append("f " + " ".join(face))
                 offset += len(mesh.vertices)
+                if has_uvs:
+                    uv_offset += len(mesh.loops)
                 normal_offset += len(mesh.loops)
                 evaluated.to_mesh_clear()
             (mesh_directory / f"{name}.obj").write_text("\n".join(lines) + "\n")
@@ -1146,22 +1238,41 @@ def export_visual_meshes(bodies, directory):
                 "mesh",
                 name=name,
                 file=f"meshes/{name}.obj",
-                inertia="convex",
+                inertia="shell",
                 smoothnormal="true",
             )
             if surface_name not in written_materials:
                 surface = bpy.data.materials[surface_name]
-                ET.SubElement(
+                layers, rgba_override, has_orm, has_roughness_map, has_metallic_map = (
+                    _extract_material_pbr_layers(surface, directory)
+                )
+                for tex_name, fname, colorspace, _role in layers:
+                    if tex_name not in written_textures:
+                        ET.SubElement(
+                            assets,
+                            "texture",
+                            name=tex_name,
+                            type="2d",
+                            file=fname,
+                            colorspace=colorspace,
+                        )
+                        written_textures.add(tex_name)
+                rgba_vals = rgba_override if rgba_override is not None else surface.diffuse_color
+                metallic_val = 1.0 if (has_orm or has_metallic_map) else float(surface["metallic"])
+                roughness_val = 1.0 if (has_orm or has_roughness_map) else float(surface["roughness"])
+                mat_el = ET.SubElement(
                     assets,
                     "material",
                     name="visual_" + surface_name,
-                    rgba=" ".join(str(value) for value in surface.diffuse_color),
-                    metallic=str(surface["metallic"]),
-                    roughness=str(surface["roughness"]),
+                    rgba=" ".join(str(value) for value in rgba_vals),
+                    metallic=str(metallic_val),
+                    roughness=str(roughness_val),
                     specular="0.5",
-                    shininess=str(1 - surface["roughness"]),
+                    shininess=str(1 - float(surface["roughness"])),
                     emission=str(min(1, surface["emission"])),
                 )
+                for tex_name, _fname, _colorspace, role in layers:
+                    ET.SubElement(mat_el, "layer", texture=tex_name, role=role)
                 written_materials.add(surface_name)
             ET.SubElement(
                 geoms,
@@ -1172,6 +1283,7 @@ def export_visual_meshes(bodies, directory):
                 material="visual_" + surface_name,
                 contype="0",
                 conaffinity="0",
+                density="0",
                 mass="0",
                 group="2",
             )

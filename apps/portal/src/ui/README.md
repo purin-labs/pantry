@@ -537,6 +537,29 @@ changed, so a save cannot replace the newer body.
 each one in the timeline at the time of its draft. The chat preview shows both
 at `/chat-preview.html?scenario=drafts&conversation=conv_00000000-0000-0000-0000-000000000001`.
 
+### Purin mark
+
+`PurinMark` and `PurinIcon` draw the Purin cat mark as inline SVG: a cat that
+looks at a custard pudding. `PurinMark` has a transparent ground and a dark
+cat, so it belongs on a light surface. `PurinIcon` puts the mark on its cream
+tile, so it reads on a light surface and on a dark surface.
+
+```tsx
+<PurinIcon size={32} label="Purin" />
+<PurinMark animated className="welcome-mark" />
+```
+
+- `animated` makes the cat sway and the pudding jiggle. The less-motion
+  setting of the device stops the motion.
+- `label` gives the accessible name. Without it, the mark is decoration.
+- `size` sets the width and the height in pixels. Without it, CSS sets them.
+
+`purin-mark-paths.ts` and `purin-mark.css` are generated. To change the
+curves, the colours or the motion, edit `scripts/brand/build-purin-logo.mjs`
+and run it. [The Purin logo folder](../../../../docs/brand/purin-logo/README.md)
+holds the SVG files and the icon pack. `PantryMark` still draws the goat mark
+on every Portal surface, until the brand switch.
+
 ### Motion
 
 State changes use the spring shorthands from `styles.css`: `--motion-quick`
