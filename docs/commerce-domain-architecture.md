@@ -1,7 +1,7 @@
 # Commerce Domain Architecture
 
 Status: **authoritative** · Date: 2026-08-12 · Owners: Contracts,
-Underclerk, and Satyr platform
+Commerce, and Pantry platform
 
 This document defines the commerce domain and runtime ownership implemented by
 Plan 22.
@@ -10,7 +10,7 @@ model sections of Plan 9. It preserves the established provider-adapter,
 single-authority, signed-delivery, governed-action, and rebuildable-projection
 boundaries.
 
-Plan 22 owns the replacement sequence and two Satyr Commerce configurations: a
+Plan 22 owns the replacement sequence and two Seams Checkout configurations: a
 Cafe / Patisserie and its online packaged-goods storefront. Existing Shopify
 support receives only the boundary updates required by the contract replacement.
 
@@ -27,10 +27,10 @@ The model must support, without parallel product or order systems:
 - direct inventory receipts, counts, waste, and production movements; and
 - exact replay, interruption recovery, governed actions, and provider receipts.
 
-## BakeryOS operating loop
+## Kitchen operating loop
 
 These contracts supply the commerce facts for an end-to-end bakery and café
-business. BakeryOS owns procedure execution and simulation evidence. The selected
+business. Kitchen owns procedure execution and simulation evidence. The selected
 commerce authority owns inventory movements, lots, accepted orders, and fulfillment.
 
 | Operating step        | Existing domain basis                                                      | Integration boundary                                                                   |
@@ -41,7 +41,7 @@ commerce authority owns inventory movements, lots, accepted orders, and fulfillm
 | Sell and distribute   | Offers, channels, orders, pickup, and shipments                            | Bind availability and delivery promises to stock and evidenced capacity                |
 | Evaluate performance  | Yield, waste movements, sales, payments, and fulfillment facts             | Combine measured labor and costs with these records; keep estimates visibly separate   |
 
-These are reuse points and integration targets. The bounded BakeryOS simulation
+These are reuse points and integration targets. The bounded Kitchen simulation
 does not prove automatic production posting, packaging release, shelf life, or
 physical fulfillment. The batch contract below records completed production.
 Planned and in-progress commerce batches remain a later measured extension.
@@ -73,16 +73,16 @@ and fulfillment aggregates for that organisation.
 
 | Fact                                                                                                                     | Authority                                                                                  |
 | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| Satyr Commerce catalog, stock ledger, checkout, order and payment orchestration, preparation, fulfillment, and shipments | Underclerk merchant runtime                                                                |
+| Seams Checkout catalog, stock ledger, checkout, order and payment orchestration, preparation, fulfillment, and shipments | Commerce merchant runtime                                                                |
 | Shopify catalog, inventory, checkout, orders, payments, fulfillment, and shipments                                       | Shopify                                                                                    |
-| External payment, address, tax, duty, carrier-rate, label, and tracking effects used by Satyr Commerce                   | The connected supporting provider; Underclerk retains the orchestration record and receipt |
+| External payment, address, tax, duty, carrier-rate, label, and tracking effects used by Seams Checkout                   | The connected supporting provider; Commerce retains the orchestration record and receipt |
 | Provider-neutral observations and merchant-safe operational projections                                                  | OrganisationActor / Commerce Read Layer                                                    |
-| Cases, proposals, approvals, actions, and effect receipts                                                                | Satyr CaseActor and ActionLedger                                                           |
+| Cases, proposals, approvals, actions, and effect receipts                                                                | Pantry CaseActor and ActionLedger                                                           |
 | Provider connections, selected commerce system, capability activation, and directories                                   | D1 control plane                                                                           |
-| Buyer contact and address data for Satyr Commerce                                                                        | Encrypted Underclerk customer boundary                                                     |
+| Buyer contact and address data for Seams Checkout                                                                        | Encrypted Commerce customer boundary                                                     |
 
-The two demonstrations use one Underclerk-backed organisation with two Storefront
-configurations. Concurrent Underclerk and Shopify transaction authority inside
+The two demonstrations use one Commerce-backed organisation with two Storefront
+configurations. Concurrent Commerce and Shopify transaction authority inside
 one organisation remains outside this architecture.
 
 ## Context map
@@ -96,7 +96,7 @@ flowchart LR
     Orders["Orders and Payments"]
     Fulfillment["Fulfillment and Shipping"]
     Provider["Selected Commerce Authority"]
-    Projection["Satyr Observations and Commerce Read Layer"]
+    Projection["Pantry Observations and Commerce Read Layer"]
     Cases["Cases and Governed Actions"]
 
     Catalog --> Online
@@ -198,7 +198,7 @@ confirming observation.
 | Shipment                 | One package and its carrier events for one shipping fulfillment             |
 | Shipment label attempt   | One rate-bound external label purchase and reconciliation lifecycle         |
 
-Underclerk may commit several aggregates atomically when a business transition
+Commerce may commit several aggregates atomically when a business transition
 requires it. Checkout placement is the primary compound transaction.
 
 ## Catalog and selling
@@ -259,8 +259,8 @@ Storefront
   lifecycle: draft | active | suspended | retired
 ```
 
-Underclerk owns first-party Storefront configuration. Shopify owns its own
-storefront configuration; Satyr retains only source-backed channel facts and
+Commerce owns first-party Storefront configuration. Shopify owns its own
+storefront configuration; Pantry retains only source-backed channel facts and
 the selected integration identity.
 
 ### Offer
@@ -343,13 +343,13 @@ InventoryPosition
   observed_at
 ```
 
-Underclerk positions are `accounted`. A provider adapter may emit
+Commerce positions are `accounted`. A provider adapter may emit
 `available_only` when the source cannot establish on-hand and allocation facts.
 All quantities use the InventoryItem base unit. For `accounted`, available is
-derived as on-hand minus active allocations and cannot be negative. Underclerk
+derived as on-hand minus active allocations and cannot be negative. Commerce
 rejects an allocation that exceeds available stock. Signed
 `AvailableQuantity` exists only at a provider-limited boundary so Shopify can
-report a real negative availability without coercion. Underclerk backorders
+report a real negative availability without coercion. Commerce backorders
 require a later allocation model and are outside the first replacement.
 
 ### InventoryMovement
@@ -620,7 +620,7 @@ CheckoutPaymentAttempt
     voided { provider_reference, voided_at }
 ```
 
-This aggregate remains private to Underclerk. A declined attempt returns the
+This aggregate remains private to Commerce. A declined attempt returns the
 Checkout to a new `ready` revision so the buyer may retry. An indeterminate
 attempt must reconcile by the same provider idempotency identity before the
 Checkout can retry or place. An authorization becomes an Order Payment only
@@ -628,7 +628,7 @@ through `attached`.
 
 Checkout placement has an idempotent provider step followed by one local
 transaction. Payment authorization occurs through an idempotent provider
-request bound to the checkout and quote revision. Underclerk then atomically:
+request bound to the checkout and quote revision. Commerce then atomically:
 
 1. verifies the checkout and quote revision;
 2. verifies unexpired held allocations;
@@ -822,7 +822,7 @@ attempt. Only signed carrier events advance `in_transit` and `delivered`.
 Provider adapters declare exact support. They never fabricate facts to satisfy
 the richer merchant model.
 
-| Domain                                | Underclerk                  | Existing Shopify adapter                                |
+| Domain                                | Commerce                  | Existing Shopify adapter                                |
 | ------------------------------------- | --------------------------- | ------------------------------------------------------- |
 | Product, variant, offer               | authoritative               | source-backed projection                                |
 | Inventory item and position           | accounted ledger            | available-only or source-backed quantities              |
@@ -868,10 +868,10 @@ children in one SQLite transaction.
 
 Cart, Checkout, CheckoutPaymentAttempt, ShipmentLabelAttempt, protected customer
 data, raw provider quote responses, and active allocation identities remain
-private to Underclerk or Shopify. An inventory observation may include a
+private to Commerce or Shopify. An inventory observation may include a
 merchant-safe allocation summary needed to validate the derived position
 balance; it never includes a buyer, checkout, or session identifier.
-Satyr receives the resulting Order, Payment, InventoryPosition, Fulfillment,
+Pantry receives the resulting Order, Payment, InventoryPosition, Fulfillment,
 Shipment, menu/preparation facts needed for merchant operations, and signed
 effect receipts.
 
@@ -903,7 +903,7 @@ packages/contracts/src/commerce/
 Rust constructors enforce invariants. Generated TypeScript and Wasm bindings
 remain mechanical outputs.
 
-### Underclerk
+### Commerce
 
 ```text
 services/commerce/src/
@@ -929,17 +929,17 @@ services/commerce/src/
 ```
 
 HTTP DTOs are parsed once into precise commands. Domain services never accept
-raw request objects. `packages/underclerk-client` is split by API surface and
+raw request objects. `packages/commerce-client` is split by API surface and
 owns the versioned HTTP DTOs and parsers consumed by both sides of the service
 boundary.
 
-Underclerk replaces generic `resource_json` authority tables with normalized
+Commerce replaces generic `resource_json` authority tables with normalized
 strict SQLite tables. JSON is limited to validated immutable nested snapshots
 such as order-line configuration and quote details. The generic production
 `upsert_resources` command is removed. Demo seeding calls the same typed domain
 commands used by ordinary setup and storefront flows.
 
-### Satyr platform
+### Pantry platform
 
 OrganisationActor remains the only commerce-delivery acceptance boundary. Projection,
 query, and reducer code is split into catalog, inventory, orders, payments,
@@ -977,9 +977,9 @@ branches with stable source identities. A later automation plan may claim those
 events and propose existing governed commands; it does not add an automation
 aggregate to the commerce domain.
 
-Underclerk backorders require explicit backordered-demand allocation and
+Commerce backorders require explicit backordered-demand allocation and
 replenishment scenarios. Signed provider availability remains capable of
-representing negative values without activating Underclerk backorders.
+representing negative values without activating Commerce backorders.
 
 ## Capability activation
 
@@ -1003,15 +1003,15 @@ scope, selected provider support, and contract revision.
 The replacement is breaking and single-path.
 
 1. Freeze the new Rust domain and invalid-state fixtures.
-2. Inventory every persisted Underclerk merchant and OrganisationActor projection
+2. Inventory every persisted Commerce merchant and OrganisationActor projection
    schema before choosing reset or migration for that store.
-3. Replace the Underclerk schema with normalized tables. Synthetic stores may
+3. Replace the Commerce schema with normalized tables. Synthetic stores may
    be reset only after the inventory proves they contain no required data.
 4. Add one OrganisationActor schema migration that parses the old persisted shape at
    the storage boundary and writes the new projections.
 5. Update the existing Shopify adapter only where the replacement contract
    requires a boundary change.
-6. Replace Underclerk API DTOs, commands, receipts, and observations with each
+6. Replace Commerce API DTOs, commands, receipts, and observations with each
    accepted Plan 22 slice.
 7. Switch affected readers and governed actions with that slice.
 8. Remove old tables, old parsers, absolute inventory adjustment, generic
@@ -1049,7 +1049,7 @@ There is no dual-write mode and no permanent compatibility union in core code.
   attempt reconciles before another purchase.
 - Plan 20 receipt posting never writes a projection directly.
 - Provider observations update only the selected organisation authority.
-- Private customer and quote payloads never enter Satyr projections or logs.
+- Private customer and quote payloads never enter Pantry projections or logs.
 - Replay and interruption converge to one receipt and one observed effect.
 
 ## Demonstration acceptance
@@ -1061,5 +1061,5 @@ The model is proven when:
 2. the ecommerce scenario sells a six-cookie box from that lot, authorizes one
    Stripe test payment, purchases one carrier label, and reaches tracked
    international delivery in Singapore; and
-3. Punter completes both buyer paths through public APIs without Underclerk
-   admin or Satyr operator credentials.
+3. Punter completes both buyer paths through public APIs without Commerce
+   admin or Pantry operator credentials.

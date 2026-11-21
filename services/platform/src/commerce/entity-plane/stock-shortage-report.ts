@@ -64,7 +64,7 @@ export async function readBoundStockShortages(
     merchantRevision: scope.merchantRevision,
     provenance: [
       {
-        source: "underclerk_stock_snapshot",
+        source: "commerce_stock_snapshot",
         merchantId: scope.merchantId,
         merchantRevision: scope.merchantRevision,
       },

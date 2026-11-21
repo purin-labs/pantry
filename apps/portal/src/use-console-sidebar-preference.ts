@@ -1,6 +1,6 @@
 import React from "react";
 
-const CONSOLE_SIDEBAR_STORAGE_KEY = "satyr:cafeos:sidebar-expanded";
+const CONSOLE_SIDEBAR_STORAGE_KEY = "pantry:cafeos:sidebar-expanded";
 
 type ConsoleSidebarPreference = {
   readonly railExpanded: boolean;

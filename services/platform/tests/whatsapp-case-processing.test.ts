@@ -401,7 +401,7 @@ function turnInput(
     policyVersion: 1,
     cuePolicy: overrides.cuePolicy ?? {
       relevantMessageTopics:
-        "CafeOS, cafe automation, cafe, bakery, order, cancel, and products.",
+        "Café, cafe automation, cafe, bakery, order, cancel, and products.",
       automaticAcknowledgementText:
         "Thanks for your message. We’ll get back to you shortly.",
       agentMode: "answer" as const,
@@ -474,7 +474,7 @@ async function irrelevantTest(): Promise<void> {
     turnInput(harness, {
       cuePolicy: {
         relevantMessageTopics:
-          "CafeOS, cafe automation, cafe, bakery, and products.",
+          "Café, cafe automation, cafe, bakery, and products.",
         automaticAcknowledgementText: acknowledgement,
         agentMode: "answer" as const,
         alwaysWaitTopics: "",

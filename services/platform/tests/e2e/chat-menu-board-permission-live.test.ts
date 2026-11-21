@@ -42,7 +42,7 @@ it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
     // The owner's café shop, as in production.
     await connectCommerceFixture(author.organisationId, author.userId, MERCHANT_ID);
     const demo = await providerClient().provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: author.organisationId,
       merchantId: MERCHANT_ID,
       profile: "cafe_patisserie",
@@ -106,7 +106,7 @@ it.skipIf(env.OPENROUTER_API_KEY === "openrouter-e2e-key")(
 
     task.meta.menuBoardPermissionLive = {
       substituted: [],
-      real: ["Pantry Worker and the Portal chat routes", "OpenRouter with Satyr's production model"],
+      real: ["Pantry Worker and the Portal chat routes", "OpenRouter with Pantry's production model"],
       models: [...new Set(calls.map((call) => call.model))],
       requests: requests.map((request) => ({ action: request.action, items: request.items })),
       toolsCalled: calls.flatMap((call) => call.called),

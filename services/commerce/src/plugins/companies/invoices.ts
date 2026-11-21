@@ -26,7 +26,7 @@ const DAY_MS = 86_400_000;
 
 /** The system command that marks an invoice overdue; no route takes it. */
 type MarkInvoiceOverdueCommand = Readonly<{
-  schemaVersion: "underclerk.mark-invoice-overdue.internal.v1";
+  schemaVersion: "commerce.mark-invoice-overdue.internal.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: string;
@@ -164,7 +164,7 @@ export class InvoiceAuthority {
       if (merchant === undefined) continue;
       const key = `invoice_overdue_${invoice.id}`;
       const command: MarkInvoiceOverdueCommand = {
-        schemaVersion: "underclerk.mark-invoice-overdue.internal.v1",
+        schemaVersion: "commerce.mark-invoice-overdue.internal.v1",
         merchantId: row.merchantId,
         idempotencyKey: key,
         requestedAt: invoice.dueAt,

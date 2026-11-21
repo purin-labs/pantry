@@ -37,7 +37,7 @@ export function readFailedPayments(
   window: FailedPaymentsWindow,
 ): CommerceFailedPaymentsV1 {
   return {
-    schemaVersion: "underclerk.failed-payments.v1",
+    schemaVersion: "commerce.failed-payments.v1",
     merchantId,
     merchantRevision,
     ...readChains(database, merchantId, window, "failed"),
@@ -51,7 +51,7 @@ export function readPayments(
   window: FailedPaymentsWindow,
 ): CommercePaymentsV1 {
   return {
-    schemaVersion: "underclerk.payments.v1",
+    schemaVersion: "commerce.payments.v1",
     merchantId,
     merchantRevision,
     ...readChains(database, merchantId, window, "all"),

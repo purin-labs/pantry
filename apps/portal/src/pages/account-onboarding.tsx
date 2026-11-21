@@ -100,8 +100,8 @@ export type AccountSetupActions = Readonly<{
 
 type StepState = "done" | "current" | "next" | "failed";
 
-const FORM_ID = "satyr-account-setup";
-const PROBLEM_ID = "satyr-account-setup-problem";
+const FORM_ID = "pantry-account-setup";
+const PROBLEM_ID = "pantry-account-setup-problem";
 const SIGN_IN_PATH = signInPath("/portal");
 const SETUP_UNAVAILABLE = "Pantry could not make the organisation. Try again.";
 const STEPS: readonly Readonly<{ step: AccountSetupStep; label: string }>[] = [
@@ -316,7 +316,7 @@ export class AccountSetup extends React.Component<
   };
 
   private get storageKey(): string {
-    return `satyr:account-onboarding:${this.props.userId}`;
+    return `pantry:account-onboarding:${this.props.userId}`;
   }
 
   componentDidMount(): void {

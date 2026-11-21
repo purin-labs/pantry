@@ -492,7 +492,7 @@ function settledTasks(run: EvalRunView): readonly EvalTaskResult[] {
           configuration: configuration.kind,
           route,
         };
-        if (route !== "satyr_platform") {
+        if (route !== "pantry_platform") {
           tasks.push({
             ...key,
             outcome: { kind: "unavailable", reason: "authority_unavailable" },
@@ -613,7 +613,7 @@ let evalRuns: readonly EvalRunView[] =
           previewRun(
             "evalrun_preview_compared",
             NOW - 5 * 3_600_000,
-            ["satyr_platform", "organisation_openai_api_key"],
+            ["pantry_platform", "organisation_openai_api_key"],
             [
               { kind: "current" },
               { kind: "candidate", memory: CANDIDATE_MEMORY },

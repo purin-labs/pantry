@@ -61,7 +61,7 @@ type DiscountCommandBase = Readonly<{
 /** A discount is published as created; a published discount cannot change. */
 export type CreateCommerceDiscountV1 = DiscountCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-discount.v1";
+    schemaVersion: "commerce.create-discount.v1";
     title: string;
     method: CommerceDiscountMethodV1;
     rule: CommerceDiscountRuleV1;
@@ -70,7 +70,7 @@ export type CreateCommerceDiscountV1 = DiscountCommandBase &
 
 export type DeactivateCommerceDiscountV1 = DiscountCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.deactivate-discount.v1";
+    schemaVersion: "commerce.deactivate-discount.v1";
     expectedRevision: number;
   }>;
 

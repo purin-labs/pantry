@@ -117,7 +117,7 @@ it("publishes an agent's menu only after an owner approves that exact menu", asy
     now: Date.now(),
   });
   const shop = await providerClient().provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",

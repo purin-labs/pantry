@@ -188,7 +188,7 @@ export async function signInToChatGpt(owner: PurgeOwner): Promise<void> {
 export function readHeaders(owner: PurgeOwner): Record<string, string> {
   const { token, csrfToken } = owner.client.session;
   return {
-    cookie: `satyr_control_session=${token}; satyr_control_csrf=${csrfToken}`,
+    cookie: `pantry_session=${token}; pantry_csrf=${csrfToken}`,
   };
 }
 

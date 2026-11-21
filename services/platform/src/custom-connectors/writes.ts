@@ -409,7 +409,7 @@ export async function executeApprovedCustomConnectorWrite(input: {
             idempotency: {
               header: input.authority.retryPolicy.header,
               // Stable for the action; it names no internal account.
-              key: `satyr-${await sha256Hex(input.idempotencyKey)}`,
+              key: `pantry-${await sha256Hex(input.idempotencyKey)}`,
             },
           }
         : {}),

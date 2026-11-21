@@ -82,7 +82,7 @@ async function unavailableRouteJourney(test: TestContext): Promise<void> {
   expect(await queuedRequests(owner, conversationId)).toEqual([]);
 
   // The owner restores the connection and retries the message.
-  await selectInference(owner, "satyr_platform");
+  await selectInference(owner, "pantry_platform");
   const retried = await post(owner, controlPaths(owner.organisationId).chat, {
     kind: "retry",
     conversationId,
@@ -107,7 +107,7 @@ async function unavailableRouteJourney(test: TestContext): Promise<void> {
 
 async function selectInference(
   owner: Member,
-  kind: "codex_subscription" | "satyr_platform",
+  kind: "codex_subscription" | "pantry_platform",
 ): Promise<void> {
   const db = organisationDatabase(owner.organisationId);
   const current = await readOrganisationInferenceSelection({

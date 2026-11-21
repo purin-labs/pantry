@@ -12,10 +12,10 @@ import {
 import type { Result } from "./result";
 import { isRecord } from "@purin-labs/std";
 
-const ADVANCE_SCHEMA = "satyr.actor.advance-session-command.v1";
-const RESTORE_SCHEMA = "satyr.actor.restore-session.v1";
+const ADVANCE_SCHEMA = "pantry.actor.advance-session-command.v1";
+const RESTORE_SCHEMA = "pantry.actor.restore-session.v1";
 const VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA =
-  "satyr.actor.validate-harness-checkpoint-restore.v1";
+  "pantry.actor.validate-harness-checkpoint-restore.v1";
 const ENCODER = new TextEncoder();
 const DECODER = new TextDecoder();
 

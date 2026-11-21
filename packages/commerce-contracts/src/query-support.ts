@@ -49,7 +49,7 @@ function selectorType(
         query.source.entityTypeId.origin === origin
         ? query.source.entityTypeId.typeId
         : null;
-    case "underclerk_context":
+    case "commerce_context":
       return contextType(query.selection, origin);
     case "commerce_list_page":
     case "saved_commerce_view":
@@ -93,7 +93,7 @@ function operationType(
         operation.source.entityTypeId.origin === origin
         ? operation.source.entityTypeId.typeId
         : null;
-    case "underclerk_context":
+    case "commerce_context":
       return contextType(operation.selection, origin);
     case "commerce_list_page":
     case "saved_commerce_view":
@@ -108,7 +108,7 @@ function selectorList(query: CommerceGraphQuery): string | null {
       return query.listId;
     case "aggregation":
       return query.source.kind === "commerce_list" ? query.source.listId : null;
-    case "underclerk_context":
+    case "commerce_context":
       return query.selection.kind === "selector"
         ? selectorList(query.selection.selector.query)
         : null;
@@ -130,7 +130,7 @@ function operationList(operation: CommerceQueryPlanOperation): string | null {
       return operation.source.kind === "commerce_list"
         ? operation.source.listId
         : null;
-    case "underclerk_context":
+    case "commerce_context":
       return operation.selection.kind === "selector"
         ? selectorList(operation.selection.selector.query)
         : null;
@@ -151,7 +151,7 @@ function supportsOperation(
   switch (profile.kind) {
     case "system_mapped":
       return operationType(operation, "system") === profile.systemEntityKind;
-    case "underclerk_custom":
+    case "commerce_custom":
       return operationType(operation, "custom") === profile.entityTypeId;
     case "commerce_list":
       return operationList(operation) === profile.listId;
@@ -163,7 +163,7 @@ function supportsOperation(
             canonicalJsonByCodePoint(profile.source)
         );
       if (
-        operation.kind === "underclerk_context" &&
+        operation.kind === "commerce_context" &&
         operation.selection.kind === "selector"
       ) {
         const selector = operation.selection.selector;

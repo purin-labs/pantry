@@ -156,9 +156,9 @@ export function goalCommand(
         method: "POST",
         headers: {
           origin: "https://localhost",
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
           "content-type": "application/json",
-          "x-satyr-csrf": session.csrfToken,
+          "x-pantry-csrf": session.csrfToken,
         },
         body: JSON.stringify({
           commandId: crypto.randomUUID(),
@@ -200,8 +200,8 @@ function requestChat(
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body,
     },
@@ -222,8 +222,8 @@ export function dispatchCommand(
         origin: "https://localhost",
         "content-type": "application/json",
         "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({ instruction }),
     },
@@ -331,8 +331,8 @@ export function controlFetch(
       headers: {
         "content-type": "application/json",
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: body === null ? null : JSON.stringify(body),
     },
@@ -354,7 +354,7 @@ export function control(
       headers: {
         origin: PUBLIC_ORIGIN,
         ...controlReadHeaders(session),
-        "x-satyr-csrf": session.csrfToken,
+        "x-pantry-csrf": session.csrfToken,
         "content-type": "application/json",
       },
       ...(body === null ? {} : { body: JSON.stringify(body) }),
@@ -478,7 +478,7 @@ export function draftAction(
 ): Promise<Response> {
   const headers = commerceHeaders(person.session);
   headers.set("idempotency-key", crypto.randomUUID());
-  headers.set("x-satyr-configuration-version", "1");
+  headers.set("x-pantry-configuration-version", "1");
   return exports.default.fetch(
     `${PUBLIC_ORIGIN}${fixture.paths.organisation}/chat/conversations/${conversationId}/configuration-drafts/${draft.draftId}/${action}`,
     { method: "POST", headers, body: "{}" },

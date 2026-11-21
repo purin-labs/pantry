@@ -153,7 +153,7 @@ function parsePluginCaseAuthority(
   value: unknown,
 ): CommerceCaseAuthority | null {
   const authority = checked(commerceSystemAuthoritySchema, value);
-  if (authority === null || authority.system !== "satyr_commerce") return null;
+  if (authority === null || authority.system !== "builtin_commerce") return null;
   const revision = parseCommerceSystemRevision(authority.revision);
   const integrationAccountId = parseIntegrationAccountId(
     authority.integrationAccountId,
@@ -161,7 +161,7 @@ function parsePluginCaseAuthority(
   return revision.ok && integrationAccountId.ok
     ? {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: revision.value,
         integrationAccountId: integrationAccountId.value,
       }

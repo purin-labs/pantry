@@ -149,7 +149,7 @@ export function TerminalOperationsPanel(
       {confirming === null ? null : (
         <RetireCounterDialog
           counter={confirming}
-          busy={busy === confirming.satyrLocationId}
+          busy={busy === confirming.pantryLocationId}
           close={setConfirming.bind(null, null)}
           confirm={retireCounter.bind(
             null,
@@ -192,7 +192,7 @@ function RetireCounterDialog(
           close={props.close}
         />
         <p id="terminal-retire-description">
-          <strong>{props.counter.satyrLocationId}</strong> will stop taking card
+          <strong>{props.counter.pantryLocationId}</strong> will stop taking card
           payments. Payments it has already taken are unaffected, and pairing it
           again needs the device in hand.
         </p>
@@ -235,9 +235,9 @@ function renderTerminalCounter(
   counter: TerminalCounterReadback,
 ): React.ReactNode {
   return (
-    <li key={counter.satyrLocationId} className="terminal-row">
+    <li key={counter.pantryLocationId} className="terminal-row">
       <div className="terminal-row-identity">
-        <span className="terminal-row-location">{counter.satyrLocationId}</span>
+        <span className="terminal-row-location">{counter.pantryLocationId}</span>
         <span className="terminal-row-device">
           Credentials {credentialHealthLabel(counter.credentialHealth)}
         </span>
@@ -273,7 +273,7 @@ function renderTerminalCounter(
         <button
           type="button"
           className="terminal-row-action"
-          disabled={context.busy === counter.satyrLocationId}
+          disabled={context.busy === counter.pantryLocationId}
           onClick={context.setConfirming.bind(null, counter)}
         >
           Stop taking payments
@@ -293,7 +293,7 @@ async function retireCounter(
   >,
   counter: TerminalCounterReadback,
 ): Promise<void> {
-  setBusy(counter.satyrLocationId);
+  setBusy(counter.pantryLocationId);
   try {
     const operations = await retireTerminalCounter(
       props.organisationId,
@@ -307,7 +307,7 @@ async function retireCounter(
       });
     }
     setConfirming(null);
-    toast.success(`${counter.satyrLocationId} no longer takes card payments.`);
+    toast.success(`${counter.pantryLocationId} no longer takes card payments.`);
   } catch (cause) {
     toast.error(
       cause instanceof Error
@@ -443,7 +443,7 @@ function TerminalSetup(
   }
   const locations = squareLocationOptions(props.configuration);
   const canConfigure =
-    props.configuration.satyrLocations.length > 0 &&
+    props.configuration.pantryLocations.length > 0 &&
     locations.length > 0 &&
     props.configuration.testDevices.length > 0;
   return (
@@ -466,8 +466,8 @@ function TerminalSetup(
         <label>
           <span>Seams Checkout location</span>
           <TerminalSelect
-            name="satyrLocationId"
-            items={props.configuration.satyrLocations.map(pantryLocationItem)}
+            name="pantryLocationId"
+            items={props.configuration.pantryLocations.map(pantryLocationItem)}
             disabled={!canConfigure || busy}
             required
           />
@@ -511,7 +511,7 @@ function TerminalSetup(
 
 type PairingInProgress = Readonly<{
   pairing: TerminalPairingReadback;
-  satyrLocationId: string;
+  pantryLocationId: string;
   integrationAccountId: string;
 }>;
 
@@ -539,7 +539,7 @@ function TerminalPairingSetup(
   );
   const locations = squareLocationOptions(props.configuration);
   const canPair =
-    props.configuration.satyrLocations.length > 0 && locations.length > 0;
+    props.configuration.pantryLocations.length > 0 && locations.length > 0;
   if (progress !== null)
     return (
       <section className="terminal-setup">
@@ -588,8 +588,8 @@ function TerminalPairingSetup(
         <label>
           <span>Seams Checkout location</span>
           <TerminalSelect
-            name="satyrLocationId"
-            items={props.configuration.satyrLocations.map(pantryLocationItem)}
+            name="pantryLocationId"
+            items={props.configuration.pantryLocations.map(pantryLocationItem)}
             disabled={!canPair || busy}
             required
           />
@@ -644,7 +644,7 @@ function SquarePosAppSetup(
   const [busy, setBusy] = React.useState(false);
   const locations = squareLocationOptions(props.configuration);
   const canAssign =
-    props.configuration.satyrLocations.length > 0 && locations.length > 0;
+    props.configuration.pantryLocations.length > 0 && locations.length > 0;
   if (!canAssign) return null;
   return (
     <form
@@ -665,8 +665,8 @@ function SquarePosAppSetup(
         <label>
           <span>Seams Checkout location</span>
           <TerminalSelect
-            name="satyrLocationId"
-            items={props.configuration.satyrLocations.map(pantryLocationItem)}
+            name="pantryLocationId"
+            items={props.configuration.pantryLocations.map(pantryLocationItem)}
             disabled={busy}
             required
           />
@@ -711,7 +711,7 @@ async function submitSquarePosApp(
       await assignSquarePosApp(
         props.organisationId,
         {
-          satyrLocationId: selection.satyrLocationId,
+          pantryLocationId: selection.pantryLocationId,
           integrationAccountId: selection.integrationAccountId,
           providerLocationId: selection.providerLocationId,
         },
@@ -750,7 +750,7 @@ async function submitTerminalPairing(
     const pairing = await startTerminalPairing(
       props.organisationId,
       {
-        satyrLocationId: selection.satyrLocationId,
+        pantryLocationId: selection.pantryLocationId,
         integrationAccountId: selection.integrationAccountId,
         providerLocationId: selection.providerLocationId,
         deviceName: deviceName.trim(),
@@ -759,7 +759,7 @@ async function submitTerminalPairing(
     );
     setProgress({
       pairing,
-      satyrLocationId: selection.satyrLocationId,
+      pantryLocationId: selection.pantryLocationId,
       integrationAccountId: selection.integrationAccountId,
     });
   } catch (cause) {
@@ -808,7 +808,7 @@ function watchTerminalPairing(
           props.organisationId,
           pairing.deviceCodeId,
           {
-            satyrLocationId: progress.satyrLocationId,
+            pantryLocationId: progress.pantryLocationId,
             integrationAccountId: progress.integrationAccountId,
           },
           props.mutate,
@@ -900,11 +900,11 @@ function renderTerminalSelectItem(item: TerminalSelectItem): React.ReactNode {
 }
 
 function pantryLocationItem(
-  location: ReadyTerminalConfiguration["satyrLocations"][number],
+  location: ReadyTerminalConfiguration["pantryLocations"][number],
 ): TerminalSelectItem {
   return {
-    value: location.satyrLocationId,
-    label: `${location.satyrLocationId} · ${location.currency}`,
+    value: location.pantryLocationId,
+    label: `${location.pantryLocationId} · ${location.currency}`,
   };
 }
 
@@ -961,7 +961,7 @@ async function submitTerminalConfiguration(
 function parseTerminalSelection(
   form: FormData,
 ): TerminalConfigurationRequest | null {
-  const pantryLocationId = form.get("satyrLocationId");
+  const pantryLocationId = form.get("pantryLocationId");
   const squareLocation = form.get("squareLocation");
   const testDeviceId = form.get("testDeviceId");
   if (
@@ -984,7 +984,7 @@ function parseTerminalSelection(
       pantryLocationId.length > 0 &&
       testDeviceId.length > 0
       ? {
-          satyrLocationId: pantryLocationId,
+          pantryLocationId: pantryLocationId,
           integrationAccountId,
           providerLocationId,
           testDeviceId,

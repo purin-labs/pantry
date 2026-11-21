@@ -25,14 +25,14 @@ must sign in, so turn on automatic login. If the macOS firewall is on, allow inc
 for the service. To read the state of the service:
 
 ```bash
-PYTHONPATH=~/.satyr-voice/app ~/.satyr-voice/venv/bin/python -m shop_voice status
+PYTHONPATH=~/.pantry-voice/app ~/.pantry-voice/venv/bin/python -m shop_voice status
 ```
 
 To remove the service, run this command, and then revoke the Mac in the Portal. A revocation
 alone stops the service and deletes its model, certificate and credential.
 
 ```bash
-PYTHONPATH=~/.satyr-voice/app ~/.satyr-voice/venv/bin/python -m shop_voice uninstall
+PYTHONPATH=~/.pantry-voice/app ~/.pantry-voice/venv/bin/python -m shop_voice uninstall
 ```
 
 To update an enrolled Mac to the version that the deployed Worker serves, run this command. The Mac
@@ -48,7 +48,7 @@ curl -fsSL https://<origin>/shop-voice/install.sh | sh -s -- --update
 Each engine is one module in `shop_voice/engines/`, behind the `SpeechEngine` interface: its file
 pins, its load and unload, and `hear`, which returns the text after the engine's own noise rule
 ([Plan 82C](../../docs/plan-82C-speech-engines.md)). The ids are those of the catalogue in
-`packages/control-api/src/voice-engines.ts`. Each engine keeps its files in `~/.satyr-voice/model/<id>/`.
+`packages/control-api/src/voice-engines.ts`. Each engine keeps its files in `~/.pantry-voice/model/<id>/`.
 `ModelHost` (`model_host.py`) loads, unloads and queues the engine and the answer voice alike. The
 Portal's text check drops the rest of what an engine invents on noise, for every engine.
 
@@ -57,7 +57,7 @@ control dialog, and the Platform names the choice in each heartbeat answer (`eng
 Mac then downloads the engine's files (Qwen3-ASR: 4.1 GB, Apache-2.0 licence), answers with its old
 engine until they are complete, and changes engine. Only one engine is in memory: Qwen3-ASR needs
 5.0 GB, against 2.5 GB for Whisper. The old engine's files stay for 14 days with no use, so a change
-back needs no download. The Mac records its engine in `~/.satyr-voice/engine` and starts with it.
+back needs no download. The Mac records its engine in `~/.pantry-voice/engine` and starts with it.
 
 ## Spoken answers
 

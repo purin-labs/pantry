@@ -56,7 +56,7 @@ function connectorDeliverySuite(): void {
     deliversChannelSnapshot,
   );
   it.skipIf(process.env.PANTRY_CAFE_LIVE_SLACK !== "1")(
-    "delivers one live CafeOS receipt after an injected Vault outage",
+    "delivers one live Café receipt after an injected Vault outage",
     deliversLiveCafeReceiptAfterVaultOutage,
   );
 }
@@ -396,7 +396,7 @@ function liveCafeReceiptRequest(
       caseRevision: 1,
       content: {
         kind: "text",
-        text: `CafeOS acceptance receipt ${identity}: payment captured for order order_${identity}; fulfillment fulfillment_${identity} created; Vault retry recovered.`,
+        text: `Café acceptance receipt ${identity}: payment captured for order order_${identity}; fulfillment fulfillment_${identity} created; Vault retry recovered.`,
       },
       idempotencyKey: `case_output_cafe_acceptance_${identity}`,
       addressedAt: 1_000,

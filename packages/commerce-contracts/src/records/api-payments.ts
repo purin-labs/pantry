@@ -19,7 +19,7 @@ export type CommercePaymentStepV1 = Static<
 >;
 
 export const commercePaymentsV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.payments.v1"),
+  schemaVersion: Type.Literal("commerce.payments.v1"),
   merchantId: normalizedTextSchema,
   merchantRevision: Type.Integer({ minimum: 0 }),
   /** True when the window held more payments than this read returns. */

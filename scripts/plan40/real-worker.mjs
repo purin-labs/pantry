@@ -10,21 +10,21 @@ import { singleDatabaseMigrations } from "../../services/platform/scripts/single
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "../..");
 const port = readPort(process.env.PLAN40_PORT ?? "31840", "PLAN40_PORT");
-const commercePort = readPort(process.env.PLAN40_UNDERCLERK_PORT ?? "3102", "PLAN40_UNDERCLERK_PORT");
+const commercePort = readPort(process.env.PLAN40_COMMERCE_PORT ?? "3102", "PLAN40_COMMERCE_PORT");
 const inspectorPort = readPort(process.env.PLAN40_INSPECTOR_PORT ?? "32940", "PLAN40_INSPECTOR_PORT");
-const commerceInspectorPort = readPort(process.env.PLAN40_UNDERCLERK_INSPECTOR_PORT ?? "32941", "PLAN40_UNDERCLERK_INSPECTOR_PORT");
+const commerceInspectorPort = readPort(process.env.PLAN40_COMMERCE_INSPECTOR_PORT ?? "32941", "PLAN40_COMMERCE_INSPECTOR_PORT");
 const origin = `http://127.0.0.1:${port}`;
 const commerceOrigin = `http://127.0.0.1:${commercePort}`;
 const setupToken = "plan40-local-setup-token";
 const runId = `${Date.now()}-${process.pid}`;
-const workerServiceName = `satyr-plan40-${runId}`;
-const commerceServiceName = `underclerk-plan40-${runId}`;
-const stateDirectory = join("/private/tmp", `satyr-plan40-real-worker-${runId}`);
-const commerceStateDirectory = join("/private/tmp", `satyr-plan40-underclerk-${runId}`);
-const generatedDirectory = await mkdtemp(join(tmpdir(), "satyr-plan40-real-worker-build-"));
+const workerServiceName = `pantry-plan40-${runId}`;
+const commerceServiceName = `commerce-plan40-${runId}`;
+const stateDirectory = join("/private/tmp", `pantry-plan40-real-worker-${runId}`);
+const commerceStateDirectory = join("/private/tmp", `pantry-plan40-commerce-${runId}`);
+const generatedDirectory = await mkdtemp(join(tmpdir(), "pantry-plan40-real-worker-build-"));
 const generatedConfig = join(generatedDirectory, "wrangler.jsonc");
-const generatedCommerceConfig = join(generatedDirectory, "underclerk.wrangler.jsonc");
-const commerceAssetsDirectory = await mkdtemp(join(generatedDirectory, "underclerk-assets-"));
+const generatedCommerceConfig = join(generatedDirectory, "commerce.wrangler.jsonc");
+const commerceAssetsDirectory = await mkdtemp(join(generatedDirectory, "commerce-assets-"));
 const commerceEnvFile = join(generatedDirectory, ".dev.vars.local");
 let workerProcess;
 let commerceProcess;
@@ -70,10 +70,10 @@ try {
 async function writeWranglerConfig(outfile, workerEntry) {
   const source = await readFile(resolve(scriptDirectory, "real-worker.wrangler.jsonc"), "utf8");
   const rewritten = source
-    .replace('"name": "satyr-plan40-browser"', `"name": ${JSON.stringify(workerServiceName)}`)
+    .replace('"name": "pantry-plan40-browser"', `"name": ${JSON.stringify(workerServiceName)}`)
     .replace('"main": "./real-worker.ts"', `"main": ${JSON.stringify(workerEntry)}`)
     .replace('"directory": "../../apps/portal/dist"', `"directory": ${JSON.stringify(resolve(repositoryRoot, "apps/portal/dist"))}`)
-    .replace('"service": "underclerk"', `"service": ${JSON.stringify(commerceServiceName)}`)
+    .replace('"service": "pantry-commerce"', `"service": ${JSON.stringify(commerceServiceName)}`)
     .replaceAll("http://127.0.0.1:31840", origin)
     .replaceAll("http://127.0.0.1:3102", commerceOrigin);
   await writeFile(outfile, rewritten);
@@ -84,18 +84,18 @@ async function writeCommerceConfig(outfile) {
   const workerEntry = resolve(repositoryRoot, "services/commerce/src/worker.ts");
   const expectedValues = [
     '"main": "src/worker.ts"',
-    '"name": "underclerk"',
+    '"name": "pantry-commerce"',
     '"directory": "../../apps/storefront/dist"',
-    '"service": "satyr-edge"',
+    '"service": "pantry"',
   ];
   if (hasMissingConfigValue(source, expectedValues)) {
-    throw new Error("Underclerk Wrangler config no longer matches the Plan 40 harness boundary");
+    throw new Error("Commerce Wrangler config no longer matches the Plan 40 harness boundary");
   }
   const rewritten = source
     .replace('"main": "src/worker.ts"', `"main": ${JSON.stringify(workerEntry)}`)
-    .replace('"name": "underclerk"', `"name": ${JSON.stringify(commerceServiceName)}`)
+    .replace('"name": "pantry-commerce"', `"name": ${JSON.stringify(commerceServiceName)}`)
     .replace('"directory": "../../apps/storefront/dist"', `"directory": ${JSON.stringify(commerceAssetsDirectory)}`)
-    .replace('"service": "satyr-edge"', `"service": ${JSON.stringify(workerServiceName)}`);
+    .replace('"service": "pantry"', `"service": ${JSON.stringify(workerServiceName)}`);
   await writeFile(outfile, rewritten);
 }
 
@@ -110,9 +110,9 @@ async function writeCommerceEnvironment(outfile) {
   const keyPair = generateKeyPairSync("ed25519");
   const signingPrivateKey = keyPair.privateKey.export({ format: "der", type: "pkcs8" }).toString("base64");
   const environment = {
-    UNDERCLERK_SERVICE_TOKEN: "plan40-browser-underclerk-token",
-    UNDERCLERK_BUYER_SESSION_SECRET: randomBytes(32).toString("base64url"),
-    UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64: signingPrivateKey,
+    COMMERCE_SERVICE_TOKEN: "plan40-browser-commerce-token",
+    COMMERCE_BUYER_SESSION_SECRET: randomBytes(32).toString("base64url"),
+    COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64: signingPrivateKey,
     JAPAN_CARRIER_SIGNING_KEY: randomBytes(32).toString("base64url"),
   };
   const contents = `${Object.entries(environment).map(([key, value]) => `${key}=${value}`).join("\n")}\n`;
@@ -123,7 +123,7 @@ async function writeCommerceEnvironment(outfile) {
 async function initializeDatabase(configPath) {
   const result = spawnSync(
     "pnpm",
-    ["--filter", "@purin-labs/platform", "exec", "wrangler", "d1", "execute", "satyr-plan40-browser", "--local",
+    ["--filter", "@purin-labs/platform", "exec", "wrangler", "d1", "execute", "pantry-plan40-browser", "--local",
       "--file", join(singleDatabaseMigrations(), "0001_current_schema.sql"),
       "--persist-to", stateDirectory, "--config", configPath],
     { cwd: repositoryRoot, stdio: "inherit", env: { ...process.env, CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: "false" } },

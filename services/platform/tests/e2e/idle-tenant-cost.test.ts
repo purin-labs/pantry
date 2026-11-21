@@ -89,7 +89,7 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
   await seedSlackWorkspace(CAFE_SLACK, { client: owner, organisationId });
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -99,7 +99,7 @@ async function idleTenantCostJourney({ task }: TestContext): Promise<void> {
   for (const slug of ["ginger_cookie", "taro_cookie"])
     await shop.describeProduct(slug);
 
-  const meter = new WriteMeter({ underclerkMerchantId: merchantId });
+  const meter = new WriteMeter({ commerceMerchantId: merchantId });
   const crons = env.TEST_PRODUCTION_CRONS;
   expect(crons.length).toBeGreaterThan(0);
   const hour = 60 * 60_000;

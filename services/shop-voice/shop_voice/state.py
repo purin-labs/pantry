@@ -18,7 +18,7 @@ _OLD_BASE_URLS = {
     "model_base_url": "https://huggingface.co/mlx-community/whisper-large-v3-turbo/resolve",
     "speech_base_url": "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve",
 }
-DEFAULT_LABEL = "sh.seams.satyr.shop-voice"
+DEFAULT_LABEL = "io.purin.pantry.shop-voice"
 # An engine's files stay this long after the Mac stops using it, so a change back needs no download
 # (Plan 82C D3).
 UNUSED_ENGINE_SECONDS = 14 * 24 * 60 * 60
@@ -27,7 +27,7 @@ _UNUSED_SINCE = ".unused-since"
 
 def home() -> Path:
     # certbot splits its hook command at each space, so this path must have none.
-    return Path(os.environ.get("PANTRY_VOICE_HOME", Path.home() / ".satyr-voice"))
+    return Path(os.environ.get("PANTRY_VOICE_HOME", Path.home() / ".pantry-voice"))
 
 
 @dataclass(frozen=True)

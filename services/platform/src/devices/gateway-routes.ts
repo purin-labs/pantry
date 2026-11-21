@@ -171,9 +171,9 @@ async function openSocket(request: Request, env: Env): Promise<Response> {
   if (stub === null) return controlError("device_gateway_unavailable", 503);
   const headers = new Headers({
     Upgrade: "websocket",
-    "x-satyr-device-gateway": gateway.gatewayId,
-    "x-satyr-device-organisation": scope.organisationId,
-    "x-satyr-device-location": gateway.locationId,
+    "x-pantry-device-gateway": gateway.gatewayId,
+    "x-pantry-device-organisation": scope.organisationId,
+    "x-pantry-device-location": gateway.locationId,
   });
   return stub.fetch(new Request(request.url, { headers }));
 }

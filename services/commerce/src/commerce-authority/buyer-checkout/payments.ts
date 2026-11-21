@@ -206,7 +206,7 @@ export function buyerPaymentAttemptResult(
   switch (attempt.lifecycle.state) {
     case "declined":
       return {
-        schemaVersion: "underclerk.buyer-payment-result.v1",
+        schemaVersion: "commerce.buyer-payment-result.v1",
         state: "declined",
         checkoutId: checkout.checkoutId,
         reasonCode: attempt.lifecycle.reasonCode,
@@ -214,7 +214,7 @@ export function buyerPaymentAttemptResult(
     case "processing":
     case "indeterminate":
       return {
-        schemaVersion: "underclerk.buyer-payment-result.v1",
+        schemaVersion: "commerce.buyer-payment-result.v1",
         state: attempt.lifecycle.state,
         checkoutId: checkout.checkoutId,
         reconcileAfter: attempt.lifecycle.reconcileAfter,

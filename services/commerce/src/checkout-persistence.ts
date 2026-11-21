@@ -514,7 +514,7 @@ export function writeCheckout(
     .prepare(
       `INSERT INTO buyer_checkout (
        merchant_id, checkout_id, source_kind, storefront_id, cart_id,
-       buyer_session_digest, satyr_location_id, operator_identity,
+       buyer_session_digest, pantry_location_id, operator_identity,
        terminal_assignment_revision, point_of_sale_buyer_kind,
        point_of_sale_customer_id, checkout_profile_id,
        checkout_profile_revision, pos_configuration_revision, revision,
@@ -537,7 +537,7 @@ export function writeCheckout(
       online?.storefrontId ?? null,
       online?.cartId ?? null,
       online?.buyerSessionDigest ?? null,
-      pointOfSale?.satyrLocationId ?? null,
+      pointOfSale?.pantryLocationId ?? null,
       pointOfSale?.operatorIdentity ?? null,
       pointOfSale?.terminalAssignmentRevision ?? null,
       pointOfSale?.buyer.kind ?? null,

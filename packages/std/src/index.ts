@@ -21,8 +21,8 @@ declare function setTimeout(callback: () => void, milliseconds: number): unknown
 // hibernation API. The Actor's runtime answers the ping without waking the
 // Actor, so a client checks its connection without a charge for the Actor's
 // time. A socket that is silent for longer than the expiry lost its client.
-export const SOCKET_PING = "satyr.ping";
-export const SOCKET_PONG = "satyr.pong";
+export const SOCKET_PING = "pantry.ping";
+export const SOCKET_PONG = "pantry.pong";
 export const SOCKET_PRESENCE_EXPIRY_MS = 90_000;
 
 // Rust-compatible text rules. Validate Unicode scalar values at the boundary.

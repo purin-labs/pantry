@@ -61,7 +61,7 @@ export async function handleOrderTimesControlRoute(
     start: new Date(from).toISOString(),
     end: new Date(to).toISOString(),
   });
-  if (!times.ok) return controlError("underclerk_unavailable", 503);
+  if (!times.ok) return controlError("commerce_unavailable", 503);
   const window: OrderTimesWindow = {
     truncated: times.value.truncated,
     orders: times.value.orders,

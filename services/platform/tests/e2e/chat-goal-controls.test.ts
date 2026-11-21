@@ -206,8 +206,8 @@ function requestGoal(
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": csrf ? session.csrfToken : "invalid",
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": csrf ? session.csrfToken : "invalid",
       },
       body: command === null ? undefined : JSON.stringify(command),
     },

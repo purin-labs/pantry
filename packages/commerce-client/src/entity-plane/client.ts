@@ -385,7 +385,7 @@ function responseMessage(value: unknown): string {
     typeof value.message === "string"
   )
     return value.message;
-  return "Underclerk entity-plane request failed";
+  return "Commerce entity-plane request failed";
 }
 
 function encodeJson(value: unknown): string {
@@ -397,7 +397,7 @@ function encodeJsonValue(_key: string, value: unknown): unknown {
   const encoded = Number(value);
   if (!Number.isSafeInteger(encoded))
     throw new Error(
-      "Underclerk integer exceeds the JSON safe-integer boundary",
+      "Commerce integer exceeds the JSON safe-integer boundary",
     );
   return encoded;
 }

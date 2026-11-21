@@ -505,7 +505,7 @@ export async function provisionPantryCommerceDemo(
   organisationId: string,
 ): Promise<void> {
   const raw = await controlMutation(
-    `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce-system/satyr-commerce/demo`,
+    `/v1/control/organisations/${encodeURIComponent(organisationId)}/commerce-system/builtin-commerce/demo`,
     "POST",
     createPantryCommerceDemoRequest(),
   );
@@ -640,7 +640,7 @@ export async function fetchReadiness(
 export function offerPriceAllowanceInteraction(
   canConfigure: boolean,
 ): OfferPriceAllowanceInteraction {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   return {
     canConfigure,
     transport: csrf === null ? undefined : offerPriceAllowanceTransport(csrf),
@@ -651,7 +651,7 @@ export async function emitOnboardingStageViewed(
   organisationId: string,
   stage: string,
 ): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) return;
   // A view event: an answer, a refusal and a lost connection all end it.
   await controlSignal(

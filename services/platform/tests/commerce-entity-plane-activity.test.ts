@@ -62,7 +62,7 @@ describe("commerce entity-plane activity", () => {
         ],
         approvals: [],
         effects: [],
-        underclerkReceipts: [],
+        commerceReceipts: [],
         actionLedger: [],
       },
     });
@@ -104,7 +104,7 @@ describe("commerce entity-plane activity", () => {
         proposals: [],
         approvals: [],
         effects: [],
-        underclerkReceipts: [],
+        commerceReceipts: [],
         actionLedger: [],
       },
     });
@@ -131,7 +131,7 @@ describe("commerce entity-plane activity", () => {
       updatedAt: Date.parse("2026-08-25T13:00:00.000Z"),
       providerResult: JSON.stringify({
         kind: "commerce_provider_receipt",
-        provider: "underclerk",
+        provider: "commerce",
         receiptId: "receipt_1",
         effectId: "effect_1",
         actionNonce: "nonce_1",
@@ -198,7 +198,7 @@ describe("commerce entity-plane activity", () => {
     expect(result.value.unsupportedSources).toEqual([]);
     expect(result.value.events.map((event) => event.kind)).toEqual(
       expect.arrayContaining([
-        "underclerk_receipt",
+        "commerce_receipt",
         "proposal",
         "case",
         "approval",
@@ -295,8 +295,8 @@ describe("commerce entity-plane activity", () => {
     expect(result.value.events.map((event) => event.kind)).toEqual(
       expect.arrayContaining([
         "entity_plane_effect",
-        "underclerk_observation",
-        "underclerk_receipt",
+        "commerce_observation",
+        "commerce_receipt",
         "proposal",
         "case",
         "action_ledger",
@@ -311,7 +311,7 @@ describe("commerce entity-plane activity", () => {
     });
     expect(
       result.value.events.find(
-        (event) => event.kind === "underclerk_observation",
+        (event) => event.kind === "commerce_observation",
       ),
     ).toMatchObject({
       observationId: "command_1",

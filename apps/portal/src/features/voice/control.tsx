@@ -543,7 +543,7 @@ async function macRequest(
   payload?: unknown,
 ): Promise<Readonly<{ ok: boolean; status: number; body: unknown }>> {
   // Without a session Pantry refuses a change.
-  if (method === "POST" && readCookie("satyr_control_csrf") === null)
+  if (method === "POST" && readCookie("pantry_csrf") === null)
     return { ok: false, status: 403, body: null };
   try {
     const body = await (method === "GET"

@@ -96,19 +96,19 @@ export async function installEffectAuthority(
       .bind(ORGANISATION_ID, WORKSPACE_ID, CHANNEL_ID, OWNER, now),
     fixtureDatabase()
       .prepare(
-        `INSERT INTO underclerk_merchant_binding (
+        `INSERT INTO commerce_merchant_binding (
       binding_id, organisation_id, integration_account_id, merchant_id, environment,
       delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at
-    ) VALUES ('underclerk_binding_pi_effect', ?, ?, ?, 'development', 'key_pi_effect_e2e',
+    ) VALUES ('commerce_binding_pi_effect', ?, ?, ?, 'development', 'key_pi_effect_e2e',
       'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, ?, ?)`,
       )
       .bind(ORGANISATION_ID, ACCOUNT, MERCHANT, now, now),
     fixtureDatabase()
       .prepare(
         `INSERT INTO organisation_commerce_system (
-      organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id,
+      organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id,
       revision, selected_at, selected_by_user_id
-    ) VALUES (?, 'satyr_commerce', 'underclerk_binding_pi_effect', NULL, 1, ?, ?)`,
+    ) VALUES (?, 'builtin_commerce', 'commerce_binding_pi_effect', NULL, 1, ?, ?)`,
       )
       .bind(ORGANISATION_ID, now, OWNER),
   ]);
@@ -213,15 +213,15 @@ export async function installEffectAuthority(
 
 export function providerClient(): CommerceAdminClient {
   return new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
 }
 
 async function provisionProviderMerchant(): Promise<void> {
   const provisioned = await providerClient().provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     createdAt: new Date().toISOString(),
@@ -298,12 +298,12 @@ async function seedProviderProduct(loseFirstPublish = true): Promise<void> {
  * publish for this merchant and counts mutations and receipt reads.
  */
 async function armLostPublish(): Promise<void> {
-  const armed = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT}/test-fixture`,
+  const armed = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${MERCHANT}/test-fixture`,
     {
       method: "POST",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({ kind: "lose_first_committed_publish" }),
@@ -324,7 +324,7 @@ function seedProductProjection(
       provenance: {
         organisationId: ORGANISATION_ID,
         integrationAccountId: ACCOUNT,
-        source: "underclerk",
+        source: "commerce",
         resourceType: "product",
         resourceId: commerceCanonicalResourceId(MERCHANT, PRODUCT),
         revision: 1,
@@ -403,7 +403,7 @@ export function listingProvenance(
   return {
     organisationId: ORGANISATION_ID,
     integrationAccountId: ACCOUNT,
-    source: "underclerk",
+    source: "commerce",
     resourceType,
     resourceId: commerceCanonicalResourceId(MERCHANT, resourceId),
     revision: 1,
@@ -589,8 +589,8 @@ export async function postControl(
       headers: {
         "content-type": "application/json",
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}; ${APPROVAL_GRANT_COOKIE}=${approvalGrant}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}; ${APPROVAL_GRANT_COOKIE}=${approvalGrant}`,
+        "x-pantry-csrf": session.csrfToken,
         "idempotency-key": identity,
       },
       body: JSON.stringify(body),
@@ -599,9 +599,9 @@ export async function postControl(
 }
 
 export async function effectEvidence(): Promise<unknown> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT}/e2e-evidence`,
-    { headers: { authorization: "Bearer underclerk-e2e-token" } },
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${MERCHANT}/e2e-evidence`,
+    { headers: { authorization: "Bearer commerce-e2e-token" } },
   );
   return response.json();
 }

@@ -67,7 +67,7 @@ export function sealJevUsageHours(
         COALESCE(SUM(input_tokens), 0) AS input_tokens, COUNT(*) AS evaluations,
         GROUP_CONCAT(evaluation_id, ' ') AS evaluation_ids
       FROM typesafe_evaluation
-      WHERE organisation_id = ? AND funding = 'satyr_platform'
+      WHERE organisation_id = ? AND funding = 'pantry_platform'
         AND reserved_at >= ? AND reserved_at < ?
       GROUP BY purpose, hour_start`,
       organisationId,
@@ -121,7 +121,7 @@ export function nextJevUsageAt(
   const unsealed = sql
     .exec<{ at: number | null }>(
       `SELECT MIN(reserved_at) AS at FROM typesafe_evaluation
-      WHERE organisation_id = ? AND funding = 'satyr_platform' AND reserved_at >= ?`,
+      WHERE organisation_id = ? AND funding = 'pantry_platform' AND reserved_at >= ?`,
       organisationId,
       readCursor(sql, organisationId),
     )

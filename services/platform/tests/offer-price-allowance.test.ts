@@ -32,7 +32,7 @@ import {
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION = requireOrganisationId("organisation_allowance");
-const OFFER = "underclerk:merchant_cafe:offer_coffee";
+const OFFER = "commerce:merchant_cafe:offer_coffee";
 let ENV: UnitTestEnv;
 
 describe("the price allowance boundary", () => {

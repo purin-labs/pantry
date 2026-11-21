@@ -80,9 +80,9 @@ type CommerceEntityPlaneCommandAuthorizationError = Readonly<{
 }>;
 
 export type CommerceEntityPlaneExecutionEnv = Readonly<{
-  readonly UNDERCLERK: Readonly<{ readonly fetch: CommerceEntityPlaneFetch }>;
-  readonly UNDERCLERK_BASE_URL?: string;
-  readonly UNDERCLERK_SERVICE_TOKEN?: string;
+  readonly COMMERCE: Readonly<{ readonly fetch: CommerceEntityPlaneFetch }>;
+  readonly COMMERCE_BASE_URL?: string;
+  readonly COMMERCE_SERVICE_TOKEN?: string;
 }>;
 
 type CommerceEntityPlaneExecutionError = Readonly<{
@@ -93,7 +93,7 @@ type CommerceEntityPlaneExecutionError = Readonly<{
     | "commerce_entity_plane_flow_binding_invalid"
     | "commerce_entity_plane_flow_denied"
     | "commerce_entity_plane_binding_missing"
-    | "commerce_entity_plane_underclerk_unavailable"
+    | "commerce_entity_plane_commerce_unavailable"
     | "commerce_entity_plane_command_invalid"
     | "commerce_entity_plane_command_rejected"
     | "commerce_entity_plane_receipt_invalid"
@@ -204,7 +204,7 @@ export async function executeCommerceEntityPlaneAction(
     String(input.action.action.organisationId),
   );
   if (client === null)
-    return executionFailure("commerce_entity_plane_underclerk_unavailable");
+    return executionFailure("commerce_entity_plane_commerce_unavailable");
 
   const snapshot = await client.changes(
     String(gate.value.merchantBinding.merchantId),
@@ -213,7 +213,7 @@ export async function executeCommerceEntityPlaneAction(
   );
   if (!snapshot.ok)
     return executionFailure(
-      "commerce_entity_plane_underclerk_unavailable",
+      "commerce_entity_plane_commerce_unavailable",
       snapshot.error,
     );
 
@@ -796,7 +796,7 @@ function commandAuthorityForProposal(
 }
 
 type EntityPlaneCommandCallError = Readonly<{
-  readonly code: "commerce_entity_plane_underclerk_unavailable";
+  readonly code: "commerce_entity_plane_commerce_unavailable";
   readonly evidence: unknown;
 }>;
 
@@ -813,7 +813,7 @@ async function executeEntityPlaneCommand(
       : {
           ok: false,
           error: {
-            code: "commerce_entity_plane_underclerk_unavailable",
+            code: "commerce_entity_plane_commerce_unavailable",
             evidence: result.error,
           },
         };
@@ -821,7 +821,7 @@ async function executeEntityPlaneCommand(
     return {
       ok: false,
       error: {
-        code: "commerce_entity_plane_underclerk_unavailable",
+        code: "commerce_entity_plane_commerce_unavailable",
         evidence: errorEvidence(error),
       },
     };
@@ -845,7 +845,7 @@ async function settleEntityPlaneIndeterminate(
     providerResult: JSON.stringify(evidence),
   });
   return completed.ok
-    ? executionFailure("commerce_entity_plane_underclerk_unavailable", evidence)
+    ? executionFailure("commerce_entity_plane_commerce_unavailable", evidence)
     : executionFailure("commerce_entity_plane_action_failed", completed.error);
 }
 
@@ -882,17 +882,17 @@ function createEntityPlaneClient(
   organisationId: string,
 ): CommerceEntityPlaneClient | null {
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return null;
   try {
     return new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         organisationId,
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
       ),
     });
   } catch {

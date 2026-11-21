@@ -421,7 +421,7 @@ export async function admittedPublishCaseContextDiscoveryConfiguration(
         authority,
         caseContextDiscoveryRouteAuthority(policy.value.route),
       ) ||
-      (authority.kind === "satyr_platform" &&
+      (authority.kind === "pantry_platform" &&
         resolvePantryTypeSafeKey(host.env) === null)
     ) {
       return {

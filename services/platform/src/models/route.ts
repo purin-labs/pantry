@@ -62,8 +62,8 @@ export type PantryPlatformModelRoute = VariantBy<
 
 export type PantryPlatformModelRouteError = {
   readonly code:
-    | "satyr_platform_credential_unavailable"
-    | "satyr_platform_model_unsupported";
+    | "pantry_platform_credential_unavailable"
+    | "pantry_platform_model_unsupported";
 };
 
 /** The route of an Organisation's own API key, for one provider. */
@@ -343,13 +343,13 @@ export function resolvePantryPlatformModelRoute(
   if (key.length === 0) {
     return {
       ok: false,
-      error: { code: "satyr_platform_credential_unavailable" },
+      error: { code: "pantry_platform_credential_unavailable" },
     };
   }
   const model =
     env.PANTRY_PLATFORM_PI_MODEL?.trim() || PLATFORM_DEFAULT_PI_MODEL;
   if (!isPlatformPiModel(model)) {
-    return { ok: false, error: { code: "satyr_platform_model_unsupported" } };
+    return { ok: false, error: { code: "pantry_platform_model_unsupported" } };
   }
   return {
     ok: true,
@@ -435,7 +435,7 @@ export async function resolveOrganisationModelRouteForSelection(input: {
       });
     case "organisation_google_api_key":
       return resolveOrganisationApiKeyModelRoute({ ...input, provider: "google" });
-    case "satyr_platform":
+    case "pantry_platform":
       return resolvePantryPlatformModelRoute(input.env);
     default:
       return assertNever(input.selection);
@@ -488,10 +488,10 @@ export function activationModelRouteError(
       return "claude_connection_required";
     case "organisation_codex_subscription_unavailable":
       return "codex_subscription_required";
-    case "satyr_platform_credential_unavailable":
-      return "satyr_platform_credential_required";
-    case "satyr_platform_model_unsupported":
-      return "satyr_platform_model_unsupported";
+    case "pantry_platform_credential_unavailable":
+      return "pantry_platform_credential_required";
+    case "pantry_platform_model_unsupported":
+      return "pantry_platform_model_unsupported";
     case "organisation_openai_api_key_unavailable":
       return "organisation_openai_api_key_required";
     case "organisation_anthropic_api_key_unavailable":

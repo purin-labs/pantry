@@ -476,7 +476,7 @@ function validTypeSafeSink(
 ): boolean {
   if (
     sink.organisationId.length === 0 ||
-    (sink.funding.kind !== "satyr_platform" &&
+    (sink.funding.kind !== "pantry_platform" &&
       (sink.funding.kind !== "organisation_byo" ||
         !Number.isSafeInteger(sink.funding.connectionRevision) ||
         sink.funding.connectionRevision < 1))

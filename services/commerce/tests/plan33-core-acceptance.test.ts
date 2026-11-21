@@ -125,7 +125,7 @@ it(
 async function plan33CoreAcceptance(): Promise<void> {
   const databasePath = join(
     tmpdir(),
-    `underclerk-plan33-core-${randomUUID()}.sqlite3`,
+    `commerce-plan33-core-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, NOW);
@@ -147,18 +147,18 @@ async function plan33CoreAcceptance(): Promise<void> {
     serviceToken: SERVICE_TOKEN,
   });
   const admin = new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: api.fetch,
   });
   const storefront = new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
 
   try {
     const provisioned = await admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
       profile: "cafe_patisserie",
@@ -178,7 +178,7 @@ async function plan33CoreAcceptance(): Promise<void> {
     } as const;
 
     const session = await storefront.createSession(MERCHANT_ID, STOREFRONT_ID, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     });
     if (!session.ok) throw new Error(JSON.stringify(session.error));
@@ -208,7 +208,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       STOREFRONT_ID,
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: "plan33_original_cart",
         lines: [
           { kind: "catalog", variantId: FIRST_VARIANT_ID, quantity: 1 },
@@ -225,7 +225,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       STOREFRONT_ID,
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: "plan33_original_checkout",
         cartId: cart.value.cartId,
         cartRevision: cart.value.revision,
@@ -253,7 +253,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       activeBefore.profile.configuration,
     );
     const replacement = await admin.createCheckoutProfileDraft({
-      schemaVersion: "underclerk.create-checkout-profile-draft.v1",
+      schemaVersion: "commerce.create-checkout-profile-draft.v1",
       merchantId: MERCHANT_ID,
       checkoutProfileId: REPLACEMENT_PROFILE_ID,
       name: "Plan 33 replacement checkout",
@@ -262,7 +262,7 @@ async function plan33CoreAcceptance(): Promise<void> {
     });
     if (!replacement.ok) throw new Error(JSON.stringify(replacement.error));
     const published = await admin.publishCheckoutProfile({
-      schemaVersion: "underclerk.publish-checkout-profile.v1",
+      schemaVersion: "commerce.publish-checkout-profile.v1",
       merchantId: MERCHANT_ID,
       checkoutProfileId: REPLACEMENT_PROFILE_ID,
       expectedRevision: replacement.value.revision,
@@ -271,7 +271,7 @@ async function plan33CoreAcceptance(): Promise<void> {
     });
     if (!published.ok) throw new Error(JSON.stringify(published.error));
     const activated = await admin.activateCheckoutProfile({
-      schemaVersion: "underclerk.activate-checkout-profile.v1",
+      schemaVersion: "commerce.activate-checkout-profile.v1",
       merchantId: MERCHANT_ID,
       storefrontId: STOREFRONT_ID,
       checkoutProfileId: REPLACEMENT_PROFILE_ID,
@@ -293,7 +293,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       MERCHANT_ID,
       STOREFRONT_ID,
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -324,7 +324,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       checkoutId,
       session.value.token,
       {
-        schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
         idempotencyKey: "plan33_original_checkout_refresh",
         checkoutRevision: checkout.value.revision,
         quoteDigest: checkout.value.quote.quoteDigest,
@@ -356,7 +356,7 @@ async function plan33CoreAcceptance(): Promise<void> {
     ).toEqual(originalBuyerContact);
 
     const paymentCommand = {
-      schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+      schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
       idempotencyKey: "plan33_original_payment",
       checkoutRevision: refreshed.value.revision,
       quoteDigest: refreshed.value.quote.quoteDigest,
@@ -382,7 +382,7 @@ async function plan33CoreAcceptance(): Promise<void> {
     expect(paymentSessionReplay).toEqual(paymentSession);
 
     const reconcileCommand = {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1" as const,
+      schemaVersion: "commerce.reconcile-buyer-payment.v1" as const,
       idempotencyKey: paymentCommand.idempotencyKey,
       checkoutRevision: paymentCommand.checkoutRevision,
       quoteDigest: paymentCommand.quoteDigest,
@@ -484,7 +484,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       STOREFRONT_ID,
       replacementSession.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: "plan33_indeterminate_cart",
         lines: [{ kind: "catalog", variantId: FIRST_VARIANT_ID, quantity: 1 }],
       },
@@ -496,7 +496,7 @@ async function plan33CoreAcceptance(): Promise<void> {
       STOREFRONT_ID,
       replacementSession.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: "plan33_indeterminate_checkout",
         cartId: indeterminateCart.value.cartId,
         cartRevision: indeterminateCart.value.revision,
@@ -506,7 +506,7 @@ async function plan33CoreAcceptance(): Promise<void> {
     if (!indeterminateCheckout.ok)
       throw new Error(JSON.stringify(indeterminateCheckout.error));
     const indeterminatePaymentCommand = {
-      schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+      schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
       idempotencyKey: "plan33_indeterminate_payment",
       checkoutRevision: indeterminateCheckout.value.revision,
       quoteDigest: indeterminateCheckout.value.quote.quoteDigest,
@@ -526,13 +526,13 @@ async function plan33CoreAcceptance(): Promise<void> {
       throw new Error(JSON.stringify(indeterminateSession));
     }
     paymentGateway.setReconcileResult({
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "indeterminate",
       reason: "provider_timeout",
       reconcileAfter: "2026-08-31T09:35:00.000Z",
     });
     const indeterminateReconcileCommand = {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1" as const,
+      schemaVersion: "commerce.reconcile-buyer-payment.v1" as const,
       idempotencyKey: indeterminatePaymentCommand.idempotencyKey,
       checkoutRevision: indeterminatePaymentCommand.checkoutRevision,
       quoteDigest: indeterminatePaymentCommand.quoteDigest,
@@ -621,7 +621,7 @@ async function plan33ShippingAcceptance(): Promise<void> {
       MERCHANT_ID,
       SHIPPING_STOREFRONT_ID,
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -748,7 +748,7 @@ async function plan33ShippingAcceptance(): Promise<void> {
       domesticInitial.value.checkoutId,
       session.value.token,
       {
-        schemaVersion: "underclerk.refresh-buyer-shipping-checkout.v1",
+        schemaVersion: "commerce.refresh-buyer-shipping-checkout.v1",
         idempotencyKey: "plan33_domestic_checkout_refresh",
         checkoutRevision: domesticInitial.value.revision,
         quoteDigest: domesticInitial.value.quote.quoteDigest,
@@ -990,7 +990,7 @@ async function plan33ShippingAcceptance(): Promise<void> {
       singaporeInitial.value.checkoutId,
       session.value.token,
       {
-        schemaVersion: "underclerk.refresh-buyer-shipping-checkout.v1",
+        schemaVersion: "commerce.refresh-buyer-shipping-checkout.v1",
         idempotencyKey: "plan33_singapore_checkout_refresh",
         checkoutRevision: singaporeInitial.value.revision,
         quoteDigest: singaporeInitial.value.quote.quoteDigest,
@@ -1080,7 +1080,7 @@ async function exportShippingAcceptance(): Promise<void> {
       MERCHANT_ID,
       SHIPPING_STOREFRONT_ID,
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -1267,7 +1267,7 @@ async function exportShippingAcceptance(): Promise<void> {
       ].map(async (address, index) => {
         // Raw HTTP: the client refuses both before it sends them.
         const response = await fixture.fetch(
-          `https://underclerk.test/v1/public/merchants/${MERCHANT_ID}/storefronts/${SHIPPING_STOREFRONT_ID}/address-validations`,
+          `https://commerce.test/v1/public/merchants/${MERCHANT_ID}/storefronts/${SHIPPING_STOREFRONT_ID}/address-validations`,
           {
             method: "POST",
             headers: {
@@ -1275,7 +1275,7 @@ async function exportShippingAcceptance(): Promise<void> {
               "content-type": "application/json",
             },
             body: JSON.stringify({
-              schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+              schemaVersion: "commerce.validate-buyer-shipping-address.v1",
               idempotencyKey: `export_refused_${index}`,
               address,
             }),
@@ -1313,7 +1313,7 @@ async function exportShippingAcceptance(): Promise<void> {
       MERCHANT_ID,
       SHIPPING_STOREFRONT_ID,
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -1495,7 +1495,7 @@ async function configureShippingBase(
 
 async function createShippingItems(admin: CommerceAdminClient): Promise<void> {
   const provisioned = await admin.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     createdAt: SHIPPING_NOW,
@@ -1556,7 +1556,7 @@ function shippingInventoryItemCommand(
 ): CreateCommerceInventoryItemV1 {
   const cookieBox = kind === "cookie_box";
   return {
-    schemaVersion: "underclerk.create-inventory-item.v1",
+    schemaVersion: "commerce.create-inventory-item.v1",
     merchantId: MERCHANT_ID,
     expectedMerchantRevision,
     idempotencyKey: `plan33_shipping_inventory_item_${kind}`,
@@ -1578,7 +1578,7 @@ function baseShippingStorefrontCommand(
   expectedMerchantRevision: number,
 ): ConfigureCommerceShippingStorefrontV1 {
   return {
-    schemaVersion: "underclerk.configure-shipping-storefront.v1",
+    schemaVersion: "commerce.configure-shipping-storefront.v1",
     merchantId: MERCHANT_ID,
     expectedMerchantRevision,
     idempotencyKey: "plan33_shipping_storefront",
@@ -1726,7 +1726,7 @@ function shippingInventoryPositionCommand(
 ): OpenCommerceInventoryPositionV1 {
   const cookieBox = kind === "cookie_box";
   return {
-    schemaVersion: "underclerk.open-inventory-position.v1",
+    schemaVersion: "commerce.open-inventory-position.v1",
     merchantId: MERCHANT_ID,
     expectedMerchantRevision,
     idempotencyKey: `plan33_shipping_inventory_position_${kind}`,
@@ -1749,7 +1749,7 @@ function shippingReceiptCommand(
 ): ReceiveCommerceInventoryV3 {
   const cookieBox = kind === "cookie_box";
   return {
-    schemaVersion: "underclerk.receive-inventory.v3",
+    schemaVersion: "commerce.receive-inventory.v3",
     purchase: { kind: "unlinked" },
     merchantId: MERCHANT_ID,
     expectedMerchantRevision,
@@ -1784,7 +1784,7 @@ function createShippingFixture(
 ): ShippingFixture {
   const databasePath = join(
     tmpdir(),
-    `underclerk-plan33-shipping-${randomUUID()}.sqlite3`,
+    `commerce-plan33-shipping-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, SHIPPING_NOW);
@@ -1814,12 +1814,12 @@ function createShippingFixture(
     serviceToken: SERVICE_TOKEN,
   });
   const admin = new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: api.fetch,
   });
   const storefront = new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
   return {
@@ -1848,7 +1848,7 @@ async function validateShippingAddress(
     SHIPPING_STOREFRONT_ID,
     sessionToken,
     {
-      schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+      schemaVersion: "commerce.validate-buyer-shipping-address.v1",
       idempotencyKey,
       address,
     },
@@ -1897,7 +1897,7 @@ async function createShippingCheckoutFromLines(
     SHIPPING_STOREFRONT_ID,
     sessionToken,
     {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `${idempotencyKey}_cart`,
       lines: lines.map(shippingCartLine),
     },
@@ -1908,7 +1908,7 @@ async function createShippingCheckoutFromLines(
     SHIPPING_STOREFRONT_ID,
     sessionToken,
     {
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey,
       cartId: cart.value.cartId,
       cartRevision: cart.value.revision,
@@ -1939,7 +1939,7 @@ async function payShippingCheckout(
 ): Promise<ShippingPaymentEvidence> {
   const beforeReconcileCalls = fixture.paymentGateway.reconcileCalls;
   const paymentCommand = {
-    schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+    schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
     idempotencyKey,
     checkoutRevision: checkout.revision,
     quoteDigest: checkout.quote.quoteDigest,
@@ -1965,7 +1965,7 @@ async function payShippingCheckout(
   expect(paymentSessionReplay).toEqual(paymentSession);
 
   const reconcileCommand = {
-    schemaVersion: "underclerk.reconcile-buyer-payment.v1" as const,
+    schemaVersion: "commerce.reconcile-buyer-payment.v1" as const,
     idempotencyKey,
     checkoutRevision: checkout.revision,
     quoteDigest: checkout.quote.quoteDigest,
@@ -2018,7 +2018,7 @@ async function completeShippingLifecycle(
   if (shipment === undefined)
     throw new Error("Shipping shipment was unavailable");
   const rateCommand: QuoteShipmentLabelRateCommand = {
-    schemaVersion: "underclerk.quote-shipment-label-rate.v1",
+    schemaVersion: "commerce.quote-shipment-label-rate.v1",
     merchantId: MERCHANT_ID,
     idempotencyKey: `${idempotencyPrefix}_label_rate`,
     requestedAt: SHIPPING_NOW,
@@ -2038,7 +2038,7 @@ async function completeShippingLifecycle(
     },
   });
   const purchaseCommand: PurchaseShippingLabelCommand = {
-    schemaVersion: "underclerk.purchase-shipping-label.v1",
+    schemaVersion: "commerce.purchase-shipping-label.v1",
     merchantId: MERCHANT_ID,
     expectedMerchantRevision: initialSnapshot.merchantRevision,
     idempotencyKey: `${idempotencyPrefix}_label_purchase`,
@@ -2080,7 +2080,7 @@ async function completeShippingLifecycle(
     location: "Tokyo",
   };
   const inTransitCommand: RecordShippingTrackingCommand = {
-    schemaVersion: "underclerk.record-shipping-tracking.v1",
+    schemaVersion: "commerce.record-shipping-tracking.v1",
     merchantId: MERCHANT_ID,
     expectedMerchantRevision: labeledSnapshot.merchantRevision,
     idempotencyKey: `${idempotencyPrefix}_tracking_in_transit`,
@@ -2124,7 +2124,7 @@ async function completeShippingLifecycle(
     location: "Singapore",
   };
   const deliveredCommand: RecordShippingTrackingCommand = {
-    schemaVersion: "underclerk.record-shipping-tracking.v1",
+    schemaVersion: "commerce.record-shipping-tracking.v1",
     merchantId: MERCHANT_ID,
     expectedMerchantRevision: handedSnapshot.merchantRevision,
     idempotencyKey: `${idempotencyPrefix}_tracking_delivered`,

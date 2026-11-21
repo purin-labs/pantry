@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "satyr-edge-e2e",
+  "name": "pantry-e2e",
   "main": "./runtime-worker.ts",
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],
@@ -100,11 +100,11 @@
     },
   },
   "d1_databases": [
-    { "binding": "ORGANISATION_DB_WNAM", "database_name": "satyr-e2e-wnam", "database_id": "00000000-0000-0000-0000-000000000002" },
-    { "binding": "ORGANISATION_DB_APAC", "database_name": "satyr-e2e-apac", "database_id": "00000000-0000-0000-0000-000000000003" },
+    { "binding": "ORGANISATION_DB_WNAM", "database_name": "pantry-e2e-wnam", "database_id": "00000000-0000-0000-0000-000000000002" },
+    { "binding": "ORGANISATION_DB_APAC", "database_name": "pantry-e2e-apac", "database_id": "00000000-0000-0000-0000-000000000003" },
     {
       "binding": "DB",
-      "database_name": "satyr-e2e",
+      "database_name": "pantry-e2e",
       "database_id": "00000000-0000-0000-0000-000000000001",
     },
   ],
@@ -117,23 +117,23 @@
   "r2_buckets": [
     {
       "binding": "ARCHIVE",
-      "bucket_name": "satyr-e2e-archive",
+      "bucket_name": "pantry-e2e-archive",
     },
   ],
   "queues": {
     "producers": [
       {
         "binding": "EVENT_Q",
-        "queue": "satyr-events",
+        "queue": "pantry-events",
       },
       {
         "binding": "CUE_Q",
-        "queue": "satyr-cues",
+        "queue": "pantry-cues",
       },
     ],
     "consumers": [
-      { "queue": "satyr-events", "max_batch_size": 1, "max_batch_timeout": 1 },
-      { "queue": "satyr-cues", "max_batch_size": 1, "max_batch_timeout": 1 },
+      { "queue": "pantry-events", "max_batch_size": 1, "max_batch_timeout": 1 },
+      { "queue": "pantry-cues", "max_batch_size": 1, "max_batch_timeout": 1 },
     ],
   },
 }

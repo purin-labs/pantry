@@ -1,13 +1,13 @@
 """Run the Plan 40B phase 2 journey: QR order pages at <name>.menu.<domain>.
 
-The runner starts a local Underclerk with fresh storage and seeds two shops:
+The runner starts a local Commerce with fresh storage and seeds two shops:
 the Nuki café demo merchant and a second café merchant with the pâtisserie
-menu. It gives each storefront a shop name through Underclerk's admin API
+menu. It gives each storefront a shop name through Commerce's admin API
 and checks the refusals (a taken name, a reserved name, a name of the wrong
 form). Then it builds the storefront, runs the shop Worker with wrangler dev
-(`menu.localhost` as the order page domain, Underclerk through a service
+(`menu.localhost` as the order page domain, Commerce through a service
 binding), and checks each host over HTTP: the right shop for each name, 404
-for an unknown name, a redirect from an earlier name, and no Underclerk route
+for an unknown name, a redirect from an earlier name, and no Commerce route
 of another shop. Last, it drives both order pages in Chromium with the
 Playwright CLI. Results and screenshots go to output/playwright/plan-40b-order-page.
 """
@@ -30,7 +30,7 @@ import urllib.request
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
-UNDERCLERK = ROOT / "services/commerce"
+COMMERCE = ROOT / "services/commerce"
 STOREFRONT = ROOT / "apps/storefront"
 ARTIFACTS = ROOT / "output/playwright/plan-40b-order-page"
 SUFFIX = "menu.localhost"
@@ -57,11 +57,11 @@ def node_script(script: str, arguments: list[str], env: dict[str, str]) -> str:
         [
             "node",
             "--experimental-strip-types",
-            f"--env-file={UNDERCLERK / '.dev.vars.local'}",
-            str(UNDERCLERK / "scripts" / script),
+            f"--env-file={COMMERCE / '.dev.vars.local'}",
+            str(COMMERCE / "scripts" / script),
             *arguments,
         ],
-        cwd=UNDERCLERK,
+        cwd=COMMERCE,
         env=env,
         capture_output=True,
         text=True,
@@ -102,7 +102,7 @@ def get(port: int, host: str, path: str) -> tuple[int, dict[str, str], str]:
 
 
 def shop_meta(body: str) -> dict | None:
-    match = re.search(r'<meta name="underclerk-shop" content="([^"]*)">', body)
+    match = re.search(r'<meta name="commerce-shop" content="([^"]*)">', body)
     return None if match is None else json.loads(html.unescape(match.group(1)))
 
 
@@ -145,39 +145,39 @@ def main() -> None:
     )
     args = parser.parse_args()
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
-    if not (UNDERCLERK / ".dev.vars.local").exists():
+    if not (COMMERCE / ".dev.vars.local").exists():
         raise SystemExit("services/commerce/.dev.vars.local is missing")
     run_id = uuid.uuid4().hex[:8]
-    underclerk_name = f"underclerk-journey-{run_id}"
+    commerce_name = f"commerce-journey-{run_id}"
     port = free_port()
     scratch = Path(tempfile.mkdtemp(prefix=f"order-page-{run_id}-"))
-    underclerk = subprocess.Popen(
+    commerce = subprocess.Popen(
         [
             "pnpm", "exec", "wrangler", "dev", "--local", "--env", "local",
-            "--persist-to", str(scratch / "underclerk"),
+            "--persist-to", str(scratch / "commerce"),
             "--port", str(port), "--inspector-port", str(free_port()),
             # Its own name, so the run never replaces the developer's
-            # Underclerk in the shared dev registry.
-            "--name", underclerk_name,
+            # Commerce in the shared dev registry.
+            "--name", commerce_name,
         ],
-        cwd=UNDERCLERK,
+        cwd=COMMERCE,
         start_new_session=True,
-        stdout=(scratch / "underclerk.log").open("w"),
+        stdout=(scratch / "commerce.log").open("w"),
         stderr=subprocess.STDOUT,
     )
     try:
-        wait_ready(f"http://127.0.0.1:{port}/health", underclerk)
-        run_journey(args.cli, run_id, f"http://127.0.0.1:{port}", underclerk_name, scratch)
+        wait_ready(f"http://127.0.0.1:{port}/health", commerce)
+        run_journey(args.cli, run_id, f"http://127.0.0.1:{port}", commerce_name, scratch)
     finally:
-        stop(underclerk)
+        stop(commerce)
         shutil.rmtree(scratch, ignore_errors=True)
 
 
 def run_journey(
-    cli: Path, run_id: str, underclerk: str, underclerk_name: str, scratch: Path
+    cli: Path, run_id: str, commerce: str, commerce_name: str, scratch: Path
 ) -> None:
     checks = Checks()
-    env = {**os.environ, "UNDERCLERK_BASE_URL": underclerk}
+    env = {**os.environ, "COMMERCE_BASE_URL": commerce}
     node_script("seed-local-commerce.ts", [], env)
     node_script(
         "seed-local-commerce.ts",
@@ -199,7 +199,7 @@ def run_journey(
     taken = set_name(PATISSERIE, "nuki")
     checks.check(
         "the second shop cannot take the café's name",
-        taken == {"schemaVersion": "underclerk.storefront-shop-name-change.v1", "outcome": "refused", "reason": "taken"},
+        taken == {"schemaVersion": "commerce.storefront-shop-name-change.v1", "outcome": "refused", "reason": "taken"},
         taken,
     )
     for name, reason in (("www", "reserved"), ("Nuki", "invalid"), ("xn--nuki", "invalid")):
@@ -222,7 +222,7 @@ def run_journey(
         still_taken,
     )
 
-    # The storefront as the shop Worker serves it, with Underclerk through
+    # The storefront as the shop Worker serves it, with Commerce through
     # the dev registry under this run's own name.
     subprocess.run(
         ["pnpm", "exec", "vite", "build", "--outDir", str(scratch / "dist")],
@@ -234,7 +234,7 @@ def run_journey(
     config.write_text(
         json.dumps(
             {
-                "name": f"seams-shop-journey-{run_id}",
+                "name": f"purin-shop-journey-{run_id}",
                 "main": str(STOREFRONT / "worker/index.ts"),
                 "compatibility_date": "2026-07-07",
                 "assets": {
@@ -244,7 +244,7 @@ def run_journey(
                     "run_worker_first": True,
                 },
                 "vars": {"MENU_HOST_SUFFIX": SUFFIX},
-                "services": [{"binding": "UNDERCLERK", "service": underclerk_name}],
+                "services": [{"binding": "COMMERCE", "service": commerce_name}],
             }
         )
     )
@@ -256,7 +256,7 @@ def run_journey(
             "--port", str(shop_port), "--inspector-port", str(free_port()),
             "--persist-to", str(scratch / "shop"),
         ],
-        cwd=UNDERCLERK,
+        cwd=COMMERCE,
         start_new_session=True,
         stdout=(scratch / "shop.log").open("w"),
         stderr=subprocess.STDOUT,
@@ -280,7 +280,7 @@ def run_journey(
         if browser.get("result") != "passed":
             raise RuntimeError("The browser journey did not pass")
         evidence = {
-            "backend": "local Underclerk Worker with its own storage",
+            "backend": "local Commerce Worker with its own storage",
             "site": "the shop Worker under wrangler dev, order page domain menu.localhost",
             "shops": {
                 "nuki-cafe": CAFE,
@@ -338,7 +338,7 @@ def http_checks(checks: Checks, port: int) -> None:
     own = f"/v1/public/merchants/{PATISSERIE}/storefronts/{STOREFRONT_ID}/catalog"
     status, _, _ = get(port, f"petit-four.{SUFFIX}", own)
     checks.check(
-        "an order page passes its own storefront's routes to Underclerk",
+        "an order page passes its own storefront's routes to Commerce",
         status == 401,
         {"status": status, "detail": "401: a catalog read needs a buyer session"},
     )

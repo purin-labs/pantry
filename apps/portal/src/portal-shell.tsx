@@ -90,7 +90,7 @@ export function SignIn(): React.ReactNode {
         <div className="signin-brand" aria-label="Seams Pantry">
           <img
             className="signin-brand-mark"
-            src="/brand/satyr-mark-dark-32.png"
+            src="/brand/pantry-mark-dark-32.png"
             alt=""
             width={28}
             height={28}

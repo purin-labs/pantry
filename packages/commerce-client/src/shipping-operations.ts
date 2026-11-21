@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/commerce-contracts/records/api-shipping-operations";
 
 export type QuoteShipmentLabelRateCommand = Readonly<{
-  schemaVersion: "underclerk.quote-shipment-label-rate.v1";
+  schemaVersion: "commerce.quote-shipment-label-rate.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: string;
@@ -23,7 +23,7 @@ export type QuoteShipmentLabelRateCommand = Readonly<{
 }>;
 
 export type PurchaseShippingLabelCommand = Readonly<{
-  schemaVersion: "underclerk.purchase-shipping-label.v1";
+  schemaVersion: "commerce.purchase-shipping-label.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -35,7 +35,7 @@ export type PurchaseShippingLabelCommand = Readonly<{
 }>;
 
 export type RecordShippingTrackingCommand = Readonly<{
-  schemaVersion: "underclerk.record-shipping-tracking.v1";
+  schemaVersion: "commerce.record-shipping-tracking.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -60,7 +60,7 @@ export type RecordShippingTrackingCommand = Readonly<{
 }>;
 
 export type AttachFulfillmentTrackingCommand = Readonly<{
-  schemaVersion: "underclerk.attach-fulfillment-tracking.v1";
+  schemaVersion: "commerce.attach-fulfillment-tracking.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -74,7 +74,7 @@ export type AttachFulfillmentTrackingCommand = Readonly<{
 }>;
 
 export type ShipmentLabelRateResult = Readonly<{
-  schemaVersion: "underclerk.shipment-label-rate-result.v1";
+  schemaVersion: "commerce.shipment-label-rate-result.v1";
   outcome: "quoted" | "replayed";
   rate: ShipmentLabelRateSnapshot;
 }>;

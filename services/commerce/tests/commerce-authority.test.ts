@@ -112,8 +112,8 @@ function quoteJapanShipping(request: ShippingQuoteRequest) {
 }
 
 const NOW = "2026-08-14T09:30:00.000Z";
-const SERVICE_TOKEN = "underclerk_test_service_token";
-const TEST_CARRIER_SIGNING_KEY = "satyr-plan22-japan-post-ems-test-key";
+const SERVICE_TOKEN = "commerce_test_service_token";
+const TEST_CARRIER_SIGNING_KEY = "pantry-plan22-japan-post-ems-test-key";
 const TEST_BUYER_CONTACT = {
   kind: "email",
   email: "buyer@example.test",
@@ -251,7 +251,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
   };
   expect(() =>
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "legacy_single_line",
       buyerContact: TEST_BUYER_CONTACT,
       line: { variantId: "variant_cookie_box_6", quantity: 1 },
@@ -260,7 +260,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
   ).toThrow();
   expect(() =>
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "retired_line_bearing_checkout",
       cartId: "cart_shipping",
       cartRevision: 1,
@@ -275,7 +275,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
   ).toThrow();
   expect(() =>
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "invalid_cart_revision",
       cartId: "cart_shipping",
       cartRevision: 0,
@@ -291,7 +291,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
 
   expect(
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "japan_address",
       cartId: "cart_shipping",
       cartRevision: 1,
@@ -301,7 +301,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
         kind: "provided_address",
         address: {
           countryCode: "JP",
-          recipientName: "Satyr Buyer",
+          recipientName: "Pantry Buyer",
           addressLine1: "1-2-3 Marunouchi",
           locality: "Chiyoda-ku",
           administrativeArea: "Tokyo",
@@ -314,7 +314,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
     kind: "provided_address",
     address: {
       countryCode: "JP",
-      recipientName: "Satyr Buyer",
+      recipientName: "Pantry Buyer",
       addressLine1: "1-2-3 Marunouchi",
       locality: "Chiyoda-ku",
       administrativeArea: "Tokyo",
@@ -324,7 +324,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
   });
   expect(() =>
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "retired_city_address",
       cartId: "cart_shipping",
       cartRevision: 1,
@@ -346,7 +346,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
 
   expect(
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "normalized_contact",
       cartId: "cart_shipping",
       cartRevision: 1,
@@ -375,7 +375,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
   });
   expect(() =>
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "invalid_contact_phone",
       cartId: "cart_shipping",
       cartRevision: 1,
@@ -396,7 +396,7 @@ it("requires an exact Cart revision at the shipping checkout boundary", () => {
   ).toThrow();
   expect(() =>
     parseCreateBuyerShippingCheckoutCommand({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: "guest_saved_address",
       cartId: "cart_shipping",
       cartRevision: 1,
@@ -512,7 +512,7 @@ it("attaches frozen tracking through the ordinary mutation, receipt, and deliver
     );
     const client = createClient(fixture.authority);
     const command = {
-      schemaVersion: "underclerk.attach-fulfillment-tracking.v1" as const,
+      schemaVersion: "commerce.attach-fulfillment-tracking.v1" as const,
       merchantId: "merchant_demo",
       expectedMerchantRevision: 1,
       idempotencyKey: "attach_tracking_1",
@@ -557,7 +557,7 @@ it("attaches frozen tracking through the ordinary mutation, receipt, and deliver
             id: "fulfillment_tracking_attachment",
             revision: 2,
           },
-          signer: { keyId: "key_underclerk_test", algorithm: "ed25519" },
+          signer: { keyId: "key_commerce_test", algorithm: "ed25519" },
         },
       },
     });
@@ -611,7 +611,7 @@ it("attaches frozen tracking through the ordinary mutation, receipt, and deliver
           resource: { revision: 2, lifecycle: { state: "handed_to_carrier" } },
         },
       ],
-      signer: { keyId: "key_underclerk_test", algorithm: "ed25519" },
+      signer: { keyId: "key_commerce_test", algorithm: "ed25519" },
     });
     expect(
       fixture.database
@@ -662,7 +662,7 @@ it("attaches frozen tracking through the ordinary mutation, receipt, and deliver
 });
 
 class DigestSigner implements CommerceSigner {
-  readonly keyId = "key_underclerk_test";
+  readonly keyId = "key_commerce_test";
   readonly publicKeyB64 = Buffer.alloc(32, 7).toString("base64url");
 
   sign(payload: Uint8Array): string {
@@ -734,7 +734,7 @@ it("updates a product description through the signed mutation boundary", async (
       throw new Error("Description update fixture product is missing");
     }
     const command: UpdateCommerceProductDescriptionV1 = {
-      schemaVersion: "underclerk.update-product-description.v1",
+      schemaVersion: "commerce.update-product-description.v1",
       merchantId: "merchant_demo",
       expectedMerchantRevision: 2,
       productId: "product_cookie_box",
@@ -839,7 +839,7 @@ it("creates a preparation station in the canonical resource table and main deliv
       receipt: { merchantRevision: 1 },
     });
     const command: CreatePreparationStationCommand = {
-      schemaVersion: "underclerk.create-preparation-station.v1",
+      schemaVersion: "commerce.create-preparation-station.v1",
       merchantId: "merchant_demo",
       expectedMerchantRevision: 1,
       idempotencyKey: "station_create",
@@ -896,7 +896,7 @@ it("retires a rejected delivery and replays its settlement on later acknowledgem
     expect(before.length).toBeGreaterThan(0);
     const deliveryId = before.at(-1)!.deliveryId;
     const rejectCommand = {
-      schemaVersion: "underclerk.acknowledge-commerce-delivery.v2",
+      schemaVersion: "commerce.acknowledge-commerce-delivery.v2",
       organisationId: "organisation_demo",
       merchantId: "merchant_demo",
       deliveryId,
@@ -922,7 +922,7 @@ it("retires a rejected delivery and replays its settlement on later acknowledgem
     });
     expect(
       fixture.authority.acknowledgeDelivery({
-        schemaVersion: "underclerk.acknowledge-commerce-delivery.v2",
+        schemaVersion: "commerce.acknowledge-commerce-delivery.v2",
         organisationId: "organisation_demo",
         merchantId: "merchant_demo",
         deliveryId,
@@ -940,7 +940,7 @@ it("routes the typed cafe resource slice through HTTP with authoritative relatio
     const client = createClient(fixture.authority);
     expect(
       await client.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: "organisation_demo",
         merchantId: "merchant_demo",
         createdAt: NOW,
@@ -1861,10 +1861,10 @@ it("provisions demo inventory only through typed commands", () => {
   const fixture = createFixture(false);
   try {
     const snapshot = fixture.authority.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: "organisation_demo",
       merchantId: "merchant_demo",
-      profile: "satyr_ecommerce",
+      profile: "pantry_ecommerce",
       createdAt: NOW,
     });
     expect(snapshot).toMatchObject({
@@ -1879,10 +1879,10 @@ it("provisions demo inventory only through typed commands", () => {
     ).toHaveLength(1);
     expect(
       fixture.authority.provisionDemo({
-        schemaVersion: "underclerk.provision-demo.v2",
+        schemaVersion: "commerce.provision-demo.v2",
         externalReference: "organisation_demo",
         merchantId: "merchant_demo",
-        profile: "satyr_ecommerce",
+        profile: "pantry_ecommerce",
         createdAt: NOW,
       }),
     ).toEqual(snapshot);
@@ -1898,7 +1898,7 @@ it("quotes and places shipping with the pinned merchant percentage tax policy", 
     const admin = createClient(fixture.authority);
     expect(
       await admin.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: "organisation_demo",
         merchantId: "merchant_demo",
         createdAt: NOW,
@@ -1949,14 +1949,14 @@ it("quotes and places shipping with the pinned merchant percentage tax policy", 
 
     capabilityHealth.mode = {
       state: "unavailable",
-      capabilityReference: "underclerk_merchant_tax_authority",
+      capabilityReference: "commerce_merchant_tax_authority",
     };
     const storefront = createStorefrontClient(fixture);
     const session = await storefront.createSession(
       "merchant_demo",
       "storefront_cookie_store_sg",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -2040,7 +2040,7 @@ it("quotes and places shipping with the pinned merchant percentage tax policy", 
       state: "quoted",
       quote: {
         taxQuote: {
-          providerAccountReference: "underclerk_merchant_tax_authority",
+          providerAccountReference: "commerce_merchant_tax_authority",
           registrationPolicyReference: "tax_policy_storefront_cookie_store_sg",
           taxAmount: { amountMinor: 580, currency: "JPY" },
           lineAllocations: [{ amount: { amountMinor: 580, currency: "JPY" } }],
@@ -2063,7 +2063,7 @@ it("quotes and places shipping with the pinned merchant percentage tax policy", 
       checkout.value.checkoutId,
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: "merchant_tax_payment",
         checkoutRevision: checkout.value.revision,
         quoteDigest: checkout.value.quote.quoteDigest,
@@ -2098,7 +2098,7 @@ it("places flavored channel listings and marks one variant on two channels", asy
     const client = createClient(fixture.authority);
     expect(
       await client.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: "organisation_demo",
         merchantId: "merchant_demo",
         createdAt: NOW,
@@ -2246,7 +2246,7 @@ it("places flavored channel listings and marks one variant on two channels", asy
       "merchant_demo",
       "storefront_cookie_store_sg",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -2290,7 +2290,7 @@ it("configures the Plan 23 flavored catalog and quotes per-flavor customs facts"
       "merchant_demo",
       "storefront_cookie_store_sg",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -2622,7 +2622,7 @@ function createFixture(
   provision = true,
   checkoutCapabilityHealthProvider: CheckoutProviderCapabilityHealthProvider = new ReadyCheckoutProviderCapabilityHealthProvider(),
 ): Fixture {
-  const databasePath = temporaryDatabasePath("underclerk");
+  const databasePath = temporaryDatabasePath("commerce");
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, NOW);
   const authority = new CommerceAuthority({
@@ -2631,10 +2631,10 @@ function createFixture(
     paymentGateway: new DeterministicPaymentGateway(fixedNow),
     now: fixedNow,
     shippingGateway: createJapanShippingGateway(
-      "satyr-plan22-japan-post-ems-test-key",
+      "pantry-plan22-japan-post-ems-test-key",
     ),
     shipping: createJapanExportShipping(
-        "satyr-plan22-japan-post-ems-test-key",
+        "pantry-plan22-japan-post-ems-test-key",
       ),
     checkoutCapabilityHealthProvider,
   });
@@ -2664,7 +2664,7 @@ function createInventoryFixture(): Fixture {
 
 function provisionMerchant(authority: CommerceAuthority): void {
   authority.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: "organisation_demo",
     merchantId: "merchant_demo",
     createdAt: NOW,
@@ -2688,7 +2688,7 @@ function createClient(authority: CommerceAuthority): CommerceAdminClient {
     serviceToken: SERVICE_TOKEN,
   });
   return new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: api.fetch,
   });
@@ -2705,7 +2705,7 @@ function createStorefrontClient(fixture: Fixture) {
     serviceToken: SERVICE_TOKEN,
   });
   return new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
 }
@@ -2726,7 +2726,7 @@ async function createShippingCheckoutFromLines(
   command: BuyerShippingCheckoutFromLines<CreateCommerceBuyerShippingCheckoutV1>,
 ): Promise<CommerceClientResult<CommerceBuyerQuotedShippingCheckoutV1>> {
   const cart = await client.createCart(merchantId, storefrontId, sessionToken, {
-    schemaVersion: "underclerk.create-buyer-cart.v1",
+    schemaVersion: "commerce.create-buyer-cart.v1",
     idempotencyKey: `${command.idempotencyKey}_cart`,
     lines: command.lines.map(shippingCartLine),
   });
@@ -2786,7 +2786,7 @@ async function validateTestShippingAddress(
     "storefront_cookie_store_sg",
     sessionToken,
     {
-      schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+      schemaVersion: "commerce.validate-buyer-shipping-address.v1",
       idempotencyKey,
       address,
     },
@@ -2849,7 +2849,7 @@ async function completeBuyerCheckout(
     checkoutId,
     sessionToken,
     {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+      schemaVersion: "commerce.reconcile-buyer-payment.v1",
       idempotencyKey: command.idempotencyKey,
       checkoutRevision: command.checkoutRevision,
       quoteDigest: command.quoteDigest,
@@ -2860,7 +2860,7 @@ async function completeBuyerCheckout(
 
 function testBuyerSessions(): BuyerSessionAuthority {
   return new BuyerSessionAuthority({
-    secret: "underclerk_test_buyer_session_secret",
+    secret: "commerce_test_buyer_session_secret",
     now: fixedNow,
     newSessionId: fixedBuyerSessionId,
   });
@@ -2874,7 +2874,7 @@ function createLocationCommand(
   idempotencyKey: string,
 ): CreateCommerceLocationV1 {
   return {
-    schemaVersion: "underclerk.create-location.v1",
+    schemaVersion: "commerce.create-location.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision: 0,
     idempotencyKey,
@@ -2895,7 +2895,7 @@ function prepareCatalogCommand(
   expectedMerchantRevision: number,
 ): PrepareCommerceCatalogListingV1 {
   return {
-    schemaVersion: "underclerk.prepare-catalog-listing.v1",
+    schemaVersion: "commerce.prepare-catalog-listing.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey,
@@ -2972,7 +2972,7 @@ function seedCatalog(
 
 function publishCommand(): PublishCommerceCatalogListingV1 {
   return {
-    schemaVersion: "underclerk.publish-catalog-listing.v1",
+    schemaVersion: "commerce.publish-catalog-listing.v1",
     merchantId: "merchant_demo",
     idempotencyKey: "publish_cookie_box",
     requestedAt: NOW,
@@ -2991,7 +2991,7 @@ function createInventoryItemCommand(
   expectedMerchantRevision: number,
 ): CreateCommerceInventoryItemV1 {
   return {
-    schemaVersion: "underclerk.create-inventory-item.v1",
+    schemaVersion: "commerce.create-inventory-item.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "create_oat_milk",
@@ -3009,7 +3009,7 @@ function openInventoryPositionCommand(
   expectedMerchantRevision: number,
 ): OpenCommerceInventoryPositionV1 {
   return {
-    schemaVersion: "underclerk.open-inventory-position.v1",
+    schemaVersion: "commerce.open-inventory-position.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "open_oat_cafe",
@@ -3026,7 +3026,7 @@ function receiveInventoryCommand(
   expectedMerchantRevision: number,
 ): ReceiveCommerceInventoryV3 {
   return {
-    schemaVersion: "underclerk.receive-inventory.v3",
+    schemaVersion: "commerce.receive-inventory.v3",
     purchase: { kind: "unlinked" },
     merchantId: "merchant_demo",
     expectedMerchantRevision,
@@ -3054,7 +3054,7 @@ function cafeInventoryItemCommand(
   expectedMerchantRevision: number,
 ): CreateCommerceInventoryItemV1 {
   return {
-    schemaVersion: "underclerk.create-inventory-item.v1",
+    schemaVersion: "commerce.create-inventory-item.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_oat_milk_item",
@@ -3074,7 +3074,7 @@ function shippingInventoryItemCommand(
 ): CreateCommerceInventoryItemV1 {
   if (kind === "cookie_box") {
     return {
-      schemaVersion: "underclerk.create-inventory-item.v1",
+      schemaVersion: "commerce.create-inventory-item.v1",
       merchantId: "merchant_demo",
       expectedMerchantRevision,
       idempotencyKey: "shipping_cookie_box_item",
@@ -3088,7 +3088,7 @@ function shippingInventoryItemCommand(
     };
   }
   return {
-    schemaVersion: "underclerk.create-inventory-item.v1",
+    schemaVersion: "commerce.create-inventory-item.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "shipping_carton_item",
@@ -3125,7 +3125,7 @@ function shippingStorefrontCommand(
         },
       ];
   return {
-    schemaVersion: "underclerk.configure-shipping-storefront.v1",
+    schemaVersion: "commerce.configure-shipping-storefront.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: `shipping_storefront_${identity}`,
@@ -3347,7 +3347,7 @@ function shippingInventoryPositionCommand(
       ? "inventory_cookie_box_6"
       : "inventory_shipping_carton";
   return {
-    schemaVersion: "underclerk.open-inventory-position.v1",
+    schemaVersion: "commerce.open-inventory-position.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: `shipping_position_${kind}`,
@@ -3381,7 +3381,7 @@ function shippingReceiptCommand(
         }
       : { kind: "not_tracked" as const };
   return {
-    schemaVersion: "underclerk.receive-inventory.v3",
+    schemaVersion: "commerce.receive-inventory.v3",
     purchase: { kind: "unlinked" },
     merchantId: "merchant_demo",
     expectedMerchantRevision,
@@ -3406,7 +3406,7 @@ function shippingBuyerCheckoutCommand(
   addressLine1 = "1 Raffles Quay",
 ) {
   return {
-    schemaVersion: "underclerk.create-buyer-shipping-checkout.v1" as const,
+    schemaVersion: "commerce.create-buyer-shipping-checkout.v1" as const,
     idempotencyKey: "shipping_checkout_sg",
     buyer: TEST_GUEST_BUYER,
     lines: [{ variantId: "variant_cookie_box_6", quantity: 1 as const }],
@@ -3427,7 +3427,7 @@ function shippingBuyerCheckoutCommand(
 
 function cafeStorefrontCommand(expectedMerchantRevision: number) {
   return {
-    schemaVersion: "underclerk.configure-pickup-storefront.v1" as const,
+    schemaVersion: "commerce.configure-pickup-storefront.v1" as const,
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_storefront",
@@ -3523,7 +3523,7 @@ function cafeInventoryPositionCommand(
   expectedMerchantRevision: number,
 ): OpenCommerceInventoryPositionV1 {
   return {
-    schemaVersion: "underclerk.open-inventory-position.v1",
+    schemaVersion: "commerce.open-inventory-position.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_oat_milk_position",
@@ -3540,7 +3540,7 @@ function cafePreparationStationCommand(
   expectedMerchantRevision: number,
 ): CreatePreparationStationCommand {
   return {
-    schemaVersion: "underclerk.create-preparation-station.v1",
+    schemaVersion: "commerce.create-preparation-station.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_station",
@@ -3557,7 +3557,7 @@ function cafeModifierGroupCommand(
   expectedMerchantRevision: number,
 ): CreateModifierGroupRevisionCommand {
   return {
-    schemaVersion: "underclerk.create-modifier-group-revision.v1",
+    schemaVersion: "commerce.create-modifier-group-revision.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_milk_modifier",
@@ -3589,7 +3589,7 @@ function cafeRecipeCommand(
   expectedMerchantRevision: number,
 ): CreateRecipeRevisionCommand {
   return {
-    schemaVersion: "underclerk.create-recipe-revision.v1",
+    schemaVersion: "commerce.create-recipe-revision.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_latte_recipe",
@@ -3612,7 +3612,7 @@ function cafeStockPolicyCommand(
   expectedMerchantRevision: number,
 ): ConfigureStockPolicyCommand {
   return {
-    schemaVersion: "underclerk.configure-stock-policy.v1",
+    schemaVersion: "commerce.configure-stock-policy.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_oat_stock_policy",
@@ -3632,7 +3632,7 @@ function cafeStockPolicyCommand(
 
 function cafeMenuCommand(expectedMerchantRevision: number): PublishMenuCommand {
   return {
-    schemaVersion: "underclerk.publish-menu.v1",
+    schemaVersion: "commerce.publish-menu.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "cafe_main_menu",
@@ -3679,7 +3679,7 @@ function matchaBoxItemCommand(
   expectedMerchantRevision: number,
 ): CreateCommerceInventoryItemV1 {
   return {
-    schemaVersion: "underclerk.create-inventory-item.v1",
+    schemaVersion: "commerce.create-inventory-item.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "matcha_box_item",
@@ -3698,7 +3698,7 @@ function matchaChannelListingCommand(
   includeSpecification: boolean,
 ): PlaceCommerceChannelListingV1 {
   return {
-    schemaVersion: "underclerk.place-channel-listing.v1",
+    schemaVersion: "commerce.place-channel-listing.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: `matcha_channel_listing_${includeSpecification ? "with_spec" : "without_spec"}`,
@@ -3796,7 +3796,7 @@ function existingMatchaPlacementCommand(
   shippingSpecification?: PlaceCommerceChannelListingV1["shippingSpecification"],
 ): PlaceCommerceChannelListingV1 {
   return {
-    schemaVersion: "underclerk.place-channel-listing.v1",
+    schemaVersion: "commerce.place-channel-listing.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: `matcha_existing_placement_${identity}`,
@@ -3826,7 +3826,7 @@ function giftTinCatalogCommand(
   expectedMerchantRevision: number,
 ): PrepareCommerceCatalogListingV1 {
   return {
-    schemaVersion: "underclerk.prepare-catalog-listing.v1",
+    schemaVersion: "commerce.prepare-catalog-listing.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision,
     idempotencyKey: "gift_tin_catalog",
@@ -3893,7 +3893,7 @@ function flavoredBuyerCheckoutCommand(
   shippingServiceCode = "ems_test",
 ) {
   return {
-    schemaVersion: "underclerk.create-buyer-shipping-checkout.v1" as const,
+    schemaVersion: "commerce.create-buyer-shipping-checkout.v1" as const,
     idempotencyKey,
     buyer: TEST_GUEST_BUYER,
     lines: [{ variantId, quantity }],
@@ -3916,7 +3916,7 @@ function flavoredBuyerMultiLineCheckoutCommand(
   acceptance: CommerceBuyerShippingAddressAcceptanceV1,
 ) {
   return {
-    schemaVersion: "underclerk.create-buyer-shipping-checkout.v1" as const,
+    schemaVersion: "commerce.create-buyer-shipping-checkout.v1" as const,
     idempotencyKey: "flavored_multi_line_checkout",
     buyer: TEST_GUEST_BUYER,
     lines: [
@@ -3946,7 +3946,7 @@ function flavoredBuyerMultiLineRefreshCommand(
   acceptance: CommerceBuyerShippingAddressAcceptanceV1,
 ) {
   return {
-    schemaVersion: "underclerk.refresh-buyer-shipping-checkout.v1" as const,
+    schemaVersion: "commerce.refresh-buyer-shipping-checkout.v1" as const,
     idempotencyKey: "flavored_multi_line_refresh",
     checkoutRevision: checkout.revision,
     quoteDigest: checkout.quote.quoteDigest,

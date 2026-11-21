@@ -152,7 +152,7 @@ export class ProvisioningAuthority {
       throw new Error("Demo profile catalog is incomplete");
     }
     const locationResult = this.#options.createLocation({
-      schemaVersion: "underclerk.create-location.v1",
+      schemaVersion: "commerce.create-location.v1",
       merchantId: command.merchantId,
       expectedMerchantRevision: 0,
       idempotencyKey: `${ecommerceDemoFixtureIdempotencyKey()}_location`,
@@ -173,7 +173,7 @@ export class ProvisioningAuthority {
       }
       const idempotencyKey = `${ecommerceDemoFixtureIdempotencyKey()}_catalog_${index}`;
       const catalogResult = this.#options.prepareCatalogListing({
-        schemaVersion: "underclerk.prepare-catalog-listing.v1",
+        schemaVersion: "commerce.prepare-catalog-listing.v1",
         merchantId: command.merchantId,
         expectedMerchantRevision: index + 1,
         idempotencyKey,
@@ -208,7 +208,7 @@ export class ProvisioningAuthority {
         undefined
       ) {
         const created = this.#options.createInventoryItem({
-          schemaVersion: "underclerk.create-inventory-item.v1",
+          schemaVersion: "commerce.create-inventory-item.v1",
           merchantId: command.merchantId,
           expectedMerchantRevision: snapshot.merchantRevision,
           idempotencyKey: `${ecommerceDemoFixtureIdempotencyKey()}_${expectedItem.id}`,
@@ -252,7 +252,7 @@ export class ProvisioningAuthority {
     );
     if (position === undefined) {
       const opened = this.#options.openInventoryPosition({
-        schemaVersion: "underclerk.open-inventory-position.v1",
+        schemaVersion: "commerce.open-inventory-position.v1",
         merchantId: command.merchantId,
         expectedMerchantRevision: snapshot.merchantRevision,
         idempotencyKey: `${ecommerceDemoFixtureIdempotencyKey()}_${expectedPosition.id}`,
@@ -302,7 +302,7 @@ function merchantProvisioningResult(
   outcome: CommerceMerchantProvisioningResultV1["outcome"],
 ): CommerceMerchantProvisioningResultV1 {
   return {
-    schemaVersion: "underclerk.merchant-provisioning-result.v2",
+    schemaVersion: "commerce.merchant-provisioning-result.v2",
     outcome,
     externalReference: command.externalReference,
     merchantId: command.merchantId,
@@ -313,7 +313,7 @@ function merchantProvisioningCommand(
   command: ProvisionCommerceDemoV1,
 ): ProvisionCommerceMerchantV1 {
   return {
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: command.externalReference,
     merchantId: command.merchantId,
     createdAt: command.createdAt,
@@ -356,7 +356,7 @@ function seedDemoPositionBalance(
     );
   }
   const result = receiveInventory({
-    schemaVersion: "underclerk.receive-inventory.v3",
+    schemaVersion: "commerce.receive-inventory.v3",
     purchase: { kind: "unlinked" },
     organisationId: command.externalReference,
     merchantId: command.merchantId,

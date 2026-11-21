@@ -95,12 +95,12 @@ export async function recordPaidReceipts(
     if (destination.error === "operations_destination_unavailable")
       return {
         ok: false,
-        error: { code: "underclerk_slack_receipt_destination_unavailable" },
+        error: { code: "commerce_slack_receipt_destination_unavailable" },
       };
     // A shop with no Slack channel has no one to tell here; its staff see
     // the order in the queue. A damaged channel row is reported here.
     if (destination.error === "operations_destination_invalid")
-      traceWarn("underclerk.paid_receipt_destination_invalid", {
+      traceWarn("commerce.paid_receipt_destination_invalid", {
         requestId: newRequestId(),
         organisation_id: input.scope.organisationId,
       });
@@ -158,7 +158,7 @@ export async function recordPaidReceipts(
   } catch {
     return {
       ok: false,
-      error: { code: "underclerk_paid_receipt_record_failed" },
+      error: { code: "commerce_paid_receipt_record_failed" },
     };
   }
   const connectors = new ConnectorStubs(input.env, input.scope, input.now);
@@ -183,7 +183,7 @@ export async function runScheduledPaidReceiptDelivery(
     try {
       organisations = await dueOrganisations(database, now);
     } catch {
-      traceWarn("underclerk.paid_receipt_pass_read_failed", {
+      traceWarn("commerce.paid_receipt_pass_read_failed", {
         requestId: newRequestId(),
         reconciler: PAID_RECEIPT_PASS.name,
       });
@@ -199,7 +199,7 @@ export async function runScheduledPaidReceiptDelivery(
         if (!scope.ok || scope.value.database !== database) continue;
         await deliverDuePaidReceipts({ env, scope: scope.value, now });
       } catch {
-        traceWarn("underclerk.paid_receipt_pass_failed", {
+        traceWarn("commerce.paid_receipt_pass_failed", {
           requestId: newRequestId(),
           reconciler: PAID_RECEIPT_PASS.name,
           organisation_id: organisationId,
@@ -286,7 +286,7 @@ async function attemptPaidReceipt(
         assertNever(outcome, "Unexpected paid receipt outcome");
     }
   } catch {
-    traceWarn("underclerk.paid_receipt_write_failed", {
+    traceWarn("commerce.paid_receipt_write_failed", {
       requestId: newRequestId(),
       reconciler: PAID_RECEIPT_PASS.name,
       organisation_id: scope.organisationId,
@@ -318,13 +318,13 @@ async function sendToConnector(
   } catch {
     return {
       kind: "failed",
-      reason: "underclerk_slack_receipt_connector_unavailable",
+      reason: "commerce_slack_receipt_connector_unavailable",
     };
   }
   if (!result.ok)
     return {
       kind: "failed",
-      reason: `underclerk_slack_receipt_connector_${result.error.code}`,
+      reason: `commerce_slack_receipt_connector_${result.error.code}`,
     };
   switch (result.value.kind) {
     case "delivered":
@@ -333,14 +333,14 @@ async function sendToConnector(
     case "retry":
       return {
         kind: "failed",
-        reason: `underclerk_slack_receipt_retry_${result.value.reason}`,
+        reason: `commerce_slack_receipt_retry_${result.value.reason}`,
       };
     // The Connector keeps a refusal for the receipt's key: a later attempt
     // gets the same answer.
     case "rejected":
       return {
         kind: "refused",
-        reason: `underclerk_slack_receipt_rejected_${result.value.reason}`,
+        reason: `commerce_slack_receipt_rejected_${result.value.reason}`,
       };
     default:
       return assertNever(result.value, "Unexpected Connector delivery result");
@@ -387,10 +387,10 @@ class ConnectorStubs {
         ? connector
         : {
             ok: false,
-            error: `underclerk_slack_receipt_actor_${connector.error.code}`,
+            error: `commerce_slack_receipt_actor_${connector.error.code}`,
           };
     } catch {
-      return { ok: false, error: "underclerk_slack_receipt_actor_unavailable" };
+      return { ok: false, error: "commerce_slack_receipt_actor_unavailable" };
     }
   }
 }
@@ -494,7 +494,7 @@ async function dueReceipts(
     const parsed = parseReceiptRow(scope.organisationId, row);
     if (parsed !== null) due.push(parsed);
     else
-      traceWarn("underclerk.paid_receipt_unreadable", {
+      traceWarn("commerce.paid_receipt_unreadable", {
         requestId: newRequestId(),
         reconciler: PAID_RECEIPT_PASS.name,
         organisation_id: scope.organisationId,

@@ -44,7 +44,7 @@ async function effectJourney(): Promise<void> {
     const provisioned = await new CommerceAdminClient(
       config,
     ).provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: ORGANISATION,
       merchantId: MERCHANT,
       createdAt: NOW,

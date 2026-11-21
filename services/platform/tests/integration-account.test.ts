@@ -1088,7 +1088,7 @@ function stripeSeed(
     provider: "stripe",
     providerSubjectId: providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: ["read_write"],
     createdByUserId: userId,
@@ -1119,7 +1119,7 @@ function squareSeed(
     provider: "square",
     providerSubjectId: "merchant_square_isolated",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: SQUARE_SCOPES,
     createdByUserId: userId,
@@ -1148,7 +1148,7 @@ function whatsappSeed(
     provider: "whatsapp",
     providerSubjectId: "waba-test",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: [
       "business_management",
@@ -1177,7 +1177,7 @@ function slackSeed(
     provider: "slack",
     providerSubjectId: workspaceId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requireVaultHandle(

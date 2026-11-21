@@ -92,7 +92,7 @@ export async function listCollectionsRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_collections">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.collections.v1",
+    schemaVersion: "commerce.collections.v1",
     collections: ctx.authority.listCollections(route.merchantId),
   });
 }
@@ -112,7 +112,7 @@ export async function readCatalogSnapshotRoute(
     route.storefrontId,
     mediaBaseUrl(
       ctx,
-      request.headers.get("x-underclerk-public-origin") ??
+      request.headers.get("x-commerce-public-origin") ??
         new URL(request.url).origin,
       route,
     ),
@@ -124,7 +124,7 @@ export async function readCatalogSnapshotRoute(
   return context === undefined || catalog === undefined
     ? jsonResponse(404, { message: "Storefront not found" })
     : jsonResponse(200, {
-        schemaVersion: "underclerk.catalog-snapshot.v1",
+        schemaVersion: "commerce.catalog-snapshot.v1",
         organisationId: context.organisationId,
         storefrontRevision: context.storefront.revision,
         builtAt: ctx.authority.currentTime(),

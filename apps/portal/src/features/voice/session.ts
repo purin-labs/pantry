@@ -36,9 +36,9 @@ import { StartAttempt } from "./start-attempt";
 import { VoiceTransport } from "./transport";
 import type { VoiceWorkerEvent } from "./worker-protocol";
 
-const LOCK_NAME = "satyr-voice-control";
-const DEVICE_KEY = "satyr.voice.device";
-const MICROPHONE_KEY = "satyr.voice.microphone";
+const LOCK_NAME = "pantry-voice-control";
+const DEVICE_KEY = "pantry.voice.device";
+const MICROPHONE_KEY = "pantry.voice.microphone";
 /** Safari leaves resume() open until a tap, so the start cannot wait on it. */
 const RESUME_WAIT_MS = 1000;
 const SPEAKER_RESUME_WAIT_MS = 300;

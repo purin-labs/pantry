@@ -46,7 +46,7 @@ const OAUTH = {
   clientSecret: "sandbox-secret-jp",
 };
 const ACCOUNT: InPersonPaymentBinding["account"] = {
-  integrationAccountId: `underclerk_square_${SELLER}`,
+  integrationAccountId: `commerce_square_${SELLER}`,
   providerAccountId: SELLER,
   environment: "development",
   capabilityRevision: 1,
@@ -458,7 +458,7 @@ class JapanTerminalDesk extends StaffDesk {
   publishCashAndTerminalPolicy() {
     return required(
       this.admin.publishPointOfSaleConfiguration({
-        schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+        schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
         merchantId,
         expectedRevision: null,
         publishedAt: NOW,
@@ -466,7 +466,7 @@ class JapanTerminalDesk extends StaffDesk {
         configuration: {
           configurationId: "pos_configuration_jp",
           organisationId,
-          satyrLocationId: LOCATION,
+          pantryLocationId: LOCATION,
           salesChannelId: CHANNEL,
           currency: "JPY",
           supportedItems: [],
@@ -503,7 +503,7 @@ class JapanTerminalDesk extends StaffDesk {
     return this.apply(
       this.admin.createInPersonCheckout({
         ...(await this.base(`open_${checkoutId}`)),
-        satyrLocationId: LOCATION,
+        pantryLocationId: LOCATION,
         posConfigurationRevision: 1,
         operatorIdentity: "operator_barista",
         terminalAssignmentRevision,
@@ -579,7 +579,7 @@ class JapanTerminalDesk extends StaffDesk {
     }> | null,
   ): CommerceCounterSaleHandoffResultV1 {
     return {
-      schemaVersion: "underclerk.counter-sale-handoff-result.v1",
+      schemaVersion: "commerce.counter-sale-handoff-result.v1",
       paymentAttemptId: `attempt_${checkoutId}`,
       handoffReference,
       status: "ok",

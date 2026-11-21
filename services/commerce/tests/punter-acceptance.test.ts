@@ -160,9 +160,9 @@ async function runJourney(journey: Journey): Promise<void> {
 }
 
 async function startBackend(): Promise<Backend> {
-  const directory = mkdtempSync(join(tmpdir(), "underclerk-punter-"));
+  const directory = mkdtempSync(join(tmpdir(), "commerce-punter-"));
   const database = new NodeCommerceDatabase(
-    join(directory, "underclerk.sqlite3"),
+    join(directory, "commerce.sqlite3"),
   );
   initializeCommerceSchema(database, NOW);
   const authority = new CommerceAuthority({
@@ -697,7 +697,7 @@ function runPunter(journey: Journey, baseUrl: string): Promise<PunterRun> {
         cwd: PUNTER_DIRECTORY,
         env: {
           ...process.env,
-          PUNTER_UNDERCLERK_BASE_URL: baseUrl,
+          PUNTER_COMMERCE_BASE_URL: baseUrl,
           PUNTER_MERCHANT_ID: merchantId,
           PUNTER_STOREFRONT_ID: journey.storefrontId,
           PUNTER_RUN_ID: journey.runId,
@@ -748,7 +748,7 @@ function writeArtifacts(
       .filter(Boolean),
     clock: NOW,
     backend: {
-      api: "UnderclerkHttpApi over localhost HTTP",
+      api: "CommerceHttpApi over localhost HTTP",
       store: "disposable SQLite",
       payments: "DeterministicPaymentGateway (provider stub)",
       carrier: "createJapanShippingGateway (provider stub)",

@@ -4,7 +4,7 @@
 // Usage: PLAYWRIGHT_MODULE=<path> node drive-chrome.cjs https://<name>:8443 check warm cold bakers hang off
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
 const [mac, ...tests] = process.argv.slice(2);
-const PAGE = "https://satyr-voice-path-test.n6378056.workers.dev/?mac=";
+const PAGE = "https://pantry-voice-path-test.n6378056.workers.dev/?mac=";
 
 (async () => {
   const browser = await chromium.launch({

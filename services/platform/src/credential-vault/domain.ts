@@ -15,8 +15,8 @@ export type VaultOpaqueProfileFormat =
   | "codex_device_authorization_v1"
   | "chatgpt_agent_profile_v1"
   | "chatgpt_agent_sign_in_v1"
-  /** A Square connection that Underclerk holds; no token (Plan 80 step 4). */
-  | "underclerk_square_connection_v1";
+  /** A Square connection that Commerce holds; no token (Plan 80 step 4). */
+  | "commerce_square_connection_v1";
 
 const VAULT_OPAQUE_PROFILE_FORMATS: Readonly<
   Record<VaultOpaqueProfileFormat, true>
@@ -25,7 +25,7 @@ const VAULT_OPAQUE_PROFILE_FORMATS: Readonly<
   codex_device_authorization_v1: true,
   chatgpt_agent_profile_v1: true,
   chatgpt_agent_sign_in_v1: true,
-  underclerk_square_connection_v1: true,
+  commerce_square_connection_v1: true,
 };
 
 export function isVaultOpaqueProfileFormat(

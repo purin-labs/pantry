@@ -96,7 +96,7 @@ export type CommerceSystemSyncView =
 /** The selected commerce system, as the control API gives it. */
 export type CommerceSystemIdentityView =
   | Readonly<{
-      kind: "satyr_commerce";
+      kind: "builtin_commerce";
       bindingId: string;
       merchantId: string;
       revision: number;

@@ -26,11 +26,11 @@ const problems = [
   ...kindProblems,
 ];
 if (problems.length > 0) {
-  console.error(`underclerk commerce data: ${problems.length} problem(s)`);
+  console.error(`commerce data: ${problems.length} problem(s)`);
   for (const problem of problems) console.error(`- ${problem}`);
   process.exit(1);
 }
 console.log(
-  `underclerk commerce data: ${machines.length} machines and ${BUILT_IN_PLUGINS.length} built-in plugins pass`,
+  `commerce data: ${machines.length} machines and ${BUILT_IN_PLUGINS.length} built-in plugins pass`,
 );
 

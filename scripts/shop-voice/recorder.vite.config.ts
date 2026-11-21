@@ -18,7 +18,7 @@ const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const SESSIONS = join(ROOT, ".cache/human");
 const PYTHON =
   process.env.SHOP_VOICE_PYTHON ??
-  join(homedir(), ".satyr-voice/venv/bin/python");
+  join(homedir(), ".pantry-voice/venv/bin/python");
 const EVENTS = new Set(["captured", "no_speech", "near_wake", "skipped"]);
 
 type Prompt = { index: number; set: string; kind: string; target: string };
@@ -55,7 +55,7 @@ function answer(response: ServerResponse, status: number, body: unknown) {
 function recorder() {
   const sessions = new Map<string, Session>();
   return {
-    name: "satyr-voice-recorder",
+    name: "pantry-voice-recorder",
     configureServer(server: {
       middlewares: {
         use: (

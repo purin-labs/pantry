@@ -20,7 +20,7 @@ import type { TerminalCounterReadback } from "@purin-labs/control-api";
  * collection failure, not a loss of authority.
  */
 type TerminalOperationsReadback = Readonly<{
-  schemaVersion: "satyr.terminal-operations.v2";
+  schemaVersion: "pantry.terminal-operations.v2";
   organisationId: OrganisationId;
   generatedAt: string;
   counters: readonly TerminalCounterReadback[];
@@ -67,7 +67,7 @@ export async function readTerminalOperations(
     );
   }
   return {
-    schemaVersion: "satyr.terminal-operations.v2",
+    schemaVersion: "pantry.terminal-operations.v2",
     organisationId: input.organisationId,
     generatedAt: new Date(input.now).toISOString(),
     counters,
@@ -99,7 +99,7 @@ async function readCounter(
   } as const;
 
   return {
-    satyrLocationId: assignment.satyrLocationId,
+    pantryLocationId: assignment.pantryLocationId,
     // A retired assignment has no binding.
     blockedReason: binding.ok ? null : "assignment_retired",
     assignment: described,

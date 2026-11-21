@@ -602,8 +602,8 @@ function dispatch(
         origin: "https://localhost",
         "content-type": "application/json",
         "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({
         instruction:
@@ -680,7 +680,7 @@ async function fixture() {
     authorizationProduct: "full_mailbox_pilot",
     providerSubjectId: "google_mail_origin",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle },
     grantedScopes: GMAIL_FULL_MAILBOX_SCOPES,
     createdByUserId: userId,

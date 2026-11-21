@@ -33,7 +33,7 @@ export type OrderQueueAdvanceResult =
   | Readonly<{
       ok: false;
       code:
-        | "underclerk_unavailable"
+        | "commerce_unavailable"
         | "order_queue_changed"
         | "order_queue_payment_missing"
         | "order_queue_busy";
@@ -54,7 +54,7 @@ export type SoldOutMarkResult =
   | Readonly<{
       ok: false;
       code:
-        | "underclerk_unavailable"
+        | "commerce_unavailable"
         | "sold_out_item_not_on_menu"
         | "sold_out_refused"
         | "sold_out_busy";
@@ -110,7 +110,7 @@ export async function advanceOrderQueueEntry(
   let moved = false;
   for (let attempt = 0; attempt < STEP_LIMIT; attempt += 1) {
     const queue = await context.client.readPickupQueue(context.merchantId);
-    if (!queue.ok) return { ok: false, code: "underclerk_unavailable" };
+    if (!queue.ok) return { ok: false, code: "commerce_unavailable" };
     const entry = queue.value.entries.find(
       (candidate) => candidate.fulfillmentId === fulfillmentId,
     );
@@ -127,7 +127,7 @@ export async function advanceOrderQueueEntry(
       expectedMerchantRevision: queue.value.merchantRevision,
       idempotencyKey: `${idempotencyKey}_${attempt}_${step.name}`,
     });
-    if (!result.ok) return { ok: false, code: "underclerk_unavailable" };
+    if (!result.ok) return { ok: false, code: "commerce_unavailable" };
     if (result.value.outcome === "rejected") {
       const code = result.value.error.code;
       // Another sale moved a revision between the read and the command.
@@ -258,12 +258,12 @@ export async function setSoldOutMark(
   idempotencyKey: string,
 ): Promise<SoldOutMarkResult> {
   const menu = await readCafeSoldOutMenu(context);
-  if (menu === null) return { ok: false, code: "underclerk_unavailable" };
+  if (menu === null) return { ok: false, code: "commerce_unavailable" };
   if (!menu.items.some((item) => item.variantId === variantId))
     return { ok: false, code: "sold_out_item_not_on_menu" };
   for (let attempt = 0; attempt < MARK_ATTEMPT_LIMIT; attempt += 1) {
     const marks = await context.client.readSoldOutMarks(context.merchantId);
-    if (!marks.ok) return { ok: false, code: "underclerk_unavailable" };
+    if (!marks.ok) return { ok: false, code: "commerce_unavailable" };
     const result = await context.client.markSoldOut({
       merchantId: context.merchantId,
       expectedMerchantRevision: marks.value.merchantRevision,
@@ -272,7 +272,7 @@ export async function setSoldOutMark(
       variantId,
       mark,
     });
-    if (!result.ok) return { ok: false, code: "underclerk_unavailable" };
+    if (!result.ok) return { ok: false, code: "commerce_unavailable" };
     if (result.value.outcome !== "rejected") return { ok: true };
     if (result.value.error.code !== "stale_merchant_revision")
       return { ok: false, code: "sold_out_refused" };
@@ -334,7 +334,7 @@ export type CounterSaleReadRequest = Readonly<{ checkoutId: string }>;
 
 export type CounterSaleToolRead = Readonly<{
   checkoutId: string;
-  satyrLocationId: string;
+  pantryLocationId: string;
   state: string;
   collectable: boolean;
   orderId: string | null;

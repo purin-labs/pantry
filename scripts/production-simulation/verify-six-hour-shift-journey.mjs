@@ -707,7 +707,7 @@ const syntheticMeasuredRaw = {
   kind: "bakery-six-hour-measured-shift",
   schemaVersion: 1,
   shiftId: "synthetic-intake-rehearsal-01",
-  site: "satyr-kitchen-rehearsal-bench",
+  site: "pantry-kitchen-rehearsal-bench",
   startTime: "2026-11-01T06:00:00+09:00",
   operatorId: "operator-rehearsal",
   measurementMethod: "synthetic-intake-verification-not-real-shop",

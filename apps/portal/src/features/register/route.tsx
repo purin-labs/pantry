@@ -285,7 +285,7 @@ export function RegisterRoute(
     setErrorMessage(null);
     try {
       const opened = await openRegisterMenuSale(props.organisationId, {
-        satyrLocationId: snapshot.satyrLocationId,
+        pantryLocationId: snapshot.pantryLocationId,
         tenderMode: "cash",
         lines: basket,
       });
@@ -311,7 +311,7 @@ export function RegisterRoute(
     setErrorMessage(null);
     try {
       const opened = await openRegisterMenuSale(props.organisationId, {
-        satyrLocationId: snapshot.satyrLocationId,
+        pantryLocationId: snapshot.pantryLocationId,
         tenderMode: "terminal",
         lines: basket,
       });
@@ -418,7 +418,7 @@ export function RegisterRoute(
       let saleToSettle = activeSale;
       if (activeSale.state !== "awaiting_collection" && basket.length > 0) {
         saleToSettle = await openRegisterMenuSale(props.organisationId, {
-          satyrLocationId: snapshot.satyrLocationId,
+          pantryLocationId: snapshot.pantryLocationId,
           tenderMode: "cash",
           lines: basket,
         });

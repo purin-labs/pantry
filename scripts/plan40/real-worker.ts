@@ -26,7 +26,7 @@ const SETUP_TOKEN = "plan40-local-setup-token";
 const PRODUCT_ID = "product_plan40_browser";
 const INTEGRATION_ACCOUNT_ID = "integration_plan40_browser";
 const PROVIDER_CONNECTION_ID = "provider_plan40_browser";
-const BINDING_ID = "underclerk_binding_plan40_browser";
+const BINDING_ID = "commerce_binding_plan40_browser";
 const MERCHANT_ID = "merchant_plan40_browser";
 const PRODUCT_DESCRIPTION = "Freshly baked browser acceptance product.";
 
@@ -78,16 +78,16 @@ async function handleSetup(request: Request, env: Env): Promise<Response> {
     now,
   });
   const commerceEngine = createCommerceAdminClient(env);
-  if (commerceEngine === null) return setupFailure("underclerk_unconfigured");
+  if (commerceEngine === null) return setupFailure("commerce_unconfigured");
   const provisioned = await commerceEngine.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: organisation.organisationId,
     merchantId: MERCHANT_ID,
     createdAt: new Date(now).toISOString(),
   });
-  if (!provisioned.ok) return setupFailure("underclerk_provision_failed");
+  if (!provisioned.ok) return setupFailure("commerce_provision_failed");
   const merchantSnapshot = await commerceEngine.readSnapshot(MERCHANT_ID);
-  if (!merchantSnapshot.ok) return setupFailure("underclerk_snapshot_failed");
+  if (!merchantSnapshot.ok) return setupFailure("commerce_snapshot_failed");
   await addEditorAndCommerceBinding(
     env,
     organisation.organisationId,
@@ -100,7 +100,7 @@ async function handleSetup(request: Request, env: Env): Promise<Response> {
     catalogListing(organisation.organisationId, now),
   );
   if (!prepared.ok || prepared.value.outcome !== "applied") {
-    return setupFailure("underclerk_catalog_seed_failed");
+    return setupFailure("commerce_catalog_seed_failed");
   }
   await ensureCreatedOrganisationActor({ env, organisationId: organisation.organisationId, now });
   const integrationAccountId = parseIntegrationAccountId(INTEGRATION_ACCOUNT_ID);
@@ -108,7 +108,7 @@ async function handleSetup(request: Request, env: Env): Promise<Response> {
   const reconciled = await reconcileCommerceOutbox({
     env,
     message: {
-      type: "underclerk.outbox_reconcile.v1",
+      type: "commerce.outbox_reconcile.v1",
       requestId: newRequestId(),
       receivedAt: now,
       organisationId: organisation.organisationId,
@@ -116,7 +116,7 @@ async function handleSetup(request: Request, env: Env): Promise<Response> {
     },
     now,
   });
-  if (reconciled.kind !== "drained") return setupFailure(`underclerk_projection_failed:${reconciled.kind}`);
+  if (reconciled.kind !== "drained") return setupFailure(`commerce_projection_failed:${reconciled.kind}`);
   await env.POLICY_KV.put("plan40-demo-path",
     `/portal/${organisation.organisationHandle}/${organisation.workspace.workspaceHandle}/products/${PRODUCT_ID}`);
   return Response.json({
@@ -145,12 +145,12 @@ async function handleDemoLogin(request: Request, env: Env, persona: "owner" | "e
 }
 
 function createCommerceAdminClient(env: Env): CommerceAdminClient | null {
-  if (env.UNDERCLERK_BASE_URL === undefined || env.UNDERCLERK_SERVICE_TOKEN === undefined) return null;
+  if (env.COMMERCE_BASE_URL === undefined || env.COMMERCE_SERVICE_TOKEN === undefined) return null;
   try {
     return new CommerceAdminClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
-      serviceToken: env.UNDERCLERK_SERVICE_TOKEN,
-      fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      baseUrl: env.COMMERCE_BASE_URL,
+      serviceToken: env.COMMERCE_SERVICE_TOKEN,
+      fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
     });
   } catch {
     return null;
@@ -162,7 +162,7 @@ function catalogListing(organisationId: string, now: number): PrepareCommerceCat
   const variantId = "variant_plan40_browser";
   const salesChannelId = "sales_channel_plan40_browser";
   return {
-    schemaVersion: "underclerk.prepare-catalog-listing.v1",
+    schemaVersion: "commerce.prepare-catalog-listing.v1",
     organisationId,
     merchantId: MERCHANT_ID,
     expectedMerchantRevision: 0,
@@ -223,7 +223,7 @@ async function createControlClient(env: Env, subject: string, displayName: strin
   const identity = await upsertUser({
     db: env.DB,
     identity: {
-      issuer: "urn:satyr:plan40-local",
+      issuer: "urn:pantry:plan40-local",
       subject,
       email: `${subject}@plan40.local`,
       displayName,
@@ -279,32 +279,32 @@ async function addEditorAndCommerceBinding(
       disabled_at, revoked_at, environment, provider_subject_id
     ) VALUES (?, ?, 'shopify', 'api_key', 'connection_credential', 1, ?, NULL, NULL, NULL,
       'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`)
-      .bind(PROVIDER_CONNECTION_ID, organisationId, "local:plan40-underclerk", owner.userId, now, now),
+      .bind(PROVIDER_CONNECTION_ID, organisationId, "local:plan40-commerce", owner.userId, now, now),
     env.DB.prepare(`INSERT INTO integration_account (
       integration_account_id, organisation_id, provider_connection_id, provider,
       provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code,
       capability_set, audience_policy, retention_policy, created_at, updated_at,
       disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider
     ) VALUES (?, ?, ?, 'shopify', ?, 'merchant', ?, 'active', NULL, '[]', '{"kind":"operator"}', '{"kind":"organisation_default"}', ?, ?, NULL, NULL, NULL, 'development', 0)`)
-      .bind(INTEGRATION_ACCOUNT_ID, organisationId, PROVIDER_CONNECTION_ID, MERCHANT_ID, "Plan 40 Underclerk", now, now),
-    env.DB.prepare(`INSERT INTO underclerk_merchant_binding (
+      .bind(INTEGRATION_ACCOUNT_ID, organisationId, PROVIDER_CONNECTION_ID, MERCHANT_ID, "Plan 40 Commerce", now, now),
+    env.DB.prepare(`INSERT INTO commerce_merchant_binding (
       binding_id, organisation_id, integration_account_id, merchant_id, environment,
       delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at
     ) VALUES (?, ?, ?, ?, 'development', ?, ?, 1, ?, ?)`)
       .bind(BINDING_ID, organisationId, INTEGRATION_ACCOUNT_ID, MERCHANT_ID,
         merchantSnapshot.deliverySigner.keyId, merchantSnapshot.deliverySigner.publicKeyB64, now, now),
     env.DB.prepare(`INSERT INTO organisation_commerce_system (
-      organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id,
+      organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id,
       revision, selected_at, selected_by_user_id
-    ) VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)`)
+    ) VALUES (?, 'builtin_commerce', ?, NULL, 1, ?, ?)`)
       .bind(organisationId, BINDING_ID, now, owner.userId),
   ]);
 }
 
 function browserSession(client: ControlClient): Readonly<{ readonly sessionCookie: string; readonly csrfCookie: string; readonly displayName: string }> {
   return {
-    sessionCookie: `satyr_control_session=${encodeURIComponent(client.session.token)}`,
-    csrfCookie: `satyr_control_csrf=${encodeURIComponent(client.session.csrfToken)}`,
+    sessionCookie: `pantry_session=${encodeURIComponent(client.session.token)}`,
+    csrfCookie: `pantry_csrf=${encodeURIComponent(client.session.csrfToken)}`,
     displayName: client.identity.displayName,
   };
 }

@@ -238,8 +238,8 @@ async function requestAccess(
     method: body === null ? "GET" : "POST",
     headers: {
       origin: "https://localhost",
-      cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-      "x-satyr-csrf": session.csrfToken,
+      cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+      "x-pantry-csrf": session.csrfToken,
       "content-type": "application/json",
     },
     ...(body === null ? {} : { body: JSON.stringify(body) }),
@@ -996,8 +996,8 @@ async function requestChatApi(
     method,
     headers: {
       origin: "https://localhost",
-      cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-      "x-satyr-csrf": session.csrfToken,
+      cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+      "x-pantry-csrf": session.csrfToken,
       "content-type": "application/json",
     },
     body: JSON.stringify(body),

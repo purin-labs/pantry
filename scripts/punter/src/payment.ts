@@ -167,7 +167,7 @@ async function reconcilePayment(
     input.checkoutId,
     input.sessionToken,
     {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+      schemaVersion: "commerce.reconcile-buyer-payment.v1",
       idempotencyKey: input.command.idempotencyKey,
       checkoutRevision: input.command.checkoutRevision,
       quoteDigest: input.command.quoteDigest,

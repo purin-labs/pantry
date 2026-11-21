@@ -94,7 +94,7 @@ async function productionPlanAgentJourney({
     author.session,
   );
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: author.organisationId,
     merchantId: MERCHANT_ID,
     profile: "cafe_patisserie",
@@ -324,7 +324,7 @@ async function productionPlanAgentJourney({
     planBeforeAccept: planned,
     agentCursorTargets: targets,
     accept: accepted,
-    underclerkAfter: Object.fromEntries(after),
+    commerceAfter: Object.fromEntries(after),
     answers: await answers(author, conversationId),
   };
 }

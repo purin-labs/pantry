@@ -83,7 +83,7 @@ export async function closeMerchant(
       .prepare("DELETE FROM square_connection WHERE merchant_id = ?")
       .run(merchantId);
     const closure: CommerceMerchantClosureV1 = {
-      schemaVersion: "underclerk.merchant-closure.v1",
+      schemaVersion: "commerce.merchant-closure.v1",
       merchantId,
       closedAt,
       revokedCredentials,

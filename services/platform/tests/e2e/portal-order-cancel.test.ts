@@ -113,7 +113,7 @@ async function openShop(): Promise<IssuedControlSession> {
     "plugin",
   );
   const provisioned = await providerClient().provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",
@@ -303,7 +303,7 @@ async function orderProvenance(
 
 async function drainFeed(): Promise<void> {
   const binding = await fixtureDatabase().prepare(
-    "SELECT integration_account_id AS integrationAccountId FROM underclerk_merchant_binding WHERE merchant_id = ?",
+    "SELECT integration_account_id AS integrationAccountId FROM commerce_merchant_binding WHERE merchant_id = ?",
   )
     .bind(MERCHANT)
     .first<{ integrationAccountId: string }>();

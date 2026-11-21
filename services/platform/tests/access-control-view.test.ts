@@ -80,7 +80,7 @@ async function assemblesBoundedView(): Promise<void> {
   if (!assembled.ok) throw new Error(assembled.error.field);
   expect(assembled.value.grants.items[0]).toMatchObject({
     subject: { label: "Owners" },
-    resource: { label: "Satyr" },
+    resource: { label: "Pantry" },
     actions: { kind: "revoke_grant" },
   });
   expect(assembled.value.sourceFlowPolicies.items[0]).toMatchObject({
@@ -137,7 +137,7 @@ async function acceptsNativeCommerceAvailability(): Promise<void> {
     target: "commerce_read",
     providerDependency: {
       kind: "commerce_system",
-      systems: ["satyr_commerce", "shopify"],
+      systems: ["builtin_commerce", "shopify"],
     },
     policyModes: "enabled_disabled",
   };
@@ -155,7 +155,7 @@ async function acceptsNativeCommerceAvailability(): Promise<void> {
     revision: 1,
     changedAt: 1,
   };
-  for (const commerceSystem of ["satyr_commerce", "shopify"] as const) {
+  for (const commerceSystem of ["builtin_commerce", "shopify"] as const) {
     const assembled = assembleAccessControlView({
       ...base,
       capabilityDefinitions: [...base.capabilityDefinitions, definition],
@@ -357,7 +357,7 @@ function resourceProjections(
       grantId: grant.grantId,
       targetRefId: `target_${grant.grantId}`,
       revision: grant.lifecycle.revision,
-      label: "Satyr",
+      label: "Pantry",
     });
   }
   return resources;

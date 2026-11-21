@@ -29,7 +29,7 @@ flow goes silent after previously receiving traffic.
 
 1. Check Worker request logs for `/slack/events` signature failures, `5xx`, or
    queue fallback exhaustion.
-2. Check `satyr-event-dlq` for parked Slack events.
+2. Check `pantry-event-dlq` for parked Slack events.
 3. Check Slack app Event Subscriptions in the app configuration page. Slack may
    disable delivery after sustained failures; re-enable there after the Worker
    is healthy.
@@ -44,5 +44,5 @@ flow goes silent after previously receiving traffic.
 - Record gaps that are absent from the DLQ as unrecoverable by the current
   runtime. Channel memory resumes from the next verified Events API delivery.
 
-Satyr currently exposes no Slack history or replies reader. Any future repair
+Pantry currently exposes no Slack history or replies reader. Any future repair
 runner must remain off the Slack ACK path and live agent turns.

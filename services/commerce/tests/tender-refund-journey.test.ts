@@ -87,7 +87,7 @@ async function splitRefunds(): Promise<void> {
     // before any part runs.
     expect(await staff.splitRefund(mioOrder, "refund_mio_more", 1_600)).toEqual(
       {
-        schemaVersion: "underclerk.tender-refund.v1",
+        schemaVersion: "commerce.tender-refund.v1",
         outcome: "rejected",
         error: {
           code: "resource_relationship_invalid",

@@ -14,7 +14,7 @@ the Portal. `AGENTS.md` (Deployment) gives the order of the six Workers.
    ```
 
 3. Fetch the files that the Portal serves from R2. The Kitchen physics bundles
-   that no pin names are in the R2 bucket `satyr-repo-binaries-apac`, not in
+   that no pin names are in the R2 bucket `pantry-repo-binaries-apac`, not in
    git. A saved run can name any of them, so the Portal build must hold all of
    them. The fetch needs a Wrangler sign-in, or `R2_ACCESS_KEY_ID`,
    `R2_SECRET_ACCESS_KEY` and `R2_ENDPOINT`:

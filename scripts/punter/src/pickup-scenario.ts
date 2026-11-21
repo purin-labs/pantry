@@ -151,7 +151,7 @@ export async function runPunterPickupScenario(
     input.merchantId,
     input.storefrontId,
     {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     },
   );
@@ -178,7 +178,7 @@ export async function runPunterPickupScenario(
     input.storefrontId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `${input.runId}_cart`,
       lines: [
         {
@@ -202,7 +202,7 @@ export async function runPunterPickupScenario(
     input.storefrontId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: `${input.runId}_checkout`,
       cartId: cart.value.cartId,
       cartRevision: cart.value.revision,
@@ -230,7 +230,7 @@ export async function runPunterPickupScenario(
     checkout.value.checkoutId,
     session.value.token,
     {
-      schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
       idempotencyKey: `${input.runId}_refresh`,
       checkoutRevision: checkout.value.revision,
       quoteDigest: checkout.value.quote.quoteDigest,
@@ -261,7 +261,7 @@ export async function runPunterPickupScenario(
     };
   }
   const paymentCommand = {
-    schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+    schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
     idempotencyKey: `${input.runId}_payment`,
     checkoutRevision: refreshed.value.revision,
     quoteDigest: refreshed.value.quote.quoteDigest,

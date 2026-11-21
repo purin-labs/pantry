@@ -33,7 +33,7 @@ export function createConfigurationDraftActions(
 async function configurationDraftMutation(
   path: string,
 ): Promise<ConfigurationDraftView> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to act on this change.");
   let raw: unknown;
   try {

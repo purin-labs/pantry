@@ -184,7 +184,7 @@ type OrganisationInferenceMutation =
       readonly selection:
         | { readonly kind: "claude_oauth" }
         | { readonly kind: "codex_subscription" }
-        | { readonly kind: "satyr_platform" };
+        | { readonly kind: "pantry_platform" };
       readonly apiKey?: never;
     }
   | {
@@ -219,7 +219,7 @@ function parseOrganisationInferenceMutation(
   switch (selection.value.kind) {
     case "claude_oauth":
     case "codex_subscription":
-    case "satyr_platform":
+    case "pantry_platform":
       return hasExactKeys(body, ["selection"])
         ? {
             ok: true,

@@ -173,7 +173,7 @@ async function seedActiveWebhookScenario(
     provider: row.provider,
     providerSubjectId: row.providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes:
       row.provider === "stripe"

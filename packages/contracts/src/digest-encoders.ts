@@ -68,7 +68,7 @@ function orderedTurn(turn: TurnIdentity): TurnIdentity {
 
 /** Preserve the original separators and the order of the accepted parts. */
 export function encodeUserMessageDigest(message: UserMessage): string {
-  let encoded = `satyr.user_message.v1\x1e${encodeMessagePart(message.firstPart)}`;
+  let encoded = `pantry.user_message.v1\x1e${encodeMessagePart(message.firstPart)}`;
   for (const part of message.remainingParts) {
     encoded += `\x1e${encodeMessagePart(part)}`;
   }

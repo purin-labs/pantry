@@ -116,7 +116,7 @@ export async function installFixture(
     provider: "whatsapp",
     providerSubjectId: "410000000000055",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle },
     grantedScopes: ["whatsapp_business_messaging"],
     createdByUserId: userId,

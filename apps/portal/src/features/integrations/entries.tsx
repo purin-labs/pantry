@@ -163,8 +163,8 @@ function integrationEntries(
       label: "AI account",
       description: "Choose the AI that runs your agents.",
       tile:
-        props.inferenceSelection.kind === "satyr_platform"
-          ? "satyr_commerce"
+        props.inferenceSelection.kind === "pantry_platform"
+          ? "builtin_commerce"
           : "codex",
       accounts: [],
       connected:
@@ -233,7 +233,7 @@ function integrationEntries(
       id: "commerce",
       label: "Seams Checkout",
       description: "Your built-in products, stock and orders.",
-      tile: "satyr_commerce",
+      tile: "builtin_commerce",
       accounts: [],
       connected: props.commerceSystem !== null,
       panel: (
@@ -246,7 +246,7 @@ function integrationEntries(
             props.commerceSyncProblem,
           )}
           {props.canManage &&
-          props.commerceSystem?.kind === "satyr_commerce" ? (
+          props.commerceSystem?.kind === "builtin_commerce" ? (
             <IntegrationSetup title="Export tools (optional)">
               <p className="notice-text">
                 Add these only if you ship goods to other countries. They add an
@@ -278,7 +278,7 @@ function integrationEntries(
                 <button
                   type="button"
                   className="connection-primary-action"
-                  onClick={props.actions.setupSatyrCommerce}
+                  onClick={props.actions.setupBuiltInCommerce}
                   disabled={mutationBlocked(props.mutations, {
                     kind: "provision_commerce",
                   })}
@@ -370,7 +370,7 @@ function integrationEntries(
         <>
           {list(stripe)}
           {props.canManage &&
-          props.commerceSystem?.kind === "satyr_commerce" ? (
+          props.commerceSystem?.kind === "builtin_commerce" ? (
             // One section: the shop's payments. A new account is the main
             // path; an owner who already uses Stripe connects it instead.
             <IntegrationSetup title={null}>

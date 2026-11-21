@@ -112,8 +112,8 @@ export type CostsCommerce = CommerceToolReads &
     label: string,
   ): Promise<PreparedCommerceRead>;
   /**
-   * The Underclerk clients of one person of the Organisation, behind this
-   * turn's admission. Null when Underclerk is not configured.
+   * The Commerce clients of one person of the Organisation, behind this
+   * turn's admission. Null when Commerce is not configured.
    */
   adminClient(actor: string): CommerceAdminClient | null;
   entityPlaneClient(actor: string): CommerceEntityPlaneClient | null;
@@ -471,7 +471,7 @@ async function readCostsForSession(
   const adminClient = host.commerce.adminClient(prepared.personId);
   const entityPlaneClient = host.commerce.entityPlaneClient(prepared.personId);
   if (adminClient === null || entityPlaneClient === null) {
-    throw new Error("costs Underclerk unavailable");
+    throw new Error("costs Commerce unavailable");
   }
 
   const [overview, draftCells] = await Promise.all([
@@ -869,7 +869,7 @@ async function saveSupplyCostForSession(
     run: async (work, key) => {
       const entityPlaneClient = host.commerce.entityPlaneClient(work.personId);
       if (entityPlaneClient === null) {
-        throw new Error("supply cost Underclerk unavailable");
+        throw new Error("supply cost Commerce unavailable");
       }
       const nowMs = Date.now();
       const saved = await saveSupplyCostTerms({
@@ -931,10 +931,10 @@ async function saveCostsPlanForSession(
     run: async (work) => {
       const snapshot = await work.client.readStockSnapshot(work.merchantId);
       if (!snapshot.ok) {
-        throw new Error("cost plan Underclerk unavailable");
+        throw new Error("cost plan Commerce unavailable");
       }
       if (snapshot.value.commerce.merchantId !== work.merchantId) {
-        throw new Error("cost plan Underclerk scope mismatch");
+        throw new Error("cost plan Commerce scope mismatch");
       }
       const knownProductIds = new Set(
         snapshot.value.commerce.resources.products
@@ -1003,8 +1003,8 @@ function supplyCostSaveRefusal(saved: SupplyCostSaveResult): string | null {
     return null;
   }
   switch (saved.code) {
-    case "underclerk_unavailable":
-    case "underclerk_scope_mismatch":
+    case "commerce_unavailable":
+    case "commerce_scope_mismatch":
       throw new Error("supply costs unavailable");
     case "supply_cost_changed":
       return "That item's supplier pack price changed after you read it, so this save would lose the other change. Nothing changed. Call costs_read, and tell the person what you see before you save again.";
@@ -1050,10 +1050,10 @@ async function saveLotCostForSession(
     run: async (work) => {
       const snapshot = await work.client.readStockSnapshot(work.merchantId);
       if (!snapshot.ok) {
-        throw new Error("lot cost Underclerk unavailable");
+        throw new Error("lot cost Commerce unavailable");
       }
       if (snapshot.value.commerce.merchantId !== work.merchantId) {
-        throw new Error("lot cost Underclerk scope mismatch");
+        throw new Error("lot cost Commerce scope mismatch");
       }
       const itemsById = new Map(
         snapshot.value.commerce.resources.inventoryItems.map((item) => [

@@ -33,7 +33,7 @@ function externalVaultImportSuite(): void {
   );
   it("revokes only an authenticated tombstone", importsAuthenticatedTombstone);
   it(
-    "resolves from Satyr Vault while the adapter is unavailable",
+    "resolves from Seams Vault while the adapter is unavailable",
     resolvesDuringOutage,
   );
 }

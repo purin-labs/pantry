@@ -73,18 +73,18 @@ async function productsPageActions(context: TestContext): Promise<void> {
       ),
   ]);
   const clientOptions = {
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   };
   const admin = new CommerceAdminClient(clientOptions);
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -117,7 +117,7 @@ async function productsPageActions(context: TestContext): Promise<void> {
   async function shop() {
     const session = await required(
       buyer.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
     );

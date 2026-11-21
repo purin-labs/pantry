@@ -9,12 +9,12 @@ export type AuthorizedResult = {
     | { type: "image"; data: string; mimeType: string }
   )[];
   details: {
-    satyrOutput: {
+    pantryOutput: {
       kind: "inline";
       content: { kind: "text"; text: string }[];
       digest: string;
     };
-    satyrAuthority:
+    pantryAuthority:
       | { kind: "read"; resultDigest: string }
       | { kind: "code_execution"; resultDigest: string; receiptId: string };
   };
@@ -89,7 +89,7 @@ export function readCodeModeReceipt(
 }
 
 export const CodeModeResult = defineDoc<{ state: StoredCodeModeReceipt }>({
-  kind: "satyr.codemode.result",
+  kind: "pantry.codemode.result",
   version: 2,
   scope: "task",
   initial: initialReceipt,

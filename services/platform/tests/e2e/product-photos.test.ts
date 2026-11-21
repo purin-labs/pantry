@@ -72,18 +72,18 @@ async function productPhotos(context: TestContext): Promise<void> {
       ),
   ]);
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   // The catalog names photos by HTTPS address, as a buyer's browser reads them.
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "https://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -147,7 +147,7 @@ async function productPhotos(context: TestContext): Promise<void> {
   async function shopPhotos(variantId: string): Promise<string[]> {
     const session = await required(
       buyer.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
     );
@@ -204,7 +204,7 @@ async function productPhotos(context: TestContext): Promise<void> {
   expect(ids(afterSecond)).toEqual([photoA, photoB]);
   expect(afterSecond.image?.url).toContain(photoA);
   await shopShows(link.variantId, [photoA, photoB]);
-  const served = await env.UNDERCLERK.fetch(
+  const served = await env.COMMERCE.fetch(
     afterSecond.photos.items[1]?.url ?? "",
   );
   expect(served.status).toBe(200);

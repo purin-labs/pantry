@@ -95,7 +95,7 @@ describe("integration account removal", () => {
       provider: "stripe",
       providerSubjectId: "acct_removal",
       environment: "development",
-      authMode: "shared_satyr_app",
+      authMode: "shared_pantry_app",
       authority: {
         kind: "connection_credential",
         credentialRef: credential.value,
@@ -432,7 +432,7 @@ async function removesSlackAccountOnSplitTopologyTest(): Promise<void> {
     provider: "slack",
     providerSubjectId: "workspace-split-removal",
     environment: "production",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: credential.value,
@@ -559,7 +559,7 @@ async function createDisabledAccount(
     provider,
     providerSubjectId: `workspace-${suffix}`,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: credential.value,

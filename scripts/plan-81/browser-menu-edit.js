@@ -32,7 +32,7 @@ async (page) => {
   }
   async function csrf() {
     const cookies = await page.context().cookies(WORKER);
-    return cookies.find((cookie) => cookie.name === "satyr_control_csrf")?.value;
+    return cookies.find((cookie) => cookie.name === "pantry_csrf")?.value;
   }
   // The Access page's change: the Access revision and the capability's.
   async function enableCapability(capabilityId) {
@@ -47,7 +47,7 @@ async (page) => {
         headers: {
           origin: PORTAL,
           "content-type": "application/json",
-          "x-satyr-csrf": await csrf(),
+          "x-pantry-csrf": await csrf(),
           "idempotency-key": crypto.randomUUID(),
         },
         data: {

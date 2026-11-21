@@ -82,7 +82,7 @@ function WorkflowDemo(): React.ReactNode {
                   context={{
                     organisation: "Nuki Inc.",
                     workspace: "Cafe operations",
-                    area: "BakeryOS",
+                    area: "kitchen",
                     view: "Production",
                   }}
                   close={closeWorkflowDemoChat.bind(null, navigate)}

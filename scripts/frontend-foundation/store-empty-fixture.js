@@ -17,7 +17,7 @@ async function storeEmptyFixture(page) {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        schemaVersion: "underclerk.buyer-catalog.v1",
+        schemaVersion: "commerce.buyer-catalog.v1",
         storefront: {
           storefrontId: "storefront_cookie_store_sg",
           revision: 1,

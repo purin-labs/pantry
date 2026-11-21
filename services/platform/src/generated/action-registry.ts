@@ -5,7 +5,7 @@ import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import type { Result } from "../result";
 
-export const STRIPE_CHARGE_CREATE_TOOL = "satyr-stripe-charge";
+export const STRIPE_CHARGE_CREATE_TOOL = "pantry-stripe-charge";
 
 export const STRIPE_CHARGE_CREATE_DEF = {
   "provider": "stripe",
@@ -54,7 +54,7 @@ export const STRIPE_CHARGE_CREATE_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_REFUND_CREATE_TOOL = "satyr-stripe-refund";
+export const STRIPE_REFUND_CREATE_TOOL = "pantry-stripe-refund";
 
 export const STRIPE_REFUND_CREATE_DEF = {
   "provider": "stripe",
@@ -110,7 +110,7 @@ export const STRIPE_REFUND_CREATE_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_SUBSCRIPTION_CANCEL_TOOL = "satyr-stripe-subscription-cancel";
+export const STRIPE_SUBSCRIPTION_CANCEL_TOOL = "pantry-stripe-subscription-cancel";
 
 export const STRIPE_SUBSCRIPTION_CANCEL_DEF = {
   "provider": "stripe",
@@ -150,7 +150,7 @@ export const STRIPE_SUBSCRIPTION_CANCEL_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_PAYOUT_CREATE_TOOL = "satyr-stripe-payout";
+export const STRIPE_PAYOUT_CREATE_TOOL = "pantry-stripe-payout";
 
 export const STRIPE_PAYOUT_CREATE_DEF = {
   "provider": "stripe",
@@ -207,7 +207,7 @@ export const STRIPE_PAYOUT_CREATE_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_TRANSFER_CREATE_TOOL = "satyr-stripe-transfer";
+export const STRIPE_TRANSFER_CREATE_TOOL = "pantry-stripe-transfer";
 
 export const STRIPE_TRANSFER_CREATE_DEF = {
   "provider": "stripe",
@@ -258,7 +258,7 @@ export const STRIPE_TRANSFER_CREATE_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_PAYMENT_INTENT_CAPTURE_TOOL = "satyr-stripe-payment-intent-capture";
+export const STRIPE_PAYMENT_INTENT_CAPTURE_TOOL = "pantry-stripe-payment-intent-capture";
 
 export const STRIPE_PAYMENT_INTENT_CAPTURE_DEF = {
   "provider": "stripe",
@@ -301,7 +301,7 @@ export const STRIPE_PAYMENT_INTENT_CAPTURE_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_PAYMENT_INTENT_CONFIRM_TOOL = "satyr-stripe-payment-intent-confirm";
+export const STRIPE_PAYMENT_INTENT_CONFIRM_TOOL = "pantry-stripe-payment-intent-confirm";
 
 export const STRIPE_PAYMENT_INTENT_CONFIRM_DEF = {
   "provider": "stripe",
@@ -351,7 +351,7 @@ export const STRIPE_PAYMENT_INTENT_CONFIRM_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const STRIPE_SUBSCRIPTION_UPDATE_TOOL = "satyr-stripe-subscription-update";
+export const STRIPE_SUBSCRIPTION_UPDATE_TOOL = "pantry-stripe-subscription-update";
 
 export const STRIPE_SUBSCRIPTION_UPDATE_DEF = {
   "provider": "stripe",
@@ -386,7 +386,7 @@ export const STRIPE_SUBSCRIPTION_UPDATE_DEF = {
   ]
 } as const satisfies ActionDef;
 
-export const SHOPIFY_ORDER_CANCEL_TOOL = "satyr-shopify-order-cancel";
+export const SHOPIFY_ORDER_CANCEL_TOOL = "pantry-shopify-order-cancel";
 
 export const SHOPIFY_ORDER_CANCEL_DEF = {
   "provider": "shopify",
@@ -830,7 +830,7 @@ export async function buildShopifyOrderCancelDraft(args: ShopifyOrderCancelArgs)
   return { kind: "shopify_order_cancel", host: args.shopDomain, verb: "shopify.order.cancel", path: "/admin/api/2026-07/graphql.json", argsHash: await hashCanonicalArgs(args), amount: null, resourceKey: "shopify:order:" + args.orderId };
 }
 
-const SHOPIFY_ORDER_CANCEL_MUTATION = "mutation SatyrOrderCancel($orderId: ID!, $notifyCustomer: Boolean, $refundMethod: OrderCancelRefundMethodInput!, $restock: Boolean!, $reason: OrderCancelReason!, $staffNote: String) { orderCancel(orderId: $orderId, notifyCustomer: $notifyCustomer, refundMethod: $refundMethod, restock: $restock, reason: $reason, staffNote: $staffNote) { job { id done } orderCancelUserErrors { field message code } } }";
+const SHOPIFY_ORDER_CANCEL_MUTATION = "mutation PantryOrderCancel($orderId: ID!, $notifyCustomer: Boolean, $refundMethod: OrderCancelRefundMethodInput!, $restock: Boolean!, $reason: OrderCancelReason!, $staffNote: String) { orderCancel(orderId: $orderId, notifyCustomer: $notifyCustomer, refundMethod: $refundMethod, restock: $restock, reason: $reason, staffNote: $staffNote) { job { id done } orderCancelUserErrors { field message code } } }";
 
 function stripeSubscriptionPath(subscriptionId: string): string { return "/v1/subscriptions/" + encodeURIComponent(subscriptionId); }
 

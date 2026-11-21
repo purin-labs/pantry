@@ -126,7 +126,7 @@ export async function connectExternalRecordsOAuth(
     provider,
     providerSubjectId: identity.value.providerAccountId,
     environment: base.environment,
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: identity.value.grantedScopes,
     createdByUserId: base.userId,

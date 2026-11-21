@@ -106,8 +106,8 @@ function insertProviderProjection(
       `INSERT INTO commerce_projection (
        organisation_id, projection_kind, canonical_id, integration_account_id,
        revision, lifecycle, projection_json, updated_at, validated_at, lab_run_id
-     ) VALUES (?, 'product', 'underclerk:merchant_demo:product_1',
-       'integration_underclerk_demo', 1, 'active', ?, 1000, 1000, NULL)`,
+     ) VALUES (?, 'product', 'commerce:merchant_demo:product_1',
+       'integration_commerce_demo', 1, 'active', ?, 1000, 1000, NULL)`,
     )
     .run(
       organisationId,
@@ -116,10 +116,10 @@ function insertProviderProjection(
         projection: {
           provenance: {
             organisationId,
-            integrationAccountId: "integration_underclerk_demo",
-            source: "underclerk",
+            integrationAccountId: "integration_commerce_demo",
+            source: "commerce",
             resourceType: "product",
-            resourceId: "underclerk:merchant_demo:product_1",
+            resourceId: "commerce:merchant_demo:product_1",
             revision: 1,
             occurredAt: "2026-07-26T00:00:00Z",
             observedAt: "2026-07-26T00:00:00Z",
@@ -135,7 +135,7 @@ function providerProjectionCount(database: DatabaseSync): number {
   const row = database
     .prepare(
       `SELECT COUNT(*) AS count FROM commerce_projection
-     WHERE integration_account_id = 'integration_underclerk_demo'`,
+     WHERE integration_account_id = 'integration_commerce_demo'`,
     )
     .get() as { readonly count: number | bigint };
   return Number(row.count);

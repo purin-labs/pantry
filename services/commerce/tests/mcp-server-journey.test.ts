@@ -88,7 +88,7 @@ async function mcpServerJourney(): Promise<void> {
       notification: initializedNote.status,
     }).toEqual({
       protocolVersion: "2025-06-18",
-      server: "underclerk",
+      server: "commerce",
       session: null,
       notification: 202,
     });
@@ -196,7 +196,7 @@ async function mcpServerJourney(): Promise<void> {
         checkout.checkoutId,
         token,
         {
-          schemaVersion: "underclerk.create-buyer-payment-session.v1",
+          schemaVersion: "commerce.create-buyer-payment-session.v1",
           idempotencyKey: "site_payment",
           checkoutRevision: checkout.revision,
           quoteDigest: checkout.quote.quoteDigest,
@@ -211,7 +211,7 @@ async function mcpServerJourney(): Promise<void> {
         checkout.checkoutId,
         token,
         {
-          schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+          schemaVersion: "commerce.reconcile-buyer-payment.v1",
           idempotencyKey: "site_payment",
           checkoutRevision: checkout.revision,
           quoteDigest: checkout.quote.quoteDigest,
@@ -232,7 +232,7 @@ async function mcpServerJourney(): Promise<void> {
     // 8. What opens nothing.
     await required(
       admin.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: "organisation_second_shop",
         merchantId: SECOND_MERCHANT,
         createdAt: NOW,

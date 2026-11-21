@@ -248,7 +248,7 @@ async function handleMerchantSupport(
   if (!authorized.ok) {
     return authorized.response;
   }
-  if (!/^SATYR-[A-Za-z0-9-]{16,80}$/u.test(supportReferenceRaw)) {
+  if (!/^PANTRY-[A-Za-z0-9-]{16,80}$/u.test(supportReferenceRaw)) {
     return controlError("support_reference_not_found", 404);
   }
   const diagnostics = await readMerchantSupportDiagnostics({

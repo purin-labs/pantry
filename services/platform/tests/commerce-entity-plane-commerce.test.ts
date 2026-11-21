@@ -18,17 +18,17 @@ import {
 } from "../src/commerce/entity-plane/planner";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
 
-describe("commerce entity-plane Underclerk source", () => {
+describe("commerce entity-plane Commerce source", () => {
   it.each([
     [
       "authority",
       { organisationId: "other_organisation" },
-      "Underclerk capability metadata authority mismatch",
+      "Commerce capability metadata authority mismatch",
     ],
     [
       "watermark",
-      { watermark: { kind: "underclerk_native", merchantRevision: 3 } },
-      "Underclerk capability metadata watermark mismatch",
+      { watermark: { kind: "commerce_native", merchantRevision: 3 } },
+      "Commerce capability metadata watermark mismatch",
     ],
   ] as const)(
     "rejects capability metadata with a mismatched %s",
@@ -42,7 +42,7 @@ describe("commerce entity-plane Underclerk source", () => {
         traversal: { maxDepth: 0, resultLimit: 10 },
       });
       const client = new CommerceEntityPlaneClient({
-        baseUrl: "https://underclerk.example",
+        baseUrl: "https://commerce.example",
         serviceToken: "service-token",
         fetch: async () =>
           new Response(
@@ -51,7 +51,7 @@ describe("commerce entity-plane Underclerk source", () => {
               organisationId: "organisation_source",
               merchantId: "merchant_source",
               merchantRevision: 4,
-              watermark: { kind: "underclerk_native", merchantRevision: 4 },
+              watermark: { kind: "commerce_native", merchantRevision: 4 },
               capabilities: {
                 kind: "system_mapped",
                 systemEntityKind: "order",
@@ -81,7 +81,7 @@ describe("commerce entity-plane Underclerk source", () => {
       });
       expect(await source.readCapabilityMetadata(query)).toEqual({
         ok: false,
-        error: { code: "source_invalid", source: "underclerk", message },
+        error: { code: "source_invalid", source: "commerce", message },
       });
     },
   );
@@ -96,7 +96,7 @@ describe("commerce entity-plane Underclerk source", () => {
       traversal: { maxDepth: 0, resultLimit: 10 },
     });
     const client = new CommerceEntityPlaneClient({
-      baseUrl: "https://underclerk.example",
+      baseUrl: "https://commerce.example",
       serviceToken: "service-token",
       fetch: async () =>
         new Response(
@@ -105,7 +105,7 @@ describe("commerce entity-plane Underclerk source", () => {
             organisationId: "organisation_source",
             merchantId: "merchant_source",
             merchantRevision: 4,
-            watermark: { kind: "underclerk_native", merchantRevision: 4 },
+            watermark: { kind: "commerce_native", merchantRevision: 4 },
             capabilities: { kind: "system_mapped", systemEntityKind: "order" },
             projection: {
               attributeIds: [],
@@ -127,7 +127,7 @@ describe("commerce entity-plane Underclerk source", () => {
       ok: false,
       error: expect.objectContaining({
         code: "source_invalid",
-        source: "underclerk",
+        source: "commerce",
       }),
     });
   });
@@ -156,7 +156,7 @@ describe("commerce entity-plane Underclerk source", () => {
       );
     };
     const client = new CommerceEntityPlaneClient({
-      baseUrl: "https://underclerk.example",
+      baseUrl: "https://commerce.example",
       serviceToken: "service-token",
       fetch: fetcher,
     });
@@ -201,7 +201,7 @@ describe("commerce entity-plane Underclerk source", () => {
 
   it("sends one authoritative plan request for a native relationship step", async () => {
     const planned = requiredRelationshipPlan({
-      kind: "underclerk_native",
+      kind: "commerce_native",
       merchantRevision: parseCommerceSnapshotRevision(1, "merchantRevision"),
     });
     const requests: Request[] = [];
@@ -225,7 +225,7 @@ describe("commerce entity-plane Underclerk source", () => {
       merchantId: "merchant_source",
       integrationAccountId: "integration_source",
       client: new CommerceEntityPlaneClient({
-        baseUrl: "https://underclerk.example",
+        baseUrl: "https://commerce.example",
         serviceToken: "service-token",
         fetch: fetcher,
       }),
@@ -248,14 +248,14 @@ describe("commerce entity-plane Underclerk source", () => {
     });
   });
 
-  it("rejects system facts returned by Underclerk for a provider-backed relationship step", async () => {
+  it("rejects system facts returned by Commerce for a provider-backed relationship step", async () => {
     const planned = requiredRelationshipPlan({
       kind: "provider_backed",
       blotterAcceptedProjectionSequence: parseCommerceSnapshotRevision(
         2,
         "blotterRevision",
       ),
-      underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+      commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
         1,
         "merchantRevision",
       ),
@@ -283,7 +283,7 @@ describe("commerce entity-plane Underclerk source", () => {
                 provenance: {
                   organisationId: "organisation_source",
                   integrationAccountId: "integration_source",
-                  source: "underclerk",
+                  source: "commerce",
                   resourceType: "shipment",
                   resourceId: "shipment_1",
                   revision: 1,
@@ -306,7 +306,7 @@ describe("commerce entity-plane Underclerk source", () => {
       merchantId: "merchant_source",
       integrationAccountId: "integration_source",
       client: new CommerceEntityPlaneClient({
-        baseUrl: "https://underclerk.example",
+        baseUrl: "https://commerce.example",
         serviceToken: "service-token",
         fetch: fetcher,
       }),
@@ -321,9 +321,9 @@ describe("commerce entity-plane Underclerk source", () => {
       ok: false,
       error: {
         code: "source_invalid",
-        source: "underclerk",
+        source: "commerce",
         message:
-          "Provider-backed Underclerk relationship step returned system-owned facts",
+          "Provider-backed Commerce relationship step returned system-owned facts",
       },
     });
   });

@@ -99,7 +99,7 @@ export async function handlePortalChatSurfaceReceipt(
       settled.code,
       settled.code.endsWith("missing") ? 404 : 409,
     );
-  // The settlement adds a BakeryOS event to the user's conversation, which
+  // The settlement adds a Kitchen event to the user's conversation, which
   // the next chat read places in its timeline.
   signalChat(authorized.executionScope, {
     kind: "user",

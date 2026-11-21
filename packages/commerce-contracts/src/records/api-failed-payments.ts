@@ -39,7 +39,7 @@ export type CommerceFailedPaymentStepV1 = Static<
 >;
 
 export const commerceFailedPaymentsV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.failed-payments.v1"),
+  schemaVersion: Type.Literal("commerce.failed-payments.v1"),
   merchantId: text,
   merchantRevision: Type.Integer({ minimum: 0 }),
   /** True when the window held more failed payments than this read returns. */

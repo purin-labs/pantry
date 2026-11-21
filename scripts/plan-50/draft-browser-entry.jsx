@@ -53,14 +53,14 @@ function controlHeaders() {
   if (csrf === undefined) throw new Error("Missing operator session");
   return new Headers({
     "content-type": "application/json",
-    "x-satyr-csrf": decodeURIComponent(
-      csrf.slice("satyr_control_csrf=".length),
+    "x-pantry-csrf": decodeURIComponent(
+      csrf.slice("pantry_csrf=".length),
     ),
   });
 }
 
 function isCsrfCookie(cookie) {
-  return cookie.startsWith("satyr_control_csrf=");
+  return cookie.startsWith("pantry_csrf=");
 }
 
 function noRefresh() {}

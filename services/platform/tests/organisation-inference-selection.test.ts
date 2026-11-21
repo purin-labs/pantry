@@ -17,7 +17,7 @@ import { readMigration } from "./sqlite-d1";
 import { requireUserId, requireOrganisationId } from "./test-ids";
 
 describe("organisation inference selection", () => {
-  it("defaults to Codex and persists a versioned Satyr selection", async () => {
+  it("defaults to Codex and persists a versioned Pantry selection", async () => {
     const fixture = createFixture();
     await expect(
       readOrganisationInferenceSelection({
@@ -34,7 +34,7 @@ describe("organisation inference selection", () => {
     const selected = await selectOrganisationInferenceSelection({
       db: fixture.db,
       organisationId: fixture.organisationId,
-      selection: { kind: "satyr_platform" },
+      selection: { kind: "pantry_platform" },
       expectedConfigurationVersion: 1,
       selectedByUserId: fixture.userId,
       now: 2,
@@ -43,7 +43,7 @@ describe("organisation inference selection", () => {
       ok: true,
       value: {
         organisationId: fixture.organisationId,
-        selection: { kind: "satyr_platform" },
+        selection: { kind: "pantry_platform" },
         configurationVersion: 2,
       },
     });
@@ -53,7 +53,7 @@ describe("organisation inference selection", () => {
         organisationId: fixture.organisationId,
       }),
     ).resolves.toMatchObject({
-      selection: { kind: "satyr_platform" },
+      selection: { kind: "pantry_platform" },
       configurationVersion: 2,
     });
 
@@ -92,17 +92,17 @@ describe("organisation inference selection", () => {
       error: { code: "inference_selection_invalid" },
     });
     expect(
-      parseOrganisationInferenceSelection({ kind: "satyr_platform", extra: true }),
+      parseOrganisationInferenceSelection({ kind: "pantry_platform", extra: true }),
     ).toEqual({
       ok: false,
       error: { code: "inference_selection_invalid" },
     });
   });
 
-  it("refuses the Satyr selection without the OpenRouter credential", () => {
+  it("refuses the Pantry selection without the OpenRouter credential", () => {
     expect(resolvePantryPlatformModelRoute({})).toEqual({
       ok: false,
-      error: { code: "satyr_platform_credential_unavailable" },
+      error: { code: "pantry_platform_credential_unavailable" },
     });
   });
 

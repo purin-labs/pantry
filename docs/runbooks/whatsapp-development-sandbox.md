@@ -66,7 +66,7 @@ Dashboard access is established. The stable Worker callback, app webhook
 subscription, and test-WABA app subscription were verified on 2026-08-27. On
 2026-09-03 the live test-number path received two customer texts, created one
 Case, exposed the retained conversation to the assigned agent and Slack scope,
-sent one approved reply through the former Satyr System User credential, recorded a
+sent one approved reply through the former Pantry System User credential, recorded a
 Meta message id, and converged through `sent` and `delivered` status webhooks.
 The recipient confirmed the reply in WhatsApp. The Case-close drill then set a
 production `closed_at`, reduced the account to zero open Cases, and returned no
@@ -74,7 +74,7 @@ customer or reply messages after a fresh portal load. Content-free receipts and
 proposal lifecycle metadata remain. The organisation-token runtime is ready, while
 the existing production test connection stays on its legacy credential until a
 replacement is proven. On 2026-09-04, Embedded Signup returned no WABA grant;
-**Edit settings** showed that Seams KK cannot onboard customers yet. Satyr
+**Edit settings** showed that Seams KK cannot onboard customers yet. Pantry
 stored no organisation credential and left the working connection unchanged. The
 remaining live-sandbox work is an Embedded Signup cutover and controlled
 credential-revocation recovery drill after Meta approval. See the
@@ -117,9 +117,9 @@ Deploy non-secret binding changes only from a clean, reviewed worktree.
 0. Apply the schema to the local D1 once, or every webhook 500s on
    `no such table: whatsapp_phone_number_account`:
    `pnpm exec wrangler d1 execute DB --local --file=migrations/0001_current_schema.sql`
-1. [x] Install the two application secrets on the deployed `satyr-edge` Worker.
+1. [x] Install the two application secrets on the deployed `pantry` Worker.
 2. [x] Save
-       `https://satyr-edge.n6378056.workers.dev/hook/whatsapp` as the Meta callback,
+       `https://pantry.purin.io/hook/whatsapp` as the Meta callback,
        verify it with `WHATSAPP_VERIFY_TOKEN`, and subscribe `messages`.
 3. [x] Subscribe the Seams app to the test WABA and confirm it through
        `/{waba-id}/subscribed_apps`.
@@ -136,7 +136,7 @@ Deploy non-secret binding changes only from a clean, reviewed worktree.
        on 2026-09-03.
 7. [x] Close the live test Case and verify its conversation window is terminal, its active
        envelope is unavailable, and no customer or reply plaintext remains in
-       terminal Satyr storage. Verified on 2026-09-03 through the production
+       terminal Pantry storage. Verified on 2026-09-03 through the production
        conversation window projection, zero-open-Case account state, and a fresh content-free
        conversation read.
 8. [ ] After Meta permits signup, complete Embedded Signup and prove the organisation
@@ -170,9 +170,9 @@ Sanitize before checking anything into `tests/whatsapp/fixtures.ts`.
 These remain open. Each needs the live sandbox plus a Tech Provider
 conversation with Meta; none can be answered from this repository.
 
-1. **Embedded Signup and funding.** Can an organisation complete Satyr's Tech
-   Provider flow and activate its WABA without Satyr sharing a credit line?
-   If Meta requires Satyr's credit line, stop production onboarding and report
+1. **Embedded Signup and funding.** Can an organisation complete Pantry's Tech
+   Provider flow and activate its WABA without Pantry sharing a credit line?
+   If Meta requires Pantry's credit line, stop production onboarding and report
    the gate as failed. This build implements no credit-sharing path.
 2. **Credential and permissions.** Confirm the production customer business
    token flow, app subscription removal, rotation behavior, and the minimum App
@@ -194,7 +194,7 @@ generation. Proposals frozen against the previous generation refuse to send
 with `authority_moved`;
 an operator re-approves them under the new generation.
 
-After full revocation, use **Connect WhatsApp** for a fresh signup. Satyr keeps
+After full revocation, use **Connect WhatsApp** for a fresh signup. Pantry keeps
 the stable phone-number account identity, creates a new provider connection,
 and leaves the revoked connection and credential generations terminal.
 

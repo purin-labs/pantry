@@ -76,7 +76,7 @@ export class PointOfSaleConfigurationService {
         `SELECT configuration_json AS configurationJson
        FROM point_of_sale_configuration
        WHERE merchant_id = ? AND lifecycle_state = 'published'
-       ORDER BY satyr_location_id ASC`,
+       ORDER BY pantry_location_id ASC`,
       )
       .all<Readonly<{ configurationJson: string }>>(merchantId);
     return rows.map((row) =>
@@ -100,13 +100,13 @@ function publishTransaction(
       error: { code: "merchant_not_found", merchantId: input.merchantId },
     };
   }
-  const pantryLocationId = input.configuration.satyrLocationId;
+  const pantryLocationId = input.configuration.pantryLocationId;
   if (typeof pantryLocationId !== "string" || pantryLocationId.length === 0) {
     return {
       ok: false,
       error: {
         code: "invalid_configuration",
-        field: "pointOfSaleConfiguration.satyrLocationId",
+        field: "pointOfSaleConfiguration.pantryLocationId",
       },
     };
   }

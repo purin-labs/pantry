@@ -160,7 +160,7 @@ export const updateCommerceProductV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-product.v1"),
+      schemaVersion: Type.Literal("commerce.update-product.v1"),
       productId: text,
       expectedProductRevision: PositiveInteger,
       changes: commerceProductChangesV1Schema,
@@ -177,7 +177,7 @@ export const deleteCommerceProductV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.delete-product.v1"),
+      schemaVersion: Type.Literal("commerce.delete-product.v1"),
       productId: text,
       expectedProductRevision: PositiveInteger,
     }),
@@ -192,7 +192,7 @@ export const updateCommerceVariantV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-variant.v1"),
+      schemaVersion: Type.Literal("commerce.update-variant.v1"),
       variantId: text,
       expectedVariantRevision: PositiveInteger,
       changes: commerceVariantChangesV1Schema,
@@ -208,7 +208,7 @@ export const updateCommerceOfferV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-offer.v1"),
+      schemaVersion: Type.Literal("commerce.update-offer.v1"),
       offerId: text,
       expectedOfferRevision: PositiveInteger,
       changes: commerceOfferChangesV1Schema,
@@ -225,7 +225,7 @@ export const updateCommerceStorefrontTaxV1Schema = Type.Intersect(
   [
     catalogEditBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-storefront-tax.v1"),
+      schemaVersion: Type.Literal("commerce.update-storefront-tax.v1"),
       storefrontId: text,
       expectedStorefrontRevision: PositiveInteger,
       tax: storefrontTaxConfigurationSchema,

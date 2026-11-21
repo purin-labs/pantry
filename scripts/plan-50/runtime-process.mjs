@@ -85,7 +85,7 @@ const worker = {
   kvNamespaces: usesDraftCollaboration ? ["POLICY_KV"] : [],
   queueProducers: usesProposal ? { EVENT_Q: "trial-context" } : {},
   // A price proposal reads the offer's price allowance from Commerce.
-  serviceBindings: usesProposal ? { UNDERCLERK: forwardCommerceRequest } : {},
+  serviceBindings: usesProposal ? { COMMERCE: forwardCommerceRequest } : {},
   bindings: {
     PROVIDER_URL: providerUrl,
     TRIAL_SCENARIO: basename(persistenceDirectory),
@@ -122,8 +122,8 @@ const worker = {
       : {}),
     ...(usesProposal
       ? {
-          UNDERCLERK_BASE_URL: "http://underclerk.test",
-          UNDERCLERK_SERVICE_TOKEN: "underclerk-e2e-token",
+          COMMERCE_BASE_URL: "http://commerce.test",
+          COMMERCE_SERVICE_TOKEN: "commerce-e2e-token",
           FIXTURE_QUERIES: JSON.stringify(fixtureQueries),
           PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
             databaseBinding: "DB",
@@ -192,7 +192,7 @@ async function forwardOutboundRequest(request) {
 async function forwardCommerceRequest(request) {
   const original = new URL(request.url);
   const target = new URL(
-    `/underclerk${original.pathname}${original.search}`,
+    `/commerce${original.pathname}${original.search}`,
     providerUrl,
   );
   target.searchParams.set("scenario", basename(persistenceDirectory));

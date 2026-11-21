@@ -128,7 +128,7 @@ export class CandidateActor extends DurableObject {
     if (scenario !== "unsafe_default") publish.replay = "safe";
     registry.install(
       defineExtension({
-        name: "satyr-evaluation",
+        name: "pantry-evaluation",
         tools: [
           defineTool(publish),
           defineTool({

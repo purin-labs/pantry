@@ -162,7 +162,7 @@ class ShippingBuyer {
   ): Promise<ShippingBuyer> {
     const session = await required(
       client.createSession(merchantId, SHOP, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
     );
@@ -193,14 +193,14 @@ class ShippingBuyer {
       throw new Error("The shipping storefront sells nothing to Singapore");
     const cart = await required(
       this.#client.createCart(merchantId, SHOP, this.#token, {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: `${this.#name}_cart`,
         lines: [{ kind: "catalog", variantId: listing.variantId, quantity: 2 }],
       }),
     );
     const validation = await required(
       this.#client.validateShippingAddress(merchantId, SHOP, this.#token, {
-        schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+        schemaVersion: "commerce.validate-buyer-shipping-address.v1",
         idempotencyKey: `${this.#name}_address`,
         address: {
           countryCode: "SG",
@@ -215,7 +215,7 @@ class ShippingBuyer {
       throw new Error("The Singapore address was not accepted");
     return required(
       this.#client.createShippingCheckout(merchantId, SHOP, this.#token, {
-        schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+        schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
         idempotencyKey: `${this.#name}_checkout`,
         cartId: cart.cartId,
         cartRevision: cart.revision,
@@ -246,11 +246,11 @@ class ShippingBuyer {
         checkout.checkoutId,
         this.#token,
         {
-          schemaVersion: "underclerk.create-buyer-payment-session.v1",
+          schemaVersion: "commerce.create-buyer-payment-session.v1",
           idempotencyKey: key,
           checkoutRevision: checkout.revision,
           quoteDigest: checkout.quote.quoteDigest,
-          returnUrl: "https://underclerk.test/store/cookies",
+          returnUrl: "https://commerce.test/store/cookies",
         },
       ),
     );
@@ -263,7 +263,7 @@ class ShippingBuyer {
         checkout.checkoutId,
         this.#token,
         {
-          schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+          schemaVersion: "commerce.reconcile-buyer-payment.v1",
           idempotencyKey: key,
           checkoutRevision: checkout.revision,
           quoteDigest: checkout.quote.quoteDigest,
@@ -280,7 +280,7 @@ class ShippingBuyer {
       checkout.checkoutId,
       this.#token,
       {
-        schemaVersion: "underclerk.place-buyer-stored-value-checkout.v1",
+        schemaVersion: "commerce.place-buyer-stored-value-checkout.v1",
         idempotencyKey: `${this.#name}_stored_value`,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,

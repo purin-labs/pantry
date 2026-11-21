@@ -73,7 +73,7 @@ export function singleDatabaseSchema() {
  * that reads a folder with readD1Migrations.
  */
 export function singleDatabaseMigrations() {
-  const directory = mkdtempSync(join(tmpdir(), "satyr-single-database-"));
+  const directory = mkdtempSync(join(tmpdir(), "pantry-single-database-"));
   writeFileSync(
     join(directory, "0001_current_schema.sql"),
     singleDatabaseSchema(),

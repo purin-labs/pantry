@@ -68,7 +68,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_charge_create";
         capabilityId: typeof CAPABILITY_KEYS.stripeChargeCreate;
-        command: "satyr-stripe-charge";
+        command: "pantry-stripe-charge";
         verb: "charge.create";
         path: "/v1/charges";
         resourceKey: "stripe:charge.create";
@@ -76,7 +76,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_refund_create";
         capabilityId: typeof CAPABILITY_KEYS.stripeRefundCreate;
-        command: "satyr-stripe-refund";
+        command: "pantry-stripe-refund";
         verb: "refund.create";
         path: "/v1/refunds";
         resourceKey: "stripe:charge:{chargeId}";
@@ -84,7 +84,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_subscription_cancel";
         capabilityId: typeof CAPABILITY_KEYS.stripeSubscriptionCancel;
-        command: "satyr-stripe-subscription-cancel";
+        command: "pantry-stripe-subscription-cancel";
         verb: "subscription.cancel";
         path: "/v1/subscriptions/{subscriptionId}";
         resourceKey: "stripe:subscription:{subscriptionId}";
@@ -92,7 +92,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_payout_create";
         capabilityId: typeof CAPABILITY_KEYS.stripePayoutCreate;
-        command: "satyr-stripe-payout";
+        command: "pantry-stripe-payout";
         verb: "payout.create";
         path: "/v1/payouts";
         resourceKey: "stripe:payout:{destinationId}";
@@ -100,7 +100,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_transfer_create";
         capabilityId: typeof CAPABILITY_KEYS.stripeTransferCreate;
-        command: "satyr-stripe-transfer";
+        command: "pantry-stripe-transfer";
         verb: "transfer.create";
         path: "/v1/transfers";
         resourceKey: "stripe:account:{destinationAccountId}";
@@ -108,7 +108,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_payment_intent_capture";
         capabilityId: typeof CAPABILITY_KEYS.stripePaymentIntentCapture;
-        command: "satyr-stripe-payment-intent-capture";
+        command: "pantry-stripe-payment-intent-capture";
         verb: "payment_intent.capture";
         path: "/v1/payment_intents/{paymentIntentId}/capture";
         resourceKey: "stripe:payment-intent:{paymentIntentId}";
@@ -116,7 +116,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_payment_intent_confirm";
         capabilityId: typeof CAPABILITY_KEYS.stripePaymentIntentConfirm;
-        command: "satyr-stripe-payment-intent-confirm";
+        command: "pantry-stripe-payment-intent-confirm";
         verb: "payment_intent.confirm";
         path: "/v1/payment_intents/{paymentIntentId}/confirm";
         resourceKey: "stripe:payment-intent:{paymentIntentId}";
@@ -124,7 +124,7 @@ type StripeActionSource = ActionSourceBase & {
     | {
         id: "stripe_subscription_update";
         capabilityId: typeof CAPABILITY_KEYS.stripeSubscriptionUpdate;
-        command: "satyr-stripe-subscription-update";
+        command: "pantry-stripe-subscription-update";
         verb: "subscription.update";
         path: "/v1/subscriptions/{subscriptionId}";
         resourceKey: "stripe:subscription:{subscriptionId}";
@@ -134,7 +134,7 @@ type StripeActionSource = ActionSourceBase & {
 type ShopifyActionSource = ActionSourceBase & {
   id: "shopify_order_cancel";
   capabilityId: typeof CAPABILITY_KEYS.shopifyOrderCancel;
-  command: "satyr-shopify-order-cancel";
+  command: "pantry-shopify-order-cancel";
   provider: "shopify";
   verb: "order.cancel";
   method: "POST";
@@ -150,7 +150,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_charge_create",
     capabilityId: CAPABILITY_KEYS.stripeChargeCreate,
-    command: "satyr-stripe-charge",
+    command: "pantry-stripe-charge",
     provider: "stripe",
     verb: "charge.create",
     method: "POST",
@@ -171,7 +171,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_refund_create",
     capabilityId: CAPABILITY_KEYS.stripeRefundCreate,
-    command: "satyr-stripe-refund",
+    command: "pantry-stripe-refund",
     provider: "stripe",
     verb: "refund.create",
     method: "POST",
@@ -201,7 +201,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_subscription_cancel",
     capabilityId: CAPABILITY_KEYS.stripeSubscriptionCancel,
-    command: "satyr-stripe-subscription-cancel",
+    command: "pantry-stripe-subscription-cancel",
     provider: "stripe",
     verb: "subscription.cancel",
     method: "DELETE",
@@ -226,7 +226,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_payout_create",
     capabilityId: CAPABILITY_KEYS.stripePayoutCreate,
-    command: "satyr-stripe-payout",
+    command: "pantry-stripe-payout",
     provider: "stripe",
     verb: "payout.create",
     method: "POST",
@@ -259,7 +259,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_transfer_create",
     capabilityId: CAPABILITY_KEYS.stripeTransferCreate,
-    command: "satyr-stripe-transfer",
+    command: "pantry-stripe-transfer",
     provider: "stripe",
     verb: "transfer.create",
     method: "POST",
@@ -290,7 +290,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_payment_intent_capture",
     capabilityId: CAPABILITY_KEYS.stripePaymentIntentCapture,
-    command: "satyr-stripe-payment-intent-capture",
+    command: "pantry-stripe-payment-intent-capture",
     provider: "stripe",
     verb: "payment_intent.capture",
     method: "POST",
@@ -315,7 +315,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_payment_intent_confirm",
     capabilityId: CAPABILITY_KEYS.stripePaymentIntentConfirm,
-    command: "satyr-stripe-payment-intent-confirm",
+    command: "pantry-stripe-payment-intent-confirm",
     provider: "stripe",
     verb: "payment_intent.confirm",
     method: "POST",
@@ -351,7 +351,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "stripe_subscription_update",
     capabilityId: CAPABILITY_KEYS.stripeSubscriptionUpdate,
-    command: "satyr-stripe-subscription-update",
+    command: "pantry-stripe-subscription-update",
     provider: "stripe",
     verb: "subscription.update",
     method: "POST",
@@ -375,7 +375,7 @@ export const ACTION_REGISTRY: readonly ActionSource[] = [
   {
     id: "shopify_order_cancel",
     capabilityId: CAPABILITY_KEYS.shopifyOrderCancel,
-    command: "satyr-shopify-order-cancel",
+    command: "pantry-shopify-order-cancel",
     provider: "shopify",
     verb: "order.cancel",
     method: "POST",

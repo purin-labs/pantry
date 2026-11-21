@@ -146,7 +146,7 @@ it("revokes a Stripe account when the seller deauthorizes the application", asyn
         object: {
           id: event.application,
           object: "application",
-          name: "Satyr",
+          name: "Pantry",
         },
       },
     });
@@ -334,7 +334,7 @@ async function seed(
     provider: input.provider,
     providerSubjectId: input.providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes:
       input.provider === "stripe" ? ["read_write"] : ["read_orders"],

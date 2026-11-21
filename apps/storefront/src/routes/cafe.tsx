@@ -8,7 +8,7 @@ export function StorefrontRoute(): ReactNode {
       config={storefrontConfiguration(
         window.location.pathname,
         document
-          .querySelector('meta[name="underclerk-shop"]')
+          .querySelector('meta[name="commerce-shop"]')
           ?.getAttribute("content") ?? null,
       )}
     />

@@ -174,7 +174,7 @@ export class ProjectSharing extends React.Component<
     const version = ++this.requestVersion;
     this.setState({ panel: { ...panel, busy: true, error: null } });
     try {
-      const csrf = readCookie("satyr_control_csrf");
+      const csrf = readCookie("pantry_csrf");
       if (csrf === null)
         throw new Error("Sign in again to manage project access.");
       const result = await controlWrite(this.path(), "POST", command).catch(

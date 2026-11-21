@@ -19,8 +19,8 @@ export type TerminalConfiguration =
       merchantId: string;
       /** Development binds Sandbox test devices; production pairs Terminals. */
       environment: "development" | "production";
-      satyrLocations: readonly Readonly<{
-        satyrLocationId: string;
+      pantryLocations: readonly Readonly<{
+        pantryLocationId: string;
         currency: string;
         supportedItems: readonly Readonly<{
           variantId: string;
@@ -126,7 +126,7 @@ function parseTerminalConfiguration(raw: unknown): TerminalConfiguration {
       "kind",
       "merchantId",
       "environment",
-      "satyrLocations",
+      "pantryLocations",
       "squareAccounts",
       "testDevices",
     ],
@@ -137,7 +137,7 @@ function parseTerminalConfiguration(raw: unknown): TerminalConfiguration {
     typeof object.merchantId !== "string" ||
     (object.environment !== "development" &&
       object.environment !== "production") ||
-    !Array.isArray(object.satyrLocations) ||
+    !Array.isArray(object.pantryLocations) ||
     !Array.isArray(object.squareAccounts) ||
     !Array.isArray(object.testDevices)
   ) {
@@ -147,7 +147,7 @@ function parseTerminalConfiguration(raw: unknown): TerminalConfiguration {
     kind: "ready",
     merchantId: object.merchantId,
     environment: object.environment,
-    satyrLocations: object.satyrLocations.map(parsePantryLocation),
+    pantryLocations: object.pantryLocations.map(parsePantryLocation),
     squareAccounts: object.squareAccounts.map(parseSquareAccount),
     testDevices: object.testDevices.map(parseTestDevice),
   };
@@ -155,22 +155,22 @@ function parseTerminalConfiguration(raw: unknown): TerminalConfiguration {
 
 function parsePantryLocation(
   raw: unknown,
-): ReadyTerminalConfiguration["satyrLocations"][number] {
+): ReadyTerminalConfiguration["pantryLocations"][number] {
   const object = requireObject(raw, "Seams Checkout location");
   requireExactKeys(
     object,
-    ["satyrLocationId", "currency", "supportedItems"],
+    ["pantryLocationId", "currency", "supportedItems"],
     "Seams Checkout location",
   );
   if (
-    typeof object.satyrLocationId !== "string" ||
+    typeof object.pantryLocationId !== "string" ||
     typeof object.currency !== "string" ||
     !Array.isArray(object.supportedItems)
   ) {
     throw new Error("Seams Checkout location is invalid.");
   }
   return {
-    satyrLocationId: object.satyrLocationId,
+    pantryLocationId: object.pantryLocationId,
     currency: object.currency,
     supportedItems: object.supportedItems.map(parseSupportedItem),
   };
@@ -284,7 +284,7 @@ function parseOperations(raw: unknown): TerminalOperations {
     ],
     "terminal operations",
   );
-  if (object.schemaVersion !== "satyr.terminal-operations.v2") {
+  if (object.schemaVersion !== "pantry.terminal-operations.v2") {
     throw new Error(
       "Terminal operations are reported in a version this portal cannot read.",
     );
@@ -308,7 +308,7 @@ function parseCounter(raw: unknown): TerminalCounterReadback {
   requireExactKeys(
     object,
     [
-      "satyrLocationId",
+      "pantryLocationId",
       "blockedReason",
       "assignment",
       "credentialHealth",
@@ -318,13 +318,13 @@ function parseCounter(raw: unknown): TerminalCounterReadback {
     "terminal counter",
   );
   if (
-    typeof object.satyrLocationId !== "string" ||
+    typeof object.pantryLocationId !== "string" ||
     typeof object.paymentsLinked !== "boolean"
   ) {
     throw new Error("Terminal counter is invalid.");
   }
   return {
-    satyrLocationId: object.satyrLocationId,
+    pantryLocationId: object.pantryLocationId,
     blockedReason: parseBlockedReason(object.blockedReason),
     assignment: parseAssignment(object.assignment),
     credentialHealth: parseCredentialHealth(object.credentialHealth),

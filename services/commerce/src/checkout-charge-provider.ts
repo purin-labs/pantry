@@ -13,7 +13,7 @@ import type { CommerceShippingCountry } from "@purin-labs/commerce-client";
 type JpyMoney = Readonly<{ amountMinor: number; currency: "JPY" }>;
 
 export const MERCHANT_TAX_AUTHORITY_REFERENCE =
-  "underclerk_merchant_tax_authority";
+  "commerce_merchant_tax_authority";
 
 type TaxQuoteProviderRequestBase = Readonly<{
   providerAccountReference: string;

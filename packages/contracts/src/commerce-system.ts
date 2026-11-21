@@ -1,18 +1,18 @@
 // The commerce system that an Organisation selects: the built-in commerce
-// engine (`satyr_commerce`) or Shopify. This file is the one definition of the
+// engine (`builtin_commerce`) or Shopify. This file is the one definition of the
 // kind union and of the record source that each kind gives (Refactor 17, step
 // A2.5). It is a closed union of wire values, so it is in `contracts`; the
 // behavior of each kind is in its `CommerceProvider`.
 import { Type, type Static } from "typebox";
 
 export const commerceSystemKindSchema = Type.Union([
-  Type.Literal("satyr_commerce"),
+  Type.Literal("builtin_commerce"),
   Type.Literal("shopify"),
 ]);
 export type CommerceSystemKind = Static<typeof commerceSystemKindSchema>;
 
 const COMMERCE_SYSTEM_SOURCES = {
-  satyr_commerce: "underclerk",
+  builtin_commerce: "commerce",
   shopify: "shopify",
 } as const satisfies Record<CommerceSystemKind, string>;
 

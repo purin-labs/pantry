@@ -39,7 +39,7 @@ export type CommerceFreshness = StrictUnion<
 export const sourceProvenanceSchema = OpenObject({
   organisationId: trimmedIdentityTextSchema,
   integrationAccountId: trimmedIdentityTextSchema,
-  source: Type.Enum(["shopify", "stripe", "lab", "underclerk"]),
+  source: Type.Enum(["shopify", "stripe", "lab", "commerce"]),
   resourceType: Type.Enum([
     "product",
     "sellable_variant",

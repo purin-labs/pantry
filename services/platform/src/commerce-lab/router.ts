@@ -118,7 +118,7 @@ type ParsedIngressEnvelope = {
   readonly event: JsonObject & { readonly eventId: string };
 };
 
-const LAB_EVENT_SCHEMA_VERSION = "satyr.commerce.lab.event.v1";
+const LAB_EVENT_SCHEMA_VERSION = "pantry.commerce.lab.event.v1";
 const SEED_TIMESTAMP = "2026-07-26T00:00:00.000Z";
 const SEED_RUN_ID = `commerce_lab_seed_${COMMERCE_LAB_CATALOG_VERSION.replaceAll(
   "-",

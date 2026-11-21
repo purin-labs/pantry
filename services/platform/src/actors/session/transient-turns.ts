@@ -150,7 +150,7 @@ export async function runTransientMailHarness(
           cursor: null,
           modelRouteDigest: await digestModelRoute(contract.modelRoute),
           instructionDigest: await digestCanonical({
-            kind: "satyr_transient_email_instructions_v1",
+            kind: "pantry_transient_email_instructions_v1",
             instructions: input.harnessInstructions,
           }),
           toolCatalogDigest: toolHost.catalogDigest,

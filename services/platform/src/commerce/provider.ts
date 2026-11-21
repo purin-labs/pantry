@@ -102,10 +102,10 @@ type NormalizeCommerceDeliveryResult =
   | Readonly<{
       ok: false;
       error:
-        | "underclerk_delivery_signature_invalid"
-        | "underclerk_delivery_organisation_mismatch"
-        | "underclerk_delivery_merchant_mismatch"
-        | "underclerk_delivery_mixed_observation_categories";
+        | "commerce_delivery_signature_invalid"
+        | "commerce_delivery_organisation_mismatch"
+        | "commerce_delivery_merchant_mismatch"
+        | "commerce_delivery_mixed_observation_categories";
     }>;
 
 type CommerceCatalogPublicationResult =
@@ -133,9 +133,9 @@ type CommerceProductDescriptionUpdateResult =
   | Readonly<{ status: "unavailable"; error: CommerceClientError }>;
 
 type CommerceCancellationAuthorityError =
-  | Readonly<{ code: "underclerk_unavailable"; cause: CommerceClientError }>
+  | Readonly<{ code: "commerce_unavailable"; cause: CommerceClientError }>
   | Readonly<{
-      code: "underclerk_cancellation_authority_incomplete";
+      code: "commerce_cancellation_authority_incomplete";
       field: string;
     }>;
 
@@ -159,7 +159,7 @@ export async function normalizeCommerceEngineDelivery(
   }>,
 ): Promise<NormalizeCommerceDeliveryResult> {
   if (input.delivery.merchantId !== input.merchantId) {
-    return { ok: false, error: "underclerk_delivery_merchant_mismatch" };
+    return { ok: false, error: "commerce_delivery_merchant_mismatch" };
   }
   if (
     !(await input.verifier.verify({
@@ -169,7 +169,7 @@ export async function normalizeCommerceEngineDelivery(
       signature: input.delivery.signer.signature,
     }))
   ) {
-    return { ok: false, error: "underclerk_delivery_signature_invalid" };
+    return { ok: false, error: "commerce_delivery_signature_invalid" };
   }
   const entityPlaneObservations = readEntityPlaneObservations(
     input.delivery.observations,
@@ -194,7 +194,7 @@ export async function normalizeCommerceEngineDelivery(
   if (aggregateObservations === null) {
     return {
       ok: false,
-      error: "underclerk_delivery_mixed_observation_categories",
+      error: "commerce_delivery_mixed_observation_categories",
     };
   }
   return {
@@ -496,7 +496,7 @@ export async function resolveCommerceCancellationAuthority(
   return {
     ok: true,
     value: {
-      kind: "underclerk_full_refund",
+      kind: "commerce_full_refund",
       merchantRevision: snapshot.value.merchantRevision,
       paymentId: payment.id,
       paymentRevision: payment.revision,
@@ -695,7 +695,7 @@ function timestampAtOrBefore(left: string, right: string): boolean {
 function commerceUnavailable<T>(
   cause: CommerceClientError,
 ): Result<T, CommerceCancellationAuthorityError> {
-  return { ok: false, error: { code: "underclerk_unavailable", cause } };
+  return { ok: false, error: { code: "commerce_unavailable", cause } };
 }
 
 function cancellationAuthorityIncomplete<T>(
@@ -703,7 +703,7 @@ function cancellationAuthorityIncomplete<T>(
 ): Result<T, CommerceCancellationAuthorityError> {
   return {
     ok: false,
-    error: { code: "underclerk_cancellation_authority_incomplete", field },
+    error: { code: "commerce_cancellation_authority_incomplete", field },
   };
 }
 
@@ -2180,7 +2180,7 @@ function commerceProvenance(
   return {
     organisationId: input.organisationId,
     integrationAccountId: input.integrationAccountId,
-    source: "underclerk",
+    source: "commerce",
     resourceType: input.observation.kind,
     resourceId: commerceCanonicalResourceId(
       input.merchantId,

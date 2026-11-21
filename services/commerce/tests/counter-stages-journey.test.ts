@@ -124,7 +124,7 @@ class CounterDesk extends StaffDesk {
   async publishPolicy() {
     return required(
       this.admin.publishPointOfSaleConfiguration({
-        schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+        schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
         merchantId,
         expectedRevision: null,
         publishedAt: NOW,
@@ -132,7 +132,7 @@ class CounterDesk extends StaffDesk {
         configuration: {
           configurationId: "pos_configuration_counter",
           organisationId,
-          satyrLocationId: LOCATION,
+          pantryLocationId: LOCATION,
           salesChannelId: CHANNEL,
           currency: "JPY",
           supportedItems: [{ variantId: SMALL_SENCHA, maxQuantityPerLine: 10 }],
@@ -146,7 +146,7 @@ class CounterDesk extends StaffDesk {
           },
           presentationPolicy: {
             locale: "ja-JP",
-            merchantDisplayName: "Satyr Cafe",
+            merchantDisplayName: "Pantry Cafe",
             termsPolicyId: "terms_counter",
             privacyPolicyId: "privacy_counter",
             supportContact: "support@example.test",
@@ -192,12 +192,12 @@ class CounterDesk extends StaffDesk {
   async ring(name: string, tins: number, discountCodes?: readonly string[]) {
     const snapshot = await required(this.admin.readSnapshot(merchantId));
     const command: CreateCommerceInPersonCheckoutV1 = {
-      schemaVersion: "underclerk.create-in-person-checkout.v1",
+      schemaVersion: "commerce.create-in-person-checkout.v1",
       merchantId,
       expectedMerchantRevision: snapshot.merchantRevision,
       idempotencyKey: `counter_${name}`,
       requestedAt: NOW,
-      satyrLocationId: LOCATION,
+      pantryLocationId: LOCATION,
       posConfigurationRevision: 1,
       operatorIdentity: "operator_barista",
       terminalAssignmentRevision: 1,

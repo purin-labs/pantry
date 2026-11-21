@@ -911,7 +911,7 @@ async function checkSignedDeliveries(
     }),
   ).toThrow();
   const acknowledgement = {
-    schemaVersion: "underclerk.acknowledge-commerce-delivery.v2",
+    schemaVersion: "commerce.acknowledge-commerce-delivery.v2",
     organisationId,
     merchantId,
     deliveryId: delivery.deliveryId,

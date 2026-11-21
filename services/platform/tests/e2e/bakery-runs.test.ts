@@ -171,7 +171,7 @@ async function sharedRuns(): Promise<void> {
     401,
   );
   const badCsrf = headers(owner.session);
-  badCsrf.delete("x-satyr-csrf");
+  badCsrf.delete("x-pantry-csrf");
   expect(
     (
       await exports.default.fetch(`https://localhost${path}`, {
@@ -981,9 +981,9 @@ async function scenarioApprovalJourney(): Promise<void> {
   );
   expect(sample.status, await sample.text()).toBe(200);
   const entityPlane = new CommerceEntityPlaneClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const source = await readBakeryProcedure(
     readBakeryGraph.bind(null, entityPlane, merchantId),

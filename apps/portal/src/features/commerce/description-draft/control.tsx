@@ -42,7 +42,7 @@ export function ProductDescriptionDraftControl(props: Readonly<{
   const entity = props.entity;
   const productId = entity.reference.entityId;
   const source = entity.reference.origin === "system" && entity.reference.typeId === "product" &&
-    entity.provenance !== undefined && entity.freshness !== undefined && entity.provenance.source === "underclerk"
+    entity.provenance !== undefined && entity.freshness !== undefined && entity.provenance.source === "commerce"
     ? { revision: entity.provenance.revision, freshness: entity.freshness.state } : null;
   const snapshotKind = state.kind === "open" ? state.snapshot.kind : "idle";
 

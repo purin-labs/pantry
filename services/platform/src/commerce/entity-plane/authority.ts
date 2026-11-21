@@ -150,7 +150,7 @@ export function buildSavedSelectorCommerceReadAuthority(
   }>,
 ): Result<CommerceGraphReadAuthority, CommerceGraphAuthorityError> {
   try {
-    if (input.query.kind === "underclerk_context") {
+    if (input.query.kind === "commerce_context") {
       throw new TypeError("A saved selector cannot contain a context request");
     }
     return {
@@ -215,7 +215,7 @@ export function enforceCommerceGraphReadAuthority(
     return denied("authority_out_of_scope");
   }
   if (
-    input.query.kind === "underclerk_context" &&
+    input.query.kind === "commerce_context" &&
     !sensitivityAtMost(
       input.query.allowedSensitivity,
       context.sensitivityCeiling,
@@ -500,7 +500,7 @@ function scopeAllowsQuery(
       return false;
     case "commerce_list": {
       const list =
-        query.kind === "underclerk_context" &&
+        query.kind === "commerce_context" &&
         query.selection.kind === "selector"
           ? query.selection.selector.query
           : query;
@@ -520,7 +520,7 @@ function selectorAllowsQuery(
   query: CommerceGraphQuery,
 ): boolean {
   const requestedQuery =
-    query.kind === "underclerk_context" && query.selection.kind === "selector"
+    query.kind === "commerce_context" && query.selection.kind === "selector"
       ? query.selection.selector.query
       : query;
   return sameQuery(selectorQuery, requestedQuery);
@@ -571,7 +571,7 @@ function queryReferencesEntity(
       return sameEntityRef(query.reference, reference);
     case "relationship_traversal":
       return query.seeds.some((seed) => sameEntityRef(seed, reference));
-    case "underclerk_context":
+    case "commerce_context":
       return (
         query.selection.kind === "entity_seeds" &&
         query.selection.seeds.some((seed) => sameEntityRef(seed, reference))
@@ -606,7 +606,7 @@ function queryReferencesEntityType(
       return sameEntityType(entityType, query.reference);
     case "relationship_traversal":
       return query.seeds.some((seed) => sameEntityType(entityType, seed));
-    case "underclerk_context":
+    case "commerce_context":
       if (query.selection.kind !== "entity_seeds") {
         return queryReferencesEntityType(
           query.selection.selector.query,

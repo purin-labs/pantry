@@ -567,8 +567,8 @@ async function readGrantedCommerceQuery(
     !binding.ok ||
     !system.ok ||
     !grants.ok ||
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return unavailable();
   const scope = {
@@ -611,11 +611,11 @@ async function readGrantedCommerceQuery(
   )
     return unavailable();
   const client = new CommerceEntityPlaneClient({
-    baseUrl: env.UNDERCLERK_BASE_URL,
+    baseUrl: env.COMMERCE_BASE_URL,
     ...pantryCommerceAccess(
-      env.UNDERCLERK_SERVICE_TOKEN,
+      env.COMMERCE_SERVICE_TOKEN,
       String(organisationId),
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
   });
   const commerceEngine = graph.createCommerceEngineSource({
@@ -628,7 +628,7 @@ async function readGrantedCommerceQuery(
     commerceSystem: system.value.commerceSystem,
     organisationId,
     merchantId: String(binding.value.merchantId),
-    underclerk: commerceEngine,
+    commerce: commerceEngine,
     organisation: () =>
       requireActiveOrganisationActor({ env, organisationId, now: Date.now() }),
   });
@@ -694,8 +694,8 @@ export async function validateEmailCommerceEvidence(
   const organisationId = parseOrganisationId(organisationIdRaw);
   if (
     !organisationId.ok ||
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return changed();
   const execution = await OrganisationExecutionScope.resolve(
@@ -717,11 +717,11 @@ export async function validateEmailCommerceEvidence(
     merchantId: String(binding.value.merchantId),
     integrationAccountId: binding.value.integrationAccountId,
     client: new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(organisationId.value),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
       ),
     }),
   });

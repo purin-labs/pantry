@@ -204,10 +204,10 @@ const CLOSE_NOTICES: Readonly<Record<LiveCloseReason, string | null>> = {
   unsupported: null,
   stopped: null,
   ended: null,
-  held: "\n\n_Satyr held the rest of this answer._",
-  withheld: "\n\n_Satyr cannot share the rest of this answer in this channel._",
+  held: "\n\n_Pantry held the rest of this answer._",
+  withheld: "\n\n_Pantry cannot share the rest of this answer in this channel._",
   // The final delivery decides whether the full answer follows.
-  uncertain: "\n\n_Satyr could not finish this answer here._",
+  uncertain: "\n\n_Pantry could not finish this answer here._",
 };
 
 /** What one call of the stream needs to release text into the thread. */

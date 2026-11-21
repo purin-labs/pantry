@@ -7,7 +7,7 @@ export default defineConfig({
     proxy: {
       // A journey runner may start its own Commerce on another port.
       "/v1":
-        process.env.STOREFRONT_UNDERCLERK_ORIGIN ?? "http://127.0.0.1:3102",
+        process.env.STOREFRONT_COMMERCE_ORIGIN ?? "http://127.0.0.1:3102",
     },
     allowedHosts: [
       "example.cafe",

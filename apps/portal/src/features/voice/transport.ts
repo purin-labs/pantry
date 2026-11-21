@@ -106,7 +106,7 @@ export class VoiceTransport {
   private async refreshGrant(): Promise<GrantRead> {
     try {
       // Without a session Pantry refuses the grant.
-      if (readCookie("satyr_control_csrf") === null) return "unavailable";
+      if (readCookie("pantry_csrf") === null) return "unavailable";
       let ok = true;
       let body: unknown;
       try {

@@ -69,7 +69,7 @@ describe("commerce entity-plane context parity", () => {
     if (!portalAuthority.ok) return;
 
     const contextParsed = parseCommerceGraphQuery({
-      kind: "underclerk_context",
+      kind: "commerce_context",
       selection: {
         kind: "selector",
         selector: {
@@ -83,8 +83,8 @@ describe("commerce entity-plane context parity", () => {
       allowedAttributeIds: [],
       freshnessRequirement: "any",
     });
-    expect(contextParsed.kind).toBe("underclerk_context");
-    if (contextParsed.kind !== "underclerk_context") return;
+    expect(contextParsed.kind).toBe("commerce_context");
+    if (contextParsed.kind !== "commerce_context") return;
     if (contextParsed.selection.kind !== "selector") return;
     const { kind: _kind, ...contextRequest } = contextParsed;
     const requestAuthority: RequestAuthority = {
@@ -121,7 +121,7 @@ describe("commerce entity-plane context parity", () => {
     };
 
     const client = new CommerceEntityPlaneClient({
-      baseUrl: "https://underclerk.phase4.test",
+      baseUrl: "https://commerce.phase4.test",
       serviceToken: "phase4-test-token",
       fetch: commerceFetch(graph),
     });
@@ -134,7 +134,7 @@ describe("commerce entity-plane context parity", () => {
     const reader = new CommerceGraphReader({
       organisationId: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
     });
 
     const portal = await handleCommerceGraphRoute({
@@ -236,7 +236,7 @@ function commerceFetch(
         organisationId: ORGANISATION_ID,
         merchantId: MERCHANT_ID,
         merchantRevision: 7,
-        watermark: { kind: "underclerk_native", merchantRevision: 7 },
+        watermark: { kind: "commerce_native", merchantRevision: 7 },
         capabilities: systemCapabilities("shipment"),
         projection: {
           attributeIds: [],
@@ -398,7 +398,7 @@ function systemEntity(
     provenance: {
       organisationId: ORGANISATION_ID,
       integrationAccountId: INTEGRATION_ID,
-      source: "underclerk" as const,
+      source: "commerce" as const,
       resourceType,
       resourceId: entityId,
       revision: 1,
@@ -443,7 +443,7 @@ function systemRelationship(
     provenance: {
       organisationId: ORGANISATION_ID,
       integrationAccountId: INTEGRATION_ID,
-      source: "underclerk" as const,
+      source: "commerce" as const,
       resourceType:
         definitionId === "order_shipment"
           ? ("commerce_order" as const)

@@ -48,7 +48,7 @@ export type CommerceArchiveLocationV1 = Static<
 >;
 
 export const commerceArchiveRunV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.archive-run.v1"),
+  schemaVersion: Type.Literal("commerce.archive-run.v1"),
   files: ImmutableArray(commerceArchiveFileV1Schema),
   orders: NonNegativeInteger,
   events: NonNegativeInteger,
@@ -58,7 +58,7 @@ export type CommerceArchiveRunV1 = Static<
 >;
 
 export const commerceOrderRecordV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.order-record.v1"),
+  schemaVersion: Type.Literal("commerce.order-record.v1"),
   source: Type.Union([Type.Literal("live"), Type.Literal("archived")]),
   archive: Nullable(commerceArchiveLocationV1Schema),
   order: commerceOrderV1Schema,

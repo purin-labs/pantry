@@ -1232,7 +1232,7 @@ export function sessionObservedCommerceEntityId(
       WHERE session_id = ? AND organisation_id = ? AND entity_type = ?
         AND revision = ?
         AND (entity_id = ?
-          OR (entity_id LIKE 'underclerk:%'
+          OR (entity_id LIKE 'commerce:%'
             AND substr(entity_id, length(entity_id) - length(?)) = ':' || ?))`,
       input.sessionId,
       input.organisationId,

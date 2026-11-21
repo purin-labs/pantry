@@ -118,15 +118,15 @@ function parseArguments(
   ) {
     throw new Error("--included-tax must be basis points from 0 to 10000");
   }
-  const baseUrl = env.UNDERCLERK_BASE_URL;
-  if (baseUrl === undefined) throw new Error("UNDERCLERK_BASE_URL is required");
+  const baseUrl = env.COMMERCE_BASE_URL;
+  if (baseUrl === undefined) throw new Error("COMMERCE_BASE_URL is required");
   const parsed = new URL(baseUrl);
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("UNDERCLERK_BASE_URL must use http or https");
+    throw new Error("COMMERCE_BASE_URL must use http or https");
   }
-  const serviceToken = env.UNDERCLERK_SERVICE_TOKEN;
+  const serviceToken = env.COMMERCE_SERVICE_TOKEN;
   if (serviceToken === undefined || serviceToken.length === 0) {
-    throw new Error("UNDERCLERK_SERVICE_TOKEN is required");
+    throw new Error("COMMERCE_SERVICE_TOKEN is required");
   }
   return {
     merchantId,

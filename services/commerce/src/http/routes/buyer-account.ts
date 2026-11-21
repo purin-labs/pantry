@@ -67,7 +67,7 @@ export async function requestCustomerSignInRoute(
   return challenge === undefined
     ? jsonResponse(409, { message: "Customer accounts are disabled" })
     : jsonResponse(200, {
-        schemaVersion: "underclerk.customer-sign-in-challenge.v1",
+        schemaVersion: "commerce.customer-sign-in-challenge.v1",
         ...challenge,
       });
 }
@@ -110,7 +110,7 @@ export async function verifyCustomerSignInRoute(
     customerId: verified.customerId,
   });
   return jsonResponse(200, {
-    schemaVersion: "underclerk.customer-access.v1",
+    schemaVersion: "commerce.customer-access.v1",
     customerAccessToken: access.token,
     expiresAt: access.claims.expiresAt,
   });

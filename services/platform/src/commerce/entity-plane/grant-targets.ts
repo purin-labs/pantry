@@ -60,7 +60,7 @@ function parseCommerceReadScope(
     if (kind === "saved_selector") {
       const selector = asRecord(value?.selector);
       const query = parseCommerceGraphQuery({
-        kind: "underclerk_context",
+        kind: "commerce_context",
         selection: { kind: "selector", selector },
         traversal: { maxDepth: 0, resultLimit: 1 },
         allowedSensitivity: "restricted",
@@ -68,7 +68,7 @@ function parseCommerceReadScope(
         freshnessRequirement: "any",
       });
       if (
-        query.kind !== "underclerk_context" ||
+        query.kind !== "commerce_context" ||
         query.selection.kind !== "selector"
       ) {
         throw new Error("scope kind changed");

@@ -15,7 +15,7 @@ import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { readStored, writeStored } from "./setting";
 
-const COUNTS_KEY = "satyr.voice.counts";
+const COUNTS_KEY = "pantry.voice.counts";
 const COUNT_DAYS = 14;
 
 /** What one engine on one host heard: the texts that the Portal kept, and the texts that it dropped. */

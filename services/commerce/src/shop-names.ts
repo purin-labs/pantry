@@ -1,4 +1,4 @@
-// Shop names (Plan 40B phase 2). One `UnderclerkShopNameDO` holds each name
+// Shop names (Plan 40B phase 2). One `CommerceShopNameDO` holds each name
 // and the storefront that owns it, so two merchants cannot take one name.
 // The merchant's object keeps each storefront's current and earlier names
 // and claims a name before it records it. A name never leaves its
@@ -49,7 +49,7 @@ export async function lookUpShopName(
   const owner = await names.getByName(name).owner();
   if (owner === null) return undefined;
   return {
-    schemaVersion: "underclerk.shop-name.v1",
+    schemaVersion: "commerce.shop-name.v1",
     name,
     merchantId: owner.merchantId,
     storefrontId: owner.storefrontId,
@@ -100,7 +100,7 @@ export function merchantShopNameRegistry(
       await storage.get(storageKey(merchantId, storefrontId)),
     );
     return {
-      schemaVersion: "underclerk.storefront-shop-name.v1",
+      schemaVersion: "commerce.storefront-shop-name.v1",
       merchantId,
       storefrontId,
       name: stored.name,
@@ -139,7 +139,7 @@ export function merchantShopNameRegistry(
         await names.getByName(previous).claim(owner);
       } catch (error) {
         log(
-          "underclerk.shop_name_pointer_failed",
+          "commerce.shop_name_pointer_failed",
           error instanceof Error ? error.message : String(error),
         );
       }
@@ -160,7 +160,7 @@ function set(
   shopName: CommerceStorefrontShopNameV1,
 ): CommerceStorefrontShopNameChangeV1 {
   return {
-    schemaVersion: "underclerk.storefront-shop-name-change.v1",
+    schemaVersion: "commerce.storefront-shop-name-change.v1",
     outcome: "set",
     shopName,
   };
@@ -173,7 +173,7 @@ function refused(
   >["reason"],
 ): CommerceStorefrontShopNameChangeV1 {
   return {
-    schemaVersion: "underclerk.storefront-shop-name-change.v1",
+    schemaVersion: "commerce.storefront-shop-name-change.v1",
     outcome: "refused",
     reason,
   };

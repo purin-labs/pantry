@@ -26,7 +26,7 @@ const SIGNER = {
     Buffer.from(payload).toString("base64url"),
 };
 
-describe("Underclerk published-resource metadata", () => {
+describe("Commerce published-resource metadata", () => {
   it("enumerates published definitions and resolves each resource branch", async () => {
     const database = new NodeCommerceDatabase(":memory:");
     initializeCommerceSchema(database, NOW);
@@ -429,7 +429,7 @@ describe("Underclerk published-resource metadata", () => {
       ),
     });
     authority.provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: "organisation_route",
       merchantId: "merchant_route",
       createdAt: NOW,
@@ -450,7 +450,7 @@ describe("Underclerk published-resource metadata", () => {
       entityPlane: service,
     });
     const url =
-      "https://underclerk.test/v1/admin/merchants/merchant_route/entity-plane/published-resources";
+      "https://commerce.test/v1/admin/merchants/merchant_route/entity-plane/published-resources";
     const request = {
       kind: "enumerate",
       organisationId: "organisation_route",

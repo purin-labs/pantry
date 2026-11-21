@@ -71,7 +71,7 @@ def make_handler(shop: ShopVoice) -> type[BaseHTTPRequestHandler]:
 
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
-        server_version = "satyr-shop-voice"
+        server_version = "pantry-shop-voice"
         sys_version = ""
         timeout = SOCKET_TIMEOUT_SECONDS
 

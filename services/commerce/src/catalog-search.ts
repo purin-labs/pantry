@@ -69,7 +69,7 @@ export function searchCatalog(
   );
   const bounded = Math.max(1, Math.min(CATALOG_SEARCH_MAXIMUM_LIMIT, limit));
   return {
-    schemaVersion: "underclerk.buyer-catalog-search.v1",
+    schemaVersion: "commerce.buyer-catalog-search.v1",
     query,
     listings: scored.slice(0, bounded).map((item) => item.listing),
   };

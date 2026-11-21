@@ -103,18 +103,18 @@ export async function placePickupOrder(
   order: Readonly<{ key: string; email: string }>,
 ) {
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const session = await required(
     buyer.createSession(merchantId, storefrontId, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
   const cart = await required(
     buyer.createCart(merchantId, storefrontId, session.token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `cart-${order.key}`,
       lines: lines.map((line) =>
         line.kind === "menu"
@@ -125,7 +125,7 @@ export async function placePickupOrder(
   );
   const checkout = await required(
     buyer.createPickupCheckout(merchantId, storefrontId, session.token, {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: `checkout-${order.key}`,
       cartId: cart.cartId,
       cartRevision: cart.revision,
@@ -142,11 +142,11 @@ export async function placePickupOrder(
       checkout.checkoutId,
       session.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: `payment-${order.key}`,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
-        returnUrl: "https://underclerk.test/return",
+        returnUrl: "https://commerce.test/return",
       },
     ),
   );
@@ -158,7 +158,7 @@ export async function placePickupOrder(
       checkout.checkoutId,
       session.token,
       {
-        schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+        schemaVersion: "commerce.reconcile-buyer-payment.v1",
         idempotencyKey: `payment-${order.key}`,
         checkoutRevision: payment.checkoutRevision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -173,18 +173,18 @@ export async function placePickupOrder(
 /** A guest buyer's card payment that the provider declines: no order is placed. */
 export async function declineCafeOrder(merchantId: string): Promise<string> {
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const session = await required(
     buyer.createSession(merchantId, CAFE_STOREFRONT_ID, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
   const cart = await required(
     buyer.createCart(merchantId, CAFE_STOREFRONT_ID, session.token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: "cart-declined",
       lines: [
         {
@@ -199,7 +199,7 @@ export async function declineCafeOrder(merchantId: string): Promise<string> {
   );
   const checkout = await required(
     buyer.createPickupCheckout(merchantId, CAFE_STOREFRONT_ID, session.token, {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: "checkout-declined",
       cartId: cart.cartId,
       cartRevision: cart.revision,
@@ -216,11 +216,11 @@ export async function declineCafeOrder(merchantId: string): Promise<string> {
       checkout.checkoutId,
       session.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: "payment-declined",
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
-        returnUrl: "https://underclerk.test/return",
+        returnUrl: "https://commerce.test/return",
       },
     ),
   );

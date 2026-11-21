@@ -1817,7 +1817,7 @@
   width: 16px;
   height: 16px;
   margin-inline-start: auto;
-  color: var(--satyr-ink-2);
+  color: var(--pantry-ink-2);
 }
 @media (prefers-reduced-motion: no-preference) {
   .chat-thread-spinner {

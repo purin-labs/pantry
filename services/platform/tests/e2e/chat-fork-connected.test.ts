@@ -650,10 +650,10 @@ function currentToolText(body: Record<string, unknown>): string {
 
 function controlHeaders(session: IssuedControlSession): Record<string, string> {
   return {
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
     origin: "https://localhost",
     "content-type": "application/json",
-    "x-satyr-csrf": session.csrfToken,
+    "x-pantry-csrf": session.csrfToken,
   };
 }
 

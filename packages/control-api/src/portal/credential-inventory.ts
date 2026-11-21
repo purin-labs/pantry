@@ -113,7 +113,7 @@ export function parseCredentialInventoryResponse(
   if (
     !isRecord(raw) ||
     raw.kind !== "success" ||
-    raw.schema_version !== "satyr.credential-inventory.v1" ||
+    raw.schema_version !== "pantry.credential-inventory.v1" ||
     !isRecord(raw.inventory) ||
     typeof raw.inventory.organisationId !== "string" ||
     !Array.isArray(raw.inventory.accounts)

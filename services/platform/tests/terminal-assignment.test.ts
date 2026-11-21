@@ -34,7 +34,7 @@ function assignmentRecord(
     assignmentId: "terminal_assignment_1",
     organisationId: "organisation_1",
     merchantId: "merchant_1",
-    satyrLocationId: "pantry_location_1",
+    pantryLocationId: "pantry_location_1",
     account: account("production"),
     providerLocationId: "provider_location_1",
     target: { kind: "paired_physical", providerDeviceId: "device_1" },
@@ -92,7 +92,7 @@ function pairingRecord(
     attemptId: "terminal_pairing_1",
     organisationId: "organisation_1",
     merchantId: "merchant_1",
-    satyrLocationId: "pantry_location_1",
+    pantryLocationId: "pantry_location_1",
     account: account("production"),
     providerLocationId: "provider_location_1",
     state: {

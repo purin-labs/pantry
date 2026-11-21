@@ -42,7 +42,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
   const fixture = createFixture();
   try {
     const unauthorized = await fixture.api.fetch(
-      "https://underclerk.test/v1/admin/merchants/merchant_cafe/checkout-profiles",
+      "https://commerce.test/v1/admin/merchants/merchant_cafe/checkout-profiles",
     );
     expect(unauthorized.status).toBe(401);
 
@@ -51,7 +51,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       "/v1/admin/merchants/merchant_cafe/checkout-profiles",
       "POST",
       {
-        schemaVersion: "underclerk.create-checkout-profile-draft.v1",
+        schemaVersion: "commerce.create-checkout-profile-draft.v1",
         merchantId: "merchant_cafe",
         checkoutProfileId: PROFILE_ID,
         name: "Domestic checkout",
@@ -69,7 +69,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       `/v1/admin/merchants/merchant_cafe/checkout-profiles/${PROFILE_ID}/draft`,
       "PUT",
       {
-        schemaVersion: "underclerk.replace-checkout-profile-draft.v1",
+        schemaVersion: "commerce.replace-checkout-profile-draft.v1",
         merchantId: "merchant_cafe",
         checkoutProfileId: PROFILE_ID,
         expectedRevision: 1,
@@ -85,7 +85,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       `/v1/admin/merchants/merchant_cafe/checkout-profiles/${PROFILE_ID}/publication`,
       "POST",
       {
-        schemaVersion: "underclerk.publish-checkout-profile.v1",
+        schemaVersion: "commerce.publish-checkout-profile.v1",
         merchantId: "merchant_cafe",
         checkoutProfileId: PROFILE_ID,
         expectedRevision: 2,
@@ -103,7 +103,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       "/v1/admin/merchants/merchant_cafe/storefronts/storefront_online/checkout-profile-activation",
       "PUT",
       {
-        schemaVersion: "underclerk.activate-checkout-profile.v1",
+        schemaVersion: "commerce.activate-checkout-profile.v1",
         merchantId: "merchant_cafe",
         storefrontId: "storefront_online",
         checkoutProfileId: PROFILE_ID,
@@ -126,14 +126,14 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       "merchant_cafe",
       "storefront_online",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
     expect(originalSession).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-session.v4",
+        schemaVersion: "commerce.buyer-session.v4",
         buyer: { kind: "guest" },
         checkoutProfile: { checkoutProfileId: PROFILE_ID, revision: 2 },
         checkoutProfileConfiguration: profileConfiguration(),
@@ -169,7 +169,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       `/v1/admin/merchants/merchant_cafe/checkout-profiles/${PROFILE_ID}/publication`,
       "POST",
       {
-        schemaVersion: "underclerk.publish-checkout-profile.v1",
+        schemaVersion: "commerce.publish-checkout-profile.v1",
         merchantId: "merchant_cafe",
         checkoutProfileId: "checkout_profile_other",
         expectedRevision: 1,
@@ -184,7 +184,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       "/v1/admin/merchants/merchant_cafe/checkout-profiles",
       "POST",
       {
-        schemaVersion: "underclerk.create-checkout-profile-draft.v1",
+        schemaVersion: "commerce.create-checkout-profile-draft.v1",
         merchantId: "merchant_cafe",
         checkoutProfileId: REPLACEMENT_PROFILE_ID,
         name: "Replacement checkout",
@@ -198,7 +198,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
     });
 
     const publishedReplacement = await fixture.client.publishCheckoutProfile({
-      schemaVersion: "underclerk.publish-checkout-profile.v1",
+      schemaVersion: "commerce.publish-checkout-profile.v1",
       merchantId: "merchant_cafe",
       checkoutProfileId: REPLACEMENT_PROFILE_ID,
       expectedRevision: 1,
@@ -211,7 +211,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
     });
 
     const activatedReplacement = await fixture.client.activateCheckoutProfile({
-      schemaVersion: "underclerk.activate-checkout-profile.v1",
+      schemaVersion: "commerce.activate-checkout-profile.v1",
       merchantId: "merchant_cafe",
       storefrontId: "storefront_online",
       checkoutProfileId: REPLACEMENT_PROFILE_ID,
@@ -227,7 +227,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
       "merchant_cafe",
       "storefront_online",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -250,7 +250,7 @@ async function merchantProfileApiLifecycle(): Promise<void> {
     ).toMatchObject({ ok: true });
 
     const retired = await fixture.client.retireCheckoutProfile({
-      schemaVersion: "underclerk.retire-checkout-profile.v1",
+      schemaVersion: "commerce.retire-checkout-profile.v1",
       merchantId: "merchant_cafe",
       checkoutProfileId: PROFILE_ID,
       expectedRevision: 2,
@@ -366,7 +366,7 @@ async function profileRequest(
   method: "GET" | "POST" | "PUT",
   body?: unknown,
 ): Promise<Readonly<{ status: number; body: unknown }>> {
-  const response = await api.fetch(`https://underclerk.test${path}`, {
+  const response = await api.fetch(`https://commerce.test${path}`, {
     method,
     headers: {
       authorization: `Bearer ${SERVICE_TOKEN}`,
@@ -385,7 +385,7 @@ function createFixture(): Readonly<{
 }> {
   const databasePath = join(
     tmpdir(),
-    `underclerk-checkout-profile-http-${randomUUID()}.sqlite3`,
+    `commerce-checkout-profile-http-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, NOW);
@@ -410,12 +410,12 @@ function createFixture(): Readonly<{
   return {
     api,
     client: new CommerceAdminClient({
-      baseUrl: "https://underclerk.test",
+      baseUrl: "https://commerce.test",
       serviceToken: SERVICE_TOKEN,
       fetch: api.fetch.bind(api),
     }),
     storefrontClient: new CommerceStorefrontClient({
-      baseUrl: "https://underclerk.test",
+      baseUrl: "https://commerce.test",
       fetch: api.fetch.bind(api),
     }),
     close: createFixtureCloser(authority, databasePath),

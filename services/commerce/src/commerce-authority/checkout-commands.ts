@@ -266,13 +266,13 @@ export class CheckoutCommandAuthority {
     const configuration = readPublishedPointOfSaleConfiguration(
       this.#options.database,
       command.merchantId,
-      command.satyrLocationId,
+      command.pantryLocationId,
     );
     if (configuration === undefined) {
       return this.#options.rejected({
         code: "resource_not_found",
         kind: "point_of_sale_configuration",
-        id: command.satyrLocationId,
+        id: command.pantryLocationId,
       });
     }
     const snapshot = this.#options.readSnapshot(command.merchantId);
@@ -714,7 +714,7 @@ export class CheckoutCommandAuthority {
       if (merchant === undefined) continue;
       const key = `checkout_expiry_${lapsed.checkoutId}_${lapsed.revision}`;
       this.expireCheckout({
-        schemaVersion: "underclerk.expire-checkout.v1",
+        schemaVersion: "commerce.expire-checkout.v1",
         merchantId: lapsed.merchantId,
         expectedMerchantRevision: merchant.revision,
         idempotencyKey: key,

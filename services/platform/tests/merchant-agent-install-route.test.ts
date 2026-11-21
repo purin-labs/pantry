@@ -45,7 +45,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_urk_route";
 const ROUTE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/agents/urk`;
-const COOKIE = "satyr_control_session=session-urk; satyr_control_csrf=csrf-urk";
+const COOKIE = "pantry_session=session-urk; pantry_csrf=csrf-urk";
 const ROLE_RANK = { viewer: 1, operator: 2, admin: 3, owner: 4 } as const;
 
 describe("Urk installation route", () => {
@@ -89,7 +89,7 @@ function installRequest(): Request {
     headers: {
       cookie: COOKIE,
       origin: "https://pantry.example",
-      "x-satyr-csrf": "csrf-urk",
+      "x-pantry-csrf": "csrf-urk",
       "content-type": "application/json",
       "idempotency-key": "install-urk-once",
     },

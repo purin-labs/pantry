@@ -158,7 +158,7 @@ export function refundResolutionMutation(
     plan,
     committedAt,
     customers,
-    command.schemaVersion === "underclerk.record-counter-manual-cash-refund.v1"
+    command.schemaVersion === "commerce.record-counter-manual-cash-refund.v1"
       ? "record_counter_manual_cash_refund"
       : "refund_order",
     "Successful refund plan lost terminal evidence",

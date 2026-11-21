@@ -40,7 +40,7 @@ export function parseInferenceSelectionCommand(
   switch (selection.kind) {
     case "claude_oauth":
     case "codex_subscription":
-    case "satyr_platform":
+    case "pantry_platform":
       return {
         kind: "valid",
         command: { kind: "select_inference", selection },
@@ -74,7 +74,7 @@ export function parseInferenceSelection(
   switch (value) {
     case "claude_oauth":
     case "codex_subscription":
-    case "satyr_platform":
+    case "pantry_platform":
     case "organisation_openai_api_key":
     case "organisation_anthropic_api_key":
     case "organisation_google_api_key":

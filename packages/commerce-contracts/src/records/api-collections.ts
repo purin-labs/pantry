@@ -141,7 +141,7 @@ export const createCommerceCollectionV1Schema = Type.Refine(
     [
       collectionCommandBaseSchema,
       ReadonlyOpenObject({
-        schemaVersion: Type.Literal("underclerk.create-collection.v1"),
+        schemaVersion: Type.Literal("commerce.create-collection.v1"),
         handle: Type.String({
           pattern: "^(?=.{1,100}$)[a-z0-9]+(?:-[a-z0-9]+)*$",
         }),
@@ -174,7 +174,7 @@ export const updateCommerceCollectionV1Schema = Type.Intersect(
   [
     collectionCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-collection.v1"),
+      schemaVersion: Type.Literal("commerce.update-collection.v1"),
       expectedRevision: PositiveInteger,
       changes: Type.Refine(
         ReadonlyStrictObject({
@@ -199,7 +199,7 @@ export const deleteCommerceCollectionV1Schema = Type.Intersect(
   [
     collectionCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.delete-collection.v1"),
+      schemaVersion: Type.Literal("commerce.delete-collection.v1"),
       expectedRevision: PositiveInteger,
     }),
   ],
@@ -240,7 +240,7 @@ export type CommerceBuyerCollectionProductV1 = Static<
 >;
 
 export const commerceBuyerCollectionPageV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-collection-page.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-collection-page.v1"),
   collection: commerceBuyerCollectionSummaryV1Schema,
   products: ImmutableArray(commerceBuyerCollectionProductV1Schema),
   nextCursor: Nullable(text),
@@ -250,7 +250,7 @@ export type CommerceBuyerCollectionPageV1 = Static<
 >;
 
 export const commerceBuyerCollectionsV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-collections.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-collections.v1"),
   collections: ImmutableArray(commerceBuyerCollectionSummaryV1Schema),
 });
 export type CommerceBuyerCollectionsV1 = Static<
@@ -290,7 +290,7 @@ export type CommerceCollectionV1 = Static<
 >;
 
 type CollectionList = Readonly<{
-  schemaVersion: "underclerk.collections.v1";
+  schemaVersion: "commerce.collections.v1";
   collections: readonly CommerceCollectionV1[];
 }>;
 
@@ -298,7 +298,7 @@ type CollectionList = Readonly<{
 const collectionListSchema = Type.Unsafe<readonly CommerceCollectionV1[]>(
   Type.Codec(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.collections.v1"),
+      schemaVersion: Type.Literal("commerce.collections.v1"),
       collections: ImmutableArray(commerceCollectionV1Schema),
     }),
   )
@@ -315,7 +315,7 @@ function collectionsOf(
 function collectionList(
   collections: readonly CommerceCollectionV1[],
 ): CollectionList {
-  return { schemaVersion: "underclerk.collections.v1", collections };
+  return { schemaVersion: "commerce.collections.v1", collections };
 }
 
 // Parsers of the client API types (Plan 78 step 2).

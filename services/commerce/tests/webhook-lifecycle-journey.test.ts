@@ -39,8 +39,8 @@ import {
 } from "./journey-support.ts";
 import { TransitionMatrix } from "./transition-matrix.ts";
 
-const SORA = "https://hooks.sora.example/underclerk";
-const RIN = "https://hooks.rin.example/underclerk";
+const SORA = "https://hooks.sora.example/commerce";
+const RIN = "https://hooks.rin.example/commerce";
 const TOPICS = ["order.*"];
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -69,8 +69,8 @@ class Endpoints implements WebhookSender {
 
   async post(request: WebhookPost): Promise<WebhookPostResult> {
     const event = parseWebhookEvent(JSON.parse(request.body));
-    const timestamp = request.headers["x-underclerk-timestamp"] ?? "";
-    const signatures = (request.headers["x-underclerk-signature"] ?? "").split(
+    const timestamp = request.headers["x-commerce-timestamp"] ?? "";
+    const signatures = (request.headers["x-commerce-signature"] ?? "").split(
       ",",
     );
     const expected = `v1=${createHmac(

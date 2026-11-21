@@ -169,7 +169,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     buyer.requestCustomerSignIn(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -178,7 +178,7 @@ async function signIn(
   return (
     await required(
       buyer.verifyCustomerSignIn(merchantId, STOREFRONT, challenge.challengeId, {
-        schemaVersion: "underclerk.verify-customer-sign-in.v1",
+        schemaVersion: "commerce.verify-customer-sign-in.v1",
         code,
       }),
     )

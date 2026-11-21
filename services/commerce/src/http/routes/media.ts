@@ -52,7 +52,7 @@ async function mediaCommand(
         await ctx.media
           .delete(mediaObjectKey(route.merchantId, before.sha256))
           .catch((error: unknown) =>
-            console.warn("underclerk.media_delete_failed", errorMessage(error)),
+            console.warn("commerce.media_delete_failed", errorMessage(error)),
           );
       }
       return result;

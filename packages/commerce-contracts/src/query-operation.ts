@@ -92,7 +92,7 @@ const aggregationQueryPlanOperationSchema = OpenObject({
   aggregation: commerceAggregationSchema,
 });
 const commerceContextQueryPlanOperationSchema = OpenObject({
-  kind: Type.Literal("underclerk_context"),
+  kind: Type.Literal("commerce_context"),
   selection: commerceContextSelectionSchema,
   traversal: commerceTraversalLimitsSchema,
   allowedSensitivity: Type.Enum([
@@ -162,7 +162,7 @@ const operationWire = Type.Union([
     aggregation: Type.Unknown(),
   }),
   OpenObject({
-    kind: Type.Literal("underclerk_context"),
+    kind: Type.Literal("commerce_context"),
     selection: Type.Unknown(),
     traversal: Type.Unknown(),
     allowedSensitivity: Type.Enum([
@@ -259,7 +259,7 @@ export function parseCommerceQueryPlanOperation(
         },
       };
     }
-    case "underclerk_context": {
+    case "commerce_context": {
       const traversal = parseTraversal(operation.traversal);
       if (!traversal.ok) return traversal;
       const selection = parseCommerceContextSelection(operation.selection);
@@ -281,7 +281,7 @@ export function parseCommerceQueryPlanOperation(
       return {
         ok: true,
         value: {
-          kind: "underclerk_context",
+          kind: "commerce_context",
           selection: selection.value,
           traversal: traversal.value,
           allowedSensitivity: operation.allowedSensitivity,

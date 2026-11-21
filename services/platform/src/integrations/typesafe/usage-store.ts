@@ -73,7 +73,7 @@ export function readMonthlyPantryTypeSafeCost(
       `SELECT COALESCE(SUM(CASE
         WHEN settlement_state = 'settled' AND estimated_cost_microusd IS NOT NULL
         THEN estimated_cost_microusd ELSE reserved_cost_microusd END), 0) AS cost
-      FROM typesafe_evaluation WHERE organisation_id = ? AND funding = 'satyr_platform'
+      FROM typesafe_evaluation WHERE organisation_id = ? AND funding = 'pantry_platform'
         AND reserved_at >= ? AND reserved_at < ?`,
       organisationId,
       month.start,
@@ -93,7 +93,7 @@ export function readRecentPantryTypeSafeCount(
   const row = sql
     .exec<{ count: number }>(
       `SELECT COUNT(*) AS count FROM typesafe_evaluation
-      WHERE organisation_id = ? AND funding = 'satyr_platform' AND reserved_at > ?`,
+      WHERE organisation_id = ? AND funding = 'pantry_platform' AND reserved_at > ?`,
       organisationId,
       now - 1_000,
     )
@@ -170,7 +170,7 @@ function typeSafeEvaluationTable(name: string): string {
     evaluation_id TEXT NOT NULL,
     request_digest TEXT NOT NULL,
     policy_revision INTEGER NOT NULL,
-    funding TEXT CHECK (funding IN ('satyr_platform', 'organisation_byo')),
+    funding TEXT CHECK (funding IN ('pantry_platform', 'organisation_byo')),
     connection_revision INTEGER CHECK (connection_revision > 0),
     disclosure_decision_digest TEXT,
     input_bytes INTEGER NOT NULL CHECK (input_bytes > 0),

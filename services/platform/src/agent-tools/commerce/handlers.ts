@@ -133,7 +133,7 @@ export async function prepareCommerceReadForEmbeddedHarness(
     throw new Error(`${label} provider authority unavailable`);
   }
   if (!binding.ok) {
-    throw new Error(`${label} Underclerk binding unavailable`);
+    throw new Error(`${label} Commerce binding unavailable`);
   }
   if (!grants.ok) {
     throw new Error(`${label} source policy unavailable`);
@@ -177,27 +177,27 @@ export async function prepareCommerceReadForEmbeddedHarness(
     throw new Error(`${label} information-flow admission denied`);
   }
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    throw new Error(`${label} Underclerk unavailable`);
+    throw new Error(`${label} Commerce unavailable`);
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(organisationId),
         admittedSessionOperation(
           execution,
           lease,
-          env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+          env.COMMERCE.fetch.bind(env.COMMERCE),
         ),
       ),
     });
   } catch {
-    throw new Error(`${label} Underclerk unavailable`);
+    throw new Error(`${label} Commerce unavailable`);
   }
   const commerceEngine = new CommerceEngineSource({
     organisationId: String(organisationId),
@@ -209,7 +209,7 @@ export async function prepareCommerceReadForEmbeddedHarness(
     commerceSystem: commerceAuthority.value.commerceSystem,
     organisationId,
     merchantId,
-    underclerk: commerceEngine,
+    commerce: commerceEngine,
     organisation: async () =>
       admittedBlotterReader(
         execution,
@@ -245,7 +245,7 @@ function observedCommerceEntities(
     // Commerce graph references use provider IDs; actions use canonical IDs.
     const entityId =
       isSystemCommerceEntity(entity) &&
-      entity.provenance.source === "underclerk"
+      entity.provenance.source === "commerce"
         ? commerceCanonicalResourceId(merchantId, entity.reference.entityId)
         : entity.reference.entityId;
     observed.push({
@@ -442,7 +442,7 @@ export async function readCounterSaleForEmbeddedHarness(
   const view = loaded.value;
   const value: CounterSaleToolRead = {
     checkoutId: view.checkoutId,
-    satyrLocationId: view.satyrLocationId,
+    pantryLocationId: view.pantryLocationId,
     state: view.state,
     collectable: view.collectable,
     orderId: view.orderId,
@@ -660,7 +660,7 @@ function orderQueueAdvanceRefusal(
     return null;
   }
   switch (moved.code) {
-    case "underclerk_unavailable":
+    case "commerce_unavailable":
       throw new Error("order queue unavailable");
     case "order_queue_changed":
       return "That order is not at that step now, or it left the queue. An order must be ready before it is handed over. Nothing changed. Call order_queue_read, and tell the person what you see.";
@@ -682,7 +682,7 @@ function soldOutMarkRefusal(marked: SoldOutMarkResult): string | null {
     return null;
   }
   switch (marked.code) {
-    case "underclerk_unavailable":
+    case "commerce_unavailable":
       throw new Error("sold out marks unavailable");
     case "sold_out_item_not_on_menu":
       return "That item is not on the published café menu. Nothing changed. Call sold_out_read for the items on the menu.";
@@ -812,7 +812,7 @@ async function readProductSalesForEmbeddedHarness(
   });
   if (
     !authority.ok ||
-    authority.value.commerceSystem.kind !== "satyr_commerce"
+    authority.value.commerceSystem.kind !== "builtin_commerce"
   ) {
     return unavailable;
   }
@@ -848,7 +848,7 @@ async function readProductSalesForEmbeddedHarness(
     admittedSessionOperation(
       execution,
       lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
     {
       kind: "organisation",
@@ -909,7 +909,7 @@ async function readStockShortagesForEmbeddedHarness(
   });
   if (
     !authority.ok ||
-    authority.value.commerceSystem.kind !== "satyr_commerce"
+    authority.value.commerceSystem.kind !== "builtin_commerce"
   ) {
     return unavailable;
   }
@@ -937,7 +937,7 @@ async function readStockShortagesForEmbeddedHarness(
     admittedSessionOperation(
       execution,
       lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
     {
       kind: "organisation",

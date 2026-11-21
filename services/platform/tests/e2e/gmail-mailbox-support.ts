@@ -83,7 +83,7 @@ export async function connectGmailMailbox(
     authorizationProduct: "full_mailbox_pilot",
     providerSubjectId: label,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle.value },
     grantedScopes: GMAIL_FULL_MAILBOX_SCOPES,
     createdByUserId: owner.userId,

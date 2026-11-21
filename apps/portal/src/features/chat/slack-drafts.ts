@@ -75,7 +75,7 @@ async function slackDraftMutation(
   path: string,
   body: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to act on this draft.");
   return slackDraftResult(controlWrite(path, "POST", body));
 }

@@ -102,7 +102,7 @@ async function readCatalogNames(shop: Shop): Promise<string[] | null> {
       shop.merchantId,
       CAFE_STOREFRONT_ID,
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );

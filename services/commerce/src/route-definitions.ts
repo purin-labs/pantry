@@ -20,7 +20,7 @@ export type RouteDefinition<Route extends AnyRoute = AnyRoute> = Readonly<{
    * path parameters, the `Idempotency-Key` header, its clock and this
    * version.
    */
-  command?: `underclerk.${string}.v${number}`;
+  command?: `commerce.${string}.v${number}`;
 }>;
 
 type PathParameterNames<Path extends string> =

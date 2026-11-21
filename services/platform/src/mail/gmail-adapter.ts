@@ -1165,7 +1165,7 @@ async function gmailUploadSend(
   const message = decodeBase64(standardBase64(input.raw));
   if (message === null)
     return { ok: false, error: { code: "gmail_response_invalid" } };
-  const boundary = `satyr_upload_${crypto.randomUUID()}`;
+  const boundary = `pantry_upload_${crypto.randomUUID()}`;
   const encoder = new TextEncoder();
   const head = encoder.encode(
     `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ threadId: input.threadId })}\r\n--${boundary}\r\nContent-Type: message/rfc822\r\n\r\n`,

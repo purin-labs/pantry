@@ -11,15 +11,15 @@ Its SVG files and its icon pack are in `docs/brand/purin-logo`, and the Portal
 components are `PurinMark` and `PurinIcon` in `src/ui`. Nothing in this folder
 uses it yet: the goat files stay in use until the brand switch.
 
-`satyr-mark.png` is the canonical 1024 px transparent source asset.
+`pantry-mark.png` is the canonical 1024 px transparent source asset.
 
 Keep the compact ram-head mark on navigation, favicons, application icons,
 and formal product surfaces.
 
 The exported PNG families preserve the same silhouette and transparent canvas:
 
-- `satyr-mark-dark-{size}.png` uses a black mark for light surfaces.
-- `satyr-mark-light-{size}.png` uses a white mark for dark surfaces.
+- `pantry-mark-dark-{size}.png` uses a black mark for light surfaces.
+- `pantry-mark-light-{size}.png` uses a white mark for dark surfaces.
 
 Available sizes are 1024, 512, 256, 192, 128, 64, and 32 pixels.
 

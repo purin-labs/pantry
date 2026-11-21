@@ -103,7 +103,7 @@ export function arrivalLabel(message: EvalScenario["message"]): string {
 }
 
 export const EVAL_ROUTES: readonly EvalRoute[] = [
-  "satyr_platform",
+  "pantry_platform",
   "claude_oauth",
   "codex_subscription",
   "organisation_openai_api_key",
@@ -112,7 +112,7 @@ export const EVAL_ROUTES: readonly EvalRoute[] = [
 
 export function routeLabel(route: EvalRoute): string {
   switch (route) {
-    case "satyr_platform":
+    case "pantry_platform":
       return "Seams AI";
     case "claude_oauth":
       return "Claude OAuth";

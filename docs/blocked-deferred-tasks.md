@@ -6,26 +6,26 @@ and completion criteria.
 
 ## Plan 32 — WhatsApp customer support
 
-Deferred on 2026-09-08 while Satyr waits for Meta to permit external customer
+Deferred on 2026-09-08 while Pantry waits for Meta to permit external customer
 onboarding.
 
 ### Meta approval dependencies
 
 - Finish the Japanese company incorporation.
-- Update the Meta Business Portfolio and Satyr's public policies with the final
+- Update the Meta Business Portfolio and Pantry's public policies with the final
   legal entity name, address, and company support contact.
 - Complete Meta Business Verification and any required Access Verification.
 - Submit App Review for `business_management`,
   `whatsapp_business_management`, and `whatsapp_business_messaging`.
-- Obtain Advanced Access and permission to onboard businesses outside Satyr's
+- Obtain Advanced Access and permission to onboard businesses outside Pantry's
   Meta app roles.
-- Confirm that each organisation can fund its own WhatsApp account without Satyr
+- Confirm that each organisation can fund its own WhatsApp account without Pantry
   sharing a credit line.
 
 ### Resume after approval
 
 - Complete Embedded Signup with an organisation-owned test business and verify that
-  Satyr stores its organisation-specific credential.
+  Pantry stores its organisation-specific credential.
 - Cut the existing test connection over from its legacy credential only after
   the organisation credential, WABA subscription, and one inbound message are proven.
 - Run the controlled live recovery drill: stage a second known-good signup,
@@ -57,7 +57,7 @@ unfinished.
 
 - Obtain Wise enterprise approval for API funding and statement access on the
   Japanese business profile.
-- Obtain GMO Aozora's written acceptance of Satyr's production access arrangement.
+- Obtain GMO Aozora's written acceptance of Pantry's production access arrangement.
 - Obtain the approved provider's credentials and contracted API specifications.
 
 ### Resume per provider after approval
@@ -81,7 +81,7 @@ Deferred by the user on 2026-09-08. P33C is complete for the agreed Sandbox scop
 including exact-binding certification. Resume these tasks only when requested:
 
 - **Distinct-seller isolation:** connect a distinct Sandbox seller to the second
-  Satyr organisation and verify payment authority, refresh, and revocation isolation.
+  Pantry organisation and verify payment authority, refresh, and revocation isolation.
   Both current connections use the Japan seller. Preserve them until replacement
   is explicitly undertaken; a separate Square login may not be necessary.
 - **Physical Terminal/live certification:** after the Sandbox release gates pass,
@@ -95,7 +95,7 @@ Sandbox completion does not imply production readiness.
 
 ## Deferred product proposals
 
-These documents remain discoverable outside the active BakeryOS/CafeOS delivery
+These documents remain discoverable outside the active Kitchen/Café delivery
 sequence. Their existence creates no implementation requirement.
 
 | Proposal                                                                 | Current boundary and resume condition                                                                                              |

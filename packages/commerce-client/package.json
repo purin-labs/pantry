@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Underclerk's typed commerce client: wire parsers and the admin and storefront API clients.",
+  "description": "Commerce's typed commerce client: wire parsers and the admin and storefront API clients.",
   "exports": {
     ".": {
       "types": "./src/index.ts",

@@ -27,12 +27,12 @@ const kindName = Type.String({
 });
 const identifier = Type.String({ minLength: 1, maxLength: 200 });
 
-/** The navigation group of a Portal page. `BakeryOS` shows as Kitchen. */
+/** The navigation group of a Portal page. `kitchen` shows as Kitchen. */
 export const surfaceAreaSchema = Type.Union([
   Type.Literal("Workspace"),
-  Type.Literal("AgentCommerce"),
-  Type.Literal("CafeOS"),
-  Type.Literal("BakeryOS"),
+  Type.Literal("commerce"),
+  Type.Literal("cafe"),
+  Type.Literal("kitchen"),
   Type.Literal("Agents"),
   Type.Literal("Settings"),
 ]);
@@ -111,9 +111,9 @@ export type SurfaceArea = Static<typeof surfaceAreaSchema>;
  */
 const SURFACE_AREA_TITLES: Readonly<Record<SurfaceArea, string>> = {
   Workspace: "Workspace",
-  AgentCommerce: "Commerce",
-  CafeOS: "Café",
-  BakeryOS: "Kitchen",
+  commerce: "Commerce",
+  cafe: "Café",
+  kitchen: "Kitchen",
   Agents: "Agents",
   Settings: "Settings",
 };
@@ -152,9 +152,9 @@ export function surfaceObservationBytes(
 
 const SURFACE_AREAS: ReadonlySet<unknown> = new Set<SurfaceArea>([
   "Workspace",
-  "AgentCommerce",
-  "CafeOS",
-  "BakeryOS",
+  "commerce",
+  "cafe",
+  "kitchen",
   "Agents",
   "Settings",
 ]);

@@ -245,7 +245,7 @@ class SteraGatewayDesk extends StaffDesk {
   publishPosPolicy() {
     return required(
       this.admin.publishPointOfSaleConfiguration({
-        schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+        schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
         merchantId,
         expectedRevision: null,
         publishedAt: NOW,
@@ -253,7 +253,7 @@ class SteraGatewayDesk extends StaffDesk {
         configuration: {
           configurationId: "pos_configuration_stera",
           organisationId,
-          satyrLocationId: LOCATION,
+          pantryLocationId: LOCATION,
           salesChannelId: CHANNEL,
           currency: "JPY",
           supportedItems: [],
@@ -290,7 +290,7 @@ class SteraGatewayDesk extends StaffDesk {
     return this.apply(
       this.admin.createInPersonCheckout({
         ...(await this.base(`open_${checkoutId}`)),
-        satyrLocationId: LOCATION,
+        pantryLocationId: LOCATION,
         posConfigurationRevision: 1,
         operatorIdentity: "operator_barista",
         terminalAssignmentRevision,

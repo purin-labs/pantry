@@ -87,7 +87,7 @@ const NOT_REACHED: Readonly<Record<string, string>> = {
   "order * prepare":
     "checkout-persistence.test.ts prepares food-service tickets for a pickup order",
   "order * resolve_cancellation":
-    "Underclerk resolves a cancellation's refund itself, inside cancel_order",
+    "Commerce resolves a cancellation's refund itself, inside cancel_order",
   "order fulfilled exchange":
     "exchange-journey.test.ts exchanges received units of a fulfilled order",
   "order fulfilled pay_balance":
@@ -99,17 +99,17 @@ const NOT_REACHED: Readonly<Record<string, string>> = {
   "payment refunded record_dispute":
     "stripe-after-sale-journey.test.ts records a dispute of a refunded card payment",
   "payment captured refund_part":
-    "Underclerk moves the payment when the provider answers a refund; this journey refunds through request_refund",
+    "Commerce moves the payment when the provider answers a refund; this journey refunds through request_refund",
   "payment captured refund_rest":
-    "Underclerk moves the payment when the provider answers a refund; this journey refunds through request_refund",
+    "Commerce moves the payment when the provider answers a refund; this journey refunds through request_refund",
   "payment partially_refunded refund_part":
-    "Underclerk moves the payment when the provider answers a refund; this journey refunds through request_refund",
+    "Commerce moves the payment when the provider answers a refund; this journey refunds through request_refund",
   "payment partially_refunded refund_rest":
-    "Underclerk moves the payment when the provider answers a refund; this journey refunds through request_refund",
+    "Commerce moves the payment when the provider answers a refund; this journey refunds through request_refund",
   "payment refunded refund_part":
-    "Underclerk moves the payment only inside a refund, which request_refund already refuses",
+    "Commerce moves the payment only inside a refund, which request_refund already refuses",
   "payment refunded refund_rest":
-    "Underclerk moves the payment only inside a refund, which request_refund already refuses",
+    "Commerce moves the payment only inside a refund, which request_refund already refuses",
   "refund_attempt requested *":
     "The deterministic gateway answers a refund inside the request; stripe-after-sale-journey.test.ts holds a refund open",
   "refund_attempt processing *":
@@ -591,7 +591,7 @@ async function refresh(
     record.checkoutId,
     record.token,
     {
-      schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
       idempotencyKey: `${record.name}_refresh_${record.revision}`,
       checkoutRevision: record.revision,
       quoteDigest: record.quoteDigest,
@@ -661,7 +661,7 @@ class MachineDesk extends OrderDesk {
     if (attempt === undefined) throw new Error(`${record.name} has no attempt`);
     return this.edit(
       this.admin.observePaymentDispute({
-        schemaVersion: "underclerk.observe-payment-dispute.v1",
+        schemaVersion: "commerce.observe-payment-dispute.v1",
         organisationId,
         merchantId,
         providerDeliveryId: `${reference}_${at}_${lifecycle.state}`,

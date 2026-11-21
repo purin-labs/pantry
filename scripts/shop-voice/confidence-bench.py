@@ -9,7 +9,7 @@ real room.
 
 Run it with the Mac service's Python, because that one has mlx_whisper:
 
-    ~/.satyr-voice/venv/bin/python scripts/shop-voice/confidence-bench.py
+    ~/.pantry-voice/venv/bin/python scripts/shop-voice/confidence-bench.py
 
 SHOP_VOICE_WORKERS_AI_URL sends each clip to Whisper on Workers AI instead, the Platform's fallback, through
 a Worker that returns the model's whole answer. The fallback uses the same engine rule
@@ -55,7 +55,7 @@ from shop_voice.engines import qwen3_mlx, whisper_mlx  # noqa: E402
 
 # The Mac's own Whisper files, in their engine folder since service 0.4.0.
 MODEL = state.engine_dir(whisper_mlx.ID)
-NOISE = Path(os.environ.get("SHOP_VOICE_NOISE", Path.home() / ".satyr-voice-test/wake/noise-test.npz"))
+NOISE = Path(os.environ.get("SHOP_VOICE_NOISE", Path.home() / ".pantry-voice-test/wake/noise-test.npz"))
 RESULTS = ROOT / "output/shop-voice" / os.environ.get("SHOP_VOICE_RESULTS", "confidence-bench.json")
 WORKERS_AI_URL = os.environ.get("SHOP_VOICE_WORKERS_AI_URL")
 QWEN3 = os.environ.get("SHOP_VOICE_QWEN3")

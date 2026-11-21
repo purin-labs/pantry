@@ -16,11 +16,11 @@ import { PlanJourney } from "./production-plan-support";
 
 declare module "vitest" {
   interface TaskMeta {
-    underclerkWebhookCatchUp?: Record<string, unknown>;
+    commerceWebhookCatchUp?: Record<string, unknown>;
   }
 }
 
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 
 it(
   "catches up through signed webhook posts, refuses a post it cannot verify, and takes a new secret after losing its own",
@@ -35,7 +35,7 @@ it(
  * Pantry's feed cursor reaches the newest event from the posts alone. A post
  * that a stranger signs is refused. When Pantry loses its secret, the posts
  * it cannot verify start no read; the next one-minute run takes a new
- * secret, and the next change arrives by post again. With the CafeOS
+ * secret, and the next change arrives by post again. With the Café
  * acceptance fault armed, the next post fails at its queue step and starts
  * no read; the one-minute read still brings Pantry up to date.
  */
@@ -55,7 +55,7 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
   );
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -67,8 +67,8 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
   await runScheduledCommerceOutboxReconciliation(env, Date.now());
   const subscribed = await subscription(merchantId);
   expect(subscribed).toMatchObject({
-    id: "satyr",
-    url: `https://localhost/hook/underclerk/${organisationId}`,
+    id: "pantry",
+    url: `https://localhost/hook/commerce/${organisationId}`,
     topics: ["*"],
     state: "active",
   });
@@ -121,7 +121,7 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
 
   // 3. A post that a stranger signs is refused.
   const forgedBody = JSON.stringify({
-    schemaVersion: "underclerk.webhook-event.v1",
+    schemaVersion: "commerce.webhook-event.v1",
     eventId: "event_forged",
     kind: "order.created",
     merchantId,
@@ -135,7 +135,7 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
   // 4. Pantry loses its secret: the next post starts no read.
   await fixtureDatabase()
     .prepare(
-      "UPDATE underclerk_webhook_subscription SET sealed_secret = ? WHERE organisation_id = ?",
+      "UPDATE commerce_webhook_subscription SET sealed_secret = ? WHERE organisation_id = ?",
     )
     .bind("AAAAAAAAAAAAAAAA.AAAA", organisationId)
     .run();
@@ -192,9 +192,9 @@ async function webhookCatchUpJourney({ task }: TestContext): Promise<void> {
     .poll(() => consumer(merchantId), { timeout: 30_000 })
     .toBe(faulted[0]);
 
-  task.meta.underclerkWebhookCatchUp = {
+  task.meta.commerceWebhookCatchUp = {
     subscription: {
-      url: "https://localhost/hook/underclerk/:organisationId",
+      url: "https://localhost/hook/commerce/:organisationId",
       topics: subscribed.topics,
     },
     changesByPost: changes.length,
@@ -230,12 +230,12 @@ async function post(
     ),
   );
   return exports.default.fetch(
-    new Request(`https://localhost/hook/underclerk/${organisationId}`, {
+    new Request(`https://localhost/hook/commerce/${organisationId}`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-underclerk-timestamp": timestamp,
-        "x-underclerk-signature": `v1=${[...signature]
+        "x-commerce-timestamp": timestamp,
+        "x-commerce-signature": `v1=${[...signature]
           .map((byte) => byte.toString(16).padStart(2, "0"))
           .join("")}`,
       },
@@ -255,8 +255,8 @@ type Subscription = Readonly<{
 }>;
 
 async function subscription(merchantId: string): Promise<Subscription> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/webhook-subscriptions`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/webhook-subscriptions`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();
@@ -270,8 +270,8 @@ async function subscription(merchantId: string): Promise<Subscription> {
 }
 
 async function consumer(merchantId: string): Promise<string> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/feed-consumers/satyr`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/feed-consumers/pantry`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();
@@ -285,8 +285,8 @@ async function eventsAfter(
   merchantId: string,
   after: string,
 ): Promise<string[]> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/events?after=${encodeURIComponent(after)}&limit=200`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/events?after=${encodeURIComponent(after)}&limit=200`,
     { headers: { authorization: OPERATOR } },
   );
   const body = (await response.json()) as { events: { cursor: string }[] };
@@ -300,8 +300,8 @@ async function requestCounts(
   merchantId: string,
   method: "GET" | "DELETE",
 ): Promise<Record<string, number>> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-request-counts`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-request-counts`,
     { method, headers: { authorization: OPERATOR } },
   );
   return (await response.json()) as Record<string, number>;

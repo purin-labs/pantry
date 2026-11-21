@@ -683,8 +683,8 @@ async function resolveArchiveAuthority(
           `SELECT
            (SELECT COUNT(*) FROM service_role_grant
             WHERE organisation_id = ? AND status = 'active') AS activeMembershipCount,
-           (SELECT COUNT(*) FROM underclerk_merchant_binding
-            WHERE organisation_id = ?) AS underclerkBindingCount,
+           (SELECT COUNT(*) FROM commerce_merchant_binding
+            WHERE organisation_id = ?) AS commerceBindingCount,
            (SELECT COUNT(*) FROM integration_account
             WHERE organisation_id = ? AND provider = 'shopify'
               AND lifecycle = 'active' AND is_default_for_provider = 1) AS activeShopifyCount`,
@@ -696,11 +696,11 @@ async function resolveArchiveAuthority(
         )
         .first<{
           readonly activeMembershipCount: unknown;
-          readonly underclerkBindingCount: unknown;
+          readonly commerceBindingCount: unknown;
           readonly activeShopifyCount: unknown;
         }>();
       return guard?.activeMembershipCount === 0 &&
-        guard.underclerkBindingCount === 0 &&
+        guard.commerceBindingCount === 0 &&
         guard.activeShopifyCount === 0
         ? {
             ok: true,

@@ -177,7 +177,7 @@ message is sent, so a withheld page is not stored, and again at turn time. The
 conversation response sends only the page name of a message, never its view.
 A page joins the shared list only after its control route is checked; a page
 that needs more than the viewer role first needs a check of each reader.
-Since phase 2 the Satyr Kitchen view is the `state` of its observation
+Since phase 2 the Kitchen view is the `state` of its observation
 (`chat/kitchen-observation.ts`), so the same rule covers it, in the prompt's
 Kitchen block too. The Kitchen is not on the shared list, because some of its
 reads need the admin role. With the chip off on the Kitchen page, the message

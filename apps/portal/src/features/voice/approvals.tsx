@@ -32,7 +32,7 @@ async function readPhrase(
   target: VoiceConfirmationTarget,
 ): Promise<VoiceConfirmation | null> {
   // Without a session Pantry refuses the phrase.
-  if (readCookie("satyr_control_csrf") === null) return null;
+  if (readCookie("pantry_csrf") === null) return null;
   try {
     return parseVoiceConfirmation(
       await controlWrite(

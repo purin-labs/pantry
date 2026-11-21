@@ -1,9 +1,9 @@
-# Satyr Vault Operations
+# Seams Vault Operations
 
 Status: Active operator runbook
 Last reviewed: 2026-08-03
 
-Satyr Vault stores organisation provider credentials and organisation-owned model keys as
+Seams Vault stores organisation provider credentials and organisation-owned model keys as
 encrypted D1 records. Cloudflare Secrets Store holds the versioned root keys.
 Trusted platform code resolves a credential only after checking its exact
 organisation, provider account, environment, generation, purpose, and current policy
@@ -43,7 +43,7 @@ Apply production D1 migrations explicitly before deploying a Worker that
 depends on them:
 
 ```bash
-pnpm --filter @purin-labs/platform exec wrangler d1 migrations apply satyr --remote
+pnpm --filter @purin-labs/platform exec wrangler d1 migrations apply pantry --remote
 pnpm --filter @purin-labs/platform run deploy
 ```
 

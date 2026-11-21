@@ -29,7 +29,7 @@ export type RecipeClock = Readonly<{ timeS: number; reachedS: number }>;
 
 export type RecipeSurface = "factory" | "workflow" | "split";
 
-const SPLIT_STORAGE_KEY = "satyr-recipe-split-percent";
+const SPLIT_STORAGE_KEY = "pantry-recipe-split-percent";
 const DEFAULT_SPLIT_PERCENT = 48;
 const MIN_SPLIT_PERCENT = 30;
 const MAX_SPLIT_PERCENT = 68;

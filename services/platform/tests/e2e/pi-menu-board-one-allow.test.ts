@@ -113,7 +113,7 @@ it(
         kind: "surface-observation",
         schemaVersion: 2,
         surface: "menus",
-        area: "CafeOS",
+        area: "cafe",
         instance: null,
         title: pageView.title,
         path: pageView.path,

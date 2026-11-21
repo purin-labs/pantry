@@ -79,7 +79,7 @@ export type CommerceOrderChangeV1 =
 
 /** Staff exchange the received lines of a return for new lines. */
 export type ExchangeCommerceOrderLinesV1 = Readonly<{
-  schemaVersion: "underclerk.exchange-order-lines.v1";
+  schemaVersion: "commerce.exchange-order-lines.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -105,7 +105,7 @@ export type CommerceOrderBalanceV1 = Readonly<{
 }>;
 
 export type CommerceOrderChangesV1 = Readonly<{
-  schemaVersion: "underclerk.order-changes.v1";
+  schemaVersion: "commerce.order-changes.v1";
   orderId: string;
   orderRevision: number;
   changes: readonly CommerceOrderChangeV1[];
@@ -113,7 +113,7 @@ export type CommerceOrderChangesV1 = Readonly<{
 }>;
 
 export type EditCommerceOrderV1 = Readonly<{
-  schemaVersion: "underclerk.edit-order.v1";
+  schemaVersion: "commerce.edit-order.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -132,7 +132,7 @@ export type EditCommerceOrderV1 = Readonly<{
  * `expectedOrderRevision`.
  */
 export type RecordCommerceOrderManualPaymentV1 = Readonly<{
-  schemaVersion: "underclerk.record-order-manual-payment.v1";
+  schemaVersion: "commerce.record-order-manual-payment.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -145,11 +145,11 @@ export type RecordCommerceOrderManualPaymentV1 = Readonly<{
 
 /** The buyer's request to pay an order balance, sent with the order link. */
 export type OpenCommerceBuyerOrderBalanceV1 = Readonly<{
-  schemaVersion: "underclerk.open-buyer-order-balance.v1";
+  schemaVersion: "commerce.open-buyer-order-balance.v1";
 }>;
 
 export type CommerceOrderBalanceCheckoutV1 = Readonly<{
-  schemaVersion: "underclerk.order-balance-checkout.v1";
+  schemaVersion: "commerce.order-balance-checkout.v1";
   session: Readonly<{ token: string; expiresAt: CommerceEngineTimestamp }>;
   checkout: CommerceBuyerQuotedCheckoutV1;
 }>;

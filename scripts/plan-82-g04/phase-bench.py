@@ -10,7 +10,7 @@ DEMAND test part, so the numbers compare the phase counts and do not predict a r
 
 Run it with the wake bench's Python (onnxruntime, numpy, scipy):
 
-    ~/.satyr-voice-test/wake/.venv/bin/python scripts/plan-82-g04/phase-bench.py
+    ~/.pantry-voice-test/wake/.venv/bin/python scripts/plan-82-g04/phase-bench.py
 
 Results: output/shop-voice/wake-phase-bench.json
 """
@@ -28,7 +28,7 @@ import onnxruntime as ort
 
 ROOT = Path(__file__).resolve().parents[2]
 MODELS = ROOT / "apps/portal/public/voice"
-NOISE = Path(os.environ.get("WAKE_PHASE_NOISE", Path.home() / ".satyr-voice-test/wake/noise-test.npz"))
+NOISE = Path(os.environ.get("WAKE_PHASE_NOISE", Path.home() / ".pantry-voice-test/wake/noise-test.npz"))
 RESULTS = ROOT / "output/shop-voice/wake-phase-bench.json"
 RATE = 16_000
 CHUNK = 1280

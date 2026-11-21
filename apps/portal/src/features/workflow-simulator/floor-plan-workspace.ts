@@ -37,7 +37,7 @@ export type {
   SimulatorHistorySnapshot,
 };
 
-const FLOOR_PLAN_WORKSPACE_STORAGE_KEY = "satyr:floor-plan-workspace:v1";
+const FLOOR_PLAN_WORKSPACE_STORAGE_KEY = "pantry:floor-plan-workspace:v1";
 
 function isFloorPlanId(value: unknown): value is BakeryFloorPlanId {
   for (const id of BAKERY_FLOOR_PLAN_ORDER) {

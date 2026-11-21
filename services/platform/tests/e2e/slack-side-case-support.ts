@@ -128,7 +128,7 @@ export function sideCaseSlack(): {
         async function respondToClick({ request }) {
           const body: unknown = await request.json();
           if (!isRecord(body) || body.response_type !== "ephemeral")
-            throw new Error("Satyr answered a click for everyone");
+            throw new Error("Pantry answered a click for everyone");
           ephemeral.push(String(body.text));
           return HttpResponse.text("ok");
         },
@@ -179,7 +179,7 @@ export function startButtonValue(call: SlackCall): string | null {
     for (const element of block.elements)
       if (
         isRecord(element) &&
-        element.action_id === "satyr_side_case_start" &&
+        element.action_id === "pantry_side_case_start" &&
         typeof element.value === "string"
       )
         return element.value;
@@ -214,7 +214,7 @@ export function signedStartClick(
 ): Promise<Request> {
   return signedButtonClick({
     ...input,
-    actionId: "satyr_side_case_start",
+    actionId: "pantry_side_case_start",
     value: input.proposalId,
   });
 }
@@ -258,7 +258,7 @@ export async function signedButtonClick(
       {
         type: "button",
         action_id: input.actionId,
-        block_id: "satyr_card",
+        block_id: "pantry_card",
         value: input.value,
         action_ts: "1787500200.000001",
       },

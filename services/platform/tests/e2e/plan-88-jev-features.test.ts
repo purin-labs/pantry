@@ -34,7 +34,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { addOrganisationMember } from "./organisation-fixture";
 import { controlFetch } from "./chat-journey-support";
 
-const SATYR_KEY = "typesafe-satyr-e2e-key-0000000000";
+const PANTRY_KEY = "typesafe-pantry-e2e-key-0000000000";
 const OWN_KEY = "typesafe-own-e2e-key-00000000000";
 const RULE = {
   kind: "categorize",
@@ -47,7 +47,7 @@ type Client = Awaited<ReturnType<typeof commerceClient>>;
 type TypeSafeCall = Readonly<{ key: string; purpose: "probe" | "mail" }>;
 
 it(
-  "J1 and J2: an Organisation with no TypeSafe key sorts mail with Satyr's key, and a switch turned off stops its feature for admins only",
+  "J1 and J2: an Organisation with no TypeSafe key sorts mail with Pantry's key, and a switch turned off stops its feature for admins only",
   noKeyJourney,
   120_000,
 );
@@ -144,7 +144,7 @@ function seedPantryUse(
       connection_revision, disclosure_decision_digest, input_bytes, reserved_input_tokens,
       reserved_wall_ms, reserved_cost_microusd, estimated_cost_microusd, input_tokens,
       output_tokens, reserved_at, expires_at, state, settlement_state, failure_code
-    ) VALUES (?, 'case_context_discovery_relationship', ?, ?, 1, 'satyr_platform', NULL, ?, 100, 100,
+    ) VALUES (?, 'case_context_discovery_relationship', ?, ?, 1, 'pantry_platform', NULL, ?, 100, 100,
       1000, ?, ?, 100, 0, ?, ?, 'evaluated', 'settled', NULL)`,
     organisationId,
     evaluationId,
@@ -197,12 +197,12 @@ async function seedHourLedger(
   state: DurableObjectState,
 ): Promise<void> {
   const rows: readonly [string, string, string, number][] = [
-    ["mail_classification", "hour-mail-1", "satyr_platform", 120],
-    ["mail_classification", "hour-mail-2", "satyr_platform", 30],
+    ["mail_classification", "hour-mail-1", "pantry_platform", 120],
+    ["mail_classification", "hour-mail-2", "pantry_platform", 30],
     [
       "case_context_discovery_relationship",
       "hour-related-1",
-      "satyr_platform",
+      "pantry_platform",
       70,
     ],
     ["mail_classification", "hour-own-key", "organisation_byo", 500],
@@ -325,7 +325,7 @@ function seedTokenUse(
       connection_revision, disclosure_decision_digest, input_bytes, reserved_input_tokens,
       reserved_wall_ms, reserved_cost_microusd, estimated_cost_microusd, input_tokens,
       output_tokens, reserved_at, expires_at, state, settlement_state, failure_code
-    ) VALUES (?, 'case_context_discovery_relationship', ?, ?, 1, 'satyr_platform', NULL, ?,
+    ) VALUES (?, 'case_context_discovery_relationship', ?, ?, 1, 'pantry_platform', NULL, ?,
       100, 100, 1000, ?, ?, ?, 0, ?, ?, 'evaluated', 'settled', NULL)`,
     organisationId,
     evaluationId,
@@ -348,7 +348,7 @@ async function noKeyJourney(): Promise<void> {
   // J1: no key of its own; Pantry's key funds Jev, and every switch starts off.
   const initial = await features(organisationId, owner.session);
   expect(initial).toMatchObject({
-    funding: "satyr_platform",
+    funding: "pantry_platform",
     keyAvailable: true,
     mailClassification: {
       enabled: false,
@@ -378,13 +378,13 @@ async function noKeyJourney(): Promise<void> {
       { messageId: "m1", ruleId: "rule_supplier", outcome: "matched" },
     ],
   });
-  expect(calls).toEqual([{ key: SATYR_KEY, purpose: "mail" }]);
+  expect(calls).toEqual([{ key: PANTRY_KEY, purpose: "mail" }]);
   // No key of the Organisation exists, so no Vault key was read.
   expect(await typeSafeVaultSecrets(organisationId)).toBe(0);
 
   // J2: a non-admin reads the switches but cannot change one.
   expect((await features(organisationId, operator.session)).funding).toBe(
-    "satyr_platform",
+    "pantry_platform",
   );
   const refused = await post(organisationId, operator.session, {
     feature: "related_cases",
@@ -439,8 +439,8 @@ async function noKeyJourney(): Promise<void> {
   ]);
   expect(stillSorted.status, await stillSorted.clone().text()).toBe(200);
   expect(calls).toEqual([
-    { key: SATYR_KEY, purpose: "mail" },
-    { key: SATYR_KEY, purpose: "mail" },
+    { key: PANTRY_KEY, purpose: "mail" },
+    { key: PANTRY_KEY, purpose: "mail" },
   ]);
 
   // Mail off stops new calls at once.
@@ -519,7 +519,7 @@ async function ownKeyJourney(): Promise<void> {
     { key: OWN_KEY, purpose: "probe" },
     { key: OWN_KEY, purpose: "mail" },
   ]);
-  expect(calls.some((call) => call.key === SATYR_KEY)).toBe(false);
+  expect(calls.some((call) => call.key === PANTRY_KEY)).toBe(false);
 
   // The admin removes the key: the switches move back to Pantry's key.
   const disconnected = await controlFetch(
@@ -530,13 +530,13 @@ async function ownKeyJourney(): Promise<void> {
   );
   expect(disconnected.status, await disconnected.clone().text()).toBe(200);
   expect(await features(organisationId, owner.session)).toMatchObject({
-    funding: "satyr_platform",
+    funding: "pantry_platform",
     mailClassification: { enabled: true },
     relatedCases: { enabled: true },
   });
   const back = await preview(organisationId, owner.session, accountId, ["m2"]);
   expect(back.status, await back.clone().text()).toBe(200);
-  expect(calls.at(-1)).toEqual({ key: SATYR_KEY, purpose: "mail" });
+  expect(calls.at(-1)).toEqual({ key: PANTRY_KEY, purpose: "mail" });
 }
 
 function installFakes(
@@ -730,7 +730,7 @@ async function mailbox(
     authorizationProduct: "full_mailbox_pilot",
     providerSubjectId: name,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle },
     grantedScopes: GMAIL_FULL_MAILBOX_SCOPES,
     createdByUserId: owner.identity.userId,

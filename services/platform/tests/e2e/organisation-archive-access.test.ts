@@ -123,7 +123,7 @@ async function lifecycleCommand(
   if (version === null) throw new Error("Missing configuration version");
   const headers = commerceHeaders(owner);
   headers.set("idempotency-key", `archive-access-${command}`);
-  headers.set("x-satyr-configuration-version", String(version));
+  headers.set("x-pantry-configuration-version", String(version));
   return exports.default.fetch(
     `https://localhost/v1/control/organisations/${ORGANISATION_ID}/${command}`,
     { method: "POST", headers, body: "{}" },

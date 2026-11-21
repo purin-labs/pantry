@@ -80,7 +80,7 @@ function harnessCodeModeSuite(): void {
     executesProductDescriptionDraftTools,
   );
   it(
-    "exposes only attached BakeryOS commands and returns surface authority",
+    "exposes only attached Kitchen commands and returns surface authority",
     executesBakerySurfaceTool,
   );
   it(
@@ -892,7 +892,7 @@ async function rejectsCatalogMismatch(): Promise<void> {
 
 function fixtureContextRequest(): import("@purin-labs/commerce-contracts").CommerceContextRequest {
   const parsed = parseCommerceGraphQuery({
-    kind: "underclerk_context",
+    kind: "commerce_context",
     selection: {
       kind: "entity_seeds",
       seeds: [{ origin: "system", typeId: "order", entityId: "order_fixture" }],
@@ -902,7 +902,7 @@ function fixtureContextRequest(): import("@purin-labs/commerce-contracts").Comme
     allowedAttributeIds: [],
     freshnessRequirement: "any",
   });
-  if (parsed.kind !== "underclerk_context")
+  if (parsed.kind !== "commerce_context")
     throw new Error("fixture context query kind changed");
   const { kind: _kind, ...request } = parsed;
   return request;

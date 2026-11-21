@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/commerce-contracts/records/api-payment-dispute";
 
 export type ObserveCommercePaymentDisputeV1 = Readonly<{
-  schemaVersion: "underclerk.observe-payment-dispute.v1";
+  schemaVersion: "commerce.observe-payment-dispute.v1";
   organisationId: string;
   merchantId: string;
   providerDeliveryId: string;

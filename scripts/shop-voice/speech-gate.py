@@ -9,7 +9,7 @@ through the same stream on the same 6 s clips, in the same order, and writes the
 
 Run it with the wake bench's Python (onnxruntime, numpy):
 
-    ~/.satyr-voice-test/wake/.venv/bin/python scripts/shop-voice/speech-gate.py
+    ~/.pantry-voice-test/wake/.venv/bin/python scripts/shop-voice/speech-gate.py
 
 SHOP_VOICE_NOISE names the .npz file, as for the bench.
 Results: output/shop-voice/speech-gate-<noise file>.json

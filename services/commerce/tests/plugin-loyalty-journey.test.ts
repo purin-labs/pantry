@@ -251,7 +251,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     buyer.requestCustomerSignIn(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -264,7 +264,7 @@ async function signIn(
         STOREFRONT,
         challenge.challengeId,
         {
-          schemaVersion: "underclerk.verify-customer-sign-in.v1",
+          schemaVersion: "commerce.verify-customer-sign-in.v1",
           code,
         },
       ),
@@ -280,7 +280,7 @@ class LoyaltyDesk extends OrderDesk {
   dryRun(definition: PluginDefinition, input: unknown, creditMinor = 300) {
     return required(
       this.admin.runPluginFunction(merchantId, {
-        schemaVersion: "underclerk.run-plugin-function.v1",
+        schemaVersion: "commerce.run-plugin-function.v1",
         definition,
         functionId: "third_order",
         settings: { ...SETTINGS, creditMinor },

@@ -216,7 +216,7 @@ export class CommerceLedger {
     );
     const receipt = signReceipt(
       {
-        schemaVersion: "underclerk.mutation-receipt.v2",
+        schemaVersion: "commerce.mutation-receipt.v2",
         receiptId: `receipt_${sha256(`${command.merchantId}:${key.idempotencyKey}`)}`,
         effectId: `effect_${sha256(`${command.merchantId}:${key.idempotencyKey}:${mutation.effectName ?? mutation.commandKind}`)}`,
         commandKind: mutation.commandKind,
@@ -407,7 +407,7 @@ function buildDeliveryBase(
   }>,
 ): Omit<DeliveryV2, "signer"> {
   return {
-    schemaVersion: "underclerk.commerce-delivery.v2",
+    schemaVersion: "commerce.commerce-delivery.v2",
     deliveryId: `delivery_${sha256(`${input.merchantId}:${input.merchantRevision}:${input.commandDigest}`)}`,
     merchantId: input.merchantId,
     merchantRevision: input.merchantRevision,
@@ -419,11 +419,11 @@ function buildDeliveryBase(
 /** What the ledger signs now (Plan 80 step 2); stored version 1 stays. */
 type DeliveryV2 = Extract<
   CommerceDeliveryV1,
-  { schemaVersion: "underclerk.commerce-delivery.v2" }
+  { schemaVersion: "commerce.commerce-delivery.v2" }
 >;
 type ReceiptV2 = Extract<
   CommerceMutationReceiptV1,
-  { schemaVersion: "underclerk.mutation-receipt.v2" }
+  { schemaVersion: "commerce.mutation-receipt.v2" }
 >;
 
 function signDelivery(
@@ -487,7 +487,7 @@ export function validateMerchant(
 }
 
 export function commandDigest(command: MutationCommand): string {
-  if (command.schemaVersion === "underclerk.create-pickup-checkout.v1") {
+  if (command.schemaVersion === "commerce.create-pickup-checkout.v1") {
     return sha256(
       JSON.stringify({
         schemaVersion: command.schemaVersion,
@@ -504,7 +504,7 @@ export function commandDigest(command: MutationCommand): string {
       }),
     );
   }
-  if (command.schemaVersion === "underclerk.submit-buyer-pickup-cart.v1") {
+  if (command.schemaVersion === "commerce.submit-buyer-pickup-cart.v1") {
     return sha256(
       JSON.stringify({
         schemaVersion: command.schemaVersion,
@@ -536,7 +536,7 @@ export function commandDigest(command: MutationCommand): string {
   }
   if (
     command.schemaVersion ===
-    "underclerk.create-buyer-shipping-checkout.internal.v1"
+    "commerce.create-buyer-shipping-checkout.internal.v1"
   ) {
     return sha256(
       JSON.stringify({

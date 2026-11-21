@@ -15,8 +15,8 @@ import { validJevApiKey } from "./system-one-client";
  */
 export type { TypeSafeAuthority };
 
-const SATYR_TYPESAFE_AUTHORITY: TypeSafeAuthority = Object.freeze({
-  kind: "satyr_platform",
+const PANTRY_TYPESAFE_AUTHORITY: TypeSafeAuthority = Object.freeze({
+  kind: "pantry_platform",
 });
 
 type TypeSafePlatformBindings = Readonly<{
@@ -31,7 +31,7 @@ export function currentTypeSafeAuthority(
   const connection = readTypeSafeConnection(sql, organisationId);
   return connection.kind === "connected"
     ? { kind: "organisation_byo", connectionRevision: connection.revision }
-    : SATYR_TYPESAFE_AUTHORITY;
+    : PANTRY_TYPESAFE_AUTHORITY;
 }
 
 /** A pinned authority stays current until the Organisation's key changes. */
@@ -50,7 +50,7 @@ export function sameTypeSafeAuthority(
   left: TypeSafeAuthority,
   right: TypeSafeAuthority,
 ): boolean {
-  if (left.kind === "satyr_platform") return right.kind === "satyr_platform";
+  if (left.kind === "pantry_platform") return right.kind === "pantry_platform";
   return (
     right.kind === "organisation_byo" &&
     right.connectionRevision === left.connectionRevision
@@ -61,16 +61,16 @@ export function sameTypeSafeAuthority(
 export function typeSafeAuthorityRevision(
   authority: TypeSafeAuthority,
 ): number {
-  return authority.kind === "satyr_platform" ? 0 : authority.connectionRevision;
+  return authority.kind === "pantry_platform" ? 0 : authority.connectionRevision;
 }
 
 export function typeSafeAuthorityFromStored(
   funding: unknown,
   revision: unknown,
 ): TypeSafeAuthority | null {
-  if (funding === "satyr_platform")
+  if (funding === "pantry_platform")
     return revision === 0 || revision === null || revision === undefined
-      ? SATYR_TYPESAFE_AUTHORITY
+      ? PANTRY_TYPESAFE_AUTHORITY
       : null;
   if (
     funding === "organisation_byo" &&

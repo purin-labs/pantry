@@ -39,7 +39,7 @@ export async function linkStripePaymentAccount(
 }
 
 function warn(organisationId: OrganisationId, kind: string): void {
-  traceWarn("underclerk.stripe_link_failed", {
+  traceWarn("commerce.stripe_link_failed", {
     requestId: newRequestId(),
     organisation_id: organisationId,
     kind,

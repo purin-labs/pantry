@@ -258,7 +258,7 @@ export class StoredValueAuthority {
     if (account === undefined || account.lastCharacters === null)
       return undefined;
     return {
-      schemaVersion: "underclerk.gift-card-balance.v1",
+      schemaVersion: "commerce.gift-card-balance.v1",
       lastCharacters: account.lastCharacters,
       balance: {
         amountMinor: accountBalance(database, merchantId, account.accountId),
@@ -318,7 +318,7 @@ export class StoredValueAuthority {
       currencies.set(row.currency, entry);
     }
     return {
-      schemaVersion: "underclerk.stored-value-liability.v1",
+      schemaVersion: "commerce.stored-value-liability.v1",
       at,
       currencies: [...currencies].map(([currency, entry]) => ({
         currency,
@@ -659,7 +659,7 @@ function storeCreditAccountId(customerId: string, currency: string): string {
 }
 
 function giftCardCodeDigest(merchantId: string, code: string): string {
-  return sha256(`underclerk.gift-card-code.v1:${merchantId}:${code}`);
+  return sha256(`commerce.gift-card-code.v1:${merchantId}:${code}`);
 }
 
 function accountIdForCode(

@@ -1,6 +1,6 @@
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 
-const BROWSER_KEY = "satyr:bakery-browser-instance";
+const BROWSER_KEY = "pantry:bakery-browser-instance";
 let identity: Promise<string> | null = null;
 let releaseBrowserLock: (() => void) | null = null;
 
@@ -18,7 +18,7 @@ async function acquireBrowserIdentity(): Promise<string> {
     captureIdentityResolver.bind(null, claim),
   );
   void navigator.locks.request(
-    `satyr-browser:${candidate}`,
+    `pantry-browser:${candidate}`,
     { ifAvailable: true },
     holdBrowserIdentity.bind(null, candidate, claim.publish),
   );
@@ -41,7 +41,7 @@ async function holdBrowserIdentity(
   if (lock === null) {
     const fresh = crypto.randomUUID();
     await navigator.locks.request(
-      `satyr-browser:${fresh}`,
+      `pantry-browser:${fresh}`,
       holdBrowserIdentity.bind(null, fresh, publish),
     );
     return;

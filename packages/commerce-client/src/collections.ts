@@ -57,7 +57,7 @@ type CollectionCommandBase = Readonly<{
 
 export type CreateCommerceCollectionV1 = CollectionCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-collection.v1";
+    schemaVersion: "commerce.create-collection.v1";
     handle: string;
     title: string;
     description: string;
@@ -69,7 +69,7 @@ export type CreateCommerceCollectionV1 = CollectionCommandBase &
 
 export type UpdateCommerceCollectionV1 = CollectionCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.update-collection.v1";
+    schemaVersion: "commerce.update-collection.v1";
     expectedRevision: number;
     changes: Readonly<{
       title?: string;
@@ -82,7 +82,7 @@ export type UpdateCommerceCollectionV1 = CollectionCommandBase &
 
 export type DeleteCommerceCollectionV1 = CollectionCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.delete-collection.v1";
+    schemaVersion: "commerce.delete-collection.v1";
     expectedRevision: number;
   }>;
 
@@ -98,7 +98,7 @@ export type CommerceBuyerCollectionSummaryV1 = Readonly<{
 }>;
 
 export type CommerceBuyerCollectionsV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-collections.v1";
+  schemaVersion: "commerce.buyer-collections.v1";
   collections: readonly CommerceBuyerCollectionSummaryV1[];
 }>;
 
@@ -112,7 +112,7 @@ export type CommerceBuyerCollectionProductV1 = Readonly<{
 }>;
 
 export type CommerceBuyerCollectionPageV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-collection-page.v1";
+  schemaVersion: "commerce.buyer-collection-page.v1";
   collection: CommerceBuyerCollectionSummaryV1;
   products: readonly CommerceBuyerCollectionProductV1[];
   /** Pass as `after` for the next page; null on the last page. */

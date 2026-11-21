@@ -43,7 +43,7 @@ export class NodeCommerceDatabase implements CommerceDatabase {
 
   transaction<Result>(operation: () => Result): Result {
     // workerd's transactionSync nests with savepoints; this does the same.
-    const savepoint = `underclerk_${this.#depth}`;
+    const savepoint = `commerce_${this.#depth}`;
     this.#database.exec(
       this.#depth === 0 ? "BEGIN IMMEDIATE" : `SAVEPOINT ${savepoint}`,
     );

@@ -24,7 +24,7 @@ async function voiceMacGrantKeyBytes(
       name: "HKDF",
       hash: "SHA-256",
       salt: new Uint8Array(0),
-      info: textEncoder.encode(`satyr.voice-grant.v1:${macId}`),
+      info: textEncoder.encode(`pantry.voice-grant.v1:${macId}`),
     },
     material,
     256,

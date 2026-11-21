@@ -12,9 +12,9 @@ import {
   type EmailSelfTestTarget,
 } from "./email-operational";
 
-export const EMAIL_SELF_TEST_SUBJECT = "Satyr Gmail canary";
+export const EMAIL_SELF_TEST_SUBJECT = "Pantry Gmail canary";
 export const EMAIL_SELF_TEST_BODY =
-  "This is a synthetic test of Satyr's email drafting and approval workflow. No action is required.";
+  "This is a synthetic test of Pantry's email drafting and approval workflow. No action is required.";
 
 export type EmailSelfTestRequest = Readonly<{
   kind: "self_test";

@@ -30,7 +30,7 @@ export type CommerceEventV1 = Readonly<{
 }>;
 
 export type CommerceEventPageV1 = Readonly<{
-  schemaVersion: "underclerk.events.v1";
+  schemaVersion: "commerce.events.v1";
   events: readonly CommerceEventV1[];
   /** Pass as `after` for the next page; null when the page is empty. */
   nextCursor: string | null;
@@ -59,7 +59,7 @@ export function parseFeedConsumer(value: unknown): CommerceFeedConsumerV1 {
 
 /** The body of a webhook post: identifiers only, never personal fields. */
 export type CommerceWebhookEventV1 = Readonly<{
-  schemaVersion: "underclerk.webhook-event.v1";
+  schemaVersion: "commerce.webhook-event.v1";
   eventId: string;
   kind: string;
   merchantId: string;
@@ -88,7 +88,7 @@ export type CommerceWebhookSubscriptionV1 = Readonly<{
 }>;
 
 export type CreateCommerceWebhookSubscriptionV1 = Readonly<{
-  schemaVersion: "underclerk.create-webhook-subscription.v1";
+  schemaVersion: "commerce.create-webhook-subscription.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -99,7 +99,7 @@ export type CreateCommerceWebhookSubscriptionV1 = Readonly<{
 }>;
 
 export type CommerceWebhookSubscriptionCreatedV1 = Readonly<{
-  schemaVersion: "underclerk.webhook-subscription-created.v1";
+  schemaVersion: "commerce.webhook-subscription-created.v1";
   mutation: CommerceMutationResultV1;
   /** The signing secret, returned once, when the subscription is new. */
   secret: string | null;
@@ -120,7 +120,7 @@ type WebhookSubscriptionCommandBase = Readonly<{
  */
 export type RestartCommerceWebhookSubscriptionV1 =
   WebhookSubscriptionCommandBase &
-    Readonly<{ schemaVersion: "underclerk.restart-webhook-subscription.v1" }>;
+    Readonly<{ schemaVersion: "commerce.restart-webhook-subscription.v1" }>;
 
 /**
  * Replaces the signing secret. Until `keepPreviousSecretSeconds` after the
@@ -130,14 +130,14 @@ export type RestartCommerceWebhookSubscriptionV1 =
  */
 export type RotateCommerceWebhookSecretV1 = WebhookSubscriptionCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.rotate-webhook-secret.v1";
+    schemaVersion: "commerce.rotate-webhook-secret.v1";
     keepPreviousSecretSeconds: number;
   }>;
 
 /** Removes a subscription and its deliveries; the feed keeps the events. */
 export type DeleteCommerceWebhookSubscriptionV1 =
   WebhookSubscriptionCommandBase &
-    Readonly<{ schemaVersion: "underclerk.delete-webhook-subscription.v1" }>;
+    Readonly<{ schemaVersion: "commerce.delete-webhook-subscription.v1" }>;
 
 export type CommerceWebhookSubscriptionCommandV1 =
   | RestartCommerceWebhookSubscriptionV1
@@ -145,7 +145,7 @@ export type CommerceWebhookSubscriptionCommandV1 =
   | DeleteCommerceWebhookSubscriptionV1;
 
 export type CommerceWebhookSecretRotatedV1 = Readonly<{
-  schemaVersion: "underclerk.webhook-secret-rotated.v1";
+  schemaVersion: "commerce.webhook-secret-rotated.v1";
   mutation: CommerceMutationResultV1;
   /** The new signing secret, returned once, when the rotation applies. */
   secret: string | null;

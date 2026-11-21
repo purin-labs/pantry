@@ -19,7 +19,7 @@ SPDX-FileCopyrightText: 2025-2026, FANUC America Corporation
 SPDX-FileCopyrightText: 2025-2026, FANUC CORPORATION
 SPDX-License-Identifier: Apache-2.0
 Source revision: fb40c9803a826ba68c7c8e28ba904a25efa7fcd2
-Modified for BakeryOS: Xacro expansion, local mesh paths, Collada-to-OBJ/GLB
+Modified for Kitchen: Xacro expansion, local mesh paths, Collada-to-OBJ/GLB
 conversion, food-appearance materials, joint rig and MuJoCo inspection scene.
 Standard-arm geometry and dynamics; food-version equivalence is unverified.
 License: ../vendor/fanuc-crx10ial/LICENSES/Apache-2.0.txt

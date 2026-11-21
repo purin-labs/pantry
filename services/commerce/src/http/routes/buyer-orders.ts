@@ -60,7 +60,7 @@ export async function openDraftInvoiceRoute(
   return opened.kind === "rejected"
     ? jsonResponse(409, { outcome: "rejected", error: opened.error })
     : jsonResponse(200, {
-        schemaVersion: "underclerk.draft-invoice-checkout.v1",
+        schemaVersion: "commerce.draft-invoice-checkout.v1",
         session: {
           token: session.token,
           expiresAt: session.claims.expiresAt,
@@ -96,7 +96,7 @@ export async function requestBuyerReturnRoute(
   const returnId = `return_${identity}`;
   const result = ctx.authority.requestReturn(
     {
-      schemaVersion: "underclerk.request-return.v1",
+      schemaVersion: "commerce.request-return.v1",
       merchantId: route.merchantId,
       idempotencyKey: `buyer_return_${identity}`,
       requestedAt: ctx.authority.currentTime(),
@@ -160,7 +160,7 @@ export async function openBuyerOrderBalanceRoute(
   return opened.kind === "rejected"
     ? jsonResponse(409, { outcome: "rejected", error: opened.error })
     : jsonResponse(200, {
-        schemaVersion: "underclerk.order-balance-checkout.v1",
+        schemaVersion: "commerce.order-balance-checkout.v1",
         session: {
           token: session.token,
           expiresAt: session.claims.expiresAt,

@@ -54,7 +54,7 @@ const SQUARE_ACCOUNT = {
   eventRecency: { kind: "unavailable" },
 };
 const FAILED_WHATSAPP_ATTEMPT = {
-  supportReference: "SATYR-ref-1",
+  supportReference: "PANTRY-ref-1",
   provider: "whatsapp",
   displayAccount: null,
   reasonCode: "provider_asset_missing",
@@ -200,7 +200,7 @@ describe("file storage onboarding", () => {
       feedback: {
         mutation: { kind: "connect_provider", provider: "dropbox" },
         message:
-          "This integration is unavailable. Ask your Satyr administrator to configure it, then try again.",
+          "This integration is unavailable. Ask your Pantry administrator to configure it, then try again.",
       },
     });
     expect(markup).toContain('role="alert"');
@@ -349,7 +349,7 @@ describe("WhatsApp onboarding", () => {
       initialIntegrationId: "whatsapp",
       supportDiagnostics: FAILED_WHATSAPP_ATTEMPT,
     });
-    expect(markup).toContain("SATYR-ref-1");
+    expect(markup).toContain("PANTRY-ref-1");
     expect(markup).toContain(
       "without sharing a Business Portfolio and WhatsApp Business Account",
     );
@@ -371,7 +371,7 @@ const ROUTE_DATA = {
   commerceSystem: null,
   commerceSyncProblem: null,
   codexConnection: { kind: "disconnected", revision: 0 },
-  inferenceSelection: { kind: "satyr_platform" },
+  inferenceSelection: { kind: "pantry_platform" },
   accounts: [],
   supportReference: null,
   whatsappApplicationConfigured: true,
@@ -532,7 +532,7 @@ describe("completion handshake", () => {
   });
 
   async function deliver(message: Record<string, unknown>): Promise<void> {
-    const channel = new BroadcastChannel("satyr-provider-attempt");
+    const channel = new BroadcastChannel("pantry-provider-attempt");
     channel.postMessage(message);
     await new Promise((resolve) => setTimeout(resolve, 30));
     channel.close();
@@ -556,7 +556,7 @@ describe("completion handshake", () => {
       new Set(),
     );
     await deliver({
-      type: "satyr.provider-attempt.completed",
+      type: "pantry.provider-attempt.completed",
       attempt_id: "attempt_1",
       terminal_state: "connected",
       failure_reason_code: null,
@@ -595,7 +595,7 @@ describe("completion handshake", () => {
       new Set(),
     );
     await deliver({
-      type: "satyr.provider-attempt.completed",
+      type: "pantry.provider-attempt.completed",
       attempt_id: "attempt_2",
       terminal_state: "connected",
       failure_reason_code: null,
@@ -620,7 +620,7 @@ describe("completion handshake", () => {
       new Set(),
     );
     await deliver({
-      type: "satyr.provider-attempt.completed",
+      type: "pantry.provider-attempt.completed",
       attempt_id: "attempt_3",
       terminal_state: "connected",
       failure_reason_code: null,

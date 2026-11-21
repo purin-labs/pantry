@@ -27,7 +27,7 @@ export async function recordProviderStartFailure(input: {
   readonly supportReference: string;
   readonly correlationId: string;
 }> {
-  const supportReference = `SATYR-${crypto.randomUUID()}`;
+  const supportReference = `PANTRY-${crypto.randomUUID()}`;
   const correlationId = `provider_start_${crypto.randomUUID()}`;
   await input.db
     .prepare(

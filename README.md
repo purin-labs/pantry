@@ -78,13 +78,13 @@ history, tools, checkpoints, budgets, cancellation, and delivery for every route
 ## Layout
 
 ```text
-satyr/
+pantry/
 ├── apps/
 │   └── portal/                 # React operator portal
 ├── services/
 │   ├── platform/               # Control plane, integrations and Sous Chef
 │   ├── workspace-executor/     # Heavy execution Container image
-│   └── underclerk/             # Commerce engine: private commerce authority
+│   └── commerce/             # Commerce engine: private commerce authority
 ├── packages/
 │   ├── contracts/              # Provider-neutral contract schemas
 │   └── bakery-model/           # Kitchen model: recipes, procedures, physics
@@ -125,11 +125,11 @@ and local environment files. Keep secrets out of source control.
 
 ### Named local sites
 
-Caddy exposes the buyer storefronts, operator portal, and Underclerk boundary
+Caddy exposes the buyer storefronts, operator portal, and Commerce boundary
 under stable local names. Add this line to `/etc/hosts` once:
 
 ```text
-127.0.0.1 example.cafe example.store example.satyr example.portal example.underclerk
+127.0.0.1 example.cafe example.store example.pantry example.portal example.commerce
 ```
 
 Start each development surface in its own terminal:
@@ -162,7 +162,7 @@ from the same profile and exposes only provider POST routes through its tunnel.
 the unprivileged local ports in the foreground. Ctrl+C stops Caddy and releases
 those ports.
 Backend output prefixes each line with a colored service label so concurrent
-Underclerk and Platform logs remain distinguishable.
+Commerce and Platform logs remain distinguishable.
 Wrangler provides the local D1, Durable Object, KV, R2, queue, service-binding,
 and Worker Loader resources. Docker provides the configured container execution
 when available. `site` starts
@@ -181,10 +181,10 @@ The local HTTP addresses are:
 - `http://cafe.localhost:3001/store/cafe` → café storefront
 - `http://store.localhost:3002/store/shipping` → shipping storefront
 - `https://localhost:3003` → Pantry operator Portal and OAuth-compatible loopback origin
-- `http://underclerk.localhost:3004` → Underclerk API and health boundary
+- `http://commerce.localhost:3004` → Commerce API and health boundary
 - `http://docs.localhost:3005` → Seams Pantry documentation
 
-Platform and Underclerk remain separate Worker processes. Caddy only owns local
+Platform and Commerce remain separate Worker processes. Caddy only owns local
 host routing. The `example.cafe`, `example.store`, and `example.portal` names
 remain available as aliases. Google sign-in uses the HTTPS loopback origin at
 `localhost:3003`.
@@ -197,8 +197,8 @@ The checks need no other repository and no outside account service.
 pnpm --filter @purin-labs/platform check:types
 pnpm --filter @purin-labs/platform check:test-types
 pnpm --filter @purin-labs/platform test
-pnpm underclerk:check
-pnpm underclerk:test
+pnpm commerce:check
+pnpm commerce:test
 pnpm portal:build
 cargo test --workspace
 git diff --check

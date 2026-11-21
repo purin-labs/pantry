@@ -23,7 +23,7 @@ import "./images-panel.css";
  */
 
 /** What an image drag carries. */
-export const IMAGE_DRAG_TYPE = "application/x-satyr-board-image";
+export const IMAGE_DRAG_TYPE = "application/x-pantry-board-image";
 
 export type ShopImage = Readonly<{ mediaId: string; altText: string; url: string | null }>;
 

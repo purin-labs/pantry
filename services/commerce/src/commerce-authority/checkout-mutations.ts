@@ -272,7 +272,7 @@ export function checkoutPaymentStartMutation(
   committedAt: string,
 ): CommerceMutation {
   const commandKind =
-    command.schemaVersion === "underclerk.collect-in-person-checkout-payment.v1"
+    command.schemaVersion === "commerce.collect-in-person-checkout-payment.v1"
       ? "collect_in_person_checkout_payment"
       : "begin_checkout_payment";
   return {
@@ -370,14 +370,14 @@ export function paidCheckoutPlacementMutation(
     merchant,
     committedAt,
     commandKind:
-      command.schemaVersion === "underclerk.place-stored-value-checkout.v1"
+      command.schemaVersion === "commerce.place-stored-value-checkout.v1"
         ? "place_stored_value_checkout"
-        : command.schemaVersion === "underclerk.record-counter-cash-payment.v1"
+        : command.schemaVersion === "commerce.record-counter-cash-payment.v1"
           ? "record_counter_cash_payment"
-          : command.schemaVersion === "underclerk.mark-draft-order-paid.v1"
+          : command.schemaVersion === "commerce.mark-draft-order-paid.v1"
             ? "mark_draft_order_paid"
             : command.schemaVersion ===
-                "underclerk.place-draft-order-on-terms.v1"
+                "commerce.place-draft-order-on-terms.v1"
               ? "place_draft_order_on_terms"
               : "place_paid_checkout",
     resource: {

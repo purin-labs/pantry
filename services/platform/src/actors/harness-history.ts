@@ -58,7 +58,7 @@ export async function digestHarnessHistoryEntry(input: {
 }): Promise<Sha256Digest> {
   return sha256Hex(
     canonicalJson({
-      kind: "satyr_harness_history_chain_v1",
+      kind: "pantry_harness_history_chain_v1",
       sessionId: input.sessionId,
       sequence: input.sequence,
       previousDigest: input.previousDigest,
@@ -78,7 +78,7 @@ export async function digestPersistedHarnessHistoryEnvelope(input: {
 }): Promise<Sha256Digest> {
   return sha256Hex(
     canonicalJson({
-      kind: "satyr_harness_history_chain_v1",
+      kind: "pantry_harness_history_chain_v1",
       sessionId: input.sessionId,
       sequence: input.sequence,
       previousDigest: input.previousDigest,

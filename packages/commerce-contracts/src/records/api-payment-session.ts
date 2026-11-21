@@ -124,13 +124,13 @@ export type CommercePaymentPublicSessionV1 = Static<
 
 export const commercePaymentSessionResultV1Schema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.payment-session-result.v1"),
+    schemaVersion: Type.Literal("commerce.payment-session-result.v1"),
     kind: Type.Literal("ready"),
     paymentAttemptId: text,
     session: commercePaymentPublicSessionV1Schema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.payment-session-result.v1"),
+    schemaVersion: Type.Literal("commerce.payment-session-result.v1"),
     kind: Type.Literal("unavailable"),
     reason: text,
     retryAfter: timestampSchema,
@@ -178,13 +178,13 @@ export type CommerceInPersonCollectionSessionV1 = Static<
 
 export const commerceInPersonCollectionResultV1Schema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.in-person-collection-result.v1"),
+    schemaVersion: Type.Literal("commerce.in-person-collection-result.v1"),
     kind: Type.Literal("ready"),
     paymentAttemptId: text,
     session: commerceInPersonCollectionSessionV1Schema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.in-person-collection-result.v1"),
+    schemaVersion: Type.Literal("commerce.in-person-collection-result.v1"),
     kind: Type.Literal("unavailable"),
     reason: text,
     retryAfter: timestampSchema,
@@ -196,25 +196,25 @@ export type CommerceInPersonCollectionResultV1 = Static<
 
 export const commercePaymentRefundResultV1Schema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.payment-refund-result.v1"),
+    schemaVersion: Type.Literal("commerce.payment-refund-result.v1"),
     kind: Type.Literal("refunded"),
     providerRefundReference: text,
     money: commercePaymentMoneyV1Schema,
     refundedAt: timestampSchema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.payment-refund-result.v1"),
+    schemaVersion: Type.Literal("commerce.payment-refund-result.v1"),
     kind: Type.Literal("processing"),
     reconciliationIdentity: text,
     reconcileAfter: timestampSchema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.payment-refund-result.v1"),
+    schemaVersion: Type.Literal("commerce.payment-refund-result.v1"),
     kind: Type.Literal("rejected"),
     reason: boundedTextSchema(512),
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.payment-refund-result.v1"),
+    schemaVersion: Type.Literal("commerce.payment-refund-result.v1"),
     kind: Type.Literal("indeterminate"),
     reconciliationIdentity: text,
     reconcileAfter: timestampSchema,
@@ -226,7 +226,7 @@ export type CommercePaymentRefundResultV1 = Static<
 
 export const createCommerceBuyerPaymentSessionV1Schema = ReadonlyStrictObject(
   {
-    schemaVersion: Type.Literal("underclerk.create-buyer-payment-session.v1"),
+    schemaVersion: Type.Literal("commerce.create-buyer-payment-session.v1"),
     idempotencyKey: text,
     checkoutRevision: PositiveInteger,
     quoteDigest: text,
@@ -238,7 +238,7 @@ export type CreateCommerceBuyerPaymentSessionV1 = Static<
 >;
 
 export const reconcileCommerceBuyerPaymentV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.reconcile-buyer-payment.v1"),
+  schemaVersion: Type.Literal("commerce.reconcile-buyer-payment.v1"),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,
   quoteDigest: text,
@@ -250,7 +250,7 @@ export type ReconcileCommerceBuyerPaymentV1 = Static<
 
 export const commerceBuyerPaymentSessionV1Schema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.buyer-payment-session.v1"),
+    schemaVersion: Type.Literal("commerce.buyer-payment-session.v1"),
     state: Type.Literal("ready"),
     checkoutId: text,
     checkoutRevision: PositiveInteger,
@@ -258,7 +258,7 @@ export const commerceBuyerPaymentSessionV1Schema = Type.Union([
     session: commercePaymentPublicSessionV1Schema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.buyer-payment-session.v1"),
+    schemaVersion: Type.Literal("commerce.buyer-payment-session.v1"),
     state: Type.Literal("unavailable"),
     checkoutId: text,
     retryAfter: timestampSchema,
@@ -276,7 +276,7 @@ export type CommerceBuyerPaymentSessionV1 = Static<
 export const commerceInPersonCheckoutPaymentCollectionV1Schema = Type.Union([
   ReadonlyStrictObject({
     schemaVersion: Type.Literal(
-      "underclerk.in-person-checkout-payment-collection.v1",
+      "commerce.in-person-checkout-payment-collection.v1",
     ),
     outcome: Type.Literal("ready"),
     mutationOutcome: Type.Union([
@@ -289,7 +289,7 @@ export const commerceInPersonCheckoutPaymentCollectionV1Schema = Type.Union([
   }),
   ReadonlyStrictObject({
     schemaVersion: Type.Literal(
-      "underclerk.in-person-checkout-payment-collection.v1",
+      "commerce.in-person-checkout-payment-collection.v1",
     ),
     outcome: Type.Literal("unavailable"),
     mutationOutcome: Type.Union([
@@ -301,7 +301,7 @@ export const commerceInPersonCheckoutPaymentCollectionV1Schema = Type.Union([
   }),
   ReadonlyStrictObject({
     schemaVersion: Type.Literal(
-      "underclerk.in-person-checkout-payment-collection.v1",
+      "commerce.in-person-checkout-payment-collection.v1",
     ),
     outcome: Type.Literal("rejected"),
     error: commerceMutationErrorV1Schema,

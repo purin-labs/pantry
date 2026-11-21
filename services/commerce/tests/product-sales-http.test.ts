@@ -23,7 +23,7 @@ const START = "2026-09-01T00:00:00.000Z";
 const END = "2026-09-08T00:00:00.000Z";
 const UPDATED = "2026-09-10T00:00:00.000Z";
 const TOKEN = "product-sales-test-service-token";
-const URL = `https://underclerk.test/v1/admin/merchants/merchant_sales/reports/product-sales?start=${START}&end=${END}`;
+const URL = `https://commerce.test/v1/admin/merchants/merchant_sales/reports/product-sales?start=${START}&end=${END}`;
 
 it(
   "reports actual line attribution through authenticated HTTP at one snapshot",
@@ -40,7 +40,7 @@ it(
 
 async function rejectOtherMerchantResponse(): Promise<void> {
   const client = new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: TOKEN,
     fetch: async () =>
       Response.json({
@@ -77,7 +77,7 @@ async function reportThroughHttp(): Promise<void> {
     expect(response.status).toBe(200);
     const report = await response.json();
     const client = new CommerceAdminClient({
-      baseUrl: "https://underclerk.test",
+      baseUrl: "https://commerce.test",
       serviceToken: TOKEN,
       fetch: fixture.api.fetch,
     });

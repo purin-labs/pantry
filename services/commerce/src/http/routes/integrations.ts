@@ -137,7 +137,7 @@ export async function createWebhookSubscriptionRoute(
       message: "Merchant path and command must match",
     });
   return jsonResponse(200, {
-    schemaVersion: "underclerk.webhook-subscription-created.v1",
+    schemaVersion: "commerce.webhook-subscription-created.v1",
     ...ctx.authority.createWebhookSubscription(body.value),
   });
 }
@@ -156,10 +156,10 @@ export async function webhookSubscriptionChangeRoute(
   if (!body.ok) return body.response;
   const schemaVersion =
     route.kind === "restart_webhook_subscription"
-      ? "underclerk.restart-webhook-subscription.v1"
+      ? "commerce.restart-webhook-subscription.v1"
       : route.kind === "rotate_webhook_secret"
-        ? "underclerk.rotate-webhook-secret.v1"
-        : "underclerk.delete-webhook-subscription.v1";
+        ? "commerce.rotate-webhook-secret.v1"
+        : "commerce.delete-webhook-subscription.v1";
   if (
     !hasMerchantId(body.value, route.merchantId) ||
     !isRecord(body.value) ||
@@ -171,7 +171,7 @@ export async function webhookSubscriptionChangeRoute(
     });
   if (route.kind === "rotate_webhook_secret")
     return jsonResponse(200, {
-      schemaVersion: "underclerk.webhook-secret-rotated.v1",
+      schemaVersion: "commerce.webhook-secret-rotated.v1",
       ...ctx.authority.rotateWebhookSecret(body.value),
     });
   return jsonResponse(200, ctx.authority.changeWebhookSubscription(body.value));
@@ -185,7 +185,7 @@ export async function listWebhookSubscriptionsRoute(
   >,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.webhook-subscriptions.v1",
+    schemaVersion: "commerce.webhook-subscriptions.v1",
     subscriptions: ctx.authority.listWebhookSubscriptions(route.merchantId),
   });
 }

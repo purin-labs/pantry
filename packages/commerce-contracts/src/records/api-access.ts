@@ -131,7 +131,7 @@ export const parseCommerceApiCredentialsV1Record = wireRecordParser(
  * A repeated closure answers the first one.
  */
 export const commerceMerchantClosureV1Schema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.merchant-closure.v1"),
+  schemaVersion: Type.Literal("commerce.merchant-closure.v1"),
   merchantId: Type.String(),
   closedAt: Type.String(),
   revokedCredentials: Type.Integer({ minimum: 0 }),

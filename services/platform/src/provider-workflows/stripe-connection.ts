@@ -178,7 +178,7 @@ export async function connectStripe(
     provider: "stripe",
     providerSubjectId: token.value.accountId,
     environment: base.environment,
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: [token.value.scope],
     createdByUserId: base.userId,

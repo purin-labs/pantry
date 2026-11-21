@@ -159,7 +159,7 @@ export async function handleConfigureStripeConnector(
   const registration = await registerStripeWebhook({
     stripeTestKey: credential.value.value,
     endpointUrl,
-    idempotencyKey: `satyr-stripe-connector:${organisationId.value}`,
+    idempotencyKey: `pantry-stripe-connector:${organisationId.value}`,
     existingSigningSecret,
     fetcher: runtimeFetch,
   });

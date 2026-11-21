@@ -16,7 +16,7 @@ import {
 // @ts-expect-error Platform's test tsconfig intentionally excludes JSX; the portal builds this module separately.
 import { selectPreferredWorkspace } from "../../../apps/portal/src/portal";
 
-describe("CafeOS organisations page ownership", () => {
+describe("Café organisations page ownership", () => {
   it("opens the last valid workspace and falls back to the default workspace", () => {
     const [defaultWorkspace, previousWorkspace] =
       organisationFixture().workspaces;
@@ -39,7 +39,7 @@ describe("CafeOS organisations page ownership", () => {
   it("associates support recovery copy with the workspace lookup", () => {
     const markup = renderOrganisationList([], {
       busy: false,
-      error: "CafeOS could not inspect that workspace. Try again.",
+      error: "Café could not inspect that workspace. Try again.",
       operatorCase: null,
       inspect: ignoreInspect,
       archive: ignoreArchive,

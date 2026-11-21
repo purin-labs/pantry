@@ -95,7 +95,7 @@ export async function ensureOrganisationDefaultWorkspace(input: {
           path: "workspace.yaml",
           mediaType: "application/yaml",
           content: [
-            "schemaVersion: satyr.workspace.v1",
+            "schemaVersion: pantry.workspace.v1",
             `organisationId: ${input.scope.organisationId}`,
             `workspaceId: ${binding.value.workspaceId}`,
             "",

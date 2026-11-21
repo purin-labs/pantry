@@ -180,7 +180,7 @@ export async function reconcileOrganisationOnboarding(input: {
     return { ok: false, error: { code: "organisation_not_found" } };
   }
   const portalSubjectHash = await hashOpaqueSecret(
-    "satyr:onboarding-reconciler",
+    "pantry:onboarding-reconciler",
   );
   const runs: OnboardingReconciliationRun[] = [];
   let repairCount = 0;
@@ -808,7 +808,7 @@ async function expireOpenAttempts(
     .bind(organisation.organisationId, now)
     .all<ExpiredAttemptRow>();
   const portalSubjectHash = await hashOpaqueSecret(
-    "satyr:onboarding-reconciler",
+    "pantry:onboarding-reconciler",
   );
   let expiredCount = 0;
   for (const row of rows.results ?? []) {
@@ -1773,7 +1773,7 @@ async function buildOrganisationHarnessErasureRegistryInventory(
       .sort(compareRegistrySnapshotEntries);
   const snapshotJson = JSON.stringify(snapshotEntries);
   const fingerprint = await hashOpaqueSecret(
-    `satyr:nf9:organisation-harness-erasure:${snapshotJson}`,
+    `pantry:nf9:organisation-harness-erasure:${snapshotJson}`,
   );
   return {
     entries: sessionEntries,

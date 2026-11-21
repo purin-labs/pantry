@@ -109,7 +109,7 @@ function clientFor(
   metadataRevision = 3,
 ): CommerceEntityPlaneClient {
   return new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.example",
+    baseUrl: "https://commerce.example",
     serviceToken: "service-token",
     fetch: async (request, init) => {
       const url = String(request);

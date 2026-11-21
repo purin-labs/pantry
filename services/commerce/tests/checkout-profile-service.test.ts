@@ -224,7 +224,7 @@ function createFixture(): Readonly<{
 }> {
   const databasePath = join(
     tmpdir(),
-    `underclerk-checkout-profile-${randomUUID()}.sqlite3`,
+    `commerce-checkout-profile-${randomUUID()}.sqlite3`,
   );
   databasePaths.push(databasePath);
   const database = new NodeCommerceDatabase(databasePath);

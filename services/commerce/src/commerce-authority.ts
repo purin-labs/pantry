@@ -227,10 +227,10 @@ export class CommerceAuthority extends BuyerFamily {
       readReceipt: this.ledger.readReceiptOfKey.bind(this.ledger),
       applyCommand: (command) =>
         isRecord(command) &&
-        command.schemaVersion === "underclerk.create-discount.v1"
+        command.schemaVersion === "commerce.create-discount.v1"
           ? this.discounts.createDiscount(command)
           : isRecord(command) &&
-              command.schemaVersion === "underclerk.credit-store-credit.v1"
+              command.schemaVersion === "commerce.credit-store-credit.v1"
             ? this.storedValue.creditStoreCredit(command)
             : rejected(invalidCommand(new Error("Unknown plugin command"))),
       readOrderBuyer: (merchantId, orderId) => {

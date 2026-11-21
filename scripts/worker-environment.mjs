@@ -588,7 +588,7 @@ export function requireLocalWorkerSecrets(service, config) {
       ? [
           "SESSION_TOKEN_SECRET",
           "SLACK_OAUTH_STATE_SECRET",
-          "UNDERCLERK_SERVICE_TOKEN",
+          "COMMERCE_SERVICE_TOKEN",
         ]
       : config.secrets.required;
   for (const key of required) {
@@ -605,7 +605,7 @@ export function validateWorkerOrigins(service, environment, config) {
     "PANTRY_PUBLIC_ORIGIN",
     "PANTRY_OAUTH_CALLBACK_ORIGIN",
     "PANTRY_PROVIDER_INGRESS_ORIGIN",
-    "UNDERCLERK_BASE_URL",
+    "COMMERCE_BASE_URL",
   ]) {
     const value = config.vars[key];
     if (value === undefined) continue;

@@ -59,8 +59,8 @@ export function parseMerchantScriptArguments(
       "--merchant",
       "merchant_",
     ),
-    baseUrl: requireUrl(env.UNDERCLERK_BASE_URL),
-    serviceToken: requireSecret(env.UNDERCLERK_SERVICE_TOKEN),
+    baseUrl: requireUrl(env.COMMERCE_BASE_URL),
+    serviceToken: requireSecret(env.COMMERCE_SERVICE_TOKEN),
   };
 }
 
@@ -107,18 +107,18 @@ function requireIdentity(
 
 function requireUrl(value: string | undefined): string {
   if (value === undefined) {
-    throw new Error("UNDERCLERK_BASE_URL is required");
+    throw new Error("COMMERCE_BASE_URL is required");
   }
   const parsed = new URL(value);
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
-    throw new Error("UNDERCLERK_BASE_URL must use http or https");
+    throw new Error("COMMERCE_BASE_URL must use http or https");
   }
   return parsed.toString();
 }
 
 function requireSecret(value: string | undefined): string {
   if (value === undefined || value.length === 0) {
-    throw new Error("UNDERCLERK_SERVICE_TOKEN is required");
+    throw new Error("COMMERCE_SERVICE_TOKEN is required");
   }
   return value;
 }

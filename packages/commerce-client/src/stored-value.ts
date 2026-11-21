@@ -53,7 +53,7 @@ type StoredValueCommandBase = Readonly<{
 /** Issues a gift card with a code that the caller made. */
 export type IssueCommerceGiftCardV1 = StoredValueCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.issue-gift-card.v1";
+    schemaVersion: "commerce.issue-gift-card.v1";
     accountId: string;
     /** The code the buyer enters; Commerce keeps only its digest. */
     code: string;
@@ -65,7 +65,7 @@ export type IssueCommerceGiftCardV1 = StoredValueCommandBase &
 /** Adds store credit to a customer's account in the amount's currency. */
 export type CreditCommerceStoreCreditV1 = StoredValueCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.credit-store-credit.v1";
+    schemaVersion: "commerce.credit-store-credit.v1";
     customerId: string;
     amount: Money;
     note: string | null;
@@ -74,7 +74,7 @@ export type CreditCommerceStoreCreditV1 = StoredValueCommandBase &
 /** A disabled account pays nothing; refunds still return to it. */
 export type DisableCommerceStoredValueAccountV1 = StoredValueCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.disable-stored-value-account.v1";
+    schemaVersion: "commerce.disable-stored-value-account.v1";
     accountId: string;
     expectedRevision: number;
   }>;
@@ -86,7 +86,7 @@ export type CommerceStoredValueCommandV1 =
 
 /** What a buyer sees of a gift card from its code. */
 export type CommerceGiftCardBalanceV1 = Readonly<{
-  schemaVersion: "underclerk.gift-card-balance.v1";
+  schemaVersion: "commerce.gift-card-balance.v1";
   lastCharacters: string;
   balance: Money;
   status: "active" | "disabled" | "expired";
@@ -99,7 +99,7 @@ export type CommerceGiftCardBalanceV1 = Readonly<{
  * 31 March and 30 September.
  */
 export type CommerceStoredValueLiabilityV1 = Readonly<{
-  schemaVersion: "underclerk.stored-value-liability.v1";
+  schemaVersion: "commerce.stored-value-liability.v1";
   at: CommerceEngineTimestamp;
   currencies: readonly Readonly<{
     currency: string;

@@ -276,8 +276,8 @@ async function runMutation(
 function csrfCookie(): string | null {
   for (const part of document.cookie.split(";")) {
     const value = part.trim();
-    if (value.startsWith("satyr_control_csrf="))
-      return decodeURIComponent(value.slice("satyr_control_csrf=".length));
+    if (value.startsWith("pantry_csrf="))
+      return decodeURIComponent(value.slice("pantry_csrf=".length));
   }
   return null;
 }

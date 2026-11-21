@@ -39,7 +39,7 @@ import { googleConfig } from "../google-oidc-config";
 import { controlError, controlHeaders, controlJson } from "../http";
 import { assertNever } from "@purin-labs/std";
 
-const OIDC_STATE_COOKIE = "satyr_control_oidc_state";
+const OIDC_STATE_COOKIE = "pantry_oidc_state";
 // A session lasts seven days from its last use and thirty from its sign-in.
 // The session read renews it at most once an hour, so most reads write nothing.
 const CONTROL_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;

@@ -71,7 +71,7 @@ export abstract class CustomerFamily extends CatalogFamily {
     return customer === undefined
       ? undefined
       : {
-          schemaVersion: "underclerk.customer-export.v1",
+          schemaVersion: "commerce.customer-export.v1",
           customer,
           exportedAt: this.now(),
         };

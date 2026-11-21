@@ -357,7 +357,7 @@ export function offerPriceAllowanceTransport(
         headers: {
           accept: "application/json",
           "content-type": "application/json",
-          "x-satyr-csrf": csrfToken,
+          "x-pantry-csrf": csrfToken,
           "idempotency-key": key,
         },
         body: JSON.stringify(body),
@@ -404,8 +404,8 @@ function allowanceRouteMessage(body: unknown): string {
       return "That allowance is not a value this offer can take.";
     case "offer_not_listed":
       return "This offer is not listed, so it has no price to govern.";
-    case "underclerk_binding_missing":
-    case "underclerk_unavailable":
+    case "commerce_binding_missing":
+    case "commerce_unavailable":
       return "Commerce is unavailable right now.";
     case null:
       return "The allowance could not be saved.";

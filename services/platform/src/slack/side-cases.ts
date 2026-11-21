@@ -44,7 +44,7 @@ import { parseSlackUserId, type SlackUserId } from "./events";
 import type { SessionSideCase } from "../actors/session/conversation-port";
 
 /** The `action_id` of the Start button of a proposal message. */
-export const SLACK_SIDE_CASE_START_ACTION = "satyr_side_case_start";
+export const SLACK_SIDE_CASE_START_ACTION = "pantry_side_case_start";
 
 /** Added to the harness instructions of each turn of a Slack side Case. */
 const SLACK_SIDE_CASE_HARNESS_INSTRUCTION =

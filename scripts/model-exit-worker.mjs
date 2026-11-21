@@ -23,6 +23,6 @@ checkAndDeploy({
   operation,
   environment,
   profile: "wrangler.model-exit.jsonc",
-  prefix: "satyr-model-exit-",
+  prefix: "pantry-model-exit-",
   check: requireSmallScript.bind(null, "model-exit", MAXIMUM_SCRIPT_BYTES),
 });

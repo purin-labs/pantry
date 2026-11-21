@@ -89,7 +89,7 @@ def false_wakes(model: Wake, path: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", type=Path, default=Path.home() / ".satyr-voice-test/wake")
+    parser.add_argument("--data", type=Path, default=Path.home() / ".pantry-voice-test/wake")
     parser.add_argument("--width", type=int, default=64)
     parser.add_argument("--rounds", type=int, nargs="+", default=[15000, 10000, 10000, 15000])
     parser.add_argument("--near-weight", type=float, default=8)

@@ -34,7 +34,7 @@ SIMULATOR = os.environ.get("SHOP_VOICE_SIMULATOR", "iPhone 17")
 
 def single_database_schema_file():
     """The one-database schema, built from the two deployed baselines."""
-    out = Path(tempfile.mkdtemp(prefix="satyr-single-database-")) / "schema.sql"
+    out = Path(tempfile.mkdtemp(prefix="pantry-single-database-")) / "schema.sql"
     subprocess.run(
         ["node", str(ROOT / "services/platform/scripts/single-database-schema.mjs"), str(out)],
         check=True,
@@ -47,7 +47,7 @@ def main() -> None:
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="shop-voice-safari-")).resolve()
     voice_home = work / "home"
-    label = f"sh.seams.satyr.shop-voice.journey-{uuid.uuid4().hex[:8]}"
+    label = f"io.purin.pantry.shop-voice.journey-{uuid.uuid4().hex[:8]}"
     domain_job = f"gui/{os.getuid()}/{label}"
     plist = Path.home() / "Library/LaunchAgents" / f"{label}.plist"
     mirror = journey.Mirror(("127.0.0.1", journey.MIRROR_PORT), journey.MirrorHandler)
@@ -101,7 +101,7 @@ def main() -> None:
         def call(method: str, route: str, body: dict | None = None) -> dict:
             headers = {"cookie": owner.cookie, "origin": PORTAL}
             if method != "GET":
-                headers.update({"content-type": "application/json", "x-satyr-csrf": owner.csrf,
+                headers.update({"content-type": "application/json", "x-pantry-csrf": owner.csrf,
                                 "idempotency-key": f"journey-{uuid.uuid4()}"})
             request = urllib.request.Request(f"{PORTAL}/v1/control/organisations/{organisation_id}/{route}", method=method,
                                              headers=headers, data=None if body is None else json.dumps(body).encode())
@@ -137,7 +137,7 @@ def main() -> None:
         subprocess.run(["xcrun", "simctl", "keychain", SIMULATOR, "add-root-cert", str(ca / "ca.pem")], check=True)
         urllib.request.urlopen(urllib.request.Request(f"{PORTAL}/__probe/cookies", method="POST",
                                                       data=json.dumps(owner.cookie.split("; ")).encode()))
-        chat = "/portal/satyr-kitchen-acceptance/cafe-operations/chat"
+        chat = "/portal/pantry-kitchen-acceptance/cafe-operations/chat"
         subprocess.run(["xcrun", "simctl", "openurl", SIMULATOR, f"{PORTAL}/__probe/open?to={urllib.parse.quote(chat, safe='')}"],
                        check=True)
         print(json.dumps({"ready": True, "organisationId": organisation_id, "csrf": owner.csrf, "chat": chat}), flush=True)

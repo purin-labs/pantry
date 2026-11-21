@@ -107,7 +107,7 @@ export abstract class BuyerPlacementStage extends BuyerPaymentStage {
     const existing = readPlacement();
     if (existing !== undefined) return { kind: "resolved", result: existing };
     const placed = this.options.checkoutCommands.placeStoredValueCheckout({
-      schemaVersion: "underclerk.place-stored-value-checkout.v1",
+      schemaVersion: "commerce.place-stored-value-checkout.v1",
       merchantId: input.claims.merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `buyer_stored_value_place_${identityDigest}`,
@@ -187,7 +187,7 @@ export abstract class BuyerPlacementStage extends BuyerPaymentStage {
     )
       return undefined;
     return {
-      schemaVersion: "underclerk.buyer-payment-result.v1",
+      schemaVersion: "commerce.buyer-payment-result.v1",
       state: "placed",
       checkoutId,
       checkoutRevision: checkout.revision,
@@ -265,7 +265,7 @@ export abstract class BuyerPlacementStage extends BuyerPaymentStage {
       return undefined;
     }
     const common = {
-      schemaVersion: "underclerk.buyer-payment-result.v1",
+      schemaVersion: "commerce.buyer-payment-result.v1",
       state: "placed",
       checkoutId,
       checkoutRevision: checkout.revision,
@@ -409,7 +409,7 @@ export abstract class BuyerPlacementStage extends BuyerPaymentStage {
     );
     if (paymentDisputes === undefined) return undefined;
     const base = {
-      schemaVersion: "underclerk.buyer-order.v1" as const,
+      schemaVersion: "commerce.buyer-order.v1" as const,
       checkoutId,
       orderId: order.id,
       paymentId: payment.id,

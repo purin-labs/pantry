@@ -53,7 +53,7 @@ checkAndDeploy({
   operation,
   environment,
   profile: "wrangler.vault-onepassword.jsonc",
-  prefix: "satyr-vault-onepassword-",
+  prefix: "pantry-vault-onepassword-",
   check: requireBoundedScript,
 });
 

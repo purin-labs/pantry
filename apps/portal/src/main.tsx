@@ -268,7 +268,7 @@ async function completeInvitation(token: string): Promise<void> {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-satyr-csrf": csrf,
+        "x-pantry-csrf": csrf,
       },
       body: "{}",
     },
@@ -308,7 +308,7 @@ function hasControlSession(): boolean {
 
 /** The control CSRF token, or null when the cookie is missing or empty. */
 function readControlCsrf(): string | null {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   return csrf === "" ? null : csrf;
 }
 

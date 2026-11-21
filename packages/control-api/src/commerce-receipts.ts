@@ -46,7 +46,7 @@ export type CommerceShopifyProviderReceipt = CommerceFlowDecisionReceipt & {
 
 type CommerceProviderReceiptFields = CommerceFlowDecisionReceipt & {
   readonly kind: "commerce_provider_receipt";
-  readonly provider: "underclerk";
+  readonly provider: "commerce";
   readonly receiptId: string;
   readonly effectId: string;
   readonly actionNonce: string;

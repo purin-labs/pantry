@@ -31,7 +31,7 @@ const SIGNER = {
     Buffer.from(payload).toString("base64url"),
 };
 
-describe("Underclerk Lexicon-planned entity queries", () => {
+describe("Commerce Lexicon-planned entity queries", () => {
   it("hydrates exact plans and returns a Lexicon cursor for retained pages", () => {
     const { database, service } = fixture();
     const request = pageRequest(null, 1);
@@ -68,13 +68,13 @@ describe("Underclerk Lexicon-planned entity queries", () => {
     const stale = service.executePlannedQuery(
       parseCommerceGraphQueryPlanRequest({
         ...pageRequest(null, 1),
-        watermark: { kind: "underclerk_native", merchantRevision: 0 },
+        watermark: { kind: "commerce_native", merchantRevision: 0 },
       }),
     );
     expect(stale).toEqual({
       kind: "cursor_stale",
-      expected: { kind: "underclerk_native", merchantRevision: 1 },
-      received: { kind: "underclerk_native", merchantRevision: 0 },
+      expected: { kind: "commerce_native", merchantRevision: 1 },
+      received: { kind: "commerce_native", merchantRevision: 0 },
     });
 
     const first = service.executePlannedQuery(pageRequest(null, 1));
@@ -96,7 +96,7 @@ describe("Underclerk Lexicon-planned entity queries", () => {
   it("rejects a caller capability profile that differs from the authoritative schema", () => {
     const { database, service } = fixture();
     const request = pageRequest(null, 1);
-    if (request.capabilities.kind !== "underclerk_custom")
+    if (request.capabilities.kind !== "commerce_custom")
       throw new Error("fixture capability is not custom");
     const result = service.executePlannedQuery(
       parseCommerceGraphQueryPlanRequest({
@@ -133,9 +133,9 @@ describe("Underclerk Lexicon-planned entity queries", () => {
       organisationId: "organisation_planned",
       merchantId: "merchant_planned",
       merchantRevision: 1,
-      watermark: { kind: "underclerk_native", merchantRevision: 1 },
+      watermark: { kind: "commerce_native", merchantRevision: 1 },
       capabilities: {
-        kind: "underclerk_custom",
+        kind: "commerce_custom",
         entityTypeId: "trade_partner",
         publishedRevision: 1,
       },
@@ -391,9 +391,9 @@ function pageRequest(
     },
     organisationId: "organisation_planned",
     merchantId: "merchant_planned",
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities: {
-      kind: "underclerk_custom",
+      kind: "commerce_custom",
       entityTypeId: "trade_partner",
       publishedRevision: 1,
       capability: {

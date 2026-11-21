@@ -60,7 +60,7 @@ it(
 const PRODUCT_ID = "product_permission_e2e";
 const COMMERCE_MERCHANT_ID = "merchant_bakery_c3_draft_permission";
 // The form a person may copy from elsewhere; the draft tools take the plain id.
-const PREFIXED_PRODUCT_ID = `underclerk:${COMMERCE_MERCHANT_ID}:${PRODUCT_ID}`;
+const PREFIXED_PRODUCT_ID = `commerce:${COMMERCE_MERCHANT_ID}:${PRODUCT_ID}`;
 const INITIAL_DESCRIPTION = "Freshly baked croissant.";
 const EDITED_DESCRIPTION = "Croissant baked at dawn with cultured butter.";
 const SECOND_ROOT_TS = "1787500300.000001";

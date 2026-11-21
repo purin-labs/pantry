@@ -117,8 +117,8 @@ export type SupplierRegistrationError =
   | Readonly<{
       code:
         | "email_operational_contact_sync_failed"
-        | "underclerk_scope_mismatch"
-        | "underclerk_projection_refresh_unavailable";
+        | "commerce_scope_mismatch"
+        | "commerce_projection_refresh_unavailable";
       detail?: never;
     }>;
 
@@ -186,7 +186,7 @@ export async function registerSupplier(
     reconciled.value.organisationId !== input.organisationId ||
     reconciled.value.merchantId !== input.merchantId
   )
-    return { ok: false, error: { code: "underclerk_scope_mismatch" } };
+    return { ok: false, error: { code: "commerce_scope_mismatch" } };
   try {
     await input.queue.send(
       createCommerceOutboxReconcileQueueMessage({
@@ -200,7 +200,7 @@ export async function registerSupplier(
   } catch {
     return {
       ok: false,
-      error: { code: "underclerk_projection_refresh_unavailable" },
+      error: { code: "commerce_projection_refresh_unavailable" },
     };
   }
   return {

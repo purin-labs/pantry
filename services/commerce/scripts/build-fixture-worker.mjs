@@ -14,13 +14,13 @@ const wrangler = readFileSync(join(service, "wrangler.jsonc"), "utf8");
 const compatibilityDate = /"compatibility_date":\s*"([^"]+)"/u.exec(wrangler)?.[1];
 if (compatibilityDate === undefined) throw new Error("wrangler.jsonc has no compatibility_date");
 
-const scratch = mkdtempSync(join(tmpdir(), "underclerk-fixture-worker-"));
+const scratch = mkdtempSync(join(tmpdir(), "commerce-fixture-worker-"));
 try {
   const config = join(scratch, "wrangler.json");
   writeFileSync(
     config,
     JSON.stringify({
-      name: "underclerk-fixture",
+      name: "commerce-fixture",
       main: join(service, "tests/fixture-worker/worker.ts"),
       compatibility_date: compatibilityDate,
       compatibility_flags: ["nodejs_compat"],

@@ -81,7 +81,7 @@ async function squareConnection(): Promise<void> {
       environment: "production",
       applicationId: OAUTH.clientId,
       providerAccountId: SELLER,
-      businessName: "Satyr Café",
+      businessName: "Pantry Café",
       state: "connected",
     });
     expect(square.exchanges).toEqual([
@@ -276,7 +276,7 @@ class FakeSquare {
       return json({
         merchant: {
           id: SELLER,
-          business_name: "Satyr Café",
+          business_name: "Pantry Café",
           country: "JP",
           currency: "JPY",
         },

@@ -25,7 +25,7 @@ import { traceWarn } from "../observability";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 
 /** Pantry's subscription id on every merchant. */
-const SUBSCRIPTION_ID = "satyr";
+const SUBSCRIPTION_ID = "pantry";
 /** A post signed longer ago than this is refused, so a copy cannot replay. */
 const SIGNATURE_TOLERANCE_MS = 5 * 60 * 1_000;
 const MAXIMUM_BODY_BYTES = 64 * 1_024;
@@ -55,9 +55,9 @@ export async function ensureCommerceWebhookSubscription(
   }>,
 ): Promise<CommerceWebhookSubscriptionOutcome> {
   const { env, db, client, binding, now } = input;
-  const operatorToken = env.UNDERCLERK_SERVICE_TOKEN;
+  const operatorToken = env.COMMERCE_SERVICE_TOKEN;
   if (operatorToken === undefined) return "unavailable";
-  const url = `${env.PANTRY_PUBLIC_ORIGIN}/hook/underclerk/${binding.organisationId}`;
+  const url = `${env.PANTRY_PUBLIC_ORIGIN}/hook/commerce/${binding.organisationId}`;
   const listed = await client.listWebhookSubscriptions(binding.merchantId);
   if (!listed.ok) return "unavailable";
   let subscription = listed.value.find((item) => item.id === SUBSCRIPTION_ID);
@@ -80,7 +80,7 @@ export async function ensureCommerceWebhookSubscription(
       topics: ["*"],
     });
     if (!created.ok || created.value.secret === null) {
-      traceWarn("underclerk.webhook_subscription_refused", {
+      traceWarn("commerce.webhook_subscription_refused", {
         requestId: input.requestId,
         organisation_id: binding.organisationId,
         outcome: created.ok ? created.value.mutation.outcome : "unreachable",
@@ -127,24 +127,24 @@ export async function handleCommerceWebhook(
   if (request.method !== "POST") return methodNotAllowed(["POST"]);
   const organisationId = parseOrganisationId(organisationIdRaw);
   if (!organisationId.ok) return refused();
-  const operatorToken = env.UNDERCLERK_SERVICE_TOKEN;
+  const operatorToken = env.COMMERCE_SERVICE_TOKEN;
   if (operatorToken === undefined)
     return errorResponse(
-      "underclerk_webhook_unavailable",
-      "Underclerk webhooks are not configured.",
+      "commerce_webhook_unavailable",
+      "Commerce webhooks are not configured.",
       503,
     );
   const body = await request.text();
   if (textEncoder.encode(body).byteLength > MAXIMUM_BODY_BYTES)
     return refused();
-  const timestamp = request.headers.get("x-underclerk-timestamp") ?? "";
+  const timestamp = request.headers.get("x-commerce-timestamp") ?? "";
   const signedAt = Date.parse(timestamp);
   if (
     !Number.isFinite(signedAt) ||
     Math.abs(Date.now() - signedAt) > SIGNATURE_TOLERANCE_MS
   )
     return refused();
-  const signatures = (request.headers.get("x-underclerk-signature") ?? "")
+  const signatures = (request.headers.get("x-commerce-signature") ?? "")
     .split(",")
     .flatMap((part) => {
       const hex = /^v1=([0-9a-f]{64})$/u.exec(part.trim())?.[1];
@@ -189,7 +189,7 @@ export async function handleCommerceWebhook(
   const now = Date.now();
   const marked = await execution.value.database
     .prepare(
-      `UPDATE underclerk_webhook_subscription SET read_queued_at = ?
+      `UPDATE commerce_webhook_subscription SET read_queued_at = ?
        WHERE binding_id = ? AND (read_queued_at IS NULL OR read_queued_at < ?)`,
     )
     .bind(now, match.bindingId, now - QUEUED_READ_MS)
@@ -201,7 +201,7 @@ export async function handleCommerceWebhook(
     // scheduled read stays the backstop.
     await startCommerceWebhookRead(execution.value.database, match.bindingId);
     return errorResponse(
-      "underclerk_webhook_queue_unavailable",
+      "commerce_webhook_queue_unavailable",
       "The feed read could not be queued.",
       503,
     );
@@ -218,7 +218,7 @@ export async function handleCommerceWebhook(
 }
 
 /**
- * The CafeOS acceptance fault (development organisations only, with the
+ * The Café acceptance fault (development organisations only, with the
  * fault injection token): it fails the first queue step after it is armed.
  */
 async function consumeAcceptanceFault(
@@ -249,8 +249,8 @@ async function consumeAcceptanceFault(
 
 function refused(): Response {
   return errorResponse(
-    "underclerk_webhook_refused",
-    "The Underclerk webhook was refused.",
+    "commerce_webhook_refused",
+    "The Commerce webhook was refused.",
     401,
   );
 }
@@ -273,8 +273,8 @@ async function readKeptSecrets(
       `SELECT s.binding_id AS bindingId, s.sealed_secret AS sealedSecret,
               b.merchant_id AS merchantId,
               b.integration_account_id AS integrationAccountId
-       FROM underclerk_webhook_subscription s
-       JOIN underclerk_merchant_binding b ON b.binding_id = s.binding_id
+       FROM commerce_webhook_subscription s
+       JOIN commerce_merchant_binding b ON b.binding_id = s.binding_id
          AND b.organisation_id = s.organisation_id
        WHERE s.organisation_id = ?`,
     )
@@ -315,7 +315,7 @@ async function keepSecret(
   const sealed = await sealSecret(operatorToken, binding.bindingId, secret);
   await db
     .prepare(
-      `INSERT INTO underclerk_webhook_subscription (
+      `INSERT INTO commerce_webhook_subscription (
          binding_id, organisation_id, subscription_id, sealed_secret,
          created_at, updated_at
        ) VALUES (?, ?, ?, ?, ?, ?)
@@ -337,7 +337,7 @@ async function keepSecret(
 function commandBase(binding: Pick<CommerceMerchantBinding, "merchantId">) {
   return {
     merchantId: binding.merchantId,
-    idempotencyKey: `satyr_webhook_${crypto.randomUUID()}`,
+    idempotencyKey: `pantry_webhook_${crypto.randomUUID()}`,
   };
 }
 
@@ -357,7 +357,7 @@ async function sealingKey(operatorToken: string): Promise<CryptoKey> {
       name: "HKDF",
       hash: "SHA-256",
       salt: new Uint8Array(0),
-      info: textEncoder.encode("satyr.underclerk-webhook-secret.v1"),
+      info: textEncoder.encode("pantry.commerce-webhook-secret.v1"),
     },
     material,
     { name: "AES-GCM", length: 256 },
@@ -436,7 +436,7 @@ export async function startCommerceWebhookRead(
   await db
     .prepare(
       // A scheduled read with no post before it finds no mark and writes no row.
-      "UPDATE underclerk_webhook_subscription SET read_queued_at = NULL WHERE binding_id = ? AND read_queued_at IS NOT NULL",
+      "UPDATE commerce_webhook_subscription SET read_queued_at = NULL WHERE binding_id = ? AND read_queued_at IS NOT NULL",
     )
     .bind(bindingId)
     .run();

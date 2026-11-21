@@ -24,17 +24,17 @@ declare module "vitest" {
   }
 }
 
-const OPERATOR = "underclerk-e2e-token";
-const HOOK = "https://hooks.cafe-till.example/underclerk";
+const OPERATOR = "commerce-e2e-token";
+const HOOK = "https://hooks.cafe-till.example/commerce";
 
 it(
-  "closes the Underclerk merchant of a purged Organisation: its keys stop and its webhooks are gone",
+  "closes the Commerce merchant of a purged Organisation: its keys stop and its webhooks are gone",
   { timeout: 180_000 },
   purgedOrganisationCommerceJourney,
 );
 
 /**
- * Refactor 15, refactor 11. A café gave its till system an Commerce key and
+ * Refactor 15, refactor 11. A café gave its till system a Commerce key and
  * a webhook for its orders. The café's Organisation is archived and then
  * deleted. The purge closes the café's merchant on Commerce: the till's key
  * and Pantry's own installation are refused, and no webhook subscription is
@@ -70,18 +70,18 @@ async function purgedOrganisationCommerceJourney({
   );
   expect(subscribed.status, JSON.stringify(subscribed.body)).toBe(200);
   const pantryToken = await commerceAppInstallationToken(OPERATOR, {
-    appId: "satyr",
+    appId: "pantry",
     merchantId,
     externalReference: organisationId,
   });
   const live = {
     tillKey: (await commerceEngine("GET", `${merchantId}/snapshot`, tillKey))
       .status,
-    satyr: (await commerceEngine("GET", `${merchantId}/snapshot`, pantryToken))
+    pantry: (await commerceEngine("GET", `${merchantId}/snapshot`, pantryToken))
       .status,
     subscriptions: await subscriptions(merchantId),
   };
-  expect(live).toEqual({ tillKey: 200, satyr: 200, subscriptions: 1 });
+  expect(live).toEqual({ tillKey: 200, pantry: 200, subscriptions: 1 });
 
   // The owner archives the café, then deletes it; the purge runs.
   const execution = () =>
@@ -112,7 +112,7 @@ async function purgedOrganisationCommerceJourney({
   const after = {
     tillKey: (await commerceEngine("GET", `${merchantId}/snapshot`, tillKey))
       .status,
-    satyr: (await commerceEngine("GET", `${merchantId}/snapshot`, pantryToken))
+    pantry: (await commerceEngine("GET", `${merchantId}/snapshot`, pantryToken))
       .status,
     subscriptions: await subscriptions(merchantId),
     newKey: (
@@ -124,7 +124,7 @@ async function purgedOrganisationCommerceJourney({
   };
   expect(after).toEqual({
     tillKey: 401,
-    satyr: 401,
+    pantry: 401,
     subscriptions: 0,
     newKey: 409,
   });
@@ -141,8 +141,8 @@ async function commerceEngine(
   body?: unknown,
   idempotencyKey?: string,
 ): Promise<Readonly<{ status: number; body: unknown }>> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${path}`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${path}`,
     {
       method,
       headers: {

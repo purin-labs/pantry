@@ -210,7 +210,7 @@ export class MediaAuthority {
   library(merchantId: string): CommerceMediaLibraryV1 {
     const { database } = this.#options;
     return {
-      schemaVersion: "underclerk.media.v1",
+      schemaVersion: "commerce.media.v1",
       media: database
         .prepare(
           "SELECT media_json AS json FROM media WHERE merchant_id = ? ORDER BY media_id",

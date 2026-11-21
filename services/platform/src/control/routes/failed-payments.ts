@@ -60,7 +60,7 @@ export async function handleFailedPaymentsControlRoute(
     start: new Date(window.from).toISOString(),
     end: new Date(window.to).toISOString(),
   });
-  if (!failed.ok) return controlError("underclerk_unavailable", 503);
+  if (!failed.ok) return controlError("commerce_unavailable", 503);
   const day: FailedPaymentsDay = {
     truncated: failed.value.truncated,
     steps: failed.value.steps,

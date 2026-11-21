@@ -103,7 +103,7 @@ type CodeStore = {
     { kind: "none" } | { kind: "used"; turnId: string; harnessTaskId: TaskId };
 };
 export const CodeModeStore = defineDoc<CodeStore>({
-  kind: "satyr.codemode.store",
+  kind: "pantry.codemode.store",
   version: 1,
   scope: "conversation",
   history: "rewindable",
@@ -425,11 +425,11 @@ function executionEntry(
 function ignore(): void {}
 
 type NestedDetails = {
-  satyrAuthority: AuthorizedHarnessToolResult["authority"];
-  satyrOutput: AuthorizedHarnessToolResult["output"];
-  satyrStatus: AuthorizedHarnessToolResult["status"];
+  pantryAuthority: AuthorizedHarnessToolResult["authority"];
+  pantryOutput: AuthorizedHarnessToolResult["output"];
+  pantryStatus: AuthorizedHarnessToolResult["status"];
   /** The capabilities whose data the result can hold. */
-  satyrSources: readonly string[];
+  pantrySources: readonly string[];
 };
 
 function nestedResult(
@@ -437,10 +437,10 @@ function nestedResult(
   sources: readonly string[],
 ): ToolExecutionResult {
   const details = nestedDetails({
-    satyrAuthority: result.authority,
-    satyrOutput: result.output,
-    satyrStatus: result.status,
-    satyrSources: sources,
+    pantryAuthority: result.authority,
+    pantryOutput: result.output,
+    pantryStatus: result.status,
+    pantrySources: sources,
   });
   const text = toolText(result);
   if (result instanceof StructuredToolResult)
@@ -468,14 +468,14 @@ async function nestedFailure(
     output: [{ type: "text", text: message }],
     isError: true,
     details: nestedDetails({
-      satyrAuthority: { kind: "read", resultDigest: digest },
-      satyrOutput: {
+      pantryAuthority: { kind: "read", resultDigest: digest },
+      pantryOutput: {
         kind: "inline",
         content: [{ kind: "text", text: message }],
         digest,
       },
-      satyrStatus: "failed",
-      satyrSources: sources,
+      pantryStatus: "failed",
+      pantrySources: sources,
     }),
   };
 }
@@ -634,12 +634,12 @@ async function executeCode(
   const authorized: PendingCodeModeReceipt["authorized"] = {
     content: [...content, { type: "text", text: CODE_MODE_FINISHED }],
     details: {
-      satyrOutput: {
+      pantryOutput: {
         kind: "inline",
         content: [{ kind: "text", text }],
         digest,
       },
-      satyrAuthority: {
+      pantryAuthority: {
         kind: "code_execution",
         receiptId: lease.executionId,
         resultDigest: digest,
@@ -847,7 +847,7 @@ function recordedSources(result: unknown): readonly string[] | null {
   if (!isRecord(result)) return null;
   const details = result.details;
   if (!isRecord(details)) return result.isError === true ? [] : null;
-  const sources = details.satyrSources;
+  const sources = details.pantrySources;
   return Array.isArray(sources) && sources.every(isString) ? sources : null;
 }
 
@@ -982,18 +982,18 @@ async function nestedResults(
     const recorded: unknown = nested?.result?.details;
     if (
       !isRecord(recorded) ||
-      !isRecord(recorded.satyrAuthority) ||
-      !isRecord(recorded.satyrOutput)
+      !isRecord(recorded.pantryAuthority) ||
+      !isRecord(recorded.pantryOutput)
     )
       continue;
     results.push({
       callId: `call_${await sha256Hex(`${api.callId}/c${call.id}`)}`,
       tool: typeof call.name === "string" ? call.name : "",
       result: jsonValue({
-        kind: recorded.satyrAuthority.kind,
-        status: recorded.satyrStatus,
-        output: recorded.satyrOutput,
-        authority: recorded.satyrAuthority,
+        kind: recorded.pantryAuthority.kind,
+        status: recorded.pantryStatus,
+        output: recorded.pantryOutput,
+        authority: recorded.pantryAuthority,
       }),
     });
   }
@@ -1084,8 +1084,8 @@ function authorizedResult(
   return {
     output: [{ type: "text", text: toolText(result) }],
     details: {
-      satyrAuthority: result.authority,
-      satyrOutput: JSON.parse(canonicalJson(result.output)),
+      pantryAuthority: result.authority,
+      pantryOutput: JSON.parse(canonicalJson(result.output)),
     },
     isError: result.status === "failed",
   };
@@ -1104,8 +1104,8 @@ async function readResult(text: string): Promise<AuthorizedResult> {
   return {
     content: [{ type: "text", text }],
     details: {
-      satyrAuthority: { kind: "read", resultDigest: digest },
-      satyrOutput: {
+      pantryAuthority: { kind: "read", resultDigest: digest },
+      pantryOutput: {
         kind: "inline",
         content: [{ kind: "text", text }],
         digest,

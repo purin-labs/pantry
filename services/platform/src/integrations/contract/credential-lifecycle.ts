@@ -778,7 +778,7 @@ function parseConnectionLifecycle(
 }
 
 function parseAuthMode(value: string): ProviderConnection["authMode"] | null {
-  return value === "shared_satyr_app" ||
+  return value === "shared_pantry_app" ||
     value === "api_key" ||
     value === "webhook_secret"
     ? value

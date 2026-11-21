@@ -114,7 +114,7 @@ async function browserAcceptanceFixture(page) {
   const terminalCounters = [];
   for (const location of ["boutique_tokyo", "cafe_kyoto"]) {
     terminalCounters.push({
-      satyrLocationId: location,
+      pantryLocationId: location,
       blockedReason: location === "cafe_kyoto" ? "assignment_retired" : null,
       assignment: {
         assignmentId: `terminal_${location}`,
@@ -166,7 +166,7 @@ async function browserAcceptanceFixture(page) {
     configuration_version: 1,
     organisation: {
       organisation_id: organisationId,
-      name: "CafeOS browser lab",
+      name: "Café browser lab",
       plan: "beta",
       lifecycle: {
         kind: "active",
@@ -235,12 +235,12 @@ async function browserAcceptanceFixture(page) {
 
   const home = {
     ok: true,
-    schemaVersion: "satyr.cafeos.home.v1",
+    schemaVersion: "pantry.cafeos.home.v1",
     generatedAt: 1_800_000_000_000,
     home: {
       workspace: {
         organisationId,
-        name: "CafeOS browser lab",
+        name: "Café browser lab",
         lifecycle: "active",
         environment: "development",
       },
@@ -313,7 +313,7 @@ async function browserAcceptanceFixture(page) {
     provider_account_id: "T_PLAN21_RECOVERY",
     environment: "development",
     account_kind: "workspace",
-    display_name: "CafeOS acceptance Slack",
+    display_name: "Café acceptance Slack",
     lifecycle: { kind: "reauth_required", reason_code: "oauth_scope_revoked" },
     is_default_for_provider: true,
     capabilities: ["chat:write"],
@@ -330,7 +330,7 @@ async function browserAcceptanceFixture(page) {
       {
         resource_kind: "workspace",
         canonical_resource_id: "T_PLAN21_RECOVERY",
-        display_label: "CafeOS acceptance Slack",
+        display_label: "Café acceptance Slack",
       },
       {
         resource_kind: "channel",
@@ -355,7 +355,7 @@ async function browserAcceptanceFixture(page) {
     source: "lab",
     provider: "Commerce Lab",
     integrationAccountId: "account_browser_lab",
-    accountName: "CafeOS browser lab",
+    accountName: "Café browser lab",
     providerAccountId: "merchant_browser_lab",
     environment: "development",
     accountLifecycle: "active",
@@ -432,7 +432,7 @@ async function browserAcceptanceFixture(page) {
   function productEnvelope(products) {
     return {
       ok: true,
-      schemaVersion: "satyr.commerce.query.v1",
+      schemaVersion: "pantry.commerce.query.v1",
       organisationId,
       organisationEnvironment: "development",
       projectionSnapshot: { generatedAt: 1, maxRevision: 1 },
@@ -476,7 +476,7 @@ async function browserAcceptanceFixture(page) {
       resourceKey: providerActionDetails.offerId,
       commerceSystem: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: 1,
       },
       amount: null,
@@ -510,7 +510,7 @@ async function browserAcceptanceFixture(page) {
           ([actionNonce, state]) => ({
             action: {
               nonce: { value: actionNonce },
-              host: "satyr.commerce",
+              host: "pantry.commerce",
               verb: "commerce.catalog.publish",
               resourceKey: providerActionDetails.offerId,
               amount: null,
@@ -705,7 +705,7 @@ async function browserAcceptanceFixture(page) {
                 provenance: {
                   organisationId,
                   integrationAccountId: "intacc_commerce",
-                  source: "underclerk",
+                  source: "commerce",
                   resourceType: "commerce_order",
                   resourceId: "order_1041",
                   revision: 1,
@@ -948,7 +948,7 @@ async function browserAcceptanceFixture(page) {
       return json(route, {
         ok: true,
         terminalOperations: {
-          schemaVersion: "satyr.terminal-operations.v2",
+          schemaVersion: "pantry.terminal-operations.v2",
           organisationId,
           generatedAt: "2026-10-23T01:00:00Z",
           counters: terminalCounters,
@@ -958,9 +958,9 @@ async function browserAcceptanceFixture(page) {
           kind: "ready",
           merchantId: "merchant_browser",
           environment: "development",
-          satyrLocations: [
+          pantryLocations: [
             {
-              satyrLocationId: "boutique_tokyo",
+              pantryLocationId: "boutique_tokyo",
               currency: "JPY",
               supportedItems: [
                 { variantId: "variant_financier", maxQuantityPerLine: 24 },
@@ -1029,7 +1029,7 @@ async function browserAcceptanceFixture(page) {
       pathname === `/v1/control/organisations/${organisationId}/inference` &&
       isAuthenticated()
     ) {
-      return json(route, { ok: true, selection: { kind: "satyr_platform" } });
+      return json(route, { ok: true, selection: { kind: "pantry_platform" } });
     }
     if (
       pathname ===
@@ -1269,7 +1269,7 @@ async function browserAcceptanceFixture(page) {
             resourceKey: croissant.productId,
             commerceSystem: {
               kind: "commerce_system",
-              system: "satyr_commerce",
+              system: "builtin_commerce",
               revision: 1,
             },
             details: {

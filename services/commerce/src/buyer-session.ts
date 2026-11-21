@@ -34,7 +34,7 @@ type BuyerSessionIdentity =
 
 export type BuyerSessionClaims = Readonly<{
   version: 4;
-  audience: "underclerk_storefront";
+  audience: "commerce_storefront";
   sessionId: string;
   merchantId: string;
   storefrontId: string;
@@ -50,7 +50,7 @@ type BuyerSessionVerification =
 
 type BuyerOrderRecoveryClaims = Readonly<{
   version: 4;
-  audience: "underclerk_buyer_order";
+  audience: "commerce_buyer_order";
   sessionId: string;
   merchantId: string;
   storefrontId: string;
@@ -72,16 +72,16 @@ type BuyerSessionAuthorityOptions = Readonly<{
   newSessionId?: () => string;
 }>;
 
-const TOKEN_PREFIX = "underclerk_buyer_v3";
-const ORDER_RECOVERY_TOKEN_PREFIX = "underclerk_order_v3";
-const DRAFT_INVOICE_TOKEN_PREFIX = "underclerk_invoice_v1";
-const CUSTOMER_ACCESS_TOKEN_PREFIX = "underclerk_customer_v1";
+const TOKEN_PREFIX = "commerce_buyer_v3";
+const ORDER_RECOVERY_TOKEN_PREFIX = "commerce_order_v3";
+const DRAFT_INVOICE_TOKEN_PREFIX = "commerce_invoice_v1";
+const CUSTOMER_ACCESS_TOKEN_PREFIX = "commerce_customer_v1";
 const CUSTOMER_ACCESS_LIFETIME_MS = 30 * 24 * 60 * 60 * 1_000;
 
 /** A signed-in customer, for one storefront, for thirty days. */
 type CustomerAccessClaims = Readonly<{
   version: 2;
-  audience: "underclerk_customer";
+  audience: "commerce_customer";
   merchantId: string;
   storefrontId: string;
   customerId: string;
@@ -92,7 +92,7 @@ type CustomerAccessClaims = Readonly<{
 
 type DraftInvoiceClaims = Readonly<{
   version: 2;
-  audience: "underclerk_draft_invoice";
+  audience: "commerce_draft_invoice";
   merchantId: string;
   storefrontId: string;
   draftOrderId: string;
@@ -136,7 +136,7 @@ export class BuyerSessionAuthority {
     const sessionId = requireText(input.sessionId ?? this.#newSessionId());
     const claims: BuyerSessionClaims = {
       version: 4,
-      audience: "underclerk_storefront",
+      audience: "commerce_storefront",
       sessionId,
       merchantId: requireText(input.merchantId),
       storefrontId: requireText(input.storefrontId),
@@ -209,7 +209,7 @@ export class BuyerSessionAuthority {
   ): Readonly<{ token: string; claims: DraftInvoiceClaims }> {
     const claims: DraftInvoiceClaims = {
       version: 2,
-      audience: "underclerk_draft_invoice",
+      audience: "commerce_draft_invoice",
       merchantId: requireText(input.merchantId),
       storefrontId: requireText(input.storefrontId),
       draftOrderId: requireText(input.draftOrderId),
@@ -282,7 +282,7 @@ export class BuyerSessionAuthority {
     const issuedAt = requireTimestamp(this.#now());
     const claims: CustomerAccessClaims = {
       version: 2,
-      audience: "underclerk_customer",
+      audience: "commerce_customer",
       merchantId: requireText(input.merchantId),
       storefrontId: requireText(input.storefrontId),
       customerId: requireText(input.customerId),
@@ -362,7 +362,7 @@ export class BuyerSessionAuthority {
     const issuedAt = requireTimestamp(input.issuedAt);
     const claims: BuyerOrderRecoveryClaims = {
       version: 4,
-      audience: "underclerk_buyer_order",
+      audience: "commerce_buyer_order",
       sessionId: requireText(input.sessionId),
       merchantId: requireText(input.merchantId),
       storefrontId: requireText(input.storefrontId),
@@ -444,13 +444,13 @@ function parseDraftInvoiceClaims(
     if (
       !isRecord(value) ||
       value.version !== 2 ||
-      value.audience !== "underclerk_draft_invoice"
+      value.audience !== "commerce_draft_invoice"
     ) {
       return undefined;
     }
     return {
       version: 2,
-      audience: "underclerk_draft_invoice",
+      audience: "commerce_draft_invoice",
       merchantId: requireText(value.merchantId),
       storefrontId: requireText(value.storefrontId),
       draftOrderId: requireText(value.draftOrderId),
@@ -473,13 +473,13 @@ function parseCustomerAccessClaims(
     if (
       !isRecord(value) ||
       value.version !== 2 ||
-      value.audience !== "underclerk_customer"
+      value.audience !== "commerce_customer"
     ) {
       return undefined;
     }
     return {
       version: 2,
-      audience: "underclerk_customer",
+      audience: "commerce_customer",
       merchantId: requireText(value.merchantId),
       storefrontId: requireText(value.storefrontId),
       customerId: requireText(value.customerId),
@@ -504,13 +504,13 @@ function parseClaims(payload: string): BuyerSessionClaims | undefined {
     if (
       !isRecord(value) ||
       value.version !== 4 ||
-      value.audience !== "underclerk_storefront"
+      value.audience !== "commerce_storefront"
     ) {
       return undefined;
     }
     return {
       version: 4,
-      audience: "underclerk_storefront",
+      audience: "commerce_storefront",
       sessionId: requireText(value.sessionId),
       merchantId: requireText(value.merchantId),
       storefrontId: requireText(value.storefrontId),
@@ -535,13 +535,13 @@ function parseOrderRecoveryClaims(
     if (
       !isRecord(value) ||
       value.version !== 4 ||
-      value.audience !== "underclerk_buyer_order"
+      value.audience !== "commerce_buyer_order"
     ) {
       return undefined;
     }
     return {
       version: 4,
-      audience: "underclerk_buyer_order",
+      audience: "commerce_buyer_order",
       sessionId: requireText(value.sessionId),
       merchantId: requireText(value.merchantId),
       storefrontId: requireText(value.storefrontId),

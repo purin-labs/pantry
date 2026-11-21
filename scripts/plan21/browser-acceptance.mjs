@@ -127,7 +127,7 @@ async function main() {
   assertCommonPage(desktopSignIn, "/portal");
   assertCheck(
     desktopSignIn.heading === "Sign in to Seams Pantry",
-    "signed-out page uses the CafeOS sign-in heading",
+    "signed-out page uses the Café sign-in heading",
   );
   assertCheck(
     desktopSignIn.googleLabel === "Continue with Google",
@@ -220,7 +220,7 @@ async function main() {
   runCli("resize", ["1440", "900"]);
   runCli("goto", [`${baseUrl}/portal?p21_auth=1`]);
   runCli("run-code", [
-    "async (page) => { await page.evaluate(() => { document.cookie = 'satyr_control_csrf=csrf_plan21; path=/; SameSite=Lax'; }); return true; }",
+    "async (page) => { await page.evaluate(() => { document.cookie = 'pantry_csrf=csrf_plan21; path=/; SameSite=Lax'; }); return true; }",
   ]);
   const workspaces = checkPage();
   assertCommonPage(workspaces, "/portal");
@@ -256,7 +256,7 @@ async function main() {
   );
   assertCheck(
     failedWorkspaces.describedError ===
-      "CafeOS could not create this workspace. Try again.",
+      "Café could not create this workspace. Try again.",
     "workspace form associates merchant-safe recovery copy with its fields",
   );
   assertCheck(
@@ -296,7 +296,7 @@ async function main() {
     "workspace route moves visible focus into the new page heading",
   );
   const homeAccessibility = runCli("run-code", [
-    "async (page) => { const client = await page.context().newCDPSession(page); const tree = await client.send('Accessibility.getFullAXTree'); const nodes = tree.nodes.map((node) => ({ role: node.role?.value ?? '', name: node.name?.value ?? '' })); const has = (role, name) => nodes.some((node) => node.role === role && node.name === name); const includes = (role, name) => nodes.some((node) => node.role === role && node.name.includes(name)); return { root: nodes.some((node) => node.role === 'RootWebArea'), globalNavigation: has('navigation', 'Global'), main: nodes.some((node) => node.role === 'main'), homeHeading: has('heading', 'Home'), workspaceNavigation: has('navigation', 'Workspace pages'), search: includes('button', 'Search CafeOS'), urgentAction: includes('link', 'Open customer order') }; }",
+    "async (page) => { const client = await page.context().newCDPSession(page); const tree = await client.send('Accessibility.getFullAXTree'); const nodes = tree.nodes.map((node) => ({ role: node.role?.value ?? '', name: node.name?.value ?? '' })); const has = (role, name) => nodes.some((node) => node.role === role && node.name === name); const includes = (role, name) => nodes.some((node) => node.role === role && node.name.includes(name)); return { root: nodes.some((node) => node.role === 'RootWebArea'), globalNavigation: has('navigation', 'Global'), main: nodes.some((node) => node.role === 'main'), homeHeading: has('heading', 'Home'), workspaceNavigation: has('navigation', 'Workspace pages'), search: includes('button', 'Search Café'), urgentAction: includes('link', 'Open customer order') }; }",
   ]);
   assertCheck(
     homeAccessibility.root &&
@@ -320,7 +320,7 @@ async function main() {
     "account menu renders above sticky workspace actions in the global chrome layer",
   );
   const commandClose = runCli("run-code", [
-    "async (page) => { const trigger = page.getByRole('button', { name: 'Search CafeOS' }); await trigger.focus(); await page.keyboard.press('Meta+K'); const dialog = page.getByRole('dialog', { name: 'Search workspace pages' }); await dialog.waitFor({ state: 'visible', timeout: 10_000 }); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); const listbox = page.getByRole('listbox', { name: 'Workspace page results' }); const activeId = await input.getAttribute('aria-activedescendant'); const activeOption = page.locator('[role=option][aria-selected=true]'); const focusedInput = await input.evaluate((node) => document.activeElement === node); const modal = await dialog.evaluate((node) => node.matches(':modal')); const hasListbox = await listbox.count() === 1; const roleOptions = await page.getByRole('option').count(); const activeOptionId = await activeOption.getAttribute('id'); await page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden', timeout: 10_000 }); await page.waitForFunction(() => document.activeElement?.matches('.portal-command-trigger')); return { focusedInput, focusRestored: await trigger.evaluate((node) => document.activeElement === node), modal, hasListbox, roleOptions, activeOption: activeId !== null && activeOptionId === activeId }; }",
+    "async (page) => { const trigger = page.getByRole('button', { name: 'Search Café' }); await trigger.focus(); await page.keyboard.press('Meta+K'); const dialog = page.getByRole('dialog', { name: 'Search workspace pages' }); await dialog.waitFor({ state: 'visible', timeout: 10_000 }); const input = page.getByRole('combobox', { name: 'Search workspace pages' }); const listbox = page.getByRole('listbox', { name: 'Workspace page results' }); const activeId = await input.getAttribute('aria-activedescendant'); const activeOption = page.locator('[role=option][aria-selected=true]'); const focusedInput = await input.evaluate((node) => document.activeElement === node); const modal = await dialog.evaluate((node) => node.matches(':modal')); const hasListbox = await listbox.count() === 1; const roleOptions = await page.getByRole('option').count(); const activeOptionId = await activeOption.getAttribute('id'); await page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden', timeout: 10_000 }); await page.waitForFunction(() => document.activeElement?.matches('.portal-command-trigger')); return { focusedInput, focusRestored: await trigger.evaluate((node) => document.activeElement === node), modal, hasListbox, roleOptions, activeOption: activeId !== null && activeOptionId === activeId }; }",
   ]);
   assertCheck(
     commandClose.focusedInput && commandClose.focusRestored,
@@ -397,7 +397,7 @@ async function main() {
   );
   runCli("resize", ["1440", "900"]);
   const workspaceSwitch = runCli("run-code", [
-    "async (page) => { const trigger = page.getByRole('button', { name: /^Workspace:/ }); await trigger.focus(); await page.keyboard.press('ArrowDown'); const choice = page.getByRole('menuitemradio', { name: /Riverside Cafe/ }); await choice.waitFor({ state: 'visible', timeout: 10_000 }); const openedWithKeyboard = await trigger.getAttribute('aria-expanded') === 'true'; await choice.focus(); await page.keyboard.press('Enter'); await page.waitForURL('**/portal/riverside-cafe'); await page.locator('h1#portal-page-title').filter({ hasText: 'Home' }).waitFor({ state: 'visible', timeout: 10_000 }); const selectedPath = await page.evaluate(() => location.pathname); const selectedWorkspaceLocator = page.locator('.console-switcher-workspace .console-switcher-label'); await selectedWorkspaceLocator.filter({ hasText: 'Riverside Cafe' }).waitFor({ state: 'visible', timeout: 10_000 }); const selectedWorkspace = (await selectedWorkspaceLocator.textContent() ?? '').trim(); const currentTrigger = page.getByRole('button', { name: /^Workspace:/ }); await currentTrigger.focus(); await page.keyboard.press('ArrowDown'); const original = page.getByRole('menuitemradio', { name: /CafeOS browser lab/ }); await original.focus(); await page.keyboard.press('Enter'); await page.waitForURL('**/portal/cafe-browser-lab'); await page.locator('h1#portal-page-title').filter({ hasText: 'Home' }).waitFor({ state: 'visible', timeout: 10_000 }); return { openedWithKeyboard, selectedPath, selectedWorkspace, restoredPath: await page.evaluate(() => location.pathname) }; }",
+    "async (page) => { const trigger = page.getByRole('button', { name: /^Workspace:/ }); await trigger.focus(); await page.keyboard.press('ArrowDown'); const choice = page.getByRole('menuitemradio', { name: /Riverside Cafe/ }); await choice.waitFor({ state: 'visible', timeout: 10_000 }); const openedWithKeyboard = await trigger.getAttribute('aria-expanded') === 'true'; await choice.focus(); await page.keyboard.press('Enter'); await page.waitForURL('**/portal/riverside-cafe'); await page.locator('h1#portal-page-title').filter({ hasText: 'Home' }).waitFor({ state: 'visible', timeout: 10_000 }); const selectedPath = await page.evaluate(() => location.pathname); const selectedWorkspaceLocator = page.locator('.console-switcher-workspace .console-switcher-label'); await selectedWorkspaceLocator.filter({ hasText: 'Riverside Cafe' }).waitFor({ state: 'visible', timeout: 10_000 }); const selectedWorkspace = (await selectedWorkspaceLocator.textContent() ?? '').trim(); const currentTrigger = page.getByRole('button', { name: /^Workspace:/ }); await currentTrigger.focus(); await page.keyboard.press('ArrowDown'); const original = page.getByRole('menuitemradio', { name: /Café browser lab/ }); await original.focus(); await page.keyboard.press('Enter'); await page.waitForURL('**/portal/cafe-browser-lab'); await page.locator('h1#portal-page-title').filter({ hasText: 'Home' }).waitFor({ state: 'visible', timeout: 10_000 }); return { openedWithKeyboard, selectedPath, selectedWorkspace, restoredPath: await page.evaluate(() => location.pathname) }; }",
   ]);
   assertCheck(
     workspaceSwitch.openedWithKeyboard,
@@ -478,7 +478,7 @@ async function main() {
     "urgent Home action opens and focuses the order detail heading",
   );
   const reducedMotionStyles = runCli("run-code", [
-    "async (page) => { await page.emulateMedia({ reducedMotion: 'reduce' }); const trigger = page.getByRole('button', { name: 'Search CafeOS' }); await trigger.click(); const dialog = page.getByRole('dialog', { name: 'Search workspace pages' }); await dialog.waitFor({ state: 'visible', timeout: 10_000 }); const styles = await page.evaluate(() => ['.workspace-command-dialog', '.portal-shell-workspace', '.console-sidebar', '.console-nav-label', '.console-switcher-trigger'].map((selector) => { const node = document.querySelector(selector); if (node === null) return { selector, transitionDuration: null, animationDuration: null }; const style = getComputedStyle(node); return { selector, transitionDuration: style.transitionDuration, animationDuration: style.animationDuration }; })); await page.keyboard.press('Escape'); await page.emulateMedia({ reducedMotion: 'no-preference' }); return styles; }",
+    "async (page) => { await page.emulateMedia({ reducedMotion: 'reduce' }); const trigger = page.getByRole('button', { name: 'Search Café' }); await trigger.click(); const dialog = page.getByRole('dialog', { name: 'Search workspace pages' }); await dialog.waitFor({ state: 'visible', timeout: 10_000 }); const styles = await page.evaluate(() => ['.workspace-command-dialog', '.portal-shell-workspace', '.console-sidebar', '.console-nav-label', '.console-switcher-trigger'].map((selector) => { const node = document.querySelector(selector); if (node === null) return { selector, transitionDuration: null, animationDuration: null }; const style = getComputedStyle(node); return { selector, transitionDuration: style.transitionDuration, animationDuration: style.animationDuration }; })); await page.keyboard.press('Escape'); await page.emulateMedia({ reducedMotion: 'no-preference' }); return styles; }",
   ]);
   assertCheck(
     reducedMotionStyles.every(
@@ -535,7 +535,7 @@ async function main() {
     "an interrupted Products request cannot overwrite the newer Customer orders route",
   );
   const refreshedRoute = runCli("run-code", [
-    "async (page) => { await page.reload(); await page.locator('h1#portal-page-title').filter({ hasText: 'Customer orders' }).waitFor({ state: 'visible', timeout: 10_000 }); const text = (await page.locator('body').textContent() ?? '').replace(/\\s+/gu, ' '); return { path: await page.evaluate(() => location.pathname), heading: (await page.locator('h1#portal-page-title').textContent() ?? '').trim(), globalOpening: text.includes('Opening Satyr') }; }",
+    "async (page) => { await page.reload(); await page.locator('h1#portal-page-title').filter({ hasText: 'Customer orders' }).waitFor({ state: 'visible', timeout: 10_000 }); const text = (await page.locator('body').textContent() ?? '').replace(/\\s+/gu, ' '); return { path: await page.evaluate(() => location.pathname), heading: (await page.locator('h1#portal-page-title').textContent() ?? '').trim(), globalOpening: text.includes('Opening Pantry') }; }",
   ]);
   assertCheck(
     refreshedRoute.path === "/portal/cafe-browser-lab/orders" &&
@@ -565,7 +565,7 @@ async function main() {
   );
   runCli("resize", ["390", "844"]);
   const drawer = runCli("run-code", [
-    "async (page) => { const toggle = page.getByRole('button', { name: /sidebar/ }); const sidebar = page.locator('aside.console-sidebar'); if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click(); await toggle.focus(); await page.keyboard.press('Enter'); const closed = await sidebar.getAttribute('hidden') !== null; await page.keyboard.press('Enter'); const reopened = await sidebar.getAttribute('hidden') === null; const switcher = page.getByRole('button', { name: /^Workspace:/ }); await switcher.focus(); await page.keyboard.press('ArrowDown'); const opened = await switcher.getAttribute('aria-expanded') === 'true'; await page.keyboard.press('End'); const endFocused = await page.getByRole('menuitem', { name: /All workspaces/ }).evaluate((node) => document.activeElement === node); await page.keyboard.press('Home'); const homeFocused = await page.getByRole('menuitemradio', { name: /CafeOS browser lab/ }).evaluate((node) => document.activeElement === node); await page.keyboard.press('Escape'); return { closed, reopened, opened, endFocused, homeFocused, switcherFocusRestored: await switcher.evaluate((node) => document.activeElement === node) }; }",
+    "async (page) => { const toggle = page.getByRole('button', { name: /sidebar/ }); const sidebar = page.locator('aside.console-sidebar'); if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click(); await toggle.focus(); await page.keyboard.press('Enter'); const closed = await sidebar.getAttribute('hidden') !== null; await page.keyboard.press('Enter'); const reopened = await sidebar.getAttribute('hidden') === null; const switcher = page.getByRole('button', { name: /^Workspace:/ }); await switcher.focus(); await page.keyboard.press('ArrowDown'); const opened = await switcher.getAttribute('aria-expanded') === 'true'; await page.keyboard.press('End'); const endFocused = await page.getByRole('menuitem', { name: /All workspaces/ }).evaluate((node) => document.activeElement === node); await page.keyboard.press('Home'); const homeFocused = await page.getByRole('menuitemradio', { name: /Café browser lab/ }).evaluate((node) => document.activeElement === node); await page.keyboard.press('Escape'); return { closed, reopened, opened, endFocused, homeFocused, switcherFocusRestored: await switcher.evaluate((node) => document.activeElement === node) }; }",
   ]);
   assertCheck(
     drawer.closed && drawer.reopened,
@@ -579,7 +579,7 @@ async function main() {
     "workspace switcher supports Arrow, Home, End, and Escape with focus restoration",
   );
   const compactPreference = runCli("run-code", [
-    "async (page) => { const key = 'satyr:cafeos:sidebar-expanded'; await page.evaluate((storageKey) => localStorage.setItem(storageKey, 'false'), key); const before = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); const toggle = page.getByRole('button', { name: /sidebar/ }); await toggle.focus(); await page.keyboard.press('Enter'); const closed = await page.locator('aside.console-sidebar').getAttribute('hidden') !== null; await page.keyboard.press('Enter'); const reopened = await page.locator('aside.console-sidebar').getAttribute('hidden') === null; const after = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); return { before, after, closed, reopened }; }",
+    "async (page) => { const key = 'pantry:cafeos:sidebar-expanded'; await page.evaluate((storageKey) => localStorage.setItem(storageKey, 'false'), key); const before = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); const toggle = page.getByRole('button', { name: /sidebar/ }); await toggle.focus(); await page.keyboard.press('Enter'); const closed = await page.locator('aside.console-sidebar').getAttribute('hidden') !== null; await page.keyboard.press('Enter'); const reopened = await page.locator('aside.console-sidebar').getAttribute('hidden') === null; const after = await page.evaluate((storageKey) => localStorage.getItem(storageKey), key); return { before, after, closed, reopened }; }",
   ]);
   assertCheck(
     compactPreference.closed &&

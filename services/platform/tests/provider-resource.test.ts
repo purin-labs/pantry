@@ -64,7 +64,7 @@ describe("provider resource discovery", () => {
       provider: "slack",
       providerSubjectId: "resource-workspace",
       environment: "development",
-      authMode: "shared_satyr_app",
+      authMode: "shared_pantry_app",
       authority: {
         kind: "connection_credential",
         credentialRef: credential.value,
@@ -343,7 +343,7 @@ async function createResourceFixture(db: SingleDatabase): Promise<{
     provider: "slack",
     providerSubjectId: "resource-refresh-workspace",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: credential.value,

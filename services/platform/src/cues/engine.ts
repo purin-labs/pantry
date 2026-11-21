@@ -380,7 +380,7 @@ export function createCommerceEntityPlaneCueEvents(input: {
     organisationId: input.organisationId,
     integrationAccountId: input.integrationAccountId,
     source: "commerce",
-    nativeId: `underclerk_entity_plane:${input.deliveryId}:${observation.observationId}`,
+    nativeId: `commerce_entity_plane:${input.deliveryId}:${observation.observationId}`,
     at: input.at,
     eventType: "entity_plane_changed",
     payload: {
@@ -1023,7 +1023,7 @@ function parseCommerceEntityPlaneCueEvent(
   }
   if (
     common.nativeId !==
-    `underclerk_entity_plane:${payload.deliveryId}:${observation.observationId}`
+    `commerce_entity_plane:${payload.deliveryId}:${observation.observationId}`
   ) {
     return invalidCueField("event.nativeId");
   }

@@ -818,7 +818,7 @@ function readCodeModeWindow(_actor: unknown, state: DurableObjectState) {
       `SELECT r.content FROM documents d
        JOIN document_revisions r ON r.document_id = d.id
        WHERE d.kind = ? AND r.seq = (SELECT MAX(seq) FROM document_revisions WHERE document_id = d.id)`,
-      JSON.stringify("satyr.codemode.result"),
+      JSON.stringify("pantry.codemode.result"),
     )
     .toArray()[0];
   const saved: unknown =

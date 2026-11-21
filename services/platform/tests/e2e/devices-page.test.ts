@@ -230,7 +230,7 @@ function terminalAssignment(organisationId: string): TerminalAssignment {
     assignmentId: "terminal_assignment_devices",
     organisationId,
     merchantId: "merchant_devices",
-    satyrLocationId: "counter-main",
+    pantryLocationId: "counter-main",
     account: {
       integrationAccountId: "integration_square_devices",
       providerAccountId: "merchant_square_devices",
@@ -285,7 +285,7 @@ async function send(
       : commerceHeaders(session);
   if (method !== "GET") {
     headers.set("idempotency-key", crypto.randomUUID());
-    headers.set("x-satyr-configuration-version", "1");
+    headers.set("x-pantry-configuration-version", "1");
   }
   const response = await exports.default.fetch(url, {
     method,

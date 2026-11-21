@@ -180,7 +180,7 @@ export class FulfillmentCommandAuthority {
     if (replay !== undefined) {
       return replay.commandDigest === digestOfCommand(command)
         ? {
-            schemaVersion: "underclerk.shipment-label-rate-result.v1",
+            schemaVersion: "commerce.shipment-label-rate-result.v1",
             outcome: "replayed",
             rate: replay.rate,
           }
@@ -229,7 +229,7 @@ export class FulfillmentCommandAuthority {
       command.requestedAt,
     );
     return {
-      schemaVersion: "underclerk.shipment-label-rate-result.v1",
+      schemaVersion: "commerce.shipment-label-rate-result.v1",
       outcome: "quoted",
       rate: quote.rate,
     };

@@ -371,7 +371,7 @@ export async function resolveCafeBuyer(
   merchantId: string;
   buyer: CommerceStorefrontClient;
 }> | null> {
-  const base = env.UNDERCLERK_BASE_URL?.trim();
+  const base = env.COMMERCE_BASE_URL?.trim();
   if (base === undefined || base.length === 0) return null;
   try {
     const scope = await OrganisationExecutionScope.resolve(env, organisationId);
@@ -390,7 +390,7 @@ export async function resolveCafeBuyer(
     const merchantId = binding.value.merchantId;
     const buyer = new CommerceStorefrontClient({
       baseUrl: base,
-      fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
     });
     return { merchantId, buyer };
   } catch {
@@ -443,7 +443,7 @@ export async function readPublishedCafeMenu(
     });
     const [session, shopName] = await Promise.all([
       buyer.createSession(merchantId, CAFE_STOREFRONT_ID, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
       admin === null

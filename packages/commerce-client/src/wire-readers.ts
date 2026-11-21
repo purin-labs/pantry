@@ -60,5 +60,5 @@ export function responseMessage(value: unknown): string {
   ) {
     return value.message;
   }
-  return "Underclerk request failed";
+  return "Commerce request failed";
 }

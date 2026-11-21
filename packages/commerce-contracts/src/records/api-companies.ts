@@ -99,7 +99,7 @@ export const createCommerceCompanyV1Schema = Type.Intersect(
   [
     companyCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.create-company.v1"),
+      schemaVersion: Type.Literal("commerce.create-company.v1"),
       name: boundedTextSchema(100),
       customerIds: customerIdsSchema,
       prices: commerceCompanyPricesV1Schema,
@@ -127,7 +127,7 @@ export const updateCommerceCompanyV1Schema = Type.Intersect(
   [
     companyCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-company.v1"),
+      schemaVersion: Type.Literal("commerce.update-company.v1"),
       expectedRevision: PositiveInteger,
       changes: Type.Refine(
         ReadonlyStrictObject({
@@ -154,7 +154,7 @@ export type CommerceCompanyCommandV1 =
   CreateCommerceCompanyV1 | UpdateCommerceCompanyV1;
 
 export const commerceCompaniesV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.companies.v1"),
+  schemaVersion: Type.Literal("commerce.companies.v1"),
   companies: ImmutableArray(commerceCompanyV1Schema),
 });
 export type CommerceCompaniesV1 = Static<typeof commerceCompaniesV1Schema>;
@@ -208,7 +208,7 @@ export const placeCommerceDraftOrderOnTermsV1Schema = Type.Intersect(
   [
     commandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.place-draft-order-on-terms.v1"),
+      schemaVersion: Type.Literal("commerce.place-draft-order-on-terms.v1"),
       draftOrderId: text,
       expectedDraftOrderRevision: PositiveInteger,
       orderId: text,
@@ -228,7 +228,7 @@ export const recordCommerceInvoicePaymentV1Schema = Type.Intersect(
   [
     commandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.record-invoice-payment.v1"),
+      schemaVersion: Type.Literal("commerce.record-invoice-payment.v1"),
       invoiceId: text,
       expectedRevision: PositiveInteger,
       reference: boundedTextSchema(100),
@@ -241,7 +241,7 @@ export type RecordCommerceInvoicePaymentV1 = Static<
 >;
 
 export const commerceCompanyInvoicesV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.company-invoices.v1"),
+  schemaVersion: Type.Literal("commerce.company-invoices.v1"),
   invoices: ImmutableArray(commerceCompanyInvoiceV1Schema),
 });
 

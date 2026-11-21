@@ -145,7 +145,7 @@ function viewPatch(expectedRevision: number) {
 
 function clientFor(requests: unknown[]): CommerceEntityPlaneClient {
   return new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.example",
+    baseUrl: "https://commerce.example",
     serviceToken: "service-token",
     fetch: async (request, init) => {
       const body =

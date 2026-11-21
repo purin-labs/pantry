@@ -96,7 +96,7 @@ it(
           checkout.checkoutId,
           ana.token,
           {
-            schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+            schemaVersion: "commerce.reconcile-buyer-payment.v1",
             idempotencyKey: "due_ana",
             checkoutRevision: checkout.revision,
             quoteDigest: checkout.quote.quoteDigest,
@@ -150,7 +150,7 @@ it(
           checkout.checkoutId,
           cai.token,
           {
-            schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+            schemaVersion: "commerce.reconcile-buyer-payment.v1",
             idempotencyKey: "due_cai",
             checkoutRevision: checkout.revision,
             quoteDigest: checkout.quote.quoteDigest,
@@ -180,7 +180,7 @@ it(
       const open = await admin(backend, "GET", "unplaced-captures");
       expect(open.status).toBe(200);
       expect(open.body).toMatchObject({
-        schemaVersion: "underclerk.unplaced-captures.v1",
+        schemaVersion: "commerce.unplaced-captures.v1",
         captures: [
           {
             checkoutId: checkout.checkoutId,
@@ -207,7 +207,7 @@ it(
       clock += 60_000;
       const resolution = `unplaced-captures/${item.paymentAttemptId}/resolution`;
       const resolved = await admin(backend, "POST", resolution, {
-        schemaVersion: "underclerk.resolve-unplaced-capture.v1",
+        schemaVersion: "commerce.resolve-unplaced-capture.v1",
         expectedRevision: 1,
         resolution: "refunded",
         note: "Refunded on the Stripe dashboard",
@@ -222,7 +222,7 @@ it(
         },
       });
       const again = await admin(backend, "POST", resolution, {
-        schemaVersion: "underclerk.resolve-unplaced-capture.v1",
+        schemaVersion: "commerce.resolve-unplaced-capture.v1",
         expectedRevision: 2,
         resolution: "placed_by_hand",
       });
@@ -291,7 +291,7 @@ async function startPayment(
       checkout.checkoutId,
       buyer.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -357,8 +357,8 @@ async function notify(
     {
       STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
       STRIPE_SECRET_KEY: SECRET_KEY,
-      UNDERCLERK_SERVICE_TOKEN: SERVICE_TOKEN,
-      UNDERCLERK_MERCHANT: {
+      COMMERCE_SERVICE_TOKEN: SERVICE_TOKEN,
+      COMMERCE_MERCHANT: {
         getByName: () => ({
           fetch: (request: Request) => backend.fetch(request),
         }),

@@ -239,7 +239,7 @@ export function customCapability(
   );
   const attributeIds = type.attributes.map((attribute) => attribute.id);
   return {
-    kind: "underclerk_custom" as const,
+    kind: "commerce_custom" as const,
     entityTypeId: parsePositiveText<CustomCommerceEntityTypeId>(
       entityTypeId,
       "custom.entityTypeId",

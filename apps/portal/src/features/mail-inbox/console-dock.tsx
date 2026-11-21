@@ -4,7 +4,7 @@ import { useConsoleDock } from "../../console-tools";
 import { OverflowToolbar } from "../../ui/overflow-toolbar";
 import "../../ui/resize-handle.css";
 
-const WIDTH_KEY = "satyr:inbox-console-dock-width";
+const WIDTH_KEY = "pantry:inbox-console-dock-width";
 /** The dock's least width before a measure. */
 const MIN_WIDTH = 112;
 /** The pane's least room for the conversation before a measure. */

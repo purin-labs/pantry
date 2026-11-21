@@ -162,7 +162,7 @@ function view(requestId: string): AgentPermissionRequestView | null {
 /** Serves the list, the views and the decisions; other requests go through. */
 export function installPermissionRequestsPreview(): void {
   // A decision is a control mutation, which needs the session's CSRF cookie.
-  document.cookie = "satyr_control_csrf=preview; path=/";
+  document.cookie = "pantry_csrf=preview; path=/";
   const network = window.fetch.bind(window);
   window.fetch = async (input, init) => {
     const url =

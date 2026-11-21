@@ -375,7 +375,7 @@ async function prepareMailBudgetJourney() {
   const selected = await selectOrganisationInferenceSelection({
     db: fixtureDatabase(),
     organisationId,
-    selection: { kind: "satyr_platform" },
+    selection: { kind: "pantry_platform" },
     expectedConfigurationVersion: selection.configurationVersion,
     selectedByUserId: owner.identity.userId,
     now,
@@ -3253,7 +3253,7 @@ async function runDraftOnlyJourney(
   });
   if (!contextGrant.ok) throw new Error(contextGrant.error.code);
   await fixtureDatabase().prepare(
-    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
   )
     .bind(organisationId, owner.identity.userId, now)
     .run();
@@ -3618,8 +3618,8 @@ async function runDraftOnlyJourney(
       headers: {
         "content-type": "application/json",
         origin: "https://localhost",
-        cookie: `satyr_control_session=${owner.session.token}; satyr_control_csrf=${owner.session.csrfToken}`,
-        "x-satyr-csrf": owner.session.csrfToken,
+        cookie: `pantry_session=${owner.session.token}; pantry_csrf=${owner.session.csrfToken}`,
+        "x-pantry-csrf": owner.session.csrfToken,
         "idempotency-key": crypto.randomUUID(),
       },
       body: JSON.stringify({
@@ -3650,8 +3650,8 @@ async function runDraftOnlyJourney(
       headers: {
         "content-type": "application/json",
         origin: "https://localhost",
-        cookie: `satyr_control_session=${owner.session.token}; satyr_control_csrf=${owner.session.csrfToken}`,
-        "x-satyr-csrf": owner.session.csrfToken,
+        cookie: `pantry_session=${owner.session.token}; pantry_csrf=${owner.session.csrfToken}`,
+        "x-pantry-csrf": owner.session.csrfToken,
         "idempotency-key": crypto.randomUUID(),
       },
       body: JSON.stringify({
@@ -5146,10 +5146,10 @@ function reviewSend(
       {
         method: action === null ? "GET" : "POST",
         headers: {
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
           origin: "https://localhost",
           "content-type": "application/json",
-          "x-satyr-csrf": session.csrfToken,
+          "x-pantry-csrf": session.csrfToken,
           "idempotency-key": crypto.randomUUID(),
         },
         body: action === null ? null : JSON.stringify(body),
@@ -5472,7 +5472,7 @@ async function readReviewQueue(
     `https://localhost/v1/control/organisations/${organisationId}/email-reviews`,
     {
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: "https://localhost",
       },
     },
@@ -6174,7 +6174,7 @@ async function mailbox(
     authorizationProduct: product,
     providerSubjectId: name,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle },
     grantedScopes:
       product === "full_mailbox_pilot"
@@ -6225,8 +6225,8 @@ function send(
       headers: {
         "content-type": "application/json",
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: body === null ? null : JSON.stringify(body),
     },
@@ -8179,7 +8179,7 @@ async function assistantJourney(context: TestContext): Promise<void> {
       .status,
   ).toBe(409);
   await fixtureDatabase().prepare(
-    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
   )
     .bind(organisationId, owner.identity.userId, Date.now())
     .run();
@@ -8482,8 +8482,8 @@ function assistantSend(
       headers: {
         "content-type": "application/json",
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify(command),
     },
@@ -8796,7 +8796,7 @@ async function caseContextCollectionReplyJourney(
   });
   if (!contextGrant.ok) throw new Error(contextGrant.error.code);
   await fixtureDatabase().prepare(
-    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+    "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
   )
     .bind(organisationId, owner.identity.userId, now)
     .run();
@@ -9515,9 +9515,9 @@ function caseContextCollectionInspectorRequest(
     new Request(`https://localhost${path}`, {
       method: body === null ? "GET" : "POST",
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: "https://localhost",
-        "x-satyr-csrf": session.csrfToken,
+        "x-pantry-csrf": session.csrfToken,
         "content-type": "application/json",
       },
       ...(body === null ? {} : { body: JSON.stringify(body) }),
@@ -10136,10 +10136,10 @@ function memoryRequest(
       {
         method: body === null ? "GET" : "POST",
         headers: {
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
           origin: "https://localhost",
           "content-type": "application/json",
-          "x-satyr-csrf": session.csrfToken,
+          "x-pantry-csrf": session.csrfToken,
         },
         body: body === null ? null : JSON.stringify(body),
       },
@@ -10407,7 +10407,7 @@ async function verifySupplierReplyCorrection(
         JSON.stringify({
           substituted: [
             "Gmail",
-            "Underclerk supplier records",
+            "Commerce supplier records",
             "the reply turn before the correction",
           ],
           real: ["model provider (OpenRouter), for the learning turn"],
@@ -10664,10 +10664,10 @@ function evalRequest(
       {
         method: body === null ? "GET" : "POST",
         headers: {
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
           origin: "https://localhost",
           "content-type": "application/json",
-          "x-satyr-csrf": session.csrfToken,
+          "x-pantry-csrf": session.csrfToken,
         },
         body: body === null ? null : JSON.stringify(body),
       },
@@ -11361,7 +11361,7 @@ async function verifySupplierEvalRuns(
   expect(
     await start(
       "eval_run_unreviewed",
-      ["satyr_platform"],
+      ["pantry_platform"],
       [{ kind: "current" }],
     ),
   ).toMatchObject({ status: 409, body: { error: "eval_conflict" } });
@@ -11449,7 +11449,7 @@ async function verifySupplierEvalRuns(
       const live = receiptOf(
         await start(
           `eval_run_live_${String(trial)}`,
-          ["satyr_platform"],
+          ["pantry_platform"],
           [{ kind: "current" }, candidate],
         ),
       );
@@ -11497,11 +11497,11 @@ async function verifySupplierEvalRuns(
         JSON.stringify({
           substituted: [
             "Gmail",
-            "Underclerk supplier records",
+            "Commerce supplier records",
             "the turns before the runs (reply, correction and learning)",
           ],
           real: ["model provider (OpenRouter), for each Eval turn"],
-          route: "satyr_platform",
+          route: "pantry_platform",
           memory: { accepted: LEARNED_FACT, candidate: EVAL_CANDIDATE_FACT },
           modelRequests: {
             count: state.liveEvalAnswers.length,
@@ -11590,7 +11590,7 @@ async function verifySupplierEvalRuns(
   const compare = () =>
     start(
       "eval_run_compare",
-      ["satyr_platform", "codex_subscription", "organisation_openai_api_key"],
+      ["pantry_platform", "codex_subscription", "organisation_openai_api_key"],
       [{ kind: "current" }, candidate],
     );
   const started = await compare();
@@ -11599,7 +11599,7 @@ async function verifySupplierEvalRuns(
   // carries no other request.
   expect(await compare()).toEqual(started);
   expect(
-    await start("eval_run_compare", ["satyr_platform"], [{ kind: "current" }]),
+    await start("eval_run_compare", ["pantry_platform"], [{ kind: "current" }]),
   ).toMatchObject({ status: 409, body: { error: "eval_command_conflict" } });
   await expect
     .poll(async () => (await settledRun(comparison.runId)) !== null, {
@@ -11623,7 +11623,7 @@ async function verifySupplierEvalRuns(
   // Under the accepted revision the midday change is escalated, which the
   // reviewed criteria say is wrong. Under the candidate every scenario
   // passes, and the other supplier is handled as before under both.
-  const available = ["satyr_platform", "codex_subscription"] as const;
+  const available = ["pantry_platform", "codex_subscription"] as const;
   for (const route of available) {
     expect(byScenario(route), route).toEqual({
       late_change: { current: "passed", candidate: "passed" },
@@ -11754,7 +11754,7 @@ async function verifySupplierEvalRuns(
   const interrupted = receiptOf(
     await start(
       "eval_run_interrupted",
-      ["satyr_platform"],
+      ["pantry_platform"],
       [{ kind: "current" }],
     ),
   );
@@ -11765,7 +11765,7 @@ async function verifySupplierEvalRuns(
   expect(inProgress).toMatchObject({
     state: "running",
     tasks: [
-      { taskId: "late_change.current.satyr_platform", state: "running" },
+      { taskId: "late_change.current.pantry_platform", state: "running" },
       { state: "pending" },
       { state: "pending" },
       { state: "pending" },
@@ -11837,7 +11837,7 @@ async function verifySupplierEvalRuns(
   const beforeReplacement = state.evalInputs.length;
   const heldForReplacement = state.holdAt("model", evalTurn(2));
   const replaced = receiptOf(
-    await start("eval_run_replaced", ["satyr_platform"], [{ kind: "current" }]),
+    await start("eval_run_replaced", ["pantry_platform"], [{ kind: "current" }]),
   );
   await expect
     .poll(() => heldForReplacement.phase, { timeout: 60_000 })
@@ -11906,7 +11906,7 @@ async function verifySupplierEvalRuns(
   };
   state.evalCreditSpent = true;
   const spent = receiptOf(
-    await start("eval_run_spent", ["satyr_platform"], [{ kind: "current" }]),
+    await start("eval_run_spent", ["pantry_platform"], [{ kind: "current" }]),
   );
   await expect
     .poll(async () => (await settledRun(spent.runId)) !== null, {
@@ -11951,7 +11951,7 @@ async function verifySupplierEvalRuns(
     statement: EVAL_CANDIDATE_FACT,
   });
   expect(
-    await start("eval_run_decided", ["satyr_platform"], [candidate]),
+    await start("eval_run_decided", ["pantry_platform"], [candidate]),
   ).toMatchObject({ status: 409, body: { error: "eval_conflict" } });
   // The command that began the comparison named it while it was a candidate.
   // Sent again now, it still gets its first answer.
@@ -11988,7 +11988,7 @@ async function verifySupplierEvalRuns(
   const later = receiptOf(
     await start(
       "eval_run_later",
-      ["satyr_platform"],
+      ["pantry_platform"],
       [{ kind: "candidate", memory: { memoryId, revision: 3 } }],
     ),
   );
@@ -12457,8 +12457,8 @@ async function verifyDraftsAcrossMailboxSettings(
         headers: {
           "content-type": "application/json",
           origin: "https://localhost",
-          cookie: `satyr_control_session=${owner.session.token}; satyr_control_csrf=${owner.session.csrfToken}`,
-          "x-satyr-csrf": owner.session.csrfToken,
+          cookie: `pantry_session=${owner.session.token}; pantry_csrf=${owner.session.csrfToken}`,
+          "x-pantry-csrf": owner.session.csrfToken,
           "idempotency-key": crypto.randomUUID(),
         },
         body: JSON.stringify(body),
@@ -14853,7 +14853,7 @@ async function verifySupplierMemoryTurn(
   // A record the verification rests on that cannot be interpreted leaves the
   // supplier unknown. The read is then unavailable, never empty.
   await fixtureDatabase().prepare(
-    "UPDATE underclerk_merchant_binding SET updated_at = 9223372036854775807 WHERE organisation_id = ?",
+    "UPDATE commerce_merchant_binding SET updated_at = 9223372036854775807 WHERE organisation_id = ?",
   )
     .bind(input.organisationId)
     .run();
@@ -15652,13 +15652,13 @@ it(
 /** The decoded parts of a multipart reply, by content type. */
 function mimeParts(message: string): Record<string, string> {
   const parts: Record<string, string> = {};
-  for (const section of message.split(/\r\n--satyr_[^\r\n]*\r\n/u)) {
+  for (const section of message.split(/\r\n--pantry_[^\r\n]*\r\n/u)) {
     const type = /^Content-Type: ([a-z]+\/[a-z]+);/mu.exec(section)?.[1];
     if (type?.startsWith("multipart/") === true) continue;
     const body = section.split("\r\n\r\n")[1];
     if (type === undefined || body === undefined) continue;
     const bytes = Uint8Array.from(
-      atob(body.replace(/\r\n(--satyr_[^\r\n]*--)?/gu, "")),
+      atob(body.replace(/\r\n(--pantry_[^\r\n]*--)?/gu, "")),
       (char) => char.charCodeAt(0),
     );
     parts[type] = new TextDecoder().decode(bytes);
@@ -15776,7 +15776,7 @@ async function personReplyJourney(): Promise<void> {
       {
         headers: {
           origin: "https://localhost",
-          cookie: `satyr_control_session=${owner.session.token}; satyr_control_csrf=${owner.session.csrfToken}`,
+          cookie: `pantry_session=${owner.session.token}; pantry_csrf=${owner.session.csrfToken}`,
         },
       },
     );
@@ -15809,8 +15809,8 @@ async function personReplyJourney(): Promise<void> {
         headers: {
           "content-type": "application/json",
           origin: "https://localhost",
-          cookie: `satyr_control_session=${owner.session.token}; satyr_control_csrf=${owner.session.csrfToken}`,
-          "x-satyr-csrf": owner.session.csrfToken,
+          cookie: `pantry_session=${owner.session.token}; pantry_csrf=${owner.session.csrfToken}`,
+          "x-pantry-csrf": owner.session.csrfToken,
           "idempotency-key": key,
         },
         body: JSON.stringify(body),

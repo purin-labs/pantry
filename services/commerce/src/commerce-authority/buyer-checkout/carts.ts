@@ -217,7 +217,7 @@ export function toBuyerCart(
   fulfillment: "pickup" | "shipping",
 ): CommerceBuyerCartV1 {
   const base = {
-    schemaVersion: "underclerk.buyer-cart.v1" as const,
+    schemaVersion: "commerce.buyer-cart.v1" as const,
     cartId: cart.cartId,
     revision: cart.revision,
     checkoutProfile: cart.checkoutProfile,

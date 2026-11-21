@@ -1,6 +1,6 @@
-# CafeOS payment binding certification
+# Café payment binding certification
 
-Use this runbook before publishing or activating a CafeOS checkout profile.
+Use this runbook before publishing or activating a Café checkout profile.
 Payment authority stays disabled until Platform has an immutable certification
 record for the exact organisation, integration account, environment, capability
 revision, country, currency, collection mode, and adapter version.
@@ -52,7 +52,7 @@ the accepted creation response, same-checkout idempotent replay, a completed
 full refund, developer cancellation, buyer cancellation, and timeout.
 
 Two adapter defects surfaced: Square rejected the 64-character hex idempotency
-key, and cancellation compared its derived provider reference to the raw Satyr
+key, and cancellation compared its derived provider reference to the raw Pantry
 attempt ID. Keys now encode the entire SHA-256 digest as 43 base64url characters;
 cancellation derives the same reference as creation and reconciliation.
 [The first run](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/square-terminal-sandbox-20260906-jp-1.json) preserves
@@ -65,8 +65,8 @@ same ID when recovering an interrupted run. Every request is restricted to the
 Square sandbox origin, and the account must contain an active Japan/JPY location.
 
 ```sh
-pnpm --filter @purin-labs/platform exec esbuild ../../scripts/lab/square-terminal-sandbox.ts --bundle --platform=node --format=esm --outfile=/tmp/satyr-square-sandbox.mjs
-node --env-file=.env.local /tmp/satyr-square-sandbox.mjs your-run-id
+pnpm --filter @purin-labs/platform exec esbuild ../../scripts/lab/square-terminal-sandbox.ts --bundle --platform=node --format=esm --outfile=/tmp/pantry-square-sandbox.mjs
+node --env-file=.env.local /tmp/pantry-square-sandbox.mjs your-run-id
 ```
 
 Run IDs contain 1–32 lowercase letters, digits, or hyphens. The runner saves
@@ -94,9 +94,9 @@ Configure and export these values outside the repository:
 
 - `PANTRY_WORKER_URL` — the deployed Worker base URL. HTTPS is required except
   for a local loopback URL;
-- `UNDERCLERK_BASE_URL` — the deployed Underclerk public and service API base
+- `COMMERCE_BASE_URL` — the deployed Commerce public and service API base
   URL;
-- `PANTRY_CAFE_ORGANISATION_ID` — the CafeOS organisation whose current account is being
+- `PANTRY_CAFE_ORGANISATION_ID` — the Café organisation whose current account is being
   certified;
 - `PANTRY_CAFE_MERCHANT_ID` — the merchant owned by that organisation;
 - `PANTRY_CAFE_STOREFRONT_ID` — the activated storefront, or omit it to use
@@ -107,7 +107,7 @@ Configure and export these values outside the repository:
 - `PANTRY_CAFE_STRIPE_TEST_PUBLISHABLE_KEY` — the matching `pk_test_` key; and
 - `PANTRY_CAFE_STRIPE_TEST_ACCOUNT_ID` — the exact `acct_` identity represented
   by the development candidate returned by the Worker;
-- `UNDERCLERK_SERVICE_TOKEN` — the service token used only to read and, when
+- `COMMERCE_SERVICE_TOKEN` — the service token used only to read and, when
   necessary, replenish the disposable acceptance inventory;
 - `PANTRY_FAULT_INJECTION_TOKEN` — the acceptance-only token for the deployed
   queue interruption point;
@@ -163,7 +163,7 @@ below only when performing the packet operation manually:
 
 ```json
 {
-  "schemaVersion": "satyr.cafe-payment-binding-certification.v1",
+  "schemaVersion": "pantry.cafe-payment-binding-certification.v1",
   "organisationId": "organisation_example",
   "testRunId": "stripe_sandbox_example",
   "paymentBinding": {
@@ -198,7 +198,7 @@ below only when performing the packet operation manually:
 POST the completed packet to `/v1/admin/cafe-payment-certification` with the
 organisation-admin bearer token. The operation is idempotent by organisation and test-run
 identity. Reusing that identity with different evidence returns a conflict.
-Successful recording immediately resynchronizes Underclerk payment authority.
+Successful recording immediately resynchronizes Commerce payment authority.
 
 The final GET must show:
 

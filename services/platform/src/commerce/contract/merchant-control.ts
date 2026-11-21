@@ -38,7 +38,7 @@ export async function resolveMerchantBinding(
   });
   return binding.ok
     ? binding.value
-    : controlError("underclerk_binding_missing", 503);
+    : controlError("commerce_binding_missing", 503);
 }
 
 /** The organisation's merchant, reached as the member who asked. */
@@ -53,7 +53,7 @@ export async function resolveMerchantControlContext(
     organisationId: String(authorized.organisationId),
     actor: String(authorized.membership.personId),
   });
-  if (client === null) return controlError("underclerk_unavailable", 503);
+  if (client === null) return controlError("commerce_unavailable", 503);
   return {
     merchantId: binding.merchantId,
     integrationAccountId: binding.integrationAccountId,

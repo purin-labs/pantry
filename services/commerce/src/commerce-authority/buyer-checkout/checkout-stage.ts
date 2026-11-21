@@ -66,7 +66,7 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
     const cart = this.createBuyerCart({
       claims: input.claims,
       command: {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: `${input.checkoutId}_cart`,
         lines: input.draft.lines.map((line) => ({
           kind: "catalog" as const,
@@ -86,7 +86,7 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
     return this.createPickupCheckout({
       claims: input.claims,
       command: {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: input.checkoutId,
         cartId: cart.cart.cartId,
         cartRevision: cart.cart.revision,
@@ -127,7 +127,7 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
     );
     if (buyerAuthority === undefined) return buyerIdentityRejected();
     const result = this.submitBuyerPickupCheckout({
-      schemaVersion: "underclerk.submit-buyer-pickup-cart.v1",
+      schemaVersion: "commerce.submit-buyer-pickup-cart.v1",
       merchantId: input.claims.merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `buyer_checkout_${identityDigest}`,
@@ -228,7 +228,7 @@ export abstract class BuyerCheckoutCreationStage extends BuyerQuoteStage {
     );
     if (buyerAuthority === undefined) return buyerIdentityRejected();
     const command: BuyerShippingCheckoutCommand = {
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.internal.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.internal.v1",
       merchantId: input.claims.merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `buyer_shipping_checkout_${identityDigest}`,

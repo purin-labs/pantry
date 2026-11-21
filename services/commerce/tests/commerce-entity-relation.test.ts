@@ -22,7 +22,7 @@ import { writeCommerceEntityRelationText } from "../src/entity-plane/relation-te
 
 const NOW = "2026-08-26T00:00:00.123Z";
 
-describe("Underclerk commerce_entity relation", () => {
+describe("Commerce commerce_entity relation", () => {
   it("materializes canonical lifecycle and low-stock attributes for system entities", () => {
     const database = new NodeCommerceDatabase(":memory:");
     initializeCommerceSchema(database, NOW);
@@ -155,8 +155,8 @@ describe("Underclerk commerce_entity relation", () => {
     const stockPolicy = JSON.stringify({
       provenance: {
         organisationId: "organisation_attributes",
-        integrationAccountId: "underclerk",
-        source: "underclerk",
+        integrationAccountId: "commerce",
+        source: "commerce",
         resourceType: "stock_policy",
         resourceId: "stock_policy_attributes",
         revision: 1,
@@ -785,7 +785,7 @@ function lexiconPlan(
   const capabilities =
     options.source === "custom"
       ? {
-          kind: "underclerk_custom",
+          kind: "commerce_custom",
           entityTypeId: options.customEntityTypeId,
           publishedRevision: 1,
           capability: {
@@ -834,7 +834,7 @@ function lexiconPlan(
           },
           organisationId: "organisation_relation",
           merchantId: "merchant_relation",
-          watermark: { kind: "underclerk_native", merchantRevision: 1 },
+          watermark: { kind: "commerce_native", merchantRevision: 1 },
           capabilities,
         }),
       ),

@@ -344,8 +344,8 @@ export function readHeaders(
 ): Record<string, string> {
   return {
     origin: ORIGIN,
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
   };
 }
 
@@ -359,7 +359,7 @@ export async function send(
   if (method !== "GET") {
     headers["content-type"] = "application/json";
     headers["idempotency-key"] = crypto.randomUUID();
-    headers["x-satyr-configuration-version"] = "1";
+    headers["x-pantry-configuration-version"] = "1";
   }
   const response = await exports.default.fetch(url, {
     method,
@@ -594,7 +594,7 @@ export async function installBoardJourney(
     });
   }
   const shop = await providerClient().provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",

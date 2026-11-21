@@ -212,7 +212,7 @@ it(
         ],
         real: [
           "Pantry Worker, the board room and its comment store",
-          "Underclerk fixture Worker",
+          "Commerce fixture Worker",
           "screen feed",
         ],
         thread: {

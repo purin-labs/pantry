@@ -122,7 +122,7 @@ export const pointOfSaleConfigurationSchema = Type.Refine(
       configurationId: normalizedTextSchema,
       organisationId: normalizedTextSchema,
       merchantId: Type.Unsafe<CommerceMerchantId>(normalizedTextSchema),
-      satyrLocationId: normalizedTextSchema,
+      pantryLocationId: normalizedTextSchema,
       salesChannelId: normalizedTextSchema,
       currency: currencyCodeTextSchema,
       supportedItems: Type.Array(pointOfSaleItemPolicySchema),

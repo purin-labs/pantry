@@ -38,5 +38,5 @@
   "devDependencies": {
     "tsrs": "0.18.0-ts7.1.0-dev.20260929"
   },
-  "description": "Satyr's BakeryOS model: recipes, procedures, physics and the bakery surface."
+  "description": "Kitchen model: recipes, procedures, physics and the bakery surface."
 }

@@ -36,9 +36,9 @@ const previewFailure = "The selected AI could not finish this response.";
 export function installChatPreviewFetch(): void {
   window.fetch = previewFetch;
   if (isUserId(new URL(window.location.href).searchParams.get("preferenceUser"))) {
-    document.cookie = "satyr_control_csrf=; Path=/chat-preview.html; Max-Age=0";
+    document.cookie = "pantry_csrf=; Path=/chat-preview.html; Max-Age=0";
   } else {
-    document.cookie = "satyr_control_csrf=chat-preview; Path=/chat-preview.html; SameSite=Strict";
+    document.cookie = "pantry_csrf=chat-preview; Path=/chat-preview.html; SameSite=Strict";
   }
 }
 async function previewFetch(
@@ -247,7 +247,7 @@ async function previewFetch(
             sharing: { visibility: "private", role: "owner" },
             lineage: { kind: "original" },
             origin: {
-              area: "BakeryOS",
+              area: "kitchen",
               page: "costs",
               title: "Costs & margins",
               record: null,

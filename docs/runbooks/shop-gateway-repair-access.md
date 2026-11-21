@@ -2,7 +2,7 @@
 
 This runbook gives an engineer SSH access to a shop gateway (Plan 85, decision D4). It uses
 Cloudflare Tunnel with Cloudflare Access. The gateway dials out, so the shop opens no port. The
-Portal has no repair access, and Satyr's gateway credential takes no part.
+Portal has no repair access, and Pantry's gateway credential takes no part.
 
 Do this when the first real gateway goes into a shop. Do it again for each new gateway.
 
@@ -23,7 +23,7 @@ Do this when the first real gateway goes into a shop. Do it again for each new g
 - The gateway runs its SSH server only for keys. On Linux, set `PasswordAuthentication no` in
   `/etc/ssh/sshd_config`. On a Mac, turn on Remote Login in System Settings > General > Sharing,
   and give access only to the repair user.
-- Use a repair user that is not `root`. The Satyr gateway credential file is readable only by
+- Use a repair user that is not `root`. The Pantry gateway credential file is readable only by
   the account that runs the gateway service.
 
 ## 1. Create the tunnel
@@ -91,14 +91,14 @@ ssh repair@ssh-<gateway>.example.com
 
 ## Check the gateway
 
-These commands show the Satyr gateway service and its last messages on Linux:
+These commands show the Pantry gateway service and its last messages on Linux:
 
 ```bash
-systemctl status satyr-shop-gateway.service
+systemctl status pantry-shop-gateway.service
 ```
 
 ```bash
-journalctl -u satyr-shop-gateway.service --since "1 hour ago"
+journalctl -u pantry-shop-gateway.service --since "1 hour ago"
 ```
 
 The Devices page stays the place for work state. Do not change a device's state from the shell.

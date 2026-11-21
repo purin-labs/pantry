@@ -66,7 +66,7 @@ function policy(
     configurationId: "pos_configuration_counter",
     organisationId: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
-    satyrLocationId: "location_cafe",
+    pantryLocationId: "location_cafe",
     salesChannelId: "channel_cafe",
     currency: "JPY",
     supportedItems: [{ variantId: "variant_cookie", maxQuantityPerLine: 5 }],
@@ -80,7 +80,7 @@ function policy(
     },
     presentationPolicy: {
       locale: "ja-JP",
-      merchantDisplayName: "Satyr Cafe",
+      merchantDisplayName: "Pantry Cafe",
       termsPolicyId: "terms_counter",
       privacyPolicyId: "privacy_counter",
       supportContact: "support@example.test",
@@ -101,8 +101,8 @@ function publicationRequest(body: Record<string, unknown>): Request {
     headers: {
       origin: "https://pantry.example",
       cookie:
-        "satyr_control_session=session-counter; satyr_control_csrf=csrf-counter",
-      "x-satyr-csrf": "csrf-counter",
+        "pantry_session=session-counter; pantry_csrf=csrf-counter",
+      "x-pantry-csrf": "csrf-counter",
       "idempotency-key": "counter-policy-test",
       "content-type": "application/json",
     },
@@ -195,7 +195,7 @@ describe("counter policy control routes", function counterPolicySuite() {
     ).toHaveBeenCalledTimes(1);
   });
 
-  it("refuses a revision that is not one Underclerk could have issued", async function badRevision() {
+  it("refuses a revision that is not one Commerce could have issued", async function badRevision() {
     const response = await handleControlRequest(
       publicationRequest({ expectedRevision: 0, configuration: policy() }),
       env(),

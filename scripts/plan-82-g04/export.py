@@ -16,9 +16,9 @@ from pathlib import Path
 
 import numpy as np
 
-DATA = Path.home() / ".satyr-voice-test/wake"
+DATA = Path.home() / ".pantry-voice-test/wake"
 THRESHOLD = 0.995
-WAKE = ("hey sayter", "hey, sayter", "hey satyr", "hey, satyr")
+WAKE = ("hey sayter", "hey, sayter", "hey pantry", "hey, pantry")
 NEAR = ("hey sailor", "hey setter", "hey data", "hey waiter", "hey later", "say to her", "see you later",
         "put the second tray in the oven", "hey can you pass the scraper", "the butter needs ten more minutes")
 RATES = (160, 190, 220)
@@ -151,7 +151,7 @@ def stream() -> None:
     rng = np.random.default_rng(7)
     noise = np.load(DATA / "noise-test.npz")["DWASHING"]
     clip = np.zeros(w.RATE * 45)
-    for at, voice, text in ((8, "Tessa", "hey, sayter"), (16, "Daniel", "put the second tray in the oven"), (24, "Reed (English (US))", "hey, satyr"),
+    for at, voice, text in ((8, "Tessa", "hey, sayter"), (16, "Daniel", "put the second tray in the oven"), (24, "Reed (English (US))", "hey, pantry"),
                             (32, "Karen", "see you later"), (38, "Eddy (English (US))", "hey sayter")):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "a.wav"

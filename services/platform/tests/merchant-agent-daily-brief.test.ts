@@ -78,14 +78,14 @@ function runInput(name: MerchantReportName) {
 
 function fixtureReader(): CommerceGraphReader {
   const client = new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.urk-brief.test",
+    baseUrl: "https://commerce.urk-brief.test",
     serviceToken: "urk-brief-test-token",
     fetch: rejectUnexpectedRead,
   });
   return new CommerceGraphReader({
     organisationId: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
-    underclerk: new CommerceEngineSource({
+    commerce: new CommerceEngineSource({
       organisationId: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
       integrationAccountId: INTEGRATION_ID,

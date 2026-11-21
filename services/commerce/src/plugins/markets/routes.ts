@@ -16,14 +16,14 @@ export const MARKETS_ROUTES: readonly RouteDefinition<MarketsRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/markets",
     "create_market",
-    "underclerk.create-market.v1",
+    "commerce.create-market.v1",
   ),
   route("GET", "/v1/admin/merchants/:merchantId/markets", "list_markets"),
   route(
     "PUT",
     "/v1/admin/merchants/:merchantId/markets/:marketId",
     "update_market",
-    "underclerk.update-market.v1",
+    "commerce.update-market.v1",
   ),
 ];
 

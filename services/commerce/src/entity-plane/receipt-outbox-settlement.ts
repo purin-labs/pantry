@@ -53,7 +53,7 @@ type SignedEntityPlaneReceipt = CommerceMutationReceiptV1 &
 type EntityPlaneDelivery = Omit<
   Extract<
     CommerceDeliveryV1,
-    { schemaVersion: "underclerk.commerce-delivery.v2" }
+    { schemaVersion: "commerce.commerce-delivery.v2" }
   >,
   "observations"
 > &
@@ -141,7 +141,7 @@ export class EntityPlaneSettlement {
         ? undefined
         : signObservationDelivery(
             {
-              schemaVersion: "underclerk.commerce-delivery.v2",
+              schemaVersion: "commerce.commerce-delivery.v2",
               deliveryId: entityPlaneDeliveryId(
                 request.merchantId,
                 request.commandId,

@@ -37,7 +37,7 @@ const COSTS_OBSERVATION: SurfaceObservationV2 = {
   kind: "surface-observation",
   schemaVersion: 2,
   surface: "costs",
-  area: "BakeryOS",
+  area: "kitchen",
   instance: {
     browserInstanceId: "browser-j7",
     surfaceSessionId: "costs-session-j7",
@@ -72,7 +72,7 @@ const COSTS_OBSERVATION: SurfaceObservationV2 = {
 const ORDER_OBSERVATION: SurfaceObservationV2 = {
   ...COSTS_OBSERVATION,
   surface: "orders",
-  area: "AgentCommerce",
+  area: "commerce",
   title: "Orders",
   path: "/portal/nuki/shop/orders/order_1042",
   record: { kind: "customer_order", id: "order_1042", label: "#1042" },
@@ -290,7 +290,7 @@ it(
     ]);
     expect(JSON.stringify(records)).not.toContain("latte");
     const ledger = await relevanceLedger(fixture);
-    expect(ledger).toEqual({ evaluated: 4, funding: "satyr_platform" });
+    expect(ledger).toEqual({ evaluated: 4, funding: "pantry_platform" });
 
     task.meta.chatScreenRelevance = {
       jevRequest: typeSafe.requests[0],

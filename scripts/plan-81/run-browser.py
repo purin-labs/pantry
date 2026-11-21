@@ -23,7 +23,7 @@ ARTIFACTS = ROOT / "output/playwright/plan-81"
 
 def single_database_schema_file():
     """The one-database schema, built from the two deployed baselines."""
-    out = Path(tempfile.mkdtemp(prefix="satyr-single-database-")) / "schema.sql"
+    out = Path(tempfile.mkdtemp(prefix="pantry-single-database-")) / "schema.sql"
     subprocess.run(
         ["node", str(ROOT / "services/platform/scripts/single-database-schema.mjs"), str(out)],
         check=True,

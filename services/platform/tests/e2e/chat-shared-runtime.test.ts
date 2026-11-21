@@ -747,7 +747,7 @@ async function sharedRuntimeJourney(context: TestContext): Promise<void> {
   const stream = running.conversation.work.stream;
   const subscription = await exports.default.fetch(
     `https://localhost${base}/stream?conversation=${conversationId}&request=revoked_request`,
-    { headers: { cookie: `satyr_control_session=${editor.session.token}` } },
+    { headers: { cookie: `pantry_session=${editor.session.token}` } },
   );
   expect(subscription.status).toBe(200);
   const streamed = subscription.text();
@@ -1496,7 +1496,7 @@ async function connectArchivePeer(owner: Member) {
     provider: "slack",
     providerSubjectId: WORKSPACE_ID,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle.value },
     grantedScopes: ["chat:write"],
     createdByUserId: owner.userId,
@@ -1650,8 +1650,8 @@ function post(user: Member, path: string, body: unknown): Promise<Response> {
     method: "POST",
     headers: {
       origin: "https://localhost",
-      cookie: `satyr_control_session=${user.session.token}; satyr_control_csrf=${user.session.csrfToken}`,
-      "x-satyr-csrf": user.session.csrfToken,
+      cookie: `pantry_session=${user.session.token}; pantry_csrf=${user.session.csrfToken}`,
+      "x-pantry-csrf": user.session.csrfToken,
       "content-type": "application/json",
     },
     body: JSON.stringify(body),
@@ -1662,8 +1662,8 @@ function patch(user: Member, path: string, body: unknown): Promise<Response> {
     method: "PATCH",
     headers: {
       origin: "https://localhost",
-      cookie: `satyr_control_session=${user.session.token}; satyr_control_csrf=${user.session.csrfToken}`,
-      "x-satyr-csrf": user.session.csrfToken,
+      cookie: `pantry_session=${user.session.token}; pantry_csrf=${user.session.csrfToken}`,
+      "x-pantry-csrf": user.session.csrfToken,
       "content-type": "application/json",
     },
     body: JSON.stringify(body),
@@ -1674,7 +1674,7 @@ async function jsonGet(
   path: string,
 ): Promise<Record<string, unknown>> {
   const response = await exports.default.fetch(`https://localhost${path}`, {
-    headers: { cookie: `satyr_control_session=${user.session.token}` },
+    headers: { cookie: `pantry_session=${user.session.token}` },
   });
   const raw: unknown = await response.json();
   if (!isRecord(raw)) throw new Error("Invalid chat response");

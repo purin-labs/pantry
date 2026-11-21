@@ -231,7 +231,7 @@ export async function parseControlMutationBoundary(input: {
     };
   }
   const versionHeader = input.request.headers.get(
-    "x-satyr-configuration-version",
+    "x-pantry-configuration-version",
   );
   if (versionHeader === null) {
     return { ok: false, error: { code: "configuration_version_missing" } };

@@ -148,7 +148,7 @@ export async function connectGmail(
     provider: "gmail",
     providerSubjectId: exchanged.value.googleSubject,
     environment: base.environment,
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: exchanged.value.grantedScopes,
     createdByUserId: base.userId,

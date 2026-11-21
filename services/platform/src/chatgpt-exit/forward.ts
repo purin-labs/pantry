@@ -16,10 +16,10 @@
  */
 
 /** The request header that names the provider URL to forward to. */
-const CHATGPT_EXIT_UPSTREAM_HEADER = "x-satyr-upstream-url";
+const CHATGPT_EXIT_UPSTREAM_HEADER = "x-pantry-upstream-url";
 
 /** The response header that names the data centre of the exit. */
-const CHATGPT_EXIT_COLO_HEADER = "x-satyr-exit-colo";
+const CHATGPT_EXIT_COLO_HEADER = "x-pantry-exit-colo";
 
 /** Request headers that belong to one connection and are never forwarded. */
 const CONNECTION_HEADERS: ReadonlySet<string> = new Set([
@@ -129,7 +129,7 @@ function isForwardedHeader(name: string): boolean {
   const lower = name.toLowerCase();
   return (
     !CONNECTION_HEADERS.has(lower) &&
-    !lower.startsWith("x-satyr-") &&
+    !lower.startsWith("x-pantry-") &&
     !lower.startsWith("cf-")
   );
 }

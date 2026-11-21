@@ -24,13 +24,13 @@ if (root === null || !import.meta.env.DEV)
 const params = new URL(window.location.href).searchParams;
 if (params.get("theme") === "dark")
   document.documentElement.dataset.portalTheme = "dark";
-const previewCase = params.get("case") ?? "satyr";
+const previewCase = params.get("case") ?? "pantry";
 const viewer = previewCase === "viewer" || previewCase === "used-viewer";
 const admin = !viewer;
 const owner = !viewer;
 const used = previewCase === "used" || previewCase === "used-viewer";
 // controlMutation reads the session's CSRF cookie before it sends.
-document.cookie = "satyr_control_csrf=preview";
+document.cookie = "pantry_csrf=preview";
 
 function usedMicrousd(): number {
   if (used) return 998_500;
@@ -40,7 +40,7 @@ function usedMicrousd(): number {
 }
 
 let view: JevFeaturesView = {
-  funding: previewCase === "own" ? "organisation_byo" : "satyr_platform",
+  funding: previewCase === "own" ? "organisation_byo" : "pantry_platform",
   keyAvailable: previewCase !== "missing",
   mailClassification: {
     enabled: previewCase !== "missing",

@@ -185,10 +185,10 @@ function parseEntityContextArgs(
   }
   const request = args[0].request;
   const parsed = parseCommerceGraphQuery({
-    kind: "underclerk_context",
+    kind: "commerce_context",
     ...(isRecord(request) ? withRecordLifecycle(request) : {}),
   });
-  if (!parsed.ok || parsed.value.kind !== "underclerk_context") {
+  if (!parsed.ok || parsed.value.kind !== "commerce_context") {
     throw new CommerceContextRequestError(
       "Invalid commerce_entity_context request. Follow the tool's request schema. A selector has exactly selectorId, revision and query; for entity_type_page, place traversal inside selector.query and at request.traversal. Correct the request before retrying; this is an input error.",
     );

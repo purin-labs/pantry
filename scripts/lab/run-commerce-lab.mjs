@@ -259,7 +259,7 @@ async function postSignedScenarioEvent(input) {
   const signedAt = input.clock();
   const observedAt = input.event.occurredAt;
   const body = JSON.stringify({
-    schemaVersion: "satyr.commerce.lab.event.v1",
+    schemaVersion: "pantry.commerce.lab.event.v1",
     namespace: input.options.namespace,
     runId: input.run.runId,
     scenarioId: input.run.scenarioId,
@@ -278,8 +278,8 @@ async function postSignedScenarioEvent(input) {
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        "x-satyr-lab-timestamp": String(timestamp),
-        "x-satyr-lab-signature": commerceLabSignature(
+        "x-pantry-lab-timestamp": String(timestamp),
+        "x-pantry-lab-signature": commerceLabSignature(
           input.options.signingSecret,
           timestamp,
           body,

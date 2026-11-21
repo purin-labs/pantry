@@ -34,7 +34,7 @@ Run the first public buyer scenario against an already seeded Commerce
 storefront:
 
 ```bash
-PUNTER_UNDERCLERK_BASE_URL=https://underclerk.example \
+PUNTER_COMMERCE_BASE_URL=https://commerce.example \
 PUNTER_MERCHANT_ID=merchant_cafe \
 PUNTER_STOREFRONT_ID=storefront_cafe \
 PUNTER_RUN_ID=acceptance_001 \
@@ -54,7 +54,7 @@ unsuccessfully if any boundary fails.
 Run the Japan-to-Singapore buyer scenario against the online cookie storefront:
 
 ```bash
-PUNTER_UNDERCLERK_BASE_URL=https://underclerk.example \
+PUNTER_COMMERCE_BASE_URL=https://commerce.example \
 PUNTER_MERCHANT_ID=merchant_plan22_demo \
 PUNTER_STOREFRONT_ID=storefront_cookie_online \
 PUNTER_RUN_ID=shipping_acceptance_001 \

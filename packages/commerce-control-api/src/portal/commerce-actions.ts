@@ -220,7 +220,7 @@ export type CommerceActionAmount = Readonly<{
 type CommerceCancellationExecution =
   | Readonly<{ readonly kind: "provider_managed" }>
   | Readonly<{
-      readonly kind: "underclerk_full_refund";
+      readonly kind: "commerce_full_refund";
       readonly merchantRevision: number;
       readonly paymentId: string;
       readonly paymentRevision: number;
@@ -945,7 +945,7 @@ function parseCommerceCancellationExecution(
         throw new Error("Order cancellation execution is invalid.");
       }
       return { kind: raw.kind };
-    case "underclerk_full_refund":
+    case "commerce_full_refund":
       if (
         !hasExactKeys(raw, [
           "kind",
@@ -1128,7 +1128,7 @@ function parseCommerceProviderReceipt(
     };
   }
   if (
-    decoded.provider === "underclerk" &&
+    decoded.provider === "commerce" &&
     hasExactKeys(decoded, [
       "kind",
       "provider",
@@ -1162,7 +1162,7 @@ function parseCommerceProviderReceipt(
   ) {
     return {
       kind: "commerce_provider_receipt",
-      provider: "underclerk",
+      provider: "commerce",
       receiptId: decoded.receiptId,
       effectId: decoded.effectId,
       actionNonce: decoded.actionNonce,
@@ -1179,7 +1179,7 @@ function parseCommerceProviderReceipt(
     };
   }
   if (
-    decoded.provider === "underclerk" &&
+    decoded.provider === "commerce" &&
     hasExactKeys(decoded, [
       "kind",
       "provider",
@@ -1209,7 +1209,7 @@ function parseCommerceProviderReceipt(
   ) {
     return {
       kind: "commerce_provider_receipt",
-      provider: "underclerk",
+      provider: "commerce",
       receiptId: decoded.receiptId,
       effectId: decoded.effectId,
       actionNonce: decoded.actionNonce,

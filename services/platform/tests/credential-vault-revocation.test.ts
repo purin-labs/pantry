@@ -163,7 +163,7 @@ function seedCredentialGraph(
       user_id, issuer, subject, email, display_name,
       email_verified, created_at, last_authenticated_at
     ) VALUES (
-      'control_revocation_test', 'urn:satyr:test', 'revocation-test',
+      'control_revocation_test', 'urn:pantry:test', 'revocation-test',
       'revocation-test@example.invalid', 'Revocation Test', 1, 1, 1
     );
   `);

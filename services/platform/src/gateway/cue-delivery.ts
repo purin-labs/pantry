@@ -431,24 +431,24 @@ async function resolveSavedSelectorCueMembership(
       return savedSelectorResolverFailure();
     }
     if (
-      commerceAuthority.value.commerceSystem.kind === "satyr_commerce" &&
+      commerceAuthority.value.commerceSystem.kind === "builtin_commerce" &&
       commerceAuthority.value.commerceSystem.merchantId !==
         binding.value.merchantId
     ) {
       return savedSelectorResolverFailure();
     }
     if (
-      env.UNDERCLERK_BASE_URL === undefined ||
-      env.UNDERCLERK_SERVICE_TOKEN === undefined
+      env.COMMERCE_BASE_URL === undefined ||
+      env.COMMERCE_SERVICE_TOKEN === undefined
     ) {
       return savedSelectorResolverFailure();
     }
     const client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(input.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
       ),
     });
     const metadata = await client.capabilityMetadata({
@@ -478,7 +478,7 @@ async function resolveSavedSelectorCueMembership(
       commerceSystem: commerceAuthority.value.commerceSystem,
       organisationId: input.organisationId,
       merchantId: String(binding.value.merchantId),
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
       organisation: () =>
         requireActiveOrganisationActorAtPlacement({
           placement: scope.placement,

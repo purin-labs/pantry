@@ -12,12 +12,12 @@ out=$root/output/playwright
 mkdir -p "$out"
 room=$("$root/apps/portal/node_modules/.bin/esbuild" \
   "$root/scripts/frontend-foundation/portal-mail-reply-room.mjs" \
-  --bundle --format=iife --global-name=SatyrReplyRoom --platform=browser \
+  --bundle --format=iife --global-name=PantryReplyRoom --platform=browser \
   --log-level=warning)
 {
   echo "async function runClaimTrace(page) {"
   echo "$room"
-  echo "await SatyrReplyRoom.installMailReplyRoom(page);"
+  echo "await PantryReplyRoom.installMailReplyRoom(page);"
   cat "$root/scripts/mail-inbox/mount-browser-fixture.js"
   echo "await mountMailInbox(page);"
   cat "$root/scripts/mail-inbox/verify-browser-claim-trace.js"

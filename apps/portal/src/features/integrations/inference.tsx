@@ -131,7 +131,7 @@ const INFERENCE_SOURCES: readonly InferenceSource[] = [
     use: "Use Claude",
   },
   {
-    kind: "satyr_platform",
+    kind: "pantry_platform",
     label: "Seams AI",
     detail: "Seams provides the AI. You need no other account.",
     use: "Use Seams AI",
@@ -189,7 +189,7 @@ function inferenceApiKeyField(
       };
     case "claude_oauth":
     case "codex_subscription":
-    case "satyr_platform":
+    case "pantry_platform":
       return null;
     default:
       return assertNever(kind, "Unexpected settings state");
@@ -364,7 +364,7 @@ function inferenceSelectionSummary(
       return "This workspace uses its Claude plan.";
     case "codex_subscription":
       return "This workspace uses its ChatGPT plan.";
-    case "satyr_platform":
+    case "pantry_platform":
       return "This workspace uses Seams AI.";
     case "organisation_openai_api_key":
       return "This workspace runs Pi with its OpenAI API key. OpenAI bills usage to the workspace account.";

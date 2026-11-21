@@ -66,7 +66,7 @@ async function stageArtifactLifetime(mode) {
   if ((await window.lifetimeArtifact.read()) !== content)
     throw new Error("Another page removed a live artifact");
   const root = await navigator.storage.getDirectory();
-  const runs = await root.getDirectoryHandle("satyr-production-runs");
+  const runs = await root.getDirectoryHandle("pantry-production-runs");
   const directories = [];
   for await (const name of runs.keys()) directories.push(name);
   return { directories };

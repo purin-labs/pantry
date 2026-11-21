@@ -33,14 +33,14 @@ export type CommerceProductChangesV1 = Readonly<{
 
 export type DeleteCommerceProductV1 = CatalogEditBase &
   Readonly<{
-    schemaVersion: "underclerk.delete-product.v1";
+    schemaVersion: "commerce.delete-product.v1";
     productId: string;
     expectedProductRevision: number;
   }>;
 
 export type UpdateCommerceProductV1 = CatalogEditBase &
   Readonly<{
-    schemaVersion: "underclerk.update-product.v1";
+    schemaVersion: "commerce.update-product.v1";
     productId: string;
     expectedProductRevision: number;
     changes: CommerceProductChangesV1;
@@ -57,7 +57,7 @@ export type CommerceVariantChangesV1 = Readonly<{
 
 export type UpdateCommerceVariantV1 = CatalogEditBase &
   Readonly<{
-    schemaVersion: "underclerk.update-variant.v1";
+    schemaVersion: "commerce.update-variant.v1";
     variantId: string;
     expectedVariantRevision: number;
     changes: CommerceVariantChangesV1;
@@ -72,7 +72,7 @@ export type CommerceOfferChangesV1 = Readonly<{
 
 export type UpdateCommerceOfferV1 = CatalogEditBase &
   Readonly<{
-    schemaVersion: "underclerk.update-offer.v1";
+    schemaVersion: "commerce.update-offer.v1";
     offerId: string;
     expectedOfferRevision: number;
     changes: CommerceOfferChangesV1;
@@ -81,7 +81,7 @@ export type UpdateCommerceOfferV1 = CatalogEditBase &
 /** Changes a storefront's tax rule; the storefront gets a new revision. */
 export type UpdateCommerceStorefrontTaxV1 = CatalogEditBase &
   Readonly<{
-    schemaVersion: "underclerk.update-storefront-tax.v1";
+    schemaVersion: "commerce.update-storefront-tax.v1";
     storefrontId: string;
     expectedStorefrontRevision: number;
     tax: StorefrontTaxConfiguration;

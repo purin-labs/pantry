@@ -2,13 +2,13 @@ import { describe, expect, it, vi } from "vitest";
 
 import worker from "../src/worker.ts";
 
-const SERVICE_TOKEN = "underclerk_worker_route_service_token";
+const SERVICE_TOKEN = "commerce_worker_route_service_token";
 const BUYER_TOKEN = "buyer_session_token";
 const MERCHANT_ID = "merchant_worker_route";
 const FORWARD_URL =
-  "https://underclerk.test/v1/public/merchants/merchant_worker_route/storefronts/storefront_cafe";
+  "https://commerce.test/v1/public/merchants/merchant_worker_route/storefronts/storefront_cafe";
 
-describe("Underclerk outer Worker route guard", () => {
+describe("Commerce outer Worker route guard", () => {
   it("forwards buyer cart and address-validation routes with buyer auth", async () => {
     const fixture = routeFixture();
 
@@ -87,7 +87,7 @@ describe("Underclerk outer Worker route guard", () => {
     );
     const arbitraryAdmin = await worker.fetch(
       new Request(
-        "https://underclerk.test/v1/admin/merchants/merchant_worker_route/snapshot",
+        "https://commerce.test/v1/admin/merchants/merchant_worker_route/snapshot",
         { headers: { authorization: `Basic ${BUYER_TOKEN}` } },
       ),
       fixture.env,
@@ -121,7 +121,7 @@ function routeFixture(): {
       throw new Error("Unexpected Durable Object socket connection");
     },
     id: {
-      toString: () => "underclerk_worker_route_id",
+      toString: () => "commerce_worker_route_id",
       equals: () => false,
     },
   };
@@ -137,13 +137,13 @@ function routeFixture(): {
     jurisdiction: () => namespace,
   };
   const env = {
-    UNDERCLERK_MERCHANT: namespace,
-    UNDERCLERK_SERVICE_TOKEN: SERVICE_TOKEN,
-    UNDERCLERK_BUYER_SESSION_SECRET: "underclerk_worker_route_buyer_secret",
-    UNDERCLERK_SIGNING_KEY_ID: "underclerk_worker_route_signing_key",
-    UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64:
-      "underclerk_worker_route_private_key",
-    JAPAN_CARRIER_SIGNING_KEY: "underclerk_worker_route_carrier_key",
+    COMMERCE_MERCHANT: namespace,
+    COMMERCE_SERVICE_TOKEN: SERVICE_TOKEN,
+    COMMERCE_BUYER_SESSION_SECRET: "commerce_worker_route_buyer_secret",
+    COMMERCE_SIGNING_KEY_ID: "commerce_worker_route_signing_key",
+    COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64:
+      "commerce_worker_route_private_key",
+    JAPAN_CARRIER_SIGNING_KEY: "commerce_worker_route_carrier_key",
   };
   return { env, forwarded };
 }

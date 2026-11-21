@@ -311,7 +311,7 @@ describe("Slack event boundary", function slackEventBoundarySuite() {
                 {
                   type: "rich_text_section",
                   elements: [
-                    { type: "future_element_satyr_cannot_render", text: "?" },
+                    { type: "future_element_pantry_cannot_render", text: "?" },
                   ],
                 },
               ],
@@ -347,7 +347,7 @@ describe("Slack event boundary", function slackEventBoundarySuite() {
                 {
                   type: "rich_text_section",
                   elements: [
-                    { type: "future_element_satyr_cannot_render", text: "?" },
+                    { type: "future_element_pantry_cannot_render", text: "?" },
                   ],
                 },
               ],

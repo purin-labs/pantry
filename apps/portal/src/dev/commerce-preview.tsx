@@ -116,7 +116,7 @@ function previewCounterSale(): CounterSale {
   const currency = query.get("currency") === "JPY" ? "JPY" : "SGD";
   return {
     checkoutId: COUNTER_CHECKOUT_ID,
-    satyrLocationId: "Tokyo boutique · front counter",
+    pantryLocationId: "Tokyo boutique · front counter",
     revision: 3,
     state,
     collectable: state === "awaiting_collection" || state === "declined",
@@ -199,7 +199,7 @@ const PROVENANCE = (
 ) => ({
   organisationId: "organisation_preview",
   integrationAccountId: "intacc_commerce",
-  source: "underclerk",
+  source: "commerce",
   resourceType,
   resourceId,
   revision: 4,
@@ -1198,9 +1198,9 @@ function previewCounterEnvelope(): unknown {
   return {
     ok: true,
     counterSale: {
-      schemaVersion: "satyr.counter-sale.v1",
+      schemaVersion: "pantry.counter-sale.v1",
       checkoutId: sale.checkoutId,
-      satyrLocationId: sale.satyrLocationId,
+      pantryLocationId: sale.pantryLocationId,
       revision: sale.revision,
       state: sale.state,
       collectable: sale.collectable,

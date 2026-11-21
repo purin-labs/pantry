@@ -294,13 +294,13 @@ export async function controlSend(
   body: Blob,
   headers: Readonly<Record<string, string>>,
 ): Promise<unknown> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   return responseJson(
     await fetch(path, {
       method: "POST",
       headers: {
         ...headers,
-        ...(csrf === null ? {} : { "x-satyr-csrf": csrf }),
+        ...(csrf === null ? {} : { "x-pantry-csrf": csrf }),
       },
       body,
     }),
@@ -328,14 +328,14 @@ export async function controlSignal(
   body: unknown,
   signal?: AbortSignal,
 ): Promise<unknown> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   return responseJson(
     await fetch(path, {
       method: "POST",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        ...(csrf === null ? {} : { "x-satyr-csrf": csrf }),
+        ...(csrf === null ? {} : { "x-pantry-csrf": csrf }),
       },
       body: JSON.stringify(body),
       signal,
@@ -356,7 +356,7 @@ export async function controlMutation(
   mutationIntent?: ControlMutationIntent,
   signal?: AbortSignal,
 ): Promise<unknown> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
   }
@@ -382,11 +382,11 @@ export async function controlMutation(
     writeStoredMutationIntent(intentKey, { fingerprint, idempotencyKey });
   const headers: Record<string, string> = {
     "content-type": "application/json",
-    "x-satyr-csrf": csrf,
+    "x-pantry-csrf": csrf,
     "idempotency-key": idempotencyKey,
   };
   if (expectedConfigurationVersion !== undefined) {
-    headers["x-satyr-configuration-version"] = String(
+    headers["x-pantry-configuration-version"] = String(
       expectedConfigurationVersion,
     );
   }
@@ -424,7 +424,7 @@ function readStoredMutationIntent(
   fingerprint: string,
 ): StoredMutationIntent | undefined {
   try {
-    const raw = sessionStorage.getItem(`satyr:mutation:${intentKey}`);
+    const raw = sessionStorage.getItem(`pantry:mutation:${intentKey}`);
     if (raw === null) return undefined;
     const parsed: unknown = JSON.parse(raw);
     return isRecord(parsed) &&
@@ -443,7 +443,7 @@ function writeStoredMutationIntent(
 ): void {
   try {
     sessionStorage.setItem(
-      `satyr:mutation:${intentKey}`,
+      `pantry:mutation:${intentKey}`,
       JSON.stringify(intent),
     );
   } catch {
@@ -456,11 +456,11 @@ function clearStoredMutationIntent(
   idempotencyKey: string,
 ): void {
   try {
-    const stored = sessionStorage.getItem(`satyr:mutation:${intentKey}`);
+    const stored = sessionStorage.getItem(`pantry:mutation:${intentKey}`);
     if (stored === null) return;
     const parsed: unknown = JSON.parse(stored);
     if (isRecord(parsed) && parsed.idempotencyKey === idempotencyKey) {
-      sessionStorage.removeItem(`satyr:mutation:${intentKey}`);
+      sessionStorage.removeItem(`pantry:mutation:${intentKey}`);
     }
   } catch {
     return;
@@ -489,14 +489,14 @@ export async function controlUpload(
   form: FormData,
   idempotencyKey: string,
 ): Promise<unknown> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
   }
   return writeThenForgetReads(() =>
     fetch(path, {
       method: "POST",
-      headers: { "x-satyr-csrf": csrf, "idempotency-key": idempotencyKey },
+      headers: { "x-pantry-csrf": csrf, "idempotency-key": idempotencyKey },
       body: form,
     }),
   );
@@ -536,7 +536,7 @@ export async function controlSecretMutation(
   body: unknown,
   expectedConfigurationVersion?: number,
 ): Promise<unknown> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
   }
@@ -545,12 +545,12 @@ export async function controlSecretMutation(
       method,
       headers: {
         "content-type": "application/json",
-        "x-satyr-csrf": csrf,
+        "x-pantry-csrf": csrf,
         "idempotency-key": `portal-${crypto.randomUUID()}`,
         ...(expectedConfigurationVersion === undefined
           ? {}
           : {
-              "x-satyr-configuration-version": String(
+              "x-pantry-configuration-version": String(
                 expectedConfigurationVersion,
               ),
             }),

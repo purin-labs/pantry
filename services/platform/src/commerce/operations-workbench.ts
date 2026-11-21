@@ -75,8 +75,8 @@ export async function readCommerceExceptionInbox(
   if (!authority.ok)
     return { kind: "unavailable", reason: "commerce_system_unavailable" };
   if (
-    authority.value.provider !== "underclerk" ||
-    authority.value.commerceSystem.kind !== "satyr_commerce"
+    authority.value.provider !== "commerce" ||
+    authority.value.commerceSystem.kind !== "builtin_commerce"
   ) {
     return { kind: "unavailable", reason: "resolution_unsupported" };
   }
@@ -87,19 +87,19 @@ export async function readCommerceExceptionInbox(
   });
   if (
     !binding.ok ||
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
     return { kind: "unavailable", reason: "entity_plane_unavailable" };
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
       ),
     });
   } catch {
@@ -114,7 +114,7 @@ export async function readCommerceExceptionInbox(
   const reader = new CommerceGraphReader({
     organisationId,
     merchantId: binding.value.merchantId,
-    underclerk: commerceEngine,
+    commerce: commerceEngine,
   });
   try {
     const observedAt = new Date().toISOString();
@@ -361,7 +361,7 @@ function isCurrentSystemFulfillment(entity: CommerceEntity): boolean {
     entity.reference.typeId === "fulfillment" &&
     entity.provenance !== undefined &&
     entity.freshness !== undefined &&
-    entity.provenance.source === "underclerk" &&
+    entity.provenance.source === "commerce" &&
     entity.freshness.state === "current"
   );
 }
@@ -372,7 +372,7 @@ function isCurrentSystemShipment(entity: CommerceEntity): boolean {
     entity.reference.typeId === "shipment" &&
     entity.provenance !== undefined &&
     entity.freshness !== undefined &&
-    entity.provenance.source === "underclerk" &&
+    entity.provenance.source === "commerce" &&
     entity.freshness.state === "current"
   );
 }

@@ -377,7 +377,7 @@ const ACCEPT_PATH =
  * `?setup=live-missing` the session never lists the organisation.
  */
 function installPreviewServer(): void {
-  document.cookie = "satyr_control_csrf=organisations-preview; path=/";
+  document.cookie = "pantry_csrf=organisations-preview; path=/";
   const fetchControl = window.fetch.bind(window);
   window.fetch = async function previewFetch(
     input: RequestInfo | URL,
@@ -490,7 +490,7 @@ installPreviewServer();
 if (setup === null || !setup.startsWith("live")) {
   // A fixed state must not resume a setup left by an earlier live run.
   window.sessionStorage.removeItem(
-    "satyr:account-onboarding:organisations-preview",
+    "pantry:account-onboarding:organisations-preview",
   );
 }
 

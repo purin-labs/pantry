@@ -524,7 +524,7 @@ function vaultItemView(row: VaultItemRow): VaultItemView {
     throw new Error("vault_item_row_invalid");
   const common = {
     itemId: row.itemId,
-    store: "satyr" as const,
+    store: "pantry" as const,
     label: row.label,
     revision: row.revision,
     createdAt: row.createdAt,

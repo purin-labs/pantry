@@ -643,7 +643,7 @@ export async function handleTriggerShopifyTestOrder(
     );
   }
 
-  const sourceIdentifier = `satyr-m8-${newRequestId()}`;
+  const sourceIdentifier = `pantry-m8-${newRequestId()}`;
   const triggered = await triggerShopifyDevelopmentOrder({
     shopDomain: credential.value.shopDomain,
     accessToken: credential.value.accessToken,

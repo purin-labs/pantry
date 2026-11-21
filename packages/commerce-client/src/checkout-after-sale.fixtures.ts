@@ -45,7 +45,7 @@ const invalidProtectedPaymentDispute: CommerceBuyerPaymentDisputeStatusV1 =
   protectedPaymentDispute;
 
 const invalidRefundedOrder: CommerceBuyerOrderV1 = {
-  schemaVersion: "underclerk.buyer-order.v1",
+  schemaVersion: "commerce.buyer-order.v1",
   checkoutId: "checkout_fixture",
   orderId: "order_fixture",
   paymentId: "payment_fixture",
@@ -65,7 +65,7 @@ const invalidRefundedOrder: CommerceBuyerOrderV1 = {
 };
 
 const invalidActiveOrder: CommerceBuyerOrderV1 = {
-  schemaVersion: "underclerk.buyer-order.v1",
+  schemaVersion: "commerce.buyer-order.v1",
   checkoutId: "checkout_fixture",
   orderId: "order_fixture",
   paymentId: "payment_fixture",

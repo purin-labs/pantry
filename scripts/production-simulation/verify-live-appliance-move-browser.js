@@ -455,7 +455,7 @@ async function mountLiveMoveApp(paceDriveMs) {
     },
   };
   window.fetch = persistentChatFetch;
-  document.cookie = "satyr_control_csrf=plan81-move; path=/";
+  document.cookie = "pantry_csrf=plan81-move; path=/";
   ReactDOM.createRoot(document.getElementById("root")).render(
     React.createElement(
       MemoryRouter,

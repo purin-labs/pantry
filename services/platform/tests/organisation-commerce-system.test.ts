@@ -17,19 +17,19 @@ import {
 } from "./test-ids";
 
 describe("organisation commerce system", () => {
-  it("selects one Satyr Commerce binding and replays the same selection", async () => {
+  it("selects one Seams Checkout binding and replays the same selection", async () => {
     const db = createDatabase();
     const organisationId = requireOrganisationId("organisation_commerce_system");
     const userId = requireUserId(
       "user_750a8a95-1835-5f02-879b-102426a62ea3",
     );
     const integrationAccountId = requireIntegrationAccountId(
-      "integration_underclerk_system",
+      "integration_commerce_system",
     );
     await seedConfiguringOrganisation(db, organisationId, userId);
     const binding = await bindCommerceMerchant({
       db,
-      bindingId: "underclerk_binding_system",
+      bindingId: "commerce_binding_system",
       organisationId,
       integrationAccountId,
       merchantId: "merchant_system",
@@ -45,9 +45,9 @@ describe("organisation commerce system", () => {
       organisationId,
       selectedByUserId: userId,
       selection: {
-        kind: "select_satyr_commerce",
+        kind: "select_builtin_commerce",
         expectedRevision: 0,
-        underclerkBindingId: binding.value.bindingId,
+        commerceBindingId: binding.value.bindingId,
       },
       now: 20,
     });
@@ -56,7 +56,7 @@ describe("organisation commerce system", () => {
       value: {
         kind: "selected",
         commerceSystem: {
-          kind: "satyr_commerce",
+          kind: "builtin_commerce",
           organisationId,
           bindingId: binding.value.bindingId,
           merchantId: binding.value.merchantId,
@@ -77,9 +77,9 @@ describe("organisation commerce system", () => {
         organisationId,
         selectedByUserId: userId,
         selection: {
-          kind: "select_satyr_commerce",
+          kind: "select_builtin_commerce",
           expectedRevision: 1,
-          underclerkBindingId: binding.value.bindingId,
+          commerceBindingId: binding.value.bindingId,
         },
         now: 21,
       }),
@@ -94,12 +94,12 @@ describe("organisation commerce system", () => {
       "user_954b0a36-9058-5dba-9d44-98c1d5a70775",
     );
     const integrationAccountId = requireIntegrationAccountId(
-      "integration_underclerk_invalid",
+      "integration_commerce_invalid",
     );
     await seedConfiguringOrganisation(db, organisationId, userId);
     const binding = await bindCommerceMerchant({
       db,
-      bindingId: "underclerk_binding_invalid",
+      bindingId: "commerce_binding_invalid",
       organisationId,
       integrationAccountId,
       merchantId: "merchant_invalid",
@@ -113,10 +113,10 @@ describe("organisation commerce system", () => {
       sqlite
         .prepare(
           `INSERT INTO organisation_commerce_system (
-         organisation_id, system_kind, underclerk_binding_id,
+         organisation_id, system_kind, commerce_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
-       ) VALUES (?, 'satyr_commerce', ?, ?, 1, 20, ?)`,
+       ) VALUES (?, 'builtin_commerce', ?, ?, 1, 20, ?)`,
         )
         .run(
           organisationId,
@@ -130,9 +130,9 @@ describe("organisation commerce system", () => {
       organisationId,
       selectedByUserId: userId,
       selection: {
-        kind: "select_satyr_commerce",
+        kind: "select_builtin_commerce",
         expectedRevision: 0,
-        underclerkBindingId: binding.value.bindingId,
+        commerceBindingId: binding.value.bindingId,
       },
       now: 20,
     });
@@ -149,7 +149,7 @@ describe("organisation commerce system", () => {
            created_by_user_id, created_at, updated_at,
            environment, provider_subject_id
          ) VALUES (
-           'provider_connection_shopify_switch', ?, 'shopify', 'shared_satyr_app', 'connection_credential',
+           'provider_connection_shopify_switch', ?, 'shopify', 'shared_pantry_app', 'connection_credential',
            1, 'vault:shopify:switch', 'active', '[]', ?, 20, 20,
            'development', 'switch.myshopify.com'
          )`,
@@ -216,7 +216,7 @@ describe("organisation commerce system", () => {
            created_by_user_id, created_at, updated_at,
            environment, provider_subject_id
          ) VALUES (
-           'provider_connection_shopify_health', ?, 'shopify', 'shared_satyr_app', 'connection_credential',
+           'provider_connection_shopify_health', ?, 'shopify', 'shared_pantry_app', 'connection_credential',
            1, 'vault:shopify:health', 'active', '[]', ?, 10, 10,
            'development', 'health.myshopify.com'
          )`,

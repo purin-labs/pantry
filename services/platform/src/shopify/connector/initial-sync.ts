@@ -29,7 +29,7 @@ import { parseInitialOrder, parseInitialOrdersPage } from "./order-snapshot";
 import { validShopDomain } from "./values";
 
 const SHOPIFY_INITIAL_CATALOG_QUERY = `
-  query SatyrInitialCatalog($first: Int!, $after: String) {
+  query PantryInitialCatalog($first: Int!, $after: String) {
     products(first: $first, after: $after) {
       nodes {
         id
@@ -46,7 +46,7 @@ const SHOPIFY_INITIAL_CATALOG_QUERY = `
 `;
 
 const SHOPIFY_INITIAL_ORDERS_QUERY = `
-  query SatyrInitialOrders($first: Int!, $after: String) {
+  query PantryInitialOrders($first: Int!, $after: String) {
     orders(first: $first, after: $after, sortKey: CREATED_AT, reverse: true) {
       nodes {
         id
@@ -111,7 +111,7 @@ const SHOPIFY_INITIAL_ORDERS_QUERY = `
 `;
 
 const SHOPIFY_ORDER_REFRESH_QUERY = `
-  query SatyrOrderRefresh($id: ID!) {
+  query PantryOrderRefresh($id: ID!) {
     order(id: $id) {
       id
       name
@@ -173,7 +173,7 @@ const SHOPIFY_ORDER_REFRESH_QUERY = `
 `;
 
 const SHOPIFY_INITIAL_LOCATIONS_QUERY = `
-  query SatyrInitialLocations($first: Int!, $after: String) {
+  query PantryInitialLocations($first: Int!, $after: String) {
     locations(first: $first, after: $after, includeInactive: true, includeLegacy: true) {
       nodes {
         id
@@ -187,7 +187,7 @@ const SHOPIFY_INITIAL_LOCATIONS_QUERY = `
 `;
 
 const SHOPIFY_INITIAL_INVENTORY_QUERY = `
-  query SatyrInitialInventory($first: Int!, $after: String) {
+  query PantryInitialInventory($first: Int!, $after: String) {
     inventoryItems(first: $first, after: $after) {
       nodes {
         id
@@ -207,7 +207,7 @@ const SHOPIFY_INITIAL_INVENTORY_QUERY = `
 `;
 
 const SHOPIFY_INITIAL_PUBLICATIONS_QUERY = `
-  query SatyrInitialPublications($first: Int!, $after: String) {
+  query PantryInitialPublications($first: Int!, $after: String) {
     products(first: $first, after: $after) {
       nodes {
         id

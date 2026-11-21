@@ -151,7 +151,7 @@ export function IntegrationsPage(
   const autoSyncStarted = React.useRef(false);
   const commerceBehind =
     props.canManage &&
-    props.commerceSystem?.kind === "satyr_commerce" &&
+    props.commerceSystem?.kind === "builtin_commerce" &&
     props.commerceSystem.sync.kind === "delayed";
   React.useEffect(
     autoSyncCommerce.bind(
@@ -820,7 +820,7 @@ export function inferenceIntegrationStatus(
         : { kind: "attention", label: "Claude sign-in required" };
     case "codex_subscription":
       return codexIntegrationStatus(connection);
-    case "satyr_platform":
+    case "pantry_platform":
       return { kind: "connected", label: "Provided by Seams" };
     case "organisation_openai_api_key":
       return { kind: "connected", label: "OpenAI key" };

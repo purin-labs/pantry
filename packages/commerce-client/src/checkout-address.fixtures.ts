@@ -5,7 +5,7 @@ import type {
 
 const japanAddress: CommerceBuyerShippingAddressV1 = {
   countryCode: "JP",
-  recipientName: "Satyr Buyer",
+  recipientName: "Pantry Buyer",
   addressLine1: "1-2-3 Marunouchi",
   locality: "Chiyoda-ku",
   administrativeArea: "Tokyo",
@@ -14,7 +14,7 @@ const japanAddress: CommerceBuyerShippingAddressV1 = {
 
 const singaporeAddress: CommerceBuyerShippingAddressV1 = {
   countryCode: "SG",
-  recipientName: "Satyr Buyer",
+  recipientName: "Pantry Buyer",
   addressLine1: "1 Raffles Quay",
   locality: "Singapore",
   postalCode: "018956",
@@ -23,7 +23,7 @@ const singaporeAddress: CommerceBuyerShippingAddressV1 = {
 // @ts-expect-error Singapore addresses cannot carry Japan-only administrative state.
 const mixedAddress: CommerceBuyerShippingAddressV1 = {
   countryCode: "SG",
-  recipientName: "Satyr Buyer",
+  recipientName: "Pantry Buyer",
   addressLine1: "1 Raffles Quay",
   locality: "Singapore",
   postalCode: "018956",
@@ -33,7 +33,7 @@ const mixedAddress: CommerceBuyerShippingAddressV1 = {
 // @ts-expect-error Japan addresses require an administrative area.
 const incompleteJapanAddress: CommerceBuyerShippingAddressV1 = {
   countryCode: "JP",
-  recipientName: "Satyr Buyer",
+  recipientName: "Pantry Buyer",
   addressLine1: "1-2-3 Marunouchi",
   locality: "Chiyoda-ku",
   postalCode: "100-0005",

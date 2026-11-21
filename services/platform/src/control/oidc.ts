@@ -87,8 +87,8 @@ const GOOGLE_ISSUERS = new Set([
 ]);
 const OIDC_STATE_TTL_MS = 10 * 60 * 1000;
 const CLOCK_SKEW_SECONDS = 60;
-const REDIRECT_ORIGIN = "https://satyr.invalid";
-const APPROVAL_STATE_PARAM = "_satyr_approval";
+const REDIRECT_ORIGIN = "https://pantry.invalid";
+const APPROVAL_STATE_PARAM = "_pantry_approval";
 const APPROVAL_GRANT_VERSION = "v1";
 
 export async function beginGoogleOidc(input: {
@@ -594,7 +594,7 @@ function normalizeRedirectPath(path: string): string {
     parsed.origin !== REDIRECT_ORIGIN ||
     parsed.username !== "" ||
     parsed.password !== "" ||
-    parsed.host !== "satyr.invalid" ||
+    parsed.host !== "pantry.invalid" ||
     parsed.pathname.includes("\\")
   ) {
     return "/portal";

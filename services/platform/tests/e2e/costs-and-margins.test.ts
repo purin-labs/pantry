@@ -302,7 +302,7 @@ it(
     const now = new Date();
     const native = providerClient();
     const demo = await native.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: author.organisationId,
       merchantId: MERCHANT_ID,
       profile: "cafe_patisserie",
@@ -312,13 +312,13 @@ it(
     await publishCafeMenu(MERCHANT_ID);
 
     const entityPlane = new CommerceEntityPlaneClient({
-      baseUrl: "http://underclerk.test",
-      serviceToken: "underclerk-e2e-token",
-      fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      baseUrl: "http://commerce.test",
+      serviceToken: "commerce-e2e-token",
+      fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
     });
     const storefront = new CommerceStorefrontClient({
-      baseUrl: "http://underclerk.test",
-      fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      baseUrl: "http://commerce.test",
+      fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
     });
 
     const configured = await configurePatisserieMenu(
@@ -470,7 +470,7 @@ it(
       throw new Error("Missing calculated product rows");
     }
     expect(plainProduct.imageUrl).toMatch(
-      /^https?:\/\/underclerk\.test\/v1\/public\/merchants\/.+\/media\/media_/u,
+      /^https?:\/\/commerce\.test\/v1\/public\/merchants\/.+\/media\/media_/u,
     );
     expect(plainRow.imageUrl).toBe(plainProduct.imageUrl);
     expect(espressoRow.imageUrl).toBeNull();
@@ -2462,7 +2462,7 @@ async function placePatisserieBuyerOrder(
   const storefrontId = "storefront_cafe";
   const key = `costs_actuals_${crypto.randomUUID()}`;
   const session = await storefront.createSession(MERCHANT_ID, storefrontId, {
-    schemaVersion: "underclerk.create-buyer-session.v1",
+    schemaVersion: "commerce.create-buyer-session.v1",
     buyer: { kind: "guest" },
   });
   if (!session.ok) {
@@ -2473,7 +2473,7 @@ async function placePatisserieBuyerOrder(
     storefrontId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `${key}_cart`,
       lines: lines.map((entry) => ({
         kind: "menu" as const,
@@ -2492,7 +2492,7 @@ async function placePatisserieBuyerOrder(
     storefrontId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: `${key}_checkout`,
       cartId: cart.value.cartId,
       cartRevision: cart.value.revision,
@@ -2512,11 +2512,11 @@ async function placePatisserieBuyerOrder(
     checkout.value.checkoutId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-payment-session.v1",
+      schemaVersion: "commerce.create-buyer-payment-session.v1",
       idempotencyKey: paymentKey,
       checkoutRevision: checkout.value.revision,
       quoteDigest: checkout.value.quote.quoteDigest,
-      returnUrl: "https://underclerk.test/return",
+      returnUrl: "https://commerce.test/return",
     },
   );
   if (!payment.ok || payment.value.state !== "ready") {
@@ -2528,7 +2528,7 @@ async function placePatisserieBuyerOrder(
     checkout.value.checkoutId,
     session.value.token,
     {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+      schemaVersion: "commerce.reconcile-buyer-payment.v1",
       idempotencyKey: paymentKey,
       checkoutRevision: payment.value.checkoutRevision,
       quoteDigest: checkout.value.quote.quoteDigest,

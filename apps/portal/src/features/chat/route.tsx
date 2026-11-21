@@ -2230,7 +2230,7 @@ export class ChatPage extends React.Component<Props, State> {
   ): Promise<void> {
     if (this.forkPending) return;
     this.forkPending = true;
-    const key = `satyr:chat-fork:${this.props.organisationId}:${sourceId}:${messageId}`;
+    const key = `pantry:chat-fork:${this.props.organisationId}:${sourceId}:${messageId}`;
     const operationId = localStorage.getItem(key) ?? crypto.randomUUID();
     localStorage.setItem(key, operationId);
     this.setState({ error: null, forking: true });

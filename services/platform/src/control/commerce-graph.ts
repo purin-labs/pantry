@@ -30,9 +30,9 @@ type ControlCommerceGraphError = Readonly<{
   code:
     | CommerceSystemError["code"]
     | "organisation_not_found"
-    | "underclerk_binding_missing"
-    | "underclerk_binding_mismatch"
-    | "underclerk_unavailable";
+    | "commerce_binding_missing"
+    | "commerce_binding_mismatch"
+    | "commerce_unavailable";
   status: 404 | 503;
 }>;
 
@@ -64,32 +64,32 @@ export async function openControlCommerceGraph(
     organisationId: authorized.organisationId,
     environment,
   });
-  if (!binding.ok) return failure("underclerk_binding_missing", 503);
+  if (!binding.ok) return failure("commerce_binding_missing", 503);
   if (
-    commerceSystem.value.kind === "satyr_commerce" &&
+    commerceSystem.value.kind === "builtin_commerce" &&
     commerceSystem.value.merchantId !== binding.value.merchantId
   ) {
-    return failure("underclerk_binding_mismatch", 503);
+    return failure("commerce_binding_mismatch", 503);
   }
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    return failure("underclerk_unavailable", 503);
+    return failure("commerce_unavailable", 503);
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(authorized.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
         String(authorized.membership.personId),
       ),
     });
   } catch {
-    return failure("underclerk_unavailable", 503);
+    return failure("commerce_unavailable", 503);
   }
   const commerceEngine = new CommerceEngineSource({
     organisationId: authorized.organisationId,
@@ -101,7 +101,7 @@ export async function openControlCommerceGraph(
     commerceSystem: commerceSystem.value,
     organisationId: authorized.organisationId,
     merchantId: binding.value.merchantId,
-    underclerk: commerceEngine,
+    commerce: commerceEngine,
     organisation: () =>
       requireActiveOrganisationActor({
         env,

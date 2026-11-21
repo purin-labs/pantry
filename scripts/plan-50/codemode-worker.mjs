@@ -1319,7 +1319,7 @@ function inputCancellationId(command) {
   }
 }
 
-const STEERING_ENTRY_KIND = "satyr.steer";
+const STEERING_ENTRY_KIND = "pantry.steer";
 
 function isSteeringEntryWrite(write) {
   return write.type === "entry" && write.value.kind === STEERING_ENTRY_KIND;

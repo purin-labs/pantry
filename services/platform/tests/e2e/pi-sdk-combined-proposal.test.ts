@@ -412,7 +412,7 @@ it("joins two assignments that ran side by side into one proposal, one approval 
       substituted: [
         "model provider (deterministic OpenRouter transport)",
         "Slack",
-        "commerce provider (Underclerk test merchant)",
+        "commerce provider (Commerce test merchant)",
         "the cue (the journey starts the two-session command itself)",
       ],
       ...execution,

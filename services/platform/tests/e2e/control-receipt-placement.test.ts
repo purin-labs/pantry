@@ -52,8 +52,8 @@ async function receiptRelocationJourney({ task }: TestContext) {
       method: "POST",
       headers: {
         origin: env.PANTRY_PUBLIC_ORIGIN,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
     },
   );

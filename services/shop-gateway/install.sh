@@ -33,10 +33,10 @@ case "$(uname -s)-$(uname -m)" in
   *) echo "This computer is not supported: $(uname -s) $(uname -m)." >&2; exit 1 ;;
 esac
 case "$WANT" in
-  __*) echo "This Satyr release has no gateway build for $TARGET." >&2; exit 1 ;;
+  __*) echo "This Pantry release has no gateway build for $TARGET." >&2; exit 1 ;;
 esac
 
-PANTRY_GATEWAY_HOME="${PANTRY_GATEWAY_HOME:-$HOME/.satyr-gateway}"
+PANTRY_GATEWAY_HOME="${PANTRY_GATEWAY_HOME:-$HOME/.pantry-gateway}"
 export PANTRY_GATEWAY_HOME
 mkdir -p "$PANTRY_GATEWAY_HOME/bin"
 chmod 700 "$PANTRY_GATEWAY_HOME"
@@ -65,7 +65,7 @@ fi
 
 case "$(uname -s)" in
   Darwin)
-    LABEL=sh.seams.satyr.shop-gateway
+    LABEL=io.purin.pantry.shop-gateway
     PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
     mkdir -p "$HOME/Library/LaunchAgents"
     cat >"$PLIST" <<PLIST
@@ -86,7 +86,7 @@ PLIST
     ;;
   Linux)
     UNIT="[Unit]
-Description=Satyr shop gateway
+Description=Pantry shop gateway
 After=network-online.target
 Wants=network-online.target
 
@@ -100,14 +100,14 @@ NoNewPrivileges=true
 [Install]
 WantedBy=default.target"
     if [ "$(id -u)" = 0 ]; then
-      printf '%s\n' "$UNIT" >/etc/systemd/system/satyr-shop-gateway.service
+      printf '%s\n' "$UNIT" >/etc/systemd/system/pantry-shop-gateway.service
       systemctl daemon-reload
-      systemctl enable --now satyr-shop-gateway.service
+      systemctl enable --now pantry-shop-gateway.service
     else
       mkdir -p "$HOME/.config/systemd/user"
-      printf '%s\n' "$UNIT" >"$HOME/.config/systemd/user/satyr-shop-gateway.service"
+      printf '%s\n' "$UNIT" >"$HOME/.config/systemd/user/pantry-shop-gateway.service"
       systemctl --user daemon-reload
-      systemctl --user enable --now satyr-shop-gateway.service
+      systemctl --user enable --now pantry-shop-gateway.service
       loginctl enable-linger "$(id -un)" >/dev/null 2>&1 || true
     fi
     ;;

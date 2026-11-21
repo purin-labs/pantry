@@ -5,7 +5,7 @@
  */
 
 function onKey(organisationId: string): string {
-  return `satyr.voice.on.${organisationId}`;
+  return `pantry.voice.on.${organisationId}`;
 }
 
 export function readStored(key: string): string | null {

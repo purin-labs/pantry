@@ -48,8 +48,8 @@ describe("commerce capability activation", () => {
           capability: "food_service",
           scope: { kind: "location", locationId },
           authority: {
-            kind: "satyr_commerce",
-            integrationAccountId: "integration_underclerk_capability",
+            kind: "builtin_commerce",
+            integrationAccountId: "integration_commerce_capability",
             commerceSystemRevision: 1,
           },
           contractRevision,
@@ -364,12 +364,12 @@ async function seedActivePantryCommerceOrganisation(
       .bind(organisationId),
     db
       .prepare(
-        `INSERT INTO underclerk_merchant_binding (
+        `INSERT INTO commerce_merchant_binding (
          binding_id, organisation_id, integration_account_id, merchant_id, environment,
          delivery_signing_key_id, delivery_signing_public_key_b64,
          revision, created_at, updated_at
        ) VALUES (
-         'underclerk_binding_capability', ?, 'integration_underclerk_capability',
+         'commerce_binding_capability', ?, 'integration_commerce_capability',
          'merchant_capability', 'development', 'key_capability',
          'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, 1, 1
        )`,
@@ -378,11 +378,11 @@ async function seedActivePantryCommerceOrganisation(
     db
       .prepare(
         `INSERT INTO organisation_commerce_system (
-         organisation_id, system_kind, underclerk_binding_id,
+         organisation_id, system_kind, commerce_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
        ) VALUES (
-         ?, 'satyr_commerce', 'underclerk_binding_capability',
+         ?, 'builtin_commerce', 'commerce_binding_capability',
          NULL, 1, 1, ?
        )`,
       )

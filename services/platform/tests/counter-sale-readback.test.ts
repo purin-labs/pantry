@@ -54,7 +54,7 @@ function checkout(lifecycle: unknown): Checkout {
     checkoutId: "checkout_counter_1",
     source: {
       kind: "point_of_sale",
-      satyrLocationId: "location_cafe",
+      pantryLocationId: "location_cafe",
       posConfigurationRevision: 3,
       operatorIdentity: "user_7585a72f-b277-50a2-8525-d876e77d83f8",
       terminalAssignmentRevision: 4,
@@ -87,7 +87,7 @@ describe("counter sale readback", function counterSaleReadbackSuite() {
     expect(state.state).toBe("awaiting_collection");
     expect(state.collectable).toBe(true);
     expect(state.recoverable).toBeNull();
-    expect(state.satyrLocationId).toBe("location_cafe");
+    expect(state.pantryLocationId).toBe("location_cafe");
     expect(state.quote?.quoteDigest).toBe(DIGEST);
   });
 

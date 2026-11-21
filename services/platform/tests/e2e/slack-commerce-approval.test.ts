@@ -240,7 +240,7 @@ async function slackCommerceApprovalJourney({
   await expect
     .poll(() => slack.messages[0]?.text, { timeout: 30_000 })
     .toBe(answers[2]?.text);
-  expect(slack.messages[0]?.text).not.toMatch(/receipt_|underclerk:/u);
+  expect(slack.messages[0]?.text).not.toMatch(/receipt_|commerce:/u);
   expect(slack.visibleMessageCount()).toBe(2);
   const final = await readAction(nonce);
   expect(final).toMatchObject({
@@ -260,7 +260,7 @@ async function slackCommerceApprovalJourney({
     substituted: [
       "model provider (deterministic OpenRouter transport)",
       "Slack (signed interaction payloads and response URLs)",
-      "commerce provider (Underclerk test merchant that loses one answer)",
+      "commerce provider (Commerce test merchant that loses one answer)",
     ],
     nonce,
     noticeBlocks: blocks,
@@ -390,7 +390,7 @@ async function portalApprovalFailureJourney({
   expect(card?.text).toContain("Approved in the Portal");
   expect(card?.text).toContain("See Operations in the Portal.");
   expect(card?.text).not.toContain("Nothing changes until");
-  expect(card?.text).not.toMatch(/receipt_|underclerk:|merchant_|offer_/u);
+  expect(card?.text).not.toMatch(/receipt_|commerce:|merchant_|offer_/u);
   expect(cardButtons(card)).not.toContain("commerce_action_approve");
   expect(cardButtons(card)).not.toContain("commerce_action_decline");
   expect(slack.visibleMessageCount()).toBe(2);

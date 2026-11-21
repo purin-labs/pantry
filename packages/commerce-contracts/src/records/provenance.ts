@@ -42,7 +42,7 @@ export const commerceSourceSchema = Type.Union([
   Type.Literal("shopify"),
   Type.Literal("stripe"),
   Type.Literal("lab"),
-  Type.Literal("underclerk"),
+  Type.Literal("commerce"),
 ]);
 export type CommerceSource = Static<typeof commerceSourceSchema>;
 

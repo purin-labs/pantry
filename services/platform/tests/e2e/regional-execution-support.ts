@@ -132,7 +132,7 @@ export async function exerciseRegionalExecution(
     provider: "whatsapp",
     providerSubjectId: WABA,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle },
     grantedScopes: ["whatsapp_business_messaging"],
     createdByUserId: userId,
@@ -272,7 +272,7 @@ export async function regionalQueue(
   const message = new RegionalQueueMessage(scope);
   await gateway.queue(
     {
-      queue: "satyr-events",
+      queue: "pantry-events",
       metadata: { metrics: { backlogCount: 1, backlogBytes: 0 } },
       messages: [message],
       ackAll: message.ack.bind(message),

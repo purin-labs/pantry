@@ -393,13 +393,13 @@ async function handleCounterSaleAfterSale(
 type OpenSaleLines = Parameters<typeof openCounterSale>[1]["lines"];
 
 function parseSaleRequest(body: JsonRecord): Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   checkoutId: string;
   lines: OpenSaleLines;
   tenderMode?: "terminal" | "cash";
 }> | null {
-  const { satyrLocationId, checkoutId, lines, tenderMode } = body;
-  if (typeof satyrLocationId !== "string" || satyrLocationId.length === 0) return null;
+  const { pantryLocationId, checkoutId, lines, tenderMode } = body;
+  if (typeof pantryLocationId !== "string" || pantryLocationId.length === 0) return null;
   if (typeof checkoutId !== "string" || checkoutId.length === 0) return null;
   if (!Array.isArray(lines) || lines.length === 0) return null;
   if (
@@ -410,7 +410,7 @@ function parseSaleRequest(body: JsonRecord): Readonly<{
     return null;
   }
   return {
-    satyrLocationId,
+    pantryLocationId,
     checkoutId,
     lines: lines as OpenSaleLines,
     ...(tenderMode === undefined ? {} : { tenderMode }),
@@ -443,21 +443,21 @@ function parseCashRequest(body: JsonRecord): Readonly<{
 }
 
 function parseCollectionRequest(body: JsonRecord): Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   checkoutRevision: number;
   quoteDigest: string;
   amount: Readonly<{ amountMinor: number; currency: string }>;
   paymentMethod?: CounterRegisterPaymentMethod;
 }> | null {
-  const { satyrLocationId, checkoutRevision, quoteDigest, amount, paymentMethod } = body;
-  if (typeof satyrLocationId !== "string" || satyrLocationId.length === 0) return null;
+  const { pantryLocationId, checkoutRevision, quoteDigest, amount, paymentMethod } = body;
+  if (typeof pantryLocationId !== "string" || pantryLocationId.length === 0) return null;
   if (!Number.isSafeInteger(checkoutRevision) || Number(checkoutRevision) <= 0) return null;
   if (typeof quoteDigest !== "string" || !/^quote_[a-f0-9]{64}$/u.test(quoteDigest)) return null;
   const parsedAmount = parseMoney(amount);
   if (parsedAmount === null) return null;
   if (paymentMethod !== undefined && !isCounterRegisterPaymentMethod(paymentMethod)) return null;
   return {
-    satyrLocationId,
+    pantryLocationId,
     checkoutRevision: Number(checkoutRevision),
     quoteDigest,
     amount: parsedAmount,

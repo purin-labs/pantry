@@ -1,6 +1,6 @@
 # Security architecture
 
-This document describes how Satyr keeps credentials, network egress and
+This document describes how Pantry keeps credentials, network egress and
 external actions under trusted control. It states the current invariants, the
 owners and the modules that enforce them. Module paths are relative to
 [`services/platform/src/`](../../services/platform/src/).
@@ -8,7 +8,7 @@ owners and the modules that enforce them. Module paths are relative to
 | Replaces                                              | Section                                                                      |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Spec 2 — Trusted Egress and Credential Injection      | [Trusted egress](#trusted-egress)                                            |
-| Spec 6 — Satyr Vault, Policy, and Revocation          | [Vault, policy and revocation](#vault-policy-and-revocation)                 |
+| Spec 6 — Seams Vault, Policy, and Revocation          | [Vault, policy and revocation](#vault-policy-and-revocation)                 |
 | Spec 8 — Identity, Approval, and Action Authorization | [Identity, approval and authorization](#identity-approval-and-authorization) |
 
 The [IFC integration guide](../../services/platform/src/policy/information-flow/README.md)
@@ -49,7 +49,7 @@ Every route runs Pi.
 
 | `keySource`                 | `provider`          | Credential                                                      |
 | --------------------------- | ------------------- | --------------------------------------------------------------- |
-| `platform`                  | `openai-compatible` | Satyr's `OPENROUTER_API_KEY` Worker secret                      |
+| `platform`                  | `openai-compatible` | Pantry's `OPENROUTER_API_KEY` Worker secret                      |
 | `organisation_byo`          | `openai`            | Organisation OpenAI API key in the Vault                        |
 | `organisation_byo`          | `anthropic`         | Organisation Anthropic API key in the Vault                     |
 | `organisation_oauth`        | `anthropic`         | Claude account sign-in in the Vault                             |
@@ -64,10 +64,10 @@ refreshes the rotating ChatGPT sign-in under the `refresh_lease` of
 
 Direct model-provider requests use `modelProviderFetch(env)`
 (`model-exit/provider-fetch.ts`). Never patch `globalThis.fetch`. The
-OpenRouter route stays direct. `satyr-model-exit` (`model-exit/worker.ts`)
+OpenRouter route stays direct. `pantry-model-exit` (`model-exit/worker.ts`)
 runs at `aws:ap-northeast-1`. It forwards HTTPS only to `auth.openai.com`,
 `api.openai.com`, `api.anthropic.com` and `platform.claude.com`, with manual
-redirects. `satyr-chatgpt-exit` (`chatgpt-exit/worker.ts`) hands
+redirects. `pantry-chatgpt-exit` (`chatgpt-exit/worker.ts`) hands
 `chatgpt.com` requests to one shared container at location hint `apac-ne`.
 Both exits refuse other hosts, hold no credential, keep no state, do not retry
 and never log a header, body or token.
@@ -88,7 +88,7 @@ operator-visible errors.
 
 ## Vault, policy and revocation
 
-Satyr Vault (`credential-vault/`) owns encrypted Organisation credentials and
+Seams Vault (`credential-vault/`) owns encrypted Organisation credentials and
 their lifecycle. Cloudflare Secrets Store owns the Vault roots. Provider
 systems own the provider-side credential. Policy and grants decide which
 operation may resolve a credential. A Vault handle (`vault:...`) grants no
@@ -170,8 +170,8 @@ retries converge on one receipt. Later resolution fails with
 ### Vault items and stores
 
 `vault_item` holds `website_login` and `contact_profile` items
-(`credential-vault/items.ts`). An Organisation keeps them in Satyr Vault or in
-1Password (`credential-vault/stores.ts`). The `satyr-vault-onepassword` Worker
+(`credential-vault/items.ts`). An Organisation keeps them in Seams Vault or in
+1Password (`credential-vault/stores.ts`). The `pantry-vault-onepassword` Worker
 runs 1Password SDK calls behind the `VAULT_ONEPASSWORD` binding. It keeps only
 SDK clients in memory and never logs a request, token or item.
 

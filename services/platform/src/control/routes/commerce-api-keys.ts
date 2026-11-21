@@ -225,7 +225,7 @@ function commerceErrorResponse(error: CommerceClientError): Response {
       { ok: false, error: "api_key_rejected", detail: error.message },
       422,
     );
-  return controlError("underclerk_unavailable", 503);
+  return controlError("commerce_unavailable", 503);
 }
 
 function decode(value: string | undefined): string {

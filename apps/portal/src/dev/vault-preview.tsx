@@ -38,7 +38,7 @@ const SAMPLE: readonly VaultItemView[] = [
   {
     kind: "website_login",
     itemId: "0a1b2c3d4e5f60718293a4b5c6d7e8f9",
-    store: "satyr",
+    store: "pantry",
     label: "Cotta wholesale",
     origins: ["https://business.cotta.jp"],
     username: "orders@nini.example",
@@ -50,7 +50,7 @@ const SAMPLE: readonly VaultItemView[] = [
   {
     kind: "website_login",
     itemId: "1b2c3d4e5f60718293a4b5c6d7e8f90a",
-    store: "satyr",
+    store: "pantry",
     label: "merchant.ubereats.com",
     origins: ["https://merchant.ubereats.com", "https://restaurant.uber.com"],
     username: "cafe@nini.example",
@@ -62,7 +62,7 @@ const SAMPLE: readonly VaultItemView[] = [
   {
     kind: "contact_profile",
     itemId: "2c3d4e5f60718293a4b5c6d7e8f90a1b",
-    store: "satyr",
+    store: "pantry",
     label: "Shop",
     contact: {
       fullName: "Alex Example",
@@ -134,7 +134,7 @@ function previewTransport(): VaultTransport {
           connectedAt: NOW - 2 * DAY,
           reachable: true,
         }
-      : { kind: "satyr" };
+      : { kind: "pantry" };
   const events: VaultEvent[] = [];
   const record = (
     kind: VaultEvent["kind"],
@@ -181,7 +181,7 @@ function previewTransport(): VaultTransport {
               kind: "choose_vault",
               vaults: [
                 {
-                  vaultId: "previewvaultsatyr000000000",
+                  vaultId: "previewvaultpantry00000000",
                   title: "Seams",
                   itemCount: 0,
                 },
@@ -205,13 +205,13 @@ function previewTransport(): VaultTransport {
           return { ok: true, kind: "store", store };
         }
         case "disconnect_onepassword":
-          items = items.filter((item) => item.store === "satyr");
-          store = { kind: "satyr" };
+          items = items.filter((item) => item.store === "pantry");
+          store = { kind: "pantry" };
           record("store_disconnected", null, "onepassword");
           return { ok: true, kind: "store", store };
         case "move_items": {
           const to = command.to;
-          const from = to === "onepassword" ? "satyr" : "onepassword";
+          const from = to === "onepassword" ? "pantry" : "onepassword";
           let moved = 0;
           items = items.map((item) => {
             if (item.store !== from || moved >= 10) return item;

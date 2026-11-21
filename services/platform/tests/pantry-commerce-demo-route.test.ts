@@ -85,10 +85,10 @@ import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_demo_profiles";
-const INTEGRATION_ACCOUNT_ID = "integration_underclerk_demo_profiles";
-const MERCHANT_ID = "merchant_satyr_demo_profiles";
+const INTEGRATION_ACCOUNT_ID = "integration_commerce_demo_profiles";
+const MERCHANT_ID = "merchant_pantry_demo_profiles";
 
-describe("Satyr Commerce demo profile route", () => {
+describe("Seams Checkout demo profile route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     prepareAuthorizedControlMocks();
@@ -105,7 +105,7 @@ describe("Satyr Commerce demo profile route", () => {
     expect(invalid.status).toBe(422);
     await expect(invalid.json()).resolves.toEqual({
       ok: false,
-      error: "satyr_commerce_setup_invalid",
+      error: "builtin_commerce_setup_invalid",
     });
     expect(commerceFetch).not.toHaveBeenCalled();
 
@@ -113,20 +113,20 @@ describe("Satyr Commerce demo profile route", () => {
       kind: "absent",
     });
     const accepted = await handleControlRequest(
-      demoRequest("satyr_ecommerce", "satyr-ecommerce-demo"),
+      demoRequest("pantry_ecommerce", "pantry-ecommerce-demo"),
       env,
     );
     expect(accepted.status).toBe(200);
     await expect(accepted.json()).resolves.toMatchObject({
       ok: true,
-      profile: "satyr_ecommerce",
-      commerceSystem: { kind: "satyr_commerce", merchantId: MERCHANT_ID },
+      profile: "pantry_ecommerce",
+      commerceSystem: { kind: "builtin_commerce", merchantId: MERCHANT_ID },
       sync: "queued",
     });
     expect(await commerceCommand(commerceFetch, 0)).toMatchObject({
       externalReference: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
-      profile: "satyr_ecommerce",
+      profile: "pantry_ecommerce",
     });
     // Pantry installs itself on the new merchant for its organisation.
     expect(await commerceCommand(commerceFetch, 1)).toMatchObject({
@@ -146,7 +146,7 @@ describe("Satyr Commerce demo profile route", () => {
     expect(conflict.status).toBe(409);
     await expect(conflict.json()).resolves.toEqual({
       ok: false,
-      error: "underclerk_demo_profile_conflict",
+      error: "commerce_demo_profile_conflict",
     });
   });
 });
@@ -200,7 +200,7 @@ function prepareAuthorizedControlMocks(): void {
   bindingMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue({
     ok: true,
     value: {
-      bindingId: "underclerk_binding_demo_profiles",
+      bindingId: "commerce_binding_demo_profiles",
       organisationId: organisationId.value,
       integrationAccountId: integrationAccountId.value,
       merchantId: MERCHANT_ID,
@@ -215,9 +215,9 @@ function prepareAuthorizedControlMocks(): void {
     .mockResolvedValue({
       ok: true,
       value: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         organisationId: organisationId.value,
-        bindingId: "underclerk_binding_demo_profiles",
+        bindingId: "commerce_binding_demo_profiles",
         merchantId: MERCHANT_ID,
         revision: 1,
       },
@@ -227,9 +227,9 @@ function prepareAuthorizedControlMocks(): void {
     value: {
       kind: "selected",
       commerceSystem: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         organisationId: organisationId.value,
-        bindingId: "underclerk_binding_demo_profiles",
+        bindingId: "commerce_binding_demo_profiles",
         merchantId: MERCHANT_ID,
         revision: 1,
       },
@@ -261,15 +261,15 @@ function prepareAuthorizedControlMocks(): void {
 
 function demoRequest(profile: string, idempotencyKey: string): Request {
   return new Request(
-    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce-system/satyr-commerce/demo`,
+    `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce-system/builtin-commerce/demo`,
     {
       method: "POST",
       headers: {
         "content-type": "application/json",
         origin: "https://pantry.example",
         cookie:
-          "satyr_control_session=session-demo; satyr_control_csrf=csrf-demo",
-        "x-satyr-csrf": "csrf-demo",
+          "pantry_session=session-demo; pantry_csrf=csrf-demo",
+        "x-pantry-csrf": "csrf-demo",
         "idempotency-key": idempotencyKey,
       },
       body: JSON.stringify({ profile }),
@@ -296,9 +296,9 @@ function demoRouteEnv(
       withSession: vi.fn(() => ({ batch, prepare: vi.fn(() => ({ bind })) })),
     },
     EVENT_Q: { send: vi.fn(async () => undefined) },
-    UNDERCLERK: { fetch: commerceFetch },
-    UNDERCLERK_BASE_URL: "https://underclerk.example",
-    UNDERCLERK_SERVICE_TOKEN: "underclerk-service-token",
+    COMMERCE: { fetch: commerceFetch },
+    COMMERCE_BASE_URL: "https://commerce.example",
+    COMMERCE_SERVICE_TOKEN: "commerce-service-token",
     DATA_ENCRYPTION_ROOT: {
       get: vi.fn(async () => Buffer.alloc(32, 17).toString("base64")),
     },
@@ -317,10 +317,10 @@ async function commerceDemoFetch(
     readonly merchantId?: unknown;
     readonly authority?: Readonly<{ readonly kind?: unknown }>;
   };
-  if (new URL(request.url).pathname.endsWith("/app-installations/satyr")) {
+  if (new URL(request.url).pathname.endsWith("/app-installations/pantry")) {
     return Response.json({
       credentialId: "installation_demo_profiles",
-      appId: "satyr",
+      appId: "pantry",
       scopes: COMMERCE_API_SCOPES,
       token: "uca_installation_demo_profiles",
     });
@@ -332,7 +332,7 @@ async function commerceDemoFetch(
     );
   }
   return Response.json({
-    schemaVersion: "underclerk.commerce-snapshot.v2",
+    schemaVersion: "commerce.commerce-snapshot.v2",
     organisationId: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     merchantRevision: 1,
@@ -363,7 +363,7 @@ async function commerceCommand(
 ): Promise<unknown> {
   const call = fetchMock.mock.calls[index];
   if (call === undefined)
-    throw new Error("Underclerk request was not recorded");
+    throw new Error("Commerce request was not recorded");
   const request =
     call[0] instanceof Request
       ? call[0]

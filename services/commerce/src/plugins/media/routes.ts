@@ -40,7 +40,7 @@ export const MEDIA_ROUTES: readonly RouteDefinition<MediaRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/media",
     "create_media",
-    "underclerk.create-media.v1",
+    "commerce.create-media.v1",
   ),
   route("GET", "/v1/admin/merchants/:merchantId/media", "list_media"),
   route(
@@ -52,19 +52,19 @@ export const MEDIA_ROUTES: readonly RouteDefinition<MediaRoute>[] = [
     "PUT",
     "/v1/admin/merchants/:merchantId/media/:mediaId",
     "update_media",
-    "underclerk.update-media.v1",
+    "commerce.update-media.v1",
   ),
   route(
     "POST",
     "/v1/admin/merchants/:merchantId/media/:mediaId/deletion",
     "delete_media",
-    "underclerk.delete-media.v1",
+    "commerce.delete-media.v1",
   ),
   route(
     "PUT",
     "/v1/admin/merchants/:merchantId/products/:productId/media",
     "set_product_media",
-    "underclerk.set-product-media.v1",
+    "commerce.set-product-media.v1",
   ),
 ];
 

@@ -130,7 +130,7 @@ export async function readJevFeaturesForOrganisation(
         enabled: readJevScreenRelevance(sql, scope.organisationId),
       },
       allowance:
-        authority.kind === "satyr_platform"
+        authority.kind === "pantry_platform"
           ? jevAllowanceView(sql, scope.organisationId, Date.now())
           : null,
       paidUse: {

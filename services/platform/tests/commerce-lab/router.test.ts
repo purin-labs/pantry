@@ -181,7 +181,7 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
     labState.normalizeValue = canonical;
     labState.cueValue = cueFacts;
     const body = JSON.stringify({
-      schemaVersion: "satyr.commerce.lab.event.v1",
+      schemaVersion: "pantry.commerce.lab.event.v1",
       namespace: "lab_signed_ingress",
       runId: run.runId,
       scenarioId: run.scenarioId,
@@ -200,8 +200,8 @@ describe("commerce lab HTTP boundary", function commerceLabRouterSuite() {
           method: "POST",
           headers: {
             "content-type": "application/json",
-            "x-satyr-lab-timestamp": timestamp,
-            "x-satyr-lab-signature": signature,
+            "x-pantry-lab-timestamp": timestamp,
+            "x-pantry-lab-signature": signature,
           },
           body,
         },

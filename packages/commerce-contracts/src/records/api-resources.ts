@@ -644,7 +644,7 @@ export type CommerceResourcesV1 = Static<
 
 /** `parseMerchantSnapshot`. */
 export const commerceMerchantSnapshotV1Schema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.commerce-snapshot.v2"),
+  schemaVersion: Type.Literal("commerce.commerce-snapshot.v2"),
   merchantId: text,
   merchantRevision: NonNegativeInteger,
   deliverySigner: ReadonlyOpenObject({

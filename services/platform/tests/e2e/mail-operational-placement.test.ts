@@ -755,7 +755,7 @@ async function installFixture(boundary?: Boundary): Promise<Fixture> {
     authorizationProduct: "send_only",
     providerSubjectId: "google_p55_operational",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle },
     grantedScopes: GMAIL_SEND_ONLY_SCOPES,
     createdByUserId: required(

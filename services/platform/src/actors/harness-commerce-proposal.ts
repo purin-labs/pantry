@@ -142,7 +142,7 @@ function commerceActionProviderSupported(
 ): boolean {
   if (source === "lab") return true;
   if (source === "shopify") return kind === "cancel_order";
-  if (source === "underclerk") {
+  if (source === "commerce") {
     return (
       kind === "update_product_description" ||
       kind === "publish_catalog_listing" ||
@@ -155,12 +155,12 @@ function commerceActionProviderSupported(
 }
 
 type CommerceCancellationDraftError =
-  | { readonly code: "underclerk_projection_mismatch" }
-  | { readonly code: "underclerk_binding_unavailable" }
-  | { readonly code: "underclerk_binding_identity_mismatch" }
-  | { readonly code: "underclerk_client_unavailable" }
-  | { readonly code: "underclerk_order_id_invalid" }
-  | { readonly code: "underclerk_cancellation_authority_unavailable" }
+  | { readonly code: "commerce_projection_mismatch" }
+  | { readonly code: "commerce_binding_unavailable" }
+  | { readonly code: "commerce_binding_identity_mismatch" }
+  | { readonly code: "commerce_client_unavailable" }
+  | { readonly code: "commerce_order_id_invalid" }
+  | { readonly code: "commerce_cancellation_authority_unavailable" }
   | CommerceActionError;
 
 async function buildCommerceCancellationActionDraftForAgent(
@@ -179,7 +179,7 @@ async function buildCommerceCancellationActionDraftForAgent(
   Result<CanonicalActionDraft, CommerceCancellationDraftError>
 > {
   if (
-    input.current.projection.provenance.source !== "underclerk" ||
+    input.current.projection.provenance.source !== "commerce" ||
     input.current.projection.provenance.integrationAccountId !==
       input.integrationAccountId ||
     input.current.projection.provenance.resourceId !==
@@ -187,7 +187,7 @@ async function buildCommerceCancellationActionDraftForAgent(
     input.current.projection.provenance.revision !==
       input.request.expectedRevision
   ) {
-    return { ok: false, error: { code: "underclerk_projection_mismatch" } };
+    return { ok: false, error: { code: "commerce_projection_mismatch" } };
   }
   await input.authorizeRead();
   const binding = await resolveCommerceMerchantBinding({
@@ -196,7 +196,7 @@ async function buildCommerceCancellationActionDraftForAgent(
     integrationAccountId: input.integrationAccountId,
   });
   if (!binding.ok) {
-    return { ok: false, error: { code: "underclerk_binding_unavailable" } };
+    return { ok: false, error: { code: "commerce_binding_unavailable" } };
   }
   if (
     binding.value.organisationId !== input.organisationId ||
@@ -204,7 +204,7 @@ async function buildCommerceCancellationActionDraftForAgent(
   ) {
     return {
       ok: false,
-      error: { code: "underclerk_binding_identity_mismatch" },
+      error: { code: "commerce_binding_identity_mismatch" },
     };
   }
   const client = createCommerceClient(input.env, input.fetcher, {
@@ -212,14 +212,14 @@ async function buildCommerceCancellationActionDraftForAgent(
     organisationId: String(input.organisationId),
   });
   if (client === null) {
-    return { ok: false, error: { code: "underclerk_client_unavailable" } };
+    return { ok: false, error: { code: "commerce_client_unavailable" } };
   }
   const orderId = commerceProviderResourceId(
     String(binding.value.merchantId),
     input.request.resourceId,
   );
   if (orderId === null) {
-    return { ok: false, error: { code: "underclerk_order_id_invalid" } };
+    return { ok: false, error: { code: "commerce_order_id_invalid" } };
   }
   await input.authorizeRead();
   const authority = await resolveCommerceCancellationAuthority({
@@ -234,7 +234,7 @@ async function buildCommerceCancellationActionDraftForAgent(
   if (!authority.ok) {
     return {
       ok: false,
-      error: { code: "underclerk_cancellation_authority_unavailable" },
+      error: { code: "commerce_cancellation_authority_unavailable" },
     };
   }
   return buildCommerceCancellationActionDraft({
@@ -461,7 +461,7 @@ export async function proposeCommerceActionForHarness(
       >;
       if (
         request.kind === "cancel_order" &&
-        currentProjection.projection.provenance.source === "underclerk"
+        currentProjection.projection.provenance.source === "commerce"
       ) {
         if (currentProjection.kind !== "commerce_order") {
           throw new Error(
@@ -479,7 +479,7 @@ export async function proposeCommerceActionForHarness(
           fetcher: admittedSessionOperation(
             input.execution,
             input.lease,
-            input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+            input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
           ),
           organisationId: input.execution.scope.organisationId,
           integrationAccountId: integrationAccountId.value,
@@ -519,8 +519,8 @@ async function agentTrackingRequest(
     db: input.execution.scope.database,
     organisationId,
   });
-  if (!authority.ok || authority.value.provider !== "underclerk")
-    throw new Error("tracking proposal needs Satyr Commerce");
+  if (!authority.ok || authority.value.provider !== "commerce")
+    throw new Error("tracking proposal needs Seams Checkout");
   const binding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -532,11 +532,11 @@ async function agentTrackingRequest(
     admittedSessionOperation(
       input.execution,
       input.lease,
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
     { kind: "organisation", organisationId: String(organisationId) },
   );
-  if (client === null) throw new Error("tracking proposal Underclerk unavailable");
+  if (client === null) throw new Error("tracking proposal Commerce unavailable");
   await requireSessionExecution(input.execution, input.lease);
   const snapshot = await client.readSnapshot(binding.value.merchantId);
   await requireSessionExecution(input.execution, input.lease);
@@ -582,9 +582,9 @@ export async function proposeMerchantPluginForHarness(
   });
   if (
     !commerceAuthority.ok ||
-    commerceAuthority.value.provider !== "underclerk"
+    commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("merchant plugin proposal needs Satyr Commerce");
+    throw new Error("merchant plugin proposal needs Seams Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -598,12 +598,12 @@ export async function proposeMerchantPluginForHarness(
     admittedSessionOperation(
       input.execution,
       input.lease,
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
     { kind: "organisation", organisationId: String(organisationId) },
   );
   if (client === null)
-    throw new Error("merchant plugin proposal Underclerk unavailable");
+    throw new Error("merchant plugin proposal Commerce unavailable");
   await requireSessionExecution(input.execution, input.lease);
   const listed = await client.listPlugins(merchantId);
   await requireSessionExecution(input.execution, input.lease);
@@ -626,7 +626,7 @@ export async function proposeMerchantPluginForHarness(
     request.functionSource === null
       ? null
       : await client.previewMerchantPlugin(merchantId, {
-          schemaVersion: "underclerk.preview-merchant-plugin.v1",
+          schemaVersion: "commerce.preview-merchant-plugin.v1",
           ...merchantPluginInstallation(request),
         });
   await requireSessionExecution(input.execution, input.lease);
@@ -679,9 +679,9 @@ export async function proposeCafeMenuPublicationForHarness(
   });
   if (
     !commerceAuthority.ok ||
-    commerceAuthority.value.provider !== "underclerk"
+    commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("menu publication proposal needs Satyr Commerce");
+    throw new Error("menu publication proposal needs Seams Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -695,12 +695,12 @@ export async function proposeCafeMenuPublicationForHarness(
     admittedSessionOperation(
       input.execution,
       input.lease,
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
     { kind: "organisation", organisationId: String(organisationId) },
   );
   if (client === null)
-    throw new Error("menu publication Underclerk unavailable");
+    throw new Error("menu publication Commerce unavailable");
   await requireSessionExecution(input.execution, input.lease);
   const stored = await organisation.readMenuDraft({ organisationId });
   await requireSessionExecution(input.execution, input.lease);
@@ -780,9 +780,9 @@ export async function proposeMenuPriceForHarness(
   });
   if (
     !commerceAuthority.ok ||
-    commerceAuthority.value.provider !== "underclerk"
+    commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("menu price proposal needs Satyr Commerce");
+    throw new Error("menu price proposal needs Seams Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -796,11 +796,11 @@ export async function proposeMenuPriceForHarness(
     admittedSessionOperation(
       input.execution,
       input.lease,
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
     { kind: "organisation", organisationId: String(organisationId) },
   );
-  if (client === null) throw new Error("menu price Underclerk unavailable");
+  if (client === null) throw new Error("menu price Commerce unavailable");
   await requireSessionExecution(input.execution, input.lease);
   const [stock, draft] = await Promise.all([
     client.readStockSnapshot(merchantId),
@@ -929,9 +929,9 @@ export async function proposeOrderRefundForHarness(
   });
   if (
     !commerceAuthority.ok ||
-    commerceAuthority.value.provider !== "underclerk"
+    commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("order refund proposal needs Satyr Commerce");
+    throw new Error("order refund proposal needs Seams Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -948,11 +948,11 @@ export async function proposeOrderRefundForHarness(
     admittedSessionOperation(
       input.execution,
       input.lease,
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
     { kind: "organisation", organisationId: String(organisationId) },
   );
-  if (client === null) throw new Error("order refund Underclerk unavailable");
+  if (client === null) throw new Error("order refund Commerce unavailable");
   await requireSessionExecution(input.execution, input.lease);
   const snapshot = await client.readSnapshot(merchantId);
   await requireSessionExecution(input.execution, input.lease);
@@ -1016,9 +1016,9 @@ export async function proposeStockActionForHarness(
   });
   if (
     !commerceAuthority.ok ||
-    commerceAuthority.value.provider !== "underclerk"
+    commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("stock proposal needs Satyr Commerce");
+    throw new Error("stock proposal needs Seams Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -1030,7 +1030,7 @@ export async function proposeStockActionForHarness(
   const fetcher = admittedSessionOperation(
     input.execution,
     input.lease,
-    input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+    input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
   );
   const caller = {
     kind: "organisation",
@@ -1039,7 +1039,7 @@ export async function proposeStockActionForHarness(
   const client = createCommerceClient(input.env, fetcher, caller);
   const plane = createCommerceEntityPlaneClient(input.env, fetcher, caller);
   if (client === null || plane === null)
-    throw new Error("stock proposal Underclerk unavailable");
+    throw new Error("stock proposal Commerce unavailable");
   await requireSessionExecution(input.execution, input.lease);
   const snapshot = await client.readStockSnapshot(merchantId);
   await requireSessionExecution(input.execution, input.lease);
@@ -1134,7 +1134,7 @@ async function proposalChangeFacts(
     admittedSessionOperation(
       input.execution,
       input.lease,
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
     request.offerId,
   ).catch(() => null);

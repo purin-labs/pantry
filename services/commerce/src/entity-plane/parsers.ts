@@ -182,7 +182,7 @@ export function parseSourceProvenance(
       "shopify",
       "stripe",
       "lab",
-      "underclerk",
+      "commerce",
     ] as const),
     resourceType: enumValue(object.resourceType, `${field}.resourceType`, [
       "product",
@@ -873,7 +873,7 @@ function parseExternalResourceReference(
       "shopify",
       "stripe",
       "lab",
-      "underclerk",
+      "commerce",
     ] as readonly CommerceSource[]),
     resourceId: normalizedText(
       object.resourceId,

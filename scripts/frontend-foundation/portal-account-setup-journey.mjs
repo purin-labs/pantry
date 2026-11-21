@@ -23,7 +23,7 @@ export async function runAccountSetupJourney(page, options) {
   const fixture = new AccountSetupFixture(page, session);
   await page.route("**/v1/control/**", fixture.handle.bind(fixture));
   page.on("request", fixture.recordDocument.bind(fixture));
-  const storageKey = `satyr:account-onboarding:${session.identity.userId}`;
+  const storageKey = `pantry:account-onboarding:${session.identity.userId}`;
 
   await page.goto(`${options.portalUrl}/portal?p21_auth=1`);
   await page.evaluate(setFixtureCsrf);
@@ -486,7 +486,7 @@ const JEV_FEATURES = [
 ];
 
 const JEV_VIEW = {
-  funding: "satyr_platform",
+  funding: "pantry_platform",
   keyAvailable: true,
   mailClassification: { enabled: false, mailboxes: [] },
   relatedCases: { enabled: false, mode: null, sourceCount: 0 },
@@ -509,7 +509,7 @@ async function skipJevStep(dialog, name) {
 
 function clearRememberedOrganisations() {
   for (const key of Object.keys(localStorage))
-    if (key.startsWith("satyr:organisation-id:")) localStorage.removeItem(key);
+    if (key.startsWith("pantry:organisation-id:")) localStorage.removeItem(key);
 }
 
 async function verifyOrganisationStartup(page, fixture, options) {
@@ -895,9 +895,9 @@ async function verifySavedAppearance(page, fixture, options) {
 
 function seedSavedAppearance(preferences) {
   if (sessionStorage.getItem("browser-appearance-seeded") !== "1") {
-    localStorage.removeItem("satyr:portal-appearance");
+    localStorage.removeItem("pantry:portal-appearance");
     localStorage.setItem(
-      `satyr:preferences:${preferences.userId}:appearance`,
+      `pantry:preferences:${preferences.userId}:appearance`,
       JSON.stringify(preferences),
     );
     sessionStorage.setItem("browser-appearance-seeded", "1");
@@ -925,9 +925,9 @@ function hasLightAppearance() {
 }
 
 function storeAppearance(preferences) {
-  localStorage.setItem("satyr:portal-appearance", preferences.values.mode);
+  localStorage.setItem("pantry:portal-appearance", preferences.values.mode);
   localStorage.setItem(
-    `satyr:preferences:${preferences.userId}:appearance`,
+    `pantry:preferences:${preferences.userId}:appearance`,
     JSON.stringify(preferences),
   );
 }
@@ -967,7 +967,7 @@ async function readFixtureSession() {
 
 function setFixtureCsrf() {
   document.cookie =
-    "satyr_control_csrf=browser_setup_fixture; path=/; SameSite=Lax";
+    "pantry_csrf=browser_setup_fixture; path=/; SameSite=Lax";
 }
 
 function readSavedSetup(key) {

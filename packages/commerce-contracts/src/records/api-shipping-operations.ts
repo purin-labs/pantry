@@ -48,7 +48,7 @@ export const jsonObjectSchema = ReadonlyRecord(Type.String(), Type.Unknown());
 export type JsonObject = Static<typeof jsonObjectSchema>;
 
 export const quoteShipmentLabelRateCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.quote-shipment-label-rate.v1"),
+  schemaVersion: Type.Literal("commerce.quote-shipment-label-rate.v1"),
   merchantId: text,
   idempotencyKey: text,
   requestedAt: timestampSchema,
@@ -67,7 +67,7 @@ const mutationBase = {
 };
 
 export const purchaseShippingLabelCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.purchase-shipping-label.v1"),
+  schemaVersion: Type.Literal("commerce.purchase-shipping-label.v1"),
   ...mutationBase,
   shipmentId: text,
   shipmentRevision: PositiveInteger,
@@ -86,7 +86,7 @@ const trackingEvent = {
 };
 
 export const recordShippingTrackingCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.record-shipping-tracking.v1"),
+  schemaVersion: Type.Literal("commerce.record-shipping-tracking.v1"),
   ...mutationBase,
   shipmentId: text,
   shipmentRevision: PositiveInteger,
@@ -100,7 +100,7 @@ export type RecordShippingTrackingCommand = Static<
 >;
 
 export const attachFulfillmentTrackingCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.attach-fulfillment-tracking.v1"),
+  schemaVersion: Type.Literal("commerce.attach-fulfillment-tracking.v1"),
   ...mutationBase,
   orderId: text,
   fulfillmentId: text,
@@ -133,7 +133,7 @@ export const wireShipmentLabelRateSchema =
   );
 
 export const shipmentLabelRateResultSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.shipment-label-rate-result.v1"),
+  schemaVersion: Type.Literal("commerce.shipment-label-rate-result.v1"),
   outcome: Type.Union([Type.Literal("quoted"), Type.Literal("replayed")]),
   rate: wireShipmentLabelRateSchema,
 });

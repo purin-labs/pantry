@@ -50,8 +50,8 @@ export type CommerceActivityEventKind =
   | "proposal"
   | "approval"
   | "entity_plane_effect"
-  | "underclerk_observation"
-  | "underclerk_receipt"
+  | "commerce_observation"
+  | "commerce_receipt"
   | "action_ledger";
 
 export type CommerceActivityActionState = ActionState;
@@ -108,7 +108,7 @@ export type CommerceActivityEvent =
       occurredAt: string;
     }>
   | Readonly<{
-      kind: "underclerk_observation";
+      kind: "commerce_observation";
       resource: CommerceActivityResource;
       observationId: string;
       deliveryId: string;
@@ -116,7 +116,7 @@ export type CommerceActivityEvent =
       occurredAt: string;
     }>
   | Readonly<{
-      kind: "underclerk_receipt";
+      kind: "commerce_receipt";
       resource: CommerceActivityResource;
       receiptId: string;
       outcome: CommerceActivityReceiptOutcome;
@@ -409,7 +409,7 @@ function parseCommerceActivityEvent(value: unknown): CommerceActivityEvent {
         effect: parseCommerceActivityEffect(value.effect),
         occurredAt: value.occurredAt,
       };
-    case "underclerk_observation":
+    case "commerce_observation":
       return {
         kind: value.kind,
         resource,
@@ -421,7 +421,7 @@ function parseCommerceActivityEvent(value: unknown): CommerceActivityEvent {
         ),
         occurredAt: value.occurredAt,
       };
-    case "underclerk_receipt":
+    case "commerce_receipt":
       return {
         kind: value.kind,
         resource,
@@ -491,7 +491,7 @@ function parseCommerceActivitySource(
     value === "cases" ||
     value === "proposals" ||
     value === "approvals" ||
-    value === "underclerk_receipts" ||
+    value === "commerce_receipts" ||
     value === "action_ledger"
   ) {
     return value;
@@ -508,8 +508,8 @@ function isCommerceActivityEventKind(
     value === "proposal" ||
     value === "approval" ||
     value === "entity_plane_effect" ||
-    value === "underclerk_observation" ||
-    value === "underclerk_receipt" ||
+    value === "commerce_observation" ||
+    value === "commerce_receipt" ||
     value === "action_ledger"
   );
 }

@@ -50,7 +50,7 @@ LENGTH_SECONDS = 110
 
 def single_database_schema_file():
     """The one-database schema, built from the two deployed baselines."""
-    out = Path(tempfile.mkdtemp(prefix="satyr-single-database-")) / "schema.sql"
+    out = Path(tempfile.mkdtemp(prefix="pantry-single-database-")) / "schema.sql"
     subprocess.run(
         ["node", str(ROOT / "services/platform/scripts/single-database-schema.mjs"), str(out)],
         check=True,
@@ -104,7 +104,7 @@ def main() -> None:
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="shop-voice-portal-")).resolve()
     voice_home = work / "home"
-    label = f"sh.seams.satyr.shop-voice.journey-{uuid.uuid4().hex[:8]}"
+    label = f"io.purin.pantry.shop-voice.journey-{uuid.uuid4().hex[:8]}"
     domain_job = f"gui/{os.getuid()}/{label}"
     plist = Path.home() / "Library/LaunchAgents" / f"{label}.plist"
     mirror = journey.Mirror(("127.0.0.1", journey.MIRROR_PORT), journey.MirrorHandler)

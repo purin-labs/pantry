@@ -158,11 +158,11 @@ async function handleReceiptSettingsWrite(
     SETTINGS_PATH,
   );
   if (started instanceof Response) return started;
-  const { satyrLocationId, invoiceRegistrationNumber } = started.body;
+  const { pantryLocationId, invoiceRegistrationNumber } = started.body;
   if (
-    typeof satyrLocationId !== "string" ||
-    satyrLocationId.length === 0 ||
-    satyrLocationId.length > 255 ||
+    typeof pantryLocationId !== "string" ||
+    pantryLocationId.length === 0 ||
+    pantryLocationId.length > 255 ||
     (invoiceRegistrationNumber !== null &&
       !isInvoiceRegistrationNumber(invoiceRegistrationNumber))
   )
@@ -171,7 +171,7 @@ async function handleReceiptSettingsWrite(
     started.authorized.executionScope.database,
     {
       organisationId: started.authorized.organisationId,
-      settings: { satyrLocationId, invoiceRegistrationNumber },
+      settings: { pantryLocationId, invoiceRegistrationNumber },
       userId: started.identity.userId,
       now: started.now,
     },

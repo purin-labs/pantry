@@ -141,15 +141,15 @@ export async function handleCommerceSystem(
     if (environment === null)
       return controlError("organisation_not_found", 404);
     const integrationAccountId = parseIntegrationAccountId(
-      `integration_underclerk_entity_plane_${organisationIdUniquePart(authorized.organisationId)}`,
+      `integration_commerce_entity_plane_${organisationIdUniquePart(authorized.organisationId)}`,
     );
     if (!integrationAccountId.ok)
-      return controlError("underclerk_binding_invalid", 422);
+      return controlError("commerce_binding_invalid", 422);
     const commerceEngine = createCommerceClient(env, undefined, {
       kind: "operator",
     });
     if (commerceEngine === null)
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
     const suffix = organisationIdUniquePart(
       authorized.organisationId,
     ).replaceAll("-", "_");
@@ -159,7 +159,7 @@ export async function handleCommerceSystem(
       db: authorized.executionScope.database,
       organisationId: authorized.organisationId,
       environment,
-      bindingId: `underclerk_binding_entity_plane_${suffix}`,
+      bindingId: `commerce_binding_entity_plane_${suffix}`,
       integrationAccountId: integrationAccountId.value,
       merchantId,
       deliverySigningKeyId: `key_entity_plane_${suffix}`,
@@ -167,7 +167,7 @@ export async function handleCommerceSystem(
       now,
       provision: async () => {
         const result = await commerceEngine.provisionMerchant({
-          schemaVersion: "underclerk.provision-merchant.v2",
+          schemaVersion: "commerce.provision-merchant.v2",
           externalReference: authorized.organisationId,
           merchantId,
           createdAt: new Date(now).toISOString(),
@@ -187,7 +187,7 @@ export async function handleCommerceSystem(
     if (!provisioned.ok) {
       return controlError(
         provisioned.error.code,
-        provisioned.error.code === "underclerk_binding_conflict" ? 409 : 503,
+        provisioned.error.code === "commerce_binding_conflict" ? 409 : 503,
       );
     }
   }
@@ -592,7 +592,7 @@ export async function handleCommerceSystemSync(
     organisationId: authorized.organisationId,
   });
   if (!authority.ok) return commerceSystemErrorResponse(authority.error.code);
-  if (authority.value.provider !== "underclerk") {
+  if (authority.value.provider !== "commerce") {
     return controlError("commerce_system_sync_managed_by_shopify", 409);
   }
   const now = Date.now();
@@ -607,7 +607,7 @@ export async function handleCommerceSystemSync(
       { contentType: "json" },
     );
   } catch {
-    return controlError("underclerk_reconciliation_unavailable", 503);
+    return controlError("commerce_reconciliation_unavailable", 503);
   }
   const responseBody = {
     ok: true,
@@ -640,15 +640,15 @@ function parseCommerceSystemSelectionBody(
   if (!expectedRevision.ok)
     return { ok: false, error: { code: "commerce_system_invalid" } };
   switch (body.kind) {
-    case "select_satyr_commerce": {
-      const bindingId = parseCommerceBindingId(body.underclerk_binding_id);
+    case "select_builtin_commerce": {
+      const bindingId = parseCommerceBindingId(body.commerce_binding_id);
       return bindingId.ok
         ? {
             ok: true,
             value: {
-              kind: "select_satyr_commerce",
+              kind: "select_builtin_commerce",
               expectedRevision: expectedRevision.value,
-              underclerkBindingId: bindingId.value,
+              commerceBindingId: bindingId.value,
             },
           }
         : { ok: false, error: { code: "commerce_system_invalid" } };
@@ -708,9 +708,9 @@ export async function handlePantryCommerceDemo(
   );
   if (!authorized.ok) return authorized.response;
   const body = await readJsonRecord(request);
-  if (!body.ok) return controlError("satyr_commerce_setup_invalid", 422);
+  if (!body.ok) return controlError("builtin_commerce_setup_invalid", 422);
   const demo = parsePantryCommerceDemoRequest(body.value);
-  if (demo === null) return controlError("satyr_commerce_setup_invalid", 422);
+  if (demo === null) return controlError("builtin_commerce_setup_invalid", 422);
   const boundary = await parseMutationBoundary(
     request,
     body.value,
@@ -724,8 +724,8 @@ export async function handlePantryCommerceDemo(
   });
   const scope = controlMutationScope(
     authorized,
-    `/v1/control/organisations/${authorized.organisationId}/commerce-system/satyr-commerce/demo`,
-    "satyr_commerce.demo.provision",
+    `/v1/control/organisations/${authorized.organisationId}/commerce-system/builtin-commerce/demo`,
+    "builtin_commerce.demo.provision",
   );
   const replayed = await replayControlMutation({
     db: authorized.executionScope.database,
@@ -747,15 +747,15 @@ export async function handlePantryCommerceDemo(
     kind: "operator",
   });
   if (commerceEngine === null)
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   const now = Date.now();
   const suffix = organisationIdUniquePart(authorized.organisationId).replaceAll(
     "-",
     "_",
   );
-  const merchantId = `merchant_satyr_${suffix}`;
+  const merchantId = `merchant_pantry_${suffix}`;
   const snapshot = await commerceEngine.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: authorized.organisationId,
     merchantId,
     profile: demo.profile,
@@ -769,7 +769,7 @@ export async function handlePantryCommerceDemo(
       merchantId,
     ))
   )
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   const existingBinding = await resolveOrganisationCommerceMerchantBinding({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
@@ -787,7 +787,7 @@ export async function handlePantryCommerceDemo(
         now,
       });
   if (!binding.ok || binding.value.merchantId !== merchantId) {
-    return controlError("underclerk_binding_conflict", 409);
+    return controlError("commerce_binding_conflict", 409);
   }
   const current = await resolveOrganisationCommerceSystem({
     db: authorized.executionScope.database,
@@ -798,9 +798,9 @@ export async function handlePantryCommerceDemo(
     organisationId: authorized.organisationId,
     selectedByUserId: authorized.authenticated.session.userId,
     selection: {
-      kind: "select_satyr_commerce",
+      kind: "select_builtin_commerce",
       expectedRevision: current.ok ? current.value.revision : 0,
-      underclerkBindingId: binding.value.bindingId,
+      commerceBindingId: binding.value.bindingId,
     },
     now,
   });
@@ -816,7 +816,7 @@ export async function handlePantryCommerceDemo(
       { contentType: "json" },
     );
   } catch {
-    return controlError("underclerk_reconciliation_unavailable", 503);
+    return controlError("commerce_reconciliation_unavailable", 503);
   }
   const responseBody = {
     ok: true,
@@ -850,7 +850,7 @@ function parsePantryCommerceDemoRequest(
   if (Object.keys(value).length !== 1) return null;
   switch (value.profile) {
     case "cafe_patisserie":
-    case "satyr_ecommerce":
+    case "pantry_ecommerce":
       return { profile: value.profile };
     default:
       return null;
@@ -863,13 +863,13 @@ function commerceDemoProvisionErrorResponse(
   switch (error.kind) {
     case "http":
       return error.status === 409
-        ? controlError("underclerk_demo_profile_conflict", 409)
-        : controlError("underclerk_demo_provision_failed", 503);
+        ? controlError("commerce_demo_profile_conflict", 409)
+        : controlError("commerce_demo_provision_failed", 503);
     case "network":
     case "invalid_response":
-      return controlError("underclerk_demo_provision_failed", 503);
+      return controlError("commerce_demo_provision_failed", 503);
     case "rejected":
-      return controlError("underclerk_demo_profile_conflict", 409);
+      return controlError("commerce_demo_profile_conflict", 409);
     default:
       return assertNever(error);
   }
@@ -894,7 +894,7 @@ async function bindDemoCommerceMerchant(
     input.snapshot.deliverySigner.publicKeyB64,
   );
   const integrationAccountId = parseIntegrationAccountId(
-    `integration_underclerk_satyr_${input.suffix}`,
+    `integration_commerce_pantry_${input.suffix}`,
   );
   if (
     signingKeyId === null ||
@@ -904,12 +904,12 @@ async function bindDemoCommerceMerchant(
   ) {
     return {
       ok: false,
-      error: { code: "underclerk_binding_invalid", field: "demo" },
+      error: { code: "commerce_binding_invalid", field: "demo" },
     };
   }
   return bindCommerceMerchant({
     db: input.db,
-    bindingId: `underclerk_binding_satyr_${input.suffix}`,
+    bindingId: `commerce_binding_pantry_${input.suffix}`,
     organisationId: input.organisationId,
     integrationAccountId: integrationAccountId.value,
     merchantId: input.merchantId,

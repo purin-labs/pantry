@@ -38,11 +38,11 @@ export function draftOrderMutation(
 ): CommerceMutation {
   const { command, merchant, draft } = request;
   const commandKind =
-    command.schemaVersion === "underclerk.create-draft-order.v1"
+    command.schemaVersion === "commerce.create-draft-order.v1"
       ? ("create_draft_order" as const)
-      : command.schemaVersion === "underclerk.update-draft-order.v1"
+      : command.schemaVersion === "commerce.update-draft-order.v1"
         ? ("update_draft_order" as const)
-        : command.schemaVersion === "underclerk.send-draft-invoice.v1"
+        : command.schemaVersion === "commerce.send-draft-invoice.v1"
           ? ("send_draft_invoice" as const)
           : ("cancel_draft_order" as const);
   return {
@@ -80,11 +80,11 @@ export function returnMutation(
 ): CommerceMutation {
   const { command, merchant, record, restocks } = request;
   const commandKind =
-    command.schemaVersion === "underclerk.request-return.v1"
+    command.schemaVersion === "commerce.request-return.v1"
       ? ("request_return" as const)
-      : command.schemaVersion === "underclerk.authorize-return.v1"
+      : command.schemaVersion === "commerce.authorize-return.v1"
         ? ("authorize_return" as const)
-        : command.schemaVersion === "underclerk.receive-return.v1"
+        : command.schemaVersion === "commerce.receive-return.v1"
           ? ("receive_return" as const)
           : ("close_return" as const);
   return {

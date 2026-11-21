@@ -20,7 +20,7 @@ const assignment = {
   assignmentId: "terminal_assignment_fixture",
   organisationId: "organisation_fixture",
   merchantId,
-  satyrLocationId: "pantry_location_fixture",
+  pantryLocationId: "pantry_location_fixture",
   account,
   providerLocationId: "provider_location_fixture",
   target: {
@@ -78,7 +78,7 @@ const assignmentWithoutAdapterVersion: TerminalAssignment = {
   assignmentId: "terminal_assignment_fixture",
   organisationId: "organisation_fixture",
   merchantId,
-  satyrLocationId: "pantry_location_fixture",
+  pantryLocationId: "pantry_location_fixture",
   account,
   providerLocationId: "provider_location_fixture",
   target: { kind: "paired_physical", providerDeviceId: "device_fixture" },

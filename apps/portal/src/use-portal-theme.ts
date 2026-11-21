@@ -42,8 +42,8 @@ function applyTheme(
   document.documentElement.dataset.pantryTheme = palette;
   document.documentElement.style.colorScheme = theme;
   try {
-    localStorage.setItem("satyr:portal-appearance", mode);
-    localStorage.setItem("satyr:portal-palette", palette);
+    localStorage.setItem("pantry:portal-appearance", mode);
+    localStorage.setItem("pantry:portal-palette", palette);
   } catch {
     // Account preferences still apply when the startup paint hint cannot be saved.
   }

@@ -343,7 +343,7 @@ async function checkLiveOvenPhysics(path) {
   const task = section.dataset.physicsTask;
   const purpose = section.dataset.purpose;
   const { nativeIdentity } = await import(
-    `/@fs${window.satyrCheckout}/packages/production-simulation/src/native/cell-adapter.ts`
+    `/@fs${window.pantryCheckout}/packages/production-simulation/src/native/cell-adapter.ts`
   );
   let attempt = null;
   let startedAt = 0;
@@ -430,16 +430,16 @@ async function checkLiveRecordingBoundaries(evidence) {
   ).json();
   const { readPhysicsView } = await import("/@id/@purin-labs/production-simulation");
   const { parsePersistentCell } = await import(
-    `/@fs${window.satyrCheckout}/packages/bakery-model/src/bakery-physics.ts`
+    `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-physics.ts`
   );
   const { readOvenScene, readOvenLiveFrame, ovenFrameMotion, ovenSampleTime } =
     await import(
-      `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
+      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
     );
   const { PhysicsModel, disposePhysicsObject, samplePhysics } =
     await import("/src/features/workflow-simulator/spatial/physics-model.ts");
   const { ROBOTS } = await import(
-    `/@fs${window.satyrCheckout}/packages/bakery-model/src/bakery-robots.ts`
+    `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-robots.ts`
   );
   const scenes = new Map();
   let model = null;
@@ -455,7 +455,7 @@ async function checkLiveRecordingBoundaries(evidence) {
     if (scene === undefined) {
       const setup = await (
         await fetch(
-          `/@fs${window.satyrCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+          `/@fs${window.pantryCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
         )
       ).json();
       scene = readOvenScene(cell, {
@@ -1104,7 +1104,7 @@ function ovenPhysicsReady() {
 async function checkOvenPhysicsSample({ path, task, endpoint }) {
   const saved = await (await fetch(`/@fs/${path}`)).json();
   const { nativeIdentity } = await import(
-    `/@fs${window.satyrCheckout}/packages/production-simulation/src/native/cell-adapter.ts`
+    `/@fs${window.pantryCheckout}/packages/production-simulation/src/native/cell-adapter.ts`
   );
   let native = null;
   let startedAt = 0;
@@ -1167,25 +1167,25 @@ async function checkOvenPhysicsSample({ path, task, endpoint }) {
   }
   if (endpoint === "last") {
     const { readOvenSave } = await import(
-      `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
+      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
     );
     const { OvenRecordings, ovenRecordingArchive } = await import(
-      `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-recordings.ts`
+      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-recordings.ts`
     );
     const { readOvenScene } = await import(
-      `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
+      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
     );
     const { PhysicsModel, disposePhysicsObject, samplePhysics } =
       await import("/src/features/workflow-simulator/spatial/physics-model.ts");
     const { ROBOTS } = await import(
-      `/@fs${window.satyrCheckout}/packages/bakery-model/src/bakery-robots.ts`
+      `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-robots.ts`
     );
     const checked = await readOvenSave(saved, new Map());
     if (!checked.ok) throw new Error(checked.error);
     const cell = checked.value.cells[0];
     const setup = await (
       await fetch(
-        `/@fs${window.satyrCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+        `/@fs${window.pantryCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
       )
     ).json();
     const scene = {
@@ -1436,16 +1436,16 @@ async function checkSchedulingHistory(path) {
 
 async function checkIndexedRecordingAccess(paths) {
   const { readOvenSave } = await import(
-    `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
+    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
   );
   const { OvenRecordings, ovenRecordingArchive } = await import(
-    `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-recordings.ts`
+    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-recordings.ts`
   );
   const { readOvenScene, ovenFrameMotion, ovenSampleTime } = await import(
-    `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
+    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
   );
   const { ROBOTS } = await import(
-    `/@fs${window.satyrCheckout}/packages/bakery-model/src/bakery-robots.ts`
+    `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-robots.ts`
   );
   const reader = new OvenRecordings();
   const seenPacks = new Set();
@@ -1461,7 +1461,7 @@ async function checkIndexedRecordingAccess(paths) {
     if (scene === undefined) {
       const setup = await (
         await fetch(
-          `/@fs${window.satyrCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+          `/@fs${window.pantryCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
         )
       ).json();
       scene = readOvenScene(cell, {
@@ -1545,7 +1545,7 @@ async function checkIndexedRecordingAccess(paths) {
     `/bakery-physics/executions/${latestSave.document.bundle.id}/production-engine.mjs`
   );
   const { exportOvenSave } = await import(
-    `/@fs${window.satyrCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
+    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
   );
   const edited = JSON.parse(await exportOvenSave(latestSave).text());
   let packEntry;

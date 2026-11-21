@@ -580,7 +580,7 @@ function checkoutMatchesPreparationOrder(
   if (origin.kind === "point_of_sale") {
     return (
       checkout.source.kind === "point_of_sale" &&
-      checkout.source.satyrLocationId === origin.locationId
+      checkout.source.pantryLocationId === origin.locationId
     );
   }
   return false;

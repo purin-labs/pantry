@@ -67,7 +67,7 @@ function lexiconPlan(
   const capabilities =
     source === "custom"
       ? {
-          kind: "underclerk_custom",
+          kind: "commerce_custom",
           entityTypeId: "trade_partner",
           publishedRevision: 1,
           capability: {
@@ -116,7 +116,7 @@ function lexiconPlan(
           },
           organisationId: "organisation_query",
           merchantId: "merchant_query",
-          watermark: { kind: "underclerk_native", merchantRevision: 1 },
+          watermark: { kind: "commerce_native", merchantRevision: 1 },
           capabilities,
         }),
       ),

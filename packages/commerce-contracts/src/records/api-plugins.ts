@@ -353,7 +353,7 @@ export const commercePluginV1Schema = Type.Intersect(
 export type CommercePluginV1 = Static<typeof commercePluginV1Schema>;
 
 export const commercePluginListV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.plugins.v1"),
+  schemaVersion: Type.Literal("commerce.plugins.v1"),
   plugins: ImmutableArray(commercePluginV1Schema),
 });
 export type CommercePluginListV1 = Static<
@@ -401,7 +401,7 @@ export type CommercePluginEffectV1 = Static<
 >;
 
 export const commercePluginPreviewV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.plugin-preview.v1"),
+  schemaVersion: Type.Literal("commerce.plugin-preview.v1"),
   pluginId: text,
   change: commercePluginChangeV1Schema,
   refusal: Nullable(commerceMutationErrorV1Schema),
@@ -412,7 +412,7 @@ export type CommercePluginPreviewV1 = Static<
 >;
 
 export const previewCommercePluginChangeV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.preview-plugin-change.v1"),
+  schemaVersion: Type.Literal("commerce.preview-plugin-change.v1"),
   change: commercePluginChangeV1Schema,
 });
 export type PreviewCommercePluginChangeV1 = Static<
@@ -443,21 +443,21 @@ function pluginCommand<Version extends string>(schemaVersion: Version) {
 }
 
 export const pauseCommercePluginV1Schema = pluginCommand(
-  "underclerk.pause-plugin.v1",
+  "commerce.pause-plugin.v1",
 );
 export type PauseCommercePluginV1 = Static<
   typeof pauseCommercePluginV1Schema
 >;
 
 export const resumeCommercePluginV1Schema = pluginCommand(
-  "underclerk.resume-plugin.v1",
+  "commerce.resume-plugin.v1",
 );
 export type ResumeCommercePluginV1 = Static<
   typeof resumeCommercePluginV1Schema
 >;
 
 export const removeCommercePluginV1Schema = pluginCommand(
-  "underclerk.remove-plugin.v1",
+  "commerce.remove-plugin.v1",
 );
 export type RemoveCommercePluginV1 = Static<
   typeof removeCommercePluginV1Schema
@@ -468,7 +468,7 @@ export const configureCommercePluginV1Schema = Type.Intersect(
   [
     pluginCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.configure-plugin.v1"),
+      schemaVersion: Type.Literal("commerce.configure-plugin.v1"),
       settings: commercePluginSettingsV1Schema,
     }),
   ],
@@ -499,7 +499,7 @@ function typeIdOf(item: Readonly<{ typeId: string }>): string {
 }
 
 export const installCommerceMerchantPluginV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.install-merchant-plugin.v1"),
+  schemaVersion: Type.Literal("commerce.install-merchant-plugin.v1"),
   ...commandBase,
   definition: wirePluginDefinitionSchema,
   settings: commercePluginSettingsV1Schema,
@@ -536,7 +536,7 @@ function fieldValuesError(): string {
 }
 
 export const setCommercePluginFieldValuesV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.set-plugin-field-values.v1"),
+  schemaVersion: Type.Literal("commerce.set-plugin-field-values.v1"),
   ...commandBase,
   pluginId: text,
   entityType: pluginFieldEntityTypeSchema,
@@ -559,7 +559,7 @@ export type CommercePluginFieldValuesV1 = Static<
 >;
 
 export const commercePluginFieldValueListV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.plugin-field-values.v1"),
+  schemaVersion: Type.Literal("commerce.plugin-field-values.v1"),
   pluginId: text,
   fields: pluginFieldsSchema,
   records: ImmutableArray(commercePluginFieldValuesV1Schema),
@@ -569,7 +569,7 @@ export type CommercePluginFieldValueListV1 = Static<
 >;
 
 export const runCommercePluginActionV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.run-plugin-action.v1"),
+  schemaVersion: Type.Literal("commerce.run-plugin-action.v1"),
   ...commandBase,
   pluginId: text,
   actionId: text,
@@ -580,7 +580,7 @@ export type RunCommercePluginActionV1 = Static<
 >;
 
 export const runCommercePluginFunctionV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.run-plugin-function.v1"),
+  schemaVersion: Type.Literal("commerce.run-plugin-function.v1"),
   definition: wirePluginDefinitionSchema,
   functionId: text,
   settings: commercePluginSettingsV1Schema,
@@ -602,7 +602,7 @@ export type CommercePluginCommandCheckV1 = Static<
 >;
 
 const pluginFunctionRunShape = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.plugin-function-run.v1"),
+  schemaVersion: Type.Literal("commerce.plugin-function-run.v1"),
   outcome: Type.Union([
     ReadonlyStrictObject({
       kind: Type.Literal("returned"),
@@ -646,7 +646,7 @@ function sameRun(run: PluginFunctionRun): PluginFunctionRun {
 }
 
 export const previewCommerceMerchantPluginV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.preview-merchant-plugin.v1"),
+  schemaVersion: Type.Literal("commerce.preview-merchant-plugin.v1"),
   definition: wirePluginDefinitionSchema,
   settings: commercePluginSettingsV1Schema,
 });
@@ -655,7 +655,7 @@ export type PreviewCommerceMerchantPluginV1 = Static<
 >;
 
 export const commerceMerchantPluginPreviewV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.merchant-plugin-preview.v1"),
+  schemaVersion: Type.Literal("commerce.merchant-plugin-preview.v1"),
   pluginId: text,
   checkouts: NonNegativeInteger,
   refused: ImmutableArray(

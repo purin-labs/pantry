@@ -132,7 +132,7 @@ async (page) => {
     }
     server.sockets.push(socket);
     socket.onMessage((message) => {
-      if (message === "satyr.ping") socket.send("satyr.pong");
+      if (message === "pantry.ping") socket.send("pantry.pong");
     });
   });
   const signal = () => {
@@ -187,7 +187,7 @@ async (page) => {
     return {
       active: registration.active?.state ?? null,
       controlled: navigator.serviceWorker.controller !== null,
-      kept: (await (await caches.open("satyr-tv-v1")).keys()).map((request) => new URL(request.url).pathname),
+      kept: (await (await caches.open("pantry-tv-v1")).keys()).map((request) => new URL(request.url).pathname),
     };
   });
   check("the service worker keeps the player", worker.active === "activated" && worker.kept.includes("/tv"), worker);

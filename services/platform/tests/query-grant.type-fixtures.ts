@@ -8,7 +8,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import type { Variant } from "@purin-labs/type-utils";
 declare const selector: PublishedCommerceSelector;
-declare const context: Variant<CommerceGraphQuery, "underclerk_context">;
+declare const context: Variant<CommerceGraphQuery, "commerce_context">;
 const invalidScope: CommerceReadGrantScope = {
   kind: "saved_selector",
   selector: {

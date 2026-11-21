@@ -177,7 +177,7 @@ export abstract class BuyerReconcileStage extends BuyerPlacementStage {
         });
       } catch {
         provider = {
-          schemaVersion: "underclerk.payment-capture-result.v1" as const,
+          schemaVersion: "commerce.payment-capture-result.v1" as const,
           kind: "indeterminate" as const,
           reason: "provider_transport_interrupted",
           reconcileAfter: timestampAfter(this.options.now(), 60),
@@ -203,7 +203,7 @@ export abstract class BuyerReconcileStage extends BuyerPlacementStage {
           throw new Error("Payment resources disappeared before resolution");
         }
         const resolved = this.resolveCheckoutPayment({
-          schemaVersion: "underclerk.resolve-checkout-payment.v1",
+          schemaVersion: "commerce.resolve-checkout-payment.v1",
           merchantId: input.claims.merchantId,
           expectedMerchantRevision: merchant.revision,
           idempotencyKey: `buyer_payment_resolve_${identityDigest}_${paymentAttempt.revision}_${provider.kind}`,
@@ -258,7 +258,7 @@ export abstract class BuyerReconcileStage extends BuyerPlacementStage {
         );
       }
       const recorded = this.recordCheckoutPaymentCapture({
-        schemaVersion: "underclerk.record-checkout-payment-capture.v1",
+        schemaVersion: "commerce.record-checkout-payment-capture.v1",
         merchantId: input.claims.merchantId,
         expectedMerchantRevision: merchant.revision,
         idempotencyKey: `buyer_payment_capture_record_${identityDigest}`,
@@ -300,7 +300,7 @@ export abstract class BuyerReconcileStage extends BuyerPlacementStage {
       };
     }
     const placed = this.placePaidCheckout({
-      schemaVersion: "underclerk.place-paid-checkout.v1",
+      schemaVersion: "commerce.place-paid-checkout.v1",
       merchantId: input.claims.merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `buyer_paid_checkout_place_${identityDigest}`,

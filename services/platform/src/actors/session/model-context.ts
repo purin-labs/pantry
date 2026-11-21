@@ -83,7 +83,7 @@ export function confirmedContextObservation(
     case "organisation_record":
       return {
         kind: "observed",
-        area: "BakeryOS",
+        area: "kitchen",
         source: {
           id: source.recordId,
           revision: String(evidence.sourceRevision),
@@ -96,8 +96,8 @@ export function confirmedContextObservation(
       return {
         kind: "observed",
         area: source.resourceScope.startsWith("commerce")
-          ? "CafeOS"
-          : "AgentCommerce",
+          ? "cafe"
+          : "commerce",
         source: {
           id: `${source.integrationAccountId}:${source.resourceScope}`,
           revision: String(evidence.sourceRevision),

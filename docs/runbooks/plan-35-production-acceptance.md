@@ -19,7 +19,7 @@ Worker `c8da530c`.
 
 ## Required steady state
 
-Integration discovery is an intended CafeOS feature. For every supported
+Integration discovery is an intended Café feature. For every supported
 active organisation, require `integration.discovery.read` to be enabled, require the
 owner and admin baseline grants, and materialize an explicit versioned grant
 for every selected Slack agent conversation. Treat a missing capability or
@@ -38,7 +38,7 @@ window. Before any production mutation, record:
 
 1. the current git revision used for the canary;
 2. `wrangler deployments status --json` and its 100% Worker version;
-3. `wrangler d1 time-travel info satyr --json` and the returned bookmark;
+3. `wrangler d1 time-travel info pantry --json` and the returned bookmark;
 4. the mechanism and timestamp for holding control-plane mutations; and
 5. the disposable organisation, Slack workspace, channel, and root thread.
 
@@ -87,7 +87,7 @@ Run this path in one new Slack root thread where the agent is installed:
 1. Create the disposable organisation and select the exact Slack conversation.
 2. Confirm the ordinary conversation defaults are materialized as versioned
    grants with provenance.
-3. Mention `@satyr-dev` once in the root message to start the Case.
+3. Mention `@pantry-dev` once in the root message to start the Case.
 4. Send the next user reply in the same thread without a mention. Require an
    agent response in that thread.
 5. Ask which integrations are connected. Require `integration_list` to return
@@ -120,7 +120,7 @@ Accept only when all of these are true:
 - the root mention and untagged follow-up each receive exactly one response;
 - integration discovery is redacted, bounded, organisation-isolated, and performs no
   provider request or credential resolution;
-- every supported active CafeOS organisation has discovery enabled and each intended
+- every supported active Café organisation has discovery enabled and each intended
   owner, admin, and selected-conversation grant is active;
 - a deliberately revoked discovery grant survives default application and
   policy recompilation until an operator grants it again;

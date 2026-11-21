@@ -15,7 +15,7 @@ import type { HarnessBakerySurfaceToolResult } from "../kitchen/services";
 export function readBakerySurfaceReceiptId(value: unknown): string {
   const parsed = parseBakerySurfaceToolResult(value);
   if (parsed === null) {
-    throw new Error("BakeryOS surface receipt is missing");
+    throw new Error("Kitchen surface receipt is missing");
   }
   return parsed.receiptId;
 }

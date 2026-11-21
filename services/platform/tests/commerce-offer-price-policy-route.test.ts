@@ -41,7 +41,7 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_price_policy";
 const MERCHANT_ID = "merchant_cafe";
-const OFFER_PATH = "underclerk%3Amerchant_cafe%3Aoffer_coffee";
+const OFFER_PATH = "commerce%3Amerchant_cafe%3Aoffer_coffee";
 const ROUTE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/offers/${OFFER_PATH}/price-policy`;
 
 describe("Offer price policy control route", () => {
@@ -82,11 +82,11 @@ describe("Offer price policy control route", () => {
     expect(client.setOfferPricePolicy).not.toHaveBeenCalled();
   });
 
-  it("does not reach Underclerk when no merchant is bound", async () => {
+  it("does not reach Commerce when no merchant is bound", async () => {
     authorizeAs("viewer");
     bindingMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue({
       ok: false,
-      error: { code: "underclerk_binding_not_found" },
+      error: { code: "commerce_binding_not_found" },
     });
     const client = commerceEngineClient({ readOfferPricePolicy: vi.fn() });
 
@@ -100,7 +100,7 @@ describe("Offer price policy control route", () => {
 const ROLE_RANK = { viewer: 1, operator: 2, admin: 3, owner: 4 } as const;
 
 const COOKIE =
-  "satyr_control_session=session-price; satyr_control_csrf=csrf-price";
+  "pantry_session=session-price; pantry_csrf=csrf-price";
 
 function read(): Request {
   return new Request(ROUTE, { headers: { cookie: COOKIE } });
@@ -116,7 +116,7 @@ function write(
     headers: {
       cookie: COOKIE,
       origin: "https://pantry.example",
-      "x-satyr-csrf": "csrf-price",
+      "x-pantry-csrf": "csrf-price",
       "content-type": "application/json",
       "idempotency-key": idempotencyKey,
     },

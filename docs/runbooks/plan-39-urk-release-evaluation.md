@@ -31,7 +31,7 @@ or bypass approvals.
 1. Record the tested commit, any uncommitted changes, deployed version when
    applicable, pinned agent/model/skill revisions, and the commerce provider.
 2. Verify the actual merchant account and the existing read permissions. The
-   September 8 CafeOS setup report is historical evidence, not a current account
+   September 8 Café setup report is historical evidence, not a current account
    inventory. Do not assume a test organisation is the user's shop.
 3. Identify the source records, payment-to-order linkage, deadlines, sync
    coverage and timestamps available to this account. Write down missing facts.

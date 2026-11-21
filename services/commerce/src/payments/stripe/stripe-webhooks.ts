@@ -98,8 +98,8 @@ export function verifiedStripeNotification(
   )
     return { kind: "ignored", eventId: event.id };
   const {
-    underclerk_merchant_id: merchantId,
-    underclerk_payment_attempt_id: paymentAttemptId,
+    commerce_merchant_id: merchantId,
+    commerce_payment_attempt_id: paymentAttemptId,
   } = object.metadata;
   return typeof merchantId === "string" &&
     merchantId.length > 0 &&

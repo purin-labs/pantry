@@ -164,7 +164,7 @@ export async function createWhatsAppWorld(
     provider: "whatsapp",
     providerSubjectId: FIXTURE_WABA_ID,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef,
@@ -263,7 +263,7 @@ export async function createWhatsAppWorld(
             maxActiveCaseBytes: 32_768,
             debounceSeconds: 15,
             relevantMessageTopics:
-              "CafeOS, cafe automation, cafe, and bakery topics.",
+              "Café, cafe automation, cafe, and bakery topics.",
             automaticAcknowledgementText:
               "Thanks for your message. We’ll get back to you shortly.",
             agentMode: "answer",

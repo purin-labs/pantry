@@ -1,4 +1,4 @@
-# Satyr E2E coverage and acceptance
+# Pantry E2E coverage and acceptance
 
 Documentation reconciled: 2026-10-06. This guide identifies current runners and
 acceptance boundaries. It records no new test execution or production acceptance.
@@ -15,7 +15,7 @@ Use these sources to determine the actual suite and CI behavior:
 - [Platform E2E configuration](services/platform/vitest.e2e.config.ts)
 - [E2E runtime bindings](services/platform/tests/e2e/wrangler.jsonc)
 - [Platform commands](services/platform/package.json)
-- [Satyr CI workflow](.github/workflows/pantry.yml)
+- [Pantry CI workflow](.github/workflows/pantry.yml)
 - [Commerce CI workflow](.github/workflows/commerce-components.yml)
 - [Test maintenance guide](services/platform/tests/AGENTS.md)
 
@@ -32,7 +32,7 @@ journeys. Avoid fixed test counts or timing claims that lack a dated run artifac
 | Authorized capability discovery                     | [Discovery journey](services/platform/tests/e2e/slack-discovery-journey.test.ts)                                                                                             |
 | Attachments and reconstruction after replacement    | [Attachment journey](services/platform/tests/e2e/slack-attachment-journey.test.ts), [isolated restore journey](services/platform/tests/e2e/slack-attachment-restore.test.ts) |
 | Inventory operations                                | [Inventory E2E](services/platform/tests/e2e/inventory-operations.test.ts), Plan 47                                                                                           |
-| Saved BakeryOS runs and authority                   | [Bakery runs](services/platform/tests/e2e/bakery-runs.test.ts)                                                                                                               |
+| Saved Kitchen runs and authority                   | [Bakery runs](services/platform/tests/e2e/bakery-runs.test.ts)                                                                                                               |
 | Chat completion                                     | [Portal finalization](services/platform/tests/e2e/portal-chat-finalization.test.ts), Plans 45/45A                                                                            |
 | Native bakery execution and recovery                | [Native runner guide](crates/bakery-native/README.md), [release ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md)                                                          |
 | Buyer checkout, pickup, and export                  | [Punter](scripts/punter/README.md), commerce lab, Plans 22/23/33                                                                                                             |
@@ -112,6 +112,6 @@ silently selects another funding route cannot prove recovery.
 [Plan 37](docs/plan-37-typed-messages-and-attachments.md) retains its attachment
 collection-audit gate. [Plan 33D](docs/plan-33D-square-release-acceptance.md)
 retains deferred seller-isolation and physical/live certification.
-[The BakeryOS release ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md)
+[The Kitchen release ledger](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-42-release-readiness.md)
 retains integrated file, production release, calibration, and physical limits.
 Later documentation edits do not close these gates.

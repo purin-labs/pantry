@@ -187,8 +187,8 @@ async function publishedCommerceClient(
   );
   if (
     environment === null ||
-    input.env.UNDERCLERK_BASE_URL === undefined ||
-    input.env.UNDERCLERK_SERVICE_TOKEN === undefined
+    input.env.COMMERCE_BASE_URL === undefined ||
+    input.env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
     return unavailableCommerceTargets();
   }
@@ -196,7 +196,7 @@ async function publishedCommerceClient(
     db: execution.value.database,
     organisationId: input.organisationId,
   });
-  if (!authority.ok || authority.value.provider !== "underclerk")
+  if (!authority.ok || authority.value.provider !== "commerce")
     return unavailableCommerceTargets();
   const binding = await resolveOrganisationCommerceMerchantBinding({
     db: execution.value.database,
@@ -210,21 +210,21 @@ async function publishedCommerceClient(
     return unavailableCommerceTargets();
   }
   const client = createPublishedResourceClient({
-    baseUrl: input.env.UNDERCLERK_BASE_URL,
+    baseUrl: input.env.COMMERCE_BASE_URL,
     ...pantryCommerceAccess(
-      input.env.UNDERCLERK_SERVICE_TOKEN,
+      input.env.COMMERCE_SERVICE_TOKEN,
       String(input.organisationId),
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+      input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
     ),
   });
   let adminClient: CommerceAdminClient;
   try {
     adminClient = new CommerceAdminClient({
-      baseUrl: input.env.UNDERCLERK_BASE_URL,
+      baseUrl: input.env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        input.env.UNDERCLERK_SERVICE_TOKEN,
+        input.env.COMMERCE_SERVICE_TOKEN,
         String(input.organisationId),
-        input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
+        input.env.COMMERCE.fetch.bind(input.env.COMMERCE),
       ),
     });
   } catch {

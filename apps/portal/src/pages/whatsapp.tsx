@@ -741,7 +741,7 @@ function inferenceProviderLabel(selection: WhatsAppInferenceSelection): string {
       return "Anthropic Claude (your API key)";
     case "organisation_google_api_key":
       return "Google Gemini (your API key)";
-    case "satyr_platform":
+    case "pantry_platform":
       return "Seams AI";
   }
 }

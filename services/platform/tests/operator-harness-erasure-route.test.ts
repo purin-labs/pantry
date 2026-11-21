@@ -200,7 +200,7 @@ async function createFixture(): Promise<RouteFixture> {
 
 function readRequest(path: string, sessionToken: string): Request {
   return new Request(`${ORIGIN}${path}`, {
-    headers: { cookie: `satyr_control_session=${sessionToken}` },
+    headers: { cookie: `pantry_session=${sessionToken}` },
   });
 }
 

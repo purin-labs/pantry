@@ -53,7 +53,7 @@ opens an `mJ-Drawer` on the printer's DK port. Pantry sends a receipt layout;
 the gateway encodes StarPRNT. Pantry never learns the printer's address.
 
 1. Give the printer a fixed address on the shop network.
-2. Write `printers.json` in the gateway's folder (`~/.satyr-gateway`):
+2. Write `printers.json` in the gateway's folder (`~/.pantry-gateway`):
 
    ```json
    [{ "sourceKey": "printer-1", "host": "192.168.1.50", "port": 9100, "drawer": true, "name": "Counter printer" }]

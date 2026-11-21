@@ -20,10 +20,10 @@ import {
   resolvedSecret,
 } from "./vault-support";
 
-const SATYR_PASSWORD = "satyr-held-pass-4K";
+const PANTRY_PASSWORD = "pantry-held-pass-4K";
 const APP_PASSWORD = "added-in-1password-8M";
-const NEW_PASSWORD = "created-through-satyr-2P";
-const [SATYR_VAULT, PRIVATE_VAULT] = E2E_ONEPASSWORD_VAULTS;
+const NEW_PASSWORD = "created-through-pantry-2P";
+const [PANTRY_VAULT, PRIVATE_VAULT] = E2E_ONEPASSWORD_VAULTS;
 
 it(
   "keeps the Vault interchangeable with a connected 1Password vault, through a move there, edits, a move back and a disconnect",
@@ -67,7 +67,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
         label: "Supplier portal",
         origins: ["https://supplier.example.jp"],
         username: "buyer@nini.example",
-        password: SATYR_PASSWORD,
+        password: PANTRY_PASSWORD,
       })
     ).body,
   );
@@ -114,7 +114,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
       vaultId: null,
     }),
   ).toMatchObject({ status: 409, body: { error: "vault_store_auth_failed" } });
-  expect((await list()).store).toEqual({ kind: "satyr" });
+  expect((await list()).store).toEqual({ kind: "pantry" });
 
   // The token reaches two vaults, so the owner chooses one; only then does
   // Pantry keep the token, encrypted.
@@ -130,7 +130,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   expect(choose).toMatchObject({
     kind: "choose_vault",
     vaults: [
-      { vaultId: SATYR_VAULT.id, title: "Satyr" },
+      { vaultId: PANTRY_VAULT.id, title: "Pantry" },
       { vaultId: PRIVATE_VAULT.id, title: "Private" },
     ],
   });
@@ -138,13 +138,13 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   const connected = await send(owner, `${base}/store`, {
     kind: "connect_onepassword",
     token: E2E_ONEPASSWORD_TOKEN,
-    vaultId: SATYR_VAULT.id,
+    vaultId: PANTRY_VAULT.id,
   });
   expect(connected).toMatchObject({
     status: 200,
     body: {
       kind: "store",
-      store: { kind: "onepassword", vaultTitle: "Satyr", reachable: true },
+      store: { kind: "onepassword", vaultTitle: "Pantry", reachable: true },
     },
   });
   const tokenHandle = (await storeRow(organisationId))?.token_handle ?? "";
@@ -158,7 +158,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
       ok: true,
       store: {
         kind: "onepassword",
-        vaultTitle: "Satyr",
+        vaultTitle: "Pantry",
         connectedAt: expect.any(Number),
       },
     },
@@ -173,7 +173,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   // Pantry items.
   await onePassword("/__e2e/add", {
     category: "Login",
-    vaultId: SATYR_VAULT.id,
+    vaultId: PANTRY_VAULT.id,
     title: "Wholesale flour",
     fields: [
       {
@@ -202,8 +202,8 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   const mixed = await list();
   expect(mixed.items.map((entry) => [entry.label, entry.store])).toEqual([
     ["Wholesale flour", "onepassword"],
-    ["Supplier portal", "satyr"],
-    ["Shop", "satyr"],
+    ["Supplier portal", "pantry"],
+    ["Shop", "pantry"],
   ]);
   expect(mixed.items[0]).toMatchObject({
     origins: ["https://flour.example.jp"],
@@ -256,7 +256,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   const movedContact = afterMove.items.find((entry) => entry.label === "Shop");
   expect(await onePasswordLogin(movedLogin?.itemId ?? "")).toMatchObject({
     username: "buyer@nini.example",
-    password: SATYR_PASSWORD,
+    password: PANTRY_PASSWORD,
     websites: ["https://supplier.example.jp"],
   });
   expect(movedContact).toMatchObject({ kind: "contact_profile", contact });
@@ -307,15 +307,15 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   // the 1Password copies are archived, not deleted.
   expect(
     parseVaultStoreResult(
-      (await send(owner, `${base}/store`, { kind: "move_items", to: "satyr" }))
+      (await send(owner, `${base}/store`, { kind: "move_items", to: "pantry" }))
         .body,
     ),
   ).toMatchObject({ kind: "moved", moved: 3, remaining: 0 });
   const back = await list();
   expect(back.items.map((entry) => [entry.label, entry.store])).toEqual([
-    ["Flour mill", "satyr"],
-    ["Supplier portal", "satyr"],
-    ["Shop", "satyr"],
+    ["Flour mill", "pantry"],
+    ["Supplier portal", "pantry"],
+    ["Shop", "pantry"],
   ]);
   const flourBack = back.items.find((entry) => entry.label === "Flour mill");
   expect(
@@ -338,12 +338,12 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   // Disconnecting keeps the 1Password items in 1Password and stops the token.
   expect(
     await send(owner, `${base}/store`, { kind: "disconnect_onepassword" }),
-  ).toMatchObject({ status: 200, body: { store: { kind: "satyr" } } });
+  ).toMatchObject({ status: 200, body: { store: { kind: "pantry" } } });
   expect(await resolvedSecret(organisationId, tokenHandle)).toEqual({
     error: "vault_secret_revoked",
   });
   expect((await onePasswordState()).items).toHaveLength(4);
-  expect((await list()).store).toEqual({ kind: "satyr" });
+  expect((await list()).store).toEqual({ kind: "pantry" });
 
   // The audit log tells the story, and a member can read it.
   const events = parseVaultEventList(
@@ -367,7 +367,7 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
   // No response of the journey carried a password or the token.
   const everything = seen.join("\n");
   for (const secret of [
-    SATYR_PASSWORD,
+    PANTRY_PASSWORD,
     APP_PASSWORD,
     NEW_PASSWORD,
     E2E_ONEPASSWORD_TOKEN,
@@ -384,10 +384,10 @@ async function vaultOnePasswordJourney({ task }: TestContext): Promise<void> {
         "status read makes no 1Password call",
         "item added in the 1Password app is listed",
         "new items go to the connected store",
-        "move to 1Password copies items and revokes Satyr sign-ins",
+        "move to 1Password copies items and revokes Pantry sign-ins",
         "stale 1Password edit refused; current edit lands",
         "removal archives in 1Password",
-        "move back restores sign-ins in Satyr and archives copies",
+        "move back restores sign-ins in Pantry and archives copies",
         "disconnect keeps 1Password items and revokes the token",
         "audit log records every step",
         "no response carried a password or the token",

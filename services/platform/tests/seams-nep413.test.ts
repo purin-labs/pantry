@@ -72,8 +72,8 @@ describe("Seams NEP-413 identity proof", function seamsNep413Suite() {
 function identityChallenge(): Nep413Challenge {
   return {
     message:
-      "Link Slack user U0BFUGSC6BY to Satyr organisation organisation_T0BGQSSG45N.",
-    recipient: "satyr.identity",
+      "Link Slack user U0BFUGSC6BY to Pantry organisation organisation_T0BGQSSG45N.",
+    recipient: "pantry.identity",
     state: "link_fixture",
   };
 }

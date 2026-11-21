@@ -15,13 +15,13 @@ export const SQUARE_CONNECTION_MACHINE = {
     connected: {
       kind: "initial",
       meaning:
-        "Square accepts the token, and it holds every scope that Underclerk uses.",
+        "Square accepts the token, and it holds every scope that Commerce uses.",
       exit: { kind: "person", surface: "portal_integrations" },
     },
     scope_missing: {
       kind: "intermediate",
       meaning:
-        "Square accepts the token, but it lacks a scope that Underclerk uses, for example PAYOUTS_READ.",
+        "Square accepts the token, but it lacks a scope that Commerce uses, for example PAYOUTS_READ.",
       exit: { kind: "person", surface: "portal_integrations" },
     },
     refresh_failed: {

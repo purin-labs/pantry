@@ -350,8 +350,8 @@ export async function handleCafeCommerceAcceptance(
   });
   if (
     !authority.ok ||
-    authority.value.provider !== "underclerk" ||
-    authority.value.commerceSystem.kind !== "satyr_commerce"
+    authority.value.provider !== "commerce" ||
+    authority.value.commerceSystem.kind !== "builtin_commerce"
   ) {
     return errorResponse(
       "cafe_commerce_acceptance_authority_unavailable",

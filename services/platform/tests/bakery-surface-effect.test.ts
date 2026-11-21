@@ -64,7 +64,7 @@ import { SqliteD1Database, type SqliteD1Statement } from "./sqlite-d1";
 
 const baseline = singleDatabaseSchema();
 
-describe("BakeryOS surface effect lifecycle", function surfaceEffectSuite() {
+describe("Kitchen surface effect lifecycle", function surfaceEffectSuite() {
   beforeEach(function resetAuthority() {
     authority.valid = true;
   });

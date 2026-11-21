@@ -191,7 +191,7 @@ export class CandidateActor extends CanonicalActor {
   }
 
   extensionName() {
-    return "satyr-recovery-trial";
+    return "pantry-recovery-trial";
   }
 
   async toolHost(lease) {
@@ -753,7 +753,7 @@ async function executeCatalogTool(
         text: result.output.content.map(renderHarnessHistoryContent).join("\n"),
       },
     ],
-    details: { satyrAuthority: result.authority },
+    details: { pantryAuthority: result.authority },
     isError: result.status === "failed",
   };
 }

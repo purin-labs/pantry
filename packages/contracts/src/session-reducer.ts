@@ -34,12 +34,12 @@ import type { Variant } from "@purin-labs/type-utils";
 // returns the response that the Wasm export writes, in serde's field order.
 
 export const ADVANCE_SESSION_COMMAND_SCHEMA =
-  "satyr.actor.advance-session-command.v1";
-export const RESTORE_SESSION_SCHEMA = "satyr.actor.restore-session.v1";
+  "pantry.actor.advance-session-command.v1";
+export const RESTORE_SESSION_SCHEMA = "pantry.actor.restore-session.v1";
 export const VALIDATE_HARNESS_CHECKPOINT_SCHEMA =
-  "satyr.actor.validate-harness-checkpoint.v1";
+  "pantry.actor.validate-harness-checkpoint.v1";
 export const VALIDATE_HARNESS_CHECKPOINT_RESTORE_SCHEMA =
-  "satyr.actor.validate-harness-checkpoint-restore.v1";
+  "pantry.actor.validate-harness-checkpoint-restore.v1";
 
 export type SessionBoundaryResponse<T> =
   | Readonly<{ status: "ok"; value: T }>

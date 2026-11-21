@@ -364,7 +364,7 @@ export type CommerceViewPresentation =
 export type VisibleRelationshipColumn =
   StrictUnion<GeneratedVisibleRelationshipColumn>;
 export type CommerceContextRequest = Omit<
-  Variant<CommerceGraphQuery, "underclerk_context">,
+  Variant<CommerceGraphQuery, "commerce_context">,
   "kind"
 >;
 

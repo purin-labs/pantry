@@ -29,7 +29,7 @@ type OperationEditResult =
       code:
         | "revision_conflict"
         | "bakery_operation_invalid"
-        | "underclerk_unavailable";
+        | "commerce_unavailable";
     }>;
 
 export function parseOperationEdit(
@@ -98,7 +98,7 @@ export async function saveOperationDuration(
     filter: null,
   });
   if (!result.ok) {
-    return { ok: false, code: "underclerk_unavailable" };
+    return { ok: false, code: "commerce_unavailable" };
   }
   if (result.value.merchantRevision !== edit.snapshot) {
     return { ok: false, code: "revision_conflict" };
@@ -154,7 +154,7 @@ export async function saveOperationDuration(
   });
   const saved = await input.client.command(request);
   if (!saved.ok) {
-    return { ok: false, code: "underclerk_unavailable" };
+    return { ok: false, code: "commerce_unavailable" };
   }
   if (saved.value.status === "accepted") {
     return { ok: true };

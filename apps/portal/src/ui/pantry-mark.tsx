@@ -11,12 +11,12 @@ export function PantryMark() {
     <>
       <img
         className="pantry-mark pantry-mark-on-light"
-        src="/brand/satyr-mark-dark-128.png"
+        src="/brand/pantry-mark-dark-128.png"
         alt=""
       />
       <img
         className="pantry-mark pantry-mark-on-dark"
-        src="/brand/satyr-mark-light-128.png"
+        src="/brand/pantry-mark-light-128.png"
         alt=""
       />
     </>

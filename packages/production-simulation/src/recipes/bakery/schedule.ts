@@ -3211,7 +3211,7 @@ export type VitrineOrderOverride = Readonly<{
 }>;
 
 const VITRINE_CUSTOM_ORDERS_STORAGE_KEY =
-  "satyr.bakeryos.vitrineCustomOrders.v1";
+  "pantry.bakeryos.vitrineCustomOrders.v1";
 
 const customOrderOverridesByPreset: Readonly<
   Record<VitrineRushPresetId, Map<string, VitrineOrderOverride>>

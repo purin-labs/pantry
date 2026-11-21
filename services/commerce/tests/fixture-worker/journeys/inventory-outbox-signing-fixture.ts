@@ -40,7 +40,7 @@ export function verifyInventoryOutboxMigration(
     "delivered",
   ]) {
     const raw = {
-      schemaVersion: "underclerk.commerce-delivery.v2" as const,
+      schemaVersion: "commerce.commerce-delivery.v2" as const,
       deliveryId: `${delivery.deliveryId}:fixture_${variant}`,
       merchantId: delivery.merchantId,
       merchantRevision: delivery.merchantRevision,
@@ -64,11 +64,11 @@ export function verifyInventoryOutboxMigration(
     if (variant === "delivered") status = "delivered";
     if (variant === "signature") {
       status = "rejected";
-      reason = "underclerk_delivery_signature_invalid";
+      reason = "commerce_delivery_signature_invalid";
     }
     if (variant === "unrelated") {
       status = "rejected";
-      reason = "underclerk_scope_mismatch";
+      reason = "commerce_scope_mismatch";
     }
     database
       .prepare(
@@ -127,7 +127,7 @@ export function verifyInventoryOutboxMigration(
     );
   verified &&=
     tampered?.status === "rejected" &&
-    tampered.reason === "underclerk_delivery_signature_invalid";
+    tampered.reason === "commerce_delivery_signature_invalid";
   const second = migrateOutboxSignatures(database, signer, null);
   return {
     repaired: outcomes.filter(repairedOutcome).length,

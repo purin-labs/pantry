@@ -356,7 +356,7 @@ function savedSelectorMatchesEntityPlane(
         "saved commerce view matching requires an admission resolver",
       );
     case "aggregation":
-    case "underclerk_context":
+    case "commerce_context":
       return false;
     default:
       return failUnhandled(selector.query);

@@ -91,7 +91,7 @@ export type IntegrationsPageActions = EmailReviewActions & {
   readonly activate: () => Promise<void>;
   readonly syncCommerceSystem: () => Promise<void>;
   readonly syncCommerceSystemQuietly: () => Promise<void>;
-  readonly setupSatyrCommerce: () => Promise<void>;
+  readonly setupBuiltInCommerce: () => Promise<void>;
   readonly publishExportCoordination: () => Promise<void>;
   readonly selectShopifyCommerce: SettingsMouseHandler;
   readonly connectShopify: SettingsFormHandler;

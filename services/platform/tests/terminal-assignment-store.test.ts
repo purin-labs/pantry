@@ -32,7 +32,7 @@ function assignment(
     assignmentId: "terminal_assignment_1",
     organisationId: ORGANISATION,
     merchantId: "merchant_1",
-    satyrLocationId: "pantry_location_1",
+    pantryLocationId: "pantry_location_1",
     account: {
       integrationAccountId: "integration_square",
       providerAccountId: "merchant_square",
@@ -60,7 +60,7 @@ describe("terminal assignment store", function assignmentStoreSuite() {
     db = d1Database(database);
   });
 
-  it("resolves the terminal a Satyr location sells through", async function readsActive() {
+  it("resolves the terminal a Pantry location sells through", async function readsActive() {
     await activateTerminalAssignment({
       db,
       organisationId: ORGANISATION,

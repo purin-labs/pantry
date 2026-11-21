@@ -56,7 +56,7 @@ type HomeActionActivity = Pick<
       }>;
   }>;
 
-const HOME_VIEW_SCHEMA_VERSION = "satyr.cafeos.home.v1" as const;
+const HOME_VIEW_SCHEMA_VERSION = "pantry.cafeos.home.v1" as const;
 const HOME_ATTENTION_LIMIT = 5;
 const HOME_BLOCKER_LIMIT = 8;
 
@@ -551,7 +551,7 @@ function latestActionUpdatedAt(
 }
 
 function actionLedgerIsCommerce(item: HomeActionActivity): boolean {
-  return item.action.host === "satyr.commerce";
+  return item.action.host === "pantry.commerce";
 }
 
 async function handleHome(

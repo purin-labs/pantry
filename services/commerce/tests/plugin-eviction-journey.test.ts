@@ -47,7 +47,7 @@ it(
 );
 
 async function pluginEviction(): Promise<void> {
-  const storage = mkdtempSync(join(tmpdir(), "underclerk-eviction-"));
+  const storage = mkdtempSync(join(tmpdir(), "commerce-eviction-"));
   const evidence: Evidence = { clock: NOW, merchantId };
   let backend = await startWorkerdBackend({ persistDirectory: storage });
   try {

@@ -124,10 +124,10 @@ function bindsProviderDependencies(): void {
         const systems = [...definition.providerDependency.systems].sort();
         const providers = [...(advertised.get(definition.capabilityId) ?? [])];
         if (systems.includes("shopify")) {
-          expect(systems).toEqual(["satyr_commerce", "shopify"]);
+          expect(systems).toEqual(["builtin_commerce", "shopify"]);
           expect(providers).toEqual(["shopify"]);
         } else {
-          expect(systems).toEqual(["satyr_commerce"]);
+          expect(systems).toEqual(["builtin_commerce"]);
           expect(providers).toEqual([]);
         }
         break;
@@ -141,7 +141,7 @@ function bindsProviderDependencies(): void {
     )?.providerDependency,
   ).toEqual({
     kind: "commerce_system",
-    systems: ["satyr_commerce", "shopify"],
+    systems: ["builtin_commerce", "shopify"],
   });
 }
 

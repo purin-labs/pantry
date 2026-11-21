@@ -23,7 +23,7 @@ import type { CredentialVaultBindings, VaultKeyVersion } from "./keyring";
 import { resolveVaultHandle } from "./service";
 import { isRecord, isString, sha256Hex } from "@purin-labs/std";
 
-const VAULT_BACKUP_SCHEMA_VERSION = "satyr.vault-backup.v1";
+const VAULT_BACKUP_SCHEMA_VERSION = "pantry.vault-backup.v1";
 
 type VaultBackupVaultSecretRow = {
   readonly organisationId: string;
@@ -101,7 +101,7 @@ type VaultBackupTables = {
 type VaultBackupScope = "all" | { readonly organisationId: string };
 
 export type VaultBackupEnvelope = {
-  readonly schemaVersion: "satyr.vault-backup.v1";
+  readonly schemaVersion: "pantry.vault-backup.v1";
   readonly exportedAt: number;
   readonly scope: VaultBackupScope;
   readonly tables: VaultBackupTables;

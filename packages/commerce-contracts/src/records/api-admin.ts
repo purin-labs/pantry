@@ -71,7 +71,7 @@ export const wireCheckoutProfileReferenceSchema = Type.Object(
 );
 
 export const adjustOfferPriceCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.adjust-offer-price.v1"),
+  schemaVersion: Type.Literal("commerce.adjust-offer-price.v1"),
   merchantId: Type.String(),
   idempotencyKey: Type.String(),
   requestedAt: Type.String(),
@@ -104,7 +104,7 @@ export const counterSaleSchema = ReadonlyStrictObject({
 });
 
 const paymentCaptureVersion = Type.Literal(
-  "underclerk.payment-capture-result.v1",
+  "commerce.payment-capture-result.v1",
 );
 export const paymentCaptureResultSchema = Type.Union([
   ReadonlyOpenObject({
@@ -141,7 +141,7 @@ export const paymentCaptureResultSchema = Type.Union([
  * only by `merchantId` everywhere else.
  */
 export const provisionMerchantCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.provision-merchant.v2"),
+  schemaVersion: Type.Literal("commerce.provision-merchant.v2"),
   externalReference: text,
   merchantId: text,
   createdAt: timestamp,
@@ -149,11 +149,11 @@ export const provisionMerchantCommandSchema = ReadonlyOpenObject({
 
 export const demoProfileSchema = Type.Union([
   Type.Literal("cafe_patisserie"),
-  Type.Literal("satyr_ecommerce"),
+  Type.Literal("pantry_ecommerce"),
 ]);
 
 export const provisionDemoCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.provision-demo.v2"),
+  schemaVersion: Type.Literal("commerce.provision-demo.v2"),
   externalReference: text,
   merchantId: text,
   profile: demoProfileSchema,
@@ -161,7 +161,7 @@ export const provisionDemoCommandSchema = ReadonlyOpenObject({
 });
 
 export const merchantProvisioningResultSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.merchant-provisioning-result.v2"),
+  schemaVersion: Type.Literal("commerce.merchant-provisioning-result.v2"),
   outcome: Type.Union([
     Type.Literal("provisioned"),
     Type.Literal("already_provisioned"),
@@ -171,13 +171,13 @@ export const merchantProvisioningResultSchema = ReadonlyOpenObject({
 });
 
 export const createLocationCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.create-location.v1"),
+  schemaVersion: Type.Literal("commerce.create-location.v1"),
   ...commandContext,
   location: wireLocationSchema,
 });
 
 export const prepareCatalogListingCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.prepare-catalog-listing.v1"),
+  schemaVersion: Type.Literal("commerce.prepare-catalog-listing.v1"),
   ...commandContext,
   salesChannel: wireSalesChannelSchema,
   product: commerceProductV1Schema,
@@ -187,7 +187,7 @@ export const prepareCatalogListingCommandSchema = ReadonlyOpenObject({
 });
 
 export const updateProductDescriptionCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.update-product-description.v1"),
+  schemaVersion: Type.Literal("commerce.update-product-description.v1"),
   merchantId: text,
   expectedMerchantRevision: NonNegativeInteger,
   productId: text,
@@ -210,7 +210,7 @@ const storefrontCommandFields = {
 
 export const configurePickupStorefrontCommandSchema = Type.Refine(
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.configure-pickup-storefront.v1"),
+    schemaVersion: Type.Literal("commerce.configure-pickup-storefront.v1"),
     ...storefrontCommandFields,
   }),
   isPickupStorefront,
@@ -219,7 +219,7 @@ export const configurePickupStorefrontCommandSchema = Type.Refine(
 
 export const configureShippingStorefrontCommandSchema = Type.Refine(
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.configure-shipping-storefront.v1"),
+    schemaVersion: Type.Literal("commerce.configure-shipping-storefront.v1"),
     ...storefrontCommandFields,
     shippingProfile: shippingProfileSchema,
     shippingSpecification: variantShippingSpecificationSchema,
@@ -270,7 +270,7 @@ export const channelListingCatalogSchema = Type.Union([
 ]);
 
 export const placeChannelListingCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.place-channel-listing.v1"),
+  schemaVersion: Type.Literal("commerce.place-channel-listing.v1"),
   ...commandContext,
   salesChannelId: text,
   catalog: channelListingCatalogSchema,
@@ -342,7 +342,7 @@ export const checkoutBuyerAuthoritySchema = Type.Union([
 const checkoutLines = ImmutableArray(pickupCheckoutLineSchema, { minItems: 1 });
 
 export const createPickupCheckoutCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.create-pickup-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.create-pickup-checkout.v1"),
   ...commandContext,
   storefrontId: text,
   storefrontRevision: PositiveInteger,
@@ -357,7 +357,7 @@ export const createPickupCheckoutCommandSchema = ReadonlyStrictObject({
 export const publishPointOfSaleConfigurationCommandSchema =
   ReadonlyStrictObject({
     schemaVersion: Type.Literal(
-      "underclerk.publish-point-of-sale-configuration.v1",
+      "commerce.publish-point-of-sale-configuration.v1",
     ),
     merchantId: text,
     expectedRevision: Type.Union([PositiveInteger, Type.Null()]),
@@ -392,9 +392,9 @@ function discountCodeError(): string {
 }
 
 export const createInPersonCheckoutCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.create-in-person-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.create-in-person-checkout.v1"),
   ...commandContext,
-  satyrLocationId: text,
+  pantryLocationId: text,
   posConfigurationRevision: PositiveInteger,
   operatorIdentity: text,
   terminalAssignmentRevision: Type.Union([PositiveInteger, Type.Null()]),
@@ -417,7 +417,7 @@ const checkoutPaymentFields = {
 };
 
 export const beginCheckoutPaymentCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.begin-checkout-payment.v1"),
+  schemaVersion: Type.Literal("commerce.begin-checkout-payment.v1"),
   ...checkoutPaymentFields,
   paymentBinding: wireOnlinePaymentBindingSchema,
 });
@@ -425,7 +425,7 @@ export const beginCheckoutPaymentCommandSchema = ReadonlyStrictObject({
 export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
   {
     schemaVersion: Type.Literal(
-      "underclerk.collect-in-person-checkout-payment.v1",
+      "commerce.collect-in-person-checkout-payment.v1",
     ),
     ...checkoutPaymentFields,
     paymentBinding: wireInPersonPaymentBindingSchema,
@@ -434,7 +434,7 @@ export const collectInPersonCheckoutPaymentCommandSchema = ReadonlyStrictObject(
 );
 
 export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.record-counter-cash-payment.v1"),
+  schemaVersion: Type.Literal("commerce.record-counter-cash-payment.v1"),
   ...commandContext,
   checkoutId: text,
   checkoutRevision: PositiveInteger,
@@ -452,7 +452,7 @@ export const recordCounterCashPaymentCommandSchema = ReadonlyStrictObject({
  * Square.
  */
 export const commerceCounterSaleHandoffResultV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.counter-sale-handoff-result.v1"),
+  schemaVersion: Type.Literal("commerce.counter-sale-handoff-result.v1"),
   paymentAttemptId: text,
   handoffReference: text,
   status: Type.Union([Type.Literal("ok"), Type.Literal("error")]),
@@ -474,7 +474,7 @@ const paymentAttemptFields = {
 };
 
 export const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.record-checkout-payment-capture.v1"),
+  schemaVersion: Type.Literal("commerce.record-checkout-payment-capture.v1"),
   ...paymentAttemptFields,
   providerPaymentReference: text,
   capturedAt: timestamp,
@@ -484,7 +484,7 @@ export const recordCheckoutPaymentCaptureCommandSchema = ReadonlyOpenObject({
 });
 
 export const placePaidCheckoutCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.place-paid-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.place-paid-checkout.v1"),
   ...paymentAttemptFields,
   orderId: text,
   paymentId: text,
@@ -497,7 +497,7 @@ export const placePaidCheckoutCommandSchema = ReadonlyOpenObject({
 });
 
 export const markPickupReadyCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.mark-pickup-ready.v1"),
+  schemaVersion: Type.Literal("commerce.mark-pickup-ready.v1"),
   ...commandContext,
   orderId: text,
   orderRevision: PositiveInteger,
@@ -506,7 +506,7 @@ export const markPickupReadyCommandSchema = ReadonlyOpenObject({
 });
 
 export const completePickupCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.complete-pickup.v1"),
+  schemaVersion: Type.Literal("commerce.complete-pickup.v1"),
   ...commandContext,
   orderId: text,
   orderRevision: PositiveInteger,
@@ -517,7 +517,7 @@ export const completePickupCommandSchema = ReadonlyOpenObject({
 });
 
 export const resolveCheckoutPaymentCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.resolve-checkout-payment.v1"),
+  schemaVersion: Type.Literal("commerce.resolve-checkout-payment.v1"),
   ...paymentAttemptFields,
   outcome: Type.Union([
     ReadonlyOpenObject({
@@ -535,7 +535,7 @@ export const resolveCheckoutPaymentCommandSchema = ReadonlyOpenObject({
 });
 
 export const expireCheckoutCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.expire-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.expire-checkout.v1"),
   ...commandContext,
   checkoutId: text,
   checkoutRevision: PositiveInteger,
@@ -543,7 +543,7 @@ export const expireCheckoutCommandSchema = ReadonlyOpenObject({
 });
 
 export const publishCatalogListingCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.publish-catalog-listing.v1"),
+  schemaVersion: Type.Literal("commerce.publish-catalog-listing.v1"),
   merchantId: text,
   idempotencyKey: text,
   requestedAt: timestamp,
@@ -558,7 +558,7 @@ export const publishCatalogListingCommandSchema = ReadonlyOpenObject({
 });
 
 export const createInventoryItemCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.create-inventory-item.v1"),
+  schemaVersion: Type.Literal("commerce.create-inventory-item.v1"),
   ...commandContext,
   inventoryItemId: text,
   merchantCode: text,
@@ -569,7 +569,7 @@ export const createInventoryItemCommandSchema = ReadonlyOpenObject({
 });
 
 export const openInventoryPositionCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.open-inventory-position.v1"),
+  schemaVersion: Type.Literal("commerce.open-inventory-position.v1"),
   ...commandContext,
   inventoryPositionId: text,
   inventoryItemId: text,
@@ -603,7 +603,7 @@ export const inventoryLotInputSchema = Type.Union([
 ]);
 
 export const receiveInventoryCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.receive-inventory.v3"),
+  schemaVersion: Type.Literal("commerce.receive-inventory.v3"),
   ...commandContext,
   purchase: wireInventoryReceiptPurchaseSchema,
   receiptId: text,
@@ -665,7 +665,7 @@ export const inventoryReconciliationChangeSchema = Type.Union([
 ]);
 
 export const reconcileInventoryCommandSchema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.reconcile-inventory.v1"),
+  schemaVersion: Type.Literal("commerce.reconcile-inventory.v1"),
   ...commandContext,
   inventoryPositionId: text,
   inventoryPositionRevision: PositiveInteger,
@@ -678,14 +678,14 @@ const count = NonNegativeInteger;
 /** `parseMigrationInventory`: exactly one classification counts as 1. */
 export const migrationInventorySchema = Type.Refine(
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.migration-inventory.v2"),
+    schemaVersion: Type.Literal("commerce.migration-inventory.v2"),
     organisationId: text,
     merchantId: text,
     merchantRevision: NonNegativeInteger,
     storageSchemaVersion: PositiveInteger,
     contractRevisions: ReadonlyOpenObject({
       source: text,
-      target: Type.Literal("satyr.commerce.inventory.v1"),
+      target: Type.Literal("pantry.commerce.inventory.v1"),
     }),
     migrationDigest: sha256HexSchema,
     candidateClassification: Type.Union([
@@ -821,7 +821,7 @@ export const commerceSquareConnectionV1Schema = ReadonlyStrictObject({
   ]),
   /**
    * The scopes that Square granted, or null when Square did not show them.
-   * Optional so that a reader accepts an Commerce that has not sent it yet.
+   * Optional so that a reader accepts a Commerce that has not sent it yet.
    */
   scopes: Type.Optional(Type.Union([ImmutableArray(text), Type.Null()])),
   connectedAt: timestamp,

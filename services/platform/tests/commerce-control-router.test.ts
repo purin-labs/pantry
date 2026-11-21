@@ -160,8 +160,8 @@ import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 const ORGANISATION_ID = "organisation_commerce_console";
 const OTHER_ORGANISATION_ID = "organisation_commerce_other";
 const INTEGRATION_ACCOUNT_ID = COMMERCE_LAB_INTEGRATION_ACCOUNT_ID;
-const COMMERCE_INTEGRATION_ACCOUNT_ID = "integration_underclerk_console";
-const COMMERCE_BINDING_ID = "underclerk_binding_console";
+const COMMERCE_INTEGRATION_ACCOUNT_ID = "integration_commerce_console";
+const COMMERCE_BINDING_ID = "commerce_binding_console";
 const COMMERCE_MERCHANT_ID = "merchant_console";
 const OBSERVED_AT = "2026-07-26T00:00:00.000Z";
 
@@ -220,8 +220,8 @@ describe("commerce action approval route", () => {
           headers: {
             origin: "https://pantry.example",
             cookie:
-              "satyr_control_session=session-console; satyr_control_csrf=csrf-console",
-            "x-satyr-csrf": "csrf-console",
+              "pantry_session=session-console; pantry_csrf=csrf-console",
+            "x-pantry-csrf": "csrf-console",
             "idempotency-key": "commerce-approval-old-session",
           },
           body: "{}",
@@ -380,7 +380,7 @@ function configureConfirmedDescriptionAction() {
   const authorityPartition = { digest: "b".repeat(64) };
   const receipt = {
     kind: "commerce_provider_receipt" as const,
-    provider: "underclerk" as const,
+    provider: "commerce" as const,
     receiptId: "receipt_description_confirmed",
     effectId: "effect_description_confirmed",
     actionNonce: nonce,
@@ -410,7 +410,7 @@ function configureConfirmedDescriptionAction() {
       amount: null,
       authority: {
         kind: "commerce_system" as const,
-        system: "satyr_commerce" as const,
+        system: "builtin_commerce" as const,
         revision: 1,
       },
       requestAuthority,
@@ -484,7 +484,7 @@ function configurePendingDescriptionAction(state: "signed" | "indeterminate") {
         projection: {
           provenance: {
             organisationId: ORGANISATION_ID,
-            source: "underclerk",
+            source: "commerce",
             integrationAccountId: COMMERCE_INTEGRATION_ACCOUNT_ID,
             resourceType: "product",
             resourceId: "product_ginger_cookie",
@@ -507,8 +507,8 @@ function descriptionExecutionRequest(): Request {
       headers: {
         origin: "https://pantry.example",
         cookie:
-          "satyr_control_session=session-console; satyr_control_csrf=csrf-console",
-        "x-satyr-csrf": "csrf-console",
+          "pantry_session=session-console; pantry_csrf=csrf-console",
+        "x-pantry-csrf": "csrf-console",
         "idempotency-key": "description-execute-confirmed",
       },
       body: "{}",
@@ -537,7 +537,7 @@ describe("Google OIDC callback state binding", () => {
       new Request(
         "https://pantry.example/v1/control/auth/google/callback?state=state-1&code=code-1",
         {
-          headers: { cookie: "satyr_control_oidc_state=state-2" },
+          headers: { cookie: "pantry_oidc_state=state-2" },
         },
       ),
       googleCallbackEnv(),
@@ -552,7 +552,7 @@ describe("Google OIDC callback state binding", () => {
 });
 
 describe("commerce control query routes", () => {
-  it("queues one Satyr Commerce sync and replays the accepted mutation", async () => {
+  it("queues one Seams Checkout sync and replays the accepted mutation", async () => {
     const organisationId = parseOrganisationId(ORGANISATION_ID);
     if (!organisationId.ok) throw new Error("organisation fixture is invalid");
     const queueSend = vi.fn(
@@ -602,13 +602,13 @@ describe("commerce control query routes", () => {
       ok: true,
       value: {
         commerceSystem: {
-          kind: "satyr_commerce",
+          kind: "builtin_commerce",
           organisationId: organisationId.value,
-          bindingId: "underclerk_binding_console",
+          bindingId: "commerce_binding_console",
           merchantId: "merchant_console",
           revision: 1,
         },
-        provider: "underclerk",
+        provider: "commerce",
         integrationAccountId: INTEGRATION_ACCOUNT_ID,
       },
     });
@@ -631,9 +631,9 @@ describe("commerce control query routes", () => {
       ok: true,
       outcome: "sync_queued",
       commerceSystem: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         organisationId: ORGANISATION_ID,
-        bindingId: "underclerk_binding_console",
+        bindingId: "commerce_binding_console",
         merchantId: "merchant_console",
         revision: 1,
       },
@@ -642,7 +642,7 @@ describe("commerce control query routes", () => {
     await expect(response.json()).resolves.toEqual(acceptedBody);
     expect(queueSend).toHaveBeenCalledTimes(1);
     expect(queueSend.mock.calls[0]?.[0]).toMatchObject({
-      type: "underclerk.outbox_reconcile.v1",
+      type: "commerce.outbox_reconcile.v1",
       organisationId: ORGANISATION_ID,
       integrationAccountId: INTEGRATION_ACCOUNT_ID,
     });
@@ -658,7 +658,7 @@ describe("commerce control query routes", () => {
     expect(queueSend).toHaveBeenCalledTimes(1);
   });
 
-  it("serves CafeOS Home and rejects missing or cross-organisation authorization", async () => {
+  it("serves Café Home and rejects missing or cross-organisation authorization", async () => {
     onboardingMocks.buildOnboardingProjection.mockResolvedValue(
       homeProjection(),
     );
@@ -697,7 +697,7 @@ describe("commerce control query routes", () => {
       expect(body, path).toMatchObject({ ok: true });
       if (path.endsWith("/home")) {
         expect(body).toMatchObject({
-          schemaVersion: "satyr.cafeos.home.v1",
+          schemaVersion: "pantry.cafeos.home.v1",
           home: {
             workspace: {
               organisationId: ORGANISATION_ID,
@@ -779,13 +779,13 @@ function configureCommerceControlSession(): { readonly env: UnitTestEnv } {
     ok: true,
     value: {
       commerceSystem: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         organisationId: organisationId.value,
         bindingId: COMMERCE_BINDING_ID,
         merchantId: COMMERCE_MERCHANT_ID,
         revision: 1,
       },
-      provider: "underclerk",
+      provider: "commerce",
       integrationAccountId: COMMERCE_INTEGRATION_ACCOUNT_ID,
     },
   });
@@ -840,16 +840,16 @@ function configureCommerceControlSession(): { readonly env: UnitTestEnv } {
             batch: receiptBatch,
           }),
       },
-      UNDERCLERK_BASE_URL: "https://underclerk.example",
-      UNDERCLERK_SERVICE_TOKEN: "underclerk-service-token",
-      UNDERCLERK: { fetch: vi.fn() },
+      COMMERCE_BASE_URL: "https://commerce.example",
+      COMMERCE_SERVICE_TOKEN: "commerce-service-token",
+      COMMERCE: { fetch: vi.fn() },
     }),
   };
 }
 
 function authenticatedRequest(path: string): Request {
   return new Request(`https://pantry.example${path}`, {
-    headers: { cookie: "satyr_control_session=session-console" },
+    headers: { cookie: "pantry_session=session-console" },
   });
 }
 
@@ -861,8 +861,8 @@ function commerceSystemSyncRequest(): Request {
       headers: {
         origin: "https://pantry.example",
         cookie:
-          "satyr_control_session=session-console; satyr_control_csrf=csrf-console",
-        "x-satyr-csrf": "csrf-console",
+          "pantry_session=session-console; pantry_csrf=csrf-console",
+        "x-pantry-csrf": "csrf-console",
         "idempotency-key": "commerce-system-sync-console",
       },
       body: "{}",

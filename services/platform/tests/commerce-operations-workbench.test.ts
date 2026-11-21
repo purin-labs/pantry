@@ -16,7 +16,7 @@ const OBSERVED_AT = "2026-08-29T00:00:00.000Z";
 const EXPECTED_BY = "2026-08-30T03:00:00.000Z";
 const MERCHANT_ID = "merchant_operations";
 const EXCEPTION_ID =
-  "missing_tracking:underclerk%3Amerchant_operations%3Afulfillment_1:underclerk%3Amerchant_operations%3Ashipment_1";
+  "missing_tracking:commerce%3Amerchant_operations%3Afulfillment_1:commerce%3Amerchant_operations%3Ashipment_1";
 
 describe("commerce operations workbench", () => {
   it("derives one current missing-tracking exception and closes it from the fulfillment fact", () => {
@@ -48,10 +48,10 @@ describe("commerce operations workbench", () => {
         },
         target: {
           merchantRevision: 12,
-          orderId: "underclerk:merchant_operations:order_1",
-          fulfillmentId: "underclerk:merchant_operations:fulfillment_1",
+          orderId: "commerce:merchant_operations:order_1",
+          fulfillmentId: "commerce:merchant_operations:fulfillment_1",
           fulfillmentRevision: 4,
-          shipmentId: "underclerk:merchant_operations:shipment_1",
+          shipmentId: "commerce:merchant_operations:shipment_1",
           shipmentRevision: 7,
           trackingNumber: "JP123456789",
         },
@@ -281,8 +281,8 @@ function provenance(
 ): unknown {
   return {
     organisationId: "organisation_operations",
-    integrationAccountId: "integration_underclerk",
-    source: "underclerk",
+    integrationAccountId: "integration_commerce",
+    source: "commerce",
     resourceType,
     resourceId,
     revision,

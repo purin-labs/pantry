@@ -27,7 +27,7 @@ export function openAuthorizationPopup(url = "about:blank"): Window | null {
     "resizable=yes",
     "scrollbars=yes",
   ].join(",");
-  return window.open(url, "satyr-provider-authorization", features);
+  return window.open(url, "pantry-provider-authorization", features);
 }
 
 const POPUP_WIDTH = 560;

@@ -40,7 +40,7 @@ export async function commerceAppInstallationId(
   merchantId: string,
 ): Promise<string> {
   return (
-    await sha256Hex(`underclerk.app-installation.v1\n${appId}\n${merchantId}`)
+    await sha256Hex(`commerce.app-installation.v1\n${appId}\n${merchantId}`)
   ).slice(0, 24);
 }
 
@@ -89,8 +89,8 @@ export function commerceAppTokenMessage(
   nonce: string | undefined,
 ): string {
   return nonce === undefined
-    ? `underclerk.app-token.v1\n${appId}\n${merchantId}\n${externalReference}`
-    : `underclerk.app-token.v2\n${appId}\n${merchantId}\n${externalReference}\n${nonce}`;
+    ? `commerce.app-token.v1\n${appId}\n${merchantId}\n${externalReference}`
+    : `commerce.app-token.v2\n${appId}\n${merchantId}\n${externalReference}\n${nonce}`;
 }
 
 /**

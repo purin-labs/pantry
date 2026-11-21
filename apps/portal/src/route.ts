@@ -36,7 +36,7 @@ export type WorkspaceDetailPage =
   | "access"
   | "settings";
 
-export type WorkspaceSystem = "AgentCommerce" | "CafeOS" | "BakeryOS";
+export type WorkspaceSystem = "commerce" | "cafe" | "kitchen";
 
 export type WorkspaceNavigationGroupName =
   WorkspaceSystem | "Workspace" | "Agents" | "Settings";
@@ -114,7 +114,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Checkout",
     title: "Checkout",
     description: "How do customers buy from this storefront?",
-    group: "AgentCommerce",
+    group: "commerce",
     resource: { kind: "none" },
   },
   products: {
@@ -124,7 +124,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Products",
     description:
       "Manage products for sale online and review finished-product availability.",
-    group: "AgentCommerce",
+    group: "commerce",
     resource: {
       kind: "detail",
       resource: "product",
@@ -140,7 +140,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Menus",
     title: "Menus",
     description: "Build and review the menu for in-store service.",
-    group: "CafeOS",
+    group: "cafe",
     resource: { kind: "none" },
   },
   "order-queue": {
@@ -149,7 +149,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Order queue",
     title: "Order queue",
     description: "Prepare open orders, mark them ready and hand them over.",
-    group: "CafeOS",
+    group: "cafe",
     resource: { kind: "none" },
   },
   register: {
@@ -159,7 +159,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Register",
     description:
       "Ring up counter orders from the published menu and take cash or terminal payments.",
-    group: "CafeOS",
+    group: "cafe",
     resource: { kind: "none" },
   },
   terminals: {
@@ -168,7 +168,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Counters & payments",
     title: "Counters & payments",
     description: "Manage in-store payment terminals and card-present payments.",
-    group: "CafeOS",
+    group: "cafe",
     resource: { kind: "none" },
   },
   recipes: {
@@ -178,7 +178,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Recipes",
     description:
       "Browse recipes, set ingredient quantities, and define each batch yield.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   costs: {
@@ -188,7 +188,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Costs & margins",
     description:
       "Model daily production batches, supplier pack prices, waste, and net product margins.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   inventory: {
@@ -198,7 +198,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Ingredients & supplies",
     description:
       "See what’s available, what’s running low, and what needs replenishing.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   payouts: {
@@ -207,7 +207,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Payouts",
     title: "Payouts",
     description: "See when your card sales reach the bank.",
-    group: "AgentCommerce",
+    group: "commerce",
     resource: { kind: "none" },
   },
   payments: {
@@ -217,7 +217,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Payments",
     description:
       "See card payments, the declined ones, and whether the buyer paid later.",
-    group: "AgentCommerce",
+    group: "commerce",
     resource: { kind: "none" },
   },
   orders: {
@@ -227,7 +227,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Customer orders",
     description:
       "Track payment, fulfillment, and problems for customer orders.",
-    group: "AgentCommerce",
+    group: "commerce",
     resource: {
       kind: "detail",
       resource: "customer_order",
@@ -244,7 +244,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Suppliers",
     description:
       "Manage suppliers, supplied items, and purchasing work for low stock.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: {
       kind: "detail",
       resource: "supplier",
@@ -261,7 +261,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Production requests",
     description:
       "Accept and schedule product demand and review confirmed output.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   "workflow-simulator": {
@@ -271,7 +271,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Workflow simulator",
     description:
       "Replay a bakery shift, inspect resource queues, and compare an oven outage.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   devices: {
@@ -280,7 +280,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Devices",
     title: "Devices",
     description: "See each device in the shop and which ones need attention.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   bakes: {
@@ -290,7 +290,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     title: "Bakes",
     description:
       "Set the counter stock level of each fresh product, and decide the bake proposals.",
-    group: "BakeryOS",
+    group: "kitchen",
     resource: { kind: "none" },
   },
   agents: {
@@ -439,15 +439,15 @@ export const WORKSPACE_NAVIGATION_GROUPS: readonly WorkspaceNavigationGroup[] =
   [
     { label: "Workspace", pages: ["overview", "inbox"] },
     {
-      label: "AgentCommerce",
+      label: "commerce",
       pages: ["orders", "payments", "payouts", "products", "checkout"],
     },
     {
-      label: "CafeOS",
+      label: "cafe",
       pages: ["register", "menus", "order-queue", "terminals"],
     },
     {
-      label: "BakeryOS",
+      label: "kitchen",
       pages: [
         "recipes",
         "costs",

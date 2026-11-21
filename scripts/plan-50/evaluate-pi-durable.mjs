@@ -64,7 +64,7 @@ assert.deepEqual(
 );
 const require = createRequire(join(resolve(runtimeDirectory), "package.json"));
 const { build } = require("esbuild");
-const artifacts = await mkdtemp(join(tmpdir(), "satyr-plan50-run-"));
+const artifacts = await mkdtemp(join(tmpdir(), "pantry-plan50-run-"));
 const worker = join(artifacts, "candidate-worker.mjs");
 let browserBuild = null;
 if (draftBrowser) {
@@ -177,7 +177,7 @@ const evidence = {
   kind: trialEvidenceKind(),
   startedAt: new Date().toISOString(),
   environment: providerTrial
-    ? "Local workerd with SQLite-backed Durable Objects and actual Underclerk HTTP API over SQLite; controlled model and OIDC issuer responses; no paid calls"
+    ? "Local workerd with SQLite-backed Durable Objects and actual Commerce HTTP API over SQLite; controlled model and OIDC issuer responses; no paid calls"
     : "Local workerd with SQLite-backed Durable Objects; simulated model and provider; no paid calls",
   interruption:
     "SIGKILL of the Node runtime host and workerd process group without Harness.close, followed by a fresh host over the same SQLite and R2 directory",
@@ -355,7 +355,7 @@ function resolveNodeBuiltin(args) {
 }
 
 async function prepareRuntime() {
-  const directory = await mkdtemp(join(tmpdir(), "satyr-plan50-dependencies-"));
+  const directory = await mkdtemp(join(tmpdir(), "pantry-plan50-dependencies-"));
   await copyFile(
     join(scripts, "runtime/package.json"),
     join(directory, "package.json"),
@@ -537,7 +537,7 @@ function createFixture(scenario) {
 
 async function handleProvider(fixtures, request, response) {
   try {
-    if (request.url.startsWith("/underclerk/"))
+    if (request.url.startsWith("/commerce/"))
       return await handleCommerce(fixtures, request, response);
     const chunks = [];
     for await (const chunk of request) chunks.push(chunk);
@@ -1071,7 +1071,7 @@ function draftBrowserHeld(fixture) {
 
 async function evaluateDraftBrowserScenario(scenario) {
   const fixture = createFixture(scenario);
-  fixture.underclerk = await createCommerce();
+  fixture.commerce = await createCommerce();
   fixture.providerAttempts = 0;
   fixture.providerCommands = [];
   fixture.providerCommitted = null;
@@ -1277,7 +1277,7 @@ async function evaluateDraftBrowserScenario(scenario) {
     };
   } finally {
     await stop(runtime, false);
-    await fixture.underclerk?.dispose();
+    await fixture.commerce?.dispose();
   }
 }
 
@@ -1310,7 +1310,7 @@ function browserObserved(fixture) {
 // Commerce's records for the trial merchant, read through the fixture
 // Worker; the evaluation compares them before and after each fault.
 async function commerceRecords(fixture, tables) {
-  return fixture.underclerk.fixture("merchant_plan50_draft", {
+  return fixture.commerce.fixture("merchant_plan50_draft", {
     kind: "merchant_records",
     tables,
   });
@@ -1488,7 +1488,7 @@ async function waitingEffectCancellation(runtime, scenario, taskId) {
 
 async function evaluateCodeModeScenario(scenario) {
   const fixture = createFixture(scenario);
-  fixture.underclerk = await createCommerce();
+  fixture.commerce = await createCommerce();
   fixture.providerAttempts = 0;
   fixture.providerCommands = [];
   fixture.providerCommitted = null;
@@ -2262,7 +2262,7 @@ async function evaluateCodeModeScenario(scenario) {
     };
   } finally {
     if (runtime !== null) await stop(runtime, false);
-    await fixture.underclerk?.dispose();
+    await fixture.commerce?.dispose();
   }
 }
 function codeResultHeld(fixture) {
@@ -2552,7 +2552,7 @@ function proposalToolCall(scenario) {
         arguments: {
           request: {
             kind: "adjust_offer_price",
-            offerId: "underclerk:merchant_plan50_draft:offer_financier",
+            offerId: "commerce:merchant_plan50_draft:offer_financier",
             expectedOfferRevision: scenario.startsWith("provider_") ? 2 : 1,
             expectedPolicyRevision: 1,
             proposedPriceMinor: 2500,
@@ -2587,8 +2587,8 @@ function proposalToolCall(scenario) {
 
 async function evaluateProposalScenario(scenario) {
   const fixture = createFixture(scenario);
-  // An Commerce with no merchant: the proposal finds no price allowance.
-  fixture.underclerk = await createCommerce();
+  // A Commerce with no merchant: the proposal finds no price allowance.
+  fixture.commerce = await createCommerce();
   fixtures.set(scenario, fixture);
   let runtime = null;
   let before = null;
@@ -2687,7 +2687,7 @@ async function evaluateProposalScenario(scenario) {
     };
   } finally {
     await stop(runtime, false);
-    await fixture.underclerk.dispose();
+    await fixture.commerce.dispose();
   }
 }
 
@@ -2724,18 +2724,18 @@ async function loadCommerceFixture() {
     "services/commerce/tests/fixture-worker/scenarios.ts",
   ])
     commerceSources.add(source);
-  return () => startCommerceWorker({ serviceToken: "underclerk-e2e-token" });
+  return () => startCommerceWorker({ serviceToken: "commerce-e2e-token" });
 }
 
 async function handleCommerce(fixtures, request, response) {
-  const url = new URL(request.url, "http://underclerk.test");
+  const url = new URL(request.url, "http://commerce.test");
   const fixture = fixtures.get(url.searchParams.get("scenario"));
   assert(
-    fixture?.underclerk !== undefined,
-    "Missing isolated Underclerk runtime",
+    fixture?.commerce !== undefined,
+    "Missing isolated Commerce runtime",
   );
   url.searchParams.delete("scenario");
-  url.pathname = url.pathname.slice("/underclerk".length);
+  url.pathname = url.pathname.slice("/commerce".length);
   const chunks = [];
   for await (const chunk of request) chunks.push(chunk);
   const headers = new Headers();
@@ -2779,8 +2779,8 @@ async function handleCommerce(fixtures, request, response) {
     headers,
     body: chunks.length === 0 ? undefined : Buffer.concat(chunks),
   });
-  const result = await fixture.underclerk.fetch(
-    `${fixture.underclerk.baseUrl}${url.pathname}${url.search}`,
+  const result = await fixture.commerce.fetch(
+    `${fixture.commerce.baseUrl}${url.pathname}${url.search}`,
     {
       method: original.method,
       headers: original.headers,
@@ -2819,10 +2819,10 @@ async function postProviderControl(
   grant = null,
 ) {
   const cookies = [
-    `satyr_control_session=${session.token}`,
-    `satyr_control_csrf=${session.csrfToken}`,
+    `pantry_session=${session.token}`,
+    `pantry_csrf=${session.csrfToken}`,
   ];
-  if (grant !== null) cookies.push(`satyr_control_approval=${grant}`);
+  if (grant !== null) cookies.push(`pantry_approval=${grant}`);
   const response = await fetch(
     new URL(
       `/v1/control/organisations/organisation_plan50_seams/commerce/actions/${nonce}/${operation}`,
@@ -2836,7 +2836,7 @@ async function postProviderControl(
           ? new URL(runtime.url).origin
           : "https://fixture.test",
         cookie: cookies.join("; "),
-        "x-satyr-csrf": session.csrfToken,
+        "x-pantry-csrf": session.csrfToken,
         "idempotency-key": key,
       },
       body: "{}",
@@ -2877,7 +2877,7 @@ async function providerOwnerEvidence(fixture) {
 
 async function evaluateProviderScenario(scenario) {
   const fixture = createFixture(scenario);
-  fixture.underclerk = await createCommerce();
+  fixture.commerce = await createCommerce();
   fixture.providerAttempts = 0;
   fixture.providerCommands = [];
   fixture.providerCommitted = null;
@@ -3211,7 +3211,7 @@ async function evaluateProviderScenario(scenario) {
     };
   } finally {
     await stop(runtime, false);
-    await fixture.underclerk?.dispose();
+    await fixture.commerce?.dispose();
   }
 }
 
@@ -3400,7 +3400,7 @@ function draftModelResponse(fixture, body) {
 
 async function evaluateDraftScenario(scenario) {
   const fixture = createFixture(scenario);
-  fixture.underclerk = await createCommerce();
+  fixture.commerce = await createCommerce();
   fixtures.set(scenario, fixture);
   let runtime = null;
   const logs = [];
@@ -3569,7 +3569,7 @@ async function evaluateDraftScenario(scenario) {
     };
   } finally {
     await stop(runtime, false);
-    await fixture.underclerk.dispose();
+    await fixture.commerce.dispose();
   }
 }
 

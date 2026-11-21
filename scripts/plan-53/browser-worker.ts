@@ -23,7 +23,7 @@ export default {
         db: env.DB,
         now: Date.now(),
         identity: {
-          issuer: "urn:satyr:plan53-browser",
+          issuer: "urn:pantry:plan53-browser",
           subject: name,
           email: `${name}@example.test`,
           displayName: name,
@@ -39,11 +39,11 @@ export default {
       response = Response.json({ userId: user.userId });
       response.headers.append(
         "set-cookie",
-        `satyr_control_session=${session.token}; HttpOnly; Path=/; SameSite=Lax`,
+        `pantry_session=${session.token}; HttpOnly; Path=/; SameSite=Lax`,
       );
       response.headers.append(
         "set-cookie",
-        `satyr_control_csrf=${session.csrfToken}; Path=/; SameSite=Lax`,
+        `pantry_csrf=${session.csrfToken}; Path=/; SameSite=Lax`,
       );
     } else {
       const route = matchUserPreferencesRoute(url.pathname);
@@ -59,7 +59,7 @@ export default {
     response.headers.set("access-control-allow-credentials", "true");
     response.headers.set(
       "access-control-allow-headers",
-      "content-type,x-satyr-csrf",
+      "content-type,x-pantry-csrf",
     );
     response.headers.set(
       "access-control-allow-methods",

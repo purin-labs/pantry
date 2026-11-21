@@ -79,7 +79,7 @@ export async function handleCosts(
     actor: String(access.value.authorized.membership.personId),
   });
   if (entityPlaneClient === null) {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
 
   if (request.method === "GET") {
@@ -91,12 +91,12 @@ export async function handleCosts(
       nowMs: Date.now(),
       db: regionalDb,
       canEditPrices,
-      underclerkBaseUrl: env.UNDERCLERK_BASE_URL,
+      commerceBaseUrl: env.COMMERCE_BASE_URL,
     });
     if (!overview.ok) {
-      return overview.error.code === "underclerk_scope_mismatch"
-        ? controlError("underclerk_scope_mismatch", 502)
-        : controlError("underclerk_unavailable", 503);
+      return overview.error.code === "commerce_scope_mismatch"
+        ? controlError("commerce_scope_mismatch", 502)
+        : controlError("commerce_unavailable", 503);
     }
     return controlJson(overview.value);
   }
@@ -161,10 +161,10 @@ export async function handleCosts(
       }
       const snapshot = await mutation.value.client.readStockSnapshot(merchantId);
       if (!snapshot.ok) {
-        return controlError("underclerk_unavailable", 503);
+        return controlError("commerce_unavailable", 503);
       }
       if (snapshot.value.commerce.merchantId !== merchantId) {
-        return controlError("underclerk_scope_mismatch", 502);
+        return controlError("commerce_scope_mismatch", 502);
       }
       if (sheet.planWrite !== null) {
         knownProductIds = new Set(
@@ -201,10 +201,10 @@ export async function handleCosts(
       });
       if (!priceSaved.ok) {
         switch (priceSaved.code) {
-          case "underclerk_unavailable":
-            return controlError("underclerk_unavailable", 503);
-          case "underclerk_scope_mismatch":
-            return controlError("underclerk_scope_mismatch", 502);
+          case "commerce_unavailable":
+            return controlError("commerce_unavailable", 503);
+          case "commerce_scope_mismatch":
+            return controlError("commerce_scope_mismatch", 502);
           case "offer_price_changed":
             return controlError("stale_resource_revision", 409);
           case "offer_price_invalid":
@@ -244,10 +244,10 @@ export async function handleCosts(
       });
       if (!savedSupply.ok) {
         switch (savedSupply.code) {
-          case "underclerk_unavailable":
+          case "commerce_unavailable":
           case "supply_cost_busy":
             return controlError(savedSupply.code, 503);
-          case "underclerk_scope_mismatch":
+          case "commerce_scope_mismatch":
             return controlError(savedSupply.code, 502);
           case "supply_cost_changed":
             return controlError("stale_resource_revision", 409);
@@ -369,10 +369,10 @@ export async function handleCosts(
     const merchantId = mutation.value.binding.merchantId;
     const snapshot = await mutation.value.client.readStockSnapshot(merchantId);
     if (!snapshot.ok) {
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
     }
     if (snapshot.value.commerce.merchantId !== merchantId) {
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
     }
 
     const savedNowMs = Date.now();
@@ -444,10 +444,10 @@ export async function handleCosts(
 
   if (!saved.ok) {
     switch (saved.code) {
-      case "underclerk_unavailable":
+      case "commerce_unavailable":
       case "supply_cost_busy":
         return controlError(saved.code, 503);
-      case "underclerk_scope_mismatch":
+      case "commerce_scope_mismatch":
         return controlError(saved.code, 502);
       case "supply_cost_changed":
         return controlError("stale_resource_revision", 409);

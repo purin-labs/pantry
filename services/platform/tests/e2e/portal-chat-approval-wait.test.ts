@@ -138,7 +138,7 @@ async function approvalWaitJourney({ task }: TestContext): Promise<void> {
         "Pantry Worker",
         "Case Actor",
         "action ledger",
-        "Underclerk fixture",
+        "Commerce fixture",
       ],
       faultInjected: "the first card's expiry time moved to the past",
       firstCard: { nonce: firstNonce, stateAfterExpiry: "expired" },
@@ -303,7 +303,7 @@ async function choosePantryPlatform(): Promise<void> {
   const selected = await selectOrganisationInferenceSelection({
     db: fixtureDatabase(),
     organisationId: ORGANISATION_ID,
-    selection: { kind: "satyr_platform" },
+    selection: { kind: "pantry_platform" },
     expectedConfigurationVersion: selection.configurationVersion,
     selectedByUserId: OWNER,
     now: Date.now(),
@@ -362,14 +362,14 @@ function headers(session: IssuedControlSession): Record<string, string> {
   return {
     origin: "https://localhost",
     "content-type": "application/json",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
   };
 }
 
 async function provisionShop(): Promise<void> {
   const shop = await providerClient().provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",

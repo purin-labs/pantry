@@ -109,9 +109,9 @@ export function apiKeyErrorMessage(error: unknown): string {
       return "This key is no longer listed.";
     case "api_key_request_invalid":
       return "Give the key a name and at least one scope.";
-    case "underclerk_binding_missing":
+    case "commerce_binding_missing":
       return "This workspace has no shop yet.";
-    case "underclerk_unavailable":
+    case "commerce_unavailable":
       return "Pantry could not reach the shop. Try again.";
     default:
       return error instanceof Error

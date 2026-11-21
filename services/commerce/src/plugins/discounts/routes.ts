@@ -20,14 +20,14 @@ export const DISCOUNTS_ROUTES: readonly RouteDefinition<DiscountsRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/discounts",
     "create_discount",
-    "underclerk.create-discount.v1",
+    "commerce.create-discount.v1",
   ),
   route("GET", "/v1/admin/merchants/:merchantId/discounts", "list_discounts"),
   route(
     "POST",
     "/v1/admin/merchants/:merchantId/discounts/:discountId/deactivation",
     "deactivate_discount",
-    "underclerk.deactivate-discount.v1",
+    "commerce.deactivate-discount.v1",
   ),
 ];
 

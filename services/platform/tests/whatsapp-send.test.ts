@@ -632,7 +632,7 @@ async function assignmentTest(): Promise<void> {
       maxActiveCaseBytes: 32_768,
       debounceSeconds: 20,
       relevantMessageTopics:
-        "CafeOS, cafe automation, cafe, and bakery topics.",
+        "Café, cafe automation, cafe, and bakery topics.",
       automaticAcknowledgementText:
         "Thanks for your message. We’ll get back to you shortly.",
       agentMode: "answer",

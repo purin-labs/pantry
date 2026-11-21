@@ -78,7 +78,7 @@ async function returnPartOfAnOrder(): Promise<void> {
         placement.checkoutId,
         placement.recoveryToken,
         {
-          schemaVersion: "underclerk.request-buyer-return.v1",
+          schemaVersion: "commerce.request-buyer-return.v1",
           idempotencyKey: "lin_return",
           lines: [
             returnLine(small, 2, "Dented tins"),
@@ -100,7 +100,7 @@ async function returnPartOfAnOrder(): Promise<void> {
         placement.checkoutId,
         placement.recoveryToken,
         {
-          schemaVersion: "underclerk.request-buyer-return.v1",
+          schemaVersion: "commerce.request-buyer-return.v1",
           idempotencyKey: "lin_return",
           lines: [
             returnLine(small, 2, "Dented tins"),
@@ -119,7 +119,7 @@ async function returnPartOfAnOrder(): Promise<void> {
           placement.checkoutId,
           placement.recoveryToken,
           {
-            schemaVersion: "underclerk.request-buyer-return.v1",
+            schemaVersion: "commerce.request-buyer-return.v1",
             idempotencyKey: "lin_return_more",
             lines: [returnLine(small, 2, "More dents")],
           },

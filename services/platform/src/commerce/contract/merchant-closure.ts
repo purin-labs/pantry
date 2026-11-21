@@ -17,7 +17,7 @@ export async function closeOrganisationCommerceMerchants(
 ): Promise<number> {
   const bindings = await db
     .prepare(
-      `SELECT merchant_id AS merchantId FROM underclerk_merchant_binding
+      `SELECT merchant_id AS merchantId FROM commerce_merchant_binding
        WHERE organisation_id = ? ORDER BY merchant_id`,
     )
     .bind(organisationId)
@@ -26,14 +26,14 @@ export async function closeOrganisationCommerceMerchants(
   const commerceEngine = createCommerceClient(env, undefined, {
     kind: "operator",
   });
-  if (commerceEngine === null) throw new Error("underclerk_unavailable_for_purge");
+  if (commerceEngine === null) throw new Error("commerce_unavailable_for_purge");
   let closed = 0;
   for (const { merchantId } of bindings.results) {
     const result = await commerceEngine.closeMerchant(merchantId);
     // A merchant that Commerce never made has nothing to close.
     if (result.ok) closed += 1;
     else if (result.error.kind !== "http" || result.error.status !== 404)
-      throw new Error("underclerk_merchant_not_closed");
+      throw new Error("commerce_merchant_not_closed");
   }
   return closed;
 }

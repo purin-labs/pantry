@@ -211,6 +211,6 @@ function publishedResponsibilityScopeErrorResponse(
     case "merchant_mismatch":
       return controlError("agent_operation_invalid", 422);
     case "unavailable":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
   }
 }

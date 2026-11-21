@@ -191,7 +191,7 @@ function foodServiceCommand<Properties extends Record<string, TSchema>>(
 }
 
 export const createPreparationStationCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.create-preparation-station.v1"),
+  schemaVersion: Type.Literal("commerce.create-preparation-station.v1"),
   station: ReadonlyOpenObject({
     stationId: text,
     locationId: text,
@@ -222,7 +222,7 @@ export type ModifierGroupRevisionInput = Static<
 >;
 
 export const createModifierGroupRevisionCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.create-modifier-group-revision.v1"),
+  schemaVersion: Type.Literal("commerce.create-modifier-group-revision.v1"),
   modifierGroupRevision: modifierGroupRevisionInputSchema,
 });
 export type CreateModifierGroupRevisionCommand = Static<
@@ -238,7 +238,7 @@ export const recipeRevisionInputSchema = ReadonlyOpenObject({
 export type RecipeRevisionInput = Static<typeof recipeRevisionInputSchema>;
 
 export const createRecipeRevisionCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.create-recipe-revision.v1"),
+  schemaVersion: Type.Literal("commerce.create-recipe-revision.v1"),
   recipeRevision: recipeRevisionInputSchema,
 });
 export type CreateRecipeRevisionCommand = Static<
@@ -254,7 +254,7 @@ export const stockPolicyInputSchema = ReadonlyOpenObject({
 export type StockPolicyInput = Static<typeof stockPolicyInputSchema>;
 
 export const configureStockPolicyCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.configure-stock-policy.v1"),
+  schemaVersion: Type.Literal("commerce.configure-stock-policy.v1"),
   stockPolicy: stockPolicyInputSchema,
 });
 export type ConfigureStockPolicyCommand = Static<
@@ -300,7 +300,7 @@ export type MenuInput = Static<typeof menuInputSchema>;
  * names the revision it replaces and becomes the next revision.
  */
 export const publishMenuCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.publish-menu.v1"),
+  schemaVersion: Type.Literal("commerce.publish-menu.v1"),
   menu: menuInputSchema,
   expectedMenuRevision: Type.Optional(PositiveInteger),
 });
@@ -311,7 +311,7 @@ export type PublishMenuCommand = Static<typeof publishMenuCommandSchema>;
  * or clears the mark. It holds on every menu of that location.
  */
 export const markSoldOutCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.mark-sold-out.v1"),
+  schemaVersion: Type.Literal("commerce.mark-sold-out.v1"),
   locationId: text,
   variantId: text,
   mark: Type.Union([
@@ -322,7 +322,7 @@ export const markSoldOutCommandSchema = foodServiceCommand({
 export type MarkSoldOutCommand = Static<typeof markSoldOutCommandSchema>;
 
 export const commerceSoldOutMarksV1Schema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.sold-out-marks.v1"),
+  schemaVersion: Type.Literal("commerce.sold-out-marks.v1"),
   merchantId: text,
   merchantRevision: NonNegativeInteger,
   marks: ImmutableArray(
@@ -339,7 +339,7 @@ export type CommerceSoldOutMarksV1 = Static<
 >;
 
 export const managePreparationTicketCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.manage-preparation-ticket.v1"),
+  schemaVersion: Type.Literal("commerce.manage-preparation-ticket.v1"),
   operation: Type.Union([
     ReadonlyOpenObject({
       kind: Type.Literal("create"),
@@ -360,7 +360,7 @@ export type ManagePreparationTicketCommand = Static<
 >;
 
 export const completeProductionBatchCommandSchema = foodServiceCommand({
-  schemaVersion: Type.Literal("underclerk.complete-production-batch.v1"),
+  schemaVersion: Type.Literal("commerce.complete-production-batch.v1"),
   productionBatchId: text,
   demand: productionBatchDemandSchema,
   outputLotId: text,
@@ -402,7 +402,7 @@ function provenanceSchema<Kind extends FoodServiceResourceType>(kind: Kind) {
       Type.Literal("shopify"),
       Type.Literal("stripe"),
       Type.Literal("lab"),
-      Type.Literal("underclerk"),
+      Type.Literal("commerce"),
     ]),
     resourceType: Type.Literal(kind),
     resourceId: text,
@@ -675,7 +675,7 @@ export type CommerceFoodServiceResourcesV1 = Static<
 >;
 
 export const commerceFoodServiceSnapshotV1Schema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.food-service-snapshot.v2"),
+  schemaVersion: Type.Literal("commerce.food-service-snapshot.v2"),
   merchantId: text,
   merchantRevision: PositiveInteger,
   deliverySigner: ReadonlyOpenObject({

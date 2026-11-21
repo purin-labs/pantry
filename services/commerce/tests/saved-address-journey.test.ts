@@ -64,7 +64,7 @@ async function savedAddressCheckout(): Promise<void> {
     ])
       await required(
         buyer.saveCustomerAddress(merchantId, SHOP, anaAccess, {
-          schemaVersion: "underclerk.save-customer-address.v1",
+          schemaVersion: "commerce.save-customer-address.v1",
           address,
         }),
       );
@@ -159,7 +159,7 @@ async function shippedAndRefundedEmails(): Promise<void> {
     const access = await signIn(buyer, emails, "ana@example.test");
     await required(
       buyer.saveCustomerAddress(merchantId, SHOP, access, {
-        schemaVersion: "underclerk.save-customer-address.v1",
+        schemaVersion: "commerce.save-customer-address.v1",
         address: SINGAPORE,
       }),
     );
@@ -328,7 +328,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     buyer.requestCustomerSignIn(merchantId, SHOP, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -337,7 +337,7 @@ async function signIn(
   return (
     await required(
       buyer.verifyCustomerSignIn(merchantId, SHOP, challenge.challengeId, {
-        schemaVersion: "underclerk.verify-customer-sign-in.v1",
+        schemaVersion: "commerce.verify-customer-sign-in.v1",
         code,
       }),
     )
@@ -350,7 +350,7 @@ async function guestSavedAddressStatus(
 ): Promise<number> {
   const session = await required(
     buyer.createSession(merchantId, SHOP, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
@@ -359,7 +359,7 @@ async function guestSavedAddressStatus(
   if (listing === undefined) throw new Error("The shipping storefront sells nothing");
   const cart = await required(
     buyer.createCart(merchantId, SHOP, session.token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: "guest_cart",
       lines: [{ kind: "catalog", variantId: listing.variantId, quantity: 1 }],
     }),
@@ -370,7 +370,7 @@ async function guestSavedAddressStatus(
       method: "POST",
       headers: { authorization: `Bearer ${session.token}`, "content-type": "application/json" },
       body: JSON.stringify({
-        schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+        schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
         idempotencyKey: "guest_checkout",
         cartId: cart.cartId,
         cartRevision: cart.revision,
@@ -410,7 +410,7 @@ class ShippingBuyer {
   ): Promise<ShippingBuyer> {
     const session = await required(
       client.createSession(merchantId, SHOP, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "identified_customer", customerAccessToken },
       }),
     );
@@ -431,13 +431,13 @@ class ShippingBuyer {
     const step = (this.#step += 1);
     const cart = await required(
       this.#client.createCart(merchantId, SHOP, this.#token, {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: `${this.#name}_cart_${step}`,
         lines: [{ kind: "catalog", variantId: listing.variantId, quantity: 1 }],
       }),
     );
     return this.#client.createShippingCheckout(merchantId, SHOP, this.#token, {
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: `${this.#name}_checkout_${step}`,
       cartId: cart.cartId,
       cartRevision: cart.revision,
@@ -457,17 +457,17 @@ class ShippingBuyer {
     const key = `${this.#name}_payment_${checkout.revision}`;
     const session = await required(
       this.#client.createPaymentSession(merchantId, SHOP, checkout.checkoutId, this.#token, {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: key,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
-        returnUrl: "https://underclerk.test/store/cookies",
+        returnUrl: "https://commerce.test/store/cookies",
       }),
     );
     if (session.state !== "ready") throw new Error(`${this.#name} payment is not ready`);
     return required(
       this.#client.reconcilePayment(merchantId, SHOP, checkout.checkoutId, this.#token, {
-        schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+        schemaVersion: "commerce.reconcile-buyer-payment.v1",
         idempotencyKey: key,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,

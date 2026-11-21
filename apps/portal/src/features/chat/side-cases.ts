@@ -60,7 +60,7 @@ function requireCard(raw: unknown): ChatSideCaseView {
 async function sideCaseMutation(
   path: string,
 ): Promise<Record<string, unknown>> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to act on this side Case.");
   let raw: unknown;
   try {

@@ -77,14 +77,14 @@ export async function handleInventoryProduction(
     env,
     String(access.value.authorized.organisationId),
   );
-  if (plane === null) return controlError("underclerk_unavailable", 503);
+  if (plane === null) return controlError("commerce_unavailable", 503);
   if (request.method === "GET") {
     const snapshot = await access.value.client.readStockSnapshot(
       access.value.binding.merchantId,
     );
-    if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+    if (!snapshot.ok) return controlError("commerce_unavailable", 503);
     if (snapshot.value.commerce.merchantId !== access.value.binding.merchantId)
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
 
     const url = new URL(request.url);
     let positionId: string | null;
@@ -164,13 +164,13 @@ export async function handleInventoryProduction(
       organisationId: mutation.value.authorized.organisationId,
       merchantId: mutation.value.binding.merchantId,
     });
-    if (!result.ok) return controlError("underclerk_unavailable", 503);
+    if (!result.ok) return controlError("commerce_unavailable", 503);
     if (
       result.value.organisationId !==
         mutation.value.authorized.organisationId ||
       result.value.merchantId !== mutation.value.binding.merchantId
     )
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
     return finishInventoryOperation(request, env, mutation.value, {
       ok: true,
       publication: result.value,
@@ -180,9 +180,9 @@ export async function handleInventoryProduction(
     const snapshot = await access.value.client.readStockSnapshot(
       access.value.binding.merchantId,
     );
-    if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+    if (!snapshot.ok) return controlError("commerce_unavailable", 503);
     if (snapshot.value.commerce.merchantId !== access.value.binding.merchantId)
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
     return linkProductionRecipe(
       request,
       env,
@@ -198,7 +198,7 @@ export async function handleInventoryProduction(
     return controlError("production_request_invalid", 422);
   }
   const result = await plane.command(command);
-  if (!result.ok) return controlError("underclerk_unavailable", 503);
+  if (!result.ok) return controlError("commerce_unavailable", 503);
   if (result.value.status !== "accepted")
     return controlJson(
       { ok: false, error: result.value.error.code, result: result.value },
@@ -542,15 +542,15 @@ export function productionClient(
   env: Env,
   organisationId: string,
 ): CommerceEntityPlaneClient | null {
-  return env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+  return env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
     ? null
     : new CommerceEntityPlaneClient({
-        baseUrl: env.UNDERCLERK_BASE_URL,
+        baseUrl: env.COMMERCE_BASE_URL,
         ...pantryCommerceAccess(
-          env.UNDERCLERK_SERVICE_TOKEN,
+          env.COMMERCE_SERVICE_TOKEN,
           organisationId,
-          env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+          env.COMMERCE.fetch.bind(env.COMMERCE),
         ),
       });
 }
@@ -634,7 +634,7 @@ async function linkProductionRecipe(
       },
     },
   });
-  if (!result.ok) return controlError("underclerk_unavailable", 503);
+  if (!result.ok) return controlError("commerce_unavailable", 503);
   if (result.value.outcome === "rejected")
     return controlJson(
       { ok: false, error: result.value.error.code, result: result.value },

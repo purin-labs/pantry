@@ -35,7 +35,7 @@ export type ShopifyShopDomain = string & {
 
 export type CommerceSystem =
   | Readonly<{
-      kind: "satyr_commerce";
+      kind: "builtin_commerce";
       organisationId: OrganisationId;
       bindingId: CommerceBindingId;
       merchantId: CommerceEngineMerchantId;
@@ -51,9 +51,9 @@ export type CommerceSystem =
 
 export type CommerceSystemSelection =
   | Readonly<{
-      kind: "select_satyr_commerce";
+      kind: "select_builtin_commerce";
       expectedRevision: number;
-      underclerkBindingId: CommerceBindingId;
+      commerceBindingId: CommerceBindingId;
     }>
   | Readonly<{
       kind: "select_shopify";
@@ -81,8 +81,8 @@ export type CommerceSystemProviderAuthority = Readonly<{
 type CommerceSystemRow = Readonly<{
   organisationId: unknown;
   systemKind: unknown;
-  underclerkBindingId: unknown;
-  underclerkMerchantId: unknown;
+  commerceBindingId: unknown;
+  commerceMerchantId: unknown;
   shopifyIntegrationAccountId: unknown;
   shopDomain: unknown;
   revision: unknown;
@@ -128,18 +128,18 @@ export async function resolveOrganisationCommerceSystem(
     .prepare(
       `SELECT selected.organisation_id AS organisationId,
             selected.system_kind AS systemKind,
-            selected.underclerk_binding_id AS underclerkBindingId,
-            underclerk.merchant_id AS underclerkMerchantId,
+            selected.commerce_binding_id AS commerceBindingId,
+            commerce.merchant_id AS commerceMerchantId,
             selected.shopify_integration_account_id AS shopifyIntegrationAccountId,
             shopify.provider_account_id AS shopDomain,
             selected.revision AS revision
      FROM organisation_commerce_system AS selected
      JOIN organisation_onboarding AS onboarding
        ON onboarding.organisation_id = selected.organisation_id
-     LEFT JOIN underclerk_merchant_binding AS underclerk
-       ON underclerk.binding_id = selected.underclerk_binding_id
-      AND underclerk.organisation_id = selected.organisation_id
-      AND underclerk.environment = onboarding.environment
+     LEFT JOIN commerce_merchant_binding AS commerce
+       ON commerce.binding_id = selected.commerce_binding_id
+      AND commerce.organisation_id = selected.organisation_id
+      AND commerce.environment = onboarding.environment
      LEFT JOIN integration_account AS shopify
        ON shopify.integration_account_id = selected.shopify_integration_account_id
       AND shopify.organisation_id = selected.organisation_id
@@ -164,11 +164,11 @@ export async function resolveOrganisationCommerceSystemAuthority(
   const commerceSystem = await resolveOrganisationCommerceSystem(input);
   if (!commerceSystem.ok) return commerceSystem;
   switch (commerceSystem.value.kind) {
-    case "satyr_commerce": {
+    case "builtin_commerce": {
       const row = await input.db
         .prepare(
           `SELECT integration_account_id AS integrationAccountId
-         FROM underclerk_merchant_binding
+         FROM commerce_merchant_binding
          WHERE organisation_id = ? AND binding_id = ?`,
         )
         .bind(input.organisationId, commerceSystem.value.bindingId)
@@ -182,7 +182,7 @@ export async function resolveOrganisationCommerceSystemAuthority(
             ok: true,
             value: {
               commerceSystem: commerceSystem.value,
-              provider: "underclerk",
+              provider: "commerce",
               integrationAccountId: integrationAccountId.value,
             },
           }
@@ -284,16 +284,16 @@ function parseCommerceSystemRow(
   if (organisationId === null || !organisationId.ok || !revision.ok)
     return invalid("row");
   switch (row.systemKind) {
-    case "satyr_commerce": {
+    case "builtin_commerce": {
       if (row.shopifyIntegrationAccountId !== null || row.shopDomain !== null)
         return invalid("row");
-      const bindingId = parseCommerceBindingId(row.underclerkBindingId);
-      const merchantId = parseCommerceEngineMerchantId(row.underclerkMerchantId);
+      const bindingId = parseCommerceBindingId(row.commerceBindingId);
+      const merchantId = parseCommerceEngineMerchantId(row.commerceMerchantId);
       return bindingId.ok && merchantId.ok
         ? {
             ok: true,
             value: {
-              kind: "satyr_commerce",
+              kind: "builtin_commerce",
               organisationId: organisationId.value,
               bindingId: bindingId.value,
               merchantId: merchantId.value,
@@ -303,7 +303,7 @@ function parseCommerceSystemRow(
         : invalid("row");
     }
     case "shopify": {
-      if (row.underclerkBindingId !== null || row.underclerkMerchantId !== null)
+      if (row.commerceBindingId !== null || row.commerceMerchantId !== null)
         return invalid("row");
       const integrationAccountId =
         typeof row.shopifyIntegrationAccountId === "string"
@@ -339,23 +339,23 @@ async function resolveSelectionTarget(
   }>,
 ): Promise<Result<CommerceSystem, CommerceSystemError>> {
   switch (input.selection.kind) {
-    case "select_satyr_commerce": {
+    case "select_builtin_commerce": {
       const row = await input.db
         .prepare(
-          `SELECT binding_id AS underclerkBindingId, organisation_id AS organisationId,
-                merchant_id AS underclerkMerchantId, revision
-         FROM underclerk_merchant_binding
+          `SELECT binding_id AS commerceBindingId, organisation_id AS organisationId,
+                merchant_id AS commerceMerchantId, revision
+         FROM commerce_merchant_binding
          WHERE binding_id = ? AND organisation_id = ? AND environment = ?`,
         )
         .bind(
-          input.selection.underclerkBindingId,
+          input.selection.commerceBindingId,
           input.organisationId,
           input.environment,
         )
         .first<{
-          readonly underclerkBindingId: unknown;
+          readonly commerceBindingId: unknown;
           readonly organisationId: unknown;
-          readonly underclerkMerchantId: unknown;
+          readonly commerceMerchantId: unknown;
           readonly revision: unknown;
         }>();
       if (row === null)
@@ -365,7 +365,7 @@ async function resolveSelectionTarget(
         };
       return parseCommerceSystemRow({
         ...row,
-        systemKind: "satyr_commerce",
+        systemKind: "builtin_commerce",
         shopifyIntegrationAccountId: null,
         shopDomain: null,
         revision: 1,
@@ -399,8 +399,8 @@ async function resolveSelectionTarget(
       return parseCommerceSystemRow({
         ...row,
         systemKind: "shopify",
-        underclerkBindingId: null,
-        underclerkMerchantId: null,
+        commerceBindingId: null,
+        commerceMerchantId: null,
         revision: 1,
       });
     }
@@ -425,7 +425,7 @@ async function persistCommerceSystemSelection(
     await input.session
       .prepare(
         `INSERT INTO organisation_commerce_system (
-         organisation_id, system_kind, underclerk_binding_id,
+         organisation_id, system_kind, commerce_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -433,7 +433,7 @@ async function persistCommerceSystemSelection(
       .bind(
         input.organisationId,
         fields.systemKind,
-        fields.underclerkBindingId,
+        fields.commerceBindingId,
         fields.shopifyIntegrationAccountId,
         input.revision,
         input.now,
@@ -445,14 +445,14 @@ async function persistCommerceSystemSelection(
   const updated = await input.session
     .prepare(
       `UPDATE organisation_commerce_system
-     SET system_kind = ?, underclerk_binding_id = ?,
+     SET system_kind = ?, commerce_binding_id = ?,
          shopify_integration_account_id = ?, revision = ?,
          selected_at = ?, selected_by_user_id = ?
      WHERE organisation_id = ? AND revision = ?`,
     )
     .bind(
       fields.systemKind,
-      fields.underclerkBindingId,
+      fields.commerceBindingId,
       fields.shopifyIntegrationAccountId,
       input.revision,
       input.now,
@@ -467,20 +467,20 @@ async function persistCommerceSystemSelection(
 
 function commerceSystemPersistenceFields(system: CommerceSystem): Readonly<{
   systemKind: CommerceSystemKind;
-  underclerkBindingId: CommerceBindingId | null;
+  commerceBindingId: CommerceBindingId | null;
   shopifyIntegrationAccountId: IntegrationAccountId | null;
 }> {
   switch (system.kind) {
-    case "satyr_commerce":
+    case "builtin_commerce":
       return {
-        systemKind: "satyr_commerce",
-        underclerkBindingId: system.bindingId,
+        systemKind: "builtin_commerce",
+        commerceBindingId: system.bindingId,
         shopifyIntegrationAccountId: null,
       };
     case "shopify":
       return {
         systemKind: "shopify",
-        underclerkBindingId: null,
+        commerceBindingId: null,
         shopifyIntegrationAccountId: system.integrationAccountId,
       };
   }
@@ -492,9 +492,9 @@ function sameCommerceSystemIdentity(
 ): boolean {
   if (left.kind !== right.kind) return false;
   switch (left.kind) {
-    case "satyr_commerce":
+    case "builtin_commerce":
       return (
-        right.kind === "satyr_commerce" && left.bindingId === right.bindingId
+        right.kind === "builtin_commerce" && left.bindingId === right.bindingId
       );
     case "shopify":
       return (

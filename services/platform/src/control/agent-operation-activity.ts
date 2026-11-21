@@ -104,5 +104,5 @@ export async function readCommerceActionLedger(
 }
 
 function isCommerceActivity(item: ActionLedgerActivity): boolean {
-  return item.action.host === "satyr.commerce";
+  return item.action.host === "pantry.commerce";
 }

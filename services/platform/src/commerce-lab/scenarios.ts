@@ -891,13 +891,13 @@ function labShipmentPayload(
     occurredAt,
     kind: trackingKind(spec.eventType),
     reason: spec.reason ?? "",
-    location: "Satyr lab carrier network",
+    location: "Pantry lab carrier network",
   });
   return {
     resourceId: spec.resourceId,
     orderId: spec.orderId,
     fulfillmentId: spec.fulfillmentId,
-    carrier: "Satyr Lab Carrier",
+    carrier: "Pantry Lab Carrier",
     trackingNumber: spec.trackingNumber,
     estimatedDeliveryAt: new Date(
       Date.parse(occurredAt) + 2 * 86_400_000,
@@ -1092,7 +1092,7 @@ function shipmentEvent(
     atOffsetMs,
     orderId,
     fulfillmentId,
-    trackingNumber: "SATYRLAB0001",
+    trackingNumber: "PANTRYLAB0001",
     reason,
   };
 }

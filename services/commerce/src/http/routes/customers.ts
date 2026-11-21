@@ -111,7 +111,7 @@ export async function listMarketsRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_markets">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.markets.v1",
+    schemaVersion: "commerce.markets.v1",
     markets: ctx.authority.listMarkets(route.merchantId),
   });
 }
@@ -121,7 +121,7 @@ export async function listCompaniesRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_companies">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.companies.v1",
+    schemaVersion: "commerce.companies.v1",
     companies: ctx.authority.listCompanies(route.merchantId),
   });
 }
@@ -131,7 +131,7 @@ export async function listNotificationsRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_notifications">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.notifications.v1",
+    schemaVersion: "commerce.notifications.v1",
     notifications: ctx.authority.listNotifications(route.merchantId),
   });
 }

@@ -22,7 +22,7 @@ const TABLES = [
   "submissions",
   "documents",
   "document_revisions",
-  "satyr_pi_usage",
+  "pantry_pi_usage",
 ] as const;
 type Cell = string | number | null;
 type NativeTable = {
@@ -30,7 +30,7 @@ type NativeTable = {
   columns: string[];
   rows: Cell[][];
 };
-export const PI_DURABLE_CHECKPOINT_FORMAT = "satyr-pi-durable-sqlite-v1";
+export const PI_DURABLE_CHECKPOINT_FORMAT = "pantry-pi-durable-sqlite-v1";
 /**
  * The Pi release and the revision of this adapter's stored contract. Revision
  * 2 keeps the values of scripts in Pi's own store document, and its Code Mode
@@ -69,7 +69,7 @@ function isNativeSchemaTable(table: ActorExportTable): boolean {
   return table.name === "durable_schema";
 }
 function isNativeUsageTable(table: ActorExportTable): boolean {
-  return table.name === "satyr_pi_usage";
+  return table.name === "pantry_pi_usage";
 }
 function completePiDurableImport(): void {}
 

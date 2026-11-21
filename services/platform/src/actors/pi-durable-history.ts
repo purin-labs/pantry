@@ -76,7 +76,7 @@ function nativeHistoryEntry(
     };
   if (message.role === "toolResult") {
     const authority = isRecord(message.details)
-      ? message.details.satyrAuthority
+      ? message.details.pantryAuthority
       : undefined;
     if (!isRecord(authority))
       throw new Error("Tool result requires trusted authority");
@@ -88,7 +88,7 @@ function nativeHistoryEntry(
       outcome: {
         kind: message.isError ? "failed" : "succeeded",
         output: (isRecord(message.details)
-          ? message.details.satyrOutput
+          ? message.details.pantryOutput
           : undefined) ?? {
           kind: "inline",
           content: [

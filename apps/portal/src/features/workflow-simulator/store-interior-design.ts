@@ -242,7 +242,7 @@ export const STORE_INTERIOR_PRESET_ORDER: readonly StoreInteriorPresetId[] = [
   "kyoto-machiya",
 ];
 
-const STORAGE_KEY = "satyr:bakery-interior-design:v1";
+const STORAGE_KEY = "pantry:bakery-interior-design:v1";
 
 function loadInitialInteriorDesign(): StoreInteriorDesign {
   const fallback = STORE_INTERIOR_PRESETS["kuramae-artisan"].design;

@@ -59,7 +59,7 @@ describe("commerce entity-plane authority", () => {
     });
     let sourceReads = 0;
     const source: CommerceGraphCommerceSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readCapabilityMetadata: async () => {
         sourceReads += 1;
         return capabilityMetadata(query, merchantRevision(1));
@@ -68,7 +68,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: source,
+      commerce: source,
     });
     expect(
       await reader.query({
@@ -110,7 +110,7 @@ describe("commerce entity-plane authority", () => {
     });
     let sourceReads = 0;
     const source: CommerceGraphCommerceSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readCapabilityMetadata: async () => {
         sourceReads += 1;
         return capabilityMetadata(query, merchantRevision(1));
@@ -119,7 +119,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: source,
+      commerce: source,
     });
     const result = await reader.query({
       query,
@@ -144,7 +144,7 @@ describe("commerce entity-plane authority", () => {
     const query = entityQuery("order_1");
     let reads = 0;
     const source: CommerceGraphCommerceSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readSnapshotRevision: async () => {
         reads += 1;
         return { ok: true, value: merchantRevision(1) };
@@ -161,7 +161,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: source,
+      commerce: source,
     });
     const result = await reader.query({
       query,
@@ -431,7 +431,7 @@ describe("commerce entity-plane authority", () => {
     const organisationId = requireOrganisationId("organisation_graph_selector");
     let sourceReads = 0;
     const source: CommerceGraphCommerceSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readCapabilityMetadata: async (query) => {
         sourceReads += 1;
         return capabilityMetadata(query, merchantRevision(1));
@@ -444,7 +444,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: source,
+      commerce: source,
     });
 
     expect(
@@ -461,7 +461,7 @@ describe("commerce entity-plane authority", () => {
     expect(sourceReads).toBe(0);
   });
 
-  it("lets Underclerk own Shopify Commerce List membership while Blotter hydrates system rows", async () => {
+  it("lets Commerce own Shopify Commerce List membership while Blotter hydrates system rows", async () => {
     const organisationId = requireOrganisationId(
       "organisation_graph_shopify_list",
     );
@@ -477,14 +477,14 @@ describe("commerce entity-plane authority", () => {
       entities: [
         {
           ...systemShipmentEntity("shipment_list"),
-          displayName: "Underclerk shipment",
+          displayName: "Commerce shipment",
         },
       ],
     };
     let plannedReads = 0;
     let exactHydrations = 0;
     const commerceEngine: CommerceGraphHydratingSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       queryPlanned: async (request) => {
         plannedReads += 1;
         return plannedCommerceResult(request, commerceResult);
@@ -498,7 +498,7 @@ describe("commerce entity-plane authority", () => {
       ...sourceStub("blotter", async () => emptyResult()),
       queryPlan: async () => {
         throw new Error(
-          "Underclerk-owned list must not invoke Blotter page membership",
+          "Commerce-owned list must not invoke Blotter page membership",
         );
       },
       hydrateSystemEntities: async () => {
@@ -516,7 +516,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
       blotter,
     });
 
@@ -534,7 +534,7 @@ describe("commerce entity-plane authority", () => {
     expect(exactHydrations).toBe(1);
   });
 
-  it("fails closed when Blotter omits an Underclerk-returned system reference", async () => {
+  it("fails closed when Blotter omits a Commerce-returned system reference", async () => {
     const organisationId = requireOrganisationId(
       "organisation_graph_shopify_missing_hydration",
     );
@@ -546,7 +546,7 @@ describe("commerce entity-plane authority", () => {
       pagination: { limit: 10, cursor: null },
     });
     const commerceEngine: CommerceGraphHydratingSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       queryPlanned: async (request) =>
         plannedCommerceResult(request, {
           ...emptyResult().value,
@@ -567,7 +567,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
       blotter,
     });
 
@@ -587,7 +587,7 @@ describe("commerce entity-plane authority", () => {
     });
   });
 
-  it("keeps saved system views on Blotter and saved list views on Underclerk", async () => {
+  it("keeps saved system views on Blotter and saved list views on Commerce", async () => {
     const organisationId = requireOrganisationId(
       "organisation_graph_shopify_saved_views",
     );
@@ -603,7 +603,7 @@ describe("commerce entity-plane authority", () => {
     });
     let blotterReads = 0;
     const systemCommerce: CommerceGraphHydratingSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readCapabilityMetadata: async () => ({
         ok: true,
         value: {
@@ -611,7 +611,7 @@ describe("commerce entity-plane authority", () => {
           merchantId: "merchant_graph",
           merchantRevision: merchantRevision(1),
           watermark: {
-            kind: "underclerk_native" as const,
+            kind: "commerce_native" as const,
             merchantRevision: merchantRevision(1),
           },
           capabilities: parseCapabilityProfile({
@@ -645,7 +645,7 @@ describe("commerce entity-plane authority", () => {
           merchantId: "merchant_graph",
           merchantRevision: merchantRevision(1),
           watermark: {
-            kind: "underclerk_native" as const,
+            kind: "commerce_native" as const,
             merchantRevision: merchantRevision(1),
           },
           capabilities: parseCapabilityProfile({
@@ -670,7 +670,7 @@ describe("commerce entity-plane authority", () => {
           entities: [
             {
               ...systemShipmentEntity("shipment_saved_list"),
-              displayName: "Underclerk saved-list shipment",
+              displayName: "Commerce saved-list shipment",
             },
           ],
         }),
@@ -699,7 +699,7 @@ describe("commerce entity-plane authority", () => {
     const systemReader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: systemCommerce,
+      commerce: systemCommerce,
       blotter,
     });
     const systemResult = await systemReader.query({
@@ -721,7 +721,7 @@ describe("commerce entity-plane authority", () => {
     const listReader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: listCommerce,
+      commerce: listCommerce,
       blotter,
     });
     const listResult = await listReader.query({
@@ -766,7 +766,7 @@ describe("commerce entity-plane authority", () => {
       },
     });
     const providerCommerce: CommerceGraphHydratingSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readCapabilityMetadata: async () => ({
         ok: true,
         value: {
@@ -774,7 +774,7 @@ describe("commerce entity-plane authority", () => {
           merchantId: "merchant_graph",
           merchantRevision: merchantRevision(1),
           watermark: {
-            kind: "underclerk_native" as const,
+            kind: "commerce_native" as const,
             merchantRevision: merchantRevision(1),
           },
           capabilities: extensionProfile,
@@ -789,7 +789,7 @@ describe("commerce entity-plane authority", () => {
     const providerReader = new CommerceGraphReader({
       organisationId: providerOrganisationId,
       merchantId: "merchant_graph",
-      underclerk: providerCommerce,
+      commerce: providerCommerce,
       blotter: sourceStub("blotter", async () => emptyResult()),
     });
     const providerResult = await providerReader.query({
@@ -824,7 +824,7 @@ describe("commerce entity-plane authority", () => {
       traversal: { maxDepth: 0, resultLimit: 10 },
     });
     const nativeCommerce: CommerceGraphCommerceSource = {
-      ...sourceStub("underclerk", async () => emptyResult()),
+      ...sourceStub("commerce", async () => emptyResult()),
       readCapabilityMetadata: async () => ({
         ok: true,
         value: {
@@ -832,7 +832,7 @@ describe("commerce entity-plane authority", () => {
           merchantId: "merchant_graph",
           merchantRevision: merchantRevision(1),
           watermark: {
-            kind: "underclerk_native" as const,
+            kind: "commerce_native" as const,
             merchantRevision: merchantRevision(1),
           },
           capabilities: parseCapabilityProfile({
@@ -854,7 +854,7 @@ describe("commerce entity-plane authority", () => {
     const nativeReader = new CommerceGraphReader({
       organisationId: nativeOrganisationId,
       merchantId: "merchant_graph",
-      underclerk: nativeCommerce,
+      commerce: nativeCommerce,
     });
     const nativeResult = await nativeReader.query({
       query: nativeQuery,
@@ -885,16 +885,16 @@ describe("commerce entity-plane authority", () => {
     const stale = {
       kind: "cursor_stale" as const,
       expected: {
-        kind: "underclerk_native" as const,
+        kind: "commerce_native" as const,
         merchantRevision: merchantRevision(2),
       },
       received: {
-        kind: "underclerk_native" as const,
+        kind: "commerce_native" as const,
         merchantRevision: merchantRevision(1),
       },
     };
     const source: CommerceGraphCommerceSource = {
-      source: "underclerk",
+      source: "commerce",
       readSnapshotRevision: async () => ({
         ok: true,
         value: merchantRevision(2),
@@ -906,7 +906,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: source,
+      commerce: source,
     });
     const presentation = await reader.query({
       query: pageQuery,
@@ -946,10 +946,10 @@ describe("commerce entity-plane authority", () => {
     });
   });
 
-  it("keeps the Underclerk merchant cursor ahead of provider revisions", async () => {
+  it("keeps the Commerce merchant cursor ahead of provider revisions", async () => {
     const organisationId = requireOrganisationId("organisation_graph_revision");
     const query = entityQuery("order_1");
-    const commerceEngine = sourceStub("underclerk", async () => ({
+    const commerceEngine = sourceStub("commerce", async () => ({
       ok: true,
       value: { ...emptyResult().value, merchantRevision: merchantRevision(3) },
     }));
@@ -973,7 +973,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceWithHydration,
+      commerce: commerceWithHydration,
       blotter,
     });
 
@@ -986,10 +986,10 @@ describe("commerce entity-plane authority", () => {
     expect(result).toMatchObject({ ok: true, value: { merchantRevision: 3 } });
   });
 
-  it("attaches exact-reference Underclerk sidecars to the Blotter system entity", async () => {
+  it("attaches exact-reference Commerce sidecars to the Blotter system entity", async () => {
     const organisationId = requireOrganisationId("organisation_graph_sidecar");
     const query = entityQuery("order_sidecar");
-    const commerceEngine = sourceStub("underclerk", async () => emptyResult());
+    const commerceEngine = sourceStub("commerce", async () => emptyResult());
     const commerceWithHydration: CommerceGraphHydratingSource = {
       ...commerceEngine,
       readSnapshotRevision: async () => ({
@@ -1033,7 +1033,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceWithHydration,
+      commerce: commerceWithHydration,
       blotter,
     });
 
@@ -1079,7 +1079,7 @@ describe("commerce entity-plane authority", () => {
       "Export document",
     );
     const commerceEngine: CommerceGraphHydratingSource = {
-      source: "underclerk",
+      source: "commerce",
       readSnapshotRevision: async () => ({
         ok: true,
         value: merchantRevision(1),
@@ -1143,7 +1143,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
       blotter,
     });
     const result = await reader.query({
@@ -1163,7 +1163,7 @@ describe("commerce entity-plane authority", () => {
     ).toEqual(["shipment_trade_partner", "trade_partner_export_document"]);
   });
 
-  it("plans and reads an all-custom initial dossier through Underclerk", async () => {
+  it("plans and reads an all-custom initial dossier through Commerce", async () => {
     const organisationId = requireOrganisationId(
       "organisation_graph_custom_seed",
     );
@@ -1190,7 +1190,7 @@ describe("commerce entity-plane authority", () => {
     });
     let steps = 0;
     const commerceEngine: CommerceGraphCommerceSource = {
-      source: "underclerk",
+      source: "commerce",
       readSnapshotRevision: async () => ({
         ok: true,
         value: merchantRevision(4),
@@ -1199,7 +1199,7 @@ describe("commerce entity-plane authority", () => {
         capabilityMetadata(query, merchantRevision(4)),
       queryPlanned: async () => ({ ok: true, value: { kind: "invalid" } }),
       readRelationshipStep: async ({ frontier, planRequest }) => {
-        expect(planRequest.capabilities.kind).toBe("underclerk_custom");
+        expect(planRequest.capabilities.kind).toBe("commerce_custom");
         if (steps++ > 0) return { ok: true, value: emptyResult().value };
         expect(frontier).toEqual([seed.reference]);
         return {
@@ -1221,7 +1221,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
     });
 
     const result = await reader.query({
@@ -1265,7 +1265,7 @@ describe("commerce entity-plane authority", () => {
     });
     let blotterFrontiers: CommerceEntityRef[][] = [];
     const commerceEngine: CommerceGraphHydratingSource = {
-      source: "underclerk",
+      source: "commerce",
       readSnapshotRevision: async () => ({
         ok: true,
         value: merchantRevision(5),
@@ -1318,7 +1318,7 @@ describe("commerce entity-plane authority", () => {
     const reader = new CommerceGraphReader({
       organisationId,
       merchantId: "merchant_graph",
-      underclerk: commerceEngine,
+      commerce: commerceEngine,
       blotter,
     });
 
@@ -1379,7 +1379,7 @@ function authority(
 }
 
 function sourceStub(
-  source: "underclerk",
+  source: "commerce",
   result: () => Promise<CommerceGraphSourceResult>,
 ): CommerceGraphCommerceSource &
   Readonly<{
@@ -1392,14 +1392,14 @@ function sourceStub(
   result: () => Promise<CommerceGraphSourceResult>,
 ): CommerceGraphBlotterSource;
 function sourceStub(
-  source: "underclerk" | "blotter",
+  source: "commerce" | "blotter",
   result: () => Promise<CommerceGraphSourceResult>,
 ): CommerceGraphCommerceSource | CommerceGraphBlotterSource {
   const readSnapshotRevision = async () => ({
     ok: true as const,
     value: merchantRevision(1),
   });
-  if (source === "underclerk") {
+  if (source === "commerce") {
     return {
       source,
       readSnapshotRevision,
@@ -1428,7 +1428,7 @@ function capabilityMetadata(
       merchantId: "merchant_graph",
       merchantRevision: revision,
       watermark: {
-        kind: "underclerk_native" as const,
+        kind: "commerce_native" as const,
         merchantRevision: revision,
       },
       capabilities: capabilityProfile(query),
@@ -1492,7 +1492,7 @@ function capabilityProfile(
             capability: emptyCapabilityMatrix(),
           })
         : profileForEntityType(query.source.entityTypeId);
-    case "underclerk_context":
+    case "commerce_context":
       if (query.selection.kind === "entity_seeds") {
         const seed = query.selection.seeds[0];
         const entityType: CommerceEntityTypeId =
@@ -1521,7 +1521,7 @@ function profileForEntityType(
           capability: emptyCapabilityMatrix(),
         }
       : {
-          kind: "underclerk_custom",
+          kind: "commerce_custom",
           entityTypeId: entityType.typeId,
           publishedRevision: 1,
           capability: emptyCapabilityMatrix(),
@@ -1531,7 +1531,7 @@ function profileForEntityType(
     organisationId: "organisation_graph",
     merchantId: "merchant_graph",
     merchantRevision: 1,
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities,
     projection: commerceGraphQueryProjection(
       entityQuery("order_projection_fixture"),
@@ -1545,7 +1545,7 @@ function capabilitySourceForEntityType(
   const profile = profileForEntityType(entityType);
   if (
     profile.kind === "system_mapped" ||
-    profile.kind === "underclerk_custom" ||
+    profile.kind === "commerce_custom" ||
     profile.kind === "commerce_list"
   )
     return profile;
@@ -1560,7 +1560,7 @@ function parseCapabilityProfile(
     organisationId: "organisation_graph",
     merchantId: "merchant_graph",
     merchantRevision: 1,
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities,
     projection: commerceGraphQueryProjection(
       entityQuery("order_projection_fixture"),
@@ -1584,7 +1584,7 @@ function plannedCommerceResult(
   if (!planned.ok || planned.value.kind !== "planned")
     return { ok: true, value: { kind: "invalid" } };
   const merchantRevision =
-    request.watermark.kind === "underclerk_native"
+    request.watermark.kind === "commerce_native"
       ? request.watermark.merchantRevision
       : result.merchantRevision;
   if (merchantRevision === null)

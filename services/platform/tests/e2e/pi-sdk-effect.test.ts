@@ -391,7 +391,7 @@ it("restores a Pi listing proposal and one approved effect after response loss a
       substituted: [
         "model provider (deterministic OpenRouter transport)",
         "Slack",
-        "commerce provider (Underclerk test merchant)",
+        "commerce provider (Commerce test merchant)",
       ],
       ...caseExecution,
     },

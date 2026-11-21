@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "satyr-plan40-browser",
+  "name": "pantry-plan40-browser",
   "main": "./real-worker.ts",
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],
@@ -17,11 +17,11 @@
     "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
     "SESSION_TOKEN_SECRET": "plan40-browser-session-secret",
     "ORGANISATION_ADMIN_TOKEN": "plan40-browser-admin-token",
-    "UNDERCLERK_BASE_URL": "http://127.0.0.1:3102",
-    "UNDERCLERK_SERVICE_TOKEN": "plan40-browser-underclerk-token"
+    "COMMERCE_BASE_URL": "http://127.0.0.1:3102",
+    "COMMERCE_SERVICE_TOKEN": "plan40-browser-commerce-token"
   },
   "services": [
-    { "binding": "UNDERCLERK", "service": "underclerk" }
+    { "binding": "COMMERCE", "service": "pantry-commerce" }
   ],
   "durable_objects": {
     "bindings": [
@@ -37,16 +37,16 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "satyr-plan40-browser",
+      "database_name": "pantry-plan40-browser",
       "database_id": "00000000-0000-0000-0000-000000000040"
     }
   ],
   "kv_namespaces": [{ "binding": "POLICY_KV", "id": "00000000000000000000000000000040" }],
-  "r2_buckets": [{ "binding": "ARCHIVE", "bucket_name": "satyr-plan40-browser" }],
+  "r2_buckets": [{ "binding": "ARCHIVE", "bucket_name": "pantry-plan40-browser" }],
   "queues": {
     "producers": [
-      { "binding": "EVENT_Q", "queue": "satyr-plan40-browser-events" },
-      { "binding": "CUE_Q", "queue": "satyr-plan40-browser-cues" }
+      { "binding": "EVENT_Q", "queue": "pantry-plan40-browser-events" },
+      { "binding": "CUE_Q", "queue": "pantry-plan40-browser-cues" }
     ]
   }
 }

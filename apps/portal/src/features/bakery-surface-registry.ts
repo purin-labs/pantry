@@ -213,7 +213,7 @@ export function revealBakeryWorkspace(organisationId: string): Promise<void> {
 }
 
 function browserEffectKey(effect: BakerySurfaceEffectV1): string {
-  return `satyr:bakery-effect:${effect.effectId}`;
+  return `pantry:bakery-effect:${effect.effectId}`;
 }
 
 async function readBrowserEffectLedger(
@@ -242,7 +242,7 @@ async function readBrowserEffectLedger(
 function pruneBrowserEffectLedger(now: number): void {
   for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
     const key = sessionStorage.key(index);
-    if (key === null || !key.startsWith("satyr:bakery-effect:")) continue;
+    if (key === null || !key.startsWith("pantry:bakery-effect:")) continue;
     const raw = parseJsonOrNull(sessionStorage.getItem(key) ?? "");
     if (
       isRecord(raw) &&

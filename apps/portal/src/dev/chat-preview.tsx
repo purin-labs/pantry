@@ -65,7 +65,7 @@ function ChatPreviewContent(): React.ReactNode {
                   context={{
                     organisation: "Nuki Inc.",
                     workspace: "Cafe operations",
-                    area: "AgentCommerce",
+                    area: "commerce",
                     view: "Orders",
                   }}
                   close={close}

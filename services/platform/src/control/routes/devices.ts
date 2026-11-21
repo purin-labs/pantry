@@ -665,7 +665,7 @@ async function readTerminals(
     devices: operations.counters.map((counter) => ({
       kind: "payment_terminal",
       deviceId: counter.assignment.assignmentId,
-      name: counter.satyrLocationId,
+      name: counter.pantryLocationId,
       connection: { state: "managed_by_provider" },
       needsAttention:
         counter.blockedReason !== null || counter.credentialHealth !== "active",

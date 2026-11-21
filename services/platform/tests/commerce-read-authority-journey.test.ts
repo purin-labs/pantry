@@ -42,7 +42,7 @@ async function readAuthorityJourney(): Promise<void> {
     const provisioned = await new CommerceAdminClient(
       config,
     ).provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: ORGANISATION,
       merchantId: MERCHANT,
       createdAt: NOW,
@@ -60,7 +60,7 @@ async function readAuthorityJourney(): Promise<void> {
     const reader = new CommerceGraphReader({
       organisationId: ORGANISATION,
       merchantId: MERCHANT,
-      underclerk: new CommerceEngineSource({
+      commerce: new CommerceEngineSource({
         organisationId: ORGANISATION,
         merchantId: MERCHANT,
         integrationAccountId: "integration_read_authority",

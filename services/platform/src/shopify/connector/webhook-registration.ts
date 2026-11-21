@@ -30,7 +30,7 @@ const SHOPIFY_WEBHOOK_TOPICS = [
 ] as const satisfies readonly ShopifyWebhookTopic[];
 
 const SHOPIFY_WEBHOOK_LOOKUP_QUERY = `
-  query SatyrWebhookSubscriptions($topics: [WebhookSubscriptionTopic!]) {
+  query PantryWebhookSubscriptions($topics: [WebhookSubscriptionTopic!]) {
     webhookSubscriptions(first: 100, topics: $topics) {
       nodes {
         id
@@ -43,7 +43,7 @@ const SHOPIFY_WEBHOOK_LOOKUP_QUERY = `
 `;
 
 const SHOPIFY_WEBHOOK_CREATE_MUTATION = `
-  mutation SatyrWebhookSubscriptionCreate(
+  mutation PantryWebhookSubscriptionCreate(
     $topic: WebhookSubscriptionTopic!
     $webhookSubscription: WebhookSubscriptionInput!
   ) {
@@ -65,7 +65,7 @@ const SHOPIFY_WEBHOOK_CREATE_MUTATION = `
 `;
 
 const SHOPIFY_WEBHOOK_UPDATE_MUTATION = `
-  mutation SatyrWebhookSubscriptionUpdate(
+  mutation PantryWebhookSubscriptionUpdate(
     $id: ID!
     $webhookSubscription: WebhookSubscriptionInput!
   ) {
@@ -628,17 +628,17 @@ function isShopifyWebhookTopic(raw: unknown): raw is ShopifyWebhookTopic {
 function shopifyWebhookName(topic: ShopifyWebhookTopic): string {
   switch (topic) {
     case "ORDERS_CREATE":
-      return "satyr-orders-create";
+      return "pantry-orders-create";
     case "ORDERS_UPDATED":
-      return "satyr-orders-updated";
+      return "pantry-orders-updated";
     case "INVENTORY_LEVELS_UPDATE":
-      return "satyr-inventory-levels-update";
+      return "pantry-inventory-levels-update";
     case "PRODUCTS_CREATE":
-      return "satyr-products-create";
+      return "pantry-products-create";
     case "PRODUCTS_DELETE":
-      return "satyr-products-delete";
+      return "pantry-products-delete";
     case "PRODUCTS_UPDATE":
-      return "satyr-products-update";
+      return "pantry-products-update";
   }
 }
 

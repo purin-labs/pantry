@@ -36,10 +36,10 @@ import {
   type Evidence,
 } from "./journey-support.ts";
 
-const ALPHA = "https://hooks.alpha.example/underclerk";
-const BETA = "https://hooks.beta.example/underclerk";
-const GAMMA = "https://hooks.gamma.example/underclerk";
-const DELTA = "https://hooks.delta.example/underclerk";
+const ALPHA = "https://hooks.alpha.example/commerce";
+const BETA = "https://hooks.beta.example/commerce";
+const GAMMA = "https://hooks.gamma.example/commerce";
+const DELTA = "https://hooks.delta.example/commerce";
 const ORDER_TOPICS = ["order.*", "refund.*"];
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
@@ -66,7 +66,7 @@ class Endpoints implements WebhookSender {
 
   async post(request: WebhookPost): Promise<WebhookPostResult> {
     const event = parseWebhookEvent(JSON.parse(request.body));
-    const timestamp = request.headers["x-underclerk-timestamp"] ?? "";
+    const timestamp = request.headers["x-commerce-timestamp"] ?? "";
     const secret = this.secrets.get(request.url) ?? "";
     const expected = createHmac("sha256", secret)
       .update(`${timestamp}.${request.body}`)
@@ -78,7 +78,7 @@ class Endpoints implements WebhookSender {
       kind: event.kind,
       at: timestamp,
       status,
-      signed: request.headers["x-underclerk-signature"] === `v1=${expected}`,
+      signed: request.headers["x-commerce-signature"] === `v1=${expected}`,
       resources: event.resources.map((item) => `${item.kind}:${item.id}`),
     });
     this.posts.set(request.url, list);

@@ -4,6 +4,6 @@
 import { commerceFixtureWorkerArtifact } from "./commerce-fixture-worker";
 
 export default function setup(): void {
-  process.env.UNDERCLERK_FIXTURE_WORKER_ARTIFACT =
+  process.env.COMMERCE_FIXTURE_WORKER_ARTIFACT =
     commerceFixtureWorkerArtifact();
 }

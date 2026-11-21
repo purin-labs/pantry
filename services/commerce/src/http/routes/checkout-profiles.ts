@@ -38,7 +38,7 @@ export async function handlePointOfSaleConfiguration(
   if (route.kind === "read_point_of_sale_configuration") {
     const configuration = ctx.authority.readPublishedPointOfSaleConfiguration(
       route.merchantId,
-      route.satyrLocationId,
+      route.pantryLocationId,
     );
     return configuration === undefined
       ? jsonResponse(404, {

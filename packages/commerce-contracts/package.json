@@ -4,7 +4,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "description": "Underclerk commerce contract schemas in TypeScript (Plan 78).",
+  "description": "Commerce contract schemas in TypeScript (Plan 78).",
   "exports": {
     ".": {
       "types": "./src/index.ts",

@@ -69,7 +69,7 @@ function result(
   truncated: boolean,
 ): CommerceOrderTimesV1 {
   return {
-    schemaVersion: "underclerk.order-times.v1",
+    schemaVersion: "commerce.order-times.v1",
     merchantId,
     merchantRevision,
     truncated,

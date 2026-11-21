@@ -424,7 +424,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     buyer.requestCustomerSignIn(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -437,7 +437,7 @@ async function signIn(
         STOREFRONT,
         challenge.challengeId,
         {
-          schemaVersion: "underclerk.verify-customer-sign-in.v1",
+          schemaVersion: "commerce.verify-customer-sign-in.v1",
           code,
         },
       ),
@@ -506,7 +506,7 @@ class PluginDesk extends OrderDesk {
     expectedRevision: number | null,
   ) {
     return {
-      schemaVersion: "underclerk.install-merchant-plugin.v1" as const,
+      schemaVersion: "commerce.install-merchant-plugin.v1" as const,
       ...this.editBase(`install_${definition.version}`),
       definition,
       settings,
@@ -518,7 +518,7 @@ class PluginDesk extends OrderDesk {
 
   #action(key: string, input: CommercePluginSettingsV1) {
     return {
-      schemaVersion: "underclerk.run-plugin-action.v1" as const,
+      schemaVersion: "commerce.run-plugin-action.v1" as const,
       merchantId,
       idempotencyKey: `plugin_handlers_${key}`,
       requestedAt: NOW,

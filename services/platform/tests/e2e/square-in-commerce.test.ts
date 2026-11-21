@@ -28,13 +28,13 @@ import {
 
 declare module "vitest" {
   interface TaskMeta {
-    squareInUnderclerk?: Record<string, unknown>;
+    squareInCommerce?: Record<string, unknown>;
   }
 }
 
 const PUBLIC_ORIGIN = "https://localhost";
 const SQUARE = "https://connect.squareup.com";
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 const SELLER = "MLSQUARECAFE01";
 const CAFE = "LSQUARECAFE01";
 const BACK_OFFICE = "LSQUAREBACK01";
@@ -43,7 +43,7 @@ const COUNTER = "location_cafe";
 const TOKENS = ["sq-access-1", "sq-refresh-1"];
 
 it(
-  "connects Square in Underclerk, pairs a Terminal, sells and refunds at the counter, sells through the Square app on the iPad, and keeps no Square token in Satyr",
+  "connects Square in Commerce, pairs a Terminal, sells and refunds at the counter, sells through the Square app on the iPad, and keeps no Square token in Pantry",
   { timeout: 180_000 },
   squareInCommerceJourney,
 );
@@ -104,7 +104,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
     const afterConnect = await pantryCredential(organisationId, account);
     expect(afterConnect).toEqual({
       kind: "opaque_profile",
-      format: "underclerk_square_connection_v1",
+      format: "commerce_square_connection_v1",
       holder: { merchantId, providerAccountId: SELLER },
     });
 
@@ -126,7 +126,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       owner.session,
       "/pairings",
       {
-        satyrLocationId: COUNTER,
+        pantryLocationId: COUNTER,
         integrationAccountId: account,
         providerLocationId: CAFE,
         deviceName: "Front counter",
@@ -140,7 +140,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       organisationId,
       owner.session,
       `/pairings/${String(pairing.deviceCodeId)}/activation`,
-      { satyrLocationId: COUNTER, integrationAccountId: account },
+      { pantryLocationId: COUNTER, integrationAccountId: account },
     );
     expect(activated.status, JSON.stringify(activated.body)).toBe(200);
 
@@ -150,7 +150,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
     // 3. A barista sells a cookie; the Terminal takes the card, and
     //    Commerce's alarm reads it and places the order.
     const opened = await counterControl(organisationId, owner.session, "", {
-      satyrLocationId: COUNTER,
+      pantryLocationId: COUNTER,
       checkoutId: "checkout_counter_cookie",
       lines: [
         {
@@ -169,7 +169,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       owner.session,
       "/checkout_counter_cookie/collection",
       {
-        satyrLocationId: COUNTER,
+        pantryLocationId: COUNTER,
         checkoutRevision: quote.checkoutRevision,
         quoteDigest: quote.quoteDigest,
         amount: quote.amount,
@@ -209,14 +209,14 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       owner.session,
       "/square-pos-app",
       {
-        satyrLocationId: COUNTER,
+        pantryLocationId: COUNTER,
         integrationAccountId: account,
         providerLocationId: CAFE,
       },
     );
     expect(onIpad.status, JSON.stringify(onIpad.body)).toBe(200);
     const ipadOpened = await counterControl(organisationId, owner.session, "", {
-      satyrLocationId: COUNTER,
+      pantryLocationId: COUNTER,
       checkoutId: "checkout_counter_ipad",
       lines: [
         {
@@ -239,7 +239,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       owner.session,
       "/checkout_counter_ipad/collection",
       {
-        satyrLocationId: COUNTER,
+        pantryLocationId: COUNTER,
         checkoutRevision: ipadQuote.checkoutRevision,
         quoteDigest: ipadQuote.quoteDigest,
         amount: ipadQuote.amount,
@@ -314,7 +314,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
         method: "POST",
         headers: {
           ...configurationHeaders(owner.session, "square-disable"),
-          "x-satyr-configuration-version": await configurationVersion(),
+          "x-pantry-configuration-version": await configurationVersion(),
         },
         body: JSON.stringify({}),
       },
@@ -326,7 +326,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
         method: "DELETE",
         headers: {
           ...configurationHeaders(owner.session, "square-remove"),
-          "x-satyr-configuration-version": await configurationVersion(),
+          "x-pantry-configuration-version": await configurationVersion(),
         },
         body: JSON.stringify({}),
       },
@@ -338,8 +338,8 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       now: Date.now() + 60_000,
       fetcher: fetch,
     });
-    const connection = await env.UNDERCLERK.fetch(
-      `http://underclerk.test/v1/admin/merchants/${merchantId}/square/connection`,
+    const connection = await env.COMMERCE.fetch(
+      `http://commerce.test/v1/admin/merchants/${merchantId}/square/connection`,
       { headers: { authorization: OPERATOR } },
     );
     expect({
@@ -352,10 +352,10 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       connection: 404,
     });
 
-    task.meta.squareInUnderclerk = {
-      codeExchangedBy: "underclerk",
+    task.meta.squareInCommerce = {
+      codeExchangedBy: "commerce",
       linkedLocations: [CAFE],
-      satyrCredential: { kind: "opaque_profile", holder: "<the merchant>" },
+      pantryCredential: { kind: "opaque_profile", holder: "<the merchant>" },
       pairing: "paired_physical",
       counterSale: sale.state,
       terminalCheckouts: square.terminalCheckouts.length,
@@ -365,7 +365,7 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
         squareOrderReads: square.orderReads.length,
       },
       refund: "completed",
-      squareTokenRowsInSatyr: tokenRows.length,
+      squareTokenRowsInPantry: tokenRows.length,
       removal: { revocations: square.revocations.length, connection: 404 },
     };
   } finally {
@@ -449,7 +449,7 @@ class FakeSquare {
       return HttpResponse.json({ errors: [{ code: "UNAUTHORIZED" }] }, { status: 401 });
     if (path === "/v2/merchants/me")
       return HttpResponse.json({
-        merchant: { id: SELLER, business_name: "Satyr Café", country: "JP", currency: "JPY" },
+        merchant: { id: SELLER, business_name: "Pantry Café", country: "JP", currency: "JPY" },
       });
     if (path === "/v2/locations")
       return HttpResponse.json({ locations: [location(CAFE, true), location(BACK_OFFICE, false)] });
@@ -541,7 +541,7 @@ class FakeSquare {
 function location(id: string, cards: boolean): Record<string, unknown> {
   return {
     id,
-    name: id === CAFE ? "Satyr Café counter" : "Back office",
+    name: id === CAFE ? "Pantry Café counter" : "Back office",
     merchant_id: SELLER,
     country: "JP",
     currency: "JPY",
@@ -558,7 +558,7 @@ async function openCafeCounter(
 ): Promise<void> {
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -566,9 +566,9 @@ async function openCafeCounter(
   });
   if (!provisioned.ok) throw new Error(JSON.stringify(provisioned));
   const operator = createCommerceClient(env, undefined, { kind: "operator" });
-  if (operator === null) throw new Error("No Underclerk client");
+  if (operator === null) throw new Error("No Commerce client");
   const published = await operator.publishPointOfSaleConfiguration({
-    schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+    schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
     merchantId,
     expectedRevision: null,
     publishedAt: new Date().toISOString(),
@@ -576,7 +576,7 @@ async function openCafeCounter(
     configuration: {
       configurationId: "pos_configuration_front_counter",
       organisationId,
-      satyrLocationId: COUNTER,
+      pantryLocationId: COUNTER,
       salesChannelId: "sales_channel_cafe",
       currency: "JPY",
       supportedItems: [
@@ -592,7 +592,7 @@ async function openCafeCounter(
       },
       presentationPolicy: {
         locale: "ja-JP",
-        merchantDisplayName: "Satyr Café",
+        merchantDisplayName: "Pantry Café",
         termsPolicyId: "terms_counter",
         privacyPolicyId: "privacy_counter",
         supportContact: "support@example.test",
@@ -609,7 +609,7 @@ async function receiveCookies(
   session: IssuedControlSession,
 ): Promise<void> {
   const operator = createCommerceClient(env, undefined, { kind: "operator" });
-  if (operator === null) throw new Error("No Underclerk client");
+  if (operator === null) throw new Error("No Commerce client");
   const stock = await operator.readStockSnapshot(merchantId);
   if (!stock.ok) throw new Error(JSON.stringify(stock.error));
   const position = stock.value.commerce.resources.inventoryPositions.find(
@@ -622,7 +622,7 @@ async function receiveCookies(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/commerce/inventory/receipts?position=${position.id}`,
     {
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: PUBLIC_ORIGIN,
       },
     },
@@ -682,7 +682,7 @@ async function connectSquare(
   callback.searchParams.set("state", state);
   const completed = await exports.default.fetch(callback.toString());
   await expect(completed.text()).resolves.toContain(
-    "satyr.provider-attempt.completed",
+    "pantry.provider-attempt.completed",
   );
 }
 
@@ -777,7 +777,7 @@ async function refreshResources(
       method: "POST",
       headers: {
         ...configurationHeaders(session, "square-cafe-resources"),
-        "x-satyr-configuration-version": String(version?.version ?? 1),
+        "x-pantry-configuration-version": String(version?.version ?? 1),
       },
       body: JSON.stringify({}),
     },
@@ -794,7 +794,7 @@ async function counterSale(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/commerce/counter-sales/${checkoutId}`,
     {
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: PUBLIC_ORIGIN,
       },
     },

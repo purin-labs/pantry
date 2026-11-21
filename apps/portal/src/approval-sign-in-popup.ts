@@ -7,7 +7,7 @@
  */
 type ApprovalSignIn = "signed_in" | "closed" | "blocked";
 
-const CHANNEL = "satyr-approval-sign-in";
+const CHANNEL = "pantry-approval-sign-in";
 const RETURN_PAGE = "/approval-signed-in.html";
 /** A sign-in that takes longer than this ends as closed. */
 const MAX_WAIT_MS = 10 * 60 * 1000;
@@ -29,7 +29,7 @@ export function signInForApproval(
   const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 3));
   const popup = window.open(
     `/v1/control/auth/google/start?${query.toString()}`,
-    "satyr-approval-sign-in",
+    "pantry-approval-sign-in",
     `popup,width=${width},height=${height},left=${left},top=${top}`,
   );
   if (popup === null) return Promise.resolve("blocked");
@@ -47,7 +47,7 @@ export function signInForApproval(
     };
     const signedIn = (data: unknown): boolean =>
       typeof data === "object" && data !== null &&
-      (data as { kind?: unknown }).kind === "satyr:approval-signed-in" &&
+      (data as { kind?: unknown }).kind === "pantry:approval-signed-in" &&
       (data as { action?: unknown }).action === actionNonce;
     const onMessage = (event: MessageEvent): void => {
       if (event.origin === window.location.origin && signedIn(event.data)) finish("signed_in");

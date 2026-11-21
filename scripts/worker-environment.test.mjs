@@ -10,7 +10,7 @@ import {
 } from "./worker-environment.mjs";
 
 test("local startup requires its own secrets file; unavailable targets fail", function explicitTargets() {
-  const directory = mkdtempSync(resolve(tmpdir(), "satyr-startup-"));
+  const directory = mkdtempSync(resolve(tmpdir(), "pantry-startup-"));
   try {
     const config = readWorkerEnvironment("platform", "local");
     assert.throws(
@@ -45,14 +45,14 @@ test("local startup requires its own secrets file; unavailable targets fail", fu
 });
 
 test("local platform startup does not require Slack configuration", function optionalSlack() {
-  const directory = mkdtempSync(resolve(tmpdir(), "satyr-startup-"));
+  const directory = mkdtempSync(resolve(tmpdir(), "pantry-startup-"));
   try {
     writeFileSync(
       resolve(directory, ".dev.vars.local"),
       [
         "SESSION_TOKEN_SECRET=test-session-secret",
         "SLACK_OAUTH_STATE_SECRET=test-oauth-state-secret",
-        "UNDERCLERK_SERVICE_TOKEN=test-service-token",
+        "COMMERCE_SERVICE_TOKEN=test-service-token",
         "",
       ].join("\n"),
       { mode: 0o600 },

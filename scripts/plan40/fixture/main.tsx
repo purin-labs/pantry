@@ -65,14 +65,14 @@ function ControlRoute(): React.ReactNode {
 }
 
 function productEntity(productId: string): CommerceEntity {
-  return buildProductEntity(productId, "underclerk");
+  return buildProductEntity(productId, "commerce");
 }
 
 function unavailableProductEntity(productId: string): CommerceEntity {
   return buildProductEntity(productId, "shopify");
 }
 
-function buildProductEntity(productId: string, source: "shopify" | "underclerk"): CommerceEntity {
+function buildProductEntity(productId: string, source: "shopify" | "commerce"): CommerceEntity {
   return validateCommerceEntityShape({
     reference: { origin: "system", typeId: "product", entityId: productId },
     revision: 7,

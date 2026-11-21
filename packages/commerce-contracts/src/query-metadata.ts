@@ -19,18 +19,18 @@ export const commerceQueryFingerprintSchema = Type.Unsafe<
 export const commerceQuerySemanticsVersionSchema = Type.Literal("v1");
 export const commerceOrderingVersionSchema = Type.Literal("v1");
 const commerceReadWatermarkKindSchema = Type.Enum([
-  "underclerk_native",
+  "commerce_native",
   "provider_backed",
 ]);
 export const commerceReadWatermarkSchema = Type.Union([
   OpenObject({
-    kind: Type.Literal("underclerk_native"),
+    kind: Type.Literal("commerce_native"),
     merchantRevision: commerceSnapshotRevisionSchema,
   }),
   OpenObject({
     kind: Type.Literal("provider_backed"),
     blotterAcceptedProjectionSequence: commerceSnapshotRevisionSchema,
-    underclerkExtensionMerchantRevision: commerceSnapshotRevisionSchema,
+    commerceExtensionMerchantRevision: commerceSnapshotRevisionSchema,
   }),
 ]);
 
@@ -64,7 +64,7 @@ export function parseCommerceReadWatermark(
   if (!parsed.ok) return parsed;
   const watermark = parsed.value;
   switch (watermark.kind) {
-    case "underclerk_native":
+    case "commerce_native":
       return {
         ok: true,
         value: {
@@ -79,8 +79,8 @@ export function parseCommerceReadWatermark(
           kind: watermark.kind,
           blotterAcceptedProjectionSequence:
             watermark.blotterAcceptedProjectionSequence,
-          underclerkExtensionMerchantRevision:
-            watermark.underclerkExtensionMerchantRevision,
+          commerceExtensionMerchantRevision:
+            watermark.commerceExtensionMerchantRevision,
         },
       };
     default:

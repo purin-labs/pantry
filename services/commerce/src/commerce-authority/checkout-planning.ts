@@ -101,7 +101,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
 export type BuyerPickupCheckoutCommand = Readonly<{
-  schemaVersion: "underclerk.submit-buyer-pickup-cart.v1";
+  schemaVersion: "commerce.submit-buyer-pickup-cart.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -137,7 +137,7 @@ export type DraftPriceOverride = Readonly<{
 }>;
 
 export type BuyerShippingCheckoutCommand = Readonly<{
-  schemaVersion: "underclerk.create-buyer-shipping-checkout.internal.v1";
+  schemaVersion: "commerce.create-buyer-shipping-checkout.internal.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -984,8 +984,8 @@ export function planInPersonCheckout(
   if (configuration.revision !== command.posConfigurationRevision) {
     return checkoutPlanRejected("pointOfSaleConfiguration.revision");
   }
-  if (configuration.satyrLocationId !== command.satyrLocationId) {
-    return checkoutPlanRejected("pointOfSaleConfiguration.satyrLocationId");
+  if (configuration.pantryLocationId !== command.pantryLocationId) {
+    return checkoutPlanRejected("pointOfSaleConfiguration.pantryLocationId");
   }
   if (
     command.terminalAssignmentRevision === null &&
@@ -1015,7 +1015,7 @@ export function planInPersonCheckout(
         checkoutId: command.checkoutId,
         source: {
           kind: "point_of_sale",
-          satyrLocationId: command.satyrLocationId,
+          pantryLocationId: command.pantryLocationId,
           posConfigurationRevision: configuration.revision,
           operatorIdentity: command.operatorIdentity,
           terminalAssignmentRevision: command.terminalAssignmentRevision,
@@ -1064,7 +1064,7 @@ function planPointOfSaleQuote(
       pluginFailures: readonly PluginFunctionFailure[];
     }>
   | Readonly<{ kind: "rejected"; error: CommerceMutationErrorV1 }> {
-  const allocationLocationId = configuration.satyrLocationId;
+  const allocationLocationId = configuration.pantryLocationId;
   const allocations: InventoryAllocation[] = [];
   const checkoutLines: CheckoutQuoteSnapshot["lines"] = [];
   const nextPositions = context.positions;

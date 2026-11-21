@@ -31,7 +31,7 @@ export function installClaudeConnectionPreview(): void {
   const scenario = new URLSearchParams(window.location.search).get("claude");
   // The control client sends this token with every change. The path keeps
   // it away from a real local session on the same origin.
-  document.cookie = `satyr_control_csrf=preview; path=${window.location.pathname}; SameSite=Strict`;
+  document.cookie = `pantry_csrf=preview; path=${window.location.pathname}; SameSite=Strict`;
   const state: {
     connection: PreviewConnection;
     authorization: PreviewAuthorization;

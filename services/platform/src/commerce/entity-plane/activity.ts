@@ -64,7 +64,7 @@ export type CommerceActivityEvent =
       occurredAt: string;
     }>
   | Readonly<{
-      kind: "underclerk_observation";
+      kind: "commerce_observation";
       resource: CommerceActivityResource;
       observationId: CommerceCommandId;
       deliveryId: CommerceEntityPlaneDeliveryId;
@@ -72,7 +72,7 @@ export type CommerceActivityEvent =
       occurredAt: string;
     }>
   | Readonly<{
-      kind: "underclerk_receipt";
+      kind: "commerce_receipt";
       resource: CommerceActivityResource;
       receiptId: string;
       outcome:
@@ -96,7 +96,7 @@ type CommerceActivitySources = Readonly<{
   proposals: readonly ProposalActivity[];
   approvals: readonly ApprovalActivity[];
   effects: readonly EntityPlaneEffectActivity[];
-  underclerkReceipts: readonly CommerceReceiptActivity[];
+  commerceReceipts: readonly CommerceReceiptActivity[];
   actionLedger: readonly ActionLedgerActivity[];
 }>;
 
@@ -284,7 +284,7 @@ export async function readCommerceActivity(
       proposals,
       approvals,
       effects,
-      underclerkReceipts: commerceEngineReceipts,
+      commerceReceipts: commerceEngineReceipts,
       actionLedger: actionEvents,
     },
     limit: input.limit,
@@ -331,7 +331,7 @@ export function composeCommerceActivity(
     ...input.sources.effects.flatMap((item) =>
       observationEvent(item, input.resource),
     ),
-    ...input.sources.underclerkReceipts.flatMap((item) =>
+    ...input.sources.commerceReceipts.flatMap((item) =>
       matches(item.resource, input.resource) ? [receiptEvent(item)] : [],
     ),
     ...input.sources.actionLedger.flatMap((item) =>
@@ -488,7 +488,7 @@ function commerceReceipt(
     return null;
   }
   const parsed = parseCommerceProviderReceipt(decoded);
-  if (!parsed.ok || parsed.value.provider !== "underclerk") return null;
+  if (!parsed.ok || parsed.value.provider !== "commerce") return null;
   const expectedType =
     parsed.value.projectionKind === "offer"
       ? "offer"
@@ -564,7 +564,7 @@ function observationEvent(
     return [];
   return [
     {
-      kind: "underclerk_observation",
+      kind: "commerce_observation",
       resource: item.resource,
       observationId: item.effect.receipt.commandId,
       deliveryId: item.effect.receipt.deliveryId,
@@ -575,7 +575,7 @@ function observationEvent(
 }
 
 function receiptEvent(item: CommerceReceiptActivity): CommerceActivityEvent {
-  return { kind: "underclerk_receipt", ...item };
+  return { kind: "commerce_receipt", ...item };
 }
 
 function actionEvent(item: ActionLedgerActivity): CommerceActivityEvent {

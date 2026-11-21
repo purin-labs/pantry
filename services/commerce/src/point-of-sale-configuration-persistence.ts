@@ -19,7 +19,7 @@ export function readPublishedPointOfSaleConfiguration(
     .prepare(
       `SELECT configuration_json AS configurationJson
      FROM point_of_sale_configuration
-     WHERE merchant_id = ? AND satyr_location_id = ? AND lifecycle_state = 'published'`,
+     WHERE merchant_id = ? AND pantry_location_id = ? AND lifecycle_state = 'published'`,
     )
     .get<Readonly<{ configurationJson: string }>>(merchantId, pantryLocationId);
   return row === undefined
@@ -43,7 +43,7 @@ export function readPointOfSaleConfigurationForCheckout(
     .prepare(
       `SELECT configuration_json AS configurationJson
      FROM point_of_sale_configuration
-     WHERE merchant_id = ? AND satyr_location_id = ? AND revision = ?`,
+     WHERE merchant_id = ? AND pantry_location_id = ? AND revision = ?`,
     )
     .get<Readonly<{ configurationJson: string }>>(
       merchantId,
@@ -72,13 +72,13 @@ export function publishPointOfSaleConfiguration(
     .prepare(
       `UPDATE point_of_sale_configuration
      SET lifecycle_state = 'retired'
-     WHERE merchant_id = ? AND satyr_location_id = ? AND lifecycle_state = 'published'`,
+     WHERE merchant_id = ? AND pantry_location_id = ? AND lifecycle_state = 'published'`,
     )
-    .run(merchantId, configuration.satyrLocationId);
+    .run(merchantId, configuration.pantryLocationId);
   database
     .prepare(
       `INSERT INTO point_of_sale_configuration (
-       merchant_id, configuration_id, revision, satyr_location_id,
+       merchant_id, configuration_id, revision, pantry_location_id,
        lifecycle_state, configuration_json, recorded_at
      ) VALUES (?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT (merchant_id, configuration_id, revision) DO UPDATE SET
@@ -90,7 +90,7 @@ export function publishPointOfSaleConfiguration(
       merchantId,
       configuration.configurationId,
       configuration.revision,
-      configuration.satyrLocationId,
+      configuration.pantryLocationId,
       configuration.lifecycle.state,
       JSON.stringify(configuration),
       recordedAt,

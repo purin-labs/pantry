@@ -6,7 +6,7 @@ description: The concrete repository layout for the current Seams Pantry runtime
 # Service map
 
 ```text
-satyr/
+pantry/
 ├── apps/
 │   ├── docs/                  # This VitePress application
 │   ├── portal/                # Merchant and agent operations UI
@@ -14,7 +14,7 @@ satyr/
 ├── services/
 │   ├── platform/              # Control plane, integrations and Sous Chef
 │   ├── workspace-executor/    # Heavy execution boundary
-│   └── underclerk/            # Commerce engine: private commerce authority
+│   └── commerce/            # Commerce engine: private commerce authority
 ├── packages/
 │   ├── contracts/             # Provider-neutral contract schemas
 │   ├── rendering/             # Shared rendering and output contracts

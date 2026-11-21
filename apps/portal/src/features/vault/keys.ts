@@ -79,7 +79,7 @@ function authModeLabel(authMode: string): string {
   switch (authMode) {
     case "api_key":
       return "API key";
-    case "shared_satyr_app":
+    case "shared_pantry_app":
       return "App authorization";
     case "webhook_secret":
       return "Webhook secret";

@@ -19,8 +19,8 @@ export async function verifyCommerceLabSignature(input: {
   signingSecret: string;
   nowMs: number;
 }): Promise<CommerceLabSignatureVerification> {
-  const timestamp = input.headers.get("x-satyr-lab-timestamp");
-  const signature = input.headers.get("x-satyr-lab-signature");
+  const timestamp = input.headers.get("x-pantry-lab-timestamp");
+  const signature = input.headers.get("x-pantry-lab-signature");
 
   if (timestamp === null || signature === null) {
     return { ok: false, error: { code: "commerce_lab_signature_missing" } };

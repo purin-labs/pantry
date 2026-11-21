@@ -81,9 +81,9 @@ export type CounterRegisterTerminal = Readonly<{
 }>;
 
 export type CounterRegisterSnapshot = Readonly<{
-  schemaVersion: "satyr.counter-register.v1";
+  schemaVersion: "pantry.counter-register.v1";
   merchantId: string;
-  satyrLocationId: string;
+  pantryLocationId: string;
   currency: string;
   policy: CounterRegisterPolicy | null;
   menu: CounterRegisterMenu | null;

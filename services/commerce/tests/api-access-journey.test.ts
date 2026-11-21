@@ -77,7 +77,7 @@ it("keeps each API key and app installation to its own merchant and scopes", asy
     const evidence: Evidence = {};
     await required(
       admin(backend, SERVICE_TOKEN).provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: SECOND_ORGANISATION,
         merchantId: SECOND_MERCHANT,
         createdAt: NOW,

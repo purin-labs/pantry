@@ -325,7 +325,7 @@ async function approveAndInstall(
     {
       headers: {
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
       },
     },
   );
@@ -392,7 +392,7 @@ async function approveAndInstall(
 /** The cafe demo shop, and a buyer's pickup checkout of one cookie. */
 async function openShopWithOnePickup(): Promise<void> {
   const provisioned = await providerClient().provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",
@@ -435,11 +435,11 @@ async function openShopWithOnePickup(): Promise<void> {
   });
   if (!received.ok) throw new Error(JSON.stringify(received.error));
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const session = await buyer.createSession(MERCHANT, "storefront_cafe", {
-    schemaVersion: "underclerk.create-buyer-session.v1",
+    schemaVersion: "commerce.create-buyer-session.v1",
     buyer: { kind: "guest" },
   });
   if (!session.ok) throw new Error(JSON.stringify(session.error));
@@ -448,7 +448,7 @@ async function openShopWithOnePickup(): Promise<void> {
     "storefront_cafe",
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: "pi-plugin-cart",
       lines: [{ kind: "catalog", variantId: WHOLE_CAKE, quantity: 1 }],
     },
@@ -459,7 +459,7 @@ async function openShopWithOnePickup(): Promise<void> {
     "storefront_cafe",
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: "pi-plugin-checkout",
       cartId: cart.value.cartId,
       cartRevision: cart.value.revision,

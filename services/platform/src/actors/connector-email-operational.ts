@@ -1317,7 +1317,7 @@ function normalizeContent(
 
 async function digestTarget(target: EmailProposalTarget): Promise<string> {
   return sha256Hex(
-    JSON.stringify({ kind: "satyr_operational_target_v1", target }),
+    JSON.stringify({ kind: "pantry_operational_target_v1", target }),
   );
 }
 
@@ -1339,7 +1339,7 @@ export async function digestOperationalEmailSnapshot(
   }>,
 ): Promise<string> {
   return sha256Hex(
-    JSON.stringify({ kind: "satyr_operational_snapshot_v1", ...input }),
+    JSON.stringify({ kind: "pantry_operational_snapshot_v1", ...input }),
   );
 }
 

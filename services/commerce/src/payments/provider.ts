@@ -193,7 +193,7 @@ export class DeterministicPaymentGateway
     request: MerchantPaymentSessionCommand,
   ): Promise<CommercePaymentSessionResultV1> {
     return {
-      schemaVersion: "underclerk.payment-session-result.v1",
+      schemaVersion: "commerce.payment-session-result.v1",
       kind: "ready",
       paymentAttemptId: request.paymentAttemptId,
       session: {
@@ -214,7 +214,7 @@ export class DeterministicPaymentGateway
     request: MerchantPaymentReconciliationCommand,
   ): Promise<CommercePaymentCaptureResultV1> {
     return {
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "captured",
       providerPaymentReference: `pi_test_${request.providerRequestId}`,
       capturedAt: this.#now(),
@@ -225,7 +225,7 @@ export class DeterministicPaymentGateway
     request: MerchantPaymentRefundCommand,
   ): Promise<CommercePaymentRefundResultV1> {
     return {
-      schemaVersion: "underclerk.payment-refund-result.v1",
+      schemaVersion: "commerce.payment-refund-result.v1",
       kind: "refunded",
       providerRefundReference: `re_test_${request.refundAttemptId}`,
       money: request.refundMoney,
@@ -238,7 +238,7 @@ function unavailableInPersonCollection(
   reason: string,
 ): CommerceInPersonCollectionResultV1 {
   return {
-    schemaVersion: "underclerk.in-person-collection-result.v1",
+    schemaVersion: "commerce.in-person-collection-result.v1",
     kind: "unavailable",
     reason,
     retryAfter: new Date(Date.now() + 60_000).toISOString(),
@@ -247,7 +247,7 @@ function unavailableInPersonCollection(
 
 function unavailableSession(reason: string): CommercePaymentSessionResultV1 {
   return {
-    schemaVersion: "underclerk.payment-session-result.v1",
+    schemaVersion: "commerce.payment-session-result.v1",
     kind: "unavailable",
     reason,
     retryAfter: new Date(Date.now() + 60_000).toISOString(),
@@ -258,7 +258,7 @@ function indeterminatePayment(
   reason: string,
 ): CommercePaymentCaptureResultV1 {
   return {
-    schemaVersion: "underclerk.payment-capture-result.v1",
+    schemaVersion: "commerce.payment-capture-result.v1",
     kind: "indeterminate",
     reason,
     reconcileAfter: new Date(Date.now() + 60_000).toISOString(),
@@ -267,7 +267,7 @@ function indeterminatePayment(
 
 function rejectedRefund(reason: string): CommercePaymentRefundResultV1 {
   return {
-    schemaVersion: "underclerk.payment-refund-result.v1",
+    schemaVersion: "commerce.payment-refund-result.v1",
     kind: "rejected",
     reason,
   };

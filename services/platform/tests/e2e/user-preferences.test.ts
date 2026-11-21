@@ -178,9 +178,9 @@ function preferenceRequest(
     new Request(`https://localhost/v1/control/user/preferences/${area}`, {
       method: body === undefined ? "GET" : "PATCH",
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: "https://localhost",
-        "x-satyr-csrf": session.csrfToken,
+        "x-pantry-csrf": session.csrfToken,
         "content-type": "application/json",
       },
       body:

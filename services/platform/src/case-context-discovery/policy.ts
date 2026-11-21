@@ -38,15 +38,15 @@ export type CaseContextDiscoveryRoute =
   | Readonly<{
       provider: "typesafe";
       connectionRevision?: never;
-      funding: "satyr_platform";
-      credentialRef: "satyr_typesafe";
+      funding: "pantry_platform";
+      credentialRef: "pantry_typesafe";
     }>;
 
 export function caseContextDiscoveryRouteAuthority(
   route: CaseContextDiscoveryRoute,
 ): TypeSafeAuthority {
-  return route.funding === "satyr_platform"
-    ? { kind: "satyr_platform" }
+  return route.funding === "pantry_platform"
+    ? { kind: "pantry_platform" }
     : {
         kind: "organisation_byo",
         connectionRevision: route.connectionRevision,
@@ -56,11 +56,11 @@ export function caseContextDiscoveryRouteAuthority(
 export function caseContextDiscoveryRoute(
   authority: TypeSafeAuthority,
 ): CaseContextDiscoveryRoute {
-  return authority.kind === "satyr_platform"
+  return authority.kind === "pantry_platform"
     ? {
         provider: "typesafe",
-        funding: "satyr_platform",
-        credentialRef: "satyr_typesafe",
+        funding: "pantry_platform",
+        credentialRef: "pantry_typesafe",
       }
     : {
         provider: "typesafe",
@@ -74,10 +74,10 @@ function parseCaseContextDiscoveryRoute(
   raw: unknown,
 ): CaseContextDiscoveryRoute | null {
   if (!isRecord(raw) || raw.provider !== "typesafe") return null;
-  if (raw.funding === "satyr_platform")
-    return raw.credentialRef === "satyr_typesafe" &&
+  if (raw.funding === "pantry_platform")
+    return raw.credentialRef === "pantry_typesafe" &&
       Object.keys(raw).length === 3
-      ? caseContextDiscoveryRoute({ kind: "satyr_platform" })
+      ? caseContextDiscoveryRoute({ kind: "pantry_platform" })
       : null;
   if (
     raw.funding !== "organisation_byo" ||

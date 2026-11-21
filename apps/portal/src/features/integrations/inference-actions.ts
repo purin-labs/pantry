@@ -45,7 +45,7 @@ function inferenceSelectionSuccessMessage(
       return "New agent conversations will use Claude OAuth through Pi.";
     case "codex_subscription":
       return "New agent conversations will use your ChatGPT subscription.";
-    case "satyr_platform":
+    case "pantry_platform":
       return "New agent conversations will use Seams AI.";
     case "organisation_openai_api_key":
       return "New agent conversations will use Pi with your OpenAI API key.";

@@ -195,7 +195,7 @@ export class ArchiveAuthority {
       });
     }
     return {
-      schemaVersion: "underclerk.archive-run.v1",
+      schemaVersion: "commerce.archive-run.v1",
       files: results,
       orders: archivedOrders,
       events: archivedEvents,
@@ -641,7 +641,7 @@ function orderRecord(
     rows.map((row) => JSON.parse(String(row[column])) as unknown);
   const [order] = json(bundle.tables.commerce_order, "order_snapshot_json");
   return {
-    schemaVersion: "underclerk.order-record.v1",
+    schemaVersion: "commerce.order-record.v1",
     source,
     archive,
     order: parseOrder(order),

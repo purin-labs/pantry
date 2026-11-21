@@ -131,7 +131,7 @@ function isKnownTransition(value: TransitionFields): boolean {
 }
 
 function unknownTransitionError(): string {
-  return "names a transition that Underclerk does not have";
+  return "names a transition that Commerce does not have";
 }
 
 function toInvalidTransition(
@@ -381,11 +381,11 @@ const deliveryFields = {
  */
 export const commerceDeliveryV1Schema = Type.Union([
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.commerce-delivery.v2"),
+    schemaVersion: Type.Literal("commerce.commerce-delivery.v2"),
     ...deliveryFields,
   }),
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.commerce-delivery.v1"),
+    schemaVersion: Type.Literal("commerce.commerce-delivery.v1"),
     organisationId: text,
     ...deliveryFields,
   }),
@@ -435,7 +435,7 @@ function fromReceivedDelivery(value: CommerceReceivedDeliveryV1): unknown {
 }
 
 export const acknowledgeCommerceDeliveryV1Schema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.acknowledge-commerce-delivery.v2"),
+  schemaVersion: Type.Literal("commerce.acknowledge-commerce-delivery.v2"),
   merchantId: text,
   deliveryId: text,
   acknowledgedAt: utcTimestampSchema,
@@ -446,7 +446,7 @@ export type AcknowledgeCommerceDeliveryV1 = Static<
 >;
 
 export const commerceDeliveryAcknowledgementV1Schema = ReadonlyOpenObject({
-  schemaVersion: Type.Literal("underclerk.delivery-acknowledgement.v2"),
+  schemaVersion: Type.Literal("commerce.delivery-acknowledgement.v2"),
   outcome: Type.Union([
     Type.Literal("acknowledged"),
     Type.Literal("already_acknowledged"),
@@ -463,7 +463,7 @@ export type CommerceDeliveryAcknowledgementV1 = Static<
 
 export const commerceMigrationInventoryV2Schema = OpenObject({
   schemaVersion: Type.Readonly(
-    Type.Literal("underclerk.migration-inventory.v2"),
+    Type.Literal("commerce.migration-inventory.v2"),
   ),
   organisationId: Type.Readonly(Type.String()),
   merchantId: Type.Readonly(Type.String()),
@@ -472,7 +472,7 @@ export const commerceMigrationInventoryV2Schema = OpenObject({
   contractRevisions: Type.Readonly(
     OpenObject({
       source: Type.Readonly(Type.String()),
-      target: Type.Readonly(Type.Literal("satyr.commerce.inventory.v1")),
+      target: Type.Readonly(Type.Literal("pantry.commerce.inventory.v1")),
     }),
   ),
   migrationDigest: Type.Readonly(Type.String()),
@@ -731,12 +731,12 @@ const receiptFields = {
  */
 export const commerceMutationReceiptV1Schema = Type.Union([
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.mutation-receipt.v2"),
+    schemaVersion: Type.Literal("commerce.mutation-receipt.v2"),
     ...receiptFields,
     actor: Type.Optional(commerceMutationActorV1Schema),
   }),
   ReadonlyOpenObject({
-    schemaVersion: Type.Literal("underclerk.mutation-receipt.v1"),
+    schemaVersion: Type.Literal("commerce.mutation-receipt.v1"),
     organisationId: text,
     actionNonce: Nullable(text),
     ...receiptFields,

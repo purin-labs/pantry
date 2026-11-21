@@ -22,7 +22,7 @@ export type CommerceArchiveLocationV1 = Readonly<{
 }>;
 
 export type CommerceOrderRecordV1 = Readonly<{
-  schemaVersion: "underclerk.order-record.v1";
+  schemaVersion: "commerce.order-record.v1";
   source: "live" | "archived";
   archive: CommerceArchiveLocationV1 | null;
   order: CommerceOrderV1;
@@ -46,7 +46,7 @@ export type CommerceArchiveFileV1 = Readonly<{
 }>;
 
 export type CommerceArchiveRunV1 = Readonly<{
-  schemaVersion: "underclerk.archive-run.v1";
+  schemaVersion: "commerce.archive-run.v1";
   files: readonly CommerceArchiveFileV1[];
   orders: number;
   events: number;

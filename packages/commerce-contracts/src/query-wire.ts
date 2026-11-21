@@ -172,7 +172,7 @@ export const commerceGraphQueryWireSchema = Type.Cyclic(
         aggregation: aggregationWireSchema,
       }),
       OpenObject({
-        kind: Type.Literal("underclerk_context"),
+        kind: Type.Literal("commerce_context"),
         selection: Type.Union([
           OpenObject({
             kind: Type.Literal("entity_seeds"),

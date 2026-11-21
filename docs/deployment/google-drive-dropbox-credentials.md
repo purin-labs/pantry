@@ -2,7 +2,7 @@
 
 Status: Active deployment procedure
 
-Satyr owns the Google Drive and Dropbox provider applications. An organisation never
+Pantry owns the Google Drive and Dropbox provider applications. An organisation never
 creates an API key, OAuth client, or Dropbox app. Organisation operators only select
 **Connect Google Drive** or **Connect Dropbox**, sign in to the provider, and
 approve access.
@@ -20,7 +20,7 @@ use the same HTTPS origin for both values.
 | Environment                     | Public and callback origin                |
 | ------------------------------- | ----------------------------------------- |
 | Staging target                  | `https://staging.console.seams.sh`        |
-| Current production              | `https://satyr-edge.n6378056.workers.dev` |
+| Current production              | `https://pantry.purin.io` |
 | Production custom-domain target | `https://console.seams.sh`                |
 
 Use an origin only after its DNS, TLS certificate, Worker route, and Portal are
@@ -31,18 +31,18 @@ For each active origin, the provider URLs are:
 
 | Provider                    | Staging                                                                       | Current production                                                                   |
 | --------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Dropbox OAuth callback      | `https://staging.console.seams.sh/v1/control/providers/dropbox/callback`      | `https://satyr-edge.n6378056.workers.dev/v1/control/providers/dropbox/callback`      |
-| Dropbox webhook             | `https://staging.console.seams.sh/hook/dropbox`                               | `https://satyr-edge.n6378056.workers.dev/hook/dropbox`                               |
-| Google Drive OAuth callback | `https://staging.console.seams.sh/v1/control/providers/google_drive/callback` | `https://satyr-edge.n6378056.workers.dev/v1/control/providers/google_drive/callback` |
-| Google JavaScript origin    | `https://staging.console.seams.sh`                                            | `https://satyr-edge.n6378056.workers.dev`                                            |
+| Dropbox OAuth callback      | `https://staging.console.seams.sh/v1/control/providers/dropbox/callback`      | `https://pantry.purin.io/v1/control/providers/dropbox/callback`      |
+| Dropbox webhook             | `https://staging.console.seams.sh/hook/dropbox`                               | `https://pantry.purin.io/hook/dropbox`                               |
+| Google Drive OAuth callback | `https://staging.console.seams.sh/v1/control/providers/google_drive/callback` | `https://pantry.purin.io/v1/control/providers/google_drive/callback` |
+| Google JavaScript origin    | `https://staging.console.seams.sh`                                            | `https://pantry.purin.io`                                            |
 
 See [Provider callback origins](../runbooks/provider-callback-origins.md) before
 adding an environment or changing a hostname.
 
 ## Credential placement
 
-The six deployment values identify Satyr's provider applications. OAuth access
-and refresh tokens issued for individual organisations are stored by Satyr's Vault
+The six deployment values identify Pantry's provider applications. OAuth access
+and refresh tokens issued for individual organisations are stored by Pantry's Vault
 after consent. They do not belong in Worker configuration.
 
 | Name                          | Source                            | Placement       | Browser-visible                     |
@@ -76,32 +76,32 @@ Repeat this procedure once for staging and once for production.
    select **Create app**.
 2. Choose **Scoped access** and **Full Dropbox**.
 
-   Satyr must read pre-existing files that an organisation explicitly grants. **App
+   Pantry must read pre-existing files that an organisation explicitly grants. **App
    folder** limits the app to its own `/Apps` folder and cannot support that
    flow.
 
-3. Give the app an environment-specific name, such as `Satyr Drive Staging` or
-   `Satyr Drive Production`.
+3. Give the app an environment-specific name, such as `Pantry Drive Staging` or
+   `Pantry Drive Production`.
 4. On **Permissions**, enable only:
 
    - `account_info.read`
    - `files.metadata.read`
    - `files.content.read`
 
-   Satyr requests and validates this exact scope set. Write, sharing, team,
+   Pantry requests and validates this exact scope set. Write, sharing, team,
    file-request, and collaboration permissions are unnecessary.
 
 5. On **Settings**, add the environment's exact OAuth redirect URI from the
    table above. Scheme, hostname, path, and trailing-slash behavior must match.
-6. Set **Allow public clients (Implicit Grant & PKCE)** to **Allow**. Satyr uses
+6. Set **Allow public clients (Implicit Grant & PKCE)** to **Allow**. Pantry uses
    authorization-code flow with PKCE and a server-side client secret. It does
    not use implicit grant.
 7. Add the environment's `/hook/dropbox` URL as the webhook URI. Dropbox should
    verify it by sending a `challenge` request and receiving the same value in an
    HTTP 200 response.
-8. Do not configure Chooser, Saver, or Embedder domains. Satyr uses the Dropbox
+8. Do not configure Chooser, Saver, or Embedder domains. Pantry uses the Dropbox
    API and its own granted-resource UI.
-9. Copy the **App key** to `DROPBOX_OAUTH_CLIENT_ID` for the matching Satyr
+9. Copy the **App key** to `DROPBOX_OAUTH_CLIENT_ID` for the matching Pantry
    environment.
 10. Reveal the **App secret** only when entering it into Wrangler as
     `DROPBOX_OAUTH_CLIENT_SECRET`.
@@ -148,7 +148,7 @@ Repeat this procedure in the staging project and production project.
 ### 2. Configure Google Auth Platform
 
 1. Open [Google Auth Platform](https://console.cloud.google.com/auth/overview)
-   and complete **Branding** with the Satyr application name, support email,
+   and complete **Branding** with the Pantry application name, support email,
    home page, privacy policy, terms, and authorized domains.
 2. Under **Audience**:
 
@@ -167,7 +167,7 @@ Repeat this procedure in the staging project and production project.
    https://www.googleapis.com/auth/drive.file
    ```
 
-   Satyr validates this exact scope. It lets the app access files the user
+   Pantry validates this exact scope. It lets the app access files the user
    selects through Google Picker without granting blanket Drive access.
 
 4. Use **Verification Center** to complete the production checks required by
@@ -210,8 +210,8 @@ application's secret.
    For current production:
 
    ```text
-   https://satyr-edge.n6378056.workers.dev
-   https://satyr-edge.n6378056.workers.dev/*
+   https://pantry.purin.io
+   https://pantry.purin.io/*
    ```
 
 5. Set **API restrictions** to **Restrict key** and allow the **Google Picker
@@ -329,10 +329,10 @@ pnpm --filter @purin-labs/platform exec wrangler secret list --env staging
 1. Verify the webhook challenge:
 
    ```bash
-   curl -fsS "${PANTRY_OAUTH_CALLBACK_ORIGIN}/hook/dropbox?challenge=satyr-dropbox-check"
+   curl -fsS "${PANTRY_OAUTH_CALLBACK_ORIGIN}/hook/dropbox?challenge=pantry-dropbox-check"
    ```
 
-   The response must be `satyr-dropbox-check` with HTTP 200.
+   The response must be `pantry-dropbox-check` with HTTP 200.
 
 2. In a disposable organisation workspace, select **Connect Dropbox**.
 3. Confirm Dropbox displays the expected environment-specific app name and only

@@ -135,7 +135,7 @@ it("fails closed when a recovered profile disallows the static fulfillment", asy
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       session: {
@@ -237,7 +237,7 @@ function pickupCompletedOrder(
   { fulfillment: "pickup"; state: "completed" }
 > {
   return {
-    schemaVersion: "underclerk.buyer-order.v1",
+    schemaVersion: "commerce.buyer-order.v1",
     checkoutId: "checkout_storefront_test",
     orderId: "order_storefront_test",
     paymentId: "payment_storefront_test",
@@ -262,7 +262,7 @@ function shippingDeliveredOrder(
   { fulfillment: "shipping"; state: "delivered" }
 > {
   return {
-    schemaVersion: "underclerk.buyer-order.v1",
+    schemaVersion: "commerce.buyer-order.v1",
     checkoutId: "checkout_storefront_test",
     orderId: "order_storefront_test",
     paymentId: "payment_storefront_test",
@@ -293,7 +293,7 @@ it("recovers and replaces the latest active Cart revision after reload", async (
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify(storedCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -330,10 +330,10 @@ it("recovers and replaces the latest active Cart revision after reload", async (
     expect(capturedRequests.every(hasRecoveredSessionAuthorization)).toBe(true);
     expect(
       JSON.parse(
-        storage.getItem(`satyr.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
       ),
     ).toMatchObject({
-      schemaVersion: "satyr.storefront-checkout-session.v7",
+      schemaVersion: "pantry.storefront-checkout-session.v7",
       session: { token: SESSION_TOKEN },
       operationId: OPERATION_ID,
       cart: { kind: "active", cartId: CART_ID, revision: 4 },
@@ -360,13 +360,13 @@ it("recovers and replaces the latest active Cart revision after reload", async (
     expect(replaceRequest).toBeDefined();
     expect(replaceRequest?.method).toBe("PUT");
     await expect(replaceRequest?.clone().json()).resolves.toMatchObject({
-      schemaVersion: "underclerk.replace-buyer-cart.v1",
+      schemaVersion: "commerce.replace-buyer-cart.v1",
       cartRevision: 4,
       lines: [{ kind: "catalog", variantId: "variant_cookie", quantity: 2 }],
     });
     expect(
       JSON.parse(
-        storage.getItem(`satyr.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
       ),
     ).toMatchObject({ cart: { kind: "active", cartId: CART_ID, revision: 5 } });
   } finally {
@@ -384,7 +384,7 @@ it("recovers and submits the buyer-selected shipping service", async () => {
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store/shipping");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify(storedShippingCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -424,10 +424,10 @@ it("recovers and submits the buyer-selected shipping service", async () => {
     });
     expect(
       JSON.parse(
-        storage.getItem(`satyr.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
       ),
     ).toMatchObject({
-      schemaVersion: "satyr.storefront-checkout-session.v7",
+      schemaVersion: "pantry.storefront-checkout-session.v7",
       basket: {
         items: [
           { variantId: "variant_cookie", quantity: 1 },
@@ -454,7 +454,7 @@ it("recovers and submits the buyer-selected shipping service", async () => {
     const replaceRequest = capturedRequests.find(isCartReplaceRequest);
     expect(replaceRequest).toBeDefined();
     await expect(replaceRequest?.clone().json()).resolves.toMatchObject({
-      schemaVersion: "underclerk.replace-buyer-cart.v1",
+      schemaVersion: "commerce.replace-buyer-cart.v1",
       cartRevision: 4,
       lines: [
         { kind: "catalog", variantId: "variant_cookie", quantity: 1 },
@@ -464,7 +464,7 @@ it("recovers and submits the buyer-selected shipping service", async () => {
     const checkoutRequest = capturedRequests.find(isShippingCheckoutRequest);
     expect(checkoutRequest).toBeDefined();
     await expect(checkoutRequest?.clone().json()).resolves.toMatchObject({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       cartId: CART_ID,
       cartRevision: 5,
       shippingServiceCode: "international_parcel_air_test",
@@ -499,7 +499,7 @@ it("recovers a Japan destination and sends every selected shipping line and addr
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store/shipping");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify(storedJapanShippingCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -557,7 +557,7 @@ it("recovers a Japan destination and sends every selected shipping line and addr
     const replaceRequest = capturedRequests.find(isCartReplaceRequest);
     expect(replaceRequest).toBeDefined();
     await expect(replaceRequest?.clone().json()).resolves.toMatchObject({
-      schemaVersion: "underclerk.replace-buyer-cart.v1",
+      schemaVersion: "commerce.replace-buyer-cart.v1",
       cartRevision: 4,
       lines: [
         { kind: "catalog", variantId: "variant_cookie", quantity: 1 },
@@ -570,7 +570,7 @@ it("recovers a Japan destination and sends every selected shipping line and addr
       throw new Error("Japan shipping checkout request was not captured");
     const checkoutBody: unknown = await checkoutRequest.clone().json();
     expect(checkoutBody).toMatchObject({
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       cartId: CART_ID,
       cartRevision: 5,
       shippingServiceCode: "domestic_parcel_test",
@@ -601,7 +601,7 @@ it("recovers an expired quote when the Cart reached submitted state before the r
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify(storedCheckout()),
   );
   Object.defineProperty(globalThis, "window", {
@@ -631,7 +631,7 @@ it("recovers an expired quote when the Cart reached submitted state before the r
         },
       },
       quote: {
-        schemaVersion: "underclerk.buyer-quoted-checkout.v1",
+        schemaVersion: "commerce.buyer-quoted-checkout.v1",
         checkoutId: CHECKOUT_ID,
         quote: { expiresAt: "2020-08-29T10:00:00.000Z" },
       },
@@ -643,7 +643,7 @@ it("recovers an expired quote when the Cart reached submitted state before the r
     ]);
     expect(
       JSON.parse(
-        storage.getItem(`satyr.checkout.${config.storefrontId}`) ?? "null",
+        storage.getItem(`pantry.checkout.${config.storefrontId}`) ?? "null",
       ),
     ).toMatchObject({
       cart: {
@@ -669,7 +669,7 @@ it("recovers a quote directly from a persisted submitted Cart reference", async 
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -717,7 +717,7 @@ it("reopens the same pending provider payment session after reload", async () =>
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -783,7 +783,7 @@ it("restores indeterminate and declined payment outcomes without reopening colle
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -883,7 +883,7 @@ it("rejects a recovered quote with fields outside the public response union", as
   const storage = new MemoryStorage();
   const config = storefrontConfiguration("/store");
   storage.setItem(
-    `satyr.checkout.${config.storefrontId}`,
+    `pantry.checkout.${config.storefrontId}`,
     JSON.stringify({
       ...storedCheckout(),
       cart: {
@@ -953,7 +953,7 @@ it("rejects mixed and cross-storefront checkout recovery records", () => {
     parseStoredCheckoutRecovery(
       {
         ...storedCheckout(),
-        schemaVersion: "satyr.storefront-checkout-session.v4",
+        schemaVersion: "pantry.storefront-checkout-session.v4",
       },
       cafe,
     ),
@@ -962,7 +962,7 @@ it("rejects mixed and cross-storefront checkout recovery records", () => {
     parseStoredCheckoutRecovery(
       {
         ...storedCheckout(),
-        schemaVersion: "satyr.storefront-checkout-session.v5",
+        schemaVersion: "pantry.storefront-checkout-session.v5",
       },
       cafe,
     ),
@@ -971,7 +971,7 @@ it("rejects mixed and cross-storefront checkout recovery records", () => {
     parseStoredCheckoutRecovery(
       {
         ...storedCheckout(),
-        schemaVersion: "satyr.storefront-checkout-session.v6",
+        schemaVersion: "pantry.storefront-checkout-session.v6",
       },
       cafe,
     ),
@@ -980,7 +980,7 @@ it("rejects mixed and cross-storefront checkout recovery records", () => {
     parseStoredCheckoutRecovery(
       {
         ...storedCheckout(),
-        schemaVersion: "satyr.storefront-checkout-session.v1",
+        schemaVersion: "pantry.storefront-checkout-session.v1",
       },
       cafe,
     ),
@@ -1083,7 +1083,7 @@ async function replacedCartResponse(request: Request): Promise<Response> {
     );
   }
   return Response.json({
-    schemaVersion: "underclerk.buyer-cart.v1",
+    schemaVersion: "commerce.buyer-cart.v1",
     cartId: CART_ID,
     revision: 5,
     checkoutProfile: {
@@ -1098,7 +1098,7 @@ async function replacedCartResponse(request: Request): Promise<Response> {
 
 function catalogResponse(): Response {
   return Response.json({
-    schemaVersion: "underclerk.buyer-catalog.v1",
+    schemaVersion: "commerce.buyer-catalog.v1",
     storefront: {
       storefrontId: "storefront_cafe",
       revision: 1,
@@ -1112,7 +1112,7 @@ function catalogResponse(): Response {
 
 function shippingCatalogResponse(): Response {
   return Response.json({
-    schemaVersion: "underclerk.buyer-catalog.v1",
+    schemaVersion: "commerce.buyer-catalog.v1",
     storefront: {
       storefrontId: "storefront_cookie_store_sg",
       revision: 1,
@@ -1178,7 +1178,7 @@ function shippingCatalogResponse(): Response {
 
 function cartResponse(): Response {
   return Response.json({
-    schemaVersion: "underclerk.buyer-cart.v1",
+    schemaVersion: "commerce.buyer-cart.v1",
     cartId: CART_ID,
     revision: 4,
     checkoutProfile: {
@@ -1194,7 +1194,7 @@ function cartResponse(): Response {
 
 function shippingCartResponse(): Response {
   return Response.json({
-    schemaVersion: "underclerk.buyer-cart.v1",
+    schemaVersion: "commerce.buyer-cart.v1",
     cartId: CART_ID,
     revision: 4,
     checkoutProfile: {
@@ -1218,7 +1218,7 @@ async function shippingReplacedCartResponse(
     );
   }
   return Response.json({
-    schemaVersion: "underclerk.buyer-cart.v1",
+    schemaVersion: "commerce.buyer-cart.v1",
     cartId: CART_ID,
     revision: 5,
     checkoutProfile: {
@@ -1235,9 +1235,9 @@ function checkoutResponse(): Response {
   const money = { amountMinor: 1_000, currency: "JPY" };
   const zeroMoney = { amountMinor: 0, currency: "JPY" };
   return Response.json({
-    schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+    schemaVersion: "commerce.buyer-checkout-recovery.v1",
     checkout: {
-      schemaVersion: "underclerk.buyer-quoted-checkout.v1",
+      schemaVersion: "commerce.buyer-quoted-checkout.v1",
       checkoutId: CHECKOUT_ID,
       revision: 1,
       state: "quoted",
@@ -1276,7 +1276,7 @@ function checkoutResponse(): Response {
 
 function paymentSessionResponse(): Response {
   return Response.json({
-    schemaVersion: "underclerk.buyer-payment-session.v1",
+    schemaVersion: "commerce.buyer-payment-session.v1",
     state: "ready",
     checkoutId: CHECKOUT_ID,
     checkoutRevision: 1,
@@ -1297,7 +1297,7 @@ function paymentSessionResponse(): Response {
 
 function storedCheckout(): Readonly<Record<string, unknown>> {
   return {
-    schemaVersion: "satyr.storefront-checkout-session.v7",
+    schemaVersion: "pantry.storefront-checkout-session.v7",
     merchantId: "merchant_nuki_cafe_demo",
     storefrontId: "storefront_cafe",
     session: sessionRecord(),
@@ -1313,11 +1313,11 @@ function storedCheckout(): Readonly<Record<string, unknown>> {
 
 function storedShippingCheckout(): Readonly<Record<string, unknown>> {
   return {
-    schemaVersion: "satyr.storefront-checkout-session.v7",
+    schemaVersion: "pantry.storefront-checkout-session.v7",
     merchantId: "merchant_nuki_cafe_demo",
     storefrontId: "storefront_cookie_store_sg",
     session: {
-      schemaVersion: "underclerk.buyer-session.v4",
+      schemaVersion: "commerce.buyer-session.v4",
       token: SESSION_TOKEN,
       expiresAt: "2099-08-29T10:00:00.000Z",
       storefrontRevision: 1,
@@ -1374,7 +1374,7 @@ function storedJapanShippingCheckout(): Readonly<Record<string, unknown>> {
 
 function sessionRecord(): Readonly<Record<string, unknown>> {
   return {
-    schemaVersion: "underclerk.buyer-session.v4",
+    schemaVersion: "commerce.buyer-session.v4",
     token: SESSION_TOKEN,
     expiresAt: "2099-08-29T10:00:00.000Z",
     storefrontRevision: 1,

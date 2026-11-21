@@ -24,8 +24,8 @@ Before activation, confirm that the Slack app has:
 For the current Worker origin, the production redirect URLs are:
 
 ```text
-https://satyr-edge.n6378056.workers.dev/slack/install
-https://satyr-edge.n6378056.workers.dev/v1/control/providers/slack/callback
+https://pantry.purin.io/slack/install
+https://pantry.purin.io/v1/control/providers/slack/callback
 ```
 
 See [Provider callback origins](../runbooks/provider-callback-origins.md) before
@@ -34,14 +34,14 @@ changing either URL.
 ## Reconcile the public app manifest
 
 The public app and the development app are separate Slack applications. Apply
-the production manifest to **Satyr Local** (`A0BTDETNVJ5`) with:
+the production manifest to **Pantry Local** (`A0BTDETNVJ5`) with:
 
 ```bash
 pnpm slack:public-app:update
 ```
 
 This command targets the public app explicitly. `pnpm slack:app:update` remains
-the Satyr Dev (`A0BFVDZLFLM`) workflow.
+the Pantry Dev (`A0BFVDZLFLM`) workflow.
 
 ## Activate Public Distribution
 
@@ -67,18 +67,18 @@ Public Distribution**.
    workspaces.
 3. Confirm that the workspace selector offers workspaces beyond the app's
    development workspace.
-4. Install the app in a disposable test workspace and complete Satyr's OAuth
+4. Install the app in a disposable test workspace and complete Pantry's OAuth
    callback.
-5. Confirm that the workspace appears as an active Slack account in the Satyr
+5. Confirm that the workspace appears as an active Slack account in the Pantry
    portal and that it can be removed independently.
 
-Public Distribution was verified active for **Satyr Local** on 2026-08-30. At
+Public Distribution was verified active for **Pantry Local** on 2026-08-30. At
 verification time, Slack displayed **Share Your App with Any Workspace** and
 **Deactivate Public Distribution**.
 
 The public manifest was applied and exported successfully on 2026-08-30. The
 live app has the exact runtime scope set, both production callbacks, and all
-four event subscriptions. Satyr Local was reinstalled successfully in Seams on
+four event subscriptions. Pantry Local was reinstalled successfully in Seams on
 2026-08-30, applying the updated scopes to that workspace. The remaining
 acceptance step is an installation in a separate test workspace.
 

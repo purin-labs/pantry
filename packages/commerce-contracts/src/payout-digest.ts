@@ -60,7 +60,7 @@ export function encodeSupplierPayoutEconomics(
       return assertNever(plan);
   }
   const encoder = new TextEncoder();
-  const domain = encoder.encode("satyr:supplier-payout:economics:v1");
+  const domain = encoder.encode("pantry:supplier-payout:economics:v1");
   const encodedFields = fields.map(encodeField.bind(null, encoder));
   let byteLength = domain.length;
   for (const field of encodedFields) byteLength += 8 + field.length;

@@ -114,7 +114,7 @@ export async function storeMediaUpload(
   return {
     kind: "stored",
     upload: {
-      schemaVersion: "underclerk.media-upload.v1",
+      schemaVersion: "commerce.media-upload.v1",
       sha256,
       contentType,
       byteSize: bytes.byteLength,

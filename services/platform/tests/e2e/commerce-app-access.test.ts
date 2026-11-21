@@ -15,14 +15,14 @@ import { PRODUCTION, PlanJourney } from "./production-plan-support";
 
 declare module "vitest" {
   interface TaskMeta {
-    underclerkAppAccess?: Record<string, unknown>;
+    commerceAppAccess?: Record<string, unknown>;
   }
 }
 
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 
 it(
-  "runs Satyr's commerce commands on its own app installation, for its own organisation's merchant only",
+  "runs Pantry's commerce commands on its own app installation, for its own organisation's merchant only",
   { timeout: 180_000 },
   appAccessJourney,
 );
@@ -45,11 +45,11 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
     organisationId,
     owner.identity.userId,
     merchantId,
-    { installSatyr: false },
+    { installPantry: false },
   );
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -66,8 +66,8 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
   expect(installed).toEqual([
     {
       kind: "app_installation",
-      appId: "satyr",
-      label: "Satyr",
+      appId: "pantry",
+      label: "Pantry",
       scopes: [...COMMERCE_API_SCOPES],
       revoked: false,
     },
@@ -86,13 +86,13 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
     neighbourOrganisation,
     neighbour.identity.userId,
     neighbourMerchant,
-    { installSatyr: false },
+    { installPantry: false },
   );
   const crossClient = createCommerceEntityPlaneClient(env, undefined, {
     kind: "organisation",
     organisationId,
   });
-  if (crossClient === null) throw new Error("Underclerk client missing");
+  if (crossClient === null) throw new Error("Commerce client missing");
   const cross = await crossClient.readListEntry(
     parseListEntryReadRequest({
       merchantId: neighbourMerchant,
@@ -107,8 +107,8 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
   expect(await credentials(neighbourMerchant)).toEqual([]);
 
   // 3. Uninstalled, Pantry's next command fails and Pantry stays out.
-  const uninstall = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/app-installations/satyr/revocation`,
+  const uninstall = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/app-installations/pantry/revocation`,
     { method: "POST", headers: { authorization: OPERATOR } },
   );
   expect(uninstall.status).toBe(200);
@@ -119,15 +119,15 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
   );
 
   // 4. A new install by the operator lets the same read through again.
-  const reinstall = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/app-installations/satyr`,
+  const reinstall = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/app-installations/pantry`,
     {
       method: "PUT",
       headers: { authorization: OPERATOR, "content-type": "application/json" },
       body: JSON.stringify({
         scopes: [...COMMERCE_API_SCOPES],
         externalReference: organisationId,
-        label: "Satyr",
+        label: "Pantry",
       }),
     },
   );
@@ -135,7 +135,7 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
   const [secondRequest] = await shop.createRequests(1);
   expect(secondRequest).toBeDefined();
 
-  task.meta.underclerkAppAccess = {
+  task.meta.commerceAppAccess = {
     beforeFirstCommand: [],
     afterFirstCommand: installed,
     otherOrganisationMerchant: { status: crossStatus, installations: 0 },
@@ -154,8 +154,8 @@ async function credentials(merchantId: string): Promise<
     revoked: boolean;
   }>[]
 > {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/api-credentials`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/api-credentials`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();

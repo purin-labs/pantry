@@ -268,8 +268,8 @@ function dispatchOriginCommand(
         origin: "https://localhost",
         "content-type": "application/json",
         "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({
         instruction: "Read the reviewed supplier inventory.",
@@ -770,7 +770,7 @@ async function idempotentWriteRetryJourney({ task }: TestContext) {
       "rest_create_replayed",
     ]);
     const [firstKey, retryKey] = server.writeKeys;
-    expect(firstKey).toMatch(/^satyr-[0-9a-f]{64}$/u);
+    expect(firstKey).toMatch(/^pantry-[0-9a-f]{64}$/u);
     expect(retryKey).toBe(firstKey);
     expect(firstKey).not.toContain(fixture.restWrite.integrationAccountId);
 
@@ -935,8 +935,8 @@ function dispatchControlWrite(
         origin: "https://localhost",
         "content-type": "application/json",
         "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: "{}",
     },

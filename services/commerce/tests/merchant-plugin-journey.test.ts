@@ -152,7 +152,7 @@ async function merchantPlugin(): Promise<void> {
     const draft = cakeRules(1, RULES);
     const dryRun = await required(
       admin.runPluginFunction(merchantId, {
-        schemaVersion: "underclerk.run-plugin-function.v1",
+        schemaVersion: "commerce.run-plugin-function.v1",
         definition: draft,
         functionId: "check_cart",
         settings: SETTINGS,
@@ -176,7 +176,7 @@ async function merchantPlugin(): Promise<void> {
     // The preview over recent checkouts names the order it would refuse.
     const preview = await required(
       admin.previewMerchantPlugin(merchantId, {
-        schemaVersion: "underclerk.preview-merchant-plugin.v1",
+        schemaVersion: "commerce.preview-merchant-plugin.v1",
         definition: draft,
         settings: SETTINGS,
       }),
@@ -279,7 +279,7 @@ async function merchantPlugin(): Promise<void> {
     const loop = cakeRules(2, "function run(input) { while (true) {} }");
     const budget = await required(
       admin.runPluginFunction(merchantId, {
-        schemaVersion: "underclerk.run-plugin-function.v1",
+        schemaVersion: "commerce.run-plugin-function.v1",
         definition: loop,
         functionId: "check_cart",
         settings: SETTINGS,
@@ -368,7 +368,7 @@ async function merchantPlugin(): Promise<void> {
     // Another merchant has only the built-in plugins.
     await required(
       admin.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: organisationId,
         merchantId: SECOND_MERCHANT,
         createdAt: NOW,

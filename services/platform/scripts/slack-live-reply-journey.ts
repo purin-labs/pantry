@@ -15,7 +15,7 @@
  *
  *   SLACK_LIVE_USER_TOKEN=xoxp-... \
  *   SLACK_LIVE_CHANNEL=C0123456789 \
- *   SLACK_APP_USER_ID=U0SATYRBOT \
+ *   SLACK_APP_USER_ID=U0PANTRYBOT \
  *   pnpm --filter @purin-labs/platform slack:live-reply
  */
 
@@ -46,7 +46,7 @@ async function main(): Promise<void> {
     identity.user_id === config.appUserId
   )
     throw new Error(
-      "The live journey needs a human user token; Satyr ignores bot messages.",
+      "The live journey needs a human user token; Pantry ignores bot messages.",
     );
 
   const nonce = `live-${randomUUID().slice(0, 8)}`;
@@ -71,7 +71,7 @@ async function main(): Promise<void> {
     failures.push(`app_messages_${appMessages.length}`);
 
   const evidence = {
-    kind: "satyr.slack.live-reply-journey.v1",
+    kind: "pantry.slack.live-reply-journey.v1",
     channel: config.channel,
     sentAt: new Date(startedAt).toISOString(),
     threadTs,

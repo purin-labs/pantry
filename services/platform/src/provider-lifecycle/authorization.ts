@@ -220,7 +220,7 @@ async function deriveProviderAuthorizationValue(
     ["sign"],
   );
   const message = [
-    "satyr-provider-authorization-v1",
+    "pantry-provider-authorization-v1",
     purpose,
     context.provider,
     JSON.stringify(context),

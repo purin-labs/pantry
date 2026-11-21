@@ -52,7 +52,7 @@ const mixedBuyerAuthority: CommerceCheckoutBuyerAuthorityV1 = {
 
 // @ts-expect-error A guest cannot select an account-owned saved address.
 const guestSavedAddressCheckout: CreateCommerceBuyerShippingCheckoutV1 = {
-  schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+  schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
   idempotencyKey: "guest_saved_address",
   cartId: "cart_guest",
   cartRevision: 1,

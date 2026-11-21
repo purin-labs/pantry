@@ -75,7 +75,7 @@ import { FIXTURE_NOW } from "../scripts/fixture-miniflare.ts";
 
 export const NOW = FIXTURE_NOW;
 export const SERVICE_TOKEN = "catalog_editing_service_token";
-export const BASE_URL = "https://underclerk.test";
+export const BASE_URL = "https://commerce.test";
 export const STOREFRONT = "storefront_cafe";
 export const CHANNEL = "sales_channel_cafe";
 export const LOCATION = "location_cafe";
@@ -319,7 +319,7 @@ export class Buyer {
   ): Promise<Buyer> {
     const session = await required(
       client.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "identified_customer", customerAccessToken },
       }),
     );
@@ -332,7 +332,7 @@ export class Buyer {
   ): Promise<Buyer> {
     const session = await required(
       client.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
     );
@@ -347,7 +347,7 @@ export class Buyer {
       STOREFRONT,
       this.#token,
       {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: this.#key("cart"),
         lines,
       },
@@ -360,7 +360,7 @@ export class Buyer {
       this.#cart === undefined
         ? await required(
             this.#client.createCart(merchantId, STOREFRONT, this.#token, {
-              schemaVersion: "underclerk.create-buyer-cart.v1",
+              schemaVersion: "commerce.create-buyer-cart.v1",
               idempotencyKey: this.#key("cart"),
               lines,
             }),
@@ -372,7 +372,7 @@ export class Buyer {
               this.#cart.cartId,
               this.#token,
               {
-                schemaVersion: "underclerk.replace-buyer-cart.v1",
+                schemaVersion: "commerce.replace-buyer-cart.v1",
                 idempotencyKey: this.#key("cart"),
                 cartRevision: this.#cart.revision,
                 lines,
@@ -394,7 +394,7 @@ export class Buyer {
       STOREFRONT,
       this.#token,
       {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: this.#key("cart"),
         lines,
       },
@@ -452,7 +452,7 @@ export class Buyer {
         checkout.checkoutId,
         this.#token,
         {
-          schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
           idempotencyKey: this.#key("refresh"),
           checkoutRevision: checkout.revision,
           quoteDigest: checkout.quote.quoteDigest,
@@ -473,7 +473,7 @@ export class Buyer {
         checkout.checkoutId,
         this.#token,
         {
-          schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+          schemaVersion: "commerce.reconcile-buyer-payment.v1",
           idempotencyKey: this.#paymentKey(checkout),
           checkoutRevision: checkout.revision,
           quoteDigest: checkout.quote.quoteDigest,
@@ -498,7 +498,7 @@ export class Buyer {
       STOREFRONT,
       this.#token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: this.#key("checkout"),
         cartId: this.#cart.cartId,
         cartRevision: this.#cart.revision,
@@ -529,7 +529,7 @@ export class Buyer {
       checkout.checkoutId,
       this.#token,
       {
-        schemaVersion: "underclerk.place-buyer-stored-value-checkout.v1",
+        schemaVersion: "commerce.place-buyer-stored-value-checkout.v1",
         idempotencyKey: this.#paymentKey(checkout),
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -544,7 +544,7 @@ export class Buyer {
       checkout.checkoutId,
       this.#token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: this.#paymentKey(checkout),
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -607,9 +607,9 @@ export async function startBackend(
     media?: MediaStore;
   }> = {},
 ) {
-  const directory = mkdtempSync(join(tmpdir(), "underclerk-catalog-editing-"));
+  const directory = mkdtempSync(join(tmpdir(), "commerce-catalog-editing-"));
   const database = new NodeCommerceDatabase(
-    join(directory, "underclerk.sqlite3"),
+    join(directory, "commerce.sqlite3"),
   );
   initializeCommerceSchema(database, NOW);
   const now = options.now ?? (() => NOW);
@@ -721,7 +721,7 @@ export async function startBackend(
     ...(options.media === undefined ? {} : { media: options.media }),
   });
   // The Worker sends queued email after each response; so does this fetch.
-  const databasePath = join(directory, "underclerk.sqlite3");
+  const databasePath = join(directory, "commerce.sqlite3");
   const fetch: typeof api.fetch = async (input, init) => {
     // As the merchant object: the MCP server's tools call the same API.
     const request = new Request(input, init);
@@ -773,7 +773,7 @@ export async function startBackend(
 export async function catalogFor(client: CommerceStorefrontClient) {
   const session = await required(
     client.createSession(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );

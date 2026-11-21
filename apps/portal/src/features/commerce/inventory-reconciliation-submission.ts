@@ -110,5 +110,5 @@ export function reconciliationFailure(
 }
 
 function storageKey(scope: ReconciliationScope): string {
-  return `satyr:inventory-reconciliation:${JSON.stringify([scope.userId, scope.organisationId, scope.positionId, scope.kind])}`;
+  return `pantry:inventory-reconciliation:${JSON.stringify([scope.userId, scope.organisationId, scope.positionId, scope.kind])}`;
 }

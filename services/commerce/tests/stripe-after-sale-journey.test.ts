@@ -82,7 +82,7 @@ it(
         earlyCheckout.checkoutId,
         early.token,
         {
-          schemaVersion: "underclerk.create-buyer-payment-session.v1",
+          schemaVersion: "commerce.create-buyer-payment-session.v1",
           idempotencyKey: "after_sale_unlinked_payment",
           checkoutRevision: earlyCheckout.revision,
           quoteDigest: earlyCheckout.quote.quoteDigest,
@@ -132,7 +132,7 @@ it(
           checkout.checkoutId,
           buyer.token,
           {
-            schemaVersion: "underclerk.create-buyer-payment-session.v1",
+            schemaVersion: "commerce.create-buyer-payment-session.v1",
             idempotencyKey: "after_sale_payment",
             checkoutRevision: checkout.revision,
             quoteDigest: checkout.quote.quoteDigest,
@@ -354,7 +354,7 @@ async function refundCommand(
 ): Promise<RefundCommerceOrderV1> {
   const fresh = await sale(admin);
   return {
-    schemaVersion: "underclerk.refund-order.v1",
+    schemaVersion: "commerce.refund-order.v1",
     merchantId,
     expectedMerchantRevision: fresh.merchantRevision,
     idempotencyKey: key,
@@ -426,8 +426,8 @@ async function post(
     {
       STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
       STRIPE_SECRET_KEY: SECRET_KEY,
-      UNDERCLERK_SERVICE_TOKEN: SERVICE_TOKEN,
-      UNDERCLERK_MERCHANT: {
+      COMMERCE_SERVICE_TOKEN: SERVICE_TOKEN,
+      COMMERCE_MERCHANT: {
         getByName: () => ({
           fetch: (request: Request) => backend.fetch(request),
         }),

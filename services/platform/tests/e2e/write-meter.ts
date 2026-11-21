@@ -34,13 +34,13 @@ const USD_PER_MILLION: Readonly<Record<Unit, number>> = {
 
 const ROW_CHANGES = "SELECT total_changes() AS changes";
 const STARTED = Symbol("write meter saw this start");
-const COMMERCE_OPERATOR = "Bearer underclerk-e2e-token";
+const COMMERCE_OPERATOR = "Bearer commerce-e2e-token";
 
 type ActorNamespace = DurableObjectNamespace<undefined>;
 type ActorReading = Readonly<{ changes: number; sameStart: boolean }>;
 type Reading = Readonly<{
   actors: ReadonlyMap<string, ActorReading>;
-  underclerk: Readonly<{ instance: string; changes: number }> | null;
+  commerce: Readonly<{ instance: string; changes: number }> | null;
   sends: Readonly<Record<string, number>>;
 }>;
 
@@ -51,8 +51,8 @@ export class WriteMeter {
   readonly #statements = new Map<string, number>();
   readonly #merchantId: string | null;
 
-  constructor(options: Readonly<{ underclerkMerchantId?: string }> = {}) {
-    this.#merchantId = options.underclerkMerchantId ?? null;
+  constructor(options: Readonly<{ commerceMerchantId?: string }> = {}) {
+    this.#merchantId = options.commerceMerchantId ?? null;
     const metered: Record<string, unknown> = { ...env };
     for (const [name, binding] of Object.entries(env)) {
       const unit = sendUnit(binding);
@@ -90,10 +90,10 @@ export class WriteMeter {
     for (const [name, reading] of after.actors)
       if (reading.sameStart) throw new Error(`${name} did not stop`);
     if (
-      after.underclerk?.instance === before.underclerk?.instance &&
-      after.underclerk
+      after.commerce?.instance === before.commerce?.instance &&
+      after.commerce
     )
-      throw new Error("The Underclerk merchant object did not stop");
+      throw new Error("The Commerce merchant object did not stop");
     return written(before, after);
   }
 
@@ -139,7 +139,7 @@ export class WriteMeter {
       actorReadings.set(name, await runInDurableObject(stub, readActor));
     return {
       actors: actorReadings,
-      underclerk:
+      commerce:
         this.#merchantId === null
           ? null
           : await commerceFixture(this.#merchantId, {
@@ -240,12 +240,12 @@ function written(before: Reading, after: Reading): WriteCounts {
       : 0;
     add(`rows ${name.slice(0, name.indexOf("/"))}`, reading.changes - earlier);
   }
-  if (after.underclerk !== null) {
-    const sameStart = after.underclerk.instance === before.underclerk?.instance;
+  if (after.commerce !== null) {
+    const sameStart = after.commerce.instance === before.commerce?.instance;
     add(
-      "rows Underclerk merchant",
-      after.underclerk.changes -
-        (sameStart ? (before.underclerk?.changes ?? 0) : 0),
+      "rows Commerce merchant",
+      after.commerce.changes -
+        (sameStart ? (before.commerce?.changes ?? 0) : 0),
     );
   }
   for (const [line, amount] of Object.entries(after.sends))
@@ -364,8 +364,8 @@ async function commerceFixture(
   merchantId: string,
   body: Readonly<{ kind: string }>,
 ): Promise<{ instance: string; changes: number }> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-fixture`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-fixture`,
     {
       method: "POST",
       headers: {
@@ -378,7 +378,7 @@ async function commerceFixture(
   const answer: unknown = await response.json();
   if (!response.ok || !isRecord(answer))
     throw new Error(
-      `Underclerk fixture ${body.kind}: ${JSON.stringify(answer)}`,
+      `Commerce fixture ${body.kind}: ${JSON.stringify(answer)}`,
     );
   return {
     instance: typeof answer.instance === "string" ? answer.instance : "",

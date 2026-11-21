@@ -439,7 +439,7 @@ const position: InventoryPosition = {
   provenance: {
     organisationId: "organisation_1",
     integrationAccountId: "integration_1",
-    source: "underclerk",
+    source: "commerce",
     resourceType: "inventory_position",
     resourceId: "position_1",
     revision: 1,
@@ -455,7 +455,7 @@ const productionBatch: ProductionBatch = {
   provenance: {
     organisationId: "organisation_1",
     integrationAccountId: "integration_1",
-    source: "underclerk",
+    source: "commerce",
     resourceType: "production_batch",
     resourceId: "batch_1",
     revision: 1,
@@ -550,7 +550,7 @@ const firstPartyReadyShipment: Shipment = {
   provenance: {
     organisationId: "organisation_1",
     integrationAccountId: "integration_1",
-    source: "underclerk",
+    source: "commerce",
     resourceType: "shipment",
     resourceId: "shipment_1",
     revision: 1,
@@ -743,7 +743,7 @@ const shipmentExportDocumentRelationship: CommerceRelationship = {
 const shipmentProductionBatchProvenance: SourceProvenance = {
   organisationId: "organisation_cafe",
   integrationAccountId: "integration_cafe",
-  source: "underclerk",
+  source: "commerce",
   resourceType: "shipment",
   resourceId: shipmentEntityId,
   revision: 1,
@@ -754,7 +754,7 @@ const shipmentProductionBatchProvenance: SourceProvenance = {
 const orderShipmentProvenance: SourceProvenance = {
   organisationId: "organisation_cafe",
   integrationAccountId: "integration_cafe",
-  source: "underclerk",
+  source: "commerce",
   resourceType: "commerce_order",
   resourceId: orderEntityId,
   revision: 1,
@@ -832,7 +832,7 @@ const systemCapabilityProfile: CommerceQueryCapabilityProfile = {
 };
 
 const customCapabilityProfile: CommerceQueryCapabilityProfile = {
-  kind: "underclerk_custom",
+  kind: "commerce_custom",
   entityTypeId: tradePartnerTypeId,
   publishedRevision: customEntityTypeRevision,
   capability: {
@@ -854,7 +854,7 @@ const listCapabilityProfile: CommerceQueryCapabilityProfile = {
 };
 
 const invalidCustomCapabilityProfile: CommerceQueryCapabilityProfile = {
-  kind: "underclerk_custom",
+  kind: "commerce_custom",
   // @ts-expect-error Commerce custom capability profiles require a custom type identity.
   entityTypeId: "shipment",
   capability: {
@@ -975,7 +975,7 @@ const invalidCursorPageOwner: import("./commerce-entity-plane").CommerceCursorPa
   {
     ...validCursorPayload,
     // @ts-expect-error Cursor authority is derived from its discriminated watermark.
-    pageOwner: { kind: "underclerk_native" },
+    pageOwner: { kind: "commerce_native" },
   };
 
 const invalidNormalizedSearch: import("./commerce-entity-plane").CommerceNormalizedPredicate =
@@ -986,7 +986,7 @@ const invalidNormalizedSearch: import("./commerce-entity-plane").CommerceNormali
   };
 
 const zeroSnapshotWatermark: CommerceReadWatermark = {
-  kind: "underclerk_native",
+  kind: "commerce_native",
   merchantRevision: zeroSnapshotRevision,
 };
 

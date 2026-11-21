@@ -201,7 +201,7 @@ async function choosePi(): Promise<void> {
   const selected = await selectOrganisationInferenceSelection({
     db: fixtureDatabase(),
     organisationId: ORGANISATION_ID,
-    selection: { kind: "satyr_platform" },
+    selection: { kind: "pantry_platform" },
     expectedConfigurationVersion: selection.configurationVersion,
     selectedByUserId: userId.value,
     now: Date.now(),
@@ -220,8 +220,8 @@ function sendPiMessage(
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({
         kind: "message",

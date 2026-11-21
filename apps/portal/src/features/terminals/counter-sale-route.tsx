@@ -95,7 +95,7 @@ export function CounterSaleRoute(
         </div>
         <div>
           <dt>Counter</dt>
-          <dd>{sale.satyrLocationId}</dd>
+          <dd>{sale.pantryLocationId}</dd>
         </div>
         {sale.quote === null ? null : (
           <div>

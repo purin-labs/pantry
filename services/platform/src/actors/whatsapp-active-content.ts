@@ -51,7 +51,7 @@ export type WhatsAppContentCipher = {
   digest(plaintext: string): Promise<string>;
 };
 
-const CONTEXT = "satyr-whatsapp-active-content-v1";
+const CONTEXT = "pantry-whatsapp-active-content-v1";
 const IV_BYTES = 12;
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();

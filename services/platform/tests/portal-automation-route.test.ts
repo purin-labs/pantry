@@ -35,7 +35,7 @@ const COMMERCE_OPERATIONS: CommerceOperationsTransport = {
   proposeAction: unusedCommerceRequest,
 };
 
-describe("CafeOS automation route ownership", () => {
+describe("Café automation route ownership", () => {
   it("normalizes form data into a precise operation command", () => {
     const values = new FormData();
     values.set("name", "  Back bar  ");
@@ -92,11 +92,11 @@ describe("CafeOS automation route ownership", () => {
     ).toThrow("Agent operations are unavailable.");
   });
 
-  it("renders an Underclerk governed refund amount", () => {
+  it("renders a Commerce governed refund amount", () => {
     const actionNonce = "00000000-0000-4000-8000-000000000002";
     const providerReceipt = {
       kind: "commerce_provider_receipt",
-      provider: "underclerk",
+      provider: "commerce",
       receiptId: "receipt_refund_1",
       effectId: "effect_refund_1",
       actionNonce,
@@ -129,7 +129,7 @@ describe("CafeOS automation route ownership", () => {
         amount: { value: 42.5, currency: "USD" },
         commerceSystem: {
           kind: "commerce_system",
-          system: "satyr_commerce",
+          system: "builtin_commerce",
           revision: 3,
         },
         details: {
@@ -142,7 +142,7 @@ describe("CafeOS automation route ownership", () => {
           notifyCustomer: false,
           note: null,
           execution: {
-            kind: "underclerk_full_refund",
+            kind: "commerce_full_refund",
             merchantRevision: 12,
             paymentId: "payment_1",
             paymentRevision: 4,
@@ -162,7 +162,7 @@ describe("CafeOS automation route ownership", () => {
 
     const action = parseCommerceActionRecordResponse(actionResponse);
     expect(action.receipt).toMatchObject({
-      provider: "underclerk",
+      provider: "commerce",
       projectionKind: "commerce_order",
       providerResource: {
         kind: "refund_attempt",
@@ -206,7 +206,7 @@ describe("CafeOS automation route ownership", () => {
           {
             action: {
               nonce: { value: actionNonce },
-              host: "satyr.commerce",
+              host: "pantry.commerce",
               verb: "commerce.order.cancel",
               resourceKey: "commerce:cancel_order:order_1",
               amount: action.amount,

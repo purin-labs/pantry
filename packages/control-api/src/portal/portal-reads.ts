@@ -262,7 +262,7 @@ export function parseCommerceSystemIdentity(
     throw new Error("Commerce system response is invalid.");
   }
   if (
-    raw.kind === "satyr_commerce" &&
+    raw.kind === "builtin_commerce" &&
     typeof raw.bindingId === "string" &&
     typeof raw.merchantId === "string"
   ) {

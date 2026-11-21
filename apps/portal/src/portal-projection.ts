@@ -4,7 +4,7 @@ import type { SetupFormDefaults } from "./features/integrations/settings-types";
 import type { Membership, OrganisationWorkspace, ReadinessBlocker } from "@purin-labs/control-api/portal/portal-types";
 import { isPortalHandle } from "@purin-labs/control-api/portal/portal-projection";
 
-const LAST_USED_WORKSPACE_STORAGE_PREFIX = "satyr.portal.last-used-workspace:";
+const LAST_USED_WORKSPACE_STORAGE_PREFIX = "pantry.portal.last-used-workspace:";
 
 export function isConfigurationConflict(error: unknown): boolean {
   return (

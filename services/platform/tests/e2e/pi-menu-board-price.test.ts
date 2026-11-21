@@ -237,7 +237,7 @@ it(
         "model provider (deterministic OpenRouter transport)",
         "Slack (signed events, interaction payloads and response URLs)",
       ],
-      real: ["Pantry Worker", "Underclerk fixture Worker", "screen feed"],
+      real: ["Pantry Worker", "Commerce fixture Worker", "screen feed"],
       toolOutputs: script.outputs,
       card: { text: card.text, buttons: cardButtons(card) },
       record: record.details,

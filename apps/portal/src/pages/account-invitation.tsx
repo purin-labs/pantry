@@ -65,7 +65,7 @@ function accountInvitationTokenKey(
   organisationId: string,
   invitationId: string,
 ): string {
-  return `satyr.accountInvitationToken:${JSON.stringify([organisationId, invitationId])}`;
+  return `pantry.accountInvitationToken:${JSON.stringify([organisationId, invitationId])}`;
 }
 
 function validInvitationValue(value: string | null): value is string {

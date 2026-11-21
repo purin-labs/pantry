@@ -448,7 +448,7 @@ async function completeCommerceActionFollowUp(
     if (!(await scheduleCommerceProjectionRefresh(input))) {
       return {
         kind: "unavailable",
-        code: "underclerk_projection_refresh_unavailable",
+        code: "commerce_projection_refresh_unavailable",
       };
     }
     const result = await acceptAndDeliverCommerceOutcome({
@@ -519,7 +519,7 @@ async function scheduleCommerceProjectionRefresh(
     now: number;
   }>,
 ): Promise<boolean> {
-  if (input.receipt.provider !== "underclerk") return true;
+  if (input.receipt.provider !== "commerce") return true;
   try {
     await input.env.EVENT_Q.send(
       createCommerceOutboxReconcileQueueMessage({

@@ -7,10 +7,10 @@ import {
   workspaceResourcePath,
 } from "../../../apps/portal/src/route";
 
-const ORGANISATION_HANDLE = "satyr-cafes";
+const ORGANISATION_HANDLE = "pantry-cafes";
 const WORKSPACE_HANDLE = "cafe-central";
 
-describe("CafeOS Plan 21 contracts", () => {
+describe("Café Plan 21 contracts", () => {
   it("round-trips every navigable page through one route descriptor", () => {
     expect(readPortalRoute("/portal")).toEqual({ kind: "organisation_list" });
     expect(readPortalRoute(`/portal/${ORGANISATION_HANDLE}`)).toEqual({
@@ -52,7 +52,7 @@ describe("CafeOS Plan 21 contracts", () => {
       "gid://shopify/Product/42",
     );
     expect(productPath).toBe(
-      "/portal/satyr-cafes/cafe-central/products/gid%253A%252F%252Fshopify%252FProduct%252F42",
+      "/portal/pantry-cafes/cafe-central/products/gid%253A%252F%252Fshopify%252FProduct%252F42",
     );
     expect(readPortalRoute(productPath)).toEqual({
       kind: "workspace",
@@ -71,7 +71,7 @@ describe("CafeOS Plan 21 contracts", () => {
         "customer_order",
         "order/42",
       ),
-    ).toBe("/portal/satyr-cafes/cafe-central/orders/order%252F42");
+    ).toBe("/portal/pantry-cafes/cafe-central/orders/order%252F42");
     expect(
       workspaceResourcePath(
         ORGANISATION_HANDLE,
@@ -79,7 +79,7 @@ describe("CafeOS Plan 21 contracts", () => {
         "supplier",
         "packaging/supply",
       ),
-    ).toBe("/portal/satyr-cafes/cafe-central/suppliers/packaging%252Fsupply");
+    ).toBe("/portal/pantry-cafes/cafe-central/suppliers/packaging%252Fsupply");
   });
 
   it("keeps malformed and extra-segment paths inside the not-found state", () => {
@@ -89,28 +89,28 @@ describe("CafeOS Plan 21 contracts", () => {
       workspaceHandle: null,
     });
     expect(
-      readPortalRoute("/portal/satyr-cafes/cafe-central/products/%ZZ"),
+      readPortalRoute("/portal/pantry-cafes/cafe-central/products/%ZZ"),
     ).toEqual({
       kind: "not_found",
       organisationHandle: ORGANISATION_HANDLE,
       workspaceHandle: WORKSPACE_HANDLE,
     });
     expect(
-      readPortalRoute("/portal/satyr-cafes/cafe-central/commerce/extra"),
+      readPortalRoute("/portal/pantry-cafes/cafe-central/commerce/extra"),
     ).toEqual({
       kind: "not_found",
       organisationHandle: ORGANISATION_HANDLE,
       workspaceHandle: WORKSPACE_HANDLE,
     });
     expect(
-      readPortalRoute("/portal/satyr-cafes/cafe-central/products/item/extra"),
+      readPortalRoute("/portal/pantry-cafes/cafe-central/products/item/extra"),
     ).toEqual({
       kind: "not_found",
       organisationHandle: ORGANISATION_HANDLE,
       workspaceHandle: WORKSPACE_HANDLE,
     });
     expect(
-      readPortalRoute("/portal/satyr-cafes/cafe-central/%E0%A4%A"),
+      readPortalRoute("/portal/pantry-cafes/cafe-central/%E0%A4%A"),
     ).toEqual({
       kind: "not_found",
       organisationHandle: ORGANISATION_HANDLE,

@@ -104,7 +104,7 @@ type CafeImageDeletion = Result<
       code:
         | "media_missing"
         | "media_on_product"
-        | "underclerk_unavailable"
+        | "commerce_unavailable"
         | "organisation_placement_conflict";
     }>
 >;
@@ -144,7 +144,7 @@ export async function deleteCafeImage(
   }
   if (boards.length > 0) return { ok: false, error: { code: "media_on_board", boards } };
   const library = await input.client.listMedia(input.merchantId);
-  if (!library.ok) return { ok: false, error: { code: "underclerk_unavailable" } };
+  if (!library.ok) return { ok: false, error: { code: "commerce_unavailable" } };
   const current = library.value.media.find((item) => item.id === input.mediaId);
   if (current === undefined) return { ok: false, error: { code: "media_missing" } };
   const deleted = await input.client.deleteMedia(
@@ -167,5 +167,5 @@ export async function deleteCafeImage(
     return { ok: false, error: { code: "media_on_product" } };
   if (refusedCode === "resource_not_found")
     return { ok: false, error: { code: "media_missing" } };
-  return { ok: false, error: { code: "underclerk_unavailable" } };
+  return { ok: false, error: { code: "commerce_unavailable" } };
 }

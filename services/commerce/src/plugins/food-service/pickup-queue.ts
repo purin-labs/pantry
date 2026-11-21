@@ -52,7 +52,7 @@ export function readPickupQueue(
       first.fulfillmentId.localeCompare(second.fulfillmentId),
   );
   return {
-    schemaVersion: "underclerk.pickup-queue.v1",
+    schemaVersion: "commerce.pickup-queue.v1",
     merchantId,
     merchantRevision,
     entries,

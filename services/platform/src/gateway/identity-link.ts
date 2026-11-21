@@ -250,9 +250,9 @@ export async function handleCompleteIdentityLink(
       403,
     );
   }
-  const sessionToken = readRequestCookie(request, "satyr_control_session");
-  const csrfCookie = readRequestCookie(request, "satyr_control_csrf");
-  const csrfHeader = request.headers.get("x-satyr-csrf");
+  const sessionToken = readRequestCookie(request, "pantry_session");
+  const csrfCookie = readRequestCookie(request, "pantry_csrf");
+  const csrfHeader = request.headers.get("x-pantry-csrf");
   if (
     sessionToken === null ||
     csrfCookie === null ||

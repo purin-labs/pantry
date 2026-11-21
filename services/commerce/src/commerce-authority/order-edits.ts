@@ -102,7 +102,7 @@ export type OrderExchangeCommitRequest = Readonly<{
 
 /** The record of a buyer opening a balance checkout. */
 export type OpenCommerceOrderBalanceInternalV1 = Readonly<{
-  schemaVersion: "underclerk.open-order-balance.internal.v1";
+  schemaVersion: "commerce.open-order-balance.internal.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: string;
@@ -206,7 +206,7 @@ export class OrderEditCommandAuthority {
         : findResource(snapshot.resources.orders, orderId);
     if (snapshot === undefined || order === undefined) return undefined;
     return {
-      schemaVersion: "underclerk.order-changes.v1",
+      schemaVersion: "commerce.order-changes.v1",
       orderId: order.id,
       orderRevision: order.revision,
       changes: listOrderChanges(this.#options.database, merchantId, order.id),
@@ -339,7 +339,7 @@ export class OrderEditCommandAuthority {
         });
         this.#options.commitBalanceCheckout({
           command: {
-            schemaVersion: "underclerk.open-order-balance.internal.v1",
+            schemaVersion: "commerce.open-order-balance.internal.v1",
             merchantId: claims.merchantId,
             idempotencyKey: checkoutId,
             requestedAt,

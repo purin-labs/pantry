@@ -19,14 +19,14 @@ an order. The contract is [the spec](spec.md), section 3.
    the Commerce Worker:
 
    ```text
-   https://underclerk.n6378056.workers.dev/v1/admin/merchants/<merchantId>/mcp
+   https://commerce.pantry.purin.io/v1/admin/merchants/<merchantId>/mcp
    ```
 
    For Claude Code:
 
    ```bash
    claude mcp add --transport http commerce \
-     https://underclerk.n6378056.workers.dev/v1/admin/merchants/<merchantId>/mcp \
+     https://commerce.pantry.purin.io/v1/admin/merchants/<merchantId>/mcp \
      --header "Authorization: Bearer <your key>"
    ```
 

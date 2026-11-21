@@ -91,7 +91,7 @@ describe("local commerce walking loop", () => {
     if (sourceEvent === undefined)
       throw new Error("commerce lab source event missing");
     const normalized = normalizeLabCommerceDelivery({
-      schemaVersion: "satyr.commerce.lab.event.v1",
+      schemaVersion: "pantry.commerce.lab.event.v1",
       namespace: "lab_local_loop",
       runId: run.value.runId,
       scenarioId: run.value.scenarioId,
@@ -200,7 +200,7 @@ describe("local commerce walking loop", () => {
         authorityPartition: authority.authorityPartition,
         authority: {
           kind: "commerce_system",
-          system: "satyr_commerce",
+          system: "builtin_commerce",
           revision: requiredCommerceSystemRevision(),
         },
         caseId: requiredCaseId(),
@@ -309,7 +309,7 @@ describe("local commerce walking loop", () => {
     for (const sourceEvent of run.value.events.slice(0, 2)) {
       const observedAt = sourceEvent.occurredAt;
       const normalized = normalizeLabCommerceDelivery({
-        schemaVersion: "satyr.commerce.lab.event.v1",
+        schemaVersion: "pantry.commerce.lab.event.v1",
         namespace: "lab_local_loop",
         runId: run.value.runId,
         scenarioId: run.value.scenarioId,
@@ -378,7 +378,7 @@ describe("local commerce walking loop", () => {
         authorityPartition: authority.authorityPartition,
         authority: {
           kind: "commerce_system",
-          system: "satyr_commerce",
+          system: "builtin_commerce",
           revision: requiredCommerceSystemRevision(),
         },
         caseId: requiredCaseId(),

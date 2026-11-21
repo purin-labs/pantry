@@ -147,7 +147,7 @@ export type CommerceControlRoute =
       action: "activate" | "inactivate" | null;
     }>
   | Readonly<{ kind: "commerceSystemSync"; organisationIdRaw: string }>
-  | Readonly<{ kind: "satyrCommerceDemo"; organisationIdRaw: string }>
+  | Readonly<{ kind: "builtInCommerceDemo"; organisationIdRaw: string }>
   | Readonly<{ kind: "commerceCueRefresh"; organisationIdRaw: string }>
   | Readonly<{ kind: "commercePublishedResources"; organisationIdRaw: string }>
   | Readonly<{ kind: "commerceExportPreset"; organisationIdRaw: string }>
@@ -328,8 +328,8 @@ export function matchCommerceControlRoute(
       action: null,
     };
   }
-  const demo = organisation(pathname, "commerce-system/satyr-commerce/demo");
-  if (demo !== null) return { kind: "satyrCommerceDemo", organisationIdRaw: demo };
+  const demo = organisation(pathname, "commerce-system/builtin-commerce/demo");
+  if (demo !== null) return { kind: "builtInCommerceDemo", organisationIdRaw: demo };
   const sync = organisation(pathname, "commerce-system/sync");
   if (sync !== null) return { kind: "commerceSystemSync", organisationIdRaw: sync };
   const system = organisation(pathname, "commerce-system");
@@ -649,7 +649,7 @@ export function handleCommerceControlRoute(
       );
     case "commerceSystemSync":
       return handleCommerceSystemSync(request, env, route.organisationIdRaw);
-    case "satyrCommerceDemo":
+    case "builtInCommerceDemo":
       return handlePantryCommerceDemo(request, env, route.organisationIdRaw);
     case "commerceCueRefresh":
       return handleCommerceCueRefresh(request, env, route.organisationIdRaw);

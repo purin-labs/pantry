@@ -43,7 +43,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const MANIFEST = join(root, "repo-binaries.json");
-const BUCKET = "satyr-repo-binaries-apac";
+const BUCKET = "pantry-repo-binaries-apac";
 
 /** The manifest: `files` maps a path to its entry, `folders` maps a folder ("…/") to the entries of its files. */
 export function readManifest(path = MANIFEST) {

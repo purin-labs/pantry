@@ -128,7 +128,7 @@ async function openEditor(
       headers: {
         Upgrade: "websocket",
         Origin: "https://localhost",
-        Cookie: `satyr_control_session=${encodeURIComponent(person.session.token)}`,
+        Cookie: `pantry_session=${encodeURIComponent(person.session.token)}`,
       },
     },
   );

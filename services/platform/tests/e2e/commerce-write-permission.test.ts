@@ -60,7 +60,7 @@ async function listEntryPermissionJourney({
   );
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",

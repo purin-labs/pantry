@@ -35,17 +35,17 @@ export const RESPONSIBILITY_SCOPE_COMMERCE: ResponsibilityScopeCommerce = {
   },
   async resolvePublishedScope({ env, organisationId, merchantId, scope }) {
     if (
-      env.UNDERCLERK_BASE_URL === undefined ||
-      env.UNDERCLERK_SERVICE_TOKEN === undefined
+      env.COMMERCE_BASE_URL === undefined ||
+      env.COMMERCE_SERVICE_TOKEN === undefined
     ) {
       return { ok: false, error: { code: "unavailable" } };
     }
     const client = createPublishedResourceClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
       ),
     });
     if (client === null) {

@@ -120,7 +120,7 @@ async function payDraftThroughInvoice(): Promise<void> {
           opened.checkout.checkoutId,
           opened.session.token,
           {
-            schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+            schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
             idempotencyKey: "kenji_refresh",
             checkoutRevision: opened.checkout.revision,
             quoteDigest: opened.checkout.quote.quoteDigest,

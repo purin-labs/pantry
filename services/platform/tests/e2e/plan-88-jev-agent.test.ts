@@ -96,7 +96,7 @@ it(
     const read = toolValue(lastOutput(journey, "READJEV"));
     expect(read).toEqual(await features(fixture, author));
     expect(read).toMatchObject({
-      funding: "satyr_platform",
+      funding: "pantry_platform",
       keyAvailable: true,
       screenRelevance: { enabled: true },
     });

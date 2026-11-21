@@ -55,7 +55,7 @@ export const COMMERCE_RESERVED_SHOP_NAMES: ReadonlySet<string> = new Set([
   "portal",
   "postmaster",
   "root",
-  "satyr",
+  "pantry",
   "seams",
   "security",
   "shop",
@@ -69,7 +69,7 @@ export const COMMERCE_RESERVED_SHOP_NAMES: ReadonlySet<string> = new Set([
   "support",
   "test",
   "tv",
-  "underclerk",
+  "commerce",
   "webmaster",
   "www",
 ]);
@@ -111,7 +111,7 @@ function isShopNameForm(value: string): boolean {
 
 /** A storefront's shop names, for its merchant. */
 export const commerceStorefrontShopNameV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.storefront-shop-name.v1"),
+  schemaVersion: Type.Literal("commerce.storefront-shop-name.v1"),
   merchantId: text,
   storefrontId: text,
   name: Type.Union([commerceShopNameSchema, Type.Null()]),
@@ -137,12 +137,12 @@ export type SetCommerceStorefrontShopNameV1 = Static<
  */
 export const commerceStorefrontShopNameChangeV1Schema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.storefront-shop-name-change.v1"),
+    schemaVersion: Type.Literal("commerce.storefront-shop-name-change.v1"),
     outcome: Type.Literal("set"),
     shopName: commerceStorefrontShopNameV1Schema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.storefront-shop-name-change.v1"),
+    schemaVersion: Type.Literal("commerce.storefront-shop-name-change.v1"),
     outcome: Type.Literal("refused"),
     reason: Type.Union([
       Type.Literal("invalid"),
@@ -158,7 +158,7 @@ export type CommerceStorefrontShopNameChangeV1 = Static<
 
 /** The public answer for one name: the storefront that a shop site opens. */
 export const commerceShopNameV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.shop-name.v1"),
+  schemaVersion: Type.Literal("commerce.shop-name.v1"),
   name: commerceShopNameSchema,
   merchantId: text,
   storefrontId: text,

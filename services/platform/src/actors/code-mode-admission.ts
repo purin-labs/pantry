@@ -555,7 +555,7 @@ function commitExecutionRequest(
     actorId: current.state.identity.sessionId,
     streamId: current.state.identity.streamId,
     sequence: state.state.contract.lastEventSequence,
-    sourceTime: { kind: "satyr", issuedAt: acceptedAt },
+    sourceTime: { kind: "pantry", issuedAt: acceptedAt },
     acceptedAt,
     correlationId: reserve.executionId,
     causation: { kind: "command", commandId },

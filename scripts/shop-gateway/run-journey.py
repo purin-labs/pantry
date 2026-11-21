@@ -30,7 +30,7 @@ RESULT: dict = {"steps": []}
 
 def single_database_schema_file():
     """The one-database schema, built from the two deployed baselines."""
-    out = Path(tempfile.mkdtemp(prefix="satyr-single-database-")) / "schema.sql"
+    out = Path(tempfile.mkdtemp(prefix="pantry-single-database-")) / "schema.sql"
     subprocess.run(
         ["node", str(ROOT / "services/platform/scripts/single-database-schema.mjs"), str(out)],
         check=True,
@@ -67,12 +67,12 @@ class Member:
         with urllib.request.urlopen(request) as response:
             cookies = [header.split(";")[0] for header in response.headers.get_all("set-cookie")]
         self.cookie = "; ".join(cookies)
-        self.csrf = next(c.split("=", 1)[1] for c in cookies if c.startswith("satyr_control_csrf="))
+        self.csrf = next(c.split("=", 1)[1] for c in cookies if c.startswith("pantry_csrf="))
 
     def call(self, method: str, route: str, body: dict | None = None) -> tuple[int, dict]:
         headers = {"cookie": self.cookie, "origin": PLATFORM}
         if method != "GET":
-            headers.update({"content-type": "application/json", "x-satyr-csrf": self.csrf,
+            headers.update({"content-type": "application/json", "x-pantry-csrf": self.csrf,
                             "idempotency-key": f"journey-{uuid.uuid4()}"})
         request = urllib.request.Request(f"{PLATFORM}/v1/control/organisations/{self.organisation_id}/{route}",
                                          method=method, headers=headers,

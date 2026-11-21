@@ -144,7 +144,7 @@ async function storefrontRevision(
 ): Promise<number> {
   const session: CommerceBuyerSessionV4 = await required(
     client.createSession(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );

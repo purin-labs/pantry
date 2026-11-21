@@ -15,7 +15,7 @@ export function kitchenObservation(
     kind: "surface-observation",
     schemaVersion: 2,
     surface: "workflow-simulator",
-    area: "BakeryOS",
+    area: "kitchen",
     instance: {
       browserInstanceId,
       surfaceSessionId: context.surfaceSessionId,

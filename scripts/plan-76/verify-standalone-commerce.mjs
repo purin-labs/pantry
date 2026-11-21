@@ -20,14 +20,14 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const worker = join(root, "services/commerce");
-const output = resolve(root, process.argv[2] ?? "docs/evidence/plan-76-phase-1/standalone-underclerk.json");
+const output = resolve(root, process.argv[2] ?? "docs/evidence/plan-76-phase-1/standalone-commerce.json");
 const COMMERCE_ENGINE = ["services/commerce/", "apps/storefront/", "packages/commerce-contracts/", "packages/commerce-client/", "packages/commerce-query-sqlite/"];
 const NEUTRAL = ["packages/std/", "packages/type-utils/", "packages/contract-schema/"];
 const ALLOWED_WORKSPACE = /^@purin-labs\/(commerce-[\w-]+|storefront|std|type-utils|contract-schema)$/;
 
 const startedAt = new Date().toISOString();
 const evidence = {
-  journey: "plan-76-phase-1-standalone-underclerk",
+  journey: "plan-76-phase-1-standalone-commerce",
   startedAt,
   commit: git(["rev-parse", "HEAD"]),
   workingTreeClean: git(["status", "--porcelain"]).length === 0,
@@ -65,7 +65,7 @@ evidence.dependencyGraph = {
 };
 
 // 2. Build the Worker. The storefront assets are not part of the bundle.
-const scratch = mkdtempSync(join(tmpdir(), "underclerk-standalone-"));
+const scratch = mkdtempSync(join(tmpdir(), "commerce-standalone-"));
 try {
   const wrangler = readFileSync(join(worker, "wrangler.jsonc"), "utf8");
   const compatibilityDate = /"compatibility_date":\s*"([^"]+)"/.exec(wrangler)?.[1];
@@ -73,7 +73,7 @@ try {
   writeFileSync(
     config,
     JSON.stringify({
-      name: "underclerk-standalone-check",
+      name: "commerce-standalone-check",
       main: join(worker, "src/worker.ts"),
       compatibility_date: compatibilityDate,
       compatibility_flags: ["nodejs_compat"],
@@ -130,14 +130,14 @@ evidence.boundaryCheck = {
 };
 
 // 4. The Commerce suite.
-const report = join(tmpdir(), `underclerk-suite-${process.pid}.json`);
+const report = join(tmpdir(), `commerce-suite-${process.pid}.json`);
 const suite = spawnSync(join(worker, "node_modules/.bin/vitest"), ["run", "--reporter=json", `--outputFile=${report}`], {
   cwd: worker,
   encoding: "utf8",
 });
 const results = JSON.parse(readFileSync(report, "utf8"));
 rmSync(report, { force: true });
-evidence.underclerkSuite = {
+evidence.commerceSuite = {
   status: suite.status,
   files: results.testResults.length,
   tests: results.numTotalTests,
@@ -147,11 +147,11 @@ evidence.underclerkSuite = {
 };
 
 evidence.finishedAt = new Date().toISOString();
-evidence.passed = evidence.dependencyGraph.passed && evidence.workerBuild.passed && evidence.boundaryCheck.passed && evidence.underclerkSuite.passed;
+evidence.passed = evidence.dependencyGraph.passed && evidence.workerBuild.passed && evidence.boundaryCheck.passed && evidence.commerceSuite.passed;
 mkdirSync(dirname(output), { recursive: true });
 writeFileSync(output, `${JSON.stringify(evidence, null, 2)}\n`);
 console.log(
-  `${evidence.passed ? "PASSED" : "FAILED"}: graph ${names.size} packages (${workspaceInGraph.join(", ")}); bundle ${evidence.workerBuild.inputs} inputs, ${evidence.workerBuild.outside.length} outside; boundary refusal ${evidence.boundaryCheck.deliberateCrossing.status}; suite ${evidence.underclerkSuite.passedTests}/${evidence.underclerkSuite.tests}`,
+  `${evidence.passed ? "PASSED" : "FAILED"}: graph ${names.size} packages (${workspaceInGraph.join(", ")}); bundle ${evidence.workerBuild.inputs} inputs, ${evidence.workerBuild.outside.length} outside; boundary refusal ${evidence.boundaryCheck.deliberateCrossing.status}; suite ${evidence.commerceSuite.passedTests}/${evidence.commerceSuite.tests}`,
 );
 console.log(`evidence: ${relative(root, output)}`);
 process.exit(evidence.passed ? 0 : 1);
@@ -162,7 +162,7 @@ function areaOf(input) {
     // resolves it to its real directory, so this is an npm package.
     return "npm";
   }
-  if (COMMERCE_ENGINE.some((prefix) => input.startsWith(prefix))) return "underclerk";
+  if (COMMERCE_ENGINE.some((prefix) => input.startsWith(prefix))) return "commerce";
   if (NEUTRAL.some((prefix) => input.startsWith(prefix))) return "neutral";
   if (!input.includes("/") || input.startsWith("../") || input.startsWith("(")) return "build-runtime";
   return "outside";

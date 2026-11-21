@@ -128,7 +128,7 @@ function commerceActionProviderSupported(
 ): boolean {
   if (source === "lab") return true;
   if (source === "shopify") return kind === "cancel_order";
-  if (source === "underclerk") {
+  if (source === "commerce") {
     return (
       kind === "update_product_description" ||
       kind === "publish_catalog_listing" ||
@@ -219,7 +219,7 @@ async function commerceActionPermission(
 }
 
 /**
- * The Orders page reads an Commerce order from Commerce, so it names the
+ * The Orders page reads a Commerce order from Commerce, so it names the
  * order by Commerce's own id. The local projection and the provider call
  * name it by its canonical id.
  */
@@ -231,7 +231,7 @@ async function withCanonicalOrderId(
   if (
     body.kind !== "cancel_order" ||
     typeof body.resourceId !== "string" ||
-    body.resourceId.startsWith("underclerk:")
+    body.resourceId.startsWith("commerce:")
   )
     return body;
   const environment = await readOrganisationEnvironment(db, organisationId);
@@ -481,7 +481,7 @@ export async function handleCommerceActions(
   let draft: Awaited<ReturnType<typeof buildCommerceActionDraft>>;
   if (
     parsed.value.kind === "cancel_order" &&
-    current.value.projection.provenance.source === "underclerk"
+    current.value.projection.provenance.source === "commerce"
   ) {
     if (current.value.kind !== "commerce_order") {
       return commerceActionErrorResponse({
@@ -495,15 +495,15 @@ export async function handleCommerceActions(
     });
     if (!binding.ok) {
       return controlError(
-        binding.error.code === "underclerk_binding_not_found"
-          ? "underclerk_binding_missing"
-          : "underclerk_binding_mismatch",
+        binding.error.code === "commerce_binding_not_found"
+          ? "commerce_binding_missing"
+          : "commerce_binding_mismatch",
         503,
       );
     }
     if (
-      commerceAuthority.value.provider !== "underclerk" ||
-      commerceAuthority.value.commerceSystem.kind !== "satyr_commerce" ||
+      commerceAuthority.value.provider !== "commerce" ||
+      commerceAuthority.value.commerceSystem.kind !== "builtin_commerce" ||
       binding.value.organisationId !== authorized.organisationId ||
       binding.value.integrationAccountId !== integrationAccountId.value ||
       binding.value.bindingId !==
@@ -511,14 +511,14 @@ export async function handleCommerceActions(
       binding.value.merchantId !==
         commerceAuthority.value.commerceSystem.merchantId
     ) {
-      return controlError("underclerk_binding_mismatch", 503);
+      return controlError("commerce_binding_mismatch", 503);
     }
     const client = createCommerceClient(env, undefined, {
       kind: "organisation",
       organisationId: String(authorized.organisationId),
       actor: String(authorized.membership.personId),
     });
-    if (client === null) return controlError("underclerk_unavailable", 503);
+    if (client === null) return controlError("commerce_unavailable", 503);
     const orderId = commerceProviderResourceId(
       binding.value.merchantId,
       parsed.value.resourceId,
@@ -534,8 +534,8 @@ export async function handleCommerceActions(
       requestedAt: new Date(now).toISOString(),
     });
     if (!authority.ok) {
-      return authority.error.code === "underclerk_unavailable"
-        ? controlError("underclerk_unavailable", 503)
+      return authority.error.code === "commerce_unavailable"
+        ? controlError("commerce_unavailable", 503)
         : controlError("commerce_action_invalid", 422);
     }
     draft = await buildCommerceCancellationActionDraft({
@@ -1783,7 +1783,7 @@ function commerceEntityPlaneExecutionErrorResponse(error: {
     case "commerce_entity_plane_proposal_conflict":
       return controlError(error.code, 409);
     case "commerce_entity_plane_binding_missing":
-    case "commerce_entity_plane_underclerk_unavailable":
+    case "commerce_entity_plane_commerce_unavailable":
     case "commerce_entity_plane_command_invalid":
       return controlError(error.code, 503);
     case "commerce_entity_plane_command_rejected":

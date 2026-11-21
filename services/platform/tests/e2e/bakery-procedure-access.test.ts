@@ -53,7 +53,7 @@ async function procedureAccessJourney({ task }: TestContext): Promise<void> {
     db: scope.database,
     organisationId,
   });
-  if (!commerce.ok || commerce.value.commerceSystem.kind !== "satyr_commerce")
+  if (!commerce.ok || commerce.value.commerceSystem.kind !== "builtin_commerce")
     throw new Error("Missing commerce binding");
   const client = createCommerceEntityPlaneClient(env, undefined, {
     kind: "organisation",
@@ -99,7 +99,7 @@ async function procedureAccessJourney({ task }: TestContext): Promise<void> {
   const reader = new CommerceGraphReader({
     organisationId,
     merchantId,
-    underclerk: new CommerceEngineSource({
+    commerce: new CommerceEngineSource({
       organisationId,
       merchantId,
       integrationAccountId: commerce.value.integrationAccountId,

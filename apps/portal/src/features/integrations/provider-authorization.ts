@@ -249,7 +249,7 @@ export function beginCodexAuthorizationPolling(
 }
 
 type ProviderCompletionMessageBase = {
-  readonly type: "satyr.provider-attempt.completed";
+  readonly type: "pantry.provider-attempt.completed";
   readonly attempt_id: string;
   readonly provider: string | null;
 };
@@ -268,7 +268,7 @@ type ProviderCompletionMessage =
 // provider consent pages are adopting Cross-Origin-Opener-Policy, which
 // severs window.opener once enforced. Must match the channel name in
 // services/platform/src/control/routes/integrations.ts.
-const PROVIDER_ATTEMPT_CHANNEL = "satyr-provider-attempt";
+const PROVIDER_ATTEMPT_CHANNEL = "pantry-provider-attempt";
 
 type ProviderCompletionContext = {
   readonly props: IntegrationsRouteProps;
@@ -364,11 +364,11 @@ function handleProviderChannelCompletion(
 }
 
 function providerCompletionAck(completion: ProviderCompletionMessage): {
-  readonly type: "satyr.provider-attempt.ack";
+  readonly type: "pantry.provider-attempt.ack";
   readonly attempt_id: string;
 } {
   return {
-    type: "satyr.provider-attempt.ack",
+    type: "pantry.provider-attempt.ack",
     attempt_id: completion.attempt_id,
   };
 }
@@ -476,7 +476,7 @@ function parseProviderCompletionMessage(
 ): ProviderCompletionMessage | null {
   if (
     !isRecord(raw) ||
-    raw.type !== "satyr.provider-attempt.completed" ||
+    raw.type !== "pantry.provider-attempt.completed" ||
     typeof raw.attempt_id !== "string" ||
     raw.attempt_id.length === 0
   ) {
@@ -492,7 +492,7 @@ function parseProviderCompletionMessage(
     case "expired":
       return raw.failure_reason_code === null
         ? {
-            type: "satyr.provider-attempt.completed",
+            type: "pantry.provider-attempt.completed",
             attempt_id: raw.attempt_id,
             terminal_state: raw.terminal_state,
             failure_reason_code: null,
@@ -503,7 +503,7 @@ function parseProviderCompletionMessage(
       return typeof raw.failure_reason_code === "string" &&
         raw.failure_reason_code.length > 0
         ? {
-            type: "satyr.provider-attempt.completed",
+            type: "pantry.provider-attempt.completed",
             attempt_id: raw.attempt_id,
             terminal_state: "failed",
             failure_reason_code: raw.failure_reason_code,

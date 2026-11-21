@@ -106,7 +106,7 @@ export function parseDiscordInteraction(
     return invalidPayload("guild_id");
   }
 
-  if (!isRecord(raw.data) || raw.data.name !== "satyr") {
+  if (!isRecord(raw.data) || raw.data.name !== "pantry") {
     return { ok: false, error: { code: "discord_command_unsupported" } };
   }
 

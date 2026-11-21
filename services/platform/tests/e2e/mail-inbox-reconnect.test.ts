@@ -222,7 +222,7 @@ async function startReconnect(
   const headers = commerceHeaders(person.session);
   headers.set("idempotency-key", crypto.randomUUID());
   headers.set(
-    "x-satyr-configuration-version",
+    "x-pantry-configuration-version",
     String(await configurationVersion(organisationId)),
   );
   return exports.default.fetch(

@@ -139,9 +139,9 @@ async function acceptsOrderAttention(context: TestContext): Promise<void> {
     ),
   );
   const native = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const before = await native.readSnapshot(MERCHANT_ID);
   if (!before.ok) throw new Error("Mock shop snapshot unavailable");
@@ -226,12 +226,12 @@ async function acceptsOrderAttention(context: TestContext): Promise<void> {
 }
 
 async function mutateFixture(kind: "seed" | "resolve"): Promise<void> {
-  const result = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT_ID}/test-fixture`,
+  const result = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${MERCHANT_ID}/test-fixture`,
     {
       method: "POST",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({

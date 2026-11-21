@@ -84,7 +84,7 @@ export type CounterReceiptPrintResponse = Static<
 
 export const counterReceiptSettingsSchema = Type.Object(
   {
-    satyrLocationId: text,
+    pantryLocationId: text,
     invoiceRegistrationNumber: Type.Union([
       Type.Null(),
       Type.String({ pattern: INVOICE_REGISTRATION_NUMBER_PATTERN }),

@@ -195,7 +195,7 @@ export function reserveTypeSafeEvaluation(
     return failure("inactive");
   }
   const limits = authority.limits;
-  if (authority.funding.kind === "satyr_platform") {
+  if (authority.funding.kind === "pantry_platform") {
     if (
       readRecentPantryTypeSafeCount(sql, input.organisationId, input.now) >=
       JEV_REQUESTS_PER_SECOND

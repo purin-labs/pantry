@@ -1703,7 +1703,7 @@ function idempotencyKeyForNonce(
   integrationAccountId: IntegrationAccountId,
   nonce: string,
 ): string {
-  return `satyr:${integrationAccountId}:${nonce}`;
+  return `pantry:${integrationAccountId}:${nonce}`;
 }
 
 function invalidTransition(

@@ -587,8 +587,8 @@ function call(
     method: body === null ? "GET" : "POST",
     headers: {
       origin: "https://localhost",
-      cookie: `satyr_control_session=${actor.session.token}; satyr_control_csrf=${actor.session.csrfToken}`,
-      "x-satyr-csrf": actor.session.csrfToken,
+      cookie: `pantry_session=${actor.session.token}; pantry_csrf=${actor.session.csrfToken}`,
+      "x-pantry-csrf": actor.session.csrfToken,
       "content-type": "application/json",
     },
     ...(body === null ? {} : { body: JSON.stringify(body) }),

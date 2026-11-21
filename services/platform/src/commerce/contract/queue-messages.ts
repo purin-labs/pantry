@@ -32,7 +32,7 @@ export type CommerceDeliveryQueueMessage = {
 };
 
 export type CommerceOutboxReconcileQueueMessage = {
-  readonly type: "underclerk.outbox_reconcile.v1";
+  readonly type: "commerce.outbox_reconcile.v1";
   readonly requestId: RequestId;
   readonly receivedAt: number;
   readonly organisationId: OrganisationId;
@@ -68,7 +68,7 @@ export function createCommerceOutboxReconcileQueueMessage(
     integrationAccountId: IntegrationAccountId;
   }>,
 ): CommerceOutboxReconcileQueueMessage {
-  return { type: "underclerk.outbox_reconcile.v1", ...input };
+  return { type: "commerce.outbox_reconcile.v1", ...input };
 }
 
 export function parseCommerceEventQueuePayload(
@@ -177,7 +177,7 @@ export function parseCommerceOutboxReconcileQueuePayload(
   return {
     ok: true,
     value: {
-      type: "underclerk.outbox_reconcile.v1",
+      type: "commerce.outbox_reconcile.v1",
       requestId: requestId.value,
       receivedAt: receivedAt.value,
       organisationId: organisationId.value,

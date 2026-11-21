@@ -4,7 +4,7 @@ Status: Active operator runbook
 Last reviewed: 2026-10-19
 
 A Pi Code Mode script runs in the QuickJS VM of the `CodeModeSandbox` class.
-That class lives in its own Worker, `satyr-code-mode-sandbox`
+That class lives in its own Worker, `pantry-code-sandbox`
 (`services/platform/wrangler.code-mode-sandbox.jsonc`). The Platform Worker
 binds the class by name as `CODE_MODE_SANDBOX`. [Integration architecture: capabilities and tools (was Spec 10)](../architecture/integrations.md#capabilities-and-tools)
 describes the engine and its recovery. This runbook covers the deployment
@@ -19,11 +19,11 @@ pnpm --filter @purin-labs/platform run deploy
 
 The command runs its builds and checks first. It then deploys in this order:
 
-1. `satyr-code-mode-sandbox`, the sandbox Worker.
-2. `satyr-model-exit`, the model exit Worker
+1. `pantry-code-sandbox`, the sandbox Worker.
+2. `pantry-model-exit`, the model exit Worker
    ([Plan 73](../plan-73-model-exit-worker.md)).
-3. `satyr-edge`, the Platform Worker with its containers.
-4. `satyr-slack-ingress`, the Slack ingress Worker.
+3. `pantry`, the Platform Worker with its containers.
+4. `pantry-slack-ingress`, the Slack ingress Worker.
 
 The sandbox and the exit Worker deploy first because the Platform Worker
 names them. A failed deployment of either stops the command before the

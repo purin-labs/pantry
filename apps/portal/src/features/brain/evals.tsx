@@ -143,7 +143,7 @@ type EvalsPanelViewProps = EvalsLinks &
   }>;
 
 const DEFAULT_CHOICE: EvalRunChoice = {
-  routes: ["satyr_platform"],
+  routes: ["pantry_platform"],
   candidateMemoryId: "",
 };
 

@@ -42,7 +42,7 @@ export const WHATSAPP_REPLY_PROPOSAL_MACHINE = {
     send_indeterminate: {
       kind: "intermediate",
       meaning:
-        "Satyr cannot prove if Meta took the message. The Case is fenced until a person states the outcome.",
+        "Pantry cannot prove if Meta took the message. The Case is fenced until a person states the outcome.",
       exit: { kind: "person", surface: "inbox_whatsapp_reply_review" },
     },
     sent: {

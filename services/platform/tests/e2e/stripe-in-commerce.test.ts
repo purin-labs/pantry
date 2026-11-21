@@ -19,21 +19,21 @@ import {
 
 declare module "vitest" {
   interface TaskMeta {
-    stripeInUnderclerk?: Record<string, unknown>;
+    stripeInCommerce?: Record<string, unknown>;
   }
 }
 
 const PUBLIC_ORIGIN = "https://localhost";
 // Pantry's Connect application and Commerce's platform key are one
 // Stripe platform; the fake tells their requests apart by key.
-const SATYR_PLATFORM_KEY = "Bearer sk_test_satyr_platform_e2e";
-const COMMERCE_PLATFORM_KEY = "Bearer sk_test_underclerk_e2e";
+const PANTRY_PLATFORM_KEY = "Bearer sk_test_pantry_platform_e2e";
+const COMMERCE_PLATFORM_KEY = "Bearer sk_test_commerce_e2e";
 const CONNECTED_TOKEN = "sk_test_cafe_connected";
 const CONNECTED_ACCOUNT = "acct_cafeconnected01";
 const NEW_ACCOUNT = "acct_cafeonboarding01";
 
 it(
-  "opens Stripe onboarding through Underclerk, shows the account active when Stripe finishes it, connects an existing account on a test-mode platform for a production shop, and follows its state",
+  "opens Stripe onboarding through Commerce, shows the account active when Stripe finishes it, connects an existing account on a test-mode platform for a production shop, and follows its state",
   { timeout: 180_000 },
   stripeInCommerceJourney,
 );
@@ -169,7 +169,7 @@ async function stripeInCommerceJourney({ task }: TestContext): Promise<void> {
     { providerAccountId: CONNECTED_ACCOUNT, state: "active" },
   ]);
 
-  task.meta.stripeInUnderclerk = {
+  task.meta.stripeInCommerce = {
     onboarding: {
       accountsCreated: stripe.createdAccounts.length,
       links: stripe.links.length,
@@ -211,7 +211,7 @@ class FakeStripe {
 
   async exchange(request: FakeRequest): Promise<Response> {
     const form = new URLSearchParams(await request.text());
-    expect(form.get("client_secret")).toBe("sk_test_satyr_platform_e2e");
+    expect(form.get("client_secret")).toBe("sk_test_pantry_platform_e2e");
     if (this.exchangeFailures > 0) {
       this.exchangeFailures -= 1;
       return HttpResponse.json(
@@ -230,7 +230,7 @@ class FakeStripe {
     const url = new URL(request.url);
     const authorization = request.headers.get("authorization");
     if (url.pathname === "/v1/webhook_endpoints/we_e2e") {
-      expect(authorization).toBe(SATYR_PLATFORM_KEY);
+      expect(authorization).toBe(PANTRY_PLATFORM_KEY);
       return HttpResponse.json({
         id: "we_e2e",
         status: "enabled",
@@ -311,7 +311,7 @@ async function connectStripe(
   organisationId: string,
   session: IssuedControlSession,
   idempotencyKey = "stripe-cafe-connect",
-  expectedPage = "satyr.provider-attempt.completed",
+  expectedPage = "pantry.provider-attempt.completed",
 ): Promise<void> {
   const started = await exports.default.fetch(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/providers/stripe/start`,
@@ -343,7 +343,7 @@ async function openSupportReference(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}`,
     {
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: PUBLIC_ORIGIN,
       },
     },
@@ -378,7 +378,7 @@ async function paymentAccounts(
     `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}/commerce/payment-accounts`,
     {
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: PUBLIC_ORIGIN,
       },
     },

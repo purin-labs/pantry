@@ -31,7 +31,7 @@ root in separate terminals:
 
 ```sh
 node scripts/run-worker.mjs platform dev local
-node scripts/run-worker.mjs underclerk dev local
+node scripts/run-worker.mjs commerce dev local
 ```
 
 These profiles retain `.wrangler/square-acceptance` persistence and listen on
@@ -68,13 +68,13 @@ The operator selected the existing ChatGPT Pro account and its purchased
 credits. Two consecutive live GPT-5.6 Luna turns succeeded on that connection
 at 0% included allowance remaining. Connection revision 3 and authentication
 generation 1 remain connected. The allowance resets on 2026-10-04 at 02:39 JST;
-this date does not prevent credit-funded turns. Satyr now keeps allowance
+this date does not prevent credit-funded turns. Pantry now keeps allowance
 percentages as diagnostics and fences actual account verification failures.
 The integration meter explains included allowance and credits separately.
 
 The browser account matches the materialized harness identity, and its training
 switch was observed off without changing it. On 2026-10-02 the operator directed
-Satyr to disclose retention and recipient handling beside the processing toggle
+Pantry to disclose retention and recipient handling beside the processing toggle
 and in these docs. Further formal retention/recipient-review work is outside this
 authorized local-pilot delivery. A fixed ChatGPT Pro/Codex retention period and
 the complete downstream-provider list remain unverified; training being off
@@ -88,7 +88,7 @@ operator supplied controlled addresses and confirmed three synthetic historical
 messages arrived. The reviewed preview correctly classified all three samples;
 no rules or supplier work were persisted. See the
 [live historical preview evidence](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-29F-live-historical-preview-2026-10-02.md).
-At the preview checkpoint, the shared Underclerk service used a different local
+At the preview checkpoint, the shared Commerce service used a different local
 dataset. The subsequent supplier run restored the Financier profile. Reconnect
 changes the Gmail source pin and requires a new matching review.
 
@@ -101,7 +101,7 @@ and no rules, supplier Cases or reply drafts are pending. See the
 That preview cleanup does not establish live mailbox exit or erasure.
 
 The subsequent [live supplier run](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/plan-29F-live-supplier-2026-10-02.md)
-restored the shared Platform/Underclerk services to the existing Financier
+restored the shared Platform/Commerce services to the existing Financier
 profile and recreated the namespaced purchasing fixtures at merchant revision 181. Live classification, canonical automatic drafting, Inbox editing and
 correction, external Gmail edit fencing, source revocation/restoration and
 rejected-draft provider cleanup passed. A separate version-3 reply and its
@@ -201,7 +201,7 @@ For the configured local database, back it up before applying the patch, then ru
 from `services/platform`:
 
 ```sh
-pnpm exec wrangler d1 execute satyr --env local --local --persist-to .wrangler/square-acceptance --file scripts/plan29f-inbox-d1-patch.sql
+pnpm exec wrangler d1 execute pantry --env local --local --persist-to .wrangler/square-acceptance --file scripts/plan29f-inbox-d1-patch.sql
 node ../../scripts/run-worker.mjs platform schema local
 ```
 
@@ -210,7 +210,7 @@ native D1 recovery bookmark in the restricted register before applying the same
 file with `--env production --remote`. From the platform package:
 
 ```sh
-pnpm exec wrangler d1 time-travel info satyr --env production --json
+pnpm exec wrangler d1 time-travel info pantry --env production --json
 ```
 
 Keep the bookmark in owner-only local evidence. Rehearse the patch against the
@@ -245,7 +245,7 @@ and deployment have their own required evidence.
    saved text before approval. Also change a draft in Gmail before submitting an
    older Inbox edit; confirm the stale edit is rejected without another write.
    Avoid simultaneous editing during a Gmail update: Gmail supplies no atomic
-   conditional draft update, so Satyr's pre/post-read checks cannot prevent every
+   conditional draft update, so Pantry's pre/post-read checks cannot prevent every
    external edit between those reads.
 6. Introduce a synthetic ambiguous supplier match or update the purchasing
    snapshot. Confirm the earlier grounded reply cannot be approved. Use

@@ -126,7 +126,7 @@ async function pauseAndResume(): Promise<void> {
       admin.previewPluginChange(merchantId, "stored_value", "pause"),
     );
     expect(preview).toEqual({
-      schemaVersion: "underclerk.plugin-preview.v1",
+      schemaVersion: "commerce.plugin-preview.v1",
       pluginId: "stored_value",
       change: "pause",
       refusal: null,
@@ -180,7 +180,7 @@ async function pauseAndResume(): Promise<void> {
     // Another merchant keeps its own plugins.
     await required(
       admin.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: organisationId,
         merchantId: SECOND_MERCHANT,
         createdAt: NOW,
@@ -296,7 +296,7 @@ class PluginDesk extends OrderDesk {
 
   change(pluginId: string, expectedRevision: number) {
     return {
-      schemaVersion: "underclerk.pause-plugin.v1" as const,
+      schemaVersion: "commerce.pause-plugin.v1" as const,
       ...this.editBase(`pause_${pluginId}_${this.step}`),
       pluginId,
       expectedRevision,
@@ -330,7 +330,7 @@ class PluginDesk extends OrderDesk {
 
   giftCard(accountId: string, code: string, amountMinor: number) {
     return {
-      schemaVersion: "underclerk.issue-gift-card.v1" as const,
+      schemaVersion: "commerce.issue-gift-card.v1" as const,
       ...this.editBase(`issue_${accountId}`),
       accountId,
       code,

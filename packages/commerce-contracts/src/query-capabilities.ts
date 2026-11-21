@@ -61,7 +61,7 @@ const systemMappedSavedViewCapabilitySourceSchema = OpenObject({
   capability: commerceCapabilityMatrixSchema,
 });
 const commerceCustomSavedViewCapabilitySourceSchema = OpenObject({
-  kind: Type.Literal("underclerk_custom"),
+  kind: Type.Literal("commerce_custom"),
   entityTypeId: queryIdentitySchema<"CustomCommerceEntityTypeId">(),
   publishedRevision: revisionSchema<"CustomEntityTypeRevision">(),
   capability: commerceCapabilityMatrixSchema,
@@ -128,7 +128,7 @@ const sourceWire = Type.Union([
     capability: matrixWire,
   }),
   OpenObject({
-    kind: Type.Literal("underclerk_custom"),
+    kind: Type.Literal("commerce_custom"),
     entityTypeId: Type.String(),
     publishedRevision: revisionWire,
     capability: matrixWire,
@@ -200,7 +200,7 @@ export function parseCommerceSavedViewCapabilitySource(
       if (source.systemSchemaRevision === 0)
         return invalidRevision("SystemSchemaRevision");
       break;
-    case "underclerk_custom":
+    case "commerce_custom":
       if (
         !Value.Check(
           commerceCustomSavedViewCapabilitySourceSchema.properties

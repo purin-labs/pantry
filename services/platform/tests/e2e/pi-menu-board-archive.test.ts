@@ -141,7 +141,7 @@ it(
 
     task.meta.menuBoardArchive = {
       substituted: ["model provider (deterministic OpenRouter transport)", "Slack (signed events)"],
-      real: ["Pantry Worker, the Organisation Actor's boards and screens, the media routes", "Underclerk fixture Worker with its R2 store"],
+      real: ["Pantry Worker, the Organisation Actor's boards and screens, the media routes", "Commerce fixture Worker with its R2 store"],
       agentOnScreen: redactIds(script.outputs.find((text) => text.includes("A screen shows this board")) ?? ""),
       agentArchived: redactIds(script.outputs.find((text) => text.includes('"archived":true')) ?? "")
         .replace(/"archivedAt":\d+/gu, '"archivedAt":…'),

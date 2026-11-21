@@ -342,7 +342,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     if (!payable(request.money, binding))
       return this.#unavailableSession("payment_request_invalid");
     return {
-      schemaVersion: "underclerk.payment-session-result.v1",
+      schemaVersion: "commerce.payment-session-result.v1",
       kind: "ready",
       paymentAttemptId: request.paymentAttemptId,
       session: {
@@ -383,7 +383,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     if (row === undefined) {
       if (request.confirmation.kind !== "square_source_token")
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "declined",
           reason: "payment_method_required",
         };
@@ -443,7 +443,7 @@ export class SquarePaymentGateway implements PaymentProvider {
                 request.merchantId,
                 request.paymentAttemptId,
               ),
-              note: `Underclerk ${request.paymentAttemptId}`,
+              note: `Commerce ${request.paymentAttemptId}`,
             },
           );
     if (response.kind === "unavailable")
@@ -453,7 +453,7 @@ export class SquarePaymentGateway implements PaymentProvider {
       // card, which gets a new token and so a new idempotency key.
       if (row.paymentId === null) this.#forget(request);
       return {
-        schemaVersion: "underclerk.payment-capture-result.v1",
+        schemaVersion: "commerce.payment-capture-result.v1",
         kind: "declined",
         reason:
           response.category === "PAYMENT_METHOD_ERROR"
@@ -480,7 +480,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     switch (payment.status) {
       case "COMPLETED":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "captured",
           providerPaymentReference: payment.id,
           capturedAt: this.#now(),
@@ -488,20 +488,20 @@ export class SquarePaymentGateway implements PaymentProvider {
       case "APPROVED":
       case "PENDING":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "processing",
           reason: "payment_processing",
           reconcileAfter: this.#later(),
         };
       case "CANCELED":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "declined",
           reason: "payment_cancelled",
         };
       case "FAILED":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "declined",
           reason: "payment_declined",
         };
@@ -568,7 +568,7 @@ export class SquarePaymentGateway implements PaymentProvider {
         // The buyer stands at the counter, so the merchant's alarm reads
         // the Terminal again within seconds.
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "processing",
           reason: "payment_processing",
           reconcileAfter: new Date(
@@ -577,7 +577,7 @@ export class SquarePaymentGateway implements PaymentProvider {
         };
       case "CANCELED":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "declined",
           reason: "payment_cancelled",
         };
@@ -619,7 +619,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     )
       return this.#indeterminate("provider_response_invalid");
     return {
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "captured",
       providerPaymentReference: payment.id,
       capturedAt: this.#now(),
@@ -646,7 +646,7 @@ export class SquarePaymentGateway implements PaymentProvider {
       request.refundMoney.amountMinor > request.money.amountMinor
     )
       return {
-        schemaVersion: "underclerk.payment-refund-result.v1",
+        schemaVersion: "commerce.payment-refund-result.v1",
         kind: "rejected",
         reason: "refund_request_invalid",
       };
@@ -679,7 +679,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     if (response.kind === "unavailable") return this.#unknownRefund(request);
     if (response.kind === "refused")
       return {
-        schemaVersion: "underclerk.payment-refund-result.v1",
+        schemaVersion: "commerce.payment-refund-result.v1",
         kind: "rejected",
         reason: "refund_rejected",
       };
@@ -709,7 +709,7 @@ export class SquarePaymentGateway implements PaymentProvider {
       return read.kind === "ok"
         ? this.#refundResult(request, read.body.refund)
         : {
-            schemaVersion: "underclerk.payment-refund-result.v1",
+            schemaVersion: "commerce.payment-refund-result.v1",
             kind: "processing",
             reconciliationIdentity: earlier.providerRefundReference,
             reconcileAfter: this.#later(),
@@ -759,7 +759,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     switch (refund.status) {
       case "COMPLETED":
         return {
-          schemaVersion: "underclerk.payment-refund-result.v1",
+          schemaVersion: "commerce.payment-refund-result.v1",
           kind: "refunded",
           providerRefundReference: refund.id,
           money: request.refundMoney,
@@ -767,14 +767,14 @@ export class SquarePaymentGateway implements PaymentProvider {
         };
       case "PENDING":
         return {
-          schemaVersion: "underclerk.payment-refund-result.v1",
+          schemaVersion: "commerce.payment-refund-result.v1",
           kind: "processing",
           reconciliationIdentity: refund.id,
           reconcileAfter: this.#later(),
         };
       default:
         return {
-          schemaVersion: "underclerk.payment-refund-result.v1",
+          schemaVersion: "commerce.payment-refund-result.v1",
           kind: "rejected",
           reason: "refund_rejected",
         };
@@ -785,7 +785,7 @@ export class SquarePaymentGateway implements PaymentProvider {
     request: MerchantPaymentRefundCommand,
   ): CommercePaymentRefundResultV1 {
     return {
-      schemaVersion: "underclerk.payment-refund-result.v1",
+      schemaVersion: "commerce.payment-refund-result.v1",
       kind: "indeterminate",
       reconciliationIdentity: request.idempotencyKey,
       reconcileAfter: this.#later(),
@@ -822,7 +822,7 @@ export class SquarePaymentGateway implements PaymentProvider {
 
   #unavailableSession(reason: string): CommercePaymentSessionResultV1 {
     return {
-      schemaVersion: "underclerk.payment-session-result.v1",
+      schemaVersion: "commerce.payment-session-result.v1",
       kind: "unavailable",
       reason,
       retryAfter: this.#later(),
@@ -831,7 +831,7 @@ export class SquarePaymentGateway implements PaymentProvider {
 
   #indeterminate(reason: string): CommercePaymentCaptureResultV1 {
     return {
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "indeterminate",
       reason,
       reconcileAfter: this.#later(),
@@ -965,7 +965,7 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
         this.#now(),
       );
     return {
-      schemaVersion: "underclerk.in-person-collection-result.v1",
+      schemaVersion: "commerce.in-person-collection-result.v1",
       kind: "ready",
       paymentAttemptId: request.paymentAttemptId,
       session: {
@@ -994,7 +994,7 @@ export class SquareTerminalGateway implements InPersonCollectionGateway {
 
   #unavailable(reason: string): CommerceInPersonCollectionResultV1 {
     return {
-      schemaVersion: "underclerk.in-person-collection-result.v1",
+      schemaVersion: "commerce.in-person-collection-result.v1",
       kind: "unavailable",
       reason,
       retryAfter: new Date(
@@ -1085,7 +1085,7 @@ function squareBinding(row: AccountRow): SquareOnlineBinding {
   return {
     provider: "square_online",
     account: {
-      integrationAccountId: `underclerk_square_${row.providerAccountId}`,
+      integrationAccountId: `commerce_square_${row.providerAccountId}`,
       providerAccountId: row.providerAccountId,
       environment: row.environment,
       capabilityRevision: 1,

@@ -115,7 +115,7 @@ export async function readVaultStoreSummary(
 ): Promise<VaultStoreSummary> {
   const store = await readOnePasswordStore(scope);
   return store === null
-    ? { kind: "satyr" }
+    ? { kind: "pantry" }
     : {
         kind: "onepassword",
         vaultTitle: store.vaultTitle,
@@ -130,7 +130,7 @@ export async function listVaultStoreItems(
 > {
   const pantryItems = await listVaultItems(input.scope);
   const store = await readOnePasswordStore(input.scope);
-  if (store === null) return { store: { kind: "satyr" }, items: pantryItems };
+  if (store === null) return { store: { kind: "pantry" }, items: pantryItems };
   const remote = await listOnePasswordItems(input.env, input.scope, store);
   return {
     store: storeView(store, remote !== null),
@@ -151,7 +151,7 @@ export async function createVaultStoreItem(
       create: input.create,
     });
     if (created.ok)
-      await recordVaultEvent(input, "item_added", created.value, "satyr");
+      await recordVaultEvent(input, "item_added", created.value, "pantry");
     return created;
   }
   const answer = await callOnePassword(input, store, {
@@ -185,7 +185,7 @@ export async function commandVaultStoreItem(
         outcome.value.kind === "item"
           ? outcome.value.item
           : { itemId: input.itemId, label },
-        "satyr",
+        "pantry",
       );
     return outcome;
   }
@@ -336,7 +336,7 @@ export async function disconnectOnePassword(
   ]);
   listCache.delete(input.scope.organisationId);
   await recordVaultEvent(input, "store_disconnected", null, "onepassword");
-  return { ok: true, value: { kind: "satyr" } };
+  return { ok: true, value: { kind: "pantry" } };
 }
 
 /**
@@ -428,7 +428,7 @@ export async function moveVaultItems(
       if (moved === 0) return archived;
       break;
     }
-    await recordVaultEvent(input, "item_moved", copied.value, "satyr");
+    await recordVaultEvent(input, "item_moved", copied.value, "pantry");
     moved += 1;
   }
   listCache.delete(input.scope.organisationId);

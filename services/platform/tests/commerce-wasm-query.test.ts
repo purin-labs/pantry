@@ -71,8 +71,8 @@ describe("commerce query WASM boundary", function commerceQueryWasmSuite() {
       ok: true,
       value: {
         kind: "cursor_stale",
-        expected: { kind: "underclerk_native", merchantRevision: 2 },
-        received: { kind: "underclerk_native", merchantRevision: 1 },
+        expected: { kind: "commerce_native", merchantRevision: 2 },
+        received: { kind: "commerce_native", merchantRevision: 1 },
       },
     });
   });
@@ -107,7 +107,7 @@ function createPlannerRequest(
     organisationId: "organisation_1",
     merchantId: "merchant_1",
     watermark: {
-      kind: "underclerk_native",
+      kind: "commerce_native",
       merchantRevision: watermarkRevision,
     },
     capabilities: {

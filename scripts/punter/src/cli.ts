@@ -9,7 +9,7 @@ import {
 
 keepStdoutForResult();
 const result = await runPunterPickupScenario({
-  baseUrl: requiredEnvironment("PUNTER_UNDERCLERK_BASE_URL"),
+  baseUrl: requiredEnvironment("PUNTER_COMMERCE_BASE_URL"),
   merchantId: requiredEnvironment("PUNTER_MERCHANT_ID"),
   storefrontId: requiredEnvironment("PUNTER_STOREFRONT_ID"),
   scenario: selectScenario(process.env.PUNTER_PICKUP_SCENARIO),

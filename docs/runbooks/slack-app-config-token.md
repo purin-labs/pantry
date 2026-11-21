@@ -77,7 +77,7 @@ injects the current access token:
 pnpm slack:cli -- api apps.manifest.export app_id=A0BFVDZLFLM --team T0BGQSSG45N
 ```
 
-The live Seams verification returned `ok: true` and the Satyr Dev manifest on
+The live Seams verification returned `ok: true` and the Pantry Dev manifest on
 2026-07-11. The direct `slack api ...` equivalent returned `not_authed`, which
 is expected from the CLI's documented token-resolution order.
 
@@ -96,14 +96,14 @@ Both replacements remain in `.env.local`. The access token expires after 12
 hours and the refresh token is single-use; every successful rotation atomically
 stores the replacement pair.
 
-## Update Satyr Dev
+## Update Pantry Dev
 
 ```bash
 pnpm slack:app:update
 ```
 
 This validates or rotates the saved credential, validates the manifest, and
-updates Satyr Dev for the Seams team with the current Worker event and OAuth
+updates Pantry Dev for the Seams team with the current Worker event and OAuth
 redirect URLs.
 
 ## Eligibility
@@ -116,7 +116,7 @@ not depend on workspace ticket eligibility.
 
 If Seams moves to Slack Pro or higher, retest native authorization with `slack
 login` and `/slackauthticket`. Keep the configuration-token wrapper until that
-live retest proves ticket login, credential rotation, Satyr Dev linking, and a
+live retest proves ticket login, credential rotation, Pantry Dev linking, and a
 read-only manifest export. A plan upgrade is a retest trigger, not an assumed
 fix.
 

@@ -90,7 +90,7 @@ async function main() {
         "--bundle",
         "--platform=browser",
         "--format=iife",
-        "--global-name=SatyrSetupJourney",
+        "--global-name=PantrySetupJourney",
         `--outfile=${accountSetupBundle}`,
       ],
       { cwd: root, stdio: "inherit" },
@@ -261,7 +261,7 @@ async function main() {
 function accountSetupBrowserCommand() {
   return `async function accountSetupJourney(page) {
     ${readFileSync(accountSetupBundle, "utf8")}
-    return SatyrSetupJourney.runAccountSetupJourney(page, ${JSON.stringify({ portalUrl, artifactDir })});
+    return PantrySetupJourney.runAccountSetupJourney(page, ${JSON.stringify({ portalUrl, artifactDir })});
   }`;
 }
 

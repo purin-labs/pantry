@@ -10,7 +10,7 @@ async function verifyRecipeSplitBrowser(page) {
   const fixture = new URL(page.url()).href;
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(fixture);
-  await page.evaluate(() => localStorage.removeItem("satyr-recipe-split-percent"));
+  await page.evaluate(() => localStorage.removeItem("pantry-recipe-split-percent"));
 
   async function openRecipe(cardPattern, formName, prepareName) {
     await page.goto(fixture);
@@ -228,7 +228,7 @@ async function verifyRecipeSplitBrowser(page) {
   await page.mouse.move(sepBox.x - 120, sepBox.y + sepBox.height / 2, { steps: 6 });
   await page.mouse.up();
   const storedAfterDrag = await page.evaluate(() =>
-    Number(localStorage.getItem("satyr-recipe-split-percent")),
+    Number(localStorage.getItem("pantry-recipe-split-percent")),
   );
   if (!Number.isFinite(storedAfterDrag) || storedAfterDrag >= 52 || storedAfterDrag < 30) {
     throw new Error(`latte: pointer drag did not persist split width: ${storedAfterDrag}`);
@@ -444,7 +444,7 @@ async function verifyRecipeSplitBrowser(page) {
     fixture,
   ).href;
   await page.context().addCookies([
-    { name: "satyr_control_csrf", value: "stub-csrf", url: portalPreviewUrl },
+    { name: "pantry_csrf", value: "stub-csrf", url: portalPreviewUrl },
   ]);
   const defaultProjectId = "project_00000000-0000-4000-8000-000000000001";
   await page.route("**/v1/control/**", async (route) => {

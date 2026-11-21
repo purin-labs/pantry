@@ -2,7 +2,7 @@
 // its hashed assets, so that a screen that restarts without a network still
 // opens the player, which then shows its saved copy of the board. It never
 // keeps a /v1 answer: the player keeps its own saved feed.
-const CACHE = "satyr-tv-v1";
+const CACHE = "pantry-tv-v1";
 
 // The page and every asset that it names: the first load of the page runs
 // before this worker controls it, so the worker keeps them itself.

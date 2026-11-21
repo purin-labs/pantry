@@ -95,7 +95,7 @@ export async function buyerCollectionsRoute(
   const channel = access.context.storefront.salesChannelId;
   if (route.kind === "list_buyer_collections")
     return jsonResponse(200, {
-      schemaVersion: "underclerk.buyer-collections.v1",
+      schemaVersion: "commerce.buyer-collections.v1",
       collections: ctx.authority.readBuyerCollections(
         route.merchantId,
         channel,

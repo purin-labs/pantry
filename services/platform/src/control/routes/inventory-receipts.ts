@@ -45,9 +45,9 @@ export async function handleInventoryReceipt(
     if (positionId === null || positionId.length === 0)
       return controlError("inventory_position_missing", 422);
     const snapshot = await client.readStockSnapshot(binding.merchantId);
-    if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+    if (!snapshot.ok) return controlError("commerce_unavailable", 503);
     if (snapshot.value.commerce.merchantId !== binding.merchantId)
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
     const context = receiptContext(snapshot.value, positionId);
     if (context !== null && operation === "receipt") {
       const purchases = await readPurchases(
@@ -80,7 +80,7 @@ export async function handleInventoryReceipt(
     command =
       operation === "receipt"
         ? parseReceiveInventoryCommand({
-            schemaVersion: "underclerk.receive-inventory.v3",
+            schemaVersion: "commerce.receive-inventory.v3",
             purchase: body.value.purchase,
             organisationId: authorized.organisationId,
             merchantId: binding.merchantId,
@@ -100,7 +100,7 @@ export async function handleInventoryReceipt(
             actionNonce: `inventory_receipt:${boundary.idempotencyKey}`,
           })
         : parseReconcileInventoryCommand({
-            schemaVersion: "underclerk.reconcile-inventory.v1",
+            schemaVersion: "commerce.reconcile-inventory.v1",
             organisationId: authorized.organisationId,
             merchantId: binding.merchantId,
             expectedMerchantRevision: body.value.merchantRevision,
@@ -116,10 +116,10 @@ export async function handleInventoryReceipt(
     return controlError("inventory_receipt_invalid", 422);
   }
   const received =
-    command.schemaVersion === "underclerk.receive-inventory.v3"
+    command.schemaVersion === "commerce.receive-inventory.v3"
       ? await client.receiveInventory(commerceCommandInput(command))
       : await client.reconcileInventory(commerceCommandInput(command));
-  if (!received.ok) return controlError("underclerk_unavailable", 503);
+  if (!received.ok) return controlError("commerce_unavailable", 503);
   if (
     received.value.outcome === "rejected" &&
     received.value.error.code === "inventory_count_shortage"
@@ -146,7 +146,7 @@ export async function handleInventoryReceipt(
       409,
     );
   if (received.value.receipt.merchantId !== binding.merchantId)
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   const responseBody = { ok: true, result: received.value };
   return finishInventoryOperation(request, env, mutation.value, responseBody);
 }
@@ -255,16 +255,16 @@ async function readDeliveries(
   merchantId: string,
 ): Promise<InventoryDeliveries> {
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return { kind: "unavailable" };
   const client = new CommerceEntityPlaneClient({
-    baseUrl: env.UNDERCLERK_BASE_URL,
+    baseUrl: env.COMMERCE_BASE_URL,
     ...pantryCommerceAccess(
-      env.UNDERCLERK_SERVICE_TOKEN,
+      env.COMMERCE_SERVICE_TOKEN,
       organisationId,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
   });
   const entries: InventoryDelivery[] = [];
@@ -320,16 +320,16 @@ async function readPurchases(
   locationId: string,
 ): Promise<InventoryReceiptContext["purchases"]> {
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return { kind: "unavailable" };
   const client = new CommerceEntityPlaneClient({
-    baseUrl: env.UNDERCLERK_BASE_URL,
+    baseUrl: env.COMMERCE_BASE_URL,
     ...pantryCommerceAccess(
-      env.UNDERCLERK_SERVICE_TOKEN,
+      env.COMMERCE_SERVICE_TOKEN,
       organisationId,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
   });
   const entries = [];

@@ -162,7 +162,7 @@ function commerceErrorResponse(error: CommerceClientError): Response {
         { ok: false, error: "counter_sale_rejected", detail: error.message },
         409,
       )
-    : controlError("underclerk_unavailable", 503);
+    : controlError("commerce_unavailable", 503);
 }
 
 export function match(

@@ -47,7 +47,7 @@ const config = {
   fetch: commerceEngine.fetch,
 };
 const provisioned = await new CommerceAdminClient(config).provisionMerchant({
-  schemaVersion: "underclerk.provision-merchant.v2",
+  schemaVersion: "commerce.provision-merchant.v2",
   externalReference: organisationId,
   merchantId,
   createdAt: now,
@@ -117,13 +117,13 @@ const graphReader = new CommerceGraphReader({
   organisationId,
   merchantId,
   commerceSystem: {
-    kind: "satyr_commerce",
+    kind: "builtin_commerce",
     organisationId,
     bindingId: "oven-authoring-binding",
     merchantId,
     revision: 1,
   },
-  underclerk: new CommerceEngineSource({
+  commerce: new CommerceEngineSource({
     organisationId,
     merchantId,
     integrationAccountId: "oven-authoring-account",

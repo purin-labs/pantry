@@ -15,7 +15,7 @@ type ServiceBinding = Readonly<{
 }>;
 
 type Env = Readonly<{
-  UNDERCLERK: ServiceBinding;
+  COMMERCE: ServiceBinding;
   ASSETS: ServiceBinding;
   /** The order page domain, such as `menu.seams.tokyo`. */
   MENU_HOST_SUFFIX?: string;
@@ -42,7 +42,7 @@ declare class HTMLRewriter {
 }
 
 /** The meta tag that names the page's storefront; the page reads it. */
-const SHOP_META_NAME = "underclerk-shop";
+const SHOP_META_NAME = "commerce-shop";
 
 // A name keeps its storefront for good, so a short cache only delays a new
 // name; a missing name is cached for less time.
@@ -59,7 +59,7 @@ export default {
     const url = new URL(request.url);
     const name = menuHostName(url.hostname, env.MENU_HOST_SUFFIX);
     if (name === undefined) return siteResponse(request, url, env);
-    if (url.pathname === "/health") return env.UNDERCLERK.fetch(request);
+    if (url.pathname === "/health") return env.COMMERCE.fetch(request);
     // A host deeper under the order page domain is no shop's.
     if (name === null) return missingShop(url);
     let shop: ShopName | null;
@@ -78,7 +78,7 @@ export default {
     }
     if (url.pathname.startsWith("/v1/"))
       return url.pathname.startsWith(storefrontPrefix(shop))
-        ? env.UNDERCLERK.fetch(request)
+        ? env.COMMERCE.fetch(request)
         : jsonResponse(404, { message: "Route not found" });
     return withShopMeta(await env.ASSETS.fetch(request), shop);
   },
@@ -86,7 +86,7 @@ export default {
 
 function siteResponse(request: Request, url: URL, env: Env): Promise<Response> {
   return url.pathname.startsWith("/v1/") || url.pathname === "/health"
-    ? env.UNDERCLERK.fetch(request)
+    ? env.COMMERCE.fetch(request)
     : env.ASSETS.fetch(request);
 }
 
@@ -109,12 +109,12 @@ async function lookUpShop(env: Env, name: string): Promise<ShopName | null> {
   const now = Date.now();
   const cached = shopNames.get(name);
   if (cached !== undefined && cached.expiresAt > now) return cached.shop;
-  const response = await env.UNDERCLERK.fetch(
+  const response = await env.COMMERCE.fetch(
     new Request(
-      `https://underclerk.internal/v1/public/shop-names/${encodeURIComponent(name)}`,
+      `https://commerce.internal/v1/public/shop-names/${encodeURIComponent(name)}`,
     ),
   );
-  // An Commerce failure is not an answer about the name: it is not cached.
+  // A Commerce failure is not an answer about the name: it is not cached.
   if (response.status !== 200 && response.status !== 404)
     throw new Error(`Shop name lookup answered ${response.status}`);
   const shop =

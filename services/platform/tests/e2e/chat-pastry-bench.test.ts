@@ -35,7 +35,7 @@ function observation(pieType: string): SurfaceObservationV2 {
     kind: "surface-observation",
     schemaVersion: 2,
     surface: KITCHEN_SURFACE,
-    area: "BakeryOS",
+    area: "kitchen",
     instance: {
       browserInstanceId: BROWSER,
       surfaceSessionId: SESSION_ID,

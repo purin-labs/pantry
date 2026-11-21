@@ -247,7 +247,7 @@ export class CollectionAuthority {
     const limit = Math.max(1, Math.min(PAGE_LIMIT, filter.limit ?? 24));
     const page = visible.slice(start, start + limit);
     return {
-      schemaVersion: "underclerk.buyer-collection-page.v1",
+      schemaVersion: "commerce.buyer-collection-page.v1",
       collection: summary(collection),
       products: page.map(buyerProduct),
       nextCursor: start + limit < visible.length ? String(start + limit) : null,

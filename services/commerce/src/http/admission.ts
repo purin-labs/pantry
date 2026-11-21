@@ -113,7 +113,7 @@ export function admitAdminRequest(
   request: Request,
   route: Exclude<CommerceRoute, BuyerRoute>,
 ): CommerceMutationActorV1 | Response {
-  const person = request.headers.get("underclerk-actor") ?? undefined;
+  const person = request.headers.get("commerce-actor") ?? undefined;
   if (ctx.access === undefined) {
     const token = bearerToken(request);
     if (token === undefined || !sameSecret(token, ctx.serviceToken))
@@ -146,7 +146,7 @@ export function admitAdminRequest(
       if (person === undefined) return { kind: "app", appId: caller.appId };
       const trimmed = person.trim();
       return trimmed.length === 0 || trimmed.length > 200
-        ? actorRefused("Underclerk-Actor has 1 to 200 characters")
+        ? actorRefused("Commerce-Actor has 1 to 200 characters")
         : { kind: "app", appId: caller.appId, person: trimmed };
     }
     if (person !== undefined)

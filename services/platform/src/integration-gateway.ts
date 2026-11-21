@@ -272,7 +272,7 @@ async function handleRequest(
         return handleConfigureDiscordInteraction(request, env);
       case "stripeConnectWebhook":
         return handleStripeConnectWebhook(request, env);
-      case "underclerkWebhook":
+      case "commerceWebhook":
         return handleCommerceWebhook(request, env, route.organisationIdRaw);
       case "stripeWebhook":
         return handleStripeWebhook(request, env, route.organisationIdRaw);
@@ -343,12 +343,12 @@ async function handleQueue(
   env: Env,
 ): Promise<void> {
   switch (batch.queue) {
-    case "satyr-events":
+    case "pantry-events":
       for (const message of batch.messages) {
         await handleEventQueueMessage(message, env);
       }
       return;
-    case "satyr-cues":
+    case "pantry-cues":
       await processCueQueueBatch({
         messages: batch.messages,
         kv: env.POLICY_KV,

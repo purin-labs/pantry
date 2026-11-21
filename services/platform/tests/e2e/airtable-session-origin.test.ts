@@ -330,8 +330,8 @@ function dispatch(
         origin: "https://localhost",
         "content-type": "application/json",
         "idempotency-key": key,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({
         instruction: "Read or update the operator's Airtable order.",

@@ -17,7 +17,7 @@ export type PublishCafeMenuAction = Readonly<{
   /** The published revision that this menu replaces; null for the first. */
   expectedMenuRevision: number | null;
   menu: CafeMenuDefinition;
-  /** Each entry's name in the draft, because an Commerce entry has none. */
+  /** Each entry's name in the draft, because a Commerce entry has none. */
   entryNames: readonly Readonly<{ menuEntryId: string; displayName: string }>[];
   addedEntryIds: readonly string[];
   removedNames: readonly string[];
@@ -46,7 +46,7 @@ function parseMenu(value: unknown): CafeMenuDefinition | null {
   if (!isRecord(value) || value.menuId !== CAFE_MENU_ID) return null;
   try {
     return parsePublishMenuCommand({
-      schemaVersion: "underclerk.publish-menu.v1",
+      schemaVersion: "commerce.publish-menu.v1",
       merchantId: "merchant_action_path",
       expectedMerchantRevision: 1,
       idempotencyKey: "cafe_menu_action_path",

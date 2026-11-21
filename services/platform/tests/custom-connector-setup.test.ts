@@ -848,8 +848,8 @@ const easyPostIdentityTest: CustomConnectorIdentityTestExecutor =
       ok: true,
       value: {
         providerAccountId: "user_easypost_fixture",
-        displayName: "CafeOS shipping",
-        preview: { id: "user_easypost_fixture", name: "CafeOS shipping" },
+        displayName: "Café shipping",
+        preview: { id: "user_easypost_fixture", name: "Café shipping" },
       },
     };
   };

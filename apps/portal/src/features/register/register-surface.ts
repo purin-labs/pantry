@@ -92,7 +92,7 @@ export class RegisterPageViewSource implements SurfaceViewSource {
         {
           title: "Register status",
           facts: [
-            { label: "Location", value: snapshot.satyrLocationId || "Unset" },
+            { label: "Location", value: snapshot.pantryLocationId || "Unset" },
             {
               label: "Cash tender",
               value: snapshot.policy?.cashEnabled ? "Enabled" : "Disabled",

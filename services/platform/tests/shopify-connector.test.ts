@@ -195,7 +195,7 @@ async function registersShopifyWebhooks(): Promise<void> {
       webhookSubscription: {
         uri: endpointUrl,
         format: "JSON",
-        name: "satyr-inventory-levels-update",
+        name: "pantry-inventory-levels-update",
       },
     },
   });
@@ -289,7 +289,7 @@ async function updatesStaleShopifyWebhook(): Promise<void> {
       webhookSubscription: {
         uri: endpointUrl,
         format: "JSON",
-        name: "satyr-products-create",
+        name: "pantry-products-create",
       },
     },
   });
@@ -831,7 +831,7 @@ async function skipsInitialLocationsWithoutScope(): Promise<void> {
       (request) =>
         typeof request.body.query !== "string" ||
         (!request.body.query.includes("locations(first") &&
-          !request.body.query.includes("SatyrInitialPublications")),
+          !request.body.query.includes("PantryInitialPublications")),
     ),
   ).toBe(true);
 }
@@ -1053,7 +1053,7 @@ async function shopifyStaleWebhookFetcher(
       : isRecord(variables.webhookSubscription) &&
           typeof variables.webhookSubscription.name === "string"
         ? variables.webhookSubscription.name
-            .replace(/^satyr-/u, "")
+            .replace(/^pantry-/u, "")
             .replaceAll("-", "_")
             .toUpperCase()
         : null;
@@ -1094,7 +1094,7 @@ async function shopifyInitialSyncFetcher(
   if (typeof body.query !== "string") {
     throw new Error("Shopify initial sync query is missing");
   }
-  if (body.query.includes("SatyrInitialPublications")) {
+  if (body.query.includes("PantryInitialPublications")) {
     return Response.json({
       data: {
         products: {
@@ -1159,7 +1159,7 @@ async function shopifyInitialSyncFetcher(
       },
     });
   }
-  if (body.query.includes("SatyrInitialInventory")) {
+  if (body.query.includes("PantryInitialInventory")) {
     return Response.json({
       data: {
         inventoryItems: {

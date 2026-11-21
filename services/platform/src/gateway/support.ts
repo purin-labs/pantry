@@ -259,7 +259,7 @@ export async function handleCommerceOutboxReconcileQueueMessage(
   const result = await reconcileCommerceOutbox({ env, message: body });
   switch (result.kind) {
     case "drained":
-      traceLog("event_queue.underclerk_deliveries_drained", {
+      traceLog("event_queue.commerce_deliveries_drained", {
         requestId: body.requestId,
         message_id: message.id,
         acknowledged: result.acknowledged,
@@ -269,7 +269,7 @@ export async function handleCommerceOutboxReconcileQueueMessage(
       message.ack();
       return;
     case "rejected":
-      traceWarn("event_queue.underclerk_delivery_rejected", {
+      traceWarn("event_queue.commerce_delivery_rejected", {
         requestId: body.requestId,
         message_id: message.id,
         delivery_id: result.deliveryId ?? "",
@@ -278,7 +278,7 @@ export async function handleCommerceOutboxReconcileQueueMessage(
       message.ack();
       return;
     case "retry":
-      traceWarn("event_queue.underclerk_delivery_retry", {
+      traceWarn("event_queue.commerce_delivery_retry", {
         requestId: body.requestId,
         message_id: message.id,
         delivery_id: result.deliveryId ?? "",
@@ -635,7 +635,7 @@ function commerceDeliveryEvidenceId(
 
 function commerceDeliveryAuthority(delivery: CanonicalCommerceDelivery): Result<
   Readonly<{
-    provider: "shopify" | "underclerk" | "lab";
+    provider: "shopify" | "commerce" | "lab";
     integrationAccountId: string;
   }>,
   Readonly<{

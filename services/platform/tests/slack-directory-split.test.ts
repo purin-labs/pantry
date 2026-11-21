@@ -41,7 +41,7 @@ it("finishes a Slack connection on the regional database and keeps its directory
     provider: "slack",
     providerSubjectId: "T1",
     environment: "production",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: credential.value,

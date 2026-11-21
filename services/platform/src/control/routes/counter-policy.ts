@@ -27,7 +27,7 @@ export type CounterPolicyControlRoute =
   | Readonly<{
       kind: "counterPolicy";
       organisationIdRaw: string;
-      satyrLocationIdRaw: string;
+      pantryLocationIdRaw: string;
     }>;
 
 export function matchCounterPolicyControlRoute(
@@ -41,7 +41,7 @@ export function matchCounterPolicyControlRoute(
     return {
       kind: "counterPolicy",
       organisationIdRaw: decode(policy[0]),
-      satyrLocationIdRaw: decode(policy[1]),
+      pantryLocationIdRaw: decode(policy[1]),
     };
   }
   const policies = match(
@@ -107,7 +107,7 @@ async function handleCounterPolicy(
   if (context instanceof Response) return context;
   const configuration = await context.client.readPointOfSaleConfiguration(
     context.merchantId,
-    route.satyrLocationIdRaw,
+    route.pantryLocationIdRaw,
   );
   return configuration.ok
     ? controlJson({ ok: true, counterPolicy: configuration.value })
@@ -155,7 +155,7 @@ async function publishCounterPolicy(
   if (context instanceof Response) return context;
   const now = Date.now();
   const published = await context.client.publishPointOfSaleConfiguration({
-    schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+    schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
     merchantId: context.merchantId,
     expectedRevision: publication.expectedRevision,
     publishedAt: new Date(now).toISOString(),
@@ -229,7 +229,7 @@ function commerceErrorResponse(error: CommerceClientError): Response {
       409,
     );
   }
-  return controlError("underclerk_unavailable", 503);
+  return controlError("commerce_unavailable", 503);
 }
 
 function match(pathname: string, pattern: RegExp): readonly string[] | null {

@@ -190,7 +190,7 @@ class Review {
       key ?? `connector-review-${String(this.requests)}`,
     );
     headers.set(
-      "x-satyr-configuration-version",
+      "x-pantry-configuration-version",
       String(configurationVersion ?? this.configurationVersion),
     );
     const answered = await exports.default.fetch(

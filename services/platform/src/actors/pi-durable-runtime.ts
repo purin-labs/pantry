@@ -324,7 +324,7 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
       this.input.turnLease.turn.turnId,
       this.input.toolRules,
     );
-    const extension = defineExtension({ name: "satyr.tools", tools });
+    const extension = defineExtension({ name: "pantry.tools", tools });
     const codeMode = this.input.toolHost.codeMode.kind === "enabled";
     const catalog = this.input.toolHost.definitions;
     const wholeCatalog = codeMode && wholeCatalogEnabled(catalog);
@@ -1087,7 +1087,7 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
     if (state.kind === "opening") await state.opening;
   }
 }
-const STEERING_ENTRY_KIND = "satyr.steer";
+const STEERING_ENTRY_KIND = "pantry.steer";
 const UNFINISHED_ANSWER_NOTICE =
   "Sous Chef could not finish this answer. Ask again to continue.";
 const PROVIDER_FAILURE_NOTE =
@@ -1227,7 +1227,7 @@ async function importMessages(
   tx: Tx,
 ): Promise<void> {
   for (const message of messages)
-    await tx.appendEntry(root.id, { kind: "satyr.imported", model: [message] });
+    await tx.appendEntry(root.id, { kind: "pantry.imported", model: [message] });
 }
 
 class TransientStorage extends MemoryStorage {
@@ -1270,14 +1270,14 @@ async function trustedNativeResult(message: Message): Promise<Message> {
   if (
     message.role !== "toolResult" ||
     !message.isError ||
-    (isRecord(message.details) && isRecord(message.details.satyrAuthority))
+    (isRecord(message.details) && isRecord(message.details.pantryAuthority))
   )
     return message;
   const text = canonicalJson(message.content);
   return {
     ...message,
     details: {
-      satyrAuthority: { kind: "read", resultDigest: await sha256Hex(text) },
+      pantryAuthority: { kind: "read", resultDigest: await sha256Hex(text) },
     },
   };
 }

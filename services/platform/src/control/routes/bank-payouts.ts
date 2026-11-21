@@ -71,7 +71,7 @@ export async function handleBankPayoutsControlRoute(
     start,
     end,
   });
-  if (!read.ok) return controlError("underclerk_unavailable", 503);
+  if (!read.ok) return controlError("commerce_unavailable", 503);
   const window: BankPayoutsWindow = {
     sources: read.value.sources,
     truncated: read.value.truncated,

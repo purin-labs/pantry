@@ -25,7 +25,7 @@
   },
   "settings": {
     "event_subscriptions": {
-      "request_url": "https://satyr-slack-ingress.n6378056.workers.dev/slack/events",
+      "request_url": "https://slack.pantry.purin.io/slack/events",
       "bot_events": [
         "app_uninstalled",
         "app_mention",
@@ -37,7 +37,7 @@
     },
     "interactivity": {
       "is_enabled": true,
-      "request_url": "https://satyr-slack-ingress.n6378056.workers.dev/slack/interactions"
+      "request_url": "https://slack.pantry.purin.io/slack/interactions"
     },
     "socket_mode_enabled": false,
     "org_deploy_enabled": false,

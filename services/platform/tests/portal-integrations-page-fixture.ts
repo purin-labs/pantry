@@ -22,7 +22,7 @@ export const INTEGRATIONS_PAGE_PROPS = {
   commerceSystem: null,
   commerceSyncProblem: null,
   codexConnection: { kind: "disconnected", revision: 0 },
-  inferenceSelection: { kind: "satyr_platform" },
+  inferenceSelection: { kind: "pantry_platform" },
   accounts: [],
   credentialInventory: null,
   destinations: [],

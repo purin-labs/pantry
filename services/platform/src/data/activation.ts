@@ -583,7 +583,7 @@ export async function failOnboardingActivation(input: {
   }
   const projectionRevision = current.projectionRevision + 1;
   const correlationId = input.context.mutation.identity.correlationId;
-  const supportReference = `SATYR-${crypto.randomUUID()}`;
+  const supportReference = `PANTRY-${crypto.randomUUID()}`;
   const completedSteps = await readCompletedSteps(
     input.db,
     input.context.attemptId,

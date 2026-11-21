@@ -43,7 +43,7 @@ const COSTS: SurfaceObservationV2 = {
   kind: "surface-observation",
   schemaVersion: 2,
   surface: "costs",
-  area: "BakeryOS",
+  area: "kitchen",
   instance: INSTANCE,
   title: "Costs & margins",
   path: "/portal/nuki/shop/costs",
@@ -68,7 +68,7 @@ const COSTS: SurfaceObservationV2 = {
 const ORDER: SurfaceObservationV2 = {
   ...COSTS,
   surface: "orders",
-  area: "AgentCommerce",
+  area: "commerce",
   title: "Orders",
   path: "/portal/nuki/shop/orders/order_1042",
   record: { kind: "customer_order", id: "order_1042", label: "#1042" },
@@ -116,7 +116,7 @@ it(
     expect(observations).toEqual([
       {
         page: "Orders",
-        area: "AgentCommerce",
+        area: "commerce",
         record: "#1042",
         capturedAt: ORDER.capturedAt,
         sentAt: expect.any(Number),
@@ -124,7 +124,7 @@ it(
       },
       {
         page: "Costs & margins",
-        area: "BakeryOS",
+        area: "kitchen",
         record: null,
         capturedAt: COSTS.capturedAt,
         sentAt: expect.any(Number),

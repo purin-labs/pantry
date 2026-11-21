@@ -536,7 +536,7 @@ async function seedSlackIdentityLink(
 ): Promise<void> {
   await db
     .prepare(
-      `INSERT OR IGNORE INTO app_user (user_id, issuer, subject, email, display_name, email_verified, created_at, last_authenticated_at) VALUES (?, 'urn:satyr:fixture', ?, ?, 'Operator', 0, 1, 1)`,
+      `INSERT OR IGNORE INTO app_user (user_id, issuer, subject, email, display_name, email_verified, created_at, last_authenticated_at) VALUES (?, 'urn:pantry:fixture', ?, ?, 'Operator', 0, 1, 1)`,
     )
     .bind(userId, userId, `${userId}@example.test`)
     .run();

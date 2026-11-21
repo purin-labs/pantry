@@ -1,6 +1,6 @@
-# Satyr Portal: page and component inventory
+# Pantry Portal: page and component inventory
 
-Date: 2026-10-23. Scope: the Satyr operator app in `apps/portal`.
+Date: 2026-10-23. Scope: the Pantry operator app in `apps/portal`.
 
 The app defines **20 workspace pages**, three record-detail routes, and two additional Access routes.
 Account, identity, and public pages sit outside the workspace.
@@ -60,10 +60,10 @@ The following are substantial subviews, not additional top-level pages:
 
 | Surface                | Address or entry                           | Main UI components                                                                              |
 | ---------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| Sign in                | `/sign-in`, or a signed-out Portal request | Satyr identity, Google sign-in action, product explanation, policy links                        |
+| Sign in                | `/sign-in`, or a signed-out Portal request | Pantry identity, Google sign-in action, product explanation, policy links                        |
 | Organisations          | `/portal`                                  | Organisation cards, lifecycle/role labels, workspace links, organisation actions, account setup |
 | Organisation           | `/portal/:organisationHandle`              | Selected organisation and its workspace list, create/manage controls                            |
-| Account setup          | Set up Satyr                               | Setup dialog, identity/account steps, progress, validation and completion                       |
+| Account setup          | Set up Pantry                               | Setup dialog, identity/account steps, progress, validation and completion                       |
 | Account invitation     | `/portal` with invitation parameters       | Invitation identity, accept state, account-link action, retry/invalid states                    |
 | Identity link          | `/identity/link`                           | Invitation facts, identity authentication, action controls, success/failure panels              |
 | Missing page           | Unknown Portal address                     | In-shell explanation and navigation back to available work                                      |
@@ -240,7 +240,7 @@ Run `portal-pages-journey.js` after the existing Plan 21 fixture, using the same
 The menu module follows the existing account-journey bundle pattern:
 
 ```sh
-pnpm --filter @seams/platform exec esbuild "$PWD/scripts/frontend-foundation/portal-menu-journey.mjs" --bundle --platform=browser --format=iife --global-name=SatyrMenuJourney --outfile="$PWD/output/playwright/ui-full-review/menu.bundle.js"
+pnpm --filter @seams/platform exec esbuild "$PWD/scripts/frontend-foundation/portal-menu-journey.mjs" --bundle --platform=browser --format=iife --global-name=PantryMenuJourney --outfile="$PWD/output/playwright/ui-full-review/menu.bundle.js"
 python3 - <<'PYMENU'
 from pathlib import Path
 root = Path("output/playwright/ui-full-review")
@@ -248,7 +248,7 @@ bundle = (root / "menu.bundle.js").read_text()
 (root / "menu-run.js").write_text(
     "async function reviewMenu(page) {\nawait page.unrouteAll();\n"
     + bundle
-    + '\nreturn SatyrMenuJourney.runMenuJourney(page, {portalUrl: new URL(page.url()).origin, artifactDir: "output/playwright/ui-full-review"});\n}'
+    + '\nreturn PantryMenuJourney.runMenuJourney(page, {portalUrl: new URL(page.url()).origin, artifactDir: "output/playwright/ui-full-review"});\n}'
 )
 PYMENU
 bash "$HOME/.codex/skills/playwright/scripts/playwright_cli.sh" --session portal-ui --json run-code --filename output/playwright/ui-full-review/menu-run.js > output/playwright/ui-full-review/menu-journey.json

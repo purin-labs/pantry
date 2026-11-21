@@ -116,13 +116,13 @@ async function soldOutAndHoursJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -377,13 +377,13 @@ async function orderQueueJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -619,13 +619,13 @@ async function failedPaymentsJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -637,12 +637,12 @@ async function failedPaymentsJourney({ task }: TestContext): Promise<void> {
   await publishMenu(base, owner.session, admin, merchantId);
 
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const session = await required(
     buyer.createSession(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
@@ -811,14 +811,14 @@ async function declineOrder(
 ): Promise<string> {
   const cart = await required(
     buyer.createCart(merchantId, STOREFRONT, token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: "cart-failed-first",
       lines: [TARO_LINE],
     }),
   );
   const checkout = await required(
     buyer.createPickupCheckout(merchantId, STOREFRONT, token, {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: "checkout-failed-first",
       cartId: cart.cartId,
       cartRevision: cart.revision,
@@ -835,11 +835,11 @@ async function declineOrder(
       checkout.checkoutId,
       token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: "payment-failed-first",
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
-        returnUrl: "https://underclerk.test/return",
+        returnUrl: "https://commerce.test/return",
       },
     ),
   );
@@ -891,7 +891,7 @@ async function send(
       : commerceHeaders(session);
   if (method !== "GET") {
     headers.set("idempotency-key", idempotencyKey);
-    headers.set("x-satyr-configuration-version", "1");
+    headers.set("x-pantry-configuration-version", "1");
   }
   const response = await exports.default.fetch(url, {
     method,
@@ -1047,29 +1047,29 @@ async function placeOrder(
   openSession?: string,
 ): Promise<Readonly<{ orderId: string }>> {
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const token =
     openSession ??
     (
       await required(
         buyer.createSession(merchantId, STOREFRONT, {
-          schemaVersion: "underclerk.create-buyer-session.v1",
+          schemaVersion: "commerce.create-buyer-session.v1",
           buyer: { kind: "guest" },
         }),
       )
     ).token;
   const cart = await required(
     buyer.createCart(merchantId, STOREFRONT, token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `cart-${key}`,
       lines: [line],
     }),
   );
   const checkout = await required(
     buyer.createPickupCheckout(merchantId, STOREFRONT, token, {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
       idempotencyKey: `checkout-${key}`,
       cartId: cart.cartId,
       cartRevision: cart.revision,
@@ -1086,11 +1086,11 @@ async function placeOrder(
       checkout.checkoutId,
       token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: `payment-${key}`,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
-        returnUrl: "https://underclerk.test/return",
+        returnUrl: "https://commerce.test/return",
       },
     ),
   );
@@ -1102,7 +1102,7 @@ async function placeOrder(
       checkout.checkoutId,
       token,
       {
-        schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+        schemaVersion: "commerce.reconcile-buyer-payment.v1",
         idempotencyKey: `payment-${key}`,
         checkoutRevision: payment.checkoutRevision,
         quoteDigest: checkout.quote.quoteDigest,

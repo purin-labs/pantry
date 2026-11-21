@@ -265,7 +265,7 @@ async function seed(env: Env) {
       "INSERT INTO service_role_grant (organisation_id, user_id, person_id, role, status, created_at) VALUES (?, ?, ?, 'admin', 'active', ?)",
     ).bind(organisationId, other.userId, otherPersonId, now),
     env.DB.prepare(
-      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+      "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
     ).bind(organisationId, owner.userId, now),
   ]);
   const policy = defaultDenyPolicy({ now });
@@ -318,7 +318,7 @@ async function seed(env: Env) {
     authorizationProduct: "full_mailbox_pilot",
     providerSubjectId: "brain",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle.value },
     grantedScopes: GMAIL_FULL_MAILBOX_SCOPES,
     createdByUserId: owner.userId,
@@ -449,13 +449,13 @@ async function seed(env: Env) {
   const merchantId = `merchant_brain_${crypto.randomUUID()}`;
   const connectionId = `provider_connection_${crypto.randomUUID()}`;
   const merchantAccountId = `integration_${crypto.randomUUID()}`;
-  const bindingId = `underclerk_binding_${crypto.randomUUID()}`;
+  const bindingId = `commerce_binding_${crypto.randomUUID()}`;
   await env.DB.batch([
     env.DB.prepare(
-      `INSERT INTO provider_connection (provider_connection_id, organisation_id, provider, auth_mode, authority_kind, credential_generation, credential_ref, provider_application, application_credential_generation, asset_grant_revision, lifecycle, granted_scopes, created_by_user_id, created_at, updated_at, disabled_at, revoked_at, environment, provider_subject_id) VALUES (?, ?, 'underclerk', 'api_key', 'connection_credential', 1, 'vault:brain:purchasing:browser', NULL, NULL, NULL, 'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`,
+      `INSERT INTO provider_connection (provider_connection_id, organisation_id, provider, auth_mode, authority_kind, credential_generation, credential_ref, provider_application, application_credential_generation, asset_grant_revision, lifecycle, granted_scopes, created_by_user_id, created_at, updated_at, disabled_at, revoked_at, environment, provider_subject_id) VALUES (?, ?, 'commerce', 'api_key', 'connection_credential', 1, 'vault:brain:purchasing:browser', NULL, NULL, NULL, 'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`,
     ).bind(connectionId, organisationId, owner.userId, now, now),
     env.DB.prepare(
-      `INSERT INTO integration_account (integration_account_id, organisation_id, provider_connection_id, provider, provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code, capability_set, audience_policy, retention_policy, created_at, updated_at, disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider) VALUES (?, ?, ?, 'underclerk', ?, 'merchant', 'Brain acceptance', 'active', NULL, '[]', '{}', '{}', ?, ?, NULL, NULL, NULL, 'development', 0)`,
+      `INSERT INTO integration_account (integration_account_id, organisation_id, provider_connection_id, provider, provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code, capability_set, audience_policy, retention_policy, created_at, updated_at, disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider) VALUES (?, ?, ?, 'commerce', ?, 'merchant', 'Brain acceptance', 'active', NULL, '[]', '{}', '{}', ?, ?, NULL, NULL, NULL, 'development', 0)`,
     ).bind(
       merchantAccountId,
       organisationId,
@@ -465,10 +465,10 @@ async function seed(env: Env) {
       now,
     ),
     env.DB.prepare(
-      `INSERT INTO underclerk_merchant_binding (binding_id, organisation_id, integration_account_id, merchant_id, environment, delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at) VALUES (?, ?, ?, ?, 'development', 'key_brain_browser', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, ?, ?)`,
+      `INSERT INTO commerce_merchant_binding (binding_id, organisation_id, integration_account_id, merchant_id, environment, delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at) VALUES (?, ?, ?, ?, 'development', 'key_brain_browser', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, ?, ?)`,
     ).bind(bindingId, organisationId, merchantAccountId, merchantId, now, now),
     env.DB.prepare(
-      `INSERT INTO organisation_commerce_system (organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id, revision, selected_at, selected_by_user_id) VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)`,
+      `INSERT INTO organisation_commerce_system (organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id, revision, selected_at, selected_by_user_id) VALUES (?, 'builtin_commerce', ?, NULL, 1, ?, ?)`,
     ).bind(organisationId, bindingId, now, owner.userId),
   ]);
   const target = {

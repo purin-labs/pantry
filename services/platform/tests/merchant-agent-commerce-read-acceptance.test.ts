@@ -51,7 +51,7 @@ const AUTHORITY: RequestAuthority = {
 };
 
 it(
-  "reads paged payment and shipment evidence through the tool host and real Underclerk HTTP/SQLite, fences access and rejects mixed reports",
+  "reads paged payment and shipment evidence through the tool host and real Commerce HTTP/SQLite, fences access and rejects mixed reports",
   acceptsCommerceReads,
   30_000,
 );
@@ -289,7 +289,7 @@ async function acceptsCommerceReads(): Promise<void> {
     expect(refreshed).toMatchObject({ kind: "reported", value: 29 });
 
     await writeRecords(
-      fixture.underclerk,
+      fixture.commerce,
       Array.from({ length: 30 }, (_, index) =>
         fixturePayment(
           paymentId(index),
@@ -344,14 +344,14 @@ async function acceptsCommerceReads(): Promise<void> {
           empty,
           investigation,
           boundary:
-            "Tool host, source-grant selection, graph reader, Underclerk HTTP API and SQLite. No model or Slack delivery is simulated by this test.",
+            "Tool host, source-grant selection, graph reader, Commerce HTTP API and SQLite. No model or Slack delivery is simulated by this test.",
         },
         null,
         2,
       ) + "\n",
     );
   } finally {
-    await fixture.underclerk.dispose();
+    await fixture.commerce.dispose();
   }
 }
 
@@ -361,7 +361,7 @@ async function investigatePaymentAttempts(
 ) {
   const orderId = "order_repeated_attempts";
   await writeRecords(
-    fixture.underclerk,
+    fixture.commerce,
     [
       fixtureOrder(orderId),
       fixturePayment("attempt_first", orderId, "failed", 1),
@@ -444,7 +444,7 @@ async function investigatePaymentAttempts(
   ]);
 
   await writeRecords(
-    fixture.underclerk,
+    fixture.commerce,
     [fixturePayment("attempt_success", orderId, "captured", 1)],
     true,
   );
@@ -535,7 +535,7 @@ function isFailureAttribute(
 }
 
 type Fixture = {
-  underclerk: CommerceWorker;
+  commerce: CommerceWorker;
   admin: CommerceAdminClient;
   reader: CommerceGraphReader;
   grants: readonly AccessGrant[];
@@ -552,7 +552,7 @@ async function createFixture(): Promise<Fixture> {
     fetch: commerceEngine.fetch,
   });
   const provisioned = await admin.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     createdAt: SOURCE_TIME,
@@ -633,7 +633,7 @@ async function createFixture(): Promise<Fixture> {
     ],
     true,
   );
-  const transport = { underclerk: commerceEngine, changeAfterCount: false };
+  const transport = { commerce: commerceEngine, changeAfterCount: false };
   const client = new CommerceEntityPlaneClient({
     baseUrl: commerceEngine.baseUrl,
     serviceToken: commerceEngine.serviceToken,
@@ -645,7 +645,7 @@ async function createFixture(): Promise<Fixture> {
     reader: new CommerceGraphReader({
       organisationId: ORGANISATION_ID,
       merchantId: MERCHANT_ID,
-      underclerk: new CommerceEngineSource({
+      commerce: new CommerceEngineSource({
         organisationId: ORGANISATION_ID,
         merchantId: MERCHANT_ID,
         integrationAccountId: INTEGRATION_ID,
@@ -668,12 +668,12 @@ async function writeRecords(
 }
 
 async function fetchCommerce(
-  fixture: Pick<Fixture, "underclerk" | "changeAfterCount">,
+  fixture: Pick<Fixture, "commerce" | "changeAfterCount">,
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<Response> {
   const request = new Request(input, init);
-  const response = await fixture.underclerk.fetch(request);
+  const response = await fixture.commerce.fetch(request);
   if (
     fixture.changeAfterCount &&
     new URL(request.url).pathname.endsWith("/query-plan")
@@ -687,7 +687,7 @@ async function fetchCommerce(
     ) {
       fixture.changeAfterCount = false;
       await writeRecords(
-        fixture.underclerk,
+        fixture.commerce,
         [fixturePayment(paymentId(0), `order_${paymentId(0)}`, "captured", 2)],
         true,
       );
@@ -825,7 +825,7 @@ function exactRequest(
 
 function contextRequest(selection: unknown): CommerceContextRequest {
   const query = parseCommerceGraphQuery({
-    kind: "underclerk_context",
+    kind: "commerce_context",
     selection,
     traversal: { maxDepth: 0, resultLimit: 10 },
     allowedSensitivity: "internal",
@@ -839,7 +839,7 @@ function contextRequest(selection: unknown): CommerceContextRequest {
     ],
     freshnessRequirement: "current_only",
   });
-  if (query.kind !== "underclerk_context")
+  if (query.kind !== "commerce_context")
     throw new Error("Invalid context fixture");
   return query;
 }

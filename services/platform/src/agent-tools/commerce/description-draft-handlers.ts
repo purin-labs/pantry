@@ -157,7 +157,7 @@ async function connectedDraftProduct(
 function draftReadFailure(productId: string, code: string): Error {
   return code === "product_not_found"
     ? new DescriptionDraftRequestError(
-        `No product has the id ${productId}. Use the shop's plain product id, without an "underclerk:" prefix, or pass productId null to read the draft connected to this Slack thread.`,
+        `No product has the id ${productId}. Use the shop's plain product id, without an "commerce:" prefix, or pass productId null to read the draft connected to this Slack thread.`,
       )
     : new Error(`Description draft unavailable: ${code}`);
 }

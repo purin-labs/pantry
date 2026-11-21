@@ -12,7 +12,7 @@ outside account takes part.
    organisation in the list.
 
 The Portal keeps the request in `sessionStorage`
-(`satyr:account-onboarding:<userId>`, the value `{ operationId, name }`). A
+(`pantry:account-onboarding:<userId>`, the value `{ operationId, name }`). A
 reload, a retry or a new sign-in sends the same operation id, which is the
 idempotency key of the route. Pantry does not make a second organisation.
 

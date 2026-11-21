@@ -6,7 +6,7 @@ import type {
   CommerceVariantV1,
 } from "@purin-labs/commerce-client";
 
-const SATYR_ECOMMERCE_FIXTURE_TIMESTAMP = "2026-08-11T09:00:00Z";
+const PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP = "2026-08-11T09:00:00Z";
 
 type StorefrontDemoItem = Readonly<{
   slug: string;
@@ -18,14 +18,14 @@ type StorefrontDemoItem = Readonly<{
 }>;
 
 const STOREFRONT_DEMO_MANIFEST = {
-  schemaVersion: "satyr.storefront-demo-manifest.v1",
+  schemaVersion: "pantry.storefront-demo-manifest.v1",
   profiles: {
     cafe_patisserie: {
-      authority: "satyr_commerce",
+      authority: "builtin_commerce",
       scenario: "prepared_item_pickup",
     },
-    satyr_ecommerce: {
-      authority: "satyr_commerce",
+    pantry_ecommerce: {
+      authority: "builtin_commerce",
       scenario: "japan_to_singapore_cookie_delivery",
     },
   },
@@ -42,11 +42,11 @@ const STOREFRONT_DEMO_MANIFEST = {
   ] satisfies readonly StorefrontDemoItem[],
 } as const;
 
-const SATYR_ECOMMERCE_ITEMS: readonly StorefrontDemoItem[] =
+const PANTRY_ECOMMERCE_ITEMS: readonly StorefrontDemoItem[] =
   STOREFRONT_DEMO_MANIFEST.ecommerceCatalog;
 
 export function ecommerceDemoFixtureIdempotencyKey(): string {
-  return "underclerk_demo_satyr_ecommerce_v1";
+  return "commerce_demo_pantry_ecommerce_v1";
 }
 
 export function buildEcommerceDemoResources(): CommerceResourcesV1 {
@@ -84,7 +84,7 @@ function buildPantryEcommerceResources(): CommerceResourcesV1 {
   const offers: CommerceOfferV1[] = [];
   const inventoryPositions: CommerceResourcesV1["inventoryPositions"][number][] =
     [];
-  for (const item of SATYR_ECOMMERCE_ITEMS) {
+  for (const item of PANTRY_ECOMMERCE_ITEMS) {
     const productId = productIdFor(item);
     const variantId = variantIdFor(item);
     const inventoryItemId = inventoryItemIdFor(item);
@@ -98,7 +98,7 @@ function buildPantryEcommerceResources(): CommerceResourcesV1 {
       vendor: "",
       tags: [],
       status: "active",
-      occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+      occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
     });
     variants.push({
       id: variantId,
@@ -110,7 +110,7 @@ function buildPantryEcommerceResources(): CommerceResourcesV1 {
       media: [],
       barcode: null,
       status: "active",
-      occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+      occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
     });
     inventoryItems.push({
       id: inventoryItemId,
@@ -121,61 +121,61 @@ function buildPantryEcommerceResources(): CommerceResourcesV1 {
       category: "finished_good",
       tracking: { kind: "aggregate" },
       lifecycle: "active",
-      occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+      occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
     });
     offers.push({
       id: offerIdFor(item),
       revision: 1,
       variantId,
-      salesChannelId: "channel_satyr_ecommerce_online",
+      salesChannelId: "channel_pantry_ecommerce_online",
       price: { amountMinor: item.priceMinor, currency: "JPY" },
       compareAtPrice: null,
       availability: { state: "available" },
       lifecycle: {
         state: "prepared",
-        preparedAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+        preparedAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
       },
-      occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+      occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
     });
     inventoryPositions.push({
       id: positionIdFor(item),
       revision: 1,
       inventoryItemId,
-      locationId: "location_satyr_ecommerce_fulfillment",
+      locationId: "location_pantry_ecommerce_fulfillment",
       balance: {
         kind: "accounted",
         onHand: { amount: item.available, scale: 0, unit: "each" },
         allocated: { amount: 0, scale: 0, unit: "each" },
         available: { amount: item.available, scale: 0, unit: "each" },
       },
-      occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+      occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
     });
   }
   return {
     locations: [
       {
-        id: "location_satyr_ecommerce_fulfillment",
+        id: "location_pantry_ecommerce_fulfillment",
         revision: 1,
         name: "Seams Pantry Demo Fulfillment",
         kind: "fulfillment_center",
         lifecycle: {
           state: "active",
-          activeAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+          activeAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
         },
-        occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+        occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
       },
     ],
     salesChannels: [
       {
-        id: "channel_satyr_ecommerce_online",
+        id: "channel_pantry_ecommerce_online",
         revision: 1,
         name: "Seams Checkout Demo Storefront",
         kind: "online",
         lifecycle: {
           state: "active",
-          activeAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+          activeAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
         },
-        occurredAt: SATYR_ECOMMERCE_FIXTURE_TIMESTAMP,
+        occurredAt: PANTRY_ECOMMERCE_FIXTURE_TIMESTAMP,
       },
     ],
     products,
@@ -195,7 +195,7 @@ function hasPantryEcommerceFixture(
 ): boolean {
   if (!resources.locations.some(hasEcommerceLocation)) return false;
   if (!resources.salesChannels.some(hasEcommerceChannel)) return false;
-  const item = SATYR_ECOMMERCE_ITEMS[0];
+  const item = PANTRY_ECOMMERCE_ITEMS[0];
   if (item === undefined) return false;
   return (
     resources.products.some((resource) => resource.id === productIdFor(item)) &&
@@ -213,13 +213,13 @@ function hasPantryEcommerceFixture(
 function hasEcommerceLocation(
   resource: CommerceResourcesV1["locations"][number],
 ): boolean {
-  return resource.id === "location_satyr_ecommerce_fulfillment";
+  return resource.id === "location_pantry_ecommerce_fulfillment";
 }
 
 function hasEcommerceChannel(
   resource: CommerceResourcesV1["salesChannels"][number],
 ): boolean {
-  return resource.id === "channel_satyr_ecommerce_online";
+  return resource.id === "channel_pantry_ecommerce_online";
 }
 
 function productIdFor(item: StorefrontDemoItem): string {
@@ -239,5 +239,5 @@ function offerIdFor(item: StorefrontDemoItem): string {
 }
 
 function positionIdFor(item: StorefrontDemoItem): string {
-  return `position_${item.slug}_satyr_ecommerce`;
+  return `position_${item.slug}_pantry_ecommerce`;
 }

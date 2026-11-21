@@ -64,7 +64,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe("CafeOS settings page ownership", () => {
+describe("Café settings page ownership", () => {
   it("falls back to current-window authorization when popups are blocked", () => {
     const open = vi.fn(() => null);
     const assign = vi.fn();
@@ -110,7 +110,7 @@ describe("CafeOS settings page ownership", () => {
         );
       },
     );
-    vi.stubGlobal("document", { cookie: "satyr_control_csrf=csrf" });
+    vi.stubGlobal("document", { cookie: "pantry_csrf=csrf" });
     vi.stubGlobal("sessionStorage", {
       getItem: (key: string) => storage.get(key) ?? null,
       setItem: (key: string, value: string) => {
@@ -140,14 +140,14 @@ describe("CafeOS settings page ownership", () => {
       JSON.stringify({ presetId: "export_coordination", version: 1 }),
     );
     expect(
-      new Headers(request.init?.headers).get("x-satyr-configuration-version"),
+      new Headers(request.init?.headers).get("x-pantry-configuration-version"),
     ).toBe("7");
   });
 
   it("removes a connected Slack workspace through the disable and erase lifecycle", async () => {
     slackRemovalRequests = [];
     slackRemovalMutationStorage = new Map();
-    vi.stubGlobal("document", { cookie: "satyr_control_csrf=csrf" });
+    vi.stubGlobal("document", { cookie: "pantry_csrf=csrf" });
     vi.stubGlobal("sessionStorage", {
       getItem: readSlackRemovalMutation,
       setItem: writeSlackRemovalMutation,
@@ -200,7 +200,7 @@ describe("CafeOS settings page ownership", () => {
         );
       },
     );
-    vi.stubGlobal("document", { cookie: "satyr_control_csrf=csrf" });
+    vi.stubGlobal("document", { cookie: "pantry_csrf=csrf" });
     vi.stubGlobal("sessionStorage", {
       getItem: (key: string) => storage.get(key) ?? null,
       setItem: (key: string, value: string) => {
@@ -237,28 +237,28 @@ describe("CafeOS settings page ownership", () => {
     );
     expect(
       new Headers(organisationRequest.init?.headers).get(
-        "x-satyr-configuration-version",
+        "x-pantry-configuration-version",
       ),
     ).toBe("7");
     expect(storedMutationValues).toEqual([]);
 
     await executeIntegrationsRoute("organisation_cafe", "cafe", "central", 8, {
       kind: "select_inference",
-      selection: { kind: "satyr_platform" },
+      selection: { kind: "pantry_platform" },
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const pantryRequest = requests[1];
     expect(pantryRequest).toBeDefined();
     if (pantryRequest === undefined)
-      throw new Error("Satyr inference selection request was not sent");
+      throw new Error("Pantry inference selection request was not sent");
     expect(pantryRequest.init?.method).toBe("PUT");
     expect(pantryRequest.init?.body).toBe(
-      JSON.stringify({ selection: { kind: "satyr_platform" } }),
+      JSON.stringify({ selection: { kind: "pantry_platform" } }),
     );
     expect(
       new Headers(pantryRequest.init?.headers).get(
-        "x-satyr-configuration-version",
+        "x-pantry-configuration-version",
       ),
     ).toBe("8");
     expect(storedMutationValues.join("\n")).not.toContain(organisationApiKey);
@@ -330,7 +330,7 @@ describe("CafeOS settings page ownership", () => {
   it("narrates setup as one ordered checklist with done, actionable, and waiting steps", () => {
     const markup = renderIntegrationsPage({
       commerceSystem: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         bindingId: "binding_cafe",
         merchantId: "merchant_cafe",
         revision: 1,
@@ -381,7 +381,7 @@ describe("CafeOS settings page ownership", () => {
   it("keeps the commerce card honest about sync state and syncs itself", () => {
     const markup = renderIntegrationsPage({
       commerceSystem: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         bindingId: "binding_cafe",
         merchantId: "merchant_cafe",
         revision: 4,
@@ -579,7 +579,7 @@ describe("CafeOS settings page ownership", () => {
   it("associates mutation failures with the action that produced them", () => {
     const markup = renderIntegrationsPage({
       commerceSystem: {
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         bindingId: "binding_1",
         merchantId: "merchant_1",
         revision: 1,
@@ -697,7 +697,7 @@ function readSlackRemovalRequest(request: {
     path: String(request.input),
     method: request.init?.method,
     configurationVersion: new Headers(request.init?.headers).get(
-      "x-satyr-configuration-version",
+      "x-pantry-configuration-version",
     ),
   };
 }

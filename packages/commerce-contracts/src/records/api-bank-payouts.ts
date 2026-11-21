@@ -68,7 +68,7 @@ export type CommerceBankPayoutSourceV1 = Static<
 >;
 
 export const commerceBankPayoutsV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.bank-payouts.v1"),
+  schemaVersion: Type.Literal("commerce.bank-payouts.v1"),
   merchantId: normalizedTextSchema,
   /** The providers that this merchant connected. */
   sources: ImmutableArray(commerceBankPayoutSourceV1Schema),

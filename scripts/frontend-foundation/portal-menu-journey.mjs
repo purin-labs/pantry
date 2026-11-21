@@ -121,7 +121,7 @@ export async function runMenuJourney(page, options) {
   const fixture = new MenuFixture();
   await page.context().addCookies([
     {
-      name: "satyr_control_csrf",
+      name: "pantry_csrf",
       value: "csrf_menu_preview",
       url: options.portalUrl,
       sameSite: "Lax",

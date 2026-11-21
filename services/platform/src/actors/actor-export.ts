@@ -84,7 +84,7 @@ export type ActorExportSource = {
 };
 
 export type ActorExportPayloadV1 = {
-  readonly format: "satyr-state-object-export";
+  readonly format: "pantry-state-object-export";
   readonly version: 1;
   readonly exportId: ActorExportId;
   readonly source: ActorExportSource;
@@ -96,7 +96,7 @@ export type ActorExportPayloadV1 = {
 };
 
 export type ActorExportEnvelopeV1 = {
-  readonly format: "satyr-state-object-export-envelope";
+  readonly format: "pantry-state-object-export-envelope";
   readonly version: 1;
   readonly payload: ActorExportPayloadV1;
   readonly payloadDigestB64: string;
@@ -182,8 +182,8 @@ type ParsedEncryptedEnvelope = {
 };
 
 const EXPORT_FORMAT_VERSION = 1;
-const EXPORT_MAGIC = new TextEncoder().encode("SATYRDO1");
-const EXPORT_CONTEXT = "satyr-state-object-export-v1";
+const EXPORT_MAGIC = new TextEncoder().encode("PANTRYDO1");
+const EXPORT_CONTEXT = "pantry-state-object-export-v1";
 const EXPORT_ROOT_BYTES = 32;
 const EXPORT_IV_BYTES = 12;
 const IDENTIFIER_PATTERN = /^[A-Za-z_][A-Za-z0-9_]*$/;
@@ -347,7 +347,7 @@ export async function captureActorExport(input: {
   }
 
   const payload: ActorExportPayloadV1 = {
-    format: "satyr-state-object-export",
+    format: "pantry-state-object-export",
     version: EXPORT_FORMAT_VERSION,
     exportId: input.exportId,
     source: activation.value,
@@ -574,7 +574,7 @@ export async function createActorExportEnvelope(
   payload: ActorExportPayloadV1,
 ): Promise<ActorExportEnvelopeV1> {
   return {
-    format: "satyr-state-object-export-envelope",
+    format: "pantry-state-object-export-envelope",
     version: EXPORT_FORMAT_VERSION,
     payload,
     payloadDigestB64: await payloadDigest(payload),
@@ -821,7 +821,7 @@ async function copyReferencedR2Object(
   try {
     await input.bucket.put(archiveKey, bytes, {
       customMetadata: {
-        format: "satyr-state-object-r2-copy-v1",
+        format: "pantry-state-object-r2-copy-v1",
         sourceKey,
         digestB64,
       },
@@ -980,7 +980,7 @@ async function persistEncryptedExportEnvelope(input: {
       encryptedEnvelope(iv, new Uint8Array(ciphertext)),
       {
         customMetadata: {
-          format: "satyr-state-object-export-v1",
+          format: "pantry-state-object-export-v1",
           payloadDigestB64: input.envelope.payloadDigestB64,
         },
       },
@@ -1402,7 +1402,7 @@ function parseExportEnvelopeValue(
 ): Result<ActorExportEnvelopeV1, ActorExportError> {
   if (
     !plainObject(value) ||
-    value.format !== "satyr-state-object-export-envelope" ||
+    value.format !== "pantry-state-object-export-envelope" ||
     value.version !== EXPORT_FORMAT_VERSION ||
     typeof value.payloadDigestB64 !== "string"
   ) {
@@ -1415,7 +1415,7 @@ function parseExportEnvelopeValue(
     ? {
         ok: true,
         value: {
-          format: "satyr-state-object-export-envelope",
+          format: "pantry-state-object-export-envelope",
           version: EXPORT_FORMAT_VERSION,
           payload: payload.value,
           payloadDigestB64: value.payloadDigestB64,
@@ -1429,7 +1429,7 @@ function parseExportPayload(
 ): Result<ActorExportPayloadV1, ActorExportError> {
   if (
     !plainObject(value) ||
-    value.format !== "satyr-state-object-export" ||
+    value.format !== "pantry-state-object-export" ||
     value.version !== EXPORT_FORMAT_VERSION ||
     !validExportId(value.exportId) ||
     !validTimestamp(value.exportedAt) ||
@@ -1453,7 +1453,7 @@ function parseExportPayload(
   return {
     ok: true,
     value: {
-      format: "satyr-state-object-export",
+      format: "pantry-state-object-export",
       version: EXPORT_FORMAT_VERSION,
       exportId: value.exportId,
       source: source.value,

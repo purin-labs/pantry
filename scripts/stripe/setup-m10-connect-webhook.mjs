@@ -9,7 +9,7 @@ import { syncWorkerSecret } from "./setup-m10-connect.mjs";
 import { errorMessage, isRecord } from "../../packages/std/src/index.ts";
 import { handleFatalError, isMainModule } from "../lib/cli.mjs";
 
-const DEFAULT_PANTRY_ORIGIN = "https://satyr-edge.n6378056.workers.dev";
+const DEFAULT_PANTRY_ORIGIN = "https://pantry.purin.io";
 const WEBHOOK_ID_NAME = "STRIPE_CONNECT_WEBHOOK_ID";
 const WEBHOOK_SECRET_NAME = "STRIPE_CONNECT_WEBHOOK_SECRET";
 const STRIPE_CONNECT_EVENTS = [
@@ -59,7 +59,7 @@ export async function createStripeConnectWebhook(input) {
       headers: {
         authorization: `Bearer ${input.platformSecret}`,
         "content-type": "application/x-www-form-urlencoded",
-        "idempotency-key": "satyr-m10-shared-connect-webhook-v1",
+        "idempotency-key": "pantry-m10-shared-connect-webhook-v1",
       },
       body,
     });

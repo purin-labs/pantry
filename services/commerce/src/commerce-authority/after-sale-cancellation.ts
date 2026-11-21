@@ -362,7 +362,7 @@ export class AfterSaleCommandAuthority {
       );
       if (allocation === undefined) continue;
       await this.refundOrder({
-        schemaVersion: "underclerk.refund-order.v1",
+        schemaVersion: "commerce.refund-order.v1",
         merchantId: command.merchantId,
         expectedMerchantRevision: merchant.revision,
         idempotencyKey: refundAttemptId,
@@ -526,7 +526,7 @@ export class AfterSaleCommandAuthority {
     const refused = (
       error: CommerceMutationErrorV1,
     ): CommerceTenderRefundV1 => ({
-      schemaVersion: "underclerk.tender-refund.v1",
+      schemaVersion: "commerce.tender-refund.v1",
       outcome: "rejected",
       error,
     });
@@ -580,7 +580,7 @@ export class AfterSaleCommandAuthority {
       if (result.outcome === "rejected") break;
     }
     return {
-      schemaVersion: "underclerk.tender-refund.v1",
+      schemaVersion: "commerce.tender-refund.v1",
       outcome: "split",
       orderId: order.id,
       parts,
@@ -605,7 +605,7 @@ export class AfterSaleCommandAuthority {
     if (merchant === undefined || order === undefined || payment === undefined)
       return undefined;
     return {
-      schemaVersion: "underclerk.refund-order.v1",
+      schemaVersion: "commerce.refund-order.v1",
       merchantId: command.merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: part.refundAttemptId,
@@ -654,7 +654,7 @@ export class AfterSaleCommandAuthority {
       command.orderId,
     );
     return customerId === null ||
-      command.schemaVersion !== "underclerk.refund-order.v1"
+      command.schemaVersion !== "commerce.refund-order.v1"
       ? undefined
       : {
           kind: "store_credit",
@@ -676,12 +676,12 @@ export class AfterSaleCommandAuthority {
       try {
         const command = pending.command;
         await (isRecord(command) &&
-        command.schemaVersion === "underclerk.cancel-order.v1"
+        command.schemaVersion === "commerce.cancel-order.v1"
           ? this.cancelOrder(command)
           : this.refundOrder(command));
       } catch (error) {
         console.warn(
-          "underclerk.refund_reconciliation_failed",
+          "commerce.refund_reconciliation_failed",
           pending.refundAttemptId,
           errorMessage(error),
         );
@@ -871,7 +871,7 @@ function refundReconciliationCommand(
   const payment = findResource(resources.payments, attempt.paymentId);
   if (order === undefined || payment === undefined) return undefined;
   return {
-    schemaVersion: "underclerk.refund-order.v1",
+    schemaVersion: "commerce.refund-order.v1",
     merchantId: merchant.merchantId,
     expectedMerchantRevision: merchant.revision,
     idempotencyKey: attempt.idempotencyIdentity,
@@ -1126,7 +1126,7 @@ function planRefundReservation(
     !paymentIsRefundable(database, command.merchantId, order, payment) ||
     !orderIsAccepted(database, command.merchantId, order) ||
     // Store credit takes the place of a card refund, not of stored value.
-    (command.schemaVersion === "underclerk.refund-order.v1" &&
+    (command.schemaVersion === "commerce.refund-order.v1" &&
       command.destination === "store_credit" &&
       storedValueRedemption(database, command.merchantId, payment.id) !==
         undefined)
@@ -1139,7 +1139,7 @@ function planRefundReservation(
     order,
     payment,
   );
-  if (command.schemaVersion === "underclerk.refund-order.v1") {
+  if (command.schemaVersion === "commerce.refund-order.v1") {
     if (
       command.destination !== "store_credit" &&
       capturedContext?.paymentAttempt.lifecycle.providerRefundable === false
@@ -1823,7 +1823,7 @@ function internalRefundResult(
   refundedAt: string,
 ): CommercePaymentRefundResultV1 {
   return {
-    schemaVersion: "underclerk.payment-refund-result.v1",
+    schemaVersion: "commerce.payment-refund-result.v1",
     kind: "refunded",
     providerRefundReference: `${tender}_${attempt.refundAttemptId}`,
     money: refundAttemptMoney(attempt),

@@ -171,7 +171,7 @@ describe("supplier payout store", function payoutStoreSuite() {
     ).rejects.toThrow();
   });
 
-  it("refuses an approval digest that is not one Satyr could have computed", async function digestShape() {
+  it("refuses an approval digest that is not one Pantry could have computed", async function digestShape() {
     await expect(
       create({ stateKind: "approved", approvalDigest: "not-a-digest" }),
     ).rejects.toThrow();

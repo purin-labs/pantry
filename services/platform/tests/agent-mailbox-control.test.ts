@@ -361,9 +361,9 @@ function versionedMailboxRequest(
         ...sessionHeaders(fixture),
         "content-type": "application/json",
         origin: ORIGIN,
-        "x-satyr-csrf": fixture.csrfToken,
+        "x-pantry-csrf": fixture.csrfToken,
         "idempotency-key": idempotencyKey,
-        "x-satyr-configuration-version": String(configurationVersion),
+        "x-pantry-configuration-version": String(configurationVersion),
       },
       body: "{}",
     },
@@ -674,7 +674,7 @@ function mailboxRequest(
         ...sessionHeaders(fixture),
         "content-type": "application/json",
         origin: ORIGIN,
-        "x-satyr-csrf": fixture.csrfToken,
+        "x-pantry-csrf": fixture.csrfToken,
         "idempotency-key": idempotencyKey,
       },
       body: JSON.stringify(body),
@@ -691,7 +691,7 @@ function readRequest(fixture: Fixture): Request {
 
 function sessionHeaders(fixture: Fixture): Record<string, string> {
   return {
-    cookie: `satyr_control_session=${fixture.sessionToken}; satyr_control_csrf=${fixture.csrfToken}`,
+    cookie: `pantry_session=${fixture.sessionToken}; pantry_csrf=${fixture.csrfToken}`,
   };
 }
 
@@ -756,7 +756,7 @@ function gmailSeed(
     provider: "gmail",
     providerSubjectId: providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requireVaultHandle(

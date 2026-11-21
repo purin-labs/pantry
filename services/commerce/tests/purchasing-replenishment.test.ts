@@ -68,7 +68,7 @@ it("opens one evidence-backed requirement and closes it from accepted receipts",
     requiredQuantity: 15_000_000,
     receivedQuantity: 0,
     supplierId: "supplier_packaging",
-    owner: "CafeOS purchasing",
+    owner: "Café purchasing",
     closedAt: null,
   });
 
@@ -152,7 +152,7 @@ async function purchasingHttpJourney(): Promise<void> {
     shippingGateway: createJapanShippingGateway("purchasing-shipping-key"),
   });
   authority.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     createdAt: NOW,
@@ -172,7 +172,7 @@ async function purchasingHttpJourney(): Promise<void> {
     entityPlane: service,
   });
   const client = new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: api.fetch,
   });
@@ -229,7 +229,7 @@ async function purchasingHttpJourney(): Promise<void> {
       error: { status: 403 },
     });
     const unauthorized = await api.fetch(
-      `https://underclerk.test/v1/admin/merchants/${MERCHANT_ID}/entity-plane/purchasing-reconcile`,
+      `https://commerce.test/v1/admin/merchants/${MERCHANT_ID}/entity-plane/purchasing-reconcile`,
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -238,7 +238,7 @@ async function purchasingHttpJourney(): Promise<void> {
     );
     expect(unauthorized.status).toBe(401);
     const malformed = await api.fetch(
-      `https://underclerk.test/v1/admin/merchants/${MERCHANT_ID}/entity-plane/purchasing-reconcile`,
+      `https://commerce.test/v1/admin/merchants/${MERCHANT_ID}/entity-plane/purchasing-reconcile`,
       {
         method: "POST",
         headers: {
@@ -295,7 +295,7 @@ async function purchaseRequestJourney(): Promise<void> {
     shippingGateway: createJapanShippingGateway("purchasing-shipping-key"),
   });
   authority.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     createdAt: NOW,
@@ -315,7 +315,7 @@ async function purchaseRequestJourney(): Promise<void> {
     entityPlane: service,
   });
   const client = new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: api.fetch,
   });
@@ -397,7 +397,7 @@ async function purchaseRequestJourney(): Promise<void> {
     // The supplier delivers the whole request, and the receipt is taken.
     const receive = (receiptId: string) =>
       authority.receiveInventory({
-        schemaVersion: "underclerk.receive-inventory.v3",
+        schemaVersion: "commerce.receive-inventory.v3",
         merchantId: MERCHANT_ID,
         expectedMerchantRevision: merchantRevision(database),
         idempotencyKey: `receive_${receiptId}`,
@@ -600,8 +600,8 @@ function stockPolicyFixture() {
   return {
     provenance: {
       organisationId: ORGANISATION_ID,
-      integrationAccountId: "underclerk",
-      source: "underclerk",
+      integrationAccountId: "commerce",
+      source: "commerce",
       resourceType: "stock_policy",
       resourceId: "stock_policy_packaging_cups",
       revision: 1,

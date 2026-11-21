@@ -141,7 +141,7 @@ export const commerceContextSelectionSchema = Type.Union([
 export const commerceGraphQuerySchema = Type.Union([
   ...commerceSelectorQuerySchema.anyOf,
   OpenObject({
-    kind: Type.Literal("underclerk_context"),
+    kind: Type.Literal("commerce_context"),
     selection: commerceContextSelectionSchema,
     traversal: commerceTraversalLimitsSchema,
     allowedSensitivity: Type.Enum([

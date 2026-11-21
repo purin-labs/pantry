@@ -399,7 +399,7 @@ export function isCommerceSource(value: unknown): value is CommerceSource {
     value === "shopify" ||
     value === "stripe" ||
     value === "lab" ||
-    value === "underclerk"
+    value === "commerce"
   );
 }
 

@@ -8,7 +8,7 @@ type PendingCommerceApproval = {
   readonly createdAt: number;
 };
 
-const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "satyr:commerce-approval";
+const PENDING_COMMERCE_APPROVAL_STORAGE_KEY = "pantry:commerce-approval";
 
 const PENDING_COMMERCE_APPROVAL_MAX_AGE_MS = 10 * 60 * 1000;
 

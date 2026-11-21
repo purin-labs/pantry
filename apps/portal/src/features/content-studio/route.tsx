@@ -815,7 +815,7 @@ function startMenuDrag(
   event: React.DragEvent<HTMLElement>,
 ): void {
   event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("application/x-satyr-menu-item", itemId);
+  event.dataTransfer.setData("application/x-pantry-menu-item", itemId);
   client.current?.select({ kind: "item", itemId });
 }
 
@@ -831,7 +831,7 @@ function dropMenuItem(
   event: React.DragEvent<HTMLElement>,
 ): void {
   event.preventDefault();
-  const itemId = event.dataTransfer.getData("application/x-satyr-menu-item");
+  const itemId = event.dataTransfer.getData("application/x-pantry-menu-item");
   if (itemId.length === 0) return;
   client.current?.moveItem(itemId, { sectionId, order });
   client.current?.select({ kind: "item", itemId });

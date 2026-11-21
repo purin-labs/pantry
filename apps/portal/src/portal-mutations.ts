@@ -46,7 +46,7 @@ export async function commerceBoardPresenceTransport(
   path: string,
   body: unknown,
 ): Promise<unknown> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
   }

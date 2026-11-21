@@ -218,7 +218,7 @@ class Setup {
       `connector-fetch-placement-${String(this.requests)}`,
     );
     headers.set(
-      "x-satyr-configuration-version",
+      "x-pantry-configuration-version",
       String(this.configurationVersion),
     );
     const answered = await exports.default.fetch(

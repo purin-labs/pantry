@@ -474,7 +474,7 @@ function commerceResourceIsCurrent(
     grant.target.kind === "provider_resource" &&
     grant.target.capabilityId === CAPABILITY_KEYS.commerceActionPropose &&
     grant.target.resourceScope.startsWith("commerce:list_entry:") &&
-    input.availableCommerceSystems.includes("satyr_commerce")
+    input.availableCommerceSystems.includes("builtin_commerce")
   );
 }
 

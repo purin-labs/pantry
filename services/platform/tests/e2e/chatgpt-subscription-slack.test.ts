@@ -472,7 +472,7 @@ async function sendOutsideModelExitHosts(): Promise<unknown[]> {
       body: "{}",
     });
     expect(refused.status).toBe(403);
-    expect(refused.headers.get("x-satyr-exit-colo")).toBeTruthy();
+    expect(refused.headers.get("x-pantry-exit-colo")).toBeTruthy();
     refusals.push({ url, status: refused.status, body: await refused.json() });
   }
   for (const url of [
@@ -565,7 +565,7 @@ async function readPortalConnection(): Promise<unknown> {
     {
       headers: {
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
       },
     },
   );

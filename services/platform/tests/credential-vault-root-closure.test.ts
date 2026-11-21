@@ -140,7 +140,7 @@ async function failsClosedAfterRestoreWithoutReferencedRoot(): Promise<void> {
   const handle = requireVaultHandle("vault:test:restored-root-v2-unavailable");
   await insertEncryptedVaultRow(fixture, keys, "v2", handle, null);
 
-  const backupDirectory = mkdtempSync(join(tmpdir(), "satyr-vault-restore-"));
+  const backupDirectory = mkdtempSync(join(tmpdir(), "pantry-vault-restore-"));
   const backupPath = join(backupDirectory, "restored.sqlite");
   await backup(fixture.sqlite, backupPath);
   const restoredSqlite = new DatabaseSync(backupPath);

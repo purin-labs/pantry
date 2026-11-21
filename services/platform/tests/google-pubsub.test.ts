@@ -8,7 +8,7 @@ import {
 
 const NOW = 1_784_016_325_277;
 const AUDIENCE = "https://pantry.example/hook/email/google";
-const SERVICE_ACCOUNT = "gmail-push@satyr-project.iam.gserviceaccount.com";
+const SERVICE_ACCOUNT = "gmail-push@pantry-project.iam.gserviceaccount.com";
 
 describe("google pubsub push boundary", googlePubsubSuite);
 
@@ -117,7 +117,7 @@ function envelopeTest(): void {
   );
   const parsed = parseGmailPushEnvelope({
     message: { messageId: "pubsub-1", data },
-    subscription: "projects/satyr/subscriptions/gmail",
+    subscription: "projects/pantry/subscriptions/gmail",
   });
   expect(parsed).toEqual({
     ok: true,

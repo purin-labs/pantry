@@ -190,7 +190,7 @@ export class ChatGoalControl extends React.Component<Props, State> {
     const version = ++this.version;
     this.setState({ saving: true, error: null });
     try {
-      const csrf = readCookie("satyr_control_csrf");
+      const csrf = readCookie("pantry_csrf");
       if (csrf === null) throw new Error("Sign in again to change the goal.");
       const raw = await controlWrite(this.path(), "POST", {
         commandId: crypto.randomUUID(),

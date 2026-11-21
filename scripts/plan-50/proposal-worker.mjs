@@ -106,7 +106,7 @@ export class ProposalOrganisation extends OrganisationDO {
         provenance: {
           organisationId,
           integrationAccountId: accountId,
-          source: "underclerk",
+          source: "commerce",
           resourceType: "offer",
           resourceId: offerId,
           revision: 1,

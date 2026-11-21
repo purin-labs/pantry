@@ -22,7 +22,7 @@ const SIGNER = {
     Buffer.from(payload).toString("base64url"),
 };
 
-describe("Underclerk export preset publication", () => {
+describe("Commerce export preset publication", () => {
   it("publishes authoritative evidence and replays without advancing the merchant", async () => {
     const fixture = createFixture();
     const request = exportPresetRequest(
@@ -120,7 +120,7 @@ describe("Underclerk export preset publication", () => {
 async function publishExportJourney(): Promise<void> {
   const fixture = createFixture();
   const client = new CommerceEntityPlaneClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: fixture.api.fetch,
   });
@@ -149,7 +149,7 @@ async function publishExportJourney(): Promise<void> {
       error: { status: 403 },
     });
     const unauthorized = await fixture.api.fetch(
-      "https://underclerk.test/v1/admin/merchants/merchant_export/entity-plane/export-preset",
+      "https://commerce.test/v1/admin/merchants/merchant_export/entity-plane/export-preset",
       {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -158,7 +158,7 @@ async function publishExportJourney(): Promise<void> {
     );
     expect(unauthorized.status).toBe(401);
     const malformed = await fixture.api.fetch(
-      "https://underclerk.test/v1/admin/merchants/merchant_export/entity-plane/export-preset",
+      "https://commerce.test/v1/admin/merchants/merchant_export/entity-plane/export-preset",
       {
         method: "POST",
         headers: {
@@ -221,7 +221,7 @@ function createFixture(): Readonly<{
     ),
   });
   authority.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: "organisation_export",
     merchantId: "merchant_export",
     createdAt: NOW,

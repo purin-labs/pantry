@@ -107,13 +107,13 @@ async function deleteProductsWhileBuyersShop(): Promise<void> {
 
     const amir = await required(
       buyer.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
     );
     const amirCart = await required(
       buyer.createCart(merchantId, STOREFRONT, amir.token, {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: "amir_cart",
         lines: [
           catalogLine("variant_cocoa"),

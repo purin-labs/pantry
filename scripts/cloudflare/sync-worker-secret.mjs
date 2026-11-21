@@ -99,7 +99,7 @@ async function main() {
       cwd: repositoryRoot,
       env: {
         ...process.env,
-        WRANGLER_LOG_PATH: "/tmp/satyr-wrangler-secret.log",
+        WRANGLER_LOG_PATH: "/tmp/pantry-wrangler-secret.log",
       },
       input: `${secretValue}\n`,
       stdio: ["pipe", "inherit", "inherit"],

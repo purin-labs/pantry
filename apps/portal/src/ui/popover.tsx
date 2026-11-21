@@ -52,7 +52,7 @@ function Trigger<Payload = unknown>({
   );
   return (
     <BasePopover.Trigger
-      className={withClass("satyr-popover-trigger", className)}
+      className={withClass("pantry-popover-trigger", className)}
       ref={findContainer}
       {...props}
     />
@@ -124,7 +124,7 @@ function Close({
 }: BasePopover.Close.Props): React.ReactNode {
   return (
     <BasePopover.Close
-      className={withClass("satyr-popover-close", className)}
+      className={withClass("pantry-popover-close", className)}
       {...props}
     />
   );

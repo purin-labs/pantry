@@ -1,17 +1,17 @@
-// The ids of a commerce engine resource in Pantry: `underclerk:<merchant>:<id>`.
+// The ids of a commerce engine resource in Pantry: `commerce:<merchant>:<id>`.
 
 export function commerceCanonicalResourceId(
   merchantId: string,
   resourceId: string,
 ): string {
-  return `underclerk:${merchantId}:${resourceId}`;
+  return `commerce:${merchantId}:${resourceId}`;
 }
 
 export function commerceProviderResourceId(
   merchantId: string,
   canonicalResourceId: string,
 ): string | null {
-  const prefix = `underclerk:${merchantId}:`;
+  const prefix = `commerce:${merchantId}:`;
   if (!canonicalResourceId.startsWith(prefix)) return null;
   const resourceId = canonicalResourceId.slice(prefix.length);
   return resourceId.length === 0 ? null : resourceId;

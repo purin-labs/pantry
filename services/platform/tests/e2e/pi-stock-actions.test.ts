@@ -547,7 +547,7 @@ async function grantStockReads(
 async function provisionShop(session: IssuedControlSession) {
   const client = providerClient();
   const provisioned = await client.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",
@@ -592,9 +592,9 @@ async function readStock() {
 
 function plane(): CommerceEntityPlaneClient {
   return new CommerceEntityPlaneClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
 }
 
@@ -614,8 +614,8 @@ function controlHeaders(
   return {
     "content-type": "application/json",
     origin: "https://localhost",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
     "idempotency-key": key,
   };
 }

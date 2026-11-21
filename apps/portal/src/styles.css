@@ -4952,7 +4952,7 @@ a.commerce-count:hover {
   background: var(--provider-tile-bg);
 }
 
-.provider-tile-satyr_commerce,
+.provider-tile-builtin_commerce,
 .provider-tile-generic {
   --provider-tile-bg: var(--surface);
 

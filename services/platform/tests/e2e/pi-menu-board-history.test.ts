@@ -222,7 +222,7 @@ it(
         ],
         real: [
           "Pantry Worker, the board room and its version store",
-          "Underclerk fixture Worker",
+          "Commerce fixture Worker",
           "screen feed",
         ],
         versions: history.map((version) => ({

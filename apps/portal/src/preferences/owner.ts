@@ -213,7 +213,7 @@ export class UserPreferenceOwner {
   ): Promise<
     Readonly<{ kind: "saved" | "conflict"; document: UserPreferenceDocument }>
   > {
-    const csrf = readCookie("satyr_control_csrf");
+    const csrf = readCookie("pantry_csrf");
     if (csrf === null)
       throw new Error("Sign in again to save your preferences.");
     let raw: unknown;
@@ -255,7 +255,7 @@ function preferencePath(area: PreferenceArea): string {
 }
 
 function cacheKey(userId: UserId, area: PreferenceArea): string {
-  return `satyr:preferences:${userId}:${area}`;
+  return `pantry:preferences:${userId}:${area}`;
 }
 
 function readPreferenceCache(

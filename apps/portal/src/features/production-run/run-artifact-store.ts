@@ -28,7 +28,7 @@ function acquirePageDirectory(
 ): void {
   const id = crypto.randomUUID();
   void navigator.locks
-    .request(`satyr-artifacts:${id}`, holdPageDirectory.bind(null, id, resolve))
+    .request(`pantry-artifacts:${id}`, holdPageDirectory.bind(null, id, resolve))
     .catch(reject);
 }
 
@@ -37,12 +37,12 @@ async function holdPageDirectory(
   resolve: (directory: FileSystemDirectoryHandle) => void,
 ): Promise<void> {
   const root = await navigator.storage.getDirectory();
-  const runs = await root.getDirectoryHandle("satyr-production-runs", {
+  const runs = await root.getDirectoryHandle("pantry-production-runs", {
     create: true,
   });
   for await (const name of runs.keys()) {
     await navigator.locks.request(
-      `satyr-artifacts:${name}`,
+      `pantry-artifacts:${name}`,
       { ifAvailable: true },
       removeAbandonedDirectory.bind(null, runs, name),
     );

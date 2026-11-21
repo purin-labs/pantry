@@ -69,8 +69,8 @@ function mutation(
     headers: {
       origin: "https://pantry.example",
       cookie:
-        "satyr_control_session=session-payout; satyr_control_csrf=csrf-payout",
-      "x-satyr-csrf": "csrf-payout",
+        "pantry_session=session-payout; pantry_csrf=csrf-payout",
+      "x-pantry-csrf": "csrf-payout",
       "idempotency-key": key,
       "content-type": "application/json",
     },
@@ -80,7 +80,7 @@ function mutation(
 
 function read(url: string): Request {
   return new Request(url, {
-    headers: { cookie: "satyr_control_session=session-payout" },
+    headers: { cookie: "pantry_session=session-payout" },
   });
 }
 

@@ -2324,7 +2324,7 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
 /** The address names a conversation by its draft, or by its Gmail thread. */
 /** A source that could not load names itself and can read again. */
 /**
- * Google refused the mailbox's sign-in, so CafeOS reads none of its mail. A
+ * Google refused the mailbox's sign-in, so Café reads none of its mail. A
  * person who manages the workspace gets the way to reconnect it.
  */
 function MailboxReconnect(

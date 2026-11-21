@@ -3183,7 +3183,7 @@ export function OrderCancellationControl(
   ) {
     return null;
   }
-  const commerceEngine = props.entity.provenance.source === "underclerk";
+  const commerceEngine = props.entity.provenance.source === "commerce";
   const disabled =
     props.actionBusy ||
     state.kind === "submitting" ||
@@ -3463,7 +3463,7 @@ function buildOrderCancellationAction(
 ): OrderCancellationAction {
   const reason = orderCancellationReason(formText(formData, "reason"));
   if (reason === null) throw new Error("Order cancellation reason is invalid.");
-  if (entity.provenance.source === "underclerk") {
+  if (entity.provenance.source === "commerce") {
     return {
       kind: "cancel_order",
       resourceId: entity.provenance.resourceId,
@@ -3523,7 +3523,7 @@ function commerceSourceSupportsOrderCancellation(
   switch (source) {
     case "lab":
     case "shopify":
-    case "underclerk":
+    case "commerce":
       return true;
     case "stripe":
       return false;
@@ -3632,9 +3632,9 @@ function commerceActivityEventKey(
       return `${event.kind}:${event.approvalId}`;
     case "entity_plane_effect":
       return `${event.kind}:${event.effect.receipt.commandId}`;
-    case "underclerk_observation":
+    case "commerce_observation":
       return `${event.kind}:${event.deliveryId}`;
-    case "underclerk_receipt":
+    case "commerce_receipt":
       return `${event.kind}:${event.receiptId}`;
     case "action_ledger":
       return `${event.kind}:${event.actionNonce}`;
@@ -3663,9 +3663,9 @@ function commerceActivityEventLabel(
         : "Approval decided";
     case "entity_plane_effect":
       return "Record changed";
-    case "underclerk_observation":
+    case "commerce_observation":
       return "Change recorded";
-    case "underclerk_receipt":
+    case "commerce_receipt":
       return "Change confirmed";
     case "action_ledger":
       return `Governed change ${commerceActionStateLabel(event.state)}`;

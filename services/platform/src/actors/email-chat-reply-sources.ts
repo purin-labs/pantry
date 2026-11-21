@@ -14,7 +14,7 @@ import {
   MAX_CHAT_SOURCES,
 } from "./email-proposal-sources";
 
-const COMMERCE_RESOURCE_PREFIX = "underclerk:";
+const COMMERCE_RESOURCE_PREFIX = "commerce:";
 const MEMORY_RECORD_PREFIX = memoryObservationRecordId("");
 
 type ChatSession = Readonly<{ organisationId: string; sessionId: string }>;

@@ -421,9 +421,9 @@ function invokeWriter(request: GrantWriterRequest) {
           identity: request.identity,
         },
         client: new CommerceEntityPlaneClient({
-          baseUrl: "http://underclerk.test",
-          serviceToken: "underclerk-e2e-token",
-          fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+          baseUrl: "http://commerce.test",
+          serviceToken: "commerce-e2e-token",
+          fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
         }),
       });
     case "whatsapp":
@@ -502,10 +502,10 @@ function writerHttp(
     {
       method: "POST",
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: "https://localhost",
         "content-type": "application/json",
-        "x-satyr-csrf": session.csrfToken,
+        "x-pantry-csrf": session.csrfToken,
         "idempotency-key": `p55-${request.operation}-${request.revision}`,
       },
       body: JSON.stringify(body),
@@ -592,7 +592,7 @@ async function whatsappAccount(userId: UserId): Promise<IntegrationAccountId> {
     provider: "whatsapp",
     providerSubjectId: "310000000000001",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: required(parseVaultHandle("vault:whatsapp:p55-grants")),

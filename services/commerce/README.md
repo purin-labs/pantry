@@ -27,7 +27,7 @@ crossing. Platform hosts Sous Chef and the Commerce Read Layer, and Punter runs
 independent buyer acceptance journeys from `scripts/punter`.
 
 Status: transactional commerce v1 and the merchant entity plane are implemented
-as a Cloudflare Worker. One SQLite-backed `UnderclerkMerchantDO` owns each
+as a Cloudflare Worker. One SQLite-backed `CommerceMerchantDO` owns each
 merchant. The service owns merchant-scoped Location, SalesChannel, Product,
 SellableVariant, InventoryItem, Offer, InventoryPosition, Order, Payment,
 Fulfillment, and Shipment records. It also owns custom entity and relationship
@@ -71,7 +71,7 @@ node --experimental-strip-types scripts/schema-upgrade-rehearsal.ts --from <prod
 ```
 
 The message of the current deploy in `wrangler deployments list --name
-underclerk` usually names that commit. If the commit is only in the archived
+commerce` usually names that commit. If the commit is only in the archived
 `seams-tech/pantry-history` repository, fetch it with `git fetch --depth=1
 <repository URL> <full commit>` into a separate clone, because a shallow fetch
 makes the clone shallow.

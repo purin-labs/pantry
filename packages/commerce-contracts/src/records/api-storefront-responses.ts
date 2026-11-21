@@ -85,7 +85,7 @@ const buyerCatalogListingSchema = Type.Refine(
 );
 
 export const commerceBuyerCatalogSearchV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-catalog-search.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-catalog-search.v1"),
   query: Type.String(),
   listings: ImmutableArray(buyerCatalogListingSchema),
 });
@@ -171,7 +171,7 @@ const catalogStorefront = {
 };
 
 export const commerceBuyerCatalogV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-catalog.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-catalog.v1"),
   storefront: Type.Union([
     ReadonlyStrictObject({
       ...catalogStorefront,
@@ -192,7 +192,7 @@ export type CommerceBuyerCatalogV1 = Static<
 >;
 
 const buyerCart = {
-  schemaVersion: Type.Literal("underclerk.buyer-cart.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-cart.v1"),
   cartId: text,
   revision: PositiveInteger,
   checkoutProfile: wireCheckoutProfileReferenceSchema,
@@ -276,7 +276,7 @@ const quotedCheckout = {
 };
 
 export const commerceBuyerQuotedCheckoutV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-quoted-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-quoted-checkout.v1"),
   ...quotedCheckout,
   quote: Type.Refine(
     ReadonlyStrictObject({
@@ -346,7 +346,7 @@ type BuyerShippingMarket = Static<typeof buyerShippingMarketSchema>;
 
 export const commerceBuyerQuotedShippingCheckoutV1Schema =
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.buyer-quoted-shipping-checkout.v1"),
+    schemaVersion: Type.Literal("commerce.buyer-quoted-shipping-checkout.v1"),
     ...quotedCheckout,
     quote: Type.Refine(
       ReadonlyStrictObject({
@@ -372,7 +372,7 @@ const checkoutSession = ReadonlyOpenObject({
 });
 
 export const commerceDraftInvoiceCheckoutV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.draft-invoice-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.draft-invoice-checkout.v1"),
   session: checkoutSession,
   checkout: commerceBuyerQuotedCheckoutV1Schema,
 });
@@ -382,7 +382,7 @@ export type CommerceDraftInvoiceCheckoutV1 = Static<
 
 /** The buyer checkout of an order balance (`parseOrderBalanceCheckout`). */
 export const commerceOrderBalanceCheckoutV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.order-balance-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.order-balance-checkout.v1"),
   session: checkoutSession,
   checkout: commerceBuyerQuotedCheckoutV1Schema,
 });
@@ -392,7 +392,7 @@ export type CommerceOrderBalanceCheckoutV1 = Static<
 
 const addressValidation = {
   schemaVersion: Type.Literal(
-    "underclerk.buyer-shipping-address-validation.v1",
+    "commerce.buyer-shipping-address-validation.v1",
   ),
   validationReference: text,
   expiresAt: utcTimestampSchema,
@@ -445,7 +445,7 @@ const buyerCheckoutPaymentProgressSchema = Type.Union([
 ]);
 
 export const commerceBuyerCheckoutRecoveryV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-checkout-recovery.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-checkout-recovery.v1"),
   checkout: Type.Union([
     commerceBuyerQuotedCheckoutV1Schema,
     commerceBuyerQuotedShippingCheckoutV1Schema,
@@ -463,7 +463,7 @@ export type CommerceBuyerCheckoutRecoveryV1 = Static<
 >;
 
 const paymentResult = {
-  schemaVersion: Type.Literal("underclerk.buyer-payment-result.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-payment-result.v1"),
   checkoutId: text,
 };
 
@@ -554,7 +554,7 @@ const buyerRefundStatusSchema = Type.Union([
 ]);
 
 const buyerOrder = {
-  schemaVersion: Type.Literal("underclerk.buyer-order.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-order.v1"),
   checkoutId: text,
   orderId: text,
   paymentId: text,

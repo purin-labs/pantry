@@ -88,7 +88,7 @@ function PublicDocumentHeader(props: {
         aria-label="Seams Pantry policies home"
       >
         <img
-          src="/brand/satyr-mark-dark-32.png"
+          src="/brand/pantry-mark-dark-32.png"
           width="28"
           height="28"
           alt=""

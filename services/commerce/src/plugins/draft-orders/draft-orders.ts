@@ -292,7 +292,7 @@ export class DraftOrderCommandAuthority {
             completion.orderId,
           )[0];
     return {
-      schemaVersion: "underclerk.draft-order.v1",
+      schemaVersion: "commerce.draft-order.v1",
       draftOrder: {
         ...draft,
         buyer: {

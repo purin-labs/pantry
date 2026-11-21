@@ -37,7 +37,7 @@ import {
 } from "./journey-support.ts";
 
 const APP = "bookkeeper";
-const HOOK = "https://hooks.cafe.example/underclerk";
+const HOOK = "https://hooks.cafe.example/commerce";
 
 type Backend = Awaited<ReturnType<typeof startBackend>>;
 
@@ -193,7 +193,7 @@ it(
       expect(closed).toMatchObject({
         status: 200,
         body: {
-          schemaVersion: "underclerk.merchant-closure.v1",
+          schemaVersion: "commerce.merchant-closure.v1",
           merchantId,
           revokedCredentials: 3,
           removedWebhookSubscriptions: 1,

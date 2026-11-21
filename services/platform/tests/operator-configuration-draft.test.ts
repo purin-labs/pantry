@@ -223,7 +223,7 @@ describe("operator configuration drafts", () => {
       mutationId: "mutation_allowance",
       rawCommand: {
         kind: "set_offer_price_allowance",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedRevision: null,
         maxMovementBps: 500,
       },
@@ -235,7 +235,7 @@ describe("operator configuration drafts", () => {
       family: "offer_price_allowance",
       allowance: {
         kind: "set_offer_price_allowance",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedRevision: null,
         maxMovementBps: 500,
       },
@@ -255,7 +255,7 @@ describe("operator configuration drafts", () => {
       mutationId: "mutation_withdraw",
       rawCommand: {
         kind: "withdraw_offer_price_allowance",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedRevision: 2,
       },
     });
@@ -274,7 +274,7 @@ describe("operator configuration drafts", () => {
       actorPersonId: "person_owner",
       rawCommand: {
         kind: "set_offer_price_allowance",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedRevision: null,
         maxMovementBps: 10_001,
       },
@@ -336,7 +336,7 @@ describe("operator configuration drafts", () => {
       mutationId: "mutation_bound",
       rawCommand: {
         kind: "set_offer_price_allowance",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedRevision: null,
         maxMovementBps: 500,
         expectedOfferRevision: 4,
@@ -362,7 +362,7 @@ describe("operator configuration drafts", () => {
       actorPersonId: "person_owner",
       rawCommand: {
         kind: "set_offer_price_allowance",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedRevision: null,
         maxMovementBps: 500,
         expectedOfferRevision: 0,

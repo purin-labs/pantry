@@ -109,14 +109,14 @@ async (page) => {
     async send(target, path, body) {
       const cookies = await target.context().cookies(WORKER);
       const csrf = cookies.find(
-        (cookie) => cookie.name === "satyr_control_csrf",
+        (cookie) => cookie.name === "pantry_csrf",
       );
       if (!csrf) throw new Error("CSRF cookie missing");
       return target.request.fetch(this.url(path), {
         method: "POST",
         headers: {
           origin: PORTAL,
-          "x-satyr-csrf": csrf.value,
+          "x-pantry-csrf": csrf.value,
           "idempotency-key": `brain-${Date.now()}-${Math.random()}`,
         },
         data: body,
@@ -654,15 +654,15 @@ async (page) => {
       const run = finished.body.runs[0];
       const ranOn = (route) => run.tasks.filter((task) => task.route === route);
       const carried = (configuration) =>
-        ranOn("satyr_platform").find(
+        ranOn("pantry_platform").find(
           (task) => task.configuration === configuration,
         ).outcome.observation.memory;
       this.check(
         "the run compared the memory in use with the proposed memory",
         run.state === "completed" &&
           run.tasks.length === 4 &&
-          ranOn("satyr_platform").length === 2 &&
-          ranOn("satyr_platform").every(
+          ranOn("pantry_platform").length === 2 &&
+          ranOn("pantry_platform").every(
             (task) =>
               task.outcome.kind === "assessed" &&
               task.outcome.verdict === "passed",

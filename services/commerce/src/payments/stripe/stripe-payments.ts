@@ -270,7 +270,7 @@ export class StripePaymentAccounts {
     let row = this.#row(merchantId, body.paymentProviderBindingId);
     if (row === undefined) {
       const created = await this.#api.request("POST", "/v2/core/accounts", {
-        idempotencyKey: `underclerk_account_${merchantId}_${body.paymentProviderBindingId}`,
+        idempotencyKey: `commerce_account_${merchantId}_${body.paymentProviderBindingId}`,
         json: {
           identity: { country: body.country.toLowerCase() },
           configuration: {
@@ -283,7 +283,7 @@ export class StripePaymentAccounts {
             },
           },
           dashboard: "full",
-          metadata: { underclerk_merchant_id: merchantId },
+          metadata: { commerce_merchant_id: merchantId },
           include: ["defaults"],
         },
       });
@@ -539,15 +539,15 @@ export class StripePaymentGateway implements PaymentProvider {
       stored === undefined
         ? await this.#accounts.api.request("POST", "/v1/payment_intents", {
             account,
-            idempotencyKey: `underclerk_${request.merchantId}_${request.idempotencyKey}`,
+            idempotencyKey: `commerce_${request.merchantId}_${request.idempotencyKey}`,
             form: {
               amount: String(request.money.amountMinor),
               currency: request.money.currency.toLowerCase(),
               "automatic_payment_methods[enabled]": "true",
               "automatic_payment_methods[allow_redirects]": "never",
-              "metadata[underclerk_merchant_id]": request.merchantId,
-              "metadata[underclerk_checkout_id]": request.checkoutId,
-              "metadata[underclerk_payment_attempt_id]":
+              "metadata[commerce_merchant_id]": request.merchantId,
+              "metadata[commerce_checkout_id]": request.checkoutId,
+              "metadata[commerce_payment_attempt_id]":
                 request.paymentAttemptId,
             },
           })
@@ -582,7 +582,7 @@ export class StripePaymentGateway implements PaymentProvider {
           this.#now(),
         );
     return {
-      schemaVersion: "underclerk.payment-session-result.v1",
+      schemaVersion: "commerce.payment-session-result.v1",
       kind: "ready",
       paymentAttemptId: request.paymentAttemptId,
       session: {
@@ -624,7 +624,7 @@ export class StripePaymentGateway implements PaymentProvider {
     switch (intent.status) {
       case "succeeded":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "captured",
           providerPaymentReference: intent.id,
           capturedAt: this.#now(),
@@ -633,7 +633,7 @@ export class StripePaymentGateway implements PaymentProvider {
       case "requires_confirmation":
       case "requires_action":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "processing",
           reason:
             intent.status === "requires_action"
@@ -643,13 +643,13 @@ export class StripePaymentGateway implements PaymentProvider {
         };
       case "requires_payment_method":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "declined",
           reason: "payment_method_required",
         };
       case "canceled":
         return {
-          schemaVersion: "underclerk.payment-capture-result.v1",
+          schemaVersion: "commerce.payment-capture-result.v1",
           kind: "declined",
           reason: "payment_cancelled",
         };
@@ -677,7 +677,7 @@ export class StripePaymentGateway implements PaymentProvider {
       request.refundMoney.amountMinor > request.money.amountMinor
     )
       return {
-        schemaVersion: "underclerk.payment-refund-result.v1",
+        schemaVersion: "commerce.payment-refund-result.v1",
         kind: "rejected",
         reason: "refund_request_invalid",
       };
@@ -686,18 +686,18 @@ export class StripePaymentGateway implements PaymentProvider {
     if (earlier !== undefined) return earlier;
     const response = await this.#accounts.api.request("POST", "/v1/refunds", {
       account,
-      idempotencyKey: `underclerk_${request.merchantId}_${request.idempotencyKey}`,
+      idempotencyKey: `commerce_${request.merchantId}_${request.idempotencyKey}`,
       form: {
         payment_intent: request.providerPaymentReference,
         amount: String(request.refundMoney.amountMinor),
-        "metadata[underclerk_merchant_id]": request.merchantId,
-        "metadata[underclerk_refund_attempt_id]": request.refundAttemptId,
+        "metadata[commerce_merchant_id]": request.merchantId,
+        "metadata[commerce_refund_attempt_id]": request.refundAttemptId,
       },
     });
     if (response.kind === "unavailable") return this.#unknownRefund(request);
     if (response.kind === "refused")
       return {
-        schemaVersion: "underclerk.payment-refund-result.v1",
+        schemaVersion: "commerce.payment-refund-result.v1",
         kind: "rejected",
         reason: "refund_rejected",
       };
@@ -724,7 +724,7 @@ export class StripePaymentGateway implements PaymentProvider {
       return read.kind === "ok"
         ? this.#refundResult(request, read.body)
         : {
-            schemaVersion: "underclerk.payment-refund-result.v1",
+            schemaVersion: "commerce.payment-refund-result.v1",
             kind: "processing",
             reconciliationIdentity: earlier.providerRefundReference,
             reconcileAfter: this.#later(),
@@ -741,7 +741,7 @@ export class StripePaymentGateway implements PaymentProvider {
       (refund: unknown) =>
         isRecord(refund) &&
         isRecord(refund.metadata) &&
-        refund.metadata.underclerk_refund_attempt_id ===
+        refund.metadata.commerce_refund_attempt_id ===
           request.refundAttemptId,
     );
     return isRecord(found) ? this.#refundResult(request, found) : undefined;
@@ -762,7 +762,7 @@ export class StripePaymentGateway implements PaymentProvider {
     switch (refund.status) {
       case "succeeded":
         return {
-          schemaVersion: "underclerk.payment-refund-result.v1",
+          schemaVersion: "commerce.payment-refund-result.v1",
           kind: "refunded",
           providerRefundReference: refund.id,
           money: request.refundMoney,
@@ -771,14 +771,14 @@ export class StripePaymentGateway implements PaymentProvider {
       case "pending":
       case "requires_action":
         return {
-          schemaVersion: "underclerk.payment-refund-result.v1",
+          schemaVersion: "commerce.payment-refund-result.v1",
           kind: "processing",
           reconciliationIdentity: refund.id,
           reconcileAfter: this.#later(),
         };
       default:
         return {
-          schemaVersion: "underclerk.payment-refund-result.v1",
+          schemaVersion: "commerce.payment-refund-result.v1",
           kind: "rejected",
           reason: "refund_rejected",
         };
@@ -789,7 +789,7 @@ export class StripePaymentGateway implements PaymentProvider {
     request: MerchantPaymentRefundCommand,
   ): CommercePaymentRefundResultV1 {
     return {
-      schemaVersion: "underclerk.payment-refund-result.v1",
+      schemaVersion: "commerce.payment-refund-result.v1",
       kind: "indeterminate",
       reconciliationIdentity: request.idempotencyKey,
       reconcileAfter: this.#later(),
@@ -815,7 +815,7 @@ export class StripePaymentGateway implements PaymentProvider {
 
   #unavailableSession(reason: string): CommercePaymentSessionResultV1 {
     return {
-      schemaVersion: "underclerk.payment-session-result.v1",
+      schemaVersion: "commerce.payment-session-result.v1",
       kind: "unavailable",
       reason,
       retryAfter: this.#later(),
@@ -824,7 +824,7 @@ export class StripePaymentGateway implements PaymentProvider {
 
   #indeterminate(reason: string): CommercePaymentCaptureResultV1 {
     return {
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "indeterminate",
       reason,
       reconcileAfter: this.#later(),
@@ -893,12 +893,12 @@ function parsePaymentIntent(
     typeof raw.currency !== "string" ||
     typeof raw.status !== "string" ||
     !isRecord(raw.metadata) ||
-    typeof raw.metadata.underclerk_payment_attempt_id !== "string"
+    typeof raw.metadata.commerce_payment_attempt_id !== "string"
   )
     return undefined;
   return {
     id: raw.id,
-    paymentAttemptId: raw.metadata.underclerk_payment_attempt_id,
+    paymentAttemptId: raw.metadata.commerce_payment_attempt_id,
     amountMinor: raw.amount,
     currency: raw.currency.toUpperCase(),
     status: raw.status,
@@ -911,7 +911,7 @@ function stripeBinding(row: AccountRow): StripeOnlineBinding {
   return {
     provider: "stripe_online",
     account: {
-      integrationAccountId: `underclerk_stripe_${row.providerAccountId}`,
+      integrationAccountId: `commerce_stripe_${row.providerAccountId}`,
       providerAccountId: row.providerAccountId,
       environment: row.environment,
       capabilityRevision: 1,

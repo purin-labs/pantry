@@ -4,8 +4,8 @@ Inventory recorded 2026-09-08 from the local Worker configuration and the
 owner's Google Cloud Console screenshots. Client IDs are public identifiers.
 Secret values must never be added to this document.
 
-Satyr uses three separate web application OAuth clients. Google SSO signs a
-person into Satyr; Gmail and Drive connect that person's provider accounts.
+Pantry uses three separate web application OAuth clients. Google SSO signs a
+person into Pantry; Gmail and Drive connect that person's provider accounts.
 Each flow has its own credentials and callback path.
 
 ## Client inventory
@@ -13,12 +13,12 @@ Each flow has its own credentials and callback path.
 | Purpose                  | Google Cloud project shown in Console | Client ID setting        | Client secret setting        |
 | ------------------------ | ------------------------------------- | ------------------------ | ---------------------------- |
 | Google SSO login         | `seams`                               | `GOOGLE_OIDC_CLIENT_ID`  | `GOOGLE_OIDC_CLIENT_SECRET`  |
-| Gmail integration        | `Satyr Gmail Development`             | `GMAIL_OAUTH_CLIENT_ID`  | `GMAIL_OAUTH_CLIENT_SECRET`  |
-| Google Drive integration | `satyr-drive-pilot`                   | `GDRIVE_OAUTH_CLIENT_ID` | `GDRIVE_OAUTH_CLIENT_SECRET` |
+| Gmail integration        | `Pantry Gmail Development`             | `GMAIL_OAUTH_CLIENT_ID`  | `GMAIL_OAUTH_CLIENT_SECRET`  |
+| Google Drive integration | `pantry-drive-pilot`                   | `GDRIVE_OAUTH_CLIENT_ID` | `GDRIVE_OAUTH_CLIENT_SECRET` |
 
 Project labels above identify the observed Console projects; they are not a
 verified inventory of Google Cloud project IDs. The Drive client display name
-is `Satyr Google Drive (dev)`.
+is `Pantry Google Drive (dev)`.
 
 ### Google SSO login
 
@@ -52,9 +52,9 @@ both local and production flows.
 
 | Client | Local redirect URI                                                  | Current production redirect URI                                                      |
 | ------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| SSO    | `https://localhost:3003/v1/control/auth/google/callback`            | `https://satyr-edge.n6378056.workers.dev/v1/control/auth/google/callback`            |
-| Gmail  | `https://localhost:3003/v1/control/providers/gmail/callback`        | `https://satyr-edge.n6378056.workers.dev/v1/control/providers/gmail/callback`        |
-| Drive  | `https://localhost:3003/v1/control/providers/google_drive/callback` | `https://satyr-edge.n6378056.workers.dev/v1/control/providers/google_drive/callback` |
+| SSO    | `https://localhost:3003/v1/control/auth/google/callback`            | `https://pantry.purin.io/v1/control/auth/google/callback`            |
+| Gmail  | `https://localhost:3003/v1/control/providers/gmail/callback`        | `https://pantry.purin.io/v1/control/providers/gmail/callback`        |
+| Drive  | `https://localhost:3003/v1/control/providers/google_drive/callback` | `https://pantry.purin.io/v1/control/providers/google_drive/callback` |
 
 SSO derives its callback from `PANTRY_PUBLIC_ORIGIN`. Gmail and Drive derive
 theirs from `PANTRY_OAUTH_CALLBACK_ORIGIN`. Both local origins are
@@ -62,7 +62,7 @@ theirs from `PANTRY_OAUTH_CALLBACK_ORIGIN`. Both local origins are
 
 The SSO web client's local **Authorized JavaScript origin** is
 `https://localhost:3003`; its current production origin is
-`https://satyr-edge.n6378056.workers.dev`. The Drive screenshot also shows
+`https://pantry.purin.io`. The Drive screenshot also shows
 both origins. The Gmail screenshot shows only the production JavaScript
 origin, alongside the correct local server-side redirect URI.
 
@@ -78,7 +78,7 @@ these Google callbacks.
 - Local client secrets: ignored `services/platform/.dev.vars.local`, using
   the three secret names in the inventory. The committed
   `services/platform/.dev.vars.example` lists names without values.
-- Production client secrets: Cloudflare Worker secrets for `satyr-edge`,
+- Production client secrets: Cloudflare Worker secrets for `pantry`,
   selected explicitly with the production profile. Production SSO and Drive
   client IDs currently live there too.
 - Connected Gmail/Drive account credentials: encrypted Vault records owned
@@ -99,7 +99,7 @@ captured area and remains unverified. SSO's screenshot also contains the old
 
 After saving any Console changes, run `pnpm backend` and `pnpm site`, then use
 `https://localhost:3003` to complete each flow: Google sign-in, connect Gmail,
-and connect Drive. Confirm successful return to Satyr and the expected
+and connect Drive. Confirm successful return to Pantry and the expected
 account. Screenshots of configured URLs alone do not establish end-to-end
 OAuth success.
 
@@ -109,7 +109,7 @@ registration does not verify incoming email delivery. See the
 
 ## Planned ownership and environment separation
 
-The intended next setup uses a dedicated Google account to administer Satyr's
+The intended next setup uses a dedicated Google account to administer Pantry's
 Google Cloud projects and OAuth applications. This account is administrative
 ownership; Gmail integrations still connect the mailboxes selected by their
 users. Account creation, ownership transfer, and environment provisioning have
@@ -128,7 +128,7 @@ Migration sequence:
    access, and grant it the required project access before removing any
    existing owner access.
 2. Confirm the dev, staging, and production hostnames and Google Cloud project
-   layout. Provision isolated Satyr runtime resources; staging does not yet
+   layout. Provision isolated Pantry runtime resources; staging does not yet
    have a configured Wrangler profile.
 3. Create the three OAuth clients per environment. Configure the appropriate
    consent settings, test users or publishing requirements, API access, and

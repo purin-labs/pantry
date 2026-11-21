@@ -196,7 +196,7 @@ function repairPolicyRows(binding) {
   );
   if (sql.status !== 0)
     throw new Error(`The policy backfill SQL failed: ${sql.stderr}`);
-  const file = join(mkdtempSync(join(tmpdir(), "satyr-d1-")), "backfill.sql");
+  const file = join(mkdtempSync(join(tmpdir(), "pantry-d1-")), "backfill.sql");
   writeFileSync(file, sql.stdout);
   const applied = d1Execute(target, binding, { file });
   if (!applied.ok) return refused(binding, "the policy backfill", applied);

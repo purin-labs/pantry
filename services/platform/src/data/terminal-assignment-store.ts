@@ -34,7 +34,7 @@ export async function readActiveTerminalAssignment(
     .prepare(
       `SELECT assignment_json AS assignmentJson
      FROM cafe_terminal_assignment
-     WHERE organisation_id = ? AND satyr_location_id = ? AND state = 'active'`,
+     WHERE organisation_id = ? AND pantry_location_id = ? AND state = 'active'`,
     )
     .bind(organisationId, pantryLocationId)
     .first<Readonly<{ assignmentJson: string }>>();
@@ -59,7 +59,7 @@ export async function listActiveTerminalAssignments(
       `SELECT assignment_json AS assignmentJson
      FROM cafe_terminal_assignment
      WHERE organisation_id = ? AND state = 'active'
-     ORDER BY satyr_location_id ASC`,
+     ORDER BY pantry_location_id ASC`,
     )
     .bind(organisationId)
     .all<Readonly<{ assignmentJson: string }>>();
@@ -119,19 +119,19 @@ export async function activateTerminalAssignment(
         `UPDATE cafe_terminal_assignment
        SET state = 'retired',
            assignment_json = json_set(assignment_json, '$.state', json(?))
-       WHERE organisation_id = ? AND satyr_location_id = ? AND state = 'active'
+       WHERE organisation_id = ? AND pantry_location_id = ? AND state = 'active'
          AND assignment_id <> ?`,
       )
       .bind(
         retiredState("replaced", input.now),
         input.organisationId,
-        assignment.satyrLocationId,
+        assignment.pantryLocationId,
         assignment.assignmentId,
       ),
     input.db
       .prepare(
         `INSERT INTO cafe_terminal_assignment (
-         organisation_id, assignment_id, merchant_id, satyr_location_id,
+         organisation_id, assignment_id, merchant_id, pantry_location_id,
          provider_location_id, device_id, target_kind, environment,
          revision, state, assignment_json, recorded_at
        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)
@@ -143,7 +143,7 @@ export async function activateTerminalAssignment(
         input.organisationId,
         assignment.assignmentId,
         assignment.merchantId,
-        assignment.satyrLocationId,
+        assignment.pantryLocationId,
         assignment.providerLocationId,
         terminalTargetDeviceId(assignment.target),
         assignment.target.kind,
@@ -158,7 +158,7 @@ export async function activateTerminalAssignment(
   return readActiveTerminalAssignment(
     input.db,
     input.organisationId,
-    assignment.satyrLocationId,
+    assignment.pantryLocationId,
   );
 }
 

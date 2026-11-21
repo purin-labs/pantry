@@ -22,11 +22,11 @@ export async function browserFixture(request, env, pathname) {
     const headers = new Headers({ "content-type": "text/html" });
     headers.append(
       "set-cookie",
-      `satyr_control_session=${session.token}; Path=/; HttpOnly; SameSite=Lax`,
+      `pantry_session=${session.token}; Path=/; HttpOnly; SameSite=Lax`,
     );
     headers.append(
       "set-cookie",
-      `satyr_control_csrf=${session.csrfToken}; Path=/; SameSite=Lax`,
+      `pantry_csrf=${session.csrfToken}; Path=/; SameSite=Lax`,
     );
     return new Response(
       `<!doctype html><html><head><meta charset="utf-8"><title>R50 draft collaboration</title><link rel="stylesheet" href="/fixture/entry.css"></head><body><main id="root"></main><script type="module" src="/fixture/entry.js"></script></body></html>`,

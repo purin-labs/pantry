@@ -276,7 +276,7 @@ describe("supplier payout executor", function payoutExecutorSuite() {
     expect(h.calls.createTransfer).toBe(0);
   });
 
-  it("refuses a plan that does not match the payout Satyr holds", async function digestMismatch() {
+  it("refuses a plan that does not match the payout Pantry holds", async function digestMismatch() {
     const h = harness({
       createTransfer: { kind: "accepted", providerTransferId: "transfer_1" },
     });

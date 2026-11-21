@@ -151,8 +151,8 @@ The production engine drives a cell through this protocol; see the
 MUJOCO_DIR=/tmp/bakery-sdk node scripts/bakery-robots/package-native.mjs /tmp/bakery-package
 /tmp/bakery-package/bakery-native --output /tmp/packaged-request.json prepare
 
-docker build -f crates/bakery-native/Dockerfile -t satyr-bakery-native .
-docker run --rm -v /tmp/bakery-results:/work satyr-bakery-native --output /work/request.json prepare
+docker build -f crates/bakery-native/Dockerfile -t pantry-bakery-native .
+docker run --rm -v /tmp/bakery-results:/work pantry-bakery-native --output /work/request.json prepare
 ```
 
 The package includes the runner, native library/licenses, verified model inputs

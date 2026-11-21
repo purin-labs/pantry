@@ -73,7 +73,7 @@ export const createCommerceCustomerV1Schema = Type.Intersect(
   [
     customerCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.create-customer.v1"),
+      schemaVersion: Type.Literal("commerce.create-customer.v1"),
       email: customerEmailSchema,
       name: Nullable(boundedTextSchema(200)),
       phone: Nullable(boundedTextSchema(40)),
@@ -126,7 +126,7 @@ export const updateCommerceCustomerV1Schema = Type.Intersect(
   [
     customerCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-customer.v1"),
+      schemaVersion: Type.Literal("commerce.update-customer.v1"),
       expectedRevision: PositiveInteger,
       changes: customerChangesSchema,
     }),
@@ -141,7 +141,7 @@ export const eraseCommerceCustomerV1Schema = Type.Intersect(
   [
     customerCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.erase-customer.v1"),
+      schemaVersion: Type.Literal("commerce.erase-customer.v1"),
       expectedRevision: PositiveInteger,
       reason: boundedTextSchema(500),
     }),
@@ -162,7 +162,7 @@ export type CommerceCustomerCommandV1 = Static<
 >;
 
 export const requestCommerceCustomerSignInV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.request-customer-sign-in.v1"),
+  schemaVersion: Type.Literal("commerce.request-customer-sign-in.v1"),
   email: customerEmailSchema,
 });
 export type RequestCommerceCustomerSignInV1 = Static<
@@ -170,7 +170,7 @@ export type RequestCommerceCustomerSignInV1 = Static<
 >;
 
 export const verifyCommerceCustomerSignInV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.verify-customer-sign-in.v1"),
+  schemaVersion: Type.Literal("commerce.verify-customer-sign-in.v1"),
   code: Type.String({ pattern: "^\\d{6}$" }),
 });
 export type VerifyCommerceCustomerSignInV1 = Static<
@@ -195,7 +195,7 @@ export type CommerceCustomerAddressInputV1 = Static<
 >;
 
 export const saveCommerceCustomerAddressV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.save-customer-address.v1"),
+  schemaVersion: Type.Literal("commerce.save-customer-address.v1"),
   address: commerceCustomerAddressInputV1Schema,
 });
 export type SaveCommerceCustomerAddressV1 = Static<
@@ -244,7 +244,7 @@ export const commerceCustomerV1Schema = ReadonlyStrictObject({
 export type CommerceCustomerV1 = Static<typeof commerceCustomerV1Schema>;
 
 export const commerceCustomerExportV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.customer-export.v1"),
+  schemaVersion: Type.Literal("commerce.customer-export.v1"),
   customer: commerceCustomerV1Schema,
   exportedAt: utcTimestampSchema,
 });
@@ -253,7 +253,7 @@ export type CommerceCustomerExportV1 = Static<
 >;
 
 export const commerceCustomerSignInChallengeV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.customer-sign-in-challenge.v1"),
+  schemaVersion: Type.Literal("commerce.customer-sign-in-challenge.v1"),
   challengeId: text,
   expiresAt: utcTimestampSchema,
 });
@@ -262,7 +262,7 @@ export type CommerceCustomerSignInChallengeV1 = Static<
 >;
 
 export const commerceCustomerAccessV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.customer-access.v1"),
+  schemaVersion: Type.Literal("commerce.customer-access.v1"),
   customerAccessToken: text,
   expiresAt: utcTimestampSchema,
 });
@@ -271,7 +271,7 @@ export type CommerceCustomerAccessV1 = Static<
 >;
 
 export const commerceBuyerCustomerV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-customer.v1"),
+  schemaVersion: Type.Literal("commerce.buyer-customer.v1"),
   email: text,
   name: Nullable(boundedTextSchema(200)),
   addresses: ImmutableArray(commerceCustomerAddressV1Schema),
@@ -317,7 +317,7 @@ export type CommerceNotificationV1 = Static<
 /** `parseNotifications`: the list of a merchant's buyer messages. */
 export const commerceNotificationsV1Schema = Type.Codec(
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.notifications.v1"),
+    schemaVersion: Type.Literal("commerce.notifications.v1"),
     notifications: ImmutableArray(commerceNotificationV1Schema),
   }),
 )
@@ -325,7 +325,7 @@ export const commerceNotificationsV1Schema = Type.Codec(
   .Encode(notificationsList);
 
 type NotificationList = Readonly<{
-  schemaVersion: "underclerk.notifications.v1";
+  schemaVersion: "commerce.notifications.v1";
   notifications: readonly CommerceNotificationV1[];
 }>;
 
@@ -338,7 +338,7 @@ function notificationsOf(
 function notificationsList(
   notifications: readonly CommerceNotificationV1[],
 ): NotificationList {
-  return { schemaVersion: "underclerk.notifications.v1", notifications };
+  return { schemaVersion: "commerce.notifications.v1", notifications };
 }
 
 // Parsers of the client API types (Plan 78 step 2).

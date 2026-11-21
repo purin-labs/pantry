@@ -56,7 +56,7 @@ export function paymentAccountErrorMessage(error: unknown): string {
       return "Stripe refused this account for the shop.";
     case "stripe_onboarding_invalid":
       return "Choose the country of the business.";
-    case "underclerk_binding_missing":
+    case "commerce_binding_missing":
       return "This workspace has no shop yet.";
     default:
       return "Pantry could not reach the shop. Try again.";

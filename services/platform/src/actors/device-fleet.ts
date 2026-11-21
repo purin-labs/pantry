@@ -177,9 +177,9 @@ export class DeviceFleetActor extends DurableObject<Env> {
 
   /** The Worker verified the gateway's credential before this call. */
   override async fetch(request: Request): Promise<Response> {
-    const gatewayId = request.headers.get("x-satyr-device-gateway");
-    const organisationId = request.headers.get("x-satyr-device-organisation");
-    const locationId = request.headers.get("x-satyr-device-location");
+    const gatewayId = request.headers.get("x-pantry-device-gateway");
+    const organisationId = request.headers.get("x-pantry-device-organisation");
+    const locationId = request.headers.get("x-pantry-device-location");
     if (gatewayId === null || organisationId === null || locationId === null)
       return new Response(null, { status: 400 });
     this.#sql.exec(

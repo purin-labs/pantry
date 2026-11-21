@@ -6,7 +6,7 @@ const undoRedoEvidence =
   globalThis.bakeryEvidence ?? "output/playwright/simulator-undo-redo";
 
 function readOvenState() {
-  const raw = localStorage.getItem("satyr:floor-plan-workspace:v1");
+  const raw = localStorage.getItem("pantry:floor-plan-workspace:v1");
   const parsed = raw ? JSON.parse(raw) : null;
   const activePlan = parsed?.activePlan ?? "reference";
   const pose = parsed?.placements?.[activePlan]?.bake ?? null;
@@ -39,7 +39,7 @@ async function verifySimulatorUndoRedoBrowser(page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${base}/workflow-preview.html`);
   await page.evaluate(() => {
-    localStorage.removeItem("satyr:floor-plan-workspace:v1");
+    localStorage.removeItem("pantry:floor-plan-workspace:v1");
   });
   await page.reload();
 

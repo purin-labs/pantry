@@ -99,7 +99,7 @@ function readMonthlyPantryJevTokens(
       `SELECT COALESCE(SUM(CASE
         WHEN settlement_state = 'settled' AND input_tokens IS NOT NULL THEN input_tokens
         ELSE reserved_input_tokens END), 0) AS tokens
-      FROM typesafe_evaluation WHERE organisation_id = ? AND funding = 'satyr_platform'
+      FROM typesafe_evaluation WHERE organisation_id = ? AND funding = 'pantry_platform'
         AND reserved_at >= ? AND reserved_at < ?`,
       organisationId,
       since,

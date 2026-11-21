@@ -116,7 +116,7 @@ async function verifySample(): Promise<void> {
     };
     expect(await createFinancierSample(input)).toEqual({
       ok: false,
-      code: "underclerk_unavailable",
+      code: "commerce_unavailable",
     });
     expect(await createFinancierSample(input)).toEqual({
       ok: true,
@@ -207,7 +207,7 @@ async function fixture(
   };
   const provisioned = await new CommerceAdminClient(config).provisionMerchant(
     {
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: ORGANISATION,
       merchantId: MERCHANT,
       createdAt: NOW,
@@ -905,7 +905,7 @@ async function verifyScenarioCopy({ task }: TestContext): Promise<void> {
     };
     expect(await saveScenarioCopy(interrupted)).toEqual({
       ok: false,
-      code: "underclerk_unavailable",
+      code: "commerce_unavailable",
     });
     const copyQuery = parseCommerceGraphQuery({
       kind: "entity_by_ref",

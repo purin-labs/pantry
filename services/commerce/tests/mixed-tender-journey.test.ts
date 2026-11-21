@@ -274,7 +274,7 @@ class MixedDesk extends OrderDesk {
       throw new Error("The card paid no online order");
     return this.edit(
       this.admin.observePaymentDispute({
-        schemaVersion: "underclerk.observe-payment-dispute.v1",
+        schemaVersion: "commerce.observe-payment-dispute.v1",
         organisationId,
         merchantId,
         providerDeliveryId: "dispute_delivery_kai",

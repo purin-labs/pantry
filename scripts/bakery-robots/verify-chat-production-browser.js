@@ -39,7 +39,7 @@ async function verifyProductionChatParity(page) {
     };
     window.chatParityAcceptance = fixture;
     const originalFetch = window.fetch.bind(window);
-    document.cookie = "satyr_control_csrf=parity-fixture; path=/";
+    document.cookie = "pantry_csrf=parity-fixture; path=/";
     window.fetch = async function transport(input, init) {
       const url = new URL(
         typeof input === "string" ? input : input.url,

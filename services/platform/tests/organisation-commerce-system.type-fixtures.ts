@@ -15,7 +15,7 @@ const organisationId = requireParsed(
 );
 const revision = requireParsed(parseCommerceSystemRevision(1));
 const bindingId = requireParsed(
-  parseCommerceBindingId("underclerk_binding_type_fixture"),
+  parseCommerceBindingId("commerce_binding_type_fixture"),
 );
 const merchantId = requireParsed(
   parseCommerceEngineMerchantId("merchant_type_fixture"),
@@ -35,14 +35,14 @@ const incompleteActionAuthority: ActionAuthority = {
 
 // @ts-expect-error Pantry Commerce requires its accepted merchant binding.
 const incompletePantryCommerce: CommerceSystem = {
-  kind: "satyr_commerce",
+  kind: "builtin_commerce",
   organisationId,
   merchantId,
   revision,
 };
 
 const mixedCommerceAuthority: CommerceSystem = {
-  kind: "satyr_commerce",
+  kind: "builtin_commerce",
   organisationId,
   bindingId,
   merchantId,

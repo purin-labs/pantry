@@ -63,7 +63,7 @@ export type CommerceManualTenderV1 =
 
 /** A draft as staff read it: the record plus the order its invoice made. */
 export type CommerceDraftOrderViewV1 = Readonly<{
-  schemaVersion: "underclerk.draft-order.v1";
+  schemaVersion: "commerce.draft-order.v1";
   draftOrder: CommerceDraftOrderV1;
   checkoutIds: readonly string[];
   completion: Readonly<{
@@ -92,27 +92,27 @@ type DraftContents = Readonly<{
 export type CreateCommerceDraftOrderV1 = DraftCommandBase &
   DraftContents &
   Readonly<{
-    schemaVersion: "underclerk.create-draft-order.v1";
+    schemaVersion: "commerce.create-draft-order.v1";
     storefrontId: string;
   }>;
 
 export type UpdateCommerceDraftOrderV1 = DraftCommandBase &
   DraftContents &
   Readonly<{
-    schemaVersion: "underclerk.update-draft-order.v1";
+    schemaVersion: "commerce.update-draft-order.v1";
     expectedDraftOrderRevision: number;
   }>;
 
 export type SendCommerceDraftInvoiceV1 = DraftCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.send-draft-invoice.v1";
+    schemaVersion: "commerce.send-draft-invoice.v1";
     expectedDraftOrderRevision: number;
     expiresAt: CommerceEngineTimestamp;
   }>;
 
 export type CancelCommerceDraftOrderV1 = DraftCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.cancel-draft-order.v1";
+    schemaVersion: "commerce.cancel-draft-order.v1";
     expectedDraftOrderRevision: number;
   }>;
 
@@ -122,7 +122,7 @@ export type CancelCommerceDraftOrderV1 = DraftCommandBase &
  */
 export type MarkCommerceDraftOrderPaidV1 = DraftCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.mark-draft-order-paid.v1";
+    schemaVersion: "commerce.mark-draft-order-paid.v1";
     expectedDraftOrderRevision: number;
     tender: CommerceManualTenderV1;
     orderId: string;
@@ -138,7 +138,7 @@ export type CommerceDraftOrderCommandV1 =
 
 /** The result of sending an invoice: the mutation and, once applied, the link. */
 export type CommerceDraftInvoiceV1 = Readonly<{
-  schemaVersion: "underclerk.draft-invoice.v1";
+  schemaVersion: "commerce.draft-invoice.v1";
   mutation: CommerceMutationResultV1;
   invoice: Readonly<{ token: string; expiresAt: CommerceEngineTimestamp }> | null;
 }>;

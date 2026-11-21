@@ -127,7 +127,7 @@ export abstract class BuyerCheckoutRefreshStage extends BuyerCheckoutCreationSta
         BuyerPickupCheckoutCommand,
         "discount" | "marketId" | "storedValue" | "pickupAt"
       > = {
-      schemaVersion: "underclerk.create-pickup-checkout.v1",
+      schemaVersion: "commerce.create-pickup-checkout.v1",
       merchantId: input.claims.merchantId,
       expectedMerchantRevision: prepared.merchant.revision,
       discount: {
@@ -270,7 +270,7 @@ export abstract class BuyerCheckoutRefreshStage extends BuyerCheckoutCreationSta
         ? input.claims.buyer.protectedCustomerReference
         : held.customerId;
     const command: BuyerShippingCheckoutCommand = {
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.internal.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.internal.v1",
       merchantId: input.claims.merchantId,
       expectedMerchantRevision: prepared.merchant.revision,
       idempotencyKey: `buyer_shipping_checkout_refresh_${identityDigest}`,

@@ -333,7 +333,7 @@ export class ReturnCommandAuthority {
   #restocks(
     command: Extract<
       CommerceReturnCommandV1,
-      { schemaVersion: "underclerk.receive-return.v1" }
+      { schemaVersion: "commerce.receive-return.v1" }
     >,
     resources: CommerceMerchantSnapshotV1["resources"],
     order: CommerceOrderV1,
@@ -379,7 +379,7 @@ export class ReturnCommandAuthority {
       );
       if (position === undefined) return invalid("return.restock.position");
       const receipt: ReceiveCommerceInventoryV3 = {
-        schemaVersion: "underclerk.receive-inventory.v3",
+        schemaVersion: "commerce.receive-inventory.v3",
         purchase: { kind: "unlinked" },
         merchantId: command.merchantId,
         expectedMerchantRevision: 0,

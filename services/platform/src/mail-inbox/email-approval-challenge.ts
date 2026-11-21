@@ -58,7 +58,7 @@ function emailApprovalChallengePayload(
   }>,
 ): string {
   return JSON.stringify({
-    kind: "satyr_email_approval_challenge_v1",
+    kind: "pantry_email_approval_challenge_v1",
     proposalId: input.proposalId,
     version: input.version,
     snapshotDigest: input.snapshotDigest,

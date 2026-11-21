@@ -422,7 +422,7 @@ async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
       substituted: ["Gmail", "the model provider (OpenRouter)"],
       real: [
         "Platform Worker and Actors",
-        "Underclerk supplier records",
+        "Commerce supplier records",
         "mail admission, reply turn, correction and learning turn",
       ],
       beforeLink: {
@@ -852,18 +852,18 @@ async function seedSuppliers(
   const merchantId = `merchant_mail_purchasing_${crypto.randomUUID()}`;
   const connectionId = `provider_connection_${crypto.randomUUID()}`;
   const accountId = `integration_${crypto.randomUUID()}`;
-  const bindingId = `underclerk_binding_${crypto.randomUUID()}`;
+  const bindingId = `commerce_binding_${crypto.randomUUID()}`;
   const now = Date.now();
-  const provision = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}`,
+  const provision = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}`,
     {
       method: "PUT",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: organisationId,
         merchantId,
         createdAt: new Date(now).toISOString(),
@@ -874,22 +874,22 @@ async function seedSuppliers(
   await fixtureDatabase().batch([
     fixtureDatabase()
       .prepare(
-        `INSERT INTO provider_connection (provider_connection_id, organisation_id, provider, auth_mode, authority_kind, credential_generation, credential_ref, provider_application, application_credential_generation, asset_grant_revision, lifecycle, granted_scopes, created_by_user_id, created_at, updated_at, disabled_at, revoked_at, environment, provider_subject_id) VALUES (?, ?, 'underclerk', 'api_key', 'connection_credential', 1, 'vault:mail:senderlink:e2e', NULL, NULL, NULL, 'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`,
+        `INSERT INTO provider_connection (provider_connection_id, organisation_id, provider, auth_mode, authority_kind, credential_generation, credential_ref, provider_application, application_credential_generation, asset_grant_revision, lifecycle, granted_scopes, created_by_user_id, created_at, updated_at, disabled_at, revoked_at, environment, provider_subject_id) VALUES (?, ?, 'commerce', 'api_key', 'connection_credential', 1, 'vault:mail:senderlink:e2e', NULL, NULL, NULL, 'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`,
       )
       .bind(connectionId, organisationId, userId, now, now),
     fixtureDatabase()
       .prepare(
-        `INSERT INTO integration_account (integration_account_id, organisation_id, provider_connection_id, provider, provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code, capability_set, audience_policy, retention_policy, created_at, updated_at, disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider) VALUES (?, ?, ?, 'underclerk', ?, 'merchant', 'Sender link acceptance', 'active', NULL, '[]', '{}', '{}', ?, ?, NULL, NULL, NULL, 'development', 0)`,
+        `INSERT INTO integration_account (integration_account_id, organisation_id, provider_connection_id, provider, provider_account_id, account_kind, display_name, lifecycle, lifecycle_reason_code, capability_set, audience_policy, retention_policy, created_at, updated_at, disabled_by_user_id, disabled_at, revoked_at, environment, is_default_for_provider) VALUES (?, ?, ?, 'commerce', ?, 'merchant', 'Sender link acceptance', 'active', NULL, '[]', '{}', '{}', ?, ?, NULL, NULL, NULL, 'development', 0)`,
       )
       .bind(accountId, organisationId, connectionId, merchantId, now, now),
     fixtureDatabase()
       .prepare(
-        `INSERT INTO underclerk_merchant_binding (binding_id, organisation_id, integration_account_id, merchant_id, environment, delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at) VALUES (?, ?, ?, ?, 'development', 'key_mail_e2e', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, ?, ?)`,
+        `INSERT INTO commerce_merchant_binding (binding_id, organisation_id, integration_account_id, merchant_id, environment, delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at) VALUES (?, ?, ?, ?, 'development', 'key_mail_e2e', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, ?, ?)`,
       )
       .bind(bindingId, organisationId, accountId, merchantId, now, now),
     fixtureDatabase()
       .prepare(
-        `INSERT INTO organisation_commerce_system (organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id, revision, selected_at, selected_by_user_id) VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)`,
+        `INSERT INTO organisation_commerce_system (organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id, revision, selected_at, selected_by_user_id) VALUES (?, 'builtin_commerce', ?, NULL, 1, ?, ?)`,
       )
       .bind(organisationId, bindingId, now, userId),
   ]);

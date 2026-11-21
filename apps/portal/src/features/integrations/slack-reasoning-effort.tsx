@@ -182,14 +182,14 @@ function standardDetail(source: InferenceSourceKind): string {
     case "organisation_google_api_key":
     case "codex_subscription":
       return "Deep reasoning.";
-    case "satyr_platform":
+    case "pantry_platform":
       return "The lowest level.";
   }
 }
 
 function draftLabel(draft: Draft, source: InferenceSourceKind): string {
   if (draft !== "standard") return effortLabel(draft);
-  return source === "satyr_platform"
+  return source === "pantry_platform"
     ? "the standard level"
     : "Deep reasoning (standard)";
 }

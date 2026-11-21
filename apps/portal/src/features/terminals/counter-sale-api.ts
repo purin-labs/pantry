@@ -51,7 +51,7 @@ export async function collectCounterSale(
     `${counterSalesPath(organisationId)}/${encodeURIComponent(sale.checkoutId)}/collection`,
     "POST",
     {
-      satyrLocationId: sale.satyrLocationId,
+      pantryLocationId: sale.pantryLocationId,
       checkoutRevision: sale.quote.checkoutRevision,
       quoteDigest: sale.quote.quoteDigest,
       amount,
@@ -121,7 +121,7 @@ export async function readCounterRegister(
 export async function openRegisterMenuSale(
   organisationId: string,
   request: Readonly<{
-    satyrLocationId: string;
+    pantryLocationId: string;
     tenderMode: "terminal" | "cash";
     lines: readonly Readonly<{
       menuId: string;
@@ -152,7 +152,7 @@ export async function openRegisterMenuSale(
     counterSalesPath(organisationId),
     "POST",
     {
-      satyrLocationId: request.satyrLocationId,
+      pantryLocationId: request.pantryLocationId,
       checkoutId,
       tenderMode: request.tenderMode,
       lines,
@@ -302,7 +302,7 @@ async function mutateCounterSaleAfterSale(
 export async function openCounterSale(
   organisationId: string,
   request: Readonly<{
-    satyrLocationId: string;
+    pantryLocationId: string;
     lines: readonly Readonly<{ variantId: string; quantity: number }>[];
   }>,
   mutate: CounterSaleMutationTransport,
@@ -314,7 +314,7 @@ export async function openCounterSale(
     counterSalesPath(organisationId),
     "POST",
     {
-      satyrLocationId: request.satyrLocationId,
+      pantryLocationId: request.pantryLocationId,
       checkoutId,
       lines,
     },

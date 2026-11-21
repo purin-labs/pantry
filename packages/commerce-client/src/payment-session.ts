@@ -49,13 +49,13 @@ export type CommercePaymentPublicSessionV1 =
 
 export type CommercePaymentSessionResultV1 =
   | Readonly<{
-      schemaVersion: "underclerk.payment-session-result.v1";
+      schemaVersion: "commerce.payment-session-result.v1";
       kind: "ready";
       paymentAttemptId: string;
       session: CommercePaymentPublicSessionV1;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.payment-session-result.v1";
+      schemaVersion: "commerce.payment-session-result.v1";
       kind: "unavailable";
       reason: string;
       retryAfter: string;
@@ -89,13 +89,13 @@ export type CommerceInPersonCollectionSessionV1 =
 
 export type CommerceInPersonCollectionResultV1 =
   | Readonly<{
-      schemaVersion: "underclerk.in-person-collection-result.v1";
+      schemaVersion: "commerce.in-person-collection-result.v1";
       kind: "ready";
       paymentAttemptId: string;
       session: CommerceInPersonCollectionSessionV1;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.in-person-collection-result.v1";
+      schemaVersion: "commerce.in-person-collection-result.v1";
       kind: "unavailable";
       reason: string;
       retryAfter: string;
@@ -107,32 +107,32 @@ export type CommercePaymentClientConfirmationV1 =
 
 export type CommercePaymentRefundResultV1 =
   | Readonly<{
-      schemaVersion: "underclerk.payment-refund-result.v1";
+      schemaVersion: "commerce.payment-refund-result.v1";
       kind: "refunded";
       providerRefundReference: string;
       money: CommercePaymentMoneyV1;
       refundedAt: string;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.payment-refund-result.v1";
+      schemaVersion: "commerce.payment-refund-result.v1";
       kind: "processing";
       reconciliationIdentity: string;
       reconcileAfter: string;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.payment-refund-result.v1";
+      schemaVersion: "commerce.payment-refund-result.v1";
       kind: "rejected";
       reason: string;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.payment-refund-result.v1";
+      schemaVersion: "commerce.payment-refund-result.v1";
       kind: "indeterminate";
       reconciliationIdentity: string;
       reconcileAfter: string;
     }>;
 
 export type CreateCommerceBuyerPaymentSessionV1 = Readonly<{
-  schemaVersion: "underclerk.create-buyer-payment-session.v1";
+  schemaVersion: "commerce.create-buyer-payment-session.v1";
   idempotencyKey: string;
   checkoutRevision: number;
   quoteDigest: string;
@@ -140,7 +140,7 @@ export type CreateCommerceBuyerPaymentSessionV1 = Readonly<{
 }>;
 
 export type ReconcileCommerceBuyerPaymentV1 = Readonly<{
-  schemaVersion: "underclerk.reconcile-buyer-payment.v1";
+  schemaVersion: "commerce.reconcile-buyer-payment.v1";
   idempotencyKey: string;
   checkoutRevision: number;
   quoteDigest: string;
@@ -149,7 +149,7 @@ export type ReconcileCommerceBuyerPaymentV1 = Readonly<{
 
 export type CommerceBuyerPaymentSessionV1 =
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-session.v1";
+      schemaVersion: "commerce.buyer-payment-session.v1";
       state: "ready";
       checkoutId: string;
       checkoutRevision: number;
@@ -157,7 +157,7 @@ export type CommerceBuyerPaymentSessionV1 =
       session: CommercePaymentPublicSessionV1;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-session.v1";
+      schemaVersion: "commerce.buyer-payment-session.v1";
       state: "unavailable";
       checkoutId: string;
       retryAfter: string;

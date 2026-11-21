@@ -541,8 +541,8 @@ function dispatchManualOrigin(
       origin: "https://localhost",
       "content-type": "application/json",
       "idempotency-key": key,
-      cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-      "x-satyr-csrf": session.csrfToken,
+      cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+      "x-pantry-csrf": session.csrfToken,
     },
     body: JSON.stringify(body),
   });
@@ -555,7 +555,7 @@ it(
 );
 
 it(
-  "loads saved context without an attachment and resumes interrupted BakeryOS preparation on pi under the same request",
+  "loads saved context without an attachment and resumes interrupted Kitchen preparation on pi under the same request",
   { timeout: 70_000 },
   async function automaticContext({ task }) {
     const route = "pi";
@@ -670,7 +670,7 @@ it(
             kind: "context",
             contextDetails: expect.objectContaining({
               kind: "observed",
-              area: "BakeryOS",
+              area: "kitchen",
               source: expect.objectContaining({
                 id: `bakery-run:${savedRunId}`,
                 digest: savedRunId,
@@ -692,7 +692,7 @@ it(
             kind: "context",
             contextDetails: expect.objectContaining({
               kind: "observed",
-              area: "AgentCommerce",
+              area: "commerce",
             }),
           }),
         ]),
@@ -1027,7 +1027,7 @@ it(
             route,
             substituted: [
               "model provider (deterministic OpenRouter transport)",
-              "browser (BakeryOS receipts made by the journey)",
+              "browser (Kitchen receipts made by the journey)",
             ],
             interruptions: 2,
             resumedTurn: resumedExecution,
@@ -1119,8 +1119,8 @@ async function saveAutomaticContextDraft(
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({
         draft: AUTOMATIC_CONTEXT_DRAFT,
@@ -1244,7 +1244,7 @@ async function respondToAutomaticContext(
       return openRouterText(
         JSON.stringify({
           kind: "reply",
-          text: "Read the saved catalogue and confirmed the current BakeryOS view.",
+          text: "Read the saved catalogue and confirmed the current Kitchen view.",
         }),
         "automatic_done",
       );
@@ -1464,9 +1464,9 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
   const merchantId = "merchant_bakery_c3_order_capacity";
   await installAutomaticContextCommerce(merchantId);
   const native = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const before = await native.readSnapshot(merchantId);
   if (!before.ok) throw new Error("Missing comparison merchant snapshot");
@@ -1479,7 +1479,7 @@ async function liveAutomaticContext({ task }: TestContext): Promise<void> {
   const conversationId = "conv_920061c1-6f5e-50c3-982e-b59958ad4951";
   const requestId = "request_context_live_pi";
   const comparisonRequestId = "request_context_live_pi_comparison";
-  const comparisonText = `Read exactly the selected system orders order_capacity_upcoming, order_capacity_partial and order_capacity_cancelled with commerce_entity_context, maxDepth 0, resultLimit 3, internal sensitivity, allowedAttributeIds ["lifecycle", "ext_ordered_boxes", "ext_fulfilled_boxes", "ext_pieces_per_box", "ext_recipe_id", "ext_recipe_revision"], current_only. Read saved BakeryOS run ${savedRunId} with bakery_saved_run_read. Discover these tools as needed. This is synthetic acceptance data. For this comparison the saved rehearsal represents financier recipe revision 1; record that operator-supplied mapping as an assumption. Include only unfulfilled active demand for that recipe, exclude cancelled demand, and multiply remaining boxes by the observed pieces per box. Calculate nominal planned pieces as batchCount * traysPerBatch * piecesPerTray, required trays rounded up, and the nonnegative shortfall. Distinguish nominal planned output from actual saved tray count and physical production evidence. Do not use browser tools, navigate, change, simulate or save. Return only a JSON object using this exact flat schema and field names: { activeOrderIds: string[], cancelledOrderIds: string[], recipeId: string, recipeRevision: number, remainingDemandPieces: number, settingsAssumedPieces: number, requiredTrays: number, shortfallPieces: number, savedTrayCount: number, capacityVerified: boolean, assumptions: string[] }. Keep all calculations in those fields and explanations in assumptions. Complete this same request.`;
+  const comparisonText = `Read exactly the selected system orders order_capacity_upcoming, order_capacity_partial and order_capacity_cancelled with commerce_entity_context, maxDepth 0, resultLimit 3, internal sensitivity, allowedAttributeIds ["lifecycle", "ext_ordered_boxes", "ext_fulfilled_boxes", "ext_pieces_per_box", "ext_recipe_id", "ext_recipe_revision"], current_only. Read saved Kitchen run ${savedRunId} with bakery_saved_run_read. Discover these tools as needed. This is synthetic acceptance data. For this comparison the saved rehearsal represents financier recipe revision 1; record that operator-supplied mapping as an assumption. Include only unfulfilled active demand for that recipe, exclude cancelled demand, and multiply remaining boxes by the observed pieces per box. Calculate nominal planned pieces as batchCount * traysPerBatch * piecesPerTray, required trays rounded up, and the nonnegative shortfall. Distinguish nominal planned output from actual saved tray count and physical production evidence. Do not use browser tools, navigate, change, simulate or save. Return only a JSON object using this exact flat schema and field names: { activeOrderIds: string[], cancelledOrderIds: string[], recipeId: string, recipeRevision: number, remainingDemandPieces: number, settingsAssumedPieces: number, requiredTrays: number, shortfallPieces: number, savedTrayCount: number, capacityVerified: boolean, assumptions: string[] }. Keep all calculations in those fields and explanations in assumptions. Complete this same request.`;
   const comparisonStartedAt = Date.now();
   expect(
     (
@@ -1701,12 +1701,12 @@ async function installAutomaticContextCommerce(
     "user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab",
     merchantId,
   );
-  const seeded = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-fixture`,
+  const seeded = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-fixture`,
     {
       method: "POST",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({ kind: "order_capacity" }),
@@ -1888,7 +1888,7 @@ async function blockedContext(
   expect(
     (
       await send(session, {
-        ...command(requestId, "Inspect the current BakeryOS workspace."),
+        ...command(requestId, "Inspect the current Kitchen workspace."),
         conversationId,
         browserContext,
       })
@@ -1926,7 +1926,7 @@ async function blockedContext(
           expect.objectContaining({
             contextDetails: expect.objectContaining({
               kind: "failed",
-              area: "BakeryOS",
+              area: "kitchen",
             }),
           }),
         ]),
@@ -2003,7 +2003,7 @@ it.for(["cancel", "revoke"] as const)(
     expect(
       (
         await send(session, {
-          ...command(requestId, "Show the current BakeryOS workspace."),
+          ...command(requestId, "Show the current Kitchen workspace."),
           conversationId,
         })
       ).status,
@@ -2027,8 +2027,8 @@ it.for(["cancel", "revoke"] as const)(
             headers: {
               origin: "https://localhost",
               "content-type": "application/json",
-              cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-              "x-satyr-csrf": session.csrfToken,
+              cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+              "x-pantry-csrf": session.csrfToken,
             },
             body: JSON.stringify({
               conversationId,
@@ -2678,8 +2678,8 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({
         conversationId: playbackChat,
@@ -3037,8 +3037,8 @@ function postSurfaceReceipt(
         headers: {
           origin: "https://localhost",
           "content-type": "application/json",
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-          "x-satyr-csrf": session.csrfToken,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+          "x-pantry-csrf": session.csrfToken,
         },
         body: JSON.stringify({ receipt }),
       },
@@ -3101,7 +3101,7 @@ function readChatEndpoint(
   return exports.default.fetch(
     new Request(
       `https://localhost/v1/control/organisations/${ORGANISATION_ID}/chat${suffix}`,
-      { headers: { cookie: `satyr_control_session=${session.token}` } },
+      { headers: { cookie: `pantry_session=${session.token}` } },
     ),
   );
 }
@@ -3370,8 +3370,8 @@ function send(
         headers: {
           origin: "https://localhost",
           "content-type": "application/json",
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-          "x-satyr-csrf": session.csrfToken,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+          "x-pantry-csrf": session.csrfToken,
         },
         ...(body === null ? {} : { body: JSON.stringify(body) }),
       },
@@ -3495,8 +3495,8 @@ function requestEndpoint(
     headers: {
       origin: "https://localhost",
       "content-type": "application/json",
-      cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-      "x-satyr-csrf": session.csrfToken,
+      cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+      "x-pantry-csrf": session.csrfToken,
     },
     body: JSON.stringify(body),
   });
@@ -3506,7 +3506,7 @@ async function readRunEndpoint(
   path: string,
 ): Promise<unknown> {
   const response = await exports.default.fetch(`https://localhost${path}`, {
-    headers: { cookie: `satyr_control_session=${session.token}` },
+    headers: { cookie: `pantry_session=${session.token}` },
   });
   return responseJson(response);
 }
@@ -4051,8 +4051,8 @@ async function projectChatMetadata(
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify(body),
     },
@@ -4208,7 +4208,7 @@ async function addAcceptedProjectReference(
   const response = await exports.default.fetch(
     new Request(
       `https://localhost/v1/control/organisations/${ORGANISATION_ID}/projects/references?search=New%20chat`,
-      { headers: { cookie: `satyr_control_session=${session.token}` } },
+      { headers: { cookie: `pantry_session=${session.token}` } },
     ),
   );
   const raw = await response.json();
@@ -4703,7 +4703,7 @@ async function provePiSourceCheckpoint(
   expect(stored.historyCursor).toEqual(cutoff.cursor);
   const object = await env.ARCHIVE.get(stored.blob.objectKey);
   if (object === null) throw new Error("Missing source checkpoint");
-  expect((await object.text()).startsWith("SATYRCP1")).toBe(true);
+  expect((await object.text()).startsWith("PANTRYCP1")).toBe(true);
   return {
     kind: "checkpointed",
     sessionId: cutoff.sessionId,
@@ -4859,8 +4859,8 @@ async function stopForkSource(
         headers: {
           origin: "https://localhost",
           "content-type": "application/json",
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-          "x-satyr-csrf": session.csrfToken,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+          "x-pantry-csrf": session.csrfToken,
         },
         body: JSON.stringify({
           conversationId,
@@ -5331,8 +5331,8 @@ function uploadInspectionAttachment(
       method: "POST",
       headers: {
         origin: "https://localhost",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: form,
     },
@@ -5398,7 +5398,7 @@ async function capturedReadOriginJourney(
     `merchant_bakery_c3_origin_${boundary}`,
   );
   const connection = await fixtureDatabase().prepare(
-    "SELECT integration_account_id FROM underclerk_merchant_binding WHERE organisation_id = ?",
+    "SELECT integration_account_id FROM commerce_merchant_binding WHERE organisation_id = ?",
   )
     .bind(ORGANISATION_ID)
     .first<{ integration_account_id: string }>();

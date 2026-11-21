@@ -102,5 +102,5 @@ export function productionReceipt(response: unknown): string {
 }
 
 function storageKey(scope: ProductionSubmissionScope): string {
-  return `satyr:inventory-production:${JSON.stringify([scope.userId, scope.organisationId, scope.kind, scope.targetId])}`;
+  return `pantry:inventory-production:${JSON.stringify([scope.userId, scope.organisationId, scope.kind, scope.targetId])}`;
 }

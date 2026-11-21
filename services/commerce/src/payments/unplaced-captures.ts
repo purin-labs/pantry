@@ -89,7 +89,7 @@ export function listUnplacedCaptures(
     )
     .all<Readonly<{ captureJson: string }>>(merchantId, LIST_LIMIT);
   return {
-    schemaVersion: "underclerk.unplaced-captures.v1",
+    schemaVersion: "commerce.unplaced-captures.v1",
     merchantId,
     captures: rows.map((row) => storedCapture(row.captureJson)),
   };

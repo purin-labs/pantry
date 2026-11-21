@@ -448,7 +448,7 @@ function authenticatedRequest(suffix: string): Request {
   return new Request(
     `https://pantry.example/v1/control/organisations/${ORGANISATION_ID_RAW}/${suffix}`,
     {
-      headers: { cookie: "satyr_control_session=access-control-read" },
+      headers: { cookie: "pantry_session=access-control-read" },
     },
   );
 }

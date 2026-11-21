@@ -103,11 +103,11 @@
     0 8px 24px color-mix(in oklch, var(--pantry-shadow-color) 4%, transparent);
 }
 
-:root[data-pantry-theme="paper"][data-satyr-texture="2"] {
+:root[data-pantry-theme="paper"][data-pantry-texture="2"] {
   --pantry-texture: url("./paper-dots-2.png");
 }
 
-:root[data-pantry-theme="paper"][data-satyr-texture="3"] {
+:root[data-pantry-theme="paper"][data-pantry-texture="3"] {
   --pantry-texture: url("./paper-dots-3.png");
 }
 

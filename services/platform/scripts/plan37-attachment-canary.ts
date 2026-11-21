@@ -23,7 +23,7 @@
  *
  *   SLACK_CANARY_USER_TOKEN=xoxp-... \
  *   SLACK_CANARY_CHANNEL=C0123456789 \
- *   SLACK_APP_USER_ID=U0SATYRBOT \
+ *   SLACK_APP_USER_ID=U0PANTRYBOT \
  *   node --experimental-strip-types scripts/plan37-attachment-canary.ts
  */
 
@@ -117,7 +117,7 @@ async function main(): Promise<void> {
     identity.user_id === config.appUserId
   ) {
     throw new Error(
-      "plan37 canary requires a human user token; Satyr ignores bot-authored messages",
+      "plan37 canary requires a human user token; Pantry ignores bot-authored messages",
     );
   }
   const cases = await canaryCases();
@@ -136,7 +136,7 @@ async function main(): Promise<void> {
   const verified = outcomes.filter(isVerified);
   const failed = outcomes.filter(isFailed);
   const evidence = {
-    kind: "satyr.plan37.attachment-canary.v2",
+    kind: "pantry.plan37.attachment-canary.v2",
     channel: config.channel,
     // The run is identified by the first message it posted, so the evidence
     // points at a real conversation rather than a wall-clock guess.

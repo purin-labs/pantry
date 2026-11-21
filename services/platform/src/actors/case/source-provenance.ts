@@ -56,7 +56,7 @@ function isCommerceSource(value: unknown): value is SourceProvenance["source"] {
     value === "shopify" ||
     value === "stripe" ||
     value === "lab" ||
-    value === "underclerk"
+    value === "commerce"
   );
 }
 

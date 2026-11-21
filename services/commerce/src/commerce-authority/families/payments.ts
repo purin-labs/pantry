@@ -100,7 +100,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
           : readPointOfSaleConfigurationForCheckout(
               this.database,
               command.merchantId,
-              posSource.satyrLocationId,
+              posSource.pantryLocationId,
               posSource.posConfigurationRevision,
             )?.presentationPolicy.merchantDisplayName;
     if (merchantDisplayName === undefined) {
@@ -111,7 +111,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
     }
     if (command.paymentBinding.provider === "gmo_stera") {
       return {
-        schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+        schemaVersion: "commerce.in-person-checkout-payment-collection.v1",
         outcome: "ready",
         mutationOutcome: started.outcome,
         receipt: started.receipt,
@@ -169,7 +169,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
       });
     }
     return {
-      schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+      schemaVersion: "commerce.in-person-checkout-payment-collection.v1",
       outcome: "ready",
       mutationOutcome: started.outcome,
       receipt: started.receipt,
@@ -270,7 +270,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
         });
       } catch {
         provider = {
-          schemaVersion: "underclerk.payment-capture-result.v1" as const,
+          schemaVersion: "commerce.payment-capture-result.v1" as const,
           kind: "indeterminate" as const,
           reason: "provider_transport_interrupted",
           reconcileAfter: timestampAfter(this.now(), 60),
@@ -294,7 +294,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
         return sale;
       if (provider.kind !== "captured") {
         const resolved = this.checkoutCommands.resolveCheckoutPayment({
-          schemaVersion: "underclerk.resolve-checkout-payment.v1",
+          schemaVersion: "commerce.resolve-checkout-payment.v1",
           merchantId,
           expectedMerchantRevision: merchant.revision,
           idempotencyKey: `counter_payment_resolve_${identityDigest}_${sale.paymentAttempt.revision}_${provider.kind}`,
@@ -313,7 +313,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
         return requireCounterSale(this.readCounterSale(merchantId, checkoutId));
       }
       const recorded = this.checkoutCommands.recordCheckoutPaymentCapture({
-        schemaVersion: "underclerk.record-checkout-payment-capture.v1",
+        schemaVersion: "commerce.record-checkout-payment-capture.v1",
         merchantId,
         expectedMerchantRevision: merchant.revision,
         idempotencyKey: `counter_payment_capture_${identityDigest}`,
@@ -358,7 +358,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
             customerReference: source.buyer.customerId,
           };
     const placed = this.checkoutCommands.placePaidCheckout({
-      schemaVersion: "underclerk.place-paid-checkout.v1",
+      schemaVersion: "commerce.place-paid-checkout.v1",
       merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `counter_paid_checkout_${identityDigest}`,
@@ -457,7 +457,7 @@ export abstract class PaymentFamily extends CheckoutFamily {
         field: "stripeDispute.paymentIntent",
       });
     return this.observePaymentDispute({
-      schemaVersion: "underclerk.observe-payment-dispute.v1",
+      schemaVersion: "commerce.observe-payment-dispute.v1",
       organisationId: merchant.organisationId,
       merchantId,
       providerDeliveryId: dispute.eventId,

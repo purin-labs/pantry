@@ -226,7 +226,7 @@ export class CandidateActor extends SeamActor {
           actorId: identity.sessionId,
           streamId: identity.streamId,
           sequence: 0,
-          sourceTime: { kind: "satyr", issuedAt: now },
+          sourceTime: { kind: "pantry", issuedAt: now },
           acceptedAt: now,
           correlationId: "trial",
           causation: { kind: "command", commandId: "initialize_trial" },

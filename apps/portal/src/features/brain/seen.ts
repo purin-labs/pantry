@@ -15,7 +15,7 @@ export type SeenRecords = Readonly<{
 const MAX_OPENED = 600;
 
 function storageKey(organisationId: string): string {
-  return `satyr.brain.seen.${organisationId}`;
+  return `pantry.brain.seen.${organisationId}`;
 }
 
 function readSeen(organisationId: string, now: number): SeenRecords {

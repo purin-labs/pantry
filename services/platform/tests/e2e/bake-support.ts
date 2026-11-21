@@ -72,13 +72,13 @@ export async function openCounterShop(
   if (connected === null)
     await connectCommerceFixture(organisationId, ownerUserId, merchantId);
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",

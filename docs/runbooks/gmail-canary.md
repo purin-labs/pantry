@@ -18,7 +18,7 @@ The Pub/Sub half is built in Google Cloud project `satyr-gmail-dev`:
 | Push identity   | `satyr-gmail-push@satyr-gmail-dev.iam.gserviceaccount.com` (no key issued)   |
 | Token minting   | Pub/Sub service agent granted `roles/iam.serviceAccountTokenCreator`         |
 | Subscription    | `satyr-gmail-push-sub`, OIDC, 30s ack, 1d retention                          |
-| Push endpoint   | `https://satyr-edge.n6378056.workers.dev/hook/email/google`                  |
+| Push endpoint   | `https://pantry.purin.io/hook/email/google`                  |
 
 Gmail API and Pub/Sub API are enabled on that project.
 
@@ -48,7 +48,7 @@ Without an OAuth client no mailbox can be connected, so every canary step below
 is blocked until these exist.
 
 The Worker must also be deployed with the Gmail routes. As of this writing
-`POST https://satyr-edge.n6378056.workers.dev/hook/email/google` answers 404,
+`POST https://pantry.purin.io/hook/email/google` answers 404,
 so production is serving a build that predates the mailbox work: the push
 subscription is wired correctly and delivers, but there is nothing to receive
 it yet. Verify the endpoint answers 503 (configuration missing) or 401 (bad
@@ -87,7 +87,7 @@ permission.
    `https://www.googleapis.com/auth/gmail.compose`.
 3. Create an OAuth client of type **Web application**. Set one authorized
    redirect URI, byte for byte:
-   `https://satyr-edge.n6378056.workers.dev/v1/control/providers/gmail/callback`
+   `https://pantry.purin.io/v1/control/providers/gmail/callback`
 4. Put the client ID in `wrangler.jsonc` as `GMAIL_OAUTH_CLIENT_ID`, and set the
    secret yourself so it never lands in the repo:
 
@@ -134,7 +134,7 @@ Run in order. Each step names the evidence to capture.
 10. **Approval rejection.** Reject a proposal. Evidence: the draft is deleted
     and the lifecycle records who rejected it.
 11. **Approve and send.** Approve a proposal. Evidence: exactly one message in
-    the original thread, a `satyr-dispatch-` Message-ID, and the proposal draft
+    the original thread, a `pantry-dispatch-` Message-ID, and the proposal draft
     deleted afterwards.
 12. **Ambiguous send.** Force an indeterminate result if you can reproduce one.
     Evidence: state `send_indeterminate`, then resolution finds the message by
@@ -154,7 +154,7 @@ Run in order. Each step names the evidence to capture.
 ## Exit gate
 
 The gate is zero unauthorized sends, zero duplicate replies, zero policy-limit
-overruns, zero cross-organisation disclosures, and no durable Satyr copy of email
+overruns, zero cross-organisation disclosures, and no durable Pantry copy of email
 content. Confirm each explicitly:
 
 - **Unauthorized sends.** Every delivered message corresponds to one approval
@@ -205,9 +205,9 @@ Google rather than establishing them.
 
 Three things cannot be proven without Google and are the canary's real purpose:
 
-1. That Gmail accepts Satyr's `users.watch`, publishes to the topic, and that
+1. That Gmail accepts Pantry's `users.watch`, publishes to the topic, and that
    the push subscription reaches the Worker with a token that verifies.
-2. That a reply built by Satyr threads correctly in a real Gmail client and
+2. That a reply built by Pantry threads correctly in a real Gmail client and
    appears once.
 3. That the restricted scopes granted in production are sufficient for read,
    draft, and send without further consent prompts.

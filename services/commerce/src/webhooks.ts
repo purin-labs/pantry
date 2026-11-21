@@ -184,7 +184,7 @@ export class WebhookAuthority {
     const admitted = this.#admitChange(rawCommand);
     if ("outcome" in admitted) return admitted;
     const { command, merchant, subscription } = admitted;
-    if (command.schemaVersion === "underclerk.rotate-webhook-secret.v1")
+    if (command.schemaVersion === "commerce.rotate-webhook-secret.v1")
       return this.#options.rejected(
         this.#options.invalidCommand(
           new Error("A secret rotation has its own route"),
@@ -193,7 +193,7 @@ export class WebhookAuthority {
     const { database } = this.#options;
     const revision = subscription.revision + 1;
     const key = [command.merchantId, command.subscriptionId] as const;
-    if (command.schemaVersion === "underclerk.delete-webhook-subscription.v1")
+    if (command.schemaVersion === "commerce.delete-webhook-subscription.v1")
       return this.#options.commit({
         command,
         merchant,
@@ -262,12 +262,12 @@ export class WebhookAuthority {
     const admitted = this.#admitChange(rawCommand);
     if ("outcome" in admitted) return { mutation: admitted, secret: null };
     const { command, merchant, subscription } = admitted;
-    if (command.schemaVersion !== "underclerk.rotate-webhook-secret.v1")
+    if (command.schemaVersion !== "commerce.rotate-webhook-secret.v1")
       return {
         mutation: this.#options.rejected(
           this.#options.invalidCommand(
             new Error(
-              "schemaVersion must be underclerk.rotate-webhook-secret.v1",
+              "schemaVersion must be commerce.rotate-webhook-secret.v1",
             ),
           ),
         ),
@@ -453,10 +453,10 @@ export class WebhookAuthority {
             url: subscription.url,
             headers: {
               "content-type": "application/json",
-              "x-underclerk-event-id": event.eventId,
-              "x-underclerk-event-kind": event.kind,
-              "x-underclerk-timestamp": timestamp,
-              "x-underclerk-signature": [subscription.secret, previous]
+              "x-commerce-event-id": event.eventId,
+              "x-commerce-event-kind": event.kind,
+              "x-commerce-timestamp": timestamp,
+              "x-commerce-signature": [subscription.secret, previous]
                 .flatMap((secret) =>
                   secret === null
                     ? []
@@ -646,7 +646,7 @@ function webhookBody(
   event: CommerceEventV1,
 ): CommerceWebhookEventV1 {
   return {
-    schemaVersion: "underclerk.webhook-event.v1",
+    schemaVersion: "commerce.webhook-event.v1",
     eventId: event.eventId,
     kind: event.kind,
     merchantId,

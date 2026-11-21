@@ -65,7 +65,7 @@ export function parseIngressQueueMessage(
       return parseCommerceEventQueuePayload(body);
     case "shopify.commerce_refresh.v1":
       return parseShopifyCommerceRefreshQueuePayload(body);
-    case "underclerk.outbox_reconcile.v1":
+    case "commerce.outbox_reconcile.v1":
       return parseCommerceOutboxReconcileQueuePayload(body);
     case "agent_schedule.dispatch.v1":
       return parseAgentScheduleDispatchQueuePayload(body);

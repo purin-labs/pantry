@@ -321,7 +321,7 @@ async function relationshipRequest(
 }
 
 function isCsrfCookie(value: string): boolean {
-  return value.startsWith("satyr_control_csrf=");
+  return value.startsWith("pantry_csrf=");
 }
 
 function relationshipProblem(code: unknown): string {

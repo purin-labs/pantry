@@ -73,7 +73,7 @@ export const requestCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.request-return.v1"),
+      schemaVersion: Type.Literal("commerce.request-return.v1"),
       orderId: text,
       lines: requestLinesSchema,
     }),
@@ -88,7 +88,7 @@ export const authorizeCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.authorize-return.v1"),
+      schemaVersion: Type.Literal("commerce.authorize-return.v1"),
       expectedReturnRevision: PositiveInteger,
       decisions: ImmutableArray(
         ReadonlyStrictObject({
@@ -111,7 +111,7 @@ export const receiveCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.receive-return.v1"),
+      schemaVersion: Type.Literal("commerce.receive-return.v1"),
       expectedReturnRevision: PositiveInteger,
       locationId: text,
       dispositions: ImmutableArray(
@@ -132,7 +132,7 @@ export const closeCommerceReturnV1Schema = Type.Intersect(
   [
     returnCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.close-return.v1"),
+      schemaVersion: Type.Literal("commerce.close-return.v1"),
       expectedReturnRevision: PositiveInteger,
       refundAttemptId: Nullable(text),
     }),
@@ -154,7 +154,7 @@ export type CommerceReturnCommandV1 = Static<
 >;
 
 export const requestCommerceBuyerReturnV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.request-buyer-return.v1"),
+  schemaVersion: Type.Literal("commerce.request-buyer-return.v1"),
   idempotencyKey: text,
   lines: requestLinesSchema,
 });
@@ -218,7 +218,7 @@ export const commerceReturnV1Schema = ReadonlyStrictObject({
 export type CommerceReturnV1 = Static<typeof commerceReturnV1Schema>;
 
 type ReturnList = Readonly<{
-  schemaVersion: "underclerk.returns.v1";
+  schemaVersion: "commerce.returns.v1";
   returns: readonly CommerceReturnV1[];
 }>;
 
@@ -226,7 +226,7 @@ type ReturnList = Readonly<{
 const returnListSchema = Type.Unsafe<readonly CommerceReturnV1[]>(
   Type.Codec(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.returns.v1"),
+      schemaVersion: Type.Literal("commerce.returns.v1"),
       returns: ImmutableArray(commerceReturnV1Schema),
     }),
   )
@@ -239,7 +239,7 @@ function returnsOf(list: ReturnList): readonly CommerceReturnV1[] {
 }
 
 function returnList(returns: readonly CommerceReturnV1[]): ReturnList {
-  return { schemaVersion: "underclerk.returns.v1", returns };
+  return { schemaVersion: "commerce.returns.v1", returns };
 }
 
 // Parsers of the client API types (Plan 78 step 2).

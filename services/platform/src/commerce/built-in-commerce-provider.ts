@@ -1,5 +1,5 @@
 // The `CommerceProvider` of the built-in commerce engine (Seams Checkout and
-// the commerce engine Worker). Its records have the source `underclerk`.
+// the commerce engine Worker). Its records have the source `commerce`.
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import type { CommerceProvider } from "./contract/commerce-provider";
 import {
@@ -7,10 +7,10 @@ import {
   reconcileBuiltInCommerceAction,
 } from "./provider-execution";
 
-export const builtInCommerceProvider: CommerceProvider<"satyr_commerce"> = {
-  kind: "satyr_commerce",
+export const builtInCommerceProvider: CommerceProvider<"builtin_commerce"> = {
+  kind: "builtin_commerce",
   wire: (system) => ({
-    kind: "satyr_commerce",
+    kind: "builtin_commerce",
     organisationId: system.organisationId,
     bindingId: system.bindingId,
     merchantId: system.merchantId,
@@ -22,7 +22,7 @@ export const builtInCommerceProvider: CommerceProvider<"satyr_commerce"> = {
     return merchantBinding.ok
       ? {
           ok: true,
-          value: { kind: "underclerk", merchantBinding: merchantBinding.value },
+          value: { kind: "commerce", merchantBinding: merchantBinding.value },
         }
       : {
           ok: false,

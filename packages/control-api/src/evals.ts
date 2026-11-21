@@ -188,7 +188,7 @@ export type EvalCommandErrorCode =
   | "eval_capacity_exceeded";
 
 /** How criteria are decided. A result names the scorer that produced it. */
-export const EVAL_SCORER_VERSION = "satyr_eval_scorer_v1";
+export const EVAL_SCORER_VERSION = "pantry_eval_scorer_v1";
 
 export const MAX_EVAL_SCENARIOS = 6;
 /**
@@ -211,7 +211,7 @@ export type EvalRoute =
   | "organisation_openai_api_key"
   | "organisation_anthropic_api_key"
   | "organisation_google_api_key"
-  | "satyr_platform";
+  | "pantry_platform";
 
 /**
  * The knowledge the agent under test is given. `current` is the accepted
@@ -416,7 +416,7 @@ const EVAL_ROUTES: readonly EvalRoute[] = [
   "organisation_openai_api_key",
   "organisation_anthropic_api_key",
   "organisation_google_api_key",
-  "satyr_platform",
+  "pantry_platform",
 ];
 const MAX_RUNS = 100;
 const MAX_TITLE_LENGTH = 160;

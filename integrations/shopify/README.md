@@ -1,14 +1,14 @@
 # Shopify app configuration
 
-Shopify is an external commerce authority for CafeOS. The integration normalizes
+Shopify is an external commerce authority for Café. The integration normalizes
 catalog, inventory, order, and fulfillment facts into governed commerce
 projections. Agents use those records through the same authorization and receipt
 boundaries as other connected providers.
 
 `pnpm shopify:m8:link` links this directory to the existing Dev Dashboard app
 and pulls its released configuration. `pnpm shopify:m8:deploy` releases the
-standalone OAuth configuration and required Admin API scopes. Satyr is not
-embedded in Shopify Admin. Satyr reconciles Shopify
+standalone OAuth configuration and required Admin API scopes. Pantry is not
+embedded in Shopify Admin. Pantry reconciles Shopify
 webhook subscriptions after OAuth so app versions do not duplicate
 organisation-addressed webhook delivery.
 
@@ -17,7 +17,7 @@ Shopify's protected-customer-data gate can reject app-managed
 **Order creation** JSON webhook in Shopify Admin with this callback:
 
 ```text
-https://satyr-edge.n6378056.workers.dev/hook/shopify/organisation_T0BGQSSG45N
+https://pantry.purin.io/hook/shopify/organisation_T0BGQSSG45N
 ```
 
 Use API version `2026-07`. Import the store-specific signing secret with

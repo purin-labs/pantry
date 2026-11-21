@@ -588,15 +588,15 @@ describe("onboarding activation", () => {
     });
   });
 
-  it("activates a fresh Satyr Commerce organisation with Slack and no external commerce account", async () => {
+  it("activates a fresh Seams Checkout organisation with Slack and no external commerce account", async () => {
     const db = createMigratedDatabase();
     const owner = await upsertUser({
       db,
       identity: {
         issuer: "https://accounts.google.com",
-        subject: "satyr-commerce-owner",
-        email: "satyr-commerce@example.com",
-        displayName: "Satyr Commerce Owner",
+        subject: "builtin-commerce-owner",
+        email: "builtin-commerce@example.com",
+        displayName: "Seams Checkout Owner",
         emailVerified: true,
       },
       now: NOW,
@@ -608,7 +608,7 @@ describe("onboarding activation", () => {
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
-      organisationName: "Satyr Commerce Cafe",
+      organisationName: "Seams Checkout Cafe",
       environment: "development",
       mutation: organisationBootstrapMutation(owner, NOW),
       placement: TEST_INITIAL_ORGANISATION_PLACEMENT,
@@ -627,12 +627,12 @@ describe("onboarding activation", () => {
       request: activationRequest(
         organisation.organisationId,
         owner.userId,
-        "activate-satyr-commerce-0001",
+        "activate-builtin-commerce-0001",
         NOW + 1,
       ),
     });
     if (!started.ok || started.value.kind !== "run") {
-      throw new Error("Satyr Commerce activation did not start");
+      throw new Error("Seams Checkout activation did not start");
     }
     await checkpointActivationStep({
       db,
@@ -664,7 +664,7 @@ describe("onboarding activation", () => {
       readPantryCommerceActivationEvidence(db, organisation.organisationId),
     ).resolves.toEqual({
       lifecycle: "active",
-      systemKind: "satyr_commerce",
+      systemKind: "builtin_commerce",
       commerceSystemRevision: 1,
       destinationId: "activation-channel",
       shopifyAccounts: 0,
@@ -1557,10 +1557,10 @@ async function seedReadyOnboarding(
          credential_ref, lifecycle, granted_scopes, created_by_user_id,
          created_at, updated_at, disabled_at, revoked_at, environment, provider_subject_id
        ) VALUES
-         ('activation_slack_connection', ?, 'slack', 'shared_satyr_app', 'connection_credential', 1,
+         ('activation_slack_connection', ?, 'slack', 'shared_pantry_app', 'connection_credential', 1,
           'vault:activation:slack', 'active', '[]', ?, ?, ?, NULL, NULL,
           'development', 'activation-workspace'),
-         ('activation_shop_connection', ?, 'shopify', 'shared_satyr_app', 'connection_credential', 1,
+         ('activation_shop_connection', ?, 'shopify', 'shared_pantry_app', 'connection_credential', 1,
           'vault:activation:shopify', 'active', '[]', ?, ?, ?, NULL, NULL,
           'development', 'activation-shop')`,
       )
@@ -1597,13 +1597,13 @@ async function seedReadyOnboarding(
       .bind(organisationId, NOW),
     session
       .prepare(
-        `INSERT INTO underclerk_merchant_binding (
+        `INSERT INTO commerce_merchant_binding (
          binding_id, organisation_id, integration_account_id, merchant_id, environment,
          delivery_signing_key_id, delivery_signing_public_key_b64,
          revision, created_at, updated_at
        ) VALUES (
-         'underclerk_binding_activation', ?, 'integration_underclerk_activation',
-         'merchant_activation', 'development', 'key_underclerk_activation',
+         'commerce_binding_activation', ?, 'integration_commerce_activation',
+         'merchant_activation', 'development', 'key_commerce_activation',
          'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 1, ?, ?
        )`,
       )
@@ -1611,7 +1611,7 @@ async function seedReadyOnboarding(
     session
       .prepare(
         `INSERT INTO organisation_commerce_system (
-         organisation_id, system_kind, underclerk_binding_id,
+         organisation_id, system_kind, commerce_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
        ) VALUES (?, 'shopify', NULL, 'activation_shop_account', 1, ?, ?)`,
@@ -1687,10 +1687,10 @@ async function replaceShopifyWithPantryCommerce(
     session
       .prepare(
         `INSERT INTO organisation_commerce_system (
-         organisation_id, system_kind, underclerk_binding_id,
+         organisation_id, system_kind, commerce_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
-       ) VALUES (?, 'satyr_commerce', 'underclerk_binding_activation', NULL, 1, ?, ?)`,
+       ) VALUES (?, 'builtin_commerce', 'commerce_binding_activation', NULL, 1, ?, ?)`,
       )
       .bind(organisationId, NOW, userId),
   ]);
@@ -1738,7 +1738,7 @@ async function readPantryCommerceActivationEvidence(
       slackAccounts: number;
     }>();
   if (row === null)
-    throw new Error("Satyr Commerce activation evidence is missing");
+    throw new Error("Seams Checkout activation evidence is missing");
   return row;
 }
 

@@ -72,7 +72,7 @@ async function linksAlternateGoogleIssuer(): Promise<void> {
 }
 
 async function linksPasskeyIssuer(): Promise<void> {
-  const fixture = await createFixture({ issuer: "urn:satyr:passkey" });
+  const fixture = await createFixture({ issuer: "urn:pantry:passkey" });
   const token = await issueLink(fixture, "U0IDENTITYPASSKEY");
   const completed = await completeLink(
     token,
@@ -94,7 +94,7 @@ async function linksPasskeyIssuer(): Promise<void> {
 }
 
 async function linksSeamsIssuer(): Promise<void> {
-  const fixture = await createFixture({ issuer: "urn:satyr:seams" });
+  const fixture = await createFixture({ issuer: "urn:pantry:seams" });
   const token = await issueLink(fixture, "U0IDENTITYSEAMS");
   const completed = await completeLink(
     token,
@@ -251,7 +251,7 @@ async function createFixture(
     provider: "slack",
     providerSubjectId: WORKSPACE_ID,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: handle.value,
@@ -363,8 +363,8 @@ async function completeLink(
       headers: {
         "content-type": "application/json",
         origin: ORIGIN,
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: "{}",
     }),

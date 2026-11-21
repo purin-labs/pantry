@@ -28,7 +28,7 @@ export function StoreLine(props: {
   return (
     <div className="vault-store-line">
       <p>
-        {store.kind === "satyr" ? (
+        {store.kind === "pantry" ? (
           <>Storage: Seams Vault</>
         ) : (
           <>
@@ -178,14 +178,14 @@ export function StoreDetails(props: {
   readonly busy: boolean;
   readonly failure: string | null;
   readonly confirmingDisconnect: boolean;
-  readonly move: (to: "onepassword" | "satyr") => void;
+  readonly move: (to: "onepassword" | "pantry") => void;
   readonly askDisconnect: (asking: boolean) => void;
   readonly disconnect: () => void;
   readonly organisationId: string;
   readonly transport: VaultTransport;
 }): React.ReactNode {
   const pantryCount = props.items.filter(
-    (item) => item.store === "satyr",
+    (item) => item.store === "pantry",
   ).length;
   const onePasswordCount = props.items.length - pantryCount;
   return (
@@ -258,7 +258,7 @@ export function StoreDetails(props: {
               type="button"
               className="vault-secondary"
               disabled={props.busy}
-              onClick={() => props.move("satyr")}
+              onClick={() => props.move("pantry")}
             >
               Move items to Seams Vault
             </button>

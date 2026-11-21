@@ -97,9 +97,9 @@ export type OnePasswordItemCreate = Readonly<{
 
 const LOGIN = "Login";
 const IDENTITY = "Identity";
-const CONTACT_SECTION = { id: "satyr_contact", title: "Seams Pantry contact" };
+const CONTACT_SECTION = { id: "pantry_contact", title: "Seams Pantry contact" };
 /** Items that Pantry writes carry this tag, so people see where they came from. */
-const SATYR_TAG = "Seams Pantry";
+const PANTRY_TAG = "Seams Pantry";
 
 export async function handleOnePasswordOperation(
   operation: OnePasswordOperation,
@@ -245,7 +245,7 @@ function createParams(
         fields: loginFields(item.username, item.password),
         sections: [],
         websites: websites(item.origins),
-        tags: [SATYR_TAG],
+        tags: [PANTRY_TAG],
       };
     case "contact_profile":
       return {
@@ -255,7 +255,7 @@ function createParams(
         fields: contactFields(item.contact),
         sections: [CONTACT_SECTION],
         websites: [],
-        tags: [SATYR_TAG],
+        tags: [PANTRY_TAG],
       };
     default:
       return assertNever(item);
@@ -369,7 +369,7 @@ function contactFields(contact: VaultContact): OnePasswordField[] {
       ? []
       : [
           {
-            id: `satyr_${id}`,
+            id: `pantry_${id}`,
             title,
             sectionId: CONTACT_SECTION.id,
             fieldType: "Text",
@@ -383,7 +383,7 @@ function identityContact(item: OnePasswordItem): VaultContact | null {
   const read = (id: ContactFieldId): string | null => {
     const field = item.fields.find(
       (candidate) =>
-        candidate.id === `satyr_${id}` &&
+        candidate.id === `pantry_${id}` &&
         candidate.sectionId === CONTACT_SECTION.id,
     );
     const value = field?.value.trim() ?? "";

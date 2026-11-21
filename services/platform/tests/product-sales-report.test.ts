@@ -81,7 +81,7 @@ describe("merchant product sales", () => {
 
 function client(value: ProductSalesReport): CommerceAdminClient {
   return new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: "test-token",
     fetch: respond.bind(null, value),
   });

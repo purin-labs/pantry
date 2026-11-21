@@ -481,7 +481,7 @@ function entitySelectionForOperation(
     case "relationship_traversal":
     case "commerce_list_page":
     case "aggregation":
-    case "underclerk_context":
+    case "commerce_context":
       return operation.selection === undefined
         ? null
         : entitySelectionForContext(operation.selection);
@@ -493,7 +493,7 @@ function entitySelectionForOperation(
             entityOrigin: "system",
             entityType: operation.source.systemEntityKind,
           };
-        case "underclerk_custom":
+        case "commerce_custom":
           return {
             kind: "page",
             entityOrigin: "custom",
@@ -521,7 +521,7 @@ function entityTypeSelection(
 function entitySelectionForContext(
   selection: Variant<
     CommerceQueryPlanOperation,
-    "underclerk_context"
+    "commerce_context"
   >["selection"],
 ): CommerceEntitySelection | null {
   switch (selection.kind) {
@@ -560,7 +560,7 @@ function entitySelectionForQuery(
     case "commerce_list_page":
     case "saved_commerce_view":
     case "aggregation":
-    case "underclerk_context":
+    case "commerce_context":
       return null;
     default:
       return assertNever(query, "commerce_query_sql_unhandled");

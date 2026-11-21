@@ -42,7 +42,7 @@ export const commerceOrderTimeV1Schema = ReadonlyStrictObject({
 export type CommerceOrderTimeV1 = Static<typeof commerceOrderTimeV1Schema>;
 
 export const commerceOrderTimesV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.order-times.v1"),
+  schemaVersion: Type.Literal("commerce.order-times.v1"),
   merchantId: text,
   merchantRevision: Type.Integer({ minimum: 0 }),
   /** True when the window held more orders than this read returns. */

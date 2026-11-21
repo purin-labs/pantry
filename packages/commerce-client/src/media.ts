@@ -28,7 +28,7 @@ export type CommerceMediaContent = Readonly<{
 
 /** What an upload stored: the same bytes always give the same answer. */
 export type CommerceMediaUploadV1 = Readonly<{
-  schemaVersion: "underclerk.media-upload.v1";
+  schemaVersion: "commerce.media-upload.v1";
   sha256: string;
   contentType: CommerceMediaContentType;
   byteSize: number;
@@ -57,7 +57,7 @@ export type CommerceProductMediaV1 = Readonly<{
 }>;
 
 export type CommerceMediaLibraryV1 = Readonly<{
-  schemaVersion: "underclerk.media.v1";
+  schemaVersion: "commerce.media.v1";
   media: readonly CommerceMediaV1[];
   products: readonly CommerceProductMediaV1[];
 }>;
@@ -70,7 +70,7 @@ type MediaCommandBase = Readonly<{
 
 export type CreateCommerceMediaV1 = MediaCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-media.v1";
+    schemaVersion: "commerce.create-media.v1";
     mediaId: string;
     sha256: string;
     altText: string;
@@ -78,7 +78,7 @@ export type CreateCommerceMediaV1 = MediaCommandBase &
 
 export type UpdateCommerceMediaV1 = MediaCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.update-media.v1";
+    schemaVersion: "commerce.update-media.v1";
     mediaId: string;
     expectedRevision: number;
     altText: string;
@@ -86,14 +86,14 @@ export type UpdateCommerceMediaV1 = MediaCommandBase &
 
 export type DeleteCommerceMediaV1 = MediaCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.delete-media.v1";
+    schemaVersion: "commerce.delete-media.v1";
     mediaId: string;
     expectedRevision: number;
   }>;
 
 export type SetCommerceProductMediaV1 = MediaCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.set-product-media.v1";
+    schemaVersion: "commerce.set-product-media.v1";
     productId: string;
     /** The product's current media revision; 0 when it has none yet. */
     expectedRevision: number;

@@ -28,12 +28,12 @@ import {
 
 const NOW = "2026-08-09T09:00:00Z";
 
-it("normalizes one verified Underclerk delivery onto the canonical resource spine", async () => {
+it("normalizes one verified Commerce delivery onto the canonical resource spine", async () => {
   const result = await normalizeCommerceEngineDelivery({
     delivery: DELIVERY,
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -49,13 +49,13 @@ it("normalizes one verified Underclerk delivery onto the canonical resource spin
             kind: "inventory_position",
             projection: {
               provenance: {
-                source: "underclerk",
+                source: "commerce",
                 resourceType: "inventory_position",
-                resourceId: "underclerk:merchant_demo:position_1",
+                resourceId: "commerce:merchant_demo:position_1",
                 revision: 3,
               },
-              inventoryItemId: "underclerk:merchant_demo:inventory_1",
-              locationId: "underclerk:merchant_demo:location_1",
+              inventoryItemId: "commerce:merchant_demo:inventory_1",
+              locationId: "commerce:merchant_demo:location_1",
               balance: {
                 kind: "available_only",
                 available: { amount: 8, scale: 0, unit: "each" },
@@ -90,7 +90,7 @@ it("routes entity-plane observations to typed admission without provider project
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -125,7 +125,7 @@ it("preserves empty aggregate deliveries and rejects mixed-category deliveries",
     delivery: { ...DELIVERY, observations: [] },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
   expect(empty).toMatchObject({
@@ -154,12 +154,12 @@ it("preserves empty aggregate deliveries and rejects mixed-category deliveries",
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
   expect(mixed).toEqual({
     ok: false,
-    error: "underclerk_delivery_mixed_observation_categories",
+    error: "commerce_delivery_mixed_observation_categories",
   });
 });
 
@@ -171,7 +171,7 @@ it("normalizes provider clock skew without producing an impossible observation o
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -194,19 +194,19 @@ it("normalizes provider clock skew without producing an impossible observation o
   });
 });
 
-it("rejects an unverified Underclerk delivery before canonical projection", async () => {
+it("rejects an unverified Commerce delivery before canonical projection", async () => {
   expect(
     await normalizeCommerceEngineDelivery({
       delivery: DELIVERY,
       organisationId: "organisation_demo",
       merchantId: "merchant_demo",
-      integrationAccountId: "underclerk_merchant_demo",
+      integrationAccountId: "commerce_merchant_demo",
       verifier: new RejectVerifier(),
     }),
-  ).toEqual({ ok: false, error: "underclerk_delivery_signature_invalid" });
+  ).toEqual({ ok: false, error: "commerce_delivery_signature_invalid" });
 });
 
-it("normalizes Underclerk order and operational resource states", async () => {
+it("normalizes Commerce order and operational resource states", async () => {
   const normalized = await normalizeCommerceEngineDelivery({
     delivery: {
       ...DELIVERY,
@@ -309,7 +309,7 @@ it("normalizes Underclerk order and operational resource states", async () => {
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
   expect(normalized).toMatchObject({
@@ -321,11 +321,11 @@ it("normalizes Underclerk order and operational resource states", async () => {
             kind: "commerce_order",
             projection: {
               provenance: {
-                resourceId: "underclerk:merchant_demo:order_cafe_001",
+                resourceId: "commerce:merchant_demo:order_cafe_001",
               },
               origin: {
                 kind: "online",
-                checkoutId: "underclerk:merchant_demo:checkout_cafe_001",
+                checkoutId: "commerce:merchant_demo:checkout_cafe_001",
                 configuration: {
                   kind: "checkout_profile",
                   checkoutProfile: {
@@ -341,7 +341,7 @@ it("normalizes Underclerk order and operational resource states", async () => {
           projection: {
             kind: "payment",
             projection: {
-              orderId: "underclerk:merchant_demo:order_cafe_001",
+              orderId: "commerce:merchant_demo:order_cafe_001",
               lifecycle: { state: "failed" },
             },
           },
@@ -351,7 +351,7 @@ it("normalizes Underclerk order and operational resource states", async () => {
             kind: "fulfillment",
             projection: {
               lifecycle: { state: "blocked" },
-              locationId: "underclerk:merchant_demo:location_nuki_cafe",
+              locationId: "commerce:merchant_demo:location_nuki_cafe",
             },
           },
         },
@@ -371,7 +371,7 @@ it("preserves the accepted first-party shipping quote while canonicalizing its i
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -387,30 +387,30 @@ it("preserves the accepted first-party shipping quote while canonicalizing its i
               binding: {
                 kind: "first_party_checkout",
                 protectedAddressReference:
-                  "underclerk:merchant_demo:protected_address_sg_1",
+                  "commerce:merchant_demo:protected_address_sg_1",
                 acceptedShippingQuote: {
-                  shippingQuoteId: "underclerk:merchant_demo:shipping_quote_1",
+                  shippingQuoteId: "commerce:merchant_demo:shipping_quote_1",
                   routeBinding: {
-                    routeId: "underclerk:merchant_demo:route_jp_sg_ems",
-                    zoneId: "underclerk:merchant_demo:zone_singapore",
+                    routeId: "commerce:merchant_demo:route_jp_sg_ems",
+                    zoneId: "commerce:merchant_demo:zone_singapore",
                   },
                   address: {
                     protectedAddressReference:
-                      "underclerk:merchant_demo:protected_address_sg_1",
+                      "commerce:merchant_demo:protected_address_sg_1",
                   },
                   packagePlan: {
                     package: {
-                      packageId: "underclerk:merchant_demo:package_1",
+                      packageId: "commerce:merchant_demo:package_1",
                       lineQuantities: [
                         {
                           checkoutLineId:
-                            "underclerk:merchant_demo:checkout_line_1",
+                            "commerce:merchant_demo:checkout_line_1",
                         },
                       ],
                       customsLines: [
                         {
                           checkoutLineId:
-                            "underclerk:merchant_demo:checkout_line_1",
+                            "commerce:merchant_demo:checkout_line_1",
                         },
                       ],
                     },
@@ -443,7 +443,7 @@ it("canonicalizes food-service menu and preparation identities", async () => {
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -459,14 +459,14 @@ it("canonicalizes food-service menu and preparation identities", async () => {
                 {
                   source: {
                     kind: "food_service",
-                    menuId: "underclerk:merchant_demo:menu_cafe",
+                    menuId: "commerce:merchant_demo:menu_cafe",
                     menuRevision: 3,
                     menuEntryId:
-                      "underclerk:merchant_demo:menu_entry_oat_latte",
+                      "commerce:merchant_demo:menu_entry_oat_latte",
                     menuEntryRevision: 4,
                     preparation: {
                       kind: "immediate_recipe",
-                      recipeId: "underclerk:merchant_demo:recipe_oat_latte",
+                      recipeId: "commerce:merchant_demo:recipe_oat_latte",
                       recipeRevision: 7,
                     },
                   },
@@ -494,7 +494,7 @@ it("preserves stocked-inventory food-service preparation", async () => {
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -510,7 +510,7 @@ it("preserves stocked-inventory food-service preparation", async () => {
                 {
                   source: {
                     kind: "food_service",
-                    menuId: "underclerk:merchant_demo:menu_cafe",
+                    menuId: "commerce:merchant_demo:menu_cafe",
                     menuRevision: 3,
                     preparation: { kind: "stocked_inventory" },
                   },
@@ -554,7 +554,7 @@ it("canonicalizes production-batch inventory decrease reasons", async () => {
     },
     organisationId: "organisation_demo",
     merchantId: "merchant_demo",
-    integrationAccountId: "underclerk_merchant_demo",
+    integrationAccountId: "commerce_merchant_demo",
     verifier: new ExactVerifier(),
   });
 
@@ -568,14 +568,14 @@ it("canonicalizes production-batch inventory decrease reasons", async () => {
             projection: {
               provenance: {
                 resourceId:
-                  "underclerk:merchant_demo:movement_production_input_1",
+                  "commerce:merchant_demo:movement_production_input_1",
               },
               change: {
                 kind: "decrease",
                 reason: {
                   kind: "production",
                   productionBatchId:
-                    "underclerk:merchant_demo:batch_oat_latte_1",
+                    "commerce:merchant_demo:batch_oat_latte_1",
                   recipeRevision: 2,
                 },
               },
@@ -600,7 +600,7 @@ it("resolves approval-required cancellation authority from exact provider resour
   expect(result).toEqual({
     ok: true,
     value: {
-      kind: "underclerk_full_refund",
+      kind: "commerce_full_refund",
       merchantRevision: 7,
       paymentId: "payment_cancel_1",
       paymentRevision: 2,
@@ -727,18 +727,18 @@ it("fails closed when cancellation totals do not reconcile", async () => {
   expect(result).toEqual({
     ok: false,
     error: {
-      code: "underclerk_cancellation_authority_incomplete",
+      code: "commerce_cancellation_authority_incomplete",
       field: "order.totals",
     },
   });
 });
 
-it("returns a typed unavailable result when Underclerk cannot be read", async () => {
+it("returns a typed unavailable result when Commerce cannot be read", async () => {
   const result = await resolveCommerceCancellationAuthority({
     client: createCancellationAuthorityClient({
       snapshot: {
         ok: false,
-        error: { kind: "http", status: 503, message: "Underclerk unavailable" },
+        error: { kind: "http", status: 503, message: "Commerce unavailable" },
       },
     }),
     organisationId: "organisation_demo",
@@ -750,8 +750,8 @@ it("returns a typed unavailable result when Underclerk cannot be read", async ()
   expect(result).toEqual({
     ok: false,
     error: {
-      code: "underclerk_unavailable",
-      cause: { kind: "http", status: 503, message: "Underclerk unavailable" },
+      code: "commerce_unavailable",
+      cause: { kind: "http", status: 503, message: "Commerce unavailable" },
     },
   });
 });
@@ -772,7 +772,7 @@ it("fails closed on ambiguous related resources", async () => {
   expect(duplicateOrder).toEqual({
     ok: false,
     error: {
-      code: "underclerk_cancellation_authority_incomplete",
+      code: "commerce_cancellation_authority_incomplete",
       field: "order",
     },
   });
@@ -792,7 +792,7 @@ it("fails closed on ambiguous related resources", async () => {
   expect(duplicatePayment).toEqual({
     ok: false,
     error: {
-      code: "underclerk_cancellation_authority_incomplete",
+      code: "commerce_cancellation_authority_incomplete",
       field: "payment",
     },
   });
@@ -852,7 +852,7 @@ it("rejects invalid cancellation lifecycle, lines, money, and timestamps", async
     });
     expect(result).toEqual({
       ok: false,
-      error: { code: "underclerk_cancellation_authority_incomplete", field },
+      error: { code: "commerce_cancellation_authority_incomplete", field },
     });
   }
 });
@@ -871,7 +871,7 @@ it("rejects mismatched, draft, or future-published checkout profiles", async () 
   expect(mismatched).toEqual({
     ok: false,
     error: {
-      code: "underclerk_cancellation_authority_incomplete",
+      code: "commerce_cancellation_authority_incomplete",
       field: "checkoutProfile",
     },
   });
@@ -891,7 +891,7 @@ it("rejects mismatched, draft, or future-published checkout profiles", async () 
   expect(draft).toEqual({
     ok: false,
     error: {
-      code: "underclerk_cancellation_authority_incomplete",
+      code: "commerce_cancellation_authority_incomplete",
       field: "checkoutProfile",
     },
   });
@@ -947,11 +947,11 @@ function cancellationSnapshot(
   }> = {},
 ): CommerceMerchantSnapshotV1 {
   return {
-    schemaVersion: "underclerk.commerce-snapshot.v2",
+    schemaVersion: "commerce.commerce-snapshot.v2",
     merchantId: "merchant_demo",
     merchantRevision: 7,
     deliverySigner: {
-      keyId: "key_underclerk",
+      keyId: "key_commerce",
       algorithm: "ed25519",
       publicKeyB64: "public-key",
     },
@@ -1152,7 +1152,7 @@ const CANCELLATION_SHIPPING_FULFILLMENT: CommerceFulfillmentV1 = {
 };
 
 it(
-  "publishes through the authenticated Underclerk API and verifies its signed observation",
+  "publishes through the authenticated Commerce API and verifies its signed observation",
   runCommerceWalkingPath,
   30_000,
 );
@@ -1166,7 +1166,7 @@ async function runCommerceWalkingPath(): Promise<void> {
       fetch: commerceEngine.fetch,
     });
     const provisioned = await client.provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       merchantId: "merchant_demo",
       externalReference: "organisation_demo",
       createdAt: NOW,
@@ -1194,13 +1194,13 @@ async function runCommerceWalkingPath(): Promise<void> {
 
     const reader = await fixture.client.readFeedConsumer(
       "merchant_demo",
-      "satyr",
+      "pantry",
     );
-    if (!reader.ok) throw new Error("Expected Satyr's feed cursor");
+    if (!reader.ok) throw new Error("Expected Pantry's feed cursor");
     const page = await fixture.client.readEvents("merchant_demo", {
       after: reader.value.cursor,
     });
-    if (!page.ok) throw new Error("Expected Underclerk events");
+    if (!page.ok) throw new Error("Expected Commerce events");
     const publishedEvent = page.value.events.find((event) =>
       isPublishedOfferDelivery(event.delivery),
     );
@@ -1211,7 +1211,7 @@ async function runCommerceWalkingPath(): Promise<void> {
       delivery: publishedDelivery,
       organisationId: "organisation_demo",
       merchantId: "merchant_demo",
-      integrationAccountId: "integration_underclerk_demo",
+      integrationAccountId: "integration_commerce_demo",
       verifier: createCommerceEd25519Verifier({
         expectedKeyId: commerceEngine.signingKeyId,
         publicKey: new Uint8Array(
@@ -1231,8 +1231,8 @@ async function runCommerceWalkingPath(): Promise<void> {
               projection: {
                 lifecycle: { state: "listed" },
                 provenance: {
-                  source: "underclerk",
-                  integrationAccountId: "integration_underclerk_demo",
+                  source: "commerce",
+                  integrationAccountId: "integration_commerce_demo",
                   revision: 2,
                 },
               },
@@ -1243,7 +1243,7 @@ async function runCommerceWalkingPath(): Promise<void> {
     });
     const applied = await fixture.client.advanceFeedConsumer(
       "merchant_demo",
-      "satyr",
+      "pantry",
       publishedEvent.cursor,
     );
     expect(applied).toMatchObject({
@@ -1349,10 +1349,10 @@ function isPublishedOfferDelivery(delivery: CommerceDeliveryV1): boolean {
 
 function seedCommand(): PrepareCommerceCatalogListingV1 {
   return {
-    schemaVersion: "underclerk.prepare-catalog-listing.v1",
+    schemaVersion: "commerce.prepare-catalog-listing.v1",
     merchantId: "merchant_demo",
     expectedMerchantRevision: 0,
-    idempotencyKey: "seed_underclerk_demo",
+    idempotencyKey: "seed_commerce_demo",
     requestedAt: NOW,
     salesChannel: {
       id: "channel_1",
@@ -1421,7 +1421,7 @@ class RejectVerifier implements CommerceDeliveryVerifier {
 }
 
 const DELIVERY: CommerceDeliveryV1 = {
-  schemaVersion: "underclerk.commerce-delivery.v1",
+  schemaVersion: "commerce.commerce-delivery.v1",
   deliveryId: "delivery_1",
   organisationId: "organisation_demo",
   merchantId: "merchant_demo",
@@ -1444,7 +1444,7 @@ const DELIVERY: CommerceDeliveryV1 = {
     },
   ],
   signer: {
-    keyId: "underclerk_key_1",
+    keyId: "commerce_key_1",
     algorithm: "ed25519",
     signature: "delivery_signature",
   },
@@ -1559,7 +1559,7 @@ function createShippingFulfillment(): CommerceFulfillmentV1 {
 }
 
 const PUBLISH_COMMAND: PublishCommerceCatalogListingV1 = {
-  schemaVersion: "underclerk.publish-catalog-listing.v1",
+  schemaVersion: "commerce.publish-catalog-listing.v1",
   merchantId: "merchant_demo",
   idempotencyKey: "publish_1",
   requestedAt: NOW,
@@ -1575,8 +1575,8 @@ const PUBLISH_COMMAND: PublishCommerceCatalogListingV1 = {
 
 function createClient(fetcher: CommerceFetch): CommerceAdminClient {
   return new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
-    serviceToken: "underclerk_test_service_token",
+    baseUrl: "https://commerce.test",
+    serviceToken: "commerce_test_service_token",
     fetch: fetcher,
   });
 }

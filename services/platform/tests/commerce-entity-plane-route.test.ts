@@ -120,7 +120,7 @@ describe("commerce entity-plane route boundary", () => {
 
     expect(
       parseCommerceGraphQuery({
-        kind: "underclerk_context",
+        kind: "commerce_context",
         selection: { kind: "entity_seeds", seeds: [] },
         traversal: { maxDepth: 1, resultLimit: 10 },
         allowedSensitivity: "restricted",

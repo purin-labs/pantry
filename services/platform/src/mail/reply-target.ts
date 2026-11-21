@@ -74,7 +74,7 @@ export async function digestGmailReplyTarget(
 ): Promise<string> {
   return sha256Hex(
     JSON.stringify({
-      kind: "satyr_email_reply_target_v1",
+      kind: "pantry_email_reply_target_v1",
       accountAddress: target.accountAddress,
       sourceMessageId: target.sourceMessageId,
       threadId: target.threadId,
@@ -89,7 +89,7 @@ export async function digestGmailReplyTarget(
 }
 
 export async function digestEmailBody(body: string): Promise<string> {
-  return sha256Hex(JSON.stringify({ kind: "satyr_email_body_v1", body }));
+  return sha256Hex(JSON.stringify({ kind: "pantry_email_body_v1", body }));
 }
 
 export async function digestEmailSnapshot(
@@ -102,7 +102,7 @@ export async function digestEmailSnapshot(
 ): Promise<string> {
   return sha256Hex(
     JSON.stringify({
-      kind: "satyr_email_snapshot_v1",
+      kind: "pantry_email_snapshot_v1",
       targetDigest: input.targetDigest,
       bodyDigest: input.bodyDigest,
       proposalId: input.proposalId,
@@ -116,7 +116,7 @@ export function proposalRfcMessageId(
   version: number,
   accountAddress: string,
 ): string {
-  return `<satyr-proposal-${sanitizeIdSegment(proposalId)}-v${version}@${rfcIdDomain(accountAddress)}>`;
+  return `<pantry-proposal-${sanitizeIdSegment(proposalId)}-v${version}@${rfcIdDomain(accountAddress)}>`;
 }
 
 export function dispatchRfcMessageId(
@@ -124,7 +124,7 @@ export function dispatchRfcMessageId(
   version: number,
   accountAddress: string,
 ): string {
-  return `<satyr-dispatch-${sanitizeIdSegment(proposalId)}-v${version}@${rfcIdDomain(accountAddress)}>`;
+  return `<pantry-dispatch-${sanitizeIdSegment(proposalId)}-v${version}@${rfcIdDomain(accountAddress)}>`;
 }
 
 /**
@@ -172,7 +172,7 @@ export function buildGmailReplyRaw(
   const content =
     input.html === undefined
       ? text
-      : multipart("alternative", `satyr_${tag}`, [
+      : multipart("alternative", `pantry_${tag}`, [
           text,
           mimePart("text/html", input.html),
         ]);
@@ -182,7 +182,7 @@ export function buildGmailReplyRaw(
       ? [...headers, ...content]
       : [
           ...headers,
-          ...multipart("mixed", `satyr_mixed_${tag}`, [
+          ...multipart("mixed", `pantry_mixed_${tag}`, [
             content,
             ...attachments.map(attachmentPart),
           ]),
@@ -264,7 +264,7 @@ function rfcIdDomain(accountAddress: string): string {
   const domain = at >= 0 ? accountAddress.slice(at + 1) : "";
   return /^[A-Za-z0-9.-]+$/u.test(domain) && domain.length > 0
     ? domain
-    : "satyr.invalid";
+    : "pantry.invalid";
 }
 
 function assertHeaderSafe(value: string): string {

@@ -1,6 +1,6 @@
 # WhatsApp Meta review package
 
-Use this checklist after the Satyr legal entity exists and Meta allows Business
+Use this checklist after the Pantry legal entity exists and Meta allows Business
 Verification. It prepares one narrow review submission for the customer-support
 flow implemented by Plan 32.
 
@@ -13,7 +13,7 @@ See the [live drill evidence](https://github.com/seams-tech/pantry-history/blob/
 Complete these provider-owned gates in order:
 
 1. Finish the Japanese company incorporation.
-2. Update the Meta Business Portfolio and Satyr public policies with the final
+2. Update the Meta Business Portfolio and Pantry public policies with the final
    legal entity name, address, and contact details.
 3. Complete Meta Business Verification and any required Access Verification.
 4. Submit App Review for the three permissions below.
@@ -25,17 +25,17 @@ Complete these provider-owned gates in order:
 
 Verify each deployed page from a signed-out browser before submission:
 
-- Privacy policy: <https://satyr-edge.n6378056.workers.dev/docs/privacy>
-- Terms of service: <https://satyr-edge.n6378056.workers.dev/docs/terms>
-- User-data deletion: <https://satyr-edge.n6378056.workers.dev/docs/deletion>
-- Support contact: <https://satyr-edge.n6378056.workers.dev/docs/contact>
+- Privacy policy: <https://pantry.purin.io/docs/privacy>
+- Terms of service: <https://pantry.purin.io/docs/terms>
+- User-data deletion: <https://pantry.purin.io/docs/deletion>
+- Support contact: <https://pantry.purin.io/docs/contact>
 
 The current support address is shown on those pages. Replace personal or
 pre-incorporation details with the final company contact before review.
 
 ## Minimum permissions
 
-Satyr requests only the permissions exercised by the implemented flow.
+Pantry requests only the permissions exercised by the implemented flow.
 
 | Permission                     | Reviewer-visible use                                                                                                                       |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -68,14 +68,14 @@ codes in this repository or the review video.
 ## Demonstration script
 
 Capture one continuous video with the browser address bar visible when moving
-between Satyr and Meta.
+between Pantry and Meta.
 
-1. Sign in to the dedicated Satyr test workspace and open WhatsApp settings.
+1. Sign in to the dedicated Pantry test workspace and open WhatsApp settings.
 2. Select **Connect with Meta**.
 3. Continue with the reviewer Meta account.
 4. Select or create the test Business Portfolio and WABA.
 5. Select and verify the eligible phone number.
-6. Approve the requested access and return to Satyr.
+6. Approve the requested access and return to Pantry.
 7. Show the connected number in a processing-disabled state. Do not display the
    organisation credential.
 8. Select the number, assign an agent, publish the test ingress policy, and
@@ -103,11 +103,11 @@ Use the following facts consistently in the submission and demo:
 
 - Each organisation approves access to its own Business Portfolio, WABA, and phone
   number through Meta Embedded Signup.
-- Satyr exchanges the one-time code server-side and encrypts the organisation-specific
+- Pantry exchanges the one-time code server-side and encrypts the organisation-specific
   business token in that organisation's Vault.
 - Raw Meta credentials never enter the browser after the callback, model
   prompts, generated code, logs, analytics, or workspace executors.
-- Satyr processes new webhook-delivered text messages. It does not import or
+- Pantry processes new webhook-delivered text messages. It does not import or
   browse WhatsApp history.
 - Active Case text is application-encrypted and retained only for the open Case,
   with a maximum 24-hour bound.
@@ -116,9 +116,9 @@ Use the following facts consistently in the submission and demo:
 
 ## Funding boundary
 
-Satyr does not provide or share a WhatsApp credit line. The organisation owns its
+Pantry does not provide or share a WhatsApp credit line. The organisation owns its
 Meta business assets and any payment method Meta requires. Stop the release if
-Meta requires Satyr to become financially responsible for organisation messaging.
+Meta requires Pantry to become financially responsible for organisation messaging.
 
 ## Submission evidence
 

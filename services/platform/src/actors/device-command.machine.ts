@@ -21,13 +21,13 @@ export const DEVICE_COMMAND_MACHINE = {
     queued: {
       kind: "initial",
       meaning:
-        "Satyr stored the command. The gateway had no open socket, so it gets the command at its next hello.",
+        "Pantry stored the command. The gateway had no open socket, so it gets the command at its next hello.",
       exit: { kind: "person", surface: "devices_page" },
     },
     sent: {
       kind: "intermediate",
       meaning:
-        "The command went on the gateway's socket. Satyr waits for its answer, and sends it again at the next hello.",
+        "The command went on the gateway's socket. Pantry waits for its answer, and sends it again at the next hello.",
       exit: { kind: "person", surface: "devices_page" },
     },
     done: {

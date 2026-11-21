@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 
 const SERVICE = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
-export const FIXTURE_SERVICE_TOKEN = "underclerk-workerd-service-token";
+export const FIXTURE_SERVICE_TOKEN = "commerce-workerd-service-token";
 /** The fixture clock; journeys build their records at this time. */
 export const FIXTURE_NOW = "2026-08-14T10:00:00.000Z";
 
@@ -76,7 +76,7 @@ export async function startFixtureMiniflare(
     compatibilityDate: settings.compatibilityDate,
     compatibilityFlags: settings.compatibilityFlags,
     durableObjects: {
-      UNDERCLERK_MERCHANT: {
+      COMMERCE_MERCHANT: {
         className: "CommerceFixtureMerchantDO",
         useSQLite: true,
         ...(options.merchantStorageKey === undefined
@@ -89,15 +89,15 @@ export async function startFixtureMiniflare(
       : { durableObjectsPersist: options.persistDirectory }),
     bindings: {
       PANTRY_DEPLOYMENT_PROFILE: "local",
-      UNDERCLERK_SERVICE_TOKEN: FIXTURE_SERVICE_TOKEN,
-      UNDERCLERK_BUYER_SESSION_SECRET:
-        "underclerk-workerd-buyer-session-secret-01",
-      UNDERCLERK_SIGNING_KEY_ID: "key_underclerk_workerd",
-      UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64: options.signingKey
+      COMMERCE_SERVICE_TOKEN: FIXTURE_SERVICE_TOKEN,
+      COMMERCE_BUYER_SESSION_SECRET:
+        "commerce-workerd-buyer-session-secret-01",
+      COMMERCE_SIGNING_KEY_ID: "key_commerce_workerd",
+      COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64: options.signingKey
         .export({ format: "der", type: "pkcs8" })
         .toString("base64url"),
-      JAPAN_CARRIER_SIGNING_KEY: "underclerk-workerd-carrier-key",
-      UNDERCLERK_FIXTURE_NOW: FIXTURE_NOW,
+      JAPAN_CARRIER_SIGNING_KEY: "commerce-workerd-carrier-key",
+      COMMERCE_FIXTURE_NOW: FIXTURE_NOW,
     },
   });
   const origin = (await miniflare.ready).origin;

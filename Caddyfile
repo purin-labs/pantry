@@ -10,8 +10,8 @@ http://cafe.localhost:3001 {
 	}
 	redir @root /store/cafe 302
 
-	@underclerk path /v1/*
-	handle @underclerk {
+	@commerce path /v1/*
+	handle @commerce {
 		reverse_proxy 127.0.0.1:3102
 	}
 
@@ -27,8 +27,8 @@ http://store.localhost:3002 {
 	}
 	redir @root /store/shipping 302
 
-	@underclerk path /v1/*
-	handle @underclerk {
+	@commerce path /v1/*
+	handle @commerce {
 		reverse_proxy 127.0.0.1:3102
 	}
 
@@ -53,6 +53,6 @@ http://docs.localhost:3005 {
 	reverse_proxy 127.0.0.1:3105
 }
 
-http://underclerk.localhost:3004 {
+http://commerce.localhost:3004 {
 	reverse_proxy 127.0.0.1:3102
 }

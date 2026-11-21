@@ -46,7 +46,7 @@ class DownloadStopped(Exception):
 def _fetch(url: str, part: Path, stopped: threading.Event) -> None:
     """Adds the rest of the file to `part`. A server that ignores the range restarts it."""
     have = part.stat().st_size if part.exists() else 0
-    headers = {"User-Agent": f"satyr-shop-voice/{VERSION}"}
+    headers = {"User-Agent": f"pantry-shop-voice/{VERSION}"}
     if have:
         headers["Range"] = f"bytes={have}-"
     request = urllib.request.Request(url, headers=headers)

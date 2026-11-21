@@ -26,7 +26,7 @@ type CommerceSigningKeyId = string & {
 export function parseCommerceBindingId(
   value: unknown,
 ): Result<CommerceBindingId, CommerceMerchantBindingError> {
-  return parseCommerceId(value, "bindingId", "underclerk_binding_");
+  return parseCommerceId(value, "bindingId", "commerce_binding_");
 }
 
 export function parseCommerceEngineMerchantId(
@@ -49,10 +49,10 @@ export type CommerceMerchantBinding = Readonly<{
 }>;
 
 type CommerceMerchantBindingError =
-  | Readonly<{ code: "underclerk_binding_invalid"; field: string }>
-  | Readonly<{ code: "underclerk_binding_not_found" }>
-  | Readonly<{ code: "underclerk_binding_conflict" }>
-  | Readonly<{ code: "underclerk_provision_failed" }>;
+  | Readonly<{ code: "commerce_binding_invalid"; field: string }>
+  | Readonly<{ code: "commerce_binding_not_found" }>
+  | Readonly<{ code: "commerce_binding_conflict" }>
+  | Readonly<{ code: "commerce_provision_failed" }>;
 
 type BindingRow = Readonly<{
   bindingId: unknown;
@@ -86,7 +86,7 @@ export async function bindCommerceMerchant(
   try {
     await input.db
       .prepare(
-        `INSERT INTO underclerk_merchant_binding (
+        `INSERT INTO commerce_merchant_binding (
          binding_id, organisation_id, integration_account_id, merchant_id, environment,
          delivery_signing_key_id, delivery_signing_public_key_b64,
          revision, created_at, updated_at
@@ -120,7 +120,7 @@ export async function bindCommerceMerchant(
         deliverySigningPublicKey: input.deliverySigningPublicKey,
       })
     ) {
-      return { ok: false, error: { code: "underclerk_binding_conflict" } };
+      return { ok: false, error: { code: "commerce_binding_conflict" } };
     }
     return existing;
   }
@@ -145,13 +145,13 @@ export async function resolveCommerceMerchantBinding(
             environment, delivery_signing_key_id AS deliverySigningKeyId,
             delivery_signing_public_key_b64 AS deliverySigningPublicKeyB64,
             revision, created_at AS createdAt, updated_at AS updatedAt
-     FROM underclerk_merchant_binding
+     FROM commerce_merchant_binding
      WHERE organisation_id = ? AND integration_account_id = ?`,
     )
     .bind(input.organisationId, input.integrationAccountId)
     .first<BindingRow>();
   if (row === null)
-    return { ok: false, error: { code: "underclerk_binding_not_found" } };
+    return { ok: false, error: { code: "commerce_binding_not_found" } };
   return parseActiveBinding(row);
 }
 
@@ -169,13 +169,13 @@ export async function resolveCommerceMerchantBindingById(
             environment, delivery_signing_key_id AS deliverySigningKeyId,
             delivery_signing_public_key_b64 AS deliverySigningPublicKeyB64,
             revision, created_at AS createdAt, updated_at AS updatedAt
-     FROM underclerk_merchant_binding
+     FROM commerce_merchant_binding
      WHERE organisation_id = ? AND binding_id = ?`,
     )
     .bind(input.organisationId, input.bindingId)
     .first<BindingRow>();
   if (row === null)
-    return { ok: false, error: { code: "underclerk_binding_not_found" } };
+    return { ok: false, error: { code: "commerce_binding_not_found" } };
   return parseActiveBinding(row);
 }
 
@@ -193,13 +193,13 @@ export async function resolveOrganisationCommerceMerchantBinding(
             environment, delivery_signing_key_id AS deliverySigningKeyId,
             delivery_signing_public_key_b64 AS deliverySigningPublicKeyB64,
             revision, created_at AS createdAt, updated_at AS updatedAt
-     FROM underclerk_merchant_binding
+     FROM commerce_merchant_binding
      WHERE organisation_id = ? AND environment = ?`,
     )
     .bind(input.organisationId, input.environment)
     .first<BindingRow>();
   if (row === null)
-    return { ok: false, error: { code: "underclerk_binding_not_found" } };
+    return { ok: false, error: { code: "commerce_binding_not_found" } };
   return parseActiveBinding(row);
 }
 
@@ -218,7 +218,7 @@ export async function resolveCurrentOrganisationCommerceMerchantBinding(
             binding.delivery_signing_public_key_b64 AS deliverySigningPublicKeyB64,
             binding.revision, binding.created_at AS createdAt,
             binding.updated_at AS updatedAt
-       FROM underclerk_merchant_binding AS binding
+       FROM commerce_merchant_binding AS binding
        JOIN organisation_onboarding AS onboarding
          ON onboarding.organisation_id = binding.organisation_id
         AND onboarding.environment = binding.environment
@@ -227,7 +227,7 @@ export async function resolveCurrentOrganisationCommerceMerchantBinding(
     .bind(input.organisationId)
     .first<BindingRow>();
   if (row === null)
-    return { ok: false, error: { code: "underclerk_binding_not_found" } };
+    return { ok: false, error: { code: "commerce_binding_not_found" } };
   return parseActiveBinding(row);
 }
 
@@ -256,12 +256,12 @@ export async function ensureEntityPlaneCommerceMerchantBinding(
     environment: input.environment,
   });
   if (existing.ok) return existing;
-  if (existing.error.code !== "underclerk_binding_not_found") return existing;
+  if (existing.error.code !== "commerce_binding_not_found") return existing;
   try {
     if (!(await input.provision()))
-      return { ok: false, error: { code: "underclerk_provision_failed" } };
+      return { ok: false, error: { code: "commerce_provision_failed" } };
   } catch {
-    return { ok: false, error: { code: "underclerk_provision_failed" } };
+    return { ok: false, error: { code: "commerce_provision_failed" } };
   }
   return bindCommerceMerchant({
     db: input.db,
@@ -431,5 +431,5 @@ function parseBoundedId(
 }
 
 function invalid(field: string): Result<never, CommerceMerchantBindingError> {
-  return { ok: false, error: { code: "underclerk_binding_invalid", field } };
+  return { ok: false, error: { code: "commerce_binding_invalid", field } };
 }

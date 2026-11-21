@@ -129,7 +129,7 @@ export class ConversationSharingDialog extends React.Component<
     this.setState({ panel: { ...panel, busy: true, error: null } });
     try {
       if (panel.choice === "shared") {
-        const csrf = readCookie("satyr_control_csrf");
+        const csrf = readCookie("pantry_csrf");
         if (csrf === null) throw new Error("Sign in again to share chats.");
         const raw = await controlWrite(this.path(), "POST", {
           kind:

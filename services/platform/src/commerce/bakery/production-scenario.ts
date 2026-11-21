@@ -98,7 +98,7 @@ export async function saveProductionScenario(
         },
       });
       const result = await input.client.command(request);
-      if (!result.ok) return { ok: false, code: "underclerk_unavailable" };
+      if (!result.ok) return { ok: false, code: "commerce_unavailable" };
       if (result.value.status !== "accepted")
         return { ok: false, code: result.value.error.code };
       revision = parseCommerceSnapshotRevision(
@@ -110,7 +110,7 @@ export async function saveProductionScenario(
     }
     return { ok: true, scenarioId: copy.id };
   } catch {
-    return { ok: false, code: "underclerk_unavailable" };
+    return { ok: false, code: "commerce_unavailable" };
   }
 }
 

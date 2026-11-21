@@ -1341,7 +1341,7 @@ async function hasReadyCommerceSystem(
   const selected = await db
     .prepare(
       `SELECT system_kind AS systemKind,
-            underclerk_binding_id AS underclerkBindingId,
+            commerce_binding_id AS commerceBindingId,
             shopify_integration_account_id AS shopifyIntegrationAccountId
      FROM organisation_commerce_system
      WHERE organisation_id = ?`,
@@ -1349,33 +1349,33 @@ async function hasReadyCommerceSystem(
     .bind(organisationId)
     .first<{
       readonly systemKind: unknown;
-      readonly underclerkBindingId: unknown;
+      readonly commerceBindingId: unknown;
       readonly shopifyIntegrationAccountId: unknown;
     }>();
   if (
-    selected?.systemKind === "satyr_commerce" &&
-    typeof selected.underclerkBindingId === "string" &&
+    selected?.systemKind === "builtin_commerce" &&
+    typeof selected.commerceBindingId === "string" &&
     selected.shopifyIntegrationAccountId === null
   ) {
     const binding = await db
       .prepare(
         `SELECT 1 AS present
-       FROM underclerk_merchant_binding
+       FROM commerce_merchant_binding
        WHERE binding_id = ? AND organisation_id = ? AND environment = ?`,
       )
-      .bind(selected.underclerkBindingId, organisationId, environment)
+      .bind(selected.commerceBindingId, organisationId, environment)
       .first<{ readonly present: unknown }>();
     return binding?.present === 1;
   }
   if (
     selected?.systemKind === "shopify" &&
-    selected.underclerkBindingId === null &&
+    selected.commerceBindingId === null &&
     typeof selected.shopifyIntegrationAccountId === "string"
   ) {
     const binding = await db
       .prepare(
         `SELECT COUNT(*) AS count
-       FROM underclerk_merchant_binding
+       FROM commerce_merchant_binding
        WHERE organisation_id = ? AND environment = ?`,
       )
       .bind(organisationId, environment)

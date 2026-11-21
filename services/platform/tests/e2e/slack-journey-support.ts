@@ -209,7 +209,7 @@ export async function installSlackActorFixture(): Promise<{
       .prepare(
         `INSERT INTO organisation_inference_selection (
          organisation_id, selection_kind, selected_by_user_id, selected_at
-       ) VALUES (?, 'satyr_platform', 'user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab', ?)`,
+       ) VALUES (?, 'pantry_platform', 'user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab', ?)`,
       )
       .bind(ORGANISATION_ID, now - 700),
   ]);

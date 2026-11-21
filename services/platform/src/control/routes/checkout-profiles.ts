@@ -222,7 +222,7 @@ async function handleProfileCreate(
   );
   if (started instanceof Response) return started;
   const created = await started.context.client.createCheckoutProfileDraft({
-    schemaVersion: "underclerk.create-checkout-profile-draft.v1",
+    schemaVersion: "commerce.create-checkout-profile-draft.v1",
     merchantId: started.context.merchantId,
     checkoutProfileId: creation.checkoutProfileId,
     name: creation.name,
@@ -282,7 +282,7 @@ async function handleProfileDraft(
   );
   if (started instanceof Response) return started;
   const updated = await started.context.client.replaceCheckoutProfileDraft({
-    schemaVersion: "underclerk.replace-checkout-profile-draft.v1",
+    schemaVersion: "commerce.replace-checkout-profile-draft.v1",
     merchantId: started.context.merchantId,
     checkoutProfileId: route.checkoutProfileIdRaw,
     expectedRevision: replacement.expectedRevision,
@@ -332,7 +332,7 @@ async function handleProfilePublication(
     return controlError("checkout_payment_binding_uncertified", 409);
   }
   const published = await started.context.client.publishCheckoutProfile({
-    schemaVersion: "underclerk.publish-checkout-profile.v1",
+    schemaVersion: "commerce.publish-checkout-profile.v1",
     merchantId: started.context.merchantId,
     checkoutProfileId: route.checkoutProfileIdRaw,
     expectedRevision,
@@ -367,7 +367,7 @@ async function handleProfileRetirement(
   );
   if (started instanceof Response) return started;
   const retired = await started.context.client.retireCheckoutProfile({
-    schemaVersion: "underclerk.retire-checkout-profile.v1",
+    schemaVersion: "commerce.retire-checkout-profile.v1",
     merchantId: started.context.merchantId,
     checkoutProfileId: route.checkoutProfileIdRaw,
     expectedRevision,
@@ -416,7 +416,7 @@ async function handleProfileActivation(
     return controlError("checkout_payment_binding_uncertified", 409);
   }
   const activated = await started.context.client.activateCheckoutProfile({
-    schemaVersion: "underclerk.activate-checkout-profile.v1",
+    schemaVersion: "commerce.activate-checkout-profile.v1",
     merchantId: started.context.merchantId,
     storefrontId: route.storefrontIdRaw,
     checkoutProfileId: activation.checkoutProfileId,
@@ -580,12 +580,12 @@ function checkoutProfileErrorResponse(error: CommerceClientError): Response {
         return controlError("checkout_profile_request_invalid", 422);
       if (error.status === 409)
         return controlError("checkout_profile_conflict", 409);
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
     case "rejected":
       return controlError("checkout_profile_conflict", 409);
     case "network":
     case "invalid_response":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
   }
 }
 

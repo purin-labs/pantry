@@ -162,10 +162,10 @@ export function PortalFrame(props: PortalFrameProps): React.ReactNode {
   const preference = useConsoleSidebarPreference();
   const shell = React.useRef<HTMLDivElement>(null);
   const [lastSystem, setLastSystem] =
-    React.useState<WorkspaceSystem>("AgentCommerce");
+    React.useState<WorkspaceSystem>("commerce");
   const routeSystem = workspaceSystem(props.sidebar?.activePage ?? null);
   const activeSystem = routeSystem ?? lastSystem;
-  usePortalTheme(routeSystem === "BakeryOS" ? "bakeryos" : "appearance");
+  usePortalTheme(routeSystem === "kitchen" ? "bakeryos" : "appearance");
   useSurfaceOnScreen();
   useEffect(rememberWorkspaceSystem.bind(null, routeSystem, setLastSystem), [
     routeSystem,
@@ -1333,7 +1333,7 @@ function PortalBrand(props: {
     >
       <img
         className="portal-brand-mark"
-        src="/brand/satyr-mark-dark-32.png"
+        src="/brand/pantry-mark-dark-32.png"
         alt=""
       />
       <span className="portal-brand-copy">
@@ -1355,22 +1355,22 @@ const WORKSPACE_SYSTEMS: Readonly<
     }
   >
 > = {
-  AgentCommerce: {
-    name: "AgentCommerce",
-    label: navigationGroupTitle("AgentCommerce"),
+  commerce: {
+    name: "commerce",
+    label: navigationGroupTitle("commerce"),
     page: "orders",
     icon: Store,
   },
-  // CafeOS opens on Home: its first page, Menus, is a full-screen canvas.
-  CafeOS: {
-    name: "CafeOS",
-    label: navigationGroupTitle("CafeOS"),
+  // Café opens on Home: its first page, Menus, is a full-screen canvas.
+  cafe: {
+    name: "cafe",
+    label: navigationGroupTitle("cafe"),
     page: "overview",
     icon: Coffee,
   },
-  BakeryOS: {
-    name: "BakeryOS",
-    label: navigationGroupTitle("BakeryOS"),
+  kitchen: {
+    name: "kitchen",
+    label: navigationGroupTitle("kitchen"),
     page: "workflow-simulator",
     icon: Croissant,
   },
@@ -1486,9 +1486,9 @@ function workspaceSystem(
   if (page === null) return null;
   const group = workspacePageDescriptor(page).group;
   switch (group) {
-    case "AgentCommerce":
-    case "CafeOS":
-    case "BakeryOS":
+    case "commerce":
+    case "cafe":
+    case "kitchen":
       return group;
     case "Workspace":
     case "Agents":

@@ -99,7 +99,7 @@ export async function readBankPayoutsRoute(
     200,
     ctx.bankPayouts === undefined
       ? {
-          schemaVersion: "underclerk.bank-payouts.v1",
+          schemaVersion: "commerce.bank-payouts.v1",
           merchantId: route.merchantId,
           sources: [],
           truncated: false,
@@ -195,7 +195,7 @@ export async function readEventsRoute(
     });
   try {
     return jsonResponse(200, {
-      schemaVersion: "underclerk.events.v1",
+      schemaVersion: "commerce.events.v1",
       ...(await ctx.authority.readEvents(
         route.merchantId,
         after,

@@ -155,7 +155,7 @@ async function storefrontFixture(page) {
     },
   ];
   const cafeCatalog = {
-    schemaVersion: "underclerk.buyer-catalog.v1",
+    schemaVersion: "commerce.buyer-catalog.v1",
     storefront: {
       storefrontId: "storefront_cafe",
       revision: 1,
@@ -270,7 +270,7 @@ async function storefrontFixture(page) {
     availability: "available",
   });
   const shippingCatalog = {
-    schemaVersion: "underclerk.buyer-catalog.v1",
+    schemaVersion: "commerce.buyer-catalog.v1",
     storefront: {
       storefrontId: "storefront_cookie_store_sg",
       revision: 1,
@@ -319,7 +319,7 @@ async function storefrontFixture(page) {
     );
     const tax = Math.round(subtotal * 0.1);
     return {
-      schemaVersion: "underclerk.buyer-quoted-checkout.v1",
+      schemaVersion: "commerce.buyer-quoted-checkout.v1",
       checkoutId: "checkout_browser_cafe",
       revision: 1,
       state: "quoted",
@@ -352,7 +352,7 @@ async function storefrontFixture(page) {
     const tax = Math.floor(((subtotal + shipping) * 900 + 5000) / 10000);
     const weight = product.weightGrams * safeQuantity;
     return {
-      schemaVersion: "underclerk.buyer-quoted-shipping-checkout.v1",
+      schemaVersion: "commerce.buyer-quoted-shipping-checkout.v1",
       checkoutId: "checkout_browser_shipping",
       revision: 1,
       state: "quoted",
@@ -511,7 +511,7 @@ async function storefrontFixture(page) {
     let body;
     if (pathname.endsWith("/sessions")) {
       body = {
-        schemaVersion: "underclerk.buyer-session.v4",
+        schemaVersion: "commerce.buyer-session.v4",
         buyer: { kind: "guest" },
         checkoutProfile: profile,
         checkoutProfileConfiguration: {
@@ -530,7 +530,7 @@ async function storefrontFixture(page) {
         body = carts.get(storefrontId);
       } else {
         body = {
-          schemaVersion: "underclerk.buyer-cart.v1",
+          schemaVersion: "commerce.buyer-cart.v1",
           cartId: `cart_${storefrontId}`,
           revision:
             payload.cartRevision === undefined ? 1 : payload.cartRevision + 1,
@@ -543,7 +543,7 @@ async function storefrontFixture(page) {
       }
     } else if (pathname.endsWith("/address-validations")) {
       body = {
-        schemaVersion: "underclerk.buyer-shipping-address-validation.v1",
+        schemaVersion: "commerce.buyer-shipping-address-validation.v1",
         validationReference: "address_browser",
         expiresAt: future,
         state: "accepted",

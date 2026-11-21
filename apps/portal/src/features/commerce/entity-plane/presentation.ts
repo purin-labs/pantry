@@ -274,7 +274,7 @@ export function commerceRelationshipLabel(definitionId: string): string {
 /** Where a projected record's facts came from, in words rather than an enum. */
 export function commerceSourceLabel(source: string): string {
   switch (source) {
-    case "underclerk":
+    case "commerce":
       return "Seams Checkout";
     case "shopify":
       return "Shopify";

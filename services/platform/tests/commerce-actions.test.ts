@@ -142,7 +142,7 @@ describe("commerce action contracts", () => {
       authorityPartition: authority.authorityPartition,
       authority: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: requiredCommerceSystemRevision(),
       },
       sessionId,
@@ -252,7 +252,7 @@ describe("commerce action contracts", () => {
       authorityPartition: authority.authorityPartition,
       authority: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: requiredCommerceSystemRevision(),
       },
       sessionId,
@@ -385,7 +385,7 @@ describe("commerce action contracts", () => {
         authorityPartition: authority.authorityPartition,
         authority: {
           kind: "commerce_system",
-          system: "satyr_commerce",
+          system: "builtin_commerce",
           revision: requiredCommerceSystemRevision(),
         },
         sessionId,
@@ -422,10 +422,10 @@ describe("commerce action contracts", () => {
     });
   });
 
-  it("round-trips a governed Underclerk full refund with exact path binding", async () => {
+  it("round-trips a governed Commerce full refund with exact path binding", async () => {
     const request = parseCommerceActionRequest({
       kind: "cancel_order",
-      resourceId: "order_underclerk",
+      resourceId: "order_commerce",
       expectedRevision: 7,
       reason: "customer_requested",
       refund: "full",
@@ -449,16 +449,16 @@ describe("commerce action contracts", () => {
     if (!draft.ok) throw new Error(draft.error.code);
 
     const url = new URL(`https://commerce.invalid${draft.value.path}`);
-    expect(url.searchParams.get("execution")).toBe("underclerk_full_refund");
+    expect(url.searchParams.get("execution")).toBe("commerce_full_refund");
     expect(url.searchParams.get("merchant_revision")).toBe("12");
-    expect(url.searchParams.get("payment_id")).toBe("payment_underclerk");
+    expect(url.searchParams.get("payment_id")).toBe("payment_commerce");
     expect(url.searchParams.get("payment_revision")).toBe("4");
     expect(url.searchParams.get("fulfillment_id")).toBe(
-      "fulfillment_underclerk",
+      "fulfillment_commerce",
     );
     expect(url.searchParams.get("fulfillment_revision")).toBe("5");
     expect(url.searchParams.get("checkout_profile_id")).toBe(
-      "checkout_profile_underclerk",
+      "checkout_profile_commerce",
     );
     expect(url.searchParams.get("checkout_profile_revision")).toBe("3");
     expect(url.searchParams.get("refund_policy_id")).toBe(
@@ -491,7 +491,7 @@ describe("commerce action contracts", () => {
   it("converts two-decimal refund money for approval display", async () => {
     const request = parseCommerceActionRequest({
       kind: "cancel_order",
-      resourceId: "order_underclerk",
+      resourceId: "order_commerce",
       expectedRevision: 7,
       reason: "fraud_suspected",
       refund: "full",
@@ -519,7 +519,7 @@ describe("commerce action contracts", () => {
     });
   });
 
-  it("rejects unsupported Underclerk cancellation semantics", async () => {
+  it("rejects unsupported Commerce cancellation semantics", async () => {
     const authority = commerceCancellationAuthority({
       refundAmountMinor: 990,
       refundCurrency: "JPY",
@@ -533,7 +533,7 @@ describe("commerce action contracts", () => {
     for (const [field, value] of semantics) {
       const raw = {
         kind: "cancel_order" as const,
-        resourceId: "order_underclerk",
+        resourceId: "order_commerce",
         expectedRevision: 7,
         reason: "customer_requested" as const,
         refund: "full" as const,
@@ -562,7 +562,7 @@ describe("commerce action contracts", () => {
   it("rejects stale orders, mismatched identity, and mismatched refund money", async () => {
     const request = parseCommerceActionRequest({
       kind: "cancel_order",
-      resourceId: "order_underclerk",
+      resourceId: "order_commerce",
       expectedRevision: 7,
       reason: "customer_requested",
       refund: "full",
@@ -666,7 +666,7 @@ describe("commerce action contracts", () => {
 
     const mixedExecutionBranch = {
       kind: "cancel_order",
-      resourceId: "order_underclerk",
+      resourceId: "order_commerce",
       expectedRevision: 7,
       reason: "customer_requested",
       refund: "full",
@@ -680,7 +680,7 @@ describe("commerce action contracts", () => {
     void mixedExecutionBranch;
 
     const incompletePath =
-      "/orders/order_underclerk/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=false&note=&execution=underclerk_full_refund&merchant_revision=12";
+      "/orders/order_commerce/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=false&note=&execution=commerce_full_refund&merchant_revision=12";
     expect(
       parseCommerceActionPath({
         verb: "commerce.order.cancel",
@@ -693,7 +693,7 @@ describe("commerce action contracts", () => {
     expect(
       parseCommerceActionPath({
         verb: "commerce.order.cancel",
-        path: `${incompletePath}&payment_id=payment_underclerk`,
+        path: `${incompletePath}&payment_id=payment_commerce`,
       }),
     ).toEqual({
       ok: false,
@@ -702,7 +702,7 @@ describe("commerce action contracts", () => {
     expect(
       parseCommerceActionPath({
         verb: "commerce.order.cancel",
-        path: "/orders/order_underclerk/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=true&note=&execution=provider_managed&payment_id=payment_underclerk",
+        path: "/orders/order_commerce/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=true&note=&execution=provider_managed&payment_id=payment_commerce",
       }),
     ).toEqual({
       ok: false,
@@ -711,7 +711,7 @@ describe("commerce action contracts", () => {
     expect(
       parseCommerceActionPath({
         verb: "commerce.order.cancel",
-        path: "/orders/order_underclerk/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=false&note=&execution=unknown",
+        path: "/orders/order_commerce/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=false&note=&execution=unknown",
       }),
     ).toEqual({
       ok: false,
@@ -720,7 +720,7 @@ describe("commerce action contracts", () => {
     expect(
       parseCommerceActionPath({
         verb: "commerce.order.cancel",
-        path: "/orders/order_underclerk/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=false&note=&unknown=value",
+        path: "/orders/order_commerce/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=false&note=&unknown=value",
       }),
     ).toEqual({
       ok: false,
@@ -729,7 +729,7 @@ describe("commerce action contracts", () => {
 
     const request = parseCommerceActionRequest({
       kind: "cancel_order",
-      resourceId: "order_underclerk",
+      resourceId: "order_commerce",
       expectedRevision: 7,
       reason: "customer_requested",
       refund: "full",
@@ -752,7 +752,7 @@ describe("commerce action contracts", () => {
       ok: true,
       value: {
         amount: null,
-        path: "/orders/order_underclerk/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=true&note=Customer+requested+cancellation.",
+        path: "/orders/order_commerce/cancel?expected_revision=7&reason=customer_requested&refund=full&restock=true&notify_customer=true&note=Customer+requested+cancellation.",
       },
     });
     if (!providerDraft.ok) throw new Error(providerDraft.error.code);
@@ -767,17 +767,17 @@ describe("commerce action contracts", () => {
     });
   });
 
-  it("keeps Underclerk cancellation receipts separate from projection receipts", () => {
+  it("keeps Commerce cancellation receipts separate from projection receipts", () => {
     const common = {
       kind: "commerce_provider_receipt" as const,
-      provider: "underclerk" as const,
-      receiptId: "receipt_underclerk_cancel",
-      effectId: "effect_underclerk_cancel",
+      provider: "commerce" as const,
+      receiptId: "receipt_commerce_cancel",
+      effectId: "effect_commerce_cancel",
       actionNonce: "00000000-0000-4000-8000-000000000001",
       flowBindingDigest: "a".repeat(64),
       decisionDigest: "b".repeat(64),
-      eventId: "delivery_underclerk_cancel",
-      resourceId: "underclerk:merchant_cafe:order_1",
+      eventId: "delivery_commerce_cancel",
+      resourceId: "commerce:merchant_cafe:order_1",
       revision: 7,
       status: "accepted" as const,
       merchantId: "merchant_cafe",
@@ -786,7 +786,7 @@ describe("commerce action contracts", () => {
     };
     const offerReceipt = {
       ...common,
-      resourceId: "underclerk:merchant_cafe:offer_1",
+      resourceId: "commerce:merchant_cafe:offer_1",
       projectionKind: "offer" as const,
     } satisfies CommerceEngineProviderReceipt;
     const cancellationReceipt = {
@@ -879,7 +879,7 @@ describe("commerce action contracts", () => {
         authorityPartition: authority.authorityPartition,
         authority: {
           kind: "commerce_system",
-          system: "satyr_commerce",
+          system: "builtin_commerce",
           revision: requiredCommerceSystemRevision(),
         },
         caseId: caseId.value,
@@ -1066,13 +1066,13 @@ function commerceCancellationAuthority(
   overrides: Partial<CommerceCancellationAuthority> = {},
 ): CommerceCancellationAuthority {
   return {
-    kind: "underclerk_full_refund",
+    kind: "commerce_full_refund",
     merchantRevision: 12,
-    paymentId: "payment_underclerk",
+    paymentId: "payment_commerce",
     paymentRevision: 4,
-    fulfillmentId: "fulfillment_underclerk",
+    fulfillmentId: "fulfillment_commerce",
     fulfillmentRevision: 5,
-    checkoutProfileId: "checkout_profile_underclerk",
+    checkoutProfileId: "checkout_profile_commerce",
     checkoutProfileRevision: 3,
     refundPolicyId: "refund_policy_standard",
     refundAmountMinor: 990,
@@ -1091,7 +1091,7 @@ function orderProjection(
     currency?: string;
   }> = {},
 ): Variant<CommerceProjection, "commerce_order"> {
-  const resourceId = options.resourceId ?? "order_underclerk";
+  const resourceId = options.resourceId ?? "order_commerce";
   const revision = options.revision ?? 7;
   const amountMinor = options.amountMinor ?? 990;
   const currency = options.currency ?? "JPY";
@@ -1112,8 +1112,8 @@ function orderProjection(
       origin: {
         kind: "online",
         salesChannelId: "sales_channel_online",
-        storefrontId: "storefront_underclerk",
-        checkoutId: "checkout_underclerk",
+        storefrontId: "storefront_commerce",
+        checkoutId: "checkout_commerce",
         configuration: { kind: "external_authority" },
       },
       buyer: { kind: "guest" },

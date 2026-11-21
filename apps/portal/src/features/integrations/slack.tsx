@@ -34,7 +34,7 @@ export function inferenceRouteName(selection: OrganisationInferenceSelection): s
       return "your Claude account";
     case "codex_subscription":
       return "your ChatGPT subscription";
-    case "satyr_platform":
+    case "pantry_platform":
       return "Seams AI";
     case "organisation_openai_api_key":
       return "your OpenAI API key";
@@ -274,7 +274,7 @@ export function SlackSetup(props: {
   );
 }
 
-/** The channels CafeOS posts in, one row each, or a quiet empty line. */
+/** The channels Café posts in, one row each, or a quiet empty line. */
 function SlackChannelList(props: {
   readonly connections: readonly SlackRoutingConnection[];
   readonly accounts: readonly IntegrationAccount[];

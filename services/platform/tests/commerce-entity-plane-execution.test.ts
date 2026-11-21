@@ -164,9 +164,9 @@ describe("commerce entity-plane governed execution", () => {
       },
     };
     const env: CommerceEntityPlaneExecutionEnv = {
-      UNDERCLERK_BASE_URL: "https://underclerk.example",
-      UNDERCLERK_SERVICE_TOKEN: "service-token",
-      UNDERCLERK: { fetch: fetcher },
+      COMMERCE_BASE_URL: "https://commerce.example",
+      COMMERCE_SERVICE_TOKEN: "service-token",
+      COMMERCE: { fetch: fetcher },
     };
     const caseActor = {
       readAcceptedCommerceEntityPlaneProposal: async () => ({
@@ -322,7 +322,7 @@ describe("commerce entity-plane governed execution", () => {
     expect(commandCalls).toBe(1);
   });
 
-  it("rechecks current command policy before touching Underclerk", async () => {
+  it("rechecks current command policy before touching Commerce", async () => {
     const fixture = await executionFixture("denied");
     const execution = fixture.execution;
     const fetcher = vi.fn(async () => jsonResponse({}));
@@ -399,12 +399,12 @@ async function signedAction(
       authorityPartition: authority.authorityPartition,
       authority: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: authorityRevision.value,
       },
       threadId: "case_entity_plane_execution",
       sessionId,
-      host: "underclerk",
+      host: "commerce",
       verb: "POST",
       path: "/entity-plane/commands",
       argsHash: "c".repeat(64),
@@ -455,9 +455,9 @@ function testEnv(
   ) => Promise<Response>,
 ): CommerceEntityPlaneExecutionEnv {
   return {
-    UNDERCLERK_BASE_URL: "https://underclerk.example",
-    UNDERCLERK_SERVICE_TOKEN: "service-token",
-    UNDERCLERK: { fetch: fetcher },
+    COMMERCE_BASE_URL: "https://commerce.example",
+    COMMERCE_SERVICE_TOKEN: "service-token",
+    COMMERCE: { fetch: fetcher },
   };
 }
 

@@ -108,14 +108,14 @@ async function receiptPrinterJourney(): Promise<void> {
     `${base}/commerce/counter-receipt-settings`,
     staff.session,
     "PUT",
-    { satyrLocationId: locationId, invoiceRegistrationNumber: REGISTRATION },
+    { pantryLocationId: locationId, invoiceRegistrationNumber: REGISTRATION },
   );
   expect(operatorSettings.status).toBe(404);
   const ownerSettings = await send(
     `${base}/commerce/counter-receipt-settings`,
     owner.session,
     "PUT",
-    { satyrLocationId: locationId, invoiceRegistrationNumber: REGISTRATION },
+    { pantryLocationId: locationId, invoiceRegistrationNumber: REGISTRATION },
   );
   expect(ownerSettings.status, JSON.stringify(ownerSettings.body)).toBe(200);
 
@@ -126,7 +126,7 @@ async function receiptPrinterJourney(): Promise<void> {
     staff.session,
     "POST",
     {
-      satyrLocationId: locationId,
+      pantryLocationId: locationId,
       checkoutId,
       tenderMode: "cash",
       lines: [

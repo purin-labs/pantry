@@ -15,7 +15,7 @@ export async function listInvoicesRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_invoices">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.company-invoices.v1",
+    schemaVersion: "commerce.company-invoices.v1",
     invoices: ctx.authority.listInvoices(route.merchantId),
   });
 }
@@ -89,7 +89,7 @@ export async function listOrderReturnsRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_order_returns">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.returns.v1",
+    schemaVersion: "commerce.returns.v1",
     returns: ctx.authority.listOrderReturns(route.merchantId, route.orderId),
   });
 }
@@ -206,7 +206,7 @@ export async function draftOrderCommandRoute(
           expiresAt: draft.lifecycle.expiresAt,
         });
   return jsonResponse(200, {
-    schemaVersion: "underclerk.draft-invoice.v1",
+    schemaVersion: "commerce.draft-invoice.v1",
     mutation,
     invoice:
       invoice === null

@@ -47,7 +47,7 @@ export type ActorRestoreManifestObject = {
 };
 
 type ActorRestoreManifestBase = {
-  readonly format: "satyr-state-object-restore-manifest";
+  readonly format: "pantry-state-object-restore-manifest";
   readonly organisationId: OrganisationId;
   readonly sourcePlacementEpoch: number;
   readonly createdAt: number;
@@ -74,7 +74,7 @@ export type ActorRestoreManifestError =
 type RestoreManifestBindings = OrganisationPlacementBindings &
   Pick<Env, "DB" | "ARCHIVE" | "DATA_ENCRYPTION_ROOT">;
 type RestoreArchiveBindings = Pick<Env, "ARCHIVE" | "DATA_ENCRYPTION_ROOT">;
-const RESTORE_MANIFEST_FORMAT = "satyr-state-object-restore-manifest";
+const RESTORE_MANIFEST_FORMAT = "pantry-state-object-restore-manifest";
 const RESTORE_MANIFEST_VERSION = 2;
 const textEncoder = new TextEncoder();
 

@@ -10,7 +10,7 @@ async (page) => {
   });
   const account = page
     .locator(".account-row")
-    .filter({ hasText: "CafeOS acceptance Slack" });
+    .filter({ hasText: "Café acceptance Slack" });
   await status.first().waitFor({ state: "visible", timeout: 10_000 });
   await reconnect.first().waitFor({ state: "visible", timeout: 10_000 });
   await account.first().waitFor({ state: "visible", timeout: 10_000 });
@@ -33,7 +33,7 @@ async (page) => {
   );
   const recoveredAccount = page
     .locator(".account-row")
-    .filter({ hasText: "CafeOS acceptance Slack" });
+    .filter({ hasText: "Café acceptance Slack" });
   const recoveredText = ((await recoveredAccount.textContent()) ?? "").replace(
     /\s+/gu,
     " ",

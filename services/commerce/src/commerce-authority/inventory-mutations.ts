@@ -76,7 +76,7 @@ export function inventoryMovementMutation(
 ): CommerceMutation {
   const committedAt = plan.committedAt;
   const commandKind =
-    command.schemaVersion === "underclerk.receive-inventory.v3"
+    command.schemaVersion === "commerce.receive-inventory.v3"
       ? "receive_inventory"
       : "reconcile_inventory";
   return {
@@ -92,7 +92,7 @@ export function inventoryMovementMutation(
     observations: inventoryMovementObservations(plan),
     write: (database) => {
       switch (command.schemaVersion) {
-        case "underclerk.receive-inventory.v3":
+        case "commerce.receive-inventory.v3":
           insertReceiptMovement(
             database,
             command.merchantId,
@@ -107,7 +107,7 @@ export function inventoryMovementMutation(
               plan.lot,
             );
           break;
-        case "underclerk.reconcile-inventory.v1":
+        case "commerce.reconcile-inventory.v1":
           insertReconciliationMovement(
             database,
             command.merchantId,

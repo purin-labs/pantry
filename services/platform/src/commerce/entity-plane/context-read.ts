@@ -170,7 +170,7 @@ function prepareCommerceContextRead(
   }>,
 ): Result<PreparedCommerceContextRead, CommerceContextAssemblyError> {
   const query: CommerceGraphQuery = {
-    kind: "underclerk_context",
+    kind: "commerce_context",
     ...input.request,
   };
   const ceiling = sensitivityCeiling(input.requestAuthority);

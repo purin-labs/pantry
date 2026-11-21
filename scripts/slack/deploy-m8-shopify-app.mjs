@@ -25,7 +25,7 @@ async function main() {
       "--allow-updates",
       "--no-color",
       "--message",
-      "Configure Satyr commerce cue webhooks",
+      "Configure Pantry commerce cue webhooks",
     ],
     { env: process.env, stdio: "inherit" },
   );

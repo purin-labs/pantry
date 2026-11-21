@@ -378,7 +378,7 @@ function printCreatedApp(created, envPath) {
     "1. Open the App Settings URL, then OAuth & Permissions -> Install to Workspace.",
   );
   console.log(
-    "2. Invite the bot to a test channel and send Satyr the Team ID and Channel ID.",
+    "2. Invite the bot to a test channel and send Pantry the Team ID and Channel ID.",
   );
 }
 

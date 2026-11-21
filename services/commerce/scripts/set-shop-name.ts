@@ -4,7 +4,7 @@
 //   pnpm --filter @purin-labs/commerce-worker set:shop-name --merchant <merchant_id> \
 //     [--storefront storefront_cafe] [--name <name>]
 //
-// UNDERCLERK_BASE_URL and UNDERCLERK_SERVICE_TOKEN name the Commerce. The
+// COMMERCE_BASE_URL and COMMERCE_SERVICE_TOKEN name the Commerce. The
 // script prints Commerce's answer as JSON; a refused name exits with 2.
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
 
@@ -25,11 +25,11 @@ if (merchantId === undefined || !/^merchant_[A-Za-z0-9_]+$/u.test(merchantId))
   throw new Error("--merchant must be a merchant_ identity");
 const storefrontId = values.get("--storefront") ?? "storefront_cafe";
 const name = values.get("--name");
-const baseUrl = process.env.UNDERCLERK_BASE_URL;
-const serviceToken = process.env.UNDERCLERK_SERVICE_TOKEN;
+const baseUrl = process.env.COMMERCE_BASE_URL;
+const serviceToken = process.env.COMMERCE_SERVICE_TOKEN;
 if (baseUrl === undefined || serviceToken === undefined || serviceToken === "")
   throw new Error(
-    "UNDERCLERK_BASE_URL and UNDERCLERK_SERVICE_TOKEN are required",
+    "COMMERCE_BASE_URL and COMMERCE_SERVICE_TOKEN are required",
   );
 
 const client = new CommerceAdminClient({ baseUrl, serviceToken });

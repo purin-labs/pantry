@@ -28,7 +28,7 @@ export async function installProductSource(
   );
   const binding = await fixtureDatabase()
     .prepare(
-      "SELECT integration_account_id AS accountId FROM underclerk_merchant_binding WHERE organisation_id = ?",
+      "SELECT integration_account_id AS accountId FROM commerce_merchant_binding WHERE organisation_id = ?",
     )
     .bind(input.organisationId)
     .first<{ readonly accountId: string }>();
@@ -61,7 +61,7 @@ function seedProductProjection(
       provenance: {
         organisationId: input.organisationId,
         integrationAccountId,
-        source: "underclerk",
+        source: "commerce",
         resourceType: "product",
         resourceId: canonicalId,
         revision: 1,

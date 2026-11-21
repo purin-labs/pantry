@@ -65,7 +65,7 @@ import {
 export type IntegrationProvider = OnboardingProvider;
 
 type ProviderAuthMode =
-  "shared_satyr_app" | "api_key" | "webhook_secret";
+  "shared_pantry_app" | "api_key" | "webhook_secret";
 
 export type ProviderConnectionAuthority = {
   readonly kind: "connection_credential";
@@ -2480,7 +2480,7 @@ function requireNumber(raw: unknown, field: string): number {
 
 function isProviderAuthMode(raw: unknown): raw is ProviderAuthMode {
   return (
-    raw === "shared_satyr_app" || raw === "api_key" || raw === "webhook_secret"
+    raw === "shared_pantry_app" || raw === "api_key" || raw === "webhook_secret"
   );
 }
 
@@ -2602,12 +2602,12 @@ function surfaceAuthMode(provider: IntegrationProvider): ProviderAuthMode {
   switch (provider) {
     case "slack":
     case "discord":
-      return "shared_satyr_app";
+      return "shared_pantry_app";
     case "gmail":
     case "whatsapp":
     case "google_drive":
     case "dropbox":
-      return "shared_satyr_app";
+      return "shared_pantry_app";
     case "stripe":
     case "square":
     case "shopify":

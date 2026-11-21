@@ -728,7 +728,7 @@ async function processEvalTask(
       model: modelRoute.value.model,
       modelRouteDigest: await digestModelRoute(modelRoute.value),
       instructionDigest: await digestCanonical({
-        kind: "satyr_eval_instructions_v1",
+        kind: "pantry_eval_instructions_v1",
         instructions: harnessInstructions,
         agent: {
           installationId: agent.profile.installationId,
@@ -888,7 +888,7 @@ type FixtureIdentity = Readonly<{ messageId: string; threadId: string }>;
 async function fixtureIdentity(key: string): Promise<FixtureIdentity> {
   const [messageId, threadId] = await Promise.all(
     (["message", "thread"] as const).map((part) =>
-      digestCanonical({ kind: "satyr_eval_fixture_identity_v1", part, key }),
+      digestCanonical({ kind: "pantry_eval_fixture_identity_v1", part, key }),
     ),
   );
   if (messageId === undefined || threadId === undefined)

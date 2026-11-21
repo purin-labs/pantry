@@ -63,7 +63,7 @@ export type ChatGptSignIn = "codex_device" | "chatgpt_agent";
 export type OrganisationInferenceSelection =
   | { readonly kind: "claude_oauth" }
   | { readonly kind: "codex_subscription" }
-  | { readonly kind: "satyr_platform" }
+  | { readonly kind: "pantry_platform" }
   | { readonly kind: "organisation_openai_api_key" }
   | { readonly kind: "organisation_anthropic_api_key" }
   | { readonly kind: "organisation_google_api_key" };
@@ -213,7 +213,7 @@ export type SelectInferenceCommand =
       readonly kind: "select_inference";
       readonly selection: Variant<
         OrganisationInferenceSelection,
-        "claude_oauth" | "codex_subscription" | "satyr_platform"
+        "claude_oauth" | "codex_subscription" | "pantry_platform"
       >;
       readonly apiKey?: never;
     }

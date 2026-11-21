@@ -71,7 +71,7 @@ async function customerAccountLifecycle(): Promise<void> {
     // She saves an address and buys again while signed in.
     const saved = await required(
       buyer.saveCustomerAddress(merchantId, STOREFRONT, firstAccess, {
-        schemaVersion: "underclerk.save-customer-address.v1",
+        schemaVersion: "commerce.save-customer-address.v1",
         address: {
           recipient: NAME,
           line1: STREET,
@@ -158,7 +158,7 @@ async function customerAccountLifecycle(): Promise<void> {
     ).toMatchObject({ ok: false, error: { kind: "http", status: 401 } });
     expect(
       await buyer.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "identified_customer", customerAccessToken: firstAccess },
       }),
     ).toMatchObject({ ok: false, error: { kind: "http", status: 401 } });
@@ -210,7 +210,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     buyer.requestCustomerSignIn(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -226,14 +226,14 @@ async function signIn(
           merchantId,
           STOREFRONT,
           challenge.challengeId,
-          { schemaVersion: "underclerk.verify-customer-sign-in.v1", code: wrong },
+          { schemaVersion: "commerce.verify-customer-sign-in.v1", code: wrong },
         ),
       ),
     ).toMatchObject({ field: "customerSignIn.code" });
   }
   const access = await required(
     buyer.verifyCustomerSignIn(merchantId, STOREFRONT, challenge.challengeId, {
-      schemaVersion: "underclerk.verify-customer-sign-in.v1",
+      schemaVersion: "commerce.verify-customer-sign-in.v1",
       code,
     }),
   );
@@ -244,7 +244,7 @@ async function signIn(
         merchantId,
         STOREFRONT,
         challenge.challengeId,
-        { schemaVersion: "underclerk.verify-customer-sign-in.v1", code },
+        { schemaVersion: "commerce.verify-customer-sign-in.v1", code },
       ),
     ),
   ).toMatchObject({ field: "customerSignIn.expired" });

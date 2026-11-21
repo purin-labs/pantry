@@ -223,7 +223,7 @@ class FakeSquare {
       return Response.json({
         merchant: {
           id: SELLER,
-          business_name: "Satyr Café",
+          business_name: "Pantry Café",
           country: "JP",
           currency: "JPY",
         },

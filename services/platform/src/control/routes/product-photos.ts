@@ -108,7 +108,7 @@ async function listLibrary(
 ): Promise<Response> {
   const merchantId = access.binding.merchantId;
   const library = await access.client.listMedia(merchantId);
-  if (!library.ok) return controlError("underclerk_unavailable", 503);
+  if (!library.ok) return controlError("commerce_unavailable", 503);
   // The editor reads each image through the Platform, under the person's
   // session: the shop serves only the images that listed products show.
   const mediaBase = controlMediaBase(String(access.authorized.organisationId));
@@ -143,7 +143,7 @@ export async function handleLibraryImageContent(
   if (!content.ok)
     return content.error.kind === "http" && content.error.status === 404
       ? controlError("not_found", 404)
-      : controlError("underclerk_unavailable", 503);
+      : controlError("commerce_unavailable", 503);
   return new Response(content.value.bytes, {
     status: 200,
     headers: {
@@ -196,7 +196,7 @@ async function deleteLibraryImage(
         return controlError(deleted.error.code, 409);
       case "media_missing":
         return controlError(deleted.error.code, 404);
-      case "underclerk_unavailable":
+      case "commerce_unavailable":
       case "organisation_placement_conflict":
         return controlError(deleted.error.code, 503);
       default:
@@ -240,11 +240,11 @@ async function addLibraryImage(
     return stored.error.kind === "http" &&
       (stored.error.status === 413 || stored.error.status === 415)
       ? controlError("product_photo_invalid", 422)
-      : controlError("underclerk_unavailable", 503);
+      : controlError("commerce_unavailable", 503);
   if (stored.value.sha256 !== upload.sha256)
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   const library = await client.listMedia(merchantId);
-  if (!library.ok) return controlError("underclerk_unavailable", 503);
+  if (!library.ok) return controlError("commerce_unavailable", 503);
   // The same bytes keep one record, as for a product's photo.
   let mediaId = library.value.media.find(
     (item) => item.sha256 === upload.sha256,
@@ -305,11 +305,11 @@ async function addPhoto(
     return stored.error.kind === "http" &&
       (stored.error.status === 413 || stored.error.status === 415)
       ? controlError("product_photo_invalid", 422)
-      : controlError("underclerk_unavailable", 503);
+      : controlError("commerce_unavailable", 503);
   if (stored.value.sha256 !== upload.sha256)
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   const library = await client.listMedia(merchantId);
-  if (!library.ok) return controlError("underclerk_unavailable", 503);
+  if (!library.ok) return controlError("commerce_unavailable", 503);
   const current = productMedia(library.value, upload.productId);
   // The same bytes keep one record, whichever product showed them first.
   let mediaId = library.value.media.find(
@@ -370,7 +370,7 @@ async function arrangePhotos(
   const { client, binding, boundary } = mutation.value;
   const merchantId = binding.merchantId;
   const libraryRead = await client.listMedia(merchantId);
-  if (!libraryRead.ok) return controlError("underclerk_unavailable", 503);
+  if (!libraryRead.ok) return controlError("commerce_unavailable", 503);
   const current = productMedia(libraryRead.value, arrangement.productId);
   const unchanged =
     current.media.length === arrangement.mediaIds.length &&
@@ -507,11 +507,11 @@ function refusal(
   if (!outcome.ok)
     return outcome.error.kind === "rejected"
       ? controlJson({ ok: false, error: outcome.error.error.code }, 409)
-      : controlError("underclerk_unavailable", 503);
+      : controlError("commerce_unavailable", 503);
   if (outcome.value.outcome === "rejected")
     return controlJson({ ok: false, error: outcome.value.error.code }, 409);
   if (outcome.value.receipt.merchantId !== merchantId)
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   return null;
 }
 

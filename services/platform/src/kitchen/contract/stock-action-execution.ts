@@ -155,7 +155,7 @@ async function receiveStock(
   let command: ReturnType<typeof parseReceiveInventoryCommand>;
   try {
     command = parseReceiveInventoryCommand({
-      schemaVersion: "underclerk.receive-inventory.v3",
+      schemaVersion: "commerce.receive-inventory.v3",
       purchase,
       organisationId: input.organisationId,
       merchantId: input.merchantId,
@@ -203,7 +203,7 @@ async function countStock(
   let command: ReturnType<typeof parseReconcileInventoryCommand>;
   try {
     command = parseReconcileInventoryCommand({
-      schemaVersion: "underclerk.reconcile-inventory.v1",
+      schemaVersion: "commerce.reconcile-inventory.v1",
       organisationId: input.organisationId,
       merchantId: input.merchantId,
       expectedMerchantRevision: snapshot.value.commerce.merchantRevision,

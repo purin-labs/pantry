@@ -76,7 +76,7 @@ function sameText(value: string): string {
 const noteSchema = Nullable(boundedTextSchema(500));
 
 export const issueCommerceGiftCardV1Schema = storedValueCommand({
-  schemaVersion: Type.Literal("underclerk.issue-gift-card.v1"),
+  schemaVersion: Type.Literal("commerce.issue-gift-card.v1"),
   accountId: text,
   code: giftCardCodeSchema,
   amount: positiveWireMoneySchema,
@@ -88,7 +88,7 @@ export type IssueCommerceGiftCardV1 = Static<
 >;
 
 export const creditCommerceStoreCreditV1Schema = storedValueCommand({
-  schemaVersion: Type.Literal("underclerk.credit-store-credit.v1"),
+  schemaVersion: Type.Literal("commerce.credit-store-credit.v1"),
   customerId: text,
   amount: positiveWireMoneySchema,
   note: noteSchema,
@@ -98,7 +98,7 @@ export type CreditCommerceStoreCreditV1 = Static<
 >;
 
 export const disableCommerceStoredValueAccountV1Schema = storedValueCommand({
-  schemaVersion: Type.Literal("underclerk.disable-stored-value-account.v1"),
+  schemaVersion: Type.Literal("commerce.disable-stored-value-account.v1"),
   accountId: text,
   expectedRevision: PositiveInteger,
 });
@@ -142,7 +142,7 @@ export type CommerceStoredValueAccountV1 = Static<
 >;
 
 export const commerceGiftCardBalanceV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.gift-card-balance.v1"),
+  schemaVersion: Type.Literal("commerce.gift-card-balance.v1"),
   lastCharacters: text,
   balance: wireMoneySchema,
   status: Type.Union([
@@ -157,7 +157,7 @@ export type CommerceGiftCardBalanceV1 = Static<
 >;
 
 export const commerceStoredValueLiabilityV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.stored-value-liability.v1"),
+  schemaVersion: Type.Literal("commerce.stored-value-liability.v1"),
   at: utcTimestampSchema,
   currencies: ImmutableArray(
     ReadonlyStrictObject({
@@ -212,7 +212,7 @@ export const commerceStoredValueAccountsV1Schema = Type.Unsafe<
 >(
   Type.Codec(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.stored-value-accounts.v1"),
+      schemaVersion: Type.Literal("commerce.stored-value-accounts.v1"),
       accounts: ImmutableArray(commerceStoredValueAccountV1Schema),
     }),
   )
@@ -228,7 +228,7 @@ function accountsOfList(
 
 function listOfAccounts(accounts: readonly CommerceStoredValueAccountV1[]) {
   return {
-    schemaVersion: "underclerk.stored-value-accounts.v1" as const,
+    schemaVersion: "commerce.stored-value-accounts.v1" as const,
     accounts,
   };
 }

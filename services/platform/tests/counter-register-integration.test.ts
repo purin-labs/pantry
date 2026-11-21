@@ -48,7 +48,7 @@ describe("Plan 90 counter register & GMO stera LAN gateway integration", () => {
       assignmentId: "assign_stera_1",
       organisationId: ORG_ID,
       merchantId: "merchant_tokyo",
-      satyrLocationId: "loc_tokyo",
+      pantryLocationId: "loc_tokyo",
       providerLocationId: "GMO_STERA_LOC_TOKYO",
       account: {
         integrationAccountId: "gmo_account_1",

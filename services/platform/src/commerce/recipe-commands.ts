@@ -34,7 +34,7 @@ export type RecipeSaveResult =
   | Readonly<{ ok: true; recipeId: string; revision: number }>
   | Readonly<{
       ok: false;
-      code: "underclerk_unavailable" | "recipe_changed" | "recipe_busy";
+      code: "commerce_unavailable" | "recipe_changed" | "recipe_busy";
     }>
   | Readonly<{ ok: false; code: "recipe_invalid"; detail: string }>
   | Readonly<{
@@ -77,7 +77,7 @@ export async function saveRecipeDraft(
   };
   for (let attempt = 0; attempt < SAVE_ATTEMPT_LIMIT; attempt += 1) {
     const snapshot = await context.client.readStockSnapshot(context.merchantId);
-    if (!snapshot.ok) return { ok: false, code: "underclerk_unavailable" };
+    if (!snapshot.ok) return { ok: false, code: "commerce_unavailable" };
     const current = snapshot.value.foodService.resources.recipeRevisions.find(
       (candidate) => candidate.recipeId === draft.recipeId,
     );
@@ -115,7 +115,7 @@ export async function saveRecipeDraft(
       idempotencyKey: `${idempotencyKey}_${attempt}`,
       recipeRevision: action.recipe,
     });
-    if (!result.ok) return { ok: false, code: "underclerk_unavailable" };
+    if (!result.ok) return { ok: false, code: "commerce_unavailable" };
     if (result.value.outcome !== "rejected")
       return { ok: true, recipeId: draft.recipeId, revision: next };
     if (result.value.error.code !== "stale_merchant_revision")

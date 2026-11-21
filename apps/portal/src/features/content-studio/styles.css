@@ -425,7 +425,7 @@
 .content-studio-shop-rule {
   margin-top: 6px;
   color: var(--ink-2);
-  font-size: var(--satyr-text-small, 13px);
+  font-size: var(--pantry-text-small, 13px);
 }
 
 .content-studio-published {

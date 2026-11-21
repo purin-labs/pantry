@@ -275,7 +275,7 @@ function eventEnvelope<T extends SessionTransition>(input: {
     actorId: input.state.state.identity.sessionId,
     streamId: input.state.state.identity.streamId,
     sequence: input.state.state.contract.lastEventSequence,
-    sourceTime: { kind: "satyr", issuedAt: input.acceptedAt },
+    sourceTime: { kind: "pantry", issuedAt: input.acceptedAt },
     acceptedAt: input.acceptedAt,
     correlationId: input.correlationId,
     causation: causationForOrigin(input.origin, input.commandId),

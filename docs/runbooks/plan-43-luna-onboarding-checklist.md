@@ -83,7 +83,7 @@ useful-operation replay at 390px.
 ## 1. Record the run and prepare its prerequisites
 
 - [ ] Record the checkout path, commit, working-tree changes, date/time, selected
-      profile, Portal/Platform/Underclerk origins, schema/configuration revision,
+      profile, Portal/Platform/Commerce origins, schema/configuration revision,
       and the processes serving those origins. Identify the actual tested code;
       a build from another checkout is a different candidate.
 - [ ] Name the owner/test identity, selected development environment, exact storage
@@ -177,7 +177,7 @@ Use unique synthetic markers and independently known expected results.
 - [ ] Add a focused regression for each distinct defect. If direct database repair
       was used during diagnosis, invalidate that journey and recreate its state
       through onboarding before claiming PASS.
-- [ ] Automate the working creation/recreation journey against real Satyr routes
+- [ ] Automate the working creation/recreation journey against real Pantry routes
       using the existing browser/e2e tooling and returned IDs. The current
       `frontend:journeys` runner installs mocked Portal responses. Its results are
       UI-fixture evidence until an actual-backend mode is implemented and verified.
@@ -210,7 +210,7 @@ also require the full platform suite under the local test instructions. Commerce
 lifecycle changes require `test:commerce-lab`, `lab:reset`, `lab:seed`,
 `lab:scenario`, and `lab:verify` as specified in AGENTS.md; resolve their target
 as the designated development lab before execution. Those lab commands do not
-replace C02. Run Underclerk/storefront/Rust checks when their code changes.
+replace C02. Run Commerce/storefront/Rust checks when their code changes.
 
 ## 5. Report and decide
 

@@ -61,7 +61,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/provider-adapters/`
   - `services/platform/src/slack/`
   - `services/platform/src/whatsapp/`
-- Tables (15): `integration_account`, `organisation_commerce_system`, `provider_authorization_state`, `provider_connection`, `provider_connection_attempt`, `provider_credential_generation`, `provider_default_account_history`, `provider_discovered_resource`, `provider_manifest_observation`, `provider_provisioning_attempt`, `provider_provisioning_receipt`, `provider_resource_cursor`, `provider_resource_snapshot`, `provider_webhook`, `underclerk_merchant_binding`
+- Tables (15): `commerce_merchant_binding`, `integration_account`, `organisation_commerce_system`, `provider_authorization_state`, `provider_connection`, `provider_connection_attempt`, `provider_credential_generation`, `provider_default_account_history`, `provider_discovered_resource`, `provider_manifest_observation`, `provider_provisioning_attempt`, `provider_provisioning_receipt`, `provider_resource_cursor`, `provider_resource_snapshot`, `provider_webhook`
 
 ## foundation/authority
 
@@ -248,7 +248,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/payouts/`
   - `services/platform/src/stripe/`
 - Packages: `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
-- Tables (13): `campaign_brief`, `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`, `underclerk_webhook_subscription`
+- Tables (13): `campaign_brief`, `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
 - Public files: `apps/portal/src/features/commerce/entity-plane/api.ts`, `apps/portal/src/features/commerce/operations.ts`, `apps/portal/src/features/commerce/stock-status.ts`, `apps/portal/src/features/governed-actions/commerce.ts`, `packages/commerce-contracts`, `services/platform/src/commerce/contract/`
 
 ## areas/devices

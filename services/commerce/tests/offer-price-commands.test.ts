@@ -295,7 +295,7 @@ function applyPrice(
     shippingGateway: createJapanShippingGateway("offer-price-carrier-key"),
   });
   return authority.adjustOfferPrice({
-    schemaVersion: "underclerk.adjust-offer-price.v1",
+    schemaVersion: "commerce.adjust-offer-price.v1",
     merchantId: MERCHANT,
     idempotencyKey: `idem_${offerId}_${proposedPriceMinor}`,
     requestedAt: AT,
@@ -356,7 +356,7 @@ class TestSigner implements CommerceSigner {
 function withDatabase(body: (database: NodeCommerceDatabase) => void): void {
   const databasePath = join(
     tmpdir(),
-    `underclerk-offer-price-${randomUUID()}.sqlite3`,
+    `commerce-offer-price-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   try {

@@ -200,7 +200,7 @@ export function foodProvenance(
 ): Readonly<{
   organisationId: string;
   integrationAccountId: string;
-  source: "underclerk";
+  source: "commerce";
   resourceType: typeof resourceType;
   resourceId: string;
   revision: number;
@@ -210,7 +210,7 @@ export function foodProvenance(
   return {
     organisationId,
     integrationAccountId,
-    source: "underclerk",
+    source: "commerce",
     resourceType,
     resourceId,
     revision,

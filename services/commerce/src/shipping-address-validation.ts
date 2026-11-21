@@ -239,7 +239,7 @@ export class ShippingAddressValidationService {
 }
 
 export const localAddressValidationProvider: AddressValidationProvider = {
-  providerAccountReference: "underclerk_local_address_validation_v1",
+  providerAccountReference: "commerce_local_address_validation_v1",
   validate: validateLocalAddress,
 };
 
@@ -402,7 +402,7 @@ function toBuyerAddressValidation(
   providerResult: AddressValidationProviderResult,
 ): CommerceBuyerShippingAddressValidationV1 {
   const base = {
-    schemaVersion: "underclerk.buyer-shipping-address-validation.v1" as const,
+    schemaVersion: "commerce.buyer-shipping-address-validation.v1" as const,
     validationReference: attempt.attemptId,
     expiresAt: attempt.expiresAt,
   };

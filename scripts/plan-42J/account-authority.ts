@@ -159,11 +159,11 @@ export function fixturePeople(subjectPrefix: string, label: string) {
     );
     response.headers.append(
       "set-cookie",
-      `satyr_control_session=${issued.token}; HttpOnly; Path=/; SameSite=Lax`,
+      `pantry_session=${issued.token}; HttpOnly; Path=/; SameSite=Lax`,
     );
     response.headers.append(
       "set-cookie",
-      `satyr_control_csrf=${issued.csrfToken}; Path=/; SameSite=Lax`,
+      `pantry_csrf=${issued.csrfToken}; Path=/; SameSite=Lax`,
     );
     return response;
   }
@@ -211,7 +211,7 @@ export function fixturePeople(subjectPrefix: string, label: string) {
         ];
       }),
       env.DB.prepare(
-        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
       ).bind(organisationId, owner.userId, now),
     ]);
     const ownerPerson = await fixturePerson(env, organisationId, owner);

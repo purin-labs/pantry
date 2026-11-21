@@ -48,7 +48,7 @@ export function deliveryAcknowledgement(
   acknowledgedAt: string,
 ): CommerceDeliveryAcknowledgementV1 {
   return {
-    schemaVersion: "underclerk.delivery-acknowledgement.v2",
+    schemaVersion: "commerce.delivery-acknowledgement.v2",
     outcome,
     merchantId: command.merchantId,
     deliveryId: command.deliveryId,

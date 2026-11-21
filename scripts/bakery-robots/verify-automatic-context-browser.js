@@ -180,7 +180,7 @@ async function mountAutomaticContext() {
       this.effects.push({ effect });
       this.contexts.push({
         kind: "preparing",
-        area: "BakeryOS",
+        area: "kitchen",
         effectId: effect.effectId,
       });
       this.render();
@@ -209,7 +209,7 @@ async function mountAutomaticContext() {
       }
       if (uncertain)
         sessionStorage.setItem(
-          `satyr:bakery-effect:${effect.effectId}`,
+          `pantry:bakery-effect:${effect.effectId}`,
           JSON.stringify({
             kind: "executing",
             commandDigest: effect.commandDigest,
@@ -250,7 +250,7 @@ async function mountAutomaticContext() {
         if (receipt.outcome.kind === "prepared")
           this.contexts.push({
             kind: "ready",
-            area: "BakeryOS",
+            area: "kitchen",
             effectId: receipt.effectId,
             browserInstanceId: receipt.outcome.binding.browserInstanceId,
             surfaceSessionId: receipt.outcome.surface.context.surfaceSessionId,
@@ -261,7 +261,7 @@ async function mountAutomaticContext() {
         if (preparation && receipt.outcome.kind === "delivery_failed")
           this.contexts.push({
             kind: "failed",
-            area: "BakeryOS",
+            area: "kitchen",
             effectId: receipt.effectId,
             message: receipt.outcome.message,
           });
@@ -298,7 +298,7 @@ async function mountAutomaticContext() {
   // Chrome does not show a cookie with Path=/workflow-preview.html to this
   // page, whose document began at /@vite/client; the dev origin is a test one.
   document.cookie =
-    "satyr_control_csrf=automatic-fixture; Path=/; SameSite=Strict";
+    "pantry_csrf=automatic-fixture; Path=/; SameSite=Strict";
   window.fetch = fixture.transport.bind(fixture, window.fetch.bind(window));
   document.getElementById("root").remove();
   const host = document.createElement("div");
@@ -379,7 +379,7 @@ async function mountAutomaticContext() {
               context: {
                 organisation: "Test café",
                 workspace: "Operations",
-                area: "CafeOS",
+                area: "cafe",
                 view: "Purchasing",
               },
               conversation: chat,
@@ -553,7 +553,7 @@ function uncertainInspectionSettled() {
   return false;
 }
 async function duplicateBrowserIdentity(id) {
-  sessionStorage.setItem("satyr:bakery-browser-instance", id);
+  sessionStorage.setItem("pantry:bakery-browser-instance", id);
   const browser = await import("/src/features/bakery-browser-context.ts");
   return browser.bakeryBrowserInstanceId();
 }

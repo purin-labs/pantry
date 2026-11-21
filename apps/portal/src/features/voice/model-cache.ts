@@ -1,5 +1,5 @@
 /** The wake phrase and speech detection files, kept only while voice control is on. */
-const CACHE_NAME = "satyr-voice-v1";
+const CACHE_NAME = "pantry-voice-v1";
 
 /**
  * A voice file, from the cache when the cache holds the real file. The Portal

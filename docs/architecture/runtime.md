@@ -1,6 +1,6 @@
 # Runtime architecture
 
-This document describes the Satyr runtime on Cloudflare: the platform
+This document describes the Pantry runtime on Cloudflare: the platform
 layout, the Actors and their storage, agent sessions, the Pi harness adapter,
 Case coordination with Connector delivery, and cues. It states ownership,
 invariants, data placement, flows and recovery rules. Security rules
@@ -20,7 +20,7 @@ Organisation setup and lifecycle are in [onboarding.md](./onboarding.md).
 
 ### Workers and resources
 
-The platform Worker `satyr-edge` starts in
+The platform Worker `pantry` starts in
 [`integration-gateway.ts`](../../services/platform/src/integration-gateway.ts)
 and its Actors are in
 [`services/platform/src/actors/`](../../services/platform/src/actors/). The
@@ -46,10 +46,10 @@ binds:
 | `ORGANISATION_DB_<REGION>`          | D1, one per placement cell      | the Organisation's operational records                              |
 | `POLICY_KV`                         | KV                              | compiled policy and cue snapshots, ignored-cue counters             |
 | `ARCHIVE`                           | R2                              | checkpoints, attachments, workspace revisions, artifacts            |
-| `EVENT_Q`, `CUE_Q`                  | Queues                          | `satyr-events` and `satyr-cues`                                     |
+| `EVENT_Q`, `CUE_Q`                  | Queues                          | `pantry-events` and `pantry-cues`                                     |
 
 Secrets Store binds the data-encryption and Vault roots. Service bindings
-reach the exit Workers, the 1Password store, Underclerk and the Console.
+reach the exit Workers, the 1Password store, Commerce and the Console.
 Production has one placement cell in Asia Pacific (`ORGANISATION_DB_APAC`).
 The D1 baselines are `migrations-global/` and `migrations-regional/`. The E2E
 suite loads them into two databases; unit tests and local tools with one
@@ -57,14 +57,14 @@ database load the schema that `scripts/single-database-schema.mjs` builds
 from them.
 
 Queues carry work, not domain state. A consumer retries a message at most
-five times, then sends it to `satyr-event-dlq` or `satyr-cue-dlq`. The
-one-minute cron reconciles the Underclerk outbox. The fifteen-minute cron
+five times, then sends it to `pantry-event-dlq` or `pantry-cue-dlq`. The
+one-minute cron reconciles the Commerce outbox. The fifteen-minute cron
 runs onboarding reconciliation, schedule dispatch, attachment collection,
 payout reconciliation and other bounded passes.
 
 The Slack ingress Worker
 ([`handler.ts`](../../services/platform/src/slack-ingress/handler.ts)) binds
-`ConnectorDO` of `satyr-edge` by `script_name`. It completes a signed message
+`ConnectorDO` of `pantry` by `script_name`. It completes a signed message
 that its Connector accepts, and forwards every other request to the platform
 Worker. `CODE_MODE_SANDBOX` binds the class of a separate Worker by
 `script_name`; the deploy command deploys it first. That Worker holds no
@@ -100,7 +100,7 @@ that the registry lists as active at the active placement.
 ### Contracts and envelopes
 
 Cross-boundary contracts are TypeBox 1.x schemas with `Value` checks in
-`packages/contracts`, which re-exports `packages/underclerk-contracts`. No
+`packages/contracts`, which re-exports `packages/commerce-contracts`. No
 contract remains in Rust. The session reducer is TypeScript
 ([`session-reducer.ts`](../../packages/contracts/src/session-reducer.ts)).
 Branded Platform identities are in [`ids.ts`](../../services/platform/src/ids.ts).
@@ -210,7 +210,7 @@ is filed in the default Project ([Refactor 9](../refactor-9.md)).
 `OrganisationActor` stores merchant-safe projections of the records in
 [Commerce Domain Architecture](../commerce-domain-architecture.md). The
 connected system stays authoritative. Each Organisation selects one system
-in `organisation_commerce_system`: `satyr_commerce` (an Underclerk binding)
+in `organisation_commerce_system`: `builtin_commerce` (a Commerce binding)
 or `shopify` (an integration account), with a revision. Only the selected
 system updates projections; a mismatch fails with
 `commerce_system_authority_mismatch` before the reducer runs.
@@ -291,7 +291,7 @@ Every route runs Pi in the Worker. The session pins exactly one route
 
 | `keySource` + `provider`               | Funding and authentication                            |
 | -------------------------------------- | ----------------------------------------------------- |
-| `platform` + `openai-compatible`       | Satyr's `OPENROUTER_API_KEY`                          |
+| `platform` + `openai-compatible`       | Pantry's `OPENROUTER_API_KEY`                          |
 | `organisation_byo` + `openai`          | the Organisation's OpenAI API key, Vault-encrypted    |
 | `organisation_byo` + `anthropic`       | the Organisation's Anthropic API key, Vault-encrypted |
 | `organisation_oauth` + `anthropic`     | the Organisation's Claude account                     |
@@ -434,7 +434,7 @@ The Codex and Picocodex backends are retired; their checkpoints start a
 fresh lineage. `AgentSessionActor` owns identity, lifecycle, leases,
 history, checkpoints and budget. The adapter owns the live conversation.
 The Tool Host and Tool Gateway own tool authorization and effects. Pi types
-never become Satyr persistence contracts.
+never become Pantry persistence contracts.
 
 ### Adapter interface
 
@@ -493,7 +493,7 @@ Pi gets model-visible tools from the accepted catalog
 The Tool Host
 ([`embedded-harness-tool-host.ts`](../../services/platform/src/actors/embedded-harness-tool-host.ts))
 authorizes each call against the exact capability. Code Mode is one bounded
-tool, and Satyr controls each nested call. Each tool has a replay rule for a
+tool, and Pantry controls each nested call. Each tool has a replay rule for a
 call that a lost process left in flight
 ([`pi-tool-replay.ts`](../../services/platform/src/actors/pi-tool-replay.ts)):
 
@@ -507,11 +507,11 @@ the Organisation answer a repeat with the first proposal.
 
 ### Pi checkpoint
 
-The build is `PI_DURABLE_BUILD`; the format is `satyr-pi-durable-sqlite-v1`
+The build is `PI_DURABLE_BUILD`; the format is `pantry-pi-durable-sqlite-v1`
 ([`pi-durable-checkpoint.ts`](../../services/platform/src/actors/pi-durable-checkpoint.ts)).
 The checkpoint copies the Pi Durable tables in Session SQLite, with the
 checkpoint binding and history cursor. It holds script store values and the
-Code Mode attempt of a turn (`satyr.codemode.store`), but no active script
+Code Mode attempt of a turn (`pantry.codemode.store`), but no active script
 journal: an unfinished script stays in Session SQLite until it settles.
 Restore refuses a checkpoint whose session, binding or cursor differs. No
 build reads another build's checkpoint; the Session starts a fresh lineage.
@@ -660,8 +660,8 @@ Stripe or Shopify webhook, or OrganisationActor.applyCommerceDelivery
 
 A commerce delivery writes its cues into `commerce_cue_outbox` with the
 projection. The Worker sends each to `CUE_Q` and marks it enqueued. The
-Underclerk outbox reconciliation sends recoverable cues again
-([`underclerk-outbox-worker.ts`](../../services/platform/src/underclerk-outbox-worker.ts)).
+Commerce outbox reconciliation sends recoverable cues again
+([`commerce-outbox-worker.ts`](../../services/platform/src/commerce-outbox-worker.ts)).
 A `CueEvent` carries the Organisation, integration account, source, native
 identity, event type, payload and time
 ([`cue-engine.ts`](../../services/platform/src/cue-engine.ts)):
@@ -682,7 +682,7 @@ maximum count for each hour and a `propose` action with a template.
 snapshot to `POLICY_KV` (`cue:<organisation>:latest`). Matching
 ([`cue-queue-consumer.ts`](../../services/platform/src/cue-queue-consumer.ts))
 reads only this snapshot and makes no model call. `entity_plane_changed`
-matches a saved commerce view through an Underclerk membership read.
+matches a saved commerce view through a Commerce membership read.
 
 `claimCueDelivery` returns `claimed` (with a lease), `duplicate`,
 `in_progress` (retry later) or `suppressed` (`debounce` or

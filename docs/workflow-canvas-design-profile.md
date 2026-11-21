@@ -2,7 +2,7 @@
 
 Status: applied to the Plan 84 recipe canvas on 3 November 2026.
 
-This profile sets the look and behaviour of workflow canvas pages in Satyr Kitchen. It adds
+This profile sets the look and behaviour of workflow canvas pages in Kitchen. It adds
 to the [style guide](style-guide.md). If the two disagree, the style guide wins, except for
 the one exception in [Port colours](#port-colours). The profile comes from five screenshots
 of two other products, a dark canvas (reference A) and a light canvas (reference B), and from
@@ -42,7 +42,7 @@ what kind of work each wire carries.
 
 ## Decisions on the references
 
-| Reference pattern                                    | Decision | Satyr form                                                     |
+| Reference pattern                                    | Decision | Pantry form                                                     |
 | ---------------------------------------------------- | -------- | -------------------------------------------------------------- |
 | Floating groups at the corners (A, B)                | Keep     | Bottom left: zoom. Bottom right: review, run and apply.        |
 | Bottom dock with tools and an agent composer (B)     | Keep     | Select, Pan, Add step, Add wait, Add decision, Undo, Redo.     |
@@ -56,7 +56,7 @@ what kind of work each wire carries.
 | Pure black canvas and white primary (A)              | Reject   | Use the slate dark theme.                                      |
 | Blurred page behind a dialog (B)                     | Reject   | Use the standard scrim.                                        |
 | Run button and model picker on each node (B)         | Reject   | A recipe runs as one draft.                                    |
-| Promotion banners and credit counters (A, B)         | Reject   | Satyr has none on a work surface.                              |
+| Promotion banners and credit counters (A, B)         | Reject   | Pantry has none on a work surface.                              |
 | Comment pins, sharing, minimap, timeline node (A, B) | Later    | Show no control until the feature exists.                      |
 
 ## Page layout
@@ -116,24 +116,24 @@ the header, the stacked stages, the tools, the list and the footer.
 | Layer              | Surface                                                            | Radius                   | Depth                  |
 | ------------------ | ------------------------------------------------------------------ | ------------------------ | ---------------------- |
 | Canvas             | `--ground` with 55% `--surface`, dots every 20px, no edge          | None                     | None                   |
-| Workspace bar      | `--paper`: header, footer, summary                                 | `--satyr-radius-card`    | Floating shadow        |
-| Stage track        | `--paper`, segments `--satyr-radius-card` less 4px                 | `--satyr-radius-card`    | Floating shadow        |
+| Workspace bar      | `--paper`: header, footer, summary                                 | `--pantry-radius-card`    | Floating shadow        |
+| Stage track        | `--paper`, segments `--pantry-radius-card` less 4px                 | `--pantry-radius-card`    | Floating shadow        |
 | Wire               | `--port-wire`, 1.25px, curved                                      | Round ends               | None                   |
-| Step               | `--paper`, 176 × 68px                                              | `--satyr-radius-card`    | `--shadow-card`        |
+| Step               | `--paper`, 176 × 68px                                              | `--pantry-radius-card`    | `--shadow-card`        |
 | Step on hover      | The same                                                           | The same                 | Floating shadow        |
 | Kind tile          | `--port-fill`, 32px, icon 16px in `--port-ink`                     | 6px                      | None                   |
-| Floating group     | `--paper`, 44px high                                               | `--satyr-radius-card`    | Floating shadow        |
-| Control in a group | Clear; hover `--surface`; pressed accent, 36px                     | `--satyr-radius-control` | None                   |
-| Select in a group  | Text and a 14px caret 8px from the edge, no box; hover `--surface` | `--satyr-radius-control` | None                   |
-| Primary            | `--satyr-primary`, one in each view at most                        | `--satyr-radius-control` | `--satyr-primary-ring` |
-| Notice             | `--paper`, or `--danger-bg` for a problem                          | `--satyr-radius-notice`  | `--shadow-card`        |
-| Comparison         | `--paper`, numbers beside a lane for each task, 320px high at most | `--satyr-radius-card`    | Floating shadow        |
+| Floating group     | `--paper`, 44px high                                               | `--pantry-radius-card`    | Floating shadow        |
+| Control in a group | Clear; hover `--surface`; pressed accent, 36px                     | `--pantry-radius-control` | None                   |
+| Select in a group  | Text and a 14px caret 8px from the edge, no box; hover `--surface` | `--pantry-radius-control` | None                   |
+| Primary            | `--pantry-primary`, one in each view at most                        | `--pantry-radius-control` | `--pantry-primary-ring` |
+| Notice             | `--paper`, or `--danger-bg` for a problem                          | `--pantry-radius-notice`  | `--shadow-card`        |
+| Comparison         | `--paper`, numbers beside a lane for each task, 320px high at most | `--pantry-radius-card`    | Floating shadow        |
 | Task bar           | `--port-fill` with a 1px `--port-wire` edge, 12px high             | 3px                      | None                   |
-| Side panel         | `--paper`, 340px; header and actions stay in view, fields scroll   | `--satyr-radius-panel`   | Floating shadow        |
+| Side panel         | `--paper`, 340px; header and actions stay in view, fields scroll   | `--pantry-radius-panel`   | Floating shadow        |
 
-The Satyr Kitchen workspace has tighter corners than the rest of the Portal. It sets
-`--satyr-radius-control` to 4px, `--satyr-radius-notice` to 6px, `--satyr-radius-card` to 8px
-and `--satyr-radius-panel` to 10px, for the Factory and the Workflow surfaces. A button with no
+The Kitchen workspace has tighter corners than the rest of the Portal. It sets
+`--pantry-radius-control` to 4px, `--pantry-radius-notice` to 6px, `--pantry-radius-card` to 8px
+and `--pantry-radius-panel` to 10px, for the Factory and the Workflow surfaces. A button with no
 style of its own takes 4px, not a pill. A group with 4px of padding has an 8px corner, so the
 corners of a group and its controls stay concentric. Ports, dots and marks stay round.
 
@@ -168,12 +168,12 @@ ring gives the step its edge. Do not add a border as well. The floating shadow i
 | State          | Mark on the step                                           | Text                     |
 | -------------- | ---------------------------------------------------------- | ------------------------ |
 | Not started    | None                                                       | The kind only            |
-| Current        | 1.5px inset ring in `--satyr-focus`, pulsing coral dot     | Running                  |
+| Current        | 1.5px inset ring in `--pantry-focus`, pulsing coral dot     | Running                  |
 | Done           | State word in `--ok-text`, green check                     | Done                     |
 | Failed         | `--danger-bg` fill, with a ring and an alert               | Failed                   |
 | Skipped        | Opacity 60%, with a badge                                  | Skipped                  |
-| Selected       | 2px outline in `--satyr-focus`, 1px offset                 | None                     |
-| Added, Changed | Badge in `--satyr-accent-text` on `--satyr-accent-surface` | Added, Changed           |
+| Selected       | 2px outline in `--pantry-focus`, 1px offset                 | None                     |
+| Added, Changed | Badge in `--pantry-accent-text` on `--pantry-accent-surface` | Added, Changed           |
 | Has a problem  | 2px inset ring in `--danger-text`                          | The problem, in a notice |
 
 Every state that a run sets has a word. Colour never carries a state alone. The step's

@@ -11,8 +11,8 @@ export type HarnessCheckpointError =
   | { code: "checkpoint_corrupt" }
   | { code: "checkpoint_too_large" };
 
-const CHECKPOINT_MAGIC = new TextEncoder().encode("SATYRCP1");
-const CHECKPOINT_CONTEXT = "satyr-harness-checkpoint-v1";
+const CHECKPOINT_MAGIC = new TextEncoder().encode("PANTRYCP1");
+const CHECKPOINT_CONTEXT = "pantry-harness-checkpoint-v1";
 const CHECKPOINT_IV_BYTES = 12;
 const CHECKPOINT_ROOT_BYTES = 32;
 export const MAX_CHECKPOINT_PLAINTEXT_BYTES = 16 * 1024 * 1024;

@@ -326,7 +326,7 @@ export function WorkQueue(props: {
 }
 
 /**
- * Rounded tile marks for the providers CafeOS connects to. The glyphs are the
+ * Rounded tile marks for the providers Café connects to. The glyphs are the
  * providers' own marks in their own palette (simplified where a faithful
  * trace would not survive 24px), so an operator can find a connection by shape
  * before reading any label.
@@ -345,7 +345,7 @@ export type ProviderTileName =
   | "codex"
   | "typesafe"
   | "onepassword"
-  | "satyr_commerce"
+  | "builtin_commerce"
   | "generic";
 
 export function ProviderTile(props: {
@@ -533,9 +533,9 @@ function providerGlyph(provider: ProviderTileName): React.ReactNode {
           <path fill="#4285F4" d="M4.7 21.5l3.9-6.8h13.9l-3.9 6.8z" />
         </svg>
       );
-    case "satyr_commerce":
+    case "builtin_commerce":
       // The Pantry ram mark, same asset the console header uses.
-      return <img src="/brand/satyr-mark-dark-64.png" alt="" />;
+      return <img src="/brand/pantry-mark-dark-64.png" alt="" />;
     case "codex":
       // OpenAI blossom sourced from developers.openai.com.
       return (

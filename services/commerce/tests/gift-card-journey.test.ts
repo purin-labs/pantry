@@ -470,7 +470,7 @@ async function payWithStripe(
       checkout.checkoutId,
       buyer.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: key,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -492,7 +492,7 @@ async function payWithStripe(
       checkout.checkoutId,
       buyer.token,
       {
-        schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+        schemaVersion: "commerce.reconcile-buyer-payment.v1",
         idempotencyKey: key,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -526,7 +526,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     client.requestCustomerSignIn(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -534,7 +534,7 @@ async function signIn(
   if (code === undefined) throw new Error("The sign-in email has no code");
   const access = await required(
     client.verifyCustomerSignIn(merchantId, STOREFRONT, challenge.challengeId, {
-      schemaVersion: "underclerk.verify-customer-sign-in.v1",
+      schemaVersion: "commerce.verify-customer-sign-in.v1",
       code,
     }),
   );

@@ -2366,12 +2366,12 @@ function parseBakerySurfaceToolRequest(
   input: unknown,
 ): HarnessBakerySurfaceToolRequest {
   if (!isRecord(input)) {
-    throw new TypeError("BakeryOS surface tool input must be an object");
+    throw new TypeError("Kitchen surface tool input must be an object");
   }
   if (name === "bakery_surface_prepare_workcell") {
     const preparation = parseBakeryWorkcellPreparation(input.preparation);
     if (Object.keys(input).length !== 1 || preparation === null) {
-      throw new TypeError("BakeryOS workcell preparation is invalid");
+      throw new TypeError("Kitchen workcell preparation is invalid");
     }
     return { kind: "prepare_workcell", preparation };
   }
@@ -2398,7 +2398,7 @@ function parseBakerySurfaceToolRequest(
       ...input,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "select_item") {
-      throw new TypeError("BakeryOS selection is invalid");
+      throw new TypeError("Kitchen selection is invalid");
     }
     return { kind: "select_item", selection: parsed.value.selection };
   }
@@ -2409,7 +2409,7 @@ function parseBakerySurfaceToolRequest(
       input.applianceId.length === 0 ||
       input.applianceId.length > 160
     ) {
-      throw new TypeError("BakeryOS equipment rotation is invalid");
+      throw new TypeError("Kitchen equipment rotation is invalid");
     }
     return { kind: "rotate_equipment", applianceId: input.applianceId };
   }
@@ -2428,7 +2428,7 @@ function parseBakerySurfaceToolRequest(
       input.zMm < -20_000 ||
       input.zMm > 20_000
     ) {
-      throw new TypeError("BakeryOS equipment move is invalid");
+      throw new TypeError("Kitchen equipment move is invalid");
     }
     return {
       kind: "move_equipment",
@@ -2445,7 +2445,7 @@ function parseBakerySurfaceToolRequest(
       input.openingId.length > 160 ||
       typeof input.open !== "boolean"
     ) {
-      throw new TypeError("BakeryOS opening toggle is invalid");
+      throw new TypeError("Kitchen opening toggle is invalid");
     }
     return {
       kind: "toggle_opening",
@@ -2465,7 +2465,7 @@ function parseBakerySurfaceToolRequest(
         "reference",
       ].includes(input.floorPlan)
     ) {
-      throw new TypeError("BakeryOS floor plan selection is invalid");
+      throw new TypeError("Kitchen floor plan selection is invalid");
     }
     return { kind: "select_floor_plan", floorPlan: input.floorPlan };
   }
@@ -2480,7 +2480,7 @@ function parseBakerySurfaceToolRequest(
       input.yawDegrees < -180 ||
       input.yawDegrees > 180
     ) {
-      throw new TypeError("BakeryOS equipment angle is invalid");
+      throw new TypeError("Kitchen equipment angle is invalid");
     }
     return {
       kind: "set_equipment_angle",
@@ -2490,11 +2490,11 @@ function parseBakerySurfaceToolRequest(
   }
   if (name === "bakery_surface_configure_interior") {
     if (!hasExactKeys(input, ["action"])) {
-      throw new TypeError("BakeryOS store interior configuration is invalid");
+      throw new TypeError("Kitchen store interior configuration is invalid");
     }
     const action = parseBakeryStoreInteriorAction(input.action);
     if (action === null) {
-      throw new TypeError("BakeryOS store interior configuration is invalid");
+      throw new TypeError("Kitchen store interior configuration is invalid");
     }
     return { kind: "configure_interior", action };
   }
@@ -2503,7 +2503,7 @@ function parseBakerySurfaceToolRequest(
       !hasExactKeys(input, ["action"]) ||
       !isBakeryFloorPlanResetAction(input.action)
     ) {
-      throw new TypeError("BakeryOS floor plan reset is invalid");
+      throw new TypeError("Kitchen floor plan reset is invalid");
     }
     return { kind: "reset_floor_plan", action: input.action };
   }
@@ -2512,7 +2512,7 @@ function parseBakerySurfaceToolRequest(
       !hasExactKeys(input, ["preset"]) ||
       (input.preset !== "procedure" && input.preset !== "one-batch")
     ) {
-      throw new TypeError("BakeryOS production start is invalid");
+      throw new TypeError("Kitchen production start is invalid");
     }
     return { kind: "start_production", preset: input.preset };
   }
@@ -2521,14 +2521,14 @@ function parseBakerySurfaceToolRequest(
       !hasExactKeys(input, ["mode"]) ||
       (input.mode !== "normal" && input.mode !== "outage")
     ) {
-      throw new TypeError("BakeryOS shift comparison is invalid");
+      throw new TypeError("Kitchen shift comparison is invalid");
     }
     return { kind: "compare_shift", mode: input.mode };
   }
   if (name === "bakery_surface_show_production_panel") {
     const panel = parseBakeryProductionPanel(input.panel);
     if (Object.keys(input).length !== 1 || panel === null) {
-      throw new TypeError("BakeryOS production panel is invalid");
+      throw new TypeError("Kitchen production panel is invalid");
     }
     return { kind: "show_production_panel", panel };
   }
@@ -2537,14 +2537,14 @@ function parseBakerySurfaceToolRequest(
       Object.keys(input).length !== 1 ||
       (input.action !== "pin" && input.action !== "clear")
     ) {
-      throw new TypeError("BakeryOS baseline action is invalid");
+      throw new TypeError("Kitchen baseline action is invalid");
     }
     return { kind: "control_baseline", action: input.action };
   }
   if (name === "bakery_surface_control_playback") {
     const action = parseBakeryPlaybackAction(input.action);
     if (Object.keys(input).length !== 1 || action === null) {
-      throw new TypeError("BakeryOS playback action is invalid");
+      throw new TypeError("Kitchen playback action is invalid");
     }
     return { kind: "control_playback", action };
   }
@@ -2553,7 +2553,7 @@ function parseBakerySurfaceToolRequest(
     name === "bakery_surface_read_draft"
   ) {
     if (Object.keys(input).length !== 0) {
-      throw new TypeError("BakeryOS surface read takes no fields");
+      throw new TypeError("Kitchen surface read takes no fields");
     }
     return name === "bakery_surface_inspect"
       ? { kind: "inspect_surface" }
@@ -2572,7 +2572,7 @@ function parseBakerySurfaceToolRequest(
       parsed.kind === "invalid" ||
       parsed.value.kind !== "simulate_workcell"
     ) {
-      throw new TypeError("BakeryOS workcell mode is invalid");
+      throw new TypeError("Kitchen workcell mode is invalid");
     }
     return { kind: "simulate_workcell", mode: parsed.value.mode };
   }
@@ -2584,7 +2584,7 @@ function parseBakerySurfaceToolRequest(
       filter: input,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "query_tasks") {
-      throw new TypeError("BakeryOS task query input is invalid");
+      throw new TypeError("Kitchen task query input is invalid");
     }
     return {
       kind: "query_tasks",
@@ -2619,7 +2619,7 @@ function parseBakerySurfaceToolRequest(
     name === "bakery_surface_apply_production"
   ) {
     if (Object.keys(input).length !== 0) {
-      throw new TypeError("BakeryOS production command takes no fields");
+      throw new TypeError("Kitchen production command takes no fields");
     }
     return name === "bakery_surface_preview_production"
       ? { kind: "preview_production" }
@@ -2627,7 +2627,7 @@ function parseBakerySurfaceToolRequest(
   }
   if (name === "bakery_surface_edit_production") {
     if (Object.keys(input).length !== 1 || !Object.hasOwn(input, "edit")) {
-      throw new TypeError("BakeryOS production edit input is invalid");
+      throw new TypeError("Kitchen production edit input is invalid");
     }
     const parsed = parseBakerySurfaceCommand({
       schemaVersion: 1,
@@ -2637,13 +2637,13 @@ function parseBakerySurfaceToolRequest(
       edit: input.edit,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "edit_production") {
-      throw new TypeError("BakeryOS production edit input is invalid");
+      throw new TypeError("Kitchen production edit input is invalid");
     }
     return { kind: "edit_production", edit: parsed.value.edit };
   }
   if (name === "bakery_surface_edit_rehearsal") {
     if (Object.keys(input).length !== 1 || !Object.hasOwn(input, "edit")) {
-      throw new TypeError("BakeryOS rehearsal edit input is invalid");
+      throw new TypeError("Kitchen rehearsal edit input is invalid");
     }
     const parsed = parseBakerySurfaceCommand({
       schemaVersion: 1,
@@ -2653,7 +2653,7 @@ function parseBakerySurfaceToolRequest(
       edit: input.edit,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "edit_rehearsal") {
-      throw new TypeError("BakeryOS rehearsal edit input is invalid");
+      throw new TypeError("Kitchen rehearsal edit input is invalid");
     }
     return { kind: "edit_rehearsal", edit: parsed.value.edit };
   }
@@ -2678,7 +2678,7 @@ function parseBakerySurfaceToolRequest(
       !Object.hasOwn(input, "baseDraft") ||
       !Object.hasOwn(input, "edits")
     ) {
-      throw new TypeError(`BakeryOS ${kind} input is invalid`);
+      throw new TypeError(`Kitchen ${kind} input is invalid`);
     }
     const parsed = parseBakerySurfaceCommand({
       schemaVersion: 1,
@@ -2692,7 +2692,7 @@ function parseBakerySurfaceToolRequest(
       (parsed.value.kind !== "prepare_edit" &&
         parsed.value.kind !== "run_shift")
     ) {
-      throw new TypeError(`BakeryOS ${kind} input is invalid`);
+      throw new TypeError(`Kitchen ${kind} input is invalid`);
     }
     return {
       kind: parsed.value.kind,
@@ -2708,14 +2708,14 @@ function parseBakerySurfaceToolRequest(
       ...input,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "prepare_run_save") {
-      throw new TypeError("BakeryOS run-save proposal input is invalid");
+      throw new TypeError("Kitchen run-save proposal input is invalid");
     }
     return { kind: "prepare_run_save", name: parsed.value.name };
   }
   if (name === "bakery_surface_file") {
     const action = parseBakeryFileAction(input.action);
     if (!hasExactKeys(input, ["action"]) || action === null) {
-      throw new TypeError("Invalid BakeryOS file action");
+      throw new TypeError("Invalid Kitchen file action");
     }
     return { kind: "file_action", action };
   }
@@ -2733,7 +2733,7 @@ function parseBakerySurfaceToolRequest(
       ...input,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "inspect_run_save") {
-      throw new TypeError("BakeryOS save inspection input is invalid");
+      throw new TypeError("Kitchen save inspection input is invalid");
     }
     return { kind: "inspect_run_save", runKind: parsed.value.runKind };
   }
@@ -2745,7 +2745,7 @@ function parseBakerySurfaceToolRequest(
       ...input,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "list_saved_runs") {
-      throw new TypeError("BakeryOS saved-run listing input is invalid");
+      throw new TypeError("Kitchen saved-run listing input is invalid");
     }
     return {
       kind: "list_saved_runs",
@@ -2761,7 +2761,7 @@ function parseBakerySurfaceToolRequest(
       ...input,
     });
     if (parsed.kind === "invalid" || parsed.value.kind !== "prepare_run_open") {
-      throw new TypeError("BakeryOS saved-run review input is invalid");
+      throw new TypeError("Kitchen saved-run review input is invalid");
     }
     return {
       kind: "prepare_run_open",
@@ -2780,7 +2780,7 @@ function parseBakerySurfaceToolRequest(
       parsed.kind === "invalid" ||
       parsed.value.kind !== "prepare_scenario_save"
     ) {
-      throw new TypeError("BakeryOS scenario-save proposal input is invalid");
+      throw new TypeError("Kitchen scenario-save proposal input is invalid");
     }
     return {
       kind: "prepare_scenario_save",
@@ -2796,11 +2796,11 @@ function parseBakerySurfaceToolRequest(
   }
   if (name === "bakery_surface_accept_candidate") {
     if (Object.keys(input).length !== 1 || !Object.hasOwn(input, "candidate")) {
-      throw new TypeError("BakeryOS candidate input is invalid");
+      throw new TypeError("Kitchen candidate input is invalid");
     }
     const candidate = parseRecordingAcceptanceReference(input.candidate);
     if (candidate === null) {
-      throw new TypeError("BakeryOS candidate input is invalid");
+      throw new TypeError("Kitchen candidate input is invalid");
     }
     return { kind: "accept_candidate", candidate };
   }
@@ -2809,7 +2809,7 @@ function parseBakerySurfaceToolRequest(
     !Object.hasOwn(input, "selection") ||
     !Object.hasOwn(input, "cursorSeconds")
   ) {
-    throw new TypeError("BakeryOS view input is invalid");
+    throw new TypeError("Kitchen view input is invalid");
   }
   const parsed = parseBakerySurfaceCommand({
     schemaVersion: 1,
@@ -2822,7 +2822,7 @@ function parseBakerySurfaceToolRequest(
     },
   });
   if (parsed.kind === "invalid" || parsed.value.kind !== "set_view") {
-    throw new TypeError("BakeryOS view input is invalid");
+    throw new TypeError("Kitchen view input is invalid");
   }
   return {
     kind: "set_view",

@@ -64,14 +64,14 @@ export type CommerceReturnRequestLineV1 = Readonly<{
 
 export type RequestCommerceReturnV1 = ReturnCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.request-return.v1";
+    schemaVersion: "commerce.request-return.v1";
     orderId: string;
     lines: readonly CommerceReturnRequestLineV1[];
   }>;
 
 export type AuthorizeCommerceReturnV1 = ReturnCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.authorize-return.v1";
+    schemaVersion: "commerce.authorize-return.v1";
     expectedReturnRevision: number;
     decisions: readonly Readonly<{
       orderLineId: string;
@@ -81,7 +81,7 @@ export type AuthorizeCommerceReturnV1 = ReturnCommandBase &
 
 export type ReceiveCommerceReturnV1 = ReturnCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.receive-return.v1";
+    schemaVersion: "commerce.receive-return.v1";
     expectedReturnRevision: number;
     /** Restocked items go back to stock at this location. */
     locationId: string;
@@ -93,7 +93,7 @@ export type ReceiveCommerceReturnV1 = ReturnCommandBase &
 
 export type CloseCommerceReturnV1 = ReturnCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.close-return.v1";
+    schemaVersion: "commerce.close-return.v1";
     expectedReturnRevision: number;
     /** The succeeded refund for this return, or null when none was made. */
     refundAttemptId: string | null;
@@ -107,7 +107,7 @@ export type CommerceReturnCommandV1 =
 
 /** The buyer's request, sent with an order recovery token. */
 export type RequestCommerceBuyerReturnV1 = Readonly<{
-  schemaVersion: "underclerk.request-buyer-return.v1";
+  schemaVersion: "commerce.request-buyer-return.v1";
   idempotencyKey: string;
   lines: readonly CommerceReturnRequestLineV1[];
 }>;

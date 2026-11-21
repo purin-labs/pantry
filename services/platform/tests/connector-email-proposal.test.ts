@@ -480,7 +480,7 @@ async function setup(state: GmailWorld): Promise<{
     .run();
   await db
     .prepare(
-      "INSERT INTO provider_connection (provider_connection_id, organisation_id, provider, auth_mode, authority_kind, credential_generation, credential_ref, lifecycle, granted_scopes, created_by_user_id, created_at, updated_at) VALUES ('connection_mail_proposal', ?, 'gmail', 'shared_satyr_app', 'connection_credential', 1, 'vault:fixture', 'active', '[]', 'user_mail_proposal', 0, 0)",
+      "INSERT INTO provider_connection (provider_connection_id, organisation_id, provider, auth_mode, authority_kind, credential_generation, credential_ref, lifecycle, granted_scopes, created_by_user_id, created_at, updated_at) VALUES ('connection_mail_proposal', ?, 'gmail', 'shared_pantry_app', 'connection_credential', 1, 'vault:fixture', 'active', '[]', 'user_mail_proposal', 0, 0)",
     )
     .bind(ORGANISATION)
     .run();

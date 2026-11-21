@@ -59,10 +59,10 @@ function portalSimulationSource() {
   return `/@fs${checkoutRoot()}/packages/production-simulation/src`;
 }
 
-// Page code that reads checkout files uses window.satyrCheckout; it stays set
+// Page code that reads checkout files uses window.pantryCheckout; it stays set
 // across reloads.
 async function exposeCheckout(page) {
-  const script = `window.satyrCheckout = ${JSON.stringify(checkoutRoot())};`;
+  const script = `window.pantryCheckout = ${JSON.stringify(checkoutRoot())};`;
   await page.addInitScript(script);
   await page.evaluate(script);
 }
@@ -444,8 +444,8 @@ async function forwardToArchive(route) {
 
 // Page code: signs in one person of the archive fixture.
 function signInToArchive(session) {
-  document.cookie = `satyr_control_session=${session.token}; Path=/; SameSite=Lax`;
-  document.cookie = `satyr_control_csrf=${session.csrfToken}; Path=/; SameSite=Lax`;
+  document.cookie = `pantry_session=${session.token}; Path=/; SameSite=Lax`;
+  document.cookie = `pantry_csrf=${session.csrfToken}; Path=/; SameSite=Lax`;
   window.archiveCsrf = session.csrfToken;
 }
 
@@ -459,7 +459,7 @@ async function archiveMutation(path, body) {
       credentials: "same-origin",
       headers: {
         "content-type": "application/json",
-        "x-satyr-csrf": window.archiveCsrf,
+        "x-pantry-csrf": window.archiveCsrf,
       },
       body: JSON.stringify(body),
     }),

@@ -108,7 +108,7 @@ declare global {
 }
 
 const MERCHANT_ID = "merchant_nuki_cafe_demo";
-const CAFE_LANGUAGE_STORAGE_KEY = "satyr.storefront.cafe.language";
+const CAFE_LANGUAGE_STORAGE_KEY = "pantry.storefront.cafe.language";
 
 type ShippingListingImage = Readonly<{ imageUrl: string; imageAlt: string }>;
 
@@ -1477,7 +1477,7 @@ export class StorefrontApp extends React.Component<
       config.merchantId,
       config.storefrontId,
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -1702,16 +1702,16 @@ export class StorefrontApp extends React.Component<
     };
     if (
       (config.kind === "cafe" &&
-        quote.schemaVersion !== "underclerk.buyer-quoted-checkout.v1") ||
+        quote.schemaVersion !== "commerce.buyer-quoted-checkout.v1") ||
       (config.kind === "shipping" &&
-        quote.schemaVersion !== "underclerk.buyer-quoted-shipping-checkout.v1")
+        quote.schemaVersion !== "commerce.buyer-quoted-shipping-checkout.v1")
     ) {
       clearStoredCheckoutContext(config.storefrontId);
       return { kind: "new_session" };
     }
     saveStoredCheckoutContext(config, context);
     if (checkout.value.progress.state === "quoted") {
-      return quote.schemaVersion === "underclerk.buyer-quoted-checkout.v1"
+      return quote.schemaVersion === "commerce.buyer-quoted-checkout.v1"
         ? { kind: "recovered_pickup_quote", context, quote }
         : { kind: "recovered_shipping_quote", context, quote };
     }
@@ -1719,7 +1719,7 @@ export class StorefrontApp extends React.Component<
       case "pending":
         return this.recoverPendingPaymentSession(config, context, quote);
       case "captured":
-        return quote.schemaVersion === "underclerk.buyer-quoted-checkout.v1"
+        return quote.schemaVersion === "commerce.buyer-quoted-checkout.v1"
           ? {
               kind: "recovered_pickup_indeterminate",
               context,
@@ -1740,7 +1740,7 @@ export class StorefrontApp extends React.Component<
         };
       case "processing":
       case "indeterminate":
-        return quote.schemaVersion === "underclerk.buyer-quoted-checkout.v1"
+        return quote.schemaVersion === "commerce.buyer-quoted-checkout.v1"
           ? {
               kind: "recovered_pickup_indeterminate",
               context,
@@ -1773,7 +1773,7 @@ export class StorefrontApp extends React.Component<
       quote.checkoutId,
       context.session.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: `${context.runId}_payment`,
         checkoutRevision: quote.revision,
         quoteDigest: quote.quote.quoteDigest,
@@ -1782,7 +1782,7 @@ export class StorefrontApp extends React.Component<
     );
     if (!result.ok) {
       if (isQuoteExpiredError(result.error)) {
-        return quote.schemaVersion === "underclerk.buyer-quoted-checkout.v1"
+        return quote.schemaVersion === "commerce.buyer-quoted-checkout.v1"
           ? { kind: "recovered_pickup_quote", context, quote }
           : { kind: "recovered_shipping_quote", context, quote };
       }
@@ -1794,7 +1794,7 @@ export class StorefrontApp extends React.Component<
         message: `Payment collection is temporarily unavailable. Try again after ${formatDate(result.value.retryAfter, config.kind, this.#cafeLanguage)}.`,
       };
     }
-    return quote.schemaVersion === "underclerk.buyer-quoted-checkout.v1"
+    return quote.schemaVersion === "commerce.buyer-quoted-checkout.v1"
       ? {
           kind: "recovered_pickup_payment",
           context,
@@ -2182,7 +2182,7 @@ export class StorefrontApp extends React.Component<
       current.quote.checkoutId,
       current.context.session.token,
       {
-        schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
         idempotencyKey: `${newRunId()}_checkout`,
         checkoutRevision: current.quote.revision,
         quoteDigest: current.quote.quote.quoteDigest,
@@ -2282,7 +2282,7 @@ export class StorefrontApp extends React.Component<
       quote.checkoutId,
       context.session.token,
       {
-        schemaVersion: "underclerk.refresh-buyer-shipping-checkout.v1",
+        schemaVersion: "commerce.refresh-buyer-shipping-checkout.v1",
         idempotencyKey: `${operationId}_checkout`,
         checkoutRevision: quote.revision,
         quoteDigest: quote.quote.quoteDigest,
@@ -2351,7 +2351,7 @@ export class StorefrontApp extends React.Component<
       config.storefrontId,
       prepared.context.session.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: `${prepared.context.runId}_checkout`,
         cartId: prepared.cart.cartId,
         cartRevision: prepared.cart.revision,
@@ -2413,7 +2413,7 @@ export class StorefrontApp extends React.Component<
             context.cart.cart.cartId,
             context.session.token,
             {
-              schemaVersion: "underclerk.replace-buyer-cart.v1",
+              schemaVersion: "commerce.replace-buyer-cart.v1",
               idempotencyKey: `${context.runId}_cart_replace`,
               cartRevision: context.cart.cart.revision,
               lines,
@@ -2424,7 +2424,7 @@ export class StorefrontApp extends React.Component<
             config.storefrontId,
             context.session.token,
             {
-              schemaVersion: "underclerk.create-buyer-cart.v1",
+              schemaVersion: "commerce.create-buyer-cart.v1",
               idempotencyKey: `${context.runId}_cart_create`,
               lines,
             },
@@ -2519,7 +2519,7 @@ export class StorefrontApp extends React.Component<
       config.storefrontId,
       context.session.token,
       {
-        schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+        schemaVersion: "commerce.validate-buyer-shipping-address.v1",
         idempotencyKey: `${continuation.operationId}_address_validation`,
         address: normalizedShippingAddress(context.basket.address),
       },
@@ -2746,7 +2746,7 @@ export class StorefrontApp extends React.Component<
       config.storefrontId,
       prepared.context.session.token,
       {
-        schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+        schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
         idempotencyKey: `${operationId}_checkout`,
         cartId: prepared.cart.cartId,
         cartRevision: prepared.cart.revision,
@@ -2857,7 +2857,7 @@ export class StorefrontApp extends React.Component<
       checkoutId,
       context.session.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: `${context.runId}_payment`,
         checkoutRevision,
         quoteDigest,
@@ -2948,7 +2948,7 @@ export class StorefrontApp extends React.Component<
       checkoutId,
       context.session.token,
       {
-        schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+        schemaVersion: "commerce.reconcile-buyer-payment.v1",
         idempotencyKey: `${context.runId}_payment`,
         checkoutRevision,
         quoteDigest,
@@ -7671,7 +7671,7 @@ function normalizedText(value: string | null): string | undefined {
 }
 
 function orderStatusStorageKey(storefrontId: string): string {
-  return `satyr.order-status.${storefrontId}`;
+  return `pantry.order-status.${storefrontId}`;
 }
 
 const ORDER_QR_SVG_CACHE = new Map<string, string>();
@@ -7704,7 +7704,7 @@ type StoredReceiptV1 = Readonly<{
   lines: readonly StoredReceiptLineV1[];
 }>;
 
-const RECEIPT_STORAGE_PREFIX = "satyr.order-receipt.";
+const RECEIPT_STORAGE_PREFIX = "pantry.order-receipt.";
 const RECEIPT_STORAGE_LIMIT = 12;
 
 function receiptStorageKey(checkoutId: string): string {
@@ -7982,7 +7982,7 @@ type StoredShippingBasket = Readonly<{
 }>;
 
 function checkoutStorageKey(storefrontId: string): string {
-  return `satyr.checkout.${storefrontId}`;
+  return `pantry.checkout.${storefrontId}`;
 }
 
 function saveStoredCheckoutContext(
@@ -7993,7 +7993,7 @@ function saveStoredCheckoutContext(
     window.sessionStorage.setItem(
       checkoutStorageKey(config.storefrontId),
       JSON.stringify({
-        schemaVersion: "satyr.storefront-checkout-session.v7",
+        schemaVersion: "pantry.storefront-checkout-session.v7",
         merchantId: config.merchantId,
         storefrontId: config.storefrontId,
         session: context.session,
@@ -8089,7 +8089,7 @@ export function parseStoredCheckoutRecovery(
       "cart",
       "basket",
     ]) ||
-    value.schemaVersion !== "satyr.storefront-checkout-session.v7" ||
+    value.schemaVersion !== "pantry.storefront-checkout-session.v7" ||
     value.merchantId !== config.merchantId ||
     value.storefrontId !== config.storefrontId
   ) {
@@ -8399,7 +8399,7 @@ function recordHasKey(keys: readonly string[], field: string): boolean {
 }
 
 function kioskStorageKey(storefrontId: string): string {
-  return `satyr.kiosk.${storefrontId}`;
+  return `pantry.kiosk.${storefrontId}`;
 }
 
 function readKioskMode(storefrontId: string, location: Location): boolean {

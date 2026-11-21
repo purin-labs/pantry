@@ -17,7 +17,7 @@ import "./products-panel.css";
  */
 
 /** What a product drag carries. */
-export const PRODUCT_DRAG_TYPE = "application/x-satyr-board-product";
+export const PRODUCT_DRAG_TYPE = "application/x-pantry-board-product";
 
 export type BoardProduct =
   | Readonly<{ kind: "item"; itemId: string; name: string }>

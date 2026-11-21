@@ -10,7 +10,7 @@
   :is(
     .portal-brand-mark,
     .signin-brand-mark,
-    .provider-tile-satyr_commerce img
+    .provider-tile-builtin_commerce img
   ) {
   filter: invert(1);
 }

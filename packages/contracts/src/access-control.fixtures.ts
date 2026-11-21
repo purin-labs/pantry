@@ -91,14 +91,14 @@ export const invalidProviderDependency = {
 
 export const commerceSystemDependency = {
   kind: "commerce_system",
-  systems: ["satyr_commerce", "shopify"],
+  systems: ["builtin_commerce", "shopify"],
 } satisfies CapabilityProviderDependency;
 
 export const invalidCommerceSystemDependency = {
   kind: "commerce_system",
   systems: [
     // @ts-expect-error Commerce is an implementation authority, not a commerce-system identity.
-    "underclerk",
+    "commerce",
   ],
 } satisfies CapabilityProviderDependency;
 

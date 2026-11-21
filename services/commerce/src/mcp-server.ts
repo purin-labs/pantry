@@ -28,7 +28,7 @@ const MCP_PATH = /^\/v1\/admin\/merchants\/([^/]+)\/mcp$/u;
 const PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"] as const;
 
 const INSTRUCTIONS =
-  "Underclerk is the commerce backend of this shop. Use list_storefronts " +
+  "Commerce is the commerce backend of this shop. Use list_storefronts " +
   "to find the storefront ID, read_catalog for the products, the menus and " +
   "the live prices, create_checkout to make a pickup checkout as a guest " +
   "buyer, and read_order for the state of an order. A site pays a checkout " +
@@ -209,7 +209,7 @@ async function createCheckout(
   let cart;
   try {
     cart = await storefront.createCart(merchantId, storefrontId, token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `${key}.cart`,
       lines,
     });
@@ -224,7 +224,7 @@ async function createCheckout(
       storefrontId,
       token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: `${key}.checkout`,
         cartId: cart.value.cartId,
         cartRevision: cart.value.revision,
@@ -252,7 +252,7 @@ function guestSession(
   storefrontId: string,
 ) {
   return storefront.createSession(merchantId, storefrontId, {
-    schemaVersion: "underclerk.create-buyer-session.v1",
+    schemaVersion: "commerce.create-buyer-session.v1",
     buyer: { kind: "guest" },
   });
 }
@@ -285,7 +285,7 @@ export async function handleMcpRequest(
       status: 401,
       headers: {
         "content-type": "application/json",
-        "www-authenticate": 'Bearer realm="underclerk"',
+        "www-authenticate": 'Bearer realm="commerce"',
       },
     });
   const caller = identified.caller;
@@ -317,7 +317,7 @@ export async function handleMcpRequest(
         result: {
           protocolVersion,
           capabilities: { tools: { listChanged: false } },
-          serverInfo: { name: "underclerk", title: "Underclerk", version: "1" },
+          serverInfo: { name: "commerce", title: "Commerce", version: "1" },
           instructions: INSTRUCTIONS,
         },
       });
@@ -431,7 +431,7 @@ function refusal(result: CommerceClientResult<unknown>): Out {
     ok: false,
     message:
       error.kind === "rejected"
-        ? `Underclerk refused: ${JSON.stringify(error.error)}`
-        : `Underclerk answered: ${error.message}`,
+        ? `Commerce refused: ${JSON.stringify(error.error)}`
+        : `Commerce answered: ${error.message}`,
   };
 }

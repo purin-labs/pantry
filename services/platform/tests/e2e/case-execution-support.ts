@@ -42,7 +42,7 @@ export async function executionRequest(
       `https://localhost/v1/control/organisations/${organisationId}${path}`,
       {
         headers: {
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
           origin: "https://localhost",
         },
       },
@@ -680,7 +680,7 @@ export function readCanonicalRuntimes(
  * attempt is interrupted where the journal records the recovery that fenced
  * it, at that recovery's time. An attempt that ended has no end time. The
  * tool operations are the Session's accepted results. A tool operation that
- * was a BakeryOS command carries the receipt that the chat timeline shows for
+ * was a Kitchen command carries the receipt that the chat timeline shows for
  * the same command, with the same outcome.
  */
 export async function verifyResumedTurnExecution(
@@ -769,7 +769,7 @@ export async function verifyResumedTurnExecution(
   for (const tool of tools)
     expect(incoming(full, tool.nodeId)).toEqual(["turn:turn"]);
   expect(full.limitations).toEqual(["tool_attempt_unrecorded"]);
-  // The chat timeline and the graph name a BakeryOS command by one receipt.
+  // The chat timeline and the graph name a Kitchen command by one receipt.
   const commands = tools.filter((tool) => tool.authority === "surface_effect");
   expect(commands.length).toBeGreaterThan(0);
   for (const command of commands) {

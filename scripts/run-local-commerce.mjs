@@ -16,7 +16,7 @@ const commands = [];
 const ports = [];
 const docker = dockerIsAvailable();
 const containers = docker && options.length === 0;
-for (const service of ["underclerk", "platform"]) {
+for (const service of ["commerce", "platform"]) {
   const config = readWorkerEnvironment(service, "local");
   validateWorkerOrigins(service, "local", config);
   requireLocalWorkerSecrets(service, config);

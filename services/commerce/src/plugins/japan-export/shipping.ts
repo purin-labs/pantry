@@ -105,7 +105,7 @@ const DOMESTIC_JAPAN_ROUTE: JapanShippingRoute = {
   destinationCountries: ["JP"],
   carrierAccountReference: "yamato_transport_test",
   service: { code: "takkyubin_test", name: "Yamato Takkyubin Test" },
-  dutyProviderAccountReference: "underclerk_domestic_duty_not_applicable",
+  dutyProviderAccountReference: "commerce_domestic_duty_not_applicable",
   customsRequired: false,
   labelAmountMinor: 800,
   trackingPrefix: "JP-DOM",
@@ -119,7 +119,7 @@ const DOMESTIC_JAPAN_PRIORITY_ROUTE: JapanShippingRoute = {
     code: "takkyubin_priority_test",
     name: "Yamato Takkyubin Priority Test",
   },
-  dutyProviderAccountReference: "underclerk_domestic_duty_not_applicable",
+  dutyProviderAccountReference: "commerce_domestic_duty_not_applicable",
   customsRequired: false,
   labelAmountMinor: 1_200,
   trackingPrefix: "JP-DOM",
@@ -312,7 +312,7 @@ function checkoutProviderCapabilities(
       reference: string;
     }>
   > = [
-    { kind: "address_validation", reference: "underclerk_address_validation" },
+    { kind: "address_validation", reference: "commerce_address_validation" },
     { kind: "carrier_rate", reference: routeBinding.carrierRateCapabilityId },
     { kind: "duty", reference: dutyCapabilityReference },
     { kind: "label", reference: routeBinding.carrierRateCapabilityId },

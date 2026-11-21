@@ -187,7 +187,7 @@ export async function updateChatConversation(
         readonly expectedRevision: number;
       },
 ): Promise<ChatConversationSummary> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to update this chat.");
   const raw = await chatRequest(
     chatConversationPath(organisationId, conversationId),
@@ -212,7 +212,7 @@ export async function rateChatResponse(
   eventId: string,
   rating: "good" | "bad" | null,
 ): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to save feedback.");
   const raw = await chatRequest(
     chatConversationPath(organisationId, conversationId),
@@ -235,7 +235,7 @@ export async function saveChatDraft(
   readonly draft: string;
   readonly updatedAt: number | null;
 }> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to save this draft.");
   const raw = await chatRequest(chatDraftPath(organisationId, conversationId), {
     method: "PUT",
@@ -260,7 +260,7 @@ export async function markChatRead(
   conversationId: ConversationId,
   sequence: number,
 ): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to mark chat read.");
   await chatRequest(chatReadPath(organisationId, conversationId), {
     method: "POST",
@@ -278,7 +278,7 @@ export async function cancelChat(
     readonly cancellationId: string;
   },
 ): Promise<Chat> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to stop this response.");
   const raw = await chatRequest(chatCancelPath(organisationId), {
     method: "POST",
@@ -294,7 +294,7 @@ export async function decideChatPermission(
   permissionRequestId: string,
   decision: ChatPermissionDecision,
 ): Promise<Chat> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to answer this request.");
   const raw = await chatRequest(
     `${chatConversationPath(organisationId, conversationId)}/permission`,
@@ -372,7 +372,7 @@ export async function postChatCommand(
   body: ChatCommand & { readonly surfaceObservation?: SurfaceObservationV2 },
   files: readonly File[] = [],
 ): Promise<Chat> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null)
     throw new Error("Sign in again to continue this conversation.");
   const form = new FormData();
@@ -516,7 +516,7 @@ async function projectCommand(
   path: string,
   command: unknown,
 ): Promise<Record<string, unknown>> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to change projects.");
   let raw: unknown = null;
   let status = 200;
@@ -624,7 +624,7 @@ export async function permanentlyDeleteChat(
   expectedRevision: number,
   operationId: string,
 ): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to delete chats.");
   await chatRequest(chatConversationPath(organisationId, conversationId), {
     method: "PATCH",
@@ -653,7 +653,7 @@ export async function createProjectChat(
   projectId: ProjectId,
   conversationId: ConversationId,
 ): Promise<ConversationId> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to start a project chat.");
   const raw = await chatRequest(`${chatPath(organisationId)}/projects/chats`, {
     method: "POST",
@@ -665,7 +665,7 @@ export async function createProjectChat(
 }
 
 export async function forkChatThread(organisationId: string, sourceId: ConversationId, messageId: string, operationId: string): Promise<ConversationId> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("Sign in again to fork this chat.");
   const raw = await chatRequest(chatConversationPath(organisationId, sourceId), { method: "PATCH", json: { action: "fork", messageId, operationId } });
   if (raw.kind !== "ready" || !isConversationId(raw.conversationId)) throw new Error("The fork is still preparing. Retry to recover the same chat.");

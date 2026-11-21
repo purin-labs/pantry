@@ -214,7 +214,7 @@ export async function createEmailHarnessToolHost(
     return reads;
   };
   const catalogDigest = await digestCanonical({
-    kind: "satyr_email_tool_catalog_v1",
+    kind: "pantry_email_tool_catalog_v1",
     definitions,
     messageIds: input.manifest.messageIds,
   });
@@ -905,7 +905,7 @@ async function inlineToolOutput(
   output: string,
 ): Promise<Variant<HarnessToolOutput, "inline">> {
   const digest = await digestCanonical({
-    kind: "satyr_email_tool_output_v1",
+    kind: "pantry_email_tool_output_v1",
     output,
   });
   return {

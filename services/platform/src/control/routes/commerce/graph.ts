@@ -139,24 +139,24 @@ export async function handleCommerceExportPreset(
   const binding = await resolveMerchantBinding(authorized);
   if (binding instanceof Response) return binding;
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(authorized.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
         String(authorized.membership.personId),
       ),
     });
   } catch {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   const now = Date.now();
   const mutationIdentity = await controlMutationIdentity(
@@ -217,9 +217,9 @@ function commerceExportPresetErrorResponse(
     case "commerce_export_preset_owner_conflict":
     case "commerce_export_preset_drift":
       return controlError(error.code, 409);
-    case "commerce_export_preset_underclerk_mismatch":
+    case "commerce_export_preset_commerce_mismatch":
       return controlError(error.code, 502);
-    case "commerce_export_preset_underclerk_unavailable":
+    case "commerce_export_preset_commerce_unavailable":
     case "commerce_export_preset_persistence_failed":
       return controlError(error.code, 503);
     default:
@@ -334,24 +334,24 @@ export async function handleCommerceGraphChanges(
   const binding = await resolveMerchantBinding(authorized);
   if (binding instanceof Response) return binding;
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(authorized.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
         String(authorized.membership.personId),
       ),
     });
   } catch {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   const changes = await client.changes(
     binding.merchantId,
@@ -360,7 +360,7 @@ export async function handleCommerceGraphChanges(
   );
   return changes.ok
     ? controlJson({ ok: true, changes: changes.value })
-    : controlError("underclerk_unavailable", 503);
+    : controlError("commerce_unavailable", 503);
 }
 
 export async function handleCommerceBoardPresence(
@@ -508,24 +508,24 @@ export async function handleCommerceListEntryPatch(
     return controlJson(requested.value, 202);
   }
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(authorized.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
         String(authorized.membership.personId),
       ),
     });
   } catch {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   let commandId: ReturnType<typeof parseCommerceCommandId>;
   try {
@@ -566,7 +566,7 @@ export async function handleCommerceListEntryPatch(
       { contentType: "json" },
     );
   } catch {
-    return controlError("underclerk_projection_refresh_unavailable", 503);
+    return controlError("commerce_projection_refresh_unavailable", 503);
   }
   const responseBody = { ok: true, receipt: patched.value };
   const recordedMutationReceipt = await recordCommerceMutationReceipt({
@@ -832,7 +832,7 @@ async function requestCommerceListEntryPatchApproval(
     sessionId: sessionId.value,
     threadId: caseId.value,
     draft: {
-      host: "satyr.commerce",
+      host: "pantry.commerce",
       verb: "commerce.list_entry.patch",
       path: commerceListEntryPatchActionPath(input.command),
       argsHash: actionDigest,
@@ -1022,7 +1022,7 @@ function commerceListEntryPatchErrorResponse(
           );
     case "receipt_mismatch":
     case "unavailable":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
     default:
       return assertNever(error);
   }
@@ -1086,24 +1086,24 @@ export async function handleCommerceSavedViewPresentationPatch(
   const binding = await resolveMerchantBinding(authorized);
   if (binding instanceof Response) return binding;
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   let client: CommerceEntityPlaneClient;
   try {
     client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(authorized.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
         String(authorized.membership.personId),
       ),
     });
   } catch {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   let commandId: ReturnType<typeof parseCommerceCommandId>;
   try {
@@ -1191,7 +1191,7 @@ function commerceSavedViewPresentationPatchErrorResponse(
           );
     case "receipt_mismatch":
     case "unavailable":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
     default:
       return assertNever(error);
   }

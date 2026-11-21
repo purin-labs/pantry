@@ -130,7 +130,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
     }
     if (checkout.lifecycle.state === "quoted") {
       const started = this.beginCheckoutPayment({
-        schemaVersion: "underclerk.begin-checkout-payment.v1",
+        schemaVersion: "commerce.begin-checkout-payment.v1",
         merchantId: input.claims.merchantId,
         expectedMerchantRevision: merchant.revision,
         idempotencyKey: `buyer_payment_start_${identityDigest}`,
@@ -214,7 +214,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
       });
     } catch {
       providerSession = {
-        schemaVersion: "underclerk.payment-session-result.v1" as const,
+        schemaVersion: "commerce.payment-session-result.v1" as const,
         kind: "unavailable" as const,
         reason: "provider_transport_interrupted",
         retryAfter: timestampAfter(this.options.now(), 60),
@@ -224,7 +224,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
       return {
         kind: "resolved",
         result: {
-          schemaVersion: "underclerk.buyer-payment-session.v1",
+          schemaVersion: "commerce.buyer-payment-session.v1",
           state: "unavailable",
           checkoutId: input.checkoutId,
           retryAfter: providerSession.retryAfter,
@@ -243,7 +243,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
     return {
       kind: "resolved",
       result: {
-        schemaVersion: "underclerk.buyer-payment-session.v1",
+        schemaVersion: "commerce.buyer-payment-session.v1",
         state: "ready",
         checkoutId: input.checkoutId,
         checkoutRevision: input.command.checkoutRevision,
@@ -382,7 +382,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
           return { state: "pending" };
         const outcome = dueOutcome(provider, quote.expiresAt, now);
         const resolved = this.resolveCheckoutPayment({
-          schemaVersion: "underclerk.resolve-checkout-payment.v1",
+          schemaVersion: "commerce.resolve-checkout-payment.v1",
           merchantId,
           expectedMerchantRevision: merchant.revision,
           idempotencyKey: `payment_due_resolve_${identityDigest}_${paymentAttempt.revision}_${outcome.kind}`,
@@ -396,7 +396,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
         });
         if (resolved.outcome === "rejected") {
           console.warn(
-            "underclerk.payment_due_refused",
+            "commerce.payment_due_refused",
             paymentAttemptId,
             JSON.stringify(resolved.error),
           );
@@ -406,7 +406,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
       }
       if (paymentAttempt.lifecycle.state !== "captured") {
         const recorded = this.recordCheckoutPaymentCapture({
-          schemaVersion: "underclerk.record-checkout-payment-capture.v1",
+          schemaVersion: "commerce.record-checkout-payment-capture.v1",
           merchantId,
           expectedMerchantRevision: merchant.revision,
           idempotencyKey: `payment_settlement_capture_${identityDigest}`,
@@ -437,7 +437,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
       return { state: "pending" };
     const balance = balanceCheckoutOrder(checkout);
     const placed = this.placePaidCheckout({
-      schemaVersion: "underclerk.place-paid-checkout.v1",
+      schemaVersion: "commerce.place-paid-checkout.v1",
       merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `payment_settlement_place_${identityDigest}`,
@@ -484,7 +484,7 @@ export abstract class BuyerPaymentStage extends BuyerCheckoutRefreshStage {
         );
       } catch (error) {
         console.warn(
-          "underclerk.payment_due_failed",
+          "commerce.payment_due_failed",
           payment.paymentAttemptId,
           error instanceof Error ? error.message : String(error),
         );

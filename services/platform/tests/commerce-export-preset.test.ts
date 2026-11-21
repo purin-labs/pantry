@@ -31,7 +31,7 @@ const NOW = "2026-08-26T00:00:00.000Z";
 const BASELINE = singleDatabaseSchema();
 
 describe("Platform export preset publication", () => {
-  it("rebuilds the current development baseline and publishes the real Underclerk preset", async () => {
+  it("rebuilds the current development baseline and publishes the real Commerce preset", async () => {
     const platform = createDatabase();
     const commerceEngine = await startCommerceWorker({ now: NOW });
     const config = {
@@ -41,7 +41,7 @@ describe("Platform export preset publication", () => {
     };
     const admin = new CommerceAdminClient(config);
     const provisioned = await admin.provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: ORGANISATION,
       merchantId: MERCHANT,
       createdAt: NOW,
@@ -162,7 +162,7 @@ describe("Platform export preset publication", () => {
     database.sqlite.close();
   });
 
-  it("fails closed for Underclerk identity and resource drift", async () => {
+  it("fails closed for Commerce identity and resource drift", async () => {
     const database = createDatabase();
     const mismatch = await publish(
       database.db,
@@ -173,7 +173,7 @@ describe("Platform export preset publication", () => {
     expect(mismatch).toEqual({
       ok: false,
       error: {
-        code: "commerce_export_preset_underclerk_mismatch",
+        code: "commerce_export_preset_commerce_mismatch",
         field: "organisationId",
       },
     });
@@ -185,7 +185,7 @@ describe("Platform export preset publication", () => {
     expect(invalidDigest).toEqual({
       ok: false,
       error: {
-        code: "commerce_export_preset_underclerk_mismatch",
+        code: "commerce_export_preset_commerce_mismatch",
         field: "digest",
       },
     });

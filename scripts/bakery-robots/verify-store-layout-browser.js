@@ -50,7 +50,7 @@ function retainStoreModuleTimings() {
 
 function invalidStorePreference() {
   localStorage.setItem(
-    "satyr:bakery-interior-design:v1",
+    "pantry:bakery-interior-design:v1",
     JSON.stringify({
       preset: "missing-preset",
       floorMaterial: "missing-floor",
@@ -705,13 +705,13 @@ async function verifyStoreLayoutBrowser(page) {
   }
   const storageAndSurfaceCheck = await page.evaluate(() => {
     const { workspace, shiftLayout } = window.storeLayoutProbe;
-    const savedRaw = localStorage.getItem("satyr:floor-plan-workspace:v1");
+    const savedRaw = localStorage.getItem("pantry:floor-plan-workspace:v1");
     if (!savedRaw)
       throw new Error("Workspace state was not saved to localStorage.");
     const parsed = JSON.parse(savedRaw);
-    localStorage.setItem("satyr:floor-plan-workspace:v1", "{corrupt-json");
+    localStorage.setItem("pantry:floor-plan-workspace:v1", "{corrupt-json");
     workspace.reloadFromStorage();
-    localStorage.setItem("satyr:floor-plan-workspace:v1", savedRaw);
+    localStorage.setItem("pantry:floor-plan-workspace:v1", savedRaw);
     workspace.reloadFromStorage();
     const surfaceLayout = shiftLayout.shiftFloorPlanLayout();
     return {

@@ -119,7 +119,7 @@ const nothing = (): void => {};
 const ACTIONS: IntegrationsPageActions = {
   syncCommerceSystem: settle,
   syncCommerceSystemQuietly: settle,
-  setupSatyrCommerce: settle,
+  setupBuiltInCommerce: settle,
   publishExportCoordination: settle,
   selectShopifyCommerce: settle,
   connectShopify: settle,
@@ -688,7 +688,7 @@ function scenarioDiagnostics(
 ): SupportDiagnostics | null {
   if (scenario !== "attempt_failed") return null;
   return {
-    supportReference: "SATYR-3f2a9c0e-7d41-4b0a-9a6e-2c1d5e8f0b77",
+    supportReference: "PANTRY-3f2a9c0e-7d41-4b0a-9a6e-2c1d5e8f0b77",
     provider,
     displayAccount: null,
     reasonCode:
@@ -804,8 +804,8 @@ function previewCommerceSystem(): IntegrationsPageProps["commerceSystem"] {
   const commerce = previewParam("commerce");
   if (commerce === null || commerce === "none") return null;
   return {
-    kind: "satyr_commerce",
-    bindingId: "underclerk_binding_preview",
+    kind: "builtin_commerce",
+    bindingId: "commerce_binding_preview",
     merchantId: "merchant_preview",
     revision: 1,
     sync:
@@ -830,7 +830,7 @@ const SLACK_ACCOUNT = account({
   provider: "slack",
   providerAccountId: "T0CAFEOS",
   accountKind: "workspace",
-  displayName: "CafeOS",
+  displayName: "cafe",
   scopes: ["chat:write", "channels:read"],
 });
 
@@ -915,7 +915,7 @@ function buildProps(
         ? { kind: "claude_oauth" }
         : integration === "codex" || previewParam("codex") !== null
           ? { kind: "codex_subscription" }
-          : { kind: "satyr_platform" },
+          : { kind: "pantry_platform" },
     accounts: [...scenarioAccounts(scenario), ...previewSlack().accounts],
     credentialInventory: null,
     destinations: previewSlack().destinations,
@@ -1206,7 +1206,7 @@ function readPreviewOverview(
  * The stand-in Slack window marks its approval here; the popup and the page
  * share this origin's storage. Each page load clears it.
  */
-const APPROVED_SLACK_KEY = "satyr-preview-slack-approved";
+const APPROVED_SLACK_KEY = "pantry-preview-slack-approved";
 
 function slackApproved(): boolean {
   try {
@@ -1333,7 +1333,7 @@ function acknowledgesAttempt(attemptId: string, data: unknown): boolean {
     typeof data === "object" &&
     data !== null &&
     (data as { readonly type?: unknown }).type ===
-      "satyr.provider-attempt.ack" &&
+      "pantry.provider-attempt.ack" &&
     (data as { readonly attempt_id?: unknown }).attempt_id === attemptId
   );
 }
@@ -1344,7 +1344,7 @@ function approveInProviderWindow(
   setStatus: React.Dispatch<React.SetStateAction<ProviderWindowStatus>>,
 ): void {
   const completion = {
-    type: "satyr.provider-attempt.completed",
+    type: "pantry.provider-attempt.completed",
     attempt_id: attemptId,
     terminal_state: "connected",
     failure_reason_code: null,
@@ -1357,7 +1357,7 @@ function approveInProviderWindow(
       // Without storage the next read stays unconnected.
     }
   }
-  const channel = new BroadcastChannel("satyr-provider-attempt");
+  const channel = new BroadcastChannel("pantry-provider-attempt");
   const settleWindow = (): void => {
     setStatus("acknowledged");
     window.close();

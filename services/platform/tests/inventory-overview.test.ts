@@ -250,7 +250,7 @@ function stockSnapshot() {
   ];
   return {
     commerce: {
-      schemaVersion: "underclerk.commerce-snapshot.v2" as const,
+      schemaVersion: "commerce.commerce-snapshot.v2" as const,
       organisationId: "organisation",
       merchantId: "merchant",
       merchantRevision: 1,
@@ -313,7 +313,7 @@ function stockSnapshot() {
       },
     },
     foodService: {
-      schemaVersion: "underclerk.food-service-snapshot.v2" as const,
+      schemaVersion: "commerce.food-service-snapshot.v2" as const,
       organisationId: "organisation",
       merchantId: "merchant",
       merchantRevision: 1,

@@ -76,7 +76,7 @@ import { assertNever } from "@purin-labs/std";
  * full; the buyer's route builds it, so it is not a public command.
  */
 export type PlaceCommerceStoredValueCheckoutV1 = Readonly<{
-  schemaVersion: "underclerk.place-stored-value-checkout.v1";
+  schemaVersion: "commerce.place-stored-value-checkout.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -634,7 +634,7 @@ export function planManualCheckoutPlacement(
   if (checkout === undefined) return placementRejected("draftOrder.checkout");
   const onTerms = terms ?? { companyId: "", netDays: 0 };
   if (
-    command.schemaVersion === "underclerk.place-draft-order-on-terms.v1" &&
+    command.schemaVersion === "commerce.place-draft-order-on-terms.v1" &&
     terms === undefined
   )
     return placementRejected("company.paymentTerms");
@@ -699,7 +699,7 @@ export function planManualCheckoutPlacement(
       placement: { kind: "pickup" },
     },
     checkout,
-    command.schemaVersion === "underclerk.place-draft-order-on-terms.v1"
+    command.schemaVersion === "commerce.place-draft-order-on-terms.v1"
       ? { kind: "invoice", invoiceId: command.invoiceId, terms: onTerms }
       : { kind: "manual", tender: command.tender },
   );
@@ -773,7 +773,7 @@ export function planCounterCashPlacement(
   const configuration = readPointOfSaleConfigurationForCheckout(
     database,
     command.merchantId,
-    checkout.source.satyrLocationId,
+    checkout.source.pantryLocationId,
     checkout.source.posConfigurationRevision,
   );
   if (configuration === undefined || !pointOfSaleCashEnabled(configuration)) {
@@ -2013,7 +2013,7 @@ function placementSalesChannelId(
   const configuration = readPointOfSaleConfigurationForCheckout(
     database,
     merchantId,
-    checkout.source.satyrLocationId,
+    checkout.source.pantryLocationId,
     checkout.source.posConfigurationRevision,
   );
   return configuration?.salesChannelId;
@@ -2041,7 +2041,7 @@ function placementOrderOrigin(
       return {
         kind: "point_of_sale",
         salesChannelId,
-        locationId: checkout.source.satyrLocationId,
+        locationId: checkout.source.pantryLocationId,
         checkoutId: checkout.checkoutId,
         // The terminal that actually took the money, read off the payment
         // binding rather than restated by the caller.

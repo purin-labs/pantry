@@ -46,7 +46,7 @@ export const DRAFT_ORDERS_ROUTES: readonly RouteDefinition<DraftOrdersRoute>[] =
       "POST",
       "/v1/admin/merchants/:merchantId/draft-orders",
       "create_draft_order",
-      "underclerk.create-draft-order.v1",
+      "commerce.create-draft-order.v1",
     ),
     route(
       "GET",
@@ -57,25 +57,25 @@ export const DRAFT_ORDERS_ROUTES: readonly RouteDefinition<DraftOrdersRoute>[] =
       "PUT",
       "/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId",
       "update_draft_order",
-      "underclerk.update-draft-order.v1",
+      "commerce.update-draft-order.v1",
     ),
     route(
       "POST",
       "/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/invoice",
       "send_draft_invoice",
-      "underclerk.send-draft-invoice.v1",
+      "commerce.send-draft-invoice.v1",
     ),
     route(
       "POST",
       "/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/cancellation",
       "cancel_draft_order",
-      "underclerk.cancel-draft-order.v1",
+      "commerce.cancel-draft-order.v1",
     ),
     route(
       "POST",
       "/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/manual-payment",
       "mark_draft_order_paid",
-      "underclerk.mark-draft-order-paid.v1",
+      "commerce.mark-draft-order-paid.v1",
     ),
     route(
       "POST",

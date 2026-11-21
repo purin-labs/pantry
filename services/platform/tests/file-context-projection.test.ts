@@ -309,7 +309,7 @@ async function createFixture(): Promise<
       created_by_user_id, created_at, updated_at, environment,
       provider_subject_id
     ) VALUES (
-      'connection_files', 'organisation_files', 'dropbox', 'shared_satyr_app',
+      'connection_files', 'organisation_files', 'dropbox', 'shared_pantry_app',
       'connection_credential', 1, 'vault:dropbox:files:g1', 'active',
       '["files.metadata.read","files.content.read"]', 'user_dab01be4-5d2a-5eb0-ad17-377ebd580df4',
       ${NOW}, ${NOW}, 'development', 'dbid:files'

@@ -24,7 +24,7 @@ import { catalogSearchRequest, searchCatalog } from "./catalog-search.ts";
  */
 export const CATALOG_SNAPSHOT_SECONDS = 2;
 
-const FETCHED_AT_HEADER = "x-underclerk-snapshot-fetched-at";
+const FETCHED_AT_HEADER = "x-commerce-snapshot-fetched-at";
 
 type CatalogSnapshot = Readonly<{
   organisationId: string;
@@ -92,7 +92,7 @@ export async function createSessionThroughSnapshot(
   });
   return new Response(
     JSON.stringify({
-      schemaVersion: "underclerk.buyer-session.v4",
+      schemaVersion: "commerce.buyer-session.v4",
       token: issued.token,
       expiresAt: issued.claims.expiresAt,
       storefrontRevision: issued.claims.storefrontRevision,
@@ -175,17 +175,17 @@ async function cachedSnapshot(
   const merchant = encodeURIComponent(route.merchantId);
   const storefront = encodeURIComponent(route.storefrontId);
   const key = new Request(
-    `https://underclerk.internal/catalog-snapshots/${merchant}/${storefront}?origin=${encodeURIComponent(origin)}`,
+    `https://commerce.internal/catalog-snapshots/${merchant}/${storefront}?origin=${encodeURIComponent(origin)}`,
   );
   let response = await cache?.match(key);
   if (response === undefined) {
     const built = await options.merchantObject.fetch(
       new Request(
-        `https://underclerk.internal/v1/internal/merchants/${merchant}/storefronts/${storefront}/catalog-snapshot`,
+        `https://commerce.internal/v1/internal/merchants/${merchant}/storefronts/${storefront}/catalog-snapshot`,
         {
           headers: {
             authorization: `Bearer ${options.serviceToken}`,
-            "x-underclerk-public-origin": origin,
+            "x-commerce-public-origin": origin,
           },
         },
       ),
@@ -214,7 +214,7 @@ async function cachedSnapshot(
 
 function parseSnapshot(value: unknown): CatalogSnapshot | undefined {
   return isRecord(value) &&
-    value.schemaVersion === "underclerk.catalog-snapshot.v1" &&
+    value.schemaVersion === "commerce.catalog-snapshot.v1" &&
     typeof value.organisationId === "string" &&
     typeof value.storefrontRevision === "number" &&
     typeof value.builtAt === "string" &&

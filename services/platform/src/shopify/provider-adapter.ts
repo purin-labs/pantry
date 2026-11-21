@@ -148,7 +148,7 @@ export async function discoverShopifyIdentity(
         },
         body: JSON.stringify({
           query:
-            "query SatyrOnboardingShop { shop { id name myshopifyDomain plan { displayName partnerDevelopment } } }",
+            "query PantryOnboardingShop { shop { id name myshopifyDomain plan { displayName partnerDevelopment } } }",
         }),
       },
     );
@@ -271,7 +271,7 @@ async function uninstallShopifyApplication(
           "x-shopify-access-token": token.value,
         },
         body: JSON.stringify({
-          query: `mutation SatyrUninstallApp {
+          query: `mutation PantryUninstallApp {
             appUninstall {
               app { id }
               userErrors { field message }

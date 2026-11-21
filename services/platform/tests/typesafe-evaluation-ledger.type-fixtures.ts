@@ -14,7 +14,7 @@ export const inactiveConnection: TypeSafeUsageAuthority = {
   kind: "inactive",
   revision: 1,
   // @ts-expect-error Inactive authority cannot carry a usable connection.
-  funding: { kind: "satyr_platform" },
+  funding: { kind: "pantry_platform" },
 };
 
 // @ts-expect-error Active authority requires pinned connection and limits.

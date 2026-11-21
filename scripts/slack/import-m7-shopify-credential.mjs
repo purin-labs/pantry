@@ -25,7 +25,7 @@ async function main() {
       : await promptForHiddenTerminalValue(
           process.stdin,
           process.stderr,
-          "Paste the Satyr organisation admin token (input hidden): ",
+          "Paste the Pantry organisation admin token (input hidden): ",
         );
   const clientId = await configuredOrPrompt(
     "SHOPIFY_CLIENT_ID",

@@ -67,7 +67,7 @@ describe("commerce entity-plane Blotter source", () => {
           4,
           "blotterRevision",
         ),
-        underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+        commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
           8,
           "commerceRevision",
         ),
@@ -486,7 +486,7 @@ function requiredPlannedRelationship(
         1,
         "blotterRevision",
       ),
-      underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+      commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
         1,
         "commerceRevision",
       ),
@@ -543,7 +543,7 @@ function requiredPlannedPage(
         1,
         "blotterRevision",
       ),
-      underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+      commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
         1,
         "commerceRevision",
       ),
@@ -597,7 +597,7 @@ function requiredPlannedCount(
         1,
         "blotterRevision",
       ),
-      underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+      commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
         1,
         "commerceRevision",
       ),

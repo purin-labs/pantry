@@ -319,7 +319,7 @@ async function seedSecondOrganisation(world: WhatsAppTestWorld): Promise<{
     provider: "whatsapp",
     providerSubjectId: "102290129340399",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef,
@@ -421,7 +421,7 @@ async function policyTest(): Promise<void> {
   });
   expect(current).toMatchObject({
     kind: "enabled",
-    relevantMessageTopics: "CafeOS, cafe automation, cafe, and bakery topics.",
+    relevantMessageTopics: "Café, cafe automation, cafe, and bakery topics.",
     automaticAcknowledgementText:
       "Thanks for your message. We’ll get back to you shortly.",
   });
@@ -472,7 +472,7 @@ function policyBoundaryTest(): void {
     maxActiveCaseBytes: 32_768,
     debounceSeconds: 15,
     relevantMessageTopics:
-      "CafeOS, cafe automation, cafe, bakery, and products.",
+      "Café, cafe automation, cafe, bakery, and products.",
     automaticAcknowledgementText:
       "Thanks for your message. We’ll get back to you shortly.",
     overflow: "pause_and_notify",

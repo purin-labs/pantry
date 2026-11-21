@@ -243,7 +243,7 @@ async function mountPersistentChat() {
     originalFetch: window.fetch.bind(window),
   };
   window.fetch = persistentChatFetch;
-  document.cookie = "satyr_control_csrf=plan70-chat; path=/";
+  document.cookie = "pantry_csrf=plan70-chat; path=/";
   ReactDOM.createRoot(document.getElementById("root")).render(
     React.createElement(
       MemoryRouter,

@@ -228,7 +228,7 @@ function readUnfinishedReceipts(
        WHERE d.kind = ? AND d.scope_kind = 'task' AND t.status <> 'terminal'
          AND d.retired_at IS NULL
          AND r.seq = (SELECT MAX(seq) FROM document_revisions WHERE document_id = d.id)`,
-      JSON.stringify("satyr.codemode.result"),
+      JSON.stringify("pantry.codemode.result"),
     )
     .toArray()
     .map(receiptPhase);

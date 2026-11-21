@@ -10,17 +10,17 @@ import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
 import { requireIntegrationAccountId } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 
-it("binds one Satyr organisation and integration identity to one active Underclerk merchant", async () => {
+it("binds one Pantry organisation and integration identity to one active Commerce merchant", async () => {
   const db = createMigratedDatabase();
-  const organisationId = parseOrganisationId("organisation_underclerk_binding");
+  const organisationId = parseOrganisationId("organisation_commerce_binding");
   const integrationAccountId = parseIntegrationAccountId(
-    "integration_underclerk_binding",
+    "integration_commerce_binding",
   );
   if (!organisationId.ok || !integrationAccountId.ok)
     throw new Error("Invalid binding fixture");
   await db
     .prepare(
-      "INSERT INTO organisation (organisation_id, name, plan, created_at, status) VALUES (?, 'Underclerk', 'beta', 1, 'active')",
+      "INSERT INTO organisation (organisation_id, name, plan, created_at, status) VALUES (?, 'Commerce', 'beta', 1, 'active')",
     )
     .bind(organisationId.value)
     .run();
@@ -35,12 +35,12 @@ it("binds one Satyr organisation and integration identity to one active Undercle
     .run();
   const binding = {
     db,
-    bindingId: "underclerk_binding_demo",
+    bindingId: "commerce_binding_demo",
     organisationId: organisationId.value,
     integrationAccountId: integrationAccountId.value,
     merchantId: "merchant_demo",
     environment: "development",
-    deliverySigningKeyId: "key_underclerk_demo",
+    deliverySigningKeyId: "key_commerce_demo",
     deliverySigningPublicKey: new Uint8Array(32).fill(7),
   } as const;
   let provisions = 0;
@@ -83,16 +83,16 @@ it("binds one Satyr organisation and integration identity to one active Undercle
   expect(
     await bindCommerceMerchant({
       db,
-      bindingId: "underclerk_binding_second",
+      bindingId: "commerce_binding_second",
       organisationId: organisationId.value,
       integrationAccountId: requireIntegrationAccountId(
-        "integration_underclerk_second",
+        "integration_commerce_second",
       ),
       merchantId: "merchant_second",
       environment: "development",
-      deliverySigningKeyId: "key_underclerk_second",
+      deliverySigningKeyId: "key_commerce_second",
       deliverySigningPublicKey: new Uint8Array(32).fill(9),
       now: 101,
     }),
-  ).toEqual({ ok: false, error: { code: "underclerk_binding_conflict" } });
+  ).toEqual({ ok: false, error: { code: "commerce_binding_conflict" } });
 });

@@ -6,9 +6,9 @@ import type { VaultEvent, VaultStoreView } from "@purin-labs/control-api";
  * The preview Vault holds no items, so a move has nothing to move.
  */
 export function installVaultIntegrationPreview(organisationId: string): void {
-  document.cookie = `satyr_control_csrf=preview; path=${window.location.pathname}; SameSite=Strict`;
+  document.cookie = `pantry_csrf=preview; path=${window.location.pathname}; SameSite=Strict`;
   const base = `/v1/control/organisations/${organisationId}/vault`;
-  let store: VaultStoreView = { kind: "satyr" };
+  let store: VaultStoreView = { kind: "pantry" };
   const events: VaultEvent[] = [];
   const record = (kind: VaultEvent["kind"]): void => {
     events.unshift({
@@ -38,7 +38,7 @@ export function installVaultIntegrationPreview(organisationId: string): void {
       return Response.json({
         ok: true,
         store:
-          store.kind === "satyr"
+          store.kind === "pantry"
             ? store
             : {
                 kind: "onepassword",
@@ -62,7 +62,7 @@ export function installVaultIntegrationPreview(organisationId: string): void {
           kind: "choose_vault",
           vaults: [
             {
-              vaultId: "previewvaultsatyr000000000",
+              vaultId: "previewvaultpantry00000000",
               title: "Seams",
               itemCount: 0,
             },
@@ -86,7 +86,7 @@ export function installVaultIntegrationPreview(organisationId: string): void {
       return Response.json({ ok: true, kind: "store", store });
     }
     if (command.kind === "disconnect_onepassword") {
-      store = { kind: "satyr" };
+      store = { kind: "pantry" };
       record("store_disconnected");
       return Response.json({ ok: true, kind: "store", store });
     }

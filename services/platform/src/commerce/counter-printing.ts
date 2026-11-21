@@ -60,7 +60,7 @@ export async function recordCounterCashAndOpenDrawer(
   const drawer =
     settled.value.state === "complete"
       ? await runPrinterTask(deps, {
-          locationId: settled.value.satyrLocationId,
+          locationId: settled.value.pantryLocationId,
           checkoutId: input.checkoutId,
           task: "cash_drawer_kick",
           requestId: `drawer_sale_${input.checkoutId}`,
@@ -89,7 +89,7 @@ export async function runCounterAfterSaleWithDrawer(
     input.action === "manual_cash_refund" &&
     done.value.afterSale?.refundState === "completed"
       ? await runPrinterTask(deps, {
-          locationId: done.value.satyrLocationId,
+          locationId: done.value.pantryLocationId,
           checkoutId: input.checkoutId,
           task: "cash_drawer_kick",
           requestId: `drawer_refund_${input.checkoutId}`,
@@ -121,7 +121,7 @@ export async function printCounterSaleReceipt(
     return { ok: false, failure: { kind: "commerce", error: record.error } };
   const configuration = await deps.client.readPointOfSaleConfiguration(
     deps.merchantId,
-    sale.value.satyrLocationId,
+    sale.value.pantryLocationId,
   );
   if (!configuration.ok)
     return {
@@ -131,7 +131,7 @@ export async function printCounterSaleReceipt(
   const settings = await readCounterReceiptSettings(
     deps.scope.database,
     deps.organisationId,
-    sale.value.satyrLocationId,
+    sale.value.pantryLocationId,
   );
   const order = record.value.order;
   const cash = sale.value.manualTender ?? null;
@@ -166,7 +166,7 @@ export async function printCounterSaleReceipt(
     copy: input.copy,
   });
   const job = await runPrinterTask(deps, {
-    locationId: sale.value.satyrLocationId,
+    locationId: sale.value.pantryLocationId,
     checkoutId: input.checkoutId,
     task: "receipt_print",
     requestId: input.requestId,
@@ -182,7 +182,7 @@ export async function readCounterSaleReceipt(
 ): Promise<CounterRegisterResult<CounterSaleReceipt>> {
   const sale = await readCounterSaleView(deps, checkoutId);
   if (!sale.ok) return sale;
-  const locationId = sale.value.satyrLocationId;
+  const locationId = sale.value.pantryLocationId;
   const fleet = (await locationHasReceiptPrinter(deps, locationId))
     ? counterLocationFleet(deps, locationId)
     : null;
@@ -198,17 +198,17 @@ export async function readCounterSaleReceipt(
 export async function readCounterReceiptSettings(
   db: OrganisationDatabase,
   organisationId: OrganisationId,
-  satyrLocationId: string,
+  pantryLocationId: string,
 ): Promise<CounterReceiptSettings> {
   const row = await db
     .prepare(
       `SELECT invoice_registration_number FROM cafe_counter_receipt_setting
-        WHERE organisation_id = ? AND satyr_location_id = ?`,
+        WHERE organisation_id = ? AND pantry_location_id = ?`,
     )
-    .bind(organisationId, satyrLocationId)
+    .bind(organisationId, pantryLocationId)
     .first<{ invoice_registration_number: string | null }>();
   return {
-    satyrLocationId,
+    pantryLocationId,
     invoiceRegistrationNumber: row?.invoice_registration_number ?? null,
   };
 }
@@ -226,7 +226,7 @@ export async function writeCounterReceiptSettings(
   const current = await readCounterReceiptSettings(
     db,
     input.organisationId,
-    input.settings.satyrLocationId,
+    input.settings.pantryLocationId,
   );
   if (
     current.invoiceRegistrationNumber ===
@@ -236,17 +236,17 @@ export async function writeCounterReceiptSettings(
   await db
     .prepare(
       `INSERT INTO cafe_counter_receipt_setting (
-         organisation_id, satyr_location_id, invoice_registration_number,
+         organisation_id, pantry_location_id, invoice_registration_number,
          updated_by_user_id, updated_at
        ) VALUES (?, ?, ?, ?, ?)
-       ON CONFLICT (organisation_id, satyr_location_id) DO UPDATE SET
+       ON CONFLICT (organisation_id, pantry_location_id) DO UPDATE SET
          invoice_registration_number = excluded.invoice_registration_number,
          updated_by_user_id = excluded.updated_by_user_id,
          updated_at = excluded.updated_at`,
     )
     .bind(
       input.organisationId,
-      input.settings.satyrLocationId,
+      input.settings.pantryLocationId,
       input.settings.invoiceRegistrationNumber,
       input.userId,
       input.now,

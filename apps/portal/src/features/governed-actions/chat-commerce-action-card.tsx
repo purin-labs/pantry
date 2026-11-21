@@ -31,7 +31,7 @@ import "./chat-commerce-action-card.css";
 
 const ACTION_LINK = /[?&]commerceAction=([A-Za-z0-9_-]{1,128})/gu;
 /** Marks an action whose step-up sign-in began in a chat card, to apply it after. */
-const APPLY_AFTER_SIGN_IN_KEY = "satyr:commerce-apply-after-approval";
+const APPLY_AFTER_SIGN_IN_KEY = "pantry:commerce-apply-after-approval";
 
 /** The actions that an answer links to, each once, in order. */
 function linkedCommerceActions(text: string): readonly string[] {

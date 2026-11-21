@@ -212,7 +212,7 @@ export class CommerceHttpApi {
         if (due !== null) next.push(due);
       } catch (error) {
         console.warn(
-          "underclerk.due_work_pass_failed",
+          "commerce.due_work_pass_failed",
           pass.name,
           error instanceof Error ? error.message : String(error),
         );

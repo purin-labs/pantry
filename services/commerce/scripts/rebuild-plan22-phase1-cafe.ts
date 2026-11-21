@@ -37,7 +37,7 @@ export async function rebuildPhase1Cafe(
   identities: RebuildIdentity,
 ): Promise<Plan22Phase1CafeRebuildResult> {
   const provisioned = await adminClient.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: identities.organisationId,
     merchantId: identities.merchantId,
     createdAt: OCCURRED_AT,

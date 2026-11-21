@@ -20,7 +20,7 @@ import { createMigratedDatabase } from "./sqlite-d1";
 import { testExecutionContext, type UnitTestEnv } from "./worker-fakes";
 
 const AUDIENCE = "https://pantry.example/hook/email/google";
-const SERVICE_ACCOUNT = "gmail-push@satyr-project.iam.gserviceaccount.com";
+const SERVICE_ACCOUNT = "gmail-push@pantry-project.iam.gserviceaccount.com";
 const ADDRESS = "support@example.com";
 
 describe("gmail operating path ingress", ingressSuite);
@@ -366,7 +366,7 @@ async function createFixture(slug: string): Promise<Fixture> {
       }));
       await worker.queue(
         {
-          queue: "satyr-events",
+          queue: "pantry-events",
           messages,
           ackAll: () => undefined,
           retryAll: () => undefined,
@@ -509,7 +509,7 @@ function gmailSeed(
     provider: "gmail",
     providerSubjectId: providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requireVaultHandle(

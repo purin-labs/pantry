@@ -368,7 +368,7 @@ class RegisterCashDesk extends StaffDesk {
   ) {
     return required(
       this.admin.publishPointOfSaleConfiguration({
-        schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+        schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
         merchantId,
         expectedRevision: input.expectedRevision,
         publishedAt: NOW,
@@ -376,7 +376,7 @@ class RegisterCashDesk extends StaffDesk {
         configuration: {
           configurationId: "pos_configuration_register",
           organisationId,
-          satyrLocationId: LOCATION,
+          pantryLocationId: LOCATION,
           salesChannelId: CHANNEL,
           currency: "JPY",
           supportedItems: [],
@@ -432,7 +432,7 @@ class RegisterCashDesk extends StaffDesk {
     return this.edit(
       this.admin.createInPersonCheckout({
         ...(await this.base(`ring_${input.checkoutId}`)),
-        satyrLocationId: LOCATION,
+        pantryLocationId: LOCATION,
         posConfigurationRevision: input.posConfigurationRevision,
         operatorIdentity: "operator_barista",
         terminalAssignmentRevision: input.terminalAssignmentRevision,

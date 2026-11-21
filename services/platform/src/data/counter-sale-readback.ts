@@ -12,9 +12,9 @@ import type {
 } from "@purin-labs/control-api";
 
 export type CounterSaleReadback = Readonly<{
-  schemaVersion: "satyr.counter-sale.v1";
+  schemaVersion: "pantry.counter-sale.v1";
   checkoutId: string;
-  satyrLocationId: string;
+  pantryLocationId: string;
   revision: number;
   state: CounterSaleState;
   /**
@@ -108,11 +108,11 @@ export function readCounterSale(
     };
   }
   return {
-    schemaVersion: "satyr.counter-sale.v1",
+    schemaVersion: "pantry.counter-sale.v1",
     checkoutId: checkout.checkoutId,
-    satyrLocationId:
+    pantryLocationId:
       checkout.source.kind === "point_of_sale"
-        ? checkout.source.satyrLocationId
+        ? checkout.source.pantryLocationId
         : "",
     revision: checkout.revision,
     state,

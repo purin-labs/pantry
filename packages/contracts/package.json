@@ -4,7 +4,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "description": "Satyr contract schemas in TypeScript (Plan 78).",
+  "description": "Pantry contract schemas in TypeScript (Plan 78).",
   "exports": {
     ".": {
       "types": "./src/index.ts",

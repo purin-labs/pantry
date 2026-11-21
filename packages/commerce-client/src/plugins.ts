@@ -138,7 +138,7 @@ export type CommercePluginV1 = PluginDefinition &
   }>;
 
 export type CommercePluginListV1 = Readonly<{
-  schemaVersion: "underclerk.plugins.v1";
+  schemaVersion: "commerce.plugins.v1";
   plugins: readonly CommercePluginV1[];
 }>;
 
@@ -167,7 +167,7 @@ export type CommercePluginEffectV1 =
   | Readonly<{ kind: "active_discounts"; discounts: number }>;
 
 export type CommercePluginPreviewV1 = Readonly<{
-  schemaVersion: "underclerk.plugin-preview.v1";
+  schemaVersion: "commerce.plugin-preview.v1";
   pluginId: string;
   change: CommercePluginChangeV1;
   /** Why the change would be refused, or null when it would apply. */
@@ -176,7 +176,7 @@ export type CommercePluginPreviewV1 = Readonly<{
 }>;
 
 export type PreviewCommercePluginChangeV1 = Readonly<{
-  schemaVersion: "underclerk.preview-plugin-change.v1";
+  schemaVersion: "commerce.preview-plugin-change.v1";
   change: CommercePluginChangeV1;
 }>;
 
@@ -189,13 +189,13 @@ type PluginCommandBase = Readonly<{
 }>;
 
 export type PauseCommercePluginV1 = PluginCommandBase &
-  Readonly<{ schemaVersion: "underclerk.pause-plugin.v1" }>;
+  Readonly<{ schemaVersion: "commerce.pause-plugin.v1" }>;
 
 export type ResumeCommercePluginV1 = PluginCommandBase &
-  Readonly<{ schemaVersion: "underclerk.resume-plugin.v1" }>;
+  Readonly<{ schemaVersion: "commerce.resume-plugin.v1" }>;
 
 export type RemoveCommercePluginV1 = PluginCommandBase &
-  Readonly<{ schemaVersion: "underclerk.remove-plugin.v1" }>;
+  Readonly<{ schemaVersion: "commerce.remove-plugin.v1" }>;
 
 export type CommercePluginCommandV1 =
   PauseCommercePluginV1 | ResumeCommercePluginV1 | RemoveCommercePluginV1;
@@ -206,7 +206,7 @@ export type CommercePluginCommandV1 =
  */
 export type ConfigureCommercePluginV1 = PluginCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.configure-plugin.v1";
+    schemaVersion: "commerce.configure-plugin.v1";
     settings: CommercePluginSettingsV1;
   }>;
 
@@ -224,7 +224,7 @@ export type CommercePluginSettingsV1 = Readonly<
  * plugin that the merchant does not have yet.
  */
 export type InstallCommerceMerchantPluginV1 = Readonly<{
-  schemaVersion: "underclerk.install-merchant-plugin.v1";
+  schemaVersion: "commerce.install-merchant-plugin.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -249,7 +249,7 @@ export type InstallCommerceMerchantPluginV1 = Readonly<{
  * record has no values yet.
  */
 export type SetCommercePluginFieldValuesV1 = Readonly<{
-  schemaVersion: "underclerk.set-plugin-field-values.v1";
+  schemaVersion: "commerce.set-plugin-field-values.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -268,7 +268,7 @@ export type CommercePluginFieldValuesV1 = Readonly<{
 }>;
 
 export type CommercePluginFieldValueListV1 = Readonly<{
-  schemaVersion: "underclerk.plugin-field-values.v1";
+  schemaVersion: "commerce.plugin-field-values.v1";
   pluginId: string;
   fields: readonly CommercePluginFieldV1[];
   records: readonly CommercePluginFieldValuesV1[];
@@ -276,7 +276,7 @@ export type CommercePluginFieldValueListV1 = Readonly<{
 
 /** Runs a merchant plugin's action with its inputs. */
 export type RunCommercePluginActionV1 = Readonly<{
-  schemaVersion: "underclerk.run-plugin-action.v1";
+  schemaVersion: "commerce.run-plugin-action.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: CommerceEngineTimestamp;
@@ -287,7 +287,7 @@ export type RunCommercePluginActionV1 = Readonly<{
 
 /** Runs one function of a draft definition on an input; it changes nothing. */
 export type RunCommercePluginFunctionV1 = Readonly<{
-  schemaVersion: "underclerk.run-plugin-function.v1";
+  schemaVersion: "commerce.run-plugin-function.v1";
   definition: PluginDefinition;
   /** A hook function, or a draft handler or action of the lists below. */
   functionId: string;
@@ -308,7 +308,7 @@ export type CommercePluginCommandCheckV1 = Readonly<{
 }>;
 
 export type CommercePluginFunctionRunV1 = Readonly<{
-  schemaVersion: "underclerk.plugin-function-run.v1";
+  schemaVersion: "commerce.plugin-function-run.v1";
   outcome:
     | Readonly<{ kind: "returned"; output: unknown }>
     | Readonly<{
@@ -325,13 +325,13 @@ export type CommercePluginFunctionRunV1 = Readonly<{
 
 /** Runs a draft definition over the merchant's recent checkouts. */
 export type PreviewCommerceMerchantPluginV1 = Readonly<{
-  schemaVersion: "underclerk.preview-merchant-plugin.v1";
+  schemaVersion: "commerce.preview-merchant-plugin.v1";
   definition: PluginDefinition;
   settings: CommercePluginSettingsV1;
 }>;
 
 export type CommerceMerchantPluginPreviewV1 = Readonly<{
-  schemaVersion: "underclerk.merchant-plugin-preview.v1";
+  schemaVersion: "commerce.merchant-plugin-preview.v1";
   pluginId: string;
   /** How many recent checkouts the functions ran on. */
   checkouts: number;

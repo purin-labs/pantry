@@ -304,7 +304,7 @@ async function proposalPermissionJourney({ task }: TestContext): Promise<void> {
     substituted: [
       "model provider (deterministic OpenRouter transport)",
       "Slack (signed events, interaction payloads and response URLs)",
-      "commerce provider (Underclerk test merchant)",
+      "commerce provider (Commerce test merchant)",
     ],
     requestId,
     request: asked,

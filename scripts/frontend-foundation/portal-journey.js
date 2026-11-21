@@ -5,7 +5,7 @@ async function portalJourney(page) {
   await page.goto(`${origin}/portal?p21_auth=1&p21_provider=1`);
   await page.evaluate(() => {
     document.cookie =
-      "satyr_control_csrf=csrf_frontend_foundation; path=/; SameSite=Lax";
+      "pantry_csrf=csrf_frontend_foundation; path=/; SameSite=Lax";
   });
   const workspace = page.locator(
     'a.organisation-row-link[href="/portal/cafe-browser-lab"]',

@@ -229,7 +229,7 @@ export async function prepareStaffPageWork(
     admittedSessionOperation(
       execution,
       lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
     {
       kind: "organisation",
@@ -238,7 +238,7 @@ export async function prepareStaffPageWork(
     },
   );
   if (client === null) {
-    throw new Error(`${label} Underclerk unavailable`);
+    throw new Error(`${label} Commerce unavailable`);
   }
   return {
     member,

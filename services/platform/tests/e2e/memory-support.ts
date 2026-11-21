@@ -94,7 +94,7 @@ export async function installMemoryFixture(): Promise<MemoryFixture> {
   );
   const viewer = await nativeMember(organisationId, "memory-viewer", "viewer");
   const outsider = await commerceClient("memory-outsider");
-  const route = await selectModelRoute(organisationId, owner, "satyr_platform");
+  const route = await selectModelRoute(organisationId, owner, "pantry_platform");
   await activateOrganisation(organisationId);
   network.use(
     http.post("https://openrouter.ai/api/v1/chat/completions", () =>

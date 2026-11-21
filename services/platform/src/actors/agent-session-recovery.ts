@@ -240,7 +240,7 @@ function recoveryEnvelope<T extends SessionTransition>(
     actorId: state.state.identity.sessionId,
     streamId: state.state.identity.streamId,
     sequence: state.state.contract.lastEventSequence,
-    sourceTime: { kind: "satyr", issuedAt: event.acceptedAt },
+    sourceTime: { kind: "pantry", issuedAt: event.acceptedAt },
     acceptedAt: event.acceptedAt,
     correlationId: event.operationId,
     causation: { kind: "command", commandId: event.operationId },

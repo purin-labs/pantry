@@ -150,7 +150,7 @@ function probeEntries(view) {
 }
 
 function isProbeEntry(entry) {
-  return entry.kind === "satyr.observation_probe";
+  return entry.kind === "pantry.observation_probe";
 }
 
 function writeProbe(root, index) {
@@ -158,7 +158,7 @@ function writeProbe(root, index) {
     {
       type: "write",
       requestId: `observation_probe_${index}`,
-      entry: { kind: "satyr.observation_probe", data: { index } },
+      entry: { kind: "pantry.observation_probe", data: { index } },
     },
     BACKGROUND_CONTEXT,
   );

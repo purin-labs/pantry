@@ -19,7 +19,7 @@ const TEST_SECRET_BINDINGS = {
   GOOGLE_OIDC_CLIENT_SECRET: "google-oidc-e2e-secret",
   NOTION_OAUTH_CLIENT_SECRET: "notion-e2e-secret",
   OPENROUTER_API_KEY: "openrouter-e2e-key",
-  TYPESAFE_API_KEY: "typesafe-satyr-e2e-key-0000000000",
+  TYPESAFE_API_KEY: "typesafe-pantry-e2e-key-0000000000",
   SESSION_TOKEN_SECRET: "session-token-e2e-secret",
   SHOPIFY_CLIENT_ID: "shopify-e2e-client",
   SHOPIFY_CLIENT_SECRET: "shopify-e2e-secret",
@@ -29,11 +29,11 @@ const TEST_SECRET_BINDINGS = {
   SLACK_SIGNING_SECRET: "slack-signing-e2e-secret",
   SQUARE_OAUTH_CLIENT_SECRET: "square-e2e-secret",
   STRIPE_CONNECT_CLIENT_ID: "stripe-e2e-client",
-  STRIPE_CONNECT_CLIENT_SECRET: "sk_test_satyr_platform_e2e",
+  STRIPE_CONNECT_CLIENT_SECRET: "sk_test_pantry_platform_e2e",
   STRIPE_CONNECT_WEBHOOK_ID: "we_e2e",
   STRIPE_CONNECT_WEBHOOK_SECRET: "whsec_e2e",
   ORGANISATION_ADMIN_TOKEN: "organisation-admin-e2e-token-000000000000",
-  UNDERCLERK_SERVICE_TOKEN: "underclerk-e2e-token",
+  COMMERCE_SERVICE_TOKEN: "commerce-e2e-token",
   PANTRY_FAULT_INJECTION_TOKEN: "fault-injection-e2e-token",
   WHATSAPP_APP_SECRET: "whatsapp-e2e-app-secret",
 } as const;
@@ -118,7 +118,7 @@ const TEST_VALUE_BINDINGS = {
   }),
   PANTRY_VAULT_ACTIVE_KEY_VERSION: "v1",
   SLACK_APP_ID: "A12345678",
-  UNDERCLERK_BASE_URL: "http://underclerk.test",
+  COMMERCE_BASE_URL: "http://commerce.test",
   SHOP_ORDER_PAGE_ORIGIN: "https://{name}.menu.test",
   WHATSAPP_APP_ID: "1000000000000001",
   WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID: "3000000000000003",
@@ -227,7 +227,7 @@ async function cloudflareOptions() {
         }),
       },
       serviceBindings: {
-        UNDERCLERK: { name: COMMERCE_FIXTURE_WORKER },
+        COMMERCE: { name: COMMERCE_FIXTURE_WORKER },
         MODEL_EXIT: { name: MODEL_EXIT_WORKER },
         // The E2E runtime cannot run the ChatGPT exit container (Plan 75); an
         // entrypoint of the runner runs its steps instead.
@@ -257,7 +257,7 @@ function productionCrons(): string[] {
   return [...(config.triggers.crons ?? [])];
 }
 
-const COMMERCE_FIXTURE_WORKER = "underclerk-fixture-e2e";
+const COMMERCE_FIXTURE_WORKER = "commerce-fixture-e2e";
 
 /**
  * Commerce's built fixture Worker (Plan 76 phase 1). This test runtime never
@@ -290,12 +290,12 @@ function commerceFixtureWorker() {
       }),
     ),
     durableObjects: {
-      UNDERCLERK_MERCHANT: {
+      COMMERCE_MERCHANT: {
         className: "CommerceFixtureMerchantDO",
         useSQLite: true,
       },
-      UNDERCLERK_SHOP_NAME: {
-        className: "UnderclerkShopNameDO",
+      COMMERCE_SHOP_NAME: {
+        className: "CommerceShopNameDO",
         useSQLite: true,
       },
     },
@@ -303,24 +303,24 @@ function commerceFixtureWorker() {
     r2Buckets: ["BUCKET"],
     bindings: {
       PANTRY_DEPLOYMENT_PROFILE: "local",
-      UNDERCLERK_SERVICE_TOKEN: TEST_SECRET_BINDINGS.UNDERCLERK_SERVICE_TOKEN,
-      UNDERCLERK_BUYER_SESSION_SECRET: "bakery-e2e-buyer-secret-00000001",
-      UNDERCLERK_SIGNING_KEY_ID: "key_bakery_e2e",
-      UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64: signingKey,
+      COMMERCE_SERVICE_TOKEN: TEST_SECRET_BINDINGS.COMMERCE_SERVICE_TOKEN,
+      COMMERCE_BUYER_SESSION_SECRET: "bakery-e2e-buyer-secret-00000001",
+      COMMERCE_SIGNING_KEY_ID: "key_bakery_e2e",
+      COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64: signingKey,
       JAPAN_CARRIER_SIGNING_KEY: "bakery-e2e-shipping",
       // Commerce holds Pantry merchants' Square connections (Plan 80 step 4).
       SQUARE_OAUTH_CLIENT_ID: TEST_VALUE_BINDINGS.SQUARE_OAUTH_CLIENT_ID,
       SQUARE_OAUTH_CLIENT_SECRET:
         TEST_SECRET_BINDINGS.SQUARE_OAUTH_CLIENT_SECRET,
       // Commerce links Pantry merchants' Stripe accounts (Plan 80 step 5).
-      STRIPE_SECRET_KEY: "sk_test_underclerk_e2e",
+      STRIPE_SECRET_KEY: "sk_test_commerce_e2e",
     },
     // Webhook posts to the platform's origin reach the platform Worker.
     outboundService: { name: RUNNER_WORKER, entrypoint: "CommerceNetwork" },
   };
 }
 
-const CODE_MODE_SANDBOX_WORKER = "satyr-code-mode-sandbox-e2e";
+const CODE_MODE_SANDBOX_WORKER = "pantry-code-sandbox-e2e";
 
 let sandboxWorker: ReturnType<typeof buildCodeModeSandboxWorker> | null = null;
 
@@ -349,7 +349,7 @@ function buildCodeModeSandboxWorker() {
   };
 }
 
-const MODEL_EXIT_WORKER = "satyr-model-exit-e2e";
+const MODEL_EXIT_WORKER = "pantry-model-exit-e2e";
 /**
  * The Worker that runs the test files. The Cloudflare Vitest plugin names it
  * after the Vitest project, and this project has no name.

@@ -2,47 +2,47 @@
   "tools": [
     {
       "provider": "stripe",
-      "command": "satyr-stripe-charge",
+      "command": "pantry-stripe-charge",
       "capabilityId": "stripe.charge.create"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-refund",
+      "command": "pantry-stripe-refund",
       "capabilityId": "stripe.refund.create"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-subscription-cancel",
+      "command": "pantry-stripe-subscription-cancel",
       "capabilityId": "stripe.subscription.cancel"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-payout",
+      "command": "pantry-stripe-payout",
       "capabilityId": "stripe.payout.create"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-transfer",
+      "command": "pantry-stripe-transfer",
       "capabilityId": "stripe.transfer.create"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-payment-intent-capture",
+      "command": "pantry-stripe-payment-intent-capture",
       "capabilityId": "stripe.payment_intent.capture"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-payment-intent-confirm",
+      "command": "pantry-stripe-payment-intent-confirm",
       "capabilityId": "stripe.payment_intent.confirm"
     },
     {
       "provider": "stripe",
-      "command": "satyr-stripe-subscription-update",
+      "command": "pantry-stripe-subscription-update",
       "capabilityId": "stripe.subscription.update"
     },
     {
       "provider": "shopify",
-      "command": "satyr-shopify-order-cancel",
+      "command": "pantry-shopify-order-cancel",
       "capabilityId": "shopify.order.cancel"
     }
   ]

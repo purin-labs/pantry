@@ -8,7 +8,7 @@ export function providerCompletionPage(
   returnPath: string,
 ): Response {
   const message = JSON.stringify({
-    type: "satyr.provider-attempt.completed",
+    type: "pantry.provider-attempt.completed",
     attempt_id: attemptId,
     terminal_state: terminal.kind,
     failure_reason_code: terminal.failureReasonCode,
@@ -57,7 +57,7 @@ export function providerCompletionPage(
     // once enforced. BroadcastChannel reaches the same-origin portal tab
     // either way, so completion and acknowledgement travel both routes.
     const channel = "BroadcastChannel" in window
-      ? new BroadcastChannel("satyr-provider-attempt")
+      ? new BroadcastChannel("pantry-provider-attempt")
       : null;
     let settled = false;
     function sendCompletion() {
@@ -68,7 +68,7 @@ export function providerCompletionPage(
     }
     function isAcknowledgement(data) {
       if (typeof data !== "object" || data === null) return false;
-      return data.type === "satyr.provider-attempt.ack" && data.attempt_id === attemptId;
+      return data.type === "pantry.provider-attempt.ack" && data.attempt_id === attemptId;
     }
     function returnToPortal() {
       status.textContent = "Taking you back to Pantry…";

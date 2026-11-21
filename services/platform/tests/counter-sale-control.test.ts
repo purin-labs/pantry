@@ -88,7 +88,7 @@ function assignment(
     assignmentId: "terminal_assignment_1",
     organisationId: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
-    satyrLocationId: "location_cafe",
+    pantryLocationId: "location_cafe",
     account: {
       integrationAccountId: "integration_square",
       providerAccountId: "merchant_square",
@@ -111,7 +111,7 @@ function assignment(
 
 function saleRequest(body: Record<string, unknown> = {}): Request {
   return counterRequest(BASE, {
-    satyrLocationId: "location_cafe",
+    pantryLocationId: "location_cafe",
     checkoutId: "checkout_counter_1",
     lines: [
       {
@@ -127,7 +127,7 @@ function saleRequest(body: Record<string, unknown> = {}): Request {
 
 function collectionRequest(body: Record<string, unknown> = {}): Request {
   return counterRequest(`${BASE}/checkout_counter_1/collection`, {
-    satyrLocationId: "location_cafe",
+    pantryLocationId: "location_cafe",
     checkoutRevision: 2,
     quoteDigest: DIGEST,
     amount: { amountMinor: 1200, currency: "JPY" },
@@ -141,8 +141,8 @@ function counterRequest(url: string, body: Record<string, unknown>): Request {
     headers: {
       origin: "https://pantry.example",
       cookie:
-        "satyr_control_session=session-counter; satyr_control_csrf=csrf-counter",
-      "x-satyr-csrf": "csrf-counter",
+        "pantry_session=session-counter; pantry_csrf=csrf-counter",
+      "x-pantry-csrf": "csrf-counter",
       "idempotency-key": "counter-sale-test",
       "content-type": "application/json",
     },
@@ -156,7 +156,7 @@ function placedCounterSale(): Record<string, unknown> {
       checkoutId: "checkout_counter_1",
       source: {
         kind: "point_of_sale",
-        satyrLocationId: "location_cafe",
+        pantryLocationId: "location_cafe",
         posConfigurationRevision: 7,
         operatorIdentity: "user_7585a72f-b277-50a2-8525-d876e77d83f8",
         terminalAssignmentRevision: 4,
@@ -299,7 +299,7 @@ describe("counter sale control routes", function counterSaleSuite() {
     });
     counterSaleMocks.readPointOfSaleConfiguration.mockResolvedValue({
       ok: true,
-      value: { satyrLocationId: "location_cafe", revision: 7 },
+      value: { pantryLocationId: "location_cafe", revision: 7 },
     });
     counterSaleMocks.createInPersonCheckout.mockResolvedValue({
       ok: true,
@@ -312,7 +312,7 @@ describe("counter sale control routes", function counterSaleSuite() {
           checkoutId: "checkout_counter_1",
           source: {
             kind: "point_of_sale",
-            satyrLocationId: "location_cafe",
+            pantryLocationId: "location_cafe",
             posConfigurationRevision: 7,
             operatorIdentity: "user_7585a72f-b277-50a2-8525-d876e77d83f8",
             terminalAssignmentRevision: 4,
@@ -390,7 +390,7 @@ describe("counter sale control routes", function counterSaleSuite() {
 
   it("refuses to open a sale at a counter with no terminal", async function noTerminal() {
     const response = await handleControlRequest(
-      saleRequest({ satyrLocationId: "location_without_terminal" }),
+      saleRequest({ pantryLocationId: "location_without_terminal" }),
       env(),
     );
     expect(response.status).toBe(409);
@@ -437,7 +437,7 @@ describe("counter sale control routes", function counterSaleSuite() {
           checkoutId: "checkout_counter_1",
           source: {
             kind: "point_of_sale",
-            satyrLocationId: "location_cafe",
+            pantryLocationId: "location_cafe",
             posConfigurationRevision: 7,
             operatorIdentity: "user_7585a72f-b277-50a2-8525-d876e77d83f8",
             terminalAssignmentRevision: 4,
@@ -492,7 +492,7 @@ describe("counter sale control routes", function counterSaleSuite() {
           checkoutId: "checkout_counter_1",
           source: {
             kind: "point_of_sale",
-            satyrLocationId: "location_cafe",
+            pantryLocationId: "location_cafe",
             posConfigurationRevision: 7,
             operatorIdentity: "user_7585a72f-b277-50a2-8525-d876e77d83f8",
             terminalAssignmentRevision: 4,
@@ -539,7 +539,7 @@ describe("counter sale control routes", function counterSaleSuite() {
   it("reads a sale back with the state its payment is actually in", async function reads() {
     const response = await handleControlRequest(
       new Request(`${BASE}/checkout_counter_1`, {
-        headers: { cookie: "satyr_control_session=session-counter" },
+        headers: { cookie: "pantry_session=session-counter" },
       }),
       env(),
     );
@@ -547,9 +547,9 @@ describe("counter sale control routes", function counterSaleSuite() {
     expect(await response.json()).toMatchObject({
       ok: true,
       counterSale: {
-        schemaVersion: "satyr.counter-sale.v1",
+        schemaVersion: "pantry.counter-sale.v1",
         checkoutId: "checkout_counter_1",
-        satyrLocationId: "location_cafe",
+        pantryLocationId: "location_cafe",
         state: "awaiting_collection",
         collectable: true,
       },

@@ -13,7 +13,7 @@ export type OrganisationInferenceSelection =
   | { readonly kind: "organisation_openai_api_key" }
   | { readonly kind: "organisation_anthropic_api_key" }
   | { readonly kind: "organisation_google_api_key" }
-  | { readonly kind: "satyr_platform" };
+  | { readonly kind: "pantry_platform" };
 
 type OrganisationInferenceSelectionSnapshot = {
   readonly organisationId: OrganisationId;
@@ -62,7 +62,7 @@ export function parseOrganisationInferenceSelection(
     case "organisation_openai_api_key":
     case "organisation_anthropic_api_key":
     case "organisation_google_api_key":
-    case "satyr_platform":
+    case "pantry_platform":
       return { ok: true, value: { kind: raw.kind } };
     default:
       return { ok: false, error: { code: "inference_selection_invalid" } };

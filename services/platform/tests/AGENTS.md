@@ -92,7 +92,7 @@ test and any fixture that exists only for the obsolete behavior.
   click by another member is refused. Each runs in its own process. A second journey in `slack-side-case.test.ts`
   follows a start that stops after its claim: when the start's lease ends,
   another member starts the side Case (Refactor 15).
-- `e2e/bakery-surface-quarantine.test.ts` gives a Session 33 damaged Satyr
+- `e2e/bakery-surface-quarantine.test.ts` gives a Session 33 damaged Pantry
   Kitchen effects: recovery ends them as `quarantined`, one page for each
   pass, and then reads none of them again (Refactor 15).
 - `e2e/cue-claim-sweep.test.ts` follows a Cue claim whose queue message went
@@ -104,7 +104,7 @@ test and any fixture that exists only for the obsolete behavior.
   each turn fails and its Case settles the assignment. A day later, the
   Session whose reservation expired settles it from that record and ends;
   the Session whose reservation moved to another lease stays quarantined.
-- `e2e/device-commands.test.ts` follows the pauses that Satyr sends to a shop
+- `e2e/device-commands.test.ts` follows the pauses that Pantry sends to a shop
   gateway: a refused snapshot of a paused camera leaves the pause unconfirmed
   until the gateway answers the pause, and a pause sent while the gateway is
   offline reaches it at its next hello, one time (Refactor 15).
@@ -172,7 +172,7 @@ test and any fixture that exists only for the obsolete behavior.
   drawing and a file whose bytes are not its named type change nothing, and
   the shop's catalog shows each order.
 - `e2e/portal-order-cancel.test.ts` follows a paid order that an owner cancels
-  from the Orders page, with the id that the page reads from Underclerk: no
+  from the Orders page, with the id that the page reads from Commerce: no
   money moves before the approval, and the approval cancels and refunds it.
 - `e2e/chat-agent-order-queue.test.ts` follows the Portal chat agent through
   the same queue and "sold out today" (Plan 81): a prompt for each missing read
@@ -281,13 +281,13 @@ test and any fixture that exists only for the obsolete behavior.
   outcomes. Artifact: `output/plan-24/cafe-day.json`. Each S6 journey needs
   `cargo` and `MUJOCO_DIR` (or
   `PANTRY_COBOT_CONTROLLER_BINARY`).
-- `commerce-fixture-worker.ts` runs Underclerk's built fixture Worker in
+- `commerce-fixture-worker.ts` runs Commerce's built fixture Worker in
   Miniflare: the production Worker with a deterministic payment gateway, an
   optional fixed clock and named seed scenarios at `/test-fixture`. The E2E
-  config binds `UNDERCLERK` to the same artifact. Tests never import
-  Underclerk source; seed state through a scenario in
+  config binds `COMMERCE` to the same artifact. Tests never import
+  Commerce source; seed state through a scenario in
   `services/commerce/tests/fixture-worker/scenarios.ts` and read it over
-  HTTP. `pnpm lint:runtime-boundary` refuses a new import of Underclerk
+  HTTP. `pnpm lint:runtime-boundary` refuses a new import of Commerce
   source.
 - `*.type-fixtures.ts` use `@ts-expect-error` for invalid domain states that the
   type system must reject.

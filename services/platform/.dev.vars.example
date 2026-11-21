@@ -1,6 +1,6 @@
 # Copy to .dev.vars.local. Non-secret settings belong in wrangler.jsonc env.local.vars.
 # pnpm local:init creates the shared service token and session-signing secrets.
-UNDERCLERK_SERVICE_TOKEN=
+COMMERCE_SERVICE_TOKEN=
 SESSION_TOKEN_SECRET=
 SLACK_CLIENT_SECRET=
 SLACK_SIGNING_SECRET=

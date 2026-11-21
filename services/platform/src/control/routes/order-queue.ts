@@ -72,7 +72,7 @@ async function readOrderQueue(
   if (read instanceof Response) return read;
   const { context } = read;
   const queue = await context.client.readPickupQueue(context.merchantId);
-  if (!queue.ok) return controlError("underclerk_unavailable", 503);
+  if (!queue.ok) return controlError("commerce_unavailable", 503);
   return controlJson({
     ok: true,
     entries: queue.value.entries.map(presentOrderQueueEntry),
@@ -119,7 +119,7 @@ async function advanceOrder(
   );
   if (!moved.ok) {
     switch (moved.code) {
-      case "underclerk_unavailable":
+      case "commerce_unavailable":
         return controlError(moved.code, 503);
       case "order_queue_refused":
         return controlJson(

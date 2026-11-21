@@ -25,7 +25,7 @@ import {
 } from "@purin-labs/commerce-client";
 import type { Env } from "../../env";
 
-const SATYR_UNDERCLERK_APP_ID = "satyr";
+const PANTRY_COMMERCE_APP_ID = "pantry";
 
 /**
  * Whom a Platform client acts for: the operator (provisioning and payment
@@ -43,9 +43,9 @@ export type CommerceCaller =
 /** The client settings for `caller`, or null when Commerce is not configured. */
 export function commerceClientConfig(
   env: Readonly<{
-    UNDERCLERK_BASE_URL?: string;
-    UNDERCLERK_SERVICE_TOKEN?: string;
-    UNDERCLERK: Readonly<{ fetch: CommerceFetch }>;
+    COMMERCE_BASE_URL?: string;
+    COMMERCE_SERVICE_TOKEN?: string;
+    COMMERCE: Readonly<{ fetch: CommerceFetch }>;
   }>,
   fetcher: CommerceFetch | undefined,
   caller: CommerceCaller,
@@ -56,21 +56,21 @@ export function commerceClientConfig(
   actor?: string;
 }> | null {
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return null;
-  const commerceFetch = fetcher ?? env.UNDERCLERK.fetch.bind(env.UNDERCLERK);
+  const commerceFetch = fetcher ?? env.COMMERCE.fetch.bind(env.COMMERCE);
   return caller.kind === "operator"
     ? {
-        baseUrl: env.UNDERCLERK_BASE_URL,
-        serviceToken: env.UNDERCLERK_SERVICE_TOKEN,
+        baseUrl: env.COMMERCE_BASE_URL,
+        serviceToken: env.COMMERCE_SERVICE_TOKEN,
         fetch: commerceFetch,
       }
     : {
-        baseUrl: env.UNDERCLERK_BASE_URL,
+        baseUrl: env.COMMERCE_BASE_URL,
         ...pantryCommerceAccess(
-          env.UNDERCLERK_SERVICE_TOKEN,
+          env.COMMERCE_SERVICE_TOKEN,
           caller.organisationId,
           commerceFetch,
           caller.actor,
@@ -103,7 +103,7 @@ export function pantryCommerceAccess(
     serviceToken: async (merchantId) =>
       readInstallationToken(organisationId, merchantId) ??
       commerceAppInstallationToken(operatorToken, {
-        appId: SATYR_UNDERCLERK_APP_ID,
+        appId: PANTRY_COMMERCE_APP_ID,
         merchantId,
         externalReference: organisationId,
       }),
@@ -131,7 +131,7 @@ export function pantryCommerceAccess(
       }
       if (!(await needsInstall(response))) return response;
       const installed = await commerceFetch(
-        `${url.origin}/v1/admin/merchants/${merchant}/app-installations/${SATYR_UNDERCLERK_APP_ID}`,
+        `${url.origin}/v1/admin/merchants/${merchant}/app-installations/${PANTRY_COMMERCE_APP_ID}`,
         {
           method: "PUT",
           headers: {
@@ -141,7 +141,7 @@ export function pantryCommerceAccess(
           body: JSON.stringify({
             scopes: COMMERCE_API_SCOPES,
             externalReference: organisationId,
-            label: "Satyr",
+            label: "Pantry",
           }),
         },
       );
@@ -190,11 +190,11 @@ export async function installPantryCommerceApp(
 ): Promise<boolean> {
   const installed = await operator.installApp(
     merchantId,
-    SATYR_UNDERCLERK_APP_ID,
+    PANTRY_COMMERCE_APP_ID,
     {
       scopes: COMMERCE_API_SCOPES,
       externalReference: organisationId,
-      label: "Satyr",
+      label: "Pantry",
     },
   );
   return installed.ok;
@@ -238,7 +238,7 @@ async function readActiveInstallationToken(
   );
   INSTALLATION_TOKENS.delete(key);
   const read = await commerceFetch(
-    `${origin}/v1/admin/merchants/${merchant}/app-installations/${SATYR_UNDERCLERK_APP_ID}?externalReference=${encodeURIComponent(organisationId)}`,
+    `${origin}/v1/admin/merchants/${merchant}/app-installations/${PANTRY_COMMERCE_APP_ID}?externalReference=${encodeURIComponent(organisationId)}`,
     { headers: { authorization: `Bearer ${operatorToken}` } },
   );
   if (!read.ok) return null;

@@ -62,7 +62,7 @@ const sites = runLocalProcesses(
       command: "pnpm",
       args: [
         "--filter",
-        "satyr-docs",
+        "pantry-docs",
         "dev",
         "--host",
         "127.0.0.1",

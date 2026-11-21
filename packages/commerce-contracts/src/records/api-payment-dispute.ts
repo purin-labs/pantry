@@ -104,7 +104,7 @@ const lifecycleSchema = Type.Unsafe<PaymentDisputeLifecycle>(
 );
 
 export const observeCommercePaymentDisputeV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.observe-payment-dispute.v1"),
+  schemaVersion: Type.Literal("commerce.observe-payment-dispute.v1"),
   organisationId: text,
   merchantId: text,
   providerDeliveryId: text,

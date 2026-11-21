@@ -33,7 +33,7 @@ export const RETURNS_ROUTES: readonly RouteDefinition<ReturnsRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/orders/:orderId/returns",
     "request_return",
-    "underclerk.request-return.v1",
+    "commerce.request-return.v1",
   ),
   route(
     "GET",
@@ -44,25 +44,25 @@ export const RETURNS_ROUTES: readonly RouteDefinition<ReturnsRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/orders/:orderId/exchanges",
     "exchange_order_lines",
-    "underclerk.exchange-order-lines.v1",
+    "commerce.exchange-order-lines.v1",
   ),
   route(
     "POST",
     "/v1/admin/merchants/:merchantId/returns/:returnId/authorization",
     "authorize_return",
-    "underclerk.authorize-return.v1",
+    "commerce.authorize-return.v1",
   ),
   route(
     "POST",
     "/v1/admin/merchants/:merchantId/returns/:returnId/receipt",
     "receive_return",
-    "underclerk.receive-return.v1",
+    "commerce.receive-return.v1",
   ),
   route(
     "POST",
     "/v1/admin/merchants/:merchantId/returns/:returnId/closure",
     "close_return",
-    "underclerk.close-return.v1",
+    "commerce.close-return.v1",
   ),
   route(
     "POST",

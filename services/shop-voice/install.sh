@@ -1,5 +1,5 @@
 #!/bin/sh
-# Installs the Satyr shop voice service on this Mac (Plan 82). The Portal shows the command:
+# Installs the Pantry shop voice service on this Mac (Plan 82). The Portal shows the command:
 #   curl -fsSL <origin>/shop-voice/install.sh | sh -s -- --origin <origin> \
 #     --organisation <id> --mac <id> --code <one-time code> --accept-letsencrypt-terms
 # An enrolled Mac updates its service with `sh -s -- --update`, and keeps its enrollment.
@@ -18,7 +18,7 @@ if [ "$(sw_vers -productVersion | cut -d. -f1)" -lt 14 ]; then
   echo "This service needs macOS 14 or later." >&2
   exit 1
 fi
-PANTRY_VOICE_HOME="${PANTRY_VOICE_HOME:-$HOME/.satyr-voice}"
+PANTRY_VOICE_HOME="${PANTRY_VOICE_HOME:-$HOME/.pantry-voice}"
 export PANTRY_VOICE_HOME
 case "$PANTRY_VOICE_HOME" in
   *" "*) echo "The service folder must have no space in its path." >&2; exit 1 ;;

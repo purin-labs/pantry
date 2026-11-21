@@ -85,7 +85,7 @@ type CommerceCapabilityIdentity =
       kind: "system_mapped";
       systemEntityKind: SystemCommerceEntityKind;
     }>
-  | Readonly<{ kind: "underclerk_custom"; entityTypeId: string }>
+  | Readonly<{ kind: "commerce_custom"; entityTypeId: string }>
   | Readonly<{ kind: "commerce_list"; listId: string }>
   | Readonly<{ kind: "saved_commerce_view"; viewId: string }>
   | Readonly<{ kind: "context_source" }>;
@@ -102,7 +102,7 @@ function capabilityProfileMatchesQuery(
         capabilities.kind === expected.kind &&
         capabilities.systemEntityKind === expected.systemEntityKind
       );
-    case "underclerk_custom":
+    case "commerce_custom":
       return (
         capabilities.kind === expected.kind &&
         capabilities.entityTypeId === expected.entityTypeId
@@ -120,7 +120,7 @@ function capabilityProfileMatchesQuery(
     case "context_source":
       return (
         capabilities.kind === "system_mapped" ||
-        capabilities.kind === "underclerk_custom" ||
+        capabilities.kind === "commerce_custom" ||
         capabilities.kind === "commerce_list" ||
         capabilities.kind === "saved_commerce_view"
       );
@@ -156,7 +156,7 @@ function expectedCapabilityIdentity(
         : query.source.kind === "commerce_list"
           ? { kind: "commerce_list", listId: query.source.listId }
           : capabilityIdentityForEntityType(query.source.entityTypeId);
-    case "underclerk_context":
+    case "commerce_context":
       if (query.selection.kind === "entity_seeds")
         return relationshipCapabilityIdentity(query.selection.seeds);
       return query.selection.selector.query.kind === "saved_commerce_view"
@@ -172,7 +172,7 @@ function capabilityIdentityForReference(
 ): CommerceCapabilityIdentity {
   return reference.origin === "system"
     ? { kind: "system_mapped", systemEntityKind: reference.typeId }
-    : { kind: "underclerk_custom", entityTypeId: reference.typeId };
+    : { kind: "commerce_custom", entityTypeId: reference.typeId };
 }
 
 function capabilityIdentityForEntityType(
@@ -180,7 +180,7 @@ function capabilityIdentityForEntityType(
 ): CommerceCapabilityIdentity {
   return entityTypeId.origin === "system"
     ? { kind: "system_mapped", systemEntityKind: entityTypeId.typeId }
-    : { kind: "underclerk_custom", entityTypeId: entityTypeId.typeId };
+    : { kind: "commerce_custom", entityTypeId: entityTypeId.typeId };
 }
 
 function relationshipCapabilityIdentity(
@@ -196,7 +196,7 @@ function relationshipCapabilityIdentity(
     return null;
   return first.origin === "system"
     ? { kind: "system_mapped", systemEntityKind: first.typeId }
-    : { kind: "underclerk_custom", entityTypeId: first.typeId };
+    : { kind: "commerce_custom", entityTypeId: first.typeId };
 }
 
 export function commerceGraphQueryProjection(

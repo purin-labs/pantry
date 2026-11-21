@@ -795,7 +795,7 @@ function parsePersistedAuthority(
       ? parseIntegrationAccountId(row.integrationAccountId)
       : null;
   if (
-    (row.authorityKind !== "satyr_commerce" &&
+    (row.authorityKind !== "builtin_commerce" &&
       row.authorityKind !== "shopify") ||
     integrationAccountId === null ||
     !integrationAccountId.ok ||

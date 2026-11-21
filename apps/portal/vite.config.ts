@@ -5,7 +5,7 @@ export default defineConfig({
   // The shop screen's player answers at /tv, as Workers assets serve tv.html.
   plugins: [
     {
-      name: "satyr-tv-page",
+      name: "pantry-tv-page",
       configureServer(server) {
         server.middlewares.use(serveTvPage);
       },
@@ -35,7 +35,7 @@ export default defineConfig({
   server: {
     port: 3103,
     strictPort: true,
-    allowedHosts: ["example.satyr", "example.portal"],
+    allowedHosts: ["example.pantry", "example.portal"],
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
     },

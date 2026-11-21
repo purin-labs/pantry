@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// Fails when the Commerce commerce spec (services/commerce/docs/spec.md)
+// Fails when the Commerce spec (services/commerce/docs/spec.md)
 // drifts from the code:
 //
 // - Appendix A must list every route of src/http-routes.ts and of each
 //   built-in plugin's src/plugins/<plugin>/routes.ts, with the access
 //   that src/api-access.ts gives it (a scope, `operator` or `buyer`), and no
 //   route that the code does not have.
-// - Appendix B must list every scope of UNDERCLERK_API_SCOPES
+// - Appendix B must list every scope of COMMERCE_API_SCOPES
 //   (packages/commerce-contracts/src/records/api-access.ts).
 // - Appendix C must list every event kind that src/event-feed.ts and each
 //   built-in plugin's src/plugins/<plugin>/events.ts name, with the command
@@ -135,12 +135,12 @@ for (const journey of new Set(spec.match(/[\w./-]+\.test\.ts/gu) ?? [])) {
 }
 
 if (failures.length > 0) {
-  console.error(`underclerk spec: ${failures.length} problem(s)`);
+  console.error(`commerce spec: ${failures.length} problem(s)`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 console.log(
-  `underclerk spec: ${routes.length} routes, ${scopes.length} scopes, ${events.length} event kinds and ${machines.length} state machines match the code`,
+  `commerce spec: ${routes.length} routes, ${scopes.length} scopes, ${events.length} event kinds and ${machines.length} state machines match the code`,
 );
 
 function readRoutes() {
@@ -443,7 +443,7 @@ function stringObject(file, name) {
 
 function blockPattern(name) {
   return new RegExp(
-    `(<!-- underclerk-spec:${name}:start -->\\n)([\\s\\S]*?)(<!-- underclerk-spec:${name}:end -->)`,
+    `(<!-- commerce-spec:${name}:start -->\\n)([\\s\\S]*?)(<!-- commerce-spec:${name}:end -->)`,
     "u",
   );
 }

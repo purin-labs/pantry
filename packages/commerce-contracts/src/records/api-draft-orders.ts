@@ -118,7 +118,7 @@ export const createCommerceDraftOrderV1Schema = Type.Intersect(
     draftCommandBaseSchema,
     draftContentsSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.create-draft-order.v1"),
+      schemaVersion: Type.Literal("commerce.create-draft-order.v1"),
       storefrontId: text,
     }),
   ],
@@ -133,7 +133,7 @@ export const updateCommerceDraftOrderV1Schema = Type.Intersect(
     draftCommandBaseSchema,
     draftContentsSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-draft-order.v1"),
+      schemaVersion: Type.Literal("commerce.update-draft-order.v1"),
       expectedDraftOrderRevision: PositiveInteger,
     }),
   ],
@@ -147,7 +147,7 @@ export const sendCommerceDraftInvoiceV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.send-draft-invoice.v1"),
+      schemaVersion: Type.Literal("commerce.send-draft-invoice.v1"),
       expectedDraftOrderRevision: PositiveInteger,
       expiresAt: utcTimestampSchema,
     }),
@@ -162,7 +162,7 @@ export const cancelCommerceDraftOrderV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.cancel-draft-order.v1"),
+      schemaVersion: Type.Literal("commerce.cancel-draft-order.v1"),
       expectedDraftOrderRevision: PositiveInteger,
     }),
   ],
@@ -188,7 +188,7 @@ export const markCommerceDraftOrderPaidV1Schema = Type.Intersect(
   [
     draftCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.mark-draft-order-paid.v1"),
+      schemaVersion: Type.Literal("commerce.mark-draft-order-paid.v1"),
       expectedDraftOrderRevision: PositiveInteger,
       tender: commerceManualTenderV1Schema,
       orderId: text,
@@ -213,7 +213,7 @@ export type CommerceDraftOrderCommandV1 = Static<
 >;
 
 export const commerceDraftInvoiceV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.draft-invoice.v1"),
+  schemaVersion: Type.Literal("commerce.draft-invoice.v1"),
   mutation: commerceMutationResultV1Schema,
   invoice: Nullable(
     ReadonlyOpenObject({ token: text, expiresAt: utcTimestampSchema }),
@@ -300,7 +300,7 @@ const recordedTenderSchema = Type.Union([
 ]);
 
 export const commerceDraftOrderViewV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.draft-order.v1"),
+  schemaVersion: Type.Literal("commerce.draft-order.v1"),
   draftOrder: commerceDraftOrderV1Schema,
   checkoutIds: ImmutableArray(text),
   completion: Nullable(

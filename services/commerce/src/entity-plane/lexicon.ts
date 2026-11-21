@@ -161,7 +161,7 @@ export function validateCommerceMutationReceiptWithLexicon(
   value: unknown,
 ): asserts value is CommerceMutationReceiptV1 {
   decideContract(
-    "Underclerk mutation receipt",
+    "Commerce mutation receipt",
     parseCommerceMutationReceipt,
     value,
   );

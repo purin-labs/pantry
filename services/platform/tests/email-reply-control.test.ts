@@ -175,7 +175,7 @@ async function postSelfTestApproval(
           ...sessionHeaders(fixture),
           "content-type": "application/json",
           origin: ORIGIN,
-          "x-satyr-csrf": fixture.csrfToken,
+          "x-pantry-csrf": fixture.csrfToken,
           "idempotency-key": key,
         },
         body: JSON.stringify(body),
@@ -406,8 +406,8 @@ function fakeConnectorNamespace(connector: FakeConnector): unknown {
             sender: "sender@example.com",
             recipient: "owner@example.com",
             recipientDisplayName: null,
-            subject: "Satyr Gmail canary",
-            body: "This is a synthetic test of Satyr's email drafting and approval workflow. No action is required.",
+            subject: "Pantry Gmail canary",
+            body: "This is a synthetic test of Pantry's email drafting and approval workflow. No action is required.",
             targetDigest: "1".repeat(64),
             snapshotDigest: SNAPSHOT,
             expiresAt: Date.now() + 60_000,
@@ -724,7 +724,7 @@ async function postReply(
           ...sessionHeaders(fixture),
           "content-type": "application/json",
           origin: ORIGIN,
-          "x-satyr-csrf": fixture.csrfToken,
+          "x-pantry-csrf": fixture.csrfToken,
           "idempotency-key": idempotencyKey,
         },
         body: JSON.stringify(body),
@@ -743,7 +743,7 @@ function getPreviewRequest(fixture: Fixture): Request {
 
 function sessionHeaders(fixture: Fixture): Record<string, string> {
   return {
-    cookie: `satyr_control_session=${fixture.sessionToken}; satyr_control_csrf=${fixture.csrfToken}`,
+    cookie: `pantry_session=${fixture.sessionToken}; pantry_csrf=${fixture.csrfToken}`,
   };
 }
 
@@ -758,7 +758,7 @@ function gmailSeed(
     provider: "gmail",
     providerSubjectId: providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requireVaultHandle(

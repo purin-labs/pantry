@@ -55,7 +55,7 @@ export const attributeValueSchema = Type.Union([
   OpenObject({
     kind: Type.Literal("external_resource_reference"),
     value: OpenObject({
-      source: Type.Enum(["shopify", "stripe", "lab", "underclerk"]),
+      source: Type.Enum(["shopify", "stripe", "lab", "commerce"]),
       resourceId: Type.String(),
       label: Type.Union([Type.String(), Type.Null()]),
     }),

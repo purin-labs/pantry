@@ -2587,7 +2587,7 @@ function initializedSession(
       actorId: input.sessionId,
       streamId: state.state.identity.streamId,
       sequence: 0,
-      sourceTime: { kind: "satyr", issuedAt: input.receivedAt },
+      sourceTime: { kind: "pantry", issuedAt: input.receivedAt },
       acceptedAt: input.receivedAt,
       correlationId: input.requestId,
       causation: { kind: "command", commandId },

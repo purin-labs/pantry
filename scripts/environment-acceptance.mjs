@@ -19,11 +19,11 @@ if (environment !== "local" || outputPath === undefined || extra.length > 0) {
 }
 
 const platform = readWorkerEnvironment("platform", environment);
-const commerceEngine = readWorkerEnvironment("underclerk", environment);
+const commerceEngine = readWorkerEnvironment("commerce", environment);
 validateWorkerOrigins("platform", environment, platform);
-validateWorkerOrigins("underclerk", environment, commerceEngine);
+validateWorkerOrigins("commerce", environment, commerceEngine);
 const secrets = requireLocalWorkerSecrets("platform", platform);
-requireLocalWorkerSecrets("underclerk", commerceEngine);
+requireLocalWorkerSecrets("commerce", commerceEngine);
 const signingSecret = secrets.SLACK_SIGNING_SECRET;
 assert.ok(
   typeof signingSecret === "string" && signingSecret.length > 0,

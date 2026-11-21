@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "54e4960b970012a1e8259fc94237602d"
-application_url = "https://satyr-edge.n6378056.workers.dev/portal"
+application_url = "https://pantry.purin.io/portal"
 embedded = false
 name = "Nuki"
 
@@ -13,7 +13,7 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://satyr-edge.n6378056.workers.dev/v1/control/providers/shopify/callback",
+  "https://pantry.purin.io/v1/control/providers/shopify/callback",
   "https://localhost:3003/v1/control/providers/shopify/callback"
 ]
 

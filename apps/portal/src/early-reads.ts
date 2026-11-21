@@ -10,7 +10,7 @@ import {
 } from "./control-paths";
 import { readPortalRoute, type WorkspaceDetailPage } from "./route";
 
-const ORGANISATION_ID_STORAGE_PREFIX = "satyr:organisation-id:";
+const ORGANISATION_ID_STORAGE_PREFIX = "pantry:organisation-id:";
 
 /**
  * Starts the reads of the page at `pathname` while the Portal's code loads.

@@ -61,7 +61,7 @@ export async function handleCredentialInventory(
   }
   return controlJson({
     kind: "success",
-    schema_version: "satyr.credential-inventory.v1",
+    schema_version: "pantry.credential-inventory.v1",
     inventory: inventory.value,
   });
 }

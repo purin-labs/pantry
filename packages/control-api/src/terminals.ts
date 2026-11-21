@@ -32,7 +32,7 @@ export type CounterSaleState =
 export type TerminalBlockedReason = "assignment_retired";
 
 export type TerminalConfigurationRequest = Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   integrationAccountId: string;
   providerLocationId: string;
   testDeviceId: string;
@@ -40,7 +40,7 @@ export type TerminalConfigurationRequest = Readonly<{
 
 /** Asks Square for a code that pairs a physical Terminal (production only). */
 export type TerminalPairingRequest = Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   integrationAccountId: string;
   providerLocationId: string;
   /** The name that Square shows for the device once it is paired. */
@@ -60,7 +60,7 @@ export type TerminalPairingReadback = Readonly<{
 }>;
 
 export type TerminalCounterReadback = Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   /** Why this counter cannot collect, or null when it can. */
   blockedReason: TerminalBlockedReason | null;
   assignment: Readonly<{

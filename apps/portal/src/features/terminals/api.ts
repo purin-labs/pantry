@@ -41,7 +41,7 @@ export async function configureSandboxTerminal(
       terminalOperationsPath(organisationId),
       "POST",
       selection,
-      `terminal-configure:${selection.satyrLocationId}:${selection.integrationAccountId}:${selection.providerLocationId}:${selection.testDeviceId}`,
+      `terminal-configure:${selection.pantryLocationId}:${selection.integrationAccountId}:${selection.providerLocationId}:${selection.testDeviceId}`,
     ),
   );
 }
@@ -56,7 +56,7 @@ export async function startTerminalPairing(
     `${terminalOperationsPath(organisationId)}/pairings`,
     "POST",
     request,
-    `terminal-pairing:${request.satyrLocationId}:${request.providerLocationId}:${Date.now()}`,
+    `terminal-pairing:${request.pantryLocationId}:${request.providerLocationId}:${Date.now()}`,
   );
   return parsePairingEnvelope(raw);
 }
@@ -80,7 +80,7 @@ export async function activateTerminalPairing(
   organisationId: string,
   deviceCodeId: string,
   selection: Readonly<{
-    satyrLocationId: string;
+    pantryLocationId: string;
     integrationAccountId: string;
   }>,
   mutate: TerminalMutationTransport,
@@ -90,7 +90,7 @@ export async function activateTerminalPairing(
       `${terminalOperationsPath(organisationId)}/pairings/${encodeURIComponent(deviceCodeId)}/activation`,
       "POST",
       selection,
-      `terminal-pairing-activation:${deviceCodeId}:${selection.satyrLocationId}`,
+      `terminal-pairing-activation:${deviceCodeId}:${selection.pantryLocationId}`,
     ),
   );
 }
@@ -102,7 +102,7 @@ export async function activateTerminalPairing(
 export async function assignSquarePosApp(
   organisationId: string,
   selection: Readonly<{
-    satyrLocationId: string;
+    pantryLocationId: string;
     integrationAccountId: string;
     providerLocationId: string;
   }>,
@@ -113,7 +113,7 @@ export async function assignSquarePosApp(
       `${terminalOperationsPath(organisationId)}/square-pos-app`,
       "POST",
       selection,
-      `terminal-square-pos-app:${selection.satyrLocationId}:${selection.providerLocationId}`,
+      `terminal-square-pos-app:${selection.pantryLocationId}:${selection.providerLocationId}`,
     ),
   );
 }
@@ -132,7 +132,7 @@ export async function retireTerminalCounter(
 ): Promise<TerminalOperations> {
   return parseOperationsOnlyEnvelope(
     await mutate(
-      `${terminalOperationsPath(organisationId)}/${encodeURIComponent(counter.satyrLocationId)}/retirement`,
+      `${terminalOperationsPath(organisationId)}/${encodeURIComponent(counter.pantryLocationId)}/retirement`,
       "POST",
       {},
       `terminal-retire:${counter.assignment.assignmentId}:${counter.assignment.revision}`,

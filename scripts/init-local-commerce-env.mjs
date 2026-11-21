@@ -20,11 +20,11 @@ const platform = await readEnvironmentFile(platformPath);
 const commerceEngine = await readEnvironmentFile(commercePath);
 const platformToken = readEnvironmentValue(
   platform,
-  "UNDERCLERK_SERVICE_TOKEN",
+  "COMMERCE_SERVICE_TOKEN",
 );
 const commerceToken = readEnvironmentValue(
   commerceEngine,
-  "UNDERCLERK_SERVICE_TOKEN",
+  "COMMERCE_SERVICE_TOKEN",
 );
 
 if (
@@ -33,14 +33,14 @@ if (
   platformToken !== commerceToken
 ) {
   throw new Error(
-    "Platform and Underclerk already have different local service tokens",
+    "Platform and Commerce already have different local service tokens",
   );
 }
 
 const serviceToken = commerceToken ?? platformToken ?? randomSecret();
 let nextPlatform = upsertEnvironmentValue(
   platform,
-  "UNDERCLERK_SERVICE_TOKEN",
+  "COMMERCE_SERVICE_TOKEN",
   serviceToken,
 );
 nextPlatform = ensureEnvironmentValue(
@@ -55,17 +55,17 @@ nextPlatform = ensureEnvironmentValue(
 );
 let nextCommerce = upsertEnvironmentValue(
   commerceEngine,
-  "UNDERCLERK_SERVICE_TOKEN",
+  "COMMERCE_SERVICE_TOKEN",
   serviceToken,
 );
 nextCommerce = ensureEnvironmentValue(
   nextCommerce,
-  "UNDERCLERK_BUYER_SESSION_SECRET",
+  "COMMERCE_BUYER_SESSION_SECRET",
   randomSecret,
 );
 nextCommerce = ensureEnvironmentValue(
   nextCommerce,
-  "UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64",
+  "COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64",
   generateSigningKey,
 );
 nextCommerce = ensureEnvironmentValue(
@@ -80,7 +80,7 @@ await Promise.all([
 ]);
 ensureLocalSecretsStore();
 
-console.log("Local Platform and Underclerk secrets are ready.");
+console.log("Local Platform and Commerce secrets are ready.");
 
 function ensureLocalSecretsStore() {
   const listed = runSecretsStoreCommand(["secret", "list", secretsStoreId]);

@@ -130,8 +130,8 @@ export const HANDLER_RUNS = 50;
  */
 export type PluginFailureCommand = Readonly<{
   schemaVersion:
-    | "underclerk.report-plugin-function-failure.internal.v1"
-    | "underclerk.pause-failing-plugin.internal.v1";
+    | "commerce.report-plugin-function-failure.internal.v1"
+    | "commerce.pause-failing-plugin.internal.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: string;
@@ -218,7 +218,7 @@ export class PluginAuthority {
 
   listPlugins(merchantId: string): CommercePluginListV1 {
     return {
-      schemaVersion: "underclerk.plugins.v1",
+      schemaVersion: "commerce.plugins.v1",
       plugins: this.#all(merchantId).map((plugin) => {
         const failure = lastFailure(
           this.#options.database,
@@ -297,7 +297,7 @@ export class PluginAuthority {
       const report = this.#failureCommand(
         failure,
         merchant,
-        "underclerk.report-plugin-function-failure.internal.v1",
+        "commerce.report-plugin-function-failure.internal.v1",
       );
       if (
         this.#options.readReplay(
@@ -337,7 +337,7 @@ export class PluginAuthority {
           command: this.#failureCommand(
             failure,
             after,
-            "underclerk.pause-failing-plugin.internal.v1",
+            "commerce.pause-failing-plugin.internal.v1",
           ),
           merchant: after,
           pluginId: failure.pluginId,
@@ -369,7 +369,7 @@ export class PluginAuthority {
     merchant: MerchantRow,
     schemaVersion: PluginFailureCommand["schemaVersion"],
   ): PluginFailureCommand {
-    const key = `${schemaVersion === "underclerk.pause-failing-plugin.internal.v1" ? "plugin_pause" : "plugin_failure_report"}_${failure.failureId}`;
+    const key = `${schemaVersion === "commerce.pause-failing-plugin.internal.v1" ? "plugin_pause" : "plugin_failure_report"}_${failure.failureId}`;
     return {
       schemaVersion,
       merchantId: failure.merchantId,
@@ -406,7 +406,7 @@ export class PluginAuthority {
     const available = change === "resume";
     const { routes, pipelineSteps } = plugin.definition.contributions;
     return {
-      schemaVersion: "underclerk.plugin-preview.v1",
+      schemaVersion: "commerce.plugin-preview.v1",
       pluginId,
       change,
       refusal: "code" in planned ? planned : null,
@@ -448,9 +448,9 @@ export class PluginAuthority {
     const planned = this.#plan(
       command.merchantId,
       command.pluginId,
-      command.schemaVersion === "underclerk.pause-plugin.v1"
+      command.schemaVersion === "commerce.pause-plugin.v1"
         ? "pause"
-        : command.schemaVersion === "underclerk.resume-plugin.v1"
+        : command.schemaVersion === "commerce.resume-plugin.v1"
           ? "resume"
           : "remove",
     );
@@ -1166,7 +1166,7 @@ export class PluginAuthority {
     if (plugin === undefined || plugin.definition.kind !== "merchant")
       return undefined;
     return {
-      schemaVersion: "underclerk.plugin-field-values.v1",
+      schemaVersion: "commerce.plugin-field-values.v1",
       pluginId,
       fields: listPluginFields(this.#options.database, merchantId, pluginId),
       records: listPluginFieldValues(
@@ -1300,7 +1300,7 @@ export class PluginAuthority {
       );
       if (outcome.kind !== "returned")
         return {
-          schemaVersion: "underclerk.plugin-function-run.v1",
+          schemaVersion: "commerce.plugin-function-run.v1",
           outcome: {
             kind: "failed",
             reason: outcome.reason,
@@ -1310,7 +1310,7 @@ export class PluginAuthority {
         };
       const output = parseRunOutput(outcome.output);
       return {
-        schemaVersion: "underclerk.plugin-function-run.v1",
+        schemaVersion: "commerce.plugin-function-run.v1",
         outcome:
           output === undefined
             ? {
@@ -1352,7 +1352,7 @@ export class PluginAuthority {
       ),
     );
     return {
-      schemaVersion: "underclerk.plugin-function-run.v1",
+      schemaVersion: "commerce.plugin-function-run.v1",
       outcome:
         outcome.kind === "returned"
           ? { kind: "returned", output: outcome.output }
@@ -1456,7 +1456,7 @@ export class PluginAuthority {
       }
     });
     return {
-      schemaVersion: "underclerk.merchant-plugin-preview.v1",
+      schemaVersion: "commerce.merchant-plugin-preview.v1",
       pluginId: definition.pluginId,
       checkouts: checkoutIds.length,
       refused,

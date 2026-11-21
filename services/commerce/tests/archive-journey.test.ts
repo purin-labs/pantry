@@ -184,7 +184,7 @@ class DownEndpoint {
   readonly posts: string[] = [];
 
   async post(request: WebhookPost): Promise<WebhookPostResult> {
-    this.posts.push(request.headers["x-underclerk-event-id"] ?? "");
+    this.posts.push(request.headers["x-commerce-event-id"] ?? "");
     return { kind: "response", status: 503 };
   }
 }
@@ -340,7 +340,7 @@ class ArchiveStaff extends StaffDesk {
       this.admin.createWebhookSubscription({
         ...this.editBase(`subscribe_${subscriptionId}`),
         subscriptionId,
-        url: "https://hooks.sora.example/underclerk",
+        url: "https://hooks.sora.example/commerce",
         topics: ["order.*"],
       }),
     );

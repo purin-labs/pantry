@@ -120,7 +120,7 @@ const TAX_ACCOUNTS: readonly TaxAccount[] = [
 
 const DUTY_ACCOUNTS: readonly DutyAccount[] = [
   {
-    providerAccountReference: "underclerk_domestic_duty_not_applicable",
+    providerAccountReference: "commerce_domestic_duty_not_applicable",
     destinationCountries: ["JP"],
     incoterm: "not_applicable",
     basisPoints: 0,

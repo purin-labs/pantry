@@ -20,7 +20,7 @@ describe("Offer price approval surface", () => {
       verb: "commerce.offer.adjust_price",
       details: {
         kind: "adjust_offer_price",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedOfferRevision: 4,
         expectedPolicyRevision: 2,
         proposedPriceMinor: 950,
@@ -59,7 +59,7 @@ describe("Offer price approval surface", () => {
       parseCommerceActionPath({
         verb: "commerce.offer.adjust_price",
         path:
-          "/offers/underclerk%3Amerchant_cafe%3Aoffer_coffee/price" +
+          "/offers/commerce%3Amerchant_cafe%3Aoffer_coffee/price" +
           "?expected_revision=4&expected_policy_revision=2" +
           "&proposed_price_minor=950&currency=JPY",
       }),
@@ -67,7 +67,7 @@ describe("Offer price approval surface", () => {
       ok: true,
       value: {
         kind: "adjust_offer_price",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedOfferRevision: 4,
         expectedPolicyRevision: 2,
         proposedPriceMinor: 950,
@@ -87,18 +87,18 @@ function servedAction(
       caseId: "case_offer_price",
       proposalId: "proposal_offer_price",
       resourceKey:
-        "commerce:adjust_offer_price:underclerk:merchant_cafe:offer_coffee",
+        "commerce:adjust_offer_price:commerce:merchant_cafe:offer_coffee",
       amount: null,
       state: "approval_requested",
       verb: "commerce.offer.adjust_price",
       commerceSystem: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: 3,
       },
       details: {
         kind: "adjust_offer_price",
-        offerId: "underclerk:merchant_cafe:offer_coffee",
+        offerId: "commerce:merchant_cafe:offer_coffee",
         expectedOfferRevision: 4,
         expectedPolicyRevision: 2,
         proposedPriceMinor: 950,

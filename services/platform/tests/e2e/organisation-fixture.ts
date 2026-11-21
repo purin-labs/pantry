@@ -139,7 +139,7 @@ export async function activateOrganisation(
 export async function selectModelRoute(
   organisationId: OrganisationId,
   client: OrganisationClient,
-  selection: "satyr_platform" | "organisation_openai_api_key",
+  selection: "pantry_platform" | "organisation_openai_api_key",
 ): Promise<ModelRoute> {
   const scope = await requireOrganisationExecutionScope(env, organisationId);
   if (selection === "organisation_openai_api_key") {
@@ -167,8 +167,8 @@ export async function selectModelRoute(
     db: scope.database,
     organisationId,
     selection:
-      selection === "satyr_platform"
-        ? { kind: "satyr_platform" }
+      selection === "pantry_platform"
+        ? { kind: "pantry_platform" }
         : { kind: "organisation_openai_api_key" },
     expectedConfigurationVersion: current.configurationVersion,
     selectedByUserId: client.identity.userId,
@@ -204,7 +204,7 @@ export async function memberMutation(
   const headers = commerceHeaders(owner.session);
   headers.set("idempotency-key", crypto.randomUUID());
   headers.set(
-    "x-satyr-configuration-version",
+    "x-pantry-configuration-version",
     String(current.configurationVersion),
   );
   return exports.default.fetch(

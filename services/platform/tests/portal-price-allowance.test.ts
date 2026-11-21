@@ -26,9 +26,9 @@ import {
 const ORGANISATION = "organisation_price_allowance";
 
 const OFFER: PricedOffer = {
-  offerId: "underclerk:merchant_cafe:offer_coffee",
-  variantId: "underclerk:merchant_cafe:variant_coffee",
-  salesChannelId: "underclerk:merchant_cafe:channel_online",
+  offerId: "commerce:merchant_cafe:offer_coffee",
+  variantId: "commerce:merchant_cafe:variant_coffee",
+  salesChannelId: "commerce:merchant_cafe:channel_online",
   revision: 4,
   priceMinor: 1_000,
   currency: "JPY",
@@ -237,7 +237,7 @@ describe("Offer price allowance control", () => {
   });
 
   it("replaces one offer's view after a write and leaves the others alone", () => {
-    const other = { ...OFFER, offerId: "underclerk:merchant_cafe:offer_tea" };
+    const other = { ...OFFER, offerId: "commerce:merchant_cafe:offer_tea" };
     const ready = {
       kind: "ready" as const,
       offers: [OFFER, other],

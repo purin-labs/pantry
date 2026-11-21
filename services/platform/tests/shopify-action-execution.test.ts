@@ -27,7 +27,7 @@ describe("Shopify typed action execution", function shopifyExecutionSuite() {
 
     expect(route).toEqual({
       kind: "shopify_order_cancel",
-      tool: "satyr-shopify-order-cancel",
+      tool: "pantry-shopify-order-cancel",
     });
 
     if (route === null) {
@@ -50,7 +50,7 @@ describe("Shopify typed action execution", function shopifyExecutionSuite() {
 
     expect(request.host).toBe("fixture.myshopify.com");
     expect(request.path).toBe("/admin/api/2026-07/graphql.json");
-    expect(request.body.query).toContain("mutation SatyrOrderCancel");
+    expect(request.body.query).toContain("mutation PantryOrderCancel");
     expect(request.body.query).toContain("orderCancel(");
     expect(request.body.query).not.toContain("productDelete");
     expect(request.body.variables).toEqual({
@@ -279,7 +279,7 @@ async function confirmedShopifyFetch(
   expect(headers.get("authorization")).toBeNull();
   const body: unknown = JSON.parse(String(init?.body));
   expect(body).toMatchObject({
-    query: expect.stringContaining("mutation SatyrOrderCancel"),
+    query: expect.stringContaining("mutation PantryOrderCancel"),
     variables: { orderId: "gid://shopify/Order/42" },
   });
   return Response.json({
@@ -302,7 +302,7 @@ async function cancelledOrderLookupFetch(
   const body: unknown = JSON.parse(String(init?.body));
   expect(body).toMatchObject({
     query: expect.stringContaining(
-      "query SatyrOrderCancellationReconciliation",
+      "query PantryOrderCancellationReconciliation",
     ),
     variables: { orderId: "gid://shopify/Order/42" },
   });
@@ -376,7 +376,7 @@ async function unexpectedShopifyFetch(): Promise<Response> {
 function shopifyCall(): GeneratedShopifyActionCall {
   return {
     kind: "shopify_order_cancel",
-    tool: "satyr-shopify-order-cancel",
+    tool: "pantry-shopify-order-cancel",
     args: {
       shopDomain: "fixture.myshopify.com",
       orderId: "gid://shopify/Order/42",

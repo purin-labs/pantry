@@ -32,8 +32,8 @@ before moving them. Local Sandbox IDs must never be copied into production.
 ## Standard local commerce path
 
 Public ports remain 3001 (café), 3002 (store), 3003 (HTTPS portal),
-3004 (Underclerk API), and 3005 (docs). Internal servers use 3101 (Platform),
-3102 (Underclerk), 3103 (portal Vite), 3104 (storefront Vite), and 3105 (docs).
+3004 (Commerce API), and 3005 (docs). Internal servers use 3101 (Platform),
+3102 (Commerce), 3103 (portal Vite), 3104 (storefront Vite), and 3105 (docs).
 Optional provider ingress uses 3111 and the local harness uses 3112. Worker
 inspectors use 9231 and 9232; Codex's existing provider login callback uses 1455.
 
@@ -58,7 +58,7 @@ For an existing installation, retain its secrets and persistence. `local:init`
 creates missing local service/signing secrets; provider secrets still need to
 be supplied in `.dev.vars.local`. Examples contain secret names only.
 
-Platform listens internally on `http://127.0.0.1:3101`; Underclerk listens on
+Platform listens internally on `http://127.0.0.1:3101`; Commerce listens on
 `http://127.0.0.1:3102`. The public portal and OAuth origin is
 `https://localhost:3003` through Caddy. Service bindings join the two local processes.
 Remote bindings are disabled. When Docker is available, backend startup builds
@@ -105,7 +105,7 @@ Square-only hostname.
 ## Production
 
 The package deployment commands explicitly select `production`, retaining
-`satyr-edge` and `underclerk` and their existing resource identities. Production
+`pantry` and `commerce` and their existing resource identities. Production
 origins must be HTTPS and cannot be loopback.
 Production container application names are pinned explicitly; Wrangler would
 otherwise append `-production` to their previously generated names.
@@ -147,7 +147,7 @@ callbacks. Configuration validation never prints secret values.
 
 Checks on 2026-10-04: 2,390 Platform tests passed (3 skipped), 51 onboarding
 closure tests passed, configuration loading checks passed, Platform source/test
-and Underclerk type checks passed, and the portal build passed. Both production
+and Commerce type checks passed, and the portal build passed. Both production
 Worker dry runs passed without upload; the Platform dry run used
 `--containers-rollout none`. Normal backend startup built all four configured
 native container images. The public Slack tunnel accepted repeated signed UTF-8
@@ -169,7 +169,7 @@ The [Square readback receipt](https://github.com/seams-tech/pantry-history/blob/
 records the existing account credential and keeps fresh OAuth acceptance pending.
 
 The original local secret files were moved to the private backup directory
-`/tmp/satyr-env-migration.izd9Yk`; active secrets are in `.dev.vars.local`.
+`/tmp/pantry-env-migration.izd9Yk`; active secrets are in `.dev.vars.local`.
 No secret values or database contents were deleted.
 
 For a real-user proof, open the signed-in local portal, select Square, refresh

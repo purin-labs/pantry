@@ -14,7 +14,7 @@ import {
 } from "node:crypto";
 
 const KEY_VERSION = 1;
-const SALT = "underclerk.customer-data";
+const SALT = "commerce.customer-data";
 
 export type SealedCustomerKey = Readonly<{ version: number; wrapped: string }>;
 

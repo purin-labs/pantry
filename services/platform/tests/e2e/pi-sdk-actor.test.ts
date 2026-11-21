@@ -68,7 +68,7 @@ it("restores native discovery and Code Mode store across Actor eviction after de
   expect(checkpoint.blob.formatVersion).toBe(PACKAGED_PI_CHECKPOINT_FORMAT);
   const sealed = await env.ARCHIVE.get(checkpoint.blob.objectKey);
   if (sealed === null) throw new Error("Missing encrypted Actor checkpoint");
-  expect((await sealed.text()).startsWith("SATYRCP1")).toBe(true);
+  expect((await sealed.text()).startsWith("PANTRYCP1")).toBe(true);
   expect(checkpoint.blob.harnessBuild).toBe(PACKAGED_PI_HARNESS_BUILD);
   await evictSdkSession();
 

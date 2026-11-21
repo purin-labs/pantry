@@ -138,7 +138,7 @@ export async function onboardSplitOrganisation(
     owner,
     organisationId: created.value.organisationId,
     scope: scope.value,
-    cookie: `satyr_control_session=${session.token}`,
+    cookie: `pantry_session=${session.token}`,
   };
 }
 

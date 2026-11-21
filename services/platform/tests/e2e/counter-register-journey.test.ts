@@ -63,7 +63,7 @@ async function operatorCashAndRbacJourney(): Promise<void> {
     viewer.session,
     "POST",
     {
-      satyrLocationId: locationId,
+      pantryLocationId: locationId,
       checkoutId: "chk_viewer_blocked",
       tenderMode: "cash",
       lines: [menuLine("l1", COOKIE_ENTRY, [], 1)],
@@ -82,7 +82,7 @@ async function operatorCashAndRbacJourney(): Promise<void> {
   );
   expect(registerResponse.status, JSON.stringify(registerResponse.body)).toBe(200);
   const register = extractRegister(registerResponse.body);
-  expect(register.satyrLocationId).toBe(locationId);
+  expect(register.pantryLocationId).toBe(locationId);
   expect(register.policy?.cashEnabled).toBe(true);
   expect(register.policy?.catalogScope).toMatchObject({
     kind: "published_menu",
@@ -107,7 +107,7 @@ async function operatorCashAndRbacJourney(): Promise<void> {
     staff.session,
     "POST",
     {
-      satyrLocationId: locationId,
+      pantryLocationId: locationId,
       checkoutId,
       tenderMode: "cash",
       lines: [
@@ -304,7 +304,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     assignmentId: `assign_stera_${crypto.randomUUID().slice(0, 8)}`,
     organisationId,
     merchantId,
-    satyrLocationId: locationId,
+    pantryLocationId: locationId,
     providerLocationId: "GMO_STERA_LOC_TOKYO",
     account: {
       integrationAccountId: "gmo_stera_account_1",
@@ -352,7 +352,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   // 3. Operator opens Sale #1 and dispatches a FeliCa payment to the LAN gateway.
   const checkout1 = `chk_stera_1_${crypto.randomUUID().slice(0, 8)}`;
   const open1 = await send(`${base}/commerce/counter-sales`, staff.session, "POST", {
-    satyrLocationId: locationId,
+    pantryLocationId: locationId,
     checkoutId: checkout1,
     tenderMode: "terminal",
     lines: [menuLine("l1", COOKIE_ENTRY, [], 1)],
@@ -369,7 +369,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     staff.session,
     "POST",
     {
-      satyrLocationId: locationId,
+      pantryLocationId: locationId,
       checkoutRevision: quote1.checkoutRevision,
       quoteDigest: quote1.quoteDigest,
       amount: quote1.amount,
@@ -396,7 +396,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   // 4. Exclusivity: second concurrent sale on the same terminal is refused with 409 terminal_busy!
   const checkout2 = `chk_stera_2_${crypto.randomUUID().slice(0, 8)}`;
   await send(`${base}/commerce/counter-sales`, staff.session, "POST", {
-    satyrLocationId: locationId,
+    pantryLocationId: locationId,
     checkoutId: checkout2,
     tenderMode: "terminal",
     lines: [menuLine("l2", COOKIE_ENTRY, [], 1)],
@@ -410,7 +410,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     staff.session,
     "POST",
     {
-      satyrLocationId: locationId,
+      pantryLocationId: locationId,
       checkoutRevision: sale2.quote!.checkoutRevision,
       quoteDigest: sale2.quote!.quoteDigest,
       amount: sale2.quote!.amount,
@@ -439,7 +439,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
   // While still in result_unknown (before terminal_result arrives), a new sale is STILL blocked!
   const checkout3 = `chk_stera_3_${crypto.randomUUID().slice(0, 8)}`;
   await send(`${base}/commerce/counter-sales`, staff.session, "POST", {
-    satyrLocationId: locationId,
+    pantryLocationId: locationId,
     checkoutId: checkout3,
     tenderMode: "terminal",
     lines: [menuLine("l3", COOKIE_ENTRY, [], 1)],
@@ -453,7 +453,7 @@ async function gmoSteraLanGatewayEndToEndJourney(): Promise<void> {
     staff.session,
     "POST",
     {
-      satyrLocationId: locationId,
+      pantryLocationId: locationId,
       checkoutRevision: sale3.quote!.checkoutRevision,
       quoteDigest: sale3.quote!.quoteDigest,
       amount: sale3.quote!.amount,

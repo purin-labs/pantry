@@ -3,3 +3,23 @@
 # `pnpm lint:d1-patch` reads this file. Add an entry only when no deployed
 # database needs the change; otherwise write a patch script that names the object.
 organisation_codex_connection: Plan 93: the new stack loads the baseline fresh
+cafe_counter_receipt_setting: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+cafe_terminal_assignment: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_capability_activation: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_capability_activation_account_update: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_capability_activation_authority_insert: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_capability_activation_authority_lifecycle_update: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_merchant_binding: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_one_merchant_per_organisation_environment: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+commerce_webhook_subscription: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+idx_cafe_terminal_assignment_active_location: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+mail_classification_eligibility: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+organisation_commerce_system: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+organisation_commerce_system_commerce_binding: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+organisation_inference_selection: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+provider_connection: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+vault_item_event: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+organisation_commerce_system_underclerk_binding: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+underclerk_merchant_binding: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+underclerk_one_merchant_per_organisation_environment: Plan 93 renames it for the new stack, whose databases load the baseline fresh
+underclerk_webhook_subscription: Plan 93 renames it for the new stack, whose databases load the baseline fresh

@@ -51,7 +51,7 @@ export async function saveScenarioCopy(
       copy.settings,
     );
   } catch {
-    return { ok: false, code: "underclerk_unavailable" };
+    return { ok: false, code: "commerce_unavailable" };
   }
   if (
     source.kind !== "ready" ||
@@ -87,7 +87,7 @@ export async function saveScenarioCopy(
     });
     const result = await input.client.command(request);
     if (!result.ok) {
-      return { ok: false, code: "underclerk_unavailable" };
+      return { ok: false, code: "commerce_unavailable" };
     }
     if (result.value.status !== "accepted") {
       return { ok: false, code: result.value.error.code };

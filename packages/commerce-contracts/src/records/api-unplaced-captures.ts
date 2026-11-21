@@ -54,7 +54,7 @@ export type CommerceUnplacedCaptureV1 = Static<
 >;
 
 export const commerceUnplacedCapturesV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.unplaced-captures.v1"),
+  schemaVersion: Type.Literal("commerce.unplaced-captures.v1"),
   merchantId: text,
   /** The open captures first, then the resolved ones, the newest first. */
   captures: ImmutableArray(commerceUnplacedCaptureV1Schema),
@@ -72,7 +72,7 @@ export const parseCommerceUnplacedCaptureV1 = wireRecordParser(
 
 /** Staff record what they did for a capture with no order. */
 export const resolveCommerceUnplacedCaptureV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.resolve-unplaced-capture.v1"),
+  schemaVersion: Type.Literal("commerce.resolve-unplaced-capture.v1"),
   expectedRevision: Type.Integer({ minimum: 1 }),
   resolution: unplacedCaptureResolutionSchema,
   note: Type.Optional(text),

@@ -1,4 +1,4 @@
-# Satyr Economics: Storage, Runtime, and Subscription Costs
+# Pantry Economics: Storage, Runtime, and Subscription Costs
 
 Model last reviewed: 2026-08-23. Documentation scope reconciled: 2026-10-06.
 
@@ -30,7 +30,7 @@ and provider effects as larger costs than storage. Its break-even calculations
 below depend on the recorded prices, write counts, and placement assumptions.
 
 Current cost accounting distinguishes organisation ChatGPT allowance, organisation OpenAI
-API usage, and Satyr-funded OpenRouter usage. Compare measured cost per successful
+API usage, and Seams-funded OpenRouter usage. Compare measured cost per successful
 task before changing placement or subscription pricing.
 
 ## Historical pricing snapshot (2026-07; not revalidated)
@@ -65,7 +65,7 @@ Assumptions used throughout (tune these as real telemetry arrives):
 ## Worked Comparison
 
 Monthly platform bill for the persistence layer (excludes containers,
-provider-effect spend, and Satyr-funded Pi model usage; organisation Codex usage
+provider-effect spend, and Seams-funded Pi model usage; organisation Codex usage
 consumes the organisation's allowance):
 
 | Scale                   | Row writes/mo | Cloudflare                                 | Supabase equivalent                              |
@@ -214,7 +214,7 @@ Enforcement maps onto mechanisms the fork plan already defines:
 - `AgentSessionActor` reserves the turn token budget against the pinned model
   route. Organisation-subscription Codex checks the provider-reported allowance.
   Platform-funded Pi uses `OPENROUTER_API_KEY` and settles usage against the
-  Satyr-funded budget.
+  Seams-funded budget.
 - The Policy Engine gates plan-tier features (Cue Engine mode, raw DB
   access, surface count) as ordinary policy rules, so plan changes are
   policy snapshot changes rather than special-cased code.
@@ -255,13 +255,13 @@ Inference has three explicit cost profiles:
 
 - `organisation_subscription` + `openai` sends an Actor-leased turn to the
   organisation-addressed `CodexHarnessContainer`. Codex App Server consumes the
-  organisation's ChatGPT allowance while Satyr pays container time, Worker requests,
+  organisation's ChatGPT allowance while Pantry pays container time, Worker requests,
   Durable Object duration, storage, and provider effects.
 - `organisation_byo` + `openai` runs Pi with the organisation's purpose-bound OpenAI API key
-  from Vault. The organisation funds model usage. Satyr still incurs Platform runtime
+  from Vault. The organisation funds model usage. Pantry still incurs Platform runtime
   and storage costs.
 - `platform` + `openai-compatible` runs Pi in the Worker with
-  `OPENROUTER_API_KEY`. Satyr pays the OpenRouter model usage, Worker and Durable
+  `OPENROUTER_API_KEY`. Pantry pays the OpenRouter model usage, Worker and Durable
   Object runtime, storage, and provider effects.
 
 The session contract pins the route. An expired OAuth profile, exhausted
@@ -277,12 +277,12 @@ outside the selected harness boundary.
 
 The dominant platform-variable costs depend on route mix. Organisation Codex makes
 model usage an external allowance and capacity constraint. Platform Pi makes
-model tokens a direct Satyr expense. Storage and coordination are the platform
+model tokens a direct Pantry expense. Storage and coordination are the platform
 floor. Measure the following dimensions per Case assignment and AgentSession
 turn before changing placement or adding a new compute tier:
 
 - pinned funding class, harness, model, and input/output tokens for each turn;
-- provider-reported Codex allowance, organisation OpenAI usage, or Satyr OpenRouter usage;
+- provider-reported Codex allowance, organisation OpenAI usage, or Pantry OpenRouter usage;
 - Worker requests and Durable Object active duration;
 - queue operations, journal bytes, and R2 artifact bytes;
 - workspace-executor CPU, memory, disk, wall time, and retries; and

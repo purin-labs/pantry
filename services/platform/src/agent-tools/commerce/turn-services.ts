@@ -105,13 +105,13 @@ export function commerceToolServices(
   };
 }
 
-/** The commerce reads and the Underclerk clients of the Kitchen costs tools. */
+/** The commerce reads and the Commerce clients of the Kitchen costs tools. */
 function costsCommerce(turn: ToolTurnContext) {
   const { env, execution, lease, assignment } = turn;
-  const admittedUnderclerkFetch = admittedSessionOperation(
+  const admittedCommerceFetch = admittedSessionOperation(
     execution,
     lease,
-    env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    env.COMMERCE.fetch.bind(env.COMMERCE),
   );
   const caller = (actor: string) =>
     ({
@@ -129,11 +129,11 @@ function costsCommerce(turn: ToolTurnContext) {
       assignment,
     ),
     adminClient: (actor: string) =>
-      createCommerceClient(env, admittedUnderclerkFetch, caller(actor)),
+      createCommerceClient(env, admittedCommerceFetch, caller(actor)),
     entityPlaneClient: (actor: string) =>
       createCommerceEntityPlaneClient(
         env,
-        admittedUnderclerkFetch,
+        admittedCommerceFetch,
         caller(actor),
       ),
   };
@@ -253,7 +253,7 @@ export async function bindAllowanceReference(
     admittedSessionOperation(
       execution,
       lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
     body.offerId,
   );

@@ -2,7 +2,7 @@
 
 Uses one DNS-only A record, <random id>.voice.seams.tokyo, with this Mac's private
 address, and gets a Let's Encrypt certificate through a DNS-01 challenge. The private
-key stays in ~/.satyr-voice-test. Run it again when the Mac's address changes.
+key stays in ~/.pantry-voice-test. Run it again when the Mac's address changes.
 
 With a token, the script writes the records. It needs CLOUDFLARE_DNS_API_TOKEN in
 .env.local.production (Zone, DNS, Edit on seams.tokyo).
@@ -26,7 +26,7 @@ from pathlib import Path
 ZONE = "seams.tokyo"
 HERE = Path(__file__).resolve().parent
 REPO = Path(__file__).resolve().parents[2]
-HOME = Path.home() / ".satyr-voice-test"
+HOME = Path.home() / ".pantry-voice-test"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--accept-letsencrypt-terms", action="store_true")
@@ -49,7 +49,7 @@ def api(token: str, method: str, path: str, body: dict | None = None) -> dict:
     request = urllib.request.Request(
         f"https://api.cloudflare.com/client/v4{path}", method=method,
         data=None if body is None else json.dumps(body).encode(),
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json", "User-Agent": "satyr-g06"})
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json", "User-Agent": "pantry-g06"})
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             return json.load(response)["result"]

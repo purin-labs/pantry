@@ -117,7 +117,7 @@ export async function handleCommerceMenuPublicationControlRoute(
     merchant.client.readStorefront(merchant.merchantId, CAFE_STOREFRONT_ID),
     merchant.client.readStockSnapshot(merchant.merchantId),
   ]);
-  if (!stock.ok) return controlError("underclerk_unavailable", 503);
+  if (!stock.ok) return controlError("commerce_unavailable", 503);
   if (!storefront.ok || storefront.value.fulfillment.kind !== "pickup")
     return controlError("cafe_storefront_missing", 409);
   const cafe = {
@@ -162,7 +162,7 @@ export async function handleCommerceMenuPublicationControlRoute(
     },
     ...(expectedMenuRevision === undefined ? {} : { expectedMenuRevision }),
   });
-  if (!result.ok) return controlError("underclerk_unavailable", 503);
+  if (!result.ok) return controlError("commerce_unavailable", 503);
   if (result.value.outcome === "rejected")
     return controlJson(
       {
@@ -218,7 +218,7 @@ async function readCafeMenuOptions(
     ),
     merchant.client.listMedia(merchant.merchantId),
   ]);
-  if (!stock.ok) return controlError("underclerk_unavailable", 503);
+  if (!stock.ok) return controlError("commerce_unavailable", 503);
   if (!storefront.ok || storefront.value.fulfillment.kind !== "pickup")
     return controlError("cafe_storefront_missing", 409);
   const cafe = {
@@ -226,10 +226,10 @@ async function readCafeMenuOptions(
     locationId: storefront.value.fulfillment.locationId,
   };
   const published = publishedCafeMenu(stock.value);
-  // An Commerce without shop names still serves the menu page.
+  // A Commerce without shop names still serves the menu page.
   const name = shopName.ok ? shopName.value.name : null;
   // A failed photo read leaves the products without photos.
-  const base = env.UNDERCLERK_BASE_URL;
+  const base = env.COMMERCE_BASE_URL;
   const photos =
     library.ok && base !== undefined
       ? cafeProductPhotos(library.value, base, merchant.merchantId)
@@ -278,7 +278,7 @@ async function readCafeMenuOptions(
 
 /** Commerce serves each shop's café page at `/shops/<merchantId>`. */
 function hostedShopUrl(env: Env, merchantId: string): string | null {
-  const base = env.UNDERCLERK_BASE_URL?.trim();
+  const base = env.COMMERCE_BASE_URL?.trim();
   if (base === undefined || base.length === 0) return null;
   return `${base.replace(/\/+$/u, "")}/shops/${encodeURIComponent(merchantId)}`;
 }
@@ -350,7 +350,7 @@ async function setShopName(
     CAFE_STOREFRONT_ID,
     name,
   );
-  if (!result.ok) return controlError("underclerk_unavailable", 503);
+  if (!result.ok) return controlError("commerce_unavailable", 503);
   if (result.value.outcome === "refused")
     return controlError(
       `shop_name_${result.value.reason}`,

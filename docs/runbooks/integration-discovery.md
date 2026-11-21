@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Integration discovery lets an authorized Satyr agent answer which integrations
+Integration discovery lets an authorized Pantry agent answer which integrations
 are connected for its organisation. The response distinguishes configured data
 classes from data classes the current requester may read.
 
@@ -41,7 +41,7 @@ Use the Access portal for the target organisation:
    `integration.discovery.read` in `authz.allowedTools`.
 4. Confirm the D1 policy snapshot, the `POLICY_KV` latest snapshot, and the
    Organisation Actor active policy head agree.
-5. Start a new Slack root thread with one `@satyr-dev` mention. Continue that
+5. Start a new Slack root thread with one `@pantry-dev` mention. Continue that
    thread without mentioning the app.
 
 The initial mention creates the Case. Ordinary replies in that active thread
@@ -72,7 +72,7 @@ account-existence leak.
 
 ## Information-flow behavior
 
-Satyr joins every admitted source label into cumulative Case/session state.
+Pantry joins every admitted source label into cumulative Case/session state.
 Revocation or policy narrowing takes effect immediately and cannot erase
 information already observed by that Case. This is deliberate: broadening a
 later grant must not declassify earlier observations.
@@ -86,7 +86,7 @@ before changing policy code.
 
 ### The app does not answer an untagged reply
 
-- Confirm the reply is inside an active thread that Satyr previously joined.
+- Confirm the reply is inside an active thread that Pantry previously joined.
 - Confirm the Connector admitted the event and the Case still exists.
 - Check for an expired Case-work lease or a missing recovery alarm.
 
@@ -99,7 +99,7 @@ before changing policy code.
 
 ### Slack says the output was held
 
-- Treat `Message held by Satyr output guardrail.` as a content-screen hold.
+- Treat `Message held by Pantry output guardrail.` as a content-screen hold.
   Inspect the terminal assistant output for sensitive entities or leaked
   internal model/tool protocol before changing grants.
 - Confirm intermediate tool-use preambles were excluded from canonical Slack

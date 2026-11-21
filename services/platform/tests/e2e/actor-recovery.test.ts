@@ -794,7 +794,7 @@ async function installRecoveryFixture(): Promise<{
       .prepare(
         `INSERT INTO organisation_inference_selection (
          organisation_id, selection_kind, selected_by_user_id, selected_at
-       ) VALUES (?, 'satyr_platform', 'user_78d52121-40d5-53ad-83cd-ef528ba5f3f2', ?)`,
+       ) VALUES (?, 'pantry_platform', 'user_78d52121-40d5-53ad-83cd-ef528ba5f3f2', ?)`,
       )
       .bind(ORGANISATION_ID, now - 700),
   ]);

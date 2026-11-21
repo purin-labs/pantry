@@ -81,7 +81,7 @@ async function inventoryJourney(context: TestContext): Promise<void> {
   );
   await required(
     journey.native.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -352,7 +352,7 @@ async function inventoryJourney(context: TestContext): Promise<void> {
   const output = positionForItem(beforeBatch, recipe.output.inventoryItemId);
   const batch = {
     ...(await journey.base("batch")),
-    schemaVersion: "underclerk.complete-production-batch.v1" as const,
+    schemaVersion: "commerce.complete-production-batch.v1" as const,
     productionBatchId: "batch_inventory_acceptance",
     demand: {
       kind: "request" as const,
@@ -549,12 +549,12 @@ async function inventoryJourney(context: TestContext): Promise<void> {
       rowForItem.bind(null, "inventory_unlinked_cookie", "unlinked_product"),
     ),
   ).toMatchObject({ available: "0 each", recipeCount: 1, product: null });
-  const availableOnlyFixture = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-fixture`,
+  const availableOnlyFixture = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-fixture`,
     {
       method: "POST",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({
@@ -611,14 +611,14 @@ async function inventoryJourney(context: TestContext): Promise<void> {
 
 class InventoryJourney {
   readonly entities = new CommerceEntityPlaneClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   readonly native = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   readonly now = new Date().toISOString();
   constructor(
@@ -715,12 +715,12 @@ class InventoryJourney {
         env,
         Date.now(),
       );
-      const diagnostic = await env.UNDERCLERK.fetch(
-        `http://underclerk.test/v1/admin/merchants/${this.merchantId}/test-fixture`,
+      const diagnostic = await env.COMMERCE.fetch(
+        `http://commerce.test/v1/admin/merchants/${this.merchantId}/test-fixture`,
         {
           method: "POST",
           headers: {
-            authorization: "Bearer underclerk-e2e-token",
+            authorization: "Bearer commerce-e2e-token",
             "content-type": "application/json",
           },
           body: JSON.stringify({ kind: "outbox_status" }),
@@ -801,7 +801,7 @@ class InventoryJourney {
     target = await this.orderTarget(orderId);
     const command = {
       ...(await this.base(`fulfill-${orderId}`)),
-      schemaVersion: "underclerk.complete-pickup.v1" as const,
+      schemaVersion: "commerce.complete-pickup.v1" as const,
       orderId,
       orderRevision: target.order.revision,
       fulfillmentId: target.fulfillment.id,
@@ -822,7 +822,7 @@ class InventoryJourney {
     const target = await this.orderTarget(orderId);
     const command = {
       ...(await this.base(`cancel-${orderId}`)),
-      schemaVersion: "underclerk.cancel-order.v1" as const,
+      schemaVersion: "commerce.cancel-order.v1" as const,
       orderId,
       orderRevision: target.order.revision,
       fulfillmentId: target.fulfillment.id,
@@ -1003,7 +1003,7 @@ async function verifyAdjustmentQueueFailure(
   const appliedResult = await response.json();
   const unread = async () => {
     const reader = await required(
-      journey.native.readFeedConsumer(journey.merchantId, "satyr"),
+      journey.native.readFeedConsumer(journey.merchantId, "pantry"),
     );
     const page = await required(
       journey.native.readEvents(journey.merchantId, { after: reader.cursor }),
@@ -1175,7 +1175,7 @@ async function verifyMerchantQueryIsolation(journey: InventoryJourney) {
   const organisationId = `organisation_foreign_${crypto.randomUUID()}`;
   await required(
     journey.native.provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       merchantId,
       externalReference: organisationId,
       createdAt: journey.now,
@@ -1499,8 +1499,8 @@ async function verifyProductionRecovery(
   journey: InventoryJourney,
   body: InventoryProductionCreation,
 ) {
-  const service = new ProductionRecoveryService(env.UNDERCLERK);
-  const outage: Env = { ...env, UNDERCLERK: service };
+  const service = new ProductionRecoveryService(env.COMMERCE);
+  const outage: Env = { ...env, COMMERCE: service };
   const headers = commerceHeaders(journey.session);
   headers.set("idempotency-key", "production-demand");
 
@@ -1680,12 +1680,12 @@ function productionTestAttribute(field: {
 async function verifyOutboxSigningRepair(
   journey: InventoryJourney,
 ): Promise<unknown> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${journey.merchantId}/test-fixture`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${journey.merchantId}/test-fixture`,
     {
       method: "POST",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({ kind: "outbox_signing_migration" }),
@@ -1715,12 +1715,12 @@ function productionRecoveryRequest(
 }
 
 class ProductionRecoveryService {
-  readonly connect: Env["UNDERCLERK"]["connect"];
-  readonly native: Env["UNDERCLERK"];
+  readonly connect: Env["COMMERCE"]["connect"];
+  readonly native: Env["COMMERCE"];
   dropped = false;
   stockReads = 0;
 
-  constructor(native: Env["UNDERCLERK"]) {
+  constructor(native: Env["COMMERCE"]) {
     this.native = native;
     this.connect = native.connect.bind(native);
   }

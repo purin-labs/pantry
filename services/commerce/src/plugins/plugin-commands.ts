@@ -67,7 +67,7 @@ export function operationCommand(
     const buyer = base.orderBuyer(orderId);
     if (buyer === undefined) return undefined;
     return {
-      schemaVersion: "underclerk.credit-store-credit.v1",
+      schemaVersion: "commerce.credit-store-credit.v1",
       merchantId: base.merchantId,
       idempotencyKey: base.idempotencyKey,
       requestedAt: base.at,
@@ -94,7 +94,7 @@ export function operationCommand(
       entityId = id;
     }
     return {
-      schemaVersion: "underclerk.set-plugin-field-values.v1",
+      schemaVersion: "commerce.set-plugin-field-values.v1",
       merchantId: base.merchantId,
       idempotencyKey: base.idempotencyKey,
       requestedAt: base.at,
@@ -126,7 +126,7 @@ export function operationCommand(
   )
     return undefined;
   return {
-    schemaVersion: "underclerk.create-discount.v1",
+    schemaVersion: "commerce.create-discount.v1",
     merchantId: base.merchantId,
     idempotencyKey: base.idempotencyKey,
     requestedAt: base.at,

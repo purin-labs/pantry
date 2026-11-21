@@ -60,7 +60,7 @@ export async function openMailInboxCursor(
 async function cursorKey(sessionToken: string): Promise<CryptoKey> {
   const digest = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(`satyr-mail-inbox-cursor-v1:${sessionToken}`),
+    new TextEncoder().encode(`pantry-mail-inbox-cursor-v1:${sessionToken}`),
   );
   return crypto.subtle.importKey("raw", digest, "AES-GCM", false, [
     "encrypt",

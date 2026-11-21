@@ -24,14 +24,14 @@ const text = normalizedTextSchema;
 
 export const createBuyerSessionCommandSchema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.create-buyer-session.v1"),
+    schemaVersion: Type.Literal("commerce.create-buyer-session.v1"),
     buyer: ReadonlyStrictObject({
       kind: Type.Literal("guest"),
       customerAccessToken: Absent,
     }),
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.create-buyer-session.v1"),
+    schemaVersion: Type.Literal("commerce.create-buyer-session.v1"),
     buyer: ReadonlyStrictObject({
       kind: Type.Literal("identified_customer"),
       customerAccessToken: text,
@@ -58,7 +58,7 @@ function invalidConfiguration(): string {
 }
 
 export const buyerSessionSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.buyer-session.v4"),
+  schemaVersion: Type.Literal("commerce.buyer-session.v4"),
   token: text,
   expiresAt: utcTimestampSchema,
   storefrontRevision: PositiveInteger,
@@ -95,20 +95,20 @@ const buyerLines = ImmutableArray(buyerPickupCheckoutLineSchema, {
 });
 
 export const createBuyerCartCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.create-buyer-cart.v1"),
+  schemaVersion: Type.Literal("commerce.create-buyer-cart.v1"),
   idempotencyKey: text,
   lines: buyerLines,
 });
 
 export const replaceBuyerCartCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.replace-buyer-cart.v1"),
+  schemaVersion: Type.Literal("commerce.replace-buyer-cart.v1"),
   idempotencyKey: text,
   cartRevision: PositiveInteger,
   lines: buyerLines,
 });
 
 export const refreshBuyerPickupCheckoutCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.refresh-buyer-pickup-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.refresh-buyer-pickup-checkout.v1"),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,
   quoteDigest: text,
@@ -117,7 +117,7 @@ export const refreshBuyerPickupCheckoutCommandSchema = ReadonlyStrictObject({
 
 export const placeBuyerStoredValueCheckoutCommandSchema = ReadonlyStrictObject({
   schemaVersion: Type.Literal(
-    "underclerk.place-buyer-stored-value-checkout.v1",
+    "commerce.place-buyer-stored-value-checkout.v1",
   ),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,
@@ -238,7 +238,7 @@ function withoutStoreCreditFalse<
 
 export const createBuyerPickupCheckoutCommandSchema = Type.Codec(
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.create-buyer-pickup-checkout.v1"),
+    schemaVersion: Type.Literal("commerce.create-buyer-pickup-checkout.v1"),
     idempotencyKey: text,
     cartId: text,
     cartRevision: PositiveInteger,
@@ -495,7 +495,7 @@ type BuyerShippingDestination = Static<typeof buyerShippingDestinationSchema>;
 
 /** `CreateCommerceBuyerShippingCheckoutV1`. */
 export type WireCreateBuyerShippingCheckout = Readonly<{
-  schemaVersion: "underclerk.create-buyer-shipping-checkout.v1";
+  schemaVersion: "commerce.create-buyer-shipping-checkout.v1";
   idempotencyKey: string;
   cartId: string;
   cartRevision: number;
@@ -527,7 +527,7 @@ export const createBuyerShippingCheckoutCommandSchema =
       Type.Refine(
         ReadonlyStrictObject({
           schemaVersion: Type.Literal(
-            "underclerk.create-buyer-shipping-checkout.v1",
+            "commerce.create-buyer-shipping-checkout.v1",
           ),
           idempotencyKey: text,
           cartId: text,
@@ -561,7 +561,7 @@ function guestAddressError(): string {
 }
 
 export const validateBuyerShippingAddressCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.validate-buyer-shipping-address.v1"),
+  schemaVersion: Type.Literal("commerce.validate-buyer-shipping-address.v1"),
   idempotencyKey: text,
   address: buyerShippingAddressSchema,
 });
@@ -593,7 +593,7 @@ function distinctVariantsError(): string {
 }
 
 export const refreshBuyerShippingCheckoutCommandSchema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.refresh-buyer-shipping-checkout.v1"),
+  schemaVersion: Type.Literal("commerce.refresh-buyer-shipping-checkout.v1"),
   idempotencyKey: text,
   checkoutRevision: PositiveInteger,
   quoteDigest: text,

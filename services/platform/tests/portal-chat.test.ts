@@ -226,7 +226,7 @@ beforeEach(async function setup() {
       created_by_user_id, created_at, updated_at, environment,
       provider_subject_id, authorization_product
     ) VALUES (
-      'connection_chat_email', 'organisation_chat_test', 'gmail', 'shared_satyr_app',
+      'connection_chat_email', 'organisation_chat_test', 'gmail', 'shared_pantry_app',
       'connection_credential', 1, 'vault:chat-email', 'active', '["gmail.send"]',
       'user_2eee7198-ed08-56f8-9771-97f608f2cb4c', 1, 1, 'development', 'google-chat-email', 'send_only'
     );
@@ -302,9 +302,9 @@ beforeEach(async function setup() {
     scope.organisationId,
   );
   authenticatedHeaders = {
-    cookie: `satyr_control_session=${actorSession.token}; satyr_control_csrf=${actorSession.csrfToken}`,
+    cookie: `pantry_session=${actorSession.token}; pantry_csrf=${actorSession.csrfToken}`,
     origin: "https://portal.example",
-    "x-satyr-csrf": actorSession.csrfToken,
+    "x-pantry-csrf": actorSession.csrfToken,
   };
   mocks.model.mockResolvedValue({
     ok: true,
@@ -1213,7 +1213,7 @@ describe("persistent portal chat", function chatSuite() {
     });
   });
 
-  it("projects settled BakeryOS commands and receipts into the chat timeline", async function bakerySurfaceTimeline() {
+  it("projects settled Kitchen commands and receipts into the chat timeline", async function bakerySurfaceTimeline() {
     const surfaceContext = await createBakerySurfaceAttachment({
       schemaVersion: 1,
       kind: "bakery-workspace",

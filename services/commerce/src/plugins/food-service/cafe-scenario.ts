@@ -581,7 +581,7 @@ export class CafeScenarioProvisioning {
       revision = requireDemoMutationRevision(
         this.#options.createLocation({
           ...cafeScenarioCommandBase(command, 0, "open_store"),
-          schemaVersion: "underclerk.create-location.v1",
+          schemaVersion: "commerce.create-location.v1",
           location: cafeScenarioLocation(),
         }),
         "cafe location",
@@ -593,7 +593,7 @@ export class CafeScenarioProvisioning {
             revision,
             "create_sesame_cookie_item",
           ),
-          schemaVersion: "underclerk.create-inventory-item.v1",
+          schemaVersion: "commerce.create-inventory-item.v1",
           inventoryItemId: "inventory_sesame_cookie",
           merchantCode: "SESAME-COOKIE",
           name: "Sesame cookie",
@@ -610,7 +610,7 @@ export class CafeScenarioProvisioning {
             revision,
             "open_sesame_cookie_position",
           ),
-          schemaVersion: "underclerk.open-inventory-position.v1",
+          schemaVersion: "commerce.open-inventory-position.v1",
           inventoryPositionId: "position_sesame_cookie_cafe",
           inventoryItemId: "inventory_sesame_cookie",
           inventoryItemRevision: 1,
@@ -622,7 +622,7 @@ export class CafeScenarioProvisioning {
       revision = requireDemoMutationRevision(
         this.#options.createInventoryItem({
           ...cafeScenarioCommandBase(command, revision, "create_oat_milk_item"),
-          schemaVersion: "underclerk.create-inventory-item.v1",
+          schemaVersion: "commerce.create-inventory-item.v1",
           inventoryItemId: "inventory_oat_milk",
           merchantCode: "OAT-MILK",
           name: "Oat milk",
@@ -639,7 +639,7 @@ export class CafeScenarioProvisioning {
             revision,
             "open_oat_milk_position",
           ),
-          schemaVersion: "underclerk.open-inventory-position.v1",
+          schemaVersion: "commerce.open-inventory-position.v1",
           inventoryPositionId: "position_oat_milk_cafe",
           inventoryItemId: "inventory_oat_milk",
           inventoryItemRevision: 1,
@@ -651,7 +651,7 @@ export class CafeScenarioProvisioning {
       revision = requireDemoMutationRevision(
         this.#options.receiveInventory({
           ...cafeScenarioCommandBase(command, revision, "receive_oat_milk"),
-          schemaVersion: "underclerk.receive-inventory.v3",
+          schemaVersion: "commerce.receive-inventory.v3",
           purchase: { kind: "unlinked" },
           receiptId: "receipt_oat_milk",
           receiptLineId: "receipt_line_oat_milk_accepted",
@@ -680,7 +680,7 @@ export class CafeScenarioProvisioning {
             revision,
             "create_sesame_cookie_item",
           ),
-          schemaVersion: "underclerk.create-inventory-item.v1",
+          schemaVersion: "commerce.create-inventory-item.v1",
           inventoryItemId: "inventory_sesame_cookie",
           merchantCode: "SESAME-COOKIE",
           name: "Sesame cookie",
@@ -697,7 +697,7 @@ export class CafeScenarioProvisioning {
             revision,
             "open_sesame_cookie_position",
           ),
-          schemaVersion: "underclerk.open-inventory-position.v1",
+          schemaVersion: "commerce.open-inventory-position.v1",
           inventoryPositionId: "position_sesame_cookie_cafe",
           inventoryItemId: "inventory_sesame_cookie",
           inventoryItemRevision: 1,
@@ -725,7 +725,7 @@ export class CafeScenarioProvisioning {
     revision = requireDemoMutationRevision(
       this.#options.createRecipeRevision({
         ...cafeScenarioCommandBase(command, revision, "create_cookie_recipe"),
-        schemaVersion: "underclerk.create-recipe-revision.v1",
+        schemaVersion: "commerce.create-recipe-revision.v1",
         recipeRevision: {
           recipeId: "recipe_sesame_cookie_stocked",
           name: "Sesame cookie batch",
@@ -759,7 +759,7 @@ export class CafeScenarioProvisioning {
     revision = requireDemoMutationRevision(
       this.#options.createModifierGroupRevision({
         ...cafeScenarioCommandBase(command, revision, "create_milk_modifier"),
-        schemaVersion: "underclerk.create-modifier-group-revision.v1",
+        schemaVersion: "commerce.create-modifier-group-revision.v1",
         modifierGroupRevision: {
           modifierGroupId: "modifier_group_milk",
           name: "Milk",
@@ -795,7 +795,7 @@ export class CafeScenarioProvisioning {
           revision,
           "create_sesame_latte_recipe",
         ),
-        schemaVersion: "underclerk.create-recipe-revision.v1",
+        schemaVersion: "commerce.create-recipe-revision.v1",
         recipeRevision: {
           recipeId: "recipe_sesame_latte",
           name: "Sesame latte",
@@ -837,7 +837,7 @@ export class CafeScenarioProvisioning {
           revision,
           "create_sesame_financier_recipe",
         ),
-        schemaVersion: "underclerk.create-recipe-revision.v1",
+        schemaVersion: "commerce.create-recipe-revision.v1",
         recipeRevision: {
           recipeId: "recipe_sesame_financier",
           name: "Sesame financier",
@@ -875,7 +875,7 @@ export class CafeScenarioProvisioning {
           revision,
           "configure_oat_milk_stock_policy",
         ),
-        schemaVersion: "underclerk.configure-stock-policy.v1",
+        schemaVersion: "commerce.configure-stock-policy.v1",
         stockPolicy: {
           stockPolicyId: "stock_policy_oat_milk_cafe",
           inventoryItemId: "inventory_oat_milk",
@@ -896,7 +896,7 @@ export class CafeScenarioProvisioning {
           revision,
           "configure_sesame_cookie_storefront",
         ),
-        schemaVersion: "underclerk.configure-pickup-storefront.v1",
+        schemaVersion: "commerce.configure-pickup-storefront.v1",
         location: cafeScenarioLocation(),
         salesChannel: cafeScenarioSalesChannel(),
         product: {
@@ -969,7 +969,7 @@ export class CafeScenarioProvisioning {
           revision,
           "prepare_sesame_latte_catalog",
         ),
-        schemaVersion: "underclerk.prepare-catalog-listing.v1",
+        schemaVersion: "commerce.prepare-catalog-listing.v1",
         salesChannel: cafeScenarioSalesChannel(),
         product: {
           id: "product_sesame_latte",
@@ -1016,7 +1016,7 @@ export class CafeScenarioProvisioning {
     );
     revision = requireDemoMutationRevision(
       this.#options.publishCatalogListing({
-        schemaVersion: "underclerk.publish-catalog-listing.v1",
+        schemaVersion: "commerce.publish-catalog-listing.v1",
         merchantId: command.merchantId,
         idempotencyKey: cafeScenarioKey("publish_sesame_latte_catalog"),
         requestedAt: CAFE_SCENARIO_TIMESTAMP,
@@ -1038,7 +1038,7 @@ export class CafeScenarioProvisioning {
           revision,
           "prepare_sesame_financier_catalog",
         ),
-        schemaVersion: "underclerk.prepare-catalog-listing.v1",
+        schemaVersion: "commerce.prepare-catalog-listing.v1",
         salesChannel: cafeScenarioSalesChannel(),
         product: {
           id: "product_sesame_financier",
@@ -1084,7 +1084,7 @@ export class CafeScenarioProvisioning {
     );
     revision = requireDemoMutationRevision(
       this.#options.publishCatalogListing({
-        schemaVersion: "underclerk.publish-catalog-listing.v1",
+        schemaVersion: "commerce.publish-catalog-listing.v1",
         merchantId: command.merchantId,
         idempotencyKey: cafeScenarioKey("publish_sesame_financier_catalog"),
         requestedAt: CAFE_SCENARIO_TIMESTAMP,
@@ -1121,7 +1121,7 @@ export class CafeScenarioProvisioning {
             revision,
             `create_${recipe.recipeId}`,
           ),
-          schemaVersion: "underclerk.create-recipe-revision.v1",
+          schemaVersion: "commerce.create-recipe-revision.v1",
           recipeRevision: recipe,
         }),
         `${recipe.name} recipe`,
@@ -1144,7 +1144,7 @@ export class CafeScenarioProvisioning {
           expectedMerchantRevision,
           `create_${product.inventoryItemId}`,
         ),
-        schemaVersion: "underclerk.create-inventory-item.v1",
+        schemaVersion: "commerce.create-inventory-item.v1",
         inventoryItemId: product.inventoryItemId,
         merchantCode: product.sku,
         name: product.title,
@@ -1162,7 +1162,7 @@ export class CafeScenarioProvisioning {
           itemRevision,
           `open_${product.inventoryItemId}_position`,
         ),
-        schemaVersion: "underclerk.open-inventory-position.v1",
+        schemaVersion: "commerce.open-inventory-position.v1",
         inventoryPositionId: positionId,
         inventoryItemId: product.inventoryItemId,
         inventoryItemRevision: 1,
@@ -1178,7 +1178,7 @@ export class CafeScenarioProvisioning {
           positionRevision,
           `receive_${product.inventoryItemId}`,
         ),
-        schemaVersion: "underclerk.receive-inventory.v3",
+        schemaVersion: "commerce.receive-inventory.v3",
         purchase: { kind: "unlinked" },
         receiptId: `receipt_${product.inventoryItemId}`,
         receiptLineId: `receipt_line_${product.inventoryItemId}`,
@@ -1214,7 +1214,7 @@ export class CafeScenarioProvisioning {
         expectedMerchantRevision,
         `prepare_${product.slug}_catalog`,
       ),
-      schemaVersion: "underclerk.prepare-catalog-listing.v1",
+      schemaVersion: "commerce.prepare-catalog-listing.v1",
       salesChannel: cafeScenarioSalesChannel(),
       product: {
         id: productId,
@@ -1248,7 +1248,7 @@ export class CafeScenarioProvisioning {
     requireDemoMutationRevision(prepared, `${product.title} catalog`);
     return requireDemoMutationRevision(
       this.#options.publishCatalogListing({
-        schemaVersion: "underclerk.publish-catalog-listing.v1",
+        schemaVersion: "commerce.publish-catalog-listing.v1",
         merchantId: command.merchantId,
         idempotencyKey: cafeScenarioKey(`publish_${product.slug}_catalog`),
         requestedAt: CAFE_SCENARIO_TIMESTAMP,
@@ -1276,7 +1276,7 @@ export class CafeScenarioProvisioning {
           expectedMerchantRevision,
           `create_${ingredient.inventoryItemId}`,
         ),
-        schemaVersion: "underclerk.create-inventory-item.v1",
+        schemaVersion: "commerce.create-inventory-item.v1",
         inventoryItemId: ingredient.inventoryItemId,
         merchantCode: ingredient.merchantCode,
         name: ingredient.name,
@@ -1294,7 +1294,7 @@ export class CafeScenarioProvisioning {
           itemRevision,
           `open_${ingredient.inventoryItemId}_position`,
         ),
-        schemaVersion: "underclerk.open-inventory-position.v1",
+        schemaVersion: "commerce.open-inventory-position.v1",
         inventoryPositionId: positionId,
         inventoryItemId: ingredient.inventoryItemId,
         inventoryItemRevision: 1,
@@ -1310,7 +1310,7 @@ export class CafeScenarioProvisioning {
           positionRevision,
           `receive_${ingredient.inventoryItemId}`,
         ),
-        schemaVersion: "underclerk.receive-inventory.v3",
+        schemaVersion: "commerce.receive-inventory.v3",
         purchase: { kind: "unlinked" },
         receiptId: `receipt_${ingredient.inventoryItemId}`,
         receiptLineId: `receipt_line_${ingredient.inventoryItemId}`,
@@ -1348,7 +1348,7 @@ export class CafeScenarioProvisioning {
           expectedMerchantRevision,
           `create_${stationId}`,
         ),
-        schemaVersion: "underclerk.create-preparation-station.v1",
+        schemaVersion: "commerce.create-preparation-station.v1",
         station: { stationId, locationId: "location_cafe", name },
       }),
       name,

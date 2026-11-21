@@ -96,7 +96,7 @@ export async function resolveProfileBinding(
   return {
     kind: "resolved",
     profile,
-    extensionName: `satyr-trusted-tools/v${implementationVersion}/${digest}`,
+    extensionName: `pantry-trusted-tools/v${implementationVersion}/${digest}`,
     instructions: composeAgentInstructions(
       "Use only admitted tools. Preserve source restrictions.",
       profile,

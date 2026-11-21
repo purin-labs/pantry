@@ -93,13 +93,13 @@ async function menuBoardScreenJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -549,7 +549,7 @@ async function send(
       : commerceHeaders(session);
   if (method !== "GET") {
     headers.set("idempotency-key", crypto.randomUUID());
-    headers.set("x-satyr-configuration-version", "1");
+    headers.set("x-pantry-configuration-version", "1");
   }
   const response = await exports.default.fetch(url, {
     method,
@@ -720,17 +720,17 @@ async function cartRefusal(
   menuEntryId: string,
 ): Promise<unknown> {
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const session = await required(
     buyer.createSession(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
   const cart = await buyer.createCart(merchantId, STOREFRONT, session.token, {
-    schemaVersion: "underclerk.create-buyer-cart.v1",
+    schemaVersion: "commerce.create-buyer-cart.v1",
     idempotencyKey: `cart-${crypto.randomUUID()}`,
     lines: [
       {

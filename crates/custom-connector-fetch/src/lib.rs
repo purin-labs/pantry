@@ -206,7 +206,7 @@ async fn perform_fetch(request: FetchRequest) -> Result<FetchResponse, FetchErro
             },
         )
         .header(ACCEPT_ENCODING, "identity")
-        .header(USER_AGENT, "Satyr-Custom-Connector-Transport/1")
+        .header(USER_AGENT, "Pantry-Custom-Connector-Transport/1")
         .header(
             authentication_header_name(&request.authentication),
             authentication_header_value(&request.authentication)?,
@@ -961,7 +961,7 @@ mod tests {
                 .map(str::to_owned);
             let credential = request
                 .headers()
-                .get("x-satyr-probe-key")
+                .get("x-pantry-probe-key")
                 .and_then(|value| value.to_str().ok())
                 .map(str::to_owned);
             let host_observer = Arc::clone(&host_observer);
@@ -1024,7 +1024,7 @@ mod tests {
             "bodyBase64": BASE64.encode(br#"{"name":"tart"}"#),
         });
         wire["idempotency"] =
-            serde_json::json!({ "header": "Idempotency-Key", "key": "satyr-effect-1" });
+            serde_json::json!({ "header": "Idempotency-Key", "key": "pantry-effect-1" });
         let parsed = parse_request(&serde_json::to_vec(&wire).unwrap()).expect("key is valid");
         let mut request = fixture_request(
             url,
@@ -1039,11 +1039,11 @@ mod tests {
         let response = perform_fetch(request).await.expect("fixture succeeds");
 
         assert_eq!(response.status, 200);
-        assert_eq!(observed_key.lock().await.as_deref(), Some("satyr-effect-1"));
+        assert_eq!(observed_key.lock().await.as_deref(), Some("pantry-effect-1"));
         server.await.expect("fixture task succeeds");
 
         wire["idempotency"] =
-            serde_json::json!({ "header": "authorization", "key": "satyr-effect-1" });
+            serde_json::json!({ "header": "authorization", "key": "pantry-effect-1" });
         assert_eq!(
             parse_request(&serde_json::to_vec(&wire).unwrap()),
             Err(FetchError::InvalidRequest)
@@ -1236,7 +1236,7 @@ mod tests {
             url,
             address,
             authentication: Authentication::Header {
-                name: HeaderName::from_static("x-satyr-probe-key"),
+                name: HeaderName::from_static("x-pantry-probe-key"),
                 value: secret.to_owned(),
             },
             operation,

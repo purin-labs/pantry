@@ -655,7 +655,7 @@ async (page) => {
         const csrfHeaders = {
           origin: PORTAL,
           "content-type": "application/json",
-          "x-satyr-csrf": member.csrfToken,
+          "x-pantry-csrf": member.csrfToken,
         };
         const directPortalChat = await memberPage.request.post(
           `${WORKER}/v1/control/organisations/${this.fixtures.organisationId}/chat`,

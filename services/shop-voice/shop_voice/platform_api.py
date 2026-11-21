@@ -18,7 +18,7 @@ class PlatformRefused(Exception):
 
 
 def _call(origin: str, method: str, route: str, credential: str | None, body: dict | None) -> dict:
-    headers = {"User-Agent": f"satyr-shop-voice/{VERSION}", "Content-Type": "application/json"}
+    headers = {"User-Agent": f"pantry-shop-voice/{VERSION}", "Content-Type": "application/json"}
     if credential is not None:
         headers["Authorization"] = f"Bearer {credential}"
     request = urllib.request.Request(f"{origin}/v1/voice-macs/{route}", method=method, headers=headers,

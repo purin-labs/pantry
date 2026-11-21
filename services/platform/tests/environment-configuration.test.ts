@@ -16,7 +16,7 @@ describe("actual Wrangler configuration loading", function configurationLoading(
       config: resolve("wrangler.jsonc"),
       env: "local",
     });
-    const directory = mkdtempSync(resolve(tmpdir(), "satyr-config-"));
+    const directory = mkdtempSync(resolve(tmpdir(), "pantry-config-"));
     try {
       writeFileSync(
         resolve(directory, ".dev.vars.local"),

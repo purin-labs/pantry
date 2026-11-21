@@ -157,7 +157,7 @@ it(
       MERCHANT_ID,
     );
     const demo = await providerClient().provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: author.organisationId,
       merchantId: MERCHANT_ID,
       profile: "cafe_patisserie",
@@ -488,9 +488,9 @@ async function personPosts(
 
 async function directoryEntry(entryId: string) {
   const plane = new CommerceEntityPlaneClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const read = await plane.readListEntry(
     parseListEntryReadRequest({

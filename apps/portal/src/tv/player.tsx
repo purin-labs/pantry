@@ -31,7 +31,7 @@ import { ScaledBoard } from "../features/menu-boards/board-view";
  * screen that the shop removed goes back to a new code.
  */
 
-const STORAGE_KEY = "satyr.tv.v1";
+const STORAGE_KEY = "pantry.tv.v1";
 const POLL_PAIRING_MS = 3_000;
 const READ_EVERY_MS = 60_000;
 

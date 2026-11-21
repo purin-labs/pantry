@@ -447,7 +447,7 @@ async function submitSurfaceReceipt(
   receipt: Awaited<ReturnType<typeof deliverBakerySurfaceEffect>>,
   signal: AbortSignal,
 ): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) throw new Error("The control session is unavailable");
   try {
     await controlWrite(

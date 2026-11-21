@@ -194,7 +194,7 @@ export type CommerceReceivedDeliveryV1 = CommerceDeliveryV1 &
   Readonly<{ signedObservations: readonly unknown[] }>;
 
 export type AcknowledgeCommerceDeliveryV1 = Readonly<{
-  schemaVersion: "underclerk.acknowledge-commerce-delivery.v2";
+  schemaVersion: "commerce.acknowledge-commerce-delivery.v2";
   merchantId: string;
   deliveryId: string;
   acknowledgedAt: CommerceEngineTimestamp;
@@ -207,7 +207,7 @@ export type AcknowledgeCommerceDeliveryV1 = Readonly<{
 }>;
 
 export type CommerceDeliveryAcknowledgementV1 = Readonly<{
-  schemaVersion: "underclerk.delivery-acknowledgement.v2";
+  schemaVersion: "commerce.delivery-acknowledgement.v2";
   outcome:
     "acknowledged" | "already_acknowledged" | "rejected" | "already_rejected";
   merchantId: string;
@@ -231,14 +231,14 @@ export type CommerceClientResult<T> =
   | Readonly<{ ok: false; error: CommerceClientError }>;
 
 export type CommerceMigrationInventoryV2 = Readonly<{
-  schemaVersion: "underclerk.migration-inventory.v2";
+  schemaVersion: "commerce.migration-inventory.v2";
   organisationId: string;
   merchantId: string;
   merchantRevision: number;
   storageSchemaVersion: number;
   contractRevisions: Readonly<{
     source: string;
-    target: "satyr.commerce.inventory.v1";
+    target: "pantry.commerce.inventory.v1";
   }>;
   migrationDigest: string;
   candidateClassification: "migrate" | "reject";
@@ -324,7 +324,7 @@ export function commerceDeliverySignaturePayload<TObservation>(
   const payload = {
     schemaVersion: delivery.schemaVersion,
     deliveryId: delivery.deliveryId,
-    ...(delivery.schemaVersion === "underclerk.commerce-delivery.v1"
+    ...(delivery.schemaVersion === "commerce.commerce-delivery.v1"
       ? { organisationId: delivery.organisationId }
       : {}),
     merchantId: delivery.merchantId,
@@ -374,7 +374,7 @@ export function parseRejectedMutation(
       kind: "rejected",
       status: 409,
       error,
-      message: `Underclerk request rejected: ${error.code}`,
+      message: `Commerce request rejected: ${error.code}`,
     };
   } catch {
     return undefined;

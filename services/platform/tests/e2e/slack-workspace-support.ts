@@ -163,7 +163,7 @@ export async function seedSlackWorkspace(
       provider: "slack",
       providerSubjectId: workspace.teamId,
       environment: "development",
-      authMode: "shared_satyr_app",
+      authMode: "shared_pantry_app",
       authority: { kind: "connection_credential", credentialRef: tokenRef },
       grantedScopes: [...SLACK_SCOPES],
       createdByUserId: owner.client.identity.userId,

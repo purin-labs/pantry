@@ -1133,7 +1133,7 @@ function checkpointRecord(
       objectKey: `harness-checkpoints/organisation_1/session_1/turn_1/sequence-2/${"a".repeat(64)}.bin`,
       sha256: "a".repeat(64),
       byteLength: 256,
-      formatVersion: "satyr-pi-durable-checkpoint-fixture-v1",
+      formatVersion: "pantry-pi-durable-checkpoint-fixture-v1",
       harnessBuild: "pi-durable-fixture",
       createdAt: 13,
     },

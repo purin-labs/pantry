@@ -47,19 +47,19 @@ export const CUSTOMERS_ROUTES: readonly RouteDefinition<CustomersRoute>[] = [
     "POST",
     "/v1/admin/merchants/:merchantId/customers",
     "create_customer",
-    "underclerk.create-customer.v1",
+    "commerce.create-customer.v1",
   ),
   route(
     "PUT",
     "/v1/admin/merchants/:merchantId/customers/:customerId",
     "update_customer",
-    "underclerk.update-customer.v1",
+    "commerce.update-customer.v1",
   ),
   route(
     "POST",
     "/v1/admin/merchants/:merchantId/customers/:customerId/erasure",
     "erase_customer",
-    "underclerk.erase-customer.v1",
+    "commerce.erase-customer.v1",
   ),
   route(
     "GET",

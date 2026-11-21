@@ -176,7 +176,7 @@ type CommerceCancellationRequest = Variant<
 >;
 
 export type CommerceCancellationAuthority = Readonly<{
-  readonly kind: "underclerk_full_refund";
+  readonly kind: "commerce_full_refund";
   readonly merchantRevision: number;
   readonly paymentId: string;
   readonly paymentRevision: number;
@@ -221,7 +221,7 @@ export type CommerceActionError =
 
 /**
  * The path of an approved action: the request, with the execution of a
- * cancellation bound to its provider or to the full Underclerk refund.
+ * cancellation bound to its provider or to the full Commerce refund.
  */
 export type CommerceActionPath =
   | Exclude<CommerceActionRequest, CommerceCancellationRequest>
@@ -367,7 +367,7 @@ export function parseCommerceProviderReceipt(
     };
   }
   if (
-    raw.provider === "underclerk" &&
+    raw.provider === "commerce" &&
     raw.eventId !== null &&
     raw.status === "accepted" &&
     typeof raw.merchantId === "string" &&
@@ -389,7 +389,7 @@ export function parseCommerceProviderReceipt(
         ok: true,
         value: {
           kind: "commerce_provider_receipt",
-          provider: "underclerk",
+          provider: "commerce",
           receiptId: raw.receiptId,
           effectId: raw.effectId,
           actionNonce: raw.actionNonce,
@@ -419,7 +419,7 @@ export function parseCommerceProviderReceipt(
       ok: true,
       value: {
         kind: "commerce_provider_receipt",
-        provider: "underclerk",
+        provider: "commerce",
         receiptId: raw.receiptId,
         effectId: raw.effectId,
         actionNonce: raw.actionNonce,
@@ -443,7 +443,7 @@ export function parseCommerceProviderReceipt(
 function providerReceiptOutcome(
   receipt: CommerceProviderReceipt,
 ): "confirmed" | "failed" | "indeterminate" {
-  if (receipt.provider === "lab" || receipt.provider === "underclerk")
+  if (receipt.provider === "lab" || receipt.provider === "commerce")
     return "confirmed";
   switch (receipt.status) {
     case "accepted":
@@ -581,7 +581,7 @@ export function parseCommerceCancellationAuthority(
   ) {
     return invalid("authority");
   }
-  if (raw.kind !== "underclerk_full_refund") return invalid("authority.kind");
+  if (raw.kind !== "commerce_full_refund") return invalid("authority.kind");
   const merchantRevision = positiveIntegerOrNull(raw.merchantRevision);
   if (merchantRevision === null) return invalid("authority.merchantRevision");
   const paymentId = text(raw.paymentId) ? raw.paymentId : null;
@@ -617,7 +617,7 @@ export function parseCommerceCancellationAuthority(
   return {
     ok: true,
     value: {
-      kind: "underclerk_full_refund",
+      kind: "commerce_full_refund",
       merchantRevision,
       paymentId,
       paymentRevision,
@@ -706,7 +706,7 @@ export async function buildCommerceCancellationActionDraft(
   return {
     ok: true,
     value: {
-      host: "satyr.commerce",
+      host: "pantry.commerce",
       verb: "commerce.order.cancel",
       path: pathValue,
       argsHash,
@@ -780,7 +780,7 @@ async function buildActionRequestDraft(
   if (!path.ok) return path;
   const argsHash = await sha256Hex(JSON.stringify(path.value));
   const common = {
-    host: "satyr.commerce",
+    host: "pantry.commerce",
     path: path.value,
     argsHash,
     amount: null,
@@ -1109,7 +1109,7 @@ export function parseCommerceActionPath(
     };
   }
   if (
-    execution !== "underclerk_full_refund" ||
+    execution !== "commerce_full_refund" ||
     refund !== "full" ||
     restock !== "true" ||
     notifyCustomer !== "false" ||
@@ -1762,7 +1762,7 @@ function cancellationPath(
   switch (path.execution.kind) {
     case "provider_managed":
       break;
-    case "underclerk_full_refund":
+    case "commerce_full_refund":
       params.set("execution", path.execution.kind);
       params.set("merchant_revision", String(path.execution.merchantRevision));
       params.set("payment_id", path.execution.paymentId);

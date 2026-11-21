@@ -127,7 +127,7 @@ function allocationMismatch(): string {
 }
 
 export const cancelCommerceOrderV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.cancel-order.v1"),
+  schemaVersion: Type.Literal("commerce.cancel-order.v1"),
   merchantId: text,
   expectedMerchantRevision: NonNegativeInteger,
   idempotencyKey: text,
@@ -147,7 +147,7 @@ export type CancelCommerceOrderV1 = Static<
 
 export const refundCommerceOrderV1Schema = Type.Refine(
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.refund-order.v1"),
+    schemaVersion: Type.Literal("commerce.refund-order.v1"),
     merchantId: text,
     expectedMerchantRevision: NonNegativeInteger,
     idempotencyKey: text,
@@ -172,7 +172,7 @@ export type RefundCommerceOrderV1 = Static<
 
 export const recordCounterManualCashRefundV1Schema = Type.Refine(
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.record-counter-manual-cash-refund.v1"),
+    schemaVersion: Type.Literal("commerce.record-counter-manual-cash-refund.v1"),
     merchantId: text,
     expectedMerchantRevision: NonNegativeInteger,
     idempotencyKey: text,
@@ -232,7 +232,7 @@ function tendersMismatch(): string {
 export const refundCommerceOrderTendersV1Schema = Type.Refine(
   Type.Refine(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.refund-order-tenders.v1"),
+      schemaVersion: Type.Literal("commerce.refund-order-tenders.v1"),
       merchantId: text,
       idempotencyKey: text,
       requestedAt: timestampSchema,
@@ -266,12 +266,12 @@ export type CommerceTenderRefundPartV1 = Static<
 
 export const commerceTenderRefundV1Schema = Type.Union([
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.tender-refund.v1"),
+    schemaVersion: Type.Literal("commerce.tender-refund.v1"),
     outcome: Type.Literal("rejected"),
     error: commerceMutationErrorV1Schema,
   }),
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.tender-refund.v1"),
+    schemaVersion: Type.Literal("commerce.tender-refund.v1"),
     outcome: Type.Literal("split"),
     orderId: text,
     parts: ImmutableArray(commerceTenderRefundPartV1Schema),

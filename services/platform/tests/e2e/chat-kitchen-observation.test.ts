@@ -91,13 +91,13 @@ it(
     expect(userScreenParts(privateRead)).toEqual([
       {
         kind: "screen",
-        area: "BakeryOS",
+        area: "kitchen",
         title: "Workflow simulator",
         record: null,
       },
     ]);
     expect(privateRead.conversation.origin).toMatchObject({
-      area: "BakeryOS",
+      area: "kitchen",
       page: "workflow-simulator",
     });
 

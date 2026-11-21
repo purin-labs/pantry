@@ -41,7 +41,7 @@ export async function regionalHarnessJourney(
       .run();
     await scope.database
       .prepare(
-        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?) ON CONFLICT (organisation_id) DO UPDATE SET selection_kind = excluded.selection_kind",
+        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?) ON CONFLICT (organisation_id) DO UPDATE SET selection_kind = excluded.selection_kind",
       )
       .bind(scope.organisationId, userId.value, Date.now())
       .run();
@@ -105,8 +105,8 @@ export async function regionalHarnessJourney(
   const headers = {
     origin: "https://localhost",
     "content-type": "application/json",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
   };
   const command = JSON.stringify({
     kind: "message",

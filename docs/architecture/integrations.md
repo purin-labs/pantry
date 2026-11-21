@@ -1,10 +1,10 @@
 # Integration architecture
 
-This document describes how provider traffic enters Satyr, how agents reach
+This document describes how provider traffic enters Pantry, how agents reach
 providers through typed capabilities, how an Organisation connects a built-in
 provider, and how it adds its own API as a custom connector. It describes the
-code as built. Commerce behavior belongs to Underclerk; see
-[the Underclerk commerce spec](../../services/commerce/docs/spec.md).
+code as built. Commerce behavior belongs to Commerce; see
+[the Commerce spec](../../services/commerce/docs/spec.md).
 
 | Replaces                                                   | Section                                           |
 | ---------------------------------------------------------- | ------------------------------------------------- |
@@ -50,7 +50,7 @@ Portal chat, address `CaseActor` without a Connector.
 | `/hook/stripe/:org`                      | Stripe account webhook             | signature, then account resolution            |
 | `/hook/shopify/:org`                     | Shopify webhook                    | HMAC, then canonical delivery or refresh      |
 | `/hook/square/:org`                      | Square Terminal webhook            | signature, then terminal state                |
-| `/hook/underclerk/:org`                  | Underclerk merchant webhook        | signature, then a queued feed read            |
+| `/hook/commerce/:org`                  | Commerce merchant webhook        | signature, then a queued feed read            |
 | `/hook/email/google`                     | Gmail watch through Google Pub/Sub | `email.change.v1` on the event Queue          |
 | `/hook/dropbox`                          | Dropbox file change                | signature, then a file reconciliation hint    |
 | `/hook/whatsapp`                         | WhatsApp Cloud API                 | WhatsApp Case ingress                         |
@@ -84,14 +84,14 @@ API delivery is the context source, not an implicit history backfill.
 
 ### Queued ingress and commerce webhooks
 
-Work that needs no answer in the request goes to `EVENT_Q` (`satyr-events`) or
-`CUE_Q` (`satyr-cues`). Each module owns its message types (`queue-messages.ts`
+Work that needs no answer in the request goes to `EVENT_Q` (`pantry-events`) or
+`CUE_Q` (`pantry-cues`). Each module owns its message types (`queue-messages.ts`
 in `commerce/`, `shopify/`, `schedules/` and `mail/`, and
 `slack/case-command-message.ts`).
 [`ingress-queue.ts`](../../services/platform/src/ingress-queue.ts) holds the
 union of the `EVENT_Q` messages and picks the parser. The types are
 `slack.case_command.v1`, `commerce.delivery.v1`,
-`shopify.commerce_refresh.v1`, `underclerk.outbox_reconcile.v1`,
+`shopify.commerce_refresh.v1`, `commerce.outbox_reconcile.v1`,
 `email.change.v1` and `agent_schedule.dispatch.v1`. Consumers parse each body
 again. Retries reuse deterministic delivery and observation identities, so
 at-least-once delivery has one effect.
@@ -103,13 +103,13 @@ payloads enter canonical delivery directly
 An Order body is incomplete, so the boundary queues
 `shopify.commerce_refresh.v1` with the exact Organisation, account, shop,
 webhook and Order GID; the consumer fetches that Order and uses the mapper of
-the initial sync. An Underclerk merchant posts every event to
-`/hook/underclerk/:org`
-([`underclerk-webhooks.ts`](../../services/platform/src/underclerk-webhooks.ts)).
+the initial sync. A Commerce merchant posts every event to
+`/hook/commerce/:org`
+([`commerce-webhooks.ts`](../../services/platform/src/commerce-webhooks.ts)).
 The post carries no change: a valid signature, less than five minutes old,
 queues a feed read. The feed stays the truth, and a one-minute reconcile covers
 a lost post. Accepted events update rebuildable Platform projections and may
-create Cue matches. The provider or Underclerk stays authoritative.
+create Cue matches. The provider or Commerce stays authoritative.
 
 ### Addressing, idempotency and attachments
 
@@ -214,11 +214,11 @@ receipt records the origin and a path digest, never the query or fragment.
 ### Commerce reads and governed actions
 
 Commerce reads use Platform's commerce projections (the Commerce Read Layer),
-which Underclerk and Shopify feed. Results are bounded and
+which Commerce and Shopify feed. Results are bounded and
 sensitivity-classified. Raw payloads, SDK clients, SQL and credentials are not
 available to the harness. Commerce tools resolve the selected `CommerceSystem`
 ([`organisation-commerce-system.ts`](../../services/platform/src/data/organisation-commerce-system.ts)):
-`satyr_commerce` (an Underclerk merchant binding) or `shopify`. Each read and
+`builtin_commerce` (a Commerce merchant binding) or `shopify`. Each read and
 action binds that system and its revision.
 
 A provider mutation starts as a typed proposal, such as
@@ -233,10 +233,10 @@ see [Action ledger](./security.md#action-ledger) and
 ([`commerce-actions.ts`](../../services/platform/src/commerce-actions.ts))
 lists the commerce actions, and each source supports a subset
 ([`harness-commerce-proposal.ts`](../../services/platform/src/actors/harness-commerce-proposal.ts)):
-`underclerk` supports `publish_catalog_listing`, `cancel_order`,
+`commerce` supports `publish_catalog_listing`, `cancel_order`,
 `attach_tracking` and `adjust_offer_price`; `shopify` supports `cancel_order`.
 [`commerce-provider-execution.ts`](../../services/platform/src/commerce-provider-execution.ts)
-runs an approved action through `@underclerk/client`, or through
+runs an approved action through `@commerce/client`, or through
 [`shopify-action-execution.ts`](../../services/platform/src/shopify-action-execution.ts)
 for the Shopify cancel. The handler gets the canonical connection authority,
 the normalized parameters and the stable effect identity. Browser and model
@@ -261,7 +261,7 @@ admission.
 Generated code cannot allocate an executor, call itself, create a child
 session, get credentials or Actor bindings, use the network, install packages,
 query D1, or approve or settle its own effects. Pi owns the replay of a script
-and the order of its calls. Satyr owns admission, the lease, the deadline,
+and the order of its calls. Pantry owns admission, the lease, the deadline,
 capability claims, the source check of each result, receipts, settlement and
 delivery
 ([`code-mode-admission.ts`](../../services/platform/src/actors/code-mode-admission.ts)).
@@ -274,7 +274,7 @@ script again, and `authorizeSources` checks its sources first. The deadline,
 admission digest and counted calls do not change. An in-flight call runs again
 only when a repeat is safe
 ([`pi-tool-replay.ts`](../../services/platform/src/actors/pi-tool-replay.ts)).
-Reads, BakeryOS surface commands, `codemode`, `tool_search` and named
+Reads, Kitchen surface commands, `codemode`, `tool_search` and named
 proposals run again from any caller. `commerce_propose_action` and
 `commerce_propose_plugin` run again only from a script, and the owner returns
 the first proposal. Every other call waits for an operator.
@@ -304,7 +304,7 @@ text, and audit records hold no credentials.
 ## Provider connections
 
 This section covers the built-in providers. Model route sign-ins and the
-Underclerk merchant binding have their own flows.
+Commerce merchant binding have their own flows.
 [`provider-lifecycle/`](../../services/platform/src/provider-lifecycle/)
 owns attempts, provisioning and observation.
 [`data/integration-account.ts`](../../services/platform/src/data/integration-account.ts)
@@ -395,10 +395,10 @@ consumption fails with `provider_state_replayed`. A valid callback after the
 portal session expired can still finish provisioning.
 
 The callback page has a strict CSP and holds no credential. Once a second, it
-sends `satyr.provider-attempt.completed` to `window.opener` (exact portal
-origin) and on the `BroadcastChannel` `satyr-provider-attempt`, which works
+sends `pantry.provider-attempt.completed` to `window.opener` (exact portal
+origin) and on the `BroadcastChannel` `pantry-provider-attempt`, which works
 when Cross-Origin-Opener-Policy severs the opener. It closes after
-`satyr.provider-attempt.ack`. The portal listener
+`pantry.provider-attempt.ack`. The portal listener
 ([`pages/settings.tsx`](../../apps/portal/src/pages/settings.tsx)) ignores
 unknown attempt IDs and refreshes the server projection. Completion depends on
 the server attempt, so a lost message loses no progress.
@@ -407,7 +407,7 @@ the server attempt, so a lost message loses no progress.
 
 `provider_connection` records the shared grant: `source_kind` (`built_in` or
 `custom_api`), provider, environment, `provider_subject_id`, `auth_mode`
-(`shared_satyr_app`, `api_key` or `webhook_secret`), credential generation,
+(`shared_pantry_app`, `api_key` or `webhook_secret`), credential generation,
 `granted_scopes` and, for Gmail, the `authorization_product` (`standard`,
 `full_mailbox_pilot` or `send_only`). Its lifecycle is `connecting`, `active`,
 `reauth_required`, `disabled` or `revoked`.
@@ -450,7 +450,7 @@ moves an `active` account to `degraded`, and a healthy one clears it.
 
 Provider notes:
 
-- **Slack** authorizes the shared Satyr application. Event subscriptions belong
+- **Slack** authorizes the shared Pantry application. Event subscriptions belong
   to that application, not to each Organisation. The server validates the
   channel selection.
 - **Shopify** normalizes the `*.myshopify.com` domain. Each webhook topic keeps
@@ -477,7 +477,7 @@ and expires. Before the portal stores a selected resource, the server reads it
 again, checks ownership and access, and records the provider revision.
 
 At most one account for each provider and environment has
-`is_default_for_provider = 1`. The field names Satyr's default, not a provider
+`is_default_for_provider = 1`. The field names Pantry's default, not a provider
 concept. A change through `default-for-provider` is a serialized mutation. It
 writes `provider_default_account_history` with the new `configuration_version`
 and invalidates [readiness](./onboarding.md#readiness). The previous default
@@ -528,7 +528,7 @@ rejection. Open: OpenAPI import and per-account rate and concurrency limits.
 ### Trust model and records
 
 An admin reviews the destination and the operation semantics against the
-service documentation. Satyr enforces the declared request contract. It cannot
+service documentation. Pantry enforces the declared request contract. It cannot
 prove that a remote service is honest, complete or free of side effects. The
 service receives the API key, so destination approval is a real trust
 decision. The connected account and each named operation are the access
@@ -756,7 +756,7 @@ takes the lease and then resolves the credential. The outcome is `confirmed`
 `indeterminate`. After a request may have started, a timeout, cancellation,
 lost response, lease loss or unreadable success is `indeterminate`, and nothing
 is resent automatically. A `provider_idempotent` write sends
-`satyr-<SHA-256 of the ledger idempotency key>` in its header; the value is
+`pantry-<SHA-256 of the ledger idempotency key>` in its header; the value is
 the same for every attempt of the action and names no internal account. The
 fetch container sends it only on a REST request. For such a write an admin
 can `POST /retry` on an `indeterminate` action: the ledger accepts

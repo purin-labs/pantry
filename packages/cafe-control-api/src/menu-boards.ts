@@ -155,7 +155,7 @@ export type MenuScreenFeed = Readonly<{
 export const MENU_SCREEN_SIGNAL = "menu_screen_changed";
 
 /** The subprotocol that carries a screen's token when its socket opens. */
-export const MENU_SCREEN_SOCKET_PROTOCOL = "satyr-screen.v1";
+export const MENU_SCREEN_SOCKET_PROTOCOL = "pantry-screen.v1";
 
 /** A pairing code: six letters and digits that do not look alike. */
 export const MENU_SCREEN_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

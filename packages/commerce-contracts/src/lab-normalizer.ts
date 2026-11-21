@@ -56,7 +56,7 @@ import type {
 import type { CommerceCueFact } from "./records/transitions.ts";
 
 /** Plan 78: `commerce/lab.rs`, the commerce lab event boundary. */
-export const LAB_EVENT_SCHEMA_VERSION = "satyr.commerce.lab.event.v1";
+export const LAB_EVENT_SCHEMA_VERSION = "pantry.commerce.lab.event.v1";
 
 const SCENARIOS = [
   "product-listing",

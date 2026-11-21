@@ -69,7 +69,7 @@ export function parseIntegrationAccountReference(
 export async function integrationAccountReference(
   organisationId: OrganisationId,
   sourceIntegrationAccountId: IntegrationAccountId,
-  kind: "integration_account" | "satyr_commerce",
+  kind: "integration_account" | "builtin_commerce",
 ): Promise<IntegrationAccountReference> {
   return `integration_ref_${await digestCanonical({
     kind,
@@ -89,7 +89,7 @@ const DATA_CLASS_ORDER = exhaustiveList<IntegrationDiscoveryDataClass>()([
 const DISCOVERY_PROVIDERS: Readonly<
   Record<IntegrationDiscoveryProvider, true>
 > = {
-  satyr_commerce: true,
+  builtin_commerce: true,
   airtable: true,
   dropbox: true,
   gmail: true,
@@ -124,7 +124,7 @@ export type IntegrationDiscoveryObservation = Readonly<{
 }>;
 
 type DiscoveryCandidate = Readonly<{
-  kind: "integration_account" | "satyr_commerce";
+  kind: "integration_account" | "builtin_commerce";
   sourceIntegrationAccountId: IntegrationAccountId;
   provider: IntegrationDiscoveryProvider;
   displayName: string;
@@ -395,7 +395,7 @@ async function readDiscoveryCandidates(
     if (provider === null || account.lifecycle.kind === "revoked") continue;
     candidates.push(candidateForIntegrationAccount(account, provider));
   }
-  if (commerceSystem?.kind === "satyr_commerce") {
+  if (commerceSystem?.kind === "builtin_commerce") {
     const binding = await resolveCommerceMerchantBindingById({
       db,
       organisationId,
@@ -403,9 +403,9 @@ async function readDiscoveryCandidates(
     });
     if (binding.ok) {
       candidates.push({
-        kind: "satyr_commerce",
+        kind: "builtin_commerce",
         sourceIntegrationAccountId: binding.value.integrationAccountId,
-        provider: "satyr_commerce",
+        provider: "builtin_commerce",
         displayName: "Seams Checkout",
         connection: "available",
         configuredDataClasses: ["commerce"],
@@ -552,7 +552,7 @@ function providerDependencyIncludes(
 ): boolean {
   if (
     definition.providerDependency.kind !== "provider" ||
-    provider === "satyr_commerce"
+    provider === "builtin_commerce"
   )
     return false;
   for (const allowed of definition.providerDependency.providers) {
@@ -605,8 +605,8 @@ function commerceReadable(
     state.commerceSystem === null
   )
     return false;
-  if (candidate.kind === "satyr_commerce") {
-    return state.commerceSystem.kind === "satyr_commerce";
+  if (candidate.kind === "builtin_commerce") {
+    return state.commerceSystem.kind === "builtin_commerce";
   }
   return (
     candidate.provider === "shopify" &&

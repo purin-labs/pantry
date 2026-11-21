@@ -90,7 +90,7 @@ export async function executeBakerySurfaceForHarness(
     throw new BakeryContextRequestError(
       authority.browserContext.kind === "excluded"
         ? KITCHEN_EXCLUDED
-        : "This request has no eligible browser. Open chat in the portal to use BakeryOS browser controls.",
+        : "This request has no eligible browser. Open chat in the portal to use Kitchen browser controls.",
     );
   }
   await requireLiveBakeryAuthority(
@@ -251,7 +251,7 @@ function requireSupportedBakeryCommand(
 ): void {
   if (!surface.context.supportedCommands.includes(requiredCommand)) {
     throw new BakeryContextRequestError(
-      "The current BakeryOS view does not support this operation. Inspect its current context and select a supported operation.",
+      "The current Kitchen view does not support this operation. Inspect its current context and select a supported operation.",
     );
   }
 }
@@ -735,13 +735,13 @@ async function dispatchBakeryContextPreparation(
   import("../../actors/bakery-surface-effect").BakerySurfaceEffectDispatch
 > {
   if (authority.lease.requestAuthority.kind !== "control") {
-    throw new Error("BakeryOS requires control authority");
+    throw new Error("Kitchen requires control authority");
   }
   if (authority.browserContext.kind !== "available") {
     throw new BakeryContextRequestError(
       authority.browserContext.kind === "excluded"
         ? KITCHEN_EXCLUDED
-        : "This request has no eligible browser. Open chat in the portal to use BakeryOS browser controls.",
+        : "This request has no eligible browser. Open chat in the portal to use Kitchen browser controls.",
     );
   }
   return dispatchBakerySurfaceEffect({
@@ -802,7 +802,7 @@ export async function requireLiveBakeryAuthority(
     lease.requestAuthority.organisationId !== organisationId ||
     !roleAllowed
   ) {
-    throw new Error("BakeryOS authority is unavailable");
+    throw new Error("Kitchen authority is unavailable");
   }
   const live = await validateLiveRequestAuthority({
     db,
@@ -815,7 +815,7 @@ export async function requireLiveBakeryAuthority(
     authority: lease.requestAuthority,
   });
   if (!live.ok) {
-    throw new Error("BakeryOS authority has changed");
+    throw new Error("Kitchen authority has changed");
   }
 }
 

@@ -82,7 +82,7 @@ async function slackChannelAfterDeletionJourney({ task }: TestContext) {
         app_id: APP_ID,
         access_token: "xoxb-after-deletion",
         scope: SLACK_SCOPES.join(","),
-        bot_user_id: "U0SATYRBOT",
+        bot_user_id: "U0PANTRYBOT",
         team: { id: TEAM_ID, name: "Cafe Workspace" },
       }),
     ),
@@ -188,7 +188,7 @@ async function slackChannelAfterDeletionJourney({ task }: TestContext) {
 
   // The new workspace is already active when its owner adds the channel
   // that the deleted Organisation left behind. Adding it keeps the workspace
-  // active and gives the channel the grants of a channel CafeOS posts in.
+  // active and gives the channel the grants of a channel Café posts in.
   await markActive(fresh);
   const before = await lifecycleState(fresh.organisationId);
   const released = await bindChannel(fresh, connection, RELEASED_CHANNEL);
@@ -354,7 +354,7 @@ async function seedWorkspace(installer: Owner, other: Owner): Promise<void> {
         provider: "slack",
         providerSubjectId: TEAM_ID,
         environment: "development",
-        authMode: "shared_satyr_app",
+        authMode: "shared_pantry_app",
         authority: {
           kind: "connection_credential",
           credentialRef: requiredHandle(tokenRef),
@@ -434,7 +434,7 @@ async function connectSlack(owner: Owner): Promise<void> {
   const completed = await exports.default.fetch(callback.toString());
   expect(completed.status).toBe(200);
   await expect(completed.text()).resolves.toContain(
-    "satyr.provider-attempt.completed",
+    "pantry.provider-attempt.completed",
   );
 }
 
@@ -547,7 +547,7 @@ function mutationHeaders(
     "idempotency-key": `slack-after-deletion-${idempotencyKey}`,
     ...(version === null
       ? {}
-      : { "x-satyr-configuration-version": String(version) }),
-    "x-satyr-csrf": owner.client.session.csrfToken,
+      : { "x-pantry-configuration-version": String(version) }),
+    "x-pantry-csrf": owner.client.session.csrfToken,
   };
 }

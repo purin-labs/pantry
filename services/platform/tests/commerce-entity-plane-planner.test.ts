@@ -76,7 +76,7 @@ describe("commerce entity-plane planner surface", () => {
     });
   });
 
-  it("plans an all-custom traversal with the Underclerk capability profile", () => {
+  it("plans an all-custom traversal with the Commerce capability profile", () => {
     const outcome = planSafeCommerceQuery({
       organisationId: "organisation_custom_relationship_plan",
       merchantId: "merchant_custom_relationship_plan",
@@ -108,7 +108,7 @@ describe("commerce entity-plane planner surface", () => {
 
 function nativeWatermark(revision: number) {
   return {
-    kind: "underclerk_native" as const,
+    kind: "commerce_native" as const,
     merchantRevision: parseCommerceSnapshotRevision(
       revision,
       "merchantRevision",
@@ -122,7 +122,7 @@ function systemCapabilities(systemEntityKind: "shipment" | "order") {
     organisationId: "organisation_relationship_plan",
     merchantId: "merchant_relationship_plan",
     merchantRevision: 1,
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities: {
       kind: "system_mapped" as const,
       systemEntityKind,
@@ -148,9 +148,9 @@ function customCapabilities(entityTypeId: "trade_partner") {
     organisationId: "organisation_custom_relationship_plan",
     merchantId: "merchant_custom_relationship_plan",
     merchantRevision: 1,
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities: {
-      kind: "underclerk_custom" as const,
+      kind: "commerce_custom" as const,
       entityTypeId,
       publishedRevision: 1,
       capability: {

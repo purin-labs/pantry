@@ -87,7 +87,7 @@ const AT = "2026-08-14T09:30:00.000Z";
 const READY_AT = "2026-08-14T09:45:00.000Z";
 const EXPIRES_AT = "2026-08-14T09:40:00.000Z";
 const SERVICE_TOKEN = "checkout_persistence_service_token";
-const TEST_CARRIER_SIGNING_KEY = "satyr-plan22-test-carrier-key";
+const TEST_CARRIER_SIGNING_KEY = "pantry-plan22-test-carrier-key";
 const TEST_BUYER_CONTACT = {
   kind: "email",
   email: "buyer@example.test",
@@ -183,7 +183,7 @@ class DigestSigner implements CommerceSigner {
 
 class TestPaymentGateway implements PaymentGateway, PaymentRefundGateway {
   #result: CommercePaymentCaptureResultV1 = {
-    schemaVersion: "underclerk.payment-capture-result.v1",
+    schemaVersion: "commerce.payment-capture-result.v1",
     kind: "captured",
     providerPaymentReference: "pi_test_default",
     capturedAt: AT,
@@ -246,7 +246,7 @@ class TestPaymentGateway implements PaymentGateway, PaymentRefundGateway {
   ): Promise<CommercePaymentSessionResultV1> {
     this.#sessionCalls += 1;
     return {
-      schemaVersion: "underclerk.payment-session-result.v1",
+      schemaVersion: "commerce.payment-session-result.v1",
       kind: "ready",
       paymentAttemptId: request.paymentAttemptId,
       session: {
@@ -280,7 +280,7 @@ class TestPaymentGateway implements PaymentGateway, PaymentRefundGateway {
     const queuedResult = this.#refundResults.shift();
     if (queuedResult !== undefined) return queuedResult;
     return {
-      schemaVersion: "underclerk.payment-refund-result.v1",
+      schemaVersion: "commerce.payment-refund-result.v1",
       kind: "refunded",
       providerRefundReference: `refund_${request.refundAttemptId}`,
       money: request.refundMoney,
@@ -303,7 +303,7 @@ class TestInPersonCollectionGateway implements InPersonCollectionGateway {
     this.requests.push(request);
     this.#effects.add(request.idempotencyKey);
     return {
-      schemaVersion: "underclerk.in-person-collection-result.v1",
+      schemaVersion: "commerce.in-person-collection-result.v1",
       kind: "ready",
       paymentAttemptId: request.paymentAttemptId,
       session: {
@@ -332,7 +332,7 @@ class TestClock {
 it("rejects buyer payment when the pinned profile binding ID is unavailable", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-payment-binding-${randomUUID()}.sqlite3`,
+    `commerce-payment-binding-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -351,7 +351,7 @@ it("rejects buyer payment when the pinned profile binding ID is unavailable", as
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -362,7 +362,7 @@ it("rejects buyer payment when the pinned profile binding ID is unavailable", as
       "storefront_cafe",
       buyerSession.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: "payment_binding_id_mismatch_checkout",
         buyer: TEST_GUEST_BUYER,
         lines: [
@@ -377,7 +377,7 @@ it("rejects buyer payment when the pinned profile binding ID is unavailable", as
       checkout.value.checkoutId,
       buyerSession.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: "payment_binding_id_mismatch_payment",
         checkoutRevision: checkout.value.revision,
         quoteDigest: checkout.value.quote.quoteDigest,
@@ -404,7 +404,7 @@ it("rejects buyer payment when the pinned profile binding ID is unavailable", as
 it("rejects a pending buyer payment whose concrete binding changed", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-payment-binding-pending-${randomUUID()}.sqlite3`,
+    `commerce-payment-binding-pending-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -426,7 +426,7 @@ it("rejects a pending buyer payment whose concrete binding changed", async () =>
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -437,7 +437,7 @@ it("rejects a pending buyer payment whose concrete binding changed", async () =>
       "storefront_cafe",
       buyerSession.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: "pending_payment_binding_mismatch_checkout",
         buyer: TEST_GUEST_BUYER,
         lines: [
@@ -458,7 +458,7 @@ it("rejects a pending buyer payment whose concrete binding changed", async () =>
     )}`;
     requireApplied(
       authority.beginCheckoutPayment({
-        schemaVersion: "underclerk.begin-checkout-payment.v1",
+        schemaVersion: "commerce.begin-checkout-payment.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: requireMerchantRevision(authority),
         idempotencyKey: "internal_pending_payment_binding_mismatch",
@@ -478,7 +478,7 @@ it("rejects a pending buyer payment whose concrete binding changed", async () =>
       checkout.value.checkoutId,
       buyerSession.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: paymentIdempotencyKey,
         checkoutRevision: checkout.value.revision,
         quoteDigest: checkout.value.quote.quoteDigest,
@@ -505,7 +505,7 @@ it("rejects a pending buyer payment whose concrete binding changed", async () =>
 it("collects and replays one configured in-person checkout through the shared payment evidence", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-in-person-${randomUUID()}.sqlite3`,
+    `commerce-in-person-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -531,7 +531,7 @@ it("collects and replays one configured in-person checkout through the shared pa
     expect(first).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+        schemaVersion: "commerce.in-person-checkout-payment-collection.v1",
         outcome: "ready",
         mutationOutcome: "applied",
         paymentAttemptId: "payment_attempt_cookie",
@@ -621,7 +621,7 @@ it("collects and replays one configured in-person checkout through the shared pa
 it("round-trips one normalized quote-bound pickup cohort", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-checkout-${randomUUID()}.sqlite3`,
+    `commerce-checkout-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -641,7 +641,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -654,7 +654,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     expect(catalog).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-catalog.v1",
+        schemaVersion: "commerce.buyer-catalog.v1",
         storefront: {
           storefrontId: "storefront_cafe",
           revision: 1,
@@ -1229,7 +1229,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
       )?.lifecycle.state,
     ).toBe("allocated_to_order");
     const publicCheckoutCommand = {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1" as const,
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1" as const,
       idempotencyKey: "public_cookie_checkout",
       buyer: TEST_GUEST_BUYER,
       lines: [
@@ -1250,7 +1250,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     expect(publicCheckout).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-quoted-checkout.v1",
+        schemaVersion: "commerce.buyer-quoted-checkout.v1",
         revision: 1,
         state: "quoted",
         quote: {
@@ -1388,7 +1388,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -1410,7 +1410,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
         "storefront_cafe",
         replacementSession.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
           idempotencyKey: "replacement_profile_requires_phone",
           buyer: TEST_GUEST_BUYER,
           lines: [publicCheckoutCommand.lines[0]!],
@@ -1433,7 +1433,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
         "storefront_cafe",
         replacementSession.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
           idempotencyKey: "replacement_profile_rejects_multiple_lines",
           buyer: {
             kind: "guest",
@@ -1460,7 +1460,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
       },
     });
     const publicPaymentCommand = {
-      schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+      schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
       idempotencyKey: "public_cookie_payment",
       checkoutRevision: publicCheckout.value.revision,
       quoteDigest: publicCheckout.value.quote.quoteDigest,
@@ -1495,7 +1495,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     ).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+        schemaVersion: "commerce.buyer-checkout-recovery.v1",
         checkout: publicCheckout.value,
         progress: {
           state: "payment_pending",
@@ -1529,7 +1529,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     expect(publicPlacement).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-payment-result.v1",
+        schemaVersion: "commerce.buyer-payment-result.v1",
         state: "placed",
         checkoutId: publicCheckout.value.checkoutId,
         checkoutRevision: 3,
@@ -1606,7 +1606,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     expect(placedOrder).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-order.v1",
+        schemaVersion: "commerce.buyer-order.v1",
         fulfillment: "pickup",
         state: "placed",
         checkoutId: publicCheckout.value.checkoutId,
@@ -1637,7 +1637,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     const publicReadyRevision = requireMerchantRevision(authority);
     requireApplied(
       authority.markPickupReady({
-        schemaVersion: "underclerk.mark-pickup-ready.v1",
+        schemaVersion: "commerce.mark-pickup-ready.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: publicReadyRevision,
         idempotencyKey: "public_cookie_ready",
@@ -1658,7 +1658,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     ).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-order.v1",
+        schemaVersion: "commerce.buyer-order.v1",
         fulfillment: "pickup",
         state: "ready_for_pickup",
         checkoutId: publicCheckout.value.checkoutId,
@@ -1667,7 +1667,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     });
     requireApplied(
       authority.completePickup({
-        schemaVersion: "underclerk.complete-pickup.v1",
+        schemaVersion: "commerce.complete-pickup.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: requireMerchantRevision(authority),
         idempotencyKey: "public_cookie_complete",
@@ -1690,7 +1690,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     ).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-order.v1",
+        schemaVersion: "commerce.buyer-order.v1",
         fulfillment: "pickup",
         state: "completed",
         checkoutId: publicCheckout.value.checkoutId,
@@ -1726,7 +1726,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     });
 
     paymentGateway.setResult({
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "declined",
       reason: "card_declined",
     });
@@ -1755,7 +1755,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     expect(declinedPayment).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-payment-result.v1",
+        schemaVersion: "commerce.buyer-payment-result.v1",
         state: "declined",
         checkoutId: declinedCheckout.value.checkoutId,
         reasonCode: "card_declined",
@@ -1828,7 +1828,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     });
 
     paymentGateway.setResult({
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "indeterminate",
       reason: "provider_timeout",
       reconcileAfter: "2026-08-14T09:31:00.000Z",
@@ -1859,7 +1859,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
     expect(uncertainPayment).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-payment-result.v1",
+        schemaVersion: "commerce.buyer-payment-result.v1",
         state: "indeterminate",
         checkoutId: uncertainCheckout.value.checkoutId,
         reconcileAfter: "2026-08-14T09:31:00.000Z",
@@ -1904,7 +1904,7 @@ it("round-trips one normalized quote-bound pickup cohort", async () => {
 it("holds inventory while processing payment recovers through an exact replay", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-processing-recovery-${randomUUID()}.sqlite3`,
+    `commerce-processing-recovery-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -1920,14 +1920,14 @@ it("holds inventory while processing payment recovers through an exact replay", 
   const api = new CommerceHttpApi({
     authority,
     buyerSessions: new BuyerSessionAuthority({
-      secret: "underclerk_processing_recovery_secret",
+      secret: "commerce_processing_recovery_secret",
       now: clock.read,
       newSessionId: fixedBuyerSessionId,
     }),
     serviceToken: SERVICE_TOKEN,
   });
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
   try {
@@ -1936,7 +1936,7 @@ it("holds inventory while processing payment recovers through an exact replay", 
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -1948,7 +1948,7 @@ it("holds inventory while processing payment recovers through an exact replay", 
       "storefront_cafe",
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: "processing_recovery_checkout",
         buyer: TEST_GUEST_BUYER,
         lines: [
@@ -1961,7 +1961,7 @@ it("holds inventory while processing payment recovers through an exact replay", 
         `Processing recovery checkout failed: ${quoted.error.message}`,
       );
     const paymentCommand = {
-      schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+      schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
       idempotencyKey: "processing_recovery_payment",
       checkoutRevision: quoted.value.revision,
       quoteDigest: quoted.value.quote.quoteDigest,
@@ -1981,14 +1981,14 @@ it("holds inventory while processing payment recovers through an exact replay", 
       value: { state: "ready", checkoutId: quoted.value.checkoutId },
     });
     const reconcileCommand = {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1" as const,
+      schemaVersion: "commerce.reconcile-buyer-payment.v1" as const,
       idempotencyKey: paymentCommand.idempotencyKey,
       checkoutRevision: paymentCommand.checkoutRevision,
       quoteDigest: paymentCommand.quoteDigest,
       confirmation: { kind: "provider_ui_completed" as const },
     };
     paymentGateway.setResult({
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "processing",
       reason: "provider_processing",
       reconcileAfter: "2026-08-14T09:31:00.000Z",
@@ -2003,7 +2003,7 @@ it("holds inventory while processing payment recovers through an exact replay", 
     expect(processing).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-payment-result.v1",
+        schemaVersion: "commerce.buyer-payment-result.v1",
         state: "processing",
         checkoutId: quoted.value.checkoutId,
         reconcileAfter: "2026-08-14T09:31:00.000Z",
@@ -2050,7 +2050,7 @@ it("holds inventory while processing payment recovers through an exact replay", 
 
     clock.set("2026-08-14T09:31:00.000Z");
     paymentGateway.setResult({
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "captured",
       providerPaymentReference: "pi_processing_recovered",
       capturedAt: clock.read(),
@@ -2102,7 +2102,7 @@ it("holds inventory while processing payment recovers through an exact replay", 
 it("rejects tampered quote content before payment and placement effects", () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-checkout-quote-digest-${randomUUID()}.sqlite3`,
+    `commerce-checkout-quote-digest-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -2240,7 +2240,7 @@ it("rejects tampered quote content before payment and placement effects", () => 
 it("projects buyer-safe payment dispute states and closes on invalid money", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-payment-dispute-buyer-${randomUUID()}.sqlite3`,
+    `commerce-payment-dispute-buyer-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -2272,7 +2272,7 @@ it("projects buyer-safe payment dispute states and closes on invalid money", asy
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -2423,7 +2423,7 @@ it("projects buyer-safe payment dispute states and closes on invalid money", asy
 it("resumes one cancelled pickup through the same original-tender refund", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-cancellation-${randomUUID()}.sqlite3`,
+    `commerce-cancellation-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -2509,19 +2509,19 @@ it("resumes one cancelled pickup through the same original-tender refund", async
 
     const api = checkoutApi(authority);
     const client = new CommerceAdminClient({
-      baseUrl: "https://underclerk.test",
+      baseUrl: "https://commerce.test",
       serviceToken: SERVICE_TOKEN,
       fetch: api.fetch,
     });
     const buyerClient = new CommerceStorefrontClient({
-      baseUrl: "https://underclerk.test",
+      baseUrl: "https://commerce.test",
       fetch: api.fetch,
     });
     const buyerSession = await buyerClient.createSession(
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -2535,7 +2535,7 @@ it("resumes one cancelled pickup through the same original-tender refund", async
     expect(pendingBuyerOrder).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-order.v1",
+        schemaVersion: "commerce.buyer-order.v1",
         fulfillment: "pickup",
         state: "cancelled",
         cancelledAt: AT,
@@ -2618,7 +2618,7 @@ it("resumes one cancelled pickup through the same original-tender refund", async
     ).toMatchObject({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-order.v1",
+        schemaVersion: "commerce.buyer-order.v1",
         fulfillment: "pickup",
         state: "cancelled",
         cancelledAt: AT,
@@ -2637,12 +2637,12 @@ it("resumes one cancelled pickup through the same original-tender refund", async
     });
     expect(paymentGateway.refundRequests).toHaveLength(2);
     const unauthorized = await api.fetch(
-      "https://underclerk.test/v1/admin/merchants/merchant_cookie/orders/order_cookie/cancellations",
+      "https://commerce.test/v1/admin/merchants/merchant_cookie/orders/order_cookie/cancellations",
       { method: "POST", body: JSON.stringify(command) },
     );
     expect(unauthorized.status).toBe(401);
     const mismatchedPath = await api.fetch(
-      "https://underclerk.test/v1/admin/merchants/merchant_cookie/orders/order_other/cancellations",
+      "https://commerce.test/v1/admin/merchants/merchant_cookie/orders/order_other/cancellations",
       {
         method: "POST",
         headers: {
@@ -2669,7 +2669,7 @@ it("resumes one cancelled pickup through the same original-tender refund", async
 it("applies exact order refunds and rejects cumulative over-refunds", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-order-refund-${randomUUID()}.sqlite3`,
+    `commerce-order-refund-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -2763,7 +2763,7 @@ it("applies exact order refunds and rejects cumulative over-refunds", async () =
 it("retries after capture recording without recapturing or duplicating placement", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-capture-restart-${randomUUID()}.sqlite3`,
+    `commerce-capture-restart-${randomUUID()}.sqlite3`,
   );
   let database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -2851,7 +2851,7 @@ it("retries after capture recording without recapturing or duplicating placement
 it("refreshes an expired buyer quote under the same checkout revision chain", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-refresh-checkout-${randomUUID()}.sqlite3`,
+    `commerce-refresh-checkout-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -2866,14 +2866,14 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
   const api = new CommerceHttpApi({
     authority,
     buyerSessions: new BuyerSessionAuthority({
-      secret: "underclerk_refresh_buyer_session_secret",
+      secret: "commerce_refresh_buyer_session_secret",
       now: clock.read,
       newSessionId: fixedBuyerSessionId,
     }),
     serviceToken: SERVICE_TOKEN,
   });
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
   try {
@@ -2882,7 +2882,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -2893,7 +2893,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
       "storefront_cafe",
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
         idempotencyKey: "buyer_quote_before_expiry",
         buyer: TEST_GUEST_BUYER,
         lines: [
@@ -2925,7 +2925,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
     ).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+        schemaVersion: "commerce.buyer-checkout-recovery.v1",
         checkout: quoted.value,
         progress: { state: "quoted" },
       },
@@ -2936,7 +2936,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
       quoted.value.checkoutId,
       session.value.token,
       {
-        schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+        schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
         idempotencyKey: "buyer_quote_after_expiry",
         checkoutRevision: quoted.value.revision,
         quoteDigest: quoted.value.quote.quoteDigest,
@@ -2972,7 +2972,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
         quoted.value.checkoutId,
         session.value.token,
         {
-          schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
           idempotencyKey: "buyer_quote_after_expiry",
           checkoutRevision: quoted.value.revision,
           quoteDigest: quoted.value.quote.quoteDigest,
@@ -2993,7 +2993,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
         quoted.value.checkoutId,
         session.value.token,
         {
-          schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
           idempotencyKey: "buyer_quote_after_expiry",
           checkoutRevision: quoted.value.revision,
           quoteDigest: "a".repeat(64),
@@ -3024,7 +3024,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
         quoted.value.checkoutId,
         session.value.token,
         {
-          schemaVersion: "underclerk.refresh-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.refresh-buyer-pickup-checkout.v1",
           idempotencyKey: "buyer_quote_after_expiry",
           checkoutRevision: refreshed.value.revision,
           quoteDigest: refreshed.value.quote.quoteDigest,
@@ -3056,7 +3056,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
         quoted.value.checkoutId,
         session.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-payment-session.v1",
+          schemaVersion: "commerce.create-buyer-payment-session.v1",
           idempotencyKey: "buyer_stale_quote_payment",
           checkoutRevision: quoted.value.revision,
           quoteDigest: quoted.value.quote.quoteDigest,
@@ -3078,7 +3078,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
         refreshed.value.checkoutId,
         session.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-payment-session.v1",
+          schemaVersion: "commerce.create-buyer-payment-session.v1",
           idempotencyKey: "buyer_refreshed_quote_payment",
           checkoutRevision: refreshed.value.revision,
           quoteDigest: refreshed.value.quote.quoteDigest,
@@ -3097,7 +3097,7 @@ it("refreshes an expired buyer quote under the same checkout revision chain", as
 it("quotes a prepared sesame latte beside a catalog sesame cookie with exact snapshots", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-prepared-checkout-${randomUUID()}.sqlite3`,
+    `commerce-prepared-checkout-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -3178,7 +3178,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.createPreparationStation({
-        schemaVersion: "underclerk.create-preparation-station.v1",
+        schemaVersion: "commerce.create-preparation-station.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: revision,
         idempotencyKey: "latte_station",
@@ -3192,7 +3192,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.createModifierGroupRevision({
-        schemaVersion: "underclerk.create-modifier-group-revision.v1",
+        schemaVersion: "commerce.create-modifier-group-revision.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: revision,
         idempotencyKey: "latte_modifier",
@@ -3226,7 +3226,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.createRecipeRevision({
-        schemaVersion: "underclerk.create-recipe-revision.v1",
+        schemaVersion: "commerce.create-recipe-revision.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: revision,
         idempotencyKey: "latte_recipe",
@@ -3266,7 +3266,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.configureStockPolicy({
-        schemaVersion: "underclerk.configure-stock-policy.v1",
+        schemaVersion: "commerce.configure-stock-policy.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: revision,
         idempotencyKey: "latte_stock_policy",
@@ -3285,7 +3285,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.prepareCatalogListing({
-        schemaVersion: "underclerk.prepare-catalog-listing.v1",
+        schemaVersion: "commerce.prepare-catalog-listing.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: revision,
         idempotencyKey: "latte_catalog",
@@ -3342,7 +3342,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.publishCatalogListing({
-        schemaVersion: "underclerk.publish-catalog-listing.v1",
+        schemaVersion: "commerce.publish-catalog-listing.v1",
         merchantId: "merchant_cookie",
         idempotencyKey: "latte_catalog_publish",
         requestedAt: AT,
@@ -3358,7 +3358,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     );
     revision = applyMutation(
       authority.publishMenu({
-        schemaVersion: "underclerk.publish-menu.v1",
+        schemaVersion: "commerce.publish-menu.v1",
         merchantId: "merchant_cookie",
         expectedMerchantRevision: revision,
         idempotencyKey: "cafe_main_menu",
@@ -3402,7 +3402,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -3443,7 +3443,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       "requirementAdjustments",
     );
     const command = {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1" as const,
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1" as const,
       idempotencyKey: "prepared_cookie_latte_checkout",
       buyer: TEST_GUEST_BUYER,
       lines: [
@@ -3466,7 +3466,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       "storefront_cafe",
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-cart.v1",
+        schemaVersion: "commerce.create-buyer-cart.v1",
         idempotencyKey: "prepared_cookie_latte_cart",
         lines: command.lines,
       },
@@ -3474,7 +3474,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     if (!cart.ok)
       throw new Error(`Prepared Cart rejected: ${cart.error.message}`);
     expect(cart.value).toMatchObject({
-      schemaVersion: "underclerk.buyer-cart.v1",
+      schemaVersion: "commerce.buyer-cart.v1",
       revision: 1,
       state: "active",
       fulfillment: "pickup",
@@ -3489,7 +3489,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       ),
     ).toEqual(cart);
     const replacement = {
-      schemaVersion: "underclerk.replace-buyer-cart.v1" as const,
+      schemaVersion: "commerce.replace-buyer-cart.v1" as const,
       idempotencyKey: "prepared_cookie_latte_cart_replace",
       cartRevision: cart.value.revision,
       lines: [
@@ -3552,7 +3552,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
         "storefront_cafe",
         session.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-cart.v1",
+          schemaVersion: "commerce.create-buyer-cart.v1",
           idempotencyKey: "prepared_cookie_latte_cart_invalid_modifier",
           lines: [
             {
@@ -3582,7 +3582,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
         "storefront_cafe",
         session.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-cart.v1",
+          schemaVersion: "commerce.create-buyer-cart.v1",
           idempotencyKey: "prepared_cookie_latte_cart",
           lines: [
             {
@@ -3610,7 +3610,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
         "storefront_cafe",
         session.value.token,
         {
-          schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+          schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
           idempotencyKey: "prepared_cookie_latte_checkout_stale",
           cartId: replaced.value.cartId,
           cartRevision: cart.value.revision,
@@ -3632,7 +3632,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       },
     });
     const checkoutCommand = {
-      schemaVersion: "underclerk.create-buyer-pickup-checkout.v1" as const,
+      schemaVersion: "commerce.create-buyer-pickup-checkout.v1" as const,
       idempotencyKey: command.idempotencyKey,
       cartId: replaced.value.cartId,
       cartRevision: replaced.value.revision,
@@ -3694,7 +3694,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     ).toEqual({
       ok: true,
       value: {
-        schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+        schemaVersion: "commerce.buyer-checkout-recovery.v1",
         checkout: quoted.value,
         progress: { state: "quoted" },
       },
@@ -3707,7 +3707,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       "merchant_cookie",
       "storefront_cafe",
       {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       },
     );
@@ -3903,7 +3903,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
       quoted.value.checkoutId,
       session.value.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: "prepared_cookie_latte_payment",
         checkoutRevision: quoted.value.revision,
         quoteDigest: quoted.value.quote.quoteDigest,
@@ -3914,7 +3914,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
     const adminClient = checkoutClient(authority);
     let merchantRevision = requireMerchantRevision(authority);
     const createTicket = {
-      schemaVersion: "underclerk.manage-preparation-ticket.v1" as const,
+      schemaVersion: "commerce.manage-preparation-ticket.v1" as const,
       merchantId: "merchant_cookie",
       expectedMerchantRevision: merchantRevision,
       idempotencyKey: "scenario_cafe_patisserie_v2:create_preparation_ticket:1",
@@ -4291,7 +4291,7 @@ it("quotes a prepared sesame latte beside a catalog sesame cookie with exact sna
 it("completes a stocked production batch atomically with FEFO input consumption", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-production-${randomUUID()}.sqlite3`,
+    `commerce-production-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -4431,7 +4431,7 @@ it("completes a stocked production batch atomically with FEFO input consumption"
       beforeFailedFood,
     );
     const command = {
-      schemaVersion: "underclerk.complete-production-batch.v1" as const,
+      schemaVersion: "commerce.complete-production-batch.v1" as const,
       merchantId: "merchant_production",
       expectedMerchantRevision: revision,
       idempotencyKey: "production_complete",
@@ -4633,14 +4633,14 @@ function seedCookieAuthority(
   seed: CookieSeed = LEGACY_COOKIE_SEED,
 ): void {
   authority.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: "organisation_cookie",
     merchantId: "merchant_cookie",
     createdAt: AT,
   });
   requireApplied(
     authority.createInventoryItem({
-      schemaVersion: "underclerk.create-inventory-item.v1",
+      schemaVersion: "commerce.create-inventory-item.v1",
       merchantId: "merchant_cookie",
       expectedMerchantRevision: 0,
       idempotencyKey: `item_${seed.inventoryItemId}`,
@@ -4655,7 +4655,7 @@ function seedCookieAuthority(
   );
   expect(
     authority.prepareCatalogListing({
-      schemaVersion: "underclerk.prepare-catalog-listing.v1",
+      schemaVersion: "commerce.prepare-catalog-listing.v1",
       merchantId: "merchant_cookie",
       expectedMerchantRevision: 1,
       idempotencyKey: "reject_uncommittable_direct_plan",
@@ -4738,7 +4738,7 @@ function seedCookieAuthority(
   );
   requireApplied(
     authority.openInventoryPosition({
-      schemaVersion: "underclerk.open-inventory-position.v1",
+      schemaVersion: "commerce.open-inventory-position.v1",
       merchantId: "merchant_cookie",
       expectedMerchantRevision: 2,
       idempotencyKey: seed.positionId,
@@ -4752,7 +4752,7 @@ function seedCookieAuthority(
   );
   requireApplied(
     authority.receiveInventory({
-      schemaVersion: "underclerk.receive-inventory.v3",
+      schemaVersion: "commerce.receive-inventory.v3",
       purchase: { kind: "unlinked" },
       merchantId: "merchant_cookie",
       expectedMerchantRevision: 3,
@@ -4786,14 +4786,14 @@ function seedCookieAuthority(
 
 function seedProductionMerchant(authority: CommerceAuthority): number {
   authority.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: "organisation_production",
     merchantId: "merchant_production",
     createdAt: AT,
   });
   let revision = applyMutation(
     authority.createLocation({
-      schemaVersion: "underclerk.create-location.v1",
+      schemaVersion: "commerce.create-location.v1",
       merchantId: "merchant_production",
       expectedMerchantRevision: 0,
       idempotencyKey: "production_location",
@@ -4843,7 +4843,7 @@ function seedProductionMerchant(authority: CommerceAuthority): number {
   }
   revision = applyMutation(
     authority.createInventoryItem({
-      schemaVersion: "underclerk.create-inventory-item.v1",
+      schemaVersion: "commerce.create-inventory-item.v1",
       merchantId: "merchant_production",
       expectedMerchantRevision: revision,
       idempotencyKey: "item_inventory_cookie",
@@ -4858,7 +4858,7 @@ function seedProductionMerchant(authority: CommerceAuthority): number {
   );
   return applyMutation(
     authority.openInventoryPosition({
-      schemaVersion: "underclerk.open-inventory-position.v1",
+      schemaVersion: "commerce.open-inventory-position.v1",
       merchantId: "merchant_production",
       expectedMerchantRevision: revision,
       idempotencyKey: "position_inventory_cookie",
@@ -4883,7 +4883,7 @@ function seedIngredientForMerchant(
 ): number {
   const created = applyMutation(
     authority.createInventoryItem({
-      schemaVersion: "underclerk.create-inventory-item.v1",
+      schemaVersion: "commerce.create-inventory-item.v1",
       merchantId: "merchant_production",
       expectedMerchantRevision,
       idempotencyKey: `item_${inventoryItemId}`,
@@ -4898,7 +4898,7 @@ function seedIngredientForMerchant(
   );
   const opened = applyMutation(
     authority.openInventoryPosition({
-      schemaVersion: "underclerk.open-inventory-position.v1",
+      schemaVersion: "commerce.open-inventory-position.v1",
       merchantId: "merchant_production",
       expectedMerchantRevision: created,
       idempotencyKey: `position_${inventoryItemId}`,
@@ -4912,7 +4912,7 @@ function seedIngredientForMerchant(
   );
   return applyMutation(
     authority.receiveInventory({
-      schemaVersion: "underclerk.receive-inventory.v3",
+      schemaVersion: "commerce.receive-inventory.v3",
       purchase: { kind: "unlinked" },
       merchantId: "merchant_production",
       expectedMerchantRevision: opened,
@@ -4949,7 +4949,7 @@ function seedIngredient(
 ): number {
   const created = applyMutation(
     authority.createInventoryItem({
-      schemaVersion: "underclerk.create-inventory-item.v1",
+      schemaVersion: "commerce.create-inventory-item.v1",
       merchantId: "merchant_cookie",
       expectedMerchantRevision,
       idempotencyKey: `item_${inventoryItemId}`,
@@ -4964,7 +4964,7 @@ function seedIngredient(
   );
   const opened = applyMutation(
     authority.openInventoryPosition({
-      schemaVersion: "underclerk.open-inventory-position.v1",
+      schemaVersion: "commerce.open-inventory-position.v1",
       merchantId: "merchant_cookie",
       expectedMerchantRevision: created,
       idempotencyKey: `position_${inventoryItemId}`,
@@ -4978,7 +4978,7 @@ function seedIngredient(
   );
   return applyMutation(
     authority.receiveInventory({
-      schemaVersion: "underclerk.receive-inventory.v3",
+      schemaVersion: "commerce.receive-inventory.v3",
       purchase: { kind: "unlinked" },
       merchantId: "merchant_cookie",
       expectedMerchantRevision: opened,
@@ -5030,7 +5030,7 @@ function pickupStorefrontCommand(
   seed: CookieSeed = LEGACY_COOKIE_SEED,
 ) {
   return {
-    schemaVersion: "underclerk.configure-pickup-storefront.v1",
+    schemaVersion: "commerce.configure-pickup-storefront.v1",
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 1,
     idempotencyKey: "catalog_cookie",
@@ -5101,7 +5101,7 @@ function pickupStorefrontCommand(
 
 function createPickupCheckoutCommand(quantity = 1) {
   return {
-    schemaVersion: "underclerk.create-pickup-checkout.v1" as const,
+    schemaVersion: "commerce.create-pickup-checkout.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 4,
     idempotencyKey: "checkout_cookie",
@@ -5130,7 +5130,7 @@ function createPickupCheckoutCommand(quantity = 1) {
 function beginCheckoutPaymentCommand() {
   const quote = checkoutQuote();
   return {
-    schemaVersion: "underclerk.begin-checkout-payment.v1" as const,
+    schemaVersion: "commerce.begin-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 5,
     idempotencyKey: "payment_cookie",
@@ -5148,7 +5148,7 @@ function beginCheckoutPaymentCommand() {
 function collectInPersonCheckoutPaymentCommand() {
   const payment = beginCheckoutPaymentCommand();
   return {
-    schemaVersion: "underclerk.collect-in-person-checkout-payment.v1" as const,
+    schemaVersion: "commerce.collect-in-person-checkout-payment.v1" as const,
     merchantId: payment.merchantId,
     expectedMerchantRevision: payment.expectedMerchantRevision,
     idempotencyKey: payment.idempotencyKey,
@@ -5192,7 +5192,7 @@ function restartPaymentStartCommand(
   identityDigest: string,
 ) {
   return {
-    schemaVersion: "underclerk.begin-checkout-payment.v1" as const,
+    schemaVersion: "commerce.begin-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 5,
     idempotencyKey: `buyer_payment_start_${identityDigest}`,
@@ -5229,7 +5229,7 @@ function restartPaymentCaptureRecordCommand(
   provider: Variant<CommercePaymentCaptureResultV1, "captured">,
 ) {
   return {
-    schemaVersion: "underclerk.record-checkout-payment-capture.v1" as const,
+    schemaVersion: "commerce.record-checkout-payment-capture.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 6,
     idempotencyKey: `buyer_payment_capture_record_${identityDigest}`,
@@ -5257,7 +5257,7 @@ function restartBuyerClaims() {
 
 function restartBuyerPaymentCommand(quote: CheckoutQuoteSnapshot) {
   return {
-    schemaVersion: "underclerk.reconcile-buyer-payment.v1" as const,
+    schemaVersion: "commerce.reconcile-buyer-payment.v1" as const,
     idempotencyKey: "buyer_restart_payment",
     checkoutRevision: 1,
     quoteDigest: quote.quoteDigest,
@@ -5268,7 +5268,7 @@ function restartBuyerPaymentCommand(quote: CheckoutQuoteSnapshot) {
 function staleCheckoutPaymentCommand() {
   const quote = checkoutQuote();
   return {
-    schemaVersion: "underclerk.begin-checkout-payment.v1" as const,
+    schemaVersion: "commerce.begin-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 6,
     idempotencyKey: "payment_cookie_stale_quote",
@@ -5285,7 +5285,7 @@ function staleCheckoutPaymentCommand() {
 
 function recordCheckoutPaymentCaptureCommand() {
   return {
-    schemaVersion: "underclerk.record-checkout-payment-capture.v1" as const,
+    schemaVersion: "commerce.record-checkout-payment-capture.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 6,
     idempotencyKey: "record_capture_payment_cookie",
@@ -5302,7 +5302,7 @@ function recordCheckoutPaymentCaptureCommand() {
 
 function placePaidCheckoutCommand() {
   return {
-    schemaVersion: "underclerk.place-paid-checkout.v1" as const,
+    schemaVersion: "commerce.place-paid-checkout.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 7,
     idempotencyKey: "place_paid_checkout_cookie",
@@ -5325,7 +5325,7 @@ function cookiePaymentDisputeCommand(
   lifecycle: ObserveCommercePaymentDisputeV1["lifecycle"],
 ): ObserveCommercePaymentDisputeV1 {
   return {
-    schemaVersion: "underclerk.observe-payment-dispute.v1",
+    schemaVersion: "commerce.observe-payment-dispute.v1",
     organisationId: "organisation_cookie",
     merchantId: "merchant_cookie",
     providerDeliveryId,
@@ -5343,7 +5343,7 @@ function cookiePaymentDisputeCommand(
 
 function cancelOrderCommand() {
   return {
-    schemaVersion: "underclerk.cancel-order.v1" as const,
+    schemaVersion: "commerce.cancel-order.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 8,
     idempotencyKey: "cancel_order_cookie",
@@ -5365,7 +5365,7 @@ function orderRefundCommand(
   idempotencyKey: string,
 ): RefundCommerceOrderV1 {
   return {
-    schemaVersion: "underclerk.refund-order.v1",
+    schemaVersion: "commerce.refund-order.v1",
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 8,
     idempotencyKey,
@@ -5394,7 +5394,7 @@ function orderRefundCommand(
 
 function markPickupReadyCommand() {
   return {
-    schemaVersion: "underclerk.mark-pickup-ready.v1" as const,
+    schemaVersion: "commerce.mark-pickup-ready.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 8,
     idempotencyKey: "ready_cookie",
@@ -5408,7 +5408,7 @@ function markPickupReadyCommand() {
 
 function completePickupCommand() {
   return {
-    schemaVersion: "underclerk.complete-pickup.v1" as const,
+    schemaVersion: "commerce.complete-pickup.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 10,
     idempotencyKey: "complete_cookie",
@@ -5424,7 +5424,7 @@ function completePickupCommand() {
 
 function earlyPickupCompletionCommand() {
   return {
-    schemaVersion: "underclerk.complete-pickup.v1" as const,
+    schemaVersion: "commerce.complete-pickup.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 10,
     idempotencyKey: "complete_cookie_too_early",
@@ -5440,7 +5440,7 @@ function earlyPickupCompletionCommand() {
 
 function receiveFinerScaleInventoryCommand() {
   return {
-    schemaVersion: "underclerk.receive-inventory.v3" as const,
+    schemaVersion: "commerce.receive-inventory.v3" as const,
     purchase: { kind: "unlinked" } as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 9,
@@ -5469,7 +5469,7 @@ function createFailureCheckoutCommand(
   suffix: string,
 ) {
   return {
-    schemaVersion: "underclerk.create-pickup-checkout.v1" as const,
+    schemaVersion: "commerce.create-pickup-checkout.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision,
     idempotencyKey: `checkout_${suffix}`,
@@ -5502,7 +5502,7 @@ function failurePaymentCommand(
 ) {
   const checkoutId = `checkout_${suffix}`;
   return {
-    schemaVersion: "underclerk.begin-checkout-payment.v1" as const,
+    schemaVersion: "commerce.begin-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision,
     idempotencyKey: `payment_${suffix}`,
@@ -5522,7 +5522,7 @@ function indeterminatePaymentCommand(
   reconcileAfter: string,
 ) {
   return {
-    schemaVersion: "underclerk.resolve-checkout-payment.v1" as const,
+    schemaVersion: "commerce.resolve-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 13,
     idempotencyKey: "payment_decline_indeterminate",
@@ -5542,7 +5542,7 @@ function indeterminatePaymentCommand(
 
 function declinedPaymentCommand(quote: CheckoutQuoteSnapshot) {
   return {
-    schemaVersion: "underclerk.resolve-checkout-payment.v1" as const,
+    schemaVersion: "commerce.resolve-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 14,
     idempotencyKey: "payment_decline_terminal",
@@ -5558,7 +5558,7 @@ function declinedPaymentCommand(quote: CheckoutQuoteSnapshot) {
 
 function expireCheckoutCommand(quote: CheckoutQuoteSnapshot) {
   return {
-    schemaVersion: "underclerk.expire-checkout.v1" as const,
+    schemaVersion: "commerce.expire-checkout.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 16,
     idempotencyKey: "checkout_expiry_terminal",
@@ -5571,7 +5571,7 @@ function expireCheckoutCommand(quote: CheckoutQuoteSnapshot) {
 
 function reconciliationIndeterminateCommand(quote: CheckoutQuoteSnapshot) {
   return {
-    schemaVersion: "underclerk.resolve-checkout-payment.v1" as const,
+    schemaVersion: "commerce.resolve-checkout-payment.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 19,
     idempotencyKey: "payment_reconcile_indeterminate",
@@ -5591,7 +5591,7 @@ function reconciliationIndeterminateCommand(quote: CheckoutQuoteSnapshot) {
 
 function reconciliationCaptureRecordCommand(quote: CheckoutQuoteSnapshot) {
   return {
-    schemaVersion: "underclerk.record-checkout-payment-capture.v1" as const,
+    schemaVersion: "commerce.record-checkout-payment-capture.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 20,
     idempotencyKey: "payment_reconcile_capture_recorded",
@@ -5608,7 +5608,7 @@ function reconciliationCaptureRecordCommand(quote: CheckoutQuoteSnapshot) {
 
 function reconciliationPlacementCommand(quote: CheckoutQuoteSnapshot) {
   return {
-    schemaVersion: "underclerk.place-paid-checkout.v1" as const,
+    schemaVersion: "commerce.place-paid-checkout.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 21,
     idempotencyKey: "payment_reconcile_placed",
@@ -5913,7 +5913,7 @@ function fixedNow(): string {
 function checkoutClient(authority: CommerceAuthority): CommerceAdminClient {
   const api = checkoutApi(authority);
   return new CommerceAdminClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     serviceToken: SERVICE_TOKEN,
     fetch: api.fetch,
   });
@@ -5924,7 +5924,7 @@ function storefrontClient(
 ): CommerceStorefrontClient {
   const api = checkoutApi(authority);
   return new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
 }
@@ -5936,14 +5936,14 @@ function storefrontClientWithSessionId(
   const api = new CommerceHttpApi({
     authority,
     buyerSessions: new BuyerSessionAuthority({
-      secret: "underclerk_test_buyer_session_secret",
+      secret: "commerce_test_buyer_session_secret",
       now: fixedNow,
       newSessionId,
     }),
     serviceToken: SERVICE_TOKEN,
   });
   return new CommerceStorefrontClient({
-    baseUrl: "https://underclerk.test",
+    baseUrl: "https://commerce.test",
     fetch: api.fetch,
   });
 }
@@ -5962,7 +5962,7 @@ async function createPickupCheckoutFromLines(
   command: BuyerPickupCheckoutFromLines,
 ): Promise<CommerceClientResult<CommerceBuyerQuotedCheckoutV1>> {
   const cart = await client.createCart(merchantId, storefrontId, sessionToken, {
-    schemaVersion: "underclerk.create-buyer-cart.v1",
+    schemaVersion: "commerce.create-buyer-cart.v1",
     idempotencyKey: `${command.idempotencyKey}_cart`,
     lines: command.lines,
   });
@@ -6005,7 +6005,7 @@ async function completeBuyerCheckout(
     checkoutId,
     sessionToken,
     {
-      schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+      schemaVersion: "commerce.reconcile-buyer-payment.v1",
       idempotencyKey: command.idempotencyKey,
       checkoutRevision: command.checkoutRevision,
       quoteDigest: command.quoteDigest,
@@ -6018,7 +6018,7 @@ function checkoutApi(authority: CommerceAuthority): CommerceHttpApi {
   return new CommerceHttpApi({
     authority,
     buyerSessions: new BuyerSessionAuthority({
-      secret: "underclerk_test_buyer_session_secret",
+      secret: "commerce_test_buyer_session_secret",
       now: fixedNow,
       newSessionId: fixedBuyerSessionId,
     }),
@@ -6043,7 +6043,7 @@ function removeDatabase(databasePath: string): void {
 it("refuses a counter sale at a location with no active pickup storefront", () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-counter-${randomUUID()}.sqlite3`,
+    `commerce-counter-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -6059,7 +6059,7 @@ it("refuses a counter sale at a location with no active pickup storefront", () =
     publishCounterPolicy(database);
     expect(
       authority.createInPersonCheckout(
-        createInPersonCheckoutCommand({ satyrLocationId: "location_unknown" }),
+        createInPersonCheckoutCommand({ pantryLocationId: "location_unknown" }),
       ),
     ).toMatchObject({
       outcome: "rejected",
@@ -6086,12 +6086,12 @@ function createInPersonCheckoutCommand(
   overrides: Record<string, unknown> = {},
 ) {
   return {
-    schemaVersion: "underclerk.create-in-person-checkout.v1" as const,
+    schemaVersion: "commerce.create-in-person-checkout.v1" as const,
     merchantId: "merchant_cookie",
     expectedMerchantRevision: 4,
     idempotencyKey: "checkout_counter",
     requestedAt: AT,
-    satyrLocationId: "location_cafe",
+    pantryLocationId: "location_cafe",
     posConfigurationRevision: 1,
     operatorIdentity: "operator_barista",
     terminalAssignmentRevision: 1,
@@ -6121,7 +6121,7 @@ function publishCounterPolicy(database: NodeCommerceDatabase): void {
       configurationId: "pos_configuration_counter",
       organisationId: "organisation_cookie",
       merchantId: "merchant_cookie" as PointOfSaleConfiguration["merchantId"],
-      satyrLocationId: "location_cafe",
+      pantryLocationId: "location_cafe",
       salesChannelId: "channel_cafe",
       currency: "JPY",
       supportedItems: [
@@ -6137,7 +6137,7 @@ function publishCounterPolicy(database: NodeCommerceDatabase): void {
       },
       presentationPolicy: {
         locale: "ja-JP",
-        merchantDisplayName: "Satyr Cafe",
+        merchantDisplayName: "Pantry Cafe",
         termsPolicyId: "terms_counter",
         privacyPolicyId: "privacy_counter",
         supportContact: "support@example.test",
@@ -6161,7 +6161,7 @@ it(
 async function recoversCapturedCounterSale(): Promise<void> {
   const databasePath = join(
     tmpdir(),
-    `underclerk-counter-restart-${randomUUID()}.sqlite3`,
+    `commerce-counter-restart-${randomUUID()}.sqlite3`,
   );
   let database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -6250,7 +6250,7 @@ async function recoversCapturedCounterSale(): Promise<void> {
 it("reconciles an interrupted counter-sale refund with the same provider identity", async () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-counter-refund-${randomUUID()}.sqlite3`,
+    `commerce-counter-refund-${randomUUID()}.sqlite3`,
   );
   const database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, AT);
@@ -6321,7 +6321,7 @@ it("reconciles an interrupted counter-sale refund with the same provider identit
     }
     const refundAttemptId = "refund_counter";
     const command: RefundCommerceOrderV1 = {
-      schemaVersion: "underclerk.refund-order.v1",
+      schemaVersion: "commerce.refund-order.v1",
       merchantId: "merchant_cookie",
       expectedMerchantRevision: snapshot.merchantRevision,
       idempotencyKey: refundAttemptId,

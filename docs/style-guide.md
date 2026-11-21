@@ -1,6 +1,6 @@
-# Satyr design system & style guide
+# Pantry design system & style guide
 
-Governs every user-facing web surface Satyr ships. That is the merchant portal
+Governs every user-facing web surface Pantry ships. That is the merchant portal
 served from `apps/portal` (workspace list and workspace pages, sign-in, the
 public policy pages, the identity-link page, and the provider authorization
 popup) **and the buyer storefront served from `apps/storefront`**. Both consume
@@ -20,7 +20,7 @@ radii sit on the same ladder.
 
 The source contract is explicit:
 
-- `portal.tsx` owns the control-portal route controller and the CafeOS `SignIn`
+- `portal.tsx` owns the control-portal route controller and the Café `SignIn`
   view. The Google action remains a native link to the Worker authentication
   boundary.
 - `main.tsx` owns the identity-link and action-approval bootstraps, including
@@ -28,7 +28,7 @@ The source contract is explicit:
 - `console-sidebar.tsx` owns the generic controlled sidebar, responsive rail/drawer
   controller, toggle, navigation semantics, and keyboard-operable switcher.
   `use-console-sidebar-preference.ts` owns the persisted desktop rail preference.
-- `shell.tsx` owns `PortalFrame`, `OrganisationLayout`, CafeOS sidebar configuration,
+- `shell.tsx` owns `PortalFrame`, `OrganisationLayout`, Café sidebar configuration,
   workspace/product switchers, the command palette, and route focus. Workspace
   pages render in its outlet and do not recreate global or workspace navigation.
 - `page-components.tsx` owns `PageHeader`, `EmptyState`, `RecoverableError`,
@@ -45,7 +45,7 @@ adapted for an operations console. Their product app validates the console patte
 
 ## Product language
 
-Satyr is a provider-backed commerce operations system. Product copy should
+Pantry is a provider-backed commerce operations system. Product copy should
 describe a clear path from connected commerce providers to products, orders,
 governed actions, and operational outcomes. The web experience should make
 integration health, provider projections, action state, and blockers legible.
@@ -88,7 +88,7 @@ File-native content, product folders, and file synchronization are deferred.
 point. Import it once at the application stylesheet entry point. It imports
 every theme from [`packages/frontend-themes/`](../packages/frontend-themes/) and
 holds the color-independent tokens: rings, radii, spacing, motion, and type. All
-palette values are sRGB-safe OKLCH. Components consume semantic `--satyr-*`
+palette values are sRGB-safe OKLCH. Components consume semantic `--pantry-*`
 roles. Raw shade variables exist only while their theme is selected, so they
 belong in theme files and never in component CSS. The portal's short names
 (`--paper`, `--ink`, `--ok-bg`, etc.) refer to these same shared roles. Header
@@ -97,8 +97,8 @@ CSS owns only portal aliases, never another palette.
 ### Themes
 
 A theme is one file that defines its shade ramps and every semantic role for
-both appearances. `data-satyr-theme` on `<html>` selects the theme and
-`data-portal-theme` selects the appearance. Without `data-satyr-theme`,
+both appearances. `data-pantry-theme` on `<html>` selects the theme and
+`data-portal-theme` selects the appearance. Without `data-pantry-theme`,
 slate-coral applies.
 
 | Theme         | File                                                             | Status                          |
@@ -108,8 +108,8 @@ slate-coral applies.
 | `sageberry`   | [`sageberry.css`](../packages/frontend-themes/sageberry.css)     | Alternate; the previous default |
 
 To add a theme, copy an existing file and scope its two blocks to
-`:root[data-satyr-theme="<name>"]` and
-`:root[data-satyr-theme="<name>"][data-portal-theme="dark"]`. Define every
+`:root[data-pantry-theme="<name>"]` and
+`:root[data-pantry-theme="<name>"][data-portal-theme="dark"]`. Define every
 semantic role below in the light block; the dark block overrides what changes.
 Import the file from `frontend-theme.css`, add it to `THEMES` in
 `apps/portal/src/dev/theme-preview.tsx`, and measure the contrast pairs below in
@@ -119,12 +119,12 @@ both appearances.
 
 | Reference                  | Palette anchor      | OKLCH                      |
 | -------------------------- | ------------------- | -------------------------- |
-| Blush `#F6E8E3`            | `--satyr-coral-100` | `oklch(0.941 0.017 40.8)`  |
-| Peach `#F0B1A1`            | `--satyr-coral-300` | `oklch(0.815 0.078 34.7)`  |
-| Coral `#C96357`            | `--satyr-coral-500` | `oklch(0.619 0.132 28.4)`  |
-| Slate gray `#8B9BA7`       | `--satyr-slate-450` | `oklch(0.681 0.025 240.3)` |
-| Light slate gray `#778899` | `--satyr-slate-500` | `oklch(0.619 0.032 248.4)` |
-| Dark slate `#3C4552`       | `--satyr-slate-700` | `oklch(0.387 0.025 257.5)` |
+| Blush `#F6E8E3`            | `--pantry-coral-100` | `oklch(0.941 0.017 40.8)`  |
+| Peach `#F0B1A1`            | `--pantry-coral-300` | `oklch(0.815 0.078 34.7)`  |
+| Coral `#C96357`            | `--pantry-coral-500` | `oklch(0.619 0.132 28.4)`  |
+| Slate gray `#8B9BA7`       | `--pantry-slate-450` | `oklch(0.681 0.025 240.3)` |
+| Light slate gray `#778899` | `--pantry-slate-500` | `oklch(0.619 0.032 248.4)` |
+| Dark slate `#3C4552`       | `--pantry-slate-700` | `oklch(0.387 0.025 257.5)` |
 
 Each family provides **50 through 800 in increments of 50** (16 shades).
 Intermediate shades interpolate lightness, chroma, and hue in OKLCH between the
@@ -145,29 +145,29 @@ Three-decimal OKLCH rounding can change a source RGB channel by one level.
 
 | Global token                                              | Role                                                           |
 | --------------------------------------------------------- | -------------------------------------------------------------- |
-| `--satyr-ground`                                          | Page canvas                                                    |
-| `--satyr-paper`                                           | Cards, menus, input and secondary-button surfaces              |
-| `--satyr-surface`                                         | Recessed groups, tracks, neutral chips                         |
-| `--satyr-border`                                          | Decorative dividers; never the sole control boundary           |
-| `--satyr-hairline`                                        | Visible input and control boundary                             |
-| `--satyr-ink` / `--satyr-ink-strong`                      | Body text / emphasized supporting text                         |
-| `--satyr-ink-muted` / `--satyr-ink-subtle`                | Supporting copy / captions and placeholders                    |
-| `--satyr-primary` / `--satyr-on-primary`                  | Primary action / contrasting label                             |
-| `--satyr-primary-hover` / `--satyr-primary-border`        | Action hover / visible action boundary                         |
-| `--satyr-hover`                                           | Quiet navigation hover surface                                 |
-| `--satyr-selected` / `--satyr-on-selected`                | Selected navigation and text selection                         |
-| `--satyr-link`                                            | Inline links and form-control accents; underline links         |
-| `--satyr-focus`                                           | Opaque keyboard focus outline, with a 2px offset               |
-| `--satyr-disabled-surface` / `--satyr-disabled-text`      | Unavailable controls; preserve disabled semantics              |
-| `--satyr-{success,info,warning,danger}-surface` / `-text` | Paired status surfaces and labels                              |
-| `--satyr-category-{accent,neutral}-surface` / `-text`     | Paired category fills and labels, including workflow timelines |
-| `--satyr-sidebar` / `--satyr-chat-surface`                | Workspace navigation / chat canvas                             |
-| `--satyr-sidebar-hover` / `--satyr-sidebar-selected`      | Rail item hover / selected rail item                           |
-| `--satyr-sidebar-selected-ring`                           | Inset outline on the selected rail item, or `none`             |
-| `--satyr-shadow-color` / `--satyr-shadow-card`            | Tint for shadows and scrims / raised card elevation            |
+| `--pantry-ground`                                          | Page canvas                                                    |
+| `--pantry-paper`                                           | Cards, menus, input and secondary-button surfaces              |
+| `--pantry-surface`                                         | Recessed groups, tracks, neutral chips                         |
+| `--pantry-border`                                          | Decorative dividers; never the sole control boundary           |
+| `--pantry-hairline`                                        | Visible input and control boundary                             |
+| `--pantry-ink` / `--pantry-ink-strong`                      | Body text / emphasized supporting text                         |
+| `--pantry-ink-muted` / `--pantry-ink-subtle`                | Supporting copy / captions and placeholders                    |
+| `--pantry-primary` / `--pantry-on-primary`                  | Primary action / contrasting label                             |
+| `--pantry-primary-hover` / `--pantry-primary-border`        | Action hover / visible action boundary                         |
+| `--pantry-hover`                                           | Quiet navigation hover surface                                 |
+| `--pantry-selected` / `--pantry-on-selected`                | Selected navigation and text selection                         |
+| `--pantry-link`                                            | Inline links and form-control accents; underline links         |
+| `--pantry-focus`                                           | Opaque keyboard focus outline, with a 2px offset               |
+| `--pantry-disabled-surface` / `--pantry-disabled-text`      | Unavailable controls; preserve disabled semantics              |
+| `--pantry-{success,info,warning,danger}-surface` / `-text` | Paired status surfaces and labels                              |
+| `--pantry-category-{accent,neutral}-surface` / `-text`     | Paired category fills and labels, including workflow timelines |
+| `--pantry-sidebar` / `--pantry-chat-surface`                | Workspace navigation / chat canvas                             |
+| `--pantry-sidebar-hover` / `--pantry-sidebar-selected`      | Rail item hover / selected rail item                           |
+| `--pantry-sidebar-selected-ring`                           | Inset outline on the selected rail item, or `none`             |
+| `--pantry-shadow-color` / `--pantry-shadow-card`            | Tint for shadows and scrims / raised card elevation            |
 
-Mix `--satyr-shadow-color` with `transparent` for shadows and modal scrims, for
-example `color-mix(in oklch, var(--satyr-shadow-color) 24%, transparent)`.
+Mix `--pantry-shadow-color` with `transparent` for shadows and modal scrims, for
+example `color-mix(in oklch, var(--pantry-shadow-color) 24%, transparent)`.
 Neutral black shadows are acceptable; warm or cool literal tints are not,
 because they belong to one theme.
 
@@ -179,9 +179,9 @@ state. On charts, label series directly and use markers or line patterns; these
 fills alone do not establish sufficient contrast for thin lines or adjacent
 regions.
 
-Use `--satyr-accent` and `--satyr-accent-soft` for decorative animation, and
-`--satyr-accent-text` on `--satyr-accent-surface` for small labeled accents.
-`--satyr-focus` uses an accessible coral shade. Activity effects respect reduced
+Use `--pantry-accent` and `--pantry-accent-soft` for decorative animation, and
+`--pantry-accent-text` on `--pantry-accent-surface` for small labeled accents.
+`--pantry-focus` uses an accessible coral shade. Activity effects respect reduced
 motion; animation never carries the only indication of state.
 
 ### Appearance and contrast
@@ -201,19 +201,19 @@ While chat is open, the workspace floats on the chat surface, so the chat
 surface stays the darkest layer in both appearances, then the canvas, then the
 sidebar. Text uses slate 50–300. Dark sidebar selection adds
 a full slate 400 inset outline. Labeled secondary buttons use the subtle
-`--satyr-button-ring`. Inputs retain `--satyr-ring` for a clear boundary, and
+`--pantry-button-ring`. Inputs retain `--pantry-ring` for a clear boundary, and
 keyboard focus retains its coral outline.
 
-Workflow inputs use `--satyr-hairline` for their border: slate 500 in light mode
+Workflow inputs use `--pantry-hairline` for their border: slate 500 in light mode
 and slate 400 in dark mode. Workflow panels and playback controls share
 `--shadow-card`. The bakery floor, wall, and grid switch to medium stone
 materials in dark mode without changing equipment materials or simulation state.
 
 Target at least **4.5:1** for normal text and **3:1** for control boundaries and
 focus outlines on their surrounding surface. Decorative dividers are exempt.
-Use `--satyr-ink` for long reading passages. Light-mode primary actions use
+Use `--pantry-ink` for long reading passages. Light-mode primary actions use
 slate 700 with slate 50 labels and slate 750 hover. Dark-mode actions use slate
-150 with slate 800 labels. Always pair action fills with `--satyr-on-primary`.
+150 with slate 800 labels. Always pair action fills with `--pantry-on-primary`.
 Use the supplied focus color with an offset so it borders the surrounding
 surface. Changing a token requires checking all its rendered foreground/background
 pairs in both appearances. Measured slate-coral pairs:
@@ -234,27 +234,27 @@ pairs in both appearances. Measured slate-coral pairs:
 @import "../../../packages/frontend-theme.css";
 
 .save-action {
-  background: var(--satyr-primary);
-  color: var(--satyr-on-primary);
-  box-shadow: var(--satyr-primary-ring);
+  background: var(--pantry-primary);
+  color: var(--pantry-on-primary);
+  box-shadow: var(--pantry-primary-ring);
   border: 0;
-  border-radius: var(--satyr-radius-pill);
-  padding: var(--satyr-space-3) var(--satyr-space-6);
-  transition: background-color var(--satyr-motion-fast) ease;
+  border-radius: var(--pantry-radius-pill);
+  padding: var(--pantry-space-3) var(--pantry-space-6);
+  transition: background-color var(--pantry-motion-fast) ease;
 }
 
 .save-action:hover:not(:disabled) {
-  background: var(--satyr-primary-hover);
+  background: var(--pantry-primary-hover);
 }
 
 .save-action:focus-visible {
-  outline: 2px solid var(--satyr-focus);
+  outline: 2px solid var(--pantry-focus);
   outline-offset: 2px;
 }
 
 .save-action:disabled {
-  background: var(--satyr-disabled-surface);
-  color: var(--satyr-disabled-text);
+  background: var(--pantry-disabled-surface);
+  color: var(--pantry-disabled-text);
   box-shadow: none;
 }
 ```
@@ -278,10 +278,10 @@ is the working fallback. Body text carries `letter-spacing: 0.005em`.
 
 ### Scale
 
-Global size tokens are `--satyr-text-caption` (12px), `--satyr-text-label`
-(14px), `--satyr-text-body` (16px), `--satyr-text-heading` (24px), and
-`--satyr-text-title` (36–44px). Font stacks remain `--satyr-font-sans` and
-`--satyr-font-display`.
+Global size tokens are `--pantry-text-caption` (12px), `--pantry-text-label`
+(14px), `--pantry-text-body` (16px), `--pantry-text-heading` (24px), and
+`--pantry-text-title` (36–44px). Font stacks remain `--pantry-font-sans` and
+`--pantry-font-display`.
 
 | Role                 | Face / weight | Size / line                              | Notes                                                    |
 | -------------------- | ------------- | ---------------------------------------- | -------------------------------------------------------- |
@@ -301,13 +301,13 @@ Weight 500 is the ceiling; never use 600+.
 
 ## 4. Shape & elevation
 
-- **`--satyr-radius-pill` (`9999px`)** — buttons, chips, select-as-control.
-- **`--satyr-radius-control` (`10px`)** — inputs, selects, rail links, small menus.
-- **`--satyr-radius-notice` (`12px`)** — banners and notices.
-- **`--satyr-radius-card` (`16px`)** — row-list cards.
-- **`--satyr-radius-panel` (`20px`)** — large identity panels and recessed wells.
+- **`--pantry-radius-pill` (`9999px`)** — buttons, chips, select-as-control.
+- **`--pantry-radius-control` (`10px`)** — inputs, selects, rail links, small menus.
+- **`--pantry-radius-notice` (`12px`)** — banners and notices.
+- **`--pantry-radius-card` (`16px`)** — row-list cards.
+- **`--pantry-radius-panel` (`20px`)** — large identity panels and recessed wells.
 - Shadows: `--shadow-card` for anything raised; `--ring` for secondary buttons; a
-  `--satyr-danger-ring` for destructive controls and `--satyr-primary-ring` for
+  `--pantry-danger-ring` for destructive controls and `--pantry-primary-ring` for
   the primary action boundary.
   No other shadows. Nothing is ever both bordered and shadowed.
 
@@ -321,8 +321,8 @@ Class names are the contract — reuse them rather than inventing parallel style
 
 - **Primary** (`.connection-primary-action` on buttons, `.primary-button` on
   link CTAs): slate pill,
-  light `--satyr-on-primary` text, weight 400, heights 38–48px, hover
-  `--satyr-primary-hover`. One primary action per
+  light `--pantry-on-primary` text, weight 400, heights 38–48px, hover
+  `--pantry-primary-hover`. One primary action per
   view region. The auth-only `.signin-button` is a 50px rectangle capped at 26rem,
   with a 10px radius so the identity choice reads as the page's single entry point.
 - **Secondary** (`button.secondary` anywhere; also the default for
@@ -352,7 +352,7 @@ hover, and `cursor: default` so they never look pressable.
 ### Inputs & selects
 
 44px tall, `10px` radius, 1px `--hairline` border, `--paper` fill; focus uses
-`--satyr-focus` for the border and a 2px outline with a 2px offset. Selects are
+`--pantry-focus` for the border and a 2px outline with a 2px offset. Selects are
 `appearance: none` with the shared SVG chevron (data URI in `styles.css`), inset 18px
 from the right, `padding-right:
 46px`. Row-scoped selects (`.account-row select`) are the 34px pill variant.
@@ -378,7 +378,7 @@ controlled sidebar is a persistent 264px rail that collapses to 60px. At 1160px 
 below it becomes a full-width drawer that can be completely hidden. Closing that
 drawer never changes the persisted desktop preference. Normal navigation closes the
 drawer; modified link activation retains native browser behavior. The generic shell
-accepts route groups and resolved links while `shell.tsx` supplies CafeOS labels,
+accepts route groups and resolved links while `shell.tsx` supplies Café labels,
 icons, switchers, and footer content.
 
 ### Workspace search (`.portal-command-trigger`, `.workspace-command-dialog`)
@@ -401,7 +401,7 @@ archived workspaces.
 
 Above 1160px it has a hairline right border and fills the shell height. Its expanded
 width is 264px; the topbar control collapses it to a 60px icon rail with the same
-280ms coordinated width, padding, gap, label, and page-grid transition. The SATYR
+280ms coordinated width, padding, gap, label, and page-grid transition. The PANTRY
 brand, product switcher, and workspace switcher stay pinned while navigation scrolls.
 The desktop preference persists locally and every related transition is removed under
 reduced motion. Both switchers expose keyboard-operable menus with Arrow, Home, End,
@@ -435,7 +435,7 @@ displaying invented zeroes.
 ### Sign-in
 
 The sign-in route uses a full-height split canvas rather than a card. At wide widths,
-the 36% access panel appears first in the DOM and contains the Satyr CafeOS identity,
+the 36% access panel appears first in the DOM and contains the Pantry Café identity,
 one h1, the Google action, its access explanation, and a quiet footer note. The warm
 story panel carries one supporting h2 and a concise product statement. A 1px hairline
 separates the panels; neither panel uses a shadow.
@@ -468,22 +468,22 @@ two-step `.confirming` button with a 5-second auto-revert.
 
 ## 6. Layout
 
-- Spacing uses `--satyr-space-{1,2,3,4,6,8,12}`: 4, 8, 12, 16, 24, 32,
+- Spacing uses `--pantry-space-{1,2,3,4,6,8,12}`: 4, 8, 12, 16, 24, 32,
   and 48px. Use these for new component gaps and padding; keep existing layout
   dimensions when their content requires them.
-- `--satyr-motion-fast` is 150ms for color feedback and becomes 0ms under
+- `--pantry-motion-fast` is 150ms for color feedback and becomes 0ms under
   reduced motion. Animate explicit properties only.
 - State changes move on springs. `--motion-quick` (210ms) covers icons, presses,
   tooltips, and small disclosures; `--motion-smooth` (340ms) covers containers,
   drawers, and layout; `--motion-glide` (390ms, 1.5% overshoot) is reserved for
   one shape morphing between states. Leaving elements use `--motion-exit`. Each
-  is a `transition` shorthand of a `--satyr-spring-*` duration and `linear()`
+  is a `transition` shorthand of a `--pantry-spring-*` duration and `linear()`
   easing; springs never bounce further than glide. Continuous loops such as
   spinners and shimmers keep their own easing.
 - A control that changes state stays one element: its content swaps with a
   short blur and scale, and swapping text leaves before the new text enters.
 
-- Shell: full-height left rail with SATYR and the workspace picker → content top nav
+- Shell: full-height left rail with PANTRY and the workspace picker → content top nav
   (60px, `--ground`, hairline bottom) with the sidebar toggle, current page, workspace
   search, and identity menu → `.portal-shell-workspace` grid
   (`264px minmax(0,1fr)`, or `60px minmax(0,1fr)` when collapsed, above 1160px) → `.portal-main` capped at
@@ -522,8 +522,8 @@ two-step `.confirming` button with a 5-second auto-revert.
   refreshed. Try again."_
 - **Failure honesty.** Load failures render the `load_failed` card (message + Try
   again) — only a real 401 shows sign-in.
-- **Titles.** Every view sets `document.title` (`Workspaces · Satyr`,
-  `<page> · <workspace> · Satyr CafeOS`, `Sign in · Satyr`).
+- **Titles.** Every view sets `document.title` (`Workspaces · Pantry`,
+  `<page> · <workspace> · Pantry Café`, `Sign in · Pantry`).
 
 ---
 

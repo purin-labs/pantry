@@ -116,7 +116,7 @@ export async function executeReviewedConnectorOperation(
     ),
   };
   const client = new McpClient({
-    name: "satyr",
+    name: "pantry",
     version: "1",
     requestTimeoutMs: remainingMs,
   });

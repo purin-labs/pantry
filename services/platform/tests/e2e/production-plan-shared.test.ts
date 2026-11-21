@@ -29,7 +29,7 @@ declare module "vitest" {
 }
 
 it(
-  "lets two operators plan one location's production together, shows a viewer the plan without edits, revises and accepts each line once, refuses only the request that changed in Underclerk, and replays a repeated accept",
+  "lets two operators plan one location's production together, shows a viewer the plan without edits, revises and accepts each line once, refuses only the request that changed in Commerce, and replays a repeated accept",
   { timeout: 180_000 },
   sharedProductionPlanJourney,
 );
@@ -65,7 +65,7 @@ async function sharedProductionPlanJourney({
   ]);
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -134,7 +134,7 @@ async function sharedProductionPlanJourney({
     await expect.poll(() => room.lines()).toEqual(planned);
 
   // 4. Meanwhile the third request changes in Commerce.
-  const changedInCommerce = await shop.reviseInUnderclerk(third, whole * 5);
+  const changedInCommerce = await shop.reviseInCommerce(third, whole * 5);
 
   // 5. The owner accepts the plan that the page shows.
   const acceptance = {
@@ -243,10 +243,10 @@ async function sharedProductionPlanJourney({
     requests: { first, second, third, fourth },
     originalQuantity: original,
     planned,
-    changedInUnderclerk: changedInCommerce,
+    changedInCommerce: changedInCommerce,
     accept: accepted,
     merchantWrites: revisionAfter - revisionBefore,
-    underclerkAfter: Object.fromEntries(after),
+    commerceAfter: Object.fromEntries(after),
     planAfterAccept: { [third]: thirdQuantity },
     repeatedAcceptReplayed: true,
     viewer: { edit: viewerEdit, acceptStatus: viewerAccept.status },

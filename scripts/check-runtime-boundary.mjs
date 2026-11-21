@@ -137,7 +137,7 @@ for (const failure of failures) console.error(failure);
 if (failures.length) process.exit(1);
 const allowedCount = [...ALLOWED.values()].reduce((sum, entry) => sum + entry.count, 0);
 console.log(
-  `runtime boundary: ${checkedSources} source files checked; ${commercePackages.size} Underclerk packages depend on no Satyr package; ${allowedCount} existing crossings in ${ALLOWED.size} files, no new one`,
+  `runtime boundary: ${checkedSources} source files checked; ${commercePackages.size} Commerce packages depend on no Pantry package; ${allowedCount} existing crossings in ${ALLOWED.size} files, no new one`,
 );
 
 function checkSource(file) {
@@ -158,19 +158,19 @@ function checkSource(file) {
         report(file, line, specifier, `imports ${target}; take the plugin through ${plugin}/index.ts`);
       if (commerceEngine || neutral) {
         if (!allowedFromCommerce(target, neutral))
-          report(file, line, specifier, `imports ${target}, outside ${commerceEngine ? "Underclerk" : "the neutral packages"}`);
+          report(file, line, specifier, `imports ${target}, outside ${commerceEngine ? "Commerce" : "the neutral packages"}`);
       } else if (within(target, COMMERCE_RUNTIME_DIRECTORIES)) {
-        report(file, line, specifier, `imports Underclerk source ${target}; use @purin-labs/commerce-client or the built Worker`);
+        report(file, line, specifier, `imports Commerce source ${target}; use @purin-labs/commerce-client or the built Worker`);
       }
       continue;
     }
     const name = packageName(specifier);
     if (!packages.has(name)) continue; // an npm package or a runtime module
     if (commerceEngine && !commercePackages.has(name) && !neutralPackages.has(name))
-      report(file, line, specifier, `imports ${name}, a package outside Underclerk`);
+      report(file, line, specifier, `imports ${name}, a package outside Commerce`);
     else if (neutral && !neutralPackages.has(name)) report(file, line, specifier, `imports ${name} from a neutral package`);
     else if (!commerceEngine && runtimePackages.has(name))
-      report(file, line, specifier, `imports ${name}, Underclerk's runtime source; use @purin-labs/commerce-client or the built Worker`);
+      report(file, line, specifier, `imports ${name}, Commerce's runtime source; use @purin-labs/commerce-client or the built Worker`);
   }
   if (within(file, [PLATFORM_ROUTES]))
     for (const match of text.matchAll(/\.prepare\(/g))
@@ -187,7 +187,7 @@ function checkSource(file) {
   for (const match of text.matchAll(/["'`](\.\.\/[^"'`\s$]+)["'`]/g)) {
     const target = repositoryPath(file, match[1]);
     if (target !== null && !allowedFromCommerce(target, neutral))
-      report(file, lineOf(match.index), match[1], `refers to ${target}, outside ${commerceEngine ? "Underclerk" : "the neutral packages"}`);
+      report(file, lineOf(match.index), match[1], `refers to ${target}, outside ${commerceEngine ? "Commerce" : "the neutral packages"}`);
   }
 }
 
@@ -223,10 +223,10 @@ function checkManifest(file) {
     for (const name of Object.keys(manifest[field] ?? {})) {
       if (!packages.has(name)) continue;
       if (commerceEngine && !commercePackages.has(name) && !neutralPackages.has(name))
-        report(file, line(name), name, `depends on ${name}, a package outside Underclerk`);
+        report(file, line(name), name, `depends on ${name}, a package outside Commerce`);
       else if (neutral && !neutralPackages.has(name)) report(file, line(name), name, `depends on ${name} from a neutral package`);
       else if (!commerceEngine && !neutral && runtimePackages.has(name))
-        report(file, line(name), name, `depends on ${name}, Underclerk's runtime source; use the built Worker`);
+        report(file, line(name), name, `depends on ${name}, Commerce's runtime source; use the built Worker`);
     }
   }
 }
@@ -236,7 +236,7 @@ function checkCargoManifest(file) {
   for (const match of text.matchAll(/path\s*=\s*"([^"]+)"/g)) {
     const target = normalize(join(dirname(file), match[1]));
     if (!isCommerce(target))
-      report(file, text.slice(0, match.index).split("\n").length, match[1], `depends on the crate at ${target}, outside Underclerk`);
+      report(file, text.slice(0, match.index).split("\n").length, match[1], `depends on the crate at ${target}, outside Commerce`);
   }
 }
 

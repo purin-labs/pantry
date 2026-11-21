@@ -31,14 +31,14 @@ type CommerceLabCustomer = {
   readonly postalRegion: string;
 };
 
-const PRODUCT_IMAGE_ROOT = "https://assets.example.invalid/satyr-commerce-lab";
+const PRODUCT_IMAGE_ROOT = "https://assets.example.invalid/builtin-commerce-lab";
 
 export const COMMERCE_LAB_PRODUCTS = [
   {
     productId: "product_field_watch",
     slug: "field-watch",
     title: "Field Watch",
-    description: "Synthetic automatic field watch for the Satyr commerce lab.",
+    description: "Synthetic automatic field watch for the Pantry commerce lab.",
     imageUrl: `${PRODUCT_IMAGE_ROOT}/field-watch.png`,
     variants: [
       {
@@ -234,21 +234,21 @@ export const COMMERCE_LAB_CUSTOMERS = [
   {
     customerId: "customer_lab_ada",
     displayName: "Ada Example",
-    email: "ada@satyr-lab.example",
+    email: "ada@pantry-lab.example",
     countryCode: "US",
     postalRegion: "CA",
   },
   {
     customerId: "customer_lab_ren",
     displayName: "Ren Example",
-    email: "ren@satyr-lab.example",
+    email: "ren@pantry-lab.example",
     countryCode: "JP",
     postalRegion: "Tokyo",
   },
   {
     customerId: "customer_lab_mina",
     displayName: "Mina Example",
-    email: "mina@satyr-lab.example",
+    email: "mina@pantry-lab.example",
     countryCode: "GB",
     postalRegion: "London",
   },

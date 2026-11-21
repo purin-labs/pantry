@@ -20,6 +20,6 @@ checkAndDeploy({
   operation,
   environment,
   profile: "wrangler.slack-ingress.jsonc",
-  prefix: "satyr-slack-ingress-",
+  prefix: "pantry-slack-ingress-",
   check: requireSmallScript.bind(null, "slack-ingress", MAXIMUM_SCRIPT_BYTES),
 });

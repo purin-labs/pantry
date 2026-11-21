@@ -124,7 +124,7 @@ export const createCommerceDiscountV1Schema = Type.Intersect(
   [
     discountCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.create-discount.v1"),
+      schemaVersion: Type.Literal("commerce.create-discount.v1"),
       title: boundedTextSchema(200),
       method: commerceDiscountMethodV1Schema,
       rule: commerceDiscountRuleV1Schema,
@@ -141,7 +141,7 @@ export const deactivateCommerceDiscountV1Schema = Type.Intersect(
   [
     discountCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.deactivate-discount.v1"),
+      schemaVersion: Type.Literal("commerce.deactivate-discount.v1"),
       expectedRevision: PositiveInteger,
     }),
   ],
@@ -173,7 +173,7 @@ export const commerceDiscountV1Schema = ReadonlyStrictObject({
 export type CommerceDiscountV1 = Static<typeof commerceDiscountV1Schema>;
 
 type DiscountList = Readonly<{
-  schemaVersion: "underclerk.discounts.v1";
+  schemaVersion: "commerce.discounts.v1";
   discounts: readonly CommerceDiscountV1[];
 }>;
 
@@ -181,7 +181,7 @@ type DiscountList = Readonly<{
 const discountListSchema = Type.Unsafe<readonly CommerceDiscountV1[]>(
   Type.Codec(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.discounts.v1"),
+      schemaVersion: Type.Literal("commerce.discounts.v1"),
       discounts: ImmutableArray(commerceDiscountV1Schema),
     }),
   )
@@ -196,7 +196,7 @@ function discountsOf(list: DiscountList): readonly CommerceDiscountV1[] {
 function discountList(
   discounts: readonly CommerceDiscountV1[],
 ): DiscountList {
-  return { schemaVersion: "underclerk.discounts.v1", discounts };
+  return { schemaVersion: "commerce.discounts.v1", discounts };
 }
 
 // Parsers of the client API types (Plan 78 step 2).

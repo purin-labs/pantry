@@ -10,7 +10,7 @@ predict a real room.
 
 Run it once for each engine, with the Python of that engine (see `confidence-bench.py`):
 
-    ~/.satyr-voice/venv/bin/python scripts/shop-voice/phrase-bench.py
+    ~/.pantry-voice/venv/bin/python scripts/shop-voice/phrase-bench.py
     SHOP_VOICE_QWEN3=<Qwen3-ASR MLX folder> SHOP_VOICE_RESULTS=phrase-bench-qwen3.json <mlx-audio python> \
         scripts/shop-voice/phrase-bench.py
     node scripts/shop-voice/phrase-score.mjs output/shop-voice/phrase-bench.json output/shop-voice/phrase-bench-qwen3.json
@@ -23,14 +23,14 @@ to say: the commands, the approval phrases and their near misses, "Stop." and "C
 2 m with the wake phrase, two bare lists of names, and 30 s of each room sound. The recordings stay on this
 Mac in `.cache/human/<session>/`. Then both engines hear the same clips, and the scorer compares them:
 
-    ~/.satyr-voice/venv/bin/python scripts/shop-voice/phrase-bench.py human .cache/human/<session>
+    ~/.pantry-voice/venv/bin/python scripts/shop-voice/phrase-bench.py human .cache/human/<session>
 
 A run can join sessions, and `:-<set>` leaves a set of one session out: the commands of one session with
 the room sound of another, recorded in the shop (`voice-recorder.html?only=room`):
 
     phrase-bench.py human .cache/human/<commands>:-room .cache/human/<room sound>
 
-SHOP_VOICE_QWEN3 names the Qwen3-ASR folder when the Mac has none in `~/.satyr-voice/model/qwen3-asr-1.7b`.
+SHOP_VOICE_QWEN3 names the Qwen3-ASR folder when the Mac has none in `~/.pantry-voice/model/qwen3-asr-1.7b`.
 """
 import importlib.util
 import json

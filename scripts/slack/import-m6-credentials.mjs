@@ -19,12 +19,12 @@ async function main() {
   const botToken = await promptForHiddenTerminalValue(
     process.stdin,
     process.stderr,
-    "Paste the Satyr Dev Bot User OAuth Token (input hidden): ",
+    "Paste the Pantry Dev Bot User OAuth Token (input hidden): ",
   );
   const signingSecret = await promptForHiddenTerminalValue(
     process.stdin,
     process.stderr,
-    "Paste the Satyr Dev Signing Secret (input hidden): ",
+    "Paste the Pantry Dev Signing Secret (input hidden): ",
   );
   assertM6CredentialShapes(botToken, signingSecret);
 

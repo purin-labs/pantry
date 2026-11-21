@@ -188,7 +188,7 @@ export class FoodServiceCommandAuthority {
           command.merchantId,
         ),
         integrationAccountId: command.merchantId,
-        source: "underclerk",
+        source: "commerce",
         resourceType: "preparation_station",
         resourceId: command.station.stationId,
         revision: 1,

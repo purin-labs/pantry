@@ -94,7 +94,7 @@ async function acceptProductionPlan(
     env,
     String(access.value.authorized.organisationId),
   );
-  if (plane === null) return controlError("underclerk_unavailable", 503);
+  if (plane === null) return controlError("commerce_unavailable", 503);
   const body = await readJsonRecord(request);
   if (!body.ok) return controlError("production_plan_invalid", 422);
   let acceptance: InventoryProductionPlanAcceptance;

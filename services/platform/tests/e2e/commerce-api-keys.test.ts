@@ -25,7 +25,7 @@ declare module "vitest" {
   }
 }
 
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 
 it(
   "lets an owner give the shop's own systems a scoped key, and names the key or the member on each stock change",
@@ -53,16 +53,16 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
     organisationId,
     owner.identity.userId,
     merchantId,
-    { installSatyr: false },
+    { installPantry: false },
   );
   // Pantry's installation from before Plan 80 step 3.
   const before = COMMERCE_API_SCOPES.filter(
     (scope) => scope !== "credentials:write",
   );
-  await operator(`${merchantId}/app-installations/satyr`, "PUT", {
+  await operator(`${merchantId}/app-installations/pantry`, "PUT", {
     scopes: before,
     externalReference: organisationId,
-    label: "Satyr",
+    label: "Pantry",
   });
   await fixtureDatabase().batch([
     fixtureDatabase()
@@ -77,12 +77,12 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
       .bind(organisationId, viewer.identity.userId, Date.now()),
   ]);
   const native = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const provisioned = await native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -124,7 +124,7 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
   if (typeof secret !== "string" || typeof apiKey.credentialId !== "string")
     throw new Error(`Key missing: ${JSON.stringify(created.body)}`);
   const pantryScopes = (await credentials(merchantId)).find(
-    (entry) => entry.appId === "satyr" && !entry.revoked,
+    (entry) => entry.appId === "pantry" && !entry.revoked,
   )?.scopes;
   expect(pantryScopes).toEqual([...COMMERCE_API_SCOPES]);
   const retried = await answer(
@@ -145,9 +145,9 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
   // 2. The key corrects a count on Commerce; the owner corrects one in
   // the Portal. Each receipt names who acted.
   const keyClient = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
+    baseUrl: "http://commerce.test",
     serviceToken: secret,
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const context = async (positionId: string) =>
     parseInventoryReceiptContext(
@@ -191,7 +191,7 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
   };
   expect(actors).toEqual({
     key: { kind: "api_key", credentialId: apiKey.credentialId },
-    owner: { kind: "app", appId: "satyr", person: ownerPerson },
+    owner: { kind: "app", appId: "pantry", person: ownerPerson },
   });
 
   // 3. What the key and the people may not do.
@@ -264,11 +264,11 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
 
   // Ids are random; the evidence names them by role.
   task.meta.commerceApiKeys = {
-    satyrInstallationAfterFirstKey: pantryScopes,
+    pantryInstallationAfterFirstKey: pantryScopes,
     retryShowsSecret: false,
     actors: {
       key: { kind: "api_key", credentialId: "<the stock system key>" },
-      owner: { kind: "app", appId: "satyr", person: "<the owner>" },
+      owner: { kind: "app", appId: "pantry", person: "<the owner>" },
     },
     refusals,
     afterRevoke,
@@ -315,8 +315,8 @@ function actorOf(result: unknown): unknown {
 }
 
 async function operator(path: string, method: "PUT", body: unknown) {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${path}`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${path}`,
     {
       method,
       headers: { authorization: OPERATOR, "content-type": "application/json" },
@@ -328,8 +328,8 @@ async function operator(path: string, method: "PUT", body: unknown) {
 
 /** The operator's list of a merchant's credentials, without ids or times. */
 async function credentials(merchantId: string) {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/api-credentials`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/api-credentials`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();

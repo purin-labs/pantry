@@ -1,6 +1,6 @@
 
 export type IntegrationDiscoveryProvider =
-  | "satyr_commerce"
+  | "builtin_commerce"
   | "airtable"
   | "dropbox"
   | "gmail"

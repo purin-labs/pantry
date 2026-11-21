@@ -5,7 +5,7 @@ import {
   type OrganisationMutation,
 } from "../../../apps/portal/src/mutation-state";
 
-describe("CafeOS scoped mutation ledger", () => {
+describe("Café scoped mutation ledger", () => {
   it("allows independent scopes while rejecting duplicate and conflicting work", () => {
     const initial = MutationLedger.empty();
     const commerce = add(initial, { kind: "sync_commerce" });

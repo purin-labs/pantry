@@ -6,19 +6,19 @@ async (page) => {
     static cacheState() {
       const userId = new URL(location.href).searchParams.get("preferenceUser");
       return JSON.parse(
-        localStorage.getItem(`satyr:preferences:${userId}:chat`) ?? "null",
+        localStorage.getItem(`pantry:preferences:${userId}:chat`) ?? "null",
       );
     }
     static storedChatKeys() {
       const keys = [];
       for (const key of Object.keys(localStorage)) {
-        if (key.startsWith("satyr:preferences:") && key.endsWith(":chat"))
+        if (key.startsWith("pantry:preferences:") && key.endsWith(":chat"))
           keys.push(key);
       }
       return keys;
     }
     static isChatKey(key) {
-      return key.startsWith("satyr:preferences:") && key.endsWith(":chat");
+      return key.startsWith("pantry:preferences:") && key.endsWith(":chat");
     }
     static width(element) {
       return Math.round(element.getBoundingClientRect().width);
@@ -89,7 +89,7 @@ async (page) => {
         {
           headers: {
             origin: "http://127.0.0.1:3115",
-            "x-satyr-csrf": csrf.value,
+            "x-pantry-csrf": csrf.value,
           },
           data: {
             expectedUserId: current.userId,
@@ -102,7 +102,7 @@ async (page) => {
       return (await response.json()).document;
     }
     static isCsrf(cookie) {
-      return cookie.name === "satyr_control_csrf";
+      return cookie.name === "pantry_csrf";
     }
     async reset(target = this.page) {
       for (const area of ["appearance", "chat", "bakeryos"])
@@ -471,7 +471,7 @@ async (page) => {
     static cacheStateForArea(area) {
       const userId = new URL(location.href).searchParams.get("preferenceUser");
       return JSON.parse(
-        localStorage.getItem(`satyr:preferences:${userId}:${area}`) ?? "null",
+        localStorage.getItem(`pantry:preferences:${userId}:${area}`) ?? "null",
       );
     }
     async resizeLifecycleJourney(alice) {

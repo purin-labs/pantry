@@ -43,7 +43,7 @@ async function merchantKeys(): Promise<void> {
     const { admin } = backend;
     await required(
       admin.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: "organisation_second_shop",
         merchantId: SECOND_MERCHANT,
         createdAt: NOW,
@@ -190,7 +190,7 @@ async function configure(
 
 function actorOf(result: CommerceMutationResultV1) {
   if (result.outcome === "rejected") throw new Error(result.error.code);
-  return result.receipt.schemaVersion === "underclerk.mutation-receipt.v2"
+  return result.receipt.schemaVersion === "commerce.mutation-receipt.v2"
     ? result.receipt.actor
     : undefined;
 }
@@ -209,7 +209,7 @@ async function call(
     headers: {
       authorization: `Bearer ${token}`,
       ...(body === undefined ? {} : { "content-type": "application/json" }),
-      ...(actor === undefined ? {} : { "underclerk-actor": actor }),
+      ...(actor === undefined ? {} : { "commerce-actor": actor }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });

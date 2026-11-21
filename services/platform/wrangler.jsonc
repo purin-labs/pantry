@@ -89,7 +89,7 @@
         "PANTRY_PROVIDER_INGRESS_ORIGIN": "https://square-sandbox-webhook.seams.sh",
         "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
         "SQUARE_OAUTH_ENVIRONMENT": "development",
-        "UNDERCLERK_BASE_URL": "http://127.0.0.1:3102",
+        "COMMERCE_BASE_URL": "http://127.0.0.1:3102",
         "AIRTABLE_OAUTH_CLIENT_ID": "55e93b04-5c92-4a8d-b96b-d83e7a4caa32",
         "DROPBOX_OAUTH_CLIENT_ID": "08go391f1qw6vbd",
         "GDRIVE_OAUTH_CLIENT_ID": "791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com",
@@ -107,7 +107,7 @@
       },
       "services": [
         {
-          "binding": "UNDERCLERK",
+          "binding": "COMMERCE",
           "service": "pantry-commerce",
         },
         {
@@ -314,7 +314,7 @@
         "GMAIL_PUBSUB_TOPIC": "projects/satyr-gmail-dev/topics/satyr-gmail-push",
         "GMAIL_PUBSUB_SERVICE_ACCOUNT": "satyr-gmail-push@satyr-gmail-dev.iam.gserviceaccount.com",
         "GMAIL_OAUTH_PILOT_EXPIRY_DAYS": "7",
-        "UNDERCLERK_BASE_URL": "https://commerce.pantry.purin.io",
+        "COMMERCE_BASE_URL": "https://commerce.pantry.purin.io",
         // No SHOP_ORDER_PAGE_ORIGIN yet: the order page domain is not chosen,
         // so QR codes keep the shop.purin.io/shops/<merchant> address.
         "WHATSAPP_APP_ID": "3167174123466651",
@@ -327,7 +327,7 @@
       },
       "services": [
         {
-          "binding": "UNDERCLERK",
+          "binding": "COMMERCE",
           "service": "pantry-commerce",
         },
         // Plan 73: every direct model-provider request leaves through this
@@ -368,7 +368,7 @@
           "DROPBOX_OAUTH_CLIENT_SECRET",
           "GDRIVE_OAUTH_CLIENT_SECRET",
           "GDRIVE_PICKER_API_KEY",
-          "UNDERCLERK_SERVICE_TOKEN",
+          "COMMERCE_SERVICE_TOKEN",
           "OPENROUTER_API_KEY",
           "TYPESAFE_API_KEY",
           "WHATSAPP_APP_SECRET",

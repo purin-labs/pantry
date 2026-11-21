@@ -654,7 +654,7 @@ export class InventoryProductionDialog extends React.Component<Props, State> {
                     </table>
                   )}
                   <p className="stock-footnote">
-                    * Required. This creates demand for BakeryOS. Stock
+                    * Required. This creates demand for Kitchen. Stock
                     increases after a confirmed batch; shortages must be
                     resolved before baking.
                   </p>

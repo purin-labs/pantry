@@ -6,15 +6,15 @@ import { isRecord } from "@purin-labs/std";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { fixtureDatabase } from "./organisation-database";
 
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 
 /** One admin read of a merchant in the commerce engine. */
 export async function commerceEngine(
   merchantId: string,
   path: string,
 ): Promise<Record<string, unknown>> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/${path}`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/${path}`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();
@@ -27,8 +27,8 @@ export async function commerceEngine(
  * placeholder key; a journey that reads deliveries needs the real one.
  */
 export async function trustShopDeliveries(merchantId: string): Promise<void> {
-  const signing = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-signing-key`,
+  const signing = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-signing-key`,
     { headers: { authorization: OPERATOR } },
   );
   const key: unknown = await signing.json();
@@ -36,7 +36,7 @@ export async function trustShopDeliveries(merchantId: string): Promise<void> {
     throw new Error("Fixture signing key missing");
   await fixtureDatabase()
     .prepare(
-      "UPDATE underclerk_merchant_binding SET delivery_signing_key_id = 'key_bakery_e2e', delivery_signing_public_key_b64 = ? WHERE merchant_id = ?",
+      "UPDATE commerce_merchant_binding SET delivery_signing_key_id = 'key_bakery_e2e', delivery_signing_public_key_b64 = ? WHERE merchant_id = ?",
     )
     .bind(key.publicKeyB64, merchantId)
     .run();
@@ -48,11 +48,11 @@ export function configurationHeaders(
   idempotencyKey: string,
 ): Record<string, string> {
   return {
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
     origin: "https://localhost",
     "content-type": "application/json",
     "idempotency-key": idempotencyKey,
-    "x-satyr-configuration-version": "1",
-    "x-satyr-csrf": session.csrfToken,
+    "x-pantry-configuration-version": "1",
+    "x-pantry-csrf": session.csrfToken,
   };
 }

@@ -141,7 +141,7 @@ async function holdGoogleAccount(owner: Owner): Promise<void> {
     provider: "gmail",
     providerSubjectId: GOOGLE_SUBJECT,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: handle.value },
     grantedScopes: GRANTED_SCOPES.split(" "),
     createdByUserId: owner.client.identity.userId,
@@ -247,7 +247,7 @@ function mutationHeaders(
     origin: PUBLIC_ORIGIN,
     "content-type": "application/json",
     "idempotency-key": `gmail-after-deletion-${owner.organisationId}-${idempotencyKey}`,
-    "x-satyr-configuration-version": String(version),
-    "x-satyr-csrf": owner.client.session.csrfToken,
+    "x-pantry-configuration-version": String(version),
+    "x-pantry-csrf": owner.client.session.csrfToken,
   };
 }

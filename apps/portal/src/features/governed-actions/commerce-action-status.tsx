@@ -157,7 +157,7 @@ function ActionDecisionControls(props: {
 
 function commerceSystemName(system: CommerceSystemKind): string {
   switch (system) {
-    case "satyr_commerce":
+    case "builtin_commerce":
       return "Seams Checkout";
     case "shopify":
       return "Shopify";
@@ -482,7 +482,7 @@ function commerceCancellationApprovalGuidance(
   switch (execution.kind) {
     case "provider_managed":
       return "Merchant approval status is provider-managed; automatic eligibility is not asserted.";
-    case "underclerk_full_refund":
+    case "commerce_full_refund":
       return execution.refundGovernance === "approval_required"
         ? "Merchant approval is required before this full refund can run."
         : "This full refund is automatic-eligible under the pinned refund policy. Platform controls may still require merchant approval.";

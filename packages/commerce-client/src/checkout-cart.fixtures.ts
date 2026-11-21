@@ -10,7 +10,7 @@ const profile = {
 } as const;
 
 const activeCart: CommerceBuyerCartV1 = {
-  schemaVersion: "underclerk.buyer-cart.v1",
+  schemaVersion: "commerce.buyer-cart.v1",
   cartId: "cart_fixture",
   revision: 1,
   checkoutProfile: profile,
@@ -21,7 +21,7 @@ const activeCart: CommerceBuyerCartV1 = {
 
 // @ts-expect-error Submitted Carts require the Checkout they created.
 const incompleteSubmittedCart: CommerceBuyerCartV1 = {
-  schemaVersion: "underclerk.buyer-cart.v1",
+  schemaVersion: "commerce.buyer-cart.v1",
   cartId: "cart_fixture",
   revision: 2,
   checkoutProfile: profile,
@@ -32,7 +32,7 @@ const incompleteSubmittedCart: CommerceBuyerCartV1 = {
 
 // @ts-expect-error Active Carts cannot point at a Checkout.
 const invalidActiveCart: CommerceBuyerCartV1 = {
-  schemaVersion: "underclerk.buyer-cart.v1",
+  schemaVersion: "commerce.buyer-cart.v1",
   cartId: "cart_fixture",
   revision: 1,
   checkoutProfile: profile,
@@ -51,7 +51,7 @@ const invalidMixedLine: CommerceBuyerCartLineV1 = {
 };
 
 const lineBearingCheckout: CreateCommerceBuyerPickupCheckoutV1 = {
-  schemaVersion: "underclerk.create-buyer-pickup-checkout.v1",
+  schemaVersion: "commerce.create-buyer-pickup-checkout.v1",
   idempotencyKey: "checkout_fixture",
   cartId: "cart_fixture",
   cartRevision: 1,

@@ -341,7 +341,7 @@ async function expectSharedThreadFailure(
         ...controlReadHeaders(scenario.owner.session),
         Origin: PUBLIC_ORIGIN,
         "content-type": "application/json",
-        "x-satyr-csrf": scenario.owner.session.csrfToken,
+        "x-pantry-csrf": scenario.owner.session.csrfToken,
       },
       body: JSON.stringify({ threadUrl }),
     },
@@ -849,7 +849,7 @@ async function postReview(
       ...controlReadHeaders(session),
       Origin: PUBLIC_ORIGIN,
       "content-type": "application/json",
-      "x-satyr-csrf": session.csrfToken,
+      "x-pantry-csrf": session.csrfToken,
     },
     body: "{}",
   });

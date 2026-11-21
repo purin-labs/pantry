@@ -3,7 +3,7 @@
 # person must add, and holds certbot until Cloudflare's own name server answers with it.
 # It asks that server directly, because a public resolver can remember "no record" for 30 min.
 set -eu
-TEST_HOME="$HOME/.satyr-voice-test"
+TEST_HOME="$HOME/.pantry-voice-test"
 RECORD="_acme-challenge.$CERTBOT_DOMAIN"
 printf '%s\n%s\n' "$RECORD" "$CERTBOT_VALIDATION" > "$TEST_HOME/txt-record"
 ZONE_SERVER="$(dig +short NS seams.tokyo @1.1.1.1 | head -1)"

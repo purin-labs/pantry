@@ -85,7 +85,7 @@ export class SquareCounterDesk extends StaffDesk {
   publishPolicy(currency: string) {
     return required(
       this.admin.publishPointOfSaleConfiguration({
-        schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+        schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
         merchantId,
         expectedRevision: null,
         publishedAt: NOW,
@@ -93,7 +93,7 @@ export class SquareCounterDesk extends StaffDesk {
         configuration: {
           configurationId: "pos_configuration_counter_au",
           organisationId,
-          satyrLocationId: LOCATION,
+          pantryLocationId: LOCATION,
           salesChannelId: CHANNEL,
           currency,
           supportedItems: [{ variantId: AUD_TIN, maxQuantityPerLine: 10 }],
@@ -107,7 +107,7 @@ export class SquareCounterDesk extends StaffDesk {
           },
           presentationPolicy: {
             locale: "en-AU",
-            merchantDisplayName: "Satyr Cafe",
+            merchantDisplayName: "Pantry Cafe",
             termsPolicyId: "terms_counter",
             privacyPolicyId: "privacy_counter",
             supportContact: "support@example.test",
@@ -124,7 +124,7 @@ export class SquareCounterDesk extends StaffDesk {
         merchantId,
         expectedMerchantRevision: snapshot.merchantRevision,
         idempotencyKey: `ring_${checkoutId}`,
-        satyrLocationId: LOCATION,
+        pantryLocationId: LOCATION,
         posConfigurationRevision: 1,
         operatorIdentity: "operator_barista",
         terminalAssignmentRevision: 1,

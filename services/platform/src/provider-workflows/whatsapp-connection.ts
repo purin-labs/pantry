@@ -195,7 +195,7 @@ export async function connectWhatsApp(
     provider: "whatsapp",
     providerSubjectId: assets.wabaId,
     environment: base.environment,
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: assets.grantedScopes,
     createdByUserId: base.userId,

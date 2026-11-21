@@ -4,11 +4,11 @@ import { parseHomeResponse } from "@purin-labs/control-api/portal/home";
 
 const OBSERVED_AT = "2026-07-26T00:00:00.000Z";
 
-describe("CafeOS Home boundary parser", () => {
+describe("Café Home boundary parser", () => {
   it("accepts the versioned merchant-safe view and closed destinations", () => {
     const parsed = parseHomeResponse({
       ok: true,
-      schemaVersion: "satyr.cafeos.home.v1",
+      schemaVersion: "pantry.cafeos.home.v1",
       generatedAt: Date.parse(OBSERVED_AT),
       home: {
         workspace: {
@@ -84,7 +84,7 @@ describe("CafeOS Home boundary parser", () => {
   it("rejects unknown destinations and stale schema versions at the boundary", () => {
     const response = {
       ok: true,
-      schemaVersion: "satyr.cafeos.home.v1",
+      schemaVersion: "pantry.cafeos.home.v1",
       generatedAt: Date.parse(OBSERVED_AT),
       home: {
         workspace: {
@@ -108,7 +108,7 @@ describe("CafeOS Home boundary parser", () => {
     };
 
     expect(() =>
-      parseHomeResponse({ ...response, schemaVersion: "satyr.cafeos.home.v0" }),
+      parseHomeResponse({ ...response, schemaVersion: "pantry.cafeos.home.v0" }),
     ).toThrow("Home response is invalid.");
     expect(() =>
       parseHomeResponse({
@@ -167,7 +167,7 @@ describe("CafeOS Home boundary parser", () => {
     expect(() =>
       parseHomeResponse({
         ok: true,
-        schemaVersion: "satyr.cafeos.home.v1",
+        schemaVersion: "pantry.cafeos.home.v1",
         generatedAt: Date.parse(OBSERVED_AT),
         home: {
           workspace: {

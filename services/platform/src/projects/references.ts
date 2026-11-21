@@ -207,7 +207,7 @@ function referenceFromResource(row: ResourceRow): ProjectReference | null {
       providerFileId: row.provider_resource_id,
       label: row.display_label,
     };
-  if (row.provider === "underclerk" && isCommerceRecordType(row.resource_kind))
+  if (row.provider === "commerce" && isCommerceRecordType(row.resource_kind))
     return {
       kind: "commerce_record",
       type: row.resource_kind,
@@ -489,7 +489,7 @@ export async function observeProjectReference(
         .prepare(
           `SELECT r.display_label, r.provider_revision, s.created_at FROM provider_discovered_resource r
         JOIN provider_resource_snapshot s USING(snapshot_revision) JOIN integration_account a ON a.organisation_id = s.organisation_id AND a.integration_account_id = s.integration_account_id AND a.lifecycle = 'active'
-        WHERE s.organisation_id = ? AND s.integration_account_id = ? AND s.provider = 'underclerk' AND r.resource_kind = ? AND r.provider_resource_id = ? AND r.access_state = 'accessible'
+        WHERE s.organisation_id = ? AND s.integration_account_id = ? AND s.provider = 'commerce' AND r.resource_kind = ? AND r.provider_resource_id = ? AND r.access_state = 'accessible'
         ORDER BY s.created_at DESC LIMIT 1`,
         )
         .bind(

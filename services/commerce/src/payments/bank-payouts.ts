@@ -136,7 +136,7 @@ export class BankPayouts {
     await this.#readSales(merchantId, sources, window);
     const rows = this.#rows(merchantId, window);
     return {
-      schemaVersion: "underclerk.bank-payouts.v1",
+      schemaVersion: "commerce.bank-payouts.v1",
       merchantId,
       sources: sourceStates(sources, answers),
       truncated:

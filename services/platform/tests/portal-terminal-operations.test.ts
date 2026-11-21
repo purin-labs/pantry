@@ -35,7 +35,7 @@ function operations(counters: readonly unknown[]): Record<string, unknown> {
   return {
     ok: true,
     terminalOperations: {
-      schemaVersion: "satyr.terminal-operations.v2",
+      schemaVersion: "pantry.terminal-operations.v2",
       organisationId: ORGANISATION,
       generatedAt: new Date(5).toISOString(),
       counters,
@@ -49,7 +49,7 @@ function counter(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
-    satyrLocationId: "pantry_location_1",
+    pantryLocationId: "pantry_location_1",
     blockedReason: null,
     assignment: assignment(),
     credentialHealth: "active",
@@ -66,7 +66,7 @@ function counter(
 }
 
 describe("Portal terminal-operations boundary", function terminalBoundarySuite() {
-  it("parses a counter and whether Underclerk takes its payments", async function parses() {
+  it("parses a counter and whether Commerce takes its payments", async function parses() {
     const read: TerminalReadTransport = async (path) => {
       expect(path).toBe(PATH);
       return operations([counter({ paymentsLinked: false })]);
@@ -83,7 +83,7 @@ describe("Portal terminal-operations boundary", function terminalBoundarySuite()
       ok: true,
       terminalOperations: {
         ...(operations([]).terminalOperations as Record<string, unknown>),
-        schemaVersion: "satyr.terminal-operations.v1",
+        schemaVersion: "pantry.terminal-operations.v1",
       },
       configuration: { kind: "blocked", reason: "commerce_system_missing" },
     });

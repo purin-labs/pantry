@@ -36,7 +36,7 @@ export type CommerceActivitySourceName =
   | "cases"
   | "proposals"
   | "approvals"
-  | "underclerk_receipts"
+  | "commerce_receipts"
   | "action_ledger";
 
 export type CommerceActionFollowUp =

@@ -24,7 +24,7 @@
   "vars": {
     "MENU_HOST_SUFFIX": "menu.seams.tokyo",
   },
-  "services": [{ "binding": "UNDERCLERK", "service": "pantry-commerce" }],
+  "services": [{ "binding": "COMMERCE", "service": "pantry-commerce" }],
   "routes": [{ "pattern": "shop.purin.io", "custom_domain": true }],
   "workers_dev": false,
   "preview_urls": false,

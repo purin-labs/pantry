@@ -102,13 +102,13 @@ export function stream(chunks) {
  */
 function unavailableCommerce(request) {
   return Response.json(
-    { error: "underclerk_unavailable", url: request.url },
+    { error: "commerce_unavailable", url: request.url },
     { status: 503 },
   );
 }
 
 /**
- * Starts the fixture Worker of `config` on `port`. UNDERCLERK refuses each
+ * Starts the fixture Worker of `config` on `port`. COMMERCE refuses each
  * call, `bindings` adds others or replaces it, and `respond` answers every
  * request that the Worker sends out.
  */
@@ -130,7 +130,7 @@ export async function startFixtureWorker({
     config,
     build: { nodejsCompatMode: "v2" },
     bindings: {
-      UNDERCLERK: { type: "fetcher", fetcher: unavailableCommerce },
+      COMMERCE: { type: "fetcher", fetcher: unavailableCommerce },
       ...bindings,
     },
     dev: {

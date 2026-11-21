@@ -1398,7 +1398,7 @@ export async function includeStorefrontTax(
   basisPoints: number,
 ): Promise<Readonly<{ storefrontRevision: number; basisPoints: number }>> {
   const session = await buyer.createSession(merchantId, STOREFRONT_ID, {
-    schemaVersion: "underclerk.create-buyer-session.v1",
+    schemaVersion: "commerce.create-buyer-session.v1",
     buyer: { kind: "guest" },
   });
   if (!session.ok) throw clientFailure("buyer session", session);

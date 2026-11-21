@@ -195,7 +195,7 @@ export async function runPunterShippingScenario(
     input.merchantId,
     input.storefrontId,
     {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     },
   );
@@ -272,7 +272,7 @@ export async function runPunterShippingScenario(
     input.storefrontId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `${input.runId}_cart`,
       lines: [
         {
@@ -294,7 +294,7 @@ export async function runPunterShippingScenario(
     input.storefrontId,
     session.value.token,
     {
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: `${input.runId}_checkout`,
       cartId: cart.value.cartId,
       cartRevision: cart.value.revision,
@@ -354,7 +354,7 @@ export async function runPunterShippingScenario(
     checkout.value.checkoutId,
     session.value.token,
     {
-      schemaVersion: "underclerk.refresh-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.refresh-buyer-shipping-checkout.v1",
       idempotencyKey: `${input.runId}_refresh`,
       checkoutRevision: checkout.value.revision,
       quoteDigest: checkout.value.quote.quoteDigest,
@@ -390,7 +390,7 @@ export async function runPunterShippingScenario(
     };
   }
   const paymentCommand = {
-    schemaVersion: "underclerk.create-buyer-payment-session.v1" as const,
+    schemaVersion: "commerce.create-buyer-payment-session.v1" as const,
     idempotencyKey: `${input.runId}_payment`,
     checkoutRevision: refreshed.value.revision,
     quoteDigest: refreshed.value.quote.quoteDigest,
@@ -660,7 +660,7 @@ async function validateShippingAddress(
     input.storefrontId,
     input.sessionToken,
     {
-      schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+      schemaVersion: "commerce.validate-buyer-shipping-address.v1",
       idempotencyKey: input.idempotencyKey,
       address: input.address,
     },

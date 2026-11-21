@@ -85,24 +85,24 @@ async function activatePurchasing(
     organisationId: context.authorized.organisationId,
     merchantId: context.merchantId,
   });
-  if (!published.ok) return controlError("underclerk_unavailable", 503);
+  if (!published.ok) return controlError("commerce_unavailable", 503);
   if (
     published.value.organisationId !== context.authorized.organisationId ||
     published.value.merchantId !== context.merchantId
   ) {
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   }
   const reconciled = await context.client.reconcilePurchasing({
     organisationId: context.authorized.organisationId,
     merchantId: context.merchantId,
   });
-  if (!reconciled.ok) return controlError("underclerk_unavailable", 503);
+  if (!reconciled.ok) return controlError("commerce_unavailable", 503);
   if (!purchasingResponseMatchesContext(context, reconciled.value)) {
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   }
   const queued = await enqueuePurchasingProjectionRefresh(env, context);
   if (!queued)
-    return controlError("underclerk_projection_refresh_unavailable", 503);
+    return controlError("commerce_projection_refresh_unavailable", 503);
   const responseBody = {
     ok: true,
     publication: published.value,
@@ -127,13 +127,13 @@ async function reconcilePurchasing(
     organisationId: context.authorized.organisationId,
     merchantId: context.merchantId,
   });
-  if (!reconciled.ok) return controlError("underclerk_unavailable", 503);
+  if (!reconciled.ok) return controlError("commerce_unavailable", 503);
   if (!purchasingResponseMatchesContext(context, reconciled.value)) {
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   }
   const queued = await enqueuePurchasingProjectionRefresh(env, context);
   if (!queued)
-    return controlError("underclerk_projection_refresh_unavailable", 503);
+    return controlError("commerce_projection_refresh_unavailable", 503);
   const responseBody = { ok: true, reconciliation: reconciled.value };
   const recordedMutationReceipt = await recordPurchasingReceipt(
     request,
@@ -214,7 +214,7 @@ async function resolvePurchasingControlContext(
   if (binding instanceof Response) return { ok: false, response: binding };
   const client = createPurchasingClient(env, String(authorized.organisationId));
   if (client === null)
-    return { ok: false, response: controlError("underclerk_unavailable", 503) };
+    return { ok: false, response: controlError("commerce_unavailable", 503) };
   return {
     ok: true,
     value: {
@@ -234,17 +234,17 @@ function createPurchasingClient(
   organisationId: string,
 ): CommerceEntityPlaneClient | null {
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
     return null;
   try {
     return new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         organisationId,
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
       ),
     });
   } catch {
@@ -316,11 +316,11 @@ function supplierCreationErrorResponse(
         409,
       );
     case "unavailable":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
     case "email_operational_contact_sync_failed":
-    case "underclerk_projection_refresh_unavailable":
+    case "commerce_projection_refresh_unavailable":
       return controlError(error.code, 503);
-    case "underclerk_scope_mismatch":
+    case "commerce_scope_mismatch":
       return controlError(error.code, 502);
   }
 }

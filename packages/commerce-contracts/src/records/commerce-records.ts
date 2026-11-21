@@ -1829,7 +1829,7 @@ export const checkoutSourceSchema = Type.Union([
   }),
   StrictObject({
     kind: Type.Literal("point_of_sale"),
-    satyrLocationId: recordTextSchema,
+    pantryLocationId: recordTextSchema,
     posConfigurationRevision: PositiveInteger,
     operatorIdentity: recordTextSchema,
     terminalAssignmentRevision: Type.Union([PositiveInteger, Type.Null()]),

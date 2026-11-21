@@ -313,7 +313,7 @@ export function VaultRoute(props: {
       | Readonly<{ kind: "disconnect_onepassword" }>
       | Readonly<{
           kind: "move_items";
-          to: "onepassword" | "satyr";
+          to: "onepassword" | "pantry";
         }>,
   ): Promise<void> => {
     if (busy) return;
@@ -376,7 +376,7 @@ export function VaultRoute(props: {
           openStore={() => {
             setNotice(null);
             open(
-              load.store.kind === "satyr"
+              load.store.kind === "pantry"
                 ? {
                     kind: "connect",
                     itemId: null,

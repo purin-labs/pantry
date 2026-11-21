@@ -104,7 +104,7 @@ export function providerDependencyLabel(
 
 function commerceSystemLabel(system: string): string {
   switch (system) {
-    case "satyr_commerce":
+    case "builtin_commerce":
       return "Seams Checkout";
     case "shopify":
       return "Shopify";

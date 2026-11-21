@@ -17,7 +17,7 @@ async (page) => {
     checks.push({ name, passed: Boolean(passed), detail });
     if (!passed) throw new Error(`${name}: ${JSON.stringify(detail ?? null)}`);
   };
-  const calls = () => page.evaluate(() => [...(window.satyrCommercePreviewCalls ?? [])]);
+  const calls = () => page.evaluate(() => [...(window.builtInCommercePreviewCalls ?? [])]);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(PREVIEW);
   await page.locator("a[href$='/chat']").first().click();
@@ -52,7 +52,7 @@ async (page) => {
   await page.evaluate(() => {
     const open = window.open.bind(window);
     window.open = (url, name, features) => {
-      window.satyrOpened = [...(window.satyrOpened ?? []), String(url)];
+      window.pantryOpened = [...(window.pantryOpened ?? []), String(url)];
       const nonce = new URL(String(url), window.location.origin).searchParams.get("action") ?? "";
       return open(`/approval-signed-in.html?action=${encodeURIComponent(nonce)}`, name, features);
     };
@@ -61,7 +61,7 @@ async (page) => {
   await again.getByRole("button", { name: "Approve and apply", exact: true }).click();
   const popup = await popupEvent;
   await again.locator(".action-state-confirmed").waitFor({ timeout: 15_000 });
-  opened.push(...await page.evaluate(() => window.satyrOpened ?? []));
+  opened.push(...await page.evaluate(() => window.pantryOpened ?? []));
   const stepUpCalls = await calls();
   check("the sign-in opened in a window, with the approval's purpose", opened.length === 1 && opened[0].includes("/v1/control/auth/google/start?purpose=approval"), opened);
   check("the chat page did not move", page.url() === before, page.url());

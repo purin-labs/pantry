@@ -115,7 +115,7 @@ try {
   step(`old code ${fromCommit.slice(0, 9)}: worktree and install`);
   run("git", ["worktree", "add", "--detach", oldTree, fromCommit], repository);
   run("pnpm", ["install", "--prefer-offline", "--frozen-lockfile"], oldTree);
-  const oldService = ["services/commerce", "services/underclerk"]
+  const oldService = ["services/commerce", "services/commerce"]
     .map((path) => join(oldTree, path))
     .find((path) => existsSync(join(path, "tests/workerd-backend.ts")));
   if (oldService === undefined)

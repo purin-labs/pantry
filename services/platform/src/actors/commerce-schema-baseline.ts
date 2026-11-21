@@ -43,7 +43,7 @@ export const COMMERCE_PROJECTION_SCHEMA_V16: readonly string[] = [
       processed_at INTEGER NOT NULL CHECK (processed_at >= 0),
       last_seen_at INTEGER NOT NULL CHECK (last_seen_at >= processed_at),
       delivery_count INTEGER NOT NULL CHECK (delivery_count >= 1),
-      lab_run_id TEXT, provider_delivery_id TEXT, observation_index INTEGER NOT NULL DEFAULT 0, commerce_system_kind TEXT NOT NULL DEFAULT 'historical' CHECK (commerce_system_kind IN ('historical', 'lab', 'satyr_commerce', 'shopify')), commerce_system_revision INTEGER CHECK (commerce_system_revision IS NULL OR commerce_system_revision >= 1),
+      lab_run_id TEXT, provider_delivery_id TEXT, observation_index INTEGER NOT NULL DEFAULT 0, commerce_system_kind TEXT NOT NULL DEFAULT 'historical' CHECK (commerce_system_kind IN ('historical', 'lab', 'builtin_commerce', 'shopify')), commerce_system_revision INTEGER CHECK (commerce_system_revision IS NULL OR commerce_system_revision >= 1),
       PRIMARY KEY (organisation_id, event_id)
     )`,
   `CREATE TABLE commerce_cue_outbox (
@@ -75,7 +75,7 @@ export const COMMERCE_PROJECTION_SCHEMA_V16: readonly string[] = [
       processed_at INTEGER NOT NULL CHECK (processed_at >= 0),
       last_seen_at INTEGER NOT NULL CHECK (last_seen_at >= processed_at),
       delivery_count INTEGER NOT NULL CHECK (delivery_count >= 1),
-      lab_run_id TEXT, commerce_system_kind TEXT NOT NULL DEFAULT 'historical' CHECK (commerce_system_kind IN ('historical', 'lab', 'satyr_commerce', 'shopify')), commerce_system_revision INTEGER CHECK (commerce_system_revision IS NULL OR commerce_system_revision >= 1),
+      lab_run_id TEXT, commerce_system_kind TEXT NOT NULL DEFAULT 'historical' CHECK (commerce_system_kind IN ('historical', 'lab', 'builtin_commerce', 'shopify')), commerce_system_revision INTEGER CHECK (commerce_system_revision IS NULL OR commerce_system_revision >= 1),
       PRIMARY KEY (organisation_id, provider_delivery_id)
     )`,
   `CREATE TABLE commerce_projection_tombstone (

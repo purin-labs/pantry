@@ -147,7 +147,7 @@ describe("OrganisationActor normalized commerce relation", () => {
           0,
           "blotterRevision",
         ),
-        underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+        commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
           0,
           "commerceRevision",
         ),
@@ -223,7 +223,7 @@ describe("OrganisationActor normalized commerce relation", () => {
           0,
           "blotterRevision",
         ),
-        underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+        commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
           0,
           "commerceRevision",
         ),
@@ -493,7 +493,7 @@ function capabilitiesForQuery(
       return query.source.kind === "commerce_list"
         ? listCapabilities(query.source.listId)
         : capabilitiesForEntityType(query.source.entityTypeId);
-    case "underclerk_context":
+    case "commerce_context":
       return query.selection.kind === "entity_seeds"
         ? capabilitiesForQuery({
             kind: "relationship_traversal",
@@ -535,7 +535,7 @@ function customCapabilities(
   entityTypeId: CustomCommerceEntityTypeId,
 ): CommerceQueryCapabilityProfile {
   return parseCapabilityProfile({
-    kind: "underclerk_custom",
+    kind: "commerce_custom",
     entityTypeId,
     publishedRevision: 1,
     capability: {
@@ -567,7 +567,7 @@ function capabilitySourceForEntityType(
   const profile = capabilitiesForEntityType(entityType);
   if (
     profile.kind === "system_mapped" ||
-    profile.kind === "underclerk_custom" ||
+    profile.kind === "commerce_custom" ||
     profile.kind === "commerce_list"
   )
     return profile;
@@ -582,7 +582,7 @@ function parseCapabilityProfile(
     organisationId: "organisation_query_schema",
     merchantId: "merchant_query_schema",
     merchantRevision: 1,
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities,
     projection: {
       attributeIds: [],
@@ -626,7 +626,7 @@ function requiredPlannedRelationship(
         0,
         "blotterRevision",
       ),
-      underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+      commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
         0,
         "commerceRevision",
       ),

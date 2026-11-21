@@ -47,20 +47,20 @@ export function chatThreadActivity(
 export type ChatContextDetails =
   | Readonly<{
       kind: "preparing";
-      area: "BakeryOS";
+      area: "kitchen";
       effectId: string;
       source?: never;
     }>
   | Readonly<{
       kind: "failed" | "cancelled";
-      area: "BakeryOS";
+      area: "kitchen";
       effectId: string;
       message: string;
       source?: never;
     }>
   | Readonly<{
       kind: "observed";
-      area: "AgentCommerce" | "CafeOS" | "BakeryOS";
+      area: "commerce" | "cafe" | "kitchen";
       source: Readonly<{
         id: string;
         revision: string;
@@ -72,7 +72,7 @@ export type ChatContextDetails =
     }>
   | Readonly<{
       kind: "ready";
-      area: "BakeryOS";
+      area: "kitchen";
       effectId: string;
       browserInstanceId: string;
       surfaceSessionId: string;
@@ -88,9 +88,9 @@ export function parseChatContextDetails(
   if (!isRecord(raw)) return null;
   if (raw.kind === "observed") {
     if (
-      (raw.area !== "AgentCommerce" &&
-        raw.area !== "CafeOS" &&
-        raw.area !== "BakeryOS") ||
+      (raw.area !== "commerce" &&
+        raw.area !== "cafe" &&
+        raw.area !== "kitchen") ||
       !hasExactKeys(raw, ["kind", "area", "source"]) ||
       !isRecord(raw.source)
     )
@@ -125,12 +125,12 @@ export function parseChatContextDetails(
       },
     };
   }
-  if (raw.area !== "BakeryOS" || !isNonEmptyString(raw.effectId)) return null;
+  if (raw.area !== "kitchen" || !isNonEmptyString(raw.effectId)) return null;
   if (
     raw.kind === "preparing" &&
     hasExactKeys(raw, ["kind", "area", "effectId"])
   )
-    return { kind: "preparing", area: "BakeryOS", effectId: raw.effectId };
+    return { kind: "preparing", area: "kitchen", effectId: raw.effectId };
   if (
     (raw.kind === "failed" || raw.kind === "cancelled") &&
     hasExactKeys(raw, ["kind", "area", "effectId", "message"]) &&
@@ -138,7 +138,7 @@ export function parseChatContextDetails(
   )
     return {
       kind: raw.kind,
-      area: "BakeryOS",
+      area: "kitchen",
       effectId: raw.effectId,
       message: raw.message,
     };
@@ -162,7 +162,7 @@ export function parseChatContextDetails(
   )
     return {
       kind: "ready",
-      area: "BakeryOS",
+      area: "kitchen",
       effectId: raw.effectId,
       browserInstanceId: raw.browserInstanceId,
       surfaceSessionId: raw.surfaceSessionId,

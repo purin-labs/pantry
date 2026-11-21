@@ -143,7 +143,7 @@ export async function realProviderExecutionFixture(
     db,
     input.organisationId,
     input.integrationAccountId,
-    input.integrationAccountId.includes("shopify") ? "shopify" : "underclerk",
+    input.integrationAccountId.includes("shopify") ? "shopify" : "commerce",
     owner.userId,
   );
   const policy = defaultDenyPolicy({ now: 1 });

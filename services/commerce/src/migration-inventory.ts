@@ -10,7 +10,7 @@ import type {
   CommerceSqlValue,
 } from "./database.ts";
 
-const TARGET_CONTRACT_REVISION = "satyr.commerce.inventory.v1" as const;
+const TARGET_CONTRACT_REVISION = "pantry.commerce.inventory.v1" as const;
 
 const MERCHANT_TABLES = [
   "location",
@@ -92,7 +92,7 @@ export function readCommerceMigrationInventory(
   });
 
   return {
-    schemaVersion: "underclerk.migration-inventory.v2",
+    schemaVersion: "commerce.migration-inventory.v2",
     organisationId: merchant.organisationId,
     merchantId: merchant.merchantId,
     merchantRevision: merchant.revision,
@@ -856,8 +856,8 @@ function readStorageSchemaVersion(database: CommerceDatabase): number {
 function sourceContractRevision(storageSchemaVersion: number): string {
   if (storageSchemaVersion >= 8) return TARGET_CONTRACT_REVISION;
   return storageSchemaVersion >= 7
-    ? "underclerk.commerce.v1"
-    : "underclerk.legacy-commerce.v1";
+    ? "commerce.commerce.v1"
+    : "commerce.legacy-commerce.v1";
 }
 
 function failure(

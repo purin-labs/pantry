@@ -85,7 +85,7 @@ export type CommercePickupQueueEntryV1 = Static<
 >;
 
 export const commercePickupQueueV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.pickup-queue.v1"),
+  schemaVersion: Type.Literal("commerce.pickup-queue.v1"),
   merchantId: text,
   merchantRevision: Type.Integer({ minimum: 0 }),
   entries: ImmutableArray(commercePickupQueueEntryV1Schema),

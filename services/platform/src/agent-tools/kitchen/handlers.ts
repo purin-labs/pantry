@@ -403,7 +403,7 @@ export async function createSupplierForEmbeddedHarness(
     admittedSessionOperation(
       execution,
       lease,
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
     ),
     {
       kind: "organisation",
@@ -412,7 +412,7 @@ export async function createSupplierForEmbeddedHarness(
     },
   );
   if (client === null) {
-    throw new Error("supplier Underclerk unavailable");
+    throw new Error("supplier Commerce unavailable");
   }
   const integrationAccountId = parseIntegrationAccountId(
     work.prepared.integrationAccountId,
@@ -466,7 +466,7 @@ function recipeSaveRefusal(saved: RecipeSaveResult): string | null {
     return null;
   }
   switch (saved.code) {
-    case "underclerk_unavailable":
+    case "commerce_unavailable":
       throw new Error("recipes unavailable");
     case "recipe_changed":
       return "That recipe changed after you read it, so this save would lose the other change. Nothing changed. Call recipe_read, and tell the person what you see before you save again.";
@@ -491,8 +491,8 @@ function supplierRefusal(error: SupplierRegistrationError): string {
       return `The shop refused this supplier (${error.detail ?? "refused"}). A supplier with this name may exist, or an item may not. Call supplier_read and recipe_read, and tell the person what you see. Do not retry with the same details.`;
     case "unavailable":
     case "email_operational_contact_sync_failed":
-    case "underclerk_scope_mismatch":
-    case "underclerk_projection_refresh_unavailable":
+    case "commerce_scope_mismatch":
+    case "commerce_projection_refresh_unavailable":
       // The directory may hold the supplier. A repeat of this call finishes it.
       throw new Error(`supplier registration: ${error.code}`);
     default:

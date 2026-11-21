@@ -593,7 +593,7 @@ function deliveryExceptionEventFixture(
     payload: {
       orderId: "order_delayed_fixture",
       shipmentId: "shipment_delayed_fixture",
-      trackingNumber: "SATYR-LAB-DELAYED-001",
+      trackingNumber: "PANTRY-LAB-DELAYED-001",
       status: "delivery_exception",
       reason: "weather_delay",
     },

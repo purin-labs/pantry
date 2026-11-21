@@ -175,7 +175,7 @@ export const emailOperationalProposal = defineChannelTool({
   name: "email_operational_propose",
   description:
     "Prepare one plain-text operational email for human approval using the exact Gmail accountRef returned by integration_list. Use an existing Customer or Supplier contact identity and revision from authorized context. A raw address alone is ineligible: ask for an existing contact or explain that it must be registered through the contact workflow. Never invent relationships, contact IDs, revisions or verification. " +
-    "For an explicitly requested self-test to the user's own address, use target {kind: 'self_test', address: '...'}, subject 'Satyr Gmail canary' and body \"This is a synthetic test of Satyr's email drafting and approval workflow. No action is required.\". It creates a temporary test recipient; ownership confirmation and approval remain pending. Never claim ownership was independently verified. " +
+    "For an explicitly requested self-test to the user's own address, use target {kind: 'self_test', address: '...'}, subject 'Pantry Gmail canary' and body \"This is a synthetic test of Pantry's email drafting and approval workflow. No action is required.\". It creates a temporary test recipient; ownership confirmation and approval remain pending. Never claim ownership was independently verified. " +
     "The platform resolves sender and recipient and never sends through this tool. Tell the user to review the conversation's email approval card. Custom connector creation, direct Gmail API calls, mailbox search and inbox activation cannot replace this workflow.",
   input: jsonSchema({
     type: "object",

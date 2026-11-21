@@ -53,7 +53,7 @@ type CommerceProviderCredential =
       accountContext: ActiveProviderAccountContext;
     }>
   | Readonly<{
-      kind: "underclerk";
+      kind: "commerce";
       merchantBinding: CommerceMerchantBinding;
     }>;
 
@@ -177,7 +177,7 @@ export function commerceProjectionRevision(
  */
 export type ConnectedCommerceProviders = {
   readonly [
-    K in Exclude<CommerceSystemKind, "satyr_commerce">
+    K in Exclude<CommerceSystemKind, "builtin_commerce">
   ]: CommerceProvider<K>;
 };
 

@@ -92,7 +92,7 @@ export function parseCommerceGraphQuery(
 
 function validateQueryBounds(query: CommerceGraphQuery): void {
   if (
-    query.kind === "underclerk_context" &&
+    query.kind === "commerce_context" &&
     query.selection.kind === "entity_seeds" &&
     query.selection.seeds.length === 0
   ) {

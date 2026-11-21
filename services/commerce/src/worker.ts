@@ -70,7 +70,7 @@ import { handleMcpRequest, mcpMerchantId } from "./mcp-server.ts";
 
 const SHOP_NAME_OWNER_KEY = "owner";
 
-export class UnderclerkShopNameDO extends DurableObject {
+export class CommerceShopNameDO extends DurableObject {
   /**
    * Takes the name for a storefront, or moves its pointer to the
    * storefront's current name. Another storefront's name stays taken.
@@ -106,13 +106,13 @@ const CUSTOMER_DATA_ROOT_KEY = "customers:data_root_v1";
 const ARCHIVE_INTERVAL_MS = 24 * 60 * 60 * 1_000;
 
 export type Env = Readonly<{
-  UNDERCLERK_MERCHANT: DurableObjectNamespace<UnderclerkMerchantDO>;
+  COMMERCE_MERCHANT: DurableObjectNamespace<CommerceMerchantDO>;
   /** One object for each shop name (Plan 40B phase 2). */
-  UNDERCLERK_SHOP_NAME?: DurableObjectNamespace<UnderclerkShopNameDO>;
-  UNDERCLERK_SERVICE_TOKEN: string;
-  UNDERCLERK_BUYER_SESSION_SECRET: string;
-  UNDERCLERK_SIGNING_KEY_ID: string;
-  UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64: string;
+  COMMERCE_SHOP_NAME?: DurableObjectNamespace<CommerceShopNameDO>;
+  COMMERCE_SERVICE_TOKEN: string;
+  COMMERCE_BUYER_SESSION_SECRET: string;
+  COMMERCE_SIGNING_KEY_ID: string;
+  COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64: string;
   JAPAN_CARRIER_SIGNING_KEY: string;
   /**
    * The standalone shop site that took over the pages Commerce served
@@ -148,7 +148,7 @@ export type Env = Readonly<{
   SQUARE_OAUTH_CLIENT_SECRET?: string;
 }>;
 
-export class UnderclerkMerchantDO extends DurableObject<Env> {
+export class CommerceMerchantDO extends DurableObject<Env> {
   readonly #database: DurableObjectCommerceDatabase;
   readonly #env: Env;
   readonly #access: ApiAccess;
@@ -164,7 +164,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
     initializeCommerceSchema(this.#database, this.now());
     this.#access = new ApiAccess({
       database: this.#database,
-      operatorToken: env.UNDERCLERK_SERVICE_TOKEN,
+      operatorToken: env.COMMERCE_SERVICE_TOKEN,
       now: () => this.now(),
     });
     this.#stripeAccounts = this.#connectStripe(env);
@@ -181,7 +181,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
         now: () => this.now(),
       });
     } catch (error) {
-      console.warn("underclerk.stripe_unconfigured", errorMessage(error));
+      console.warn("commerce.stripe_unconfigured", errorMessage(error));
       return undefined;
     }
   }
@@ -202,7 +202,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
         now: () => this.now(),
       });
     } catch (error) {
-      console.warn("underclerk.stripe_unconfigured", errorMessage(error));
+      console.warn("commerce.stripe_unconfigured", errorMessage(error));
       return undefined;
     }
   }
@@ -251,7 +251,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
     let cursor = typeof stored === "string" ? stored : null;
     while (true) {
       const batch = migrateOutboxSignatures(this.#database, signer, cursor);
-      console.info("underclerk.outbox_signing_migration", batch);
+      console.info("commerce.outbox_signing_migration", batch);
       await this.ctx.storage.put(
         key,
         batch.kind === "complete" ? "complete" : batch.afterDeliveryId,
@@ -315,7 +315,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
       await this.#runDueWork(api);
       await this.#archiveDaily(api);
     } catch (error) {
-      console.warn("underclerk.alarm_delivery_failed", errorMessage(error));
+      console.warn("commerce.alarm_delivery_failed", errorMessage(error));
     }
   }
 
@@ -333,7 +333,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
         await api.runArchive(merchantIds);
         await this.ctx.storage.put(ARCHIVE_LAST_RUN_KEY, Date.now());
       } catch (error) {
-        console.warn("underclerk.archive_failed", errorMessage(error));
+        console.warn("commerce.archive_failed", errorMessage(error));
       }
     }
     const next = Date.now() + ARCHIVE_INTERVAL_MS;
@@ -351,7 +351,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
     try {
       next = await api.runDueWork();
     } catch (error) {
-      console.warn("underclerk.due_work_failed", errorMessage(error));
+      console.warn("commerce.due_work_failed", errorMessage(error));
       return;
     }
     if (next === null) return;
@@ -496,7 +496,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
     return new CommerceHttpApi({
       authority,
       buyerSessions: new BuyerSessionAuthority({
-        secret: this.#env.UNDERCLERK_BUYER_SESSION_SECRET,
+        secret: this.#env.COMMERCE_BUYER_SESSION_SECRET,
         now,
       }),
       addressValidations: new ShippingAddressValidationService({
@@ -505,7 +505,7 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
         now,
         validitySeconds: 1_800,
       }),
-      serviceToken: this.#env.UNDERCLERK_SERVICE_TOKEN,
+      serviceToken: this.#env.COMMERCE_SERVICE_TOKEN,
       access: this.#access,
       feedConsumers: new FeedConsumers({ database: this.#database, now }),
       ...(this.#stripeAccounts === undefined
@@ -521,12 +521,12 @@ export class UnderclerkMerchantDO extends DurableObject<Env> {
         now,
       }),
       webhooks: new FetchWebhookSender(),
-      ...(this.#env.UNDERCLERK_SHOP_NAME === undefined
+      ...(this.#env.COMMERCE_SHOP_NAME === undefined
         ? {}
         : {
             shopNames: merchantShopNameRegistry(
               this.ctx.storage,
-              this.#env.UNDERCLERK_SHOP_NAME,
+              this.#env.COMMERCE_SHOP_NAME,
               (event, detail) => console.warn(event, detail),
             ),
           }),
@@ -558,7 +558,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     if (url.pathname === "/health" && request.method === "GET") {
-      return jsonResponse(200, { ok: true, service: "underclerk" });
+      return jsonResponse(200, { ok: true, service: "commerce" });
     }
     // Commerce serves no pages. An old shop link opens the shop site.
     if (
@@ -587,9 +587,9 @@ export default {
       buyerRoute?.kind === "create_buyer_session"
     ) {
       const options = {
-        sessionSecret: env.UNDERCLERK_BUYER_SESSION_SECRET,
-        serviceToken: env.UNDERCLERK_SERVICE_TOKEN,
-        merchantObject: env.UNDERCLERK_MERCHANT.getByName(
+        sessionSecret: env.COMMERCE_BUYER_SESSION_SECRET,
+        serviceToken: env.COMMERCE_SERVICE_TOKEN,
+        merchantObject: env.COMMERCE_MERCHANT.getByName(
           merchantObjectName(buyerRoute.merchantId),
         ),
       };
@@ -610,7 +610,7 @@ export default {
     const merchantId = parseMerchantId(url.pathname);
     if (merchantId === undefined)
       return jsonResponse(404, { message: "Route not found" });
-    return env.UNDERCLERK_MERCHANT.getByName(
+    return env.COMMERCE_MERCHANT.getByName(
       merchantObjectName(merchantId),
     ).fetch(request);
   },
@@ -619,7 +619,7 @@ export default {
 // A shop site asks which storefront a name opens. A name that no shop holds
 // answers 404, as an unknown name of any form does.
 async function readShopName(env: Env, raw: string): Promise<Response> {
-  if (env.UNDERCLERK_SHOP_NAME === undefined)
+  if (env.COMMERCE_SHOP_NAME === undefined)
     return jsonResponse(503, { message: "Shop names are unavailable" });
   let name: string;
   try {
@@ -627,7 +627,7 @@ async function readShopName(env: Env, raw: string): Promise<Response> {
   } catch {
     return jsonResponse(404, { message: "Shop not found" });
   }
-  const found = await lookUpShopName(env.UNDERCLERK_SHOP_NAME, name);
+  const found = await lookUpShopName(env.COMMERCE_SHOP_NAME, name);
   if (found === undefined)
     return jsonResponse(404, { message: "Shop not found" });
   const response = jsonResponse(200, found);
@@ -642,14 +642,14 @@ class Ed25519WorkerSigner implements CommerceSigner {
 
   constructor(env: Env) {
     this.keyId = requireText(
-      env.UNDERCLERK_SIGNING_KEY_ID,
-      "UNDERCLERK_SIGNING_KEY_ID",
+      env.COMMERCE_SIGNING_KEY_ID,
+      "COMMERCE_SIGNING_KEY_ID",
     );
     this.#privateKey = createPrivateKey({
       key: Buffer.from(
         requireText(
-          env.UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64,
-          "UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64",
+          env.COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64,
+          "COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64",
         ),
         "base64url",
       ),
@@ -664,7 +664,7 @@ class Ed25519WorkerSigner implements CommerceSigner {
       publicJwk.crv !== "Ed25519" ||
       publicJwk.x === undefined
     ) {
-      throw new Error("Underclerk signing key must be Ed25519");
+      throw new Error("Commerce signing key must be Ed25519");
     }
     this.publicKeyB64 = publicJwk.x;
   }
@@ -674,7 +674,7 @@ class Ed25519WorkerSigner implements CommerceSigner {
   }
 }
 
-// Stripe's Connect notifications. A notification of an Commerce payment
+// Stripe's Connect notifications. A notification of a Commerce payment
 // asks that merchant's object to settle the attempt; the object reads the
 // payment from Stripe. Any failure answers 500, so Stripe sends it again.
 export async function stripeWebhook(
@@ -683,8 +683,8 @@ export async function stripeWebhook(
     Env,
     | "STRIPE_WEBHOOK_SECRET"
     | "STRIPE_SECRET_KEY"
-    | "UNDERCLERK_MERCHANT"
-    | "UNDERCLERK_SERVICE_TOKEN"
+    | "COMMERCE_MERCHANT"
+    | "COMMERCE_SERVICE_TOKEN"
   >,
   // Stripe's API; a journey passes its own.
   stripeFetch?: typeof fetch,
@@ -708,14 +708,14 @@ export async function stripeWebhook(
   const merchant = encodeURIComponent(notification.merchantId);
   const attempt = encodeURIComponent(notification.paymentAttemptId);
   try {
-    const settled = await env.UNDERCLERK_MERCHANT.getByName(
+    const settled = await env.COMMERCE_MERCHANT.getByName(
       merchantObjectName(notification.merchantId),
     ).fetch(
       new Request(
-        `https://underclerk.internal/v1/internal/merchants/${merchant}/payment-attempts/${attempt}/settlement`,
+        `https://commerce.internal/v1/internal/merchants/${merchant}/payment-attempts/${attempt}/settlement`,
         {
           method: "POST",
-          headers: { authorization: `Bearer ${env.UNDERCLERK_SERVICE_TOKEN}` },
+          headers: { authorization: `Bearer ${env.COMMERCE_SERVICE_TOKEN}` },
         },
       ),
     );
@@ -725,12 +725,12 @@ export async function stripeWebhook(
       ? jsonResponse(500, { message: "Settlement conflict" })
       : jsonResponse(200, { received: true });
   } catch (error) {
-    console.warn("underclerk.stripe_webhook_failed", errorMessage(error));
+    console.warn("commerce.stripe_webhook_failed", errorMessage(error));
     return jsonResponse(500, { message: "Settlement failed" });
   }
 }
 
-// A dispute of an Commerce payment goes to the merchant whose metadata the
+// A dispute of a Commerce payment goes to the merchant whose metadata the
 // PaymentIntent carries. A PaymentIntent without it is not Commerce's, and
 // its dispute is acknowledged and left alone. A refused
 // dispute cannot change on a retry, so it is acknowledged with a warning.
@@ -743,7 +743,7 @@ async function stripeDispute(
   body: string,
   env: Pick<
     Env,
-    "STRIPE_SECRET_KEY" | "UNDERCLERK_MERCHANT" | "UNDERCLERK_SERVICE_TOKEN"
+    "STRIPE_SECRET_KEY" | "COMMERCE_MERCHANT" | "COMMERCE_SERVICE_TOKEN"
   >,
   stripeFetch: typeof fetch | undefined,
 ): Promise<Response> {
@@ -763,20 +763,20 @@ async function stripeDispute(
     intent.kind === "ok" && isRecord(intent.body.metadata)
       ? intent.body.metadata
       : {};
-  const merchantId = metadata.underclerk_merchant_id;
-  const paymentAttemptId = metadata.underclerk_payment_attempt_id;
+  const merchantId = metadata.commerce_merchant_id;
+  const paymentAttemptId = metadata.commerce_payment_attempt_id;
   if (typeof merchantId !== "string" || typeof paymentAttemptId !== "string")
     return jsonResponse(200, { received: true });
   try {
-    const observed = await env.UNDERCLERK_MERCHANT.getByName(
+    const observed = await env.COMMERCE_MERCHANT.getByName(
       merchantObjectName(merchantId),
     ).fetch(
       new Request(
-        `https://underclerk.internal/v1/internal/merchants/${encodeURIComponent(merchantId)}/payment-attempts/${encodeURIComponent(paymentAttemptId)}/stripe-disputes`,
+        `https://commerce.internal/v1/internal/merchants/${encodeURIComponent(merchantId)}/payment-attempts/${encodeURIComponent(paymentAttemptId)}/stripe-disputes`,
         {
           method: "POST",
           headers: {
-            authorization: `Bearer ${env.UNDERCLERK_SERVICE_TOKEN}`,
+            authorization: `Bearer ${env.COMMERCE_SERVICE_TOKEN}`,
             "content-type": "application/json",
           },
           body,
@@ -787,13 +787,13 @@ async function stripeDispute(
     const result: unknown = await observed.json();
     if (isRecord(result) && result.outcome === "rejected")
       console.warn(
-        "underclerk.stripe_dispute_refused",
+        "commerce.stripe_dispute_refused",
         notification.eventId,
         JSON.stringify(result.error),
       );
     return jsonResponse(200, { received: true });
   } catch (error) {
-    console.warn("underclerk.stripe_dispute_failed", errorMessage(error));
+    console.warn("commerce.stripe_dispute_failed", errorMessage(error));
     return jsonResponse(500, { message: "Dispute failed" });
   }
 }

@@ -647,7 +647,7 @@ async function resolveGrantTargetSelection(
         db: scope.database,
         organisationId: scope.organisationId,
       });
-      if (!authority.ok || authority.value.provider !== "underclerk") {
+      if (!authority.ok || authority.value.provider !== "commerce") {
         return { ok: false, error: "access_grant_target_unavailable" };
       }
       return {
@@ -670,7 +670,7 @@ async function resolveGrantTargetSelection(
         db: scope.database,
         organisationId: scope.organisationId,
       });
-      if (!authority.ok || authority.value.provider !== "underclerk")
+      if (!authority.ok || authority.value.provider !== "commerce")
         return { ok: false, error: "access_grant_target_unavailable" };
       const listId = commerceAccessTargets
         .use()
@@ -776,7 +776,7 @@ async function resolveGrantTargetSelection(
         // A Pantry Commerce proposal grant names one published record, or the
         // whole shop when an agent's permission request asks for it.
         if (
-          (authority.value.provider === "underclerk" &&
+          (authority.value.provider === "commerce" &&
             resourceScope !== "*") ||
           authority.value.integrationAccountId !== integrationAccountId
         ) {
@@ -906,7 +906,7 @@ async function validateGrantTarget(
         });
         if (
           authority.ok &&
-          authority.value.provider === "underclerk" &&
+          authority.value.provider === "commerce" &&
           authority.value.integrationAccountId === target.integrationAccountId
         ) {
           return { ok: true, value: target };

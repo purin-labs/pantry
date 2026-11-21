@@ -1,6 +1,6 @@
-"""Run the pâtisserie storefront journey against a local Underclerk.
+"""Run the pâtisserie storefront journey against a local Commerce.
 
-The runner starts Underclerk on a free port with fresh storage (the storefront
+The runner starts Commerce on a free port with fresh storage (the storefront
 proxies /v1 there), seeds the local café merchant, runs the pâtisserie menu setup two
 times (a second run must leave one menu of twenty-four items), starts the
 storefront as shop.seams.tokyo builds it, and drives it with the Playwright
@@ -21,7 +21,7 @@ import urllib.request
 import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
-UNDERCLERK = ROOT / "services/commerce"
+COMMERCE = ROOT / "services/commerce"
 ARTIFACTS = ROOT / "output/playwright/patisserie-storefront"
 MERCHANT = "merchant_nuki_cafe_demo"
 
@@ -45,11 +45,11 @@ def node_script(script: str, arguments: list[str], env: dict[str, str]) -> str:
         [
             "node",
             "--experimental-strip-types",
-            f"--env-file={UNDERCLERK / '.dev.vars.local'}",
-            str(UNDERCLERK / "scripts" / script),
+            f"--env-file={COMMERCE / '.dev.vars.local'}",
+            str(COMMERCE / "scripts" / script),
             *arguments,
         ],
-        cwd=UNDERCLERK,
+        cwd=COMMERCE,
         env=env,
         capture_output=True,
         text=True,
@@ -101,34 +101,34 @@ def main() -> None:
     )
     args = parser.parse_args()
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
-    if not (UNDERCLERK / ".dev.vars.local").exists():
+    if not (COMMERCE / ".dev.vars.local").exists():
         raise SystemExit("services/commerce/.dev.vars.local is missing")
     run_id = uuid.uuid4().hex[:8]
     port = free_port()
-    underclerk = subprocess.Popen(
+    commerce = subprocess.Popen(
         [
             "pnpm", "exec", "wrangler", "dev", "--local", "--env", "local",
             "--persist-to", tempfile.mkdtemp(prefix=f"patisserie-{run_id}-"),
             "--port", str(port), "--inspector-port", str(free_port()),
-            # Its own Worker name: under the name "underclerk" this run would
-            # replace the developer's Underclerk in the shared dev registry
+            # Its own Worker name: under the name "commerce" this run would
+            # replace the developer's Commerce in the shared dev registry
             # and, when it stops, leave the local Platform without one.
-            "--name", f"underclerk-journey-{run_id}",
+            "--name", f"commerce-journey-{run_id}",
         ],
-        cwd=UNDERCLERK,
+        cwd=COMMERCE,
         start_new_session=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     try:
-        wait_ready(f"http://127.0.0.1:{port}/health", underclerk)
+        wait_ready(f"http://127.0.0.1:{port}/health", commerce)
         run_journey(args.cli, run_id, f"http://127.0.0.1:{port}")
     finally:
-        stop(underclerk)
+        stop(commerce)
 
 
-def run_journey(cli: Path, run_id: str, underclerk: str) -> None:
-    env = {**os.environ, "UNDERCLERK_BASE_URL": underclerk}
+def run_journey(cli: Path, run_id: str, commerce: str) -> None:
+    env = {**os.environ, "COMMERCE_BASE_URL": commerce}
     node_script("seed-local-commerce.ts", [], env)
     # The first run also makes the listed prices include 8% tax.
     runs = [
@@ -143,7 +143,7 @@ def run_journey(cli: Path, run_id: str, underclerk: str) -> None:
     ]
     if any(run["items"] != 24 for run in runs):
         raise RuntimeError(f"The menu setup did not publish 24 items: {runs}")
-    # Guest sessions come from a catalog snapshot that Underclerk keeps for
+    # Guest sessions come from a catalog snapshot that Commerce keeps for
     # 5 s, so a session in that time would still pin the old storefront.
     time.sleep(6)
 
@@ -157,7 +157,7 @@ def run_journey(cli: Path, run_id: str, underclerk: str) -> None:
         env={
             **os.environ,
             "VITE_SHOP_MERCHANT_ID": MERCHANT,
-            "STOREFRONT_UNDERCLERK_ORIGIN": underclerk,
+            "STOREFRONT_COMMERCE_ORIGIN": commerce,
         },
         start_new_session=True,
         stdout=subprocess.DEVNULL,
@@ -176,7 +176,7 @@ def run_journey(cli: Path, run_id: str, underclerk: str) -> None:
         journey = journey.replace("JOURNEY_ARTIFACTS", json.dumps(str(ARTIFACTS)))
         output = run_cli(cli, session, ["run-code", journey], "journey")
         evidence = {
-            "backend": "local Underclerk Worker with its own storage",
+            "backend": "local Commerce Worker with its own storage",
             "site": "the storefront built as shop.seams.tokyo builds it",
             "menuSetup": runs,
             "journey": result_json(output),

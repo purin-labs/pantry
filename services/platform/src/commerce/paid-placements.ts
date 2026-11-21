@@ -41,17 +41,17 @@ export function paidPlacementConnectorDelivery(
   const orderId = input.placement.order.provenance.resourceId;
   const identity = `${input.providerDeliveryId}:${orderId}`;
   return {
-    deliveryId: `underclerk_paid_placement_${identity}`,
-    bindingId: `underclerk_paid_placement_binding_${identity}`,
+    deliveryId: `commerce_paid_placement_${identity}`,
+    bindingId: `commerce_paid_placement_binding_${identity}`,
     address: {
       kind: "slack_channel",
       workspaceId: input.destination.workspaceId,
       channelId: input.destination.channelId,
     },
-    caseId: `underclerk_paid_placement_case_${identity}`,
+    caseId: `commerce_paid_placement_case_${identity}`,
     caseRevision: 1,
     content: { kind: "text", text: paidPlacementReceiptText(input.placement) },
-    idempotencyKey: `underclerk_paid_placement:${identity}`,
+    idempotencyKey: `commerce_paid_placement:${identity}`,
     addressedAt: input.addressedAt,
   };
 }

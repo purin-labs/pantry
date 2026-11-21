@@ -109,7 +109,7 @@ describe("terminal operations control routes", function terminalControlSuite() {
     terminalControlMocks.resolveOrganisationCommerceMerchantBinding.mockResolvedValue(
       {
         ok: false,
-        error: { code: "underclerk_binding_not_found" },
+        error: { code: "commerce_binding_not_found" },
       },
     );
     terminalControlMocks.createCommerceClient.mockReturnValue(null);
@@ -124,7 +124,7 @@ describe("terminal operations control routes", function terminalControlSuite() {
     });
     const response = await handleControlRequest(
       new Request(ROUTE, {
-        headers: { cookie: "satyr_control_session=session-terminal" },
+        headers: { cookie: "pantry_session=session-terminal" },
       }),
       env(),
     );
@@ -132,10 +132,10 @@ describe("terminal operations control routes", function terminalControlSuite() {
     expect(await response.json()).toMatchObject({
       ok: true,
       terminalOperations: {
-        schemaVersion: "satyr.terminal-operations.v2",
+        schemaVersion: "pantry.terminal-operations.v2",
         counters: [
           {
-            satyrLocationId: "pantry_location_1",
+            pantryLocationId: "pantry_location_1",
             blockedReason: null,
             paymentsLinked: false,
             assignment: { deviceId: "device_1", revision: 1 },
@@ -149,7 +149,7 @@ describe("terminal operations control routes", function terminalControlSuite() {
     const response = await handleControlRequest(
       new Request(ROUTE, {
         method: "PUT",
-        headers: { cookie: "satyr_control_session=session-terminal" },
+        headers: { cookie: "pantry_session=session-terminal" },
       }),
       env(),
     );
@@ -190,8 +190,8 @@ function retirementRequest(): Request {
     headers: {
       origin: "https://pantry.example",
       cookie:
-        "satyr_control_session=session-terminal; satyr_control_csrf=csrf-terminal",
-      "x-satyr-csrf": "csrf-terminal",
+        "pantry_session=session-terminal; pantry_csrf=csrf-terminal",
+      "x-pantry-csrf": "csrf-terminal",
       "idempotency-key": "terminal-retirement-test",
       "content-type": "application/json",
     },
@@ -214,7 +214,7 @@ function assignment(
     assignmentId: "terminal_assignment_1",
     organisationId: ORGANISATION_ID,
     merchantId: "merchant_1",
-    satyrLocationId: "pantry_location_1",
+    pantryLocationId: "pantry_location_1",
     account: {
       integrationAccountId: "integration_square",
       providerAccountId: "merchant_square",

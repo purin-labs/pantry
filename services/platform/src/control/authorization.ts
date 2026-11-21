@@ -17,10 +17,10 @@ import { parseOrganisationId, type OrganisationId } from "../ids";
 import { requirePublicOrigin } from "../public-origin";
 import { controlError } from "./http";
 
-export const SESSION_COOKIE = "satyr_control_session";
-export const CSRF_COOKIE = "satyr_control_csrf";
-const CSRF_HEADER = "x-satyr-csrf";
-export const APPROVAL_GRANT_COOKIE = "satyr_control_approval";
+export const SESSION_COOKIE = "pantry_session";
+export const CSRF_COOKIE = "pantry_csrf";
+const CSRF_HEADER = "x-pantry-csrf";
+export const APPROVAL_GRANT_COOKIE = "pantry_approval";
 
 export type AuthenticatedControlRequest = {
   readonly session: ActiveControlSession;

@@ -19,7 +19,7 @@ type CommerceProviders = { [K in CommerceSystemKind]: CommerceProvider<K> };
 // which imports this list.
 function commerceProviders(): CommerceProviders {
   return {
-    satyr_commerce: builtInCommerceProvider,
+    builtin_commerce: builtInCommerceProvider,
     ...connectedCommerceProviders.use(),
   };
 }

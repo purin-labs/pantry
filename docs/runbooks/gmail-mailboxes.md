@@ -2,7 +2,7 @@
 
 Status: Active operational runbook
 
-Satyr connects an organisation Gmail mailbox to one assigned agent. Inbound mail is
+Pantry connects an organisation Gmail mailbox to one assigned agent. Inbound mail is
 admitted as a Case, answered by a transient agent turn, and delivered only
 after an operator approves an exact snapshot. This runbook covers deployment
 configuration, the signals to alert on, and every recovery path.
@@ -61,7 +61,7 @@ watch call fails outright.
 5. Each admitted thread runs one transient Cue turn. Irrelevant mail closes
    without a reply; routine mail can send immediately; sensitive or uncertain
    mail receives the fixed acknowledgement and a visible substantive draft.
-6. An operator approves a reviewed snapshot; Satyr sends it once with a
+6. An operator approves a reviewed snapshot; Pantry sends it once with a
    deterministic dispatch Message-ID and deletes the proposal draft.
 
 Push notifications are hints. Losing one costs latency, never correctness: the
@@ -183,7 +183,7 @@ is no quarantine state to drain.
 ## Revocation
 
 Revoking a mailbox stops processing, fences pending sends, attempts to delete
-every outstanding Satyr-created draft, and revokes the stored credential.
+every outstanding Pantry-created draft, and revokes the stored credential.
 Drafts that cannot be deleted remain in Gmail and report as cleanup needed.
 Limited audit metadata is retained under the workspace retention policy.
 

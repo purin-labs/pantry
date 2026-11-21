@@ -1553,7 +1553,7 @@ export class ChatOrganizer extends React.Component<Props, State> {
 
 function readOrganizerTab(organisationId: string): State["tab"] {
   try {
-    return sessionStorage.getItem(`satyr:chat-tab:${organisationId}`) === "archived"
+    return sessionStorage.getItem(`pantry:chat-tab:${organisationId}`) === "archived"
       ? "archived"
       : "chats";
   } catch {
@@ -1562,7 +1562,7 @@ function readOrganizerTab(organisationId: string): State["tab"] {
 }
 function rememberOrganizerTab(organisationId: string, tab: State["tab"]): void {
   try {
-    sessionStorage.setItem(`satyr:chat-tab:${organisationId}`, tab);
+    sessionStorage.setItem(`pantry:chat-tab:${organisationId}`, tab);
   } catch {
     // Storage restrictions do not prevent switching tabs in the open panel.
   }

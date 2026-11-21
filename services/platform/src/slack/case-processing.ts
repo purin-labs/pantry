@@ -259,11 +259,11 @@ function slackOperatorMayConfigure(role: string): boolean {
 
 /** Where the operator can see the same setup in the Portal. */
 function portalAgentsUrl(env: Env, organisationId: string): string {
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/satyr/${encodeURIComponent(organisationId)}/agents`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/pantry/${encodeURIComponent(organisationId)}/agents`;
 }
 
 function portalCustomConnectorUrl(env: Env, organisationId: string): string {
-  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/satyr/${encodeURIComponent(organisationId)}/chat`;
+  return `${requirePublicOrigin(env.PANTRY_PUBLIC_ORIGIN)}/portal/pantry/${encodeURIComponent(organisationId)}/chat`;
 }
 
 function portalEmailReviewUrl(

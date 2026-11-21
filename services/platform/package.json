@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Cloudflare-native Satyr platform and control plane.",
+  "description": "Cloudflare-native Pantry platform and control plane.",
   "scripts": {
     "check:types": "pnpm contracts:media && pnpm actions:check && tsrs --noEmit",
     "check:test-types": "tsrs -p tsconfig.tests.json && tsrs -p tsconfig.e2e.json",

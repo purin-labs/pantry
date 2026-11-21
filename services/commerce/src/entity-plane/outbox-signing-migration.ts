@@ -44,7 +44,7 @@ export function migrateOutboxSignatures(
        outbox.merchant_revision AS merchantRevision, merchant.external_reference AS organisationId,
        outbox.delivery_json AS deliveryJson, outbox.status
      FROM observation_outbox AS outbox JOIN merchant USING (merchant_id)
-     WHERE (outbox.status = 'pending' OR (outbox.status = 'rejected' AND outbox.rejected_reason = 'underclerk_delivery_signature_invalid'))
+     WHERE (outbox.status = 'pending' OR (outbox.status = 'rejected' AND outbox.rejected_reason = 'commerce_delivery_signature_invalid'))
        AND (? IS NULL OR outbox.delivery_id > ?)
      ORDER BY outbox.delivery_id LIMIT 100`,
     )
@@ -55,7 +55,7 @@ export function migrateOutboxSignatures(
     if (outcome === "quarantined" && row.status === "pending") {
       const retired = database
         .prepare(
-          `UPDATE observation_outbox SET status = 'rejected', rejected_at = ?, rejected_reason = 'underclerk_delivery_signature_invalid'
+          `UPDATE observation_outbox SET status = 'rejected', rejected_at = ?, rejected_reason = 'commerce_delivery_signature_invalid'
          WHERE delivery_id = ? AND delivery_json = ? AND status = 'pending'`,
         )
         .run(new Date().toISOString(), row.deliveryId, row.deliveryJson);
@@ -87,7 +87,7 @@ function migrateDelivery(
       delivery.deliveryId !== row.deliveryId ||
       delivery.merchantId !== row.merchantId ||
       // Version 1 also named its owner (Plan 80 step 2).
-      (delivery.schemaVersion === "underclerk.commerce-delivery.v1" &&
+      (delivery.schemaVersion === "commerce.commerce-delivery.v1" &&
         delivery.organisationId !== row.organisationId) ||
       delivery.merchantRevision !== row.merchantRevision ||
       delivery.signer.keyId !== signer.keyId

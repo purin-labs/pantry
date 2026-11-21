@@ -106,10 +106,10 @@ export function constructCommerceQuery(
         limit: 500,
         cursor: null,
       };
-    case "underclerk_context":
+    case "commerce_context":
       return {
         operation: {
-          kind: "underclerk_context",
+          kind: "commerce_context",
           selection: query.selection,
           traversal: query.traversal,
           allowedSensitivity: query.allowedSensitivity,

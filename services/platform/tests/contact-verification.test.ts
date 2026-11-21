@@ -123,7 +123,7 @@ async function fixture() {
     provider: "gmail",
     providerSubjectId: "contact-mailbox",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authorizationProduct: "send_only",
     authority: {
       kind: "connection_credential",
@@ -154,7 +154,7 @@ async function fixture() {
     db,
     organisationId: organisation.organisationId,
     integrationAccountId: connected.account.integrationAccountId,
-    bindingId: "underclerk_binding_contacts",
+    bindingId: "commerce_binding_contacts",
     merchantId: "merchant_contacts",
     environment: "development",
     deliverySigningKeyId: "key_contact_fixture",
@@ -523,8 +523,8 @@ async function controlsPublication(): Promise<void> {
   const headers = {
     origin: "https://pantry.example",
     "content-type": "application/json",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
   };
   const noCsrf = new Request(url, {
     method: "POST",
@@ -564,8 +564,8 @@ async function controlsPublication(): Promise<void> {
     method: "POST",
     headers: {
       origin: headers.origin,
-      cookie: `satyr_control_session=${outsiderSession.token}; satyr_control_csrf=${outsiderSession.csrfToken}`,
-      "x-satyr-csrf": outsiderSession.csrfToken,
+      cookie: `pantry_session=${outsiderSession.token}; pantry_csrf=${outsiderSession.csrfToken}`,
+      "x-pantry-csrf": outsiderSession.csrfToken,
     },
     body: JSON.stringify({
       kind: "revoke",

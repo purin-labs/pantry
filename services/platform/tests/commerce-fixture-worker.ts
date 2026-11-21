@@ -47,9 +47,9 @@ export type CommerceWorker = Readonly<{
 
 /** The directory of the built fixture Worker; builds it when the sources changed. */
 export function commerceFixtureWorkerArtifact(): string {
-  const configured = process.env.UNDERCLERK_FIXTURE_WORKER_ARTIFACT;
+  const configured = process.env.COMMERCE_FIXTURE_WORKER_ARTIFACT;
   if (configured !== undefined && configured !== "") return resolve(configured);
-  const cache = join(tmpdir(), "satyr-underclerk-fixture-worker", sourceKey());
+  const cache = join(tmpdir(), "pantry-commerce-fixture-worker", sourceKey());
   if (existsSync(join(cache, "worker.js"))) return cache;
   const building = `${cache}.building-${process.pid}-${Date.now()}`;
   mkdirSync(dirname(cache), { recursive: true });
@@ -71,7 +71,7 @@ export async function startCommerceWorker(options: CommerceWorkerOptions = {}): 
     compatibilityDate: string;
     compatibilityFlags: string[];
   };
-  const serviceToken = options.serviceToken ?? "underclerk-fixture-service-token";
+  const serviceToken = options.serviceToken ?? "commerce-fixture-service-token";
   const signingKey = options.signingKey ?? generatedSigningKey();
   const miniflare = new Miniflare({
     modules: true,
@@ -81,16 +81,16 @@ export async function startCommerceWorker(options: CommerceWorkerOptions = {}): 
     compatibilityDate: settings.compatibilityDate,
     compatibilityFlags: settings.compatibilityFlags,
     durableObjects: {
-      UNDERCLERK_MERCHANT: { className: "CommerceFixtureMerchantDO", useSQLite: true },
+      COMMERCE_MERCHANT: { className: "CommerceFixtureMerchantDO", useSQLite: true },
     },
     bindings: {
       PANTRY_DEPLOYMENT_PROFILE: "local",
-      UNDERCLERK_SERVICE_TOKEN: serviceToken,
-      UNDERCLERK_BUYER_SESSION_SECRET: "underclerk-fixture-buyer-session-secret-0001",
-      UNDERCLERK_SIGNING_KEY_ID: signingKey.keyId,
-      UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64: signingKey.privateKeyPkcs8B64,
-      JAPAN_CARRIER_SIGNING_KEY: options.carrierSigningKey ?? "underclerk-fixture-carrier-key",
-      ...(options.now === undefined ? {} : { UNDERCLERK_FIXTURE_NOW: options.now }),
+      COMMERCE_SERVICE_TOKEN: serviceToken,
+      COMMERCE_BUYER_SESSION_SECRET: "commerce-fixture-buyer-session-secret-0001",
+      COMMERCE_SIGNING_KEY_ID: signingKey.keyId,
+      COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64: signingKey.privateKeyPkcs8B64,
+      JAPAN_CARRIER_SIGNING_KEY: options.carrierSigningKey ?? "commerce-fixture-carrier-key",
+      ...(options.now === undefined ? {} : { COMMERCE_FIXTURE_NOW: options.now }),
     },
   });
   const baseUrl = (await miniflare.ready).origin;
@@ -111,7 +111,7 @@ export async function startCommerceWorker(options: CommerceWorkerOptions = {}): 
   const publicKey = await fetch(`${baseUrl}/v1/admin/merchants/fixture_signing_key/test-signing-key`, {
     headers: { authorization: `Bearer ${serviceToken}` },
   });
-  if (!publicKey.ok) throw new Error(`Underclerk fixture Worker did not start: ${publicKey.status}`);
+  if (!publicKey.ok) throw new Error(`Commerce fixture Worker did not start: ${publicKey.status}`);
   const { publicKeyB64 } = (await publicKey.json()) as { publicKeyB64: string };
   return {
     baseUrl,
@@ -126,7 +126,7 @@ export async function startCommerceWorker(options: CommerceWorkerOptions = {}): 
         body: JSON.stringify(input),
       });
       const result: unknown = await response.json();
-      if (!response.ok) throw new Error(`Underclerk fixture ${input.kind} failed: ${JSON.stringify(result)}`);
+      if (!response.ok) throw new Error(`Commerce fixture ${input.kind} failed: ${JSON.stringify(result)}`);
       return result as never;
     },
     dispose: () => miniflare.dispose(),
@@ -136,7 +136,7 @@ export async function startCommerceWorker(options: CommerceWorkerOptions = {}): 
 function generatedSigningKey(): Readonly<{ keyId: string; privateKeyPkcs8B64: string }> {
   const { privateKey } = generateKeyPairSync("ed25519");
   return {
-    keyId: "key_underclerk_fixture",
+    keyId: "key_commerce_fixture",
     privateKeyPkcs8B64: privateKey.export({ format: "der", type: "pkcs8" }).toString("base64url"),
   };
 }

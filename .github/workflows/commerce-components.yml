@@ -55,7 +55,7 @@ jobs:
         run: pnpm --filter @purin-labs/commerce-contracts commerce-data:check
 
       - name: Check Commerce types
-        run: pnpm underclerk:check
+        run: pnpm commerce:check
 
       - name: Test Commerce
-        run: pnpm underclerk:test
+        run: pnpm commerce:test

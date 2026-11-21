@@ -45,7 +45,7 @@ export async function seedRegionalCanvas(
       .bind(Date.now(), scope.organisationId),
     scope.database
       .prepare(
-        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+        "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
       )
       .bind(scope.organisationId, user.value, Date.now()),
   ]);

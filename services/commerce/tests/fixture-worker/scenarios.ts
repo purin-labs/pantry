@@ -205,8 +205,8 @@ function readMerchantRevision(database: CommerceDatabase, merchantId: string): {
 // client calls the production routes of the same Durable Object.
 function selfClient(context: FixtureScenarioContext): CommerceAdminClient {
   return new CommerceAdminClient({
-    baseUrl: "https://underclerk.fixture",
-    serviceToken: context.env.UNDERCLERK_SERVICE_TOKEN,
+    baseUrl: "https://commerce.fixture",
+    serviceToken: context.env.COMMERCE_SERVICE_TOKEN,
     fetch: (input, init) => context.api(new Request(input, init)),
   });
 }
@@ -245,14 +245,14 @@ const EMPTY_EFFECT_EVIDENCE: EffectEvidence = { mutations: 0, receiptReads: 0, c
 // The Worker's own signing key, for seeds that sign as Commerce does.
 function fixtureSigner(env: Env): CommerceSigner {
   const privateKey = createPrivateKey({
-    key: Buffer.from(env.UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64, "base64url"),
+    key: Buffer.from(env.COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64, "base64url"),
     format: "der",
     type: "pkcs8",
   });
   const jwk = createPublicKey(privateKey).export({ format: "jwk" });
-  if (jwk.x === undefined) throw new Error("Underclerk signing key must be Ed25519");
+  if (jwk.x === undefined) throw new Error("Commerce signing key must be Ed25519");
   return {
-    keyId: env.UNDERCLERK_SIGNING_KEY_ID,
+    keyId: env.COMMERCE_SIGNING_KEY_ID,
     publicKeyB64: jwk.x,
     sign: (payload) => signPayload(null, payload, privateKey).toString("base64url"),
   };

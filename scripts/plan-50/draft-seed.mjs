@@ -93,12 +93,12 @@ export async function seedDraftAuthority(db) {
       ),
       db
         .prepare(
-          "INSERT INTO underclerk_merchant_binding (binding_id, organisation_id, integration_account_id, merchant_id, environment, delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at) VALUES ('underclerk_binding_plan50_draft', ?, ?, ?, 'development', 'fixture-key', 'AA==', 1, ?, ?)",
+          "INSERT INTO commerce_merchant_binding (binding_id, organisation_id, integration_account_id, merchant_id, environment, delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at) VALUES ('commerce_binding_plan50_draft', ?, ?, ?, 'development', 'fixture-key', 'AA==', 1, ?, ?)",
         )
         .bind(organisationId, accountId, merchantId, now, now),
       db
         .prepare(
-          "INSERT INTO organisation_commerce_system (organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id, revision, selected_at, selected_by_user_id) VALUES (?, 'satyr_commerce', 'underclerk_binding_plan50_draft', NULL, 1, ?, ?)",
+          "INSERT INTO organisation_commerce_system (organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id, revision, selected_at, selected_by_user_id) VALUES (?, 'builtin_commerce', 'commerce_binding_plan50_draft', NULL, 1, ?, ?)",
         )
         .bind(organisationId, now, agentUser),
       db

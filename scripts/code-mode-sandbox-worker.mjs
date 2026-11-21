@@ -23,7 +23,7 @@ checkAndDeploy({
   operation,
   environment,
   profile: "wrangler.code-mode-sandbox.jsonc",
-  prefix: "satyr-code-mode-sandbox-",
+  prefix: "pantry-code-sandbox-",
   check: requireSandboxScript,
 });
 

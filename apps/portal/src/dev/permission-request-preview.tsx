@@ -68,7 +68,7 @@ const scopeOptions = [
     label: "Noix de Beurre · Ginza",
     icon: <Store size={14} />,
   },
-  { id: "satyr", label: "Satyr Bakery Group", icon: <Building2 size={14} /> },
+  { id: "pantry", label: "Pantry Bakery Group", icon: <Building2 size={14} /> },
 ];
 
 /** The brand README: dark marks for light surfaces, light marks for dark. */

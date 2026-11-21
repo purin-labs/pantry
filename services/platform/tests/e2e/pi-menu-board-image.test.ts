@@ -117,7 +117,7 @@ it(
       expect(other.status).toBe(404);
       task.meta.menuBoardImage = {
         substituted: ["model provider (deterministic OpenRouter transport)", "Slack (signed events)"],
-        real: ["Pantry Worker, the board room, the media routes and the screen media route", "Underclerk fixture Worker with its R2 store", "screen feed"],
+        real: ["Pantry Worker, the board room, the media routes and the screen media route", "Commerce fixture Worker with its R2 store", "screen feed"],
         viewerUpload: { status: refused.status, body: JSON.parse(refusal) as unknown },
         library: library.filter((image) => image.altText === ALT).map((image) => ({ altText: image.altText, url: image.url !== null })),
         board: ownerPeer.read().elements.map((element) => ({ ...imageView(element), mediaId: "media_…" })),

@@ -1287,7 +1287,7 @@ async function credentialIsAdmissible(
             ? { ok: true, value: true }
             : credentialUnavailable();
         }
-        case "underclerk": {
+        case "commerce": {
           const binding = await resolveCommerceMerchantBinding({
             db,
             organisationId,

@@ -91,7 +91,7 @@ export async function send(
       : commerceHeaders(session);
   if (method !== "GET") {
     headers.set("idempotency-key", idempotencyKey);
-    headers.set("x-satyr-configuration-version", "1");
+    headers.set("x-pantry-configuration-version", "1");
   }
   const response = await exports.default.fetch(url, {
     method,

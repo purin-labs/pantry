@@ -205,7 +205,7 @@ async function editAsPerson(env, personUserId) {
       headers: {
         Upgrade: "websocket",
         Origin: env.PANTRY_PUBLIC_ORIGIN,
-        Cookie: `satyr_control_session=${encodeURIComponent(token)}`,
+        Cookie: `pantry_session=${encodeURIComponent(token)}`,
       },
     }),
     env,

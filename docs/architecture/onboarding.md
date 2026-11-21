@@ -1,6 +1,6 @@
 # Onboarding architecture
 
-This document describes how an Organisation comes into existence in Satyr,
+This document describes how an Organisation comes into existence in Pantry,
 how its members configure it, and how it becomes active. It also covers the
 evidence, diagnostics and reconciliation that keep onboarding state correct.
 Provider authorization, credentials and webhooks are in
@@ -33,9 +33,9 @@ Diagnostics describe state. They never change it.
 | Invitations                       | `organisation_invitation` in the Organisation's regional D1           |
 | Request eligibility               | `OrganisationAccess` (native reads, Plan 95)                          |
 | Organisation lifecycle            | `organisation_onboarding` in the Organisation's regional D1           |
-| Satyr service role of a member    | `service_role_grant`                                                  |
+| Pantry service role of a member    | `service_role_grant`                                                  |
 | Placement (home region and D1)    | `organisation_placement`, resolved by `OrganisationExecutionScope`    |
-| Selected commerce system          | `organisation_commerce_system` (`satyr_commerce` or `shopify`)        |
+| Selected commerce system          | `organisation_commerce_system` (`builtin_commerce` or `shopify`)        |
 | Provider accounts and credentials | `integration_account`, `provider_connection`, Vault (Spec 12)         |
 | Operating policy and cue preset   | Immutable rows in `organisation_setup_snapshot`                       |
 | Readiness                         | `organisation_readiness_assessment`                                   |
@@ -95,7 +95,7 @@ Archive sets `purge_after` to 30 days later and `organisation.status` to
 `organisation_archive_cleanup` and `organisation_archive_tombstone`, and holds
 policy distribution in `POLICY_KV`. The tombstone records the authority. A
 `support_admin` archive needs an active Organisation with no members, no
-Underclerk binding and no active default Shopify account.
+Commerce binding and no active default Shopify account.
 
 Restore returns the Organisation to `configuring` with a new configuration
 version. After the purge starts, restore returns `organisation_purge_started`.
@@ -121,9 +121,9 @@ readiness and activation row carries the environment.
 
 ### Portal session and mutation safety
 
-Satyr owns the control identity, membership, person link and roles. Google
+Pantry owns the control identity, membership, person link and roles. Google
 OIDC proves identity but grants no Organisation authority. The session cookie
-`satyr_control_session` lasts seven days. An Organisation route checks the session, reads the membership
+`pantry_session` lasts seven days. An Organisation route checks the session, reads the membership
 under the regional placement fence, then checks the role rank and the Account
 Platform access
 ([`control/authorization.ts`](../../services/platform/src/control/authorization.ts)).
@@ -131,10 +131,10 @@ A missing membership or a low role returns `404`, so a person cannot probe
 other Organisations.
 
 Every mutation needs an `Origin` equal to `PANTRY_PUBLIC_ORIGIN` and an
-`x-satyr-csrf` header that matches the `satyr_control_csrf` cookie. Rename,
+`x-pantry-csrf` header that matches the `pantry_csrf` cookie. Rename,
 delete, member changes, setup, activate, archive and restore also need an
 `idempotency-key` (8 to 128 characters) and the expected
-`x-satyr-configuration-version`.
+`x-pantry-configuration-version`.
 
 `control_mutation_receipt` keeps the request hash and the response for at
 least 24 hours, keyed by user, Organisation, route, operation and key
@@ -255,8 +255,8 @@ needs every check:
 | A policy snapshot and a cue snapshot                                     | `policy_snapshot_missing`, `cue_snapshot_missing` |
 | The model route resolves                                                 | `runtime_admission_unavailable`                   |
 
-A ready commerce system is Satyr Commerce with an Underclerk binding, or
-Shopify with a live webhook and one Underclerk binding. The checked accounts
+A ready commerce system is Seams Checkout with a Commerce binding, or
+Shopify with a live webhook and one Commerce binding. The checked accounts
 are the Slack destination account and the selected Shopify account. Other
 accounts do not block activation. The stored assessment is a cache. While the lifecycle is `configuring`, a read
 collects the blockers again and stores a new version only when the set
@@ -370,7 +370,7 @@ deletes audit or event rows.
 ### Support references and merchant diagnostics
 
 An activation, provider start or provider attempt failure creates one
-`onboarding_support_reference` row with a random `SATYR-<uuid>` reference. The
+`onboarding_support_reference` row with a random `PANTRY-<uuid>` reference. The
 row links the correlation ID, actor, route, operation, lifecycle before and
 after, provider, redacted provider status, receipts, last successful phase,
 retry classification and occurrence times. The projection shows the newest

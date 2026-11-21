@@ -92,7 +92,7 @@ export function OnePasswordIntegrationPanel(props: {
       return "1Password connected. New Vault items now go to 1Password.";
     });
 
-  const move = (to: "onepassword" | "satyr"): void =>
+  const move = (to: "onepassword" | "pantry"): void =>
     void run(async () => {
       const result = await transport.store(props.organisationId, {
         kind: "move_items",
@@ -147,7 +147,7 @@ export function OnePasswordIntegrationPanel(props: {
             : "1Password is not connected."}{" "}
           An owner or admin manages this connection.
         </p>
-      ) : state.list.store.kind === "satyr" ? (
+      ) : state.list.store.kind === "pantry" ? (
         <ConnectForm
           token={draft.token}
           vaults={draft.vaults}

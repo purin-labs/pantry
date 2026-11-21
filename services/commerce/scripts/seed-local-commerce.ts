@@ -14,7 +14,7 @@ import {
 import { rebuildPhase3Cafe } from "./rebuild-plan22-phase3-cafe.ts";
 import { clientFailure, isMainModule } from "./merchant-script.ts";
 
-const BASE_URL = process.env.UNDERCLERK_BASE_URL ?? "http://127.0.0.1:3102";
+const BASE_URL = process.env.COMMERCE_BASE_URL ?? "http://127.0.0.1:3102";
 const ORGANISATION_ID = "organisation_local_nuki_demo";
 const MERCHANT_ID = "merchant_nuki_cafe_demo";
 const CAFE_MENU_ENTRY_IDS = [
@@ -41,7 +41,7 @@ if (isMainModule(import.meta.url)) await main();
 
 async function main(): Promise<void> {
   await waitForCommerce();
-  const serviceToken = requiredEnvironment("UNDERCLERK_SERVICE_TOKEN");
+  const serviceToken = requiredEnvironment("COMMERCE_SERVICE_TOKEN");
   const admin = new CommerceAdminClient({ baseUrl: BASE_URL, serviceToken });
   // `--other-cafe <organisation_id> <merchant_id>` seeds one more café shop
   // with the same menu, for journeys that need a second tenant.
@@ -371,7 +371,7 @@ async function verifyBuyerSessions(
   buyer: CommerceStorefrontClient,
 ): Promise<void> {
   const cafe = await buyer.createSession(MERCHANT_ID, "storefront_cafe", {
-    schemaVersion: "underclerk.create-buyer-session.v1",
+    schemaVersion: "commerce.create-buyer-session.v1",
     buyer: { kind: "guest" },
   });
   if (!cafe.ok) throw clientFailure("café buyer session", cafe);
@@ -392,7 +392,7 @@ async function verifyBuyerSessions(
     MERCHANT_ID,
     "storefront_cookie_store_sg",
     {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     },
   );
@@ -433,11 +433,11 @@ async function waitForCommerce(): Promise<void> {
       const response = await fetch(`${BASE_URL}/health`);
       if (response.ok) return;
     } catch {
-      // Underclerk may still be binding its local port.
+      // Commerce may still be binding its local port.
     }
     await delay(250);
   }
-  throw new Error("Underclerk did not become healthy within 30 seconds");
+  throw new Error("Commerce did not become healthy within 30 seconds");
 }
 
 function delay(milliseconds: number): Promise<void> {
@@ -448,7 +448,7 @@ function resolveDelay(milliseconds: number, resolve: () => void): void {
   setTimeout(resolve, milliseconds);
 }
 
-function requiredEnvironment(name: "UNDERCLERK_SERVICE_TOKEN"): string {
+function requiredEnvironment(name: "COMMERCE_SERVICE_TOKEN"): string {
   const value = process.env[name];
   if (value === undefined || value.length === 0)
     throw new Error(`${name} is required`);

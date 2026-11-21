@@ -141,18 +141,18 @@ export async function handleBakeryControl(
   const binding = await resolveMerchantBinding(authorized);
   if (binding instanceof Response) return binding;
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   )
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   const now = Date.now();
   try {
     const client = new CommerceEntityPlaneClient({
-      baseUrl: env.UNDERCLERK_BASE_URL,
+      baseUrl: env.COMMERCE_BASE_URL,
       ...pantryCommerceAccess(
-        env.UNDERCLERK_SERVICE_TOKEN,
+        env.COMMERCE_SERVICE_TOKEN,
         String(authorized.organisationId),
-        env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+        env.COMMERCE.fetch.bind(env.COMMERCE),
         String(authorized.membership.personId),
       ),
     });
@@ -190,7 +190,7 @@ export async function handleBakeryControl(
     if (!result.ok)
       return controlError(
         result.code,
-        result.code === "underclerk_unavailable" ? 503 : 409,
+        result.code === "commerce_unavailable" ? 503 : 409,
       );
     const responseBody = result;
     const recordedMutationReceipt = await recordCommerceMutationReceipt({

@@ -46,8 +46,8 @@ const QUANTITY_SCALE = 6;
 const SAVE_ATTEMPT_LIMIT = 4;
 
 type CostReadError =
-  | Readonly<{ code: "underclerk_unavailable" }>
-  | Readonly<{ code: "underclerk_scope_mismatch" }>;
+  | Readonly<{ code: "commerce_unavailable" }>
+  | Readonly<{ code: "commerce_scope_mismatch" }>;
 
 export type SupplyCostSaveResult =
   | Readonly<{
@@ -59,8 +59,8 @@ export type SupplyCostSaveResult =
   | Readonly<{
       ok: false;
       code:
-        | "underclerk_unavailable"
-        | "underclerk_scope_mismatch"
+        | "commerce_unavailable"
+        | "commerce_scope_mismatch"
         | "supply_cost_changed"
         | "supply_cost_busy";
     }>
@@ -79,13 +79,13 @@ export async function readCostsOverview(
     nowMs: number;
     db?: OrganisationDatabase;
     canEditPrices?: boolean;
-    underclerkBaseUrl?: string | undefined;
+    commerceBaseUrl?: string | undefined;
   }>,
 ): Promise<
   | Readonly<{ ok: true; value: CostsOverview }>
   | Readonly<{ ok: false; error: CostReadError }>
 > {
-  const base = input.underclerkBaseUrl?.trim().replace(/\/+$/u, "");
+  const base = input.commerceBaseUrl?.trim().replace(/\/+$/u, "");
   const hasPublicBase = base !== undefined && base.length > 0;
   const [
     snapshotResult,
@@ -128,9 +128,9 @@ export async function readCostsOverview(
   ]);
 
   if (!snapshotResult.ok)
-    {return { ok: false, error: { code: "underclerk_unavailable" } };}
+    {return { ok: false, error: { code: "commerce_unavailable" } };}
   if (snapshotResult.value.commerce.merchantId !== input.merchantId)
-    {return { ok: false, error: { code: "underclerk_scope_mismatch" } };}
+    {return { ok: false, error: { code: "commerce_scope_mismatch" } };}
 
   const termsByItemId = new Map<string, SupplyCostTerms>();
   if (metadataResult.ok && metadataResult.value.kind === "enumerated") {
@@ -138,7 +138,7 @@ export async function readCostsOverview(
       metadataResult.value.organisationId !== input.organisationId ||
       metadataResult.value.merchantId !== input.merchantId
     ) {
-      return { ok: false, error: { code: "underclerk_scope_mismatch" } };
+      return { ok: false, error: { code: "commerce_scope_mismatch" } };
     }
     const costList = metadataResult.value.lists.find(
       (list) => String(list.listId) === SUPPLY_COST_TERMS_LIST_ID,
@@ -150,7 +150,7 @@ export async function readCostsOverview(
         costList.listId,
       );
       if (!loaded.ok)
-        {return { ok: false, error: { code: "underclerk_unavailable" } };}
+        {return { ok: false, error: { code: "commerce_unavailable" } };}
       for (const [itemId, terms] of loaded.value) {
         termsByItemId.set(itemId, terms);
       }
@@ -246,9 +246,9 @@ export async function saveSupplyCostTerms(
     input.merchantId,
   );
   if (!snapshotResult.ok)
-    {return { ok: false, code: "underclerk_unavailable" };}
+    {return { ok: false, code: "commerce_unavailable" };}
   if (snapshotResult.value.commerce.merchantId !== input.merchantId)
-    {return { ok: false, code: "underclerk_scope_mismatch" };}
+    {return { ok: false, code: "commerce_scope_mismatch" };}
 
   const item = snapshotResult.value.commerce.resources.inventoryItems.find(
     (candidate) => candidate.id === input.write.inventoryItemId,
@@ -290,7 +290,7 @@ export async function saveSupplyCostTerms(
       ensured.listId,
     );
     if (!existingEntries.ok)
-      {return { ok: false, code: "underclerk_unavailable" };}
+      {return { ok: false, code: "commerce_unavailable" };}
 
     const existing = existingEntries.value.find(
       (entry) => String(entry.entityRef.entityId) === input.write.inventoryItemId,
@@ -445,7 +445,7 @@ export async function saveSupplyCostTerms(
           });
 
     const executed = await input.entityPlaneClient.command(request);
-    if (!executed.ok) {return { ok: false, code: "underclerk_unavailable" };}
+    if (!executed.ok) {return { ok: false, code: "commerce_unavailable" };}
     if (executed.value.status === "accepted") {
       const receipt = executed.value.receipt;
       const nextEntryRevision =
@@ -492,7 +492,7 @@ async function ensureSupplyCostList(
   if (!metadata.ok || metadata.value.kind !== "enumerated") {
     return {
       ok: false,
-      error: { ok: false, code: "underclerk_unavailable" },
+      error: { ok: false, code: "commerce_unavailable" },
     };
   }
   if (
@@ -501,7 +501,7 @@ async function ensureSupplyCostList(
   ) {
     return {
       ok: false,
-      error: { ok: false, code: "underclerk_scope_mismatch" },
+      error: { ok: false, code: "commerce_scope_mismatch" },
     };
   }
   let list = metadata.value.lists.find(
@@ -515,7 +515,7 @@ async function ensureSupplyCostList(
     if (!published.ok) {
       return {
         ok: false,
-        error: { ok: false, code: "underclerk_unavailable" },
+        error: { ok: false, code: "commerce_unavailable" },
       };
     }
     metadata = await client.publishedResourceMetadata({
@@ -526,7 +526,7 @@ async function ensureSupplyCostList(
     if (!metadata.ok || metadata.value.kind !== "enumerated") {
       return {
         ok: false,
-        error: { ok: false, code: "underclerk_unavailable" },
+        error: { ok: false, code: "commerce_unavailable" },
       };
     }
     list = metadata.value.lists.find(
@@ -535,7 +535,7 @@ async function ensureSupplyCostList(
     if (list === undefined) {
       return {
         ok: false,
-        error: { ok: false, code: "underclerk_unavailable" },
+        error: { ok: false, code: "commerce_unavailable" },
       };
     }
   }

@@ -44,7 +44,7 @@ import {
 } from "./purchase-request.ts";
 
 const QUANTITY_SCALE = 6;
-const SYSTEM_OWNER = "CafeOS purchasing";
+const SYSTEM_OWNER = "Café purchasing";
 
 type ExecuteEntityPlaneMutation = (
   request: EntityPlaneMutationRequest,

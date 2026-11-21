@@ -143,7 +143,7 @@ export abstract class BuyerQuoteStage extends BuyerCartStage {
     if (recoverableCheckout === undefined) return undefined;
     if (checkout.lifecycle.state === "quoted") {
       return {
-        schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+        schemaVersion: "commerce.buyer-checkout-recovery.v1",
         checkout: recoverableCheckout,
         progress: { state: "quoted" },
       };
@@ -165,7 +165,7 @@ export abstract class BuyerQuoteStage extends BuyerCartStage {
       checkout.lifecycle.state === "expired"
     ) {
       return {
-        schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+        schemaVersion: "commerce.buyer-checkout-recovery.v1",
         checkout: recoverableCheckout,
         progress: { state: "quoted" },
       };
@@ -174,7 +174,7 @@ export abstract class BuyerQuoteStage extends BuyerCartStage {
     return payment === undefined
       ? undefined
       : {
-          schemaVersion: "underclerk.buyer-checkout-recovery.v1",
+          schemaVersion: "commerce.buyer-checkout-recovery.v1",
           checkout: recoverableCheckout,
           progress: { state: "payment_pending", payment },
         };

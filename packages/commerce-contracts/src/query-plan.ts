@@ -108,7 +108,7 @@ export function parseCommerceQueryPlan(
       case "entity_by_ref":
       case "relationship_traversal":
       case "aggregation":
-      case "underclerk_context":
+      case "commerce_context":
         return queryRefusal();
       default:
         return assertNever(operation.value);

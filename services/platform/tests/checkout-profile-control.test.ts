@@ -93,7 +93,7 @@ describe("checkout profile control routes", () => {
     expect(checkoutControlMocks.activateCheckoutProfile).not.toHaveBeenCalled();
   });
 
-  it("rejects mixed activation fields before calling Underclerk", async () => {
+  it("rejects mixed activation fields before calling Commerce", async () => {
     const response = await handleControlRequest(
       new Request(
         `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce/storefronts/${STOREFRONT_ID}/checkout-profile-activation`,
@@ -198,8 +198,8 @@ function activationRequest(): Request {
       headers: {
         origin: "https://pantry.example",
         cookie:
-          "satyr_control_session=session-checkout; satyr_control_csrf=csrf-checkout",
-        "x-satyr-csrf": "csrf-checkout",
+          "pantry_session=session-checkout; pantry_csrf=csrf-checkout",
+        "x-pantry-csrf": "csrf-checkout",
         "idempotency-key": "checkout-activation-test",
         "content-type": "application/json",
       },

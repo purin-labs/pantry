@@ -140,7 +140,7 @@ describe("portal commerce entity-plane presentation", () => {
       state: "approval_requested",
       details: {
         kind: "cancel_order",
-        execution: { kind: "underclerk_full_refund" },
+        execution: { kind: "commerce_full_refund" },
       },
     });
 
@@ -296,7 +296,7 @@ describe("portal commerce entity-plane presentation", () => {
           occurredAt: "2026-08-26T00:00:04.000Z",
         },
         {
-          kind: "underclerk_observation",
+          kind: "commerce_observation",
           resource,
           observationId: "activity_command",
           deliveryId: "activity_delivery",
@@ -304,7 +304,7 @@ describe("portal commerce entity-plane presentation", () => {
           occurredAt: "2026-08-26T00:00:04.000Z",
         },
         {
-          kind: "underclerk_receipt",
+          kind: "commerce_receipt",
           resource,
           receiptId: "activity_command",
           outcome: "applied",
@@ -338,7 +338,7 @@ describe("portal commerce entity-plane presentation", () => {
     );
     expect(activity.events[5]).toEqual(
       expect.objectContaining({
-        kind: "underclerk_observation",
+        kind: "commerce_observation",
         deliveryId: "activity_delivery",
       }),
     );
@@ -701,7 +701,7 @@ function systemEntity(
     provenance: {
       organisationId: "organisation_export",
       integrationAccountId: "integration_export",
-      source: "underclerk",
+      source: "commerce",
       resourceType,
       resourceId: entityId,
       revision: 1,
@@ -737,7 +737,7 @@ async function proposedCancellationResponse(): Promise<unknown> {
       amount: { value: 12.5, currency: "USD" },
       commerceSystem: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: 3,
       },
       details: {
@@ -750,7 +750,7 @@ async function proposedCancellationResponse(): Promise<unknown> {
         notifyCustomer: false,
         note: null,
         execution: {
-          kind: "underclerk_full_refund",
+          kind: "commerce_full_refund",
           merchantRevision: 9,
           paymentId: "payment_order_1",
           paymentRevision: 2,
@@ -807,7 +807,7 @@ function systemRelationship(
     provenance: {
       organisationId: "organisation_export",
       integrationAccountId: "integration_export",
-      source: "underclerk",
+      source: "commerce",
       resourceType: sourceType === "order" ? "commerce_order" : sourceType,
       resourceId: sourceId,
       revision: 1,

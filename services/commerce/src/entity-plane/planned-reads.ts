@@ -154,7 +154,7 @@ export class EntityPlanePlannedReads {
         "merchantId",
       ),
       merchantRevision,
-      watermark: { kind: "underclerk_native", merchantRevision },
+      watermark: { kind: "commerce_native", merchantRevision },
       capabilities: planRequest.capabilities,
       projection: planRequest.projection,
     };
@@ -194,9 +194,9 @@ export class EntityPlanePlannedReads {
       request.planRequest.watermark.kind === "provider_backed"
         ? {
             ...request.planRequest.watermark,
-            underclerkExtensionMerchantRevision: merchantRevision,
+            commerceExtensionMerchantRevision: merchantRevision,
           }
-        : { kind: "underclerk_native", merchantRevision };
+        : { kind: "commerce_native", merchantRevision };
     if (!sameReadWatermark(request.planRequest.watermark, expectedWatermark)) {
       return {
         kind: "cursor_stale",
@@ -346,10 +346,10 @@ export class EntityPlanePlannedReads {
       "merchantRevision",
     );
     const expectedWatermark: CommerceReadWatermark = {
-      kind: "underclerk_native",
+      kind: "commerce_native",
       merchantRevision,
     };
-    if (request.watermark.kind !== "underclerk_native") {
+    if (request.watermark.kind !== "commerce_native") {
       return {
         kind: "unsupported_query",
         capability: { kind: "source_mapping" },
@@ -423,8 +423,8 @@ export class EntityPlanePlannedReads {
       };
     }
     if (
-      planned.value.plan.operation.kind === "underclerk_context" &&
-      request.query.kind === "underclerk_context"
+      planned.value.plan.operation.kind === "commerce_context" &&
+      request.query.kind === "commerce_context"
     ) {
       const selected: CommerceGraphQuery =
         request.query.selection.kind === "selector"
@@ -1127,7 +1127,7 @@ function relationshipDefinitionKey(
 
 function filterContextResult(
   parts: QueryParts,
-  query: Variant<CommerceGraphQuery, "underclerk_context">,
+  query: Variant<CommerceGraphQuery, "commerce_context">,
 ): QueryParts {
   const allowedAttributeIds = new Set(query.allowedAttributeIds.map(String));
   const entities = parts.entities
@@ -1291,9 +1291,9 @@ function capabilityProfileWithinAuthority(
           authoritative.capability,
         )
       );
-    case "underclerk_custom":
+    case "commerce_custom":
       return (
-        authoritative.kind === "underclerk_custom" &&
+        authoritative.kind === "commerce_custom" &&
         requested.entityTypeId === authoritative.entityTypeId &&
         Number(requested.publishedRevision) ===
           Number(authoritative.publishedRevision) &&
@@ -1342,9 +1342,9 @@ function savedViewSourceWithinAuthority(
           authoritative.capability,
         )
       );
-    case "underclerk_custom":
+    case "commerce_custom":
       return (
-        authoritative.kind === "underclerk_custom" &&
+        authoritative.kind === "commerce_custom" &&
         requested.entityTypeId === authoritative.entityTypeId &&
         Number(requested.publishedRevision) ===
           Number(authoritative.publishedRevision) &&
@@ -1448,14 +1448,14 @@ function sameReadWatermark(
   right: CommerceReadWatermark,
 ): boolean {
   if (left.kind !== right.kind) return false;
-  return left.kind === "underclerk_native" && right.kind === "underclerk_native"
+  return left.kind === "commerce_native" && right.kind === "commerce_native"
     ? left.merchantRevision === right.merchantRevision
     : left.kind === "provider_backed" &&
         right.kind === "provider_backed" &&
         left.blotterAcceptedProjectionSequence ===
           right.blotterAcceptedProjectionSequence &&
-        left.underclerkExtensionMerchantRevision ===
-          right.underclerkExtensionMerchantRevision;
+        left.commerceExtensionMerchantRevision ===
+          right.commerceExtensionMerchantRevision;
 }
 
 function hydrateEntity(
@@ -1563,7 +1563,7 @@ function buildNativePlanRequest(
       ? savedViewPlanContext(database, merchantId, planningQuery.viewId)
       : null;
   const contextSavedView =
-    planningQuery.kind === "underclerk_context" &&
+    planningQuery.kind === "commerce_context" &&
     planningQuery.selection.kind === "selector" &&
     planningQuery.selection.selector.query.kind === "saved_commerce_view"
       ? savedViewPlanContext(
@@ -1573,7 +1573,7 @@ function buildNativePlanRequest(
         )
       : null;
   const contextCapability =
-    planningQuery.kind === "underclerk_context"
+    planningQuery.kind === "commerce_context"
       ? (contextSavedView?.capability ??
         contextPlanCapability(database, merchantId, planningQuery))
       : null;
@@ -1609,7 +1609,7 @@ function buildNativePlanRequest(
     projection: {
       attributeIds:
         savedView?.visibleAttributeIds ??
-        (planningQuery.kind === "underclerk_context"
+        (planningQuery.kind === "commerce_context"
           ? planningQuery.allowedAttributeIds
           : []),
       relationshipDefinitions:
@@ -1627,7 +1627,7 @@ function buildNativePlanRequest(
     ),
     merchantId: parsePositiveText<CommerceMerchantId>(merchantId, "merchantId"),
     watermark: {
-      kind: "underclerk_native",
+      kind: "commerce_native",
       merchantRevision: parseSnapshotRevision<CommerceSnapshotRevision>(
         merchant.revision,
         "merchantRevision",
@@ -1687,7 +1687,7 @@ function sharedPlanEntityType(
     case "relationship_traversal":
     case "commerce_list_page":
     case "saved_commerce_view":
-    case "underclerk_context":
+    case "commerce_context":
       return null;
     default:
       return assertNever(query, "entity_plane_unhandled_query_plan");
@@ -1697,7 +1697,7 @@ function sharedPlanEntityType(
 function contextPlanCapability(
   database: CommerceDatabase,
   merchantId: string,
-  query: Variant<CommerceGraphQuery, "underclerk_context">,
+  query: Variant<CommerceGraphQuery, "commerce_context">,
 ): CommerceQueryCapabilityProfile | null {
   switch (query.selection.kind) {
     case "selector": {
@@ -1777,7 +1777,7 @@ function sourceCapabilityForQuery(
         savedViewPlanContext(database, merchantId, query.viewId)?.capability
           .source ?? null
       );
-    case "underclerk_context":
+    case "commerce_context":
       return null;
     default:
       return assertNever(query, "entity_plane_unhandled_query_plan");

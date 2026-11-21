@@ -1,6 +1,6 @@
 {
   // Plan 82 G0.6 test page. Static files only. Delete this Worker when G0.6 closes.
-  "name": "satyr-voice-path-test",
+  "name": "pantry-voice-path-test",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./page" },
   "workers_dev": true,

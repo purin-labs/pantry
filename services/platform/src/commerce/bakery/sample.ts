@@ -45,7 +45,7 @@ export async function createFinancierSample(
     metadata.value.organisationId !== input.organisationId ||
     metadata.value.merchantId !== input.merchantId
   ) {
-    return { ok: false, code: "underclerk_unavailable" };
+    return { ok: false, code: "commerce_unavailable" };
   }
   let revision = metadata.value.merchantRevision;
   for (const step of sampleCommands()) {
@@ -74,7 +74,7 @@ export async function createFinancierSample(
     });
     const result = await input.client.command(request);
     if (!result.ok) {
-      return { ok: false, code: "underclerk_unavailable" };
+      return { ok: false, code: "commerce_unavailable" };
     }
     if (result.value.status !== "accepted") {
       return { ok: false, code: result.value.error.code };

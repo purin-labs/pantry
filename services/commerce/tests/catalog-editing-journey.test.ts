@@ -75,7 +75,7 @@ async function editCatalogWhileBuyersShop(): Promise<void> {
       title: "Kyoto loose leaf tea",
       handle: "kyoto-loose-leaf-tea",
       productType: "Tea",
-      vendor: "Satyr Tea",
+      vendor: "Pantry Tea",
       tags: ["tea", "gift"],
     });
     expect(rename).toMatchObject({

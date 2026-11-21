@@ -829,7 +829,7 @@ async function executionKey(env: Env): Promise<CryptoKey | null> {
   const derived = await crypto.subtle.sign(
     "HMAC",
     root,
-    encoder.encode("satyr.case-execution.identity.v1"),
+    encoder.encode("pantry.case-execution.identity.v1"),
   );
   return crypto.subtle.importKey("raw", derived, hmac, false, ["sign"]);
 }

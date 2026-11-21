@@ -273,7 +273,7 @@ function approvalAction() {
     integrationAccountId: integrationAccountId.value,
     threadId: "case_control_oidc",
     sessionId: sessionId.value,
-    host: "satyr.commerce",
+    host: "pantry.commerce",
     verb: "commerce.order.cancel",
     path: "/orders/order_control_oidc/cancel?expected_revision=1&reason=customer_requested&refund=none&restock=false&notify_customer=false&note=",
     argsHash: "approval-action-args",

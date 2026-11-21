@@ -1,6 +1,6 @@
 -- Organisation regional operational schema. Global identities and sessions remain in DB.
 -- organisation_placement is the local execution fence; the global directory publishes epochs.
--- Current Satyr platform schema.
+-- Current Pantry platform schema.
 
 PRAGMA foreign_keys = ON;
 
@@ -168,7 +168,7 @@ CREATE TABLE vault_item_event (
   kind TEXT NOT NULL CHECK (kind IN ('item_added', 'item_edited', 'sign_in_replaced', 'item_removed', 'item_moved', 'store_connected', 'store_disconnected')),
   item_id TEXT,
   item_label TEXT,
-  store TEXT NOT NULL CHECK (store IN ('satyr', 'onepassword')),
+  store TEXT NOT NULL CHECK (store IN ('pantry', 'onepassword')),
   actor_user_id TEXT NOT NULL,
   at INTEGER NOT NULL,
   PRIMARY KEY (organisation_id, event_id)
@@ -343,7 +343,7 @@ CREATE TABLE provider_connection (
   custom_connector_id TEXT,
   provider TEXT NOT NULL,
   auth_mode TEXT NOT NULL CHECK (
-    auth_mode IN ('shared_satyr_app', 'api_key', 'webhook_secret')
+    auth_mode IN ('shared_pantry_app', 'api_key', 'webhook_secret')
   ),
   authority_kind TEXT NOT NULL CHECK (
     authority_kind IN ('connection_credential', 'shared_application_asset_grant')
@@ -1854,7 +1854,7 @@ CREATE TABLE skill_binding (
 );
 CREATE INDEX skill_binding_target
   ON skill_binding (organisation_id, target_kind, target_id);
-CREATE TABLE underclerk_merchant_binding (
+CREATE TABLE commerce_merchant_binding (
   binding_id TEXT PRIMARY KEY,
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   integration_account_id TEXT NOT NULL UNIQUE,
@@ -1866,10 +1866,10 @@ CREATE TABLE underclerk_merchant_binding (
   created_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL
 ) STRICT;
-CREATE UNIQUE INDEX underclerk_one_merchant_per_organisation_environment
-ON underclerk_merchant_binding (organisation_id, environment);
-CREATE TABLE underclerk_webhook_subscription (
-  binding_id TEXT PRIMARY KEY REFERENCES underclerk_merchant_binding (binding_id),
+CREATE UNIQUE INDEX commerce_one_merchant_per_organisation_environment
+ON commerce_merchant_binding (organisation_id, environment);
+CREATE TABLE commerce_webhook_subscription (
+  binding_id TEXT PRIMARY KEY REFERENCES commerce_merchant_binding (binding_id),
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   subscription_id TEXT NOT NULL CHECK (length(subscription_id) > 0),
   sealed_secret TEXT NOT NULL CHECK (length(sealed_secret) > 0),
@@ -1879,25 +1879,25 @@ CREATE TABLE underclerk_webhook_subscription (
 ) STRICT;
 CREATE TABLE organisation_commerce_system (
   organisation_id TEXT PRIMARY KEY REFERENCES organisation (organisation_id),
-  system_kind TEXT NOT NULL CHECK (system_kind IN ('satyr_commerce', 'shopify')),
-  underclerk_binding_id TEXT REFERENCES underclerk_merchant_binding (binding_id),
+  system_kind TEXT NOT NULL CHECK (system_kind IN ('builtin_commerce', 'shopify')),
+  commerce_binding_id TEXT REFERENCES commerce_merchant_binding (binding_id),
   shopify_integration_account_id TEXT REFERENCES integration_account (integration_account_id),
   revision INTEGER NOT NULL CHECK (revision > 0),
   selected_at INTEGER NOT NULL,
   selected_by_user_id TEXT NOT NULL,
   CHECK (
-    (system_kind = 'satyr_commerce'
-      AND underclerk_binding_id IS NOT NULL
+    (system_kind = 'builtin_commerce'
+      AND commerce_binding_id IS NOT NULL
       AND shopify_integration_account_id IS NULL)
     OR
     (system_kind = 'shopify'
-      AND underclerk_binding_id IS NULL
+      AND commerce_binding_id IS NULL
       AND shopify_integration_account_id IS NOT NULL)
   )
 ) STRICT;
-CREATE UNIQUE INDEX organisation_commerce_system_underclerk_binding
-ON organisation_commerce_system (underclerk_binding_id)
-WHERE underclerk_binding_id IS NOT NULL;
+CREATE UNIQUE INDEX organisation_commerce_system_commerce_binding
+ON organisation_commerce_system (commerce_binding_id)
+WHERE commerce_binding_id IS NOT NULL;
 CREATE UNIQUE INDEX organisation_commerce_system_shopify_account
 ON organisation_commerce_system (shopify_integration_account_id)
 WHERE shopify_integration_account_id IS NOT NULL;
@@ -2066,7 +2066,7 @@ CREATE TABLE commerce_capability_activation (
   scope_kind TEXT NOT NULL CHECK (scope_kind IN ('organisation', 'location')),
   location_id TEXT,
   authority_kind TEXT NOT NULL CHECK (
-    authority_kind IN ('satyr_commerce', 'shopify')
+    authority_kind IN ('builtin_commerce', 'shopify')
   ),
   integration_account_id TEXT NOT NULL,
   commerce_system_revision INTEGER NOT NULL CHECK (commerce_system_revision > 0),
@@ -2131,8 +2131,8 @@ BEGIN
   SELECT (CASE WHEN NOT EXISTS (
     SELECT 1
     FROM organisation_commerce_system AS selected
-    LEFT JOIN underclerk_merchant_binding AS binding
-      ON binding.binding_id = selected.underclerk_binding_id
+    LEFT JOIN commerce_merchant_binding AS binding
+      ON binding.binding_id = selected.commerce_binding_id
      AND binding.organisation_id = selected.organisation_id
     LEFT JOIN integration_account AS shopify
       ON shopify.integration_account_id = selected.shopify_integration_account_id
@@ -2142,8 +2142,8 @@ BEGIN
     WHERE selected.organisation_id = NEW.organisation_id
       AND selected.revision = NEW.commerce_system_revision
       AND (
-        (NEW.authority_kind = 'satyr_commerce'
-          AND selected.system_kind = 'satyr_commerce'
+        (NEW.authority_kind = 'builtin_commerce'
+          AND selected.system_kind = 'builtin_commerce'
           AND binding.integration_account_id = NEW.integration_account_id)
         OR
         (NEW.authority_kind = 'shopify'
@@ -2177,8 +2177,8 @@ BEGIN
   SELECT (CASE WHEN NOT EXISTS (
     SELECT 1
     FROM organisation_commerce_system AS selected
-    LEFT JOIN underclerk_merchant_binding AS binding
-      ON binding.binding_id = selected.underclerk_binding_id
+    LEFT JOIN commerce_merchant_binding AS binding
+      ON binding.binding_id = selected.commerce_binding_id
      AND binding.organisation_id = selected.organisation_id
     LEFT JOIN integration_account AS shopify
       ON shopify.integration_account_id = selected.shopify_integration_account_id
@@ -2188,8 +2188,8 @@ BEGIN
     WHERE selected.organisation_id = NEW.organisation_id
       AND selected.revision = NEW.commerce_system_revision
       AND (
-        (NEW.authority_kind = 'satyr_commerce'
-          AND selected.system_kind = 'satyr_commerce'
+        (NEW.authority_kind = 'builtin_commerce'
+          AND selected.system_kind = 'builtin_commerce'
           AND binding.integration_account_id = NEW.integration_account_id)
         OR
         (NEW.authority_kind = 'shopify'
@@ -2206,8 +2206,8 @@ BEGIN
   SELECT (CASE WHEN NOT EXISTS (
     SELECT 1
     FROM organisation_commerce_system AS selected
-    LEFT JOIN underclerk_merchant_binding AS binding
-      ON binding.binding_id = selected.underclerk_binding_id
+    LEFT JOIN commerce_merchant_binding AS binding
+      ON binding.binding_id = selected.commerce_binding_id
      AND binding.organisation_id = selected.organisation_id
     LEFT JOIN integration_account AS shopify
       ON shopify.integration_account_id = selected.shopify_integration_account_id
@@ -2217,8 +2217,8 @@ BEGIN
     WHERE selected.organisation_id = NEW.organisation_id
       AND selected.revision = NEW.commerce_system_revision
       AND (
-        (NEW.authority_kind = 'satyr_commerce'
-          AND selected.system_kind = 'satyr_commerce'
+        (NEW.authority_kind = 'builtin_commerce'
+          AND selected.system_kind = 'builtin_commerce'
           AND binding.integration_account_id = NEW.integration_account_id)
         OR
         (NEW.authority_kind = 'shopify'
@@ -3099,7 +3099,7 @@ CREATE TABLE organisation_default_workspace (
 );
 -- An approved amount owed to a supplier, and how much of it is committed.
 --
--- `in_flight` is money Satyr has sent but the provider has not settled. It is
+-- `in_flight` is money Pantry has sent but the provider has not settled. It is
 -- deliberately not derivable from payout rows: a payout whose outcome is
 -- unknown must keep holding its share, and reconstructing that from payout
 -- state would release it the moment a row looked terminal.
@@ -3154,7 +3154,7 @@ CREATE UNIQUE INDEX idx_supplier_destination_active
   ON supplier_destination_revision (organisation_id, destination_id)
   WHERE state = 'active';
 
--- One Satyr location's binding to a terminal target.
+-- One Pantry location's binding to a terminal target.
 --
 -- Retired revisions are kept, not deleted: an attempt dispatched under an
 -- earlier revision still needs its binding to recover, and replacing a terminal
@@ -3163,7 +3163,7 @@ CREATE TABLE cafe_terminal_assignment (
   organisation_id TEXT NOT NULL,
   assignment_id TEXT NOT NULL CHECK (length(assignment_id) BETWEEN 1 AND 255),
   merchant_id TEXT NOT NULL CHECK (length(merchant_id) BETWEEN 1 AND 255),
-  satyr_location_id TEXT NOT NULL CHECK (length(satyr_location_id) BETWEEN 1 AND 255),
+  pantry_location_id TEXT NOT NULL CHECK (length(pantry_location_id) BETWEEN 1 AND 255),
   provider_location_id TEXT NOT NULL CHECK (length(provider_location_id) BETWEEN 1 AND 255),
   device_id TEXT NOT NULL CHECK (length(device_id) BETWEEN 1 AND 255),
   target_kind TEXT NOT NULL CHECK (target_kind IN ('sandbox_simulated', 'paired_physical', 'lan_gateway_device', 'square_pos_app')),
@@ -3184,13 +3184,13 @@ CREATE TABLE cafe_terminal_assignment (
 );
 -- One counter sells through one terminal at a time.
 CREATE UNIQUE INDEX idx_cafe_terminal_assignment_active_location
-  ON cafe_terminal_assignment (organisation_id, satyr_location_id)
+  ON cafe_terminal_assignment (organisation_id, pantry_location_id)
   WHERE state = 'active';
 -- What a café counter's printed receipt shows besides the sale (Plan 90
 -- Phase 5): the Qualified Invoice registration number (T and 13 digits).
 CREATE TABLE cafe_counter_receipt_setting (
   organisation_id TEXT NOT NULL,
-  satyr_location_id TEXT NOT NULL CHECK (length(satyr_location_id) BETWEEN 1 AND 255),
+  pantry_location_id TEXT NOT NULL CHECK (length(pantry_location_id) BETWEEN 1 AND 255),
   invoice_registration_number TEXT CHECK (
     invoice_registration_number IS NULL OR (
       length(invoice_registration_number) = 14 AND
@@ -3200,10 +3200,10 @@ CREATE TABLE cafe_counter_receipt_setting (
   ),
   updated_by_user_id TEXT NOT NULL,
   updated_at INTEGER NOT NULL CHECK (updated_at >= 0),
-  PRIMARY KEY (organisation_id, satyr_location_id)
+  PRIMARY KEY (organisation_id, pantry_location_id)
 );
 
--- What Satyr sent to a payout provider, written before the request leaves.
+-- What Pantry sent to a payout provider, written before the request leaves.
 --
 -- `provider_transfer_id` is nullable on purpose: between dispatch and the
 -- provider's answer there is genuinely no transfer identity, and that absence
@@ -3415,7 +3415,7 @@ CREATE TABLE organisation_inference_selection (
       'organisation_anthropic_api_key',
       'organisation_google_api_key',
       'claude_oauth',
-      'satyr_platform'
+      'pantry_platform'
     )
   ),
   selected_by_user_id TEXT NOT NULL,
@@ -4354,9 +4354,9 @@ CREATE TABLE mail_classification_eligibility (
   organisation_id TEXT NOT NULL REFERENCES organisation (organisation_id),
   integration_account_id TEXT NOT NULL,
   source_pin TEXT NOT NULL,
-  -- Plan 88: who funds the calls. Satyr's key pins revision 0; the
+  -- Plan 88: who funds the calls. Pantry's key pins revision 0; the
   -- Organisation's own key pins its connection revision.
-  funding TEXT NOT NULL DEFAULT 'organisation_byo' CHECK (funding IN ('satyr_platform', 'organisation_byo')),
+  funding TEXT NOT NULL DEFAULT 'organisation_byo' CHECK (funding IN ('pantry_platform', 'organisation_byo')),
   connection_revision INTEGER NOT NULL CHECK (connection_revision >= 0),
   model TEXT NOT NULL CHECK (model = 'jev-1.13.0'),
   purpose TEXT NOT NULL CHECK (purpose = 'mail_classification'),
@@ -4366,7 +4366,7 @@ CREATE TABLE mail_classification_eligibility (
   reviewed_at INTEGER NOT NULL,
   review_expires_at INTEGER NOT NULL CHECK (review_expires_at > reviewed_at),
   revoked_at INTEGER,
-  CHECK ((funding = 'satyr_platform') = (connection_revision = 0)),
+  CHECK ((funding = 'pantry_platform') = (connection_revision = 0)),
   PRIMARY KEY (organisation_id, integration_account_id, source_pin, funding, connection_revision),
   FOREIGN KEY (integration_account_id, organisation_id) REFERENCES integration_account (integration_account_id, organisation_id)
 );

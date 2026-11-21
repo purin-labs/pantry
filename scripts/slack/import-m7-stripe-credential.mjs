@@ -24,7 +24,7 @@ async function main() {
       : await promptForHiddenTerminalValue(
           process.stdin,
           process.stderr,
-          "Paste the Satyr organisation admin token (input hidden): ",
+          "Paste the Pantry organisation admin token (input hidden): ",
         );
   const stripeSecret = await promptForHiddenTerminalValue(
     process.stdin,

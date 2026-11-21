@@ -10,7 +10,7 @@ Run `pnpm site` alongside the backend to start the shared Caddy entrypoints.
 Docker startup uses the same backend command. `pnpm slack:ingress` separately
 updates the existing local Slack app and starts its restricted ingress tunnel.
 
-Satyr uses fixed callback paths under an environment-specific origin. Moving
+Pantry uses fixed callback paths under an environment-specific origin. Moving
 between local, staging, and production requires configuration changes and
 provider allowlist updates. Provider-specific callback environment variables
 are unnecessary.
@@ -38,7 +38,7 @@ Deployed environments normally use the same fixed origin for both values.
 | Environment        | `PANTRY_PUBLIC_ORIGIN`                     | `PANTRY_OAUTH_CALLBACK_ORIGIN`             | `PANTRY_PROVIDER_INGRESS_ORIGIN`                               |
 | ------------------ | ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------- |
 | Local              | `https://localhost:3003`                  | `https://localhost:3003`                  | `https://square-sandbox-webhook.seams.sh` (Square paths only) |
-| Current production | `https://satyr-edge.n6378056.workers.dev` | `https://satyr-edge.n6378056.workers.dev` | Unset; uses callback origin                                   |
+| Current production | `https://pantry.purin.io` | `https://pantry.purin.io` | Unset; uses callback origin                                   |
 | Staging target     | `https://staging.console.seams.sh`        | `https://staging.console.seams.sh`        | Unset; uses callback origin                                   |
 | Production target  | `https://console.seams.sh`                | `https://console.seams.sh`                | Unset; uses callback origin                                   |
 
@@ -77,8 +77,8 @@ Google sign-in uses the browser-facing origin instead:
 ${PANTRY_PUBLIC_ORIGIN}/v1/control/auth/google/callback
 ```
 
-ChatGPT uses OpenAI's device authorization flow and has no Satyr callback URI.
-Satyr Commerce has no external OAuth callback.
+ChatGPT uses OpenAI's device authorization flow and has no Pantry callback URI.
+Seams Checkout has no external OAuth callback.
 
 ## External configuration registry
 
@@ -112,7 +112,7 @@ from the endpoint URL. See [Gmail mailboxes](gmail-mailboxes.md). Dropbox uses
 the shared `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/dropbox` endpoint. Shopify
 uses organisation-specific `/hook/shopify/:organisationId` endpoints, while the Stripe
 Connect platform uses `/hook/stripe/connect`; reconcile connected accounts
-after an origin change so Satyr registers the new provider endpoints.
+after an origin change so Pantry registers the new provider endpoints.
 
 ## Adding an environment or changing a hostname
 

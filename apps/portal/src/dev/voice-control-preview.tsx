@@ -84,7 +84,7 @@ function json(body: unknown, status = 200): Response {
 }
 
 // The Portal sends a change only with a session's CSRF cookie, so the preview sets one.
-document.cookie = "satyr_control_csrf=preview; path=/";
+document.cookie = "pantry_csrf=preview; path=/";
 
 const realFetch = window.fetch.bind(window);
 window.fetch = async (input, init) => {
@@ -136,7 +136,7 @@ window.fetch = async (input, init) => {
 /** The dialog needs the session's state and calls. A real one opens the microphone. */
 function previewSession(): VoiceSession {
   let status = STATUSES[query.get("status") ?? "off"] ?? { kind: "off" };
-  const key = `satyr.voice.on.${organisationId}`;
+  const key = `pantry.voice.on.${organisationId}`;
   if (status.kind === "off") localStorage.removeItem(key);
   else localStorage.setItem(key, "on");
   const listeners = new Set<() => void>();

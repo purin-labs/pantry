@@ -419,7 +419,7 @@ CREATE TABLE IF NOT EXISTS point_of_sale_configuration (
   merchant_id TEXT NOT NULL,
   configuration_id TEXT NOT NULL,
   revision INTEGER NOT NULL CHECK (revision > 0),
-  satyr_location_id TEXT NOT NULL,
+  pantry_location_id TEXT NOT NULL,
   lifecycle_state TEXT NOT NULL CHECK (
     lifecycle_state IN ('draft', 'published', 'retired')
   ),
@@ -432,7 +432,7 @@ CREATE TABLE IF NOT EXISTS point_of_sale_configuration (
 -- One counter sells under one published policy at a time. Publishing a new
 -- revision retires the previous one rather than creating a second authority.
 CREATE UNIQUE INDEX IF NOT EXISTS point_of_sale_configuration_published_location
-  ON point_of_sale_configuration (merchant_id, satyr_location_id)
+  ON point_of_sale_configuration (merchant_id, pantry_location_id)
   WHERE lifecycle_state = 'published';
 `;
 
@@ -452,7 +452,7 @@ CREATE TABLE buyer_checkout (
       buyer_session_digest NOT GLOB '*[^0-9a-f]*'
     )
   ),
-  satyr_location_id TEXT,
+  pantry_location_id TEXT,
   operator_identity TEXT,
   terminal_assignment_revision INTEGER CHECK (
     terminal_assignment_revision IS NULL OR terminal_assignment_revision > 0
@@ -486,7 +486,7 @@ CREATE TABLE buyer_checkout (
       AND checkout_profile_id IS NOT NULL
       AND checkout_profile_revision IS NOT NULL
       AND pos_configuration_revision IS NULL
-      AND satyr_location_id IS NULL AND operator_identity IS NULL
+      AND pantry_location_id IS NULL AND operator_identity IS NULL
       AND terminal_assignment_revision IS NULL
       AND point_of_sale_buyer_kind IS NULL AND point_of_sale_customer_id IS NULL)
     OR
@@ -495,7 +495,7 @@ CREATE TABLE buyer_checkout (
       AND buyer_session_digest IS NULL
       AND checkout_profile_id IS NULL AND checkout_profile_revision IS NULL
       AND pos_configuration_revision IS NOT NULL
-      AND satyr_location_id IS NOT NULL AND operator_identity IS NOT NULL
+      AND pantry_location_id IS NOT NULL AND operator_identity IS NOT NULL
       AND point_of_sale_buyer_kind IS NOT NULL
       AND (
         (point_of_sale_buyer_kind = 'anonymous' AND point_of_sale_customer_id IS NULL)
@@ -1818,7 +1818,7 @@ export function initializeCommerceSchema(
       applySchemaV92(database, appliedAt);
     });
   } else if (row.version !== SCHEMA_VERSION) {
-    throw new Error(`Unsupported Underclerk schema version: ${row.version}`);
+    throw new Error(`Unsupported Commerce schema version: ${row.version}`);
   }
   initializeEntityPlaneSchema(database);
 }
@@ -1833,12 +1833,12 @@ export function assertCommerceSchemaReady(
       .get<SchemaVersionRow>();
   } catch {
     throw new Error(
-      "Underclerk schema must be initialized before constructing runtime services",
+      "Commerce schema must be initialized before constructing runtime services",
     );
   }
   if (row?.version !== SCHEMA_VERSION) {
     throw new Error(
-      "Underclerk schema must be initialized before constructing runtime services",
+      "Commerce schema must be initialized before constructing runtime services",
     );
   }
 }
@@ -1907,7 +1907,7 @@ CREATE TABLE buyer_checkout (
       buyer_session_digest NOT GLOB '*[^0-9a-f]*'
     )
   ),
-  satyr_location_id TEXT,
+  pantry_location_id TEXT,
   operator_identity TEXT,
   terminal_assignment_revision INTEGER CHECK (
     terminal_assignment_revision IS NULL OR terminal_assignment_revision > 0
@@ -1937,7 +1937,7 @@ CREATE TABLE buyer_checkout (
       AND checkout_profile_id IS NOT NULL
       AND checkout_profile_revision IS NOT NULL
       AND pos_configuration_revision IS NULL
-      AND satyr_location_id IS NULL AND operator_identity IS NULL
+      AND pantry_location_id IS NULL AND operator_identity IS NULL
       AND terminal_assignment_revision IS NULL
       AND point_of_sale_buyer_kind IS NULL AND point_of_sale_customer_id IS NULL)
     OR
@@ -1946,7 +1946,7 @@ CREATE TABLE buyer_checkout (
       AND buyer_session_digest IS NULL
       AND checkout_profile_id IS NULL AND checkout_profile_revision IS NULL
       AND pos_configuration_revision IS NOT NULL
-      AND satyr_location_id IS NOT NULL AND operator_identity IS NOT NULL
+      AND pantry_location_id IS NOT NULL AND operator_identity IS NOT NULL
       AND point_of_sale_buyer_kind IS NOT NULL
       AND (
         (point_of_sale_buyer_kind = 'anonymous' AND point_of_sale_customer_id IS NULL)
@@ -1969,7 +1969,7 @@ CREATE TABLE buyer_checkout (
 ) STRICT;
 INSERT INTO buyer_checkout (
   merchant_id, checkout_id, source_kind, storefront_id, cart_id,
-  buyer_session_digest, satyr_location_id, operator_identity,
+  buyer_session_digest, pantry_location_id, operator_identity,
   terminal_assignment_revision, point_of_sale_buyer_kind,
   point_of_sale_customer_id, checkout_profile_id,
   checkout_profile_revision, pos_configuration_revision, revision,
@@ -1977,7 +1977,7 @@ INSERT INTO buyer_checkout (
 )
 SELECT
   merchant_id, checkout_id, source_kind, storefront_id, cart_id,
-  buyer_session_digest, satyr_location_id, operator_identity,
+  buyer_session_digest, pantry_location_id, operator_identity,
   terminal_assignment_revision, point_of_sale_buyer_kind,
   point_of_sale_customer_id, checkout_profile_id,
   checkout_profile_revision, pos_configuration_revision, revision,

@@ -8,7 +8,7 @@ import type { Variant } from "@purin-labs/type-utils";
  * (Plan 88). A Jev processing label names it.
  */
 export type TypeSafeAuthority =
-  | Readonly<{ kind: "satyr_platform"; connectionRevision?: never }>
+  | Readonly<{ kind: "pantry_platform"; connectionRevision?: never }>
   | Readonly<{ kind: "organisation_byo"; connectionRevision: number }>;
 
 export type FlowPolicyOwner =

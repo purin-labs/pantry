@@ -665,7 +665,7 @@ function slackSeed(
     provider: "slack",
     providerSubjectId: workspaceId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requireVaultHandle(

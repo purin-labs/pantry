@@ -302,12 +302,12 @@ async function disconnectCommerceSquare(
   input: Parameters<ProviderCleanupAdapter<"square">["remove"]>[0],
   delegation: SquareDelegation,
 ): Promise<ProviderCleanupResult> {
-  const commerceEngine = input.env.UNDERCLERK;
+  const commerceEngine = input.env.COMMERCE;
   const client =
     commerceEngine === undefined
       ? null
       : createCommerceClient(
-          { ...input.env, UNDERCLERK: commerceEngine },
+          { ...input.env, COMMERCE: commerceEngine },
           undefined,
           {
             kind: "organisation",

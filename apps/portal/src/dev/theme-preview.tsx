@@ -127,7 +127,7 @@ const THEME_ITEMS = THEME_KEYS.map((theme) => ({
 }));
 
 function Shade(family: string, shade: number): React.ReactNode {
-  const token = `--satyr-${family}-${shade}`;
+  const token = `--pantry-${family}-${shade}`;
   return (
     <li key={shade}>
       <span
@@ -159,8 +159,8 @@ function Tone(tone: string): React.ReactNode {
       className="theme-tone"
       key={tone}
       style={{
-        color: `var(--satyr-${tone}-text)`,
-        background: `var(--satyr-${tone}-surface)`,
+        color: `var(--pantry-${tone}-text)`,
+        background: `var(--pantry-${tone}-surface)`,
       }}
     >
       {tone.replace("category-", "")}
@@ -287,8 +287,8 @@ function ThemePreview(): React.ReactNode {
       </section>
       <div className="theme-ramps">{spec.families.map(Family)}</div>
       <footer>
-        Use <code>--satyr-primary</code> for actions and{" "}
-        <code>--satyr-ink</code> for text. Semantic tokens adapt to the selected
+        Use <code>--pantry-primary</code> for actions and{" "}
+        <code>--pantry-ink</code> for text. Semantic tokens adapt to the selected
         theme and appearance.
       </footer>
     </main>

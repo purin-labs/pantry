@@ -177,7 +177,7 @@ async function createFixture(): Promise<
   };
   const admin = new CommerceAdminClient(config);
   const provisioned = await admin.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     createdAt: NOW,

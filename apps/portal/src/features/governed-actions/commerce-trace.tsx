@@ -93,7 +93,7 @@ export function CommerceActionTrace({
                   pending.
                 </p>
               )}
-            {action.receipt.provider === "underclerk" &&
+            {action.receipt.provider === "commerce" &&
               action.receipt.projectionKind === "commerce_order" && (
                 <p>
                   Refund attempt {action.receipt.providerResource.id} was

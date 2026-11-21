@@ -6,7 +6,7 @@ const SHOPIFY_ADMIN_API_VERSION = "2026-07";
 type ShopifyAcceptanceOperation =
   "verify_development_store" | "resolve_variant" | "create_order";
 
-const SHOPIFY_ACCEPTANCE_SKU = "SATYR-CK4-20260809";
+const SHOPIFY_ACCEPTANCE_SKU = "PANTRY-CK4-20260809";
 
 type ShopifyDevelopmentOrderTrigger = {
   kind: "development_order_submitted";
@@ -66,7 +66,7 @@ export async function triggerShopifyDevelopmentOrder(input: {
     "verify_development_store",
     {
       query:
-        "query SatyrAcceptanceShopPlan { shop { plan { partnerDevelopment } } }",
+        "query PantryAcceptanceShopPlan { shop { plan { partnerDevelopment } } }",
       variables: {},
     },
   );
@@ -89,7 +89,7 @@ export async function triggerShopifyDevelopmentOrder(input: {
   }
 
   const variant = await sendShopifyAcceptanceGraphql(input, "resolve_variant", {
-    query: `query SatyrAcceptanceVariant($query: String!) {
+    query: `query PantryAcceptanceVariant($query: String!) {
       productVariants(first: 1, query: $query) { nodes { id sku } }
     }`,
     variables: { query: `sku:${SHOPIFY_ACCEPTANCE_SKU}` },
@@ -106,7 +106,7 @@ export async function triggerShopifyDevelopmentOrder(input: {
   }
 
   const created = await sendShopifyAcceptanceGraphql(input, "create_order", {
-    query: `mutation SatyrAcceptanceOrder($order: OrderCreateOrderInput!) {
+    query: `mutation PantryAcceptanceOrder($order: OrderCreateOrderInput!) {
       orderCreate(order: $order) {
         userErrors { field message }
       }
@@ -122,7 +122,7 @@ export async function triggerShopifyDevelopmentOrder(input: {
           },
         ],
         sourceIdentifier: input.sourceIdentifier,
-        tags: ["satyr-m8-acceptance"],
+        tags: ["pantry-m8-acceptance"],
         test: true,
       },
     },
@@ -301,5 +301,5 @@ function isShopifyDomain(raw: string): boolean {
 }
 
 function isAcceptanceSourceIdentifier(raw: string): boolean {
-  return raw.length <= 128 && /^satyr-m8-[0-9a-f-]{36}$/u.test(raw);
+  return raw.length <= 128 && /^pantry-m8-[0-9a-f-]{36}$/u.test(raw);
 }

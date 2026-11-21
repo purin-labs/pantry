@@ -267,7 +267,7 @@ export type ProviderCleanupResult =
 /** Cleanup also reaches Commerce, which holds Square connections. */
 export type ProviderCleanupBindings = ProviderAdapterBindings &
   Partial<
-    Pick<Env, "UNDERCLERK" | "UNDERCLERK_BASE_URL" | "UNDERCLERK_SERVICE_TOKEN">
+    Pick<Env, "COMMERCE" | "COMMERCE_BASE_URL" | "COMMERCE_SERVICE_TOKEN">
   >;
 
 type ProviderCleanupAdapterInput<P extends ActiveIntegrationProvider> = {

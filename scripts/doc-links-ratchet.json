@@ -10,13 +10,13 @@
   "docs/architecture/integrations.md -> ../../services/platform/src/shopify-connector.ts": 1,
   "docs/architecture/integrations.md -> ../../services/platform/src/slack-stream.ts": 1,
   "docs/architecture/integrations.md -> ../../services/platform/src/stored-attachment.ts": 1,
-  "docs/architecture/integrations.md -> ../../services/platform/src/underclerk-webhooks.ts": 1,
+  "docs/architecture/integrations.md -> ../../services/platform/src/commerce-webhooks.ts": 1,
   "docs/architecture/runtime.md -> ../../services/platform/src/cue-engine.ts": 1,
   "docs/architecture/runtime.md -> ../../services/platform/src/cue-queue-consumer.ts": 1,
   "docs/architecture/runtime.md -> ../../services/platform/src/message-attachment-collection.ts": 1,
   "docs/architecture/runtime.md -> ../../services/platform/src/schedule-dispatch.ts": 1,
   "docs/architecture/runtime.md -> ../../services/platform/src/schedule-window.ts": 1,
-  "docs/architecture/runtime.md -> ../../services/platform/src/underclerk-outbox-worker.ts": 1,
+  "docs/architecture/runtime.md -> ../../services/platform/src/commerce-outbox-worker.ts": 1,
   "docs/experiement-1.md -> ../services/platform/src/actors/harness-tool-catalog.ts": 1,
   "docs/integrations/shopify.md -> ../../services/platform/src/shopify-connector.ts": 1,
   "docs/plan-33-merchant-configurable-production-checkout.md -> ../scripts/punter/tests/shipping-scenario.test.ts": 1,
@@ -29,5 +29,5 @@
   "docs/plan-76A-shopify-parity.md -> ../services/underclerk/docs/spec.md": 1,
   "docs/plan-77-underclerk-modular-core.md -> ../services/underclerk/docs/spec.md": 1,
   "docs/refactor-9.md -> plan-52-chat-projects-and-context.md": 1,
-  "packages/bakery-model/README.md -> ../commerce-commerce-client/README.md": 1
+  "packages/bakery-model/README.md -> ../commerce-client/README.md": 1
 }

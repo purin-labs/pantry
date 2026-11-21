@@ -43,7 +43,7 @@ export type GatewayWebhookRoute =
   | Readonly<{ kind: "emailGoogleWebhook" }>
   | Readonly<{ kind: "whatsappWebhook" }>
   | Readonly<{ kind: "shopifyWebhook"; organisationIdRaw: string }>
-  | Readonly<{ kind: "underclerkWebhook"; organisationIdRaw: string }>
+  | Readonly<{ kind: "commerceWebhook"; organisationIdRaw: string }>
   | Readonly<{ kind: "dropboxWebhook" }>
   | Readonly<{ kind: "discordInteraction"; organisationIdRaw: string }>;
 

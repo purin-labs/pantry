@@ -347,7 +347,7 @@ export async function readContactVerificationStanding(
       contact.error.code !== "email_operational_contact_suppressed" &&
       contact.error.code !== "email_operational_contact_inactive") ||
     (!account.ok && account.error.code === "integration_account_corrupt") ||
-    (!merchant.ok && merchant.error.code !== "underclerk_binding_not_found")
+    (!merchant.ok && merchant.error.code !== "commerce_binding_not_found")
   ) {
     return { kind: "unreadable" };
   }

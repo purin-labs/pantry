@@ -65,13 +65,13 @@ async function cafeMenuPublicationJourney({
     merchantId,
   );
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -272,12 +272,12 @@ function catalogSnapshotExpires(): Promise<void> {
 /** The menus that a buyer of the café shop sees, by revision and offers. */
 async function buyerMenus(merchantId: string): Promise<unknown[]> {
   const buyer = new CommerceStorefrontClient({
-    baseUrl: "http://underclerk.test",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const session = await required(
     buyer.createSession(merchantId, STOREFRONT, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "guest" },
     }),
   );
@@ -319,8 +319,8 @@ async function publish(
         origin: PUBLIC_ORIGIN,
         "content-type": "application/json",
         "idempotency-key": crypto.randomUUID(),
-        "x-satyr-configuration-version": "1",
-        "x-satyr-csrf": session.csrfToken,
+        "x-pantry-configuration-version": "1",
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify({ documentRevision }),
     },

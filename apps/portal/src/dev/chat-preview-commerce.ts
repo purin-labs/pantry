@@ -10,7 +10,7 @@ let previewState: "proposed" | "signed" | "confirmed" | "rejected" = "proposed";
 const calls: string[] = [];
 let stepUpPending = new URLSearchParams(window.location.search).get("stepup") === "1";
 // A browser journey reads which steps the card asked for.
-Object.assign(window, { satyrCommercePreviewCalls: calls });
+Object.assign(window, { builtInCommercePreviewCalls: calls });
 
 export function commercePreviewEnabled(): boolean {
   return new URLSearchParams(window.location.search).get("scenario") === "commerce-action";
@@ -40,7 +40,7 @@ function record(): Record<string, unknown> {
         before: { price: { amountMinor: 300, currency: "JPY" }, compareAtPrice: null },
         after: { price: { amountMinor: 280, currency: "JPY" }, compareAtPrice: null },
       },
-      commerceSystem: { kind: "commerce_system", system: "satyr_commerce", revision: 1 },
+      commerceSystem: { kind: "commerce_system", system: "builtin_commerce", revision: 1 },
       providerResult: null,
     },
   };

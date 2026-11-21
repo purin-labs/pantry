@@ -2,15 +2,15 @@
 
 Status: Active deployment guide
 
-This guide is the operator checklist for making every organisation-facing Satyr
-integration available through the Portal. It covers shared Satyr
+This guide is the operator checklist for making every organisation-facing Pantry
+integration available through the Portal. It covers shared Pantry
 configuration, provider application settings, production-distribution gates,
 and webhook setup required before an organisation can complete authorization without
 operator assistance.
 
 The active external authorization providers are Airtable, Dropbox, Gmail,
 Google Drive, Notion, Shopify, Slack, Stripe, and WhatsApp. AI inference and
-Satyr Commerce also appear in the Portal, but they use Satyr-owned provisioning
+Seams Checkout also appear in the Portal, but they use Pantry-owned provisioning
 flows and have no external provider OAuth application.
 
 ## Shared configuration
@@ -59,7 +59,7 @@ Webhook endpoints use `PANTRY_PROVIDER_INGRESS_ORIGIN`:
 | -------- | ------------------------------- | -------------------------------------- |
 | Dropbox  | `/hook/dropbox`                 | Dropbox app dashboard                  |
 | Gmail    | `/hook/email/google`            | Google Cloud Pub/Sub push subscription |
-| Shopify  | `/hook/shopify/:organisationId` | Satyr, after organisation OAuth        |
+| Shopify  | `/hook/shopify/:organisationId` | Pantry, after organisation OAuth        |
 | Slack    | `/slack/events`                 | Slack app dashboard                    |
 | Stripe   | `/hook/stripe/connect`          | Stripe Connect platform                |
 | WhatsApp | `/hook/whatsapp`                | Meta app dashboard                     |
@@ -87,7 +87,7 @@ runtime contract.
 
 Create an OAuth integration in Airtable Builder Hub.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                        | Kind   |
 | ------------------------------ | ------ |
@@ -100,11 +100,11 @@ Provider configuration:
 2. Enable `data.records:read` and `schema.bases:read`.
 3. Configure the integration name, logo, support email, privacy policy, and
    terms required for authorization by users outside the developer account.
-4. Keep the client secret server-side. Satyr supplies PKCE for every organisation
+4. Keep the client secret server-side. Pantry supplies PKCE for every organisation
    authorization attempt.
 
 Airtable does not currently expose a usable programmatic revocation path for
-this connection. Satyr removal tells the operator to revoke the integration in
+this connection. Pantry removal tells the operator to revoke the integration in
 Airtable when provider-side cleanup is required.
 
 Reference: [Using Builder Hub in Airtable](https://support.airtable.com/articles/9362950318-using-builder-hub-in-airtable).
@@ -112,9 +112,9 @@ Reference: [Using Builder Hub in Airtable](https://support.airtable.com/articles
 ## Dropbox
 
 Create a scoped Dropbox API app with **Full Dropbox** access. App Folder access
-cannot represent the organisation-selected files and folders used by Satyr.
+cannot represent the organisation-selected files and folders used by Pantry.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                       | Kind   |
 | ----------------------------- | ------ |
@@ -132,7 +132,7 @@ Provider configuration:
 4. Apply for production status before opening the integration to arbitrary
    organisation accounts. Development status has a linked-user limit.
 
-Satyr requests offline access and PKCE, then stores the refreshable organisation
+Pantry requests offline access and PKCE, then stores the refreshable organisation
 grant in the organisation Vault.
 
 References: [Dropbox OAuth guide](https://developers.dropbox.com/oauth-guide),
@@ -146,7 +146,7 @@ that provides Portal sign-in or the Google Drive integration. Google consent,
 verification, test-user limits, and restricted-scope assessment apply to an
 entire project.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                          | Kind         | Purpose                                           |
 | -------------------------------- | ------------ | ------------------------------------------------- |
@@ -169,7 +169,7 @@ Google Cloud configuration:
    `https://www.googleapis.com/auth/gmail.readonly`, and
    `https://www.googleapis.com/auth/gmail.compose`.
 5. Publish the production application and complete Google's restricted-scope
-   verification. Because Satyr handles restricted Gmail data on its servers,
+   verification. Because Pantry handles restricted Gmail data on its servers,
    plan for the required third-party security assessment/CASA and its recurring
    renewal.
 
@@ -197,11 +197,11 @@ recovery.
 
 ## Google Drive
 
-Use a dedicated Google Cloud project for Drive. Satyr uses `drive.file`, which
+Use a dedicated Google Cloud project for Drive. Pantry uses `drive.file`, which
 limits access to files the user explicitly selects through Google Picker or
 creates with the app.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                      | Kind   | Purpose                                                                |
 | ---------------------------- | ------ | ---------------------------------------------------------------------- |
@@ -237,7 +237,7 @@ and [Drive API scopes](https://developers.google.com/workspace/drive/api/guides/
 Create a **Public connection** in Notion's integration dashboard. An Internal
 connection can only be installed in its owning workspace.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                      | Kind   |
 | ---------------------------- | ------ |
@@ -249,7 +249,7 @@ Provider configuration:
 1. Select the installation scope that permits installation in any workspace.
    Notion fixes this choice when the public connection is created.
 2. Register the Notion callback URI.
-3. Enable read-content capability only. Satyr validates the resulting
+3. Enable read-content capability only. Pantry validates the resulting
    `content.read` grant.
 4. Configure the public connection's organization, support, privacy, and terms
    information.
@@ -266,7 +266,7 @@ Create a standalone/API-only Shopify app that uses the authorization-code
 grant. Select **Public distribution** if unrelated merchants must install it;
 Shopify fixes the distribution method after selection.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                 | Kind   |
 | ----------------------- | ------ |
@@ -289,7 +289,7 @@ App configuration:
    Limited listing visibility is sufficient when discoverability is not
    desired; Shopify review still applies.
 
-Satyr registers and reconciles organisation-specific webhook subscriptions after
+Pantry registers and reconciles organisation-specific webhook subscriptions after
 OAuth for `INVENTORY_LEVELS_UPDATE`, `ORDERS_CREATE`, `ORDERS_UPDATED`,
 `PRODUCTS_CREATE`, `PRODUCTS_DELETE`, and `PRODUCTS_UPDATE`. Do not duplicate
 these as version-managed app webhooks.
@@ -304,7 +304,7 @@ runbook.
 
 Create a Slack app with a bot user and OAuth v2 installation.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                    | Kind   | Purpose                                |
 | -------------------------- | ------ | -------------------------------------- |
@@ -323,7 +323,7 @@ Slack app configuration:
    `${PANTRY_PROVIDER_INGRESS_ORIGIN}/slack/events`.
 4. Subscribe to bot events `app_mention`, `message.channels`,
    `message.groups`, and `message.im`.
-5. Keep Socket Mode disabled; Satyr receives signed HTTPS events.
+5. Keep Socket Mode disabled; Pantry receives signed HTTPS events.
 6. Activate Public Distribution so the OAuth workspace selector can authorize
    workspaces other than the app's development workspace. Do not pass Slack's
    optional `team` parameter because it pins the authorization to one
@@ -340,12 +340,12 @@ procedure and verification evidence.
 
 ## Stripe
 
-Configure Satyr as a Stripe Connect platform. The implemented OAuth flow
+Configure Pantry as a Stripe Connect platform. The implemented OAuth flow
 connects Standard accounts with `read_write` authority. Stripe recommends its
-newer Connect Onboarding path for new platforms; changing Satyr to that model
+newer Connect Onboarding path for new platforms; changing Pantry to that model
 requires a runtime change and is outside deployment configuration.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                         | Kind   | Purpose                                     |
 | ------------------------------- | ------ | ------------------------------------------- |
@@ -359,7 +359,7 @@ Stripe configuration:
 1. Enable Connect in the Stripe account and register the Stripe callback under
    Connect OAuth settings.
 2. Use a sandbox client ID with a test secret key, or a live client ID with a
-   live secret key. Satyr rejects mixed modes.
+   live secret key. Pantry rejects mixed modes.
 3. Create a webhook event destination for **Connected accounts** at
    `${PANTRY_PROVIDER_INGRESS_ORIGIN}/hook/stripe/connect`.
 4. Subscribe it to `charge.failed`, `invoice.payment_failed`, `refund.failed`,
@@ -375,11 +375,11 @@ and [Connect webhooks](https://docs.stripe.com/connect/webhooks).
 ## WhatsApp
 
 WhatsApp onboarding uses Meta Embedded Signup. Organisations grant WABA and phone
-number assets to Satyr's Meta application. The signup exchange returns a
-customer business token with a finite expiry; Satyr stores it in the organisation
+number assets to Pantry's Meta application. The signup exchange returns a
+customer business token with a finite expiry; Pantry stores it in the organisation
 Vault and uses it for that connection's provider operations.
 
-Satyr bindings:
+Pantry bindings:
 
 | Binding                              | Kind   | Purpose                                           |
 | ------------------------------------ | ------ | ------------------------------------------------- |
@@ -417,11 +417,11 @@ for the tested setup and remaining production gates.
 
 ## Portal entries without provider OAuth
 
-**AI inference** is configured through Satyr's organisation subscription, organisation BYO
+**AI inference** is configured through Pantry's organisation subscription, organisation BYO
 credential, or platform-funded model route. It has no provider callback in the
 integration catalogue.
 
-**Satyr Commerce** is internal organisation commerce provisioning. It has no external
+**Seams Checkout** is internal organisation commerce provisioning. It has no external
 OAuth client, consent screen, or provider webhook.
 
 Google sign-in for Portal authentication is also separate from integrations.
@@ -457,7 +457,7 @@ For each environment and provider:
 
 Scope, callback, client-ID, distribution, or consent-screen changes generally
 require organisations to authorize again. Roll out those changes as a provider app
-version plus a Satyr reconnect procedure.
+version plus a Pantry reconnect procedure.
 
 ## Current deployment readiness
 
@@ -488,9 +488,9 @@ the nine active providers, including Dropbox and Google Drive.
 Gmail currently sets `GMAIL_OAUTH_PILOT_EXPIRY_DAYS=7`; organisation grants require
 periodic reconnects until the production Google project passes verification.
 Keep general WhatsApp onboarding closed until its production gates are
-resolved. Slack Public Distribution was verified active for Satyr Local on
+resolved. Slack Public Distribution was verified active for Pantry Local on
 2026-08-30. Its reconciled public manifest was deployed and read back from
-Slack on the same date. Satyr Local was then reinstalled successfully in Seams.
+Slack on the same date. Pantry Local was then reinstalled successfully in Seams.
 
 Review [Provider callback origins](../runbooks/provider-callback-origins.md)
 whenever a hostname or environment changes.

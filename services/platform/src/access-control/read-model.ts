@@ -264,7 +264,7 @@ async function includeCommerceIntegration(
   ) {
     return { ok: true, value: input.integrations };
   }
-  if (!input.availableCommerceSystems.includes("satyr_commerce")) {
+  if (!input.availableCommerceSystems.includes("builtin_commerce")) {
     return unavailable("commerce.integration");
   }
   const binding = await resolveCommerceMerchantBinding({
@@ -280,7 +280,7 @@ async function includeCommerceIntegration(
       {
         organisationId: input.organisationId,
         integrationAccountId: binding.value.integrationAccountId,
-        provider: "satyr_commerce",
+        provider: "builtin_commerce",
         displayName: "Seams Checkout",
         availability: "available",
         updatedAt: binding.value.updatedAt,
@@ -517,7 +517,7 @@ async function resourceProjections(
           grant.target.capabilityId === CAPABILITY_KEYS.commerceActionPropose &&
           grant.target.resourceScope.startsWith("commerce:list_entry:") &&
           commerceIntegrationAccountId === grant.target.integrationAccountId &&
-          availableCommerceSystems.includes("satyr_commerce")
+          availableCommerceSystems.includes("builtin_commerce")
         ) {
           projections.push({
             kind: "commerce_scope",

@@ -155,10 +155,10 @@ export async function pluginStateRoute(
   if (!body.ok) return body.response;
   const schemaVersion =
     route.kind === "pause_plugin"
-      ? "underclerk.pause-plugin.v1"
+      ? "commerce.pause-plugin.v1"
       : route.kind === "resume_plugin"
-        ? "underclerk.resume-plugin.v1"
-        : "underclerk.remove-plugin.v1";
+        ? "commerce.resume-plugin.v1"
+        : "commerce.remove-plugin.v1";
   if (
     !hasMerchantId(body.value, route.merchantId) ||
     !isRecord(body.value) ||

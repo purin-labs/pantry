@@ -31,7 +31,7 @@ export type CommerceActiveCheckoutProfileV1 = Readonly<{
 }>;
 
 export type CreateCommerceCheckoutProfileDraftV1 = Readonly<{
-  schemaVersion: "underclerk.create-checkout-profile-draft.v1";
+  schemaVersion: "commerce.create-checkout-profile-draft.v1";
   merchantId: string;
   checkoutProfileId: string;
   name: string;
@@ -40,7 +40,7 @@ export type CreateCommerceCheckoutProfileDraftV1 = Readonly<{
 }>;
 
 export type ReplaceCommerceCheckoutProfileDraftV1 = Readonly<{
-  schemaVersion: "underclerk.replace-checkout-profile-draft.v1";
+  schemaVersion: "commerce.replace-checkout-profile-draft.v1";
   merchantId: string;
   checkoutProfileId: string;
   expectedRevision: number;
@@ -50,7 +50,7 @@ export type ReplaceCommerceCheckoutProfileDraftV1 = Readonly<{
 }>;
 
 export type PublishCommerceCheckoutProfileV1 = Readonly<{
-  schemaVersion: "underclerk.publish-checkout-profile.v1";
+  schemaVersion: "commerce.publish-checkout-profile.v1";
   merchantId: string;
   checkoutProfileId: string;
   expectedRevision: number;
@@ -59,7 +59,7 @@ export type PublishCommerceCheckoutProfileV1 = Readonly<{
 }>;
 
 export type RetireCommerceCheckoutProfileV1 = Readonly<{
-  schemaVersion: "underclerk.retire-checkout-profile.v1";
+  schemaVersion: "commerce.retire-checkout-profile.v1";
   merchantId: string;
   checkoutProfileId: string;
   expectedRevision: number;
@@ -68,7 +68,7 @@ export type RetireCommerceCheckoutProfileV1 = Readonly<{
 }>;
 
 export type ActivateCommerceCheckoutProfileV1 = Readonly<{
-  schemaVersion: "underclerk.activate-checkout-profile.v1";
+  schemaVersion: "commerce.activate-checkout-profile.v1";
   merchantId: string;
   storefrontId: string;
   checkoutProfileId: string;

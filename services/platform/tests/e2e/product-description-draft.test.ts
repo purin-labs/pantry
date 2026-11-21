@@ -36,7 +36,7 @@ const PUBLIC_ORIGIN = "https://localhost";
 const PRODUCT_ID = "product_description_e2e";
 const INTEGRATION_ACCOUNT_ID = "integration_description_e2e";
 const PROVIDER_CONNECTION_ID = "provider_description_e2e";
-const COMMERCE_BINDING_ID = "underclerk_binding_description_e2e";
+const COMMERCE_BINDING_ID = "commerce_binding_description_e2e";
 const COMMERCE_MERCHANT_ID = "merchant_description_e2e";
 const INITIAL_DESCRIPTION = "Freshly baked croissant.";
 const TEST_PLACEMENT = requiredPlacement();
@@ -452,7 +452,7 @@ async function installDraftScenario(label: string): Promise<DraftScenario> {
          application_credential_generation, asset_grant_revision, lifecycle,
          granted_scopes, created_by_user_id, created_at, updated_at,
          disabled_at, revoked_at, environment, provider_subject_id
-       ) VALUES (?, ?, 'underclerk', 'api_key', 'connection_credential',
+       ) VALUES (?, ?, 'commerce', 'api_key', 'connection_credential',
          1, ?, NULL, NULL, NULL, 'active', '[]', ?, ?, ?, NULL, NULL, 'development', '')`,
       )
       .bind(
@@ -471,7 +471,7 @@ async function installDraftScenario(label: string): Promise<DraftScenario> {
          lifecycle_reason_code, capability_set, audience_policy, retention_policy,
          created_at, updated_at, disabled_by_user_id, disabled_at,
          revoked_at, environment, is_default_for_provider
-       ) VALUES (?, ?, ?, 'underclerk', ?, 'merchant', ?, 'active', NULL,
+       ) VALUES (?, ?, ?, 'commerce', ?, 'merchant', ?, 'active', NULL,
          '[]', '{}', '{}', ?, ?, NULL, NULL, NULL, 'development', 0)`,
       )
       .bind(
@@ -479,13 +479,13 @@ async function installDraftScenario(label: string): Promise<DraftScenario> {
         organisation.organisationId,
         PROVIDER_CONNECTION_ID + label,
         COMMERCE_MERCHANT_ID + label,
-        `Underclerk ${label}`,
+        `Commerce ${label}`,
         now,
         now,
       ),
     fixtureDatabase()
       .prepare(
-        `INSERT INTO underclerk_merchant_binding (
+        `INSERT INTO commerce_merchant_binding (
          binding_id, organisation_id, integration_account_id, merchant_id,
          environment, delivery_signing_key_id, delivery_signing_public_key_b64,
          revision, created_at, updated_at
@@ -496,7 +496,7 @@ async function installDraftScenario(label: string): Promise<DraftScenario> {
         organisation.organisationId,
         INTEGRATION_ACCOUNT_ID + label,
         COMMERCE_MERCHANT_ID + label,
-        `underclerk-key-${label}`,
+        `commerce-key-${label}`,
         "AA==",
         now,
         now,
@@ -504,10 +504,10 @@ async function installDraftScenario(label: string): Promise<DraftScenario> {
     fixtureDatabase()
       .prepare(
         `INSERT INTO organisation_commerce_system (
-         organisation_id, system_kind, underclerk_binding_id,
+         organisation_id, system_kind, commerce_binding_id,
          shopify_integration_account_id, revision, selected_at,
          selected_by_user_id
-       ) VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)`,
+       ) VALUES (?, 'builtin_commerce', ?, NULL, 1, ?, ?)`,
       )
       .bind(
         organisation.organisationId,
@@ -597,7 +597,7 @@ function seedProductProjection(
       provenance: {
         organisationId,
         integrationAccountId,
-        source: "underclerk",
+        source: "commerce",
         resourceType: "product",
         resourceId: commerceCanonicalResourceId(merchantId, PRODUCT_ID),
         revision: 1,
@@ -673,7 +673,7 @@ function draftHeaders(
   return {
     Upgrade: "websocket",
     Origin: origin,
-    Cookie: `satyr_control_session=${encodeURIComponent(session.token)}`,
+    Cookie: `pantry_session=${encodeURIComponent(session.token)}`,
   };
 }
 

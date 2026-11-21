@@ -78,7 +78,7 @@ export function createIntegrationsPageActions(
       { kind: "sync_commerce" },
       null,
     ),
-    setupSatyrCommerce: runIntegrationsCommand.bind(
+    setupBuiltInCommerce: runIntegrationsCommand.bind(
       null,
       context,
       { kind: "provision_commerce" },

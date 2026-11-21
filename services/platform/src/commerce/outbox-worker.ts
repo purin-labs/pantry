@@ -99,10 +99,10 @@ async function reconcileCommerceBindings(
         // Where a row exists, it must be active.
         `SELECT b.binding_id AS bindingId, b.organisation_id AS organisationId,
                 b.integration_account_id AS integrationAccountId
-         FROM underclerk_merchant_binding b
+         FROM commerce_merchant_binding b
          JOIN organisation t ON t.organisation_id = b.organisation_id AND t.status = 'active'
          JOIN organisation_commerce_system s ON s.organisation_id = b.organisation_id
-           AND s.system_kind = 'satyr_commerce' AND s.underclerk_binding_id = b.binding_id
+           AND s.system_kind = 'builtin_commerce' AND s.commerce_binding_id = b.binding_id
          LEFT JOIN integration_account a ON a.integration_account_id = b.integration_account_id
            AND a.organisation_id = b.organisation_id
          WHERE b.binding_id > ? AND (a.integration_account_id IS NULL OR a.lifecycle = 'active')
@@ -116,14 +116,14 @@ async function reconcileCommerceBindings(
         typeof row.organisationId !== "string" ||
         typeof row.integrationAccountId !== "string"
       )
-        throw new Error("Invalid Underclerk binding identity");
+        throw new Error("Invalid Commerce binding identity");
       after = row.bindingId;
       const organisationId = parseOrganisationId(row.organisationId);
       const integrationAccountId = parseIntegrationAccountId(
         row.integrationAccountId,
       );
       if (!organisationId.ok || !integrationAccountId.ok)
-        throw new Error("Invalid Underclerk binding scope");
+        throw new Error("Invalid Commerce binding scope");
       const execution = await OrganisationExecutionScope.resolve(
         env,
         organisationId.value,
@@ -142,7 +142,7 @@ async function reconcileCommerceBindings(
         const result = await reconcileCommerceOutbox({ env, message, now });
         results.push(result);
         if (result.kind !== "drained")
-          traceWarn("underclerk.scheduled_recovery_pending", {
+          traceWarn("commerce.scheduled_recovery_pending", {
             requestId: message.requestId,
             organisation_id: message.organisationId,
             code: result.code,
@@ -151,9 +151,9 @@ async function reconcileCommerceBindings(
         results.push({
           kind: "retry",
           deliveryId: null,
-          code: "underclerk_scheduled_reconciliation_failed",
+          code: "commerce_scheduled_reconciliation_failed",
         });
-        traceWarn("underclerk.scheduled_recovery_failed", {
+        traceWarn("commerce.scheduled_recovery_failed", {
           requestId: message.requestId,
           organisation_id: message.organisationId,
         });
@@ -194,7 +194,7 @@ async function subscribeToCommerceWebhooks(
       requestId: message.requestId,
     });
   } catch {
-    traceWarn("underclerk.webhook_subscription_failed", {
+    traceWarn("commerce.webhook_subscription_failed", {
       requestId: message.requestId,
       organisation_id: message.organisationId,
     });
@@ -251,7 +251,7 @@ export async function reconcileCommerceOutbox(
     return {
       kind: "retry",
       deliveryId: null,
-      code: "underclerk_client_unconfigured",
+      code: "commerce_client_unconfigured",
     };
   }
   await startCommerceWebhookRead(scope.database, binding.value.bindingId);
@@ -260,7 +260,7 @@ export async function reconcileCommerceOutbox(
     return {
       kind: "retry",
       deliveryId: null,
-      code: `underclerk_delivery_read_${pending.error.kind}`,
+      code: `commerce_delivery_read_${pending.error.kind}`,
     };
   }
   const now = input.now ?? Date.now();
@@ -281,7 +281,7 @@ export async function reconcileCommerceOutbox(
     return {
       kind: "retry",
       deliveryId: null,
-      code: "underclerk_cue_snapshot_refresh_failed",
+      code: "commerce_cue_snapshot_refresh_failed",
     };
   }
   const storedCues = await organisation.readRecoverableCommerceCues({
@@ -307,14 +307,14 @@ export async function reconcileCommerceOutbox(
   if (pending.value.length === 0) {
     if (
       !commerceAuthority.ok ||
-      commerceAuthority.value.provider !== "underclerk" ||
+      commerceAuthority.value.provider !== "commerce" ||
       commerceAuthority.value.integrationAccountId !==
         input.message.integrationAccountId
     ) {
       return {
         kind: "rejected",
         deliveryId: null,
-        code: "underclerk_commerce_system_mismatch",
+        code: "commerce_system_mismatch",
       };
     }
     return completeCommerceSync({
@@ -358,17 +358,17 @@ export async function reconcileCommerceOutbox(
     if (!normalized.ok) {
       if (
         !commerceAuthority.ok ||
-        commerceAuthority.value.provider !== "underclerk" ||
+        commerceAuthority.value.provider !== "commerce" ||
         commerceAuthority.value.integrationAccountId !==
           input.message.integrationAccountId
       ) {
         return {
           kind: "rejected",
           deliveryId: delivery.deliveryId,
-          code: "underclerk_commerce_system_mismatch",
+          code: "commerce_system_mismatch",
         };
       }
-      console.error("underclerk_outbox.delivery_rejected", {
+      console.error("commerce_outbox.delivery_rejected", {
         organisationId: input.message.organisationId,
         deliveryId: delivery.deliveryId,
         code: normalized.error,
@@ -419,7 +419,7 @@ export async function reconcileCommerceOutbox(
           return {
             kind: "retry",
             deliveryId: delivery.deliveryId,
-            code: "underclerk_entity_plane_cue_enqueue_failed",
+            code: "commerce_entity_plane_cue_enqueue_failed",
           };
         }
       }
@@ -447,21 +447,21 @@ export async function reconcileCommerceOutbox(
         default:
           return assertNever(
             acknowledgement,
-            "Unexpected Underclerk outbox result",
+            "Unexpected Commerce outbox result",
           );
       }
       continue;
     }
     if (
       !commerceAuthority.ok ||
-      commerceAuthority.value.provider !== "underclerk" ||
+      commerceAuthority.value.provider !== "commerce" ||
       commerceAuthority.value.integrationAccountId !==
         input.message.integrationAccountId
     ) {
       return {
         kind: "rejected",
         deliveryId: delivery.deliveryId,
-        code: "underclerk_commerce_system_mismatch",
+        code: "commerce_system_mismatch",
       };
     }
     requiresProjectionValidation = true;
@@ -479,7 +479,7 @@ export async function reconcileCommerceOutbox(
     });
     if (!applied.ok) {
       if (applied.error.code === "commerce_revision_conflict") {
-        console.error("underclerk_outbox.commerce_revision_conflict", {
+        console.error("commerce_outbox.commerce_revision_conflict", {
           organisationId: input.message.organisationId,
           deliveryId: delivery.deliveryId,
           projectionKind: applied.error.projectionKind,
@@ -493,7 +493,7 @@ export async function reconcileCommerceOutbox(
         });
       }
       if (applied.error.code === "commerce_event_invalid") {
-        console.error("underclerk_outbox.commerce_event_invalid", {
+        console.error("commerce_outbox.commerce_event_invalid", {
           organisationId: input.message.organisationId,
           deliveryId: delivery.deliveryId,
           field: applied.error.field,
@@ -598,7 +598,7 @@ export async function reconcileCommerceOutbox(
       default:
         return assertNever(
           acknowledgement,
-          "Unexpected Underclerk outbox result",
+          "Unexpected Commerce outbox result",
         );
     }
   }
@@ -656,7 +656,7 @@ async function reconcilePurchasingAfterCommerceDelivery(
     organisationId: String(input.organisationId),
   });
   if (client === null)
-    return { ok: false, code: "underclerk_purchasing_reconcile_unconfigured" };
+    return { ok: false, code: "commerce_purchasing_reconcile_unconfigured" };
   const reconciled = await client.reconcilePurchasing({
     organisationId: input.organisationId,
     merchantId: input.merchantId,
@@ -664,7 +664,7 @@ async function reconcilePurchasingAfterCommerceDelivery(
   if (!reconciled.ok) {
     return {
       ok: false,
-      code: `underclerk_purchasing_reconcile_${reconciled.error.kind}`,
+      code: `commerce_purchasing_reconcile_${reconciled.error.kind}`,
     };
   }
   if (
@@ -673,7 +673,7 @@ async function reconcilePurchasingAfterCommerceDelivery(
   ) {
     return {
       ok: false,
-      code: "underclerk_purchasing_reconcile_scope_mismatch",
+      code: "commerce_purchasing_reconcile_scope_mismatch",
     };
   }
   return { ok: true };
@@ -723,7 +723,7 @@ async function enqueueRecoverableCues(
         }),
       );
     } catch {
-      return { ok: false, code: "underclerk_cue_enqueue_failed" };
+      return { ok: false, code: "commerce_cue_enqueue_failed" };
     }
     const marked = await input.organisation.markCommerceCuesEnqueued({
       organisationId: input.message.organisationId,
@@ -757,7 +757,7 @@ async function acknowledgeCommerceDelivery(
   > = "acknowledged";
   if (input.rejection !== undefined) {
     const rejected = await input.client.acknowledgeDelivery({
-      schemaVersion: "underclerk.acknowledge-commerce-delivery.v2",
+      schemaVersion: "commerce.acknowledge-commerce-delivery.v2",
       merchantId: input.merchantId,
       deliveryId: input.deliveryId,
       acknowledgedAt: input.acknowledgedAt,
@@ -767,13 +767,13 @@ async function acknowledgeCommerceDelivery(
       return {
         kind: "retry",
         deliveryId: input.deliveryId,
-        code: `underclerk_delivery_ack_${rejected.error.kind}`,
+        code: `commerce_delivery_ack_${rejected.error.kind}`,
       };
     outcome = rejected.value.outcome;
   }
   const advanced = await input.client.advanceFeedConsumer(
     input.merchantId,
-    SATYR_FEED_CONSUMER,
+    PANTRY_FEED_CONSUMER,
     input.cursor,
   );
   // Another run of Pantry's reader passed this event first.
@@ -790,13 +790,13 @@ async function acknowledgeCommerceDelivery(
         deliveryId: input.deliveryId,
         code:
           advanced.error.kind === "http"
-            ? `underclerk_feed_cursor_http_${advanced.error.status}`
-            : `underclerk_feed_cursor_${advanced.error.kind}`,
+            ? `commerce_feed_cursor_http_${advanced.error.status}`
+            : `commerce_feed_cursor_${advanced.error.kind}`,
       };
 }
 
 /** Pantry's place in each merchant's event feed. */
-const SATYR_FEED_CONSUMER = "satyr";
+const PANTRY_FEED_CONSUMER = "pantry";
 const FEED_PAGE = 100;
 const FEED_PAGES_PER_RUN = 10;
 
@@ -817,7 +817,7 @@ async function readCommerceFeed(
 > {
   const consumer = await client.readFeedConsumer(
     merchantId,
-    SATYR_FEED_CONSUMER,
+    PANTRY_FEED_CONSUMER,
   );
   if (!consumer.ok) return consumer;
   const events: Readonly<{

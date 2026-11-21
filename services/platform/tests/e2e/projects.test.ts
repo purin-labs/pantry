@@ -632,8 +632,8 @@ export async function chatApiRequest(
     headers: {
       origin: "https://localhost",
       "content-type": "application/json",
-      cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-      "x-satyr-csrf": session.csrfToken,
+      cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+      "x-pantry-csrf": session.csrfToken,
     },
     ...(body === null ? {} : { body: JSON.stringify(body) }),
   });
@@ -1385,7 +1385,7 @@ async function conversationSavePlacementJourney({ task }: TestContext) {
     .spyOn(modelRoutes, "resolveOrganisationModelRouteAtScope")
     .mockResolvedValueOnce({
       ok: false,
-      error: { code: "satyr_platform_credential_unavailable" },
+      error: { code: "pantry_platform_credential_unavailable" },
     });
   try {
     expect(
@@ -1429,7 +1429,7 @@ async function retireDuringModelPreparation(race: DirectoryPlacementRace) {
   await resumeDirectoryPlacement(race);
   return {
     ok: false as const,
-    error: { code: "satyr_platform_credential_unavailable" as const },
+    error: { code: "pantry_platform_credential_unavailable" as const },
   };
 }
 async function conversationCase(actorIdentity: string) {

@@ -23,11 +23,11 @@ import { PlanJourney } from "./production-plan-support";
 
 declare module "vitest" {
   interface TaskMeta {
-    underclerkFeedCatchUp?: Record<string, unknown>;
+    commerceFeedCatchUp?: Record<string, unknown>;
   }
 }
 
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 
 it(
   "catches up from its feed cursor after a stop and a lost cursor move, with no lost and no repeated event",
@@ -62,7 +62,7 @@ async function feedCatchUpJourney({ task }: TestContext): Promise<void> {
 
   // 1. Pantry's reader is stopped while the café is set up.
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: organisationId,
     merchantId,
     profile: "cafe_patisserie",
@@ -82,12 +82,12 @@ async function feedCatchUpJourney({ task }: TestContext): Promise<void> {
       if (moves === 4)
         return Response.json({ message: "lost" }, { status: 503 });
     }
-    return env.UNDERCLERK.fetch(input, init);
+    return env.COMMERCE.fetch(input, init);
   };
   const interrupted = await reconcile(organisationId, losingFourthMove);
   expect(interrupted).toMatchObject({
     kind: "retry",
-    code: "underclerk_feed_cursor_http_503",
+    code: "commerce_feed_cursor_http_503",
   });
   const afterInterruption = await consumer(merchantId);
   expect(afterInterruption.cursor).toBe(firstBacklog[2]);
@@ -138,7 +138,7 @@ async function feedCatchUpJourney({ task }: TestContext): Promise<void> {
   const known = await sendForApproval(shop, merchantId, "ginger_cookie");
   expect(known.error).not.toBe("commerce_action_projection_missing");
 
-  task.meta.underclerkFeedCatchUp = {
+  task.meta.commerceFeedCatchUp = {
     firstBacklog: firstBacklog.length,
     interrupted: { kind: interrupted.kind, cursorAfter: "third event" },
     secondBacklog: backlog.length,
@@ -209,7 +209,7 @@ async function reconcile(
 ) {
   const binding = await fixtureDatabase()
     .prepare(
-      "SELECT integration_account_id AS integrationAccountId FROM underclerk_merchant_binding WHERE organisation_id = ?",
+      "SELECT integration_account_id AS integrationAccountId FROM commerce_merchant_binding WHERE organisation_id = ?",
     )
     .bind(organisationId)
     .first<{ integrationAccountId: string }>();
@@ -235,8 +235,8 @@ async function reconcile(
 }
 
 async function consumer(merchantId: string): Promise<{ cursor: string }> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/feed-consumers/satyr`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/feed-consumers/pantry`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();
@@ -253,8 +253,8 @@ async function eventsAfter(
   const cursors: string[] = [];
   let next = after;
   for (;;) {
-    const response = await env.UNDERCLERK.fetch(
-      `http://underclerk.test/v1/admin/merchants/${merchantId}/events?after=${encodeURIComponent(next)}&limit=200`,
+    const response = await env.COMMERCE.fetch(
+      `http://commerce.test/v1/admin/merchants/${merchantId}/events?after=${encodeURIComponent(next)}&limit=200`,
       { headers: { authorization: OPERATOR } },
     );
     const body = (await response.json()) as {
@@ -272,8 +272,8 @@ async function eventsAfter(
 }
 
 async function fixture(merchantId: string, body: unknown): Promise<unknown> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-fixture`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-fixture`,
     {
       method: "POST",
       headers: { authorization: OPERATOR, "content-type": "application/json" },
@@ -291,7 +291,7 @@ async function sendForApproval(
 ): Promise<Readonly<{ status: number; error: unknown }>> {
   const response = await shop.send("/actions", {
     kind: "update_product_description",
-    productId: `underclerk:${merchantId}:product_${slug}`,
+    productId: `commerce:${merchantId}:product_${slug}`,
     productRevision: 1,
     description: "Baked each morning in our café.",
   });

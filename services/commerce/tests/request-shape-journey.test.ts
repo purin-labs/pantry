@@ -110,8 +110,8 @@ async function requestShape(): Promise<void> {
       ownerFields: [...owner(receipt), ...owner(delivery)],
     };
     expect(signed).toEqual({
-      receipt: "underclerk.mutation-receipt.v2",
-      delivery: "underclerk.commerce-delivery.v2",
+      receipt: "commerce.mutation-receipt.v2",
+      delivery: "commerce.commerce-delivery.v2",
       ownerFields: [],
     });
 
@@ -189,7 +189,7 @@ async function requestShape(): Promise<void> {
 
     // 5. A merchant id cannot hold a path under another merchant's id.
     const pathId = await admin.provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: "organisation_second_shop",
       merchantId: `${merchantId}/media`,
       createdAt: NOW,
@@ -199,7 +199,7 @@ async function requestShape(): Promise<void> {
     // 6. Another merchant may use the same key: its own first change.
     await required(
       admin.provisionMerchant({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: "organisation_second_shop",
         merchantId: SECOND_MERCHANT,
         createdAt: NOW,

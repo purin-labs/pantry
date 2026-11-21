@@ -42,7 +42,7 @@ validation uses `invalid_timestamp`; entity-plane cursor validation maps that
 refusal to `invalid_date`.
 
 1. **One writer for each merchant.** The records of a merchant live in one
-   SQLite-backed Durable Object (`UnderclerkMerchantDO`). Only that object
+   SQLite-backed Durable Object (`CommerceMerchantDO`). Only that object
    writes them, so two requests for one merchant never write at the same
    time.
 2. **Commands, not field writes.** Every change is a typed command with
@@ -62,8 +62,8 @@ refusal to `invalid_date`.
    command keeps its own version and idempotency key in the body (Plan 80
    D10); it names no owner and no time.
 3. **One transaction.** A command commits the domain change, its signed
-   receipt (`underclerk.mutation-receipt.v2`) and its signed delivery
-   (`underclerk.commerce-delivery.v2`) in one SQLite transaction. Both name
+   receipt (`commerce.mutation-receipt.v2`) and its signed delivery
+   (`commerce.commerce-delivery.v2`) in one SQLite transaction. Both name
    the merchant and the idempotency key, and no owner or action nonce
    (Plan 80 step 2). Receipts and deliveries of version 1, which also named
    the owner as `organisationId`, stay stored as they were signed, and every
@@ -125,14 +125,14 @@ Status: **Partial**.
 Records: `merchant` (one for each Durable Object) and API credentials (API
 keys and app installations, with secrets kept only as SHA-256 hashes). The
 operator sets a merchant's `externalReference` once, at provisioning
-(`underclerk.provision-merchant.v2`): its own name for the merchant's
+(`commerce.provision-merchant.v2`): its own name for the merchant's
 owner, such as a Pantry organisation. Snapshots name the merchant only by
 `merchantId`. A merchant id has 3 to 80 lowercase letters, digits, `_` or
 `-`; the Worker routes no other id. The entity-plane routes are Pantry's own
 integration routes: their `organisationId` is the merchant's external
 reference.
 
-- The operator token (`UNDERCLERK_SERVICE_TOKEN`) opens every route of every
+- The operator token (`COMMERCE_SERVICE_TOKEN`) opens every route of every
   merchant. Only the operator token opens the `operator` routes:
   provisioning, the migration inventory, app installations, archive runs
   and the internal routes.
@@ -144,7 +144,7 @@ reference.
   stops every earlier app token at once. Pantry is an installed app. An
   install of an app that is installed changes its scopes and keeps its
   token. An install after a revoke makes a new credential with a random
-  nonce in its token (`underclerk.app-token.v2`), so the revoked token stays
+  nonce in its token (`commerce.app-token.v2`), so the revoked token stays
   refused and only the install answer shows the new one. The operator reads
   the token of an active installation with `GET …/app-installations/:appId`
   and its `externalReference`; a revoked installation, or another reference,
@@ -678,7 +678,7 @@ Shopify: Shopify Payments, payment apps and disputes. Status: **Partial**.
   payment reference and the reason. Commerce does not refund it by itself.
   `GET …/unplaced-captures` lists the open items first.
   `POST …/unplaced-captures/:paymentAttemptId/resolution` with
-  `{schemaVersion: "underclerk.resolve-unplaced-capture.v1",
+  `{schemaVersion: "commerce.resolve-unplaced-capture.v1",
   expectedRevision, resolution, note?}` records what staff did: `refunded`
   on the provider, or `placed_by_hand`. A stale revision answers 409 with the
   current item, and a resolved item answers `invalid_transition`. The
@@ -1432,229 +1432,229 @@ takes a buyer session where it needs one). The Worker also answers
 `POST /v1/admin/merchants/:merchantId/mcp` (the MCP server, §3) outside the
 route table.
 
-<!-- underclerk-spec:routes:start -->
+<!-- commerce-spec:routes:start -->
 
-| Method   | Path                                                                                                         | Route kind                                 | Access             | Command                                            | Section |
-| -------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------ | ------------------ | -------------------------------------------------- | ------- |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/sessions`                                        | `create_buyer_session`                     | buyer              |                                                    | §7      |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/catalog`                                         | `read_buyer_catalog`                       | buyer              |                                                    | §7      |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/catalog/search`                                  | `search_buyer_catalog`                     | buyer              |                                                    | §7      |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/carts`                                           | `create_buyer_cart`                        | buyer              |                                                    | §11     |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/carts/:cartId`                                   | `read_buyer_cart`                          | buyer              |                                                    | §11     |
-| `PUT`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/carts/:cartId`                                   | `replace_buyer_cart`                       | buyer              |                                                    | §11     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/address-validations`                             | `validate_buyer_shipping_address`          | buyer              |                                                    | §11     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts`                                       | `create_buyer_checkout`                    | buyer              |                                                    | §11     |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId`                           | `read_buyer_checkout`                      | buyer              |                                                    | §11     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/payment-sessions`          | `create_buyer_payment_session`             | buyer              |                                                    | §12     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/reconcile`                 | `reconcile_buyer_payment`                  | buyer              |                                                    | §12     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/refresh`                   | `refresh_buyer_checkout`                   | buyer              |                                                    | §11     |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order`                     | `read_buyer_order`                         | buyer              |                                                    | §13     |
-| `GET`    | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId`                                                  | `read_counter_sale`                        | orders:read        |                                                    | §11     |
-| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/reconciliation`                                   | `reconcile_counter_sale_payment`           | orders:write       |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/handoff-result`                                   | `record_counter_sale_handoff_result`       | orders:write       |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/refund-reconciliation`                            | `reconcile_counter_sale_refund`            | orders:write       |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/point-of-sale-configurations`                                               | `list_point_of_sale_configurations`        | settings:read      |                                                    | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/point-of-sale-configurations`                                               | `publish_point_of_sale_configuration`      | settings:write     |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/point-of-sale-configurations/:satyrLocationId`                              | `read_point_of_sale_configuration`         | settings:read      |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/checkout-profiles`                                                          | `list_checkout_profiles`                   | settings:read      |                                                    | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/checkout-profiles`                                                          | `create_checkout_profile`                  | settings:write     |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/checkout-profile-activations`                                               | `list_checkout_profile_activations`        | settings:read      |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/storefronts`                                                                | `list_storefronts`                         | settings:read      |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId`                                                  | `read_storefront`                          | settings:read      |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/shop-name`                                        | `read_storefront_shop_name`                | settings:read      |                                                    | §4      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/shop-name`                                        | `set_storefront_shop_name`                 | settings:write     |                                                    | §4      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/checkout-profiles/:checkoutProfileId/draft`                                 | `replace_checkout_profile_draft`           | settings:write     |                                                    | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/checkout-profiles/:checkoutProfileId/publication`                           | `publish_checkout_profile`                 | settings:write     |                                                    | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/checkout-profiles/:checkoutProfileId/retirement`                            | `retire_checkout_profile`                  | settings:write     |                                                    | §4      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/checkout-profile-activation`                      | `activate_checkout_profile`                | settings:write     |                                                    | §4      |
-| `GET`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/checkout-profile-activation`                      | `read_active_checkout_profile`             | settings:read      |                                                    | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/list-entry`                                                    | `entity_plane_list_entry`                  | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/query`                                                         | `entity_plane_query`                       | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/query-plan`                                                    | `entity_plane_query_plan`                  | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/capability-metadata`                                           | `entity_plane_capability_metadata`         | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/published-resources`                                           | `entity_plane_published_resource_metadata` | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/export-preset`                                                 | `entity_plane_export_preset`               | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/relationship-step`                                             | `entity_plane_relationship_step`           | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/commands`                                                      | `entity_plane_command`                     | entity_plane:write |                                                    | §20     |
-| `GET`    | `/v1/admin/merchants/:merchantId/entity-plane/changes`                                                       | `entity_plane_changes`                     | entity_plane:read  |                                                    | §20     |
-| `POST`   | `/v1/internal/merchants/:merchantId/entity-plane/system-extensions`                                          | `entity_plane_system_extensions`           | entity_plane:read  |                                                    | §20     |
-| `PUT`    | `/v1/admin/merchants/:merchantId`                                                                            | `provision_merchant`                       | operator           |                                                    | §3      |
-| `GET`    | `/v1/admin/merchants/:merchantId/reports/product-sales`                                                      | `read_product_sales`                       | orders:read        |                                                    | §20     |
-| `GET`    | `/v1/admin/merchants/:merchantId/reports/failed-payments`                                                    | `read_failed_payments`                     | orders:read        |                                                    | §20     |
-| `GET`    | `/v1/admin/merchants/:merchantId/reports/payments`                                                           | `read_payments`                            | orders:read        |                                                    | §20     |
-| `GET`    | `/v1/admin/merchants/:merchantId/unplaced-captures`                                                          | `list_unplaced_captures`                   | orders:read        |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/unplaced-captures/:paymentAttemptId/resolution`                             | `resolve_unplaced_capture`                 | orders:write       |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/reports/order-times`                                                        | `read_order_times`                         | orders:read        |                                                    | §14     |
-| `GET`    | `/v1/admin/merchants/:merchantId/reports/bank-payouts`                                                       | `read_bank_payouts`                        | orders:read        |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/snapshot`                                                                   | `read_snapshot`                            | orders:read        |                                                    | §20     |
-| `GET`    | `/v1/admin/merchants/:merchantId/migration-inventory`                                                        | `read_migration_inventory`                 | operator           |                                                    | §3      |
-| `POST`   | `/v1/admin/merchants/:merchantId/locations`                                                                  | `create_location`                          | settings:write     | `underclerk.create-location.v1`                    | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/catalog/listings`                                                           | `prepare_catalog_listing`                  | catalog:write      | `underclerk.prepare-catalog-listing.v1`            | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/products/:productId/description`                                            | `update_product_description`               | catalog:write      | `underclerk.update-product-description.v1`         | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/products/:productId`                                                        | `update_product`                           | catalog:write      | `underclerk.update-product.v1`                     | §5      |
-| `DELETE` | `/v1/admin/merchants/:merchantId/products/:productId`                                                        | `delete_product`                           | catalog:write      | `underclerk.delete-product.v1`                     | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/variants/:variantId`                                                        | `update_variant`                           | catalog:write      | `underclerk.update-variant.v1`                     | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/offers/:offerId`                                                            | `update_offer`                             | catalog:write      | `underclerk.update-offer.v1`                       | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/tax`                                              | `update_storefront_tax`                    | settings:write     | `underclerk.update-storefront-tax.v1`              | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/edits`                                                      | `edit_order`                               | orders:write       | `underclerk.edit-order.v1`                         | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/manual-payment`                                             | `record_order_manual_payment`              | orders:write       | `underclerk.record-order-manual-payment.v1`        | §13     |
-| `GET`    | `/v1/admin/merchants/:merchantId/notifications`                                                              | `list_notifications`                       | customers:read     |                                                    | §16     |
-| `GET`    | `/v1/admin/merchants/:merchantId/events`                                                                     | `read_events`                              | events:read        |                                                    | §18     |
-| `GET`    | `/v1/admin/merchants/:merchantId/feed-consumers/:consumerId`                                                 | `read_feed_consumer`                       | events:read        |                                                    | §18     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/feed-consumers/:consumerId`                                                 | `advance_feed_consumer`                    | events:read        |                                                    | §18     |
-| `GET`    | `/v1/admin/merchants/:merchantId/payment-accounts`                                                           | `list_payment_accounts`                    | settings:read      |                                                    | §12     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/payment-accounts/stripe`                                                    | `link_stripe_account`                      | settings:write     |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/payment-accounts/stripe/onboarding`                                         | `start_stripe_onboarding`                  | settings:write     |                                                    | §12     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/payment-accounts/square`                                                    | `link_square_account`                      | settings:write     |                                                    | §12     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/square/connection`                                                          | `connect_square`                           | settings:write     |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/square/connection`                                                          | `read_square_connection`                   | settings:read      |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/square/connection/revocation`                                               | `disconnect_square`                        | settings:write     |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/square/locations`                                                           | `list_square_locations`                    | settings:read      |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/square/devices`                                                             | `list_square_devices`                      | settings:read      |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/square/device-codes`                                                        | `create_square_device_code`                | settings:write     |                                                    | §12     |
-| `GET`    | `/v1/admin/merchants/:merchantId/square/device-codes/:deviceCodeId`                                          | `read_square_device_code`                  | settings:read      |                                                    | §12     |
-| `POST`   | `/v1/internal/merchants/:merchantId/payment-attempts/:paymentAttemptId/settlement`                           | `settle_online_payment`                    | operator           |                                                    | §12     |
-| `POST`   | `/v1/internal/merchants/:merchantId/payment-attempts/:paymentAttemptId/stripe-disputes`                      | `observe_stripe_dispute`                   | operator           |                                                    | §12     |
-| `GET`    | `/v1/internal/merchants/:merchantId/storefronts/:storefrontId/catalog-snapshot`                              | `read_catalog_snapshot`                    | operator           |                                                    | §7      |
-| `POST`   | `/v1/admin/merchants/:merchantId/api-keys`                                                                   | `issue_api_key`                            | credentials:write  |                                                    | §3      |
-| `POST`   | `/v1/admin/merchants/:merchantId/closure`                                                                    | `close_merchant`                           | operator           |                                                    | §3      |
-| `GET`    | `/v1/admin/merchants/:merchantId/api-credentials`                                                            | `list_api_credentials`                     | credentials:write  |                                                    | §3      |
-| `POST`   | `/v1/admin/merchants/:merchantId/api-keys/:credentialId/revocation`                                          | `revoke_api_key`                           | credentials:write  |                                                    | §3      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/app-installations/:appId`                                                   | `install_app`                              | operator           |                                                    | §3      |
-| `GET`    | `/v1/admin/merchants/:merchantId/app-installations/:appId`                                                   | `read_app_installation`                    | operator           |                                                    | §3      |
-| `POST`   | `/v1/admin/merchants/:merchantId/app-installations/:appId/revocation`                                        | `uninstall_app`                            | operator           |                                                    | §3      |
-| `GET`    | `/v1/admin/merchants/:merchantId/orders/:orderId`                                                            | `read_order_record`                        | orders:read        |                                                    | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/archive-runs`                                                               | `run_archive`                              | operator           |                                                    | §19     |
-| `POST`   | `/v1/admin/merchants/:merchantId/webhook-subscriptions`                                                      | `create_webhook_subscription`              | webhooks:write     | `underclerk.create-webhook-subscription.v1`        | §18     |
-| `GET`    | `/v1/admin/merchants/:merchantId/webhook-subscriptions`                                                      | `list_webhook_subscriptions`               | events:read        |                                                    | §18     |
-| `POST`   | `/v1/admin/merchants/:merchantId/webhook-subscriptions/:subscriptionId/restart`                              | `restart_webhook_subscription`             | webhooks:write     | `underclerk.restart-webhook-subscription.v1`       | §18     |
-| `POST`   | `/v1/admin/merchants/:merchantId/webhook-subscriptions/:subscriptionId/secret-rotations`                     | `rotate_webhook_secret`                    | webhooks:write     | `underclerk.rotate-webhook-secret.v1`              | §18     |
-| `DELETE` | `/v1/admin/merchants/:merchantId/webhook-subscriptions/:subscriptionId`                                      | `delete_webhook_subscription`              | webhooks:write     | `underclerk.delete-webhook-subscription.v1`        | §18     |
-| `GET`    | `/v1/admin/merchants/:merchantId/orders/:orderId/changes`                                                    | `read_order_changes`                       | orders:read        |                                                    | §13     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order/balance-checkouts`   | `open_buyer_order_balance`                 | buyer              |                                                    | §13     |
-| `GET`    | `/v1/admin/merchants/:merchantId/plugins`                                                                    | `list_plugins`                             | settings:read      |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/previews`                                                 | `preview_plugin_change`                    | settings:read      |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/pause`                                                    | `pause_plugin`                             | settings:write     | `underclerk.pause-plugin.v1`                       | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/resume`                                                   | `resume_plugin`                            | settings:write     | `underclerk.resume-plugin.v1`                      | §21     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/plugins/:pluginId/settings`                                                 | `configure_plugin`                         | settings:write     | `underclerk.configure-plugin.v1`                   | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/remove`                                                   | `remove_plugin`                            | settings:write     | `underclerk.remove-plugin.v1`                      | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/merchant-plugins`                                                           | `install_merchant_plugin`                  | settings:write     | `underclerk.install-merchant-plugin.v1`            | §21     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/plugins/:pluginId/fields/:entityType/:entityId`                             | `set_plugin_field_values`                  | catalog:write      | `underclerk.set-plugin-field-values.v1`            | §21     |
-| `GET`    | `/v1/admin/merchants/:merchantId/plugins/:pluginId/fields`                                                   | `list_plugin_field_values`                 | catalog:read       |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/actions/:actionId/runs`                                   | `run_plugin_action`                        | settings:read      | `underclerk.run-plugin-action.v1`                  | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/merchant-plugins/runs`                                                      | `run_plugin_function`                      | settings:read      |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/merchant-plugins/previews`                                                  | `preview_merchant_plugin`                  | settings:read      |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/channel-listings`                                                           | `place_channel_listing`                    | catalog:write      | `underclerk.place-channel-listing.v1`              | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-storefronts`                                                         | `configure_pickup_storefront`              | settings:write     | `underclerk.configure-pickup-storefront.v1`        | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/shipping-storefronts`                                                       | `configure_shipping_storefront`            | settings:write     | `underclerk.configure-shipping-storefront.v1`      | §4      |
-| `POST`   | `/v1/admin/merchants/:merchantId/in-person-checkouts`                                                        | `create_in_person_checkout`                | orders:write       | `underclerk.create-in-person-checkout.v1`          | §11     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts`                                                           | `create_pickup_checkout`                   | orders:write       | `underclerk.create-pickup-checkout.v1`             | §11     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts`                              | `begin_checkout_payment`                   | orders:write       | `underclerk.begin-checkout-payment.v1`             | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/in-person-collections`        | `collect_in_person_checkout_payment`       | orders:write       | `underclerk.collect-in-person-checkout-payment.v1` | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment`                                     | `record_counter_cash_payment`              | orders:write       | `underclerk.record-counter-cash-payment.v1`        | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/captures`   | `record_checkout_payment_capture`          | payments:record    | `underclerk.record-checkout-payment-capture.v1`    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/payment-dispute-observations`                                               | `observe_payment_dispute`                  | payments:record    |                                                    | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/placements` | `place_paid_checkout`                      | orders:write       | `underclerk.place-paid-checkout.v1`                | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/pickup-fulfillments/:fulfillmentId/ready`                   | `mark_pickup_ready`                        | orders:write       | `underclerk.mark-pickup-ready.v1`                  | §14     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/pickup-fulfillments/:fulfillmentId/complete`                | `complete_pickup`                          | orders:write       | `underclerk.complete-pickup.v1`                    | §14     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/cancellations`                                              | `cancel_order`                             | orders:write       | `underclerk.cancel-order.v1`                       | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/refunds`                                                    | `refund_order`                             | orders:write       | `underclerk.refund-order.v1`                       | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/manual-cash-refunds`                                        | `record_counter_manual_cash_refund`        | orders:write       | `underclerk.record-counter-manual-cash-refund.v1`  | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/tender-refunds`                                             | `refund_order_tenders`                     | orders:write       | `underclerk.refund-order-tenders.v1`               | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/resolution` | `resolve_checkout_payment`                 | payments:record    | `underclerk.resolve-checkout-payment.v1`           | §12     |
-| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/expiration`                                    | `expire_checkout`                          | orders:write       | `underclerk.expire-checkout.v1`                    | §11     |
-| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/label-rates`                                          | `quote_shipment_label_rate`                | orders:write       | `underclerk.quote-shipment-label-rate.v1`          | §14     |
-| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/labels`                                               | `purchase_shipping_label`                  | orders:write       | `underclerk.purchase-shipping-label.v1`            | §14     |
-| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/tracking`                                             | `record_shipping_tracking`                 | orders:write       | `underclerk.record-shipping-tracking.v1`           | §14     |
-| `GET`    | `/v1/admin/merchants/:merchantId/offers/:offerId/price-policy`                                               | `read_offer_price_policy`                  | catalog:read       |                                                    | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/offers/:offerId/price-policy`                                               | `set_offer_price_policy`                   | catalog:write      |                                                    | §5      |
-| `DELETE` | `/v1/admin/merchants/:merchantId/offers/:offerId/price-policy`                                               | `disable_offer_price_policy`               | catalog:write      |                                                    | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/offers/:offerId/price`                                                      | `adjust_offer_price`                       | catalog:write      | `underclerk.adjust-offer-price.v1`                 | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/tracking-attachment`                                  | `attach_fulfillment_tracking`              | orders:write       | `underclerk.attach-fulfillment-tracking.v1`        | §14     |
-| `GET`    | `/v1/admin/merchants/:merchantId/inventory/snapshot`                                                         | `read_stock_snapshot`                      | inventory:read     |                                                    | §8      |
-| `POST`   | `/v1/admin/merchants/:merchantId/actions/publish-catalog-listing`                                            | `publish_catalog_listing`                  | catalog:write      | `underclerk.publish-catalog-listing.v1`            | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/inventory/items`                                                            | `create_inventory_item`                    | inventory:write    | `underclerk.create-inventory-item.v1`              | §8      |
-| `POST`   | `/v1/admin/merchants/:merchantId/inventory/positions`                                                        | `open_inventory_position`                  | inventory:write    | `underclerk.open-inventory-position.v1`            | §8      |
-| `POST`   | `/v1/admin/merchants/:merchantId/inventory/receipts`                                                         | `receive_inventory`                        | inventory:write    | `underclerk.receive-inventory.v3`                  | §8      |
-| `POST`   | `/v1/admin/merchants/:merchantId/inventory/reconciliations`                                                  | `reconcile_inventory`                      | inventory:write    | `underclerk.reconcile-inventory.v1`                | §8      |
-| `POST`   | `/v1/admin/merchants/:merchantId/deliveries/:deliveryId/acknowledgements`                                    | `acknowledge_delivery`                     | events:read        |                                                    | §18     |
-| `POST`   | `/v1/admin/merchants/:merchantId/collections`                                                                | `create_collection`                        | catalog:write      | `underclerk.create-collection.v1`                  | §6      |
-| `GET`    | `/v1/admin/merchants/:merchantId/collections`                                                                | `list_collections`                         | catalog:read       |                                                    | §6      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/collections/:collectionId`                                                  | `update_collection`                        | catalog:write      | `underclerk.update-collection.v1`                  | §6      |
-| `POST`   | `/v1/admin/merchants/:merchantId/collections/:collectionId/deletion`                                         | `delete_collection`                        | catalog:write      | `underclerk.delete-collection.v1`                  | §6      |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/collections`                                     | `list_buyer_collections`                   | buyer              |                                                    | §6      |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/collections/:handle`                             | `read_buyer_collection`                    | buyer              |                                                    | §6      |
-| `POST`   | `/v1/admin/merchants/:merchantId/companies`                                                                  | `create_company`                           | customers:write    | `underclerk.create-company.v1`                     | §16     |
-| `GET`    | `/v1/admin/merchants/:merchantId/companies`                                                                  | `list_companies`                           | customers:read     |                                                    | §16     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/companies/:companyId`                                                       | `update_company`                           | customers:write    | `underclerk.update-company.v1`                     | §16     |
-| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/terms-placement`                                 | `place_draft_order_on_terms`               | orders:write       | `underclerk.place-draft-order-on-terms.v1`         | §16     |
-| `POST`   | `/v1/admin/merchants/:merchantId/invoices/:invoiceId/payments`                                               | `record_invoice_payment`                   | orders:write       | `underclerk.record-invoice-payment.v1`             | §16     |
-| `GET`    | `/v1/admin/merchants/:merchantId/invoices`                                                                   | `list_invoices`                            | orders:read        |                                                    | §16     |
-| `POST`   | `/v1/admin/merchants/:merchantId/customers`                                                                  | `create_customer`                          | customers:write    | `underclerk.create-customer.v1`                    | §16     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/customers/:customerId`                                                      | `update_customer`                          | customers:write    | `underclerk.update-customer.v1`                    | §16     |
-| `POST`   | `/v1/admin/merchants/:merchantId/customers/:customerId/erasure`                                              | `erase_customer`                           | customers:write    | `underclerk.erase-customer.v1`                     | §16     |
-| `GET`    | `/v1/admin/merchants/:merchantId/customers/:customerId`                                                      | `read_customer`                            | customers:read     |                                                    | §16     |
-| `GET`    | `/v1/admin/merchants/:merchantId/customers/:customerId/export`                                               | `export_customer`                          | customers:read     |                                                    | §16     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer-sign-ins`                               | `request_customer_sign_in`                 | buyer              |                                                    | §16     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer-sign-ins/:challengeId/verification`     | `verify_customer_sign_in`                  | buyer              |                                                    | §16     |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer`                                        | `read_buyer_customer`                      | buyer              |                                                    | §16     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer/addresses`                              | `save_customer_address`                    | buyer              |                                                    | §16     |
-| `POST`   | `/v1/admin/merchants/:merchantId/discounts`                                                                  | `create_discount`                          | discounts:write    | `underclerk.create-discount.v1`                    | §10     |
-| `GET`    | `/v1/admin/merchants/:merchantId/discounts`                                                                  | `list_discounts`                           | discounts:read     |                                                    | §10     |
-| `POST`   | `/v1/admin/merchants/:merchantId/discounts/:discountId/deactivation`                                         | `deactivate_discount`                      | discounts:write    | `underclerk.deactivate-discount.v1`                | §10     |
-| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders`                                                               | `create_draft_order`                       | orders:write       | `underclerk.create-draft-order.v1`                 | §13     |
-| `GET`    | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId`                                                 | `read_draft_order`                         | orders:read        |                                                    | §13     |
-| `PUT`    | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId`                                                 | `update_draft_order`                       | orders:write       | `underclerk.update-draft-order.v1`                 | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/invoice`                                         | `send_draft_invoice`                       | orders:write       | `underclerk.send-draft-invoice.v1`                 | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/cancellation`                                    | `cancel_draft_order`                       | orders:write       | `underclerk.cancel-draft-order.v1`                 | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/manual-payment`                                  | `mark_draft_order_paid`                    | orders:write       | `underclerk.mark-draft-order-paid.v1`              | §13     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/draft-orders/:draftOrderId/checkouts`            | `open_draft_invoice`                       | buyer              |                                                    | §13     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/preparation-stations`                                          | `create_preparation_station`               | orders:write       | `underclerk.create-preparation-station.v1`         | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/modifier-groups`                                               | `create_modifier_group_revision`           | catalog:write      | `underclerk.create-modifier-group-revision.v1`     | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/recipes`                                                       | `create_recipe_revision`                   | inventory:write    | `underclerk.create-recipe-revision.v1`             | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/stock-policies`                                                | `configure_stock_policy`                   | inventory:write    | `underclerk.configure-stock-policy.v1`             | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/menus`                                                         | `publish_menu`                             | catalog:write      | `underclerk.publish-menu.v1`                       | §21     |
-| `GET`    | `/v1/admin/merchants/:merchantId/food-service/snapshot`                                                      | `read_food_service_snapshot`               | catalog:read       |                                                    | §21     |
-| `GET`    | `/v1/admin/merchants/:merchantId/food-service/preparation-tickets/:ticketId`                                 | `read_preparation_ticket`                  | orders:read        |                                                    | §21     |
-| `GET`    | `/v1/admin/merchants/:merchantId/food-service/pickup-queue`                                                  | `read_pickup_queue`                        | orders:read        |                                                    | §21     |
-| `GET`    | `/v1/admin/merchants/:merchantId/food-service/sold-out-marks`                                                | `read_sold_out_marks`                      | catalog:read       |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/sold-out-marks`                                                | `mark_sold_out`                            | inventory:write    | `underclerk.mark-sold-out.v1`                      | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/preparation-tickets`                                           | `manage_preparation_ticket`                | orders:write       | `underclerk.manage-preparation-ticket.v1`          | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/food-service/production-batches`                                            | `complete_production_batch`                | inventory:write    | `underclerk.complete-production-batch.v1`          | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/markets`                                                                    | `create_market`                            | settings:write     | `underclerk.create-market.v1`                      | §9      |
-| `GET`    | `/v1/admin/merchants/:merchantId/markets`                                                                    | `list_markets`                             | settings:read      |                                                    | §9      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/markets/:marketId`                                                          | `update_market`                            | settings:write     | `underclerk.update-market.v1`                      | §9      |
-| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/media/:mediaId`                                  | `read_storefront_media`                    | buyer              |                                                    | §7      |
-| `POST`   | `/v1/admin/merchants/:merchantId/media-uploads`                                                              | `upload_media`                             | catalog:write      |                                                    | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/media`                                                                      | `create_media`                             | catalog:write      | `underclerk.create-media.v1`                       | §5      |
-| `GET`    | `/v1/admin/merchants/:merchantId/media`                                                                      | `list_media`                               | catalog:read       |                                                    | §5      |
-| `GET`    | `/v1/admin/merchants/:merchantId/media/:mediaId/content`                                                     | `read_media_content`                       | catalog:read       |                                                    | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/media/:mediaId`                                                             | `update_media`                             | catalog:write      | `underclerk.update-media.v1`                       | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/media/:mediaId/deletion`                                                    | `delete_media`                             | catalog:write      | `underclerk.delete-media.v1`                       | §5      |
-| `PUT`    | `/v1/admin/merchants/:merchantId/products/:productId/media`                                                  | `set_product_media`                        | catalog:write      | `underclerk.set-product-media.v1`                  | §5      |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/production-demand-preset`                                      | `publish_production_demand_preset`         | entity_plane:write |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/purchasing-preset`                                             | `entity_plane_purchasing_preset`           | entity_plane:write |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/purchasing-reconcile`                                          | `entity_plane_purchasing_reconcile`        | entity_plane:write |                                                    | §21     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/returns`                                                    | `request_return`                           | orders:write       | `underclerk.request-return.v1`                     | §15     |
-| `GET`    | `/v1/admin/merchants/:merchantId/orders/:orderId/returns`                                                    | `list_order_returns`                       | orders:read        |                                                    | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/exchanges`                                                  | `exchange_order_lines`                     | orders:write       | `underclerk.exchange-order-lines.v1`               | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/returns/:returnId/authorization`                                            | `authorize_return`                         | orders:write       | `underclerk.authorize-return.v1`                   | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/returns/:returnId/receipt`                                                  | `receive_return`                           | orders:write       | `underclerk.receive-return.v1`                     | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/returns/:returnId/closure`                                                  | `close_return`                             | orders:write       | `underclerk.close-return.v1`                       | §15     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order/returns`             | `request_buyer_return`                     | buyer              |                                                    | §15     |
-| `POST`   | `/v1/admin/merchants/:merchantId/gift-cards`                                                                 | `issue_gift_card`                          | stored_value:write | `underclerk.issue-gift-card.v1`                    | §17     |
-| `POST`   | `/v1/admin/merchants/:merchantId/store-credit`                                                               | `credit_store_credit`                      | stored_value:write | `underclerk.credit-store-credit.v1`                | §17     |
-| `POST`   | `/v1/admin/merchants/:merchantId/stored-value-accounts/:accountId/disable`                                   | `disable_stored_value_account`             | stored_value:write | `underclerk.disable-stored-value-account.v1`       | §17     |
-| `GET`    | `/v1/admin/merchants/:merchantId/stored-value-accounts`                                                      | `list_stored_value_accounts`               | stored_value:read  |                                                    | §17     |
-| `GET`    | `/v1/admin/merchants/:merchantId/stored-value-liability`                                                     | `read_stored_value_liability`              | stored_value:read  |                                                    | §17     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/gift-card-balances`                              | `read_gift_card_balance`                   | buyer              |                                                    | §17     |
-| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/stored-value-placement`    | `place_buyer_stored_value_checkout`        | buyer              |                                                    | §17     |
+| Method   | Path                                                                                                         | Route kind                                 | Access             | Command                                          | Section |
+| -------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------ | ------------------ | ------------------------------------------------ | ------- |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/sessions`                                        | `create_buyer_session`                     | buyer              |                                                  | §7      |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/catalog`                                         | `read_buyer_catalog`                       | buyer              |                                                  | §7      |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/catalog/search`                                  | `search_buyer_catalog`                     | buyer              |                                                  | §7      |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/carts`                                           | `create_buyer_cart`                        | buyer              |                                                  | §11     |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/carts/:cartId`                                   | `read_buyer_cart`                          | buyer              |                                                  | §11     |
+| `PUT`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/carts/:cartId`                                   | `replace_buyer_cart`                       | buyer              |                                                  | §11     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/address-validations`                             | `validate_buyer_shipping_address`          | buyer              |                                                  | §11     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts`                                       | `create_buyer_checkout`                    | buyer              |                                                  | §11     |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId`                           | `read_buyer_checkout`                      | buyer              |                                                  | §11     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/payment-sessions`          | `create_buyer_payment_session`             | buyer              |                                                  | §12     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/reconcile`                 | `reconcile_buyer_payment`                  | buyer              |                                                  | §12     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/refresh`                   | `refresh_buyer_checkout`                   | buyer              |                                                  | §11     |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order`                     | `read_buyer_order`                         | buyer              |                                                  | §13     |
+| `GET`    | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId`                                                  | `read_counter_sale`                        | orders:read        |                                                  | §11     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/reconciliation`                                   | `reconcile_counter_sale_payment`           | orders:write       |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/handoff-result`                                   | `record_counter_sale_handoff_result`       | orders:write       |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/refund-reconciliation`                            | `reconcile_counter_sale_refund`            | orders:write       |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/point-of-sale-configurations`                                               | `list_point_of_sale_configurations`        | settings:read      |                                                  | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/point-of-sale-configurations`                                               | `publish_point_of_sale_configuration`      | settings:write     |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/point-of-sale-configurations/:pantryLocationId`                             | `read_point_of_sale_configuration`         | settings:read      |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/checkout-profiles`                                                          | `list_checkout_profiles`                   | settings:read      |                                                  | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/checkout-profiles`                                                          | `create_checkout_profile`                  | settings:write     |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/checkout-profile-activations`                                               | `list_checkout_profile_activations`        | settings:read      |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/storefronts`                                                                | `list_storefronts`                         | settings:read      |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId`                                                  | `read_storefront`                          | settings:read      |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/shop-name`                                        | `read_storefront_shop_name`                | settings:read      |                                                  | §4      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/shop-name`                                        | `set_storefront_shop_name`                 | settings:write     |                                                  | §4      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/checkout-profiles/:checkoutProfileId/draft`                                 | `replace_checkout_profile_draft`           | settings:write     |                                                  | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/checkout-profiles/:checkoutProfileId/publication`                           | `publish_checkout_profile`                 | settings:write     |                                                  | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/checkout-profiles/:checkoutProfileId/retirement`                            | `retire_checkout_profile`                  | settings:write     |                                                  | §4      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/checkout-profile-activation`                      | `activate_checkout_profile`                | settings:write     |                                                  | §4      |
+| `GET`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/checkout-profile-activation`                      | `read_active_checkout_profile`             | settings:read      |                                                  | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/list-entry`                                                    | `entity_plane_list_entry`                  | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/query`                                                         | `entity_plane_query`                       | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/query-plan`                                                    | `entity_plane_query_plan`                  | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/capability-metadata`                                           | `entity_plane_capability_metadata`         | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/published-resources`                                           | `entity_plane_published_resource_metadata` | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/export-preset`                                                 | `entity_plane_export_preset`               | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/relationship-step`                                             | `entity_plane_relationship_step`           | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/commands`                                                      | `entity_plane_command`                     | entity_plane:write |                                                  | §20     |
+| `GET`    | `/v1/admin/merchants/:merchantId/entity-plane/changes`                                                       | `entity_plane_changes`                     | entity_plane:read  |                                                  | §20     |
+| `POST`   | `/v1/internal/merchants/:merchantId/entity-plane/system-extensions`                                          | `entity_plane_system_extensions`           | entity_plane:read  |                                                  | §20     |
+| `PUT`    | `/v1/admin/merchants/:merchantId`                                                                            | `provision_merchant`                       | operator           |                                                  | §3      |
+| `GET`    | `/v1/admin/merchants/:merchantId/reports/product-sales`                                                      | `read_product_sales`                       | orders:read        |                                                  | §20     |
+| `GET`    | `/v1/admin/merchants/:merchantId/reports/failed-payments`                                                    | `read_failed_payments`                     | orders:read        |                                                  | §20     |
+| `GET`    | `/v1/admin/merchants/:merchantId/reports/payments`                                                           | `read_payments`                            | orders:read        |                                                  | §20     |
+| `GET`    | `/v1/admin/merchants/:merchantId/unplaced-captures`                                                          | `list_unplaced_captures`                   | orders:read        |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/unplaced-captures/:paymentAttemptId/resolution`                             | `resolve_unplaced_capture`                 | orders:write       |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/reports/order-times`                                                        | `read_order_times`                         | orders:read        |                                                  | §14     |
+| `GET`    | `/v1/admin/merchants/:merchantId/reports/bank-payouts`                                                       | `read_bank_payouts`                        | orders:read        |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/snapshot`                                                                   | `read_snapshot`                            | orders:read        |                                                  | §20     |
+| `GET`    | `/v1/admin/merchants/:merchantId/migration-inventory`                                                        | `read_migration_inventory`                 | operator           |                                                  | §3      |
+| `POST`   | `/v1/admin/merchants/:merchantId/locations`                                                                  | `create_location`                          | settings:write     | `commerce.create-location.v1`                    | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/catalog/listings`                                                           | `prepare_catalog_listing`                  | catalog:write      | `commerce.prepare-catalog-listing.v1`            | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/products/:productId/description`                                            | `update_product_description`               | catalog:write      | `commerce.update-product-description.v1`         | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/products/:productId`                                                        | `update_product`                           | catalog:write      | `commerce.update-product.v1`                     | §5      |
+| `DELETE` | `/v1/admin/merchants/:merchantId/products/:productId`                                                        | `delete_product`                           | catalog:write      | `commerce.delete-product.v1`                     | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/variants/:variantId`                                                        | `update_variant`                           | catalog:write      | `commerce.update-variant.v1`                     | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/offers/:offerId`                                                            | `update_offer`                             | catalog:write      | `commerce.update-offer.v1`                       | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/storefronts/:storefrontId/tax`                                              | `update_storefront_tax`                    | settings:write     | `commerce.update-storefront-tax.v1`              | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/edits`                                                      | `edit_order`                               | orders:write       | `commerce.edit-order.v1`                         | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/manual-payment`                                             | `record_order_manual_payment`              | orders:write       | `commerce.record-order-manual-payment.v1`        | §13     |
+| `GET`    | `/v1/admin/merchants/:merchantId/notifications`                                                              | `list_notifications`                       | customers:read     |                                                  | §16     |
+| `GET`    | `/v1/admin/merchants/:merchantId/events`                                                                     | `read_events`                              | events:read        |                                                  | §18     |
+| `GET`    | `/v1/admin/merchants/:merchantId/feed-consumers/:consumerId`                                                 | `read_feed_consumer`                       | events:read        |                                                  | §18     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/feed-consumers/:consumerId`                                                 | `advance_feed_consumer`                    | events:read        |                                                  | §18     |
+| `GET`    | `/v1/admin/merchants/:merchantId/payment-accounts`                                                           | `list_payment_accounts`                    | settings:read      |                                                  | §12     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/payment-accounts/stripe`                                                    | `link_stripe_account`                      | settings:write     |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/payment-accounts/stripe/onboarding`                                         | `start_stripe_onboarding`                  | settings:write     |                                                  | §12     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/payment-accounts/square`                                                    | `link_square_account`                      | settings:write     |                                                  | §12     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/square/connection`                                                          | `connect_square`                           | settings:write     |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/square/connection`                                                          | `read_square_connection`                   | settings:read      |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/square/connection/revocation`                                               | `disconnect_square`                        | settings:write     |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/square/locations`                                                           | `list_square_locations`                    | settings:read      |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/square/devices`                                                             | `list_square_devices`                      | settings:read      |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/square/device-codes`                                                        | `create_square_device_code`                | settings:write     |                                                  | §12     |
+| `GET`    | `/v1/admin/merchants/:merchantId/square/device-codes/:deviceCodeId`                                          | `read_square_device_code`                  | settings:read      |                                                  | §12     |
+| `POST`   | `/v1/internal/merchants/:merchantId/payment-attempts/:paymentAttemptId/settlement`                           | `settle_online_payment`                    | operator           |                                                  | §12     |
+| `POST`   | `/v1/internal/merchants/:merchantId/payment-attempts/:paymentAttemptId/stripe-disputes`                      | `observe_stripe_dispute`                   | operator           |                                                  | §12     |
+| `GET`    | `/v1/internal/merchants/:merchantId/storefronts/:storefrontId/catalog-snapshot`                              | `read_catalog_snapshot`                    | operator           |                                                  | §7      |
+| `POST`   | `/v1/admin/merchants/:merchantId/api-keys`                                                                   | `issue_api_key`                            | credentials:write  |                                                  | §3      |
+| `POST`   | `/v1/admin/merchants/:merchantId/closure`                                                                    | `close_merchant`                           | operator           |                                                  | §3      |
+| `GET`    | `/v1/admin/merchants/:merchantId/api-credentials`                                                            | `list_api_credentials`                     | credentials:write  |                                                  | §3      |
+| `POST`   | `/v1/admin/merchants/:merchantId/api-keys/:credentialId/revocation`                                          | `revoke_api_key`                           | credentials:write  |                                                  | §3      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/app-installations/:appId`                                                   | `install_app`                              | operator           |                                                  | §3      |
+| `GET`    | `/v1/admin/merchants/:merchantId/app-installations/:appId`                                                   | `read_app_installation`                    | operator           |                                                  | §3      |
+| `POST`   | `/v1/admin/merchants/:merchantId/app-installations/:appId/revocation`                                        | `uninstall_app`                            | operator           |                                                  | §3      |
+| `GET`    | `/v1/admin/merchants/:merchantId/orders/:orderId`                                                            | `read_order_record`                        | orders:read        |                                                  | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/archive-runs`                                                               | `run_archive`                              | operator           |                                                  | §19     |
+| `POST`   | `/v1/admin/merchants/:merchantId/webhook-subscriptions`                                                      | `create_webhook_subscription`              | webhooks:write     | `commerce.create-webhook-subscription.v1`        | §18     |
+| `GET`    | `/v1/admin/merchants/:merchantId/webhook-subscriptions`                                                      | `list_webhook_subscriptions`               | events:read        |                                                  | §18     |
+| `POST`   | `/v1/admin/merchants/:merchantId/webhook-subscriptions/:subscriptionId/restart`                              | `restart_webhook_subscription`             | webhooks:write     | `commerce.restart-webhook-subscription.v1`       | §18     |
+| `POST`   | `/v1/admin/merchants/:merchantId/webhook-subscriptions/:subscriptionId/secret-rotations`                     | `rotate_webhook_secret`                    | webhooks:write     | `commerce.rotate-webhook-secret.v1`              | §18     |
+| `DELETE` | `/v1/admin/merchants/:merchantId/webhook-subscriptions/:subscriptionId`                                      | `delete_webhook_subscription`              | webhooks:write     | `commerce.delete-webhook-subscription.v1`        | §18     |
+| `GET`    | `/v1/admin/merchants/:merchantId/orders/:orderId/changes`                                                    | `read_order_changes`                       | orders:read        |                                                  | §13     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order/balance-checkouts`   | `open_buyer_order_balance`                 | buyer              |                                                  | §13     |
+| `GET`    | `/v1/admin/merchants/:merchantId/plugins`                                                                    | `list_plugins`                             | settings:read      |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/previews`                                                 | `preview_plugin_change`                    | settings:read      |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/pause`                                                    | `pause_plugin`                             | settings:write     | `commerce.pause-plugin.v1`                       | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/resume`                                                   | `resume_plugin`                            | settings:write     | `commerce.resume-plugin.v1`                      | §21     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/plugins/:pluginId/settings`                                                 | `configure_plugin`                         | settings:write     | `commerce.configure-plugin.v1`                   | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/remove`                                                   | `remove_plugin`                            | settings:write     | `commerce.remove-plugin.v1`                      | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/merchant-plugins`                                                           | `install_merchant_plugin`                  | settings:write     | `commerce.install-merchant-plugin.v1`            | §21     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/plugins/:pluginId/fields/:entityType/:entityId`                             | `set_plugin_field_values`                  | catalog:write      | `commerce.set-plugin-field-values.v1`            | §21     |
+| `GET`    | `/v1/admin/merchants/:merchantId/plugins/:pluginId/fields`                                                   | `list_plugin_field_values`                 | catalog:read       |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/plugins/:pluginId/actions/:actionId/runs`                                   | `run_plugin_action`                        | settings:read      | `commerce.run-plugin-action.v1`                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/merchant-plugins/runs`                                                      | `run_plugin_function`                      | settings:read      |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/merchant-plugins/previews`                                                  | `preview_merchant_plugin`                  | settings:read      |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/channel-listings`                                                           | `place_channel_listing`                    | catalog:write      | `commerce.place-channel-listing.v1`              | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-storefronts`                                                         | `configure_pickup_storefront`              | settings:write     | `commerce.configure-pickup-storefront.v1`        | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/shipping-storefronts`                                                       | `configure_shipping_storefront`            | settings:write     | `commerce.configure-shipping-storefront.v1`      | §4      |
+| `POST`   | `/v1/admin/merchants/:merchantId/in-person-checkouts`                                                        | `create_in_person_checkout`                | orders:write       | `commerce.create-in-person-checkout.v1`          | §11     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts`                                                           | `create_pickup_checkout`                   | orders:write       | `commerce.create-pickup-checkout.v1`             | §11     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts`                              | `begin_checkout_payment`                   | orders:write       | `commerce.begin-checkout-payment.v1`             | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/in-person-collections`        | `collect_in_person_checkout_payment`       | orders:write       | `commerce.collect-in-person-checkout-payment.v1` | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/counter-sales/:checkoutId/cash-payment`                                     | `record_counter_cash_payment`              | orders:write       | `commerce.record-counter-cash-payment.v1`        | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/captures`   | `record_checkout_payment_capture`          | payments:record    | `commerce.record-checkout-payment-capture.v1`    | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/payment-dispute-observations`                                               | `observe_payment_dispute`                  | payments:record    |                                                  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/placements` | `place_paid_checkout`                      | orders:write       | `commerce.place-paid-checkout.v1`                | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/pickup-fulfillments/:fulfillmentId/ready`                   | `mark_pickup_ready`                        | orders:write       | `commerce.mark-pickup-ready.v1`                  | §14     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/pickup-fulfillments/:fulfillmentId/complete`                | `complete_pickup`                          | orders:write       | `commerce.complete-pickup.v1`                    | §14     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/cancellations`                                              | `cancel_order`                             | orders:write       | `commerce.cancel-order.v1`                       | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/refunds`                                                    | `refund_order`                             | orders:write       | `commerce.refund-order.v1`                       | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/manual-cash-refunds`                                        | `record_counter_manual_cash_refund`        | orders:write       | `commerce.record-counter-manual-cash-refund.v1`  | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/tender-refunds`                                             | `refund_order_tenders`                     | orders:write       | `commerce.refund-order-tenders.v1`               | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/payment-attempts/:paymentAttemptId/resolution` | `resolve_checkout_payment`                 | payments:record    | `commerce.resolve-checkout-payment.v1`           | §12     |
+| `POST`   | `/v1/admin/merchants/:merchantId/pickup-checkouts/:checkoutId/expiration`                                    | `expire_checkout`                          | orders:write       | `commerce.expire-checkout.v1`                    | §11     |
+| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/label-rates`                                          | `quote_shipment_label_rate`                | orders:write       | `commerce.quote-shipment-label-rate.v1`          | §14     |
+| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/labels`                                               | `purchase_shipping_label`                  | orders:write       | `commerce.purchase-shipping-label.v1`            | §14     |
+| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/tracking`                                             | `record_shipping_tracking`                 | orders:write       | `commerce.record-shipping-tracking.v1`           | §14     |
+| `GET`    | `/v1/admin/merchants/:merchantId/offers/:offerId/price-policy`                                               | `read_offer_price_policy`                  | catalog:read       |                                                  | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/offers/:offerId/price-policy`                                               | `set_offer_price_policy`                   | catalog:write      |                                                  | §5      |
+| `DELETE` | `/v1/admin/merchants/:merchantId/offers/:offerId/price-policy`                                               | `disable_offer_price_policy`               | catalog:write      |                                                  | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/offers/:offerId/price`                                                      | `adjust_offer_price`                       | catalog:write      | `commerce.adjust-offer-price.v1`                 | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/shipments/:shipmentId/tracking-attachment`                                  | `attach_fulfillment_tracking`              | orders:write       | `commerce.attach-fulfillment-tracking.v1`        | §14     |
+| `GET`    | `/v1/admin/merchants/:merchantId/inventory/snapshot`                                                         | `read_stock_snapshot`                      | inventory:read     |                                                  | §8      |
+| `POST`   | `/v1/admin/merchants/:merchantId/actions/publish-catalog-listing`                                            | `publish_catalog_listing`                  | catalog:write      | `commerce.publish-catalog-listing.v1`            | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/inventory/items`                                                            | `create_inventory_item`                    | inventory:write    | `commerce.create-inventory-item.v1`              | §8      |
+| `POST`   | `/v1/admin/merchants/:merchantId/inventory/positions`                                                        | `open_inventory_position`                  | inventory:write    | `commerce.open-inventory-position.v1`            | §8      |
+| `POST`   | `/v1/admin/merchants/:merchantId/inventory/receipts`                                                         | `receive_inventory`                        | inventory:write    | `commerce.receive-inventory.v3`                  | §8      |
+| `POST`   | `/v1/admin/merchants/:merchantId/inventory/reconciliations`                                                  | `reconcile_inventory`                      | inventory:write    | `commerce.reconcile-inventory.v1`                | §8      |
+| `POST`   | `/v1/admin/merchants/:merchantId/deliveries/:deliveryId/acknowledgements`                                    | `acknowledge_delivery`                     | events:read        |                                                  | §18     |
+| `POST`   | `/v1/admin/merchants/:merchantId/collections`                                                                | `create_collection`                        | catalog:write      | `commerce.create-collection.v1`                  | §6      |
+| `GET`    | `/v1/admin/merchants/:merchantId/collections`                                                                | `list_collections`                         | catalog:read       |                                                  | §6      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/collections/:collectionId`                                                  | `update_collection`                        | catalog:write      | `commerce.update-collection.v1`                  | §6      |
+| `POST`   | `/v1/admin/merchants/:merchantId/collections/:collectionId/deletion`                                         | `delete_collection`                        | catalog:write      | `commerce.delete-collection.v1`                  | §6      |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/collections`                                     | `list_buyer_collections`                   | buyer              |                                                  | §6      |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/collections/:handle`                             | `read_buyer_collection`                    | buyer              |                                                  | §6      |
+| `POST`   | `/v1/admin/merchants/:merchantId/companies`                                                                  | `create_company`                           | customers:write    | `commerce.create-company.v1`                     | §16     |
+| `GET`    | `/v1/admin/merchants/:merchantId/companies`                                                                  | `list_companies`                           | customers:read     |                                                  | §16     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/companies/:companyId`                                                       | `update_company`                           | customers:write    | `commerce.update-company.v1`                     | §16     |
+| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/terms-placement`                                 | `place_draft_order_on_terms`               | orders:write       | `commerce.place-draft-order-on-terms.v1`         | §16     |
+| `POST`   | `/v1/admin/merchants/:merchantId/invoices/:invoiceId/payments`                                               | `record_invoice_payment`                   | orders:write       | `commerce.record-invoice-payment.v1`             | §16     |
+| `GET`    | `/v1/admin/merchants/:merchantId/invoices`                                                                   | `list_invoices`                            | orders:read        |                                                  | §16     |
+| `POST`   | `/v1/admin/merchants/:merchantId/customers`                                                                  | `create_customer`                          | customers:write    | `commerce.create-customer.v1`                    | §16     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/customers/:customerId`                                                      | `update_customer`                          | customers:write    | `commerce.update-customer.v1`                    | §16     |
+| `POST`   | `/v1/admin/merchants/:merchantId/customers/:customerId/erasure`                                              | `erase_customer`                           | customers:write    | `commerce.erase-customer.v1`                     | §16     |
+| `GET`    | `/v1/admin/merchants/:merchantId/customers/:customerId`                                                      | `read_customer`                            | customers:read     |                                                  | §16     |
+| `GET`    | `/v1/admin/merchants/:merchantId/customers/:customerId/export`                                               | `export_customer`                          | customers:read     |                                                  | §16     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer-sign-ins`                               | `request_customer_sign_in`                 | buyer              |                                                  | §16     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer-sign-ins/:challengeId/verification`     | `verify_customer_sign_in`                  | buyer              |                                                  | §16     |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer`                                        | `read_buyer_customer`                      | buyer              |                                                  | §16     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/customer/addresses`                              | `save_customer_address`                    | buyer              |                                                  | §16     |
+| `POST`   | `/v1/admin/merchants/:merchantId/discounts`                                                                  | `create_discount`                          | discounts:write    | `commerce.create-discount.v1`                    | §10     |
+| `GET`    | `/v1/admin/merchants/:merchantId/discounts`                                                                  | `list_discounts`                           | discounts:read     |                                                  | §10     |
+| `POST`   | `/v1/admin/merchants/:merchantId/discounts/:discountId/deactivation`                                         | `deactivate_discount`                      | discounts:write    | `commerce.deactivate-discount.v1`                | §10     |
+| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders`                                                               | `create_draft_order`                       | orders:write       | `commerce.create-draft-order.v1`                 | §13     |
+| `GET`    | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId`                                                 | `read_draft_order`                         | orders:read        |                                                  | §13     |
+| `PUT`    | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId`                                                 | `update_draft_order`                       | orders:write       | `commerce.update-draft-order.v1`                 | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/invoice`                                         | `send_draft_invoice`                       | orders:write       | `commerce.send-draft-invoice.v1`                 | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/cancellation`                                    | `cancel_draft_order`                       | orders:write       | `commerce.cancel-draft-order.v1`                 | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/draft-orders/:draftOrderId/manual-payment`                                  | `mark_draft_order_paid`                    | orders:write       | `commerce.mark-draft-order-paid.v1`              | §13     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/draft-orders/:draftOrderId/checkouts`            | `open_draft_invoice`                       | buyer              |                                                  | §13     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/preparation-stations`                                          | `create_preparation_station`               | orders:write       | `commerce.create-preparation-station.v1`         | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/modifier-groups`                                               | `create_modifier_group_revision`           | catalog:write      | `commerce.create-modifier-group-revision.v1`     | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/recipes`                                                       | `create_recipe_revision`                   | inventory:write    | `commerce.create-recipe-revision.v1`             | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/stock-policies`                                                | `configure_stock_policy`                   | inventory:write    | `commerce.configure-stock-policy.v1`             | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/menus`                                                         | `publish_menu`                             | catalog:write      | `commerce.publish-menu.v1`                       | §21     |
+| `GET`    | `/v1/admin/merchants/:merchantId/food-service/snapshot`                                                      | `read_food_service_snapshot`               | catalog:read       |                                                  | §21     |
+| `GET`    | `/v1/admin/merchants/:merchantId/food-service/preparation-tickets/:ticketId`                                 | `read_preparation_ticket`                  | orders:read        |                                                  | §21     |
+| `GET`    | `/v1/admin/merchants/:merchantId/food-service/pickup-queue`                                                  | `read_pickup_queue`                        | orders:read        |                                                  | §21     |
+| `GET`    | `/v1/admin/merchants/:merchantId/food-service/sold-out-marks`                                                | `read_sold_out_marks`                      | catalog:read       |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/sold-out-marks`                                                | `mark_sold_out`                            | inventory:write    | `commerce.mark-sold-out.v1`                      | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/preparation-tickets`                                           | `manage_preparation_ticket`                | orders:write       | `commerce.manage-preparation-ticket.v1`          | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/food-service/production-batches`                                            | `complete_production_batch`                | inventory:write    | `commerce.complete-production-batch.v1`          | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/markets`                                                                    | `create_market`                            | settings:write     | `commerce.create-market.v1`                      | §9      |
+| `GET`    | `/v1/admin/merchants/:merchantId/markets`                                                                    | `list_markets`                             | settings:read      |                                                  | §9      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/markets/:marketId`                                                          | `update_market`                            | settings:write     | `commerce.update-market.v1`                      | §9      |
+| `GET`    | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/media/:mediaId`                                  | `read_storefront_media`                    | buyer              |                                                  | §7      |
+| `POST`   | `/v1/admin/merchants/:merchantId/media-uploads`                                                              | `upload_media`                             | catalog:write      |                                                  | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/media`                                                                      | `create_media`                             | catalog:write      | `commerce.create-media.v1`                       | §5      |
+| `GET`    | `/v1/admin/merchants/:merchantId/media`                                                                      | `list_media`                               | catalog:read       |                                                  | §5      |
+| `GET`    | `/v1/admin/merchants/:merchantId/media/:mediaId/content`                                                     | `read_media_content`                       | catalog:read       |                                                  | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/media/:mediaId`                                                             | `update_media`                             | catalog:write      | `commerce.update-media.v1`                       | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/media/:mediaId/deletion`                                                    | `delete_media`                             | catalog:write      | `commerce.delete-media.v1`                       | §5      |
+| `PUT`    | `/v1/admin/merchants/:merchantId/products/:productId/media`                                                  | `set_product_media`                        | catalog:write      | `commerce.set-product-media.v1`                  | §5      |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/production-demand-preset`                                      | `publish_production_demand_preset`         | entity_plane:write |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/purchasing-preset`                                             | `entity_plane_purchasing_preset`           | entity_plane:write |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/entity-plane/purchasing-reconcile`                                          | `entity_plane_purchasing_reconcile`        | entity_plane:write |                                                  | §21     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/returns`                                                    | `request_return`                           | orders:write       | `commerce.request-return.v1`                     | §15     |
+| `GET`    | `/v1/admin/merchants/:merchantId/orders/:orderId/returns`                                                    | `list_order_returns`                       | orders:read        |                                                  | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/orders/:orderId/exchanges`                                                  | `exchange_order_lines`                     | orders:write       | `commerce.exchange-order-lines.v1`               | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/returns/:returnId/authorization`                                            | `authorize_return`                         | orders:write       | `commerce.authorize-return.v1`                   | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/returns/:returnId/receipt`                                                  | `receive_return`                           | orders:write       | `commerce.receive-return.v1`                     | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/returns/:returnId/closure`                                                  | `close_return`                             | orders:write       | `commerce.close-return.v1`                       | §15     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/order/returns`             | `request_buyer_return`                     | buyer              |                                                  | §15     |
+| `POST`   | `/v1/admin/merchants/:merchantId/gift-cards`                                                                 | `issue_gift_card`                          | stored_value:write | `commerce.issue-gift-card.v1`                    | §17     |
+| `POST`   | `/v1/admin/merchants/:merchantId/store-credit`                                                               | `credit_store_credit`                      | stored_value:write | `commerce.credit-store-credit.v1`                | §17     |
+| `POST`   | `/v1/admin/merchants/:merchantId/stored-value-accounts/:accountId/disable`                                   | `disable_stored_value_account`             | stored_value:write | `commerce.disable-stored-value-account.v1`       | §17     |
+| `GET`    | `/v1/admin/merchants/:merchantId/stored-value-accounts`                                                      | `list_stored_value_accounts`               | stored_value:read  |                                                  | §17     |
+| `GET`    | `/v1/admin/merchants/:merchantId/stored-value-liability`                                                     | `read_stored_value_liability`              | stored_value:read  |                                                  | §17     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/gift-card-balances`                              | `read_gift_card_balance`                   | buyer              |                                                  | §17     |
+| `POST`   | `/v1/public/merchants/:merchantId/storefronts/:storefrontId/checkouts/:checkoutId/stored-value-placement`    | `place_buyer_stored_value_checkout`        | buyer              |                                                  | §17     |
 
-<!-- underclerk-spec:routes:end -->
+<!-- commerce-spec:routes:end -->
 
 ## Appendix B. Scopes
 
-<!-- underclerk-spec:scopes:start -->
+<!-- commerce-spec:scopes:start -->
 
 | Scope                | Opens                                                                                                                           |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -1679,13 +1679,13 @@ route table.
 | `credentials:write`  | Create, list and revoke the merchant's API keys, with only scopes that the caller holds. No API key may hold it.                |
 | `payments:record`    | Record provider results that Commerce does not check: captures, resolutions and disputes. Only an app installation may hold it. |
 
-<!-- underclerk-spec:scopes:end -->
+<!-- commerce-spec:scopes:end -->
 
 ## Appendix C. Event kinds
 
 The kind of each event comes from the command that made it.
 
-<!-- underclerk-spec:events:start -->
+<!-- commerce-spec:events:start -->
 
 | Event kind                            | Command kind                        | Section |
 | ------------------------------------- | ----------------------------------- | ------- |
@@ -1773,7 +1773,7 @@ The kind of each event comes from the command that made it.
 | `webhook_subscription.restarted`      | `restart_webhook_subscription`      | §18     |
 | `webhook_subscription.secret_rotated` | `rotate_webhook_secret`             | §18     |
 
-<!-- underclerk-spec:events:end -->
+<!-- commerce-spec:events:end -->
 
 ## Appendix D. State machines
 
@@ -1802,7 +1802,7 @@ where a person acts on it. The delivery loop moves a
 webhook subscription to `failing` through `commerceTransition`, with an
 update that holds the machine's source state in its condition.
 
-<!-- underclerk-spec:machines:start -->
+<!-- commerce-spec:machines:start -->
 
 ### D.1 `checkout_profile` (§4)
 
@@ -1856,12 +1856,12 @@ stateDiagram-v2
 
 States of `CheckoutLifecycle`:
 
-| State             | Kind         | Meaning                                                                                                               | Exit               |
-| ----------------- | ------------ | --------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `quoted`          | initial      | Priced. It holds stock, discount uses and stored value until the quote expires.                                       | none               |
-| `payment_pending` | intermediate | A payment attempt is open for the amount due. When the quote expires, Underclerk reads the payment from the provider. | due: `payment_due` |
-| `accepted`        | terminal     | Paid and placed. The order exists.                                                                                    | none               |
-| `expired`         | terminal     | The quote ran out or the payment was declined. The holds are released.                                                | none               |
+| State             | Kind         | Meaning                                                                                                             | Exit               |
+| ----------------- | ------------ | ------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `quoted`          | initial      | Priced. It holds stock, discount uses and stored value until the quote expires.                                     | none               |
+| `payment_pending` | intermediate | A payment attempt is open for the amount due. When the quote expires, Commerce reads the payment from the provider. | due: `payment_due` |
+| `accepted`        | terminal     | Paid and placed. The order exists.                                                                                  | none               |
+| `expired`         | terminal     | The quote ran out or the payment was declined. The holds are released.                                              | none               |
 
 | Event                     | From              | To                | By                     | Guards                                                                   |
 | ------------------------- | ----------------- | ----------------- | ---------------------- | ------------------------------------------------------------------------ |
@@ -1892,13 +1892,13 @@ stateDiagram-v2
 
 States of `CheckoutPaymentAttemptLifecycle`:
 
-| State           | Kind         | Meaning                                                                                                      | Exit               |
-| --------------- | ------------ | ------------------------------------------------------------------------------------------------------------ | ------------------ |
-| `pending`       | initial      | Created for the amount due. The provider has not answered. Underclerk reads it when the quote expires.       | due: `payment_due` |
-| `processing`    | intermediate | The provider is working. Underclerk reads it again after `reconcileAfter`, and not before the quote expires. | due: `payment_due` |
-| `indeterminate` | intermediate | The answer was lost. Underclerk reads it again after `reconcileAfter`, and not before the quote expires.     | due: `payment_due` |
-| `captured`      | terminal     | The provider took the money.                                                                                 | none               |
-| `declined`      | terminal     | The provider refused the payment.                                                                            | none               |
+| State           | Kind         | Meaning                                                                                                    | Exit               |
+| --------------- | ------------ | ---------------------------------------------------------------------------------------------------------- | ------------------ |
+| `pending`       | initial      | Created for the amount due. The provider has not answered. Commerce reads it when the quote expires.       | due: `payment_due` |
+| `processing`    | intermediate | The provider is working. Commerce reads it again after `reconcileAfter`, and not before the quote expires. | due: `payment_due` |
+| `indeterminate` | intermediate | The answer was lost. Commerce reads it again after `reconcileAfter`, and not before the quote expires.     | due: `payment_due` |
+| `captured`      | terminal     | The provider took the money.                                                                               | none               |
+| `declined`      | terminal     | The provider refused the payment.                                                                          | none               |
 
 | Event                  | From                                     | To              | By               | Guards              |
 | ---------------------- | ---------------------------------------- | --------------- | ---------------- | ------------------- |
@@ -2064,14 +2064,14 @@ stateDiagram-v2
 
 States of `PickupFulfillmentLifecycle`:
 
-| State              | Kind         | Meaning                                                                         |
-| ------------------ | ------------ | ------------------------------------------------------------------------------- |
-| `requested`        | initial      | Waits for staff to make it ready.                                               |
-| `preparing`        | external     | A fulfillment read from another platform uses it; Underclerk does not write it. |
-| `blocked`          | external     | A fulfillment read from another platform uses it; Underclerk does not write it. |
-| `ready_for_pickup` | intermediate | Ready. The buyer may collect it.                                                |
-| `completed`        | terminal     | Handed to the buyer.                                                            |
-| `cancelled`        | terminal     | Cancelled with its order.                                                       |
+| State              | Kind         | Meaning                                                                       |
+| ------------------ | ------------ | ----------------------------------------------------------------------------- |
+| `requested`        | initial      | Waits for staff to make it ready.                                             |
+| `preparing`        | external     | A fulfillment read from another platform uses it; Commerce does not write it. |
+| `blocked`          | external     | A fulfillment read from another platform uses it; Commerce does not write it. |
+| `ready_for_pickup` | intermediate | Ready. The buyer may collect it.                                              |
+| `completed`        | terminal     | Handed to the buyer.                                                          |
+| `cancelled`        | terminal     | Cancelled with its order.                                                     |
 
 | Event      | From               | To                 | By    | Guards                       |
 | ---------- | ------------------ | ------------------ | ----- | ---------------------------- |
@@ -2095,13 +2095,13 @@ stateDiagram-v2
 
 States of `ShippingFulfillmentLifecycle`:
 
-| State               | Kind     | Meaning                                                                         |
-| ------------------- | -------- | ------------------------------------------------------------------------------- |
-| `requested`         | initial  | Waits for the carrier.                                                          |
-| `preparing`         | external | A fulfillment read from another platform uses it; Underclerk does not write it. |
-| `blocked`           | external | A fulfillment read from another platform uses it; Underclerk does not write it. |
-| `handed_to_carrier` | terminal | The carrier has the parcel. The shipment records the delivery.                  |
-| `cancelled`         | terminal | Cancelled with its order.                                                       |
+| State               | Kind     | Meaning                                                                       |
+| ------------------- | -------- | ----------------------------------------------------------------------------- |
+| `requested`         | initial  | Waits for the carrier.                                                        |
+| `preparing`         | external | A fulfillment read from another platform uses it; Commerce does not write it. |
+| `blocked`           | external | A fulfillment read from another platform uses it; Commerce does not write it. |
+| `handed_to_carrier` | terminal | The carrier has the parcel. The shipment records the delivery.                |
+| `cancelled`         | terminal | Cancelled with its order.                                                     |
 
 | Event       | From                | To                  | By              | Guards            |
 | ----------- | ------------------- | ------------------- | --------------- | ----------------- |
@@ -2151,7 +2151,7 @@ States of `RefundAttemptLifecycle`:
 
 | State           | Kind         | Meaning                                                       |
 | --------------- | ------------ | ------------------------------------------------------------- |
-| `requested`     | initial      | Reserved before Underclerk asks the provider.                 |
+| `requested`     | initial      | Reserved before Commerce asks the provider.                   |
 | `processing`    | intermediate | The provider is working. The merchant's alarm reads it again. |
 | `indeterminate` | intermediate | The answer was lost. The merchant's alarm reads it again.     |
 | `succeeded`     | terminal     | The money went back, to the card or to stored value.          |
@@ -2315,10 +2315,10 @@ stateDiagram-v2
 
 States of `UnplacedCaptureLifecycle`:
 
-| State              | Kind     | Meaning                                                                                               | Exit                             |
-| ------------------ | -------- | ----------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `capture_unplaced` | initial  | The provider took the money, and Underclerk placed no order. Underclerk does not refund it by itself. | staff: `admin_unplaced_captures` |
-| `resolved`         | terminal | Staff refunded the buyer on the provider, or made the order by hand.                                  | none                             |
+| State              | Kind     | Meaning                                                                                           | Exit                             |
+| ------------------ | -------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `capture_unplaced` | initial  | The provider took the money, and Commerce placed no order. Commerce does not refund it by itself. | staff: `admin_unplaced_captures` |
+| `resolved`         | terminal | Staff refunded the buyer on the provider, or made the order by hand.                              | none                             |
 
 | Event     | From               | To         | By    | Guards |
 | --------- | ------------------ | ---------- | ----- | ------ |
@@ -2485,4 +2485,4 @@ stateDiagram-v2
   received --> [*]
 ```
 
-<!-- underclerk-spec:machines:end -->
+<!-- commerce-spec:machines:end -->

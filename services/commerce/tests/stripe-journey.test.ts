@@ -6,9 +6,9 @@
 // Stripe's hosted onboarding.
 //
 // It calls api.stripe.com, so it runs only with
-//   UNDERCLERK_STRIPE_TEST_SECRET_KEY  the platform's sk_test_ key
-//   UNDERCLERK_STRIPE_TEST_PUBLISHABLE_KEY  the platform's pk_test_ key
-//   UNDERCLERK_STRIPE_TEST_ACCOUNT     a connected test account with card payments
+//   COMMERCE_STRIPE_TEST_SECRET_KEY  the platform's sk_test_ key
+//   COMMERCE_STRIPE_TEST_PUBLISHABLE_KEY  the platform's pk_test_ key
+//   COMMERCE_STRIPE_TEST_ACCOUNT     a connected test account with card payments
 // The journey confirms the payment as Stripe.js does in the buyer's browser:
 // with the session's publishable key, client secret and connected account,
 // and Stripe's test card. Set STRIPE_ARTIFACT_DIR to keep the evidence; it
@@ -35,11 +35,11 @@ import {
   type Evidence,
 } from "./journey-support.ts";
 
-const SECRET_KEY = process.env.UNDERCLERK_STRIPE_TEST_SECRET_KEY ?? "";
-const ACCOUNT = process.env.UNDERCLERK_STRIPE_TEST_ACCOUNT ?? "";
+const SECRET_KEY = process.env.COMMERCE_STRIPE_TEST_SECRET_KEY ?? "";
+const ACCOUNT = process.env.COMMERCE_STRIPE_TEST_ACCOUNT ?? "";
 const PUBLISHABLE_KEY =
-  process.env.UNDERCLERK_STRIPE_TEST_PUBLISHABLE_KEY ?? "";
-const WEBHOOK_SECRET = "whsec_underclerk_journey";
+  process.env.COMMERCE_STRIPE_TEST_PUBLISHABLE_KEY ?? "";
+const WEBHOOK_SECRET = "whsec_commerce_journey";
 const BINDING = "payment_binding_primary_online";
 // Stripe keeps idempotency keys for a day, and every other id here repeats
 // from run to run, so each run pays under its own key.
@@ -120,7 +120,7 @@ it.skipIf(
           checkout.checkoutId,
           buyer.token,
           {
-            schemaVersion: "underclerk.create-buyer-payment-session.v1",
+            schemaVersion: "commerce.create-buyer-payment-session.v1",
             idempotencyKey: PAYMENT_KEY,
             checkoutRevision: checkout.revision,
             quoteDigest: checkout.quote.quoteDigest,
@@ -183,7 +183,7 @@ it.skipIf(
           checkout.checkoutId,
           buyer.token,
           {
-            schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+            schemaVersion: "commerce.reconcile-buyer-payment.v1",
             idempotencyKey: PAYMENT_KEY,
             checkoutRevision: checkout.revision,
             quoteDigest: checkout.quote.quoteDigest,
@@ -422,9 +422,9 @@ async function notify(
     }),
     {
       STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
-      UNDERCLERK_SERVICE_TOKEN: SERVICE_TOKEN,
+      COMMERCE_SERVICE_TOKEN: SERVICE_TOKEN,
       // The merchant's object, as the Worker reaches it.
-      UNDERCLERK_MERCHANT: {
+      COMMERCE_MERCHANT: {
         getByName: () => ({
           fetch: (request: Request) => backend.fetch(request),
         }),

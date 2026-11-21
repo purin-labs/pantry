@@ -60,7 +60,7 @@ export async function createWhatsAppHarnessToolHost(
   const registry = WHATSAPP_AGENT_TOOL_REGISTRY;
   const definitions = registry.tools.map(modelToolDefinition);
   const catalogDigest = await digestCanonical({
-    kind: "satyr_whatsapp_tool_catalog_v1",
+    kind: "pantry_whatsapp_tool_catalog_v1",
     definitions,
     caseId: input.manifest.caseId,
     integrationAccountId: input.manifest.integrationAccountId,
@@ -196,7 +196,7 @@ async function inlineToolOutput(
   output: string,
 ): Promise<Variant<HarnessToolOutput, "inline">> {
   const digest = await digestCanonical({
-    kind: "satyr_whatsapp_tool_output_v1",
+    kind: "pantry_whatsapp_tool_output_v1",
     output,
   });
   return { kind: "inline", content: [{ kind: "text", text: output }], digest };

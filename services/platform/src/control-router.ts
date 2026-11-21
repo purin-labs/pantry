@@ -545,7 +545,7 @@ export async function handleControlRequest(
     case "commerceSystem":
     case "commerceCapabilities":
     case "commerceSystemSync":
-    case "satyrCommerceDemo":
+    case "builtInCommerceDemo":
     case "commerceCueRefresh":
       return handleCommerceControlRoute(
         request,

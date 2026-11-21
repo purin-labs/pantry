@@ -36,7 +36,7 @@ async function mountMailInbox(page) {
       await import("/@id/@purin-labs/commerce-contracts/browser-validators");
     await initializeBrowserValidators();
     const originalFetch = window.fetch.bind(window);
-    document.cookie = "satyr_control_csrf=inbox-fixture; path=/";
+    document.cookie = "pantry_csrf=inbox-fixture; path=/";
     const draftBody =
       "Hi Mika,\n\nPlease confirm Friday arrival and the quantity. We need to check the impact on our pastry orders.\n\nCafeOS";
     const MAIL_SUPPLIERS = [
@@ -862,12 +862,12 @@ async function mountMailInbox(page) {
           accounts: [
             {
               integrationAccountId: "mailbox-a",
-              displayName: "Purchasing · CafeOS",
+              displayName: "Purchasing · Café",
               access: "readable",
             },
             {
               integrationAccountId: "mailbox-b",
-              displayName: "Events · CafeOS",
+              displayName: "Events · Café",
               access: "readable",
             },
           ],
@@ -923,7 +923,7 @@ async function mountMailInbox(page) {
           messages.push({
             ...received,
             messageId: `${extraThread.threadId}-draft`,
-            from: "CafeOS purchasing <purchasing@cafeos.example>",
+            from: "Café purchasing <purchasing@cafeos.example>",
             subject: `Re: ${extraThread.subject}`,
             receivedAt: extraThread.receivedAt + 60_000,
             unread: false,
@@ -1107,7 +1107,7 @@ async function mountMailInbox(page) {
       if (command.kind === "thread") {
         const received = {
           ...(command.threadId === "thread-1" ? message : older),
-          body: 'Hello CafeOS,\n\nYour pastry boxes will arrive on Friday instead of Thursday. Can you confirm the revised delivery window?\n\nMika\n\n<img src="https://example.test/tracker">',
+          body: 'Hello Café,\n\nYour pastry boxes will arrive on Friday instead of Thursday. Can you confirm the revised delivery window?\n\nMika\n\n<img src="https://example.test/tracker">',
           attachmentNames: ["delivery-note.pdf"],
         };
         if (command.threadId !== "thread-1")
@@ -1121,7 +1121,7 @@ async function mountMailInbox(page) {
         // The read carries no label that tells them apart.
         const own = {
           ...message,
-          from: "CafeOS purchasing <purchasing@cafeos.example>",
+          from: "Café purchasing <purchasing@cafeos.example>",
           subject: "Re: Packaging delivery delayed — Friday arrival",
           unread: false,
           attachmentNames: [],

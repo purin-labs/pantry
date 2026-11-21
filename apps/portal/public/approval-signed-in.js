@@ -3,9 +3,9 @@
 // opener, so a broadcast channel carries the message too.
 (function () {
   var action = new URLSearchParams(window.location.search).get("action") || "";
-  var message = { kind: "satyr:approval-signed-in", action: action };
+  var message = { kind: "pantry:approval-signed-in", action: action };
   try {
-    var channel = new BroadcastChannel("satyr-approval-sign-in");
+    var channel = new BroadcastChannel("pantry-approval-sign-in");
     channel.postMessage(message);
     channel.close();
   } catch (error) {}

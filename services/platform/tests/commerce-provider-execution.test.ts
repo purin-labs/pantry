@@ -189,14 +189,14 @@ describe("commerce provider dispatch", () => {
 
   it("reports a refused price change as a failed execution rather than a receipt", async () => {
     commerceSystemMocks.resolveOrganisationCommerceSystemAuthority.mockResolvedValue(
-      commerceAuthority("underclerk", "integration_underclerk_dispatch"),
+      commerceAuthority("commerce", "integration_commerce_dispatch"),
     );
     commerceEngineMocks.resolveCommerceMerchantBinding.mockResolvedValue({
       ok: true,
       value: { merchantId: "merchant_cafe" },
     });
     commerceEngineMocks.createCommerceClient.mockReturnValue({
-      kind: "underclerk_client",
+      kind: "commerce_client",
     });
     commerceEngineMocks.adjustOfferPriceThroughCommerce.mockResolvedValue({
       status: "rejected",
@@ -241,7 +241,7 @@ describe("commerce provider dispatch", () => {
 
   it("does not dispatch after the projection integration identity changes", async () => {
     commerceSystemMocks.resolveOrganisationCommerceSystemAuthority.mockResolvedValue(
-      commerceAuthority("underclerk", "integration_underclerk_dispatch"),
+      commerceAuthority("commerce", "integration_commerce_dispatch"),
     );
     const projection = offerProjection();
     const action = await executingListingAction();
@@ -254,7 +254,7 @@ describe("commerce provider dispatch", () => {
           ...projection.projection,
           provenance: {
             ...projection.projection.provenance,
-            integrationAccountId: "integration_underclerk_replaced",
+            integrationAccountId: "integration_commerce_replaced",
           },
         },
       },
@@ -327,9 +327,9 @@ describe("commerce provider dispatch", () => {
     expect(shopifyMocks.executeShopifyAction).not.toHaveBeenCalled();
   });
 
-  it("does not admit the Underclerk service credential before the flow gate", async () => {
+  it("does not admit the Commerce service credential before the flow gate", async () => {
     commerceSystemMocks.resolveOrganisationCommerceSystemAuthority.mockResolvedValue(
-      commerceAuthority("underclerk", "integration_underclerk_dispatch"),
+      commerceAuthority("commerce", "integration_commerce_dispatch"),
     );
     commerceEngineMocks.resolveCommerceMerchantBinding.mockResolvedValue({
       ok: true,
@@ -368,16 +368,16 @@ describe("commerce provider dispatch", () => {
     ).not.toHaveBeenCalled();
   });
 
-  it("permits an Underclerk retry only after the exact idempotency receipt is absent", async () => {
+  it("permits a Commerce retry only after the exact idempotency receipt is absent", async () => {
     commerceSystemMocks.resolveOrganisationCommerceSystemAuthority.mockResolvedValue(
-      commerceAuthority("underclerk", "integration_underclerk_dispatch"),
+      commerceAuthority("commerce", "integration_commerce_dispatch"),
     );
     commerceEngineMocks.resolveCommerceMerchantBinding.mockResolvedValue({
       ok: true,
       value: { merchantId: "merchant_cafe" },
     });
     commerceEngineMocks.createCommerceClient.mockReturnValue({
-      kind: "underclerk_client",
+      kind: "commerce_client",
     });
     commerceEngineMocks.reconcileCommerceCatalogPublication.mockResolvedValue({
       kind: "absent",
@@ -525,7 +525,7 @@ async function executingAction(): Promise<ExecutingActionLedgerEntry> {
       },
       sessionId: sessionId.value,
       threadId: "case_provider_dispatch",
-      host: "satyr.commerce",
+      host: "pantry.commerce",
       verb: "commerce.order.cancel",
       path: "/orders/order_shopify_42/cancel?expected_revision=3&reason=customer_requested&refund=full&restock=true&notify_customer=true&note=Customer%20requested%20cancellation.",
       argsHash: "commerce-args-hash",
@@ -550,7 +550,7 @@ async function executingAction(): Promise<ExecutingActionLedgerEntry> {
 }
 
 function commerceAuthority(
-  provider: "underclerk" | "shopify",
+  provider: "commerce" | "shopify",
   integrationAccountIdRaw: string,
 ) {
   const organisationId = parseOrganisationId("organisation_provider_dispatch");
@@ -564,11 +564,11 @@ function commerceAuthority(
     ok: true,
     value: {
       commerceSystem:
-        provider === "underclerk"
+        provider === "commerce"
           ? {
-              kind: "satyr_commerce",
+              kind: "builtin_commerce",
               organisationId: organisationId.value,
-              bindingId: "underclerk_binding_dispatch",
+              bindingId: "commerce_binding_dispatch",
               merchantId: "merchant_cafe",
               revision,
             }
@@ -593,12 +593,12 @@ function requiredCommerceSystemRevision() {
 
 async function executingListingAction(): Promise<ExecutingActionLedgerEntry> {
   const integrationAccountId = parseIntegrationAccountId(
-    "integration_underclerk_dispatch",
+    "integration_commerce_dispatch",
   );
-  if (!integrationAccountId.ok) throw new Error("invalid Underclerk fixture");
+  if (!integrationAccountId.ok) throw new Error("invalid Commerce fixture");
   const base = await executingAction();
   const providerResourceScope =
-    "commerce:publish_catalog_listing:underclerk:merchant_cafe:offer_coffee";
+    "commerce:publish_catalog_listing:commerce:merchant_cafe:offer_coffee";
   const authority = realProviderActionAuthority({
     organisationId: base.action.organisationId,
     integrationAccountId: integrationAccountId.value,
@@ -617,7 +617,7 @@ async function executingListingAction(): Promise<ExecutingActionLedgerEntry> {
       ...base.action,
       authority: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: requiredCommerceSystemRevision(),
       },
       integrationAccountId: integrationAccountId.value,
@@ -625,21 +625,21 @@ async function executingListingAction(): Promise<ExecutingActionLedgerEntry> {
       authorityPartition: authority.authorityPartition,
       flowBinding,
       verb: "commerce.catalog.publish",
-      path: "/catalog/underclerk%3Amerchant_cafe%3Aoffer_coffee/listing?expected_revision=1&product_id=underclerk%3Amerchant_cafe%3Aproduct_coffee&product_revision=1&variant_id=underclerk%3Amerchant_cafe%3Avariant_coffee&variant_revision=1&offer_revision=1&sales_channel_id=underclerk%3Amerchant_cafe%3Achannel_online&sales_channel_revision=1",
+      path: "/catalog/commerce%3Amerchant_cafe%3Aoffer_coffee/listing?expected_revision=1&product_id=commerce%3Amerchant_cafe%3Aproduct_coffee&product_revision=1&variant_id=commerce%3Amerchant_cafe%3Avariant_coffee&variant_revision=1&offer_revision=1&sales_channel_id=commerce%3Amerchant_cafe%3Achannel_online&sales_channel_revision=1",
       resourceKey:
-        "commerce:publish_catalog_listing:underclerk:merchant_cafe:offer_coffee",
+        "commerce:publish_catalog_listing:commerce:merchant_cafe:offer_coffee",
     },
   };
 }
 
 async function executingOfferPriceAction(): Promise<ExecutingActionLedgerEntry> {
   const integrationAccountId = parseIntegrationAccountId(
-    "integration_underclerk_dispatch",
+    "integration_commerce_dispatch",
   );
-  if (!integrationAccountId.ok) throw new Error("invalid Underclerk fixture");
+  if (!integrationAccountId.ok) throw new Error("invalid Commerce fixture");
   const base = await executingAction();
   const providerResourceScope =
-    "commerce:adjust_offer_price:underclerk:merchant_cafe:offer_coffee";
+    "commerce:adjust_offer_price:commerce:merchant_cafe:offer_coffee";
   const authority = realProviderActionAuthority({
     organisationId: base.action.organisationId,
     integrationAccountId: integrationAccountId.value,
@@ -658,7 +658,7 @@ async function executingOfferPriceAction(): Promise<ExecutingActionLedgerEntry> 
       ...base.action,
       authority: {
         kind: "commerce_system",
-        system: "satyr_commerce",
+        system: "builtin_commerce",
         revision: requiredCommerceSystemRevision(),
       },
       integrationAccountId: integrationAccountId.value,
@@ -666,7 +666,7 @@ async function executingOfferPriceAction(): Promise<ExecutingActionLedgerEntry> 
       authorityPartition: authority.authorityPartition,
       flowBinding,
       verb: "commerce.offer.adjust_price",
-      path: "/offers/underclerk%3Amerchant_cafe%3Aoffer_coffee/price?expected_revision=1&expected_policy_revision=3&proposed_price_minor=450&currency=USD",
+      path: "/offers/commerce%3Amerchant_cafe%3Aoffer_coffee/price?expected_revision=1&expected_policy_revision=3&proposed_price_minor=450&currency=USD",
       resourceKey: providerResourceScope,
     },
   };
@@ -823,16 +823,16 @@ function offerProjection(): Variant<CommerceProjection, "offer"> {
     projection: {
       provenance: {
         organisationId: "organisation_provider_dispatch",
-        integrationAccountId: "integration_underclerk_dispatch",
-        source: "underclerk",
+        integrationAccountId: "integration_commerce_dispatch",
+        source: "commerce",
         resourceType: "offer",
-        resourceId: "underclerk:merchant_cafe:offer_coffee",
+        resourceId: "commerce:merchant_cafe:offer_coffee",
         revision: 1,
         occurredAt: "2026-08-03T00:00:00.000Z",
         observedAt: "2026-08-03T00:00:00.000Z",
       },
-      variantId: "underclerk:merchant_cafe:variant_coffee",
-      salesChannelId: "underclerk:merchant_cafe:channel_online",
+      variantId: "commerce:merchant_cafe:variant_coffee",
+      salesChannelId: "commerce:merchant_cafe:channel_online",
       price: { amountMinor: 500, currency: "USD" },
       availability: { state: "available" },
       lifecycle: { state: "prepared", preparedAt: "2026-08-03T00:00:00.000Z" },

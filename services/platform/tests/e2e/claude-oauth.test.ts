@@ -68,7 +68,7 @@ async function claudeOAuthJourney({ task }: TestContext): Promise<void> {
     new Request(connectionUrl(), {
       method: "POST",
       headers: {
-        cookie: `satyr_control_session=${session.token}`,
+        cookie: `pantry_session=${session.token}`,
         "content-type": "application/json",
       },
       body: JSON.stringify({ kind: "start" }),
@@ -118,7 +118,7 @@ async function claudeOAuthJourney({ task }: TestContext): Promise<void> {
   const sourceBody = await source.json<{ configurationVersion: number }>();
   const selectionHeaders = headers(session);
   selectionHeaders.set(
-    "x-satyr-configuration-version",
+    "x-pantry-configuration-version",
     String(sourceBody.configurationVersion),
   );
   selectionHeaders.set("idempotency-key", "claude-oauth-e2e-select");
@@ -391,8 +391,8 @@ function connectionUrl(): string {
 function headers(session: IssuedControlSession): Headers {
   return new Headers({
     origin: "https://localhost",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
     "content-type": "application/json",
   });
 }

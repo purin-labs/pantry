@@ -147,7 +147,7 @@ describe("Platform published-resource boundary", () => {
 
 function clientFor(body: unknown, status = 200) {
   const client = createPublishedResourceClient({
-    baseUrl: "https://underclerk.example",
+    baseUrl: "https://commerce.example",
     serviceToken: "service-token",
     fetch: async () =>
       new Response(JSON.stringify(body), {

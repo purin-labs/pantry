@@ -60,7 +60,7 @@ export function expireLapsedLots(options: LotExpiryOptions): string | null {
     const expiresAt =
       lot.expiry.kind === "expires" ? lot.expiry.expiresAt : now;
     const result = options.reconcileInventory({
-      schemaVersion: "underclerk.reconcile-inventory.v1",
+      schemaVersion: "commerce.reconcile-inventory.v1",
       merchantId: row.merchantId,
       expectedMerchantRevision: merchant.revision,
       idempotencyKey: `lot_expiry_${lot.id}_${lot.revision}`,
@@ -78,7 +78,7 @@ export function expireLapsedLots(options: LotExpiryOptions): string | null {
     });
     if (result.outcome === "rejected") {
       console.warn(
-        "underclerk.lot_expiry_refused",
+        "commerce.lot_expiry_refused",
         row.lotId,
         result.error.code,
       );

@@ -50,7 +50,7 @@ import type { HarnessHistoryCursor } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import { errorMessage, sha256Hex } from "@purin-labs/std";
 
-const CHECKPOINT_METADATA_FORMAT = "satyr-actor-checkpoint-v1";
+const CHECKPOINT_METADATA_FORMAT = "pantry-actor-checkpoint-v1";
 
 export type CanonicalHarnessCheckpointError =
   | HarnessAuthorityError

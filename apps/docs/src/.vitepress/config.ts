@@ -101,7 +101,7 @@ export default defineConfig({
   head: [
     [
       "link",
-      { rel: "icon", href: "/brand/satyr-mark-dark-64.png", type: "image/png" },
+      { rel: "icon", href: "/brand/pantry-mark-dark-64.png", type: "image/png" },
     ],
     ["meta", { property: "og:site_name", content: "Seams Pantry docs" }],
     ["meta", { property: "og:type", content: "website" }],
@@ -130,8 +130,8 @@ export default defineConfig({
   themeConfig: {
     siteTitle: "Seams Pantry docs",
     logo: {
-      light: "/brand/satyr-mark-dark-64.png",
-      dark: "/brand/satyr-mark-light-64.png",
+      light: "/brand/pantry-mark-dark-64.png",
+      dark: "/brand/pantry-mark-light-64.png",
       alt: "Seams Pantry",
     },
     logoLink: siteOrigin,
@@ -151,7 +151,7 @@ export default defineConfig({
       host: "127.0.0.1",
       port: 3105,
       allowedHosts: [
-        "docs.satyr.localhost",
+        "docs.pantry.localhost",
         "localhost",
         "portal.localhost",
         "pta-m4.local",

@@ -203,7 +203,7 @@ export function parseCommerceGraphQuery(
         },
       };
     }
-    case "underclerk_context": {
+    case "commerce_context": {
       const traversal = parseTraversal(query.traversal);
       if (!traversal.ok) return traversal;
       const selection = parseCommerceContextSelection(query.selection);
@@ -373,6 +373,6 @@ export function parsePublishedCommerceSelector(
     });
   const query = parseCommerceGraphQuery(selector.query);
   if (!query.ok) return query;
-  if (query.value.kind === "underclerk_context") return queryRefusal();
+  if (query.value.kind === "commerce_context") return queryRefusal();
   return { ok: true, value: { selectorId: id, revision, query: query.value } };
 }

@@ -10,8 +10,8 @@
 // the counter sale places its order, and staff refund part of it.
 //
 // It calls Square's sandbox, so it runs only with
-//   UNDERCLERK_SQUARE_SANDBOX_TOKEN           a sandbox access token
-//   UNDERCLERK_SQUARE_SANDBOX_APPLICATION_ID  the token's sandbox application
+//   COMMERCE_SQUARE_SANDBOX_TOKEN           a sandbox access token
+//   COMMERCE_SQUARE_SANDBOX_APPLICATION_ID  the token's sandbox application
 // The buyer's browser would tokenize the card with Square's Web Payments
 // SDK; the journey uses Square's sandbox test nonces instead. Set
 // SQUARE_ARTIFACT_DIR to keep the evidence; it repeats byte for byte, because
@@ -41,9 +41,9 @@ import {
 } from "./journey-support.ts";
 import { SquareCounterDesk } from "./square-counter-desk.ts";
 
-const TOKEN = process.env.UNDERCLERK_SQUARE_SANDBOX_TOKEN ?? "";
+const TOKEN = process.env.COMMERCE_SQUARE_SANDBOX_TOKEN ?? "";
 const APPLICATION_ID =
-  process.env.UNDERCLERK_SQUARE_SANDBOX_APPLICATION_ID ?? "";
+  process.env.COMMERCE_SQUARE_SANDBOX_APPLICATION_ID ?? "";
 // A sandbox access token needs no refresh, so the secret is never sent.
 const SANDBOX_APPLICATION = {
   clientId: APPLICATION_ID,
@@ -305,7 +305,7 @@ async function startPayment(
       checkout.checkoutId,
       buyer.token,
       {
-        schemaVersion: "underclerk.create-buyer-payment-session.v1",
+        schemaVersion: "commerce.create-buyer-payment-session.v1",
         idempotencyKey: `square_payment_${name}_${RUN}`,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -338,7 +338,7 @@ function reconcile(
       checkout.checkoutId,
       buyer.token,
       {
-        schemaVersion: "underclerk.reconcile-buyer-payment.v1",
+        schemaVersion: "commerce.reconcile-buyer-payment.v1",
         idempotencyKey: `square_payment_${name}_${RUN}`,
         checkoutRevision: checkout.revision,
         quoteDigest: checkout.quote.quoteDigest,
@@ -400,7 +400,7 @@ async function paymentsFor(
         ? (listed.body.payments as Record<string, unknown>[])
         : [];
     return payments.filter(
-      (item) => item.note === `Underclerk ${paymentAttemptId}`,
+      (item) => item.note === `Commerce ${paymentAttemptId}`,
     );
   };
   for (let attempt = 0; attempt < 15; attempt += 1) {

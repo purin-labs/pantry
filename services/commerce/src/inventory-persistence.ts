@@ -208,7 +208,7 @@ export function insertInventoryPosition(
 ): void {
   if (position.balance.kind !== "accounted") {
     throw new Error(
-      "Underclerk can persist only accounted inventory positions",
+      "Commerce can persist only accounted inventory positions",
     );
   }
   database
@@ -252,7 +252,7 @@ export function updateInventoryPosition(
 ): void {
   if (position.balance.kind !== "accounted") {
     throw new Error(
-      "Underclerk can persist only accounted inventory positions",
+      "Commerce can persist only accounted inventory positions",
     );
   }
   const updated = database

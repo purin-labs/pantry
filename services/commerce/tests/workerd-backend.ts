@@ -32,7 +32,7 @@ const SIGNING_KEY = fixtureSigningKey();
 export async function startWorkerdBackend(
   options: Readonly<{ persistDirectory?: string }> = {},
 ) {
-  const artifact = mkdtempSync(join(tmpdir(), "underclerk-workerd-"));
+  const artifact = mkdtempSync(join(tmpdir(), "commerce-workerd-"));
   buildFixtureWorker(artifact);
   const miniflare = await startFixtureMiniflare({
     artifact,

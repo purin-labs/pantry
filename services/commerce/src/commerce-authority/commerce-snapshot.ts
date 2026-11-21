@@ -69,7 +69,7 @@ export class CommerceSnapshotReader {
     );
     if (merchant === undefined) return undefined;
     return parseMerchantSnapshot({
-      schemaVersion: "underclerk.commerce-snapshot.v2",
+      schemaVersion: "commerce.commerce-snapshot.v2",
       merchantId: merchant.merchantId,
       merchantRevision: merchant.revision,
       deliverySigner: {
@@ -113,7 +113,7 @@ export class CommerceSnapshotReader {
     );
     if (merchant === undefined) return undefined;
     return parseFoodServiceSnapshot({
-      schemaVersion: "underclerk.food-service-snapshot.v2",
+      schemaVersion: "commerce.food-service-snapshot.v2",
       merchantId: merchant.merchantId,
       merchantRevision: merchant.revision,
       deliverySigner: {

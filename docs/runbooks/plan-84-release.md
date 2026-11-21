@@ -35,7 +35,7 @@ until each regional database matches its baseline.
 
 The owner signs in, in the owner's own browser, with a real model on the Portal chat.
 
-1. Open Satyr Kitchen, a recipe, and the Workflow surface. The first open applies revision 1.
+1. Open Kitchen, a recipe, and the Workflow surface. The first open applies revision 1.
 2. Select Run draft. If the run has findings, select Ask the agent and send the words. If it has none,
    ask the chat to propose a change to one step.
 3. Allow the two prompts. The Workflow page shows the proposal with no reload.

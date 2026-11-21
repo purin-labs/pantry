@@ -73,7 +73,7 @@ export type TerminalOperationsControlRoute =
   | Readonly<{
       kind: "terminalRetirement";
       organisationIdRaw: string;
-      satyrLocationIdRaw: string;
+      pantryLocationIdRaw: string;
     }>
   | Readonly<{ kind: "terminalSquarePosApp"; organisationIdRaw: string }>;
 
@@ -122,7 +122,7 @@ export function matchTerminalOperationsControlRoute(
     return {
       kind: "terminalRetirement",
       organisationIdRaw: decode(retirement[0]),
-      satyrLocationIdRaw: decode(retirement[1]),
+      pantryLocationIdRaw: decode(retirement[1]),
     };
   }
   const operations = match(
@@ -232,7 +232,7 @@ type TerminalConfiguration =
        * one pairs physical Terminals.
        */
       environment: "development" | "production";
-      satyrLocations: readonly PantryLocationChoice[];
+      pantryLocations: readonly PantryLocationChoice[];
       squareAccounts: readonly SquareAccountChoice[];
       testDevices: readonly SandboxTestDevice[];
     }>
@@ -246,7 +246,7 @@ type SquareAccountChoice = Readonly<{
 }>;
 
 type PantryLocationChoice = Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   currency: string;
   supportedItems: readonly Readonly<{
     variantId: string;
@@ -310,7 +310,7 @@ async function readTerminalConfiguration(
   if (client === null) {
     return {
       kind: "error",
-      response: controlError("underclerk_unavailable", 503),
+      response: controlError("commerce_unavailable", 503),
     };
   }
   const policies = await client.listPointOfSaleConfigurations(
@@ -319,7 +319,7 @@ async function readTerminalConfiguration(
   if (!policies.ok) {
     return {
       kind: "error",
-      response: controlError("underclerk_unavailable", 503),
+      response: controlError("commerce_unavailable", 503),
     };
   }
   const accounts = await listIntegrationAccounts({
@@ -330,7 +330,7 @@ async function readTerminalConfiguration(
     kind: "ready",
     merchantId: binding.value.merchantId,
     environment,
-    satyrLocations: policies.value.map(pointOfSaleLocation),
+    pantryLocations: policies.value.map(pointOfSaleLocation),
     squareAccounts: await readSquareAccountChoices(
       scope.database,
       organisationId,
@@ -346,7 +346,7 @@ function pointOfSaleLocation(
   policy: PointOfSaleConfiguration,
 ): PantryLocationChoice {
   return {
-    satyrLocationId: policy.satyrLocationId,
+    pantryLocationId: policy.pantryLocationId,
     currency: policy.currency,
     supportedItems: policy.supportedItems,
   };
@@ -473,7 +473,7 @@ async function handleTerminalSandboxConfiguration(
     location === null ||
     !hasPantryLocation(
       configuration,
-      selection.satyrLocationId,
+      selection.pantryLocationId,
       location.currency,
     ) ||
     !hasSandboxTestDevice(selection.testDeviceId)
@@ -498,7 +498,7 @@ async function handleTerminalSandboxConfiguration(
   const current = await readActiveTerminalAssignment(
     authorized.executionScope.database,
     authorized.organisationId,
-    selection.satyrLocationId,
+    selection.pantryLocationId,
   );
   if (!current.ok && current.error.code === "terminal_assignment_corrupt") {
     return controlError("terminal_assignment_corrupt", 409);
@@ -575,14 +575,14 @@ function parseTerminalConfigurationRequest(
   const keys = Object.keys(body);
   if (
     keys.length !== 4 ||
-    !keys.includes("satyrLocationId") ||
+    !keys.includes("pantryLocationId") ||
     !keys.includes("integrationAccountId") ||
     !keys.includes("providerLocationId") ||
     !keys.includes("testDeviceId")
   )
     return null;
-  return typeof body.satyrLocationId === "string" &&
-    body.satyrLocationId.length > 0 &&
+  return typeof body.pantryLocationId === "string" &&
+    body.pantryLocationId.length > 0 &&
     typeof body.integrationAccountId === "string" &&
     body.integrationAccountId.length > 0 &&
     typeof body.providerLocationId === "string" &&
@@ -590,7 +590,7 @@ function parseTerminalConfigurationRequest(
     typeof body.testDeviceId === "string" &&
     body.testDeviceId.length > 0
     ? {
-        satyrLocationId: body.satyrLocationId,
+        pantryLocationId: body.pantryLocationId,
         integrationAccountId: body.integrationAccountId,
         providerLocationId: body.providerLocationId,
         testDeviceId: body.testDeviceId,
@@ -623,9 +623,9 @@ function hasPantryLocation(
   pantryLocationId: string,
   currency: string,
 ): boolean {
-  for (const location of configuration.satyrLocations) {
+  for (const location of configuration.pantryLocations) {
     if (
-      location.satyrLocationId === pantryLocationId &&
+      location.pantryLocationId === pantryLocationId &&
       location.currency === currency
     )
       return true;
@@ -650,7 +650,7 @@ function terminalSelectionMatches(
   return (
     assignment.state.kind === "active" &&
     assignment.merchantId === configuration.merchantId &&
-    assignment.satyrLocationId === selection.satyrLocationId &&
+    assignment.pantryLocationId === selection.pantryLocationId &&
     assignment.account.integrationAccountId === account.integrationAccountId &&
     assignment.account.providerAccountId === account.providerAccountId &&
     assignment.account.environment === account.environment &&
@@ -696,7 +696,7 @@ function buildSandboxAssignment(
     assignmentId: `terminal_assignment_${crypto.randomUUID()}`,
     organisationId: input.organisationId,
     merchantId: input.merchantId,
-    satyrLocationId: input.selection.satyrLocationId,
+    pantryLocationId: input.selection.pantryLocationId,
     account: {
       integrationAccountId: input.sourceAccount.integrationAccountId,
       providerAccountId: input.sourceAccount.providerAccountId,
@@ -762,7 +762,7 @@ async function handleTerminalPairingStart(
   const { authorized, mutation, context, selection } = change;
   const location = counterLocation(
     context,
-    selection.satyrLocationId,
+    selection.pantryLocationId,
     selection.providerLocationId,
   );
   if (location === null) return controlError("terminal_pairing_invalid", 422);
@@ -842,7 +842,7 @@ async function handleTerminalPairingActivation(
   if (
     !hasPantryLocation(
       change.context.configuration,
-      change.selection.satyrLocationId,
+      change.selection.pantryLocationId,
       read.location.currency,
     )
   )
@@ -881,7 +881,7 @@ async function handleSquarePosAppAssignment(
   if (change instanceof Response) return change;
   const location = counterLocation(
     change.context,
-    change.selection.satyrLocationId,
+    change.selection.pantryLocationId,
     change.selection.providerLocationId,
   );
   if (location === null)
@@ -898,17 +898,17 @@ async function handleSquarePosAppAssignment(
 function parseSquarePosAppSelection(
   body: Readonly<Record<string, unknown>>,
 ): Readonly<{
-  satyrLocationId: string;
+  pantryLocationId: string;
   integrationAccountId: string;
   providerLocationId: string;
 }> | null {
   const keys = Object.keys(body).sort().join(",");
-  return keys === "integrationAccountId,providerLocationId,satyrLocationId" &&
-    nonEmpty(body.satyrLocationId) &&
+  return keys === "integrationAccountId,pantryLocationId,providerLocationId" &&
+    nonEmpty(body.pantryLocationId) &&
     nonEmpty(body.integrationAccountId) &&
     nonEmpty(body.providerLocationId)
     ? {
-        satyrLocationId: body.satyrLocationId,
+        pantryLocationId: body.pantryLocationId,
         integrationAccountId: body.integrationAccountId,
         providerLocationId: body.providerLocationId,
       }
@@ -929,7 +929,7 @@ type SquareCounterChange<Selection> = Readonly<{
  */
 async function beginSquareCounterChange<
   Selection extends Readonly<{
-    satyrLocationId: string;
+    pantryLocationId: string;
     integrationAccountId: string;
   }>,
 >(
@@ -1000,7 +1000,7 @@ function counterLocation(
  */
 async function assignCounterTarget(
   request: Request,
-  change: SquareCounterChange<Readonly<{ satyrLocationId: string }>>,
+  change: SquareCounterChange<Readonly<{ pantryLocationId: string }>>,
   next: Readonly<{
     location: SquareLocationChoice;
     target: TerminalAssignment["target"];
@@ -1014,7 +1014,7 @@ async function assignCounterTarget(
   const current = await readActiveTerminalAssignment(
     database,
     authorized.organisationId,
-    selection.satyrLocationId,
+    selection.pantryLocationId,
   );
   if (!current.ok && current.error.code === "terminal_assignment_corrupt")
     return controlError("terminal_assignment_corrupt", 409);
@@ -1023,7 +1023,7 @@ async function assignCounterTarget(
     current.ok &&
     current.value.state.kind === "active" &&
     current.value.merchantId === context.configuration.merchantId &&
-    current.value.satyrLocationId === selection.satyrLocationId &&
+    current.value.pantryLocationId === selection.pantryLocationId &&
     current.value.providerLocationId === next.location.providerLocationId &&
     current.value.transport === next.transport &&
     current.value.adapterVersion === next.adapterVersion &&
@@ -1035,7 +1035,7 @@ async function assignCounterTarget(
       assignmentId: `terminal_assignment_${crypto.randomUUID()}`,
       organisationId: authorized.organisationId,
       merchantId: context.configuration.merchantId,
-      satyrLocationId: selection.satyrLocationId,
+      pantryLocationId: selection.pantryLocationId,
       account,
       providerLocationId: next.location.providerLocationId,
       target: next.target,
@@ -1249,14 +1249,14 @@ function parseTerminalPairingRequest(
 ): TerminalPairingRequest | null {
   const keys = Object.keys(body).sort().join(",");
   return keys ===
-    "deviceName,integrationAccountId,providerLocationId,satyrLocationId" &&
-    nonEmpty(body.satyrLocationId) &&
+    "deviceName,integrationAccountId,pantryLocationId,providerLocationId" &&
+    nonEmpty(body.pantryLocationId) &&
     nonEmpty(body.integrationAccountId) &&
     nonEmpty(body.providerLocationId) &&
     nonEmpty(body.deviceName) &&
     body.deviceName.length <= 128
     ? {
-        satyrLocationId: body.satyrLocationId,
+        pantryLocationId: body.pantryLocationId,
         integrationAccountId: body.integrationAccountId,
         providerLocationId: body.providerLocationId,
         deviceName: body.deviceName,
@@ -1266,13 +1266,13 @@ function parseTerminalPairingRequest(
 
 function parseTerminalPairingActivation(
   body: Readonly<Record<string, unknown>>,
-): Readonly<{ satyrLocationId: string; integrationAccountId: string }> | null {
+): Readonly<{ pantryLocationId: string; integrationAccountId: string }> | null {
   const keys = Object.keys(body).sort().join(",");
-  return keys === "integrationAccountId,satyrLocationId" &&
-    nonEmpty(body.satyrLocationId) &&
+  return keys === "integrationAccountId,pantryLocationId" &&
+    nonEmpty(body.pantryLocationId) &&
     nonEmpty(body.integrationAccountId)
     ? {
-        satyrLocationId: body.satyrLocationId,
+        pantryLocationId: body.pantryLocationId,
         integrationAccountId: body.integrationAccountId,
       }
     : null;
@@ -1314,7 +1314,7 @@ async function handleTerminalRetirement(
     body: body.value,
     boundary: "unversioned",
     user: "before_replay",
-    route: `/v1/control/organisations/${authorized.organisationId}/commerce/terminal-operations/${route.satyrLocationIdRaw}/retirement`,
+    route: `/v1/control/organisations/${authorized.organisationId}/commerce/terminal-operations/${route.pantryLocationIdRaw}/retirement`,
     operation: "terminal.assignment.retire",
   });
   if (admitted instanceof Response) return admitted;
@@ -1323,7 +1323,7 @@ async function handleTerminalRetirement(
   const assignment = await readActiveTerminalAssignment(
     authorized.executionScope.database,
     authorized.organisationId,
-    route.satyrLocationIdRaw,
+    route.pantryLocationIdRaw,
   );
   if (!assignment.ok) {
     return controlError(

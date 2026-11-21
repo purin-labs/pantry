@@ -19,20 +19,20 @@ export async function connectCommerceFixture(
   merchantId: string,
   // Platform installs Pantry when it provisions a merchant (Plan 76 phase 2).
   options: Readonly<{
-    installSatyr?: boolean;
+    installPantry?: boolean;
     environment?: "development" | "production";
   }> = {},
 ): Promise<void> {
-  const provision = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}`,
+  const provision = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}`,
     {
       method: "PUT",
       headers: {
-        authorization: "Bearer underclerk-e2e-token",
+        authorization: "Bearer commerce-e2e-token",
         "content-type": "application/json",
       },
       body: JSON.stringify({
-        schemaVersion: "underclerk.provision-merchant.v2",
+        schemaVersion: "commerce.provision-merchant.v2",
         externalReference: organisationId,
         merchantId,
         createdAt: new Date().toISOString(),
@@ -40,28 +40,28 @@ export async function connectCommerceFixture(
     },
   );
   expect(provision.status, await provision.text()).toBe(200);
-  if (options.installSatyr !== false) {
-    const installed = await env.UNDERCLERK.fetch(
-      `http://underclerk.test/v1/admin/merchants/${merchantId}/app-installations/satyr`,
+  if (options.installPantry !== false) {
+    const installed = await env.COMMERCE.fetch(
+      `http://commerce.test/v1/admin/merchants/${merchantId}/app-installations/pantry`,
       {
         method: "PUT",
         headers: {
-          authorization: "Bearer underclerk-e2e-token",
+          authorization: "Bearer commerce-e2e-token",
           "content-type": "application/json",
         },
         body: JSON.stringify({
           scopes: COMMERCE_API_SCOPES,
           externalReference: organisationId,
-          label: "Satyr",
+          label: "Pantry",
         }),
       },
     );
     expect(installed.status, await installed.text()).toBe(200);
   }
-  const signing = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${merchantId}/test-signing-key`,
+  const signing = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${merchantId}/test-signing-key`,
     {
-      headers: { authorization: "Bearer underclerk-e2e-token" },
+      headers: { authorization: "Bearer commerce-e2e-token" },
     },
   );
   const signingKey: unknown = await signing.json();
@@ -69,11 +69,11 @@ export async function connectCommerceFixture(
     throw new Error("Fixture signing key missing");
   const now = Date.now();
   const accountId = `integration_${crypto.randomUUID()}`;
-  const bindingId = `underclerk_binding_${crypto.randomUUID()}`;
+  const bindingId = `commerce_binding_${crypto.randomUUID()}`;
   const organisationDb = organisationDatabase(organisationId);
   await organisationDb.batch([
     organisationDb.prepare(
-      `INSERT INTO underclerk_merchant_binding (
+      `INSERT INTO commerce_merchant_binding (
       binding_id, organisation_id, integration_account_id, merchant_id, environment,
       delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at
     ) VALUES (?, ?, ?, ?, ?, 'key_bakery_e2e', ?, 1, ?, ?)`,
@@ -89,9 +89,9 @@ export async function connectCommerceFixture(
     ),
     organisationDb.prepare(
       `INSERT INTO organisation_commerce_system (
-      organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id,
+      organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id,
       revision, selected_at, selected_by_user_id
-    ) VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)`,
+    ) VALUES (?, 'builtin_commerce', ?, NULL, 1, ?, ?)`,
     ).bind(organisationId, bindingId, now, userId),
   ]);
 }
@@ -124,7 +124,7 @@ export async function commerceSyncStatus(
 ) {
   const binding = await organisationDatabase(organisationId)
     .prepare(
-      "SELECT integration_account_id AS integrationAccountId FROM underclerk_merchant_binding WHERE organisation_id = ?",
+      "SELECT integration_account_id AS integrationAccountId FROM commerce_merchant_binding WHERE organisation_id = ?",
     )
     .bind(organisationId)
     .first<{ integrationAccountId: string }>();
@@ -210,7 +210,7 @@ export function commerceHeaders(session: IssuedControlSession): Headers {
   return new Headers({
     "content-type": "application/json",
     origin: "https://localhost",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
   });
 }

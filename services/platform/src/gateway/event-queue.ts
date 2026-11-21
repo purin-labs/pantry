@@ -206,7 +206,7 @@ export async function handleEventQueueMessage(
         parsed.value,
       );
       return;
-    case "underclerk.outbox_reconcile.v1":
+    case "commerce.outbox_reconcile.v1":
       await handleCommerceOutboxReconcileQueueMessage(
         message,
         env,

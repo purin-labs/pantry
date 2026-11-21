@@ -150,7 +150,7 @@ async function configurationJourney(
       // Plan 88: a disconnect moves the policy to Pantry's key; it stays on.
       expect(source.policy.policy).toMatchObject({
         mode: "party_context",
-        route: { funding: "satyr_platform" },
+        route: { funding: "pantry_platform" },
       });
     } else {
       expect(source.connection).toEqual(before.connection);
@@ -1816,7 +1816,7 @@ async function installFixture(): Promise<Fixture> {
     authorizationProduct: "full_mailbox_pilot",
     providerSubjectId: "google_p55_case_context_collection",
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef: gmailHandle },
     grantedScopes: GMAIL_FULL_MAILBOX_SCOPES,
     createdByUserId: userId,

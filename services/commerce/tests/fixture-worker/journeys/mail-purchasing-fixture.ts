@@ -38,8 +38,8 @@ export function seedMailPurchasing(
         JSON.stringify({
           provenance: {
             organisationId,
-            integrationAccountId: "underclerk",
-            source: "underclerk",
+            integrationAccountId: "commerce",
+            source: "commerce",
             resourceType: "stock_policy",
             resourceId: stockPolicyId,
             revision: 1,

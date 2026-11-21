@@ -45,13 +45,13 @@ MIN_FREE_BYTES = 1_500_000_000
 # Satyr has two usual English forms, with the vowel of "say" and of "sat". Both wake the Portal.
 WAKE_FORMS = (
     "hey sayter", "hey, sayter", "[[ heɪ sˈeɪtə ]]", "[[ heɪ sˈeɪɾɚ ]]",
-    "hey satyr", "hey, satyr", "[[ heɪ sˈætə ]]",
+    "hey pantry", "hey, pantry", "[[ heɪ sˈætə ]]",
 )
 NEAR_TRAIN = (
     "hey sailor", "hey sister", "hey there", "hey waiter", "hey later", "hey peter", "hey sadie",
     "hey hater", "hey cater", "hey sara", "hey slater", "hey sweater", "hey saturday", "hey sugar",
-    "hey siri", "hey summer", "hey sir", "say to her", "say that", "satire", "satyr", "sayter", "hey",
-    "hey doctor", "hey water", "stay there", "safer", "greater", "hey sam", "a satyr came",
+    "hey siri", "hey summer", "hey sir", "say to her", "say that", "satire", "pantry", "sayter", "hey",
+    "hey doctor", "hey water", "stay there", "safer", "greater", "hey sam", "a pantry came",
     "see you later", "pass the butter", "hey set a timer", "they sat here", "the baker", "hey taylor",
 )
 NEAR_TEST = (
@@ -474,8 +474,8 @@ def prepare(args: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["prepare", "more", "kokoro", "focus"])
-    parser.add_argument("--data", type=Path, default=Path.home() / ".satyr-voice-test/wake")
-    parser.add_argument("--models", type=Path, default=Path.home() / ".satyr-voice-test/wake/models")
+    parser.add_argument("--data", type=Path, default=Path.home() / ".pantry-voice-test/wake")
+    parser.add_argument("--models", type=Path, default=Path.home() / ".pantry-voice-test/wake/models")
     parser.add_argument("--demand", type=Path, required=True)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--wake", type=int, default=7000)

@@ -1,7 +1,7 @@
 import type { ObserveCommercePaymentDisputeV1 } from "./index.ts";
 
 const validActionRequired: ObserveCommercePaymentDisputeV1 = {
-  schemaVersion: "underclerk.observe-payment-dispute.v1",
+  schemaVersion: "commerce.observe-payment-dispute.v1",
   organisationId: "organisation_fixture",
   merchantId: "merchant_fixture",
   providerDeliveryId: "delivery_fixture",
@@ -79,7 +79,7 @@ const invalidPaymentIdentity: ObserveCommercePaymentDisputeV1 = {
 
 // @ts-expect-error Payment-attempt correlation is required at the observation boundary.
 const invalidMissingPaymentAttempt: ObserveCommercePaymentDisputeV1 = {
-  schemaVersion: "underclerk.observe-payment-dispute.v1",
+  schemaVersion: "commerce.observe-payment-dispute.v1",
   organisationId: "organisation_fixture",
   merchantId: "merchant_fixture",
   providerDeliveryId: "delivery_fixture",

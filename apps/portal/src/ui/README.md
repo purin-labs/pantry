@@ -373,7 +373,7 @@ The default size is 360 × 340 pixels. `className` and `style` allow a different
 width. Long content increases the height. The `theme` prop controls the card
 and glow together. The preview uses synthetic levels and needs no audio access.
 
-Chat and BakeryOS also use the light in their text inputs through
+Chat and Kitchen also use the light in their text inputs through
 `features/chat/work-glow.tsx`. This overlay follows the existing work and stream
 states. It fades after completion, failure, pause, cancellation, approval, or
 expiry. It follows the portal theme and preserves reduced motion.
@@ -482,7 +482,7 @@ When the agent asks, name it with `AGENT_NAME` from `src/agent-name.ts`.
 <PermissionRequestDialog
   open={open}
   onClose={close}
-  requester={{ name: AGENT_NAME, icon: <SatyrMark /> }}
+  requester={{ name: AGENT_NAME, icon: <PantryMark /> }}
   target={{ name: "Noix de Beurre", icon: <Croissant /> }}
   title={`${AGENT_NAME} would like to read a public link`}
   subtitle="Only allow this if you trust the request."

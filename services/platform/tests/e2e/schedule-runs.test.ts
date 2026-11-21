@@ -329,7 +329,7 @@ async function deliver(body: unknown): Promise<void> {
   };
   await gateway.queue(
     {
-      queue: "satyr-events",
+      queue: "pantry-events",
       metadata: { metrics: { backlogCount: 1, backlogBytes: 0 } },
       messages: [message],
       ackAll: () => undefined,

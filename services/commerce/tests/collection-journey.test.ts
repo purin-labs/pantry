@@ -167,7 +167,7 @@ class Shopper {
   static async start(client: CommerceStorefrontClient): Promise<Shopper> {
     const session = await required(
       client.createSession(merchantId, STOREFRONT, {
-        schemaVersion: "underclerk.create-buyer-session.v1",
+        schemaVersion: "commerce.create-buyer-session.v1",
         buyer: { kind: "guest" },
       }),
     );

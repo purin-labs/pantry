@@ -122,24 +122,24 @@ it(
       expect(added.status, await added.clone().text()).toBe(200);
       // The shop gives photo links only on HTTPS, as production names
       // Commerce; the suite's HTTP name gets none.
-      const httpBase = env.UNDERCLERK_BASE_URL;
-      env.UNDERCLERK_BASE_URL = "https://underclerk.test";
+      const httpBase = env.COMMERCE_BASE_URL;
+      env.COMMERCE_BASE_URL = "https://commerce.test";
       let photo: MenuScreenPhoto | null = null;
       try {
         await expect
           .poll(async () => entryOf(await feed(token), script.taroId)?.image ?? null, { timeout: 30_000, interval: 1_000 })
-          .toMatchObject({ altText: PHOTO_ALT, url: expect.stringMatching(/^https:\/\/underclerk\.test\/.+\/media\/media_/u) });
+          .toMatchObject({ altText: PHOTO_ALT, url: expect.stringMatching(/^https:\/\/commerce\.test\/.+\/media\/media_/u) });
         photo = entryOf(await feed(token), script.taroId)?.image ?? null;
         const editor = await send(`${BASE}/menu-boards/facts`, journey.owner, "GET");
         expect(editorPhoto(editor.body, script.taroId)).toEqual(photo);
         const options = await send(`${BASE}/commerce/menu-publication`, journey.owner, "GET");
         expect(productPhoto(options.body, productId)).toEqual(photo);
       } finally {
-        env.UNDERCLERK_BASE_URL = httpBase;
+        env.COMMERCE_BASE_URL = httpBase;
       }
       task.meta.menuBoardProducts = {
         substituted: ["model provider (deterministic OpenRouter transport)", "Slack (signed events)"],
-        real: ["Pantry Worker, the board room and the menu draft", "Underclerk fixture Worker", "screen feed"],
+        real: ["Pantry Worker, the board room and the menu draft", "Commerce fixture Worker", "screen feed"],
         viewerAdd: refused,
         board: ownerPeer.read().elements.map((element) => ({ kind: element.kind, look: lookOf(element), placement: element.placement })),
         release: { releaseRevision: release, look: lookOf(screen.release?.elements[0]), priced: entry !== undefined },

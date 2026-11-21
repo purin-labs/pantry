@@ -26,7 +26,7 @@ function configuration(
     configurationId: "pos_configuration_counter",
     organisationId: "organisation_counter",
     merchantId: MERCHANT,
-    satyrLocationId: "location_cafe",
+    pantryLocationId: "location_cafe",
     salesChannelId: "channel_cafe",
     currency: "JPY",
     supportedItems: [
@@ -42,7 +42,7 @@ function configuration(
     },
     presentationPolicy: {
       locale: "ja-JP",
-      merchantDisplayName: "Satyr Cafe",
+      merchantDisplayName: "Pantry Cafe",
       termsPolicyId: "terms_counter",
       privacyPolicyId: "privacy_counter",
       supportContact: "support@example.test",
@@ -79,7 +79,7 @@ describe("point of sale configuration publication", function publicationSuite() 
   beforeEach(function freshDatabase() {
     databasePath = join(
       tmpdir(),
-      `underclerk-pos-config-${randomUUID()}.sqlite3`,
+      `commerce-pos-config-${randomUUID()}.sqlite3`,
     );
     database = new NodeCommerceDatabase(databasePath);
     initializeCommerceSchema(database, AT);

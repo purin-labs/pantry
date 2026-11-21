@@ -121,7 +121,7 @@ async function flashSale() {
       // A forged session is refused; once the snapshot has turned over, a
       // new buyer sees the tea as sold out.
       const forged = await backend.fetch(
-        `https://underclerk.test/v1/public/merchants/${merchantId}/storefronts/${STOREFRONT}/catalog`,
+        `https://commerce.test/v1/public/merchants/${merchantId}/storefronts/${STOREFRONT}/catalog`,
         { headers: { authorization: "Bearer ucbs.forged.token" } },
       );
       expect(forged.status).toBe(401);

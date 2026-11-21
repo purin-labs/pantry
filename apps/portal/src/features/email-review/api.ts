@@ -229,7 +229,7 @@ async function attestEmailOperational(
 }
 
 async function emailReviewMutation(path: string, body: unknown): Promise<void> {
-  const csrf = readCookie("satyr_control_csrf");
+  const csrf = readCookie("pantry_csrf");
   if (csrf === null) {
     throw new Error("Your control session expired. Sign in again.");
   }

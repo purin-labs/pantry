@@ -175,9 +175,9 @@ export async function loadCounterRegisterSnapshot(
   const openOrders = queue.value.entries.map(presentOrderQueueEntry);
 
   return ok({
-    schemaVersion: "satyr.counter-register.v1",
+    schemaVersion: "pantry.counter-register.v1",
     merchantId: deps.merchantId,
-    satyrLocationId: locationId,
+    pantryLocationId: locationId,
     currency,
     policy,
     menu,
@@ -203,7 +203,7 @@ export async function readCounterSaleView(
 export async function openCounterSale(
   deps: CounterRegisterDeps,
   input: Readonly<{
-    satyrLocationId: string;
+    pantryLocationId: string;
     checkoutId: string;
     lines: readonly CommercePickupCheckoutLineV1[];
     operatorIdentity: string;
@@ -213,7 +213,7 @@ export async function openCounterSale(
 ): Promise<CounterRegisterResult<unknown>> {
   const configuration = await deps.client.readPointOfSaleConfiguration(
     deps.merchantId,
-    input.satyrLocationId,
+    input.pantryLocationId,
   );
   if (!configuration.ok) {
     return configuration.error.kind === "http" &&
@@ -224,7 +224,7 @@ export async function openCounterSale(
   const assignment = await readActiveTerminalAssignment(
     deps.scope.database,
     deps.organisationId,
-    input.satyrLocationId,
+    input.pantryLocationId,
   );
   const cashEnabled = configuration.value.cashEnabled === true;
   let terminalAssignmentRevision: number | null;
@@ -248,7 +248,7 @@ export async function openCounterSale(
     merchantId: deps.merchantId,
     expectedMerchantRevision: snapshot.value.merchantRevision,
     idempotencyKey: input.idempotencyKey,
-    satyrLocationId: input.satyrLocationId,
+    pantryLocationId: input.pantryLocationId,
     posConfigurationRevision: configuration.value.revision,
     operatorIdentity: input.operatorIdentity,
     terminalAssignmentRevision,
@@ -298,7 +298,7 @@ export async function collectCounterSalePayment(
   deps: CounterRegisterDeps,
   input: Readonly<{
     checkoutId: string;
-    satyrLocationId: string;
+    pantryLocationId: string;
     checkoutRevision: number;
     quoteDigest: string;
     amount: Readonly<{ amountMinor: number; currency: string }>;
@@ -309,7 +309,7 @@ export async function collectCounterSalePayment(
   const assignment = await readActiveTerminalAssignment(
     deps.scope.database,
     deps.organisationId,
-    input.satyrLocationId,
+    input.pantryLocationId,
   );
   if (!assignment.ok) return fail("terminal_assignment_not_found", 409);
   const binding = terminalAssignmentPaymentBinding(assignment.value);
@@ -367,7 +367,7 @@ export async function collectCounterSalePayment(
     collected.value.session.kind === "gateway_terminal_checkout" &&
     binding.value.provider === "gmo_stera"
   ) {
-    const stub = deviceFleetStub(deps.env, deps.scope, input.satyrLocationId);
+    const stub = deviceFleetStub(deps.env, deps.scope, input.pantryLocationId);
     if (stub === null) {
       return fail("gateway_fleet_unavailable", 503);
     }
@@ -440,7 +440,7 @@ export async function recordCounterSaleHandoffResult(
   const recorded = await deps.client.recordCounterSaleHandoffResult(
     deps.merchantId,
     input.checkoutId,
-    { schemaVersion: "underclerk.counter-sale-handoff-result.v1", ...input.result },
+    { schemaVersion: "commerce.counter-sale-handoff-result.v1", ...input.result },
   );
   if (!recorded.ok) {
     if (recorded.error.kind === "http" && recorded.error.status === 404)
@@ -470,7 +470,7 @@ export async function cancelCounterSaleCollection(
     attempt?.binding.paymentBinding.provider === "gmo_stera" &&
     current.value.checkout.source.kind === "point_of_sale"
   ) {
-    const locationId = current.value.checkout.source.satyrLocationId;
+    const locationId = current.value.checkout.source.pantryLocationId;
     const assignment = await readActiveTerminalAssignment(
       deps.scope.database,
       deps.organisationId,
@@ -589,7 +589,7 @@ async function reconcileGatewayTerminalSale(
   ) {
     return buildCounterSaleView(deps, sale);
   }
-  const locationId = sale.checkout.source.satyrLocationId;
+  const locationId = sale.checkout.source.pantryLocationId;
   const assignment = await readActiveTerminalAssignment(
     deps.scope.database,
     deps.organisationId,
@@ -790,7 +790,7 @@ async function refundCounterSale(
 ) {
   const locationId =
     placed.sale.checkout.source.kind === "point_of_sale"
-      ? placed.sale.checkout.source.satyrLocationId
+      ? placed.sale.checkout.source.pantryLocationId
       : "";
   const configuration = await deps.client.readPointOfSaleConfiguration(
     deps.merchantId,

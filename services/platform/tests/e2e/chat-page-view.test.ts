@@ -35,7 +35,7 @@ const COSTS_OBSERVATION: SurfaceObservationV2 = {
   kind: "surface-observation",
   schemaVersion: 2,
   surface: "costs",
-  area: "BakeryOS",
+  area: "kitchen",
   instance: {
     browserInstanceId: "browser-j3",
     surfaceSessionId: "costs-session",
@@ -81,7 +81,7 @@ const COSTS_OBSERVATION: SurfaceObservationV2 = {
 const ORDER_OBSERVATION: SurfaceObservationV2 = {
   ...COSTS_OBSERVATION,
   surface: "orders",
-  area: "AgentCommerce",
+  area: "commerce",
   title: "Orders",
   path: "/portal/nuki/shop/orders/order_1042",
   record: { kind: "customer_order", id: "order_1042", label: "#1042" },

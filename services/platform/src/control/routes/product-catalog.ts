@@ -67,7 +67,7 @@ export async function handleProductCatalogAction(
   const outcomes = await runProductAction(mutation.value, action, body.value);
   if (outcomes === null) return controlError("product_action_invalid", 422);
   for (const outcome of outcomes) {
-    if (!outcome.ok) return controlError("underclerk_unavailable", 503);
+    if (!outcome.ok) return controlError("commerce_unavailable", 503);
     if (outcome.value.outcome === "rejected")
       return controlJson(
         {
@@ -80,7 +80,7 @@ export async function handleProductCatalogAction(
         409,
       );
     if (outcome.value.receipt.merchantId !== mutation.value.binding.merchantId)
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
   }
   return finishInventoryOperation(request, env, mutation.value, { ok: true });
 }

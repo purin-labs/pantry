@@ -1654,7 +1654,7 @@ it("publishes custom types, fences entity revisions, and round-trips list/view q
   const context = service.query({
     merchantId: "merchant_test",
     query: {
-      kind: "underclerk_context",
+      kind: "commerce_context",
       selection: {
         kind: "selector",
         selector: {
@@ -1925,7 +1925,7 @@ it("reads exact published system-extension revisions without a canonical system 
 it("keeps a published custom revision readable after a database restart", () => {
   const databasePath = join(
     tmpdir(),
-    `underclerk-entity-plane-${randomUUID()}.sqlite3`,
+    `commerce-entity-plane-${randomUUID()}.sqlite3`,
   );
   let database = new NodeCommerceDatabase(databasePath);
   initializeCommerceSchema(database, NOW);
@@ -2451,7 +2451,7 @@ it("resolves a published export board selector and returns the bounded shipment 
   const result = service.query({
     merchantId: "merchant_p0",
     query: {
-      kind: "underclerk_context",
+      kind: "commerce_context",
       selection: {
         kind: "selector",
         selector: {

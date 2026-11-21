@@ -357,7 +357,7 @@ function slackSeed(
     provider: "slack",
     providerSubjectId: WORKSPACE_ID,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: ["channels:read", "chat:write"],
     createdByUserId: userId,

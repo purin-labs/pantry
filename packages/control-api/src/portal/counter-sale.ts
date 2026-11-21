@@ -13,7 +13,7 @@ export type CounterSaleManualTender = Readonly<{
 
 export type CounterSale = Readonly<{
   checkoutId: string;
-  satyrLocationId: string;
+  pantryLocationId: string;
   revision: number;
   state: CounterSaleState;
   collectable: boolean;
@@ -46,7 +46,7 @@ export type CounterSale = Readonly<{
 const REQUIRED_SALE_KEYS = [
   "schemaVersion",
   "checkoutId",
-  "satyrLocationId",
+  "pantryLocationId",
   "revision",
   "state",
   "collectable",
@@ -103,7 +103,7 @@ function parseSale(raw: unknown): CounterSale {
       throw new Error("counter sale fields are invalid.");
     }
   }
-  if (object.schemaVersion !== "satyr.counter-sale.v1") {
+  if (object.schemaVersion !== "pantry.counter-sale.v1") {
     throw new Error(
       "This sale is reported in a version this portal cannot read.",
     );
@@ -117,7 +117,7 @@ function parseSale(raw: unknown): CounterSale {
   }
   if (
     typeof object.checkoutId !== "string" ||
-    typeof object.satyrLocationId !== "string" ||
+    typeof object.pantryLocationId !== "string" ||
     typeof object.revision !== "number" ||
     typeof object.collectable !== "boolean"
   ) {
@@ -165,7 +165,7 @@ function parseSale(raw: unknown): CounterSale {
   }
   return {
     checkoutId: object.checkoutId,
-    satyrLocationId: object.satyrLocationId,
+    pantryLocationId: object.pantryLocationId,
     revision: object.revision,
     state: state as CounterSaleState,
     collectable: object.collectable,

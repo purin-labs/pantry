@@ -47,7 +47,7 @@ type Route = "openrouter" | "openai" | "openai-codex" | "anthropic";
 
 const BOARD_ID = "board_measure_1";
 const SYSTEM_PROMPT =
-  "You are Satyr, the agent of a café. You edit the café's menu boards with menu_board_edit. Make the change that the person asks for with one tool call, then stop.";
+  "You are Pantry, the agent of a café. You edit the café's menu boards with menu_board_edit. Make the change that the person asks for with one tool call, then stop.";
 const REQUEST =
   `Board ${BOARD_ID} is a free canvas board (layout canvas_landscape, 1600 by 900). ` +
   "Add a text note at x 80, y 760, 640 wide and 96 high, that says: " +

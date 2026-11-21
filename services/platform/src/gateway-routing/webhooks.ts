@@ -30,8 +30,8 @@ export function matchWebhookRoute(
       return { kind: "stripeWebhook", organisationIdRaw: parameter };
     case "shopify":
       return { kind: "shopifyWebhook", organisationIdRaw: parameter };
-    case "underclerk":
-      return { kind: "underclerkWebhook", organisationIdRaw: parameter };
+    case "commerce":
+      return { kind: "commerceWebhook", organisationIdRaw: parameter };
     case "discord":
       return { kind: "discordInteraction", organisationIdRaw: parameter };
     case "email":

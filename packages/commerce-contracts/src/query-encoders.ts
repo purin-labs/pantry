@@ -136,7 +136,7 @@ function orderedQuery(
         filter: orderedFilter(query.filter),
         aggregation: orderedAggregation(query.aggregation),
       };
-    case "underclerk_context":
+    case "commerce_context":
       return {
         kind: query.kind,
         selection: orderedSelection(query.selection),
@@ -410,7 +410,7 @@ function orderedOrderingValue(value: CommerceOrderingValue): unknown {
 
 function orderedWatermark(watermark: CommerceReadWatermark): unknown {
   switch (watermark.kind) {
-    case "underclerk_native":
+    case "commerce_native":
       return {
         kind: watermark.kind,
         merchantRevision: watermark.merchantRevision,
@@ -420,8 +420,8 @@ function orderedWatermark(watermark: CommerceReadWatermark): unknown {
         kind: watermark.kind,
         blotterAcceptedProjectionSequence:
           watermark.blotterAcceptedProjectionSequence,
-        underclerkExtensionMerchantRevision:
-          watermark.underclerkExtensionMerchantRevision,
+        commerceExtensionMerchantRevision:
+          watermark.commerceExtensionMerchantRevision,
       };
     default:
       return assertNever(watermark);

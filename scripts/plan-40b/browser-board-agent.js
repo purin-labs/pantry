@@ -58,7 +58,7 @@ async (page) => {
   }
   async function csrf() {
     const cookies = await page.context().cookies(WORKER);
-    return cookies.find((cookie) => cookie.name === "satyr_control_csrf")?.value;
+    return cookies.find((cookie) => cookie.name === "pantry_csrf")?.value;
   }
   async function enableCapability(capabilityId) {
     const base = `${PORTAL}/v1/control/organisations/${fixtures.organisationId}/access-control`;
@@ -68,7 +68,7 @@ async (page) => {
       headers: {
         origin: PORTAL,
         "content-type": "application/json",
-        "x-satyr-csrf": await csrf(),
+        "x-pantry-csrf": await csrf(),
         "idempotency-key": crypto.randomUUID(),
       },
       data: {
@@ -529,7 +529,7 @@ async (page) => {
         headers: {
           origin: PORTAL,
           "content-type": "application/json",
-          "x-satyr-csrf": viewerCookies.find((cookie) => cookie.name === "satyr_control_csrf")?.value ?? "",
+          "x-pantry-csrf": viewerCookies.find((cookie) => cookie.name === "pantry_csrf")?.value ?? "",
           "idempotency-key": crypto.randomUUID(),
         },
         data: { label: "Viewer version" },

@@ -450,8 +450,8 @@ function parseVerificationMethod(
 ): IdentityVerificationMethod | null {
   if (raw === "https://accounts.google.com" || raw === "accounts.google.com")
     return "google";
-  if (raw === "urn:satyr:passkey") return "passkey";
-  if (raw === "urn:satyr:seams") return "seams";
+  if (raw === "urn:pantry:passkey") return "passkey";
+  if (raw === "urn:pantry:seams") return "seams";
   return null;
 }
 

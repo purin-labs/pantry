@@ -17,7 +17,7 @@ import {
  */
 export const E2E_ONEPASSWORD_TOKEN = "ops_e2e_service_account_token";
 export const E2E_ONEPASSWORD_VAULTS = [
-  { id: "e2evaultsatyr0000000000000", title: "Satyr" },
+  { id: "e2evaultpantry000000000000", title: "Pantry" },
   { id: "e2evaultprivate00000000000", title: "Private" },
 ] as const;
 

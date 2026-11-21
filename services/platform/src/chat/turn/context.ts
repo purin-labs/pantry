@@ -110,7 +110,7 @@ export function appendConfirmedBrowserContext(
     if (timeline.some(timelineEventHasId.bind(null, eventId))) return timeline;
     const contextDetails: ChatContextDetails = {
       kind: "ready",
-      area: "BakeryOS",
+      area: "kitchen",
       effectId: event.effect.effectId,
       browserInstanceId: previous.contextDetails.browserInstanceId,
       surfaceSessionId: surface.context.surfaceSessionId,
@@ -133,7 +133,7 @@ export function appendConfirmedBrowserContext(
   }
   const eventId = `context_${event.terminal.kind}_${event.effect.effectId}`;
   if (timeline.some(timelineEventHasId.bind(null, eventId))) return timeline;
-  const base = { area: "BakeryOS", effectId: event.effect.effectId } as const;
+  const base = { area: "kitchen", effectId: event.effect.effectId } as const;
   let contextDetails: ChatContextDetails;
   let text: string;
   switch (event.terminal.kind) {

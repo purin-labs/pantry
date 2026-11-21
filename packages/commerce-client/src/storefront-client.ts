@@ -106,7 +106,7 @@ export type CreateCommerceBuyerSessionV1 = WireStorefront.CreateCommerceBuyerSes
 export type CommerceBuyerSessionV4 = WireStorefront.CommerceBuyerSessionV4;
 
 type CommerceDraftInvoiceCheckoutV1 = Readonly<{
-  schemaVersion: "underclerk.draft-invoice-checkout.v1";
+  schemaVersion: "commerce.draft-invoice-checkout.v1";
   session: Readonly<{ token: string; expiresAt: CommerceEngineTimestamp }>;
   checkout: CommerceBuyerQuotedCheckoutV1;
 }>;
@@ -140,7 +140,7 @@ export type CommerceBuyerCatalogListingV1 = Readonly<{
 
 /** The listings that match a storefront search, best first. */
 export type CommerceBuyerCatalogSearchV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-catalog-search.v1";
+  schemaVersion: "commerce.buyer-catalog-search.v1";
   query: string;
   listings: readonly CommerceBuyerCatalogListingV1[];
 }>;
@@ -163,7 +163,7 @@ export type CommerceBuyerShippingServiceV1 = Readonly<{
 }>;
 
 export type CommerceBuyerCatalogV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-catalog.v1";
+  schemaVersion: "commerce.buyer-catalog.v1";
   storefront:
     | (CommerceBuyerCatalogStorefrontBaseV1 &
         Readonly<{
@@ -230,7 +230,7 @@ export type CreateCommerceBuyerCartV1 = WireStorefront.CreateCommerceBuyerCartV1
 export type ReplaceCommerceBuyerCartV1 = WireStorefront.ReplaceCommerceBuyerCartV1;
 
 type CommerceBuyerCartBaseV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-cart.v1";
+  schemaVersion: "commerce.buyer-cart.v1";
   cartId: string;
   revision: number;
   checkoutProfile: CheckoutProfileReference;
@@ -272,7 +272,7 @@ export type CommerceBuyerShippingAddressAcceptanceV1 = WireStorefront.CommerceBu
 export type ValidateCommerceBuyerShippingAddressV1 = WireStorefront.ValidateCommerceBuyerShippingAddressV1;
 
 type CommerceBuyerShippingAddressValidationBaseV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-shipping-address-validation.v1";
+  schemaVersion: "commerce.buyer-shipping-address-validation.v1";
   validationReference: string;
   expiresAt: CommerceEngineTimestamp;
 }>;
@@ -314,7 +314,7 @@ export type CommerceBuyerShippingAddressValidationV1 =
 export type CommerceBuyerPickupCheckoutLineV1 = WireStorefront.CommerceBuyerPickupCheckoutLineV1;
 
 export type CommerceBuyerQuotedCheckoutV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-quoted-checkout.v1";
+  schemaVersion: "commerce.buyer-quoted-checkout.v1";
   checkoutId: string;
   revision: number;
   state: "quoted";
@@ -364,7 +364,7 @@ export type CommerceBuyerDutyQuoteV1 = Readonly<{
 }>;
 
 export type CommerceBuyerQuotedShippingCheckoutV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-quoted-shipping-checkout.v1";
+  schemaVersion: "commerce.buyer-quoted-shipping-checkout.v1";
   checkoutId: string;
   revision: number;
   state: "quoted";
@@ -441,7 +441,7 @@ export type CommerceBuyerCheckoutPaymentProgressV1 =
     }>;
 
 export type CommerceBuyerCheckoutRecoveryV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-checkout-recovery.v1";
+  schemaVersion: "commerce.buyer-checkout-recovery.v1";
   checkout: CommerceBuyerRecoverableCheckoutV1;
   progress:
     | Readonly<{ state: "quoted"; payment?: never }>
@@ -491,7 +491,7 @@ export type CommerceBuyerOrderRecoveryV1 = Readonly<{
 
 export type CommerceBuyerPaymentResultV1 =
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-result.v1";
+      schemaVersion: "commerce.buyer-payment-result.v1";
       state: "placed";
       checkoutId: string;
       checkoutRevision: number;
@@ -506,7 +506,7 @@ export type CommerceBuyerPaymentResultV1 =
       shipmentId?: never;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-result.v1";
+      schemaVersion: "commerce.buyer-payment-result.v1";
       state: "placed";
       checkoutId: string;
       checkoutRevision: number;
@@ -524,26 +524,26 @@ export type CommerceBuyerPaymentResultV1 =
       pickup?: never;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-result.v1";
+      schemaVersion: "commerce.buyer-payment-result.v1";
       state: "declined";
       checkoutId: string;
       reasonCode: string;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-result.v1";
+      schemaVersion: "commerce.buyer-payment-result.v1";
       state: "processing";
       checkoutId: string;
       reconcileAfter: CommerceEngineTimestamp;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.buyer-payment-result.v1";
+      schemaVersion: "commerce.buyer-payment-result.v1";
       state: "indeterminate";
       checkoutId: string;
       reconcileAfter: CommerceEngineTimestamp;
     }>;
 
 type CommerceBuyerOrderBaseV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-order.v1";
+  schemaVersion: "commerce.buyer-order.v1";
   checkoutId: string;
   orderId: string;
   paymentId: string;
@@ -1097,7 +1097,7 @@ export class CommerceStorefrontClient {
         method: "POST",
         sessionToken: requireText(orderRecoveryToken, "orderRecoveryToken"),
         body: JSON.stringify({
-          schemaVersion: "underclerk.open-buyer-order-balance.v1",
+          schemaVersion: "commerce.open-buyer-order-balance.v1",
         }),
       },
       parseOrderBalanceCheckout,

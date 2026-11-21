@@ -1,5 +1,5 @@
 {
-  "name": "satyr-plan81-kitchen-acceptance",
+  "name": "pantry-plan81-kitchen-acceptance",
   "main": "kitchen-worker.ts",
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],
@@ -53,8 +53,8 @@
     },
   ],
   "queues": {
-    "producers": [{ "binding": "EVENT_Q", "queue": "satyr-events" }],
-    "consumers": [{ "queue": "satyr-events", "max_batch_timeout": 1 }],
+    "producers": [{ "binding": "EVENT_Q", "queue": "pantry-events" }],
+    "consumers": [{ "queue": "pantry-events", "max_batch_timeout": 1 }],
   },
   "kv_namespaces": [
     { "binding": "POLICY_KV", "id": "00000000000000000000000000000481" },

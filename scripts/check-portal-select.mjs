@@ -185,7 +185,7 @@ for (const file of files.filter(
     if (prelude.startsWith("@")) continue;
     const index = match.index + match[1].indexOf(prelude);
     const line = `${file}:${lineAt(text, index)}`;
-    if (/\.satyr-select-icon(?![\w-])/.test(prelude))
+    if (/\.pantry-select-icon(?![\w-])/.test(prelude))
       errors.push(
         `${line} styles .pantry-select-icon. apps/portal/src/ui/select.css owns the caret.`,
       );

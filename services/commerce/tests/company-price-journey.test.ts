@@ -232,7 +232,7 @@ async function shippedCookies(
 ): Promise<Readonly<{ variantId: string; unitPriceMinor: number }>> {
   const session = await required(
     client.createSession(merchantId, SHIPPING_SHOP, {
-      schemaVersion: "underclerk.create-buyer-session.v1",
+      schemaVersion: "commerce.create-buyer-session.v1",
       buyer: { kind: "identified_customer", customerAccessToken: access },
     }),
   );
@@ -254,14 +254,14 @@ async function shippedCookies(
     throw new Error("The shipping storefront sells nothing to Singapore");
   const cart = await required(
     client.createCart(merchantId, SHIPPING_SHOP, session.token, {
-      schemaVersion: "underclerk.create-buyer-cart.v1",
+      schemaVersion: "commerce.create-buyer-cart.v1",
       idempotencyKey: `${name}_cart`,
       lines: [{ kind: "catalog", variantId: listing.variantId, quantity: 2 }],
     }),
   );
   const validation = await required(
     client.validateShippingAddress(merchantId, SHIPPING_SHOP, session.token, {
-      schemaVersion: "underclerk.validate-buyer-shipping-address.v1",
+      schemaVersion: "commerce.validate-buyer-shipping-address.v1",
       idempotencyKey: `${name}_address`,
       address: {
         countryCode: "SG",
@@ -276,7 +276,7 @@ async function shippedCookies(
     throw new Error("The Singapore address was not accepted");
   const checkout = await required(
     client.createShippingCheckout(merchantId, SHIPPING_SHOP, session.token, {
-      schemaVersion: "underclerk.create-buyer-shipping-checkout.v1",
+      schemaVersion: "commerce.create-buyer-shipping-checkout.v1",
       idempotencyKey: `${name}_checkout`,
       cartId: cart.cartId,
       cartRevision: cart.revision,
@@ -309,7 +309,7 @@ async function signIn(
 ): Promise<string> {
   const challenge = await required(
     buyer.requestCustomerSignIn(merchantId, storefront, {
-      schemaVersion: "underclerk.request-customer-sign-in.v1",
+      schemaVersion: "commerce.request-customer-sign-in.v1",
       email,
     }),
   );
@@ -322,7 +322,7 @@ async function signIn(
         storefront,
         challenge.challengeId,
         {
-          schemaVersion: "underclerk.verify-customer-sign-in.v1",
+          schemaVersion: "commerce.verify-customer-sign-in.v1",
           code,
         },
       ),

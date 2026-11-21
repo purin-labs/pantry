@@ -204,7 +204,7 @@ async function validateMerchantPluginAuthority(
   if (
     !authority.ok ||
     authority.value.commerceSystem.kind !== action.authority.system ||
-    authority.value.provider !== "underclerk" ||
+    authority.value.provider !== "commerce" ||
     authority.value.integrationAccountId !== action.integrationAccountId ||
     authority.value.commerceSystem.revision !== action.authority.revision
   ) {
@@ -515,7 +515,7 @@ export async function reconcileBuiltInCommerceAction(
   Result<CommerceProviderReconciliation, CommerceProviderExecutionError>
 > {
   const { path, permit } = input;
-  if (permit.kind !== "underclerk") return commerceProviderUnsupported();
+  if (permit.kind !== "commerce") return commerceProviderUnsupported();
   if (
     path.kind === "attach_tracking" &&
     permit.current.kind === "fulfillment"
@@ -629,7 +629,7 @@ async function reconcileCommerceAction(
     env: Env;
     action: VariantBy<ActionLedgerEntry, "state", "indeterminate">;
     path: Variant<CommerceActionPath, "publish_catalog_listing">;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     now: number;
     fetcher: typeof fetch | undefined;
   }>,
@@ -696,7 +696,7 @@ async function reconcileCommerceProductDescriptionAction(
     action: VariantBy<ActionLedgerEntry, "state", "indeterminate">;
     current: Variant<CommerceProjection, "product">;
     path: Variant<CommerceActionPath, "update_product_description">;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     now: number;
     fetcher: typeof fetch | undefined;
   }>,
@@ -762,7 +762,7 @@ type CommerceCancellationPath = Extract<
   CommerceActionPath,
   {
     readonly kind: "cancel_order";
-    readonly execution: { readonly kind: "underclerk_full_refund" };
+    readonly execution: { readonly kind: "commerce_full_refund" };
   }
 >;
 
@@ -771,7 +771,7 @@ function isCommerceCancellationPath(
 ): path is CommerceCancellationPath {
   return (
     path.kind === "cancel_order" &&
-    path.execution.kind === "underclerk_full_refund"
+    path.execution.kind === "commerce_full_refund"
   );
 }
 
@@ -781,7 +781,7 @@ async function reconcileCommerceCancellation(
     action: VariantBy<ActionLedgerEntry, "state", "indeterminate">;
     current: Variant<CommerceProjection, "commerce_order">;
     path: CommerceCancellationPath;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     now: number;
     fetcher: typeof fetch | undefined;
   }>,
@@ -1005,7 +1005,7 @@ export async function executeBuiltInCommerceAction(
   input: CommerceProviderExecuteInput,
 ): Promise<Result<CommerceProviderOperation, CommerceProviderExecutionError>> {
   const { path, permit } = input;
-  if (permit.kind !== "underclerk") return commerceProviderUnsupported();
+  if (permit.kind !== "commerce") return commerceProviderUnsupported();
   if (
     path.kind === "publish_catalog_listing" &&
     permit.current.kind === "offer"
@@ -1130,7 +1130,7 @@ async function executeCommerceEngineAction(
     env: Env;
     action: ExecutingActionLedgerEntry;
     path: Variant<CommerceActionPath, "publish_catalog_listing">;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     now: number;
     fetcher: typeof fetch | undefined;
   }>,
@@ -1205,7 +1205,7 @@ async function executeCommerceCancellation(
     action: ExecutingActionLedgerEntry;
     current: Variant<CommerceProjection, "commerce_order">;
     path: CommerceCancellationPath;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     fetcher: typeof fetch | undefined;
   }>,
 ): Promise<Result<CommerceProviderOperation, CommerceProviderExecutionError>> {
@@ -1416,7 +1416,7 @@ async function attachTrackingThroughCommerce(
     env: Env;
     action: ApprovedCommerceActionEntry;
     path: Variant<CommerceActionPath, "attach_tracking">;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     fetcher: typeof fetch | undefined;
   }>,
 ): Promise<CommerceTrackingAttachmentResult> {
@@ -1482,7 +1482,7 @@ async function applyApprovedOfferPrice(
     env: Env;
     action: ApprovedCommerceActionEntry;
     path: Variant<CommerceActionPath, "adjust_offer_price">;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     fetcher: typeof fetch | undefined;
   }>,
 ): Promise<CommerceTrackingAttachmentResult> {
@@ -1575,7 +1575,7 @@ export async function previewMerchantPluginAction(
   const preview = await client.previewMerchantPlugin(
     merchantBinding.value.merchantId,
     {
-      schemaVersion: "underclerk.preview-merchant-plugin.v1",
+      schemaVersion: "commerce.preview-merchant-plugin.v1",
       ...merchantPluginInstallation(path.value),
     },
   );
@@ -2251,7 +2251,7 @@ async function applyApprovedProductDescription(
     action: ApprovedCommerceActionEntry;
     current: Variant<CommerceProjection, "product">;
     path: Variant<CommerceActionPath, "update_product_description">;
-    permit: Variant<CommerceEffectGatePermit, "underclerk">;
+    permit: Variant<CommerceEffectGatePermit, "commerce">;
     now: number;
     fetcher: typeof fetch | undefined;
   }>,
@@ -2342,7 +2342,7 @@ function commerceReceipt(
 > {
   return {
     kind: "commerce_provider_receipt",
-    provider: "underclerk",
+    provider: "commerce",
     receiptId: input.receipt.receiptId,
     effectId: input.receipt.effectId,
     actionNonce: input.actionNonce,
@@ -2387,7 +2387,7 @@ function commerceCancellationReceipt(
 > {
   return {
     kind: "commerce_provider_receipt",
-    provider: "underclerk",
+    provider: "commerce",
     receiptId: input.receipt.receiptId,
     effectId: input.receipt.effectId,
     actionNonce: input.actionNonce,

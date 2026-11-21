@@ -792,8 +792,8 @@ async function send(
       headers: {
         origin: "https://localhost",
         "content-type": "application/json",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-        "x-satyr-csrf": session.csrfToken,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+        "x-pantry-csrf": session.csrfToken,
       },
       body: JSON.stringify(
         kind === "retry"
@@ -829,7 +829,7 @@ async function readConversationWorkKind(
 ): Promise<string> {
   const response = await exports.default.fetch(
     `https://localhost/v1/control/organisations/${ORGANISATION_ID}/chat?conversation=${CONVERSATION_ID}`,
-    { headers: { cookie: `satyr_control_session=${session.token}` } },
+    { headers: { cookie: `pantry_session=${session.token}` } },
   );
   const body: unknown = await response.json();
   if (

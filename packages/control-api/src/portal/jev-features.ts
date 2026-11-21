@@ -15,7 +15,7 @@ export type JevMailbox = Readonly<{
 
 export type JevFeaturesView = Readonly<{
   /** Who pays for the calls: Pantry's key, or the Organisation's own key. */
-  funding: "satyr_platform" | "organisation_byo";
+  funding: "pantry_platform" | "organisation_byo";
   /** False when the key of that authority is missing. Jev calls then fail. */
   keyAvailable: boolean;
   mailClassification: Readonly<{
@@ -106,7 +106,7 @@ export function parseJevFeatureCommand(raw: unknown): JevFeatureCommand | null {
 export function parseJevFeaturesView(raw: unknown): JevFeaturesView {
   if (
     !isRecord(raw) ||
-    (raw.funding !== "satyr_platform" && raw.funding !== "organisation_byo") ||
+    (raw.funding !== "pantry_platform" && raw.funding !== "organisation_byo") ||
     typeof raw.keyAvailable !== "boolean" ||
     !isRecord(raw.mailClassification) ||
     typeof raw.mailClassification.enabled !== "boolean" ||

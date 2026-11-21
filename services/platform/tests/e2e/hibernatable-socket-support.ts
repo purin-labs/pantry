@@ -51,7 +51,7 @@ export function controlReadHeaders(
   session: IssuedControlSession,
 ): Record<string, string> {
   return {
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
   };
 }
 

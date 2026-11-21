@@ -27,7 +27,7 @@ const provenance = Type.Object({
     Type.Literal("shopify"),
     Type.Literal("stripe"),
     Type.Literal("lab"),
-    Type.Literal("underclerk"),
+    Type.Literal("commerce"),
   ]),
   resourceType: Type.String(),
   resourceId: Type.String(),

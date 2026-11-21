@@ -83,19 +83,19 @@ type CommerceGraphReaderOptions =
   | Readonly<{
       organisationId: string;
       merchantId: string;
-      underclerk: CommerceGraphCommerceSource;
+      commerce: CommerceGraphCommerceSource;
       blotter?: undefined;
     }>
   | Readonly<{
       organisationId: string;
       merchantId: string;
-      underclerk: CommerceGraphHydratingSource;
+      commerce: CommerceGraphHydratingSource;
       blotter: CommerceGraphBlotterSource;
     }>;
 
 export type CommerceGraphCommerceSource = CommerceGraphQuerySource &
   Readonly<{
-    source: "underclerk";
+    source: "commerce";
     readSnapshotRevision: NonNullable<
       CommerceGraphQuerySource["readSnapshotRevision"]
     >;
@@ -154,13 +154,13 @@ export type CommerceGraphReadInput = Readonly<{
 export class CommerceGraphReader {
   readonly #organisationId: string;
   readonly #merchantId: string;
-  readonly #underclerk: CommerceGraphCommerceSource;
+  readonly #commerce: CommerceGraphCommerceSource;
   readonly #blotter: CommerceGraphBlotterSource | null;
 
   constructor(options: CommerceGraphReaderOptions) {
     this.#organisationId = options.organisationId;
     this.#merchantId = options.merchantId;
-    this.#underclerk = options.underclerk;
+    this.#commerce = options.commerce;
     this.#blotter = options.blotter ?? null;
   }
 
@@ -186,18 +186,18 @@ export class CommerceGraphReader {
     }
     const metadata = await this.#readCapabilityMetadata(input.query);
     if (!metadata.ok) return metadata;
-    const commerceNative = await this.#readUnderclerkOwnedQuery(
+    const commerceNative = await this.#readCommerceOwnedQuery(
       input.query,
       metadata.value,
     );
     if (!commerceNative.ok) return commerceNative;
     if (commerceNative.value !== null) {
-      const hydrated = await this.#hydrateUnderclerkOwnedSystemReferences(
+      const hydrated = await this.#hydrateCommerceOwnedSystemReferences(
         commerceNative.value,
       );
       if (!hydrated.ok) return hydrated;
       const allowedAttributes =
-        input.query.kind === "underclerk_context"
+        input.query.kind === "commerce_context"
           ? input.query.allowedAttributeIds
           : undefined;
       return {
@@ -222,7 +222,7 @@ export class CommerceGraphReader {
       );
       if (!result.ok) return result;
       const allowedAttributes =
-        input.query.kind === "underclerk_context"
+        input.query.kind === "commerce_context"
           ? input.query.allowedAttributeIds
           : undefined;
       return {
@@ -264,7 +264,7 @@ export class CommerceGraphReader {
     let sources: readonly CommerceGraphSource[];
     if (this.#blotter === null) {
       watermark = metadata.value.watermark;
-      sources = [this.#underclerk];
+      sources = [this.#commerce];
     } else {
       if (this.#blotter.readSnapshotRevision === undefined) {
         return { ok: false, error: { code: "blotter_source_missing" } };
@@ -274,9 +274,9 @@ export class CommerceGraphReader {
       watermark = {
         kind: "provider_backed",
         blotterAcceptedProjectionSequence: blotterRevision.value,
-        underclerkExtensionMerchantRevision: revision,
+        commerceExtensionMerchantRevision: revision,
       };
-      sources = [this.#blotter, this.#underclerk];
+      sources = [this.#blotter, this.#commerce];
     }
     const request = buildCommerceGraphQueryPlanRequest({
       query,
@@ -569,17 +569,17 @@ export class CommerceGraphReader {
   ): Promise<
     Result<CommerceGraphCapabilityMetadata, CommerceGraphReaderError>
   > {
-    if (this.#underclerk.readCapabilityMetadata === undefined) {
+    if (this.#commerce.readCapabilityMetadata === undefined) {
       return {
         ok: false,
         error: {
           code: "source_invalid",
-          source: "underclerk",
-          message: "Underclerk capability metadata is unavailable",
+          source: "commerce",
+          message: "Commerce capability metadata is unavailable",
         },
       };
     }
-    const metadata = await this.#underclerk.readCapabilityMetadata(query);
+    const metadata = await this.#commerce.readCapabilityMetadata(query);
     if (
       !metadata.ok &&
       metadata.error.code === "commerce_query_surface_unsupported"
@@ -592,7 +592,7 @@ export class CommerceGraphReader {
     return metadata;
   }
 
-  async #hydrateUnderclerkOwnedSystemReferences(
+  async #hydrateCommerceOwnedSystemReferences(
     result: CommerceGraphQueryResult,
   ): Promise<Result<CommerceGraphQueryResult, CommerceGraphReaderError>> {
     if (this.#blotter === null) return { ok: true, value: result };
@@ -681,7 +681,7 @@ export class CommerceGraphReader {
     };
   }
 
-  async #readUnderclerkOwnedQuery(
+  async #readCommerceOwnedQuery(
     query: CommerceGraphQuery,
     metadata: CommerceGraphCapabilityMetadata,
   ): Promise<
@@ -706,9 +706,9 @@ export class CommerceGraphReader {
     if (!request.ok) {
       return request.error.code === "commerce_query_surface_unsupported"
         ? { ok: false, error: { code: "commerce_query_surface_unsupported" } }
-        : sourceWasmFailure(request.error.code, "underclerk");
+        : sourceWasmFailure(request.error.code, "commerce");
     }
-    const response = await this.#underclerk.queryPlanned(request.value);
+    const response = await this.#commerce.queryPlanned(request.value);
     if (!response.ok) return response;
     if (response.value.kind === "cursor_mismatch") {
       return {
@@ -739,7 +739,7 @@ export class CommerceGraphReader {
       return { ok: false, error: { code: "invalid_query" } };
     const planned = response.value;
     if (
-      planned.plan.watermark.kind !== "underclerk_native" ||
+      planned.plan.watermark.kind !== "commerce_native" ||
       planned.plan.watermark.merchantRevision !== revision ||
       planned.merchantRevision !== revision ||
       planned.result.merchantRevision !== revision
@@ -748,9 +748,9 @@ export class CommerceGraphReader {
         ok: false,
         error: {
           code: "source_invalid",
-          source: "underclerk",
+          source: "commerce",
           message:
-            "Underclerk planned query revision does not match its accepted snapshot",
+            "Commerce planned query revision does not match its accepted snapshot",
         },
       };
     }
@@ -775,7 +775,7 @@ export class CommerceGraphReader {
     const watermark: CommerceReadWatermark = {
       kind: "provider_backed",
       blotterAcceptedProjectionSequence: blotterRevision.value,
-      underclerkExtensionMerchantRevision: commerceRevision,
+      commerceExtensionMerchantRevision: commerceRevision,
     };
     const planRequest = buildCommerceGraphQueryPlanRequest({
       query,
@@ -850,30 +850,30 @@ export class CommerceGraphReader {
     const references = response.value.entities.map(
       (entity) => entity.reference,
     );
-    if (this.#underclerk.hydrateEntityExtensions === undefined) {
+    if (this.#commerce.hydrateEntityExtensions === undefined) {
       return {
         ok: false,
         error: {
           code: "source_invalid",
-          source: "underclerk",
-          message: "Underclerk extension sidecar hydration is unavailable",
+          source: "commerce",
+          message: "Commerce extension sidecar hydration is unavailable",
         },
       };
     }
-    const hydrated = await this.#underclerk.hydrateEntityExtensions(
+    const hydrated = await this.#commerce.hydrateEntityExtensions(
       references,
       options,
     );
     if (!hydrated.ok) return hydrated;
     if (
       hydrated.value.merchantRevision !==
-      planWatermark.underclerkExtensionMerchantRevision
+      planWatermark.commerceExtensionMerchantRevision
     ) {
       return staleReaderError(query, planWatermark, {
         kind: "provider_backed",
         blotterAcceptedProjectionSequence:
           planWatermark.blotterAcceptedProjectionSequence,
-        underclerkExtensionMerchantRevision: hydrated.value.merchantRevision,
+        commerceExtensionMerchantRevision: hydrated.value.merchantRevision,
       });
     }
     return {
@@ -882,7 +882,7 @@ export class CommerceGraphReader {
         pageOwner: pageOwnerFromWatermark(planWatermark),
         results: [
           {
-            source: "underclerk",
+            source: "commerce",
             value: merchantRevisionResult(hydrated.value.merchantRevision),
           },
           {
@@ -902,8 +902,8 @@ function pageOwnerFromWatermark(
   watermark: CommerceReadWatermark,
 ): CommerceGraphSource["source"] {
   switch (watermark.kind) {
-    case "underclerk_native":
-      return "underclerk";
+    case "commerce_native":
+      return "commerce";
     case "provider_backed":
       return "blotter";
     default:
@@ -932,7 +932,7 @@ function staleReaderError(
 ): Result<never, CommerceGraphReaderError> {
   switch (query.kind) {
     case "aggregation":
-    case "underclerk_context":
+    case "commerce_context":
       return {
         ok: false,
         error: {
@@ -999,7 +999,7 @@ function usesBlotterPageOwner(
         query.source.kind === "entity_type" &&
         query.source.entityTypeId.origin === "system"
       );
-    case "underclerk_context":
+    case "commerce_context":
       return query.selection.kind === "entity_seeds"
         ? query.selection.seeds.some((seed) => seed.origin === "system")
         : usesBlotterPageOwner(
@@ -1044,7 +1044,7 @@ function publicCommerceCapabilities(
             ? blotterSystemCapabilities(capabilities.source)
             : capabilities.source,
       };
-    case "underclerk_custom":
+    case "commerce_custom":
     case "commerce_list":
       return capabilities;
     default:
@@ -1092,7 +1092,7 @@ function queryNeedsBlotter(query: CommerceGraphQuery): boolean {
         query.source.kind === "entity_type" &&
         query.source.entityTypeId.origin === "system"
       );
-    case "underclerk_context":
+    case "commerce_context":
       return query.selection.kind === "entity_seeds"
         ? query.selection.seeds.some((seed) => seed.origin === "system")
         : selectorNeedsBlotter(query.selection.selector.query);
@@ -1120,14 +1120,14 @@ function mergeSourceResults(
   results: readonly SourceResult[],
   pageOwner: CommerceGraphSource["source"],
 ): Result<CommerceGraphQueryResult, CommerceGraphReaderError> {
-  const commerceEngine = results.find((result) => result.source === "underclerk");
+  const commerceEngine = results.find((result) => result.source === "commerce");
   if (commerceEngine === undefined) {
     return {
       ok: false,
       error: {
         code: "source_invalid",
-        source: "underclerk",
-        message: "Underclerk is the merchant revision owner",
+        source: "commerce",
+        message: "Commerce is the merchant revision owner",
       },
     };
   }
@@ -1136,8 +1136,8 @@ function mergeSourceResults(
       ok: false,
       error: {
         code: "source_invalid",
-        source: "underclerk",
-        message: "Underclerk did not provide the merchant revision",
+        source: "commerce",
+        message: "Commerce did not provide the merchant revision",
       },
     };
   }

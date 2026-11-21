@@ -75,7 +75,7 @@ const seed = (
 const NONE: CapabilityDefinition["providerDependency"] = { kind: "none" };
 const COMMERCE: CapabilityDefinition["providerDependency"] = {
   kind: "commerce_system",
-  systems: ["satyr_commerce", "shopify"],
+  systems: ["builtin_commerce", "shopify"],
 };
 const SHOPIFY: CapabilityDefinition["providerDependency"] = {
   kind: "provider",
@@ -1157,7 +1157,7 @@ function buildTransport(scenario: Scenario): AccessRouteTransport {
     readCaseScreenObservations: async () => [
       {
         page: "Costs & margins",
-        area: "BakeryOS",
+        area: "kitchen",
         record: null,
         capturedAt: Date.now() - 4 * 60_000,
         sentAt: Date.now() - 4 * 60_000,
@@ -1165,7 +1165,7 @@ function buildTransport(scenario: Scenario): AccessRouteTransport {
       },
       {
         page: "Orders",
-        area: "AgentCommerce",
+        area: "commerce",
         record: "#1042",
         capturedAt: Date.now() - 30 * 60_000,
         sentAt: Date.now() - 30 * 60_000,

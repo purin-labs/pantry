@@ -126,7 +126,7 @@ export function readSoldOutMarks(
     });
   }
   return {
-    schemaVersion: "underclerk.sold-out-marks.v1",
+    schemaVersion: "commerce.sold-out-marks.v1",
     merchantId,
     merchantRevision,
     marks,

@@ -19,7 +19,7 @@ const LEGACY_MODEL_ROUTE_DIGEST =
 const manifest = {
   backendId: "pi",
   harnessBuild: "pi-build-nf9",
-  checkpointFormat: "satyr-pi-sdk-session-v3",
+  checkpointFormat: "pantry-pi-sdk-session-v3",
   modelRouteDigest: CURRENT_MODEL_ROUTE_DIGEST,
 } as const;
 
@@ -47,7 +47,7 @@ describe("NF9 checkpoint lineage classification", function checkpointClassificat
           ...checkpoint,
           blob: {
             ...checkpoint.blob,
-            formatVersion: "satyr-pi-native-compaction-v2",
+            formatVersion: "pantry-pi-native-compaction-v2",
           },
         },
         ...manifest,

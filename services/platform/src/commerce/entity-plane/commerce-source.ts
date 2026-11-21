@@ -30,7 +30,7 @@ export type CommerceGraphSourceError = Readonly<{
     | "source_unavailable"
     | "source_invalid"
     | "commerce_query_surface_unsupported";
-  source: "underclerk" | "blotter";
+  source: "commerce" | "blotter";
   message: string;
 }>;
 
@@ -107,7 +107,7 @@ export type CommerceGraphEntityExtensionSidecar = Readonly<{
 }>;
 
 export type CommerceGraphSource = Readonly<{
-  readonly source: "underclerk" | "blotter";
+  readonly source: "commerce" | "blotter";
   readonly readRelationshipStep?: (
     input: CommerceGraphRelationshipStepInput,
     options?: CommerceGraphSourceQueryOptions,
@@ -138,7 +138,7 @@ type CommerceSourceOptions = Readonly<{
  * The client owns wire parsing; this adapter owns organisation and provenance fencing.
  */
 export class CommerceEngineSource {
-  readonly source = "underclerk" as const;
+  readonly source = "commerce" as const;
   readonly #organisationId: string;
   readonly #merchantId: string;
   readonly #integrationAccountId: string;
@@ -172,7 +172,7 @@ export class CommerceEngineSource {
           ok: false,
           error: {
             code: "commerce_query_surface_unsupported",
-            source: "underclerk",
+            source: "commerce",
             message: response.error.message,
           },
         };
@@ -190,7 +190,7 @@ export class CommerceEngineSource {
       response.value.merchantId !== this.#merchantId
     ) {
       return invalidSource(
-        "Underclerk planned query authority mismatch",
+        "Commerce planned query authority mismatch",
         "source_invalid",
       );
     }
@@ -234,7 +234,7 @@ export class CommerceEngineSource {
           ok: false,
           error: {
             code: "commerce_query_surface_unsupported",
-            source: "underclerk",
+            source: "commerce",
             message: response.error.message,
           },
         };
@@ -252,16 +252,16 @@ export class CommerceEngineSource {
       metadata.merchantId !== this.#merchantId
     ) {
       return invalidSource(
-        "Underclerk capability metadata authority mismatch",
+        "Commerce capability metadata authority mismatch",
         "source_invalid",
       );
     }
     if (
-      metadata.watermark.kind !== "underclerk_native" ||
+      metadata.watermark.kind !== "commerce_native" ||
       metadata.watermark.merchantRevision !== metadata.merchantRevision
     ) {
       return invalidSource(
-        "Underclerk capability metadata watermark mismatch",
+        "Commerce capability metadata watermark mismatch",
         "source_invalid",
       );
     }
@@ -340,7 +340,7 @@ export class CommerceEngineSource {
       response.value.merchantId !== this.#merchantId
     ) {
       return relationshipStepFailure(
-        "Underclerk relationship step authority mismatch",
+        "Commerce relationship step authority mismatch",
         "source_invalid",
       );
     }
@@ -354,7 +354,7 @@ export class CommerceEngineSource {
         ))
     ) {
       return relationshipStepFailure(
-        "Provider-backed Underclerk relationship step returned system-owned facts",
+        "Provider-backed Commerce relationship step returned system-owned facts",
         "source_invalid",
       );
     }
@@ -379,7 +379,7 @@ export class CommerceEngineSource {
     const uniqueReferences = uniqueSystemReferences(references);
     if (references.some((reference) => reference.origin !== "system")) {
       return invalidHydration(
-        "Underclerk extension hydration accepts system references only",
+        "Commerce extension hydration accepts system references only",
         "source_invalid",
       );
     }
@@ -403,14 +403,14 @@ export class CommerceEngineSource {
             response.error.kind === "invalid_response"
               ? "source_invalid"
               : "source_unavailable",
-          source: "underclerk",
+          source: "commerce",
           message: response.error.message,
         },
       };
     }
     if (response.value.merchantId !== this.#merchantId) {
       return invalidHydration(
-        "Underclerk merchant mismatch during extension hydration",
+        "Commerce merchant mismatch during extension hydration",
         "source_invalid",
       );
     }
@@ -428,7 +428,7 @@ export class CommerceEngineSource {
       )
     ) {
       return invalidHydration(
-        "Underclerk extension sidecar references do not match the requested page",
+        "Commerce extension sidecar references do not match the requested page",
         "source_invalid",
       );
     }
@@ -466,7 +466,7 @@ export class CommerceEngineSource {
       response.value.sidecars.length !== 0
     ) {
       return invalidHydration(
-        "Underclerk snapshot watermark response is invalid",
+        "Commerce snapshot watermark response is invalid",
         "source_invalid",
       );
     }
@@ -474,7 +474,7 @@ export class CommerceEngineSource {
       ok: true,
       value: parseCommerceSnapshotRevision(
         response.value.merchantRevision,
-        "underclerkSnapshotRevision",
+        "commerceSnapshotRevision",
       ),
     };
   }
@@ -506,7 +506,7 @@ function parseSidecar(
 ): CommerceGraphEntityExtensionSidecar {
   if (sidecar.entityRef.origin !== "system") {
     throw new Error(
-      "Underclerk extension sidecar returned a non-system entity reference",
+      "Commerce extension sidecar returned a non-system entity reference",
     );
   }
   const extensionSchemaRevision =
@@ -520,7 +520,7 @@ function parseSidecar(
       Number(attribute.definitionRevision) !== Number(extensionSchemaRevision)
     ) {
       throw new Error(
-        "Underclerk extension attribute scope does not match its sidecar",
+        "Commerce extension attribute scope does not match its sidecar",
       );
     }
   }
@@ -588,9 +588,9 @@ function normalizeProvenance(
   integrationAccountId: string,
 ): SourceProvenance {
   if (provenance.organisationId !== organisationId)
-    throw new Error("Underclerk provenance organisation mismatch");
-  if (provenance.source !== "underclerk")
-    throw new Error("Underclerk provenance source mismatch");
+    throw new Error("Commerce provenance organisation mismatch");
+  if (provenance.source !== "commerce")
+    throw new Error("Commerce provenance source mismatch");
   return { ...provenance, integrationAccountId };
 }
 
@@ -598,21 +598,21 @@ function invalidSource(
   message: string,
   code: CommerceGraphSourceError["code"],
 ): Result<never, CommerceGraphSourceError> {
-  return { ok: false, error: { code, source: "underclerk", message } };
+  return { ok: false, error: { code, source: "commerce", message } };
 }
 
 function relationshipStepFailure(
   message: string,
   code: CommerceGraphSourceError["code"],
 ): Result<never, CommerceGraphRelationshipStepError> {
-  return { ok: false, error: { code, source: "underclerk", message } };
+  return { ok: false, error: { code, source: "commerce", message } };
 }
 
 function invalidHydration(
   message: string,
   code: CommerceGraphSourceError["code"],
 ): Result<never, CommerceGraphSourceError> {
-  return { ok: false, error: { code, source: "underclerk", message } };
+  return { ok: false, error: { code, source: "commerce", message } };
 }
 
 function normalizedText(value: string, field: string): string {

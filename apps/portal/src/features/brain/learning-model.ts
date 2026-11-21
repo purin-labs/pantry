@@ -156,7 +156,7 @@ function shorten(text: string): string {
 }
 
 function authorWords(
-  by: Readonly<{ kind: "agent" | "operator" | "satyr" }>,
+  by: Readonly<{ kind: "agent" | "operator" | "pantry" }>,
 ): string {
   return by.kind === "operator" ? "A person" : "The agent";
 }

@@ -75,7 +75,7 @@ it(
             checkout.checkoutId,
             buyer.token,
             {
-              schemaVersion: "underclerk.create-buyer-payment-session.v1",
+              schemaVersion: "commerce.create-buyer-payment-session.v1",
               idempotencyKey: `session_${String(minutes)}`,
               checkoutRevision: checkout.revision,
               quoteDigest: checkout.quote.quoteDigest,

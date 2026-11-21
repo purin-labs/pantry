@@ -96,7 +96,7 @@ export async function readMailSenderLink(
   const csrf = document.cookie
     .split("; ")
     .find(isCsrfCookie)
-    ?.slice("satyr_control_csrf=".length);
+    ?.slice("pantry_csrf=".length);
   if (csrf === undefined)
     throw new Error("Your session expired. Sign in again.");
   // The address goes in the body, so that no URL log keeps it.
@@ -323,7 +323,7 @@ export async function readMailInbox(
 }
 
 function isCsrfCookie(cookie: string): boolean {
-  return cookie.startsWith("satyr_control_csrf=");
+  return cookie.startsWith("pantry_csrf=");
 }
 
 /** A write needs the session's CSRF cookie: without one the person signs in again. */

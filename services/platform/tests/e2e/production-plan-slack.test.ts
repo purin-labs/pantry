@@ -87,7 +87,7 @@ async function slackPlanJourney({ task }: TestContext): Promise<void> {
   );
   const shop = new PlanJourney(ORGANISATION_ID, MERCHANT_ID, owner);
   const provisioned = await shop.native.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT_ID,
     profile: "cafe_patisserie",

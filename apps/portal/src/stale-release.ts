@@ -8,7 +8,7 @@
  * the same release, the file is missing from the current release itself, and
  * the error page stays instead of reloading again.
  */
-const RELOADED_RELEASE_KEY = "satyr:stale-release-reload";
+const RELOADED_RELEASE_KEY = "pantry:stale-release-reload";
 
 export function installStaleReleaseRecovery(): void {
   window.addEventListener("vite:preloadError", reloadOnPreloadError);

@@ -23,9 +23,9 @@ function sale(
   return {
     ok: true,
     counterSale: {
-      schemaVersion: "satyr.counter-sale.v1",
+      schemaVersion: "pantry.counter-sale.v1",
       checkoutId: CHECKOUT,
-      satyrLocationId: "location_cafe",
+      pantryLocationId: "location_cafe",
       revision: 2,
       state: "awaiting_collection",
       collectable: true,
@@ -91,7 +91,7 @@ describe("Portal counter-sale boundary", function counterSaleBoundarySuite() {
   it("refuses a readback in a version it cannot read", async function versioned() {
     await expect(
       readCounterSale(ORGANISATION, CHECKOUT, async () =>
-        sale({ schemaVersion: "satyr.counter-sale.v2" }),
+        sale({ schemaVersion: "pantry.counter-sale.v2" }),
       ),
     ).rejects.toThrow(/version/u);
   });
@@ -125,7 +125,7 @@ describe("Portal counter-sale boundary", function counterSaleBoundarySuite() {
       expect(path).toBe(`${PATH}/collection`);
       expect(method).toBe("POST");
       expect(body).toEqual({
-        satyrLocationId: "location_cafe",
+        pantryLocationId: "location_cafe",
         checkoutRevision: 2,
         quoteDigest: DIGEST,
         amount: { amountMinor: 1320, currency: "JPY" },

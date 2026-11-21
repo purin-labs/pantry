@@ -21,10 +21,10 @@ import { type PluginCommitRequest } from "../plugins/plugin-authority.ts";
 import type { CommerceMutation } from "./ledger.ts";
 
 const MEDIA_COMMAND_KINDS = {
-  "underclerk.create-media.v1": "create_media",
-  "underclerk.update-media.v1": "update_media",
-  "underclerk.delete-media.v1": "delete_media",
-  "underclerk.set-product-media.v1": "set_product_media",
+  "commerce.create-media.v1": "create_media",
+  "commerce.update-media.v1": "update_media",
+  "commerce.delete-media.v1": "delete_media",
+  "commerce.set-product-media.v1": "set_product_media",
 } as const satisfies Record<CommerceMediaCommandV1["schemaVersion"], string>;
 
 export function mediaMutation(
@@ -47,16 +47,16 @@ export function mediaMutation(
 }
 
 const PLUGIN_COMMAND_KINDS = {
-  "underclerk.pause-plugin.v1": "pause_plugin",
-  "underclerk.resume-plugin.v1": "resume_plugin",
-  "underclerk.configure-plugin.v1": "configure_plugin",
-  "underclerk.remove-plugin.v1": "remove_plugin",
-  "underclerk.install-merchant-plugin.v1": "install_merchant_plugin",
-  "underclerk.report-plugin-function-failure.internal.v1":
+  "commerce.pause-plugin.v1": "pause_plugin",
+  "commerce.resume-plugin.v1": "resume_plugin",
+  "commerce.configure-plugin.v1": "configure_plugin",
+  "commerce.remove-plugin.v1": "remove_plugin",
+  "commerce.install-merchant-plugin.v1": "install_merchant_plugin",
+  "commerce.report-plugin-function-failure.internal.v1":
     "report_plugin_function_failure",
-  "underclerk.pause-failing-plugin.internal.v1": "pause_failing_plugin",
-  "underclerk.set-plugin-field-values.v1": "set_plugin_field_values",
-  "underclerk.run-plugin-action.v1": "run_plugin_action",
+  "commerce.pause-failing-plugin.internal.v1": "pause_failing_plugin",
+  "commerce.set-plugin-field-values.v1": "set_plugin_field_values",
+  "commerce.run-plugin-action.v1": "run_plugin_action",
 } as const satisfies Record<
   PluginCommitRequest["command"]["schemaVersion"],
   string
@@ -90,7 +90,7 @@ export function marketMutation(
 ): CommerceMutation {
   const { command, merchant } = request;
   const commandKind =
-    command.schemaVersion === "underclerk.create-market.v1"
+    command.schemaVersion === "commerce.create-market.v1"
       ? ("create_market" as const)
       : ("update_market" as const);
   return {
@@ -125,7 +125,7 @@ export function companyMutation(
     merchant,
     committedAt,
     commandKind:
-      command.schemaVersion === "underclerk.create-company.v1"
+      command.schemaVersion === "commerce.create-company.v1"
         ? "create_company"
         : "update_company",
     resource: {
@@ -155,7 +155,7 @@ export function invoiceMutation(
     merchant,
     committedAt,
     commandKind:
-      command.schemaVersion === "underclerk.record-invoice-payment.v1"
+      command.schemaVersion === "commerce.record-invoice-payment.v1"
         ? "record_invoice_payment"
         : "mark_invoice_overdue",
     resource: {
@@ -181,7 +181,7 @@ export function discountMutation(
 ): CommerceMutation {
   const { command, merchant } = request;
   const commandKind =
-    command.schemaVersion === "underclerk.create-discount.v1"
+    command.schemaVersion === "commerce.create-discount.v1"
       ? ("create_discount" as const)
       : ("deactivate_discount" as const);
   return {
@@ -202,9 +202,9 @@ export function discountMutation(
 }
 
 const STORED_VALUE_COMMAND_KINDS = {
-  "underclerk.issue-gift-card.v1": "issue_gift_card",
-  "underclerk.credit-store-credit.v1": "credit_store_credit",
-  "underclerk.disable-stored-value-account.v1": "disable_stored_value_account",
+  "commerce.issue-gift-card.v1": "issue_gift_card",
+  "commerce.credit-store-credit.v1": "credit_store_credit",
+  "commerce.disable-stored-value-account.v1": "disable_stored_value_account",
 } as const;
 
 export function storedValueMutation(
@@ -235,9 +235,9 @@ export function collectionMutation(
 ): CommerceMutation {
   const { command, merchant } = request;
   const commandKind =
-    command.schemaVersion === "underclerk.create-collection.v1"
+    command.schemaVersion === "commerce.create-collection.v1"
       ? ("create_collection" as const)
-      : command.schemaVersion === "underclerk.update-collection.v1"
+      : command.schemaVersion === "commerce.update-collection.v1"
         ? ("update_collection" as const)
         : ("delete_collection" as const);
   return {
@@ -258,10 +258,10 @@ export function collectionMutation(
 }
 
 const WEBHOOK_COMMAND_KINDS = {
-  "underclerk.create-webhook-subscription.v1": "create_webhook_subscription",
-  "underclerk.restart-webhook-subscription.v1": "restart_webhook_subscription",
-  "underclerk.rotate-webhook-secret.v1": "rotate_webhook_secret",
-  "underclerk.delete-webhook-subscription.v1": "delete_webhook_subscription",
+  "commerce.create-webhook-subscription.v1": "create_webhook_subscription",
+  "commerce.restart-webhook-subscription.v1": "restart_webhook_subscription",
+  "commerce.rotate-webhook-secret.v1": "rotate_webhook_secret",
+  "commerce.delete-webhook-subscription.v1": "delete_webhook_subscription",
 } as const satisfies Record<
   WebhookCommitRequest["command"]["schemaVersion"],
   string
@@ -295,9 +295,9 @@ export function customerMutation(
 ): CommerceMutation {
   const { command, merchant } = request;
   const commandKind =
-    command.schemaVersion === "underclerk.create-customer.v1"
+    command.schemaVersion === "commerce.create-customer.v1"
       ? ("create_customer" as const)
-      : command.schemaVersion === "underclerk.update-customer.v1"
+      : command.schemaVersion === "commerce.update-customer.v1"
         ? ("update_customer" as const)
         : ("erase_customer" as const);
   return {

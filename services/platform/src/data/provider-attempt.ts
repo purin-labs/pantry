@@ -1369,7 +1369,7 @@ export async function failProviderAttempt(input: {
     input.now,
     correlationId,
   );
-  const supportReference = `SATYR-${crypto.randomUUID()}`;
+  const supportReference = `PANTRY-${crypto.randomUUID()}`;
   const supportEventIdentity = providerEventIdentity(eventIdentity);
   const session = input.scope.database.withSession("first-primary");
   const statements: D1PreparedStatement[] = [];

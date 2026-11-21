@@ -63,7 +63,7 @@ function editLinesError(): string {
 
 export const editCommerceOrderV1Schema = Type.Refine(
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.edit-order.v1"),
+    schemaVersion: Type.Literal("commerce.edit-order.v1"),
     ...commandBase,
     editId: text,
     orderId: text,
@@ -93,7 +93,7 @@ function exchangeLinesError(): string {
 
 export const exchangeCommerceOrderLinesV1Schema = Type.Refine(
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.exchange-order-lines.v1"),
+    schemaVersion: Type.Literal("commerce.exchange-order-lines.v1"),
     ...commandBase,
     exchangeId: text,
     orderId: text,
@@ -111,14 +111,14 @@ export type ExchangeCommerceOrderLinesV1 = Static<
 >;
 
 export const openCommerceBuyerOrderBalanceV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.open-buyer-order-balance.v1"),
+  schemaVersion: Type.Literal("commerce.open-buyer-order-balance.v1"),
 });
 export type OpenCommerceBuyerOrderBalanceV1 = Static<
   typeof openCommerceBuyerOrderBalanceV1Schema
 >;
 
 export const recordCommerceOrderManualPaymentV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.record-order-manual-payment.v1"),
+  schemaVersion: Type.Literal("commerce.record-order-manual-payment.v1"),
   ...commandBase,
   orderId: text,
   expectedOrderRevision: PositiveInteger,
@@ -234,7 +234,7 @@ export type CommerceOrderChangeV1 = Static<
 >;
 
 export const commerceOrderChangesV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.order-changes.v1"),
+  schemaVersion: Type.Literal("commerce.order-changes.v1"),
   orderId: text,
   orderRevision: PositiveInteger,
   changes: ImmutableArray(commerceOrderChangeV1Schema),

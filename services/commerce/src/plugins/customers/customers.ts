@@ -558,7 +558,7 @@ export class CustomerAuthority {
       ]),
     );
     return {
-      schemaVersion: "underclerk.buyer-customer.v1",
+      schemaVersion: "commerce.buyer-customer.v1",
       email: profile.email,
       name: profile.name,
       addresses: profile.addresses,

@@ -18,7 +18,7 @@ export const VOICE_REQUEST_WINDOW_MS = 10 * 60_000;
 export const VOICE_VOCABULARY_TERM_LIMIT = VOICE_VOCABULARY_LIMITS.terms;
 export const VOICE_GRANT_TTL_MS = 10 * 60_000;
 /** The request header that names the member's device on a fallback call. */
-export const VOICE_DEVICE_HEADER = "x-satyr-voice-device";
+export const VOICE_DEVICE_HEADER = "x-pantry-voice-device";
 
 const strict = { additionalProperties: false } as const;
 const timestamp = Type.Integer({ minimum: 0 });

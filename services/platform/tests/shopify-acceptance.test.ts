@@ -30,7 +30,7 @@ async function triggersOrder(): Promise<void> {
   const result = await triggerShopifyDevelopmentOrder({
     shopDomain: "fixture.myshopify.com",
     accessToken: "shopify-offline-token",
-    sourceIdentifier: "satyr-m8-00000000-0000-4000-8000-000000000042",
+    sourceIdentifier: "pantry-m8-00000000-0000-4000-8000-000000000042",
     fetcher: developmentShopFetch,
   });
 
@@ -40,13 +40,13 @@ async function triggersOrder(): Promise<void> {
       kind: "development_order_submitted",
       provider: "shopify",
       shopDomain: "fixture.myshopify.com",
-      sourceIdentifier: "satyr-m8-00000000-0000-4000-8000-000000000042",
+      sourceIdentifier: "pantry-m8-00000000-0000-4000-8000-000000000042",
     },
   });
   expect(capturedFetcherReceiver).toBeUndefined();
   expect(capturedRequests).toHaveLength(3);
   expect(capturedRequests[1]?.body).toMatchObject({
-    variables: { query: "sku:SATYR-CK4-20260809" },
+    variables: { query: "sku:PANTRY-CK4-20260809" },
   });
   expect(capturedRequests[2]?.body).toMatchObject({
     variables: {
@@ -59,8 +59,8 @@ async function triggersOrder(): Promise<void> {
             variantId: "gid://shopify/ProductVariant/7002",
           },
         ],
-        sourceIdentifier: "satyr-m8-00000000-0000-4000-8000-000000000042",
-        tags: ["satyr-m8-acceptance"],
+        sourceIdentifier: "pantry-m8-00000000-0000-4000-8000-000000000042",
+        tags: ["pantry-m8-acceptance"],
         test: true,
       },
     },
@@ -75,7 +75,7 @@ async function rejectsProductionShop(): Promise<void> {
   const result = await triggerShopifyDevelopmentOrder({
     shopDomain: "fixture.myshopify.com",
     accessToken: "shopify-offline-token",
-    sourceIdentifier: "satyr-m8-00000000-0000-4000-8000-000000000043",
+    sourceIdentifier: "pantry-m8-00000000-0000-4000-8000-000000000043",
     fetcher: productionShopFetch,
   });
 
@@ -94,20 +94,20 @@ async function developmentShopFetch(
   capturedFetcherReceiver = this;
   const request = captureRequest(input, init);
 
-  if (String(request.body.query).includes("SatyrAcceptanceShopPlan")) {
+  if (String(request.body.query).includes("PantryAcceptanceShopPlan")) {
     return Response.json({
       data: { shop: { plan: { partnerDevelopment: true } } },
     });
   }
 
-  if (String(request.body.query).includes("SatyrAcceptanceVariant")) {
+  if (String(request.body.query).includes("PantryAcceptanceVariant")) {
     return Response.json({
       data: {
         productVariants: {
           nodes: [
             {
               id: "gid://shopify/ProductVariant/7002",
-              sku: "SATYR-CK4-20260809",
+              sku: "PANTRY-CK4-20260809",
             },
           ],
         },

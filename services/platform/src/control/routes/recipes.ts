@@ -27,9 +27,9 @@ export async function handleRecipes(
     const snapshot = await access.value.client.readStockSnapshot(
       access.value.binding.merchantId,
     );
-    if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+    if (!snapshot.ok) return controlError("commerce_unavailable", 503);
     if (snapshot.value.commerce.merchantId !== access.value.binding.merchantId)
-      return controlError("underclerk_scope_mismatch", 502);
+      return controlError("commerce_scope_mismatch", 502);
     return controlJson(recipeCollectionOf(snapshot.value));
   }
   const body = await readJsonRecord(request);
@@ -51,9 +51,9 @@ export async function handleRecipes(
   const snapshot = await mutation.value.client.readStockSnapshot(
     mutation.value.binding.merchantId,
   );
-  if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+  if (!snapshot.ok) return controlError("commerce_unavailable", 503);
   if (snapshot.value.commerce.merchantId !== mutation.value.binding.merchantId)
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   const current = snapshot.value.foodService.resources.recipeRevisions.find(
     recipeIdentity.bind(null, action.recipe.recipeId),
   );
@@ -71,7 +71,7 @@ export async function handleRecipes(
     idempotencyKey: mutation.value.boundary.idempotencyKey,
     recipeRevision: action.recipe,
   });
-  if (!result.ok) return controlError("underclerk_unavailable", 503);
+  if (!result.ok) return controlError("commerce_unavailable", 503);
   if (result.value.outcome === "rejected")
     return controlJson({ ok: false, error: result.value.error.code }, 409);
   return finishInventoryOperation(request, env, mutation.value, {

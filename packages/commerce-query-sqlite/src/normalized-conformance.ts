@@ -218,7 +218,7 @@ export function normalizedConformancePlanInput(
     projection: { attributeIds: [], relationshipDefinitions: [], includeProvenance: false, includeFreshness: false },
     organisationId: scope.organisationId,
     merchantId: scope.merchantId,
-    watermark: { kind: "underclerk_native", merchantRevision: 1 },
+    watermark: { kind: "commerce_native", merchantRevision: 1 },
     capabilities: {
       kind: "system_mapped",
       systemEntityKind: "order",

@@ -98,7 +98,7 @@ export function startSquarePosHandoff(
   );
   if (row === undefined) throw new Error("Square POS handoff was not stored");
   return {
-    schemaVersion: "underclerk.in-person-collection-result.v1",
+    schemaVersion: "commerce.in-person-collection-result.v1",
     kind: "ready",
     paymentAttemptId: request.paymentAttemptId,
     session: {
@@ -194,14 +194,14 @@ export async function reconcileSquarePosHandoff(
   const later = now;
   if (row.resultStatus === null)
     return {
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "processing",
       reason: "square_pos_app_open",
       reconcileAfter: later,
     };
   if (row.resultStatus === "error")
     return {
-      schemaVersion: "underclerk.payment-capture-result.v1",
+      schemaVersion: "commerce.payment-capture-result.v1",
       kind: "declined",
       reason:
         row.errorCode === "payment_canceled"
@@ -209,7 +209,7 @@ export async function reconcileSquarePosHandoff(
           : `square_pos_${row.errorCode ?? "error"}`,
     };
   const indeterminate = (reason: string): CommercePaymentCaptureResultV1 => ({
-    schemaVersion: "underclerk.payment-capture-result.v1",
+    schemaVersion: "commerce.payment-capture-result.v1",
     kind: "indeterminate",
     reason,
     reconcileAfter: later,
@@ -298,7 +298,7 @@ export async function reconcileSquarePosHandoff(
     )
     .run(paymentId, request.merchantId, request.paymentAttemptId);
   return {
-    schemaVersion: "underclerk.payment-capture-result.v1",
+    schemaVersion: "commerce.payment-capture-result.v1",
     kind: "captured",
     providerPaymentReference: paymentId,
     capturedAt: now,

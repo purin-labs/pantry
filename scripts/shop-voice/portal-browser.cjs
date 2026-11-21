@@ -502,7 +502,7 @@ async function holdToTalk(browser, input, chatUrl) {
       page.evaluate(
         () =>
           Object.values(
-            JSON.parse(localStorage.getItem("satyr.voice.counts")),
+            JSON.parse(localStorage.getItem("pantry.voice.counts")),
           )[0],
       );
     const countsBeforeList = await readCounts();
@@ -645,7 +645,7 @@ async function spokenApproval(browser, input, chatUrl) {
             method: "POST",
             headers: {
               "content-type": "application/json",
-              "x-satyr-csrf": csrf,
+              "x-pantry-csrf": csrf,
               "idempotency-key": crypto.randomUUID(),
             },
             body: JSON.stringify({
@@ -1290,13 +1290,13 @@ async function main() {
       input.builtWorker,
     );
     require_(built === "ready", `The built worker: ${built}`);
-    await page.evaluate(() => caches.delete("satyr-voice-v1"));
+    await page.evaluate(() => caches.delete("pantry-voice-v1"));
     requests.length = 0;
     step(
       "the production build's worker loads its files from the Worker's assets",
     );
 
-    const chatUrl = `${input.platform}/portal/satyr-kitchen-acceptance/cafe-operations/chat`;
+    const chatUrl = `${input.platform}/portal/pantry-kitchen-acceptance/cafe-operations/chat`;
     await page.goto(chatUrl);
     await page
       .waitForSelector("#chat-message", { timeout: 60_000 })
@@ -1327,7 +1327,7 @@ async function main() {
                   ? {}
                   : {
                       "content-type": "application/json",
-                      "x-satyr-csrf": csrf,
+                      "x-pantry-csrf": csrf,
                       "idempotency-key": crypto.randomUUID(),
                     },
               body: body === undefined ? undefined : JSON.stringify(body),
@@ -1718,7 +1718,7 @@ async function main() {
     );
     step("after a reload, voice control starts again with no new choice");
     const cached = await page.evaluate(() => caches.keys());
-    require_(cached.includes("satyr-voice-v1"), `caches: ${cached}`);
+    require_(cached.includes("pantry-voice-v1"), `caches: ${cached}`);
     await page
       .getByRole("button", { name: "Voice control", exact: true })
       .click();
@@ -1726,7 +1726,7 @@ async function main() {
     await waitFor(
       "the files to go",
       async () =>
-        !(await page.evaluate(() => caches.keys())).includes("satyr-voice-v1"),
+        !(await page.evaluate(() => caches.keys())).includes("pantry-voice-v1"),
       10_000,
     );
     require_(

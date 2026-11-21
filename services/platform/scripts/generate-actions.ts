@@ -525,7 +525,7 @@ function renderActionParsersAndBuilders(): string {
 
 function renderGeneratedHelpers(): string {
   return (
-    `const SHOPIFY_ORDER_CANCEL_MUTATION = "mutation SatyrOrderCancel($orderId: ID!, $notifyCustomer: Boolean, $refundMethod: OrderCancelRefundMethodInput!, $restock: Boolean!, $reason: OrderCancelReason!, $staffNote: String) { orderCancel(orderId: $orderId, notifyCustomer: $notifyCustomer, refundMethod: $refundMethod, restock: $restock, reason: $reason, staffNote: $staffNote) { job { id done } orderCancelUserErrors { field message code } } }";\n\n` +
+    `const SHOPIFY_ORDER_CANCEL_MUTATION = "mutation PantryOrderCancel($orderId: ID!, $notifyCustomer: Boolean, $refundMethod: OrderCancelRefundMethodInput!, $restock: Boolean!, $reason: OrderCancelReason!, $staffNote: String) { orderCancel(orderId: $orderId, notifyCustomer: $notifyCustomer, refundMethod: $refundMethod, restock: $restock, reason: $reason, staffNote: $staffNote) { job { id done } orderCancelUserErrors { field message code } } }";\n\n` +
     `function stripeSubscriptionPath(subscriptionId: string): string { return "/v1/subscriptions/" + encodeURIComponent(subscriptionId); }\n\n` +
     `function stripePaymentIntentPath(paymentIntentId: string, operation: "capture" | "confirm"): string { return "/v1/payment_intents/" + encodeURIComponent(paymentIntentId) + "/" + operation; }\n\n` +
     `async function hashCanonicalArgs(args: StripeChargeCreateArgs | StripeRefundCreateArgs | StripeSubscriptionCancelArgs | StripePayoutCreateArgs | StripeTransferCreateArgs | StripePaymentIntentCaptureArgs | StripePaymentIntentConfirmArgs | StripeSubscriptionUpdateArgs | ShopifyOrderCancelArgs): Promise<string> { return sha256Hex(JSON.stringify(args)); }\n\n` +

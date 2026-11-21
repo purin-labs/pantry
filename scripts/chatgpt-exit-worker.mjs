@@ -24,6 +24,6 @@ checkAndDeploy({
   operation,
   environment,
   profile: "wrangler.chatgpt-exit.jsonc",
-  prefix: "satyr-chatgpt-exit-",
+  prefix: "pantry-chatgpt-exit-",
   check: requireSmallScript.bind(null, "chatgpt-exit", MAXIMUM_SCRIPT_BYTES),
 });

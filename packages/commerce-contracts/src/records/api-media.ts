@@ -69,7 +69,7 @@ export const createCommerceMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.create-media.v1"),
+      schemaVersion: Type.Literal("commerce.create-media.v1"),
       mediaId: boundedTextSchema(120),
       sha256: sha256HexSchema,
       altText: altTextSchema,
@@ -85,7 +85,7 @@ export const updateCommerceMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-media.v1"),
+      schemaVersion: Type.Literal("commerce.update-media.v1"),
       mediaId: text,
       expectedRevision: PositiveInteger,
       altText: altTextSchema,
@@ -101,7 +101,7 @@ export const deleteCommerceMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.delete-media.v1"),
+      schemaVersion: Type.Literal("commerce.delete-media.v1"),
       mediaId: text,
       expectedRevision: PositiveInteger,
     }),
@@ -126,7 +126,7 @@ export const setCommerceProductMediaV1Schema = Type.Intersect(
   [
     mediaCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.set-product-media.v1"),
+      schemaVersion: Type.Literal("commerce.set-product-media.v1"),
       productId: text,
       expectedRevision: NonNegativeInteger,
       media: Type.Refine(
@@ -173,7 +173,7 @@ export type CommerceProductMediaV1 = Static<
 >;
 
 export const commerceMediaLibraryV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.media.v1"),
+  schemaVersion: Type.Literal("commerce.media.v1"),
   media: ImmutableArray(commerceMediaV1Schema),
   products: ImmutableArray(commerceProductMediaV1Schema),
 });
@@ -182,7 +182,7 @@ export type CommerceMediaLibraryV1 = Static<
 >;
 
 export const commerceMediaUploadV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.media-upload.v1"),
+  schemaVersion: Type.Literal("commerce.media-upload.v1"),
   sha256: sha256HexSchema,
   contentType: commerceMediaContentTypeSchema,
   byteSize: PositiveInteger,

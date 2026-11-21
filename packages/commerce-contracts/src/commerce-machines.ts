@@ -139,7 +139,7 @@ const CHECKOUT_MACHINE = {
     payment_pending: {
       kind: "intermediate",
       meaning:
-        "A payment attempt is open for the amount due. When the quote expires, Underclerk reads the payment from the provider.",
+        "A payment attempt is open for the amount due. When the quote expires, Commerce reads the payment from the provider.",
       exit: { kind: "due", reconciler: "payment_due", afterMs: 60000 },
     },
     accepted: {
@@ -232,19 +232,19 @@ const PAYMENT_ATTEMPT_MACHINE = {
     pending: {
       kind: "initial",
       meaning:
-        "Created for the amount due. The provider has not answered. Underclerk reads it when the quote expires.",
+        "Created for the amount due. The provider has not answered. Commerce reads it when the quote expires.",
       exit: { kind: "due", reconciler: "payment_due", afterMs: 60000 },
     },
     processing: {
       kind: "intermediate",
       meaning:
-        "The provider is working. Underclerk reads it again after `reconcileAfter`, and not before the quote expires.",
+        "The provider is working. Commerce reads it again after `reconcileAfter`, and not before the quote expires.",
       exit: { kind: "due", reconciler: "payment_due", afterMs: 60000 },
     },
     indeterminate: {
       kind: "intermediate",
       meaning:
-        "The answer was lost. Underclerk reads it again after `reconcileAfter`, and not before the quote expires.",
+        "The answer was lost. Commerce reads it again after `reconcileAfter`, and not before the quote expires.",
       exit: { kind: "due", reconciler: "payment_due", afterMs: 60000 },
     },
     captured: { kind: "terminal", meaning: "The provider took the money." },
@@ -641,12 +641,12 @@ const PICKUP_FULFILLMENT_MACHINE = {
     preparing: {
       kind: "external",
       meaning:
-        "A fulfillment read from another platform uses it; Underclerk does not write it.",
+        "A fulfillment read from another platform uses it; Commerce does not write it.",
     },
     blocked: {
       kind: "external",
       meaning:
-        "A fulfillment read from another platform uses it; Underclerk does not write it.",
+        "A fulfillment read from another platform uses it; Commerce does not write it.",
     },
     ready_for_pickup: {
       kind: "intermediate",
@@ -706,12 +706,12 @@ const SHIPPING_FULFILLMENT_MACHINE = {
     preparing: {
       kind: "external",
       meaning:
-        "A fulfillment read from another platform uses it; Underclerk does not write it.",
+        "A fulfillment read from another platform uses it; Commerce does not write it.",
     },
     blocked: {
       kind: "external",
       meaning:
-        "A fulfillment read from another platform uses it; Underclerk does not write it.",
+        "A fulfillment read from another platform uses it; Commerce does not write it.",
     },
     handed_to_carrier: {
       kind: "terminal",
@@ -805,7 +805,7 @@ const REFUND_ATTEMPT_MACHINE = {
   states: {
     requested: {
       kind: "initial",
-      meaning: "Reserved before Underclerk asks the provider.",
+      meaning: "Reserved before Commerce asks the provider.",
     },
     processing: {
       kind: "intermediate",
@@ -1118,7 +1118,7 @@ const UNPLACED_CAPTURE_MACHINE = {
     capture_unplaced: {
       kind: "initial",
       meaning:
-        "The provider took the money, and Underclerk placed no order. Underclerk does not refund it by itself.",
+        "The provider took the money, and Commerce placed no order. Commerce does not refund it by itself.",
       exit: { kind: "person", surface: "admin_unplaced_captures" },
     },
     resolved: {

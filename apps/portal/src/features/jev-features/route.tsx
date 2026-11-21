@@ -124,7 +124,7 @@ export function JevFeaturesRoute(props: {
 
   const { view } = load;
   const allowance =
-    view.funding === "satyr_platform"
+    view.funding === "pantry_platform"
       ? "The use counts toward the monthly Jev allowance in your subscription."
       : "TypeSafe bills the use to your own key.";
   const locked = !canManage;
@@ -144,7 +144,7 @@ export function JevFeaturesRoute(props: {
           turnOn={{ kind: "focus", onClick: focusPaidUse }}
         />
       </section>
-      {view.funding === "satyr_platform" ? (
+      {view.funding === "pantry_platform" ? (
         <PaidUseSection
           organisationId={organisationId}
           view={view}
@@ -228,7 +228,7 @@ function FundingLine(props: {
     props.integrationsHref === null
       ? null
       : `${props.integrationsHref}?${new URLSearchParams({ integration: "typesafe" }).toString()}`;
-  if (view.funding === "satyr_platform")
+  if (view.funding === "pantry_platform")
     return (
       <>
         <p className="jev-funding-line">

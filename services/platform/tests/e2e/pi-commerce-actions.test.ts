@@ -336,7 +336,7 @@ async function allowance(
 async function provisionShop(): Promise<void> {
   const client = providerClient();
   const shop = await client.provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",

@@ -234,7 +234,7 @@ body {
 
 /* Site footer. The sidebar is fixed to the viewport, so the footer has to be
    inset by its width on wide screens or its first column is clipped. */
-.satyr-docs-footer {
+.pantry-docs-footer {
   /* The outline column is fixed and full height, so it sits over the footer's
      right half and swallows those clicks unless the footer is raised. */
   position: relative;
@@ -245,19 +245,19 @@ body {
 }
 
 @media (min-width: 768px) {
-  .satyr-docs-footer {
+  .pantry-docs-footer {
     padding-inline: 32px;
   }
 }
 
 @media (min-width: 960px) {
-  .satyr-docs-footer {
+  .pantry-docs-footer {
     padding-left: calc(var(--vp-sidebar-width) + 32px);
   }
 }
 
 @media (min-width: 1440px) {
-  .satyr-docs-footer {
+  .pantry-docs-footer {
     padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px);
     padding-left: calc(
       (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width) + 32px
@@ -265,7 +265,7 @@ body {
   }
 }
 
-.satyr-docs-footer__inner {
+.pantry-docs-footer__inner {
   display: flex;
   flex-wrap: wrap;
   /* The brand and its copyright line sit on the baseline of the tallest
@@ -277,13 +277,13 @@ body {
   max-width: 1104px;
 }
 
-.satyr-docs-footer__brand {
+.pantry-docs-footer__brand {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.satyr-docs-footer__brand-link {
+.pantry-docs-footer__brand-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -293,35 +293,35 @@ body {
   text-decoration: none;
 }
 
-.satyr-docs-footer__mark {
+.pantry-docs-footer__mark {
   display: block;
   width: 20px;
   height: 20px;
   object-fit: contain;
 }
 
-.satyr-docs-footer__mark--dark,
-.dark .satyr-docs-footer__mark--light {
+.pantry-docs-footer__mark--dark,
+.dark .pantry-docs-footer__mark--light {
   display: none;
 }
 
-.dark .satyr-docs-footer__mark--dark {
+.dark .pantry-docs-footer__mark--dark {
   display: block;
 }
 
-.satyr-docs-footer__links {
+.pantry-docs-footer__links {
   display: flex;
   flex-wrap: wrap;
   gap: 16px 40px;
 }
 
-.satyr-docs-footer__group {
+.pantry-docs-footer__group {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.satyr-docs-footer__group h2 {
+.pantry-docs-footer__group h2 {
   margin: 0 0 2px;
   color: var(--vp-c-text-3);
   font-size: 11px;
@@ -330,18 +330,18 @@ body {
   text-transform: uppercase;
 }
 
-.satyr-docs-footer__group a {
+.pantry-docs-footer__group a {
   color: var(--vp-c-text-2);
   font-size: 13px;
   line-height: 1.5;
   text-decoration: none;
 }
 
-.satyr-docs-footer__group a:hover {
+.pantry-docs-footer__group a:hover {
   color: var(--vp-c-brand-1);
 }
 
-.satyr-docs-footer__legal {
+.pantry-docs-footer__legal {
   margin: 0;
   color: var(--vp-c-text-3);
   font-size: 12px;

@@ -152,11 +152,11 @@ function messageIdTest(): void {
     2,
     "shop@example.com",
   );
-  expect(proposal).toBe("<satyr-proposal-proposal-abc-1-v2@example.com>");
-  expect(dispatch).toBe("<satyr-dispatch-proposal-abc-1-v2@example.com>");
+  expect(proposal).toBe("<pantry-proposal-proposal-abc-1-v2@example.com>");
+  expect(dispatch).toBe("<pantry-dispatch-proposal-abc-1-v2@example.com>");
   expect(proposal).not.toBe(dispatch);
   expect(proposalRfcMessageId("p", 1, "not-an-address")).toBe(
-    "<satyr-proposal-p-v1@satyr.invalid>",
+    "<pantry-proposal-p-v1@pantry.invalid>",
   );
 }
 
@@ -187,7 +187,7 @@ function rawBuildTest(): void {
     "References: <thread-root@sender.example> <origin-123@sender.example>",
   );
   expect(headerBlock).toContain(
-    "Message-ID: <satyr-proposal-p1-v1@example.com>",
+    "Message-ID: <pantry-proposal-p1-v1@example.com>",
   );
   expect(headerBlock).toContain("Content-Transfer-Encoding: base64");
   expect(headerBlock).not.toContain("X-Injected");

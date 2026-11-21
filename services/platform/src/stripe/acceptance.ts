@@ -32,7 +32,7 @@ export async function triggerStripeFailedCharge(input: {
   body.set("payment_method", "pm_card_visa_chargeDeclined");
   body.append("payment_method_types[]", "card");
   body.set("confirm", "true");
-  body.set("description", "Satyr M8 charge.failed acceptance");
+  body.set("description", "Pantry M8 charge.failed acceptance");
   let response: Response;
 
   try {

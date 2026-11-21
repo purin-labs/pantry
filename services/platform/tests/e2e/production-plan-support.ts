@@ -49,14 +49,14 @@ export function readPlan(id: string): Promise<Response> | Response {
 
 export class PlanJourney {
   readonly entities = new CommerceEntityPlaneClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   readonly native = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
 
   constructor(
@@ -156,7 +156,7 @@ export class PlanJourney {
   }
 
   /** Another writer changes a request's quantity directly in Commerce. */
-  async reviseInUnderclerk(requestId: string, whole: number) {
+  async reviseInCommerce(requestId: string, whole: number) {
     const read = await this.entities.readListEntry(
       parseListEntryReadRequest({
         merchantId: this.merchantId,

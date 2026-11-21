@@ -43,7 +43,7 @@ function costsObservation(selected: string): SurfaceObservationV2 {
     kind: "surface-observation",
     schemaVersion: 2,
     surface: "costs",
-    area: "BakeryOS",
+    area: "kitchen",
     instance: {
       browserInstanceId: BROWSER,
       surfaceSessionId: "costs-session-j5",

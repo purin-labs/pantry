@@ -333,11 +333,11 @@ function submitLifecycleResponse(
     {
       method: lifecycleMethod(operation),
       headers: {
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
         origin: "https://localhost",
         "content-type": "application/json",
-        "x-satyr-csrf": session.csrfToken,
-        "x-satyr-configuration-version": String(version),
+        "x-pantry-csrf": session.csrfToken,
+        "x-pantry-configuration-version": String(version),
         "idempotency-key": idempotencyKey,
       },
       body: JSON.stringify(

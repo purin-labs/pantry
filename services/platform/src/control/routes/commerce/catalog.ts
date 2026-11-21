@@ -60,15 +60,15 @@ export async function handleCommerceInventory(
   if (merchant instanceof Response) return merchant;
   const { client } = merchant;
   const snapshot = await client.readStockSnapshot(merchant.merchantId);
-  if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+  if (!snapshot.ok) return controlError("commerce_unavailable", 503);
   if (snapshot.value.commerce.merchantId !== merchant.merchantId)
-    return controlError("underclerk_scope_mismatch", 502);
+    return controlError("commerce_scope_mismatch", 502);
   // A missing photo must not hide the stock, so a failed read leaves none.
   const [library, storefronts] = await Promise.all([
     client.listMedia(merchant.merchantId),
     client.listStorefrontIds(merchant.merchantId),
   ]);
-  const base = env.UNDERCLERK_BASE_URL?.trim().replace(/\/+$/u, "");
+  const base = env.COMMERCE_BASE_URL?.trim().replace(/\/+$/u, "");
   const storefrontId = storefronts.ok ? storefronts.value[0] : undefined;
   const photos =
     library.ok && base !== undefined && storefrontId !== undefined
@@ -102,7 +102,7 @@ export async function handleCommercePricedOffers(
   if (merchant instanceof Response) return merchant;
   const { client } = merchant;
   const snapshot = await client.readSnapshot(merchant.merchantId);
-  if (!snapshot.ok) return controlError("underclerk_unavailable", 503);
+  if (!snapshot.ok) return controlError("commerce_unavailable", 503);
   return controlJson({
     ok: true,
     // Canonical ids, because that is how the price-policy route and every
@@ -251,14 +251,14 @@ function offerPriceAllowanceResponse(
     case "offer_price_allowance_invalid":
       return controlError("offer_price_policy_invalid", 422);
     case "offer_price_allowance_unavailable":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
   }
 }
 
 function offerPricePolicyResponse(
   result: CommerceClientResult<CommerceOfferPriceResultV1>,
 ): Response {
-  if (!result.ok) return controlError("underclerk_unavailable", 503);
+  if (!result.ok) return controlError("commerce_unavailable", 503);
   return result.value.outcome === "accepted"
     ? controlJson({ ok: true, pricePolicy: result.value.value })
     : // A refusal is Commerce's answer about state the caller named, so it is
@@ -355,21 +355,21 @@ export async function handleCommercePublishedResources(
   const binding = await resolveMerchantBinding(authorized);
   if (binding instanceof Response) return binding;
   if (
-    env.UNDERCLERK_BASE_URL === undefined ||
-    env.UNDERCLERK_SERVICE_TOKEN === undefined
+    env.COMMERCE_BASE_URL === undefined ||
+    env.COMMERCE_SERVICE_TOKEN === undefined
   ) {
-    return controlError("underclerk_unavailable", 503);
+    return controlError("commerce_unavailable", 503);
   }
   const client = createPublishedResourceClient({
-    baseUrl: env.UNDERCLERK_BASE_URL,
+    baseUrl: env.COMMERCE_BASE_URL,
     ...pantryCommerceAccess(
-      env.UNDERCLERK_SERVICE_TOKEN,
+      env.COMMERCE_SERVICE_TOKEN,
       String(authorized.organisationId),
-      env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+      env.COMMERCE.fetch.bind(env.COMMERCE),
       String(authorized.membership.personId),
     ),
   });
-  if (client === null) return controlError("underclerk_unavailable", 503);
+  if (client === null) return controlError("commerce_unavailable", 503);
   const result = await enumeratePublishedResources({
     client,
     organisationId: authorized.organisationId,
@@ -402,6 +402,6 @@ function publishedResourceBoundaryErrorResponse(
     case "merchant_mismatch":
       return controlError("published_resource_authority_mismatch", 503);
     case "unavailable":
-      return controlError("underclerk_unavailable", 503);
+      return controlError("commerce_unavailable", 503);
   }
 }

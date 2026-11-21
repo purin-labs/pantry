@@ -183,7 +183,7 @@ async function seedWorkspace(owner: Owner): Promise<string> {
     provider: "slack",
     providerSubjectId: TEAM_ID,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requiredHandle(tokenRef),
@@ -293,7 +293,7 @@ async function post(
         origin: PUBLIC_ORIGIN,
         "content-type": "application/json",
         "idempotency-key": `slack-dm-disconnect-${idempotencyKey}`,
-        "x-satyr-csrf": actor.client.session.csrfToken,
+        "x-pantry-csrf": actor.client.session.csrfToken,
       },
       body: "{}",
     },

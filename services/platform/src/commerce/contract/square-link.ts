@@ -29,7 +29,7 @@ export type SquareDelegation = Readonly<{
   providerAccountId: string;
 }>;
 
-const SQUARE_DELEGATION_FORMAT = "underclerk_square_connection_v1";
+const SQUARE_DELEGATION_FORMAT = "commerce_square_connection_v1";
 
 /** Square runs only for an organisation whose commerce system is Pantry's. */
 export async function resolveCommerceMerchant(
@@ -41,7 +41,7 @@ export async function resolveCommerceMerchant(
     db: scope.database,
     organisationId,
   });
-  if (!system.ok || system.value.kind !== "satyr_commerce") return null;
+  if (!system.ok || system.value.kind !== "builtin_commerce") return null;
   const client = createCommerceClient(env, undefined, {
     kind: "organisation",
     organisationId: String(organisationId),
@@ -144,7 +144,7 @@ function squareBindingId(locationId: string): string {
 }
 
 function warn(organisationId: OrganisationId, kind: string): void {
-  traceWarn("underclerk.square_link_failed", {
+  traceWarn("commerce.square_link_failed", {
     requestId: newRequestId(),
     organisation_id: organisationId,
     kind,

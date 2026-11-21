@@ -297,7 +297,7 @@ describe("merchant onboarding projection", () => {
       provider: "slack",
       providerSubjectId: "projection-workspace",
       environment: "development",
-      authMode: "shared_satyr_app",
+      authMode: "shared_pantry_app",
       authority: {
         kind: "connection_credential",
         credentialRef: slackCredential.value,

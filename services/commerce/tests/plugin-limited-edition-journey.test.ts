@@ -264,7 +264,7 @@ class EditionDesk extends OrderDesk {
 
   installCommand(name: string) {
     return {
-      schemaVersion: "underclerk.install-merchant-plugin.v1" as const,
+      schemaVersion: "commerce.install-merchant-plugin.v1" as const,
       ...this.editBase(`install_${name}`),
       definition: EDITION,
       settings: {},

@@ -74,7 +74,7 @@ async function readSoldOutItems(
   if (read instanceof Response) return read;
   const { context } = read;
   const menu = await readCafeSoldOutMenu(context);
-  if (menu === null) return controlError("underclerk_unavailable", 503);
+  if (menu === null) return controlError("commerce_unavailable", 503);
   return controlJson({ ok: true, items: menu.items });
 }
 
@@ -121,7 +121,7 @@ async function markItem(
   );
   if (!marked.ok) {
     switch (marked.code) {
-      case "underclerk_unavailable":
+      case "commerce_unavailable":
         return controlError(marked.code, 503);
       case "sold_out_item_not_on_menu":
         return controlError(marked.code, 404);

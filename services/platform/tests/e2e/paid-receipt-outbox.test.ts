@@ -41,7 +41,7 @@ declare module "vitest" {
 }
 
 const MERCHANT = "merchant_paid_receipt_outbox";
-const OPERATOR = "Bearer underclerk-e2e-token";
+const OPERATOR = "Bearer commerce-e2e-token";
 
 /**
  * Refactor 15, refactor 12. The café's Slack connection is disabled while two
@@ -64,7 +64,7 @@ async function paidReceiptOutboxJourney({ task }: TestContext): Promise<void> {
   const owner = fixture.ownerSession;
   await connectCommerceFixture(ORGANISATION_ID, owner.session.userId, MERCHANT);
   const demo = await providerClient().provisionDemo({
-    schemaVersion: "underclerk.provision-demo.v2",
+    schemaVersion: "commerce.provision-demo.v2",
     externalReference: ORGANISATION_ID,
     merchantId: MERCHANT,
     profile: "cafe_patisserie",
@@ -162,7 +162,7 @@ async function paidReceiptOutboxJourney({ task }: TestContext): Promise<void> {
 async function drainFeed(now: number): Promise<unknown> {
   const binding = await fixtureDatabase()
     .prepare(
-      "SELECT integration_account_id AS integrationAccountId FROM underclerk_merchant_binding WHERE merchant_id = ?",
+      "SELECT integration_account_id AS integrationAccountId FROM commerce_merchant_binding WHERE merchant_id = ?",
     )
     .bind(MERCHANT)
     .first<{ integrationAccountId: string }>();
@@ -188,8 +188,8 @@ async function drainFeed(now: number): Promise<unknown> {
 
 /** Pantry's place in the shop's event feed, as Commerce stores it. */
 async function feedConsumer(): Promise<{ cursor: string }> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT}/feed-consumers/satyr`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${MERCHANT}/feed-consumers/pantry`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();
@@ -200,8 +200,8 @@ async function feedConsumer(): Promise<{ cursor: string }> {
 
 /** The cursors of the shop's events after `after`. */
 async function eventsAfter(after: string): Promise<string[]> {
-  const response = await env.UNDERCLERK.fetch(
-    `http://underclerk.test/v1/admin/merchants/${MERCHANT}/events?after=${encodeURIComponent(after)}&limit=200`,
+  const response = await env.COMMERCE.fetch(
+    `http://commerce.test/v1/admin/merchants/${MERCHANT}/events?after=${encodeURIComponent(after)}&limit=200`,
     { headers: { authorization: OPERATOR } },
   );
   const body: unknown = await response.json();

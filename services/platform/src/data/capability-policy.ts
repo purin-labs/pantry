@@ -442,7 +442,7 @@ export function prepareReadAndProposeAccessDefaults(
 }
 
 /**
- * The baseline grants of a Slack channel that CafeOS posts in: people in the
+ * The baseline grants of a Slack channel that Café posts in: people in the
  * channel let the agent read Case context, inspect message attachments and
  * read message links there. A grant that exists stays as it is.
  */

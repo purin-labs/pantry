@@ -274,7 +274,7 @@ fn home() -> Result<PathBuf, String> {
         return Ok(PathBuf::from(path));
     }
     std::env::var("HOME")
-        .map(|home| Path::new(&home).join(".satyr-gateway"))
+        .map(|home| Path::new(&home).join(".pantry-gateway"))
         .map_err(|_| "HOME is not set".to_string())
 }
 

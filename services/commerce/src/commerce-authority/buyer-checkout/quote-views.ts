@@ -133,7 +133,7 @@ export function toBuyerQuotedPickupCheckout(
     }
   }
   return {
-    schemaVersion: "underclerk.buyer-quoted-checkout.v1",
+    schemaVersion: "commerce.buyer-quoted-checkout.v1",
     checkoutId: checkout.checkoutId,
     revision: checkout.lifecycle.quote.checkoutRevision,
     state: "quoted",
@@ -177,7 +177,7 @@ export function toBuyerQuotedShippingCheckout(
   if (lines === undefined) return undefined;
   const market = checkout.lifecycle.quote.market;
   return {
-    schemaVersion: "underclerk.buyer-quoted-shipping-checkout.v1",
+    schemaVersion: "commerce.buyer-quoted-shipping-checkout.v1",
     checkoutId: checkout.checkoutId,
     revision: checkout.lifecycle.quote.checkoutRevision,
     state: "quoted",

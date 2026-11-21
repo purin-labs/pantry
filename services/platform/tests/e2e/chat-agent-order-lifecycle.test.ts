@@ -83,7 +83,7 @@ it(
       MERCHANT_ID,
     );
     const demo = await providerClient().provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: author.organisationId,
       merchantId: MERCHANT_ID,
       profile: "cafe_patisserie",
@@ -277,7 +277,7 @@ function advance(
 ): Promise<Response> {
   const headers = commerceHeaders(owner.session);
   headers.set("idempotency-key", crypto.randomUUID());
-  headers.set("x-satyr-configuration-version", "1");
+  headers.set("x-pantry-configuration-version", "1");
   return exports.default.fetch(
     `https://localhost${queuePath}/${encodeURIComponent(fulfillmentId)}/advance`,
     { method: "POST", headers, body: JSON.stringify({ action }) },

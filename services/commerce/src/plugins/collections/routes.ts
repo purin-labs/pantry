@@ -37,7 +37,7 @@ export const COLLECTIONS_ROUTES: readonly RouteDefinition<CollectionsRoute>[] =
       "POST",
       "/v1/admin/merchants/:merchantId/collections",
       "create_collection",
-      "underclerk.create-collection.v1",
+      "commerce.create-collection.v1",
     ),
     route(
       "GET",
@@ -48,13 +48,13 @@ export const COLLECTIONS_ROUTES: readonly RouteDefinition<CollectionsRoute>[] =
       "PUT",
       "/v1/admin/merchants/:merchantId/collections/:collectionId",
       "update_collection",
-      "underclerk.update-collection.v1",
+      "commerce.update-collection.v1",
     ),
     route(
       "POST",
       "/v1/admin/merchants/:merchantId/collections/:collectionId/deletion",
       "delete_collection",
-      "underclerk.delete-collection.v1",
+      "commerce.delete-collection.v1",
     ),
     route(
       "GET",

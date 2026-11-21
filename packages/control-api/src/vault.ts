@@ -30,7 +30,7 @@ export const vaultItemIdSchema = Type.String({
   pattern: "^([0-9a-f]{32}|[0-9a-z]{26})$",
 });
 export const vaultStoreKindSchema = Type.Union([
-  Type.Literal("satyr"),
+  Type.Literal("pantry"),
   Type.Literal("onepassword"),
 ]);
 /** A 1Password vault ID. */
@@ -115,7 +115,7 @@ export const vaultItemViewSchema = Type.Union([
 
 /** Where the Organisation's new items go, and whether 1Password answered. */
 export const vaultStoreViewSchema = Type.Union([
-  Type.Object({ kind: Type.Literal("satyr") }, strict),
+  Type.Object({ kind: Type.Literal("pantry") }, strict),
   Type.Object(
     {
       kind: Type.Literal("onepassword"),
@@ -135,7 +135,7 @@ export const vaultStoreSummarySchema = Type.Object(
   {
     ok: Type.Literal(true),
     store: Type.Union([
-      Type.Object({ kind: Type.Literal("satyr") }, strict),
+      Type.Object({ kind: Type.Literal("pantry") }, strict),
       Type.Object(
         {
           kind: Type.Literal("onepassword"),

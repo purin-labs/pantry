@@ -38,7 +38,7 @@ export async function listDiscountsRoute(
   route: Variant<Exclude<CommerceRoute, BuyerRoute>, "list_discounts">,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.discounts.v1",
+    schemaVersion: "commerce.discounts.v1",
     discounts: ctx.authority.listDiscounts(route.merchantId),
   });
 }
@@ -81,7 +81,7 @@ export async function listStoredValueAccountsRoute(
   >,
 ): Promise<Response> {
   return jsonResponse(200, {
-    schemaVersion: "underclerk.stored-value-accounts.v1",
+    schemaVersion: "commerce.stored-value-accounts.v1",
     accounts: ctx.authority.listStoredValueAccounts(route.merchantId),
   });
 }

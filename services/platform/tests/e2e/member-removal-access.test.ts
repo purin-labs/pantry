@@ -200,7 +200,7 @@ async function removeMember(
   if (version === null) throw new Error("Missing configuration version");
   const request = headers(owner);
   request.set("idempotency-key", `removal-${crypto.randomUUID()}`);
-  request.set("x-satyr-configuration-version", String(version));
+  request.set("x-pantry-configuration-version", String(version));
   return exports.default.fetch(
     `https://localhost/v1/control/organisations/${ORGANISATION_ID}/members/${userId}`,
     { method: "DELETE", headers: request, body: "{}" },
@@ -258,8 +258,8 @@ function post(
 function headers(session: IssuedControlSession): Headers {
   return new Headers({
     origin: "https://localhost",
-    cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-    "x-satyr-csrf": session.csrfToken,
+    cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+    "x-pantry-csrf": session.csrfToken,
     "content-type": "application/json",
   });
 }

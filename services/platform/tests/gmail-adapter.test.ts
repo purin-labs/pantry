@@ -39,12 +39,12 @@ async function profileAndWatchTest(): Promise<void> {
 
   const watch = await gmailStartWatch({
     accessToken: "token-1",
-    topicName: "projects/satyr/topics/gmail",
+    topicName: "projects/pantry/topics/gmail",
     fetcher: (async (request: RequestInfo | URL) => {
       const normalized = new Request(request as Request);
       const body = (await normalized.json()) as Record<string, unknown>;
       expect(body).toEqual({
-        topicName: "projects/satyr/topics/gmail",
+        topicName: "projects/pantry/topics/gmail",
         labelIds: ["INBOX"],
         labelFilterBehavior: "INCLUDE",
       });

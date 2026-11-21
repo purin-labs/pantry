@@ -660,7 +660,7 @@ function gmailSeed(
     provider: "gmail",
     providerSubjectId: providerAccountId,
     environment: "development",
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: {
       kind: "connection_credential",
       credentialRef: requireVaultHandle(

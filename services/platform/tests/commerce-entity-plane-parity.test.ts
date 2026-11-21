@@ -56,7 +56,7 @@ const INTEGRATION_ID = "integration_entity_plane_parity";
 const NOW = "2026-08-26T00:00:00.000Z";
 const OBSERVED_AT = "2026-08-25T00:00:00.000Z";
 
-type SourceMode = "underclerk" | "blotter";
+type SourceMode = "commerce" | "blotter";
 
 describe("commerce entity-plane reader parity evidence", () => {
   // Commerce runs the same cases over its merchant relations in
@@ -95,14 +95,14 @@ describe("commerce entity-plane reader parity evidence", () => {
     },
   );
 
-  it("executes actual Underclerk and OrganisationDO stores through the Reader, preserves ownership, and rejects mismatched cursors, outside-matrix operators and a mutated continuation", async () => {
-    const native = await createActualReaderFixture("underclerk");
+  it("executes actual Commerce and OrganisationDO stores through the Reader, preserves ownership, and rejects mismatched cursors, outside-matrix operators and a mutated continuation", async () => {
+    const native = await createActualReaderFixture("commerce");
     const provider = await createActualReaderFixture("blotter");
     try {
       for (const fixture of [native, provider]) {
         const counts =
-          fixture.mode === "underclerk"
-            ? fixture.underclerkEntityCounts
+          fixture.mode === "commerce"
+            ? fixture.commerceEntityCounts
             : fixture.blotter.storage
                 .exec<Readonly<{ projection_kind: string; count: number }>>(
                   `SELECT entity_type AS projection_kind, COUNT(*) AS count
@@ -114,7 +114,7 @@ describe("commerce entity-plane reader parity evidence", () => {
                 )
                 .toArray();
         expect(counts).toEqual(
-          fixture.mode === "underclerk"
+          fixture.mode === "commerce"
             ? [
                 { entityType: "order", count: 4 },
                 { entityType: "production_batch", count: 2 },
@@ -385,7 +385,7 @@ describe("commerce entity-plane reader parity evidence", () => {
         expect(scanFirst.ok).toBe(true);
         if (!scanFirst.ok) continue;
         const scanCursor = requiredCursor(scanFirst.value.nextCursor);
-        if (fixture.mode === "underclerk") await fixture.mutateMerchantRevision();
+        if (fixture.mode === "commerce") await fixture.mutateMerchantRevision();
         else fixture.mutateAcceptedProjectionSequence();
         expect(await read(fixture, pageQuery(2, cursor))).toEqual({
           ok: false,
@@ -478,7 +478,7 @@ function createNormalizedProjectionStore(): ReturnType<typeof emptySqliteFixture
 type ActualReaderFixture = Readonly<{
   mode: SourceMode;
   reader: CommerceGraphReader;
-  underclerkEntityCounts: readonly Readonly<{ entityType: string; count: number }>[];
+  commerceEntityCounts: readonly Readonly<{ entityType: string; count: number }>[];
   blotter: ReturnType<typeof emptySqliteFixture>;
   initialWatermark: CommerceReadWatermark;
   mutateMerchantRevision: () => Promise<void>;
@@ -521,7 +521,7 @@ async function createActualReaderFixture(
       ok: false as const,
       error: {
         code: "source_invalid" as const,
-        source: "underclerk" as const,
+        source: "commerce" as const,
         message: "actual parity uses planned reads",
       },
     }),
@@ -554,27 +554,27 @@ async function createActualReaderFixture(
       blotterSource.hydrateSystemEntities.bind(blotterSource),
   };
   const reader =
-    mode === "underclerk"
+    mode === "commerce"
       ? new CommerceGraphReader({
           organisationId: ORGANISATION_ID,
           merchantId: MERCHANT_ID,
-          underclerk: boundCommerce,
+          commerce: boundCommerce,
         })
       : new CommerceGraphReader({
           organisationId: ORGANISATION_ID,
           merchantId: MERCHANT_ID,
-          underclerk: boundCommerce,
+          commerce: boundCommerce,
           blotter: boundBlotter,
         });
   return {
     mode,
     reader,
-    underclerkEntityCounts: seeded.entityCounts,
+    commerceEntityCounts: seeded.entityCounts,
     blotter,
     initialWatermark:
-      mode === "underclerk"
+      mode === "commerce"
         ? {
-            kind: "underclerk_native",
+            kind: "commerce_native",
             merchantRevision: parseCommerceSnapshotRevision(
               seededMerchantRevision,
               "merchantRevision",
@@ -586,9 +586,9 @@ async function createActualReaderFixture(
               1,
               "blotterAcceptedProjectionSequence",
             ),
-            underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+            commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
               seededMerchantRevision,
-              "underclerkExtensionMerchantRevision",
+              "commerceExtensionMerchantRevision",
             ),
           },
     mutateMerchantRevision: async () => {
@@ -606,9 +606,9 @@ async function createActualReaderFixture(
       );
     },
     currentWatermark: () =>
-      mode === "underclerk"
+      mode === "commerce"
         ? {
-            kind: "underclerk_native",
+            kind: "commerce_native",
             merchantRevision: parseCommerceSnapshotRevision(
               seededMerchantRevision + 1,
               "merchantRevision",
@@ -620,9 +620,9 @@ async function createActualReaderFixture(
               2,
               "blotterAcceptedProjectionSequence",
             ),
-            underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+            commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
               seededMerchantRevision,
-              "underclerkExtensionMerchantRevision",
+              "commerceExtensionMerchantRevision",
             ),
           },
     close: async () => {
@@ -972,15 +972,15 @@ async function readAtSensitivity(
   sensitivityCeiling: "internal" | "restricted",
 ) {
   const selectorId =
-    query.kind === "underclerk_context" && query.selection.kind === "selector"
+    query.kind === "commerce_context" && query.selection.kind === "selector"
       ? query.selection.selector.selectorId
       : "selector_entity_plane_parity";
   const selectorRevision =
-    query.kind === "underclerk_context" && query.selection.kind === "selector"
+    query.kind === "commerce_context" && query.selection.kind === "selector"
       ? query.selection.selector.revision
       : 1;
   const authorityQuery =
-    query.kind === "underclerk_context" && query.selection.kind === "selector"
+    query.kind === "commerce_context" && query.selection.kind === "selector"
       ? query.selection.selector.query
       : query;
   const authority = buildSavedSelectorCommerceReadAuthority({
@@ -1006,7 +1006,7 @@ function provenanceFor(
   return {
     organisationId: ORGANISATION_ID,
     integrationAccountId: INTEGRATION_ID,
-    source: "underclerk",
+    source: "commerce",
     resourceType,
     resourceId: entityId,
     revision: 1,
@@ -1223,7 +1223,7 @@ function unfilteredCountQuery(): CommerceGraphQuery {
 
 function actualExportContextQuery(): CommerceGraphQuery {
   return parseCommerceGraphQuery({
-    kind: "underclerk_context",
+    kind: "commerce_context",
     selection: {
       kind: "selector",
       selector: {
@@ -1394,7 +1394,7 @@ function expectSystemHydrationEvidence(
     expect(matched.provenance).toMatchObject({
       organisationId: ORGANISATION_ID,
       integrationAccountId: INTEGRATION_ID,
-      source: mode === "blotter" ? "shopify" : "underclerk",
+      source: mode === "blotter" ? "shopify" : "commerce",
       resourceId: expectedEntity.entityId,
       revision: 1,
     });
@@ -1499,20 +1499,20 @@ async function expectCursorMismatches(
     })),
   };
   const otherWatermark: CommerceReadWatermark =
-    fixture.initialWatermark.kind === "underclerk_native"
+    fixture.initialWatermark.kind === "commerce_native"
       ? {
           kind: "provider_backed",
           blotterAcceptedProjectionSequence: parseCommerceSnapshotRevision(
             1,
             "blotterAcceptedProjectionSequence",
           ),
-          underclerkExtensionMerchantRevision: parseCommerceSnapshotRevision(
+          commerceExtensionMerchantRevision: parseCommerceSnapshotRevision(
             1,
-            "underclerkExtensionMerchantRevision",
+            "commerceExtensionMerchantRevision",
           ),
         }
       : {
-          kind: "underclerk_native",
+          kind: "commerce_native",
           merchantRevision: parseCommerceSnapshotRevision(
             1,
             "merchantRevision",

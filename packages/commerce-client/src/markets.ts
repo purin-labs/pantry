@@ -61,7 +61,7 @@ type MarketCommandBase = Readonly<{
 
 export type CreateCommerceMarketV1 = MarketCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-market.v1";
+    schemaVersion: "commerce.create-market.v1";
     name: string;
     countries: readonly string[];
     currency: string;
@@ -71,7 +71,7 @@ export type CreateCommerceMarketV1 = MarketCommandBase &
 
 export type UpdateCommerceMarketV1 = MarketCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.update-market.v1";
+    schemaVersion: "commerce.update-market.v1";
     expectedRevision: number;
     changes: Readonly<{
       name?: string;

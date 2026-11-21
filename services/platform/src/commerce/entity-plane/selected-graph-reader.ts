@@ -15,7 +15,7 @@ export async function createCommerceGraphReader(
     commerceSystem: CommerceSystem;
     organisationId: OrganisationId;
     merchantId: string;
-    underclerk: CommerceEngineSource;
+    commerce: CommerceEngineSource;
     /** The Organisation actor; read only for a provider-backed system. */
     organisation: () => Promise<BlotterOrganisationReader>;
   }>,
@@ -28,13 +28,13 @@ export async function createCommerceGraphReader(
       return new CommerceGraphReader({
         organisationId: String(input.organisationId),
         merchantId: input.merchantId,
-        underclerk: input.underclerk,
+        commerce: input.commerce,
       });
     case "provider_backed":
       return new CommerceGraphReader({
         organisationId: String(input.organisationId),
         merchantId: input.merchantId,
-        underclerk: input.underclerk,
+        commerce: input.commerce,
         blotter: new BlotterSource({
           organisation: await input.organisation(),
           organisationId: input.organisationId,

@@ -68,7 +68,7 @@ async function purgedOrganisationReclaimJourney({ task }: TestContext) {
         app_id: APP_ID,
         access_token: RECLAIM_TOKEN,
         scope: SLACK_SCOPES.join(","),
-        bot_user_id: "U0SATYRBOT",
+        bot_user_id: "U0PANTRYBOT",
         team: { id: TEAM_ID, name: "Reclaim Workspace" },
       }),
     ),
@@ -214,10 +214,10 @@ async function connectSlack(owner: PurgeOwner): Promise<void> {
         origin: PUBLIC_ORIGIN,
         "content-type": "application/json",
         "idempotency-key": `reclaim-${owner.organisationId}-slack-start`,
-        "x-satyr-configuration-version": String(
+        "x-pantry-configuration-version": String(
           await configurationVersion(owner.organisationId),
         ),
-        "x-satyr-csrf": owner.client.session.csrfToken,
+        "x-pantry-csrf": owner.client.session.csrfToken,
       },
       body: JSON.stringify({ returnPath: `/portal/${owner.organisationId}` }),
     },
@@ -236,6 +236,6 @@ async function connectSlack(owner: PurgeOwner): Promise<void> {
   const completed = await exports.default.fetch(callback.toString());
   expect(completed.status).toBe(200);
   await expect(completed.text()).resolves.toContain(
-    "satyr.provider-attempt.completed",
+    "pantry.provider-attempt.completed",
   );
 }

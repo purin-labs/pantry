@@ -108,9 +108,9 @@ export type CommerceExportPresetError =
       readonly code: "commerce_export_preset_owner_conflict";
       readonly resource: string;
     }>
-  | Readonly<{ readonly code: "commerce_export_preset_underclerk_unavailable" }>
+  | Readonly<{ readonly code: "commerce_export_preset_commerce_unavailable" }>
   | Readonly<{
-      readonly code: "commerce_export_preset_underclerk_mismatch";
+      readonly code: "commerce_export_preset_commerce_mismatch";
       readonly field: string;
     }>
   | Readonly<{
@@ -170,7 +170,7 @@ type ExportScope =
       selector: Readonly<{
         selectorId: PublishedCommerceSelectorId;
         revision: PublishedCommerceSelectorRevision;
-        query: Exclude<CommerceGraphQuery, { kind: "underclerk_context" }>;
+        query: Exclude<CommerceGraphQuery, { kind: "commerce_context" }>;
       }>;
     }>;
 
@@ -539,13 +539,13 @@ async function readAuthoritativePreset(
   } catch {
     return {
       ok: false,
-      error: { code: "commerce_export_preset_underclerk_unavailable" },
+      error: { code: "commerce_export_preset_commerce_unavailable" },
     };
   }
   if (!result.ok) {
     return {
       ok: false,
-      error: { code: "commerce_export_preset_underclerk_unavailable" },
+      error: { code: "commerce_export_preset_commerce_unavailable" },
     };
   }
   try {
@@ -554,7 +554,7 @@ async function readAuthoritativePreset(
       return {
         ok: false,
         error: {
-          code: "commerce_export_preset_underclerk_mismatch",
+          code: "commerce_export_preset_commerce_mismatch",
           field: "organisationId",
         },
       };
@@ -563,7 +563,7 @@ async function readAuthoritativePreset(
       return {
         ok: false,
         error: {
-          code: "commerce_export_preset_underclerk_mismatch",
+          code: "commerce_export_preset_commerce_mismatch",
           field: "merchantId",
         },
       };
@@ -575,7 +575,7 @@ async function readAuthoritativePreset(
       return {
         ok: false,
         error: {
-          code: "commerce_export_preset_underclerk_mismatch",
+          code: "commerce_export_preset_commerce_mismatch",
           field: "digest",
         },
       };
@@ -585,7 +585,7 @@ async function readAuthoritativePreset(
     return {
       ok: false,
       error: {
-        code: "commerce_export_preset_underclerk_mismatch",
+        code: "commerce_export_preset_commerce_mismatch",
         field: "response",
       },
     };

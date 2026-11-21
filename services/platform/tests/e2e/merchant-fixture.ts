@@ -21,17 +21,17 @@ export async function seedMerchantFixture(
     readonly role: "admin" | "owner";
   },
 ): Promise<void> {
-  if (!env.UNDERCLERK_SERVICE_TOKEN || !env.UNDERCLERK_BASE_URL)
+  if (!env.COMMERCE_SERVICE_TOKEN || !env.COMMERCE_BASE_URL)
     throw new Error("merchant_fixture_binding_missing");
   const merchantId = `merchant_${identity.organisationId}`;
   const client = new CommerceAdminClient({
-    baseUrl: env.UNDERCLERK_BASE_URL,
-    serviceToken: env.UNDERCLERK_SERVICE_TOKEN,
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: env.COMMERCE_BASE_URL,
+    serviceToken: env.COMMERCE_SERVICE_TOKEN,
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   const occurredAt = "2026-10-05T00:00:00.000Z";
   const provisioned = await client.provisionMerchant({
-    schemaVersion: "underclerk.provision-merchant.v2",
+    schemaVersion: "commerce.provision-merchant.v2",
     externalReference: identity.organisationId,
     merchantId,
     createdAt: occurredAt,
@@ -103,11 +103,11 @@ export async function seedMerchantFixture(
   );
   if (!scope.ok) throw new Error(scope.error.code);
   const now = Date.now();
-  const bindingId = `underclerk_binding_${identity.organisationId}`;
+  const bindingId = `commerce_binding_${identity.organisationId}`;
   await scope.value.database.batch([
     scope.value.database
       .prepare(
-        `INSERT INTO underclerk_merchant_binding
+        `INSERT INTO commerce_merchant_binding
        (binding_id, organisation_id, integration_account_id, merchant_id, environment,
         delivery_signing_key_id, delivery_signing_public_key_b64, revision, created_at, updated_at)
        VALUES (?, ?, ?, ?, 'development', ?, ?, 1, ?, ?)
@@ -126,9 +126,9 @@ export async function seedMerchantFixture(
     scope.value.database
       .prepare(
         `INSERT INTO organisation_commerce_system
-       (organisation_id, system_kind, underclerk_binding_id, shopify_integration_account_id,
+       (organisation_id, system_kind, commerce_binding_id, shopify_integration_account_id,
         revision, selected_at, selected_by_user_id)
-       VALUES (?, 'satyr_commerce', ?, NULL, 1, ?, ?)
+       VALUES (?, 'builtin_commerce', ?, NULL, 1, ?, ?)
        ON CONFLICT (organisation_id) DO NOTHING`,
       )
       .bind(identity.organisationId, bindingId, now, identity.userId),

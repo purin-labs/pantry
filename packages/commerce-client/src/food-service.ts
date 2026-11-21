@@ -46,7 +46,7 @@ export type CommerceFoodServiceResourcesV1 = Readonly<{
 }>;
 
 export type CommerceFoodServiceSnapshotV1 = Readonly<{
-  schemaVersion: "underclerk.food-service-snapshot.v2";
+  schemaVersion: "commerce.food-service-snapshot.v2";
   merchantId: string;
   merchantRevision: number;
   deliverySigner: Readonly<{
@@ -66,22 +66,22 @@ type CommandBase = Readonly<{
 
 export type CreatePreparationStationCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-preparation-station.v1";
+    schemaVersion: "commerce.create-preparation-station.v1";
     station: Readonly<{ stationId: string; locationId: string; name: string }>;
   }>;
 export type CreateModifierGroupRevisionCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-modifier-group-revision.v1";
+    schemaVersion: "commerce.create-modifier-group-revision.v1";
     modifierGroupRevision: ModifierGroupRevisionInput;
   }>;
 export type CreateRecipeRevisionCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-recipe-revision.v1";
+    schemaVersion: "commerce.create-recipe-revision.v1";
     recipeRevision: RecipeRevisionInput;
   }>;
 export type ConfigureStockPolicyCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.configure-stock-policy.v1";
+    schemaVersion: "commerce.configure-stock-policy.v1";
     stockPolicy: StockPolicyInput;
   }>;
 export type MarkSoldOutCommand = apiMarkSoldOutCommand;
@@ -89,7 +89,7 @@ export type CommerceSoldOutMarksV1 = apiCommerceSoldOutMarksV1;
 
 export type PublishMenuCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.publish-menu.v1";
+    schemaVersion: "commerce.publish-menu.v1";
     menu: MenuInput;
     /** The revision a replacement replaces; absent for a first publication. */
     expectedMenuRevision?: number;
@@ -148,7 +148,7 @@ export type MenuEntryInput = Readonly<{
 }>;
 export type ManagePreparationTicketCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.manage-preparation-ticket.v1";
+    schemaVersion: "commerce.manage-preparation-ticket.v1";
     operation:
       | Readonly<{
           kind: "create";
@@ -165,7 +165,7 @@ export type ManagePreparationTicketCommand = CommandBase &
   }>;
 export type CompleteProductionBatchCommand = CommandBase &
   Readonly<{
-    schemaVersion: "underclerk.complete-production-batch.v1";
+    schemaVersion: "commerce.complete-production-batch.v1";
     productionBatchId: string;
     demand: ProductionBatchDemand;
     outputLotId: string;

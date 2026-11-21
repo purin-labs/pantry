@@ -981,7 +981,7 @@ function beginCustomApprovalStepUp(
 ): void {
   const returnPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
   sessionStorage.setItem(
-    "satyr:custom-connector-approval",
+    "pantry:custom-connector-approval",
     JSON.stringify({
       organisationId: props.organisationId,
       connectorId: action.connectorId,
@@ -1101,7 +1101,7 @@ function resumeCustomApprovalEffect(input: {
   ) {
     return noop;
   }
-  sessionStorage.removeItem("satyr:custom-connector-approval");
+  sessionStorage.removeItem("pantry:custom-connector-approval");
   const props = {
     organisationId: input.organisationId,
     connectorId: input.connectorId,
@@ -1157,7 +1157,7 @@ function readPendingCustomApproval(): {
   readonly actionNonce: string;
   readonly returnPath: string;
 } | null {
-  const raw = sessionStorage.getItem("satyr:custom-connector-approval");
+  const raw = sessionStorage.getItem("pantry:custom-connector-approval");
   if (raw === null) return null;
   try {
     const value: unknown = JSON.parse(raw);

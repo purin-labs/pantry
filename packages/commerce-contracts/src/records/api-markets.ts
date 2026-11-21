@@ -98,7 +98,7 @@ export const createCommerceMarketV1Schema = Type.Intersect(
   [
     marketCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.create-market.v1"),
+      schemaVersion: Type.Literal("commerce.create-market.v1"),
       name: boundedTextSchema(100),
       countries: countriesSchema,
       currency: marketCurrencySchema,
@@ -124,7 +124,7 @@ export const updateCommerceMarketV1Schema = Type.Intersect(
   [
     marketCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.update-market.v1"),
+      schemaVersion: Type.Literal("commerce.update-market.v1"),
       expectedRevision: PositiveInteger,
       changes: Type.Refine(
         ReadonlyStrictObject({
@@ -182,7 +182,7 @@ export type CommerceOrderMarketV1 = Static<
 >;
 
 type MarketList = Readonly<{
-  schemaVersion: "underclerk.markets.v1";
+  schemaVersion: "commerce.markets.v1";
   markets: readonly CommerceMarketV1[];
 }>;
 
@@ -190,7 +190,7 @@ type MarketList = Readonly<{
 const marketListSchema = Type.Unsafe<readonly CommerceMarketV1[]>(
   Type.Codec(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.markets.v1"),
+      schemaVersion: Type.Literal("commerce.markets.v1"),
       markets: ImmutableArray(commerceMarketV1Schema),
     }),
   )
@@ -203,7 +203,7 @@ function marketsOf(list: MarketList): readonly CommerceMarketV1[] {
 }
 
 function marketList(markets: readonly CommerceMarketV1[]): MarketList {
-  return { schemaVersion: "underclerk.markets.v1", markets };
+  return { schemaVersion: "commerce.markets.v1", markets };
 }
 
 // Parsers of the client API types (Plan 78 step 2).

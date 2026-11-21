@@ -144,7 +144,7 @@ function commerceErrorResponse(error: CommerceClientError): Response {
       { ok: false, error: "payment_account_refused", detail: error.message },
       409,
     );
-  return controlError("underclerk_unavailable", 503);
+  return controlError("commerce_unavailable", 503);
 }
 
 function decode(value: string | undefined): string {

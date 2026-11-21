@@ -1,7 +1,7 @@
 import { EntityPlaneHttpError } from "../entity-plane/http-error.ts";
 
 export function actorRefused(message: string): Response {
-  return jsonResponse(400, { message, field: "Underclerk-Actor" });
+  return jsonResponse(400, { message, field: "Commerce-Actor" });
 }
 
 export function entityPlaneErrorResponse(error: unknown): Response | undefined {

@@ -176,7 +176,7 @@ export abstract class BuyerStorefrontStage extends BuyerCheckoutBase {
     );
     if (buyerStorefront === undefined) return undefined;
     return {
-      schemaVersion: "underclerk.buyer-catalog.v1",
+      schemaVersion: "commerce.buyer-catalog.v1",
       storefront: buyerStorefront,
       listings,
       menus,

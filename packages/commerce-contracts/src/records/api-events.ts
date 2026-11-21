@@ -46,7 +46,7 @@ export const commerceEventV1Schema = ReadonlyStrictObject({
 export type CommerceEventV1 = Static<typeof commerceEventV1Schema>;
 
 export const commerceEventPageV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.events.v1"),
+  schemaVersion: Type.Literal("commerce.events.v1"),
   events: ImmutableArray(commerceEventV1Schema),
   nextCursor: Nullable(text),
 });
@@ -66,7 +66,7 @@ export type CommerceReceivedEventV1 = Static<
 export const commerceReceivedEventPageV1Schema = Type.Intersect(
   [
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.events.v1"),
+      schemaVersion: Type.Literal("commerce.events.v1"),
       nextCursor: Nullable(text),
     }),
     ReadonlyOpenObject({
@@ -89,7 +89,7 @@ export type CommerceFeedConsumerV1 = Static<
 >;
 
 export const commerceWebhookEventV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.webhook-event.v1"),
+  schemaVersion: Type.Literal("commerce.webhook-event.v1"),
   eventId: text,
   kind: text,
   merchantId: text,
@@ -127,7 +127,7 @@ const webhookUrlSchema = Type.String({
 
 export const createCommerceWebhookSubscriptionV1Schema = ReadonlyStrictObject(
   {
-    schemaVersion: Type.Literal("underclerk.create-webhook-subscription.v1"),
+    schemaVersion: Type.Literal("commerce.create-webhook-subscription.v1"),
     merchantId: text,
     idempotencyKey: text,
     requestedAt: utcTimestampSchema,
@@ -155,7 +155,7 @@ export const restartCommerceWebhookSubscriptionV1Schema = Type.Intersect(
   [
     webhookSubscriptionCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.restart-webhook-subscription.v1"),
+      schemaVersion: Type.Literal("commerce.restart-webhook-subscription.v1"),
     }),
   ],
   exactKeys,
@@ -168,7 +168,7 @@ export const rotateCommerceWebhookSecretV1Schema = Type.Intersect(
   [
     webhookSubscriptionCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.rotate-webhook-secret.v1"),
+      schemaVersion: Type.Literal("commerce.rotate-webhook-secret.v1"),
       keepPreviousSecretSeconds: Type.Integer({ minimum: 0, maximum: 86_400 }),
     }),
   ],
@@ -182,7 +182,7 @@ export const deleteCommerceWebhookSubscriptionV1Schema = Type.Intersect(
   [
     webhookSubscriptionCommandBaseSchema,
     ReadonlyOpenObject({
-      schemaVersion: Type.Literal("underclerk.delete-webhook-subscription.v1"),
+      schemaVersion: Type.Literal("commerce.delete-webhook-subscription.v1"),
     }),
   ],
   exactKeys,
@@ -202,7 +202,7 @@ export type CommerceWebhookSubscriptionCommandV1 = Static<
 
 export const commerceWebhookSubscriptionCreatedV1Schema =
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.webhook-subscription-created.v1"),
+    schemaVersion: Type.Literal("commerce.webhook-subscription-created.v1"),
     mutation: commerceMutationResultV1Schema,
     secret: Nullable(text),
   });
@@ -211,7 +211,7 @@ export type CommerceWebhookSubscriptionCreatedV1 = Static<
 >;
 
 export const commerceWebhookSecretRotatedV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.webhook-secret-rotated.v1"),
+  schemaVersion: Type.Literal("commerce.webhook-secret-rotated.v1"),
   mutation: commerceMutationResultV1Schema,
   secret: Nullable(text),
 });
@@ -237,7 +237,7 @@ export type CommerceWebhookSubscriptionV1 = Static<
 >;
 
 type WebhookSubscriptionList = Readonly<{
-  schemaVersion: "underclerk.webhook-subscriptions.v1";
+  schemaVersion: "commerce.webhook-subscriptions.v1";
   subscriptions: readonly CommerceWebhookSubscriptionV1[];
 }>;
 
@@ -247,7 +247,7 @@ const webhookSubscriptionListSchema = Type.Unsafe<
 >(
   Type.Codec(
     ReadonlyStrictObject({
-      schemaVersion: Type.Literal("underclerk.webhook-subscriptions.v1"),
+      schemaVersion: Type.Literal("commerce.webhook-subscriptions.v1"),
       subscriptions: ImmutableArray(commerceWebhookSubscriptionV1Schema),
     }),
   )
@@ -265,7 +265,7 @@ function subscriptionList(
   subscriptions: readonly CommerceWebhookSubscriptionV1[],
 ): WebhookSubscriptionList {
   return {
-    schemaVersion: "underclerk.webhook-subscriptions.v1",
+    schemaVersion: "commerce.webhook-subscriptions.v1",
     subscriptions,
   };
 }

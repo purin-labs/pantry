@@ -1,7 +1,7 @@
 // The Commerce Worker that client test suites, such as Pantry Platform's, run
 // as a built artifact (Plan 76 phase 1). It is the production Worker with
 // four test settings: a deterministic payment gateway, an optional fixed
-// clock (UNDERCLERK_FIXTURE_NOW), named seed scenarios at
+// clock (COMMERCE_FIXTURE_NOW), named seed scenarios at
 // POST /v1/admin/merchants/:merchantId/test-fixture, and webhook posts to
 // https://localhost, the client suite's own Worker. A client reaches it only
 // over HTTP, so a client suite never imports Commerce source.
@@ -10,7 +10,7 @@ import { createPrivateKey, createPublicKey } from "node:crypto";
 import { DurableObjectCommerceDatabase } from "../../src/durable-object-database.ts";
 import { DeterministicPaymentGateway } from "../../src/payments/provider.ts";
 import { parseRoute } from "../../src/http-routes.ts";
-import worker, { UnderclerkMerchantDO, type Env } from "../../src/worker.ts";
+import worker, { CommerceMerchantDO, type Env } from "../../src/worker.ts";
 import {
   EFFECT_EVIDENCE_KEY,
   runFixtureScenario,
@@ -19,11 +19,11 @@ import {
 } from "./scenarios.ts";
 
 export default worker;
-export { UnderclerkShopNameDO } from "../../src/worker.ts";
+export { CommerceShopNameDO } from "../../src/worker.ts";
 
 type FixtureEnv = Env &
   Readonly<{
-    UNDERCLERK_FIXTURE_NOW?: string;
+    COMMERCE_FIXTURE_NOW?: string;
   }>;
 
 const FIXTURE_ROUTE =
@@ -31,7 +31,7 @@ const FIXTURE_ROUTE =
 const MERCHANT_ROUTE =
   /^\/v1\/admin\/merchants\/([^/]+)\/(e2e-evidence|command-receipts\/[^/]+|actions\/publish-catalog-listing)$/u;
 
-export class CommerceFixtureMerchantDO extends UnderclerkMerchantDO {
+export class CommerceFixtureMerchantDO extends CommerceMerchantDO {
   readonly #fixtureEnv: FixtureEnv;
   readonly #fixtureDatabase: DurableObjectCommerceDatabase;
   /** Requests that reached this object, by route kind; a journey reads them. */
@@ -47,7 +47,7 @@ export class CommerceFixtureMerchantDO extends UnderclerkMerchantDO {
 
   protected override now(): string {
     // The base constructor reads the clock before this class sets its fields.
-    const fixed = (this.env as FixtureEnv).UNDERCLERK_FIXTURE_NOW;
+    const fixed = (this.env as FixtureEnv).COMMERCE_FIXTURE_NOW;
     return fixed === undefined || fixed === "" ? super.now() : fixed;
   }
 
@@ -56,7 +56,7 @@ export class CommerceFixtureMerchantDO extends UnderclerkMerchantDO {
     return url.startsWith("https://localhost/") || super.webhookAddressAllowed(url);
   }
 
-  protected override paymentGateways(): ReturnType<UnderclerkMerchantDO["paymentGateways"]> {
+  protected override paymentGateways(): ReturnType<CommerceMerchantDO["paymentGateways"]> {
     return { paymentGateway: new DeterministicPaymentGateway(() => this.now()) };
   }
 
@@ -70,7 +70,7 @@ export class CommerceFixtureMerchantDO extends UnderclerkMerchantDO {
     }
     if (
       request.headers.get("authorization") !==
-      `Bearer ${this.#fixtureEnv.UNDERCLERK_SERVICE_TOKEN}`
+      `Bearer ${this.#fixtureEnv.COMMERCE_SERVICE_TOKEN}`
     )
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     const merchantId = decodeURIComponent(match[1] ?? "");
@@ -81,7 +81,7 @@ export class CommerceFixtureMerchantDO extends UnderclerkMerchantDO {
     }
     if (match[2] === "test-signing-key") {
       if (request.method !== "GET") return Response.json({ message: "Method not allowed" }, { status: 405 });
-      return Response.json({ keyId: this.#fixtureEnv.UNDERCLERK_SIGNING_KEY_ID, publicKeyB64: this.#publicKeyB64() });
+      return Response.json({ keyId: this.#fixtureEnv.COMMERCE_SIGNING_KEY_ID, publicKeyB64: this.#publicKeyB64() });
     }
     if (request.method !== "POST") return Response.json({ message: "Method not allowed" }, { status: 405 });
     let body: unknown;
@@ -136,12 +136,12 @@ export class CommerceFixtureMerchantDO extends UnderclerkMerchantDO {
 
   #publicKeyB64(): string {
     const key = createPrivateKey({
-      key: Buffer.from(this.#fixtureEnv.UNDERCLERK_SIGNING_PRIVATE_KEY_PKCS8_B64, "base64url"),
+      key: Buffer.from(this.#fixtureEnv.COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64, "base64url"),
       format: "der",
       type: "pkcs8",
     });
     const jwk = createPublicKey(key).export({ format: "jwk" });
-    if (jwk.x === undefined) throw new Error("Underclerk signing key must be Ed25519");
+    if (jwk.x === undefined) throw new Error("Commerce signing key must be Ed25519");
     return jwk.x;
   }
 }

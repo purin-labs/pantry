@@ -96,7 +96,7 @@ type CapabilitySeed = Omit<
 const NONE: CapabilityProviderDependency = { kind: "none" };
 const COMMERCE_SYSTEMS: CapabilityProviderDependency = {
   kind: "commerce_system",
-  systems: ["satyr_commerce", "shopify"],
+  systems: ["builtin_commerce", "shopify"],
 };
 const SHOPIFY: CapabilityProviderDependency = {
   kind: "provider",
@@ -107,9 +107,9 @@ const SHOPIFY: CapabilityProviderDependency = {
  * capability declaring this is unavailable on a Shopify-backed merchant
  * rather than silently mapping to something close.
  */
-const SATYR_COMMERCE: CapabilityProviderDependency = {
+const BUILTIN_COMMERCE: CapabilityProviderDependency = {
   kind: "commerce_system",
-  systems: ["satyr_commerce"],
+  systems: ["builtin_commerce"],
 };
 const STRIPE: CapabilityProviderDependency = {
   kind: "provider",
@@ -359,7 +359,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "platform",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   [CAPABILITY_KEYS.commerceSoldOutMark]: {
@@ -369,7 +369,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "platform",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   [CAPABILITY_KEYS.commerceRecipeSave]: {
@@ -379,7 +379,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "platform",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   [CAPABILITY_KEYS.commerceSupplyCostSave]: {
@@ -389,7 +389,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "platform",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   [CAPABILITY_KEYS.commerceSupplierCreate]: {
@@ -399,7 +399,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "platform",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   [CAPABILITY_KEYS.deviceRead]: {
@@ -559,7 +559,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "approval_required_disabled",
   },
   [CAPABILITY_KEYS.commerceOrderCancel]: {
@@ -588,7 +588,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     // Money changes hands at this price, so it is never a standing permission:
     // an approval is required whenever the capability is on at all.
     policyModes: "approval_required_disabled",
@@ -600,7 +600,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     // The plugin runs code on every checkout, so each version needs an
     // approval whenever the capability is on at all.
     policyModes: "approval_required_disabled",
@@ -641,7 +641,7 @@ const CAPABILITY_SEEDS = {
     category: "commerce",
     risk: "external_effect",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_approval_required_disabled",
   },
   [CAPABILITY_KEYS.commerceListEntryAdd]: {
@@ -742,7 +742,7 @@ const CAPABILITY_SEEDS = {
     category: "payments",
     risk: "read",
     target: "platform",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   /**
@@ -756,7 +756,7 @@ const CAPABILITY_SEEDS = {
     category: "payments",
     risk: "propose",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   /**
@@ -777,7 +777,7 @@ const CAPABILITY_SEEDS = {
     category: "payments",
     risk: "external_effect",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "approval_required_disabled",
   },
   [CAPABILITY_KEYS.commerceSupplierDestinationPropose]: {
@@ -787,7 +787,7 @@ const CAPABILITY_SEEDS = {
     category: "payments",
     risk: "propose",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "enabled_disabled",
   },
   /**
@@ -803,7 +803,7 @@ const CAPABILITY_SEEDS = {
     category: "payments",
     risk: "external_effect",
     target: "commerce_command",
-    providerDependency: SATYR_COMMERCE,
+    providerDependency: BUILTIN_COMMERCE,
     policyModes: "approval_required_disabled",
   },
   [CAPABILITY_KEYS.stripePayoutCreate]: {

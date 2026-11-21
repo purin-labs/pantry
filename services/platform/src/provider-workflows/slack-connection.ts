@@ -222,7 +222,7 @@ export async function connectSlack(
     provider: "slack",
     providerSubjectId: installation.value.teamId,
     environment: base.environment,
-    authMode: "shared_satyr_app",
+    authMode: "shared_pantry_app",
     authority: { kind: "connection_credential", credentialRef },
     grantedScopes: installation.value.scopes,
     createdByUserId: base.userId,

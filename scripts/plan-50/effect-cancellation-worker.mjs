@@ -12,7 +12,7 @@ import { organisationId } from "./proposal-worker.mjs";
 export class CandidateActor extends CodeModeActor {
   effectExtension() {
     const task = defineTask({
-      name: "satyr.trial.provider-receipt",
+      name: "pantry.trial.provider-receipt",
       version: 1,
       initial: initialWait,
       phases: { waiting: waitForReceipt.bind(null, this, false) },
@@ -21,7 +21,7 @@ export class CandidateActor extends CodeModeActor {
     return {
       task,
       extension: defineExtension({
-        name: "satyr.trial.provider-receipt",
+        name: "pantry.trial.provider-receipt",
         tasks: [task],
       }),
     };

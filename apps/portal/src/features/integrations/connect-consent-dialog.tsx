@@ -29,7 +29,7 @@ export function ConnectConsentDialog(
       className="connect-consent"
       requester={{
         name: "Seams Pantry",
-        icon: <ProviderTile provider="satyr_commerce" label="Seams Pantry" />,
+        icon: <ProviderTile provider="builtin_commerce" label="Seams Pantry" />,
       }}
       target={{
         name: label,

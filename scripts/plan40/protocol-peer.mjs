@@ -10,7 +10,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "../..");
 const fixtureRoot = join(scriptDir, "fixture");
 const { WebSocketServer } = ws;
-const generatedRoot = await mkdtemp(join("/private/tmp", "satyr-plan40-peer-"));
+const generatedRoot = await mkdtemp(join("/private/tmp", "pantry-plan40-peer-"));
 await esbuild.build({
   entryPoints: [join(repoRoot, "packages/product-description-crdt/src/index.ts")],
   bundle: true,

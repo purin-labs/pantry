@@ -40,7 +40,7 @@ export interface Env {
   VAULT_ROOT_V1?: SecretsStoreSecret;
   VAULT_ROOT_V2?: SecretsStoreSecret;
   PANTRY_VAULT_ACTIVE_KEY_VERSION: string;
-  UNDERCLERK: Fetcher;
+  COMMERCE: Fetcher;
   /**
    * The model exit Worker, near AWS Tokyo (Plan 73). Each direct request to
    * a model provider goes through it; see `modelProviderFetch`.
@@ -138,8 +138,8 @@ export interface Env {
    * OpenRouter set a cheaper model.
    */
   PANTRY_PLATFORM_PI_MODEL?: string;
-  UNDERCLERK_BASE_URL?: string;
-  UNDERCLERK_SERVICE_TOKEN?: string;
+  COMMERCE_BASE_URL?: string;
+  COMMERCE_SERVICE_TOKEN?: string;
   /**
    * The origin of a shop's QR order page, with `{name}` for its shop name,
    * such as `https://{name}.menu.seams.tokyo` (Plan 40B phase 2). Without

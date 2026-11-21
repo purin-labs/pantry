@@ -49,8 +49,8 @@ type OfferPriceSaveResult =
   | Readonly<{
       ok: false;
       code:
-        | "underclerk_unavailable"
-        | "underclerk_scope_mismatch"
+        | "commerce_unavailable"
+        | "commerce_scope_mismatch"
         | "offer_price_changed";
     }>
   | Readonly<{ ok: false; code: "offer_price_invalid"; detail: string }>;
@@ -380,7 +380,7 @@ export async function saveOfferPriceWrites(input: Readonly<{
       }),
     );
     if (!updated.ok) {
-      return { ok: false, code: "underclerk_unavailable" };
+      return { ok: false, code: "commerce_unavailable" };
     }
     if (updated.value.outcome === "rejected") {
       const code = updated.value.error.code;
@@ -394,7 +394,7 @@ export async function saveOfferPriceWrites(input: Readonly<{
       return { ok: false, code: "offer_price_changed" };
     }
     if (updated.value.receipt.merchantId !== input.merchantId) {
-      return { ok: false, code: "underclerk_scope_mismatch" };
+      return { ok: false, code: "commerce_scope_mismatch" };
     }
     latestMerchantRevision = Number(updated.value.receipt.merchantRevision);
   }

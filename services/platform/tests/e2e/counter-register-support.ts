@@ -80,13 +80,13 @@ export async function setupRegisterShop(tag: string) {
   ]);
 
   const admin = new CommerceAdminClient({
-    baseUrl: "http://underclerk.test",
-    serviceToken: "underclerk-e2e-token",
-    fetch: env.UNDERCLERK.fetch.bind(env.UNDERCLERK),
+    baseUrl: "http://commerce.test",
+    serviceToken: "commerce-e2e-token",
+    fetch: env.COMMERCE.fetch.bind(env.COMMERCE),
   });
   await required(
     admin.provisionDemo({
-      schemaVersion: "underclerk.provision-demo.v2",
+      schemaVersion: "commerce.provision-demo.v2",
       externalReference: organisationId,
       merchantId,
       profile: "cafe_patisserie",
@@ -171,7 +171,7 @@ export async function setupRegisterShop(tag: string) {
 
   await required(
     admin.publishPointOfSaleConfiguration({
-      schemaVersion: "underclerk.publish-point-of-sale-configuration.v1",
+      schemaVersion: "commerce.publish-point-of-sale-configuration.v1",
       merchantId,
       expectedRevision: null,
       publishedAt: new Date(now).toISOString(),
@@ -179,7 +179,7 @@ export async function setupRegisterShop(tag: string) {
       configuration: {
         configurationId: `pos_cfg_${tag}`,
         organisationId,
-        satyrLocationId: locationId,
+        pantryLocationId: locationId,
         salesChannelId: channelId,
         currency: "JPY",
         supportedItems: [],

@@ -247,8 +247,8 @@ function control(
     headers: {
       "content-type": "application/json",
       origin: "https://localhost",
-      cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-      "x-satyr-csrf": session.csrfToken,
+      cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+      "x-pantry-csrf": session.csrfToken,
       ...(method === "POST" ? { "idempotency-key": crypto.randomUUID() } : {}),
     },
     body: body === undefined ? null : JSON.stringify(body),

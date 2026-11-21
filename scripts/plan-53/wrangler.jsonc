@@ -1,5 +1,5 @@
 {
-  "name": "satyr-plan53-acceptance",
+  "name": "pantry-plan53-acceptance",
   "main": "browser-worker.ts",
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],

@@ -47,7 +47,7 @@ const configurationSchema = ParsedBy(parseCheckoutProfileConfiguration);
 
 export const createCommerceCheckoutProfileDraftV1Schema =
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.create-checkout-profile-draft.v1"),
+    schemaVersion: Type.Literal("commerce.create-checkout-profile-draft.v1"),
     merchantId: text,
     checkoutProfileId: text,
     name: text,
@@ -60,7 +60,7 @@ export type CreateCommerceCheckoutProfileDraftV1 = Static<
 
 export const replaceCommerceCheckoutProfileDraftV1Schema =
   ReadonlyStrictObject({
-    schemaVersion: Type.Literal("underclerk.replace-checkout-profile-draft.v1"),
+    schemaVersion: Type.Literal("commerce.replace-checkout-profile-draft.v1"),
     merchantId: text,
     checkoutProfileId: text,
     expectedRevision: PositiveInteger,
@@ -73,7 +73,7 @@ export type ReplaceCommerceCheckoutProfileDraftV1 = Static<
 >;
 
 export const publishCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.publish-checkout-profile.v1"),
+  schemaVersion: Type.Literal("commerce.publish-checkout-profile.v1"),
   merchantId: text,
   checkoutProfileId: text,
   expectedRevision: PositiveInteger,
@@ -85,7 +85,7 @@ export type PublishCommerceCheckoutProfileV1 = Static<
 >;
 
 export const retireCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.retire-checkout-profile.v1"),
+  schemaVersion: Type.Literal("commerce.retire-checkout-profile.v1"),
   merchantId: text,
   checkoutProfileId: text,
   expectedRevision: PositiveInteger,
@@ -106,7 +106,7 @@ const activationProperties = {
 };
 
 export const activateCommerceCheckoutProfileV1Schema = ReadonlyStrictObject({
-  schemaVersion: Type.Literal("underclerk.activate-checkout-profile.v1"),
+  schemaVersion: Type.Literal("commerce.activate-checkout-profile.v1"),
   ...activationProperties,
 });
 export type ActivateCommerceCheckoutProfileV1 = Static<

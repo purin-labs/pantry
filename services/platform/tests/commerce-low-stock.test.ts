@@ -22,10 +22,10 @@ import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
 import { sqlStorage, emptySqliteFixture } from "./sqlite-storage";
 
 const ORGANISATION_ID = parseOrganisationId(
-  "organisation_underclerk_low_stock",
+  "organisation_commerce_low_stock",
 );
 const INTEGRATION_ACCOUNT_ID = parseIntegrationAccountId(
-  "integration_underclerk_low_stock",
+  "integration_commerce_low_stock",
 );
 const ACCEPT_ALL_COMMERCE_DELIVERIES = { verify: acceptCommerceDelivery };
 
@@ -87,7 +87,7 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
       labRunId: null,
       processedAt: Date.parse("2026-08-09T00:00:00Z"),
     },
-    { kind: "satyr_commerce", revision: 4 },
+    { kind: "builtin_commerce", revision: 4 },
   );
   expect(applied).toMatchObject({
     ok: true,
@@ -109,7 +109,7 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
       labRunId: null,
       processedAt: Date.parse("2026-08-09T00:00:01Z"),
     },
-    { kind: "satyr_commerce", revision: 4 },
+    { kind: "builtin_commerce", revision: 4 },
   );
   expect(replay).toMatchObject({
     ok: true,
@@ -131,15 +131,15 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
     value: [
       {
         nativeId:
-          "commerce:inventory-low-stock:underclerk:merchant_nuki_cafe:stock_policy_oat_milk_cafe:1:underclerk:merchant_nuki_cafe:movement_oat_latte",
+          "commerce:inventory-low-stock:commerce:merchant_nuki_cafe:stock_policy_oat_milk_cafe:1:commerce:merchant_nuki_cafe:movement_oat_latte",
         event: {
           eventType: "inventory_low_stock",
           payload: {
             stockPolicyId:
-              "underclerk:merchant_nuki_cafe:stock_policy_oat_milk_cafe",
+              "commerce:merchant_nuki_cafe:stock_policy_oat_milk_cafe",
             stockPolicyRevision: 1,
             crossingMovementId:
-              "underclerk:merchant_nuki_cafe:movement_oat_latte",
+              "commerce:merchant_nuki_cafe:movement_oat_latte",
             itemName: "Oat milk",
             merchantCode: "OAT-MILK",
             available: { amount: 7_700, scale: 0, unit: "milliliter" },
@@ -210,7 +210,7 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
         labRunId: null,
         processedAt: Date.parse("2026-08-09T00:00:02Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({ ok: true });
   const belowCues = readRecoverableCommerceCues(sql, {
@@ -240,7 +240,7 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
         labRunId: null,
         processedAt: Date.parse("2026-08-09T00:00:03Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({ ok: true });
   const recrossed = await requireNormalizedCommerceDelivery(
@@ -263,7 +263,7 @@ it("emits one exact low-stock cue when a StockPolicy threshold is crossed", asyn
         labRunId: null,
         processedAt: Date.parse("2026-08-09T00:00:04Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({ ok: true });
   const recrossedCues = readRecoverableCommerceCues(sql, {
@@ -329,17 +329,17 @@ it("canonicalizes first-party shipment package lines and label attempts", async 
   expect(observation.projection.projection).toMatchObject({
     kind: "first_party",
     package: {
-      packageId: "underclerk:merchant_nuki_cafe:package_cafe_1",
+      packageId: "commerce:merchant_nuki_cafe:package_cafe_1",
       lineQuantities: [
-        { orderLineId: "underclerk:merchant_nuki_cafe:order_line_latte" },
+        { orderLineId: "commerce:merchant_nuki_cafe:order_line_latte" },
       ],
       customsLines: [
-        { orderLineId: "underclerk:merchant_nuki_cafe:order_line_latte" },
+        { orderLineId: "commerce:merchant_nuki_cafe:order_line_latte" },
       ],
     },
     lifecycle: {
       state: "delivered",
-      labelAttemptId: "underclerk:merchant_nuki_cafe:label_attempt_1",
+      labelAttemptId: "commerce:merchant_nuki_cafe:label_attempt_1",
     },
   });
 });
@@ -364,7 +364,7 @@ it("applies a completed production batch delivery and crosses low stock once", a
       labRunId: null,
       processedAt: Date.parse("2026-08-09T00:00:00Z"),
     },
-    { kind: "satyr_commerce", revision: 4 },
+    { kind: "builtin_commerce", revision: 4 },
   );
   expect(applied).toMatchObject({
     ok: true,
@@ -375,7 +375,7 @@ it("applies a completed production batch delivery and crosses low stock once", a
     readCurrentCommerceProjection(sql, {
       organisationId: ORGANISATION_ID.value,
       kind: "production_batch",
-      canonicalId: "underclerk:merchant_nuki_cafe:production_batch_oat_milk",
+      canonicalId: "commerce:merchant_nuki_cafe:production_batch_oat_milk",
     }),
   ).toMatchObject({
     ok: true,
@@ -383,13 +383,13 @@ it("applies a completed production batch delivery and crosses low stock once", a
       kind: "production_batch",
       projection: {
         productionBatchId:
-          "underclerk:merchant_nuki_cafe:production_batch_oat_milk",
+          "commerce:merchant_nuki_cafe:production_batch_oat_milk",
         inputMovementIds: [
-          "underclerk:merchant_nuki_cafe:movement_production_input",
+          "commerce:merchant_nuki_cafe:movement_production_input",
         ],
         outputMovementId:
-          "underclerk:merchant_nuki_cafe:movement_production_output",
-        outputLotId: "underclerk:merchant_nuki_cafe:lot_production_output",
+          "commerce:merchant_nuki_cafe:movement_production_output",
+        outputLotId: "commerce:merchant_nuki_cafe:lot_production_output",
       },
     },
   });
@@ -397,7 +397,7 @@ it("applies a completed production batch delivery and crosses low stock once", a
     readCurrentCommerceProjection(sql, {
       organisationId: ORGANISATION_ID.value,
       kind: "inventory_movement",
-      canonicalId: "underclerk:merchant_nuki_cafe:movement_production_input",
+      canonicalId: "commerce:merchant_nuki_cafe:movement_production_input",
     }),
   ).toMatchObject({
     ok: true,
@@ -409,7 +409,7 @@ it("applies a completed production batch delivery and crosses low stock once", a
           reason: {
             kind: "production",
             productionBatchId:
-              "underclerk:merchant_nuki_cafe:production_batch_oat_milk",
+              "commerce:merchant_nuki_cafe:production_batch_oat_milk",
             recipeRevision: 1,
           },
         },
@@ -419,12 +419,12 @@ it("applies a completed production batch delivery and crosses low stock once", a
   for (const [kind, canonicalId] of [
     [
       "inventory_movement",
-      "underclerk:merchant_nuki_cafe:movement_production_output",
+      "commerce:merchant_nuki_cafe:movement_production_output",
     ],
-    ["inventory_lot", "underclerk:merchant_nuki_cafe:lot_production_output"],
+    ["inventory_lot", "commerce:merchant_nuki_cafe:lot_production_output"],
     [
       "inventory_position",
-      "underclerk:merchant_nuki_cafe:position_cookie_cafe",
+      "commerce:merchant_nuki_cafe:position_cookie_cafe",
     ],
   ] as const) {
     expect(
@@ -446,7 +446,7 @@ it("applies a completed production batch delivery and crosses low stock once", a
       labRunId: null,
       processedAt: Date.parse("2026-08-09T00:00:01Z"),
     },
-    { kind: "satyr_commerce", revision: 4 },
+    { kind: "builtin_commerce", revision: 4 },
   );
   expect(replay).toMatchObject({
     ok: true,
@@ -484,7 +484,7 @@ it("converges to one low-stock cue when decrease deliveries arrive out of order"
         labRunId: null,
         processedAt: Date.parse("2026-08-09T00:00:02Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({
     ok: true,
@@ -505,7 +505,7 @@ it("converges to one low-stock cue when decrease deliveries arrive out of order"
         labRunId: null,
         processedAt: Date.parse("2026-08-09T00:00:03Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({
     ok: true,
@@ -543,7 +543,7 @@ it("converges when the receipt cohort arrives before the opening inventory deliv
         labRunId: null,
         processedAt: Date.parse("2026-08-14T09:30:01Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({
     ok: true,
@@ -567,7 +567,7 @@ it("converges when the receipt cohort arrives before the opening inventory deliv
         labRunId: null,
         processedAt: Date.parse("2026-08-14T09:30:02Z"),
       },
-      { kind: "satyr_commerce", revision: 4 },
+      { kind: "builtin_commerce", revision: 4 },
     ),
   ).toMatchObject({
     ok: true,
@@ -619,11 +619,11 @@ async function acceptCommerceDelivery(): Promise<boolean> {
 function firstPartyShipmentDelivery(): CommerceDeliveryV1 {
   const occurredAt = "2026-08-09T00:00:00Z";
   return {
-    schemaVersion: "underclerk.commerce-delivery.v1",
+    schemaVersion: "commerce.commerce-delivery.v1",
     deliveryId: "delivery_first_party_shipment",
     organisationId: ORGANISATION_ID.ok
       ? ORGANISATION_ID.value
-      : "organisation_underclerk_low_stock",
+      : "organisation_commerce_low_stock",
     merchantId: "merchant_nuki_cafe",
     merchantRevision: 9,
     observedAt: occurredAt,
@@ -682,7 +682,7 @@ function firstPartyShipmentDelivery(): CommerceDeliveryV1 {
       },
     ],
     signer: {
-      keyId: "key_underclerk_low_stock",
+      keyId: "key_commerce_low_stock",
       algorithm: "ed25519",
       signature: "signature",
     },
@@ -694,11 +694,11 @@ function stockPolicyCrossingDelivery(): CommerceDeliveryV1 {
   const provenance = {
     organisationId: ORGANISATION_ID.ok
       ? ORGANISATION_ID.value
-      : "organisation_underclerk_low_stock",
+      : "organisation_commerce_low_stock",
     integrationAccountId: INTEGRATION_ACCOUNT_ID.ok
       ? INTEGRATION_ACCOUNT_ID.value
-      : "integration_underclerk_low_stock",
-    source: "underclerk" as const,
+      : "integration_commerce_low_stock",
+    source: "commerce" as const,
     resourceType: "stock_policy" as const,
     resourceId: "stock_policy_oat_milk_cafe",
     revision: 1,
@@ -706,11 +706,11 @@ function stockPolicyCrossingDelivery(): CommerceDeliveryV1 {
     observedAt: occurredAt,
   };
   return {
-    schemaVersion: "underclerk.commerce-delivery.v1",
-    deliveryId: "delivery_underclerk_low_stock",
+    schemaVersion: "commerce.commerce-delivery.v1",
+    deliveryId: "delivery_commerce_low_stock",
     organisationId: ORGANISATION_ID.ok
       ? ORGANISATION_ID.value
-      : "organisation_underclerk_low_stock",
+      : "organisation_commerce_low_stock",
     merchantId: "merchant_nuki_cafe",
     merchantRevision: 1,
     observedAt: occurredAt,
@@ -807,7 +807,7 @@ function stockPolicyCrossingDelivery(): CommerceDeliveryV1 {
       },
     ],
     signer: {
-      keyId: "key_underclerk_low_stock",
+      keyId: "key_commerce_low_stock",
       algorithm: "ed25519",
       signature: "signature",
     },
@@ -915,11 +915,11 @@ function productionBatchCrossingDelivery(): CommerceDeliveryV1 {
         provenance: {
           organisationId: ORGANISATION_ID.ok
             ? ORGANISATION_ID.value
-            : "organisation_underclerk_low_stock",
+            : "organisation_commerce_low_stock",
           integrationAccountId: INTEGRATION_ACCOUNT_ID.ok
             ? INTEGRATION_ACCOUNT_ID.value
-            : "integration_underclerk_low_stock",
-          source: "underclerk",
+            : "integration_commerce_low_stock",
+          source: "commerce",
           resourceType: "production_batch",
           resourceId: "production_batch_oat_milk",
           revision: 1,
@@ -1032,11 +1032,11 @@ function stockPolicyMovementDelivery(
 ): CommerceDeliveryV1 {
   const occurredAt = "2026-08-09T00:00:00Z";
   return {
-    schemaVersion: "underclerk.commerce-delivery.v1",
+    schemaVersion: "commerce.commerce-delivery.v1",
     deliveryId,
     organisationId: ORGANISATION_ID.ok
       ? ORGANISATION_ID.value
-      : "organisation_underclerk_low_stock",
+      : "organisation_commerce_low_stock",
     merchantId: "merchant_nuki_cafe",
     merchantRevision: positionRevision,
     observedAt: occurredAt,
@@ -1074,7 +1074,7 @@ function stockPolicyMovementDelivery(
       },
     ],
     signer: {
-      keyId: "key_underclerk_low_stock",
+      keyId: "key_commerce_low_stock",
       algorithm: "ed25519",
       signature: "signature",
     },
@@ -1100,11 +1100,11 @@ async function requireNormalizedCommerceDelivery(delivery: CommerceDeliveryV1) {
 function oatOpeningDelivery(): CommerceDeliveryV1 {
   const occurredAt = "2026-08-14T09:00:00Z";
   return {
-    schemaVersion: "underclerk.commerce-delivery.v1",
+    schemaVersion: "commerce.commerce-delivery.v1",
     deliveryId: "delivery_oat_opening",
     organisationId: ORGANISATION_ID.ok
       ? ORGANISATION_ID.value
-      : "organisation_underclerk_low_stock",
+      : "organisation_commerce_low_stock",
     merchantId: "merchant_nuki_cafe",
     merchantRevision: 2,
     observedAt: occurredAt,
@@ -1171,7 +1171,7 @@ function oatOpeningDelivery(): CommerceDeliveryV1 {
       },
     ],
     signer: {
-      keyId: "key_underclerk_low_stock",
+      keyId: "key_commerce_low_stock",
       algorithm: "ed25519",
       signature: "signature",
     },
@@ -1181,11 +1181,11 @@ function oatOpeningDelivery(): CommerceDeliveryV1 {
 function oatReceiptDelivery(): CommerceDeliveryV1 {
   const occurredAt = "2026-08-14T09:30:00Z";
   return {
-    schemaVersion: "underclerk.commerce-delivery.v1",
+    schemaVersion: "commerce.commerce-delivery.v1",
     deliveryId: "delivery_oat_receipt",
     organisationId: ORGANISATION_ID.ok
       ? ORGANISATION_ID.value
-      : "organisation_underclerk_low_stock",
+      : "organisation_commerce_low_stock",
     merchantId: "merchant_nuki_cafe",
     merchantRevision: 3,
     observedAt: occurredAt,
@@ -1244,7 +1244,7 @@ function oatReceiptDelivery(): CommerceDeliveryV1 {
       },
     ],
     signer: {
-      keyId: "key_underclerk_low_stock",
+      keyId: "key_commerce_low_stock",
       algorithm: "ed25519",
       signature: "signature",
     },

@@ -149,11 +149,11 @@ async function handleQueue(
   batch: MessageBatch<unknown>,
   env: FullEnv,
 ): Promise<void> {
-  if (batch.queue !== `satyr-plan55-full-${env.DATABASE_REGION}`)
+  if (batch.queue !== `pantry-plan55-full-${env.DATABASE_REGION}`)
     throw new Error("fixture_queue_mismatch");
   await gateway.queue(
     {
-      queue: "satyr-events",
+      queue: "pantry-events",
       metadata: batch.metadata,
       messages: batch.messages,
       ackAll: batch.ackAll.bind(batch),
@@ -494,7 +494,7 @@ async function seed(rawEnv: FullEnv, actor: Region, identity: string) {
       .bind(now, scope.value.organisationId),
     database
       .prepare(
-        "INSERT OR IGNORE INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
+        "INSERT OR IGNORE INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'pantry_platform', ?, ?)",
       )
       .bind(scope.value.organisationId, owner.userId, now),
   ]);
@@ -667,8 +667,8 @@ async function turn(
         headers: {
           origin: env.PANTRY_PUBLIC_ORIGIN,
           "content-type": "application/json",
-          cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
-          "x-satyr-csrf": session.csrfToken,
+          cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
+          "x-pantry-csrf": session.csrfToken,
         },
         body: JSON.stringify({
           kind: "message",
@@ -698,7 +698,7 @@ async function turn(
     {
       headers: {
         accept: "application/x-ndjson",
-        cookie: `satyr_control_session=${session.token}; satyr_control_csrf=${session.csrfToken}`,
+        cookie: `pantry_session=${session.token}; pantry_csrf=${session.csrfToken}`,
       },
     },
   );

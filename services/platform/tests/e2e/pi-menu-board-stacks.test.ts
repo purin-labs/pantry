@@ -200,7 +200,7 @@ it(
         ],
         real: [
           "Pantry Worker and the board room",
-          "Underclerk fixture Worker",
+          "Commerce fixture Worker",
           "screen feed",
         ],
         stack: {

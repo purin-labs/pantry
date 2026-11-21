@@ -36,7 +36,7 @@ export function inPersonCollectionRejection(
   error: CommerceMutationErrorV1,
 ): CommerceInPersonCheckoutPaymentCollectionV1 {
   return {
-    schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+    schemaVersion: "commerce.in-person-checkout-payment-collection.v1",
     outcome: "rejected",
     error,
   };
@@ -47,7 +47,7 @@ export function unavailableInPersonCheckoutCollection(
   retryAfter: string,
 ): CommerceInPersonCheckoutPaymentCollectionV1 {
   return {
-    schemaVersion: "underclerk.in-person-checkout-payment-collection.v1",
+    schemaVersion: "commerce.in-person-checkout-payment-collection.v1",
     outcome: "unavailable",
     mutationOutcome: started.outcome,
     receipt: started.receipt,

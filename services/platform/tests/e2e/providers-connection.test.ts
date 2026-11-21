@@ -235,7 +235,7 @@ async function providerConnectionContract(row: ProviderCase): Promise<void> {
   const callback = await exports.default.fetch(callbackUrl);
   expect(callback.status).toBe(200);
   await expect(callback.text()).resolves.toContain(
-    "satyr.provider-attempt.completed",
+    "pantry.provider-attempt.completed",
   );
 
   const attempt = await readProviderAttempt(scenario, started.attemptId);
@@ -799,8 +799,8 @@ function controlMutationHeaders(
     origin: PUBLIC_ORIGIN,
     "content-type": "application/json",
     "idempotency-key": idempotencyKey,
-    "x-satyr-configuration-version": "1",
-    "x-satyr-csrf": session.csrfToken,
+    "x-pantry-configuration-version": "1",
+    "x-pantry-csrf": session.csrfToken,
   };
 }
 
@@ -878,7 +878,7 @@ const slackChannelsResolver: HttpResponseResolver = ({ request }) => {
 const stripeWebhookResolver: HttpResponseResolver = ({ request }) => {
   recordProviderCall("stripe", "webhook.verify", request);
   expect(request.headers.get("authorization")).toBe(
-    "Bearer sk_test_satyr_platform_e2e",
+    "Bearer sk_test_pantry_platform_e2e",
   );
   return HttpResponse.json({
     id: "we_e2e",
@@ -891,7 +891,7 @@ const stripeWebhookResolver: HttpResponseResolver = ({ request }) => {
 const stripeOAuthResolver: HttpResponseResolver = async ({ request }) => {
   recordProviderCall("stripe", "oauth.exchange", request);
   const form = await request.formData();
-  expect(form.get("client_secret")).toBe("sk_test_satyr_platform_e2e");
+  expect(form.get("client_secret")).toBe("sk_test_pantry_platform_e2e");
   expect(form.get("grant_type")).toBe("authorization_code");
   return HttpResponse.json({
     access_token: providerCredential("stripe"),
@@ -1092,7 +1092,7 @@ const shopifyGraphqlResolver: HttpResponseResolver = async ({ request }) => {
   );
   const body = await readGraphqlRequest(request);
   recordProviderCall("shopify", shopifyGraphqlOperation(body.query), request);
-  if (body.query.includes("SatyrOnboardingShop")) {
+  if (body.query.includes("PantryOnboardingShop")) {
     return HttpResponse.json({
       data: {
         shop: {
@@ -1104,10 +1104,10 @@ const shopifyGraphqlResolver: HttpResponseResolver = async ({ request }) => {
       },
     });
   }
-  if (body.query.includes("SatyrWebhookSubscriptions")) {
+  if (body.query.includes("PantryWebhookSubscriptions")) {
     return HttpResponse.json({ data: { webhookSubscriptions: { nodes: [] } } });
   }
-  if (body.query.includes("SatyrWebhookSubscriptionCreate")) {
+  if (body.query.includes("PantryWebhookSubscriptionCreate")) {
     const topic = requireString(body.variables.topic, "Shopify webhook topic");
     const webhook = requireRecord(
       body.variables.webhookSubscription,
@@ -1131,7 +1131,7 @@ const shopifyGraphqlResolver: HttpResponseResolver = async ({ request }) => {
 };
 
 function shopifyGraphqlOperation(query: string): string {
-  const matched = /(?:query|mutation)\s+(Satyr[A-Za-z]+)/u.exec(query);
+  const matched = /(?:query|mutation)\s+(Pantry[A-Za-z]+)/u.exec(query);
   return matched?.[1] ?? "graphql.unknown";
 }
 
@@ -1228,17 +1228,17 @@ async function readGraphqlRequest(request: {
 function shopifyInitialSnapshot(query: string) {
   const pageInfo = { hasNextPage: false, endCursor: null };
   if (
-    query.includes("SatyrInitialCatalog") ||
-    query.includes("SatyrInitialPublications")
+    query.includes("PantryInitialCatalog") ||
+    query.includes("PantryInitialPublications")
   ) {
     return HttpResponse.json({ data: { products: { nodes: [], pageInfo } } });
   }
-  if (query.includes("SatyrInitialInventory")) {
+  if (query.includes("PantryInitialInventory")) {
     return HttpResponse.json({
       data: { inventoryItems: { nodes: [], pageInfo } },
     });
   }
-  if (query.includes("SatyrInitialOrders")) {
+  if (query.includes("PantryInitialOrders")) {
     return HttpResponse.json({ data: { orders: { nodes: [], pageInfo } } });
   }
   throw new Error("unexpected Shopify GraphQL operation");

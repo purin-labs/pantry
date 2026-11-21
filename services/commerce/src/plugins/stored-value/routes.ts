@@ -34,19 +34,19 @@ export const STORED_VALUE_ROUTES: readonly RouteDefinition<StoredValueRoute>[] =
       "POST",
       "/v1/admin/merchants/:merchantId/gift-cards",
       "issue_gift_card",
-      "underclerk.issue-gift-card.v1",
+      "commerce.issue-gift-card.v1",
     ),
     route(
       "POST",
       "/v1/admin/merchants/:merchantId/store-credit",
       "credit_store_credit",
-      "underclerk.credit-store-credit.v1",
+      "commerce.credit-store-credit.v1",
     ),
     route(
       "POST",
       "/v1/admin/merchants/:merchantId/stored-value-accounts/:accountId/disable",
       "disable_stored_value_account",
-      "underclerk.disable-stored-value-account.v1",
+      "commerce.disable-stored-value-account.v1",
     ),
     route(
       "GET",

@@ -97,7 +97,7 @@ async function createBuyerSessionRoute(
     buyer,
   });
   return jsonResponse(200, {
-    schemaVersion: "underclerk.buyer-session.v4",
+    schemaVersion: "commerce.buyer-session.v4",
     token: issued.token,
     expiresAt: issued.claims.expiresAt,
     storefrontRevision: issued.claims.storefrontRevision,

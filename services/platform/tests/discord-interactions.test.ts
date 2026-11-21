@@ -14,14 +14,14 @@ import {
 import { bytesToHex } from "@purin-labs/std";
 
 describe("Discord interactions boundary", function discordInteractionSuite() {
-  it("parses the explicit /satyr link command", function parsesLinkCommand() {
+  it("parses the explicit /pantry link command", function parsesLinkCommand() {
     const interaction = parseDiscordInteraction(
       {
         type: 2,
         application_id: "11568910548192",
         guild_id: "11539475695701",
         data: {
-          name: "satyr",
+          name: "pantry",
           options: [{ type: 1, name: "link" }],
         },
         member: {
@@ -57,7 +57,7 @@ describe("Discord interactions boundary", function discordInteractionSuite() {
           type: 2,
           application_id: "99999999999999",
           guild_id: "11539475695701",
-          data: { name: "satyr", options: [{ type: 1, name: "link" }] },
+          data: { name: "pantry", options: [{ type: 1, name: "link" }] },
           member: { user: { id: "11540859491174", username: "peita" } },
         },
         requireApplicationId(),

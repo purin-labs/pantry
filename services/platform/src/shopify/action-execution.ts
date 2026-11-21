@@ -105,7 +105,7 @@ type ShopifyOrderCancellationReconciliationError =
   | { code: "shopify_reconciliation_response_invalid" };
 
 const SHOPIFY_ORDER_CANCELLATION_RECONCILIATION_QUERY = `
-  query SatyrOrderCancellationReconciliation($orderId: ID!) {
+  query PantryOrderCancellationReconciliation($orderId: ID!) {
     order(id: $orderId) {
       id
       cancelledAt

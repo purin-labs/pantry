@@ -3,7 +3,7 @@ import { defineExtension, defineTask } from "@earendil-works/pi-durable";
 
 const abortOrder = [];
 const OwnershipProbe = defineTask({
-  name: "satyr.trial.ownership",
+  name: "pantry.trial.ownership",
   version: 1,
   initial: initialProbe,
   phases: { waiting: waitForAbort },
@@ -69,7 +69,7 @@ async function readProbeTasks(harness, ids) {
 
 export async function exerciseTaskOwnership(harness, registry) {
   const extension = defineExtension({
-    name: "satyr.trial.ownership",
+    name: "pantry.trial.ownership",
     tasks: [OwnershipProbe],
   });
   registry.install(extension);
@@ -98,7 +98,7 @@ export async function createTaskHistoryFixture(
   conversationId,
 ) {
   registry.install(
-    defineExtension({ name: "satyr.trial.ownership", tasks: [OwnershipProbe] }),
+    defineExtension({ name: "pantry.trial.ownership", tasks: [OwnershipProbe] }),
   );
   const ids = await harness.commit(
     createHistoryTasks.bind(null, conversationId),

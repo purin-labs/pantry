@@ -490,7 +490,7 @@ export type CommerceCounterCashTenderV1 = WireAdmin.CommerceCounterCashTenderV1;
 
 export type CommerceInPersonCheckoutPaymentCollectionV1 =
   | Readonly<{
-      schemaVersion: "underclerk.in-person-checkout-payment-collection.v1";
+      schemaVersion: "commerce.in-person-checkout-payment-collection.v1";
       outcome: "ready";
       mutationOutcome: "applied" | "replayed";
       receipt: CommerceMutationReceiptV1;
@@ -501,14 +501,14 @@ export type CommerceInPersonCheckoutPaymentCollectionV1 =
       >["session"];
     }>
   | Readonly<{
-      schemaVersion: "underclerk.in-person-checkout-payment-collection.v1";
+      schemaVersion: "commerce.in-person-checkout-payment-collection.v1";
       outcome: "unavailable";
       mutationOutcome: "applied" | "replayed";
       receipt: CommerceMutationReceiptV1;
       retryAfter: string;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.in-person-checkout-payment-collection.v1";
+      schemaVersion: "commerce.in-person-checkout-payment-collection.v1";
       outcome: "rejected";
       error: CommerceMutationErrorV1;
     }>;
@@ -1313,7 +1313,7 @@ export class CommerceAdminClient {
         method: "GET",
         headers: {
           authorization: `Bearer ${token}`,
-          ...(this.#actor === undefined ? {} : { "underclerk-actor": this.#actor }),
+          ...(this.#actor === undefined ? {} : { "commerce-actor": this.#actor }),
         },
       });
     } catch (error) {
@@ -1957,7 +1957,7 @@ export class CommerceAdminClient {
       {
         method: "POST",
         body: JSON.stringify({
-          schemaVersion: "underclerk.preview-plugin-change.v1",
+          schemaVersion: "commerce.preview-plugin-change.v1",
           change,
         }),
       },
@@ -2651,7 +2651,7 @@ export class CommerceAdminClient {
           authorization: `Bearer ${token}`,
           ...(this.#actor === undefined
             ? {}
-            : { "underclerk-actor": this.#actor }),
+            : { "commerce-actor": this.#actor }),
           ...(init.idempotencyKey === undefined
             ? {}
             : { "idempotency-key": init.idempotencyKey }),

@@ -197,8 +197,8 @@ function mutationRequest(suffix: string, body: unknown): Request {
       headers: {
         "content-type": "application/json",
         cookie:
-          "satyr_control_session=access-mutation; satyr_control_csrf=csrf-token",
-        "x-satyr-csrf": "csrf-token",
+          "pantry_session=access-mutation; pantry_csrf=csrf-token",
+        "x-pantry-csrf": "csrf-token",
         origin: "https://pantry.example",
         "idempotency-key": "access-mutation-request-1",
       },

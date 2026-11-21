@@ -68,7 +68,7 @@ type CustomerCommandBase = Readonly<{
 
 export type CreateCommerceCustomerV1 = CustomerCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.create-customer.v1";
+    schemaVersion: "commerce.create-customer.v1";
     email: string;
     name: string | null;
     phone: string | null;
@@ -78,7 +78,7 @@ export type CreateCommerceCustomerV1 = CustomerCommandBase &
 
 export type UpdateCommerceCustomerV1 = CustomerCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.update-customer.v1";
+    schemaVersion: "commerce.update-customer.v1";
     expectedRevision: number;
     /** Only the named fields change. */
     changes: Readonly<{
@@ -95,7 +95,7 @@ export type UpdateCommerceCustomerV1 = CustomerCommandBase &
 
 export type EraseCommerceCustomerV1 = CustomerCommandBase &
   Readonly<{
-    schemaVersion: "underclerk.erase-customer.v1";
+    schemaVersion: "commerce.erase-customer.v1";
     expectedRevision: number;
     reason: string;
   }>;
@@ -107,42 +107,42 @@ export type CommerceCustomerCommandV1 =
 
 /** Everything the merchant holds about one customer. */
 export type CommerceCustomerExportV1 = Readonly<{
-  schemaVersion: "underclerk.customer-export.v1";
+  schemaVersion: "commerce.customer-export.v1";
   customer: CommerceCustomerV1;
   exportedAt: CommerceEngineTimestamp;
 }>;
 
 export type RequestCommerceCustomerSignInV1 = Readonly<{
-  schemaVersion: "underclerk.request-customer-sign-in.v1";
+  schemaVersion: "commerce.request-customer-sign-in.v1";
   email: string;
 }>;
 
 export type CommerceCustomerSignInChallengeV1 = Readonly<{
-  schemaVersion: "underclerk.customer-sign-in-challenge.v1";
+  schemaVersion: "commerce.customer-sign-in-challenge.v1";
   challengeId: string;
   expiresAt: CommerceEngineTimestamp;
 }>;
 
 export type VerifyCommerceCustomerSignInV1 = Readonly<{
-  schemaVersion: "underclerk.verify-customer-sign-in.v1";
+  schemaVersion: "commerce.verify-customer-sign-in.v1";
   code: string;
 }>;
 
 /** A signed-in buyer's token; a buyer session is made from it. */
 export type CommerceCustomerAccessV1 = Readonly<{
-  schemaVersion: "underclerk.customer-access.v1";
+  schemaVersion: "commerce.customer-access.v1";
   customerAccessToken: string;
   expiresAt: CommerceEngineTimestamp;
 }>;
 
 export type SaveCommerceCustomerAddressV1 = Readonly<{
-  schemaVersion: "underclerk.save-customer-address.v1";
+  schemaVersion: "commerce.save-customer-address.v1";
   address: CommerceCustomerAddressInputV1;
 }>;
 
 /** What a signed-in buyer sees of their own account. */
 export type CommerceBuyerCustomerV1 = Readonly<{
-  schemaVersion: "underclerk.buyer-customer.v1";
+  schemaVersion: "commerce.buyer-customer.v1";
   email: string;
   name: string | null;
   addresses: readonly CommerceCustomerAddressV1[];

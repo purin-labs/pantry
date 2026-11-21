@@ -55,7 +55,7 @@ export function parseTerminalAssignment(
       "assignmentId",
       "organisationId",
       "merchantId",
-      "satyrLocationId",
+      "pantryLocationId",
       "account",
       "providerLocationId",
       "target",
@@ -79,8 +79,8 @@ export function parseTerminalAssignment(
   const merchantId = readText(raw.merchantId, "terminalAssignment.merchantId");
   if (!merchantId.ok) return merchantId;
   const pantryLocationId = readText(
-    raw.satyrLocationId,
-    "terminalAssignment.satyrLocationId",
+    raw.pantryLocationId,
+    "terminalAssignment.pantryLocationId",
   );
   if (!pantryLocationId.ok) return pantryLocationId;
   const account = parsePaymentProviderAccountBinding(raw.account);
@@ -120,7 +120,7 @@ export function parseTerminalAssignment(
       assignmentId: assignmentId.value,
       organisationId: organisationId.value,
       merchantId: merchantId.value as CommerceMerchantId,
-      satyrLocationId: pantryLocationId.value,
+      pantryLocationId: pantryLocationId.value,
       account: account.value,
       providerLocationId: providerLocationId.value,
       target: target.value,
@@ -226,7 +226,7 @@ export function parseTerminalPairingAttempt(
       "attemptId",
       "organisationId",
       "merchantId",
-      "satyrLocationId",
+      "pantryLocationId",
       "account",
       "providerLocationId",
       "state",
@@ -246,8 +246,8 @@ export function parseTerminalPairingAttempt(
   );
   if (!merchantId.ok) return merchantId;
   const pantryLocationId = readText(
-    raw.satyrLocationId,
-    "terminalPairingAttempt.satyrLocationId",
+    raw.pantryLocationId,
+    "terminalPairingAttempt.pantryLocationId",
   );
   if (!pantryLocationId.ok) return pantryLocationId;
   const account = parsePaymentProviderAccountBinding(raw.account);
@@ -270,7 +270,7 @@ export function parseTerminalPairingAttempt(
       attemptId: attemptId.value,
       organisationId: organisationId.value,
       merchantId: merchantId.value as CommerceMerchantId,
-      satyrLocationId: pantryLocationId.value,
+      pantryLocationId: pantryLocationId.value,
       account: account.value,
       providerLocationId: providerLocationId.value,
       state: state.value,

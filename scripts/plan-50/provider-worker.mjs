@@ -70,7 +70,7 @@ export class ProposalOrganisation extends ProposalOrganisationOwner {
         "UPDATE service_role_grant SET role = 'owner' WHERE organisation_id = ? AND user_id = ?",
       ).bind(organisationId, userId),
       this.env.DB.prepare(
-        "UPDATE underclerk_merchant_binding SET delivery_signing_key_id = 'key_native_provider', delivery_signing_public_key_b64 = ? WHERE organisation_id = ? AND integration_account_id = ?",
+        "UPDATE commerce_merchant_binding SET delivery_signing_key_id = 'key_native_provider', delivery_signing_public_key_b64 = ? WHERE organisation_id = ? AND integration_account_id = ?",
       ).bind(
         "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         organisationId,
@@ -87,9 +87,9 @@ export class ProposalOrganisation extends ProposalOrganisationOwner {
       ).bind(now, organisationId),
     ]);
     const client = new CommerceAdminClient({
-      baseUrl: this.env.UNDERCLERK_BASE_URL,
-      serviceToken: this.env.UNDERCLERK_SERVICE_TOKEN,
-      fetch: this.env.UNDERCLERK.fetch.bind(this.env.UNDERCLERK),
+      baseUrl: this.env.COMMERCE_BASE_URL,
+      serviceToken: this.env.COMMERCE_SERVICE_TOKEN,
+      fetch: this.env.COMMERCE.fetch.bind(this.env.COMMERCE),
     });
     const offer = await prepareProviderOffer(client);
     const current = required(
@@ -226,7 +226,7 @@ export class CandidateActor extends ProposalActor {
       name: route.provider.name,
       auth: {
         apiKey: {
-          name: "Satyr admission",
+          name: "Pantry admission",
           resolve: this.nativeModelAuth.bind(this),
         },
       },
@@ -548,7 +548,7 @@ async function prepareProviderOffer(client) {
   const now = new Date().toISOString();
   const provisioned = required(
     await client.provisionMerchant({
-      schemaVersion: "underclerk.provision-merchant.v2",
+      schemaVersion: "commerce.provision-merchant.v2",
       externalReference: organisationId,
       merchantId,
       createdAt: now,

@@ -614,8 +614,8 @@ async function readDraftSource(
     return sourceUnavailable();
   if (
     !authority.ok ||
-    authority.value.provider !== "underclerk" ||
-    authority.value.commerceSystem.kind !== "satyr_commerce"
+    authority.value.provider !== "commerce" ||
+    authority.value.commerceSystem.kind !== "builtin_commerce"
   )
     return sourceUnavailable();
   const merchantId = authority.value.commerceSystem.merchantId;
@@ -634,7 +634,7 @@ async function readDraftSource(
       record.ok &&
       record.value !== null &&
       record.value.kind === "product" &&
-      record.value.projection.projection.provenance.source === "underclerk" &&
+      record.value.projection.projection.provenance.source === "commerce" &&
       Date.now() - record.value.validatedAt <=
         COMMERCE_PROJECTION_STALE_AFTER_MS
     ) {
@@ -698,7 +698,7 @@ async function fetchDraftSource(
 ): Promise<Response> {
   if (!(await isOrganisationExecutionActive(sql, scope)))
     throw new Error("organisation_placement_conflict");
-  return env.UNDERCLERK.fetch(request, init);
+  return env.COMMERCE.fetch(request, init);
 }
 
 function draftPlacementConflict(): Result<

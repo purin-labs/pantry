@@ -19,7 +19,7 @@ import {
 } from "@purin-labs/commerce-contracts/records/api-after-sale";
 
 export type CancelCommerceOrderV1 = Readonly<{
-  schemaVersion: "underclerk.cancel-order.v1";
+  schemaVersion: "commerce.cancel-order.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -35,7 +35,7 @@ export type CancelCommerceOrderV1 = Readonly<{
 }>;
 
 export type RefundCommerceOrderV1 = Readonly<{
-  schemaVersion: "underclerk.refund-order.v1";
+  schemaVersion: "commerce.refund-order.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -57,7 +57,7 @@ export type RefundCommerceOrderV1 = Readonly<{
 }>;
 
 export type RecordCommerceCounterManualCashRefundV1 = Readonly<{
-  schemaVersion: "underclerk.record-counter-manual-cash-refund.v1";
+  schemaVersion: "commerce.record-counter-manual-cash-refund.v1";
   merchantId: string;
   expectedMerchantRevision: number;
   idempotencyKey: string;
@@ -81,7 +81,7 @@ export type RecordCommerceCounterManualCashRefundV1 = Readonly<{
  * one payment, with the refund attempt `<refundId>_<digest of paymentId>`.
  */
 export type RefundCommerceOrderTendersV1 = Readonly<{
-  schemaVersion: "underclerk.refund-order-tenders.v1";
+  schemaVersion: "commerce.refund-order-tenders.v1";
   merchantId: string;
   idempotencyKey: string;
   requestedAt: string;
@@ -107,12 +107,12 @@ export type CommerceTenderRefundPartV1 = Readonly<{
  */
 export type CommerceTenderRefundV1 =
   | Readonly<{
-      schemaVersion: "underclerk.tender-refund.v1";
+      schemaVersion: "commerce.tender-refund.v1";
       outcome: "rejected";
       error: CommerceMutationErrorV1;
     }>
   | Readonly<{
-      schemaVersion: "underclerk.tender-refund.v1";
+      schemaVersion: "commerce.tender-refund.v1";
       outcome: "split";
       orderId: string;
       parts: readonly CommerceTenderRefundPartV1[];
