@@ -345,24 +345,23 @@ the state of the branches and the way to continue.
 
 ### The end of Stage A: the state of the exit list
 
-| Item                                                    | State                                                                                               |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| The ratchet of `lint:layers` is near zero, with reasons | Done: 10 crossings, each with a reason and a fix in `reasons` of `scripts/layers-ratchet.json`      |
-| Each area has a list of its files, tables, public files | Done: `node scripts/check-layers.mjs --areas` and [`docs/layers.md`](layers.md)                     |
-| No public export without a user in another module       | Done: 17 unused exports stay, each with a reason (the dead code entry of [Steps done](#steps-done)) |
-| No test file without a decision                         | Done: [`refactor-17-test-decisions.md`](refactor-17-test-decisions.md), 317 files                   |
-| The time of the first three ports is measured           | Done: [Cost](#cost)                                                                                 |
-| The owner decides Stage B                               | Decided on 2026-11-21: Stage B waits for the Plan 93 cutover ([D2](#decisions))                     |
+| Item                                                    | State                                                                                                    |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| The ratchet of `lint:layers` is near zero, with reasons | Done: 0 crossings. A new crossing needs a reason and a fix in `reasons` of `scripts/layers-ratchet.json` |
+| Each area has a list of its files, tables, public files | Done: `node scripts/check-layers.mjs --areas` and [`docs/layers.md`](layers.md)                          |
+| No public export without a user in another module       | Done: 17 unused exports stay, each with a reason (the dead code entry of [Steps done](#steps-done))      |
+| No test file without a decision                         | Done: [`refactor-17-test-decisions.md`](refactor-17-test-decisions.md), 317 files                        |
+| The time of the first three ports is measured           | Done: [Cost](#cost)                                                                                      |
+| The owner decides Stage B                               | Decided on 2026-11-21: Stage B waits for the Plan 93 cutover ([D2](#decisions))                          |
 
 ### Stage A: the tail
 
-1. **The 10 crossings.** Each one has a fix in its reason. In work on 2026-11-21, not on
-   `dev`: the branch `refactor-17-last10-portal` (the chat port of the Café prompt edit,
-   the Stripe part of the integrations page, and an opaque surface state of the chat
-   record with a surface registry for the Kitchen) and the branch
-   `refactor-17-last10-actor` (an activation module of `OrganisationDO`, and the
-   shared ids below both contract packages). Each needs a full E2E run on the merge and
-   the owner's agreement before a landing.
+1. **The last 10 crossings are gone: the layer count is 0.** The fixes: a chat port of
+   the Café prompt edit, the Stripe part of the integrations page through the Portal
+   wiring, an opaque page state of the chat record with a surface registry for the
+   Kitchen, an activation module of `OrganisationDO`, and the shared ids
+   (`OrganisationId`, `IntegrationAccountId`) in `@purin-labs/contract-schema`, below
+   both contract packages. `packages/contracts` names no commerce package now.
 2. **Owner decisions of step A2.1** ([Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)):
    one look for each kind of decision (the reject label and its confirm, the approval
    flow of a custom connector write, the two texts of a permission request, the three
@@ -413,12 +412,11 @@ draft at step 2 on 2026-11-21. Then, in this order:
 ## Steps done
 
 **The state on `dev`, 21 November 2026.** Each entry below that names a branch is on
-`dev` now, up to and with the test decisions and the area page. They landed in eight
-pushes; the owner agreed to each one. The full E2E suite passed on each merge
+`dev` now, up to and with the last 10 crossings. They landed in ten pushes; the owner agreed to each one. The full E2E suite passed on each merge
 before its push: 236 files and 457 or 458 tests, with 3 files skipped (they need a
 real model). In two of those runs `counter-receipt-printer.test.ts` failed under the
-load of the machine and passed alone three times. The layer count on `dev` is 10
-(1,350 at the start of the refactor), and each of the 10 has a written reason. An entry that says "the full E2E suite did not
+load of the machine and passed alone three times. The layer count on `dev` is 0
+(1,350 at the start of the refactor). An entry that says "the full E2E suite did not
 run on the branch" is about the worker branch; the merge ran it.
 
 **20 November 2026. Step A0 and step S1 are done.** The owner agreed to the landing,
