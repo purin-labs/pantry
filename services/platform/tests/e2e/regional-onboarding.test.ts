@@ -31,7 +31,6 @@ import {
   finishRegionalProviderRetry,
 } from "./regional-provider-retry-support";
 import {
-  attachRegionalAccounts,
   regionalHarnessJourney,
   verifyConversationWriteFence,
 } from "./regional-harness-support";
@@ -200,7 +199,6 @@ async function regionalOnboardingJourney({ task }: TestContext): Promise<void> {
       ],
     });
   }
-  await attachRegionalAccounts(west, east);
   await regionalHarnessJourney(west, east, "initial");
   await regionalHarnessJourney(east, west, "initial");
   await verifyConversationWriteFence(west, "active");
@@ -2002,7 +2000,6 @@ async function regionalRetirementRecoveryJourney({
     now: Date.now(),
   });
   if (!retired.ok) throw new Error(retired.error.code);
-  await attachRegionalAccounts(source);
   const canvas = await seedRegionalCanvas(source);
   const target = parseOrganisationPlacementMoveTarget({
     kind: "affinity",

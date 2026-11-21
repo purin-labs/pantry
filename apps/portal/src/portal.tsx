@@ -493,9 +493,9 @@ export class ControlPortalApp extends React.Component<
    * read keeps the organisation list on screen in place of the loading page.
    */
   async completeAccountSetup(
-    nativeOrganizationId: string,
+    organisationId: string,
   ): Promise<AccountSetupListing> {
-    const listed = this.accountSetupListing(nativeOrganizationId);
+    const listed = this.accountSetupListing(organisationId);
     if (listed !== null) {
       return listed;
     }
@@ -503,19 +503,15 @@ export class ControlPortalApp extends React.Component<
     await this.load();
     // `this.state` holds the new session only after React renders it.
     await new Promise<void>(this.forceUpdate.bind(this));
-    return (
-      this.accountSetupListing(nativeOrganizationId) ?? { kind: "missing" }
-    );
+    return this.accountSetupListing(organisationId) ?? { kind: "missing" };
   }
 
-  accountSetupListing(
-    nativeOrganizationId: string,
-  ): AccountSetupListing | null {
+  accountSetupListing(organisationId: string): AccountSetupListing | null {
     if (this.state.kind !== "organisation_list") {
       return null;
     }
     for (const membership of this.state.memberships) {
-      if (membership.organisationId === nativeOrganizationId) {
+      if (membership.organisationId === organisationId) {
         return {
           kind: "listed",
           organisationHandle: membership.organisationHandle,

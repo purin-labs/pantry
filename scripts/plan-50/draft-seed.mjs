@@ -9,7 +9,7 @@ import {
   parseOrganisationId,
   parseUserId,
 } from "../../services/platform/src/ids.ts";
-import { attachTrialOrganisation, ownerUser } from "./account-authority.mjs";
+import { ownerUser } from "./account-authority.mjs";
 
 const organisationId = required(
   parseOrganisationId("organisation_plan50_seams"),
@@ -144,30 +144,4 @@ function baseProjectEditor(db, projectId, userId) {
       "INSERT INTO project_member (organisation_id, project_id, user_id, role) VALUES (?, ?, ?, 'editor')",
     )
     .bind(organisationId, projectId, userId);
-}
-
-/**
- * The Organisation of a trial whose turns run as the trial workflow: its D1
- * schema and seeds, linked to the account Worker, with the workflow admitted.
- * Billing admission reads that link.
- */
-export async function seedTrialWorkflowAccount(env) {
-  const present = await env.DB.prepare(
-    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'organisation'",
-  ).first();
-  if (present !== null) return;
-  await env.DB.batch(
-    JSON.parse(env.FIXTURE_QUERIES).map((query) => env.DB.prepare(query)),
-  );
-  await seedDraftAuthority(env.DB);
-  await env.DB.prepare(
-    "INSERT INTO cue_subscription (organisation_id, subscription_id, version, surface_scope, source, event_type, action, enabled) VALUES (?, 'workflow_plan50_seams', 1, '{}', 'trial', 'trial_turn', '{}', 1)",
-  )
-    .bind(organisationId)
-    .run();
-  await attachTrialOrganisation(env, {
-    organisationId,
-    ownerUserId: ownerUser,
-    members: { operator: agentUser, privateMember: humanUser },
-  });
 }

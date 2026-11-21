@@ -7,6 +7,13 @@ export function organisationRecordPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}`;
 }
 
+/** The Google sign-in. It comes back to `returnTo`, by default this page. */
+export function signInPath(
+  returnTo: string = window.location.pathname + window.location.search,
+): string {
+  return `/v1/control/auth/google/start?${new URLSearchParams({ returnTo }).toString()}`;
+}
+
 /** A path under one Organisation's record, such as `devices`. */
 export function controlPath(organisationId: string, suffix: string): string {
   return `${organisationRecordPath(organisationId)}/${suffix}`;

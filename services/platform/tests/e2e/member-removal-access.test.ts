@@ -49,9 +49,7 @@ type Member = Readonly<{
 async function memberRemovalJourney(context: TestContext): Promise<void> {
   const joining = await commerceClient(`removal-${crypto.randomUUID()}`);
   const personId = `person_${crypto.randomUUID()}`;
-  const { ownerSession } = await installSlackActorFixture({
-    extraMembers: [{ client: joining, laterPersonId: personId }],
-  });
+  const { ownerSession } = await installSlackActorFixture();
   const member = await addAdmin(joining, personId);
   await fixtureDatabase()
     .prepare(

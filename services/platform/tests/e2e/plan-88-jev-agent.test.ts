@@ -31,7 +31,7 @@ import {
 } from "./memory-support";
 import { network } from "./network";
 import { allowAsPortal } from "./permission-request-support";
-import { nativeServiceMemberMutation } from "./shared-account-platform-fixture";
+import { memberMutation } from "./organisation-fixture";
 import {
   offeredToolNames,
   openRouterText,
@@ -133,7 +133,7 @@ it(
     const onAgain = await chat(fixture, reviewer, "SCREENON");
     const onCard = await onlyDraft(fixture, reviewer, onAgain);
     expect(onCard.summary).toBe("Turn on Screen relevance in Settings › Jev.");
-    const demoted = await nativeServiceMemberMutation(
+    const demoted = await memberMutation(
       organisationId,
       author,
       reviewer,

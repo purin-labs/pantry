@@ -16,9 +16,7 @@ import {
 } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { authorizeCapabilityUse } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
 import {
-  attachTrialOrganisation,
   compileTrialTurnAuthority,
-  ownerUser,
   trialAccountAccess,
 } from "./account-authority.mjs";
 import { acceptedExecutionAuthority } from "../../services/platform/src/organisation-access/access.ts";
@@ -145,20 +143,7 @@ export class ProposalOrganisation extends OrganisationDO {
       offerId,
       accountId,
     );
-    await this.attachTrialAccount();
     await this.ctx.storage.put("proposal_fixture_installed", true);
-  }
-
-  // The account Worker admits the trial's workflow turns.
-  async attachTrialAccount() {
-    await attachTrialOrganisation(this.env, {
-      organisationId,
-      ownerUserId: ownerUser,
-      members: {
-        operator: userId,
-        privateMember: "user_22222222-2222-5222-8222-222222222222",
-      },
-    });
   }
 
   evidence() {

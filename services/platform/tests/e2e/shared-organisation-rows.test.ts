@@ -25,7 +25,6 @@ import {
   connectCommerceFixture,
 } from "./commerce-support";
 import { organisationDatabase } from "./organisation-database";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -218,11 +217,6 @@ async function checkoutProfileReplayJourney({
     owner.identity.userId,
     merchantId,
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const idempotencyKey = `checkout-${crypto.randomUUID()}`;
   const body = JSON.stringify({
     checkoutProfileId: "checkout_domestic",

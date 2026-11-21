@@ -4,7 +4,6 @@ import {
   type JevFeaturesView,
 } from "@purin-labs/control-api/portal/jev-features";
 import { assertNever } from "@purin-labs/std";
-import { resolvePantryAccountBinding } from "../account-platform/binding";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import { readCaseContextDiscoveryPolicy } from "../case-context-discovery/evaluation-store";
 import {
@@ -25,7 +24,6 @@ import type { PolicyJevPort } from "../actors/organisation/organisation-policy";
 import {
   JEV_RELATED_CASES_LIMITS,
   jevAllowanceView,
-  jevFreeUseCovers,
 } from "./limits";
 import {
   disableJevMailClassification,
@@ -34,7 +32,7 @@ import {
   repinJevMailClassification,
 } from "./mail-switch";
 import {
-  ensureJevPaidHold,
+  JEV_PAID_USE_OPEN,
   readJevPaidSpendMinor,
   readJevPaidUse,
   writeJevPaidUse,
@@ -107,14 +105,6 @@ export async function readJevFeaturesForOrganisation(
     sql,
     scope.organisationId,
   ).policy;
-  const binding = await resolvePantryAccountBinding(
-    host.env,
-    scope.organisationId,
-  );
-  if (!(await isOrganisationExecutionActive(sql, scope)))
-    return organisationPlacementConflict();
-  // The owner approved the Jev price for every account (D9).
-  const priced = binding.ok ? true : null;
   return {
     ok: true,
     value: {
@@ -150,7 +140,7 @@ export async function readJevFeaturesForOrganisation(
           scope.organisationId,
           Date.now(),
         ),
-        priced,
+        priced: JEV_PAID_USE_OPEN,
       },
     },
   };
@@ -168,6 +158,9 @@ export async function manageJevPaidUseForOrganisation(
   const command = parseJevPaidUseCommand(input.body);
   if (command === null)
     return { ok: false, error: { code: "jev_paid_use_invalid" } };
+  // Paid use is closed until Pantry's own billing (Plan 95 step 6).
+  if (command.enabled && !JEV_PAID_USE_OPEN)
+    return { ok: false, error: { code: "jev_paid_use_closed" } };
   if (!(await isOrganisationExecutionActive(host.storage.sql, scope)))
     return organisationPlacementConflict();
   host.storage.transactionSync(
@@ -298,24 +291,9 @@ export async function manageJevFeatureForOrganisation(
 }
 
 /**
- * The Jev parts that two policy commands of the Organisation call: the repin
- * of mail classification after a change of the TypeSafe authority, and the
- * paid hold before a relationship evaluation.
+ * The Jev part that a policy command of the Organisation calls: the repin of
+ * mail classification after a change of the TypeSafe authority.
  */
 export const JEV_FOR_POLICY: PolicyJevPort = {
   repinMailClassification: repinJevMailClassification,
-  ensurePaidHold: (input) =>
-    ensureJevPaidHold({
-      sql: input.sql,
-      env: input.env,
-      organisationId: input.organisationId,
-      purpose: input.purpose,
-      freeUseCovers: jevFreeUseCovers(
-        input.sql,
-        input.organisationId,
-        input.reservationMicrousd,
-        input.now,
-      ),
-      now: input.now,
-    }),
 };

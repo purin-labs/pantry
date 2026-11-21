@@ -31,13 +31,12 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
 import {
-  activateSharedAccountNativeTenant,
-  addNativeServiceMember,
-  attachSharedAccountNativeOrganisation,
-  nativeAccountRequest,
-  selectSharedAccountModelRoute,
-  type SharedAccountNativeClient,
-} from "./shared-account-platform-fixture";
+  activateOrganisation,
+  addOrganisationMember,
+  controlRequest,
+  selectModelRoute,
+  type OrganisationClient,
+} from "./organisation-fixture";
 import { openRouterText } from "./slack-journey-support";
 import type { OrganisationActorStub } from "../../src/env";
 
@@ -45,7 +44,7 @@ const CUTOFF_INSTRUCTION =
   "Remember that our primary supplier closes next-day orders at noon Sydney time.";
 
 /** One person of the fixture Organisation, with their control session. */
-export type Member = SharedAccountNativeClient &
+export type Member = OrganisationClient &
   Readonly<{
     organisationId: OrganisationId;
     userId: UserId;
@@ -95,17 +94,8 @@ export async function installMemoryFixture(): Promise<MemoryFixture> {
   );
   const viewer = await nativeMember(organisationId, "memory-viewer", "viewer");
   const outsider = await commerceClient("memory-outsider");
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: reviewer, privateMember: viewer },
-  });
-  const route = await selectSharedAccountModelRoute(
-    organisationId,
-    owner,
-    "satyr_platform",
-  );
-  await activateSharedAccountNativeTenant(organisationId);
+  const route = await selectModelRoute(organisationId, owner, "satyr_platform");
+  await activateOrganisation(organisationId);
   network.use(
     http.post("https://openrouter.ai/api/v1/chat/completions", () =>
       openRouterText(
@@ -139,15 +129,15 @@ async function nativeMember(
   organisationId: OrganisationId,
   subject: string,
   role: "admin" | "viewer",
-): Promise<SharedAccountNativeClient> {
+): Promise<OrganisationClient> {
   const client = await commerceClient(subject);
-  await addNativeServiceMember(organisationId, client, role);
+  await addOrganisationMember(organisationId, client, role);
   return client;
 }
 
 async function member(
   organisationId: OrganisationId,
-  client: SharedAccountNativeClient,
+  client: OrganisationClient,
 ): Promise<Member> {
   const membership = await readActiveOrganisationMembership(
     fixtureDatabase(),
@@ -169,7 +159,7 @@ export function post(
   path: string,
   body: unknown,
 ): Promise<Response> {
-  return nativeAccountRequest(user, path, body);
+  return controlRequest(user, path, body);
 }
 
 export async function postJson(

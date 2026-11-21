@@ -74,20 +74,6 @@ export type PolicyJevPort = Readonly<{
       now: number;
     }>,
   ): Promise<unknown>;
-  /**
-   * Holds the paid use of one Jev purpose when the free use does not cover
-   * the reservation.
-   */
-  ensurePaidHold(
-    input: Readonly<{
-      sql: SqlStorage;
-      env: Env;
-      organisationId: OrganisationId;
-      purpose: "case_context_discovery_relationship";
-      reservationMicrousd: number;
-      now: number;
-    }>,
-  ): Promise<unknown>;
 }>;
 
 /**
@@ -529,19 +515,6 @@ export async function admittedEvaluateCaseContextDiscovery(
       ok: false as const,
       error: { code: "organisation_placement_conflict" as const },
     };
-  const discovery = readCaseContextDiscoveryPolicy(
-    host.storage.sql,
-    scope.organisationId,
-  ).policy;
-  if (discovery.mode !== "disabled")
-    await host.jev.ensurePaidHold({
-      sql: host.storage.sql,
-      env: host.env,
-      organisationId: scope.organisationId,
-      purpose: "case_context_discovery_relationship",
-      reservationMicrousd: discovery.limits.reservationMicrousd,
-      now: Date.now(),
-    });
   const result = await evaluateOperationalCaseContextDiscovery({
     sql: host.storage.sql,
     transaction: host.transaction(),

@@ -515,9 +515,6 @@ export function requireLocalWorkerSecrets(service, config) {
           "SESSION_TOKEN_SECRET",
           "SLACK_OAUTH_STATE_SECRET",
           "UNDERCLERK_SERVICE_TOKEN",
-          "ACCOUNT_PLATFORM_PROVISION_TOKEN",
-          "ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U",
-          "ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK",
         ]
       : config.secrets.required;
   for (const key of required) {

@@ -2,7 +2,6 @@ import { createRequire } from "node:module";
 import { readFile, readdir } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { accountAuthorityRuntime } from "./account-worker.mjs";
 import { singleDatabaseMigrations } from "../../services/platform/scripts/single-database-schema.mjs";
 
 const [runtimeDirectory, workerPath, persistenceDirectory, providerUrl, group] =
@@ -16,11 +15,9 @@ const usesDraftCollaboration = draftBrowser || group === "draft";
 const usesCodeMode =
   group === "codemode" || group === "workspace" || usesDraftCollaboration;
 const usesProvider = group === "provider" || usesCodeMode;
+// The proposal trials and the trials above them seed their Organisation in D1.
 const usesProposal = group === "proposal" || usesProvider;
-// The canonical trials seed one linked Organisation for billing admission.
-const seedsWorkflowAccount = group === "default";
-const usesAuthority = usesProposal || seedsWorkflowAccount;
-const fixtureQueries = usesAuthority ? await readFixtureQueries() : [];
+const fixtureQueries = usesProposal ? await readFixtureQueries() : [];
 const modules = [{ type: "ESModule", path: workerPath }];
 for (const name of await readdir(dirname(workerPath))) {
   if (name.endsWith(".wasm"))
@@ -45,9 +42,6 @@ const sandbox = usesCodeMode
         SANDBOX: { className: "CodeModeSandbox", useSQLite: true },
       },
     }
-  : null;
-const account = usesAuthority
-  ? await accountAuthorityRuntime(persistenceDirectory)
   : null;
 const worker = {
   name: "plan50-candidate",
@@ -87,14 +81,11 @@ const worker = {
       : {}),
   },
   r2Buckets: ["ARCHIVE"],
-  d1Databases: usesAuthority ? ["DB"] : [],
+  d1Databases: usesProposal ? ["DB"] : [],
   kvNamespaces: usesDraftCollaboration ? ["POLICY_KV"] : [],
   queueProducers: usesProposal ? { EVENT_Q: "trial-context" } : {},
-  serviceBindings: {
-    ...account?.serviceBindings,
-    // A price proposal reads the offer's price allowance from Commerce.
-    ...(usesProposal ? { UNDERCLERK: forwardCommerceRequest } : {}),
-  },
+  // A price proposal reads the offer's price allowance from Commerce.
+  serviceBindings: usesProposal ? { UNDERCLERK: forwardCommerceRequest } : {},
   bindings: {
     PROVIDER_URL: providerUrl,
     TRIAL_SCENARIO: basename(persistenceDirectory),
@@ -133,10 +124,6 @@ const worker = {
       ? {
           UNDERCLERK_BASE_URL: "http://underclerk.test",
           UNDERCLERK_SERVICE_TOKEN: "underclerk-e2e-token",
-        }
-      : {}),
-    ...(usesAuthority
-      ? {
           FIXTURE_QUERIES: JSON.stringify(fixtureQueries),
           PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({
             databaseBinding: "DB",
@@ -146,9 +133,6 @@ const worker = {
           }),
         }
       : {}),
-    ...(seedsWorkflowAccount ? { TRIAL_WORKFLOW_ACCOUNT: "seed" } : {}),
-    // Last, so that the account fixture's Google client is the one in use.
-    ...account?.bindings,
   },
 };
 const runtime = new Miniflare({
@@ -157,7 +141,7 @@ const runtime = new Miniflare({
   r2Persist: join(persistenceDirectory, "r2"),
   kvPersist: join(persistenceDirectory, "kv"),
   d1Persist: join(persistenceDirectory, "d1"),
-  workers: [worker, account?.worker, sandbox].filter(Boolean),
+  workers: [worker, sandbox].filter(Boolean),
 });
 
 const address = await runtime.ready;

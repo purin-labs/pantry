@@ -835,9 +835,7 @@ export async function executeWorkspaceSettingsRoute(
         !isNonEmptyString(raw.invitation.organisationInvitationId) ||
         !isNonEmptyString(raw.token)
       ) {
-        throw new Error(
-          "The account authority did not return an invitation link.",
-        );
+        throw new Error("Pantry did not return an invitation link.");
       }
       return {
         kind: "invitation_created",

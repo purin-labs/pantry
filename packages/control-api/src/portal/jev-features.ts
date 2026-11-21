@@ -2,9 +2,7 @@ import { isRecord } from "@purin-labs/std";
 
 /** Settings › AI features › Jev (Plan 88 section 2). */
 export type JevFeature =
-  | "mail_classification"
-  | "related_cases"
-  | "screen_relevance";
+  "mail_classification" | "related_cases" | "screen_relevance";
 
 export type JevRelatedCasesMode = "shadow" | "metadata_only" | "party_context";
 
@@ -45,10 +43,10 @@ export type JevPaidUse = Readonly<{
   /** The charge of the month so far, in US cents. */
   spentMinor: number;
   /**
-   * Whether the Account Platform prices Jev for this account: true since the
-   * owner approved the Jev price (D9); null when the account cannot be read.
+   * Whether paid use is open. False until Pantry bills through Stripe (Plan 95
+   * step 6), so a person cannot turn paid use on.
    */
-  priced: boolean | null;
+  priced: boolean;
 }>;
 
 /** Turns paid use on or off, with the monthly spending limit in US cents. */
@@ -167,7 +165,7 @@ function parseJevPaidUse(raw: unknown): JevPaidUse {
     typeof raw.enabled !== "boolean" ||
     !nonNegativeInteger(raw.spendingLimitMinor) ||
     !nonNegativeInteger(raw.spentMinor) ||
-    (raw.priced !== null && typeof raw.priced !== "boolean")
+    typeof raw.priced !== "boolean"
   )
     throw new Error("Jev settings are unavailable.");
   return {

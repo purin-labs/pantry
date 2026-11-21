@@ -25,7 +25,6 @@ import {
   controlReadHeaders,
   openSocket,
 } from "./hibernatable-socket-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { applied } from "./menu-board-journey-support";
 
 declare module "vitest" {
@@ -65,11 +64,6 @@ async function cafeMenuPublicationJourney({
     owner.identity.userId,
     merchantId,
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const admin = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",

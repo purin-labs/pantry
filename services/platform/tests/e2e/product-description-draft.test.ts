@@ -30,7 +30,6 @@ import type { OrganisationDO } from "../../src/actors/organisation";
 import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import type { OrganisationId } from "../../src/ids";
 import type { Variant } from "@purin-labs/type-utils";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { requiredPlacement } from "./slack-journey-support";
 
 const PUBLIC_ORIGIN = "https://localhost";
@@ -276,11 +275,7 @@ async function draftSafetyJourney(): Promise<void> {
     error: "origin_invalid",
   });
 
-  // The account authority takes one attach per process, so the foreign
-  // Organisation stays native only, as in the appliance journey.
-  const otherOrganisation = await installDraftScenario("cross-organisation", {
-    attach: false,
-  });
+  const otherOrganisation = await installDraftScenario("cross-organisation");
   const crossOrganisation = await exports.default.fetch(
     draftUrl(otherOrganisation.organisationId, PRODUCT_ID),
     {
@@ -379,10 +374,7 @@ async function draftSafetyJourney(): Promise<void> {
   }
 }
 
-async function installDraftScenario(
-  label: string,
-  options: Readonly<{ attach: boolean }> = { attach: true },
-): Promise<DraftScenario> {
+async function installDraftScenario(label: string): Promise<DraftScenario> {
   const now = Date.now() - 1_000;
   const owner = await createControlClient(
     `description-draft-${label}-owner`,
@@ -543,12 +535,6 @@ async function installDraftScenario(
       COMMERCE_MERCHANT_ID + label,
     ),
   );
-  if (options.attach)
-    await attachSharedAccountNativeOrganisation({
-      organisationId: organisation.organisationId,
-      owner,
-      members: { operator: editor, privateMember: viewer },
-    });
   return {
     organisationId: organisation.organisationId,
     owner,

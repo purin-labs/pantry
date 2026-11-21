@@ -1,15 +1,10 @@
 import type { OrganisationModuleHost } from "./module-host";
-import { ensureJevPaidHold } from "../../jev-features/paid-use";
 import {
   runScreenRelevanceCheck,
   type ScreenRelevanceCheckInput,
 } from "../../jev-features/screen-relevance-check";
 import { decideScreenRelevanceRecord } from "../../jev-features/screen-relevance";
 import type { ScreenRelevanceChoice } from "@purin-labs/control-api";
-import {
-  JEV_MAIL_RESERVATION_MICROUSD,
-  jevFreeUseCovers,
-} from "../../jev-features/limits";
 import { runtimeFetch } from "../../runtime-fetch";
 import {
   evaluateMail,
@@ -167,20 +162,6 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
       input.organisationId,
     );
     if (!organisation.ok) return organisation;
-    // Above the free use, paid use holds this feature-hour first (Plan 88).
-    await ensureJevPaidHold({
-      sql: this.ctx.storage.sql,
-      env: this.env,
-      organisationId: admission.scope.organisationId,
-      purpose: "mail_classification",
-      freeUseCovers: jevFreeUseCovers(
-        this.ctx.storage.sql,
-        admission.scope.organisationId,
-        JEV_MAIL_RESERVATION_MICROUSD,
-        Date.now(),
-      ),
-      now: Date.now(),
-    });
     return evaluateMail({
       env: this.env,
       sql: this.ctx.storage.sql,
@@ -209,7 +190,6 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
     if (!organisation.ok) return organisation;
     return runScreenRelevanceCheck({
       sql: this.ctx.storage.sql,
-      env: this.env,
       transaction: schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
       credential: await resolveTypeSafeCredential({
         sql: this.ctx.storage.sql,

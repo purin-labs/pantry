@@ -25,10 +25,7 @@ import {
   controlReadHeaders,
 } from "./hibernatable-socket-support";
 import { fixtureDatabase } from "./organisation-database";
-import {
-  activateSharedAccountNativeTenant,
-  attachSharedAccountNativeOrganisation,
-} from "./shared-account-platform-fixture";
+import { activateOrganisation } from "./organisation-fixture";
 
 /**
  * A simulated shop gateway for Plan 85's journeys. It speaks the real protocol
@@ -73,12 +70,7 @@ export async function deviceShop(label: string) {
         .bind(organisationId, user.identity.userId, person, role, Date.now()),
     ]),
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
-  await activateSharedAccountNativeTenant(organisationId);
+  await activateOrganisation(organisationId);
   return { owner, staff, viewer, organisationId, merchantId };
 }
 

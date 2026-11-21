@@ -10,7 +10,7 @@ import {
   type DraftServerMessage,
 } from "@purin-labs/workflow-canvas-crdt/draft-protocol";
 import { commerceHeaders } from "./commerce-support";
-import type { SharedAccountNativeClient } from "./shared-account-platform-fixture";
+import type { OrganisationClient } from "./organisation-fixture";
 
 /** One browser's replica over one socket. It uses only the room's protocol. */
 export class WorkflowDraftPeer {
@@ -22,7 +22,7 @@ export class WorkflowDraftPeer {
   private waiters: (() => void)[] = [];
 
   constructor(
-    private readonly session: SharedAccountNativeClient["session"],
+    private readonly session: OrganisationClient["session"],
     private readonly organisation: string,
     private readonly workflow: string,
   ) {}

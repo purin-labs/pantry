@@ -22,7 +22,6 @@ import {
   signInToChatGpt,
   type PurgeOwner,
 } from "./purge-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { stateObjectRegistryCommand } from "./state-object-registry-support";
 
 declare module "vitest" {
@@ -57,11 +56,6 @@ async function purgedOrganisationRowsJourney({ task }: TestContext) {
   const neighbour = await purgeOwner("leftover-neighbour", "Neighbour cafe");
   await seedSharedSlackWorkspace(WORKSPACE, purged, neighbour);
   await signInToChatGpt(purged);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: neighbour.organisationId,
-    owner: neighbour.client,
-    members: {},
-  });
   expect(await slackTokensCheckedByReadiness(neighbour, checkedTokens)).toEqual(
     [WORKSPACE.botToken],
   );

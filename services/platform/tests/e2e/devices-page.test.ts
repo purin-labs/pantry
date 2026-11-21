@@ -31,7 +31,6 @@ import {
   PUBLIC_ORIGIN,
   controlReadHeaders,
 } from "./hibernatable-socket-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import {
   enrollVoiceMac,
   installAnsweringVoiceDns,
@@ -89,11 +88,6 @@ async function devicesJourney(): Promise<void> {
       )
       .bind(organisationId, viewer.identity.userId, personId, Date.now()),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { privateMember: viewer },
-  });
   const base = `${PUBLIC_ORIGIN}/v1/control/organisations/${organisationId}`;
 
   // 1. A shop with no device has an empty list and no missing kind.

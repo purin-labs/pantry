@@ -31,7 +31,6 @@
     "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/std": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
-    "@seams-internal/console-shared": "file:../../vendor/seams/seams-internal-console-shared-0.1.3-ebed186cf39a.tgz",
     "typebox": "1.3.27"
   },
   "devDependencies": {

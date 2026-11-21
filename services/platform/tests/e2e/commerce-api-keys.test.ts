@@ -18,7 +18,6 @@ import {
   commerceWorkspace,
   connectCommerceFixture,
 } from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -77,11 +76,6 @@ async function commerceApiKeysJourney({ task }: TestContext): Promise<void> {
       )
       .bind(organisationId, viewer.identity.userId, Date.now()),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { privateMember: viewer },
-  });
   const native = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",

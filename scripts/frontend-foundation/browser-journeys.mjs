@@ -8,13 +8,21 @@ import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
+// `--account-setup` runs only the setup dialog and the invitation page
+// journey, on the Portal alone, with its own artifact folder.
+const accountSetupOnly = process.argv.includes("--account-setup");
 const storefrontUrl = (
   process.env.PANTRY_STOREFRONT_URL ?? "http://cafe.localhost:3001"
 ).replace(/\/$/u, "");
 const portalUrl = (
   process.env.PANTRY_PORTAL_URL ?? "http://127.0.0.1:3103"
 ).replace(/\/$/u, "");
-const artifactDir = join(root, "output/playwright/frontend-foundation");
+const artifactDir = join(
+  root,
+  accountSetupOnly
+    ? "output/playwright/account-setup"
+    : "output/playwright/frontend-foundation",
+);
 const daemonDir = join(artifactDir, "daemon");
 const session = `frontend-foundation-${process.pid}`;
 const storefrontFixture = join(
@@ -61,11 +69,12 @@ const cliEnv = {
 
 async function main() {
   try {
-    await assertTargetAvailable(
-      `${storefrontUrl}/store/cafe`,
-      "storefront",
-      "pnpm site",
-    );
+    if (!accountSetupOnly)
+      await assertTargetAvailable(
+        `${storefrontUrl}/store/cafe`,
+        "storefront",
+        "pnpm site",
+      );
     await assertTargetAvailable(`${portalUrl}/portal`, "portal", "pnpm site");
     execFileSync(
       "pnpm",
@@ -86,12 +95,23 @@ async function main() {
       ],
       { cwd: root, stdio: "inherit" },
     );
-    process.stdout.write(
-      `[frontend] browser journeys target ${storefrontUrl} and ${portalUrl}\n`,
-    );
     runCli("open", [
       "data:text/html,<title>Frontend foundation fixture</title>",
     ]);
+    if (accountSetupOnly) {
+      process.stdout.write(`[frontend] account setup targets ${portalUrl}\n`);
+      runCli("run-code", ["--filename", portalFixture]);
+      const accountSetup = runCli("run-code", [accountSetupBrowserCommand()]);
+      writeFileSync(
+        join(artifactDir, "report.json"),
+        JSON.stringify({ result: "passed", portalUrl, accountSetup }, null, 2),
+      );
+      process.stdout.write("Account setup browser journey passed.\n");
+      return;
+    }
+    process.stdout.write(
+      `[frontend] browser journeys target ${storefrontUrl} and ${portalUrl}\n`,
+    );
     runCli("run-code", ["--filename", storefrontFixture]);
 
     runCli("goto", [`${storefrontUrl}/store/cafe`]);

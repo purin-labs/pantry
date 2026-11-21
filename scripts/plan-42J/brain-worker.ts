@@ -53,7 +53,7 @@ import {
 import { resolveOrganisationModelRoute } from "../../services/platform/src/models/route";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
-import { attachToAccountAuthority, fixturePeople } from "./account-authority";
+import { fixturePeople } from "./account-authority";
 
 export {
   OrganisationDO,
@@ -63,13 +63,10 @@ export {
 
 const CONTROL = "https://brain-fixture.internal";
 const names = ["Owner", "Other"] as const;
-const {
-  fixtureUser,
-  fixtureOrganisation,
-  fixturePerson,
-  auxiliaryOwner,
-  login,
-} = fixturePeople("", "plan42j-browser");
+const { fixtureUser, fixtureOrganisation, login } = fixturePeople(
+  "",
+  "plan42j-browser",
+);
 const SUPPLIER = "supplier@example.test";
 const LIMITS: EmailIngressLimits = {
   maxActiveCases: 5,
@@ -244,9 +241,8 @@ async function connectorOf(env: Env, fixture: Fixture) {
 /**
  * One organisation with an owner and a second administrator, a Gmail mailbox
  * that only the owner's role may read, an agent assigned to that mailbox, and
- * one supplier contact whose address is verified for it. The account
- * authority knows the Organisation, both people and the agent, so each control
- * request and each mailbox turn of the journey passes the real account check.
+ * one supplier contact whose address is verified for it. Each control request
+ * and each mailbox turn of the journey passes Pantry's real access check.
  */
 async function seed(env: Env) {
   const now = Date.now();
@@ -272,13 +268,6 @@ async function seed(env: Env) {
       "INSERT INTO organisation_inference_selection (organisation_id, selection_kind, selected_by_user_id, selected_at) VALUES (?, 'satyr_platform', ?, ?)",
     ).bind(organisationId, owner.userId, now),
   ]);
-  const ownerPerson = await fixturePerson(env, organisationId, owner);
-  await attachToAccountAuthority(env, {
-    organisationId,
-    owner: ownerPerson,
-    administrator: await fixturePerson(env, organisationId, other),
-    auxiliary: auxiliaryOwner.bind(null, env),
-  });
   const policy = defaultDenyPolicy({ now });
   policy.version = 1;
   policy.authz.allowedTools = [

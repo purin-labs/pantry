@@ -1,12 +1,8 @@
 // Starts the Worker of the shop Mac journeys (Plan 82 Phases 1B and 2) and answers
 // every request that it sends out. The simulated services are the Cloudflare DNS
 // API, Workers AI and the model provider. They only record each call and answer
-// it. The account authority is the built account Worker of the acceptance tests,
-// as in Plan 81.
+// it.
 import {
-  accountArtifact,
-  runKeys,
-  startAccountWorker,
   startFixtureWorker,
   stopOnSignal,
   text,
@@ -15,9 +11,6 @@ import { sleep } from "../../packages/std/src/index.ts";
 
 const [config, persistence] = process.argv.slice(2);
 const port = Number(process.env.SHOP_VOICE_PORT ?? 8891);
-
-const artifact = accountArtifact();
-const keys = runKeys();
 
 const records = new Map();
 const writes = [];
@@ -239,18 +232,6 @@ async function model(request) {
   );
 }
 
-const account = await startAccountWorker({
-  artifact,
-  name: "satyr-shop-voice-account-authority",
-  database: {
-    name: "shop-voice-account-authority",
-    id: "00000000-0000-0000-0000-000000000582",
-  },
-  persistence,
-  port: port + 1,
-  keys,
-});
-
 async function respond(request) {
   const url = new URL(request.url);
   if (url.hostname === "api.cloudflare.com") return dnsApi(request, url);
@@ -273,8 +254,6 @@ const worker = await startFixtureWorker({
   config,
   persistence,
   port,
-  keys,
-  account: (request) => account.fetch(request),
   bindings: {
     PANTRY_PUBLIC_ORIGIN: text(
       process.env.SHOP_VOICE_PUBLIC_ORIGIN ?? `http://127.0.0.1:${port}`,
@@ -282,4 +261,4 @@ const worker = await startFixtureWorker({
   },
   respond,
 });
-stopOnSignal(worker, account);
+stopOnSignal(worker);

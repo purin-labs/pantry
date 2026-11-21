@@ -23,7 +23,6 @@ import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationId, requireWorkspaceId } from "./test-ids";
 import { platformEnv } from "./worker-fakes";
@@ -116,8 +115,7 @@ async function resolvesAuthorizedRoot(context: TestContext): Promise<void> {
     reason: "credential_inactive",
   });
   Object.assign(context.task.meta, {
-    sharedAccountSlackAdmission: {
-      artifactSha256: fixture.artifactSha256,
+    slackAdmission: {
       organisationId: fixture.organisationId,
       integrationAccountId: fixture.integrationAccountId,
       nativeRole: "operator",
@@ -273,13 +271,10 @@ async function createFixture() {
         operator.user.userId,
       ),
   ]);
-  const account = await connectRealAccountPlatform(
-    platformEnv({
-      DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-    }),
-    { organisationId, owner, members: [{ slot: "operator", actor: operator }] },
-  );
+  const testEnv = platformEnv({
+    DB: db,
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+  });
   const event = rootMention();
   const routed = await resolveSlackCaseIngressRoute({
     db,
@@ -291,8 +286,7 @@ async function createFixture() {
     throw new Error(`Slack route fixture failed: ${JSON.stringify(routed)}`);
   return {
     db,
-    env: account.env,
-    artifactSha256: account.artifactSha256,
+    env: testEnv,
     organisationId,
     integrationAccountId: install.integrationAccountId,
     operator,

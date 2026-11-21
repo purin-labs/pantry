@@ -31,16 +31,6 @@ export const PURGE_CATALOGUE = [
   { table: "file_projection_outbox", action: "erase" },
   { table: "access_grant", action: "erase" },
   {
-    table: "account_service_access_revision",
-    action: "erase",
-    where: "native_organisation_id = ?",
-  },
-  {
-    table: "account_service_invitation_role",
-    action: "erase",
-    where: "native_organisation_id = ?",
-  },
-  {
     table: "agent_area_assignment",
     action: "erase",
     where:
@@ -290,6 +280,7 @@ export const PURGE_CATALOGUE = [
     reason: "The erasure ledger of the Organisation's harness history.",
   },
   { table: "organisation_inference_selection", action: "erase" },
+  { table: "organisation_invitation", action: "erase" },
   {
     table: "organisation_onboarding",
     action: "keep",

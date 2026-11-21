@@ -74,11 +74,11 @@ Edit `requirements.in`, then run `./lock.sh`. The install takes only the hashes 
 ## Test
 
 The journey runs the real install, `launchd`, Whisper and Platform routes on this Mac, against a
-local Worker. It needs the built account Worker and a speech bench with the model snapshot. The
+local Worker. It needs a speech bench with the model snapshot. The
 results go to `output/shop-voice/journey-results.json`.
 
 ```bash
-PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker> python3 scripts/shop-voice/run-journey.py
+python3 scripts/shop-voice/run-journey.py
 ```
 
 The Portal journey also drives real Chrome from the microphone input to the chat. Run
@@ -86,5 +86,5 @@ The Portal journey also drives real Chrome from the microphone input to the chat
 `audioWorklet.addModule` forever. The results go to `output/shop-voice/portal-journey-results.json`.
 
 ```bash
-PANTRY_ACCOUNT_WORKER_ARTIFACT=<built account Worker> PLAYWRIGHT_MODULE=<Playwright package folder> python3 scripts/shop-voice/run-portal-journey.py
+PLAYWRIGHT_MODULE=<Playwright package folder> python3 scripts/shop-voice/run-portal-journey.py
 ```

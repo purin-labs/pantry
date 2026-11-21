@@ -1,8 +1,8 @@
 # Plan 95 — Pantry owns its accounts
 
-Status: in progress, 20 November 2026. The owner decided the five decisions
-on 20 November 2026 (see "Decisions"). Step 1 is done (see "Step 1
-results"). Steps 2 to 6 are open.
+Status: in progress, 21 November 2026. The owner decided the five decisions
+on 20 November 2026 (see "Decisions"). Steps 1 to 4 are done (see their
+"results" sections). Step 5 needs the owner for its gate. Step 6 is open.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -376,6 +376,12 @@ This table replaces the first rows of "Authority and ownership" in
 Each step lands on `dev` alone, with its checks. Steps 1 to 4 go to
 production in one release (step 5). Step 6 does not block the Console split.
 
+Step 3 landed before step 2. Each turn read the Console binding for its
+billing, so nearly every turn journey needed the Console attach of the test
+fixture until the billing went. After step 3, the attach serves only the
+sign-in link and the invitations, which step 2 replaces. The order has no
+effect on production, because steps 1 to 4 ship in one release.
+
 ### 0. Decisions (no code)
 
 Done on 20 November 2026. The owner took all five recommendations (see
@@ -492,6 +498,66 @@ list above:
 - Checks: the Platform E2E suite, `pnpm portal:build`, and a Playwright
   journey of the dialog and the invitation page, with a saved artifact.
 
+#### Step 2 results
+
+Done on 21 November 2026, after step 3 (see "Steps"). What changed, and
+where the work differs from the list above:
+
+- `POST /v1/control/organisations` makes the Organisation
+  (`organisation-access/creation.ts`). The operation id is the idempotency
+  key, so a repeat answers with the first Organisation, also after the person
+  reached the limit of five. The Organisation goes to the root cell of the
+  placement profile, which the placement module names the onboarding
+  default; the plan said that the person selects a cell, but production has
+  one cell and the Portal had no cell choice. An Organisation of the
+  production deployment has the environment `production`. The request check
+  is `readOrganisationCreationRequest` of `@purin-labs/control-api`, which the
+  Portal and the route share.
+- `organisation_invitation` (regional, patch script
+  `plan-95-invitations-d1-patch.sql`) and `organisation-access/invitations.ts`
+  replace the Console invitations. A wrong token answers as a missing
+  invitation. A person who is already a member keeps their role when they
+  accept. `account_service_invitation_role` has no reader or writer now;
+  step 4 drops it.
+- Sign-in makes no Console request. The OIDC result no longer carries the
+  Google ID token, which only the Console link used.
+- Deleted: `/v1/control/account-onboarding`, and `onboarding.ts`,
+  `service-membership.ts`, `identity.ts` and `binding.ts` of
+  `account-platform/`, and `data/service-invitation-role.ts`. What remains of
+  `account-platform/` is the provisioning route, the instance release and
+  their client and types; step 4 deletes them.
+- Fixtures: the tests already gave each member a native role, and the
+  Console attach added only Console state. So the port deletes the attach
+  calls, and `tests/e2e/organisation-fixture.ts` replaces the shared Console
+  fixture. Its `addOrganisationMember` goes through the invitation and accept
+  routes, as the plan asks. The unit tests lost the real account Worker
+  fixture, and the script fixtures of Plans 42J and 50 lost their attach.
+- Decisions on the tests with Console outcomes: `pantry-onboarding.test.ts`
+  (Console projects) and `account-session-isolation.test.ts` (Console
+  sign-in links and invitation denials) are deleted. J4 and J5 cover the
+  native outcomes.
+- A member who accepts an invitation joins the Base Project, as in
+  production. Three journeys relied on the old seed, which left members out
+  of it: the two mail reply journeys added the administrator again by hand,
+  and the production plan journey shared a private chat into a Base Project
+  that now has a viewer who may not read the chat. The first two lost that
+  step; the third shares the chat into a Project of the owner.
+- Journeys: J4 is `organisation-setup.test.ts`. J5 is
+  `organisation-invitation.test.ts`; the invited person is an admin, because
+  the Portal chat needs the role `admin`, and the expired invitation is a
+  seeded row of eight days ago.
+- Portal: the setup dialog has four steps, Organisation (one name field),
+  Prepare, Jev and Done; the plan named three, and the optional Jev step of
+  Plan 88 stays. The Project and Billing steps and the polling are gone, and
+  the file went from 1,764 to 1,029 lines. The invitation page has no "link
+  failed" state, and each accept refusal has its own message.
+  `packages/control-api/src/account-onboarding.ts` and the Console pin of
+  `@purin-labs/control-api` are gone.
+- Playwright: `scripts/frontend-foundation/portal-account-setup-journey.mjs`
+  runs on the real Portal (`browser-journeys.mjs --account-setup`) and passed
+  with 19 checks; its report and screenshots are in the git-ignored
+  `output/playwright/account-setup/`.
+
 ### 3. Billing state off the Console
 
 - Delete `execution-billing.ts` and the billing calls of its six callers.
@@ -503,6 +569,38 @@ list above:
   the billing account, not from the Console.
 - Checks: the Plan 88 journeys of free use pass. The journeys of Console paid
   use are deleted. Step 6 brings paid use back on Stripe.
+
+#### Step 3 results
+
+Done on 21 November 2026, before step 2 (see "Steps"). What changed, and
+where the work differs from the list above:
+
+- `execution-billing.ts` is deleted, with its calls in the Session: the
+  admission read of the binding and the fee policy, the dispatch mark, the
+  uncertainty mark, the three journal hooks and the four reconcile calls. A
+  turn no longer reads the Console before its model request.
+- The Session outbox schema has a version 3. It deletes the rows of the old
+  turn billing (`account_execution:*`) once, when a Session wakes. A turn of a
+  Console test account could leave such a row open, and an open row kept a
+  Session from its end and from a relocation. The relocation check and the
+  end of a quarantined Session no longer skip those rows.
+- Jev paid use is closed: `JEV_PAID_USE_OPEN` is false in
+  `jev-features/paid-use.ts`, and the view reports `priced: false`. There is
+  no plan catalog and no billing account yet; step 6 adds both. The server
+  refuses to turn paid use on (`jev_paid_use_closed`), and the Portal
+  disables the switch. A call above the free use stops as at the end of the
+  free use (`allowance_reached`). The feature-hour holds, the refusal codes
+  `spending_limit_reached` and `paid_use_unfunded`, and the Console price
+  versions are deleted. `priced` is now a boolean.
+- A sealed Jev hour is `not_billed`, with the outcome `unpriced` or
+  `no_measured_tokens`. A sealed hour no longer arms the Organisation alarm.
+  An hour that waited for the Console meter becomes `not_billed` at the next
+  seal.
+- The Console client lost its funds and usage calls.
+- Journeys: `plan-88-jev-features.test.ts` keeps J1, J2, J3 and J6 without
+  the Console attach. J4 now checks the local hour records. The two J7
+  journeys of Console paid use are one journey: above the free use a call
+  stops, and neither an admin nor the owner can turn paid use on.
 
 ### 4. Remove the Console connection
 
@@ -534,6 +632,33 @@ list above:
   `pnpm lint:unused`, `pnpm lint:layers` and `pnpm lint:d1-patch`; and
   `git grep -n -e ACCOUNT_PLATFORM -e console-shared -e SatyrAccountPlatform`
   finds nothing outside plans and evidence.
+
+#### Step 4 results
+
+Done on 21 November 2026. What changed, and where the work differs from the
+list above:
+
+- `services/platform/src/account-platform/` is deleted, with the
+  `/account-platform/v1/*` route, its `run_worker_first` entry and the
+  instance release pass of the cron.
+- The binding, the ten values and the three secrets are gone from
+  `wrangler.jsonc` (local and production) and `env.ts`. `vendor/seams/` and
+  the last pin are gone, and the lockfile names no Console package.
+- The D1 patch is two scripts, because the two databases differ:
+  `plan-95-console-removal-global-d1-patch.sql` and
+  `plan-95-console-removal-regional-d1-patch.sql`. The three old patch scripts
+  that made the Console tables are deleted, so nobody can make them again.
+- The E2E suite no longer loads the account Worker. The script harnesses of
+  Plans 40B, 42J, 50, 74, 81 and 84, the production simulation, the shop
+  gateway, the shop voice journeys and `pnpm local:init` no longer start it
+  or write its values. CI no longer checks out `purin-labs/monorepo`.
+- The grep of the check finds nothing outside plans and evidence, except the
+  past rename codemods in `scripts/rename/`, whose maps name old packages as
+  data.
+- The Plan 50 trial `recovery_schema_upgrade` fails with
+  `schema_version_retired:session_hot_schema:32:33`. It stages Session schema
+  32, which Plan 92 retired, so the failure is older than this step.
+- Idle cost: lower. The instance release pass no longer runs in the cron.
 
 ### 5. Release and production proof
 

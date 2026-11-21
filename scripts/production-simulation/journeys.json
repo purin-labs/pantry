@@ -2088,7 +2088,7 @@
         }
       },
       "status": "passes",
-      "notes": "Needs PANTRY_ACCOUNT_WORKER_ARTIFACT, the built shared account Worker. The runner starts serve-archive-acceptance.mjs on port 8840.",
+      "notes": "The runner starts serve-archive-acceptance.mjs on port 8840.",
       "lastRun": {
         "seconds": 51.6,
         "date": "2026-11-19",
@@ -2236,7 +2236,7 @@
         }
       },
       "status": "passes",
-      "notes": "Needs PANTRY_ACCOUNT_WORKER_ARTIFACT, the built shared account Worker. The runner starts serve-archive-acceptance.mjs on port 8840.",
+      "notes": "The runner starts serve-archive-acceptance.mjs on port 8840.",
       "lastRun": {
         "seconds": 20,
         "date": "2026-11-19",

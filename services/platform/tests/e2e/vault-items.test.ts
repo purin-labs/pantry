@@ -208,7 +208,6 @@ async function vaultItemJourney({ task }: TestContext): Promise<void> {
 
   Object.assign(task.meta, {
     vaultItems: {
-      accountWorkerSha256: env.TEST_ACCOUNT_PLATFORM_WORKER_SHA256,
       responses: seen.length,
       checks: [
         "http origin refused before storage",

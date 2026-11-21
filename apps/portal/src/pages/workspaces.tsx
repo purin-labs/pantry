@@ -16,6 +16,7 @@ import type {
   OrganisationOnboardingLifecycle,
 } from "@purin-labs/contracts";
 import { ControlApiError } from "../control-client";
+import { signInPath } from "../control-paths";
 import { ArchiveConfirm } from "../features/integrations/archive-confirm";
 import {
   EmptyState,
@@ -104,7 +105,7 @@ type OrganisationsRouteProps = {
   readonly userId: string;
   /** Reads the session again and reports if it lists the new organisation. */
   readonly onSetupComplete: (
-    nativeOrganizationId: string,
+    organisationId: string,
   ) => Promise<AccountSetupListing>;
   readonly organisationActions: OrganisationActions;
   readonly openWorkspace: (target: WorkspaceRouteTarget) => void;
@@ -160,7 +161,6 @@ export function OrganisationsRoute(
         ref={setup}
         userId={props.userId}
         finish={props.onSetupComplete}
-        organisationName={findOrganisationName.bind(null, content)}
         resume={content.kind !== "loading"}
       />
     </props.Frame>
@@ -173,21 +173,6 @@ export function OrganisationsRoute(
  */
 function openAccountSetup(setup: React.RefObject<AccountSetup | null>): void {
   setup.current?.open();
-}
-
-function findOrganisationName(
-  content: OrganisationsPageContent,
-  organisationId: string,
-): string | null {
-  if (content.kind !== "ready") {
-    return null;
-  }
-  for (const item of content.data) {
-    if (item.organisationId === organisationId) {
-      return item.name;
-    }
-  }
-  return null;
 }
 
 function beginOrganisationsLoad(
@@ -269,10 +254,7 @@ function OrganisationsRouteContent(props: {
       <button type="button" onClick={props.retryMemberships}>
         Refresh organisations
       </button>
-      <a
-        className="button-link"
-        href="/v1/control/auth/google/start?returnTo=/portal"
-      >
+      <a className="button-link" href={signInPath("/portal")}>
         Sign in again
       </a>
     </div>
@@ -449,13 +431,13 @@ function renderOrganisationList(
       <div className="empty-state organisation-setup-invitation">
         <strong>No organisations yet</strong>
         <span>
-          Seams Pantry runs in a project of your account. Set it up in three
+          Seams Pantry runs in an organisation that you own. Set it up in three
           steps:
         </span>
         <ol className="organisation-setup-preview">
-          <li>Choose an organisation</li>
-          <li>Choose or create a project</li>
-          <li>Confirm billing</li>
+          <li>Name your organisation</li>
+          <li>Pantry prepares it</li>
+          <li>Turn on Jev, or skip</li>
         </ol>
         {createButton}
       </div>

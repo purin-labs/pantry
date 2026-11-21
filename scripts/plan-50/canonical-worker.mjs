@@ -8,13 +8,7 @@ import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durab
 import { sha256Hex } from "../../packages/std/src/index.ts";
 import { resolvePantryPlatformModelRoute } from "../../services/platform/src/models/route.ts";
 export { default } from "./seam-worker.mjs";
-import {
-  admitPantryExecutionBilling,
-  markPantryExecutionDispatched,
-  readPantryExecutionAdmissionBinding,
-} from "../../services/platform/src/account-platform/execution-billing.ts";
 import { createActorActivationSchema } from "../../services/platform/src/actors/actor-activation.ts";
-import { seedTrialWorkflowAccount } from "./draft-seed.mjs";
 import { canonicalStopNotice } from "../../services/platform/src/actors/pi-durable-history.ts";
 import { eraseActorContentSql } from "../../services/platform/src/actors/placement-execution-quiescence.ts";
 import { createSessionSchema } from "../../services/platform/src/actors/agent-session-schema.ts";
@@ -515,23 +509,6 @@ export class CandidateActor extends SeamActor {
         }),
       );
       required(appendSessionInformationFlowInTransaction(sql, flow));
-      // A completed turn records its account billing, which admission opens
-      // before the model is called.
-      const modelRoute = this.lifecycle().state.contract.modelRoute;
-      const context = { env: this.env, storage: this.ctx.storage };
-      const binding = required(
-        await readPantryExecutionAdmissionBinding(context, this.currentLease()),
-      );
-      required(
-        await admitPantryExecutionBilling(context, {
-          lease: this.currentLease(),
-          binding,
-          modelRoute,
-          modelRouteDigest: await sha256Hex(JSON.stringify(modelRoute)),
-          continuation: "fresh",
-        }),
-      );
-      required(markPantryExecutionDispatched(sql, turnId));
     }
   }
 
@@ -960,8 +937,6 @@ export class CandidateActor extends SeamActor {
 
   async fetch(request) {
     const path = new URL(request.url).pathname;
-    if (path === "/start" && this.env.TRIAL_WORKFLOW_ACCOUNT === "seed")
-      await seedTrialWorkflowAccount(this.env);
     if (path === "/export")
       return Response.json(await this.capturePortableState());
     if (path === "/prepare-import") {

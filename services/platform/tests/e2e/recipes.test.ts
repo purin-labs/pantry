@@ -16,7 +16,6 @@ import {
   commerceHeaders,
   connectCommerceFixture,
 } from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 it(
   "creates and revises recipes, rejects stale edits and protects the library",
@@ -52,11 +51,6 @@ async function recipeJourney(context: TestContext): Promise<void> {
       )
       .bind(organisationId, viewer.identity.userId, Date.now()),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { privateMember: viewer },
-  });
   const native = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",

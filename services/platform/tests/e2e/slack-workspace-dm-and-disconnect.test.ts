@@ -18,10 +18,7 @@ import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
 import { organisationDatabase } from "./organisation-database";
 import { readHeaders } from "./purge-support";
-import {
-  attachSharedAccountNativeOrganisation,
-  type SharedAccountNativeClient,
-} from "./shared-account-platform-fixture";
+import { type OrganisationClient } from "./organisation-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -38,7 +35,7 @@ const BOT_TOKEN = "xoxb-dm-and-disconnect";
 const SLACK_SCOPES = ["app_mentions:read", "chat:write", "im:history"] as const;
 
 type Owner = Readonly<{
-  client: SharedAccountNativeClient;
+  client: OrganisationClient;
   organisationId: OrganisationId;
 }>;
 
@@ -57,8 +54,8 @@ async function slackWorkspaceDmAndDisconnectJourney({ task }: TestContext) {
       return HttpResponse.json({ ok: true });
     }),
   );
-  const owner = await nativeOwner("owner", true);
-  const outsider = await nativeOwner("outsider", false);
+  const owner = await nativeOwner("owner");
+  const outsider = await nativeOwner("outsider");
   const connectionId = await seedWorkspace(owner);
   expect(await routingConnections(owner)).toEqual([
     { connectionId, lifecycle: "active" },
@@ -140,15 +137,9 @@ async function slackWorkspaceDmAndDisconnectJourney({ task }: TestContext) {
   };
 }
 
-async function nativeOwner(label: string, attached: boolean): Promise<Owner> {
+async function nativeOwner(label: string): Promise<Owner> {
   const client = await commerceClient(`slack-dm-disconnect-${label}`);
   const organisationId = await commerceWorkspace(client, `${label} cafe`);
-  if (attached)
-    await attachSharedAccountNativeOrganisation({
-      organisationId,
-      owner: client,
-      members: {},
-    });
   return { client, organisationId };
 }
 

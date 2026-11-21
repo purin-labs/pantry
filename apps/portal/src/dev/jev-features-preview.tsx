@@ -15,7 +15,7 @@ import { JevFeaturesRoute } from "../features/jev-features/route";
 // - `used`: the free use used, paid use off, the owner.
 // - `used-viewer`: the free use used, paid use off, a viewer.
 // - `paid`: paid use on, $1.20 of $5.00, the owner.
-// - `unpriced`: the Seams account does not price Jev yet (`priced: false`).
+// - `unpriced`: paid use is not open yet (`priced: false`).
 // `?page=billing` opens Settings › Billing; `?theme=dark` sets the dark
 // appearance.
 const root = document.getElementById("root");
@@ -79,8 +79,7 @@ let view: JevFeaturesView = {
     enabled: previewCase === "paid",
     spendingLimitMinor: 500,
     spentMinor: previewCase === "paid" ? 120 : 0,
-    priced:
-      previewCase === "own" ? null : previewCase === "unpriced" ? false : true,
+    priced: previewCase !== "unpriced" && previewCase !== "own",
   },
 };
 

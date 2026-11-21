@@ -51,12 +51,6 @@ const ARCHIVE_PAGE_SIZE = 1_000;
 const ORGANISATION_DATA_ARCHIVE_PREFIX = "state-object-organisation-data-v1";
 // Directory records and global authority remain in their owning store.
 const EXCLUDED = new Set([
-  // Global tables of the account authority. Split databases keep them out of
-  // the regional schema; the combined test schema holds them beside it.
-  "account_automation_link",
-  "account_identity_link",
-  "account_provision_receipt",
-  "account_service_binding",
   ...COPY_EXCLUDED_SHARED_TABLES,
   "durable_object_registry",
   "app_user",
@@ -582,9 +576,6 @@ async function requireCopyFences(
 function ownershipPredicate(name: string, columns: readonly string[]): string {
   if (columns.includes("organisation_id")) return '"organisation_id" = ?';
   switch (name) {
-    case "account_service_invitation_role":
-    case "account_service_access_revision":
-      return '"native_organisation_id" = ?';
     case RECEIPT_TABLE:
       return `"${RECEIPT_OWNER_COLUMN}" = ?`;
     case "organisation_activation_step":

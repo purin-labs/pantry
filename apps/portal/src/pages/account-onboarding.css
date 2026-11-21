@@ -1,0 +1,398 @@
+/* The setup dialog of the Organisations page (account-onboarding.tsx). */
+
+.agent-modal.account-setup-modal {
+  width: min(560px, calc(100vw - 32px));
+  border-radius: 24px;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 6%),
+    0 32px 80px -24px rgb(0 0 0 / 38%),
+    0 0 0 1px color-mix(in oklch, var(--ink) 9%, transparent);
+}
+
+.account-setup-modal .agent-modal-header {
+  align-items: center;
+  padding: 22px 22px 0 28px;
+}
+
+.account-setup-modal .agent-modal-header > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.account-setup-modal .agent-modal-header h3 {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: var(--pantry-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.account-setup-modal .agent-modal-header p {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.account-setup-modal .agent-modal-close {
+  box-shadow: none;
+}
+
+.account-setup-modal .agent-modal-body {
+  gap: 28px;
+  padding: 18px 28px 4px;
+}
+
+.account-setup-modal .agent-modal-footer {
+  padding: 20px 28px 26px;
+  border-top: 0;
+  background: transparent;
+}
+
+.account-setup-modal :is(.modal-primary-button, .modal-secondary-button) {
+  min-height: 44px;
+  padding: 0 22px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Secondary actions step back: text on the dialog, a surface on hover. */
+.account-setup-modal .modal-secondary-button {
+  border: 0;
+  color: var(--ink-2);
+  background: transparent;
+  box-shadow: none;
+}
+
+.account-setup-modal .modal-secondary-button:hover {
+  color: var(--ink-strong);
+  background: var(--surface);
+}
+
+.account-setup-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-setup-step {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  letter-spacing: 0.01em;
+}
+
+.account-setup-step-bar {
+  position: relative;
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--ink) 12%, transparent);
+  overflow: hidden;
+}
+
+.account-setup-step-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--ink-strong);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--motion-smooth);
+}
+
+.account-setup-step:not([data-state="next"]) .account-setup-step-bar::after {
+  transform: scaleX(1);
+}
+
+.account-setup-step[data-state="failed"] .account-setup-step-bar::after {
+  background: var(--danger-text);
+}
+
+.account-setup-step-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-setup-step[data-state="done"] {
+  color: var(--ink-2);
+}
+
+.account-setup-step[data-state="current"],
+.account-setup-step[aria-current="step"][data-state="done"] {
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+.account-setup-step[data-state="failed"] {
+  color: var(--danger-text);
+  font-weight: 500;
+}
+
+.account-setup-body,
+.account-setup-form {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+}
+
+.account-setup-body {
+  min-height: 252px;
+}
+
+.account-setup-intro {
+  display: grid;
+  gap: 6px;
+}
+
+.account-setup-heading {
+  margin: 0;
+  color: var(--ink-strong);
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.account-setup-heading:focus {
+  outline: none;
+}
+
+.account-setup-lead {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.account-setup-name {
+  display: grid;
+  gap: 6px;
+}
+
+.account-setup-name label {
+  display: grid;
+  gap: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.account-setup-name input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--ink-strong);
+  background: var(--paper);
+  font: inherit;
+  font-size: 14px;
+}
+
+.account-setup-name input:focus-visible {
+  border-color: var(--ink-strong);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ink) 10%, transparent);
+}
+
+.account-setup-name input[aria-invalid="true"] {
+  border-color: var(--danger-text);
+}
+
+.account-setup-name .error-text {
+  margin: 0;
+  font-size: 13px;
+}
+
+.account-setup-summary {
+  display: grid;
+  margin: 0;
+  padding: 4px 18px;
+  border-radius: 16px;
+  background: color-mix(in oklch, var(--surface) 55%, var(--paper));
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.account-setup-summary > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+  padding: 13px 0;
+}
+
+.account-setup-summary > div + div {
+  border-top: 1px solid var(--border);
+}
+
+.account-setup-summary dt {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.account-setup-summary dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0;
+  color: var(--ink-strong);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.account-setup-note {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.account-setup-progress-block {
+  display: grid;
+  gap: 12px;
+}
+
+.account-setup-progress {
+  position: relative;
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--ink) 12%, transparent);
+  overflow: hidden;
+}
+
+.account-setup-progress > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 36%;
+  border-radius: inherit;
+  background: var(--ink-strong);
+  animation: account-setup-progress 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes account-setup-progress {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(280%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-setup-progress > span {
+    width: 100%;
+    opacity: 0.35;
+    animation: none;
+  }
+}
+
+.account-setup-status {
+  display: flex;
+  gap: 12px;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+
+.account-setup-result {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+}
+
+.account-setup-body:has(> .account-setup-result) {
+  align-content: center;
+}
+
+.account-setup-result-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--paper);
+  background: var(--ink-strong);
+}
+
+.account-setup-problem {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+}
+
+.account-setup-problem-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.account-setup-problem-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.account-setup-problem-copy .account-setup-heading {
+  margin-bottom: 2px;
+}
+
+.account-setup-problem p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.account-setup-problem .account-setup-detail {
+  justify-self: start;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: var(--ink-2);
+  background: var(--surface);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.account-setup-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+@media (max-width: 520px) {
+  .account-setup-step:not([aria-current="step"]) .account-setup-step-label {
+    visibility: hidden;
+  }
+
+  .account-setup-step[aria-current="step"] .account-setup-step-label {
+    overflow: visible;
+  }
+
+  .account-setup-modal .agent-modal-header,
+  .account-setup-modal .agent-modal-body,
+  .account-setup-modal .agent-modal-footer {
+    padding-inline: 20px;
+  }
+
+  .account-setup-summary > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}

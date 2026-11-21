@@ -1,5 +1,4 @@
 import type { SingleDatabase } from "../src/database-handles";
-import { connectRealAccountPlatform } from "./real-account-platform-fixture";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
@@ -688,24 +687,17 @@ async function createFixture(slug: string): Promise<Fixture> {
     resolveOutcome: { kind: "no_action" },
   };
   const caseActor: FakeCaseActor = { calls: [] };
-  const account = await connectRealAccountPlatform(
-    platformEnv({
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
-      DB: db,
-      PANTRY_PUBLIC_ORIGIN: ORIGIN,
-      SESSION_TOKEN_SECRET: "test-approval-hmac-secret",
-      CONNECTOR: fakeConnectorNamespace(connector),
-      CASE: fakeCaseNamespace(caseActor),
-      ORGANISATION: new EmptyMailDraftNamespace(),
-    }),
-    {
-      organisationId: organisation.organisationId,
-      owner: { user: owner, session: issued.session },
-      members: [],
-    },
-  );
+  const testEnv = platformEnv({
+    PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+    DB: db,
+    PANTRY_PUBLIC_ORIGIN: ORIGIN,
+    SESSION_TOKEN_SECRET: "test-approval-hmac-secret",
+    CONNECTOR: fakeConnectorNamespace(connector),
+    CASE: fakeCaseNamespace(caseActor),
+    ORGANISATION: new EmptyMailDraftNamespace(),
+  });
   return {
-    env: account.env,
+    env: testEnv,
     db,
     organisationId: organisation.organisationId,
     integrationAccountId: connected.account.integrationAccountId,

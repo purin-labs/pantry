@@ -21,7 +21,6 @@ import {
 } from "./commerce-support";
 import { network } from "./network";
 import { PlanJourney } from "./production-plan-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import {
   commerceEngine,
   configurationHeaders,
@@ -91,11 +90,6 @@ async function squareInCommerceJourney({ task }: TestContext): Promise<void> {
       merchantId,
       { environment: "production" },
     );
-    await attachSharedAccountNativeOrganisation({
-      organisationId,
-      owner,
-      members: {},
-    });
     await openCafeCounter(organisationId, merchantId, owner);
 
     // 1. The owner connects Square; Commerce exchanges the code.

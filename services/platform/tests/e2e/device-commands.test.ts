@@ -26,10 +26,7 @@ import {
   startGateway,
   type SimulatedGateway,
 } from "./device-fleet-support";
-import {
-  activateSharedAccountNativeTenant,
-  attachSharedAccountNativeOrganisation,
-} from "./shared-account-platform-fixture";
+import { activateOrganisation } from "./organisation-fixture";
 
 /**
  * Refactor 15, refactor 6: the pauses that Pantry sends to a shop gateway.
@@ -63,12 +60,7 @@ async function shop(): Promise<
     owner.identity.userId,
     `merchant_command_${crypto.randomUUID().replaceAll("-", "")}`,
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
-  await activateSharedAccountNativeTenant(organisationId);
+  await activateOrganisation(organisationId);
   return { owner: owner.session, organisationId };
 }
 

@@ -19,7 +19,6 @@ import {
   type PurgeOwner,
 } from "./purge-support";
 import { googleIdToken } from "./gmail-mailbox-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -74,11 +73,6 @@ async function gmailAfterDeletionJourney({ task }: TestContext) {
   await holdGoogleAccount(second);
 
   const fresh = await nativeOwner("fresh");
-  await attachSharedAccountNativeOrganisation({
-    organisationId: fresh.organisationId,
-    owner: fresh.client,
-    members: {},
-  });
 
   // An Organisation in use holds the account against every other one.
   const refusedWhileLive = await connectGmail(fresh, "refused-live");

@@ -151,7 +151,6 @@ export async function completeGoogleOidc(input: {
   Result<
     {
       readonly identity: VerifiedOidcIdentity;
-      readonly identityToken: string;
       readonly redirectPath: string;
       readonly approvalChallenge: ApprovalActionBinding | null;
       readonly approvalStateHash: string;
@@ -224,7 +223,6 @@ export async function completeGoogleOidc(input: {
         displayName: claims.value.name,
         emailVerified: true,
       },
-      identityToken: token.value,
       redirectPath: stateRecord.value.redirectPath,
       approvalChallenge: stateRecord.value.approvalChallenge,
       approvalStateHash: stateHash,
@@ -765,4 +763,3 @@ async function importGrantKey(secret: string): Promise<CryptoKey> {
     ["sign", "verify"],
   );
 }
-

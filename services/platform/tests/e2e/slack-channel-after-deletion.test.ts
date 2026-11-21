@@ -23,10 +23,7 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";
 import { configurationVersion, readHeaders } from "./purge-support";
-import {
-  attachSharedAccountNativeOrganisation,
-  type SharedAccountNativeClient,
-} from "./shared-account-platform-fixture";
+import { type OrganisationClient } from "./organisation-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -54,7 +51,7 @@ const SLACK_SCOPES = [
 ] as const;
 
 type Owner = Readonly<{
-  client: SharedAccountNativeClient;
+  client: OrganisationClient;
   organisationId: OrganisationId;
 }>;
 
@@ -143,11 +140,6 @@ async function slackChannelAfterDeletionJourney({ task }: TestContext) {
 
   // A new Organisation connects the same workspace in the Portal.
   const fresh = await nativeOwner("fresh");
-  await attachSharedAccountNativeOrganisation({
-    organisationId: fresh.organisationId,
-    owner: fresh.client,
-    members: {},
-  });
   await connectSlack(fresh);
   const connection = await activeConnection(fresh);
   expect(connection.installationId).toBe(INSTALLATION_ID);

@@ -1,7 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { createHash, generateKeyPairSync } from "node:crypto";
 import { readFileSync, readdirSync, rmSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath, URL as NodeUrl } from "node:url";
 import { builtinModules } from "node:module";
 
@@ -173,7 +172,6 @@ function regionalFixtureCells(): readonly Record<string, unknown>[] {
 }
 
 async function cloudflareOptions() {
-  const accountPlatform = sharedAccountPlatformTestRuntime();
   // Global records and each Organisation's records live in two databases, as
   // in production.
   const migrations = await readD1Migrations(
@@ -200,7 +198,6 @@ async function cloudflareOptions() {
         codeModeSandboxWorker(),
         modelExitWorker(),
         commerceFixtureWorker(),
-        ...accountPlatform.workers,
       ],
       bindings: {
         ...TEST_SECRET_BINDINGS,
@@ -208,7 +205,6 @@ async function cloudflareOptions() {
           process.env.PANTRY_PI_ACCEPTANCE_API_KEY ??
           TEST_SECRET_BINDINGS.OPENROUTER_API_KEY,
         ...TEST_VALUE_BINDINGS,
-        ...accountPlatform.bindings,
         TEST_MIGRATIONS: migrations,
         TEST_REGIONAL_MIGRATIONS: regionalMigrations,
         TEST_PRODUCTION_CRONS: productionCrons(),
@@ -244,7 +240,6 @@ async function cloudflareOptions() {
         SHOP_GATEWAY_ADAPTERS: shopGatewayAdapters,
         // The writer of a journey's artifact under output/.
         JOURNEY_ARTIFACTS: writeJourneyArtifact,
-        ...accountPlatform.serviceBindings,
       },
     },
   };
@@ -323,93 +318,6 @@ function commerceFixtureWorker() {
     // Webhook posts to the platform's origin reach the platform Worker.
     outboundService: { name: RUNNER_WORKER, entrypoint: "CommerceNetwork" },
   };
-}
-
-const ACCOUNT_PLATFORM_TEST_WORKER = "seams-account-platform-e2e";
-const ACCOUNT_PLATFORM_TEST_ORIGIN = "https://account.shared-account.invalid";
-
-/**
- * Prices that the account Worker must know. The Plan 88 journeys charge Jev
- * use at both (`JEV_PRICE` in `src/jev-features/paid-use.ts`; Node cannot
- * load that module here). An account Worker built before seams-monorepo
- * `aee87e9a` knows neither, and those journeys then fail far from the cause.
- */
-const ACCOUNT_WORKER_PRICES = [
-  "satyr-jev-input-tokens-v1",
-  "satyr-jev-input-tokens-customer-v1",
-] as const;
-
-/** Load the built account Worker. This test runtime never imports Seams source. */
-function sharedAccountPlatformTestRuntime() {
-  const artifact = process.env.PANTRY_ACCOUNT_WORKER_ARTIFACT;
-  const bindings: Record<string, string> = {};
-  const serviceBindings: Record<string, { name: string }> = {};
-  if (!artifact) return { workers: [] as const, bindings, serviceBindings };
-  const artifactPath = resolve(artifact);
-  const artifactBytes = readFileSync(artifactPath);
-  for (const version of ACCOUNT_WORKER_PRICES)
-    if (!artifactBytes.includes(version))
-      throw new Error(
-        `The account Worker ${artifactPath} has no price ${version}. Rebuild it in seams-monorepo (aee87e9a or later): pnpm -C tests exec node helpers/buildSharedAccountPlatformWorker.mjs`,
-      );
-  const assertion = generateKeyPairSync("ed25519");
-  const google = generateKeyPairSync("rsa", { modulusLength: 2048 });
-  const provision = generateKeyPairSync("ed25519");
-  const privateAssertion = assertion.privateKey.export({
-    format: "der",
-    type: "pkcs8",
-  });
-  Object.assign(bindings, {
-    TEST_ACCOUNT_PLATFORM_WORKER_SHA256: createHash("sha256")
-      .update(artifactBytes)
-      .digest("hex"),
-    ACCOUNT_PLATFORM_DEPLOYMENT_ID: "shared-account-satyr-e2e",
-    ACCOUNT_PLATFORM_PROVISION_TOKEN: "shared-account-e2e-pantry-provision",
-    ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK: JSON.stringify(
-      provision.publicKey.export({ format: "jwk" }),
-    ),
-    ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID: "account-shared-account-e2e",
-    ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER: ACCOUNT_PLATFORM_TEST_ORIGIN,
-    ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE:
-      "https://satyr.shared-account.invalid",
-    ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID: "satyr-shared-account-e2e",
-    ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U:
-      privateAssertion.toString("base64url"),
-    ACCOUNT_PLATFORM_ASSERTION_ISSUER: "https://satyr.shared-account.invalid",
-    ACCOUNT_PLATFORM_ASSERTION_AUDIENCE: ACCOUNT_PLATFORM_TEST_ORIGIN,
-    GOOGLE_OIDC_CLIENT_ID: "shared-account-satyr-e2e",
-    TEST_ACCOUNT_PLATFORM_BASE_URL: ACCOUNT_PLATFORM_TEST_ORIGIN,
-    TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN:
-      "shared-account-e2e-pantry-provision",
-  });
-  serviceBindings.ACCOUNT_PLATFORM = { name: ACCOUNT_PLATFORM_TEST_WORKER };
-  serviceBindings.ACCOUNT_PLATFORM_FIXTURE = {
-    name: ACCOUNT_PLATFORM_TEST_WORKER,
-  };
-  const worker = {
-    name: ACCOUNT_PLATFORM_TEST_WORKER,
-    modulesRoot: dirname(artifactPath),
-    compatibilityDate: "2026-07-07",
-    compatibilityFlags: ["nodejs_compat"],
-    modules: [{ type: "ESModule" as const, path: artifactPath }],
-    d1Databases: { ACCOUNT_DB: "shared-account-platform-acceptance" },
-    bindings: {
-      FIXTURE_ASSERTION_PUBLIC_JWK: JSON.stringify(
-        assertion.publicKey.export({ format: "jwk" }),
-      ),
-      FIXTURE_GOOGLE_PRIVATE_JWK: JSON.stringify(
-        google.privateKey.export({ format: "jwk" }),
-      ),
-      FIXTURE_GOOGLE_PUBLIC_JWK: JSON.stringify(
-        google.publicKey.export({ format: "jwk" }),
-      ),
-      FIXTURE_GOOGLE_CLIENT_ID: "shared-account-satyr-e2e",
-      FIXTURE_PROVISION_PRIVATE_JWK: JSON.stringify(
-        provision.privateKey.export({ format: "jwk" }),
-      ),
-    },
-  };
-  return { workers: [worker], bindings, serviceBindings };
 }
 
 const CODE_MODE_SANDBOX_WORKER = "satyr-code-mode-sandbox-e2e";

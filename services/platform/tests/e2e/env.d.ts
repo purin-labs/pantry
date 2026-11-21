@@ -5,10 +5,6 @@ import type { Env as PantryEnv } from "../../src/env";
 declare global {
   namespace Cloudflare {
     interface Env extends PantryEnv {
-      ACCOUNT_PLATFORM_FIXTURE: Fetcher;
-      TEST_ACCOUNT_PLATFORM_WORKER_SHA256: string;
-      TEST_ACCOUNT_PLATFORM_BASE_URL: string;
-      TEST_ACCOUNT_PLATFORM_PROVISION_TOKEN: string;
       TEST_MIGRATIONS: D1Migration[];
       TEST_REGIONAL_MIGRATIONS: D1Migration[];
       /** The cron triggers of the production Worker. */

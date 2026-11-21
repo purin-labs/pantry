@@ -591,8 +591,7 @@ git diff --check
 the storefront. `pnpm test:units` runs the Platform unit suite, the Portal,
 storefront and package suites and the Worker environment test. CI runs both.
 In a new worktree, `pnpm test:units` needs the R2 files, `pnpm
-async-control:build`, `pnpm --filter @purin-labs/platform contracts:media` and
-`PANTRY_ACCOUNT_WORKER_ARTIFACT`, the path of the built account Worker.
+async-control:build` and `pnpm --filter @purin-labs/platform contracts:media`.
 
 Before a release that changes Slack ingress, model routes or Slack delivery,
 run the live Slack journey against the deployed Worker. It needs a human user
@@ -732,7 +731,7 @@ executor storage.
    before the stream ends, and the provider receipt settles the exact Case
    outbox entry.
 
-The shared Console owns organisation creation and account membership.
-The portal uses the native control plane for provider OAuth,
-setup, readiness, activation, rotation, disable, reconnect, archive, and
-restore operations.
+Pantry owns organisation creation, members, invitations and request
+eligibility ([Plan 95](docs/plan-95-pantry-own-accounts.md)). The portal uses
+the native control plane for these and for provider OAuth, setup, readiness,
+activation, rotation, disable, reconnect, archive, and restore operations.

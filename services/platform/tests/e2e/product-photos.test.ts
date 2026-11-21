@@ -22,7 +22,6 @@ import {
   commerceWorkspace,
   connectCommerceFixture,
 } from "./commerce-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 const STOREFRONT = "storefront_cafe";
 
@@ -72,11 +71,6 @@ async function productPhotos(context: TestContext): Promise<void> {
         Date.now(),
       ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator },
-  });
   const admin = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",

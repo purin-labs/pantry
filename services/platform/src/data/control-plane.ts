@@ -1135,19 +1135,6 @@ type ControlMembershipLookup = Readonly<{
   userId: UserId;
 }>;
 
-export async function listControlMemberships(
-  input: ControlMembershipLookup,
-): Promise<readonly OrganisationMembership[]> {
-  const candidates = await listScopedControlMemberships(input);
-  return candidates.flatMap(placedMembership);
-}
-
-function placedMembership(
-  candidate: ScopedControlMembership,
-): readonly OrganisationMembership[] {
-  return candidate.kind === "placed" ? [candidate.membership] : [];
-}
-
 async function listScopedControlMemberships(
   input: ControlMembershipLookup,
 ): Promise<readonly ScopedControlMembership[]> {

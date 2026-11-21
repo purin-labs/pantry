@@ -5,6 +5,12 @@ ingress `a8d1642c`, release tree `cbfe7b8ec`), with Plan 87 phase 1B. seams-mono
 `80a418ba` runs on the production-mainnet Console with the Jev meter, the $10 self-serve
 credit limit and the customer price. The owner approved the Jev price (D9) on 7 November 2026.
 
+Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step 3, on `dev`, not
+released): Pantry no longer bills through the Console. Free use and the hourly records stay
+local. Paid use is closed, so a call above the free use stops, until Plan 95 step 6 bills paid
+use through Pantry's own Stripe account. The sections below on the Account Platform meter,
+the holds and the credit limit describe the released state before that change.
+
 ## Outcome and scope
 
 An Organisation uses the Jev features with no TypeSafe account and no API key. Satyr
@@ -53,7 +59,7 @@ Out of scope:
   mail classification (`mail-inbox/jev.ts`). The Inbox assistant does not call Jev.
 - Case context discovery is on when its policy row has a mode other than `disabled`.
   The policy pins `funding: "organisation_byo"` and `credentialRef:
-  "organisation_typesafe"` (`case-context-discovery/policy.ts`). No Portal control
+"organisation_typesafe"` (`case-context-discovery/policy.ts`). No Portal control
   publishes the policy.
 - Mail classification needs a row in `mail_classification_eligibility`. Only tests and
   scripts write that row; no product code writes it.
@@ -115,8 +121,8 @@ One resolver gives each call its authority:
 
 ```ts
 type TypeSafeAuthority =
-  | { kind: "satyr_platform" }                                 // TYPESAFE_API_KEY
-  | { kind: "organisation_byo"; connectionRevision: number };  // the Vault key
+  | { kind: "satyr_platform" } // TYPESAFE_API_KEY
+  | { kind: "organisation_byo"; connectionRevision: number }; // the Vault key
 ```
 
 - An Organisation with its own key keeps it. Every other Organisation uses Satyr's key.
@@ -134,11 +140,11 @@ type TypeSafeAuthority =
 
 A new section **Settings › AI features › Jev** holds one switch for each feature:
 
-| Switch | What it turns on | Today |
-| --- | --- | --- |
-| Mail classification | Jev sorts each new email against the mail rules | A test-only eligibility row |
-| Related Cases | Case context discovery, in the mode that the admin picks | A policy with no Portal control |
-| Screen relevance | The suggestion of Plan 87 section 3A | Built in Plan 87 phase 1B |
+| Switch              | What it turns on                                         | Today                           |
+| ------------------- | -------------------------------------------------------- | ------------------------------- |
+| Mail classification | Jev sorts each new email against the mail rules          | A test-only eligibility row     |
+| Related Cases       | Case context discovery, in the mode that the admin picks | A policy with no Portal control |
+| Screen relevance    | The suggestion of Plan 87 section 3A                     | Built in Plan 87 phase 1B       |
 
 - Each switch is off until an admin turns it on. A switch states what goes to TypeSafe,
   and that the use counts toward the allowance.
@@ -169,12 +175,12 @@ A new section **Settings › AI features › Jev** holds one switch for each fea
 
 ### Cost for a reference shop
 
-| Feature | Calls a month | Cost a call | Cost a month |
-| --- | --- | --- | --- |
-| Mail classification | 1,500 | $0.000022 | $0.033 |
-| Screen relevance | 3,000 | $0.000021 | $0.063 |
-| Related Cases | 600 | $0.00007 | $0.042 |
-| **Total** | 5,100 | | **$0.14** |
+| Feature             | Calls a month | Cost a call | Cost a month |
+| ------------------- | ------------- | ----------- | ------------ |
+| Mail classification | 1,500         | $0.000022   | $0.033       |
+| Screen relevance    | 3,000         | $0.000021   | $0.063       |
+| Related Cases       | 600           | $0.00007    | $0.042       |
+| **Total**           | 5,100         |             | **$0.14**    |
 
 The allowance is about 7 times this total. If every Organisation used all of it, 100
 Organisations would cost Satyr $100 a month. At the reference use, they cost about $14.
@@ -203,7 +209,7 @@ first, or postpaid use on the monthly invoice up to a credit limit of $10 (D13).
   - **Pay first (prepaid).** The person buys a credit pack of the shared Console ($10,
     $25 or $50) through Stripe Checkout and returns to the page. Jev spends the credit.
     With no credit left, Jev stops, and the prompt offers another pack.
-  After that, Jev keeps running above the free use at the Jev price version (D9).
+    After that, Jev keeps running above the free use at the Jev price version (D9).
 - **One model for each account.** The Account Platform keeps one active payment model
   for each account. A prepaid account with credit left stays prepaid; a move to postpaid
   waits until its credit is used. This rule belongs to the Account Platform. The shared
@@ -263,12 +269,12 @@ processor and links to the settings page.
 
 Times are estimates in agent days.
 
-| Phase | Result for the person | Agent days | Gate |
-| --- | --- | --- | --- |
-| 1. Satyr authority and switches | Jev features work with no key; the settings page with three switches; the Plan 46 rule changes | 3–4 | J1, J2, J6 |
-| 2. Allowance and records | The month to date, the allowance and the stop; the hourly meter records | 3–4 | J3, J4 |
-| 3. Onboarding and agent | The onboarding step and the two agent tools | 1–2 | J5 |
-| 4. Paid use and the prompt | The Jev price version on the postpaid meter, the prompt at 80 % and 100 %, the paid-use switch with payment setup and the spending limit, the Billing page | 3–4 | J4 again, J7 |
+| Phase                           | Result for the person                                                                                                                                      | Agent days | Gate         |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------ |
+| 1. Satyr authority and switches | Jev features work with no key; the settings page with three switches; the Plan 46 rule changes                                                             | 3–4        | J1, J2, J6   |
+| 2. Allowance and records        | The month to date, the allowance and the stop; the hourly meter records                                                                                    | 3–4        | J3, J4       |
+| 3. Onboarding and agent         | The onboarding step and the two agent tools                                                                                                                | 1–2        | J5           |
+| 4. Paid use and the prompt      | The Jev price version on the postpaid meter, the prompt at 80 % and 100 %, the paid-use switch with payment setup and the spending limit, the Billing page | 3–4        | J4 again, J7 |
 
 The total is 10–14 agent days. Phase 1 is useful alone. Phase 4 waits for the price of
 the subscription and the Jev price version.
@@ -482,21 +488,21 @@ pack in Stripe test mode and spends part of it on Jev.
 The cost column states what the recommendation costs beyond the phase, or what it gives
 up.
 
-| ID | Decision | Recommendation | Cost | Default |
-| --- | --- | --- | --- | --- |
-| D1 | Default authority | Satyr's key; an Organisation's own key stays as an option | Two authorities to keep | Recommendation |
-| D2 | Default switch state | Off until an admin turns it on; one onboarding step turns on all three | One onboarding step | Recommendation |
-| D3 | Allowance | $1.00 of free TypeSafe cost a month for each Organisation; when it runs out, Jev stops unless paid use is on | At most $1.00 a month for each Organisation; about $0.14 at the reference use | Accepted by the owner, 6 and 7 November 2026 |
-| D4 | Before Satyr's prices exist | An unpriced meter; Satyr pays, bounded by D3 | About $14 a month for 100 Organisations at the reference use | Replaced by D9 on 7 November 2026: every account's hours go to the meter, and the free use charges nothing |
-| D5 | Raw Jev access | None; Jev only inside Satyr features | Operator plugins cannot use Jev | Recommendation |
-| D6 | Plan 46 funding rule | Satyr may fund discovery under the switch and the allowance | One edit to Plan 46 | Recommendation |
-| D7 | ZDR and rate limits | Ask TypeSafe before the release | Unknown price; one request from the owner | Ask before phase 2 |
-| D8 | Fair share | 5 requests a second for each Organisation; checks drop on 429, mail retries | A busy Organisation can wait | Recommendation |
-| D9 | Jev price above the free use | $0.084 per million input tokens, two times the TypeSafe cost; no base fee | $5 pays for about 115,000 calls | Accepted by the owner, 7 November 2026 |
-| D10 | Monthly spending limit on paid use | $5 by default; the admin can change it | Jev stops at the limit until the admin raises it | Recommendation |
-| D11 | Agent and paid use | The agent reads the use and the limit; it cannot turn paid use on or raise the limit | The person opens payment setup | Recommendation |
-| D12 | Credit limit for self-serve postpaid use | The Account Platform grants a $10 credit limit when a person who manages billing completes payment setup for Satyr paid use; larger limits stay with Platform support | One change in the shared Account Platform (seams-monorepo); Satyr's loss on an unpaid account is at most $10 | Accepted by the owner, 7 November 2026 |
-| D13 | Billing model | Free use, then prepaid credit packs or postpaid use on the monthly invoice up to the credit limit; one model for each account | Two paths in J7; the Account Platform already has both models | Accepted by the owner, 7 November 2026 |
+| ID  | Decision                                 | Recommendation                                                                                                                                                        | Cost                                                                                                         | Default                                                                                                    |
+| --- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| D1  | Default authority                        | Satyr's key; an Organisation's own key stays as an option                                                                                                             | Two authorities to keep                                                                                      | Recommendation                                                                                             |
+| D2  | Default switch state                     | Off until an admin turns it on; one onboarding step turns on all three                                                                                                | One onboarding step                                                                                          | Recommendation                                                                                             |
+| D3  | Allowance                                | $1.00 of free TypeSafe cost a month for each Organisation; when it runs out, Jev stops unless paid use is on                                                          | At most $1.00 a month for each Organisation; about $0.14 at the reference use                                | Accepted by the owner, 6 and 7 November 2026                                                               |
+| D4  | Before Satyr's prices exist              | An unpriced meter; Satyr pays, bounded by D3                                                                                                                          | About $14 a month for 100 Organisations at the reference use                                                 | Replaced by D9 on 7 November 2026: every account's hours go to the meter, and the free use charges nothing |
+| D5  | Raw Jev access                           | None; Jev only inside Satyr features                                                                                                                                  | Operator plugins cannot use Jev                                                                              | Recommendation                                                                                             |
+| D6  | Plan 46 funding rule                     | Satyr may fund discovery under the switch and the allowance                                                                                                           | One edit to Plan 46                                                                                          | Recommendation                                                                                             |
+| D7  | ZDR and rate limits                      | Ask TypeSafe before the release                                                                                                                                       | Unknown price; one request from the owner                                                                    | Ask before phase 2                                                                                         |
+| D8  | Fair share                               | 5 requests a second for each Organisation; checks drop on 429, mail retries                                                                                           | A busy Organisation can wait                                                                                 | Recommendation                                                                                             |
+| D9  | Jev price above the free use             | $0.084 per million input tokens, two times the TypeSafe cost; no base fee                                                                                             | $5 pays for about 115,000 calls                                                                              | Accepted by the owner, 7 November 2026                                                                     |
+| D10 | Monthly spending limit on paid use       | $5 by default; the admin can change it                                                                                                                                | Jev stops at the limit until the admin raises it                                                             | Recommendation                                                                                             |
+| D11 | Agent and paid use                       | The agent reads the use and the limit; it cannot turn paid use on or raise the limit                                                                                  | The person opens payment setup                                                                               | Recommendation                                                                                             |
+| D12 | Credit limit for self-serve postpaid use | The Account Platform grants a $10 credit limit when a person who manages billing completes payment setup for Satyr paid use; larger limits stay with Platform support | One change in the shared Account Platform (seams-monorepo); Satyr's loss on an unpaid account is at most $10 | Accepted by the owner, 7 November 2026                                                                     |
+| D13 | Billing model                            | Free use, then prepaid credit packs or postpaid use on the monthly invoice up to the credit limit; one model for each account                                         | Two paths in J7; the Account Platform already has both models                                                | Accepted by the owner, 7 November 2026                                                                     |
 
 ## Actions for the owner
 

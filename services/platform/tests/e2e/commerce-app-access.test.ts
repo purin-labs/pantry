@@ -12,7 +12,6 @@ import {
   connectCommerceFixture,
 } from "./commerce-support";
 import { PRODUCTION, PlanJourney } from "./production-plan-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -48,11 +47,6 @@ async function appAccessJourney({ task }: TestContext): Promise<void> {
     merchantId,
     { installSatyr: false },
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const shop = new PlanJourney(organisationId, merchantId, owner.session);
   const provisioned = await shop.native.provisionDemo({
     schemaVersion: "underclerk.provision-demo.v2",

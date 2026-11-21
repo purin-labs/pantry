@@ -12,7 +12,6 @@ import {
   connectCommerceFixture,
 } from "./commerce-support";
 import { network } from "./network";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import {
   commerceEngine,
   configurationHeaders,
@@ -78,11 +77,6 @@ async function stripeInCommerceJourney({ task }: TestContext): Promise<void> {
     merchantId,
     { environment: "production" },
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const returnPath = `/portal/${organisationId}/settings?tab=integrations`;
 
   // 0. The owner first tries Stripe Connect, and Stripe refuses the code.

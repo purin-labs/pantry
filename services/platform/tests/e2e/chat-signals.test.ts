@@ -29,7 +29,6 @@ import {
   requireOrganisationBootstrap,
   requireOrganisationExecutionScope,
 } from "../organisation-execution-fixture";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import {
   PUBLIC_ORIGIN,
   SOCKET_MOVED_CODE,
@@ -292,11 +291,6 @@ async function installChatScenario(): Promise<
         now,
       ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: created.organisationId,
-    owner,
-    members: { operator: teammate },
-  });
   await ensureCreatedOrganisationActor({
     env,
     organisationId: created.organisationId,

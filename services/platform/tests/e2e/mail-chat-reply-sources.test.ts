@@ -196,22 +196,12 @@ async function chatReplySourcesJourney({ task }: TestContext): Promise<void> {
   // The owner may read orders and draft replies in a chat. The
   // administrator reads the mailbox through its setup, and not orders.
   await grantOwnerChatTools(organisationId, account);
-  // A member who joins the Organisation joins its Base Project. The fixture
-  // adds the administrator without it, so the owner adds them.
+  // A member who accepts an invitation joins the Base Project (Plan 95).
   const baseProjectId = await readDefaultProjectId(
     (await requireOrganisationExecutionScope(env, organisationId)).database,
     organisationId,
   );
   if (baseProjectId === null) throw new Error("The Base Project is missing");
-  expect(
-    await postJson(owner, `${paths.projects}/${baseProjectId}/access`, {
-      kind: "set_project_member",
-      operationId: crypto.randomUUID(),
-      expectedAccessRevision: 1,
-      userId: admin.userId,
-      role: "editor",
-    }),
-  ).toMatchObject({ status: 200 });
   await grantOrderRead(organisationId, merchantId, "grant_chat_owner_orders", {
     kind: "organisation_role",
     role: "owner",
@@ -630,7 +620,7 @@ async function chatReplySourcesJourney({ task }: TestContext): Promise<void> {
   // The JSON reporter writes this record, so a run leaves its evidence.
   task.meta.chatReplySources = {
     repeat:
-      "PANTRY_ACCOUNT_WORKER_ARTIFACT=<seams>/.artifacts/shared-account-platform/account-worker/index.mjs pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-chat-reply-sources.test.ts --reporter=json --outputFile=<file>",
+      "pnpm --filter @purin-labs/platform exec vitest run --config vitest.e2e.config.ts tests/e2e/mail-chat-reply-sources.test.ts --reporter=json --outputFile=<file>",
     route: route.model,
     proposalId,
     citationsMade: 2,

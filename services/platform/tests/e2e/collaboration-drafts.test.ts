@@ -38,7 +38,6 @@ import {
   type IssuedControlSession,
 } from "../../src/data/control-plane";
 import type { OrganisationId } from "../../src/ids";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import {
   PUBLIC_ORIGIN,
@@ -739,11 +738,6 @@ async function installCollaborationScenario(
         now,
       ),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId: created.organisationId,
-    owner,
-    members: { operator: editor },
-  });
   await ensureCreatedOrganisationActor({
     env,
     organisationId: created.organisationId,

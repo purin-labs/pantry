@@ -6,7 +6,7 @@ real routes. The simulated devices come from a file. The gateway enrolls, report
 found, sends samples and a fault, answers a pause, reconnects after a kill, and stops for
 good when an owner revokes it. It writes output/shop-gateway/result.json.
 
-Needs PANTRY_ACCOUNT_WORKER_ARTIFACT and free ports 8893 and 8894.
+Needs free port 8893.
 """
 import json
 import os
@@ -85,8 +85,6 @@ class Member:
 
 
 def main() -> None:
-    if not os.environ.get("PANTRY_ACCOUNT_WORKER_ARTIFACT"):
-        raise SystemExit("Set PANTRY_ACCOUNT_WORKER_ARTIFACT to the built shared account Worker.")
     shutil.rmtree(ARTIFACTS, ignore_errors=True)
     ARTIFACTS.mkdir(parents=True)
     work = Path(tempfile.mkdtemp(prefix="shop-gateway-journey-")).resolve()

@@ -65,9 +65,6 @@ import {
   storedContent,
 } from "./case-execution-support";
 import {
-  attachSharedAccountNativeOrganisation,
-} from "./shared-account-platform-fixture";
-import {
   FakeChatGpt,
   signInToChatGpt,
   textAnswer,
@@ -281,11 +278,6 @@ async function prepareMailBudgetJourney() {
   const organisationId = await workspace(owner);
   // The account authority knows this Organisation and its owner, so each
   // control request passes the real account check.
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId,
@@ -3149,11 +3141,6 @@ async function runDraftOnlyJourney(
 ): Promise<void> {
   const owner = await client("mail-draft-owner");
   const organisationId = await workspace(owner);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const rawAccount = await mailbox(
     organisationId,
     owner,
@@ -4668,11 +4655,6 @@ async function reviewQueueHeadlineJourney(): Promise<void> {
     .run();
   // The account authority admits both people, so each refusal below comes
   // from Pantry's own mailbox grant check.
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: ungranted },
-  });
   const account = parseIntegrationAccountId(rawAccount);
   const parsedCase = parseCaseId(`case_gmail_${rawAccount}_work`);
   if (!account.ok || !parsedCase.ok) throw new Error("Invalid queue identity");
@@ -4732,11 +4714,6 @@ async function reviewQueueHeadlineJourney(): Promise<void> {
 async function workJourney(): Promise<void> {
   const owner = await client("mail-work-owner");
   const organisationId = await workspace(owner);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const rawAccount = await mailbox(
     organisationId,
     owner,
@@ -5890,11 +5867,6 @@ async function inboxJourney(): Promise<void> {
     .run();
   // The account authority admits the owner and the viewer, so each refusal
   // below comes from Pantry's own mailbox grant check.
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: ungranted },
-  });
   const listed = await result(await send(organisationId, owner.session, null));
   expect(listed).toEqual({
     kind: "accounts",
@@ -7158,11 +7130,6 @@ async function installMailPlacementFixture() {
   );
   const owner = await client("p55-mail-owner");
   const organisationId = await workspace(owner);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const parsed = parseIntegrationAccountId(
     await mailbox(organisationId, owner, "p55-mail", "full_mailbox_pilot"),
   );
@@ -7325,11 +7292,6 @@ async function organizationJourney(): Promise<void> {
   const owner = await client("organization-owner");
   const outsider = await client("organization-outsider");
   const organisationId = await workspace(owner);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const accountIdRaw = await mailbox(
     organisationId,
     owner,
@@ -8199,11 +8161,6 @@ async function assistantJourney(context: TestContext): Promise<void> {
   );
   const owner = await client("assistant-owner");
   const organisationId = await workspace(owner);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const accountId = await mailbox(
     organisationId,
     owner,
@@ -8647,28 +8604,9 @@ type CaseContextCollectionReplyScenario =
   | "evals_live"
   | "learning_live";
 
-/**
- * The second administrator that a reply journey adds late. The account
- * authority must know each person when the Organisation is attached.
- */
-const REPLY_JOURNEY_COLLEAGUES: Partial<
-  Record<
-    CaseContextCollectionReplyScenario,
-    Readonly<{ subject: string; personId: string }>
-  >
-> = {
-  memory: {
-    subject: "mail-turn-memory-member",
-    personId: "person_mail_turn_member",
-  },
-  evals: { subject: "eval-run-stranger", personId: "person_eval_stranger" },
-  evals_live: {
-    subject: "eval-run-stranger",
-    personId: "person_eval_stranger",
-  },
-};
-
-async function caseContextCollectionMetadataJourney(context: TestContext): Promise<void> {
+async function caseContextCollectionMetadataJourney(
+  context: TestContext,
+): Promise<void> {
   await caseContextCollectionReplyJourney(context, "metadata");
 }
 async function supplierMemoryMailboxJourney(
@@ -8741,25 +8679,12 @@ async function caseContextCollectionReplyJourney(
     now,
   });
   if (!registered.ok) throw new Error(registered.error.code);
-  await installWorkMailbox(organisationId, account.value, owner.identity.userId, now);
-  // The account authority knows this Organisation, its owner and the agent
-  // of the mailbox, so each control request and each mailbox turn passes the
-  // real account check. It also knows the second administrator of the Memory
-  // and the Eval journeys, who gets a role in Pantry late in those journeys.
-  const colleague = REPLY_JOURNEY_COLLEAGUES[scenario];
-  await attachSharedAccountNativeOrganisation({
+  await installWorkMailbox(
     organisationId,
-    owner,
-    members:
-      colleague === undefined
-        ? {}
-        : {
-            operator: {
-              client: await client(colleague.subject),
-              laterPersonId: colleague.personId,
-            },
-          },
-  });
+    account.value,
+    owner.identity.userId,
+    now,
+  );
   const merchantId = await seedPurchasingContext(
     organisationId,
     owner.identity.userId,
@@ -15744,11 +15669,6 @@ function mimeParts(message: string): Record<string, string> {
 async function personReplyJourney(): Promise<void> {
   const owner = await client("p83-person-reply-owner");
   const organisationId = await workspace(owner);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: {},
-  });
   const accountId = parseIntegrationAccountId(
     await mailbox(organisationId, owner, "p83-mail", "full_mailbox_pilot"),
   );

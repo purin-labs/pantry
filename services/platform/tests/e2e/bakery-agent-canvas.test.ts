@@ -755,9 +755,7 @@ async function fixture(
   // The Slack fixture makes the one account attach of the Organisation. It
   // admits the Slack actor and the canvas peer, who becomes a viewer below.
   const peer = await commerceClient("canvas-peer");
-  await installSlackActorFixture({
-    privateMember: { client: peer, laterPersonId: "person_canvas_peer" },
-  });
+  await installSlackActorFixture();
   const operator = await commerceClient("e2e-slack-actor");
   await fixtureDatabase().batch([
     fixtureDatabase()

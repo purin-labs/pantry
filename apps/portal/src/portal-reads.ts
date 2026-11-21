@@ -73,14 +73,9 @@ export async function fetchControlSession(): Promise<SessionSnapshot | null> {
       membership.organisationHandle,
       membership.organisationId,
     );
-  const availability = parseControlMembershipAvailability(
+  const membershipAvailability = parseControlMembershipAvailability(
     raw.membershipAvailability,
   );
-  const membershipAvailability =
-    new URL(window.location.href).searchParams.get("accountLink") ===
-    "incomplete"
-      ? "incomplete"
-      : availability;
   return { identity, supportRole, memberships, membershipAvailability };
 }
 

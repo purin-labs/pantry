@@ -18,7 +18,6 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": [
       "/v1/*",
-      "/account-platform/*",
       "/hook/*",
       "/slack/*",
       "/health",
@@ -102,13 +101,6 @@
         "PANTRY_VAULT_ACTIVE_KEY_VERSION": "v1",
         "SQUARE_OAUTH_ENVIRONMENT": "development",
         "UNDERCLERK_BASE_URL": "http://127.0.0.1:3102",
-        "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "satyr-local",
-        "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-local-user-v1",
-        "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://localhost:3003",
-        "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "http://127.0.0.1:8787",
-        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-local-provision-v1",
-        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "http://127.0.0.1:8787",
-        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://localhost:3003",
         "AIRTABLE_OAUTH_CLIENT_ID": "55e93b04-5c92-4a8d-b96b-d83e7a4caa32",
         "DROPBOX_OAUTH_CLIENT_ID": "08go391f1qw6vbd",
         "GDRIVE_OAUTH_CLIENT_ID": "791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com",
@@ -125,11 +117,6 @@
         "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
       },
       "services": [
-        {
-          "binding": "ACCOUNT_PLATFORM",
-          "service": "seams-sdk-d1-local",
-          "entrypoint": "SatyrAccountPlatform",
-        },
         {
           "binding": "UNDERCLERK",
           "service": "underclerk",
@@ -345,13 +332,6 @@
         "UNDERCLERK_BASE_URL": "https://underclerk.n6378056.workers.dev",
         // No SHOP_ORDER_PAGE_ORIGIN yet: the order page domain is not chosen,
         // so QR codes keep the shop.seams.tokyo/shops/<merchant> address.
-        "ACCOUNT_PLATFORM_DEPLOYMENT_ID": "satyr-production",
-        "ACCOUNT_PLATFORM_USER_ASSERTION_KEY_ID": "satyr-production-user-v1",
-        "ACCOUNT_PLATFORM_ASSERTION_ISSUER": "https://satyr-edge.n6378056.workers.dev",
-        "ACCOUNT_PLATFORM_ASSERTION_AUDIENCE": "https://wallet.seams.sh",
-        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_KEY_ID": "account-production-provision-v1",
-        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_ISSUER": "https://wallet.seams.sh",
-        "ACCOUNT_PLATFORM_PROVISION_ASSERTION_AUDIENCE": "https://satyr-edge.n6378056.workers.dev",
         "WHATSAPP_APP_ID": "3167174123466651",
         "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
         "PANTRY_DEPLOYMENT_PROFILE": "production",
@@ -361,11 +341,6 @@
         "SLACK_CLIENT_ID": "11568910548192.11539475695701",
       },
       "services": [
-        {
-          "binding": "ACCOUNT_PLATFORM",
-          "service": "seams-sdk-d1-console",
-          "entrypoint": "SatyrAccountPlatform",
-        },
         {
           "binding": "UNDERCLERK",
           "service": "underclerk",
@@ -387,9 +362,6 @@
       ],
       "secrets": {
         "required": [
-          "ACCOUNT_PLATFORM_PROVISION_TOKEN",
-          "ACCOUNT_PLATFORM_USER_ASSERTION_PKCS8_B64U",
-          "ACCOUNT_PLATFORM_PROVISION_ASSERTION_JWK",
           "SLACK_SIGNING_SECRET",
           "SLACK_CLIENT_SECRET",
           "SLACK_OAUTH_STATE_SECRET",

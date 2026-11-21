@@ -1,6 +1,5 @@
 import type { JevAllowance } from "@purin-labs/control-api/portal/jev-features";
 import type { OrganisationId } from "../ids";
-import { currentTypeSafeAuthority } from "../integrations/typesafe/authority";
 import {
   JEV_MONTHLY_ALLOWANCE_MICROUSD,
   type TypeSafeUsageLimits,
@@ -43,25 +42,3 @@ export function jevAllowanceView(
       used + SMALLEST_RESERVATION_MICROUSD > JEV_MONTHLY_ALLOWANCE_MICROUSD,
   };
 }
-
-/**
- * True when the free use of the month still covers a call with this
- * reservation, or when the Organisation's own key pays.
- */
-export function jevFreeUseCovers(
-  sql: SqlStorage,
-  organisationId: OrganisationId,
-  reservationMicrousd: number,
-  now: number,
-): boolean {
-  if (currentTypeSafeAuthority(sql, organisationId).kind !== "satyr_platform")
-    return true;
-  return (
-    readMonthlyPantryTypeSafeCost(sql, organisationId, now) +
-      reservationMicrousd <=
-    JEV_MONTHLY_ALLOWANCE_MICROUSD
-  );
-}
-
-/** The mail classification reservation (`MAIL_USAGE_LIMITS`). */
-export const JEV_MAIL_RESERVATION_MICROUSD = SMALLEST_RESERVATION_MICROUSD;

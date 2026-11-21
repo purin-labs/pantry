@@ -1,10 +1,6 @@
 import type { SessionShared } from "./session-shared";
 import type { SessionCheckpoints } from "./session-checkpoints";
 import type { SessionHarnessTurns } from "./session-harness-turns";
-import {
-  countOpenEffectsBesidesBilling,
-  reconcilePantryExecutionBilling,
-} from "../../account-platform/execution-billing";
 import { buildRecoveringSessionCancellation } from "../agent-session-recovery";
 import { reconcileQuarantinedCodeModeSettlements } from "../agent-session-code-mode-settlement";
 import {
@@ -168,7 +164,11 @@ export class SessionTurnRecovery {
       (blocker) => !BLOCKERS_THAT_TERMINATION_ENDS.has(blocker),
     );
     if (others.length > 0) return kept(`work:${others.join("+")}`);
-    const effects = countOpenEffectsBesidesBilling(sql);
+    const effects = sql
+      .exec<{ count: number }>(
+        "SELECT count(*) AS count FROM actor_outbox WHERE state_kind IN ('pending', 'dispatching')",
+      )
+      .one().count;
     if (effects > 0) return kept(`open_effects:${effects}`);
     const lease = readCurrentHarnessTurnLease(sql);
     if (lease !== null)
@@ -195,12 +195,6 @@ export class SessionTurnRecovery {
       requestId: newRequestId(),
       organisation_id: organisationId.value,
       session_id: sessionId.value,
-    });
-    // The billing of the ended turn goes to the account now; a failure
-    // leaves it pending, and the alarm that this sets delivers it later.
-    await reconcilePantryExecutionBilling({
-      env: this.shared.env,
-      storage: this.shared.ctx.storage,
     });
   }
 
@@ -334,10 +328,6 @@ export class SessionTurnRecovery {
   }
 
   async resumePendingPiTurn(): Promise<void> {
-    await reconcilePantryExecutionBilling({
-      env: this.shared.env,
-      storage: this.shared.ctx.storage,
-    });
     if (this.shared.canonicalTurn !== null) return;
     const pending = readPiDurableRecovery(this.shared.ctx.storage.sql);
     if (pending === null) return;

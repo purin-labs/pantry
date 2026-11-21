@@ -1,9 +1,9 @@
 // The Worker of the shared archive journeys (Plan 70 J3):
 // verify-shared-artifacts-browser.js and verify-large-shared-archive-browser.js.
-// serve-archive-acceptance.mjs starts it on port 8840 with local D1 and R2 and
-// the built account Worker as its account authority. Every /v1 request uses
-// production routing and authorization. GET /fixture/setup builds the
-// Organisation and signs in its two people, which a browser cannot do alone.
+// serve-archive-acceptance.mjs starts it on port 8840 with local D1 and R2.
+// Every /v1 request uses production routing and authorization. GET
+// /fixture/setup builds the Organisation and signs in its two people, which a
+// browser cannot do alone.
 import gateway from "../../services/platform/src/integration-gateway";
 import { issueControlSession } from "../../services/platform/src/data/control-plane";
 import type { Env } from "../../services/platform/src/env";

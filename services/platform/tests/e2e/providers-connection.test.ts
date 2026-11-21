@@ -12,7 +12,6 @@ import { parseIntegrationAccountId, type OrganisationId } from "../../src/ids";
 import { network } from "./network";
 import { commerceWorkspace } from "./commerce-support";
 import { controlReadHeaders } from "./hibernatable-socket-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { assertNever, bytesToHex, isRecord } from "@purin-labs/std";
 
 const PUBLIC_ORIGIN = "https://localhost";
@@ -299,11 +298,6 @@ async function createControlScenario(
     client,
     `${provider} Provider E2E`,
   );
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner: client,
-    members: {},
-  });
   return { organisationId, session };
 }
 

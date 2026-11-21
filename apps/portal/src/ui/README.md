@@ -232,10 +232,10 @@ plan, test-result, or public reasoning event contract, so those gallery examples
 remain demonstrations. No private model reasoning is exposed.
 
 The native journey is `services/platform/tests/e2e/chat-execution.test.ts`.
-Run it with `PANTRY_ACCOUNT_WORKER_ARTIFACT` set to the built account Worker and
-the platform's E2E Vitest configuration. It checks real accepted tool data,
-pagination, Actor restart, and denied reads from another member. The browser
-journey is `scripts/frontend-foundation/chat-trace-journey.js`, starting from
+Run it with the platform's E2E Vitest configuration. It checks real accepted
+tool data, pagination, Actor restart, and denied reads from another member. The
+browser journey is `scripts/frontend-foundation/chat-trace-journey.js`,
+starting from
 `/chat-preview.html?scenario=trace-execution&conversation=conv_00000000-0000-0000-0000-000000000001`.
 Its simulated API events check out-of-order completion, preserved expansion,
 failure output, sources, pending work, and access loss in the actual chat UI.

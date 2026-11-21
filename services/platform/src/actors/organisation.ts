@@ -1,8 +1,5 @@
 import type { ScreenRelevanceCheckInput } from "../jev-features/screen-relevance-check";
-import {
-  deliverJevUsageHours,
-  sealJevUsageHours,
-} from "../jev-features/usage-records";
+import { sealJevUsageHours } from "../jev-features/usage-records";
 import {
   actorMachineCensus,
   type MachineCensus,
@@ -2747,7 +2744,7 @@ export class OrganisationDO
         },
       },
       {
-        // Plan 88: each closed hour of Jev use on Pantry's key goes to the meter.
+        // Plan 88: each closed hour of Jev use on Pantry's key is sealed.
         name: "jev_usage",
         run: async () => {
           this.ctx.storage.transactionSync(
@@ -2758,12 +2755,6 @@ export class OrganisationDO
               now,
             ),
           );
-          await deliverJevUsageHours({
-            sql: this.ctx.storage.sql,
-            env: this.env,
-            organisationId: organisationId.value,
-            now,
-          });
         },
       },
       {

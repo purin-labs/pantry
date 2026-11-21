@@ -2715,7 +2715,7 @@ function isTextContent(content) {
 // and reaches it over HTTP, as Platform reaches production.
 async function loadCommerceFixture() {
   const helper = "services/platform/tests/commerce-fixture-worker.ts";
-  const { startUnderclerkWorker: startCommerceWorker } = await import(
+  const { startCommerceWorker } = await import(
     pathToFileURL(join(repository, helper)).href
   );
   for (const source of [

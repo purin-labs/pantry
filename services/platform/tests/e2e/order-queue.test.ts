@@ -47,7 +47,6 @@ import {
   expectPong,
   openSocket,
 } from "./hibernatable-socket-support";
-import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";
 import { boardIdOf, nextSignal } from "./menu-board-journey-support";
 
 declare module "vitest" {
@@ -116,11 +115,6 @@ async function soldOutAndHoursJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, staff.identity.userId, "operator"),
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
   const admin = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",
@@ -382,11 +376,6 @@ async function orderQueueJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, staff.identity.userId, "operator"),
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
   const admin = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",
@@ -629,11 +618,6 @@ async function failedPaymentsJourney({ task }: TestContext): Promise<void> {
     ...member(organisationId, staff.identity.userId, "operator"),
     ...member(organisationId, viewer.identity.userId, "viewer"),
   ]);
-  await attachSharedAccountNativeOrganisation({
-    organisationId,
-    owner,
-    members: { operator: staff, privateMember: viewer },
-  });
   const admin = new CommerceAdminClient({
     baseUrl: "http://underclerk.test",
     serviceToken: "underclerk-e2e-token",

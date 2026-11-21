@@ -21,7 +21,6 @@ export default {
     hmr: false,
     proxy: {
       "/v1": { target: worker, ws: true },
-      "/account-platform": { target: worker },
       "/test": { target: worker },
       "/shop-voice": { target: worker },
     },

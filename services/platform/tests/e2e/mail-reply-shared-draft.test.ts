@@ -736,22 +736,12 @@ async function draftReply() {
   const connector = await mailboxConnector(organisationId, account);
   await runDurableObjectAlarm(connector);
   await grantOwnerReplyTools(organisationId, account);
-  // A chat's reply carries the chat's Project. The fixture adds the
-  // administrator without the Base Project, so the owner adds them.
+  // A member who accepts an invitation joins the Base Project (Plan 95).
   const baseProjectId = await readDefaultProjectId(
     (await requireOrganisationExecutionScope(env, organisationId)).database,
     organisationId,
   );
   if (baseProjectId === null) throw new Error("The Base Project is missing");
-  expect(
-    await postJson(owner, `${paths.projects}/${baseProjectId}/access`, {
-      kind: "set_project_member",
-      operationId: crypto.randomUUID(),
-      expectedAccessRevision: 1,
-      userId: admin.userId,
-      role: "editor",
-    }),
-  ).toMatchObject({ status: 200 });
   await enableCapabilities(owner, [
     CAPABILITY_KEYS.emailMailboxRead,
     CAPABILITY_KEYS.emailReplyPropose,
