@@ -165,19 +165,7 @@ export type { AccessApprovalState } from "./types/AccessApprovalState";
 export type { AccessDecisionExplanation } from "./types/AccessDecisionExplanation";
 export type { AccessDecisionQuestion } from "./types/AccessDecisionQuestion";
 export type { AccessGrantLifecycle } from "./access-control.ts";
-import type { AccessGrantTarget as GeneratedAccessGrantTarget } from "./types/AccessGrantTarget";
-import type { Variant } from "@purin-labs/type-utils";
-export type AccessGrantTarget =
-  | Exclude<
-      GeneratedAccessGrantTarget,
-      { kind: "commerce_read" | "commerce_command" }
-    >
-  | (Omit<Variant<GeneratedAccessGrantTarget, "commerce_read">, "scope"> & {
-      scope: CommerceReadGrantScope;
-    })
-  | (Omit<Variant<GeneratedAccessGrantTarget, "commerce_command">, "scope"> & {
-      scope: import("@purin-labs/commerce-contracts").CommerceAuthorityScope;
-    });
+export type { AccessGrantTarget } from "./types/AccessGrantTarget";
 export type { AccessSubjectRef } from "./types/AccessSubjectRef";
 export type { AccessTargetRef } from "./types/AccessTargetRef";
 export type { CapabilityDefinition } from "./access-control.ts";
@@ -194,10 +182,7 @@ export type { CapabilityPolicyProvenance } from "./types/CapabilityPolicyProvena
 export type { CapabilityProviderDependency } from "./access-control.ts";
 export type { CapabilityRef } from "./types/CapabilityRef";
 export type { CaseRef } from "./types/CaseRef";
-export type CommerceReadGrantScope = Variant<
-  import("@purin-labs/commerce-contracts").CommerceAuthorityScope,
-  "entity_type" | "commerce_list" | "saved_selector"
->;
+export type { CommerceReadGrantScope } from "./types/CommerceReadGrantScope";
 export type { EffectiveGrantRef } from "./types/EffectiveGrantRef";
 export type { FlowDestinationRef } from "./types/FlowDestinationRef";
 export type { GrantProvenance } from "./types/GrantProvenance";

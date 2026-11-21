@@ -1,21 +1,27 @@
+import type { OrganisationModuleHost } from "./module-host";
 import type { OrganisationDatabase } from "../../database-handles";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { Env } from "../../env";
 import {
   activatePendingIntegrationAccounts,
+  beginOnboardingActivation,
   checkpointActivationStep,
+  completeOnboardingActivation,
   failOnboardingActivation,
   type ActivationContext,
   type ActivationFailureReceipt,
+  type ActivationReceipt,
+  type OnboardingActivationInput,
 } from "../../data/activation";
 import {
-  parseRequestId,
+  newRequestId,
   parseThreadKey,
   type ChannelId,
   type OrganisationId,
   type ThreadKey,
   type WorkspaceId,
 } from "../../ids";
+import { traceWarn } from "../../observability";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import {
   compileAndStoreCueSnapshot,
@@ -24,44 +30,23 @@ import {
   writeTierOneStripeSubscription,
 } from "../../cues/engine";
 import type { Result } from "../../result";
-import { expireDueActionExecutions } from "../action-ledger";
-import { expireCodeModeOrganisationReservations } from "../code-mode-budget";
-import { expireAbandonedCueClaims } from "../cue-delivery";
-import type { OrganisationCutoverQuiescence } from "../organisation-cutover-quiescence";
-import { isNonNegativeInteger } from "@purin-labs/std";
-import type { ActivationExecutionFailure } from "../../organisation/contract/activation-types";
-import type { CafeCommerceAcceptanceFaultRecord } from "../../commerce/contract/types";
+import { errorMessage } from "@purin-labs/std";
+import {
+  armOnboardingActivationAcceptanceFault,
+  clearOnboardingActivationAcceptanceFault,
+  consumeOnboardingActivationAcceptanceFault,
+  inspectOnboardingActivationAcceptanceFault,
+  type OnboardingActivationAcceptanceFaultError,
+  type OnboardingActivationAcceptanceFaultInput,
+  type OnboardingActivationAcceptanceFaultInspection,
+  type OnboardingActivationAcceptanceFaultRecord,
+} from "../../organisation/contract/onboarding-activation-acceptance-fault";
+import type {
+  ActivationExecutionFailure,
+  OnboardingActivationError,
+} from "../../organisation/contract/activation-types";
 
-export const CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY =
-  "acceptance:cafe-commerce-fault:v1";
-
-export function expireOrganisationLeases(
-  sql: SqlStorage,
-  organisationId: OrganisationId,
-  now: number,
-): void {
-  expireDueActionExecutions(sql, organisationId, now);
-  expireCodeModeOrganisationReservations(sql, now);
-  expireAbandonedCueClaims(sql, organisationId, now);
-}
-
-export function isExpiredOrganisationCutoverCue(
-  inspection: OrganisationCutoverQuiescence,
-  settledAt: number,
-): boolean {
-  if (inspection.kind !== "blocked" || inspection.blockers.length !== 1) {
-    return false;
-  }
-
-  const blocker = inspection.blockers[0];
-  return (
-    blocker.kind === "claimed_cues" &&
-    blocker.count === 1 &&
-    blocker.earliestLeaseExpiresAt <= settledAt
-  );
-}
-
-export async function ensureActivationReadinessStep(
+async function ensureActivationReadinessStep(
   db: OrganisationDatabase,
   context: ActivationContext,
   now: number,
@@ -94,7 +79,7 @@ type OrganisationRecordWriter = Readonly<{
   ): Promise<unknown>;
 }>;
 
-export async function ensureActivationPlacementStep(
+async function ensureActivationPlacementStep(
   organisation: OrganisationRecordWriter,
   db: OrganisationDatabase,
   context: ActivationContext,
@@ -119,7 +104,7 @@ export async function ensureActivationPlacementStep(
   });
 }
 
-export async function ensureActivationPolicyStep(
+async function ensureActivationPolicyStep(
   organisation: Parameters<
     typeof compilePublishAndActivateOrganisationPolicy
   >[0]["organisation"],
@@ -156,7 +141,7 @@ export async function ensureActivationPolicyStep(
   return { ok: true, value: null };
 }
 
-export async function ensureActivationCueStep(
+async function ensureActivationCueStep(
   env: Env,
   scope: OrganisationExecutionScope,
   context: ActivationContext,
@@ -369,7 +354,7 @@ async function materializeProactiveCues(
   });
 }
 
-export async function ensureActivationAccountsStep(
+async function ensureActivationAccountsStep(
   db: OrganisationDatabase,
   context: ActivationContext,
   now: number,
@@ -391,7 +376,7 @@ export async function ensureActivationAccountsStep(
   });
 }
 
-export async function recordActivationFailure(
+async function recordActivationFailure(
   db: OrganisationDatabase,
   context: ActivationContext,
   failureCode: ActivationExecutionFailure["code"],
@@ -406,7 +391,7 @@ export async function recordActivationFailure(
   });
 }
 
-export function activationExecutionFailure(
+function activationExecutionFailure(
   code: ActivationExecutionFailure["code"],
   receipt: ActivationFailureReceipt,
 ): ActivationExecutionFailure {
@@ -418,45 +403,208 @@ export function activationExecutionFailure(
   };
 }
 
-export function hasOnboardingActivationAcceptanceFaultsEnabled(
-  env: Env,
-): boolean {
+function hasOnboardingActivationAcceptanceFaultsEnabled(env: Env): boolean {
   return (
     typeof env.PANTRY_FAULT_INJECTION_TOKEN === "string" &&
     env.PANTRY_FAULT_INJECTION_TOKEN.length > 0
   );
 }
 
-export function parseCafeCommerceAcceptanceFault(
-  raw: unknown,
-): CafeCommerceAcceptanceFaultRecord {
-  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    throw new Error("cafe_commerce_acceptance_fault_invalid");
+/** What an onboarding activation needs from the rest of the Organisation. */
+type OnboardingActivationParts = Parameters<
+  typeof ensureActivationPlacementStep
+>[0] &
+  Parameters<typeof ensureActivationPolicyStep>[0];
+
+/**
+ * The onboarding activation of the Organisation: the activation steps, and
+ * the acceptance fault that interrupts them in a fault journey.
+ */
+export class OrganisationActivation {
+  constructor(
+    private readonly host: OrganisationModuleHost,
+    /**
+     * The two steps of an onboarding activation that other parts of the
+     * Organisation own: its record and its policy.
+     */
+    private readonly organisation: OnboardingActivationParts,
+  ) {}
+
+  async activateOnboarding(
+    input: OnboardingActivationInput,
+  ): Promise<Result<ActivationReceipt, OnboardingActivationError>> {
+    return this.host.command(
+      input.organisationId,
+      this.admittedActivateOnboarding.bind(this, input),
+    );
   }
-  const record = raw as Record<string, unknown>;
-  const requestId =
-    typeof record.requestId === "string"
-      ? parseRequestId(record.requestId)
-      : { ok: false as const };
-  if (
-    record.schemaVersion !== 1 ||
-    !requestId.ok ||
-    typeof record.merchantId !== "string" ||
-    record.merchantId.length === 0 ||
-    !isNonNegativeInteger(record.armedAt) ||
-    !isNullableAcceptanceTimestamp(record.queueConsumedAt)
-  ) {
-    throw new Error("cafe_commerce_acceptance_fault_invalid");
+
+  private async admittedActivateOnboarding(
+    input: OnboardingActivationInput,
+    scope: OrganisationExecutionScope,
+  ): Promise<Result<ActivationReceipt, OnboardingActivationError>> {
+    const started = await beginOnboardingActivation({
+      db: scope.database,
+      request: input,
+      fence: scope,
+    });
+    if (!started.ok) {
+      return started;
+    }
+    if (started.value.kind === "completed") {
+      return { ok: true, value: started.value.receipt };
+    }
+    const context = started.value.context;
+    try {
+      await ensureActivationReadinessStep(scope.database, context, input.now);
+      await ensureActivationPlacementStep(
+        this.organisation,
+        scope.database,
+        context,
+        input.now,
+      );
+      const interrupted = await this.interruptOnboardingActivationForAcceptance(
+        scope,
+        context,
+        input.now,
+      );
+      if (interrupted !== null) {
+        return { ok: false, error: interrupted };
+      }
+      const policy = await ensureActivationPolicyStep(
+        this.organisation,
+        this.host.env,
+        scope,
+        context,
+        input.now,
+      );
+      if (!policy.ok) {
+        const failure = await recordActivationFailure(
+          scope.database,
+          context,
+          policy.error.code,
+          input.now,
+        );
+        return {
+          ok: false,
+          error: activationExecutionFailure(policy.error.code, failure),
+        };
+      }
+      const cues = await ensureActivationCueStep(
+        this.host.env,
+        scope,
+        context,
+        input.now,
+      );
+      if (!cues.ok) {
+        const failure = await recordActivationFailure(
+          scope.database,
+          context,
+          cues.error.code,
+          input.now,
+        );
+        return {
+          ok: false,
+          error: activationExecutionFailure(cues.error.code, failure),
+        };
+      }
+      await ensureActivationAccountsStep(scope.database, context, input.now);
+      await checkpointActivationStep({
+        db: scope.database,
+        context,
+        step: "publish",
+        receipt: { activationReadyToFinalize: true },
+        now: input.now,
+      });
+      const receipt = await completeOnboardingActivation({
+        db: scope.database,
+        context,
+        now: input.now,
+      });
+      return { ok: true, value: receipt };
+    } catch (error) {
+      const failure = await recordActivationFailure(
+        scope.database,
+        context,
+        "activation_publish_failed",
+        input.now,
+      );
+      traceWarn("organisation.onboarding_activation_failed", {
+        requestId: newRequestId(),
+        organisation_id: context.organisationId,
+        activation_attempt_id: context.attemptId,
+        error: errorMessage(error),
+      });
+      return {
+        ok: false,
+        error: activationExecutionFailure("activation_publish_failed", failure),
+      };
+    }
   }
-  return {
-    schemaVersion: 1,
-    requestId: requestId.value,
-    merchantId: record.merchantId,
-    armedAt: record.armedAt,
-    queueConsumedAt: record.queueConsumedAt,
-  };
+
+  async armOnboardingActivationAcceptanceFault(
+    input: OnboardingActivationAcceptanceFaultInput,
+  ): Promise<
+    Result<
+      OnboardingActivationAcceptanceFaultRecord,
+      OnboardingActivationAcceptanceFaultError
+    >
+  > {
+    return armOnboardingActivationAcceptanceFault(this.host.ctx.storage, input);
+  }
+
+  async inspectOnboardingActivationAcceptanceFault(): Promise<
+    Result<
+      OnboardingActivationAcceptanceFaultInspection,
+      OnboardingActivationAcceptanceFaultError
+    >
+  > {
+    return inspectOnboardingActivationAcceptanceFault(this.host.ctx.storage);
+  }
+
+  async clearOnboardingActivationAcceptanceFault(): Promise<void> {
+    await clearOnboardingActivationAcceptanceFault(this.host.ctx.storage);
+  }
+
+  private async interruptOnboardingActivationForAcceptance(
+    scope: OrganisationExecutionScope,
+    context: ActivationContext,
+    now: number,
+  ): Promise<ActivationExecutionFailure | null> {
+    if (!hasOnboardingActivationAcceptanceFaultsEnabled(this.host.env)) {
+      return null;
+    }
+    const consumed = await consumeOnboardingActivationAcceptanceFault(
+      this.host.ctx.storage,
+      now,
+    );
+    if (!consumed.ok) {
+      throw new Error(consumed.error.code);
+    }
+    if (consumed.value.kind === "inactive") {
+      return null;
+    }
+    const failure = await recordActivationFailure(
+      scope.database,
+      context,
+      "activation_interrupted",
+      now,
+    );
+    traceWarn("organisation.onboarding_activation_acceptance_interrupted", {
+      requestId: consumed.value.fault.requestId,
+      organisation_id: context.organisationId,
+      activation_attempt_id: context.attemptId,
+      activation_phase: consumed.value.fault.phase,
+    });
+    return activationExecutionFailure("activation_interrupted", failure);
+  }
 }
 
-function isNullableAcceptanceTimestamp(raw: unknown): raw is number | null {
-  return raw === null || isNonNegativeInteger(raw);
-}
+/** The RPC methods of this module. The Actor class has one method for each. */
+export type OrganisationActivationRpc = Pick<
+  OrganisationActivation,
+  | "activateOnboarding"
+  | "armOnboardingActivationAcceptanceFault"
+  | "inspectOnboardingActivationAcceptanceFault"
+  | "clearOnboardingActivationAcceptanceFault"
+>;

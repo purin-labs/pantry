@@ -15,6 +15,13 @@ import {
 } from "./record-values.ts";
 import { decodeValue } from "./sorted-unions.ts";
 
+export {
+  integrationAccountIdSchema,
+  organisationIdSchema,
+  type IntegrationAccountId,
+  type OrganisationId,
+} from "./ids.ts";
+
 export const SafeInteger = Type.Integer({
   minimum: Number.MIN_SAFE_INTEGER,
   maximum: Number.MAX_SAFE_INTEGER,
@@ -122,14 +129,18 @@ export function parseContractArray<T>(
   return { ok: true, value: parsed };
 }
 
-class InvalidContractInteger extends TypeError {}
+/**
+ * The refusal of {@link jsonSafeInteger}: an integer that JSON cannot carry
+ * without a loss.
+ */
+export class UnsafeJsonIntegerError extends TypeError {}
 
 /** Normalize JSON values once, with the integer rules of the Wasm boundary. */
 export function normalizeContractInput(
   value: unknown,
 ): ContractDecodeResult<unknown> {
   try {
-    const serialized = JSON.stringify(value, serializeInteger);
+    const serialized = JSON.stringify(value, jsonSafeInteger);
     if (serialized === undefined)
       return invalidJson("value is not JSON serializable");
     const parsed: unknown = JSON.parse(serialized);
@@ -139,7 +150,7 @@ export function normalizeContractInput(
       );
     return { ok: true, value: parsed };
   } catch (error) {
-    if (error instanceof InvalidContractInteger) {
+    if (error instanceof UnsafeJsonIntegerError) {
       return invalidInteger(
         "contract integer exceeds the JavaScript safe range",
       );
@@ -292,11 +303,16 @@ export function canonicalContractDigest(value: unknown): Promise<string> {
   return sha256Hex(canonicalJsonByCodePoint(value));
 }
 
-function serializeInteger(_key: string, value: unknown): unknown {
+/**
+ * The `JSON.stringify` replacer of the integer rules of the Wasm boundary: a
+ * safe bigint becomes a number, and an unsafe bigint or integer throws
+ * {@link UnsafeJsonIntegerError}.
+ */
+export function jsonSafeInteger(_key: string, value: unknown): unknown {
   if (typeof value === "bigint") {
     const number = Number(value);
     if (!Number.isSafeInteger(number) || BigInt(number) !== value)
-      throw new InvalidContractInteger();
+      throw new UnsafeJsonIntegerError();
     return number;
   }
   if (
@@ -304,7 +320,7 @@ function serializeInteger(_key: string, value: unknown): unknown {
     Number.isInteger(value) &&
     !Number.isSafeInteger(value)
   ) {
-    throw new InvalidContractInteger();
+    throw new UnsafeJsonIntegerError();
   }
   return value;
 }

@@ -24,6 +24,25 @@ export type CafeCommerceAcceptanceFaultRecord = Readonly<{
   queueConsumedAt: number | null;
 }>;
 
+// The commerce types that the records of `@purin-labs/contracts` carry.
+declare module "@purin-labs/contracts/commerce-parts" {
+  interface ContractCommerceParts {
+    /** The scope of a commerce command grant. */
+    authorityScope: import("@purin-labs/commerce-contracts").CommerceAuthorityScope;
+    /** The scope of a commerce read grant. */
+    readGrantScope: import("@purin-labs/type-utils").Variant<
+      import("@purin-labs/commerce-contracts").CommerceAuthorityScope,
+      "entity_type" | "commerce_list" | "saved_selector"
+    >;
+    /** The target of a commerce command grant. */
+    mutationTarget: import("@purin-labs/commerce-contracts").CommerceMutationTarget;
+    /** The commerce proposal of a Case. */
+    entityPlaneProposal: import("@purin-labs/commerce-contracts").CommerceEntityPlaneProposal;
+    /** The provenance of a commerce record in a Case. */
+    sourceProvenance: import("@purin-labs/commerce-contracts").SourceProvenance;
+  }
+}
+
 // The commerce types that foundation records carry (`commerce-type-parts.ts`).
 declare module "../../commerce-type-parts" {
   interface CommerceTypeParts {

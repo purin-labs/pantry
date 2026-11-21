@@ -156,7 +156,13 @@ import type { Env } from "../env";
 import { parseOrganisationId, newRequestId, type OrganisationId } from "../ids";
 import { traceLog } from "../observability";
 import type { Result } from "../result";
-import { admitActorRecovery, pinnedActorDatabase } from "./actor-activation";
+import {
+  admitActorRecovery,
+  advanceActorActivationSchema,
+  pinnedActorDatabase,
+  type ActorActivationSchemaAdvance,
+  type ActorActivationSchemaAdvanceError,
+} from "./actor-activation";
 import {
   exportActorPlacement,
   importActorExport,
@@ -179,7 +185,10 @@ import { type AcceptedMemoryCursor } from "../memory/store";
 import { cleanupTypeSafeCredentials } from "../integrations/typesafe/connection";
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
-import { expireOrganisationLeases } from "./organisation/activation";
+import {
+  OrganisationActivation,
+  type OrganisationActivationRpc,
+} from "./organisation/activation";
 import {
   CASE_CONTEXT_SOURCE_FOR_POLICY,
   deliverCaseContextCollectionInvalidations,
@@ -189,6 +198,7 @@ import {
   schemaTransaction,
 } from "./organisation/schema";
 import {
+  expireOrganisationLeases,
   organisationRowToMeta,
   pruneCommerceBoardPresence,
   readCommerceBoardPresence,
@@ -259,22 +269,22 @@ export class OrganisationDO
     OrganisationPolicyRpc,
     OrganisationJevRpc,
     OrganisationCaseContextCollectionRpc,
-    OrganisationCommerceRpc
+    OrganisationCommerceRpc,
+    OrganisationActivationRpc
 {
   // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
-  // the cues, the commerce lab, the Code Mode leases, the workspace executor
-  // allocation and the onboarding activation.
+  // the cues, the commerce lab, the Code Mode leases and the workspace
+  // executor allocation.
 
-  protected readonly commerce = new OrganisationCommerce(this.moduleHost, {
+  protected readonly commerce = new OrganisationCommerce(this.moduleHost);
+
+  // Activation (`actors/organisation/activation.ts`): the onboarding
+  // activation and its acceptance fault.
+
+  protected readonly activation = new OrganisationActivation(this.moduleHost, {
     ensureOrganisation: (input) => this.ensureOrganisation(input),
     activatePolicy: (input) => this.activatePolicy(input),
   });
-
-  advanceActivationSchema(
-    ...input: Parameters<OrganisationCommerce["advanceActivationSchema"]>
-  ) {
-    return this.commerce.advanceActivationSchema(...input);
-  }
 
   proposeAction(...input: Parameters<OrganisationCommerce["proposeAction"]>) {
     return this.commerce.proposeAction(...input);
@@ -455,33 +465,33 @@ export class OrganisationDO
   }
 
   activateOnboarding(
-    ...input: Parameters<OrganisationCommerce["activateOnboarding"]>
+    ...input: Parameters<OrganisationActivation["activateOnboarding"]>
   ) {
-    return this.commerce.activateOnboarding(...input);
+    return this.activation.activateOnboarding(...input);
   }
 
   armOnboardingActivationAcceptanceFault(
     ...input: Parameters<
-      OrganisationCommerce["armOnboardingActivationAcceptanceFault"]
+      OrganisationActivation["armOnboardingActivationAcceptanceFault"]
     >
   ) {
-    return this.commerce.armOnboardingActivationAcceptanceFault(...input);
+    return this.activation.armOnboardingActivationAcceptanceFault(...input);
   }
 
   inspectOnboardingActivationAcceptanceFault(
     ...input: Parameters<
-      OrganisationCommerce["inspectOnboardingActivationAcceptanceFault"]
+      OrganisationActivation["inspectOnboardingActivationAcceptanceFault"]
     >
   ) {
-    return this.commerce.inspectOnboardingActivationAcceptanceFault(...input);
+    return this.activation.inspectOnboardingActivationAcceptanceFault(...input);
   }
 
   clearOnboardingActivationAcceptanceFault(
     ...input: Parameters<
-      OrganisationCommerce["clearOnboardingActivationAcceptanceFault"]
+      OrganisationActivation["clearOnboardingActivationAcceptanceFault"]
     >
   ) {
-    return this.commerce.clearOnboardingActivationAcceptanceFault(...input);
+    return this.activation.clearOnboardingActivationAcceptanceFault(...input);
   }
 
   armCafeCommerceAcceptanceFault(
@@ -2166,6 +2176,19 @@ export class OrganisationDO
 
   protected acceptsActivation(): boolean {
     return true;
+  }
+
+  async advanceActivationSchema(
+    input: ActorActivationSchemaAdvance,
+  ): Promise<
+    Result<
+      { readonly kind: "advanced"; readonly stateVersion: number },
+      ActorActivationSchemaAdvanceError
+    >
+  > {
+    return this.ctx.storage.transactionSync(
+      advanceActorActivationSchema.bind(null, this.ctx.storage.sql, input),
+    );
   }
 
   async reconcileRelocationReceipt(request: RelocationReceiptRequest) {

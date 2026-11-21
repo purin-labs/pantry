@@ -1,10 +1,10 @@
 import { Type, type Static, type TSchema } from "typebox";
 import { Value } from "typebox/value";
-import { commerceAuthorityScopeWireSchema } from "@purin-labs/commerce-contracts/authority-scope";
-import { commerceMutationTargetWireSchema } from "@purin-labs/commerce-contracts/entity-plane-receipts";
 import { commerceSystemKindSchema } from "./commerce-system.ts";
-import { parseCommerceGraphQuery } from "@purin-labs/commerce-contracts/graph-query";
-import { systemEntityTypeIdSchema } from "@purin-labs/commerce-contracts/query-parts";
+import {
+  jsonSafeInteger,
+  UnsafeJsonIntegerError,
+} from "@purin-labs/contract-schema";
 import { hasLoneSurrogate, isRecord } from "@purin-labs/std";
 
 // Plan 78: TypeScript port of access_control.rs. Rust validates these values
@@ -79,93 +79,6 @@ export const fileResourceScopeSchema = Type.Union([
     providerFileId: Type.String(),
     name: Type.String(),
   }),
-]);
-
-const commerceEntityTypeIdShape = Type.Union([
-  systemEntityTypeIdSchema,
-  Type.Object({ origin: Type.Literal("custom"), typeId: Type.String() }),
-]);
-const publishedCommerceSelectorShape = Type.Object({
-  selectorId: Type.String(),
-  revision: u64,
-  query: Type.Unknown(),
-});
-const commerceReadGrantScopeShape = Type.Union([
-  Type.Object(
-    {
-      kind: Type.Literal("entity_type"),
-      entityTypeId: commerceEntityTypeIdShape,
-    },
-    strict,
-  ),
-  Type.Object(
-    { kind: Type.Literal("commerce_list"), listId: Type.String() },
-    strict,
-  ),
-  Type.Object(
-    {
-      kind: Type.Literal("saved_selector"),
-      selector: publishedCommerceSelectorShape,
-    },
-    strict,
-  ),
-]);
-const capability = {
-  capabilityId: Type.String(),
-  capabilityVersion: u32,
-};
-const accessGrantTargetShape = Type.Union([
-  Type.Object(
-    { kind: Type.Literal("platform_capability"), ...capability },
-    strict,
-  ),
-  Type.Object(
-    {
-      kind: Type.Literal("provider_resource"),
-      ...capability,
-      integrationAccountId: Type.String(),
-      resourceScope: Type.String(),
-    },
-    strict,
-  ),
-  Type.Object(
-    {
-      kind: Type.Literal("file_resource"),
-      ...capability,
-      integrationAccountId: Type.String(),
-      scope: fileResourceScopeSchema,
-    },
-    strict,
-  ),
-  Type.Object(
-    {
-      kind: Type.Literal("custom_connector_operation"),
-      ...capability,
-      integrationAccountId: Type.String(),
-      connectorId: Type.String(),
-      definitionRevision: u32,
-      definitionDigest: Type.String(),
-      operationId: Type.String(),
-    },
-    strict,
-  ),
-  Type.Object(
-    {
-      kind: Type.Literal("commerce_read"),
-      ...capability,
-      scope: commerceReadGrantScopeShape,
-    },
-    strict,
-  ),
-  Type.Object(
-    {
-      kind: Type.Literal("commerce_command"),
-      ...capability,
-      scope: commerceAuthorityScopeWireSchema,
-      target: commerceMutationTargetWireSchema,
-    },
-    strict,
-  ),
 ]);
 
 const accessGrantLifecycleSchema = Type.Union([
@@ -298,12 +211,12 @@ function refused(reason: string): AccessDecodeResult<never> {
 function jsonInput(value: unknown): AccessDecodeResult<unknown> {
   let text: string | undefined;
   try {
-    text = JSON.stringify(value, safeInteger);
+    text = JSON.stringify(value, jsonSafeInteger);
   } catch (error) {
     return {
       ok: false,
       error:
-        error instanceof UnsafeIntegerError
+        error instanceof UnsafeJsonIntegerError
           ? {
               kind: "input_invalid",
               code: "invalid_json_integer",
@@ -330,23 +243,6 @@ function jsonInput(value: unknown): AccessDecodeResult<unknown> {
     };
   if (hasLoneSurrogate(text)) return refused("lone surrogate in a string");
   return { ok: true, value: JSON.parse(text) };
-}
-
-class UnsafeIntegerError extends TypeError {}
-function safeInteger(_key: string, value: unknown): unknown {
-  if (typeof value === "bigint") {
-    const number = Number(value);
-    if (!Number.isSafeInteger(number) || BigInt(number) !== value)
-      throw new UnsafeIntegerError();
-    return number;
-  }
-  if (
-    typeof value === "number" &&
-    Number.isInteger(value) &&
-    !Number.isSafeInteger(value)
-  )
-    throw new UnsafeIntegerError();
-  return value;
 }
 
 function checkShape(schema: TSchema, value: unknown): AccessDecodeResult<true> {
@@ -389,12 +285,6 @@ function decode<T>(schema: TSchema, value: unknown): AccessDecodeResult<T> {
   return { ok: true, value: serdeValue(schema, input.value) as T };
 }
 
-export function decodeGrantSubject(
-  value: unknown,
-): AccessDecodeResult<GrantSubject> {
-  return decode(grantSubjectSchema, value);
-}
-
 export function decodeAccessGrantLifecycle(
   value: unknown,
 ): AccessDecodeResult<AccessGrantLifecycle> {
@@ -405,41 +295,4 @@ export function decodeCapabilityDefinition(
   value: unknown,
 ): AccessDecodeResult<CapabilityDefinition> {
   return decode(capabilityDefinitionSchema, value);
-}
-
-/**
- * A saved selector's query must also be a valid graph query. Rust checks its
- * serde shape only, so this decoder refuses a few queries with valid shape and
- * invalid content that Rust accepts; the Platform never writes such a grant.
- */
-export function decodeAccessGrantTarget<T>(
-  value: unknown,
-): AccessDecodeResult<T> {
-  const decoded = decode<Record<string, unknown>>(
-    accessGrantTargetShape,
-    value,
-  );
-  if (!decoded.ok) return decoded;
-  const target = decoded.value;
-  const scope = target.scope;
-  if (
-    target.kind === "commerce_read" &&
-    isRecord(scope) &&
-    scope.kind === "saved_selector" &&
-    isRecord(scope.selector)
-  ) {
-    const query = parseCommerceGraphQuery(scope.selector.query);
-    if (!query.ok) return refused(`selector query: ${query.error.code}`);
-    return {
-      ok: true,
-      value: {
-        ...target,
-        scope: {
-          kind: "saved_selector",
-          selector: { ...scope.selector, query: query.value },
-        },
-      } as T,
-    };
-  }
-  return { ok: true, value: target as T };
 }

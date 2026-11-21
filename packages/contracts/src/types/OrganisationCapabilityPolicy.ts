@@ -1,6 +1,6 @@
 import type { CapabilityMode } from "./CapabilityMode";
 import type { CapabilityPolicyProvenance } from "./CapabilityPolicyProvenance";
-import type { OrganisationId } from "@purin-labs/commerce-contracts";
+import type { OrganisationId } from "@purin-labs/contract-schema";
 
 export type OrganisationCapabilityPolicy = {
   organisationId: OrganisationId;

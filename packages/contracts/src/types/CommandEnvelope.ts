@@ -6,7 +6,7 @@ import type { EnvelopeVersion } from "./EnvelopeVersion";
 import type { EventPrincipal } from "./EventPrincipal";
 import type { EventSensitivity } from "./EventSensitivity";
 import type { IdempotencyKey } from "./IdempotencyKey";
-import type { OrganisationId } from "@purin-labs/commerce-contracts";
+import type { OrganisationId } from "@purin-labs/contract-schema";
 import type { PayloadVersion } from "./PayloadVersion";
 import type { RetentionClass } from "./RetentionClass";
 import type { RuntimeRevision } from "./RuntimeRevision";
