@@ -269,9 +269,7 @@ export async function connectSquare(
 /**
  * The provider check of a Square connection: Commerce still holds the
  * account's connection and can call Square with it, and the locations that
- * take cards take Pantry's Square payments. A connection from before Plan 80
- * step 4 still has its tokens in Pantry's vault; the check hands them to
- * Commerce once and keeps only the delegation.
+ * take cards take Pantry's Square payments.
  */
 export async function observeSquareConnection(
   input: ProviderObservationRequest,
@@ -300,33 +298,7 @@ export async function observeSquareConnection(
   if (square === null) {
     return squareObservationBlocked("provider_account_ineligible");
   }
-  if (credential.value.kind === "oauth_tokens") {
-    const handed = await square.client.connectSquare(square.merchantId, {
-      environment: input.environment,
-      grant: {
-        kind: "tokens",
-        accessToken: credential.value.accessToken,
-        refreshToken: credential.value.refreshToken,
-        expiresAt:
-          credential.value.expiry.kind === "expires"
-            ? new Date(credential.value.expiry.expiresAt).toISOString()
-            : null,
-      },
-    });
-    if (!handed.ok) {
-      return squareObservationBlocked("provider_credential_unavailable");
-    }
-    if (handed.value.providerAccountId !== input.providerAccountId) {
-      return squareObservationBlocked("provider_identity_unverified");
-    }
-    const stored = await storeSquareDelegation(input, input.credentialRef, {
-      merchantId: square.merchantId,
-      providerAccountId: input.providerAccountId,
-    });
-    if (!stored.ok) {
-      return squareObservationBlocked("provider_credential_unavailable");
-    }
-  } else if (readSquareDelegation(credential.value) === null) {
+  if (readSquareDelegation(credential.value) === null) {
     return squareObservationBlocked("provider_credential_unavailable");
   }
   const connection = await readCommerceSquareConnection(square);
@@ -347,7 +319,7 @@ export async function observeSquareConnection(
     : squareObservationBlocked("provider_identity_unverified");
 }
 
-/** Keeps the delegation record in place of any Square token. */
+/** Stores the delegation record, which holds no Square token. */
 async function storeSquareDelegation(
   input: Readonly<{
     env: CompleteProviderInput["env"];

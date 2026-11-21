@@ -5,7 +5,6 @@ import {
   SHORT_PROVIDER_STATE_TTL_MS,
 } from "./authorization";
 import {
-  providerHttpFailure,
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
@@ -16,7 +15,6 @@ import type {
   CommerceMerchant,
 } from "../commerce/contract/square-link";
 import { createCommerceClient } from "../commerce/contract/client";
-import { isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "revoke_square_access_in_square" as const;
 
@@ -294,52 +292,9 @@ function squareDeviceStatus(raw: unknown): SquareDeviceStatus {
 async function revokeSquareConnection(
   input: Parameters<ProviderCleanupAdapter<"square">["remove"]>[0],
 ): Promise<ProviderCleanupResult> {
-  if (input.credentials.squareDelegation !== null)
-    return disconnectCommerceSquare(
-      input,
-      input.credentials.squareDelegation,
-    );
-  // A connection from before Plan 80 step 4 that was never handed over.
-  const tokens = input.credentials.oauthTokens;
-  const configuration = readSquareConfiguration(input.env);
-  if (tokens === null)
-    return permanentFailure("provider_cleanup_credential_missing");
-  if (
-    configuration.kind !== "configured" ||
-    configuration.application.environment !== input.cleanup.environment
-  ) {
-    return permanentFailure("provider_cleanup_configuration_missing");
-  }
-  const { clientId, clientSecret } = configuration.application;
-  let response: Response;
-  try {
-    response = await input.fetcher(
-      `${squareConnectOrigin(input.cleanup.environment)}/oauth2/revoke`,
-      {
-        method: "POST",
-        headers: {
-          authorization: `Client ${clientSecret}`,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          client_id: clientId,
-          access_token: tokens.accessToken,
-          revoke_only_access_token: false,
-        }),
-      },
-    );
-  } catch {
-    return {
-      kind: "retryable_failure",
-      reason: "provider_cleanup_http_unavailable",
-    };
-  }
-  if (!response.ok)
-    return providerHttpFailure(response.status, MANUAL_INSTRUCTION);
-  const raw: unknown = await response.json().catch(() => null);
-  return isRecord(raw) && raw.success === true
-    ? { kind: "removed" }
-    : permanentFailure("provider_cleanup_response_invalid");
+  return input.credentials.squareDelegation === null
+    ? permanentFailure("provider_cleanup_credential_missing")
+    : disconnectCommerceSquare(input, input.credentials.squareDelegation);
 }
 
 /** Commerce revokes the tokens at Square and forgets the connection. */
