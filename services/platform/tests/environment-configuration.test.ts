@@ -8,6 +8,7 @@ import {
   squareOnboardingAdapter,
   type SquareApplication,
 } from "../src/provider-adapters/square";
+import { releaseTargetProblems } from "../../../scripts/worker-environment.mjs";
 
 describe("actual Wrangler configuration loading", function configurationLoading() {
   it("loads the local profile and disposable secrets into a Sandbox application", async function sandboxLoading() {
@@ -82,7 +83,7 @@ describe("actual Wrangler configuration loading", function configurationLoading(
     ).toEqual({ kind: "invalid", setting: "SQUARE_OAUTH_CLIENT_ID" });
   });
 
-  it("keeps explicit production identities", function productionIdentities() {
+  it("deploys only the Workers of the Pantry stack, each on its one address", function productionIdentities() {
     const platform = unstable_readConfig({
       config: resolve("wrangler.jsonc"),
       env: "production",
@@ -91,12 +92,21 @@ describe("actual Wrangler configuration loading", function configurationLoading(
       config: resolve("../commerce/wrangler.jsonc"),
       env: "production",
     });
-    expect(platform.name).toBe("satyr-edge");
-    expect(platform.d1_databases[0].database_id).toBe(
-      "9c1e5467-2985-4ca9-8cb0-3b3b933249ef",
-    );
     expect(platform.vars.SQUARE_OAUTH_ENVIRONMENT).toBe("production");
-    expect(commerceEngine.name).toBe("underclerk");
+    // Plan 93 step 3 writes the ids of the databases that it makes; until
+    // then the release guard refuses the platform for that reason only.
+    expect(
+      releaseTargetProblems(platform).filter(
+        (problem: string) => !problem.includes("step 3"),
+      ),
+    ).toEqual([]);
+    expect(releaseTargetProblems(commerceEngine)).toEqual([]);
+    expect(
+      releaseTargetProblems({ ...commerceEngine, name: "pantry-staging" }),
+    ).toContain("the Worker name pantry-staging is not a Pantry Worker");
+    expect(
+      releaseTargetProblems({ ...commerceEngine, workers_dev: true }),
+    ).toEqual(["a workers.dev address"]);
   });
 });
 

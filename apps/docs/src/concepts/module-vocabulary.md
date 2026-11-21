@@ -19,8 +19,6 @@ independently from package layout and deployment.
 Pantry hosts the organisation control plane, provider connections, Cases, agent
 sessions, approvals, tools, merchant console, Sous Chef behavior, and the Commerce
 Read Layer. The commerce engine or Shopify remains the selected commerce authority.
-Older plans use two names that Plan 91 retires: Underclerk for the commerce
-engine, and Urk for Sous Chef.
 
 ## Boundary rule
 

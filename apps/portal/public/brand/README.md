@@ -3,8 +3,8 @@
 The product is now Seams Pantry (Plan 91,
 `docs/plan-91-seams-atelier-rename.md`), but the goat mark stays until a
 better Seams Pantry mark is drawn. The owner rejected a first replacement
-(an arch with a stitched score line) on 17 November 2026. The file names
-keep `satyr-` until the new mark replaces them.
+(an arch with a stitched score line) on 17 November 2026. Its files are
+`pantry-mark-*`.
 
 The new mark is the Purin cat mark (the owner chose it on 19 November 2026).
 Its SVG files and its icon pack are in `docs/brand/purin-logo`, and the Portal

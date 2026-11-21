@@ -60,11 +60,9 @@ OAuth callbacks ──────────────┘        │
                                       └── on-demand workspace executor
 ```
 
-The production Worker is still deployed as `satyr-edge`; the stable name keeps
-existing hostnames and OAuth callbacks valid. Satyr is the old name of Seams
-Pantry. Code names and commands keep it until the
-[Plan 91](docs/plan-91-seams-atelier-rename.md) codemod, and deployed names keep
-it after that.
+The production Worker is `pantry`, on its one address `pantry.purin.io`
+([Plan 93](docs/plan-93-clean-cutover.md)). Plans and evidence keep the older
+names of their time; the glossary in AGENTS.md maps them.
 
 `AgentSessionActor` pins one inference route for a session:
 

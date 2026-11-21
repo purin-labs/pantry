@@ -43,9 +43,8 @@ flowchart LR
     Tools --> Provider
 ```
 
-The deployed Worker remains named `satyr-edge` so existing hostnames and OAuth
-callbacks stay stable. Satyr is the old name of Seams Pantry: package names
-and commands keep it until the Plan 91 code rename. The documentation app is a
+The production Worker is `pantry`, on its one address `pantry.purin.io`. The
+documentation app is a
 separate VitePress site under `apps/docs`.
 
 ## What to read first

@@ -1,6 +1,4 @@
 import { DatabaseSync } from "node:sqlite";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { parseTerminalAssignment } from "@purin-labs/commerce-contracts";
 
@@ -16,7 +14,7 @@ import {
 const ORG_ID = "org_11111111-1111-4111-8111-111111111111";
 
 describe("Plan 90 counter register & GMO stera LAN gateway integration", () => {
-  it("stores payment_terminal device enrollments and lan_gateway_device assignments in D1 schema and patch", async () => {
+  it("stores payment_terminal device enrollments and lan_gateway_device assignments in the D1 schema", async () => {
     const sqlite = new DatabaseSync(":memory:");
     sqlite.exec(singleDatabaseSchema());
     const db = d1Database(sqlite);
@@ -95,18 +93,5 @@ describe("Plan 90 counter register & GMO stera LAN gateway integration", () => {
       });
       expect(loaded.value.transport).toBe("lan_gateway");
     }
-
-    // Verify the D1 patch script executes cleanly on an existing database containing rows.
-    const patchSql = readFileSync(
-      resolve(__dirname, "../scripts/plan90-payment-terminal-d1-patch.sql"),
-      "utf8",
-    );
-    sqlite.exec(patchSql);
-    const reloaded = await readActiveTerminalAssignment(
-      scope.database,
-      parsedOrg.value,
-      "loc_tokyo",
-    );
-    expect(reloaded.ok).toBe(true);
   });
 });

@@ -89,14 +89,12 @@ the system through supported storefront and commerce journeys.
 ### Seams Pantry
 
 The bakery operating system: governed operations for café and bakery
-production and commerce. Its product areas include Kitchen, Café, and Commerce. Older
-plans and code call it Satyr or CafeOS, and call Kitchen BakeryOS.
+production and commerce. Its product areas include Kitchen, Café, and Commerce.
 
 ### Seams Checkout
 
 The built-in commerce that people see: checkout pages, the QR order page, and
-the Register. The commerce engine in `services/commerce` runs it. Older plans
-call it Satyr Commerce, and call the commerce engine Underclerk.
+the Register. The commerce engine in `services/commerce` runs it.
 
 ### Sous Chef
 

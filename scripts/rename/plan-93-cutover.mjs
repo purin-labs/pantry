@@ -12,7 +12,7 @@
 //
 // Run it from the repository root on a clean tree. After --write, run
 // `pnpm install --prefer-offline`. A second run changes nothing.
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
 
 const isBinary = (file) =>
@@ -76,6 +76,8 @@ const EXCLUDED_PATHS = [
   // The names of the files in R2 and the scripts that build those files: a
   // model or a mesh keeps the name that its recorded output has.
   /^repo-binaries\.json$/,
+  // The known broken links: renameRatchet below handles them.
+  /^scripts\/doc-links-ratchet\.json$/,
   /^scripts\/bakery-mujoco\//,
 ];
 
@@ -100,6 +102,11 @@ const PROTECTED = [
   // channel. A project id cannot change; step 4 changes only the push
   // endpoint of the subscription.
   /\bsatyr-gmail-(?:dev|push)\b/g,
+  // The browser folder of the physics results. The pinned execution bundle
+  // holds the name, so it changes with the next bundle build.
+  /"satyr-physics-results"/g,
+  // The file names of plans and refactors, which keep their names.
+  /\b(?:plan|refactor)-[0-9]+[A-Za-z]?-[\w-]+\.md\b/g,
 ];
 
 /** Voice code writes about the spoken word "Satyr" of the wake phrase. It keeps the word. */
@@ -246,6 +253,23 @@ export function renameText(text, file = "") {
   return unmask(next);
 }
 
+const RATCHET = "scripts/doc-links-ratchet.json";
+
+/**
+ * The known broken links, as "<source> -> <target>": a link of a living
+ * document follows its renamed target, and a record's link keeps its old one.
+ */
+function renameRatchet(text) {
+  const entries = Object.entries(JSON.parse(text)).map(([key, count]) => {
+    const [source, target] = key.split(" -> ");
+    return [
+      isExcluded(source) ? key : `${source} -> ${renameText(target)}`,
+      count,
+    ];
+  });
+  return `${JSON.stringify(Object.fromEntries(entries), null, 2)}\n`;
+}
+
 function renamePath(file) {
   for (const [pattern, replacement] of FILE_RULES)
     if (pattern.test(file)) return file.replace(pattern, replacement);
@@ -269,10 +293,11 @@ for (const file of files) {
   }
   const target = renamePath(file);
   if (target !== file) moves.push([file, target]);
-  if (isBinary(file) || isExcluded(file)) continue;
+  const ratchet = file === RATCHET;
+  if (isBinary(file) || (isExcluded(file) && !ratchet)) continue;
   const text = fs.readFileSync(file, "utf8");
   if (text.includes("\u0000") || !OLD_NAME.test(text)) continue;
-  const rewritten = renameText(text, file);
+  const rewritten = ratchet ? renameRatchet(text) : renameText(text, file);
   if (rewritten === text) continue;
   const before = text.split("\n");
   const after = rewritten.split("\n");
@@ -290,11 +315,48 @@ if (WRITE) {
   for (const change of changes) fs.writeFileSync(change.file, change.text);
   for (const [from, to] of moves) execFileSync("git", ["mv", from, to]);
   if (deletions.length > 0) execFileSync("git", ["rm", "-q", ...deletions]);
+  // Generated pages: the new names change the width of the spec's route
+  // tables and the order of the table lists on the layers page.
+  for (const command of [
+    ["scripts/check-commerce-spec.mjs", "--write"],
+    ["scripts/check-layers.mjs", "--areas", "--write"],
+  ])
+    execFileSync(process.execPath, command, { stdio: "inherit" });
+  waiveBaselineChanges();
 } else {
   for (const change of changes)
     console.log(`  ${change.lines}\t${change.file}`);
   for (const [from, to] of moves) console.log(`  move\t${from} -> ${to}`);
   for (const file of deletions) console.log(`  delete\t${file}`);
+}
+
+/**
+ * The new databases load the baselines fresh, and no deployed database ever
+ * takes the renamed objects. So each changed object gets a waiver instead of
+ * a patch script (`pnpm lint:d1-patch`).
+ */
+function waiveBaselineChanges() {
+  const check = spawnSync(
+    process.execPath,
+    ["scripts/check-d1-patch.mjs", "--base", "HEAD"],
+    { encoding: "utf8" },
+  );
+  const objects = [
+    ...check.stderr.matchAll(
+      /^\s+(?:adds|alters|removes) (?:table|index|trigger) (\S+)/gm,
+    ),
+  ].map((match) => match[1]);
+  if (objects.length === 0) return;
+  fs.appendFileSync(
+    "services/platform/scripts/d1-patch-waivers.txt",
+    objects
+      .map(
+        (object) =>
+          `${object}: Plan 93 renames it for the new stack, whose databases load the baseline fresh\n`,
+      )
+      .join(""),
+  );
+  console.log(`waived ${objects.length} baseline changes for the new stack`);
 }
 
 /**
