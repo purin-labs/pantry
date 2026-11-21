@@ -193,7 +193,6 @@ async function connectedForkJourney({
       model: PLATFORM_DEFAULT_PI_MODEL,
       text: SOURCE_TEXT,
       browserContext: { kind: "unavailable" },
-      surfaceContext: null,
     }),
   );
   for (const attachment of chatForkAttachments(acquired)) {
@@ -702,7 +701,6 @@ async function continueFork(
         model: PLATFORM_DEFAULT_PI_MODEL,
         text: "Read the current shared menu and report its croissant order. Retain the files as historical context.",
         browserContext: { kind: "unavailable" },
-        surfaceContext: null,
       }),
     },
   );

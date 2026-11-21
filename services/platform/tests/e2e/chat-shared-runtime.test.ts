@@ -1711,7 +1711,6 @@ function send(
     requestId,
     model: PLATFORM_DEFAULT_PI_MODEL,
     text,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
 }

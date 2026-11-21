@@ -126,7 +126,6 @@ async function directoryJourney(context: TestContext): Promise<void> {
     requestId: "stale_preparation",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Keep this literal task request.",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   if (!parsed.ok) throw new Error(parsed.error);
@@ -655,7 +654,6 @@ async function verifyQueuedProjectBinding(
     requestId: "running_input",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "First task",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   if (!running.ok) throw new Error(running.error);
@@ -685,7 +683,6 @@ async function verifyQueuedProjectBinding(
     inputId: "queued_project_input",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Queued literal task",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   if (!queuedCommand.ok) throw new Error(queuedCommand.error);
@@ -1336,7 +1333,6 @@ async function conversationSavePlacementJourney({ task }: TestContext) {
     requestId: "p55_delayed_recovery",
     model: stored.conversation.modelRoute.model,
     text: "Continue the handoff",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   if (!command.ok) throw new Error(command.error);
@@ -1545,7 +1541,6 @@ async function revokedConversationPlacementJourney({ task }: TestContext) {
     requestId: "revoked_contributor_request",
     model: shared.conversation.modelRoute.model,
     text: "Unaccepted contributor work",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   if (!command.ok) throw new Error(command.error);

@@ -229,7 +229,6 @@ function sendPiMessage(
         requestId: `request_credit_${turn}`,
         model: PLATFORM_DEFAULT_PI_MODEL,
         text: `Review ${turn}`,
-        surfaceContext: null,
       }),
     },
   );

@@ -825,7 +825,6 @@ function chatMessage(
       intent === "draft"
         ? `Draft a reply to the customer's mail ${MESSAGE_ID}.`
         : "Make the shipping sentence of the waiting reply more precise.",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   };
 }

@@ -49,7 +49,6 @@ import {
   clearSubmittedConversationDraft,
   type ConversationScope,
 } from "../../chat/store";
-import { verifiedKitchenState } from "../../chat/kitchen-observation";
 import { readConversationSlackDrafts } from "./chat-slack-messages";
 import { readConversationConfigurationDrafts } from "./chat-configuration-drafts";
 import { authorizeSideCaseChatRead } from "../../chat/side-cases";
@@ -390,18 +389,6 @@ async function handlePortalChatRequest(
     )
       return controlError("chat_not_found", 404);
   }
-  if (
-    (command.kind === "message" ||
-      command.kind === "next" ||
-      command.kind === "steer") &&
-    command.surfaceContext !== null &&
-    !(await verifiedKitchenState(command.surfaceContext))
-  )
-    return chatError(
-      "chat_surface_context_invalid",
-      "The attached Kitchen context changed before it was accepted. Send the message again.",
-      422,
-    );
   await reconcileRevokedConversationRun(
     placement,
     scope.userId,

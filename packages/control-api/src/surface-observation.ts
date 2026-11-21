@@ -1,9 +1,6 @@
 import { Type, type Static } from "typebox";
 import { recordParser } from "@purin-labs/contract-schema";
-import {
-  portalPageViewSectionSchema,
-  type PortalPageViewV1,
-} from "./portal-page-view.ts";
+import { portalPageViewSectionSchema } from "./portal-page-view.ts";
 
 /**
  * What a person's screen shows when they send a chat message (Plan 87). The
@@ -186,33 +183,6 @@ export function chatOriginFromObservation(
     title: observation.title,
     record: observation.record,
     startedAt,
-  };
-}
-
-// The two pages that sent a page view before Plan 87.
-const PAGE_VIEW_AREAS: Readonly<Record<string, SurfaceArea>> = {
-  costs: "BakeryOS",
-  "menu-boards": "CafeOS",
-};
-
-/** A page view that a message stored before Plan 87, read as v2. */
-export function surfaceObservationFromPageView(
-  view: PortalPageViewV1,
-): SurfaceObservationV2 {
-  return {
-    kind: "surface-observation",
-    schemaVersion: 2,
-    surface: view.page,
-    area: PAGE_VIEW_AREAS[view.page] ?? "Workspace",
-    instance: null,
-    title: view.title,
-    path: view.path,
-    record: null,
-    capturedAt: view.capturedAt,
-    view: view.sections,
-    state: null,
-    commands: [],
-    sources: [],
   };
 }
 

@@ -221,7 +221,6 @@ function send(
       requestId,
       model: MODEL,
       text: "Add rhubarb tart to the notes.",
-      surfaceContext: null,
       browserContext: { kind: "unavailable" },
     },
   );

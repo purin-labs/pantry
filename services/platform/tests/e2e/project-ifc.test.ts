@@ -315,7 +315,6 @@ async function projectInformationFlowJourney(
     requestId: "p54b_initial",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Acknowledge the inherited project context without searching or reading files.",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.text()).toBe(200);
@@ -445,7 +444,6 @@ async function projectInformationFlowJourney(
     requestId: "p54b_revoke_during_response",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Check the retained context once more.",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(pending.status).toBe(200);

@@ -1,5 +1,4 @@
 import { Type, type Static } from "typebox";
-import { recordParser } from "@purin-labs/contract-schema";
 
 /**
  * What a Portal page shows when a person sends a chat message from it. The
@@ -7,8 +6,6 @@ import { recordParser } from "@purin-labs/contract-schema";
  * the person has not saved yet. The model reads it as an observation of the
  * screen: it grants no authority and proves no saved record.
  */
-export const PORTAL_PAGE_VIEW_MAX_BYTES = 24 * 1024;
-
 const label = Type.String({ minLength: 1, maxLength: 120 });
 const cell = Type.String({ maxLength: 400 });
 
@@ -45,16 +42,3 @@ export type PortalPageViewFact = Static<typeof portalPageViewFactSchema>;
 export type PortalPageViewTable = Static<typeof portalPageViewTableSchema>;
 export type PortalPageViewSection = Static<typeof portalPageViewSectionSchema>;
 export type PortalPageViewV1 = Static<typeof portalPageViewSchema>;
-
-const decodePortalPageView = recordParser(portalPageViewSchema);
-const ENCODER = new TextEncoder();
-
-/** The page view, or null when it is malformed or too large. */
-export function parsePortalPageView(raw: unknown): PortalPageViewV1 | null {
-  const decoded = decodePortalPageView(raw);
-  if (!decoded.ok) return null;
-  return ENCODER.encode(JSON.stringify(decoded.value)).byteLength <=
-    PORTAL_PAGE_VIEW_MAX_BYTES
-    ? decoded.value
-    : null;
-}

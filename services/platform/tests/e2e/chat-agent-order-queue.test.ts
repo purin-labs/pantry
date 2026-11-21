@@ -398,7 +398,6 @@ it(
       requestId: "request_viewer_queue",
       model: fixture.route.model,
       text: "READQUEUE now.",
-      surfaceContext: null,
       browserContext: { kind: "unavailable" },
     });
     expect(await viewerChat.json()).toMatchObject({

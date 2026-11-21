@@ -11,11 +11,10 @@ export type ChatSurfaceState = Readonly<{ digest: string }>;
 
 /**
  * The surface registry of the chat record (Plan 87, section 5): the check
- * of the typed page state that an observation carries, and the old forms of
- * that state. Only the Kitchen page has a typed state now. The Worker
- * registers it (`worker-ports.ts`). The record reads it only for an
- * observation with a state or for an old form, so a message without a page
- * state does not need it.
+ * of the typed page state that an observation carries. Only the Kitchen page
+ * has a typed state now. The Worker registers it (`worker-ports.ts`). The
+ * record reads it only for an observation with a state, so a message without
+ * a page state does not need it.
  */
 export type ChatSurfaces<State extends ChatSurfaceState = ChatSurfaceState> =
   Readonly<{
@@ -31,25 +30,6 @@ export type ChatSurfaces<State extends ChatSurfaceState = ChatSurfaceState> =
   ): SurfaceObservationV2 | null;
   /** The state of an observation with a state, for the code of its area. */
   stateOf(observation: SurfaceObservationV2): State | null;
-  /**
-   * The state in its form before Plan 87 phase 2: a stored `surface` part,
-   * or the `surfaceContext` key of a tab that loaded the Portal before then.
-   * Null when the value is not that form.
-   */
-  parseOldState(raw: unknown): State | null;
-  /** Whether an old tab's state still has the digest of its view. */
-  oldStateIsIntact(state: State): boolean;
-  /** The one observation of a message that also holds an old state. */
-  withOldState(
-    observation: SurfaceObservationV2 | undefined,
-    state: State,
-    browser: PageBrowserContext,
-  ): SurfaceObservationV2 | undefined;
-  /**
-   * The read-only text of a stored `surface` part that is no longer a valid
-   * state, or null when the part is not an old snapshot.
-   */
-  historicalText(raw: unknown): string | null;
 }>;
 
 export const chatSurfaces = definePort<ChatSurfaces>("chat_surfaces");

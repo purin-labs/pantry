@@ -5,9 +5,7 @@ import {
   type VoiceEngineId,
 } from "@purin-labs/control-api";
 import {
-  parsePortalPageView,
   parseSurfaceObservation,
-  surfaceObservationFromPageView,
   type SurfaceObservationV2,
 } from "@purin-labs/control-api";
 import {
@@ -25,7 +23,6 @@ import type { Result } from "../result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
 import { parseCustomConnectorId } from "../custom-connectors/identity";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import { chatSurfaces, type ChatSurfaceState } from "./surface-registry";
 import {
   type ChatApproval,
   type ChatQuestion,
@@ -412,7 +409,6 @@ export function parseInputParts(
 ): Result<readonly ChatInputPart[], string> {
   const parts: ChatInputPart[] = [];
   let hasProjectContext = false;
-  let oldState: ChatSurfaceState | null = null;
   for (const item of raw) {
     if (!isRecord(item)) return { ok: false, error: "timeline_input_invalid" };
     if (item.kind === "project_context") {
@@ -452,25 +448,6 @@ export function parseInputParts(
       parts.push({ kind: "surface_observation", observation });
       continue;
     }
-    // A message stored before Plan 87 holds a v1 page view.
-    if (item.kind === "page_view") {
-      const view = parsePortalPageView(item.view);
-      if (view === null) return { ok: false, error: "timeline_input_invalid" };
-      parts.push({
-        kind: "surface_observation",
-        observation: surfaceObservationFromPageView(view),
-      });
-      continue;
-    }
-    // A message stored before Plan 87 phase 2 holds a Kitchen
-    // attachment beside its observation; both read as one observation.
-    if (item.kind === "surface") {
-      const parsed = chatSurfaces.use().parseOldState(item.surface);
-      if (parsed === null || oldState !== null)
-        return { ok: false, error: "timeline_input_invalid" };
-      oldState = parsed;
-      continue;
-    }
     if (
       item.kind === "attachment" &&
       typeof item.attachmentId === "string" &&
@@ -489,43 +466,7 @@ export function parseInputParts(
     }
     return { ok: false, error: "timeline_input_invalid" };
   }
-  return { ok: true, value: withOneScreenPart(parts, oldState) };
-}
-
-function withOneScreenPart(
-  parts: readonly ChatInputPart[],
-  oldState: ChatSurfaceState | null,
-): readonly ChatInputPart[] {
-  if (oldState === null) return parts;
-  const { surfaceObservation } = surfaceObservationFromParts(parts);
-  const observation = chatSurfaces.use().withOldState(
-    surfaceObservation,
-    oldState,
-    browserOfParts(parts),
-  );
-  const others = parts.filter(isNotScreenPart);
-  if (observation === undefined) return others;
-  // The part goes where a new message keeps it: before the browser part.
-  const browser = others.findIndex(isBrowserPart);
-  const at = browser < 0 ? others.length : browser;
-  return [
-    ...others.slice(0, at),
-    { kind: "surface_observation", observation },
-    ...others.slice(at),
-  ];
-}
-
-function isBrowserPart(part: ChatInputPart): boolean {
-  return part.kind === "browser";
-}
-
-function isNotScreenPart(part: ChatInputPart): boolean {
-  return part.kind !== "surface_observation";
-}
-
-function browserOfParts(parts: readonly ChatInputPart[]): PageBrowserContext {
-  for (const part of parts) if (part.kind === "browser") return part.context;
-  return { kind: "unavailable" };
+  return { ok: true, value: parts };
 }
 
 function parseSources(

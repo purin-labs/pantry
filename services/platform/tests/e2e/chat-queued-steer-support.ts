@@ -95,7 +95,6 @@ export async function send(
     ...(kind === "next" ? { inputId: `input_${name}` } : {}),
     model,
     text,
-    surfaceContext: null,
     browserContext: portalBrowser(conversationId, browserInstanceId),
   });
   expect(response.status, await response.clone().text()).toBe(200);

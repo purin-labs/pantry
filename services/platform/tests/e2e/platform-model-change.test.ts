@@ -115,7 +115,6 @@ function send(
     requestId: `request_model_change_${String(turn)}`,
     model: modelId,
     text: `How many croissants are left? (${String(turn)})`,
-    surfaceContext: null,
   });
 }
 

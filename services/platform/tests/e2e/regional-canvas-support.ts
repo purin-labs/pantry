@@ -168,7 +168,6 @@ async function completeCanvasTurn(
         requestId: `request_${id}`,
         model: PLATFORM_DEFAULT_PI_MODEL,
         text,
-        surfaceContext: null,
         browserContext: { kind: "unavailable" },
       }),
     },

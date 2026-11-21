@@ -131,7 +131,6 @@ async function documentationLinkJourney({ task }: TestContext): Promise<void> {
     requestId: "request_chat_documentation_link",
     model: route.model,
     text: `Set up the carrier API. Its reference is ${DOCUMENTATION}.`,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.clone().text()).toBe(200);

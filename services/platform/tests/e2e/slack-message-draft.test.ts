@@ -460,7 +460,6 @@ async function draft(
     requestId: `request_${crypto.randomUUID()}`,
     model: modelName,
     text: `Post this to Slack: ${turn.text}`,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.clone().text()).toBe(200);

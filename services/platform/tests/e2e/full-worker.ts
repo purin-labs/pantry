@@ -677,7 +677,6 @@ async function turn(
           model: PLATFORM_DEFAULT_PI_MODEL,
           text,
           browserContext: { kind: "unavailable" },
-          surfaceContext: null,
         }),
       },
     ),

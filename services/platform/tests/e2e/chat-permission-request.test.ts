@@ -154,7 +154,6 @@ async function permissionRequestJourney({ task }: TestContext): Promise<void> {
     requestId: "request_chat_permission_blocked",
     model: route.model,
     text: "Are you still there?",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(blocked.body).toMatchObject({ error: "chat_permission_pending" });
@@ -249,7 +248,6 @@ async function pausedRun(
     requestId: `request_${conversationId}`,
     model: route.model,
     text: `Set up the carrier API. Read its reference first: ${DOCUMENTATION}.`,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.clone().text()).toBe(200);

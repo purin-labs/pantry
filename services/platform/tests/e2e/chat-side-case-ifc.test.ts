@@ -149,7 +149,6 @@ async function sideCaseFlowJourney({ task }: TestContext): Promise<void> {
     requestId: `request_${parentId}`,
     model: route.model,
     text: QUESTION,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(asked.status, await asked.clone().text()).toBe(200);
@@ -239,7 +238,6 @@ async function sideCaseFlowJourney({ task }: TestContext): Promise<void> {
     requestId: `request_${adminSide}_after_move`,
     model: route.model,
     text: "Telephone again tomorrow.",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(message.status).toBe(403);

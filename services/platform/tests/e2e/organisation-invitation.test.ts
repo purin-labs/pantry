@@ -109,7 +109,6 @@ async function invitationJourney(context: TestContext): Promise<void> {
       requestId: "invitation_first",
       model: MODEL,
       text: "Add rhubarb tart to the notes.",
-      surfaceContext: null,
       browserContext: { kind: "unavailable" },
     },
   );

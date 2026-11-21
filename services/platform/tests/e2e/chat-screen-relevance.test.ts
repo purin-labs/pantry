@@ -441,7 +441,6 @@ function send(
     requestId: `request_${conversationId}_${message.label}`,
     model,
     text: message.text,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
     ...(message.observation === undefined
       ? {}

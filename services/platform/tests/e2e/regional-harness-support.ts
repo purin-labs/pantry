@@ -114,7 +114,6 @@ export async function regionalHarnessJourney(
     requestId: `request_${conversationId}`,
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "List connected integrations.",
-    surfaceContext: null,
     browserContext: {
       kind: "available",
       binding: {

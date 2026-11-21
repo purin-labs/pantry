@@ -327,7 +327,6 @@ function sendMessage(
         requestId: `request_approval_wait_${turn}`,
         model: PLATFORM_DEFAULT_PI_MODEL,
         text,
-        surfaceContext: null,
       }),
     },
   );

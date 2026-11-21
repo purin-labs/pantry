@@ -102,7 +102,6 @@ async function canvasChatSignalJourney({ task }: TestContext): Promise<void> {
         model: PLATFORM_DEFAULT_PI_MODEL,
         text: REQUEST_TEXT,
         browserContext: { kind: "unavailable" },
-        surfaceContext: null,
       },
     );
     expect(sent.status, await sent.clone().text()).toBe(200);

@@ -198,7 +198,6 @@ export async function instruct(
     requestId,
     model: stored.conversation.modelRoute.model,
     text: CUTOFF_INSTRUCTION,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.clone().text()).toBe(200);

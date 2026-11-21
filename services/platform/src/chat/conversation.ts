@@ -4,16 +4,13 @@ import {
   type ChatAttachmentPart,
 } from "./timeline";
 import {
-  parsePortalPageView,
   parseSurfaceObservation,
-  surfaceObservationFromPageView,
   type SurfaceObservationV2,
 } from "@purin-labs/control-api";
 import type { ChatOrigin } from "@purin-labs/control-api";
 import { chatOrigin, chatOriginField } from "./origin";
 import {
   admitSurfaceState,
-  chatSurfaces,
   surfaceStateOf,
   type ChatSurfaceState,
 } from "./surface-registry";
@@ -334,11 +331,6 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
   const effort = parseChatEffort(raw.effort);
   if (raw.effort !== undefined && effort === null)
     return { ok: false, error: "chat_message_invalid" };
-  // A tab that loaded the Portal before Plan 87 phase 2 still sends the
-  // page state in its own key, until the tab reloads.
-  const oldTabSurfaceContext = parseSurfaceContext(raw.surfaceContext);
-  if (oldTabSurfaceContext === undefined)
-    return { ok: false, error: "chat_message_invalid" };
   const browserContext =
     raw.browserContext === undefined
       ? ({ kind: "unavailable" } as const)
@@ -349,14 +341,12 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
       browserContext.binding.conversationId !== raw.conversationId)
   )
     return { ok: false, error: "chat_message_invalid" };
-  const surfaceObservation = parseSurfaceObservationKey(raw);
+  const surfaceObservation = Object.hasOwn(raw, "surfaceObservation")
+    ? parseSurfaceObservation(raw.surfaceObservation)
+    : undefined;
   if (surfaceObservation === null)
     return { ok: false, error: "chat_message_invalid" };
-  const screen = commandScreen(
-    surfaceObservation,
-    oldTabSurfaceContext,
-    browserContext,
-  );
+  const screen = commandScreen(surfaceObservation, browserContext);
   if (screen === null) return { ok: false, error: "chat_message_invalid" };
   const surfaceObservationField =
     screen.observation === undefined
@@ -367,7 +357,6 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
   const browserKeyCount =
     (Object.hasOwn(raw, "browserContext") ? 1 : 0) +
     (surfaceObservation === undefined ? 0 : 1);
-  const surfaceKeyCount = Object.hasOwn(raw, "surfaceContext") ? 1 : 0;
   const goalKeyCount = Object.hasOwn(raw, "goalTokenBudget") ? 1 : 0;
   const inputMode = Object.hasOwn(raw, "inputMode")
     ? parseChatInputMode(raw.inputMode)
@@ -413,18 +402,15 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
     (isNext
       ? Object.keys(raw).length !==
         (effort === null ? 6 : 7) +
-          surfaceKeyCount +
           browserKeyCount +
           inputModeKeyCount
       : isSteer
         ? Object.keys(raw).length !==
           (effort === null ? 7 : 8) +
-            surfaceKeyCount +
             browserKeyCount +
             inputModeKeyCount
         : Object.keys(raw).length !==
           (effort === null ? 5 : 6) +
-            surfaceKeyCount +
             browserKeyCount +
             goalKeyCount +
             inputModeKeyCount) ||
@@ -503,20 +489,6 @@ export function parseChatCommand(raw: unknown): Result<ChatCommand, string> {
   };
 }
 
-// The page on the sender's screen. A tab that loaded the Portal before Plan 87
-// still sends a v1 `pageView`, which reads as v2 until the tab reloads.
-function parseSurfaceObservationKey(
-  raw: JsonRecord,
-): SurfaceObservationV2 | null | undefined {
-  const hasObservation = Object.hasOwn(raw, "surfaceObservation");
-  const hasPageView = Object.hasOwn(raw, "pageView");
-  if (hasObservation && hasPageView) return null;
-  if (hasObservation) return parseSurfaceObservation(raw.surfaceObservation);
-  if (!hasPageView) return undefined;
-  const view = parsePortalPageView(raw.pageView);
-  return view === null ? null : surfaceObservationFromPageView(view);
-}
-
 /**
  * The one screen observation of a message, and the page state that it
  * carries for the code of its area. Null when the state breaks its
@@ -524,31 +496,17 @@ function parseSurfaceObservationKey(
  */
 function commandScreen(
   observation: SurfaceObservationV2 | undefined,
-  oldTab: ChatSurfaceState | null,
   browser: PageBrowserContext,
 ): Readonly<{
   observation: SurfaceObservationV2 | undefined;
   state: ChatSurfaceState | null;
 }> | null {
-  if (oldTab !== null && !chatSurfaces.use().oldStateIsIntact(oldTab))
-    return null;
   const admitted =
     observation === undefined
       ? undefined
       : admitSurfaceState(observation, browser);
   if (admitted === null) return null;
-  const merged =
-    oldTab === null
-      ? admitted
-      : chatSurfaces.use().withOldState(admitted, oldTab, browser);
-  return { observation: merged, state: surfaceStateOf(merged) };
-}
-
-function parseSurfaceContext(
-  raw: unknown,
-): ChatSurfaceState | null | undefined {
-  if (raw === undefined || raw === null) return null;
-  return chatSurfaces.use().parseOldState(raw) ?? undefined;
+  return { observation: admitted, state: surfaceStateOf(admitted) };
 }
 
 function isChatModelId(raw: unknown): raw is string {
@@ -722,7 +680,7 @@ function parseStoredTimeline(raw: unknown): readonly ChatTimelineEvent[] {
   const events: ChatTimelineEvent[] = [];
   let previous = -1;
   for (const item of raw) {
-    const parsed = parseChatTimelineEvent(normalizeStoredSurfaceParts(item));
+    const parsed = parseChatTimelineEvent(item);
     if (!parsed.ok && parsed.error === "project_evidence_unavailable")
       throw new Error(parsed.error);
     if (!parsed.ok || parsed.value.sequence <= previous)
@@ -731,34 +689,6 @@ function parseStoredTimeline(raw: unknown): readonly ChatTimelineEvent[] {
     events.push(parsed.value);
   }
   return events;
-}
-
-function normalizeStoredSurfaceParts(raw: unknown): unknown {
-  if (!isRecord(raw) || raw.kind !== "user" || !Array.isArray(raw.parts))
-    return raw;
-  const parts: unknown[] = [];
-  for (const part of raw.parts) {
-    if (
-      !isRecord(part) ||
-      part.kind !== "surface" ||
-      chatSurfaces.use().parseOldState(part.surface) !== null
-    ) {
-      parts.push(part);
-      continue;
-    }
-    const text = chatSurfaces.use().historicalText(part.surface);
-    if (text === null) {
-      parts.push(part);
-      continue;
-    }
-    // Historical snapshots remain readable without becoming live command authority.
-    const historical: ChatInputPart = {
-      kind: "text",
-      text,
-    };
-    parts.push(historical);
-  }
-  return { ...raw, parts };
 }
 
 function parseSequence(raw: unknown, fallback: number): number {

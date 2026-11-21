@@ -62,7 +62,6 @@ export async function sendMessage(
       body: JSON.stringify({
         kind: "message",
         ...message,
-        surfaceContext: null,
       }),
     },
   );

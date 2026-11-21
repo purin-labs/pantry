@@ -182,7 +182,6 @@ function requestChat(
       requestId: `request_credit_${request.turn}`,
       model: "gpt-5.6-luna",
       text: `Credit continuation ${request.turn}`,
-      surfaceContext: null,
     });
   } else if (request.kind === "retry") {
     body = JSON.stringify({

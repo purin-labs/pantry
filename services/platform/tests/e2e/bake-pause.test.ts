@@ -372,7 +372,6 @@ it(
       requestId: "request_viewer_pause",
       model: fixture.route.model,
       text: "PAUSERUN now.",
-      surfaceContext: null,
       browserContext: { kind: "unavailable" },
     });
     expect(viewerChat.status).toBeGreaterThanOrEqual(403);

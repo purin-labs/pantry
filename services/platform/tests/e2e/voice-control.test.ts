@@ -749,7 +749,6 @@ async function voiceControlJourney(_test: TestContext): Promise<void> {
     requestId,
     model: fixture.route.model,
     text: SPOKEN,
-    surfaceContext: null,
     browserContext: {
       kind: "available",
       binding: { browserInstanceId: "browser_voice_e2e", conversationId },

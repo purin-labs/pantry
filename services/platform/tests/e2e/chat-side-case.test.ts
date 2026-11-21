@@ -238,7 +238,6 @@ async function sideCaseJourney({ task }: TestContext): Promise<void> {
     requestId: sideCaseHereRequestId(butter),
     model: route.model,
     text: LATER_PROPOSALS[0].brief,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   };
   await post(owner, paths.chat, hereCommand);

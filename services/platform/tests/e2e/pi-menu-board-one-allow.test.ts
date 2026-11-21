@@ -13,7 +13,7 @@
 // private read between two edits). The label check that asks again for it
 // is in `passUse` (src/actors/harness-follow-up.ts).
 import { expect, it, type TestContext } from "vitest";
-import { newConversationId, type PortalPageViewV1 } from "@purin-labs/control-api";
+import { newConversationId, type SurfaceObservationV2 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import { encodeMenuBoardClientMessage, parseMenuBoardServerMessage } from "@purin-labs/menu-board-crdt/protocol";
 import { boardPageView } from "../../../../apps/portal/src/features/menu-boards/board-page-view";
@@ -98,7 +98,7 @@ it(
           text: BEFORE,
         }),
       );
-      const pageView: PortalPageViewV1 = boardPageView(
+      const pageView = boardPageView(
         {
           organisationId: "",
           boardId,
@@ -108,6 +108,22 @@ it(
         },
         "/portal/cafe/main/menus",
       );
+      // The Menus page on screen, with the board's view, as the Portal sends it.
+      const screen: SurfaceObservationV2 = {
+        kind: "surface-observation",
+        schemaVersion: 2,
+        surface: "menus",
+        area: "CafeOS",
+        instance: null,
+        title: pageView.title,
+        path: pageView.path,
+        record: null,
+        capturedAt: pageView.capturedAt,
+        view: pageView.sections,
+        state: null,
+        commands: [],
+        sources: [],
+      };
       const chat = await send(`${BASE}/chat`, journey.owner, "GET");
       expect(chat.status, JSON.stringify(chat.body).slice(0, 400)).toBe(200);
       const model =
@@ -122,9 +138,8 @@ it(
           requestId: `request_${conversationId}_${label}`,
           model,
           text,
-          surfaceContext: null,
           browserContext: { kind: "unavailable" },
-          pageView,
+          surfaceObservation: screen,
         });
       const changeText = setText(boardId, TEXT_ID, BEFORE, AFTER);
       const addNote = addText(boardId, NOTE);

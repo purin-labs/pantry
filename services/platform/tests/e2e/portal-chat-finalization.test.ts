@@ -1,4 +1,5 @@
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
+import { kitchenObservation } from "../kitchen-observation-fixture";
 import { fixtureDatabase } from "./organisation-database";
 import {
   newConversationId,
@@ -2123,7 +2124,6 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
   await evictDurableObject(initialCase.value);
   await fixtureDatabase().exec("DROP TRIGGER fail_session_preparation");
   expect((await send(session, first)).status).toBe(200);
-  await verifyHistoricalSurfaceHistory(scope, session);
   await expect
     .poll(modelPhase.bind(null, model), { timeout: 20000 })
     .toBe("root");
@@ -2409,7 +2409,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
       await send(session, {
         ...command("request_playback_seek", "Seek the canvas to 90 seconds."),
         conversationId: playbackChat,
-        surfaceContext: surface,
+        kitchen: surface,
       })
     ).status,
   ).toBe(200);
@@ -2450,7 +2450,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
       await send(session, {
         ...command("request_playback_stale", "Play this run."),
         conversationId: playbackChat,
-        surfaceContext: await captureBakerySurface(applied.state),
+        kitchen: await captureBakerySurface(applied.state),
       })
     ).status,
   ).toBe(200);
@@ -2512,7 +2512,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
               : "Preview the oven door at 110 degrees.",
           ),
           conversationId: playbackChat,
-          surfaceContext: inspectionSurface,
+          kitchen: inspectionSurface,
         })
       ).status,
     ).toBe(200);
@@ -2583,7 +2583,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
           "Prepare the open oven cycle with dispatch at 45 seconds.",
         ),
         conversationId: playbackChat,
-        surfaceContext: preparationSurface,
+        kitchen: preparationSurface,
       })
     ).status,
   ).toBe(200);
@@ -2658,7 +2658,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
       await send(session, {
         ...command(simulationRequest, "Simulate the prepared oven cycle."),
         conversationId: playbackChat,
-        surfaceContext: recapture,
+        kitchen: recapture,
       })
     ).status,
   ).toBe(200);
@@ -2724,7 +2724,7 @@ async function reliableFinalization({ task }: TestContext): Promise<void> {
           "Inspect the last save, list saved rehearsals, then review the saved copy.",
         ),
         conversationId: playbackChat,
-        surfaceContext: recapture,
+        kitchen: recapture,
       })
     ).status,
   ).toBe(200);
@@ -3106,137 +3106,6 @@ function readChatEndpoint(
   );
 }
 
-async function verifyHistoricalSurfaceHistory(
-  scope: ConversationScope,
-  session: IssuedControlSession,
-): Promise<void> {
-  const row = await fixtureDatabase().prepare(
-    "SELECT state_json FROM portal_conversation WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
-  )
-    .bind(scope.organisationId, scope.userId, CONVERSATION_ID)
-    .first<{ state_json: string }>();
-  if (row === null) throw new Error("Missing admitted conversation");
-  const raw: unknown = JSON.parse(row.state_json);
-  if (!isRecord(raw)) throw new Error("Invalid stored conversation");
-  const surface = {
-    kind: "bakery-surface-context",
-    digest: "a".repeat(64),
-    context: {
-      schemaVersion: 1,
-      kind: "bakery-workspace",
-      surfaceSessionId: "historical-session",
-      surfaceEpoch: 3,
-      capturedAt: 1,
-      supportedCommands: ["prepare_run_save"],
-      active: {
-        kind: "rehearsal",
-        rehearsalKind: "standalone",
-        readiness: "ready",
-        runSaveProposal: null,
-      },
-    },
-  };
-  const snapshot = {
-    ...raw,
-    id: newConversationId(),
-    title: "Historical rehearsal",
-    work: { kind: "ready" },
-    completedRequests: [],
-    pendingInputs: [],
-    messages: [
-      {
-        kind: "user",
-        id: "historical_user",
-        text: "Inspect my rehearsal.",
-        surfaceContext: surface,
-      },
-    ],
-    timeline: [
-      {
-        kind: "user",
-        eventId: "historical_user",
-        sequence: 1,
-        requestId: "request_historical",
-        createdAt: 1,
-        text: "Inspect my rehearsal.",
-        parts: [
-          { kind: "text", text: "Inspect my rehearsal." },
-          { kind: "surface", surface },
-        ],
-      },
-    ],
-    latestSequence: 1,
-    lastReadSequence: 0,
-  };
-  const actorIdentity = `${scope.organisationId}:portal-chat:${scope.userId}:${snapshot.id}`;
-  const caseId = await conversationCaseId(actorIdentity);
-  await fixtureDatabase().batch([
-    fixtureDatabase().prepare(
-      "INSERT INTO case_project (organisation_id, case_id, project_id, revision, updated_at) SELECT organisation_id, ?, project_id, 1, 1 FROM organisation_default_project WHERE organisation_id = ?",
-    ).bind(caseId, scope.organisationId),
-    fixtureDatabase().prepare(
-      "INSERT INTO portal_conversation (organisation_id, user_id, conversation_id, case_id, revision, state_json, updated_at, last_activity_at, latest_sequence) VALUES (?, ?, ?, ?, 1, json_set(?, '$.actorIdentity', ?), 1, 1, 1)",
-    ).bind(
-      scope.organisationId,
-      scope.userId,
-      snapshot.id,
-      caseId,
-      JSON.stringify(snapshot),
-      actorIdentity,
-    ),
-  ]);
-  const response = await readChatEndpoint(
-    session,
-    `?conversation=${snapshot.id}&observe=true`,
-  );
-  expect(response.status).toBe(200);
-  expect(await response.json()).toMatchObject({
-    conversations: expect.arrayContaining([
-      expect.objectContaining({ id: snapshot.id, title: snapshot.title }),
-    ]),
-    conversation: {
-      timeline: [
-        {
-          kind: "user",
-          text: "Inspect my rehearsal.",
-        },
-      ],
-    },
-  });
-  const restored = await readConversation(fixtureDatabase(), scope, snapshot.id);
-  expect(restored?.conversation.timeline).toMatchObject([
-    {
-      kind: "user",
-      parts: [
-        { kind: "text", text: "Inspect my rehearsal." },
-        {
-          kind: "text",
-          text: expect.stringContaining(JSON.stringify(surface)),
-        },
-      ],
-    },
-  ]);
-  expect(
-    (
-      await send(session, {
-        ...command("request_stale_live", "Use old context."),
-        surfaceContext: surface,
-      })
-    ).status,
-  ).toBe(422);
-  const retained = await fixtureDatabase().prepare(
-    "SELECT state_json FROM portal_conversation WHERE organisation_id = ? AND user_id = ? AND conversation_id = ?",
-  )
-    .bind(scope.organisationId, scope.userId, snapshot.id)
-    .first<{ state_json: string }>();
-  expect(retained?.state_json).toBe(
-    JSON.stringify({
-      ...snapshot,
-      actorIdentity: `${scope.organisationId}:portal-chat:${scope.userId}:${snapshot.id}`,
-    }),
-  );
-}
-
 type Model = {
   savedRunId: string;
   calls: number;
@@ -3445,7 +3314,6 @@ function command(requestId: string, text: string) {
     requestId,
     model: PLATFORM_DEFAULT_PI_MODEL,
     text,
-    surfaceContext: null,
   };
 }
 
@@ -3459,30 +3327,40 @@ function send(
     isConversationId(body.conversationId) &&
     (body.kind === "message" || body.kind === "next" || body.kind === "steer")
   ) {
-    const surface = body.surfaceContext;
-    if (
-      isRecord(surface) &&
-      isRecord(surface.context) &&
-      typeof surface.context.surfaceSessionId === "string"
-    ) {
-      const attachment = parseBakerySurfaceAttachment(surface);
-      if (attachment.kind === "valid")
-        reportedSurfaces.set(surface.context.surfaceSessionId, {
-          surface: attachment.value,
-          conversationId: body.conversationId,
-        });
-    }
-    if (body.browserContext === undefined)
+    const { kitchen, ...message } = body;
+    const conversationId = body.conversationId;
+    const withBrowser: Record<string, unknown> =
+      message.browserContext === undefined
+        ? {
+            ...message,
+            browserContext: {
+              kind: "available",
+              binding: {
+                browserInstanceId: "browser_chat_acceptance",
+                conversationId,
+              },
+            },
+          }
+        : message;
+    body = withBrowser;
+    // The Kitchen sends its current view as the state of its observation.
+    if (kitchen !== undefined) {
+      const attachment = parseBakerySurfaceAttachment(kitchen);
+      if (attachment.kind !== "valid")
+        throw new Error("The Kitchen view of the message is invalid");
+      reportedSurfaces.set(attachment.value.context.surfaceSessionId, {
+        surface: attachment.value,
+        conversationId,
+      });
       body = {
-        ...body,
-        browserContext: {
-          kind: "available",
-          binding: {
-            browserInstanceId: "browser_chat_acceptance",
-            conversationId: body.conversationId,
-          },
-        },
+        ...withBrowser,
+        surfaceObservation: kitchenObservation(
+          attachment.value.context,
+          "browser_chat_acceptance",
+          conversationId,
+        ),
       };
+    }
   }
   return exports.default.fetch(
     new Request(
@@ -5441,7 +5319,6 @@ function uploadInspectionAttachment(
       model: PLATFORM_DEFAULT_PI_MODEL,
       text: "Inspect the attached document.",
       browserContext: { kind: "unavailable" },
-      surfaceContext: null,
     }),
   );
   form.append(

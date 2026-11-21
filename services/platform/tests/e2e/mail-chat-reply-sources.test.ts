@@ -688,7 +688,6 @@ function chatMessage(
     requestId: `request_${crypto.randomUUID()}`,
     model,
     text: `Check ${MAIL_SOURCE_ORDER_ID} and draft a reply to the customer's mail ${messageId}.`,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   };
 }

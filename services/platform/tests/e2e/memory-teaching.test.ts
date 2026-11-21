@@ -152,7 +152,6 @@ async function memoryTeachingJourney({ task }: TestContext): Promise<void> {
       requestId,
       model: modelName,
       text,
-      surfaceContext: null,
       browserContext: { kind: "unavailable" },
     });
   /** Sends one message and returns what the model was sent for that turn. */

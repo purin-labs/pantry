@@ -1172,7 +1172,6 @@ it(
       requestId: `request_${viewerConvId}_VIEWER`,
       model: fixture.route.model,
       text: "VIEWERSUPPLYCOST now.",
-      surfaceContext: null,
       browserContext: { kind: "unavailable" },
     });
     expect(viewerChatAttempt.status).toBe(404);

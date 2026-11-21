@@ -667,7 +667,6 @@ async (page) => {
               requestId: "request_member_portal_chat",
               model: "moonshotai/kimi-k3",
               text: MEMBER_FLOOR_PLAN,
-              surfaceContext: null,
               browserContext: { kind: "unavailable" },
             },
           },
@@ -700,7 +699,6 @@ async (page) => {
               requestId: "request_member_canvas_floor_plan",
               model: "moonshotai/kimi-k3",
               text: MEMBER_FLOOR_PLAN,
-              surfaceContext: null,
               browserContext: {
                 kind: "available",
                 binding: {

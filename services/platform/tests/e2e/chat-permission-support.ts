@@ -24,7 +24,6 @@ export async function ask(
     requestId: `request_${conversationId}_${label}`,
     model,
     text,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.clone().text()).toBe(200);

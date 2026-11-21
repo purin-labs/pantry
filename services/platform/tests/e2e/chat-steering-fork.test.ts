@@ -93,7 +93,6 @@ async function steeringForkJourney(test: TestContext): Promise<void> {
     inputId: "input_fork_steer",
     model: fixture.route.model,
     text: STEERING_TEXT,
-    surfaceContext: null,
     browserContext: portalBrowser(conversationId),
   });
   expect(steered.status, await steered.clone().text()).toBe(200);
@@ -198,7 +197,6 @@ function message(
     requestId,
     model,
     text,
-    surfaceContext: null,
     browserContext: portalBrowser(conversationId),
   });
 }

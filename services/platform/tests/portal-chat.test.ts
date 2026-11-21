@@ -8,6 +8,7 @@ import {
   issueControlSession,
 } from "../src/data/control-plane";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
+import { kitchenObservation } from "./kitchen-observation-fixture";
 import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
 import { parseOrganisationPlacementProfile } from "../src/placement";
@@ -1286,7 +1287,11 @@ describe("persistent portal chat", function chatSuite() {
           requestId: "request_surface_timeline",
           model: "test-model",
           text: "Inspect this workspace.",
-          surfaceContext,
+          surfaceObservation: kitchenObservation(
+            surfaceContext.context,
+            "browser_surface_timeline",
+            "conv_fc649128-5a01-5a9a-9ba9-ab760c8e6714",
+          ),
         }),
       }),
       env,
@@ -1384,75 +1389,6 @@ describe("persistent portal chat", function chatSuite() {
         }),
       ]),
     );
-  });
-
-  it("rejects a BakeryOS observation whose accepted digest no longer matches", async function rejectsChangedBakerySurfaceContext() {
-    const surfaceContext = await createBakerySurfaceAttachment({
-      schemaVersion: 1,
-      kind: "bakery-workspace",
-      runOpenReview: null,
-      surfaceSessionId: "surface-chat-tampered",
-      surfaceEpoch: 1,
-      capturedAt: 50,
-      comparison: null,
-      simulation: null,
-      supportedCommands: ["inspect_surface"],
-      active: {
-        kind: "shift",
-        source: "sample",
-        view: {
-          dock: "closed",
-          camera: "perspective",
-          labels: "auto",
-          minimap: false,
-          chrome: "shown",
-        },
-        sourceIdentity: { kind: "sample", id: "financier-sample" },
-        variant: "normal",
-        selection: { kind: "batch", id: "A", label: "Batch A" },
-        selectedTask: null,
-        playback: {
-          cursorSeconds: 0,
-          playback: "paused",
-          speed: 120,
-        },
-        draft: { revision: 0, digest: "c".repeat(64) },
-        pendingEdit: null,
-        scenarioSaveProposal: null,
-        run: {
-          state: "complete",
-          endSeconds: 480,
-          lateBatches: 0,
-          unfinishedBatches: 0,
-        },
-      },
-    });
-    const response = await handlePortalChat(
-      new Request("https://portal.example/chat", {
-        method: "POST",
-        body: JSON.stringify({
-          kind: "message",
-          conversationId: requireConversationId(
-            "conv_c71a2ce0-733a-56e0-b371-371fe033b203",
-          ),
-          requestId: "request_surface_tampered",
-          model: "test-model",
-          text: "What is selected?",
-          surfaceContext: { ...surfaceContext, digest: "0".repeat(64) },
-        }),
-      }),
-      env,
-      scope.organisationId,
-    );
-
-    expect(response.status).toBe(422);
-    expect(
-      await readConversation(
-        env.DB,
-        scope,
-        "conv_c71a2ce0-733a-56e0-b371-371fe033b203",
-      ),
-    ).toBeNull();
   });
 
   it("lists subscription models and applies a new selection to the next turn", async function changesModel() {

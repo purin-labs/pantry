@@ -302,7 +302,6 @@ async function agentCanvasJourney(
         requestId: "request_agent_canvas",
         model: PLATFORM_DEFAULT_PI_MODEL,
         text: "Move the first saved appliance canvas node to 450,220.",
-        surfaceContext: null,
         browserContext: {
           kind: "available",
           binding: {
@@ -543,7 +542,6 @@ async function scriptCanvasJourney({ task, onTestFinished }: TestContext) {
     requestId: "request_script_canvas",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Move the first two canvas steps in one script.",
-    surfaceContext: null,
     browserContext: {
       kind: "available",
       binding: {
@@ -878,7 +876,6 @@ async function verifyPeerAccess(
         requestId: "request_viewer_canvas",
         model: PLATFORM_DEFAULT_PI_MODEL,
         text: "Move a node",
-        surfaceContext: null,
         browserContext: { kind: "unavailable" },
       }),
     },
@@ -916,7 +913,6 @@ async function verifyContinuation(
     requestId: "request_agent_canvas",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Move the first saved appliance canvas node to 450,220.",
-    surfaceContext: null,
     browserContext: {
       kind: "available",
       binding: { browserInstanceId: "browser_agent_canvas", conversationId },
@@ -958,7 +954,6 @@ async function verifyContinuation(
     requestId: "retired_request",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Do not edit from an earlier conversation",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(denied.status).toBe(409);
@@ -968,7 +963,6 @@ async function verifyContinuation(
     requestId: "next_canvas_request",
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Inspect the current canvas",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(sent.status).toBe(200);
@@ -1049,7 +1043,6 @@ async function verifyInterruptedCanvasRequest(
     requestId,
     model: PLATFORM_DEFAULT_PI_MODEL,
     text: "Recover this request",
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status).toBe(200);

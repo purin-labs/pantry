@@ -48,7 +48,6 @@ export async function measureCanvasRefresh(
           requestId: `refresh_${turn}`,
           model: PLATFORM_DEFAULT_PI_MODEL,
           text: `Explain recipe checkpoint ${turn}`,
-          surfaceContext: null,
           browserContext: { kind: "unavailable" },
         }),
       },

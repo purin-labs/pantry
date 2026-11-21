@@ -7,11 +7,10 @@ import {
   newConversationId,
   newProjectId,
   type ConversationId,
-  type SurfaceObservationV2,
 } from "@purin-labs/control-api";
-import type { BakerySurfaceContextV1 } from "@purin-labs/bakery-model/bakery-surface";
 import { isRecord } from "@purin-labs/std";
 
+import { kitchenObservation } from "../kitchen-observation-fixture";
 import { captureBakerySurface } from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
 import { initialSimulatorState } from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";
 import {
@@ -66,7 +65,7 @@ it(
     const sent = await send(author, paths.chat, privateChat, route.model, {
       label: "kitchen",
       text: "What is selected in the Kitchen?",
-      surfaceObservation: kitchenObservation(context, privateChat),
+      surfaceObservation: kitchenObservation(context, BROWSER, privateChat),
     });
     expect(sent.status, await sent.clone().text()).toBe(200);
     await finished(author, privateChat);
@@ -112,7 +111,7 @@ it(
         label: "mismatch",
         text: "And now?",
         surfaceObservation: {
-          ...kitchenObservation(context, privateChat),
+          ...kitchenObservation(context, BROWSER, privateChat),
           instance: {
             browserInstanceId: BROWSER,
             surfaceSessionId: "another-session",
@@ -131,7 +130,7 @@ it(
         label: "not-kitchen",
         text: "And now?",
         surfaceObservation: {
-          ...kitchenObservation(context, privateChat),
+          ...kitchenObservation(context, BROWSER, privateChat),
           state: { kind: "bakery-workspace", schemaVersion: 1 },
         },
       },
@@ -148,7 +147,7 @@ it(
     const sharedSend = await send(author, paths.chat, shared, route.model, {
       label: "shared",
       text: "What does my Kitchen show?",
-      surfaceObservation: kitchenObservation(context, shared),
+      surfaceObservation: kitchenObservation(context, BROWSER, shared),
     });
     expect(sharedSend.status, await sharedSend.clone().text()).toBe(200);
     await finished(author, shared);
@@ -172,31 +171,6 @@ it(
 );
 
 /** The Kitchen page as a new tab sends it: the state, and no view. */
-function kitchenObservation(
-  context: BakerySurfaceContextV1,
-  conversationId: ConversationId,
-): SurfaceObservationV2 {
-  return {
-    kind: "surface-observation",
-    schemaVersion: 2,
-    surface: "workflow-simulator",
-    area: "BakeryOS",
-    instance: {
-      browserInstanceId: BROWSER,
-      surfaceSessionId: context.surfaceSessionId,
-      epoch: context.surfaceEpoch,
-    },
-    title: "Workflow simulator",
-    path: `/portal/nuki/shop/workflow-simulator#${conversationId}`,
-    record: null,
-    capturedAt: context.capturedAt,
-    view: [],
-    state: context,
-    commands: [],
-    sources: [],
-  };
-}
-
 /** A new chat of the owner, shared with a Project that has a viewer. */
 async function sharedConversation(
   author: Member,

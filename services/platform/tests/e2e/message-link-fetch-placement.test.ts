@@ -193,7 +193,6 @@ async function linkFetchPlacementJourney({ task }: TestContext): Promise<void> {
     requestId: "request_link_fetch_placement",
     model: route.model,
     text: `Set up the carrier API. Read its reference first: ${DOCUMENTATION}.`,
-    surfaceContext: null,
     browserContext: { kind: "unavailable" },
   });
   expect(started.status, await started.clone().text()).toBe(200);

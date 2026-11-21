@@ -809,7 +809,6 @@ async function send(
               requestId,
               model: PLATFORM_DEFAULT_PI_MODEL,
               text: "List connected integrations.",
-              surfaceContext: null,
               browserContext: {
                 kind: "available",
                 binding: {

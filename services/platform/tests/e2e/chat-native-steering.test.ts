@@ -78,7 +78,6 @@ async function steeringJourney(test: TestContext): Promise<void> {
     requestId: "request_supplier_check",
     model: fixture.route.model,
     text: "Check the next deliveries of our suppliers.",
-    surfaceContext: null,
     browserContext: portalBrowser(conversationId),
   });
   expect(started.status, await started.clone().text()).toBe(200);
@@ -135,7 +134,6 @@ async function steeringJourney(test: TestContext): Promise<void> {
     requestId: "request_supplier_thanks",
     model: fixture.route.model,
     text: "Thanks. Note it for Friday.",
-    surfaceContext: null,
     browserContext: portalBrowser(conversationId),
   });
   expect(next.status, await next.clone().text()).toBe(200);
@@ -173,7 +171,6 @@ function steer(owner: Member, conversationId: string, model: string) {
     inputId: "input_supplier_steer",
     model,
     text: STEERING_TEXT,
-    surfaceContext: null,
     browserContext: portalBrowser(conversationId),
   });
 }
