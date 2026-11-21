@@ -44,9 +44,7 @@ export function isUnregisteredActorKind(
 /**
  * Empties an Actor that no registry names, for an operator who holds its
  * object identifier. The Actor refuses while what it holds names an
- * Organisation the directory still has. Storage written before the
- * Organisation rename names its owner `tenant_id`; that column is read here
- * for this one comparison.
+ * Organisation the directory still has.
  */
 export async function eraseUnregisteredActorState(
   env: Pick<Env, "DB">,
@@ -90,7 +88,7 @@ function storedActorOwners(sql: SqlStorage): readonly string[] {
       .toArray();
     if (present.length === 0) continue;
     for (const row of sql.exec(`SELECT * FROM ${table}`).toArray()) {
-      const owner = row.organisation_id ?? row.tenant_id;
+      const owner = row.organisation_id;
       if (typeof owner === "string" && owner.length > 0) owners.add(owner);
     }
   }

@@ -14,7 +14,6 @@ import type { OrganisationMetaInput } from "../../actors/organisation/types";
 import {
   advanceActiveActorRegistrySchema,
   discardQuarantinedActorRegistryEntry,
-  initialActorPhysicalName,
   listOrganisationActorRegistryEntries,
   parseActorRegistryId,
   type ActiveActorRegistryEntry,
@@ -126,13 +125,6 @@ type ActorRegistryAdminRequest =
       readonly staleReservationAgeMs?: never;
     }
   | {
-      readonly command: "erase_purged_connector";
-      readonly organisationId: OrganisationId;
-      readonly connectorId: ConnectorId;
-      readonly registryId: ActorRegistryId;
-      readonly staleReservationAgeMs?: never;
-    }
-  | {
       readonly command: "erase_purged_organisation_rows";
       readonly organisationId: OrganisationId;
       readonly staleReservationAgeMs?: never;
@@ -223,8 +215,6 @@ export async function handleAdministerActorRegistry(
       return recoverConnectorCaseWorkResponse(env, input.value);
     case "discard_quarantined_case":
       return discardQuarantinedCaseResponse(env, input.value);
-    case "erase_purged_connector":
-      return erasePurgedConnectorResponse(env, input.value);
     case "erase_purged_organisation_rows":
       return erasePurgedOrganisationRowsResponse(
         env,
@@ -410,86 +400,6 @@ function unregisteredActorStub(
     default:
       return assertNever(objectKind);
   }
-}
-
-/**
- * Empties the Connector of an Organisation whose purge is due or done. The
- * Connector decides whether it may be emptied; this only finds it.
- */
-async function erasePurgedConnectorResponse(
-  env: Env,
-  input: VariantBy<
-    ActorRegistryAdminRequest,
-    "command",
-    "erase_purged_connector"
-  >,
-): Promise<Response> {
-  const execution = await OrganisationExecutionScope.resolve(
-    env,
-    input.organisationId,
-  );
-  if (!execution.ok) {
-    return errorResponse(
-      execution.error.code,
-      "The organisation region is unavailable.",
-      503,
-    );
-  }
-  const entries = await listOrganisationActorRegistryEntries({
-    db: execution.value.database,
-    organisationId: input.organisationId,
-  });
-  if (!entries.ok) {
-    return actorRegistryReconciliationErrorResponse(entries.error);
-  }
-  const entry = entries.value.find(function matchesPurgedConnector(candidate) {
-    return (
-      candidate.registryId === input.registryId &&
-      candidate.identity.objectKind === "connector" &&
-      candidate.identity.logicalObjectId === input.connectorId
-    );
-  });
-  if (entry === undefined) {
-    return errorResponse(
-      "registry_entry_missing",
-      "Connector was not found.",
-      404,
-    );
-  }
-  // The instance the Connector started as outlives its relocations and is
-  // emptied with the current one.
-  const names = new Set([
-    entry.physicalObjectName,
-    initialActorPhysicalName(entry.identity),
-  ]);
-  for (const name of names) {
-    const erased = await actorStub(
-      env.CONNECTOR,
-      name,
-      entry.placement,
-    ).erasePurgedOrganisationState({
-      organisationId: input.organisationId,
-      connectorId: input.connectorId,
-      placement: entry.placement,
-    });
-    if (!erased.ok) {
-      return errorResponse(
-        erased.error.code,
-        "The Connector was not erased.",
-        409,
-      );
-    }
-  }
-  return jsonResponse({
-    ok: true,
-    report: {
-      kind: "purged_connector_erased",
-      identity: entry.identity,
-      registryId: entry.registryId,
-      instances: names.size,
-      erasedAt: Date.now(),
-    },
-  });
 }
 
 /**
@@ -1181,27 +1091,6 @@ function parseActorRegistryAdminRequest(
           },
         }
       : invalidActorRegistryAdminRequest("quarantinedCase");
-  }
-
-  if (command.value === "erase_purged_connector") {
-    const connectorId = readStringField(body, "connectorId");
-    const registryId = readStringField(body, "registryId");
-    if (!connectorId.ok || !registryId.ok || Object.keys(body).length !== 4) {
-      return invalidActorRegistryAdminRequest("purgedConnector");
-    }
-    const parsedConnectorId = parseConnectorId(connectorId.value);
-    const parsedRegistryId = parseActorRegistryId(registryId.value);
-    return parsedConnectorId.ok && parsedRegistryId.ok
-      ? {
-          ok: true,
-          value: {
-            command: command.value,
-            organisationId: organisationId.value,
-            connectorId: parsedConnectorId.value,
-            registryId: parsedRegistryId.value,
-          },
-        }
-      : invalidActorRegistryAdminRequest("purgedConnector");
   }
 
   return invalidActorRegistryAdminRequest("command");

@@ -6,7 +6,6 @@ import type {
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
 import { parseStoredAttachmentList } from "../../messages/stored-attachment";
-import type { PurgedConnectorErasureRequest } from "../organisation-archive-cleanup";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   checked,
@@ -29,28 +28,6 @@ import type {
   ConnectorResult,
   MetaRow,
 } from "./types";
-
-/**
- * Whether what this Actor holds belongs to the named Connector. Storage
- * written before the Organisation rename names its owner `tenant_id`. It is
- * read here only so that the wrong Actor is never emptied.
- */
-export function holdsConnectorIdentity(
-  sql: SqlStorage,
-  identity: Pick<
-    PurgedConnectorErasureRequest,
-    "organisationId" | "connectorId"
-  >,
-): boolean {
-  const stored = sql
-    .exec("SELECT * FROM connector_meta WHERE singleton = 1")
-    .toArray()[0];
-  if (stored === undefined) return true;
-  return (
-    (stored.organisation_id ?? stored.tenant_id) === identity.organisationId &&
-    stored.connector_id === identity.connectorId
-  );
-}
 
 export function ensureConnectorIdentity(
   sql: SqlStorage,

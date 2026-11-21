@@ -1158,7 +1158,7 @@ export function isRegisteredActorName(
 }
 
 /** The name an Actor has at its first placement, before any relocation. */
-export function initialActorPhysicalName(identity: ActorIdentity): string {
+function initialActorPhysicalName(identity: ActorIdentity): string {
   switch (identity.objectKind) {
     case "organisation":
       return identity.organisationId;

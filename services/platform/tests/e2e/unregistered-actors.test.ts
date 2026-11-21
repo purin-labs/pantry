@@ -58,17 +58,15 @@ async function unregisteredActorJourney({ task }: TestContext) {
   await storeConnector(registered, {
     owner: ORGANISATION_ID,
     connectorId: registeredId,
-    earlierFormat: false,
   });
 
-  // Left by an Organisation the directory no longer has, in the earlier format.
+  // Left by an Organisation the directory no longer has.
   const earlier = env.CONNECTOR.get(
     env.CONNECTOR.idFromName(`${GONE_ORGANISATION}:connector_whatsapp_gone`),
   );
   await storeConnector(earlier, {
     owner: GONE_ORGANISATION,
     connectorId: "connector_whatsapp_gone",
-    earlierFormat: true,
   });
   const earlierOrganisation = env.ORGANISATION.get(
     env.ORGANISATION.idFromName(`${GONE_ORGANISATION}:p5`),
@@ -86,7 +84,6 @@ async function unregisteredActorJourney({ task }: TestContext) {
   await storeConnector(stray, {
     owner: ORGANISATION_ID,
     connectorId: "connector_whatsapp_stray",
-    earlierFormat: false,
   });
 
   const unauthorised = await exports.default.fetch(
@@ -256,7 +253,7 @@ async function unregisteredActorJourney({ task }: TestContext) {
     registeredConnector: "refused: actor_registered, storage intact",
     registeredOrganisationActor: "refused: actor_registered",
     unregisteredWithLiveOwner: "refused: actor_owner_exists, storage intact",
-    earlierFormatConnector: "erased, no tables left",
+    goneOwnerConnector: "erased, no tables left",
     earlierOrganisationActor: "erased",
     served,
   };
@@ -340,7 +337,6 @@ async function storeConnector(
   input: {
     readonly owner: string;
     readonly connectorId: string;
-    readonly earlierFormat: boolean;
   },
 ): Promise<void> {
   await runInDurableObject(stub, function storeRows(_actor, state) {
@@ -354,10 +350,6 @@ async function storeConnector(
       "INSERT INTO connector_ingress (ingress_id, native_event_id, payload) VALUES ('ingress_journey', 'event_journey', ?)",
       JSON.stringify({ text: "A customer message" }),
     );
-    if (input.earlierFormat)
-      sql.exec(
-        "ALTER TABLE connector_meta RENAME COLUMN organisation_id TO tenant_id",
-      );
   });
 }
 

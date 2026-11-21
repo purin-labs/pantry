@@ -63,11 +63,6 @@ import {
 import { reopenWithheldConnectorSlackDelivery } from "./connector-slack-stream";
 import { deliverSlackPermissionNotice } from "../slack/case-processing";
 import type { Result } from "../result";
-import {
-  canErasePurgedConnector,
-  type PurgedConnectorErasureError,
-  type PurgedConnectorErasureRequest,
-} from "./organisation-archive-cleanup";
 import { type PlacedActorExportSource } from "./lifecycle/placed-actor";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
 import { inspectConnector } from "./connector/delivery";
@@ -75,7 +70,6 @@ import type { ConnectorChannels } from "./connector/channel-adapter";
 import { SlackConnectorChannel } from "./connector/slack-channel";
 import {
   ensureConnectorIdentity,
-  holdsConnectorIdentity,
   parseDeliveryRequest,
 } from "./connector/ingress-parsers";
 import { invalid, scheduleAcceptedCaseWorkAlarm } from "./connector/support";
@@ -455,27 +449,6 @@ export class ConnectorDO
   protected override async prepareErasure(): Promise<() => Promise<void>> {
     const slots = readWarmActorSlots(this.ctx.storage.sql);
     return this.eraseFormerWarmActorSlots.bind(this, slots);
-  }
-
-  /**
-   * Empties this Actor for an Organisation whose purge is due or done. The
-   * purge empties a Connector through the Connector's own tables; an operator
-   * uses this for one whose storage the purge cannot read.
-   */
-  async erasePurgedOrganisationState(
-    request: PurgedConnectorErasureRequest,
-  ): Promise<Result<null, PurgedConnectorErasureError>> {
-    if (!(await canErasePurgedConnector(this.env, request, Date.now())))
-      return { ok: false, error: { code: "organisation_purge_not_due" } };
-    if (!holdsConnectorIdentity(this.ctx.storage.sql, request))
-      return { ok: false, error: { code: "connector_identity_conflict" } };
-    const slots = readWarmActorSlots(this.ctx.storage.sql);
-    await this.ctx.storage.deleteAlarm();
-    await this.ctx.storage.deleteAll();
-    // The instance outlives the erasure, so its tables are created again.
-    this.createSchema();
-    await this.eraseFormerWarmActorSlots(slots);
-    return { ok: true, value: null };
   }
 
   protected acceptsActivation(input: ActorActivationRequest): boolean {

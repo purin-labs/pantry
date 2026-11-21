@@ -5,14 +5,10 @@ import {
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import {
   parseOrganisationId,
-  type ConnectorId,
   type SessionId,
   type OrganisationId,
 } from "../ids";
-import {
-  parseOrganisationPlacement,
-  type OrganisationPlacement,
-} from "../placement";
+import { parseOrganisationPlacement } from "../placement";
 import {
   isOrganisationPolicyPlacementActive,
   parseOrganisationPlacementFenceToken,
@@ -42,16 +38,6 @@ export type HarnessHistoryErasureRequest = Readonly<{
   placement: OrganisationPolicyPlacement;
   archiveReceiptId: string;
 }>;
-
-export type PurgedConnectorErasureRequest = Readonly<{
-  organisationId: OrganisationId;
-  connectorId: ConnectorId;
-  placement: OrganisationPlacement;
-}>;
-
-export type PurgedConnectorErasureError = {
-  readonly code: "organisation_purge_not_due" | "connector_identity_conflict";
-};
 
 export const ORGANISATION_ARCHIVE_CLEANUP_KEY = "organisation-archive-cleanup";
 
@@ -206,38 +192,6 @@ function parseArchiveCleanupRequest(
     placement: { placement: placement.value, fenceToken: fence.value },
     now: raw.now,
   };
-}
-
-/**
- * A Connector may be emptied once its Organisation's purge is due or done.
- * The purge empties a Connector through the Connector's own tables. This
- * answers for one whose storage the purge cannot read.
- */
-export async function canErasePurgedConnector(
-  env: OrganisationPlacementBindings,
-  request: PurgedConnectorErasureRequest,
-  now: number,
-): Promise<boolean> {
-  const selected = selectOrganisationPlacementDatabase(
-    env,
-    request.organisationId,
-    request.placement,
-  );
-  if (!selected.ok) return false;
-  const authorized = await selected.value
-    .withSession("first-primary")
-    .prepare(
-      `SELECT 1 FROM organisation_archive_cleanup AS cleanup
-     JOIN organisation_onboarding AS organisation ON organisation.organisation_id = cleanup.organisation_id
-     JOIN durable_object_registry AS registry ON registry.organisation_id = cleanup.organisation_id
-     WHERE cleanup.organisation_id = ? AND organisation.lifecycle IN ('archived', 'purging', 'purged')
-       AND (cleanup.status = 'purged'
-         OR (cleanup.status = 'pending_purge' AND cleanup.purge_after <= ?))
-       AND registry.object_kind = 'connector' AND registry.logical_object_id = ?`,
-    )
-    .bind(request.organisationId, now, request.connectorId)
-    .first();
-  return authorized !== null;
 }
 
 export async function canEraseArchivedHarnessHistory(
