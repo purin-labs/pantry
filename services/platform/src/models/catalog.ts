@@ -73,6 +73,54 @@ export const ORGANISATION_ANTHROPIC_MODEL_OPTIONS = [
   },
 ] as const;
 
+const GEMINI_CAPABILITIES: ChatModelCapabilities = {
+  input: { text: true, images: true, documents: false },
+  tools: true,
+  progressSummaries: true,
+  citations: false,
+  effortOptions: ["low", "medium", "high"],
+  contextWindowTokens: 256_000,
+};
+
+/**
+ * The Gemini models of an Organisation's own Gemini API key (spec FND-04).
+ * Pi's catalog has each id. The context window stays at 256,000 tokens, as
+ * on the other routes, although each model takes 1,048,576.
+ */
+export const ORGANISATION_GOOGLE_MODEL_OPTIONS = [
+  {
+    id: "gemini-4-hydrogen",
+    name: "Gemini 4 Hydrogen",
+    description: "The lowest-cost Gemini 4 model, for everyday work.",
+    capabilities: GEMINI_CAPABILITIES,
+  },
+  {
+    id: "gemini-4-carbon",
+    name: "Gemini 4 Carbon",
+    description: "Gemini 4 for demanding research and planning.",
+    capabilities: GEMINI_CAPABILITIES,
+  },
+  {
+    id: "gemini-4-argon",
+    name: "Gemini 4 Argon",
+    description:
+      "Gemini 4 at the price of Carbon, for everyday and complex work.",
+    capabilities: GEMINI_CAPABILITIES,
+  },
+  {
+    id: "gemini-4-neon",
+    name: "Gemini 4 Neon",
+    description: "The highest-priced Gemini 4 model, for the hardest work.",
+    capabilities: GEMINI_CAPABILITIES,
+  },
+] as const;
+
+export type OrganisationGoogleModel =
+  (typeof ORGANISATION_GOOGLE_MODEL_OPTIONS)[number]["id"];
+
+export const DEFAULT_ORGANISATION_GOOGLE_MODEL: OrganisationGoogleModel =
+  "gemini-4-hydrogen";
+
 export type OrganisationAnthropicModel =
   (typeof ORGANISATION_ANTHROPIC_MODEL_OPTIONS)[number]["id"];
 
@@ -85,13 +133,21 @@ export type OrganisationCodexModel =
 export const DEFAULT_ORGANISATION_CODEX_MODEL: OrganisationCodexModel =
   "gpt-5.6-luna";
 
-export function parseOrganisationCodexModel(
+/** The id of the option that `raw` names, from one model menu. */
+function optionId<Id extends string>(
+  options: readonly { readonly id: Id }[],
   raw: unknown,
-): Result<OrganisationCodexModel, { readonly code: "chat_model_invalid" }> {
-  for (const option of ORGANISATION_CODEX_MODEL_OPTIONS) {
+): Result<Id, { readonly code: "chat_model_invalid" }> {
+  for (const option of options) {
     if (raw === option.id) return { ok: true, value: option.id };
   }
   return { ok: false, error: { code: "chat_model_invalid" } };
+}
+
+export function parseOrganisationCodexModel(
+  raw: unknown,
+): Result<OrganisationCodexModel, { readonly code: "chat_model_invalid" }> {
+  return optionId(ORGANISATION_CODEX_MODEL_OPTIONS, raw);
 }
 
 export function isOrganisationCodexModel(
@@ -103,14 +159,23 @@ export function isOrganisationCodexModel(
 export function parseOrganisationAnthropicModel(
   raw: unknown,
 ): Result<OrganisationAnthropicModel, { readonly code: "chat_model_invalid" }> {
-  for (const option of ORGANISATION_ANTHROPIC_MODEL_OPTIONS) {
-    if (raw === option.id) return { ok: true, value: option.id };
-  }
-  return { ok: false, error: { code: "chat_model_invalid" } };
+  return optionId(ORGANISATION_ANTHROPIC_MODEL_OPTIONS, raw);
 }
 
 export function isOrganisationAnthropicModel(
   raw: string,
 ): raw is OrganisationAnthropicModel {
   return parseOrganisationAnthropicModel(raw).ok;
+}
+
+export function parseOrganisationGoogleModel(
+  raw: unknown,
+): Result<OrganisationGoogleModel, { readonly code: "chat_model_invalid" }> {
+  return optionId(ORGANISATION_GOOGLE_MODEL_OPTIONS, raw);
+}
+
+export function isOrganisationGoogleModel(
+  raw: string,
+): raw is OrganisationGoogleModel {
+  return parseOrganisationGoogleModel(raw).ok;
 }

@@ -7,12 +7,13 @@ import {
   actorMachineCensus,
   type MachineCensus,
 } from "./lifecycle/machine-census";
+import { ACTOR_MACHINES } from "./actor-machines";
 import {
   armAlarmAfterFailedSteps,
   runAlarmSteps,
 } from "./lifecycle/actor-alarm";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import { screenMediaBase } from "../commerce/cafe-media";
+import { screenMediaBase } from "../cafe/contract/media";
 import {
   CHAT_SIGNAL_SOCKET_HANDLER,
   isChatSignalSocket,
@@ -27,9 +28,9 @@ import {
 } from "../control/admission/chat-signals";
 import {
   ensureWorkspaceCanvasChat,
-  readWorkspaceCanvasChat,
   continueWorkspaceCanvasChat,
 } from "../chat/workspace-canvas";
+import { readWorkspaceCanvasChat } from "../chat/workspace-canvas-read";
 import {
   CHAT_SIGNAL,
   SURFACE_EFFECT_SIGNAL,
@@ -42,7 +43,7 @@ import { savedBakeryRunArchiveKeys } from "../commerce/bakery/saved-runs";
 import {
   reconcileFrozenOrganisationReceipt,
   type RelocationReceiptRequest,
-} from "./actor-relocation-state";
+} from "./organisation-relocation-receipt";
 import { workspaceRevisionArchiveKeys } from "../workspace-revision-store";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
 import { readChatForkAttachmentKeys } from "../chat/fork-history";
@@ -67,11 +68,16 @@ import {
   type CostsSheetAgentEdit,
   type CostsSheetSettleInput,
 } from "./costs-sheet-draft";
+import { cafeCollaborationRooms } from "./cafe-collaboration-rooms";
 import {
-  dispatchOrganisationCollaborationFetch,
-  resolveOrganisationCollaborationSocket,
-  type OrganisationCollaborationRooms,
-} from "./organisation-collaboration-rooms";
+  dispatchCollaborationFetch,
+  resolveCollaborationSocket,
+  type CollaborationRoomRoute,
+  type CollaborationSocketRooms,
+} from "./collaboration-room-dispatch";
+import { commerceCollaborationRooms } from "./commerce-collaboration-rooms";
+import { inboxCollaborationRooms } from "./inbox-collaboration-rooms";
+import { kitchenCollaborationRooms } from "./kitchen-collaboration-rooms";
 import {
   ProductDescriptionDraftRooms,
   type DraftAgentEdit,
@@ -169,18 +175,21 @@ import { cleanupTypeSafeCredentials } from "../integrations/typesafe/connection"
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import { expireOrganisationLeases } from "./organisation/activation";
-import { deliverCaseContextCollectionInvalidations } from "./organisation/case-context-collection";
-import { createOrganisationSchema } from "./organisation/schema";
 import {
-  organisationPlacementConflict,
+  CASE_CONTEXT_SOURCE_FOR_POLICY,
+  deliverCaseContextCollectionInvalidations,
+} from "./organisation/case-context-collection";
+import {
+  createOrganisationSchema,
+  schemaTransaction,
+} from "./organisation/schema";
+import {
   organisationRowToMeta,
   pruneCommerceBoardPresence,
   readCommerceBoardPresence,
-  readOrganisationMetaRow,
   resolveOrganisationActorDatabase,
   socketSweepInterval,
   sweepSafely,
-  validateActionOrganisation,
 } from "./organisation/support";
 import type {
   CommerceBoardPresenceRead,
@@ -192,7 +201,53 @@ import type {
   OrganisationPing,
   OrganisationStateError,
 } from "./organisation/types";
-import { OrganisationCommerce } from "./organisation/organisation-commerce";
+import {
+  OrganisationCommerce,
+  type OrganisationCommerceRpc,
+} from "./organisation/organisation-commerce";
+import { OrganisationActorBase } from "./organisation/organisation-actor-base";
+import {
+  activateOrganisationPolicy,
+  admittedEvaluateCaseContextDiscovery,
+  admittedManageTypeSafeConnection,
+  admittedPublishCaseContextDiscoveryConfiguration,
+  admittedReadCaseContextDiscoveryConfiguration,
+  admittedReadCaseContextDiscoverySourceReadiness,
+  admittedReadTypeSafeConnectionConfiguration,
+  type OrganisationPolicyHost,
+  type OrganisationPolicyRpc,
+} from "./organisation/organisation-policy";
+import {
+  admittedCommitCaseContextCollectionEffectFence,
+  admittedEraseCaseContextCollectionSource,
+  admittedInvalidateCaseContextCollectionVerification,
+  admittedPrepareCaseContextCollectionEvidence,
+  admittedReadCaseContextCollection,
+  admittedReadCaseContextCollectionsForCase,
+  admittedReviewCaseContextCollectionRelationship,
+  admittedValidateCaseContextCollectionEvidence,
+  type OrganisationCaseContextCollectionRpc,
+  type OrganisationCollectionHost,
+} from "./organisation/case-context-collection-commands";
+import {
+  JEV_FOR_POLICY,
+  manageJevFeatureForOrganisation,
+  manageJevPaidUseForOrganisation,
+  readJevFeaturesForOrganisation,
+  type OrganisationJevHost,
+  type OrganisationJevRpc,
+} from "../jev-features/organisation-settings";
+import type {
+  OrganisationActivatePolicyInput,
+  OrganisationPolicyActivation,
+  OrganisationPolicyActivationError,
+} from "./organisation/policy-types";
+import {
+  organisationPlacementConflict,
+  readOrganisationMetaRow,
+  validateActionOrganisation,
+} from "./organisation/organisation-record";
+
 import {
   bakeKitchenPorts,
   readBakeRunOf,
@@ -207,11 +262,660 @@ import {
 import { setBakeStockLevel } from "../kitchen/bakes/levels";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import type { InventoryStockChange } from "./commerce-projection/stock-changes";
+export class OrganisationDO
+  extends OrganisationActorBase
+  implements
+    OrganisationPolicyRpc,
+    OrganisationJevRpc,
+    OrganisationCaseContextCollectionRpc,
+    OrganisationCommerceRpc
+{
+  // Commerce (`actors/organisation/organisation-commerce.ts`): the actions,
+  // the cues, the commerce lab, the Code Mode leases, the workspace executor
+  // allocation and the onboarding activation.
 
-export class OrganisationDO extends OrganisationCommerce {
+  protected readonly commerce = new OrganisationCommerce(
+    this.moduleHost,
+    {
+      ensureOrganisation: (input) => this.ensureOrganisation(input),
+      activatePolicy: (input) => this.activatePolicy(input),
+    },
+    // Plan 24 S1: a fall of the counter stock can open a bake proposal.
+    {
+      afterStockChanges: (scope, changes) =>
+        this.afterCommerceStockChanges(scope, changes),
+    },
+  );
+
+  advanceActivationSchema(
+    ...input: Parameters<OrganisationCommerce["advanceActivationSchema"]>
+  ) {
+    return this.commerce.advanceActivationSchema(...input);
+  }
+
+  proposeAction(...input: Parameters<OrganisationCommerce["proposeAction"]>) {
+    return this.commerce.proposeAction(...input);
+  }
+
+  requestActionApproval(
+    ...input: Parameters<OrganisationCommerce["requestActionApproval"]>
+  ) {
+    return this.commerce.requestActionApproval(...input);
+  }
+
+  getAction(...input: Parameters<OrganisationCommerce["getAction"]>) {
+    return this.commerce.getAction(...input);
+  }
+
+  readActionActivity(
+    ...input: Parameters<OrganisationCommerce["readActionActivity"]>
+  ) {
+    return this.commerce.readActionActivity(...input);
+  }
+
+  signAction(...input: Parameters<OrganisationCommerce["signAction"]>) {
+    return this.commerce.signAction(...input);
+  }
+
+  rejectAction(...input: Parameters<OrganisationCommerce["rejectAction"]>) {
+    return this.commerce.rejectAction(...input);
+  }
+
+  beginActionExecution(
+    ...input: Parameters<OrganisationCommerce["beginActionExecution"]>
+  ) {
+    return this.commerce.beginActionExecution(...input);
+  }
+
+  retryIndeterminateActionExecution(
+    ...input: Parameters<
+      OrganisationCommerce["retryIndeterminateActionExecution"]
+    >
+  ) {
+    return this.commerce.retryIndeterminateActionExecution(...input);
+  }
+
+  completeActionExecution(
+    ...input: Parameters<OrganisationCommerce["completeActionExecution"]>
+  ) {
+    return this.commerce.completeActionExecution(...input);
+  }
+
+  recordCommerceEntityPlaneEffect(
+    ...input: Parameters<
+      OrganisationCommerce["recordCommerceEntityPlaneEffect"]
+    >
+  ) {
+    return this.commerce.recordCommerceEntityPlaneEffect(...input);
+  }
+
+  reconcileActionExecution(
+    ...input: Parameters<OrganisationCommerce["reconcileActionExecution"]>
+  ) {
+    return this.commerce.reconcileActionExecution(...input);
+  }
+
+  reconcileCommerceProviderReceipt(
+    ...input: Parameters<
+      OrganisationCommerce["reconcileCommerceProviderReceipt"]
+    >
+  ) {
+    return this.commerce.reconcileCommerceProviderReceipt(...input);
+  }
+
+  claimCueDelivery(
+    ...input: Parameters<OrganisationCommerce["claimCueDelivery"]>
+  ) {
+    return this.commerce.claimCueDelivery(...input);
+  }
+
+  completeClaimedCueDelivery(
+    ...input: Parameters<OrganisationCommerce["completeClaimedCueDelivery"]>
+  ) {
+    return this.commerce.completeClaimedCueDelivery(...input);
+  }
+
+  applyCommerceDelivery(
+    ...input: Parameters<OrganisationCommerce["applyCommerceDelivery"]>
+  ) {
+    return this.commerce.applyCommerceDelivery(...input);
+  }
+
+  readRecoverableCommerceCues(
+    ...input: Parameters<OrganisationCommerce["readRecoverableCommerceCues"]>
+  ) {
+    return this.commerce.readRecoverableCommerceCues(...input);
+  }
+
+  readCurrentCommerceProjection(
+    ...input: Parameters<OrganisationCommerce["readCurrentCommerceProjection"]>
+  ) {
+    return this.commerce.readCurrentCommerceProjection(...input);
+  }
+
+  readCommerceProjectionHistory(
+    ...input: Parameters<OrganisationCommerce["readCommerceProjectionHistory"]>
+  ) {
+    return this.commerce.readCommerceProjectionHistory(...input);
+  }
+
+  readExactCommerceProjectionReference(
+    ...input: Parameters<
+      OrganisationCommerce["readExactCommerceProjectionReference"]
+    >
+  ) {
+    return this.commerce.readExactCommerceProjectionReference(...input);
+  }
+
+  markCommerceCuesEnqueued(
+    ...input: Parameters<OrganisationCommerce["markCommerceCuesEnqueued"]>
+  ) {
+    return this.commerce.markCommerceCuesEnqueued(...input);
+  }
+
+  settleCommerceCues(
+    ...input: Parameters<OrganisationCommerce["settleCommerceCues"]>
+  ) {
+    return this.commerce.settleCommerceCues(...input);
+  }
+
+  readAcceptedCommerceProjectionSequence(
+    ...input: Parameters<
+      OrganisationCommerce["readAcceptedCommerceProjectionSequence"]
+    >
+  ) {
+    return this.commerce.readAcceptedCommerceProjectionSequence(...input);
+  }
+
+  readCommerceQueryPlan(
+    ...input: Parameters<OrganisationCommerce["readCommerceQueryPlan"]>
+  ) {
+    return this.commerce.readCommerceQueryPlan(...input);
+  }
+
+  readCommerceRelationshipStep(
+    ...input: Parameters<OrganisationCommerce["readCommerceRelationshipStep"]>
+  ) {
+    return this.commerce.readCommerceRelationshipStep(...input);
+  }
+
+  readCommerceSystemSyncStatus(
+    ...input: Parameters<OrganisationCommerce["readCommerceSystemSyncStatus"]>
+  ) {
+    return this.commerce.readCommerceSystemSyncStatus(...input);
+  }
+
+  validateCommerceSystemProjections(
+    ...input: Parameters<
+      OrganisationCommerce["validateCommerceSystemProjections"]
+    >
+  ) {
+    return this.commerce.validateCommerceSystemProjections(...input);
+  }
+
+  seedCommerceLab(
+    ...input: Parameters<OrganisationCommerce["seedCommerceLab"]>
+  ) {
+    return this.commerce.seedCommerceLab(...input);
+  }
+
+  resetCommerceLab(
+    ...input: Parameters<OrganisationCommerce["resetCommerceLab"]>
+  ) {
+    return this.commerce.resetCommerceLab(...input);
+  }
+
+  verifyCommerceLab(
+    ...input: Parameters<OrganisationCommerce["verifyCommerceLab"]>
+  ) {
+    return this.commerce.verifyCommerceLab(...input);
+  }
+
+  activateOnboarding(
+    ...input: Parameters<OrganisationCommerce["activateOnboarding"]>
+  ) {
+    return this.commerce.activateOnboarding(...input);
+  }
+
+  armOnboardingActivationAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["armOnboardingActivationAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.armOnboardingActivationAcceptanceFault(...input);
+  }
+
+  inspectOnboardingActivationAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["inspectOnboardingActivationAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.inspectOnboardingActivationAcceptanceFault(...input);
+  }
+
+  clearOnboardingActivationAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["clearOnboardingActivationAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.clearOnboardingActivationAcceptanceFault(...input);
+  }
+
+  armCafeCommerceAcceptanceFault(
+    ...input: Parameters<OrganisationCommerce["armCafeCommerceAcceptanceFault"]>
+  ) {
+    return this.commerce.armCafeCommerceAcceptanceFault(...input);
+  }
+
+  inspectCafeCommerceAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["inspectCafeCommerceAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.inspectCafeCommerceAcceptanceFault(...input);
+  }
+
+  consumeCafeCommerceAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["consumeCafeCommerceAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.consumeCafeCommerceAcceptanceFault(...input);
+  }
+
+  clearCafeCommerceAcceptanceFault(
+    ...input: Parameters<
+      OrganisationCommerce["clearCafeCommerceAcceptanceFault"]
+    >
+  ) {
+    return this.commerce.clearCafeCommerceAcceptanceFault(...input);
+  }
+
+  settleCutoverCue(
+    ...input: Parameters<OrganisationCommerce["settleCutoverCue"]>
+  ) {
+    return this.commerce.settleCutoverCue(...input);
+  }
+
+  reserveCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["reserveCodeModeBudget"]>
+  ) {
+    return this.commerce.reserveCodeModeBudget(...input);
+  }
+
+  settleCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["settleCodeModeBudget"]>
+  ) {
+    return this.commerce.settleCodeModeBudget(...input);
+  }
+
+  claimCodeModeCapability(
+    ...input: Parameters<OrganisationCommerce["claimCodeModeCapability"]>
+  ) {
+    return this.commerce.claimCodeModeCapability(...input);
+  }
+
+  abandonCodeModeCapabilityCalls(
+    ...input: Parameters<OrganisationCommerce["abandonCodeModeCapabilityCalls"]>
+  ) {
+    return this.commerce.abandonCodeModeCapabilityCalls(...input);
+  }
+
+  rebindCodeModeLease(
+    ...input: Parameters<OrganisationCommerce["rebindCodeModeLease"]>
+  ) {
+    return this.commerce.rebindCodeModeLease(...input);
+  }
+
+  completeCodeModeCapability(
+    ...input: Parameters<OrganisationCommerce["completeCodeModeCapability"]>
+  ) {
+    return this.commerce.completeCodeModeCapability(...input);
+  }
+
+  reserveWorkspaceExecutorAllocation(
+    ...input: Parameters<
+      OrganisationCommerce["reserveWorkspaceExecutorAllocation"]
+    >
+  ) {
+    return this.commerce.reserveWorkspaceExecutorAllocation(...input);
+  }
+
+  settleWorkspaceExecutorAllocation(
+    ...input: Parameters<
+      OrganisationCommerce["settleWorkspaceExecutorAllocation"]
+    >
+  ) {
+    return this.commerce.settleWorkspaceExecutorAllocation(...input);
+  }
+
+  cancelWorkspaceExecutorAllocation(
+    ...input: Parameters<
+      OrganisationCommerce["cancelWorkspaceExecutorAllocation"]
+    >
+  ) {
+    return this.commerce.cancelWorkspaceExecutorAllocation(...input);
+  }
+
+  cancelCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["cancelCodeModeBudget"]>
+  ) {
+    return this.commerce.cancelCodeModeBudget(...input);
+  }
+
+  reconcileCodeModeBudget(
+    ...input: Parameters<OrganisationCommerce["reconcileCodeModeBudget"]>
+  ) {
+    return this.commerce.reconcileCodeModeBudget(...input);
+  }
+
+  // The policy of the Organisation (`actors/organisation/organisation-policy.ts`):
+  // the policy activation, the TypeSafe connection and the Case context
+  // discovery configuration. The Inbox gives the source of a collection, and
+  // the integrations area gives the Jev parts.
+
+  #policyHost(): OrganisationPolicyHost {
+    return {
+      env: this.env,
+      storage: this.ctx.storage,
+      transaction: () =>
+        schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
+      rearm: () => this.rearm(),
+      jev: JEV_FOR_POLICY,
+      caseContextSource: CASE_CONTEXT_SOURCE_FOR_POLICY,
+    };
+  }
+
+  async readCaseContextDiscoveryConfiguration(
+    input: Readonly<{ organisationId: OrganisationId }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextDiscoveryConfiguration.bind(
+        null,
+        this.#policyHost(),
+      ),
+    );
+  }
+
+  async readTypeSafeConnectionConfiguration(
+    input: Readonly<{ organisationId: OrganisationId }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadTypeSafeConnectionConfiguration.bind(
+        null,
+        this.#policyHost(),
+      ),
+    );
+  }
+
+  async manageTypeSafeConnection(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedManageTypeSafeConnection.bind(null, this.#policyHost(), input),
+    );
+  }
+
+  async readCaseContextDiscoverySourceReadiness(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      source: "gmail" | "whatsapp" | "commerce";
+      integrationAccountId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextDiscoverySourceReadiness.bind(
+        null,
+        this.#policyHost(),
+        input,
+      ),
+    );
+  }
+
+  async publishCaseContextDiscoveryConfiguration(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedPublishCaseContextDiscoveryConfiguration.bind(
+        null,
+        this.#policyHost(),
+        input,
+      ),
+    );
+  }
+
+  async evaluateCaseContextDiscovery(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      request: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedEvaluateCaseContextDiscovery.bind(
+        null,
+        this.#policyHost(),
+        input,
+      ),
+    );
+  }
+
+  async activatePolicy(
+    input: OrganisationActivatePolicyInput,
+  ): Promise<
+    Result<OrganisationPolicyActivation, OrganisationPolicyActivationError>
+  > {
+    return activateOrganisationPolicy(this.#policyHost(), input);
+  }
+
+  // The Case context collection of the Inbox
+  // (`actors/organisation/case-context-collection-commands.ts`).
+
+  #collectionHost(): OrganisationCollectionHost {
+    return {
+      env: this.env,
+      storage: this.ctx.storage,
+      transaction: () =>
+        schemaTransaction(this.ctx.storage, this.ctx.storage.sql),
+      validateOrganisation: validateActionOrganisation.bind(
+        null,
+        this.ctx.storage.sql,
+      ),
+      rearm: () => this.rearm(),
+    };
+  }
+
+  async prepareCaseContextCollectionEvidence(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      caseId: string;
+      integrationAccountId: string;
+      triggeringMessageId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedPrepareCaseContextCollectionEvidence.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async validateCaseContextCollectionEvidence(
+    input: Readonly<{ organisationId: OrganisationId; dependency: unknown }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedValidateCaseContextCollectionEvidence.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async commitCaseContextCollectionEffectFence(
+    input: Readonly<{ organisationId: OrganisationId; attempt: unknown }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedCommitCaseContextCollectionEffectFence.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async invalidateCaseContextCollectionVerification(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      verificationId: string;
+      revision: number;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedInvalidateCaseContextCollectionVerification.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async eraseCaseContextCollectionSource(
+    input: Readonly<{ organisationId: OrganisationId; selection: unknown }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedEraseCaseContextCollectionSource.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async readCaseContextCollection(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      caseContextCollectionId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextCollection.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async readCaseContextCollectionsForCase(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      caseId: string;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReadCaseContextCollectionsForCase.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  async reviewCaseContextCollectionRelationship(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      caseContextCollectionId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      admittedReviewCaseContextCollectionRelationship.bind(
+        null,
+        this.#collectionHost(),
+        input,
+      ),
+    );
+  }
+
+  // The Jev settings of the integrations area (`jev-features/`).
+
+  #jevHost(): OrganisationJevHost {
+    return {
+      env: this.env,
+      storage: this.ctx.storage,
+      validateOrganisation: validateActionOrganisation.bind(
+        null,
+        this.ctx.storage.sql,
+      ),
+      publishCaseContextDiscoveryConfiguration:
+        admittedPublishCaseContextDiscoveryConfiguration.bind(
+          null,
+          this.#policyHost(),
+        ),
+    };
+  }
+
+  async readJevFeatures(input: Readonly<{ organisationId: OrganisationId }>) {
+    return this.command(
+      input.organisationId,
+      readJevFeaturesForOrganisation.bind(null, this.#jevHost()),
+    );
+  }
+
+  async manageJevPaidUse(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      manageJevPaidUseForOrganisation.bind(null, this.#jevHost(), input),
+    );
+  }
+
+  async manageJevFeature(
+    input: Readonly<{
+      organisationId: OrganisationId;
+      actorId: string;
+      body: unknown;
+    }>,
+  ) {
+    return this.command(
+      input.organisationId,
+      manageJevFeatureForOrganisation.bind(null, this.#jevHost(), input),
+    );
+  }
+
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   machineCensus(): Promise<readonly MachineCensus[]> {
-    return actorMachineCensus(this.ctx.storage);
+    return actorMachineCensus(this.ctx.storage, ACTOR_MACHINES);
   }
 
   readonly #commerceBoardPresence = new Map<
@@ -312,17 +1016,47 @@ export class OrganisationDO extends OrganisationCommerce {
     return this.#socketRoom(socket);
   }
 
-  #collaborationRooms(): OrganisationCollaborationRooms {
-    return {
+  /**
+   * The shared document rooms. Each area gives its routes and its socket
+   * rooms. This class sets the order in which the dispatch tries the routes.
+   */
+  #collaborationRooms(): Readonly<{
+    routes: readonly CollaborationRoomRoute[];
+    sockets: CollaborationSocketRooms;
+  }> {
+    const kitchen = kitchenCollaborationRooms({
       costsSheets: this.#costsSheets,
-      descriptionDrafts: this.#descriptionDrafts,
-      emailDrafts: this.#emailDrafts,
-      mailReplyDrafts: this.#mailReplyDrafts,
-      menuBoards: this.#menuBoards,
-      menuDrafts: this.#menuDrafts,
       productionPlans: this.#productionPlans,
       workflowCanvases: this.#workflowCanvases,
       workflowDrafts: this.#workflowDrafts,
+    });
+    const commerce = commerceCollaborationRooms({
+      descriptionDrafts: this.#descriptionDrafts,
+    });
+    const inbox = inboxCollaborationRooms({
+      emailDrafts: this.#emailDrafts,
+      mailReplyDrafts: this.#mailReplyDrafts,
+    });
+    const cafe = cafeCollaborationRooms({
+      menuBoards: this.#menuBoards,
+      menuDrafts: this.#menuDrafts,
+    });
+    return {
+      routes: [
+        kitchen.routes.costsSheet,
+        commerce.routes.productDescription,
+        kitchen.routes.workflowDraft,
+        kitchen.routes.productionPlan,
+        inbox.routes.mailReplyDraft,
+        inbox.routes.emailDraft,
+        cafe.routes.menuDraft,
+      ],
+      sockets: {
+        ...kitchen.sockets,
+        ...commerce.sockets,
+        ...inbox.sockets,
+        ...cafe.sockets,
+      },
     };
   }
 
@@ -336,8 +1070,8 @@ export class OrganisationDO extends OrganisationCommerce {
     if (row === undefined) return null;
     const organisationId = parseOrganisationId(row.organisation_id);
     if (!organisationId.ok) return null;
-    return resolveOrganisationCollaborationSocket(
-      this.#collaborationRooms(),
+    return resolveCollaborationSocket(
+      this.#collaborationRooms().sockets,
       organisationId.value,
       route,
     );
@@ -629,13 +1363,13 @@ export class OrganisationDO extends OrganisationCommerce {
           return assertNever(canvasRoute.transport);
       }
     }
-    return dispatchOrganisationCollaborationFetch({
+    return dispatchCollaborationFetch({
       request,
       pathname,
       env: this.env,
       sql: this.ctx.storage.sql,
       scope,
-      rooms: this.#collaborationRooms(),
+      routes: this.#collaborationRooms().routes,
       validateOrganisation: validateActionOrganisation.bind(
         null,
         this.ctx.storage.sql,
@@ -1365,7 +2099,7 @@ export class OrganisationDO extends OrganisationCommerce {
     }));
   }
 
-  protected override async afterCommerceStockChanges(
+  private async afterCommerceStockChanges(
     scope: OrganisationExecutionScope,
     changes: readonly InventoryStockChange[],
   ): Promise<void> {

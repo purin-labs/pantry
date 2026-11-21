@@ -3,7 +3,7 @@ import type { Env } from "../../../env";
 import {
   authorizeCredentialRevocation,
   recordCredentialRevocationMutation,
-} from "../../../data/credential-lifecycle";
+} from "../../../integrations/contract/credential-lifecycle";
 import {
   assignAgentMailbox,
   parseMailboxIngressPolicyPublishRequest,
@@ -15,7 +15,7 @@ import {
 import { setIntegrationAccountLifecycle } from "../../../data/integration-account";
 import { revokeCredential } from "../../../credential-vault";
 import { resolveCredentialRevocationSecret } from "../../../credential-vault/credential-revocation-resolution";
-import { revokeGoogleOAuthToken } from "../../../provider-adapters/gmail";
+import { revokeGoogleOAuthToken } from "../../../integrations/contract/google-oauth-revocation";
 import { newRequestId, parseIntegrationAccountId } from "../../../ids";
 import { traceWarn } from "../../../observability";
 import { activateRevocationPolicy } from "../../credential-revocation-policy";
@@ -34,12 +34,21 @@ import { readInstallationPins } from "../../installation-pins";
 import { recordCommerceMutationReceipt } from "../../mutation-receipt";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { readIntegrationAccountReasonCode } from "../../../data/integration-account-reads";
-import type { AgentMailboxRouteAction } from "../agents";
 import {
   agentMailboxConnector,
   emailLimitsFromPolicy,
 } from "../../../mail-inbox/agent-mailbox-connector";
 import { readAgentMailboxProjection } from "../../../mail-inbox/agent-mailbox-projection";
+
+/** The action of a mailbox route. The route matcher of the Worker reads it. */
+export type AgentMailboxRouteAction =
+  | "bind"
+  | "policy"
+  | "resume"
+  | "skip-and-resume"
+  | "reconnect"
+  | "disable"
+  | "revoke";
 
 type AgentMailboxAction = AgentMailboxRouteAction;
 

@@ -1,11 +1,11 @@
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../commerce/outbox-worker";
+} from "../commerce/contract/client";
 import { readWorkflowDocument } from "../commerce/bakery/workflow-revisions";
-import { commerceProviderResourceId } from "../commerce/provider";
-import { createCommerceOutboxReconcileQueueMessage } from "../commerce/queue-messages";
-import { executeStockOperation } from "../commerce/stock-action-execution";
+import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
+import { createCommerceOutboxReconcileQueueMessage } from "../commerce/contract/queue-messages";
+import { executeStockOperation } from "../kitchen/contract/stock-action-execution";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import { runDeviceCommand } from "../devices/commands";
 import { listDevices, listGateways } from "../devices/store";
@@ -24,7 +24,7 @@ import {
   tellBakeRunOverBake,
 } from "../slack/bake-run-announce";
 import type { BakeRunActor } from "./bake-run";
-import { deviceFleetStub } from "./device-fleet";
+import { deviceFleetStub } from "../devices/contract/fleet-stub";
 
 /**
  * The Worker's side of a bake run (Plan 24 S4). Kitchen owns the run and

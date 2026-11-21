@@ -9,9 +9,7 @@ import {
   parseCaseId,
   parseOrganisationId,
   parseIntegrationAccountId,
-  parseConnectorId,
   type CaseId,
-  type ConnectorId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
@@ -234,25 +232,6 @@ type MailboxPolicyPublishError =
 
 const SHA256_HEX = /^[0-9a-f]{64}$/u;
 const EMAIL_CUE_COALESCE_SECONDS = 30;
-
-export function gmailConnectorIdValue(integrationAccountId: string): string {
-  return `connector_gmail_${integrationAccountId}`;
-}
-
-export function gmailConnectorId(
-  integrationAccountId: string,
-): Result<
-  ConnectorId,
-  { readonly code: "invalid_field"; readonly field: string }
-> {
-  const parsed = parseConnectorId(gmailConnectorIdValue(integrationAccountId));
-  return parsed.ok
-    ? parsed
-    : {
-        ok: false,
-        error: { code: "invalid_field", field: "integrationAccountId" },
-      };
-}
 
 export function gmailThreadCaseIdValue(
   integrationAccountId: string,

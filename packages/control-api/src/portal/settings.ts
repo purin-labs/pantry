@@ -66,7 +66,14 @@ export type OrganisationInferenceSelection =
   | { readonly kind: "codex_subscription" }
   | { readonly kind: "satyr_platform" }
   | { readonly kind: "organisation_openai_api_key" }
-  | { readonly kind: "organisation_anthropic_api_key" };
+  | { readonly kind: "organisation_anthropic_api_key" }
+  | { readonly kind: "organisation_google_api_key" };
+
+/** The selections that store an Organisation's own API key. */
+export type ApiKeyInferenceSelectionKind =
+  | "organisation_openai_api_key"
+  | "organisation_anthropic_api_key"
+  | "organisation_google_api_key";
 
 export type CapabilityProfile = OnboardingCapabilityProfile;
 
@@ -215,15 +222,7 @@ export type SelectInferenceCommand =
       readonly kind: "select_inference";
       readonly selection: Variant<
         OrganisationInferenceSelection,
-        "organisation_openai_api_key"
-      >;
-      readonly apiKey: string;
-    }
-  | {
-      readonly kind: "select_inference";
-      readonly selection: Variant<
-        OrganisationInferenceSelection,
-        "organisation_anthropic_api_key"
+        ApiKeyInferenceSelectionKind
       >;
       readonly apiKey: string;
     };

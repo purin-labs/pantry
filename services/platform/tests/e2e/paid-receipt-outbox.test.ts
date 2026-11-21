@@ -11,11 +11,11 @@ import {
   parseSlackInstallationId,
   parseSlackOrganisationConnectionId,
 } from "../../src/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
 import {
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,
-} from "../../src/slack/organisation-routing";
+} from "../../src/slack/installation-store";
 import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
 import { runScheduledPaidReceiptDelivery } from "../../src/commerce/paid-receipt";
 import { placeCafeOrder, publishCafeMenu } from "./cafe-order-support";

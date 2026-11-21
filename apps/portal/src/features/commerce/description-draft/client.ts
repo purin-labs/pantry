@@ -23,7 +23,7 @@ import {
   type TextProtocolAdapter,
 } from "../../collaboration/text-client";
 import { webSocketUrl } from "../../collaboration/document-client";
-import type { DraftPresenceView } from "./presence";
+import type { DraftPresenceView } from "../../collaboration/draft-presence";
 import { assertNever } from "@purin-labs/std";
 import { parseDescriptionServerMessage } from "@purin-labs/commerce-control-api/portal/description-collaboration";
 

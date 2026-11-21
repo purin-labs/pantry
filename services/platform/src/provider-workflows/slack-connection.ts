@@ -26,7 +26,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -35,7 +35,7 @@ import {
   providerCredentialHandle,
   storeBearerCredential,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { slackInstallationOwnerIsLive } from "../credential-vault/slack-installation-credential";
@@ -45,7 +45,7 @@ import {
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,
   resolveSlackInstallation,
-} from "../slack/organisation-routing";
+} from "../slack/installation-store";
 
 export async function connectSlack(
   input: CompleteProviderInput,

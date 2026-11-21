@@ -207,18 +207,3 @@ export type ToolServices = {
 export type PartialToolServices = {
   readonly [Family in keyof ToolServices]?: Partial<ToolServices[Family]>;
 };
-
-/**
- * The request of one service, for code that implements the service outside
- * the family's own area.
- */
-export type ToolServiceRequest<
-  Family extends keyof ToolServices,
-  Service extends keyof ToolServices[Family],
-> =
-  NonNullable<ToolServices[Family][Service]> extends (
-    request: infer Request,
-    ...rest: never[]
-  ) => unknown
-    ? Request
-    : never;

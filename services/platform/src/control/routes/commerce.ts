@@ -1,3 +1,4 @@
+import type { DecidePendingDecision } from "../decide-pending-decision";
 import { handleRecipes } from "./recipes";
 import { handleCosts } from "./costs";
 import type { Env } from "../../env";
@@ -95,10 +96,8 @@ import {
 } from "./supplier-payouts";
 import { assertNever } from "@purin-labs/std";
 import {
-  handleCommerceActionApproval,
   handleCommerceActionExecution,
   handleCommerceActionPluginPreview,
-  handleCommerceActionRejection,
   handleCommerceActions,
 } from "./commerce/actions";
 import {
@@ -569,6 +568,7 @@ export function handleCommerceControlRoute(
   request: Request,
   env: Env,
   route: CommerceControlRoute,
+  decide: DecidePendingDecision,
 ): Promise<Response> {
   switch (route.kind) {
     case "checkoutProfiles":
@@ -749,18 +749,24 @@ export function handleCommerceControlRoute(
         route.actionNonceRaw,
       );
     case "commerceActionApproval":
-      return handleCommerceActionApproval(
-        request,
-        env,
-        route.organisationIdRaw,
-        route.actionNonceRaw,
+      return decide(
+        { request, organisationIdRaw: route.organisationIdRaw },
+        {
+          kind: "governed_action",
+          surface: "commerce",
+          id: route.actionNonceRaw,
+          answer: "allow",
+        },
       );
     case "commerceActionRejection":
-      return handleCommerceActionRejection(
-        request,
-        env,
-        route.organisationIdRaw,
-        route.actionNonceRaw,
+      return decide(
+        { request, organisationIdRaw: route.organisationIdRaw },
+        {
+          kind: "governed_action",
+          surface: "commerce",
+          id: route.actionNonceRaw,
+          answer: "refuse",
+        },
       );
     case "commerceActionExecution":
       return handleCommerceActionExecution(

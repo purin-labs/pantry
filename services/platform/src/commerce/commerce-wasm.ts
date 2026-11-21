@@ -29,12 +29,6 @@ import {
   normalizeLabEvent as normalizeLabEventTypescript,
 } from "@purin-labs/commerce-contracts/lab-normalizer";
 import {
-  normalizeShopifyCatalog as normalizeShopifyCatalogTypescript,
-  normalizeShopifyInventory as normalizeShopifyInventoryTypescript,
-  normalizeShopifyOrder as normalizeShopifyOrderTypescript,
-  normalizeShopifyResource as normalizeShopifyResourceTypescript,
-} from "@purin-labs/commerce-contracts/shopify-normalizer";
-import {
   applySupplierPayableCommand as applySupplierPayableCommandTypescript,
   reconcileSupplierPayout as reconcileSupplierPayoutTypescript,
   validateSupplierPayoutObservation as validateSupplierPayoutObservationTypescript,
@@ -98,31 +92,12 @@ export function normalizeLabCommerceDelivery(
   return normalizeCommerceDelivery(input, normalizeLabEventTypescript);
 }
 
-export function normalizeShopifyCommerceOrderDelivery(
-  input: unknown,
-): Result<CanonicalCommerceDelivery, CommerceWasmError> {
-  return normalizeCommerceDelivery(input, normalizeShopifyOrderTypescript);
-}
-
-export function normalizeShopifyCommerceCatalogDelivery(
-  input: unknown,
-): Result<CanonicalCommerceDelivery, CommerceWasmError> {
-  return normalizeCommerceDelivery(input, normalizeShopifyCatalogTypescript);
-}
-
-export function normalizeShopifyCommerceInventoryDelivery(
-  input: unknown,
-): Result<CanonicalCommerceDelivery, CommerceWasmError> {
-  return normalizeCommerceDelivery(input, normalizeShopifyInventoryTypescript);
-}
-
-export function normalizeShopifyCommerceResourceDelivery(
-  input: unknown,
-): Result<CanonicalCommerceDelivery, CommerceWasmError> {
-  return normalizeCommerceDelivery(input, normalizeShopifyResourceTypescript);
-}
-
-function normalizeCommerceDelivery(
+/**
+ * Runs a normalizer of a provider payload and checks the canonical delivery
+ * that it returns. A provider module gives its normalizer
+ * (`shopify/delivery-normalizers.ts`).
+ */
+export function normalizeCommerceDelivery(
   input: unknown,
   typescript: (input: unknown) => CommerceBoundaryResponse,
 ): Result<CanonicalCommerceDelivery, CommerceWasmError> {

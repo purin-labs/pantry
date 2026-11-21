@@ -25,6 +25,7 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { createMigratedDatabase } from "./sqlite-d1";
+import "./provide-organisation-lifecycle-parts";
 
 const NOW = 1_784_180_000_000;
 

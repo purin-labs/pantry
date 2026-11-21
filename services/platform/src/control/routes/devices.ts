@@ -1,6 +1,8 @@
 import { currentGrantedCapabilityIds } from "../../authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { mailControlAuthority } from "./mail-inbox";
+import {
+  mailControlAuthority,
+} from "../../mail-inbox/contract/control-authority";
 import {
   parseDeviceAlertSetting,
   parseDeviceStationId,
@@ -16,7 +18,8 @@ import {
 } from "@purin-labs/control-api";
 import { type MenuScreenSummary } from "@purin-labs/cafe-control-api";
 
-import { deviceFleetStub, type DeviceSample } from "../../actors/device-fleet";
+import { type DeviceSample } from "../../actors/device-fleet";
+import { deviceFleetStub } from "../../devices/contract/fleet-stub";
 import { roleMayConfigure, roleMayOperate } from "../../data/control-plane";
 import { readTerminalOperations } from "../../data/terminal-operations-readback";
 import {

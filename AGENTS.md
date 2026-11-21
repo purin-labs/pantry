@@ -325,14 +325,17 @@ Satyr’s production runtime is Cloudflare-native:
 - `AgentSessionActor` runs Pi on every route; its pinned model route selects
   the authority. `organisation_subscription` + `openai` runs Pi through
   pi-ai's legacy `openai-codex` provider with the organisation's ChatGPT
-  sign-in (Plan 72). `organisation_byo` + `openai` runs Pi with the
-  organisation's purpose-bound, Vault-encrypted OpenAI API key. `platform` +
-  `openai-compatible` runs Pi with Satyr's `OPENROUTER_API_KEY`. Missing or
-  exhausted authority fails the selected route.
+  sign-in (Plan 72). `organisation_byo` + `openai`, `anthropic` or
+  `google` runs Pi with the organisation's purpose-bound, Vault-encrypted
+  API key of that provider (Gemini 4 for `google`, Plan 96). `platform` +
+  `openai-compatible` runs Pi with Satyr's `OPENROUTER_API_KEY`; its default
+  model is Gemini 4 Hydrogen. Missing or exhausted authority fails the
+  selected route.
 - The model exit Worker `satyr-model-exit` sends every direct model-provider
   request from a data centre near AWS Tokyo (Plan 73): the ChatGPT sign-in
-  and refresh, the BYO OpenAI and Anthropic keys and the Claude account.
-  OpenAI and Anthropic refuse Hong Kong, where an `apac` Actor can run.
+  and refresh, the BYO OpenAI, Anthropic and Gemini keys and the Claude
+  account. OpenAI, Anthropic and the Gemini API refuse Hong Kong, where an
+  `apac` Actor can run.
   chatgpt.com blocks every request from a Worker, so the ChatGPT model
   requests and allowance reads go through the ChatGPT exit Worker
   `satyr-chatgpt-exit` and its one shared container (Plan 75). Use
@@ -399,8 +402,13 @@ beside the large file. When a listed file gets smaller, run
 [Refactor 17](docs/refactor-17.md) gives each source file a module in one of
 three layers: foundation, product areas and surfaces. `scripts/layers.json` is
 the map. An import goes only down the layers. One area imports no file of
-another area; it may import the workspace package of that area, which is its
-contract. Only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
+another area; it may import the contract of that area: its workspace package,
+or a public file that `contracts` in the map lists, such as
+`services/platform/src/commerce/contract/`. A public file holds types,
+schemas and entry points. It imports no file of its own area that is not
+public, except with `import type`; `pnpm lint:layers` refuses a public file
+that does. A service that needs the inside of its area stays behind an
+interface that the Worker wires. Only the owner module of a D1 table writes it. `pnpm lint:layers` refuses a
 new crossing, and it refuses a source file, a top-level folder or a D1 table
 with no line in the map. Remove a crossing with a port: the lower module
 defines an interface, and the higher one gives the implementation. Then run
@@ -683,8 +691,8 @@ and every route runs Pi. Organisation-funded `organisation_subscription` +
 `openai` turns call the ChatGPT backend with the organisation's ChatGPT
 sign-in, through the ChatGPT exit container. The Worker signs in with a device code, and the Session refreshes the
 token under a lease on `organisation_codex_connection`, because OpenAI rotates
-refresh tokens. Organisation-funded `organisation_byo` + `openai` turns use a
-purpose-bound, Vault-encrypted OpenAI API key. Satyr-funded `platform` +
+refresh tokens. Organisation-funded `organisation_byo` turns use a
+purpose-bound, Vault-encrypted API key of OpenAI, Anthropic or Google. Satyr-funded `platform` +
 `openai-compatible` turns use `OPENROUTER_API_KEY`. The Actor owns accepted
 history, Tool Host authority, checkpoints, budgets, cancellation, and delivery.
 Pi Durable owns Pi tasks in Actor SQLite and restores from the Actor-owned

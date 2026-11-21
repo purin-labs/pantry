@@ -20,8 +20,8 @@ import {
   resolveActiveConnectorActorAtPlacement,
 } from "../actors/actor-router";
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
-import { listVerifiedContactEndpoints } from "../data/contact-verification";
-import { gmailConnectorId } from "../data/email-mailbox";
+import { verifiedContacts } from "../mail-inbox/contract/verified-contacts";
+import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env, OrganisationActorStub } from "../env";
 import { parseIntegrationAccountId, type OrganisationId } from "../ids";
 import {
@@ -144,7 +144,7 @@ export async function readEvalSenderChoices(
     return failure("eval_unavailable");
   const account = parseIntegrationAccountId(subject.integrationAccountId);
   if (!account.ok) return failure("eval_unavailable");
-  const contacts = await listVerifiedContactEndpoints({
+  const contacts = await verifiedContacts.use().listVerifiedContactEndpoints({
     db: inspected.viewer.execution.database,
     organisationId: scope.organisationId,
     integrationAccountId: account.value,

@@ -8,11 +8,11 @@ import {
 import type { Env } from "../env";
 import { newRequestId, parseOrganisationId } from "../ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { heldOutputNoticeText } from "../slack/held-output-notice";
+import { slackSurfaceParts } from "../slack/surface-parts";
 import type { CaseOutput } from "./case/types";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
-import type { ConnectorDO } from "./connector";
-import type { CaseDO } from "./case";
+import type { CaseConnectorRpc } from "./case/connector-rpc";
+import type { CaseActor } from "./case/case-actor";
 import { traceWarn } from "../observability";
 
 /**
@@ -28,9 +28,9 @@ export async function holdCaseOutput(
   input: Readonly<{
     env: Env;
     organisationId: string;
-    connector: Pick<ConnectorDO, "deliver">;
+    connector: Pick<CaseConnectorRpc, "deliver">;
     connectorIdentity: ConnectorIdentity;
-    caseActor: Pick<CaseDO, "holdOutput">;
+    caseActor: Pick<CaseActor, "holdOutput">;
     output: CaseOutput;
     refusal: string;
     requestAuthority: RequestAuthority;
@@ -91,7 +91,7 @@ export async function holdCaseOutput(
         deliveryId: `delivery_held_${requestId}`,
         content: {
           kind: "text",
-          text: heldOutputNoticeText(reason),
+          text: slackSurfaceParts.use().heldOutputNoticeText(reason),
         },
         idempotencyKey: `held_output_notice_${requestId}`,
       },

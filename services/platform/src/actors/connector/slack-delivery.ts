@@ -49,9 +49,7 @@ import {
 import { noticeCardBlocks } from "../../slack/notice-card";
 import {
   deviceAlertCardBlocks,
-  deviceAlertNoticeOfUpdate,
   devicesPortalUrl,
-  isDeviceAlertDelivery,
 } from "../../slack/device-alert-card";
 import {
   BAKE_PROPOSAL_CARD,
@@ -64,8 +62,12 @@ import {
   bakeRunCardBlocks,
   bakeRunPauseTarget,
 } from "../../slack/bake-run-card";
+import {
+  deviceAlertNoticeOfUpdate,
+  isDeviceAlertDelivery,
+} from "../../devices/contract/alert-delivery";
 import { slackMayApproveAction } from "../../commerce/action-model";
-import { resolveActiveSlackDestinationConnection } from "../../slack/organisation-routing";
+import { resolveActiveSlackDestinationConnection } from "../../slack/installation-store";
 import { requireActiveOrganisationActor } from "../actor-router";
 import { checkPreparedConnectorDelivery } from "../connector-slack-stream";
 import {

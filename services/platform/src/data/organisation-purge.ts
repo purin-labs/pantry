@@ -25,6 +25,12 @@ import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
 } from "./organisation-lifecycle-moves";
+import {
+  organisationLifecycleParts,
+  purgeGuardedStatement as guardedStatement,
+  type OrganisationPurgeContext as PurgeContext,
+  type OrganisationPurgeParts,
+} from "./organisation-lifecycle-port";
 import { eraseEntryWhere, PURGE_CATALOGUE } from "./purge-catalogue";
 import { prepareExpiredOrganisationReceiptsDeletion } from "./shared-rows/mutation-receipt";
 import {
@@ -35,24 +41,23 @@ import {
 
 type Session = OrganisationDatabaseSession;
 
-type PurgeContext = Readonly<{
-  session: Session;
-  organisationId: OrganisationId;
-  /** True once the batch's first statement has moved the lifecycle. */
-  purged: RowGuard;
-  accounts: readonly Readonly<{ id: string; providerAccountHash: string }>[];
-  connections: readonly Readonly<{ id: string; providerSubjectHash: string }>[];
-  now: number;
-}>;
-
 type PseudonymizedTable = Extract<
   (typeof PURGE_CATALOGUE)[number],
   Readonly<{ action: "pseudonymize" }>
 >["table"];
 
 /** The rewrite of each table that the catalogue marks pseudonymize. */
-const PSEUDONYMIZE: Readonly<
-  Record<PseudonymizedTable, (context: PurgeContext) => D1PreparedStatement[]>
+type Pseudonymizers = Readonly<
+  Record<
+    PseudonymizedTable,
+    (context: PurgeContext) => readonly D1PreparedStatement[]
+  >
+>;
+
+/** The rewrite of each table of tenancy that the catalogue marks pseudonymize. */
+const TENANCY_PSEUDONYMIZE: Pick<
+  Pseudonymizers,
+  Exclude<PseudonymizedTable, keyof OrganisationPurgeParts["pseudonymize"]>
 > = {
   organisation: (context) => [
     prepareOrganisationPurge(context.session, {
@@ -67,84 +72,6 @@ const PSEUDONYMIZE: Readonly<
   ],
   email_sender_account: (context) => [
     googleAccountRelease(context, "email_sender_account"),
-  ],
-  integration_account: (context) => [
-    guarded(
-      context,
-      "DELETE FROM integration_account WHERE organisation_id = ? AND source_kind = 'custom_api'",
-    ),
-    ...context.accounts.map((account) =>
-      context.session
-        .prepare(
-          `UPDATE integration_account
-           SET provider_account_id = ?, display_name = 'Archived account',
-               lifecycle = 'revoked', lifecycle_reason_code = NULL,
-               capability_set = '[]', is_default_for_provider = 0,
-               disabled_by_user_id = NULL, disabled_at = NULL,
-               revoked_at = ?, updated_at = ?
-           WHERE integration_account_id = ? AND ${context.purged.sql}`,
-        )
-        .bind(
-          `archived:${account.providerAccountHash}`,
-          context.now,
-          context.now,
-          account.id,
-          ...context.purged.bindings,
-        ),
-    ),
-  ],
-  provider_credential_generation: (context) => [
-    guarded(
-      context,
-      `DELETE FROM provider_credential_generation
-       WHERE organisation_id = ? AND provider_connection_id IN (
-         SELECT provider_connection_id FROM provider_connection
-         WHERE source_kind = 'custom_api'
-       )`,
-    ),
-    ...context.connections.map((connection) =>
-      context.session
-        .prepare(
-          `UPDATE provider_credential_generation SET credential_ref = ?
-           WHERE provider_connection_id = ? AND ${context.purged.sql}`,
-        )
-        .bind(
-          `vault:archived:${connection.id}:revoked`,
-          connection.id,
-          ...context.purged.bindings,
-        ),
-    ),
-  ],
-  provider_connection: (context) => [
-    guarded(
-      context,
-      "DELETE FROM provider_connection WHERE organisation_id = ? AND source_kind = 'custom_api'",
-    ),
-    ...context.connections.map((connection) =>
-      context.session
-        .prepare(
-          // A shared-application connection has no organisation credential to
-          // pseudonymize, and its authority branch requires the handle to stay
-          // null, so only the organisation-credential branch is rewritten.
-          `UPDATE provider_connection
-           SET provider_subject_id = ?,
-               credential_ref = CASE
-                 WHEN authority_kind = 'connection_credential' THEN ?
-                 ELSE NULL
-               END,
-               lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL,
-               updated_at = ?
-           WHERE provider_connection_id = ? AND ${context.purged.sql}`,
-        )
-        .bind(
-          `archived:${connection.providerSubjectHash}`,
-          `vault:archived:${connection.id}:revoked`,
-          context.now,
-          context.now,
-          connection.id,
-          ...context.purged.bindings,
-        ),
-    ),
   ],
 };
 
@@ -166,26 +93,6 @@ function purgedGuard(organisationId: OrganisationId): RowGuard {
   };
 }
 
-function guardedStatement(
-  session: Session,
-  guard: RowGuard,
-  organisationId: OrganisationId,
-  sql: string,
-): D1PreparedStatement {
-  return session
-    .prepare(`${sql} AND ${guard.sql}`)
-    .bind(organisationId, ...guard.bindings);
-}
-
-function guarded(context: PurgeContext, sql: string): D1PreparedStatement {
-  return guardedStatement(
-    context.session,
-    context.purged,
-    context.organisationId,
-    sql,
-  );
-}
-
 function eraseStatement(
   session: Session,
   guard: RowGuard,
@@ -198,55 +105,6 @@ function eraseStatement(
     organisationId,
     `DELETE FROM ${entry.table} WHERE (${eraseEntryWhere(entry)})`,
   );
-}
-
-/**
- * The directory's Slack records that name the Organisation's connections: a
- * person's DM choice and the thread pins. A DM choice that named a revoked
- * connection asks the person to choose again; a pin has no Case to reach.
- */
-function directorySlackRecordDeletions(
-  directory: GlobalDatabase,
-  organisationId: OrganisationId,
-): readonly (readonly [table: string, statement: D1PreparedStatement])[] {
-  return [
-    [
-      "slack_dm_organisation_selection",
-      directory
-        .prepare(
-          `DELETE FROM slack_dm_organisation_selection
-           WHERE EXISTS (SELECT 1 FROM slack_organisation_connection AS connection
-             WHERE connection.installation_id = slack_dm_organisation_selection.installation_id
-               AND connection.connection_id = slack_dm_organisation_selection.connection_id
-               AND connection.organisation_id = ? AND connection.lifecycle = 'revoked')`,
-        )
-        .bind(organisationId),
-    ],
-    [
-      "slack_thread_case_pin",
-      directory
-        .prepare("DELETE FROM slack_thread_case_pin WHERE organisation_id = ?")
-        .bind(organisationId),
-    ],
-  ];
-}
-
-/** How many of the records that `directorySlackRecordDeletions` deletes exist. */
-function directorySlackRecordCount(
-  directory: GlobalDatabase,
-  organisationId: OrganisationId,
-): D1PreparedStatement {
-  return directory
-    .prepare(
-      `SELECT
-         (SELECT COUNT(*) FROM slack_dm_organisation_selection AS selection
-          JOIN slack_organisation_connection AS connection
-            ON connection.installation_id = selection.installation_id
-           AND connection.connection_id = selection.connection_id
-          WHERE connection.organisation_id = ?1 AND connection.lifecycle = 'revoked')
-       + (SELECT COUNT(*) FROM slack_thread_case_pin WHERE organisation_id = ?1) AS count`,
-    )
-    .bind(organisationId);
 }
 
 function googleAccountRelease(
@@ -266,8 +124,9 @@ function googleAccountRelease(
 /** The statements of one catalogue entry, in the batch's order. */
 function catalogueStatements(
   context: PurgeContext,
+  pseudonymize: Pseudonymizers,
   entry: (typeof PURGE_CATALOGUE)[number],
-): D1PreparedStatement[] {
+): readonly D1PreparedStatement[] {
   switch (entry.action) {
     case "erase":
       return [
@@ -279,7 +138,7 @@ function catalogueStatements(
         ),
       ];
     case "pseudonymize":
-      return PSEUDONYMIZE[entry.table](context);
+      return pseudonymize[entry.table](context);
     case "keep":
       // Idempotency receipts end on their own; the expired ones go now.
       return entry.table === "control_mutation_receipt"
@@ -303,6 +162,11 @@ export async function purgeArchivedOrganisation(input: {
   readonly fence: LifecycleFence;
   readonly now: number;
 }): Promise<number> {
+  const parts = organisationLifecycleParts().purge;
+  const pseudonymize: Pseudonymizers = {
+    ...TENANCY_PSEUDONYMIZE,
+    ...parts.pseudonymize,
+  };
   const accounts = await input.db
     .prepare(
       `SELECT integration_account_id AS id, provider_account_id AS providerAccountId
@@ -350,7 +214,9 @@ export async function purgeArchivedOrganisation(input: {
       fence: input.fence,
       now: input.now,
     }),
-    ...PURGE_CATALOGUE.flatMap((entry) => catalogueStatements(context, entry)),
+    ...PURGE_CATALOGUE.flatMap((entry) =>
+      catalogueStatements(context, pseudonymize, entry),
+    ),
     session
       .prepare(
         `UPDATE organisation_archive_cleanup
@@ -376,9 +242,9 @@ export async function purgeArchivedOrganisation(input: {
     organisationId: input.organisationId,
   });
   await input.directory.batch(
-    directorySlackRecordDeletions(input.directory, input.organisationId).map(
-      ([, statement]) => statement,
-    ),
+    parts
+      .directoryRecordDeletions(input.directory, input.organisationId)
+      .map(([, statement]) => statement),
   );
   return statements.length;
 }
@@ -413,6 +279,7 @@ export async function erasePurgedOrganisationRows(input: {
   readonly organisationId: OrganisationId;
   readonly releaseSharedCredentials: () => Promise<number>;
 }): Promise<Result<PurgedOrganisationRowsReport, PurgedOrganisationRowsError>> {
+  const parts = organisationLifecycleParts().purge;
   const lifecycle = await input.db
     .prepare(
       "SELECT lifecycle FROM organisation_onboarding WHERE organisation_id = ?",
@@ -442,10 +309,9 @@ export async function erasePurgedOrganisationRows(input: {
         .bind(input.organisationId),
     ),
   );
-  const directoryLeft = await directorySlackRecordCount(
-    input.directory,
-    input.organisationId,
-  ).first<unknown>("count");
+  const directoryLeft = await parts
+    .directoryRecordCount(input.directory, input.organisationId)
+    .first<unknown>("count");
   const nothingLeft =
     directoryLeft === 0 &&
     regionalLeft.every((result) => result.results[0]?.count === 0);
@@ -458,7 +324,7 @@ export async function erasePurgedOrganisationRows(input: {
       eraseStatement(session, guard, input.organisationId, entry),
     ),
   );
-  const directoryDeletions = directorySlackRecordDeletions(
+  const directoryDeletions = parts.directoryRecordDeletions(
     input.directory,
     input.organisationId,
   );

@@ -30,7 +30,7 @@ import {
   SUPPLIER_ENTITY_TYPE_ID,
 } from "@purin-labs/commerce-client";
 import { readSessionTurnMemoryRecords } from "../../src/actors/actor-journal/transactions";
-import { createMailboxTurnMemoryReader } from "../../src/memory/mailbox-turn";
+import { createMailboxTurnMemoryReader } from "../../src/mail-inbox/mailbox-turn-memory";
 import {
   canonicalFlowLabel,
   joinFlowLabels,
@@ -144,7 +144,7 @@ import {
   type EmailThreadTurnInput,
 } from "../../src/actors/email-case-processing";
 import { resolveCaseTurnAgentProfile } from "../../src/data/pinned-agent-profile";
-import { authorizeMailSource } from "../../src/mail-inbox/authorization";
+import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
 import { buildControlAuthority } from "../../src/request-authority";
 import { readActiveOrganisationMembershipRevision } from "../../src/data/control-plane";
 import {
@@ -212,10 +212,8 @@ import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
 } from "../../src/actors/actor-router";
-import {
-  gmailConnectorId,
-  registerEmailMailboxAccount,
-} from "../../src/data/email-mailbox";
+import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
+import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import { resolveActiveProviderAccountContext } from "../../src/data/integration-account";
 import { digestCanonical } from "../../src/policy/information-flow/digest";
 import {
@@ -272,10 +270,11 @@ import {
   digestEmailSnapshot,
 } from "../../src/mail/reply-target";
 import type { CaseAssignment } from "@purin-labs/contracts";
-import type { CaseGmailReplyProposal } from "../../src/actors/case/types";
+import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
 import type { OrganisationActorStub } from "../../src/env";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 async function prepareMailBudgetJourney() {
   const owner = await client("mail-budget-pi-owner");
@@ -635,7 +634,7 @@ function budgetToolCall(
       id,
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -658,7 +657,7 @@ function budgetToolCall(
       id,
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
       usage: {
         prompt_tokens: totalTokens - 100,
@@ -925,7 +924,7 @@ class TransientGoalProvider {
         id: "transient_goal",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [
           {
             index: 0,
@@ -949,7 +948,7 @@ class TransientGoalProvider {
         id: "transient_goal",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
         usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
       },

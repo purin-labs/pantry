@@ -1,9 +1,11 @@
 import { authenticatedConversationScope } from "../../../organisation-access/access";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
 import type { Env } from "../../../env";
-import { mailControlAuthority } from "../mail-inbox";
+import {
+  mailControlAuthority,
+} from "../../../mail-inbox/contract/control-authority";
 import { readReplySourceViews } from "../../../mail-inbox/reply-source-views";
-import { authorizeMailSource } from "../../../mail-inbox/authorization";
+import { authorizeMailSource } from "../../../mail-inbox/contract/mail-source-authorization";
 import {
   parseMailReplyEdit,
   parseMailReplyCorrection,

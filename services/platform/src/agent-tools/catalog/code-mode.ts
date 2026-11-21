@@ -1,4 +1,3 @@
-import type { HarnessCodeModeSandbox } from "../../actors/embedded-harness";
 import type { Result } from "../../result";
 import { CONTEXT_CASE_READ_SCOPE } from "../../authorization/access-grants/turn-authority";
 import {
@@ -34,6 +33,7 @@ import type {
   HarnessCodeModeAdmission,
   HarnessCodeModeAuthority,
   HarnessCodeModeConstructionError,
+  HarnessCodeModeSandbox,
   HarnessResourceScopeError,
   HarnessSourceAuthorization,
 } from "./types";

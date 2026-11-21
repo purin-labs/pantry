@@ -5,8 +5,7 @@ import type {
 
 import {
   normalizeShopifyCommerceResourceDelivery,
-  type CommerceWasmError,
-} from "../commerce/commerce-wasm";
+} from "./delivery-normalizers";
 import {
   parseUserId,
   parseIntegrationAccountId,
@@ -16,12 +15,17 @@ import {
   type OrganisationId,
 } from "../ids";
 import type { Result } from "../result";
+import type {
+  CommerceSystemError,
+  CommerceSystemProviderAuthority,
+} from "../data/organisation-commerce-system";
 import {
-  applyCommerceDelivery,
+  commerceDeliveryIntake,
   type AppliedCommerceDeliveryResult,
   type CommerceProjectionError,
   type CommerceSystemStorageAuthority,
-} from "../actors/commerce-projection";
+  type CommerceWasmError,
+} from "../commerce/contract/delivery-intake";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { exhaustiveList, isRecord } from "@purin-labs/std";
 
@@ -366,6 +370,48 @@ export function readShopifyLocationObservation(
   return parseObservationRow(row);
 }
 
+/**
+ * The authority of an observed location: the selected shop when it is this
+ * integration account, or none. An unselected shop keeps its observation.
+ */
+export function shopifyLocationProjectionAuthority(
+  selected: Result<CommerceSystemProviderAuthority, CommerceSystemError>,
+  integrationAccountId: IntegrationAccountId,
+): ShopifyLocationObservationProjectionAuthority {
+  return selected.ok &&
+    selected.value.provider === "shopify" &&
+    selected.value.integrationAccountId === integrationAccountId
+    ? {
+        kind: "selected",
+        commerceSystem: {
+          kind: "shopify",
+          revision: selected.value.commerceSystem.revision,
+        },
+      }
+    : { kind: "unselected" };
+}
+
+/** The selected shop that a classification of a location changes. */
+export function shopifyLocationClassificationAuthority(
+  selected: Result<CommerceSystemProviderAuthority, CommerceSystemError>,
+  integrationAccountId: IntegrationAccountId,
+): Result<
+  CommerceSystemStorageAuthority,
+  Readonly<{ code: "commerce_system_authority_mismatch" }>
+> {
+  return selected.ok &&
+    selected.value.provider === "shopify" &&
+    selected.value.integrationAccountId === integrationAccountId
+    ? {
+        ok: true,
+        value: {
+          kind: "shopify",
+          revision: selected.value.commerceSystem.revision,
+        },
+      }
+    : { ok: false, error: { code: "commerce_system_authority_mismatch" } };
+}
+
 export function assignShopifyLocationClassification(
   sql: SqlStorage,
   input: AssignShopifyLocationClassificationInput,
@@ -441,7 +487,7 @@ function projectAssignedShopifyLocationObservation(
     createAssignedLocationEnvelope(observation),
   );
   if (!normalized.ok) return normalized;
-  return applyCommerceDelivery(
+  return commerceDeliveryIntake.use().applyCommerceDelivery(
     sql,
     {
       organisationId: observation.organisationId,

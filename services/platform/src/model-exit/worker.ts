@@ -33,6 +33,8 @@ const MODEL_PROVIDER_HOSTS: ReadonlySet<string> = new Set([
   "api.anthropic.com",
   // Claude account route: sign-in and token refresh.
   "platform.claude.com",
+  // BYO Gemini route (spec FND-04). The Gemini API refuses Hong Kong.
+  "generativelanguage.googleapis.com",
 ]);
 
 async function forwardModelProviderRequest(

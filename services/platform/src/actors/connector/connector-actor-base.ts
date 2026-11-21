@@ -56,6 +56,7 @@ import type {
   ChannelAlarmDue,
   ChannelAlarmStep,
   ConnectorChannelHost,
+  ConnectorModuleHost,
   ConnectorChannels,
 } from "./channel-adapter";
 
@@ -361,6 +362,22 @@ export abstract class ConnectorActorBase extends PlacedActor<null> {
   protected armAlarm(): Promise<ConnectorResult<null>> {
     return armConnectorAlarm(this.ctx.storage, this.alarmDue());
   }
+
+  /** What this Connector gives to a module. */
+  protected readonly moduleHost: ConnectorModuleHost = (() => {
+    const actor = this;
+    return {
+      get ctx() {
+        return actor.ctx;
+      },
+      get env() {
+        return actor.env;
+      },
+      admitExecution: (identity) => actor.admitExecution(identity),
+      armAlarm: () => actor.armAlarm(),
+      trackExecution: (start) => actor.trackExecution(start),
+    };
+  })();
 
   /** What this Connector gives to a channel. */
   protected channelHost(): ConnectorChannelHost {

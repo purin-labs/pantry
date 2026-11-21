@@ -26,10 +26,7 @@ import {
   type SlackAppId,
   type WorkspaceId,
 } from "../ids";
-import {
-  traceLog,
-  traceWarn,
-} from "../observability";
+import { traceLog, traceWarn } from "../observability";
 import type { Result } from "../result";
 import {
   admitSlackInstallOrganisation,
@@ -39,7 +36,7 @@ import { resolveConfiguredSlackInstallationIdentity } from "../slack/installatio
 import {
   createSlackInstallation,
   createSlackOrganisationConnection,
-} from "../slack/organisation-routing";
+} from "../slack/installation-store";
 import {
   parseVaultHandle,
   storeVaultSecret,
@@ -52,7 +49,11 @@ import {
   isRecord,
 } from "@purin-labs/std";
 import { ensureOrganisationObject } from "../gateway/support";
-import { isLocalDebugRequest, parsePublicServiceUrl, readRuntimeSecret } from "../gateway/request-helpers";
+import {
+  isLocalDebugRequest,
+  parsePublicServiceUrl,
+  readRuntimeSecret,
+} from "../gateway/request-helpers";
 
 export const SLACK_INSTALL_SCOPES = [
   "app_mentions:read",

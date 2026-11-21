@@ -3,6 +3,7 @@ import type { OrganisationId, UserId } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationQuerySource } from "./query-source";
 import { isRecord } from "@purin-labs/std";
+import { prepareInferenceSelectionRevision } from "./organisation-onboarding-row";
 import { isChatEffort, type ChatEffort } from "@purin-labs/control-api";
 
 export type OrganisationInferenceSelection =
@@ -10,6 +11,7 @@ export type OrganisationInferenceSelection =
   | { readonly kind: "codex_subscription" }
   | { readonly kind: "organisation_openai_api_key" }
   | { readonly kind: "organisation_anthropic_api_key" }
+  | { readonly kind: "organisation_google_api_key" }
   | { readonly kind: "satyr_platform" };
 
 type OrganisationInferenceSelectionSnapshot = {
@@ -56,11 +58,9 @@ export function parseOrganisationInferenceSelection(
   switch (raw.kind) {
     case "claude_oauth":
     case "codex_subscription":
-      return { ok: true, value: { kind: raw.kind } };
     case "organisation_openai_api_key":
-      return { ok: true, value: { kind: raw.kind } };
     case "organisation_anthropic_api_key":
-      return { ok: true, value: { kind: raw.kind } };
+    case "organisation_google_api_key":
     case "satyr_platform":
       return { ok: true, value: { kind: raw.kind } };
     default:
@@ -218,28 +218,14 @@ export async function selectOrganisationInferenceSelection(input: {
         input.selectedByUserId,
         input.now,
       ),
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-       SET configuration_version = ?, projection_revision = ?,
-           readiness_version = CASE WHEN ? = 1 THEN NULL ELSE readiness_version END,
-           activation_attempt_id = CASE WHEN ? = 1 THEN NULL ELSE activation_attempt_id END,
-           activation_receipt_id = CASE WHEN ? = 1 THEN NULL ELSE activation_receipt_id END,
-           activated_at = CASE WHEN ? = 1 THEN NULL ELSE activated_at END,
-           updated_at = ?
-       WHERE organisation_id = ? AND configuration_version = ?`,
-      )
-      .bind(
-        nextConfigurationVersion,
-        nextProjectionRevision,
-        invalidateReadiness ? 1 : 0,
-        invalidateReadiness ? 1 : 0,
-        invalidateReadiness ? 1 : 0,
-        invalidateReadiness ? 1 : 0,
-        input.now,
-        input.organisationId,
-        configurationVersion,
-      ),
+    prepareInferenceSelectionRevision(session, {
+      nextConfigurationVersion,
+      nextProjectionRevision,
+      invalidateReadiness,
+      now: input.now,
+      organisationId: input.organisationId,
+      configurationVersion,
+    }),
   ];
   const results = await session.batch(statements);
   if (results[1]?.meta.changes !== 1) {

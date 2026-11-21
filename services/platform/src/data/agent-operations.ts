@@ -1,10 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { CommerceEntityPlaneCueEvent } from "../cues/engine";
-import type {
-  CommerceListEntryRef,
-  CommerceRelationshipRef,
-} from "@purin-labs/commerce-contracts";
-import type { CommerceEntityPlanePublishedResourceMetadataResponse } from "@purin-labs/commerce-client";
+import type { CommerceTypeParts } from "../commerce-type-parts";
 import type { OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
@@ -110,7 +106,7 @@ export type AgentResponsibilityScope =
     }
   | {
       readonly kind: "relationship";
-      readonly relationship: CommerceRelationshipRef;
+      readonly relationship: CommerceTypeParts["relationshipRef"];
     }
   | {
       readonly kind: "commerce_list";
@@ -118,14 +114,14 @@ export type AgentResponsibilityScope =
     }
   | {
       readonly kind: "commerce_list_entry";
-      readonly entry: CommerceListEntryRef;
+      readonly entry: CommerceTypeParts["listEntryRef"];
     }
   | {
       readonly kind: "saved_selector";
       readonly selector: {
         readonly selectorId: string;
         readonly revision: number;
-        readonly query: import("@purin-labs/commerce-contracts").CommerceGraphQuery;
+        readonly query: CommerceTypeParts["graphQuery"];
       };
     };
 
@@ -416,7 +412,7 @@ export type AgentOperationCommandMetadata = Readonly<{
 }>;
 
 export type AgentResponsibilityScopePublicationEvidence = Variant<
-  CommerceEntityPlanePublishedResourceMetadataResponse,
+  CommerceTypeParts["publishedResourceMetadata"],
   "resolved"
 >;
 

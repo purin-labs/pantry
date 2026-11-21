@@ -24,6 +24,7 @@ import {
   openRouterText,
   openRouterStream,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "checkpoints goal stops, resumes only by explicit command after eviction, and preserves unknown-usage fences",
@@ -247,7 +248,7 @@ class GoalProvider {
         id: "goal_call",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [
           {
             index: 0,
@@ -273,7 +274,7 @@ class GoalProvider {
         id: "goal_call",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }],
         usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
       },
@@ -619,7 +620,7 @@ function textWithUsage(text: string, inputTokens: number): Response {
       id: "goal_compact",
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -632,7 +633,7 @@ function textWithUsage(text: string, inputTokens: number): Response {
       id: "goal_compact",
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
       usage: {
         prompt_tokens: inputTokens,

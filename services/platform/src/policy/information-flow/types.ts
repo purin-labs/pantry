@@ -3,6 +3,14 @@ import type { RequestAuthority, ViolationAction } from "@purin-labs/contracts";
 import type { ContextVisibility } from "../../authorization/access-grants/types";
 import type { Variant } from "@purin-labs/type-utils";
 
+/**
+ * Who pays a Jev call: Seams, or the Organisation with its own TypeSafe key
+ * (Plan 88). A Jev processing label names it.
+ */
+export type TypeSafeAuthority =
+  | Readonly<{ kind: "satyr_platform"; connectionRevision?: never }>
+  | Readonly<{ kind: "organisation_byo"; connectionRevision: number }>;
+
 export type FlowPolicyOwner =
   | Readonly<{ readonly kind: "platform" }>
   | Readonly<{
@@ -243,7 +251,7 @@ export type TypeSafeInferenceSink = Readonly<{
     | "mail_classification"
     | "screen_relevance";
   /** Who funds the call: Pantry's key or the Organisation's own key (Plan 88). */
-  funding: import("../../integrations/typesafe/authority").TypeSafeAuthority;
+  funding: TypeSafeAuthority;
   model: "jev-1.13.0";
   processing:
     | Readonly<{

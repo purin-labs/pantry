@@ -1,9 +1,12 @@
-import type {
-  AuthorityPartition,
-  CanonicalAction,
-  RequestAuthority,
+import {
+  isCommerceSystemKind,
+  type AuthorityPartition,
+  type CanonicalAction,
+  type RequestAuthority,
 } from "@purin-labs/contracts";
-import type { CommerceEntityPlaneEffect } from "@purin-labs/commerce-contracts";
+import type { CommerceTypeParts } from "../commerce-type-parts";
+
+type CommerceEntityPlaneEffect = CommerceTypeParts["entityPlaneEffect"];
 
 import {
   parseCaseId,
@@ -38,10 +41,10 @@ import {
 } from "../authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "../policy";
 import { flowBindingMatchesIdentity } from "../policy";
-import { parseCommerceEntityPlaneEffect } from "../commerce/entity-plane/proposals";
-import { slackMayApproveAction } from "../commerce/action-model";
+import { definePort } from "../port";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isRecord, isSha256Hex } from "@purin-labs/std";
+import { armAlarmBy } from "./lifecycle/actor-alarm";
 
 export type CanonicalActionDraft = {
   host: string;
@@ -113,7 +116,7 @@ type ActionExecutionLease = Readonly<{
   expiresAt: number;
 }>;
 
-export const ACTION_EXECUTION_LEASE_DURATION_MS = 5 * 60_000;
+const ACTION_EXECUTION_LEASE_DURATION_MS = 5 * 60_000;
 
 type UnsignedAction = ActionIdentity & {
   approval?: never;
@@ -261,6 +264,24 @@ export type ReconcileActionExecutionInput = RequestActionApprovalInput & {
   outcome: "confirmed" | "failed" | "indeterminate";
   providerResult: string;
 };
+
+/**
+ * The commerce parts of the action ledger: the check of a recorded commerce
+ * effect, and the rule that says which actions a Slack approval may sign.
+ * Commerce owns both, and the Worker registers them (`worker-ports.ts`).
+ */
+export type ActionLedgerCommerce = Readonly<{
+  /** The recorded commerce effect, or null when the value is not one. */
+  parseEffect(raw: unknown): CommerceEntityPlaneEffect | null;
+  /** Whether a Slack approval may sign this action: it moves no money. */
+  slackMayApprove(
+    action: Pick<LedgerCanonicalAction, "verb" | "path">,
+  ): boolean;
+}>;
+
+export const actionLedgerCommerce = definePort<ActionLedgerCommerce>(
+  "action_ledger_commerce",
+);
 
 export type RecordCommerceEntityPlaneEffectInput =
   RequestActionApprovalInput & {
@@ -648,7 +669,7 @@ export function signAction(
     authentication.kind === "slack_verified_link" &&
     (authentication.challenge.organisationId !== input.organisationId ||
       authentication.challenge.actionNonce !== input.nonce ||
-      !slackMayApproveAction(entry.action))
+      !actionLedgerCommerce.use().slackMayApprove(entry.action))
   ) {
     return { ok: false, error: { code: "invalid_action", field: "approval" } };
   }
@@ -974,7 +995,7 @@ export function recordCommerceEntityPlaneEffect(
   if (!Number.isSafeInteger(input.now) || input.now < 0) {
     return { ok: false, error: { code: "invalid_action", field: "now" } };
   }
-  const effect = parseCommerceEntityPlaneEffect(input.effect);
+  const effect = actionLedgerCommerce.use().parseEffect(input.effect);
   if (effect === null) {
     return { ok: false, error: { code: "invalid_action", field: "effect" } };
   }
@@ -1236,7 +1257,7 @@ function parseCommerceEffect(
   } catch {
     throw new Error("invalid_commerce_entity_plane_effect");
   }
-  const parsed = parseCommerceEntityPlaneEffect(raw);
+  const parsed = actionLedgerCommerce.use().parseEffect(raw);
   if (parsed === null) throw new Error("invalid_commerce_entity_plane_effect");
   return parsed;
 }
@@ -1360,8 +1381,7 @@ function validateActionAuthority(authority: ActionAuthority): boolean {
   switch (authority.kind) {
     case "commerce_system":
       return (
-        (authority.system === "satyr_commerce" ||
-          authority.system === "shopify") &&
+        isCommerceSystemKind(authority.system) &&
         parseCommerceSystemRevision(authority.revision).ok
       );
     case "integration_account":
@@ -1378,7 +1398,7 @@ function parseActionAuthority(
     case "commerce_system": {
       const revision = parseCommerceSystemRevision(raw.revision);
       return Object.keys(raw).length === 3 &&
-        (raw.system === "satyr_commerce" || raw.system === "shopify") &&
+        isCommerceSystemKind(raw.system) &&
         revision.ok
         ? {
             kind: "commerce_system",
@@ -1736,4 +1756,15 @@ function requireExecutionLease(
     throw new Error("invalid_action_ledger_execution_lease");
   }
   return { leaseId, expiresAt };
+}
+
+/** Arms the alarm of the actor for the end of an action execution lease. */
+export async function armActionExecutionAlarm(
+  storage: DurableObjectStorage,
+  now: number,
+): Promise<void> {
+  const deadline = now + ACTION_EXECUTION_LEASE_DURATION_MS;
+  if (!Number.isSafeInteger(now) || now < 0 || !Number.isSafeInteger(deadline))
+    return;
+  await armAlarmBy(storage, deadline);
 }

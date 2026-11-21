@@ -36,7 +36,7 @@ import {
   stockOperationResourceId,
   stockOperationVerb,
   type StockOperationAction,
-} from "./stock-action";
+} from "../kitchen/contract/stock-action";
 import {
   CAFE_MENU_PUBLISH_VERB,
   cafeMenuActionPath,
@@ -73,12 +73,7 @@ import type {
   CommerceShopifyProviderReceipt,
   CommerceProviderResource,
 } from "@purin-labs/control-api";
-
-export function isCommerceActionNonce(value: string): boolean {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(
-    value,
-  );
-}
+import { commerceProjectionRevision } from "./contract/commerce-provider";
 
 export async function commerceActionMutationDigest(
   boundary: UnversionedControlMutationBoundary,
@@ -1405,7 +1400,7 @@ export async function buildCommerceLabDelivery(input: {
   if (input.current === null) {
     return { ok: false, error: { code: "commerce_action_projection_missing" } };
   }
-  const currentRevision = projectionRevision(input.current);
+  const currentRevision = commerceProjectionRevision(input.current);
   const expectedRevision = commerceActionExpectedRevision(path.value);
   if (currentRevision !== expectedRevision) {
     return {
@@ -1608,40 +1603,6 @@ function nextProvenance(
     occurredAt: observedAt,
     observedAt,
   };
-}
-
-function projectionRevision(projection: CommerceProjection): number {
-  switch (projection.kind) {
-    case "product":
-    case "sellable_variant":
-    case "inventory_item":
-    case "location":
-    case "sales_channel":
-    case "offer":
-      return projection.projection.provenance.revision;
-    case "commerce_order":
-      return projection.projection.provenance.revision;
-    case "inventory_position":
-    case "inventory_movement":
-    case "inventory_lot":
-    case "payment":
-    case "fulfillment":
-    case "shipment":
-    case "menu":
-    case "modifier_group_revision":
-    case "recipe_revision":
-    case "preparation_station":
-    case "preparation_ticket":
-    case "production_batch":
-    case "stock_policy":
-      return projection.projection.provenance.revision;
-  }
-}
-
-export function commerceProjectionRevision(
-  projection: CommerceProjection,
-): number {
-  return projectionRevision(projection);
 }
 
 function parseAdjustOfferPriceRequest(

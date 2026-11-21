@@ -26,12 +26,12 @@ import {
 import { readTerminalOperations } from "../../data/terminal-operations-readback";
 import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import { parseIntegrationAccountId, type OrganisationId } from "../../ids";
-import { createCommerceClient } from "../../commerce/outbox-worker";
+import { createCommerceClient } from "../../commerce/contract/client";
 import { readOrganisationEnvironment } from "../organisation-runtime";
 import {
   resolveCommerceMerchant,
   type CommerceMerchant,
-} from "../../commerce/square-link";
+} from "../../commerce/contract/square-link";
 import type {
   CommerceClientError,
   CommerceSquareDeviceCodeV1,

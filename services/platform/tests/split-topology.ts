@@ -14,6 +14,7 @@ import { parseInitialOrganisationPlacement } from "../src/placement";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
+import "./provide-organisation-lifecycle-parts";
 
 export type DeployedSchema = "migrations-global" | "migrations-regional";
 

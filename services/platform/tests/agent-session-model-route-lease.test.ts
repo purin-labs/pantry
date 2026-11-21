@@ -7,15 +7,16 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { describe, expect, test, vi } from "vitest";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
 
 const organisationCredentialMock = vi.hoisted(() => ({
-  resolveOrganisationOpenAiModelCredentialForRoute: vi.fn(),
+  resolveOrganisationModelCredentialForRoute: vi.fn(),
 }));
 
 vi.mock("../src/credential-vault", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/credential-vault")>()),
-  resolveOrganisationOpenAiModelCredentialForRoute:
-    organisationCredentialMock.resolveOrganisationOpenAiModelCredentialForRoute,
+  resolveOrganisationModelCredentialForRoute:
+    organisationCredentialMock.resolveOrganisationModelCredentialForRoute,
 }));
 
 import { createEmbeddedHarnessModelRouteLease } from "../src/actors/session/model-route";
@@ -41,7 +42,7 @@ async function resolvesPlatformOpenRouterKey(): Promise<void> {
   const route = {
     keySource: "platform" as const,
     provider: "openai-compatible" as const,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
   };
 
   const resolved = await createEmbeddedHarnessModelRouteLease({
@@ -84,7 +85,7 @@ async function resolvesOrganisationOpenAiKey(): Promise<void> {
     byoKeyRef: "vault:organisation_route_lease:openai:model:g1",
   };
   const env = testEnv({ OPENROUTER_API_KEY: "must-not-be-used", DB: {} });
-  organisationCredentialMock.resolveOrganisationOpenAiModelCredentialForRoute.mockResolvedValueOnce(
+  organisationCredentialMock.resolveOrganisationModelCredentialForRoute.mockResolvedValueOnce(
     {
       ok: true,
       value: {
@@ -112,7 +113,7 @@ async function resolvesOrganisationOpenAiKey(): Promise<void> {
     "sk-organisation-openai-key-1234567890",
   );
 
-  organisationCredentialMock.resolveOrganisationOpenAiModelCredentialForRoute.mockResolvedValueOnce(
+  organisationCredentialMock.resolveOrganisationModelCredentialForRoute.mockResolvedValueOnce(
     {
       ok: false,
       error: { code: "organisation_openai_credential_scope_mismatch" },

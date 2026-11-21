@@ -9,7 +9,11 @@ import type {
   InformationSourceRef,
 } from "@purin-labs/contracts";
 
-import { explainAccessDecision } from "../../access-control/decision-explanation";
+import {
+  explainAccessDecision,
+  type CustomConnectorAccountRead,
+} from "../../access-control/decision-explanation";
+
 import type { Env } from "../../env";
 import type { Result } from "../../result";
 import { authorizeOrganisationRequest } from "../authorization";
@@ -21,6 +25,53 @@ import {
   type JsonRecord,
 } from "../http";
 import { hasExactKeys, isPositiveInteger, isRecord } from "@purin-labs/std";
+import type {
+  CustomConnectorId,
+  CustomConnectorRevision,
+} from "../../custom-connectors/identity";
+import type { OrganisationDatabase } from "../../database-handles";
+import type { IntegrationAccountId, OrganisationId } from "../../ids";
+
+/**
+ * The parts of the product areas that the access control routes read. The
+ * Worker router gives them.
+ */
+export type AccessControlParts = Readonly<{
+  customConnectorAccount: CustomConnectorAccountRead;
+  /** One revision of a custom connector, with its review state. */
+  customConnectorRevision(
+    input: Readonly<{
+      db: OrganisationDatabase;
+      organisationId: OrganisationId;
+      connectorId: CustomConnectorId;
+      revision: CustomConnectorRevision;
+    }>,
+  ): Promise<
+    Result<
+      | Readonly<{
+          reviewState: "approved";
+          definition: Readonly<{
+            operations: readonly Readonly<{
+              id: string;
+              effect: Readonly<{ kind: string }>;
+            }>[];
+          }>;
+        }>
+      | Readonly<{
+          reviewState: "draft" | "validated" | "rejected" | "retired";
+        }>,
+      unknown
+    >
+  >;
+  /** The Airtable token of an integration account, for one operation. */
+  airtableAccountToken(
+    env: Env,
+    organisationId: OrganisationId,
+    integrationAccountId: IntegrationAccountId,
+    operation: "read" | "write",
+  ): Promise<string>;
+}>;
+
 const MAX_SOURCE_REFERENCES = 20;
 
 export type AccessControlExplainRoute = Readonly<{
@@ -34,6 +85,7 @@ export async function handleAccessControlExplainRoute(
   request: Request,
   env: Env,
   route: AccessControlExplainRoute,
+  parts: AccessControlParts,
 ): Promise<Response> {
   if (request.method !== "POST") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
@@ -49,6 +101,7 @@ export async function handleAccessControlExplainRoute(
   const question = parseAccessDecisionQuestion(raw.value);
   if (!question.ok) return controlError(question.error, 422);
   const explanation = await explainAccessDecision({
+    customConnectorAccount: parts.customConnectorAccount,
     env,
     scope: authorized.executionScope,
     organisationId: authorized.organisationId,

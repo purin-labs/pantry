@@ -1,3 +1,4 @@
+import { decidePendingDecisionWith } from "../pending-decision-parts";
 import type { Env } from "../../env";
 import { handleContactVerification } from "./contact-verification";
 import { handleAgentMailboxSetup } from "./mailbox-setup";
@@ -35,21 +36,16 @@ import {
 } from "./agents/email-operational";
 import { handleEmailReply, handleEmailReviewQueue } from "./agents/email-reply";
 import { handleOrganisationInference } from "./agents/inference";
-import { handleAgentMailbox, handleAgentMailboxCheck } from "./agents/mailbox";
+import {
+  handleAgentMailbox,
+  handleAgentMailboxCheck,
+  type AgentMailboxRouteAction,
+} from "./agents/mailbox";
 import {
   handleAgentOperationRevisions,
   handleAgentOperations,
 } from "./agents/operations";
 import { handleMerchantAgentInstallation } from "./agents/merchant-agent";
-
-export type AgentMailboxRouteAction =
-  | "bind"
-  | "policy"
-  | "resume"
-  | "skip-and-resume"
-  | "reconnect"
-  | "disable"
-  | "revoke";
 
 export type AgentControlRoute =
   | Readonly<{ kind: "organisationCodex"; organisationIdRaw: string }>
@@ -614,6 +610,16 @@ export function handleAgentControlRoute(
     case "emailReviewQueue":
       return handleEmailReviewQueue(request, env, route.organisationIdRaw);
     case "emailReply":
+      if (route.action === "approve" || route.action === "reject")
+        return decidePendingDecisionWith(env)(
+          { request, organisationIdRaw: route.organisationIdRaw },
+          {
+            kind: "email_review",
+            message: "gmail_reply",
+            id: route.proposalIdRaw,
+            answer: route.action === "approve" ? "allow" : "refuse",
+          },
+        );
       return handleEmailReply(
         request,
         env,
@@ -630,6 +636,16 @@ export function handleAgentControlRoute(
     case "contactEndpointVerification":
       return handleContactVerification(request, env, route.organisationIdRaw);
     case "emailOperational":
+      if (route.action === "approve" || route.action === "reject")
+        return decidePendingDecisionWith(env)(
+          { request, organisationIdRaw: route.organisationIdRaw },
+          {
+            kind: "email_review",
+            message: "operational_new_message",
+            id: route.proposalIdRaw,
+            answer: route.action === "approve" ? "allow" : "refuse",
+          },
+        );
       return handleEmailOperational(
         request,
         env,

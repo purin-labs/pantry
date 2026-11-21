@@ -1,17 +1,95 @@
-import type { HarnessNativeCodeMode } from "../../actors/embedded-harness";
+import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import type {
   AuthorizedHarnessToolResult,
   CodeModeExecutionOutcome,
+  FileContextProvider,
 } from "@purin-labs/contracts";
+import type { IntegrationAccountId } from "../../ids";
 import type { Result } from "../../result";
-import type {
-  CanonicalFileReference,
-  FileReadToolResult,
-  FileSearchToolResult,
-} from "../../context/files";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { JsonSchema } from "./selection";
 import type { TurnTool } from "./tool-registry";
+
+/** The file that a file tool names: its account, its provider and its id. */
+export type CanonicalFileReference = Readonly<{
+  readonly integrationAccountId: IntegrationAccountId;
+  readonly provider: FileContextProvider;
+  readonly providerFileId: string;
+}>;
+
+export type FileSearchToolResult = Readonly<{
+  readonly reference: CanonicalFileReference;
+  readonly segmentIndex: number;
+  readonly sourceRevision: number;
+  readonly title: string;
+  readonly displayPath: string;
+  readonly deepLink: string;
+  readonly excerpt: string;
+  readonly metadataOnlyReason: string | null;
+}>;
+
+export type FileReadToolResult =
+  | Readonly<{
+      readonly kind: "content";
+      readonly reference: CanonicalFileReference;
+      readonly title: string;
+      readonly displayPath: string;
+      readonly deepLink: string;
+      readonly startSegment: number;
+      readonly segments: readonly string[];
+      readonly continuation:
+        | Readonly<{ readonly kind: "complete" }>
+        | Readonly<{ readonly kind: "more"; readonly nextSegment: number }>;
+    }>
+  | Readonly<{
+      readonly kind: "metadata_only";
+      readonly reference: CanonicalFileReference;
+      readonly title: string;
+      readonly displayPath: string;
+      readonly deepLink: string;
+      readonly reason: string;
+    }>;
+
+export type HarnessCodeModeSandbox = (executionId: string) => CodemodeRemote;
+
+export type HarnessNativeCodeMode =
+  | {
+      readonly kind: "enabled";
+      /**
+       * `null` when this deployment has no sandbox Worker. Admission then
+       * fails before any reservation, and no other executor takes its place.
+       */
+      readonly sandbox: HarnessCodeModeSandbox | null;
+      readonly admission: HarnessCodeModeAdmission;
+      executeTool(
+        executionLease: HarnessCodeModeExecutionLease,
+        name: string,
+        inputJson: string,
+        callId: string,
+      ): Promise<AuthorizedHarnessToolResult>;
+      /**
+       * The capabilities that the nested call `callId` claimed. They are the
+       * sources of its result, and they are stored with that result.
+       */
+      claimedCapabilities(callId: string): readonly string[];
+      /**
+       * Whether a result with these sources may reach generated code now. It
+       * reads current authority, and it spends no allowance. A replay asks
+       * this for every recorded result, because a recorded result is not
+       * current authorization.
+       */
+      authorizeSources(
+        capabilities: readonly string[],
+      ): Promise<Result<null, { readonly detail: string }>>;
+    }
+  | {
+      readonly kind: "disabled";
+      readonly sandbox?: never;
+      readonly admission?: never;
+      readonly executeTool?: never;
+      readonly claimedCapabilities?: never;
+      readonly authorizeSources?: never;
+    };
 
 export type HarnessToolDefinition = {
   readonly type: "function";

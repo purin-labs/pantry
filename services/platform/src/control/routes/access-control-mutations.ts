@@ -2,7 +2,6 @@ import {
   isAgentPermissionListRead,
   type AgentPermissionListRead,
 } from "@purin-labs/control-api";
-import { parseCommerceGraphQuery as parseCommerceGraphQueryResult } from "../../commerce/entity-plane/routes";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   AccessSubjectRef,
@@ -11,8 +10,10 @@ import type {
   CapabilityMode,
   CapabilityRef,
 } from "@purin-labs/contracts";
-import type { CommerceEntityTypeId } from "@purin-labs/commerce-contracts";
-import { parseEntityTypeId } from "@purin-labs/commerce-client";
+import {
+  commerceAccessTargets,
+  type CommerceGrantEntityTypeId,
+} from "../../access-control/commerce-access-targets";
 
 import {
   applyVersionedAccessDefaults,
@@ -29,7 +30,6 @@ import {
   resolveGrantSubjectReference,
   resolveGrantTargetReference,
 } from "../../access-control/decision-explanation";
-import { resolvePublishedCommerceTarget } from "../../commerce/entity-plane/published-resources";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import type {
   AccessGrantTarget,
@@ -53,8 +53,7 @@ import {
 } from "../../data/control-mutation";
 import { resolveIntegrationAccount } from "../../data/integration-account";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
-import { resolveActiveCustomConnectorAccount } from "../../custom-connectors/accounts";
-import { resolveCustomConnectorRevision } from "../../custom-connectors/revisions";
+import type { AccessControlParts } from "./access-control-explain";
 import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,
@@ -124,7 +123,7 @@ type CreateGrantTargetSelection = StrictUnion<
   | Readonly<{
       kind: "commerce_entity_type";
       capabilityRef: CapabilityRef;
-      entityTypeId: CommerceEntityTypeId;
+      entityTypeId: CommerceGrantEntityTypeId;
     }>
   | Readonly<{
       kind: "commerce_list";
@@ -190,6 +189,7 @@ export async function handleAccessControlMutationRoute(
   request: Request,
   env: Env,
   route: AccessControlMutationRoute,
+  parts: AccessControlParts,
 ): Promise<Response> {
   if (route.kind === "accessControlBudget" && request.method === "GET") {
     const authorized = await authorizeOrganisationRequest(
@@ -221,7 +221,7 @@ export async function handleAccessControlMutationRoute(
     case "accessControlBudget":
       return handleBudgetChange(request, env, route, body.value);
     case "accessControlGrantCreate":
-      return handleGrantCreate(request, env, route, body.value);
+      return handleGrantCreate(request, env, route, body.value, parts);
     case "accessControlGrantRevoke":
       return handleGrantRevoke(request, env, route, body.value);
     case "accessControlCapabilityChange":
@@ -314,6 +314,7 @@ async function handleGrantCreate(
   env: Env,
   route: Variant<AccessControlMutationRoute, "accessControlGrantCreate">,
   raw: JsonRecord,
+  parts: AccessControlParts,
 ): Promise<Response> {
   const parsed = parseCreateGrantRequest(raw);
   if (!parsed.ok) return controlError(parsed.error, 422);
@@ -345,6 +346,7 @@ async function handleGrantCreate(
   );
   if (!resolvedTarget.ok) return controlError(resolvedTarget.error, 409);
   const target = await validateGrantTarget(
+    parts,
     env,
     scope.value,
     resolvedTarget.value,
@@ -670,14 +672,10 @@ async function resolveGrantTargetSelection(
       });
       if (!authority.ok || authority.value.provider !== "underclerk")
         return { ok: false, error: "access_grant_target_unavailable" };
-      const query = parseCommerceGraphQueryResult({
-        kind: "commerce_list_page",
-        listId: selection.listId,
-        filter: { kind: "all" },
-        sorts: [],
-        pagination: { limit: 1, cursor: null },
-      });
-      if (!query.ok || query.value.kind !== "commerce_list_page")
+      const listId = commerceAccessTargets
+        .use()
+        .parseListReadId(selection.listId);
+      if (listId === null)
         return { ok: false, error: "access_grant_target_invalid" };
       return {
         ok: true,
@@ -685,7 +683,7 @@ async function resolveGrantTargetSelection(
           kind: "commerce_read",
           capabilityId: definition.capabilityId,
           capabilityVersion: definition.capabilityVersion,
-          scope: { kind: "commerce_list", listId: query.value.listId },
+          scope: { kind: "commerce_list", listId },
         },
       };
     }
@@ -722,7 +720,7 @@ async function resolveGrantTargetSelection(
       ) {
         return { ok: false, error: "access_grant_target_invalid" };
       }
-      const target = await resolvePublishedCommerceTarget({
+      const target = await commerceAccessTargets.use().resolvePublishedTarget({
         env,
         organisationId: scope.organisationId,
         targetRef: selection.targetRef,
@@ -874,6 +872,7 @@ function isCommerceActionPropose(definition: CapabilityDefinition): boolean {
 }
 
 async function validateGrantTarget(
+  parts: AccessControlParts,
   env: Env,
   scope: OrganisationExecutionScope,
   target: AccessGrantTarget,
@@ -934,7 +933,7 @@ async function validateGrantTarget(
       if (!integrationAccountId.ok) {
         return { ok: false, error: "access_grant_target_invalid" };
       }
-      const account = await resolveActiveCustomConnectorAccount({
+      const account = await parts.customConnectorAccount({
         db: scope.database,
         organisationId,
         integrationAccountId: integrationAccountId.value,
@@ -950,7 +949,7 @@ async function validateGrantTarget(
       ) {
         return { ok: false, error: "access_grant_target_unavailable" };
       }
-      const revision = await resolveCustomConnectorRevision({
+      const revision = await parts.customConnectorRevision({
         db: scope.database,
         organisationId,
         connectorId: account.value.source.connectorId,
@@ -1017,12 +1016,12 @@ function parseCreateGrantTargetSelection(
     case "commerce_entity_type": {
       if (!hasExactKeys(value, ["kind", "capabilityRef", "entityTypeId"]))
         return null;
-      try {
-        const entityTypeId = parseEntityTypeId(value.entityTypeId);
-        return { kind: "commerce_entity_type", capabilityRef, entityTypeId };
-      } catch {
-        return null;
-      }
+      const entityTypeId = commerceAccessTargets
+        .use()
+        .parseEntityTypeId(value.entityTypeId);
+      return entityTypeId === null
+        ? null
+        : { kind: "commerce_entity_type", capabilityRef, entityTypeId };
     }
     case "platform":
       return hasExactKeys(value, ["kind", "capabilityRef"])

@@ -1,14 +1,9 @@
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { OrganisationId, VaultHandle } from "../ids";
+
+// The Vault handle is an opaque id, so the kernel ids define it.
+export { parseVaultHandle, type VaultHandle } from "../ids";
 import type { VaultKeyVersion } from "./keyring";
 import type { Variant } from "@purin-labs/type-utils";
-
-const vaultHandleBrand: unique symbol = Symbol("VaultHandle");
-const VAULT_HANDLE_PATTERN = /^vault:[a-z0-9][a-z0-9:_-]*$/;
-
-export type VaultHandle = string & {
-  readonly [vaultHandleBrand]: "VaultHandle";
-};
 
 /**
  * The formats of an opaque profile: the Codex sign-in and its device code
@@ -102,15 +97,3 @@ export type VaultStoredSecret = {
   readonly keyVersion: VaultKeyVersion;
   readonly createdAt: number;
 };
-
-export function parseVaultHandle(
-  raw: string,
-): Result<VaultHandle, { readonly code: "invalid_vault_handle" }> {
-  const value = raw.trim();
-
-  if (!VAULT_HANDLE_PATTERN.test(value)) {
-    return { ok: false, error: { code: "invalid_vault_handle" } };
-  }
-
-  return { ok: true, value: value as VaultHandle };
-}

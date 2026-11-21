@@ -1,3 +1,4 @@
+export { prepareReplacedSurfaceTokenRevocation } from "./secret-revocation";
 export {
   parseVaultHandle,
   type VaultHandle,
@@ -69,22 +70,12 @@ export {
   type AccountRemovalResolutionError,
 } from "./account-removal-resolution";
 export {
-  parseOpenAiApiKey,
-  parseAnthropicApiKey,
-  resolveCurrentOrganisationOpenAiModelCredential,
-  resolveCurrentOrganisationAnthropicModelCredential,
-  resolveOrganisationOpenAiModelCredentialForRoute,
-  resolveOrganisationAnthropicModelCredentialForRoute,
-  storeOrganisationAnthropicModelCredential,
-  storeOrganisationOpenAiModelCredential,
-  type AnthropicApiKey,
-  type OpenAiApiKey,
-  type OrganisationAnthropicModelCredential,
-  type OrganisationAnthropicModelCredentialError,
-  type OrganisationAnthropicModelCredentialStoreError,
-  type OrganisationOpenAiModelCredential,
-  type OrganisationOpenAiModelCredentialError,
-  type OrganisationOpenAiModelCredentialStoreError,
+  parseModelApiKey,
+  resolveCurrentOrganisationModelCredential,
+  resolveOrganisationModelCredentialForRoute,
+  storeOrganisationModelCredential,
+  type ModelApiKey,
+  type ModelKeyProvider,
 } from "./organisation-model-resolution";
 export {
   importExternalVaultSecret,

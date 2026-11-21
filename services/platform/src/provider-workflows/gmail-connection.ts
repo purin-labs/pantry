@@ -2,10 +2,7 @@ import {
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
 } from "../authorization/capability-catalogue";
-import {
-  readEmailMailboxIdentityClaimant,
-  registerEmailMailboxAccount,
-} from "../data/email-mailbox";
+import { connectionParts } from "../integrations/contract/connection-parts";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
@@ -19,17 +16,13 @@ import {
   gmailProductFromScopes,
   type GmailAuthorizationProduct,
 } from "../mail/gmail-authorization";
-import {
-  readEmailSenderIdentityClaimant,
-  registerEmailSenderAccount,
-} from "../data/email-operational";
 import { providerCallbackUri } from "../provider-lifecycle/authorization";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -38,7 +31,7 @@ import {
   providerCredentialHandle,
   storeOAuthCredential,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 
 export async function connectGmail(
@@ -86,11 +79,13 @@ export async function connectGmail(
       accountIdentity.error,
     );
   }
-  const senderClaimant = await readEmailSenderIdentityClaimant({
-    db: input.scope.database,
-    environment: base.environment,
-    googleSubject: exchanged.value.googleSubject,
-  });
+  const senderClaimant = await connectionParts
+    .use()
+    .mailbox.readEmailSenderIdentityClaimant({
+      db: input.scope.database,
+      environment: base.environment,
+      googleSubject: exchanged.value.googleSubject,
+    });
   if (
     senderClaimant !== null &&
     senderClaimant.organisationId !== base.organisationId
@@ -99,11 +94,13 @@ export async function connectGmail(
       code: "provider_mailbox_identity_claimed",
     });
   }
-  const mailboxClaimant = await readEmailMailboxIdentityClaimant({
-    db: input.scope.database,
-    environment: base.environment,
-    googleSubject: exchanged.value.googleSubject,
-  });
+  const mailboxClaimant = await connectionParts
+    .use()
+    .mailbox.readEmailMailboxIdentityClaimant({
+      db: input.scope.database,
+      environment: base.environment,
+      googleSubject: exchanged.value.googleSubject,
+    });
   if (
     mailboxClaimant !== null &&
     mailboxClaimant.organisationId !== base.organisationId
@@ -169,15 +166,17 @@ export async function connectGmail(
     retentionPolicy: { kind: "organisation_default" },
     now: input.now,
   });
-  const senderRegistered = await registerEmailSenderAccount({
-    db: input.scope.database,
-    integrationAccountId: connected.account.integrationAccountId,
-    organisationId: base.organisationId,
-    environment: base.environment,
-    googleSubject: exchanged.value.googleSubject,
-    observedAddress: exchanged.value.email,
-    now: input.now,
-  });
+  const senderRegistered = await connectionParts
+    .use()
+    .mailbox.registerEmailSenderAccount({
+      db: input.scope.database,
+      integrationAccountId: connected.account.integrationAccountId,
+      organisationId: base.organisationId,
+      environment: base.environment,
+      googleSubject: exchanged.value.googleSubject,
+      observedAddress: exchanged.value.email,
+      now: input.now,
+    });
   if (!senderRegistered.ok) {
     return failProviderCompletion(input, attempt, current, {
       code:
@@ -187,15 +186,17 @@ export async function connectGmail(
     });
   }
   if (product === "full_mailbox_pilot") {
-    const registered = await registerEmailMailboxAccount({
-      db: input.scope.database,
-      organisationId: base.organisationId,
-      integrationAccountId: connected.account.integrationAccountId,
-      environment: base.environment,
-      googleSubject: exchanged.value.googleSubject,
-      observedAddress: exchanged.value.email,
-      now: input.now,
-    });
+    const registered = await connectionParts
+      .use()
+      .mailbox.registerEmailMailboxAccount({
+        db: input.scope.database,
+        organisationId: base.organisationId,
+        integrationAccountId: connected.account.integrationAccountId,
+        environment: base.environment,
+        googleSubject: exchanged.value.googleSubject,
+        observedAddress: exchanged.value.email,
+        now: input.now,
+      });
     if (!registered.ok) {
       return failProviderCompletion(input, attempt, current, {
         code: "provider_mailbox_identity_claimed",

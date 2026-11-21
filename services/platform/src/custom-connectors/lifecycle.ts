@@ -3,6 +3,8 @@ import type { OrganisationDatabase } from "../database-handles";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import { parseVaultHandle } from "../credential-vault/domain";
 import { revokeVaultSecret } from "../credential-vault/service";
+import { prepareCustomConnectorAccountsDisable } from "../data/integration-account-writes";
+import { prepareCustomConnectorConnectionsDisable } from "../data/provider-connection-writes";
 import type { UserId, OrganisationId } from "../ids";
 import type { Result } from "../result";
 import type {
@@ -93,25 +95,23 @@ export async function disableCustomConnector(input: {
          WHERE organisation_id = ? AND connector_id = ? AND head_revision = ?
            AND lifecycle IN ('draft', 'active')`,
       ).bind(input.now, input.organisationId, input.connectorId, input.expectedHeadRevision),
-      session.prepare(
-        `UPDATE integration_account
-         SET lifecycle = 'disabled', disabled_by_user_id = ?,
-             disabled_at = ?, updated_at = ?
-         WHERE organisation_id = ? AND custom_connector_id = ? AND source_kind = 'custom_api'
-           AND lifecycle IN ('active', 'degraded', 'reauth_required')`,
-      ).bind(input.disabledByUserId, input.now, input.now, input.organisationId, input.connectorId),
+      prepareCustomConnectorAccountsDisable(session, {
+        disabledByUserId: input.disabledByUserId,
+        now: input.now,
+        organisationId: input.organisationId,
+        connectorId: input.connectorId,
+      }),
       session.prepare(
         `UPDATE custom_connector_account_binding
          SET lifecycle = 'disabled', is_default_for_connector = 0,
              disabled_at = ?, updated_at = ?
          WHERE organisation_id = ? AND connector_id = ? AND lifecycle = 'active'`,
       ).bind(input.now, input.now, input.organisationId, input.connectorId),
-      session.prepare(
-        `UPDATE provider_connection
-         SET lifecycle = 'disabled', disabled_at = ?, updated_at = ?
-         WHERE organisation_id = ? AND custom_connector_id = ? AND source_kind = 'custom_api'
-           AND lifecycle IN ('active', 'reauth_required')`,
-      ).bind(input.now, input.now, input.organisationId, input.connectorId),
+      prepareCustomConnectorConnectionsDisable(session, {
+        now: input.now,
+        organisationId: input.organisationId,
+        connectorId: input.connectorId,
+      }),
     ]);
   } catch {
     return conflict("custom_connector_lifecycle_conflict");

@@ -1,6 +1,7 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { CredentialVaultBindings } from "../../credential-vault/keyring";
 import type { OrganisationId } from "../../ids";
+import type { TypeSafeAuthority } from "../../policy/information-flow/types";
 import type { TypeSafeCredential } from "./credential";
 import {
   readTypeSafeConnection,
@@ -12,9 +13,7 @@ import { validJevApiKey } from "./system-one-client";
  * Who funds one TypeSafe call (Plan 88 section 1). An Organisation with its own
  * connected key keeps it; every other Organisation uses Pantry's key.
  */
-export type TypeSafeAuthority =
-  | Readonly<{ kind: "satyr_platform"; connectionRevision?: never }>
-  | Readonly<{ kind: "organisation_byo"; connectionRevision: number }>;
+export type { TypeSafeAuthority };
 
 const SATYR_TYPESAFE_AUTHORITY: TypeSafeAuthority = Object.freeze({
   kind: "satyr_platform",

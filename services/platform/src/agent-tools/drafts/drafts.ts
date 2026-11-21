@@ -1,8 +1,8 @@
 import {
-  MenuDraftRequestError,
   type MenuDraftEdit,
   type MenuDraftRead,
 } from "../../actors/menu-draft";
+import { MenuDraftRequestError } from "../../cafe/contract/request-errors";
 import {
   isMenuBoardFrameId,
   isMenuBoardItemRow,
@@ -37,9 +37,7 @@ import type {
   MenuBoardStackEdit,
   MenuBoardStackSettings,
 } from "../../actors/menu-boards";
-import type {
-  MenuPriceProposalRequest,
-} from "../../actors/harness-commerce-proposal";
+import type { MenuPriceProposalRequest } from "../../commerce/contract/types";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { CatalogExecutionContext } from "../catalog/execute";

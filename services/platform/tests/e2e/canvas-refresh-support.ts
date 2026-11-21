@@ -17,6 +17,7 @@ import {
   type IssuedControlSession,
 } from "../../src/data/control-plane";
 import type { UserId } from "../../src/ids";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 type Counter = {
   calls: number;
@@ -45,7 +46,7 @@ export async function measureCanvasRefresh(
           kind: "message",
           conversationId,
           requestId: `refresh_${turn}`,
-          model: "moonshotai/kimi-k3",
+          model: PLATFORM_DEFAULT_PI_MODEL,
           text: `Explain recipe checkpoint ${turn}`,
           surfaceContext: null,
           browserContext: { kind: "unavailable" },

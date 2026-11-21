@@ -2,6 +2,7 @@ import {
   actorMachineCensus,
   type MachineCensus,
 } from "./lifecycle/machine-census";
+import { ACTOR_MACHINES } from "./actor-machines";
 import { readWarmActorSlots } from "./warm-actor-slots";
 import { invalidateEmailCaseContextCollectionProposals } from "./email-case-context-collection-evidence";
 import type { Env } from "../env";
@@ -83,20 +84,367 @@ import {
   type ConnectorResult,
   type ConnectorSnapshot,
 } from "./connector/types";
-import { ConnectorEmail } from "./connector/connector-email-actor";
+import {
+  ConnectorEmail,
+  type ConnectorEmailRpc,
+} from "./connector/connector-email-actor";
+import { ConnectorActorBase } from "./connector/connector-actor-base";
+import {
+  ConnectorWhatsApp,
+  type ConnectorWhatsAppRpc,
+} from "./connector/connector-whatsapp-actor";
+import {
+  ConnectorEvals,
+  type ConnectorEvalsRpc,
+} from "./connector/connector-evals";
 
-export class ConnectorDO extends ConnectorEmail {
+export class ConnectorDO
+  extends ConnectorActorBase
+  implements ConnectorEvalsRpc, ConnectorWhatsAppRpc, ConnectorEmailRpc
+{
   private readonly slack = new SlackConnectorChannel(this.channelHost());
 
+  /** The eval runs of this Connector. */
+  protected readonly evals = new ConnectorEvals(this.moduleHost, {
+    evalAgentActive: () => this.email.evalAgentActive(),
+    runEvalTask: (...input) => this.email.runEvalTask(...input),
+  });
+
+  /** The WhatsApp channel of this Connector. */
+  protected readonly whatsApp = new ConnectorWhatsApp(this.moduleHost);
+
+  /** The email channel of this Connector: the mailboxes and their replies. */
+  protected readonly email = new ConnectorEmail(this.moduleHost, this.evals);
+
+  reconcileRelocationMailReceipt(
+    ...input: Parameters<ConnectorEmail["reconcileRelocationMailReceipt"]>
+  ) {
+    return this.email.reconcileRelocationMailReceipt(...input);
+  }
+
+  mailAssistant(...input: Parameters<ConnectorEmail["mailAssistant"]>) {
+    return this.email.mailAssistant(...input);
+  }
+
+  readMailOrganization(
+    ...input: Parameters<ConnectorEmail["readMailOrganization"]>
+  ) {
+    return this.email.readMailOrganization(...input);
+  }
+
+  readMailClassifiedPage(
+    ...input: Parameters<ConnectorEmail["readMailClassifiedPage"]>
+  ) {
+    return this.email.readMailClassifiedPage(...input);
+  }
+
+  readMailDecision(...input: Parameters<ConnectorEmail["readMailDecision"]>) {
+    return this.email.readMailDecision(...input);
+  }
+
+  manageMailOrganization(
+    ...input: Parameters<ConnectorEmail["manageMailOrganization"]>
+  ) {
+    return this.email.manageMailOrganization(...input);
+  }
+
+  acceptEmailChange(...input: Parameters<ConnectorEmail["acceptEmailChange"]>) {
+    return this.email.acceptEmailChange(...input);
+  }
+
+  checkEmailChange(...input: Parameters<ConnectorEmail["checkEmailChange"]>) {
+    return this.email.checkEmailChange(...input);
+  }
+
+  activateEmailProcessing(
+    ...input: Parameters<ConnectorEmail["activateEmailProcessing"]>
+  ) {
+    return this.email.activateEmailProcessing(...input);
+  }
+
+  disableEmailProcessing(
+    ...input: Parameters<ConnectorEmail["disableEmailProcessing"]>
+  ) {
+    return this.email.disableEmailProcessing(...input);
+  }
+
+  resumeEmailProcessing(
+    ...input: Parameters<ConnectorEmail["resumeEmailProcessing"]>
+  ) {
+    return this.email.resumeEmailProcessing(...input);
+  }
+
+  reconnectEmailProcessing(
+    ...input: Parameters<ConnectorEmail["reconnectEmailProcessing"]>
+  ) {
+    return this.email.reconnectEmailProcessing(...input);
+  }
+
+  renewEmailWatch(...input: Parameters<ConnectorEmail["renewEmailWatch"]>) {
+    return this.email.renewEmailWatch(...input);
+  }
+
+  inspectEmailRuntime(
+    ...input: Parameters<ConnectorEmail["inspectEmailRuntime"]>
+  ) {
+    return this.email.inspectEmailRuntime(...input);
+  }
+
+  searchEmailMailbox(
+    ...input: Parameters<ConnectorEmail["searchEmailMailbox"]>
+  ) {
+    return this.email.searchEmailMailbox(...input);
+  }
+
+  createEmailReplyProposal(
+    ...input: Parameters<ConnectorEmail["createEmailReplyProposal"]>
+  ) {
+    return this.email.createEmailReplyProposal(...input);
+  }
+
+  createEmailOperationalProposal(
+    ...input: Parameters<ConnectorEmail["createEmailOperationalProposal"]>
+  ) {
+    return this.email.createEmailOperationalProposal(...input);
+  }
+
+  editEmailOperationalProposal(
+    ...input: Parameters<ConnectorEmail["editEmailOperationalProposal"]>
+  ) {
+    return this.email.editEmailOperationalProposal(...input);
+  }
+
+  previewEmailOperationalProposal(
+    ...input: Parameters<ConnectorEmail["previewEmailOperationalProposal"]>
+  ) {
+    return this.email.previewEmailOperationalProposal(...input);
+  }
+
+  dispatchEmailOperational(
+    ...input: Parameters<ConnectorEmail["dispatchEmailOperational"]>
+  ) {
+    return this.email.dispatchEmailOperational(...input);
+  }
+
+  rejectEmailOperational(
+    ...input: Parameters<ConnectorEmail["rejectEmailOperational"]>
+  ) {
+    return this.email.rejectEmailOperational(...input);
+  }
+
+  revokeEmailOperationalProposals(
+    ...input: Parameters<ConnectorEmail["revokeEmailOperationalProposals"]>
+  ) {
+    return this.email.revokeEmailOperationalProposals(...input);
+  }
+
+  previewEmailProposal(
+    ...input: Parameters<ConnectorEmail["previewEmailProposal"]>
+  ) {
+    return this.email.previewEmailProposal(...input);
+  }
+
+  authorizeEmailProposalDelivery(
+    ...input: Parameters<ConnectorEmail["authorizeEmailProposalDelivery"]>
+  ) {
+    return this.email.authorizeEmailProposalDelivery(...input);
+  }
+
+  dispatchEmailReply(
+    ...input: Parameters<ConnectorEmail["dispatchEmailReply"]>
+  ) {
+    return this.email.dispatchEmailReply(...input);
+  }
+
+  readEmailReplyProvenance(
+    ...input: Parameters<ConnectorEmail["readEmailReplyProvenance"]>
+  ) {
+    return this.email.readEmailReplyProvenance(...input);
+  }
+
+  recordEmailReplyEditProvenance(
+    ...input: Parameters<ConnectorEmail["recordEmailReplyEditProvenance"]>
+  ) {
+    return this.email.recordEmailReplyEditProvenance(...input);
+  }
+
+  editReviewedEmailReply(
+    ...input: Parameters<ConnectorEmail["editReviewedEmailReply"]>
+  ) {
+    return this.email.editReviewedEmailReply(...input);
+  }
+
+  readEmailReplyCorrection(
+    ...input: Parameters<ConnectorEmail["readEmailReplyCorrection"]>
+  ) {
+    return this.email.readEmailReplyCorrection(...input);
+  }
+
+  previewEmailRelationship(
+    ...input: Parameters<ConnectorEmail["previewEmailRelationship"]>
+  ) {
+    return this.email.previewEmailRelationship(...input);
+  }
+
+  correctEmailRelationship(
+    ...input: Parameters<ConnectorEmail["correctEmailRelationship"]>
+  ) {
+    return this.email.correctEmailRelationship(...input);
+  }
+
+  dispatchReviewedEmailReply(
+    ...input: Parameters<ConnectorEmail["dispatchReviewedEmailReply"]>
+  ) {
+    return this.email.dispatchReviewedEmailReply(...input);
+  }
+
+  resolveEmailProposal(
+    ...input: Parameters<ConnectorEmail["resolveEmailProposal"]>
+  ) {
+    return this.email.resolveEmailProposal(...input);
+  }
+
+  disposeEmailProposal(
+    ...input: Parameters<ConnectorEmail["disposeEmailProposal"]>
+  ) {
+    return this.email.disposeEmailProposal(...input);
+  }
+
+  revokeEmailMailbox(
+    ...input: Parameters<ConnectorEmail["revokeEmailMailbox"]>
+  ) {
+    return this.email.revokeEmailMailbox(...input);
+  }
+
+  acceptWhatsAppEvent(
+    ...input: Parameters<ConnectorWhatsApp["acceptWhatsAppEvent"]>
+  ) {
+    return this.whatsApp.acceptWhatsAppEvent(...input);
+  }
+
+  activateWhatsAppProcessing(
+    ...input: Parameters<ConnectorWhatsApp["activateWhatsAppProcessing"]>
+  ) {
+    return this.whatsApp.activateWhatsAppProcessing(...input);
+  }
+
+  disableWhatsAppProcessing(
+    ...input: Parameters<ConnectorWhatsApp["disableWhatsAppProcessing"]>
+  ) {
+    return this.whatsApp.disableWhatsAppProcessing(...input);
+  }
+
+  resumeWhatsAppProcessing(
+    ...input: Parameters<ConnectorWhatsApp["resumeWhatsAppProcessing"]>
+  ) {
+    return this.whatsApp.resumeWhatsAppProcessing(...input);
+  }
+
+  inspectWhatsAppRuntime(
+    ...input: Parameters<ConnectorWhatsApp["inspectWhatsAppRuntime"]>
+  ) {
+    return this.whatsApp.inspectWhatsAppRuntime(...input);
+  }
+
+  readWhatsAppConversationHeads(
+    ...input: Parameters<ConnectorWhatsApp["readWhatsAppConversationHeads"]>
+  ) {
+    return this.whatsApp.readWhatsAppConversationHeads(...input);
+  }
+
+  readWhatsAppCasePanel(
+    ...input: Parameters<ConnectorWhatsApp["readWhatsAppCasePanel"]>
+  ) {
+    return this.whatsApp.readWhatsAppCasePanel(...input);
+  }
+
+  previewWhatsAppProposal(
+    ...input: Parameters<ConnectorWhatsApp["previewWhatsAppProposal"]>
+  ) {
+    return this.whatsApp.previewWhatsAppProposal(...input);
+  }
+
+  editWhatsAppProposal(
+    ...input: Parameters<ConnectorWhatsApp["editWhatsAppProposal"]>
+  ) {
+    return this.whatsApp.editWhatsAppProposal(...input);
+  }
+
+  dispatchWhatsAppReply(
+    ...input: Parameters<ConnectorWhatsApp["dispatchWhatsAppReply"]>
+  ) {
+    return this.whatsApp.dispatchWhatsAppReply(...input);
+  }
+
+  disposeWhatsAppProposal(
+    ...input: Parameters<ConnectorWhatsApp["disposeWhatsAppProposal"]>
+  ) {
+    return this.whatsApp.disposeWhatsAppProposal(...input);
+  }
+
+  resolveWhatsAppIndeterminateSend(
+    ...input: Parameters<ConnectorWhatsApp["resolveWhatsAppIndeterminateSend"]>
+  ) {
+    return this.whatsApp.resolveWhatsAppIndeterminateSend(...input);
+  }
+
+  takeOverWhatsAppCase(
+    ...input: Parameters<ConnectorWhatsApp["takeOverWhatsAppCase"]>
+  ) {
+    return this.whatsApp.takeOverWhatsAppCase(...input);
+  }
+
+  returnWhatsAppCaseToAgent(
+    ...input: Parameters<ConnectorWhatsApp["returnWhatsAppCaseToAgent"]>
+  ) {
+    return this.whatsApp.returnWhatsAppCaseToAgent(...input);
+  }
+
+  composeWhatsAppHumanReply(
+    ...input: Parameters<ConnectorWhatsApp["composeWhatsAppHumanReply"]>
+  ) {
+    return this.whatsApp.composeWhatsAppHumanReply(...input);
+  }
+
+  closeWhatsAppCase(
+    ...input: Parameters<ConnectorWhatsApp["closeWhatsAppCase"]>
+  ) {
+    return this.whatsApp.closeWhatsAppCase(...input);
+  }
+
+  startEvalRun(...input: Parameters<ConnectorEvals["startEvalRun"]>) {
+    return this.evals.startEvalRun(...input);
+  }
+
+  readEvalRunCommand(
+    ...input: Parameters<ConnectorEvals["readEvalRunCommand"]>
+  ) {
+    return this.evals.readEvalRunCommand(...input);
+  }
+
+  cancelEvalRun(...input: Parameters<ConnectorEvals["cancelEvalRun"]>) {
+    return this.evals.cancelEvalRun(...input);
+  }
+
+  readEvalRunProgress(
+    ...input: Parameters<ConnectorEvals["readEvalRunProgress"]>
+  ) {
+    return this.evals.readEvalRunProgress(...input);
+  }
+
   protected readonly channels: ConnectorChannels = {
-    adapters: [this.slack, this.emailChannel(), this.whatsAppChannel()],
+    adapters: [
+      this.slack,
+      this.email.emailChannel(),
+      this.whatsApp.whatsAppChannel(),
+    ],
     caseWork: this.slack,
     delivery: this.slack,
   };
 
   /** State counts of this Actor's machines, for the census (Refactor 15, S5). */
   machineCensus(): Promise<readonly MachineCensus[]> {
-    return actorMachineCensus(this.ctx.storage);
+    return actorMachineCensus(this.ctx.storage, ACTOR_MACHINES);
   }
 
   constructor(ctx: DurableObjectState, env: Env) {

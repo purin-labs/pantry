@@ -48,6 +48,8 @@ import {
   createDurableHostTools,
 } from "../../services/platform/src/actors/pi-durable-tools.ts";
 import { hasUnfinishedCodeModeCall } from "../../services/platform/src/actors/pi-durable-recovery.ts";
+import { piToolRules } from "../../services/platform/src/actors/pi-tool-replay.ts";
+import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import { buildCanonicalTextTurnStart } from "../../services/platform/src/actors/agent-session-turn-start.ts";
 import {
@@ -326,7 +328,10 @@ export class CandidateActor extends ProviderActor {
       },
       this.preflight.bind(this, lease),
       lease.turn.turnId,
-      this.toolReplay.bind(this),
+      (name) => ({
+        ...piToolRules(TOOL_REGISTRY, name),
+        replay: this.toolReplay(name),
+      }),
     );
     this.trustedExtension = defineExtension({
       name: this.extensionName(),

@@ -1590,6 +1590,21 @@ async function nextReadinessVersion(
   return typeof row?.version === "number" ? row.version + 1 : 1;
 }
 
+/**
+ * Ends the readiness assessment of an Organisation. A change of its
+ * configuration, such as a membership change, invalidates it.
+ */
+export function prepareReadinessAssessmentDeletion(
+  db: OrganisationQuerySource,
+  organisationId: OrganisationId,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
+    )
+    .bind(organisationId);
+}
+
 function readinessAssessmentInsert(
   db: OrganisationQuerySource,
   assessment: {

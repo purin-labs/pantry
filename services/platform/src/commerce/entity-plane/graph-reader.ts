@@ -13,7 +13,6 @@ import type {
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
 import type { Result } from "../../result";
-import type { CommerceSystem } from "../../data/organisation-commerce-system";
 import type { CommerceWasmError } from "../commerce-wasm";
 import { commerceBlotterSystemAttributeIds } from "../../actors/commerce-query-schema";
 import type { BlotterQueryPlanResult } from "./blotter-source";
@@ -36,7 +35,7 @@ import type {
   CommerceGraphRelationshipStepInput,
   CommerceGraphRelationshipStepResult,
 } from "./commerce-source";
-import type { Variant, VariantBy } from "@purin-labs/type-utils";
+import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
 const SQLITE_TEXT_ENCODER = new TextEncoder();
@@ -75,17 +74,21 @@ export type CommerceGraphReaderError =
       capability: CommerceQueryPlanErrorCapability;
     }>;
 
+/**
+ * A reader of the built-in engine has one source. A reader of a provider-backed
+ * system (Shopify) also has the blotter source of the provider's records; the
+ * `CommerceProvider` of the system says which (`createCommerceGraphReader`).
+ */
 type CommerceGraphReaderOptions =
   | Readonly<{
       organisationId: string;
       merchantId: string;
-      commerceSystem: Variant<CommerceSystem, "satyr_commerce">;
       underclerk: CommerceGraphCommerceSource;
+      blotter?: undefined;
     }>
   | Readonly<{
       organisationId: string;
       merchantId: string;
-      commerceSystem: Variant<CommerceSystem, "shopify">;
       underclerk: CommerceGraphHydratingSource;
       blotter: CommerceGraphBlotterSource;
     }>;
@@ -151,16 +154,14 @@ export type CommerceGraphReadInput = Readonly<{
 export class CommerceGraphReader {
   readonly #organisationId: string;
   readonly #merchantId: string;
-  readonly #commerceSystem: CommerceSystem;
   readonly #underclerk: CommerceGraphCommerceSource;
   readonly #blotter: CommerceGraphBlotterSource | null;
 
   constructor(options: CommerceGraphReaderOptions) {
     this.#organisationId = options.organisationId;
     this.#merchantId = options.merchantId;
-    this.#commerceSystem = options.commerceSystem;
     this.#underclerk = options.underclerk;
-    this.#blotter = isShopifyReaderOptions(options) ? options.blotter : null;
+    this.#blotter = options.blotter ?? null;
   }
 
   async query(
@@ -261,14 +262,11 @@ export class CommerceGraphReader {
     const revision = metadata.value.merchantRevision;
     let watermark: CommerceReadWatermark;
     let sources: readonly CommerceGraphSource[];
-    if (this.#commerceSystem.kind === "satyr_commerce") {
+    if (this.#blotter === null) {
       watermark = metadata.value.watermark;
       sources = [this.#underclerk];
     } else {
-      if (
-        this.#blotter === null ||
-        this.#blotter.readSnapshotRevision === undefined
-      ) {
+      if (this.#blotter.readSnapshotRevision === undefined) {
         return { ok: false, error: { code: "blotter_source_missing" } };
       }
       const blotterRevision = await this.#blotter.readSnapshotRevision();
@@ -449,10 +447,7 @@ export class CommerceGraphReader {
             missingSystemReferences.set(key, reference);
         }
       }
-      if (
-        missingSystemReferences.size > 0 &&
-        this.#commerceSystem.kind === "shopify"
-      ) {
+      if (missingSystemReferences.size > 0 && this.#blotter !== null) {
         const blotter = this.#blotter;
         if (blotter?.hydrateSystemEntities === undefined) {
           return {
@@ -600,8 +595,7 @@ export class CommerceGraphReader {
   async #hydrateUnderclerkOwnedSystemReferences(
     result: CommerceGraphQueryResult,
   ): Promise<Result<CommerceGraphQueryResult, CommerceGraphReaderError>> {
-    if (this.#commerceSystem.kind !== "shopify")
-      return { ok: true, value: result };
+    if (this.#blotter === null) return { ok: true, value: result };
     const references = [
       ...result.entities.map((entity) => entity.reference),
       ...result.listEntries.map((entry) => entry.entityRef),
@@ -694,7 +688,7 @@ export class CommerceGraphReader {
     Result<CommerceGraphQueryResult | null, CommerceGraphReaderError>
   > {
     if (
-      this.#commerceSystem.kind !== "satyr_commerce" &&
+      this.#blotter !== null &&
       usesBlotterPageOwner(query, metadata.capabilities)
     ) {
       return { ok: true, value: null };
@@ -769,13 +763,10 @@ export class CommerceGraphReader {
     metadata: CommerceGraphCapabilityMetadata,
   ): Promise<Result<ShopifyPlannedRead | null, CommerceGraphReaderError>> {
     if (
-      this.#commerceSystem.kind !== "shopify" ||
+      this.#blotter === null ||
       !usesBlotterPageOwner(query, metadata.capabilities)
     ) {
       return { ok: true, value: null };
-    }
-    if (this.#blotter === null) {
-      return { ok: false, error: { code: "blotter_source_missing" } };
     }
     const revisions = await Promise.all([this.#blotter.readSnapshotRevision()]);
     const blotterRevision = revisions[0];
@@ -905,16 +896,6 @@ export class CommerceGraphReader {
       },
     };
   }
-}
-
-function isShopifyReaderOptions(
-  options: CommerceGraphReaderOptions,
-): options is VariantBy<
-  CommerceGraphReaderOptions,
-  "commerceSystem",
-  Variant<CommerceSystem, "shopify">
-> {
-  return options.commerceSystem.kind === "shopify";
 }
 
 function pageOwnerFromWatermark(

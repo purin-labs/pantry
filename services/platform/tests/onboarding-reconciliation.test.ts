@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import {
   singleDatabase,
   type GlobalDatabase,
@@ -20,6 +22,7 @@ import {
   reconcileOrganisationOnboarding,
   reconcileAdmittedOrganisationArchiveCleanup,
 } from "../src/data/onboarding-reconciliation";
+import { ARCHIVE_CLEANUP_PARTS } from "../src/archive-cleanup-parts";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { OrganisationDO } from "../src/actors/organisation";
 import type {
@@ -64,6 +67,7 @@ import {
   createSplitTopology,
   onboardSplitOrganisation,
 } from "./split-topology";
+import "./provide-organisation-lifecycle-parts";
 
 const NOW = 1_784_390_000_000;
 
@@ -1489,6 +1493,7 @@ class ArchiveOrganisationFixture {
     const value = await reconcileAdmittedOrganisationArchiveCleanup({
       // No voice zone in this fixture.
       env: {} as never,
+      parts: ARCHIVE_CLEANUP_PARTS,
       db: this.input.db,
       directory: this.directory,
       archive: this.input.archive,

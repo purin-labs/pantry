@@ -9,7 +9,7 @@ import type {
   ProviderCleanupAdapter,
   ProviderCleanupResult,
   ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 
 const AIRTABLE_SCOPES = [
   "data.records:read",

@@ -1,10 +1,10 @@
 import type { OrganisationDatabase } from "../database-handles";
+import { prepareSlackInstallationLifecycleEvent } from "../data/slack-installation-records";
 import { runtimeFetch } from "../runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Track } from "@purin-labs/contracts";
 import type {
   CanonicalCommerceDelivery,
-  CommerceResourceType,
   CommerceSource,
 } from "@purin-labs/commerce-contracts";
 import {
@@ -17,15 +17,6 @@ import {
   type PinnedAgentProfile,
 } from "../data/pinned-agent-profile";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
-import {
-  createActiveConnectedIntegration,
-  type ActiveProviderAccountContext,
-  type ConnectedIntegrationSeed,
-} from "../data/integration-account";
-import {
-  resolveOrganisationProvisioningActor,
-  type OrganisationEnvironment,
-} from "../data/control-plane";
 import type {
   ActorIdentity,
   ActorRegistryEntry,
@@ -45,15 +36,14 @@ import {
   createCommerceDeliveryQueueMessage,
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "../commerce/queue-messages";
+} from "../commerce/contract/queue-messages";
 import type { EmailChangeQueueMessage } from "../mail/queue-messages";
 import type { IngressQueueMessageError } from "../queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
-import { gmailConnectorIdValue } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import {
   parseConnectorId,
   type RequestId,
-  type OrganisationId,
 } from "../ids";
 import {
   traceLog,
@@ -70,16 +60,16 @@ import { resolveConfiguredSlackInstallationIdentity } from "../slack/installatio
 import {
   disconnectSlackInstallation,
   resolveSlackInstallation,
-} from "../slack/organisation-routing";
+} from "../slack/installation-store";
 import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../commerce/commerce-wasm";
+} from "../shopify/delivery-normalizers";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
-  type CommerceProjectionKind,
 } from "../actors/commerce-projection";
+import { commerceObservationIdentity } from "../commerce/contract/observation-identity";
 import {
   failCommerceLabRun,
   listCommerceLabRuns,
@@ -198,19 +188,13 @@ export async function handleSlackInstallationRevoked(
       );
     }
   }
-  await env.DB.prepare(
-    `INSERT OR IGNORE INTO slack_installation_lifecycle_event (
-         event_id, installation_id, reason, occurred_at, recorded_at
-       ) VALUES (?, ?, ?, ?, ?)`,
-  )
-    .bind(
-      event.eventId,
-      installation.installationId,
-      event.reason,
-      event.occurredAt,
-      receivedAt,
-    )
-    .run();
+  await prepareSlackInstallationLifecycleEvent(env.DB, {
+    eventId: event.eventId,
+    installationId: installation.installationId,
+    reason: event.reason,
+    occurredAt: event.occurredAt,
+    recordedAt: receivedAt,
+  }).run();
   traceLog("integration_gateway.slack.installation_revoked", {
     requestId,
     workspace_id: event.workspaceId,
@@ -708,85 +692,6 @@ function commerceObservationProviderIdentity(
   };
 }
 
-export function commerceObservationIdentity(
-  observation: CanonicalCommerceDelivery["observations"][number],
-): {
-  readonly kind: CommerceProjectionKind;
-  readonly canonicalId: string;
-  readonly revision: number;
-} {
-  if (observation.kind === "delete") {
-    return {
-      kind: commerceProjectionKindForResourceType(
-        observation.provenance.resourceType,
-      ),
-      canonicalId: observation.provenance.resourceId,
-      revision: observation.provenance.revision,
-    };
-  }
-  const projection = observation.projection;
-  switch (projection.kind) {
-    case "product":
-    case "sellable_variant":
-    case "inventory_item":
-    case "location":
-    case "sales_channel":
-    case "offer":
-    case "inventory_position":
-    case "inventory_movement":
-    case "inventory_lot":
-    case "commerce_order":
-    case "payment":
-    case "fulfillment":
-    case "shipment":
-    case "menu":
-    case "modifier_group_revision":
-    case "recipe_revision":
-    case "preparation_station":
-    case "preparation_ticket":
-    case "production_batch":
-    case "stock_policy":
-      return {
-        kind: projection.kind,
-        canonicalId: projection.projection.provenance.resourceId,
-        revision: projection.projection.provenance.revision,
-      };
-    default:
-      return assertNever(projection);
-  }
-}
-
-function commerceProjectionKindForResourceType(
-  resourceType: CommerceResourceType,
-): CommerceProjectionKind {
-  switch (resourceType) {
-    case "inventory_consumption_plan":
-    case "inventory_consumption_requirement":
-      throw new Error("commerce_delivery_resource_unsupported");
-    case "product":
-    case "sellable_variant":
-    case "inventory_item":
-    case "location":
-    case "sales_channel":
-    case "offer":
-    case "inventory_position":
-    case "inventory_movement":
-    case "inventory_lot":
-    case "commerce_order":
-    case "payment":
-    case "fulfillment":
-    case "shipment":
-    case "menu":
-    case "modifier_group_revision":
-    case "recipe_revision":
-    case "preparation_station":
-    case "preparation_ticket":
-    case "production_batch":
-    case "stock_policy":
-      return resourceType;
-  }
-}
-
 export function queueErrorField(error: IngressQueueMessageError): string {
   if (error.code === "missing_field" || error.code === "invalid_field") {
     return error.field;
@@ -849,66 +754,6 @@ export function actorResolutionErrorResponse(error: ActorResolutionError): Respo
     default:
       return assertNever(error);
   }
-}
-
-type AdminConnectedIntegrationSeed = Omit<
-  ConnectedIntegrationSeed,
-  | "organisationId"
-  | "createdByUserId"
-  | "now"
-  | "environment"
-  | "providerSubjectId"
->;
-
-export async function createActiveAdminIntegration(input: {
-  readonly scope: OrganisationExecutionScope;
-  readonly seed: AdminConnectedIntegrationSeed;
-  readonly now: number;
-}): Promise<ActiveProviderAccountContext | null> {
-  const provisioningPrincipalId = await resolveOrganisationProvisioningActor({
-    db: input.scope.database,
-    organisationId: input.scope.organisationId,
-  });
-
-  if (provisioningPrincipalId === null) {
-    return null;
-  }
-  const environment = await readOrganisationEnvironment(
-    input.scope.database,
-    input.scope.organisationId,
-  );
-
-  const connected = await createActiveConnectedIntegration(
-    input.scope.database,
-    {
-      organisationId: input.scope.organisationId,
-      createdByUserId: provisioningPrincipalId,
-      providerSubjectId: input.seed.providerAccountId,
-      environment,
-      now: input.now,
-      ...input.seed,
-    },
-  );
-  return {
-    account: connected.account,
-    connection: connected.connection,
-  };
-}
-
-export async function readOrganisationEnvironment(
-  db: OrganisationDatabase,
-  organisationId: OrganisationId,
-): Promise<OrganisationEnvironment> {
-  const row = await db
-    .prepare(
-      `SELECT environment FROM organisation_onboarding WHERE organisation_id = ?`,
-    )
-    .bind(organisationId)
-    .first<{ readonly environment: unknown }>();
-  if (row?.environment !== "development" && row?.environment !== "production") {
-    throw new Error("organisation onboarding environment is invalid");
-  }
-  return row.environment;
 }
 
 export async function handleEmailChangeQueueMessage(

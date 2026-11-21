@@ -8,8 +8,9 @@ import type { MerchantActionRejectionEvidence } from "../approval-authentication
 import { parseCommerceActionPath, parseCommerceEntityPlaneActionPath, parseCommerceProviderReceipt, type CommerceActionError, type CommerceEntityPlaneActionPath, type CommerceActionPath, type CommerceActionRequest } from "./action-model";
 import { executeCommerceEntityPlaneAction, type CommerceEntityPlaneExecutionOutcome } from "./entity-plane/execution";
 import { admitCommerceCapability } from "../data/commerce-capability-activation";
-import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution, type CommerceProviderExecutionError } from "./provider-execution";
-import { createCommerceOutboxReconcileQueueMessage } from "./queue-messages";
+import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution } from "./provider-execution";
+import type { CommerceProviderExecutionError } from "./contract/commerce-provider";
+import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
 import { newRequestId } from "../ids";
 import { parseStoredRequestAuthority } from "../request-authority";
 import { deliverCommerceCaseOutput } from "./case-commerce-delivery";

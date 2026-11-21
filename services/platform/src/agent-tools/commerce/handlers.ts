@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/app-access";
+import { pantryCommerceAccess } from "../../commerce/contract/client";
 import { isSystemCommerceEntity } from "@purin-labs/commerce-contracts";
 import type {
   PaymentsReadRequest,
@@ -22,7 +22,7 @@ import type { CommerceObservationEntity } from "../../actors/agent-session-infor
 import { runMerchantReport } from "../../commerce/entity-plane/merchant-report-runner";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
-import { createCommerceClient } from "../../commerce/outbox-worker";
+import { createCommerceClient } from "../../commerce/contract/client";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
@@ -36,7 +36,7 @@ import {
   type SoldOutMarkRequest,
   type SoldOutMarkResult,
   type SoldOutToolRead,
-} from "../../commerce/order-queue-commands";
+} from "../../cafe/contract/order-queue-commands";
 import {
   presentPayments,
   type PaymentsToolRead,
@@ -55,7 +55,7 @@ import {
   readNeedsPrivateChat,
   type RequestableEntityTypeRead,
 } from "../../authorization/requestable-capabilities";
-import { commerceCanonicalResourceId } from "../../commerce/provider";
+import { commerceCanonicalResourceId } from "../../commerce/contract/resource-ids";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -65,29 +65,28 @@ import { listAccessGrants } from "../../data/access-grants";
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { CommerceEngineSource } from "../../commerce/entity-plane/commerce-source";
-import {
-  BlotterSource,
-  type BlotterOrganisationReader,
-} from "../../commerce/entity-plane/blotter-source";
-import { CommerceGraphReader } from "../../commerce/entity-plane/graph-reader";
+import type { BlotterOrganisationReader } from "../../commerce/entity-plane/blotter-source";
+import { createCommerceGraphReader } from "../../commerce/entity-plane/selected-graph-reader";
 import {
   CommerceReadRequestError,
   type CommerceContextAssemblyError,
-} from "../../context/assembly/commerce";
+} from "../../commerce/contract/read-errors";
 import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
-} from "../../context/assembly";
+} from "../../commerce/entity-plane/context-read";
 import { assertNever } from "@purin-labs/std";
+import {
+  type ToolEffect,
+} from "../session-support";
+import type { SessionToolContext } from "../context";
 import {
   type PreparedCommerceRead,
   admitCommerceReadObservation,
   prepareStaffPageWork,
   requestableReportRead,
   selectMerchantReportSourceGrant,
-  type ToolEffect,
-} from "../session-support";
-import type { SessionToolContext } from "../context";
+} from "./read-support";
 
 export async function prepareCommerceReadForEmbeddedHarness(
   env: Env,
@@ -206,35 +205,23 @@ export async function prepareCommerceReadForEmbeddedHarness(
     integrationAccountId: String(binding.value.integrationAccountId),
     client,
   });
-  const reader =
-    commerceAuthority.value.commerceSystem.kind === "shopify"
-      ? new CommerceGraphReader({
-          organisationId: String(organisationId),
-          merchantId,
-          commerceSystem: commerceAuthority.value.commerceSystem,
-          underclerk: commerceEngine,
-          blotter: new BlotterSource({
-            organisation: admittedBlotterReader(
-              execution,
-              lease,
-              await requireActiveOrganisationActorAtPlacement({
-                env,
-                organisationId,
-                placement: execution.scope.placement,
-                now: Date.now(),
-              }),
-            ),
-            organisationId,
-            merchantId,
-            integrationAccountId: commerceAuthority.value.integrationAccountId,
-          }),
-        })
-      : new CommerceGraphReader({
-          organisationId: String(organisationId),
-          merchantId,
-          commerceSystem: commerceAuthority.value.commerceSystem,
-          underclerk: commerceEngine,
-        });
+  const reader = await createCommerceGraphReader({
+    commerceSystem: commerceAuthority.value.commerceSystem,
+    organisationId,
+    merchantId,
+    underclerk: commerceEngine,
+    organisation: async () =>
+      admittedBlotterReader(
+        execution,
+        lease,
+        await requireActiveOrganisationActorAtPlacement({
+          env,
+          organisationId,
+          placement: execution.scope.placement,
+          now: Date.now(),
+        }),
+      ),
+  });
   await requireSessionExecution(execution, lease);
   return {
     execution,

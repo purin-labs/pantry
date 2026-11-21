@@ -19,6 +19,7 @@ import {
   slackEnvelope,
   slackSimulator,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -218,7 +219,7 @@ async function replyToModel({
         id: "time_cut_off",
         object: "chat.completion.chunk",
         created: 1_787_500_000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [
           {
             index: 0,
@@ -231,7 +232,7 @@ async function replyToModel({
         id: "time_cut_off",
         object: "chat.completion.chunk",
         created: 1_787_500_000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [{ index: 0, delta: {}, finish_reason: "length" }],
         usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
       },

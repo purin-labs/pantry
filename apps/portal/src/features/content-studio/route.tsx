@@ -23,10 +23,11 @@ import {
   DraftMousePointers,
   DraftParticipants,
   type DraftPresenceView,
-} from "../commerce/description-draft/presence";
+} from "../collaboration/draft-presence";
 import { MenuDraftClient, type MenuDraftView } from "./menu-client";
 import { MenuBoardsPanel } from "../menu-boards/boards-panel";
 import { MenuScreensPanel } from "../menu-boards/screens-panel";
+import "../commerce/description-draft/styles.css";
 import "./styles.css";
 import {
   assertNever,

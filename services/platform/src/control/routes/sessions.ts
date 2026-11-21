@@ -1,8 +1,12 @@
+import type { UserId } from "@purin-labs/control-api";
+import type { GlobalQuerySource } from "../../data/query-source";
 import { runtimeFetch } from "../../runtime-fetch";
 import type { ApprovalActionBinding } from "../../approval-authentication";
-import { digestApprovalAction } from "../../approval-authentication";
+import {
+  digestApprovalAction,
+  isCommerceActionNonce,
+} from "../../approval-authentication";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import { isCommerceActionNonce } from "../../commerce/action-model";
 import {
   beginGoogleOidc,
   completeGoogleOidc,
@@ -19,7 +23,6 @@ import {
   upsertUser,
   validateControlCsrf,
 } from "../../data/control-plane";
-import { resolveControlSupportRole } from "../../data/onboarding-support";
 import type { Env } from "../../env";
 import { requirePublicOrigin } from "../../public-origin";
 import {
@@ -79,11 +82,22 @@ export function matchSessionControlRoute(
   }
 }
 
+/**
+ * What the Worker gives to the session routes: the support role of a
+ * person, which the Organisation area keeps.
+ */
+export type SessionControlParts = Readonly<{
+  resolveSupportRole(
+    input: Readonly<{ db: GlobalQuerySource; userId: UserId }>,
+  ): Promise<Readonly<{ kind: "support_agent" | "support_admin" }> | null>;
+}>;
+
 export function handleSessionControlRoute(
   request: Request,
   env: Env,
   route: SessionControlRoute,
   url: URL,
+  parts: SessionControlParts,
 ): Promise<Response> {
   switch (route.kind) {
     case "googleStart":
@@ -91,7 +105,7 @@ export function handleSessionControlRoute(
     case "googleCallback":
       return handleGoogleCallback(request, env, url);
     case "session":
-      return handleSession(request, env);
+      return handleSession(request, env, parts);
     case "rotateSession":
       return handleRotateSession(request, env);
     case "logout":
@@ -397,7 +411,11 @@ async function linkAuthenticatedAccountInstances(
   };
 }
 
-async function handleSession(request: Request, env: Env): Promise<Response> {
+async function handleSession(
+  request: Request,
+  env: Env,
+  parts: SessionControlParts,
+): Promise<Response> {
   if (request.method !== "GET") {
     return controlError("method_not_allowed", 405);
   }
@@ -413,7 +431,7 @@ async function handleSession(request: Request, env: Env): Promise<Response> {
       env,
       session: authenticated.value.session,
     }),
-    resolveControlSupportRole({ db: env.DB, userId }),
+    parts.resolveSupportRole({ db: env.DB, userId }),
     renewSessionOnRead(request, env, authenticated.value.session),
   ]);
   if (identity === null) {

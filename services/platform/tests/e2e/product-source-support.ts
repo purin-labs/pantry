@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationId } from "../../src/ids";
-import { commerceCanonicalResourceId } from "../../src/commerce/provider";
+import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import { connectCommerceFixture } from "./commerce-support";
 
 /**

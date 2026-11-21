@@ -189,3 +189,97 @@ export function placementBindings(execution: OrganisationExecutionScope) {
     execution.fenceToken,
   ];
 }
+
+/**
+ * Adds an open proposal from a Slack thread, while the source Case has fewer
+ * than `openLimit` open proposals and the placement is active. A proposal
+ * that exists stays.
+ */
+export function prepareSlackSideCaseProposal(
+  execution: OrganisationExecutionScope,
+  input: Readonly<{
+    proposalId: string;
+    sourceCaseId: string;
+    sourceSessionId: string;
+    sourceTurnId: string;
+    connectorId: string;
+    workspaceId: string;
+    channelId: string;
+    sourceThreadTs: string;
+    requestedByPersonId: string;
+    title: string;
+    brief: string;
+    contentDigest: string;
+    flowBindingJson: string;
+    now: number;
+    expiresAt: number;
+    openLimit: number;
+  }>,
+): D1PreparedStatement {
+  return execution.database
+    .prepare(
+      `INSERT OR IGNORE INTO side_case_proposal (organisation_id, proposal_id, source_kind,
+        source_case_id, source_session_id, source_turn_id, source_connector_id,
+        source_workspace_id, source_channel_id, source_thread_ts, requested_by_person_id,
+        title, brief, content_digest, flow_binding_json, status, created_at, expires_at)
+      SELECT ?, ?, 'slack_thread', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?
+      WHERE (SELECT COUNT(*) FROM side_case_proposal WHERE organisation_id = ?
+          AND source_case_id = ? AND status = 'open' AND expires_at > ?) < ?
+        AND ${ACTIVE_PLACEMENT}`,
+    )
+    .bind(
+      execution.organisationId,
+      input.proposalId,
+      input.sourceCaseId,
+      input.sourceSessionId,
+      input.sourceTurnId,
+      input.connectorId,
+      input.workspaceId,
+      input.channelId,
+      input.sourceThreadTs,
+      input.requestedByPersonId,
+      input.title,
+      input.brief,
+      input.contentDigest,
+      input.flowBindingJson,
+      input.now,
+      input.expiresAt,
+      execution.organisationId,
+      input.sourceCaseId,
+      input.now,
+      input.openLimit,
+      ...placementBindings(execution),
+    );
+}
+
+/**
+ * Records the new Slack thread of a proposal that a person started, while
+ * the placement is active. A recorded destination stays.
+ */
+export function prepareSlackSideCaseDestination(
+  execution: OrganisationExecutionScope,
+  input: Readonly<{
+    threadTs: string;
+    caseId: string;
+    proposalId: string;
+    decidedByUserId: string | null;
+    decidedAt: number | null;
+  }>,
+): D1PreparedStatement {
+  return execution.database
+    .prepare(
+      `UPDATE side_case_proposal SET destination_thread_ts = ?, destination_case_id = ?
+      WHERE organisation_id = ? AND proposal_id = ? AND source_kind = 'slack_thread'
+        AND status = 'starting' AND decided_by_user_id = ? AND decided_at = ?
+        AND destination_case_id IS NULL AND ${ACTIVE_PLACEMENT}`,
+    )
+    .bind(
+      input.threadTs,
+      input.caseId,
+      execution.organisationId,
+      input.proposalId,
+      input.decidedByUserId,
+      input.decidedAt,
+      ...placementBindings(execution),
+    );
+}

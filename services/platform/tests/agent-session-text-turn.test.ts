@@ -12,6 +12,7 @@ import {
 } from "../src/actors/agent-session-text-turn";
 import { TEST_HARNESS_LEASE_AUTHORITY } from "./fixtures/plan25-turn";
 import type { Variant } from "@purin-labs/type-utils";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
 
 const DIGEST = "d".repeat(64);
 const MODEL_ROUTE_DIGEST =
@@ -93,7 +94,7 @@ function processingState(): Variant<AgentSessionLifecycle, "processing"> {
         modelRoute: {
           keySource: "platform",
           provider: "openai-compatible",
-          model: "moonshotai/kimi-k3",
+          model: PLATFORM_DEFAULT_PI_MODEL,
         },
         lastEventSequence: 2,
       },

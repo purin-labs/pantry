@@ -826,6 +826,8 @@ export function inferenceIntegrationStatus(
       return { kind: "connected", label: "OpenAI key" };
     case "organisation_anthropic_api_key":
       return { kind: "connected", label: "Anthropic key" };
+    case "organisation_google_api_key":
+      return { kind: "connected", label: "Gemini key" };
     default:
       return assertNever(selection, "Unexpected settings state");
   }

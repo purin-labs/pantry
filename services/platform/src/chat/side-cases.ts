@@ -630,5 +630,3 @@ function nullable<T>(
   if (value === null) return null;
   return guard(value) ? value : undefined;
 }
-
-export { ACTIVE_PLACEMENT, placementBindings };

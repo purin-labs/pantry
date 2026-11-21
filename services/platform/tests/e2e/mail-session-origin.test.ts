@@ -32,8 +32,8 @@ import {
   registerEmailMailboxAccount,
   assignAgentMailbox,
   publishMailboxIngressPolicy,
-  gmailConnectorId,
 } from "../../src/data/email-mailbox";
+import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import {
   registerEmailSenderAccount,
   registerOperationalEmailContact,

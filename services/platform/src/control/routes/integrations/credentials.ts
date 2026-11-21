@@ -13,8 +13,8 @@ import {
   markCredentialRotationFailed,
   markCredentialRotationVerified,
   recordCredentialRevocationMutation,
-} from "../../../data/credential-lifecycle";
-import { activateProviderCredentialCutover } from "../../../provider-lifecycle/credential-cutover";
+} from "../../../integrations/contract/credential-lifecycle";
+import { activateProviderCredentialCutover } from "../../../integrations/contract/credential-cutover";
 import {
   admitUserMutation,
   controlMutationIdentity,
@@ -24,7 +24,7 @@ import {
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { activateRevocationPolicy } from "../../credential-revocation-policy";
-import { tearDownAgentMailboxForRemoval } from "../../../mail-inbox/agent-mailbox-teardown";
+import { connectionParts } from "../../../integrations/contract/connection-parts";
 import {
   credentialRotationSlug,
   validateReplacementCredential,
@@ -105,12 +105,14 @@ export async function handleRevokeAccountCredential(
   });
   if (admitted instanceof Response) return admitted;
   const now = Date.now();
-  const teardown = await tearDownAgentMailboxForRemoval(
-    env,
-    authorized.executionScope,
-    integrationAccountId,
-    "erase",
-  );
+  const teardown = await connectionParts
+    .use()
+    .mailbox.tearDownAgentMailboxForRemoval(
+      env,
+      authorized.executionScope,
+      integrationAccountId,
+      "erase",
+    );
   if (teardown.kind === "connector_unavailable") {
     return controlError("email_teardown_unavailable", 503);
   }

@@ -1,5 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { describe, expect, it, vi } from "vitest";
 import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
 import type { CommerceMutationReceiptV1 } from "@purin-labs/commerce-contracts";

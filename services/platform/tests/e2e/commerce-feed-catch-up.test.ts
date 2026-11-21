@@ -9,7 +9,7 @@ import {
   parseOrganisationId,
   parseRequestId,
 } from "../../src/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
 import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
 import {
   commerceClient,

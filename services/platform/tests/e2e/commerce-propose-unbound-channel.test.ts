@@ -2,7 +2,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { commerceCanonicalResourceId } from "../../src/commerce/provider";
+import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import { commerceHeaders } from "./commerce-support";
 import { propose } from "./commerce-propose-support";
 import {

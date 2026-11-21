@@ -24,14 +24,14 @@ import { isNonNegativeInteger, isString } from "@purin-labs/std";
 import { decideStoredFlowConversationSink } from "../actors/case-conversation-sink";
 import {
   continuesOwnClaim,
+  prepareSlackSideCaseDestination,
+  prepareSlackSideCaseProposal,
   sideCasePhase,
   writeSideCaseTransition,
 } from "../chat/side-case-transition";
 import {
-  ACTIVE_PLACEMENT,
   admitSideCaseObservation,
   isValidSideCaseContent,
-  placementBindings,
   SIDE_CASE_LIFETIME_MS,
   SIDE_CASE_OPEN_LIMIT,
   sideCaseContentDigest,
@@ -41,12 +41,13 @@ import { parsePersonId, type PersonId } from "../data/person-authz";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { FlowBinding } from "../policy/information-flow";
 import { parseSlackUserId, type SlackUserId } from "./events";
+import type { SessionSideCase } from "../actors/session/conversation-port";
 
 /** The `action_id` of the Start button of a proposal message. */
 export const SLACK_SIDE_CASE_START_ACTION = "satyr_side_case_start";
 
 /** Added to the harness instructions of each turn of a Slack side Case. */
-export const SLACK_SIDE_CASE_HARNESS_INSTRUCTION =
+const SLACK_SIDE_CASE_HARNESS_INSTRUCTION =
   "This thread started from a side Case proposal in another Slack thread. The first message is that proposal's brief. Do the work that the brief describes. Approvals and effects in the other thread do not authorize actions here.";
 
 export type SlackSideCaseStatus = "open" | "starting" | "started";
@@ -111,41 +112,24 @@ export async function storeSlackSideCaseProposal(
     title: input.title,
     brief: input.brief,
   });
-  await execution.database
-    .prepare(
-      `INSERT OR IGNORE INTO side_case_proposal (organisation_id, proposal_id, source_kind,
-        source_case_id, source_session_id, source_turn_id, source_connector_id,
-        source_workspace_id, source_channel_id, source_thread_ts, requested_by_person_id,
-        title, brief, content_digest, flow_binding_json, status, created_at, expires_at)
-      SELECT ?, ?, 'slack_thread', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?
-      WHERE (SELECT COUNT(*) FROM side_case_proposal WHERE organisation_id = ?
-          AND source_case_id = ? AND status = 'open' AND expires_at > ?) < ?
-        AND ${ACTIVE_PLACEMENT}`,
-    )
-    .bind(
-      execution.organisationId,
-      proposalId,
-      input.sourceCaseId,
-      input.sourceSessionId,
-      input.sourceTurnId,
-      input.connectorId,
-      input.workspaceId,
-      input.channelId,
-      input.sourceThreadTs,
-      input.requestedByPersonId,
-      input.title,
-      input.brief,
-      await sideCaseContentDigest(input),
-      JSON.stringify(input.flowBinding.toJSON()),
-      input.now,
-      input.now + SIDE_CASE_LIFETIME_MS,
-      execution.organisationId,
-      input.sourceCaseId,
-      input.now,
-      SIDE_CASE_OPEN_LIMIT,
-      ...placementBindings(execution),
-    )
-    .run();
+  await prepareSlackSideCaseProposal(execution, {
+    proposalId,
+    sourceCaseId: input.sourceCaseId,
+    sourceSessionId: input.sourceSessionId,
+    sourceTurnId: input.sourceTurnId,
+    connectorId: input.connectorId,
+    workspaceId: input.workspaceId,
+    channelId: input.channelId,
+    sourceThreadTs: input.sourceThreadTs,
+    requestedByPersonId: input.requestedByPersonId,
+    title: input.title,
+    brief: input.brief,
+    contentDigest: await sideCaseContentDigest(input),
+    flowBindingJson: JSON.stringify(input.flowBinding.toJSON()),
+    now: input.now,
+    expiresAt: input.now + SIDE_CASE_LIFETIME_MS,
+    openLimit: SIDE_CASE_OPEN_LIMIT,
+  }).run();
   if (!(await execution.isActive()))
     throw new Error("side_case_placement_conflict");
   const stored = await readSlackSideCaseProposal(
@@ -243,23 +227,13 @@ export async function recordSlackSideCaseDestination(
   proposal: SlackSideCaseProposal,
   destination: Readonly<{ threadTs: string; caseId: string }>,
 ): Promise<SlackSideCaseProposal> {
-  await execution.database
-    .prepare(
-      `UPDATE side_case_proposal SET destination_thread_ts = ?, destination_case_id = ?
-      WHERE organisation_id = ? AND proposal_id = ? AND source_kind = 'slack_thread'
-        AND status = 'starting' AND decided_by_user_id = ? AND decided_at = ?
-        AND destination_case_id IS NULL AND ${ACTIVE_PLACEMENT}`,
-    )
-    .bind(
-      destination.threadTs,
-      destination.caseId,
-      execution.organisationId,
-      proposal.proposalId,
-      proposal.decidedByUserId,
-      proposal.decidedAt,
-      ...placementBindings(execution),
-    )
-    .run();
+  await prepareSlackSideCaseDestination(execution, {
+    threadTs: destination.threadTs,
+    caseId: destination.caseId,
+    proposalId: proposal.proposalId,
+    decidedByUserId: proposal.decidedByUserId,
+    decidedAt: proposal.decidedAt,
+  }).run();
   if (!(await execution.isActive()))
     throw new Error("side_case_placement_conflict");
   const recorded = await readSlackSideCaseProposal(
@@ -299,7 +273,7 @@ export async function settleSlackSideCaseStart(
  * authority is a person in the proposal's channel, and the label must allow
  * that channel now.
  */
-export async function admitSlackSideCaseInformationFlow(
+async function admitSlackSideCaseInformationFlow(
   storage: DurableObjectStorage,
   lease: HarnessTurnLease,
   proposal: SlackSideCaseProposal,
@@ -425,8 +399,29 @@ function contextBlock(text: string): Record<string, unknown> {
   return { type: "context", elements: [mrkdwn(text)] };
 }
 
+/**
+ * The side Case of a Slack thread, as a turn of its Session uses it: the
+ * instruction of each turn and the admission of the proposal.
+ */
+export async function slackThreadSideCase(
+  raw: Record<string, unknown>,
+): Promise<SessionSideCase> {
+  const proposal = await parseSlackProposalRow(raw);
+  return {
+    instruction: SLACK_SIDE_CASE_HARNESS_INSTRUCTION,
+    admit: (input) =>
+      admitSlackSideCaseInformationFlow(
+        input.storage,
+        input.lease,
+        proposal,
+        input.authorizeCommit,
+        input.env,
+      ),
+  };
+}
+
 /** A stored Slack proposal. A row of a Portal proposal is refused. */
-export async function parseSlackProposalRow(
+async function parseSlackProposalRow(
   raw: Record<string, unknown>,
 ): Promise<SlackSideCaseProposal> {
   const {

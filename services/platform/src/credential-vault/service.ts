@@ -6,7 +6,6 @@ import {
   type OrganisationExecutionScope,
 } from "../organisation-execution-scope";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import type { SessionExecutionAdmission } from "../actors/session-execution-admission";
 import type { Result } from "../result";
 import {
   activeVaultRoot,
@@ -31,7 +30,22 @@ import {
   type VaultCiphertext,
 } from "./crypto";
 import type { OrganisationQuerySource } from "../data/query-source";
+import {
+  prepareCredentialHandleAccountsRevocation,
+  prepareCredentialHandleWebhooksRevocation,
+} from "../data/integration-account-writes";
+import { prepareCredentialHandleConnectionsRevocation } from "../data/provider-connection-writes";
+import { prepareCredentialHandleGenerationsRevocation } from "../data/provider-credential-generation";
 import { assertNever, isNonNegativeInteger, isRecord } from "@purin-labs/std";
+
+/**
+ * The admission of the Session turn that asks for a credential. The Session
+ * gives it: the scope of the turn and the check that the turn is still live.
+ */
+type VaultTurnAdmission = Readonly<{
+  scope: OrganisationExecutionScope;
+  requireTurn(lease: HarnessTurnLease): Promise<void>;
+}>;
 
 type VaultAlgorithm = "AES-GCM-256";
 
@@ -223,7 +237,7 @@ export async function storeOrganisationPlacementVaultSecret(
 
 export async function storeSessionExecutionVaultSecret(
   input: Readonly<{
-    admission: SessionExecutionAdmission;
+    admission: VaultTurnAdmission;
     lease: HarnessTurnLease;
     keys: CredentialVaultBindings;
     handle: VaultHandle;
@@ -540,71 +554,17 @@ export async function revokeCredential(input: {
     input.organisationId,
     input.handle,
   );
+  const revoked = {
+    now: input.now,
+    organisationId: input.organisationId,
+    handle: input.handle,
+  };
 
   await session.batch([
-    session
-      .prepare(
-        `UPDATE provider_credential_generation
-         SET lifecycle = 'revoked', revoked_at = COALESCE(revoked_at, ?)
-         WHERE organisation_id = ? AND credential_ref = ?
-           AND lifecycle IN ('active', 'superseded')`,
-      )
-      .bind(input.now, input.organisationId, input.handle),
-    session
-      .prepare(
-        `UPDATE provider_webhook
-         SET lifecycle = 'revoked', lifecycle_reason_code = NULL, updated_at = ?
-         WHERE organisation_id = ?
-           AND (
-             signing_secret_ref = ? OR
-             integration_account_id IN (
-               SELECT account.integration_account_id
-               FROM integration_account AS account
-               JOIN provider_connection AS connection
-                 ON connection.provider_connection_id = account.provider_connection_id
-                AND connection.organisation_id = account.organisation_id
-               WHERE account.organisation_id = ? AND connection.credential_ref = ?
-             )
-           )
-           AND lifecycle != 'revoked'`,
-      )
-      .bind(
-        input.now,
-        input.organisationId,
-        input.handle,
-        input.organisationId,
-        input.handle,
-      ),
-    session
-      .prepare(
-        `UPDATE integration_account
-         SET lifecycle = 'revoked', lifecycle_reason_code = NULL,
-             is_default_for_provider = 0,
-             disabled_by_user_id = NULL, disabled_at = NULL,
-             revoked_at = COALESCE(revoked_at, ?), updated_at = ?
-         WHERE organisation_id = ?
-           AND provider_connection_id IN (
-             SELECT provider_connection_id
-             FROM provider_connection
-             WHERE organisation_id = ? AND credential_ref = ?
-           )
-           AND lifecycle != 'revoked'`,
-      )
-      .bind(
-        input.now,
-        input.now,
-        input.organisationId,
-        input.organisationId,
-        input.handle,
-      ),
-    session
-      .prepare(
-        `UPDATE provider_connection
-         SET lifecycle = 'revoked', disabled_at = NULL,
-             revoked_at = COALESCE(revoked_at, ?), updated_at = ?
-         WHERE organisation_id = ? AND credential_ref = ? AND lifecycle != 'revoked'`,
-      )
-      .bind(input.now, input.now, input.organisationId, input.handle),
+    prepareCredentialHandleGenerationsRevocation(session, revoked),
+    prepareCredentialHandleWebhooksRevocation(session, revoked),
+    prepareCredentialHandleAccountsRevocation(session, revoked),
+    prepareCredentialHandleConnectionsRevocation(session, revoked),
     session
       .prepare(
         `UPDATE credential_ref

@@ -1183,3 +1183,80 @@ function syncStateFromRow(row: FileGrantSyncRow): unknown {
 function d1Changes(result: D1Result<unknown>): number {
   return typeof result.meta?.changes === "number" ? result.meta.changes : 0;
 }
+
+/**
+ * Adds the pending sync of an active file grant at its current revision,
+ * when the statement before it in the batch changed one row.
+ */
+export function prepareChangedFileGrantSync(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: Readonly<{
+    organisationId: string;
+    grantId: string;
+    integrationAccountId: string;
+    now: number;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `INSERT INTO file_grant_sync (
+       organisation_id, grant_id, grant_revision, integration_account_id,
+       state, next_run_at, updated_at
+     )
+     SELECT organisation_id, grant_id, revision, ?, 'pending', ?, ?
+       FROM access_grant
+      WHERE organisation_id = ? AND grant_id = ? AND lifecycle = 'active' AND changes() = 1`,
+    )
+    .bind(
+      input.integrationAccountId,
+      input.now,
+      input.now,
+      input.organisationId,
+      input.grantId,
+    );
+}
+
+/** Adds the pending sync of a new file grant at its first revision. */
+export function prepareNewFileGrantSync(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: Readonly<{
+    organisationId: string;
+    grantId: string;
+    integrationAccountId: string;
+    now: number;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `INSERT INTO file_grant_sync (
+             organisation_id, grant_id, grant_revision, integration_account_id,
+             state, next_run_at, updated_at
+           ) VALUES (?, ?, 1, ?, 'pending', ?, ?)`,
+    )
+    .bind(
+      input.organisationId,
+      input.grantId,
+      input.integrationAccountId,
+      input.now,
+      input.now,
+    );
+}
+
+/** Deletes the admissions and then the sync of a revoked file grant. */
+export function prepareRevokedFileGrantRows(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: Readonly<{ organisationId: string; grantId: string }>,
+): D1PreparedStatement[] {
+  return [
+    db
+      .prepare(
+        "DELETE FROM file_grant_admission WHERE organisation_id = ? AND grant_id = ?",
+      )
+      .bind(input.organisationId, input.grantId),
+    db
+      .prepare(
+        "DELETE FROM file_grant_sync WHERE organisation_id = ? AND grant_id = ?",
+      )
+      .bind(input.organisationId, input.grantId),
+  ];
+}

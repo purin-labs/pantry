@@ -21,7 +21,7 @@ import {
 import {
   activateProviderCredentialCutover,
   reconcileInterruptedProviderCredentialCutovers,
-} from "../src/provider-lifecycle/credential-cutover";
+} from "../src/integrations/contract/credential-cutover";
 import type { Result } from "../src/result";
 import { storeVaultSecret, type VaultHandle } from "../src/credential-vault";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";

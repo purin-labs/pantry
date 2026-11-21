@@ -1,3 +1,9 @@
+export {
+  parsePageBrowserBinding,
+  parsePageBrowserContext,
+  type PageBrowserBinding,
+  type PageBrowserContext,
+} from "./page-browser-context.ts";
 export type { PortalChatStreamRecord } from "./record-schemas.ts";
 export type { AcceptedInputRef } from "./types/AcceptedInputRef";
 export type { AgentRole } from "./types/AgentRole";
@@ -179,8 +185,14 @@ export type AccessGrantTarget =
     });
 export type { AccessSubjectRef } from "./types/AccessSubjectRef";
 export type { AccessTargetRef } from "./types/AccessTargetRef";
-export type { CapabilityCommerceSystem } from "./types/CapabilityCommerceSystem";
 export type { CapabilityDefinition } from "./access-control.ts";
+export {
+  commerceSystemKindOfSource,
+  commerceSystemSource,
+  isCommerceSystemKind,
+  type CommerceSystemKind,
+  type CommerceSystemSource,
+} from "./commerce-system.ts";
 export type { CapabilityMode } from "./types/CapabilityMode";
 export type { CapabilityPolicyModes } from "./types/CapabilityPolicyModes";
 export type { CapabilityPolicyProvenance } from "./types/CapabilityPolicyProvenance";

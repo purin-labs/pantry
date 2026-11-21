@@ -30,7 +30,7 @@ import { CommerceEntityPlaneRoute } from "../features/commerce/entity-plane/rout
 import { SupplierPayoutsPanel } from "../features/payouts/route";
 import { CounterSaleRoute } from "../features/terminals/counter-sale-route";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
-import { UNAVAILABLE_ACCESS } from "./unavailable-access";
+import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import type { PayoutReadAccess } from "../features/payouts/read-permission";
 import type { SupplierPayout } from "@purin-labs/control-api/portal/payouts";
 import type { OfferPriceAllowanceTransport } from "../features/commerce/price-allowance";

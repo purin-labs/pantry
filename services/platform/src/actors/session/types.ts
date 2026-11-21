@@ -3,7 +3,6 @@ import type { PantryExecutionBillingError } from "../../account-platform/executi
 import type { Outcome } from "@purin-labs/contracts";
 import type { HarnessTurnContinuation } from "../agent-session-continuation";
 import type { LiveRequestAuthorityValidationError } from "../../request-authority";
-import type { MailOrganizationActorInput } from "../../mail-inbox/commands";
 import type {
   AcceptedHarnessEventCursor,
   UserMessage,
@@ -14,7 +13,6 @@ import type {
 } from "@purin-labs/contracts";
 import type { RequestId, SessionId, OrganisationId } from "../../ids";
 import type { WorkspaceRevisionStoreError } from "../../workspace-revision-store";
-import type { Result } from "../../result";
 import type {
   SessionCutoverInspectionError,
   SessionCutoverQuiescence,
@@ -42,25 +40,21 @@ import type {
   EmbeddedHarnessTurnError,
   EmbeddedHarnessTurnResult,
 } from "../embedded-harness";
-import type {
-  EmailCaseManifest,
-  EmailCueOutcome,
-  EmailSizeBreach,
-} from "../email-harness-tools";
-import type {
-  WhatsAppCaseManifest,
-  WhatsAppTurnOutcome,
-} from "../whatsapp-harness-tools";
 import type { CanonicalTextTurnTransitionError } from "../agent-session-text-turn";
 import type { SessionBudgetError } from "../agent-session-budget";
 import type { SessionTurnStreamError } from "../agent-session-turn-stream";
 import type { CanonicalTextTurnStartError } from "../agent-session-turn-start";
-import type { CaseConversationSinkRefusal } from "../case-conversation-sink";
-import type { SerializedFlowBinding } from "../../policy";
+import type {
+  CaseConversationSinkRefusal,
+  SerializedFlowBinding,
+} from "../../policy";
 import type { Variant } from "@purin-labs/type-utils";
 
-export type TransientEmailTurnRequest = {
-  readonly evidenceDependency: import("../../case-context-discovery/evidence").CaseContextCollectionEvidenceDependency;
+/**
+ * The fields that every transient turn gives to the harness: the identity of
+ * the turn, its authority, its prompt and its limits.
+ */
+export type TransientHarnessTurnInput = {
   readonly requestingOrganisationId: OrganisationId;
   readonly turnId: string;
   readonly inputId: string;
@@ -77,101 +71,12 @@ export type TransientEmailTurnRequest = {
   readonly allowanceTokens: number;
   readonly maxWallMs: number;
   readonly maxBodyChars: number;
-  readonly manifest: EmailCaseManifest;
-  /**
-   * The accepted context this turn was prepared with. The Session verifies it
-   * against `contextBundleDigest` and records it before asking the model.
-   */
-  readonly context: Readonly<{
-    bundle: unknown;
-    bundleDigest: string;
-    modelContext: unknown;
-  }>;
-  readonly responsePolicy: import("../email-harness-tools").EmailResponsePolicy;
 };
-
-export type TransientMailAssistantRequest = Omit<
-  TransientEmailTurnRequest,
-  "manifest" | "responsePolicy" | "evidenceDependency" | "context"
-> &
-  Readonly<{
-    mailbox: MailOrganizationActorInput;
-    modelRouteDigest: string;
-    sourcePin: string;
-  }>;
-
-export type TransientEmailTurnReply = {
-  readonly flowBinding: SerializedFlowBinding;
-  /** The Memory revisions the turn's prompt carried. */
-  readonly memory: readonly Readonly<{ memoryId: string; revision: number }>[];
-  readonly outcome: Exclude<EmailCueOutcome, { readonly kind: "none" }>;
-  readonly modelUsage: EmbeddedHarnessModelUsage;
-  readonly breaches: readonly EmailSizeBreach[];
-  readonly commerceEvidence: readonly import("../../mail-inbox/supplier-context").EmailCommerceEvidence[];
-  /** The verified sources of a draft for approval; none for other outcomes. */
-  readonly sources: import("../../mail-inbox/reply-sources").EmailReplySources;
-};
-
-/**
- * One eval turn: a mailbox reply turn that reads a reviewed scenario in place
- * of mailbox mail. It drafts and sends nothing.
- */
-export type TransientEvalTurnRequest = Omit<
-  TransientEmailTurnRequest,
-  "manifest" | "responsePolicy" | "evidenceDependency"
-> &
-  Readonly<{
-    integrationAccountId: string;
-    fixture: Readonly<{
-      /** The Eval revision and scenario the message belongs to. */
-      evalId: string;
-      revision: number;
-      scenarioId: string;
-      /** The label of that Eval revision. */
-      inputLabel: unknown;
-      message: import("../../mail/gmail-adapter").GmailMessageContent;
-    }>;
-  }>;
-
-export type TransientEvalTurnReply = Omit<
-  TransientEmailTurnReply,
-  "breaches" | "commerceEvidence" | "sources"
-> &
-  Readonly<{ toolCatalogDigest: string }>;
 
 export type TransientModelTurnError = Readonly<{
   code: string;
   modelUsage: EmbeddedHarnessModelUsage | null;
 }>;
-
-export type TransientWhatsAppTurnRequest = {
-  readonly requestingOrganisationId: OrganisationId;
-  readonly turnId: string;
-  readonly inputId: string;
-  readonly caseId: string;
-  readonly assignmentId: string;
-  readonly caseRevision: number;
-  readonly contentDigest: string;
-  readonly workspaceRevision: string;
-  readonly contextBundleDigest: string;
-  readonly requestAuthority: import("@purin-labs/contracts").RequestAuthority;
-  readonly authorityPartitionDigest: string;
-  readonly harnessInstructions: string;
-  readonly turnPrompt: string;
-  readonly allowanceTokens: number;
-  readonly maxWallMs: number;
-  readonly manifest: WhatsAppCaseManifest;
-};
-
-export type TransientWhatsAppTurnReply = {
-  readonly outcome: Exclude<WhatsAppTurnOutcome, { readonly kind: "none" }>;
-  readonly modelUsage: EmbeddedHarnessModelUsage;
-};
-
-export type TransientWhatsAppTurnResult = Result<
-  TransientWhatsAppTurnReply,
-  TransientModelTurnError
->;
 
 export type CanonicalEmbeddedHarnessTurnResult = EmbeddedHarnessTurnResult & {
   readonly binding: CanonicalEmbeddedHarnessCheckpointBinding;

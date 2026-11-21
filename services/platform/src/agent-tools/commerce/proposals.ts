@@ -1,5 +1,5 @@
 import { type OrderRefundLineRequest } from "../../commerce/order-refund-action";
-import type { StockProposalRequest } from "../../commerce/stock-action-plan";
+import type { StockProposalRequest } from "../../kitchen/contract/stock-action-plan";
 import {
   parseCommerceActionRequest,
   type CommerceActionRequest,

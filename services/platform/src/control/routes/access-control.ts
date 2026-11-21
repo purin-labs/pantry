@@ -7,7 +7,6 @@ import {
   SLACK_MESSAGE_RESOURCE_SCOPE,
 } from "../../authorization/capability-catalogue";
 import { discoverAirtableBases } from "../../external-records/records";
-import { resolveAirtableAccountToken } from "../../external-records/oauth";
 import { readActiveCaseOperations } from "../../actors/case-operations";
 import { resolveIntegrationAccount } from "../../data/integration-account";
 import type { Env } from "../../env";
@@ -19,7 +18,7 @@ import {
 } from "../../ids";
 import { digestCanonical } from "../../policy";
 import type { Result } from "../../result";
-import { listPublishedCommerceTargets } from "../../commerce/entity-plane/published-resources";
+import { commerceAccessTargets } from "../../access-control/commerce-access-targets";
 import {
   readAccessControlOrganisationProjection,
   readAccessControlView,
@@ -37,6 +36,7 @@ import {
 import {
   handleAccessControlExplainRoute,
   type AccessControlExplainRoute,
+  type AccessControlParts,
 } from "./access-control-explain";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isPositiveInteger } from "@purin-labs/std";
@@ -196,16 +196,17 @@ export async function handleAccessControlRoute(
   env: Env,
   route: AccessControlRoute,
   url: URL,
+  parts: AccessControlParts,
 ): Promise<Response> {
   switch (route.kind) {
     case "accessControlExplain":
-      return handleAccessControlExplainRoute(request, env, route);
+      return handleAccessControlExplainRoute(request, env, route, parts);
     case "accessControlGrantCreate":
     case "accessControlBudget":
     case "accessControlGrantRevoke":
     case "accessControlCapabilityChange":
     case "accessControlDefaultsApply":
-      return handleAccessControlMutationRoute(request, env, route);
+      return handleAccessControlMutationRoute(request, env, route, parts);
   }
   if (request.method !== "GET") return controlError("method_not_allowed", 405);
   const authorized = await authorizeOrganisationRequest(
@@ -224,7 +225,12 @@ export async function handleAccessControlRoute(
         url.searchParams,
       );
     case "accessControlOptions":
-      return handleOptionsRead(env, authorized.executionScope, url.searchParams);
+      return handleOptionsRead(
+        parts,
+        env,
+        authorized.executionScope,
+        url.searchParams,
+      );
     default:
       return assertNever(route);
   }
@@ -255,6 +261,7 @@ async function handleAggregateRead(
 }
 
 async function handleOptionsRead(
+  parts: AccessControlParts,
   env: Env,
   scope: OrganisationExecutionScope,
   searchParams: URLSearchParams,
@@ -287,7 +294,7 @@ async function handleOptionsRead(
         );
         return optionsPageResponse(page);
       }
-      return readProviderResourceOptions(env, scope, query.value);
+      return readProviderResourceOptions(parts, env, scope, query.value);
     }
     case "cases": {
       const page = await readCaseOptions(
@@ -750,7 +757,7 @@ async function readCommerceTargetOptions(
     query.query,
   );
   if (!cursor.ok) return cursor;
-  const targets = await listPublishedCommerceTargets({
+  const targets = await commerceAccessTargets.use().listPublishedTargets({
     env,
     organisationId,
   });
@@ -814,6 +821,7 @@ function parseIntegrationOptionRows(
 }
 
 async function readProviderResourceOptions(
+  parts: AccessControlParts,
   env: Env,
   scope: OrganisationExecutionScope,
   query: Extract<
@@ -832,7 +840,7 @@ async function readProviderResourceOptions(
     return controlError("access_control_option_unavailable", 409);
   if (account.value.provider === "airtable") {
     try {
-      const credential = await resolveAirtableAccountToken(
+      const credential = await parts.airtableAccountToken(
         env,
         organisationId,
         query.integrationAccountId,

@@ -31,14 +31,14 @@ import {
   parseJevDraftCommand,
   type JevDraftCommand,
   type JevDraftRefusal,
-} from "../jev-features/agent-draft";
+} from "../integrations/contract/jev-draft";
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,
   parseOfferPriceAllowanceCommand,
   type OfferPriceAllowanceCommand,
-} from "./offer-price-allowance";
-import type { PublishedResourceBoundaryError } from "../commerce/entity-plane/published-resources";
+} from "../commerce/contract/offer-price-allowance";
+import type { PublishedResourceBoundaryError } from "../commerce/contract/types";
 import type { Result } from "../result";
 import { digestCanonical } from "../policy";
 import {
@@ -60,6 +60,17 @@ import { assertNever, isRecord } from "@purin-labs/std";
  * This is a distinct origin from an agent suggesting a change to itself.
  * Only a direct operator request creates one.
  */
+/**
+ * A short code identifying the exact change a preview showed.
+ *
+ * The operator repeats it when accepting, which is what ties their reply to
+ * the change they read. Without it a reply to an older preview would accept
+ * whatever change happens to be pending when it arrives.
+ */
+export function previewCode(commandDigest: string): string {
+  return commandDigest.slice(0, 6).toUpperCase();
+}
+
 export type OperatorConfigurationDraftState =
   "pending" | "confirmed" | "settled" | "cancelled" | "expired";
 

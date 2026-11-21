@@ -1,6 +1,7 @@
+import { prepareEmailWatchReconciliationRun } from "../data/onboarding-reconciliation-run";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Env } from "../env";
-import { gmailConnectorIdValue } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import {
   newRequestId,
@@ -45,24 +46,15 @@ export async function reconcileOrganisationEmailWatches(
   if (repairs === 0 && failure === null) return;
   const environment =
     enabled[0]?.environment === "production" ? "production" : "development";
-  await input.scope.database
-    .prepare(
-      `INSERT INTO onboarding_reconciliation_run (
-       reconciliation_run_id, organisation_id, environment, subject_kind,
-       lifecycle, repair_count, reason_code, started_at, completed_at
-     ) VALUES (?, ?, ?, 'email_watches', ?, ?, ?, ?, ?)`,
-    )
-    .bind(
-      `reconciliation_${crypto.randomUUID()}`,
-      input.scope.organisationId,
-      environment,
-      failure === null ? "completed" : "failed",
-      repairs,
-      failure,
-      input.now,
-      input.now,
-    )
-    .run();
+  await prepareEmailWatchReconciliationRun(input.scope.database, {
+    reconciliationRunId: `reconciliation_${crypto.randomUUID()}`,
+    organisationId: input.scope.organisationId,
+    environment,
+    lifecycle: failure === null ? "completed" : "failed",
+    repairCount: repairs,
+    reasonCode: failure,
+    now: input.now,
+  }).run();
 }
 
 type EnabledMailboxPolicy = {

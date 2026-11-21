@@ -553,7 +553,9 @@ export function setupLiveState(
           ? "OpenAI API key"
           : inferenceSelection.kind === "organisation_anthropic_api_key"
             ? "Anthropic API key"
-            : inferenceSelection.kind === "claude_oauth"
+            : inferenceSelection.kind === "organisation_google_api_key"
+              ? "Gemini API key"
+              : inferenceSelection.kind === "claude_oauth"
               ? "Claude"
               : "Seams AI",
     commerceChosen: commerceSystem !== null,

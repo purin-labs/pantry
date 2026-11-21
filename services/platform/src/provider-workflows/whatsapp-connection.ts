@@ -11,10 +11,7 @@ import type {
   ProviderManifestEvidence,
 } from "../data/provider-attempt";
 import { persistProviderResourceSnapshot } from "../data/provider-resource";
-import {
-  registerWhatsAppPhoneNumberAccount,
-  setWhatsAppProviderHealth,
-} from "../data/whatsapp";
+import { connectionParts } from "../integrations/contract/connection-parts";
 import type { IntegrationAccountId } from "../ids";
 import { whatsappOnboardingAdapter } from "../provider-adapters/whatsapp";
 import { providerCallbackUri } from "../provider-lifecycle/authorization";
@@ -23,7 +20,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -32,7 +29,7 @@ import {
   finishProviderCompletion,
   providerCredentialHandle,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 import { resolveWhatsAppEmbeddedSignupCredential } from "../whatsapp/application";
 import {
@@ -245,19 +242,21 @@ export async function connectWhatsApp(
     });
   }
   for (const registration of registrations) {
-    const registered = await registerWhatsAppPhoneNumberAccount({
-      db: input.scope.database,
-      organisationId: base.organisationId,
-      integrationAccountId: registration.integrationAccountId,
-      providerConnectionId: connected.connection.providerConnectionId,
-      environment: base.environment,
-      businessPortfolioId: assets.businessPortfolioId,
-      wabaId: assets.wabaId,
-      phoneNumberId: registration.number.phoneNumberId,
-      displayPhoneNumber: registration.number.displayPhoneNumber,
-      verifiedName: registration.number.verifiedName,
-      now: input.now,
-    });
+    const registered = await connectionParts
+      .use()
+      .whatsapp.registerWhatsAppPhoneNumberAccount({
+        db: input.scope.database,
+        organisationId: base.organisationId,
+        integrationAccountId: registration.integrationAccountId,
+        providerConnectionId: connected.connection.providerConnectionId,
+        environment: base.environment,
+        businessPortfolioId: assets.businessPortfolioId,
+        wabaId: assets.wabaId,
+        phoneNumberId: registration.number.phoneNumberId,
+        displayPhoneNumber: registration.number.displayPhoneNumber,
+        verifiedName: registration.number.verifiedName,
+        now: input.now,
+      });
     if (!registered.ok) {
       return failProviderCompletion(input, attempt, current, {
         code: "provider_account_ineligible",
@@ -299,7 +298,7 @@ export async function connectWhatsApp(
         repairActions: ["reconnect_whatsapp"],
       };
   for (const registration of registrations) {
-    await setWhatsAppProviderHealth({
+    await connectionParts.use().whatsapp.setWhatsAppProviderHealth({
       db: input.scope.database,
       organisationId: base.organisationId,
       integrationAccountId: registration.integrationAccountId,

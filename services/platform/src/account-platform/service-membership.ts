@@ -7,7 +7,7 @@ import {
 import { newPersonId, type OrganisationId, type UserId } from "../ids";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { prepareBaseProjectMembership } from "../projects/default-project";
+import { organisationLifecycleParts } from "../data/organisation-lifecycle-port";
 import {
   createAccountPlatformClient,
   type AccountMembershipActor,
@@ -118,6 +118,7 @@ export async function applyAccountServiceGrantAcceptance(
     now: number;
   }>,
 ): Promise<Result<ActiveOrganisationMembership, AccountPlatformError>> {
+  const parts = organisationLifecycleParts().membership;
   const { execution, receipt } = input;
   if (
     !AccountServiceGrantAcceptance.is(receipt) ||
@@ -207,32 +208,20 @@ export async function applyAccountServiceGrantAcceptance(
         execution.organisationId,
         receipt.invitationId,
       ),
-    ...prepareBaseProjectMembership(execution.database, {
+    ...parts.baseProjectMembership(execution.database, {
       organisationId: execution.organisationId,
       userId: receipt.nativeUserId,
       role: role.value,
       now: input.now,
     }),
-    execution.database
-      .prepare(
-        `UPDATE account_service_invitation_role SET accepted_at = ?, accepted_native_user_id = ?
-       WHERE native_organisation_id = ? AND platform_invitation_id = ? AND accepted_at IS NULL
-         AND EXISTS (SELECT 1 FROM service_role_grant g
-           JOIN organisation_onboarding o ON o.organisation_id = g.organisation_id
-           WHERE g.organisation_id = account_service_invitation_role.native_organisation_id
-             AND g.user_id = ? AND g.status = 'active' AND g.platform_membership_id = ?
-             AND g.account_acceptance_receipt_id = ?
-             AND o.lifecycle NOT IN ('activating', 'archived'))`,
-      )
-      .bind(
-        input.now,
-        receipt.nativeUserId,
-        execution.organisationId,
-        receipt.invitationId,
-        receipt.nativeUserId,
-        receipt.membership.id,
-        receipt.receiptId,
-      ),
+    parts.invitationAcceptance(execution.database, {
+      organisationId: execution.organisationId,
+      invitationId: receipt.invitationId,
+      userId: receipt.nativeUserId,
+      membershipId: receipt.membership.id,
+      acceptanceReceiptId: receipt.receiptId,
+      now: input.now,
+    }),
   ]);
   const applied = await execution.database
     .prepare(

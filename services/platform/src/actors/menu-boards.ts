@@ -72,7 +72,6 @@ import type { ControlSessionId, OrganisationId, UserId } from "../ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
-import { MenuDraftRequestError } from "./menu-draft";
 import { templateElements } from "./menu-board-templates";
 import {
   boardDraftAction,
@@ -155,11 +154,6 @@ type MenuBoardCreation = Result<
   Readonly<{ code: "menu_board_limit" | "menu_board_unavailable" }>
 >;
 
-/**
- * A board or menu price request that the model can correct. Its message
- * reaches the model, as a menu draft refusal does.
- */
-export class MenuBoardRequestError extends MenuDraftRequestError {}
 
 /**
  * One change that an agent makes to a board's draft (Plan 40B phase 4). It

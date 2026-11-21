@@ -1,12 +1,12 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import { parseControlRole } from "../../data/control-plane";
-import { isUserId } from "@purin-labs/control-api";
-import { authorizeProject } from "../../projects/access";
-import { authorizeConversation } from "../../chat/conversation-access";
-import type {
-  CapabilityDefinition,
-  RequestAuthority,
-} from "@purin-labs/contracts";
+import {
+  isUserId,
+  type ConversationId,
+  type ProjectId,
+  type UserId,
+} from "@purin-labs/control-api";
+import type { CapabilityDefinition, RequestAuthority } from "@purin-labs/contracts";
 
 import {
   CAPABILITY_CATALOGUE,
@@ -41,6 +41,25 @@ import type {
 } from "./types";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
+
+/**
+ * The access checks of a native chat source: a Project that the person may
+ * read, or a conversation that the person sees. The conversation module owns
+ * them, and its callers give them with the source.
+ */
+export type NativeChatSourceAccess = Readonly<{
+  authorizeProject(
+    db: OrganisationDatabase,
+    scope: Readonly<{ organisationId: OrganisationId; userId: UserId }>,
+    projectId: ProjectId,
+    permission: "read",
+  ): Promise<unknown>;
+  authorizeConversation(
+    db: OrganisationDatabase,
+    scope: Readonly<{ organisationId: OrganisationId; userId: UserId }>,
+    conversationId: ConversationId,
+  ): Promise<Readonly<{ access: Readonly<{ kind: string }> }> | null>;
+}>;
 
 type CurrentSourceFlowLabelInput =
   | Readonly<{
@@ -77,6 +96,7 @@ type CurrentSourceFlowLabelInput =
       db: OrganisationDatabase;
       authority: Variant<RequestAuthority, "control">;
       source: import("./types").NativeChatFlowSource;
+      access: NativeChatSourceAccess;
     }>
   | Readonly<{
       readonly kind: "ingress";
@@ -889,8 +909,13 @@ async function createNativeChatLabel(
   };
   const authorized =
     input.source.kind === "project"
-      ? await authorizeProject(input.db, scope, input.source.projectId, "read")
-      : await authorizeConversation(
+      ? await input.access.authorizeProject(
+          input.db,
+          scope,
+          input.source.projectId,
+          "read",
+        )
+      : await input.access.authorizeConversation(
           input.db,
           scope,
           input.source.conversationId,
@@ -902,7 +927,7 @@ async function createNativeChatLabel(
   });
   if (!base.ok) return base;
   if (input.source.kind === "chat_conversation") {
-    const conversation = await authorizeConversation(
+    const conversation = await input.access.authorizeConversation(
       input.db,
       scope,
       input.source.conversationId,

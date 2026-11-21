@@ -13,6 +13,7 @@ import {
   signedSlackRequest,
   openRouterStream,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "applies explicit Slack goal commands once, recovers durable replies after eviction, and enforces operator authority without inference",
@@ -193,7 +194,7 @@ class GoalProviders {
         id: "goal_command_model",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [
           {
             index: 0,
@@ -206,7 +207,7 @@ class GoalProviders {
         id: "goal_command_model",
         object: "chat.completion.chunk",
         created: 1787500000,
-        model: "moonshotai/kimi-k3",
+        model: PLATFORM_DEFAULT_PI_MODEL,
         choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
         usage: { prompt_tokens: 20, completion_tokens: 5, total_tokens: 25 },
       },

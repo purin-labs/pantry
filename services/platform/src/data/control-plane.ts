@@ -56,19 +56,12 @@ import {
   type ControlMutationIdentity,
   type ControlMutationReceiptScope,
 } from "./control-mutation";
-import { prepareReadAndProposeAccessDefaults } from "./capability-policy";
+import { organisationLifecycleParts } from "./organisation-lifecycle-port";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type {
   OrganisationQuerySource,
   GlobalQuerySource,
 } from "./query-source";
-import {
-  baseProjectId,
-  prepareBaseProject,
-  prepareBaseProjectRoleChange,
-  prepareProjectMembershipRevocation,
-} from "../projects/default-project";
-import { prepareReturnPrivateChatsToDefault } from "../projects/case-project";
 import type { OnboardingControlRole } from "@purin-labs/contracts";
 import { encodeBase64Url, isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
@@ -781,6 +774,7 @@ export async function bootstrapOrganisation(input: {
   readonly mutation: OrganisationBootstrapMutation;
   readonly now: number;
 }): Promise<Result<OrganisationBootstrap, OrganisationBootstrapError>> {
+  const parts = organisationLifecycleParts().creation;
   const reserved = await reserveOrganisationBootstrap(input);
   if (!reserved.ok) return reserved;
   const reservation = reserved.value;
@@ -788,7 +782,7 @@ export async function bootstrapOrganisation(input: {
   const personId = reservation.personId;
   const organisationHandle = reservation.organisationHandle;
   const workspace = reservation.workspace;
-  const defaultProjectId = await baseProjectId(organisationId);
+  const defaultProjectId = await parts.baseProjectId(organisationId);
   const organisationName = normalizeOrganisationName(input.organisationName);
   const selected = selectOrganisationPlacementDatabase(
     input.env,
@@ -812,25 +806,13 @@ export async function bootstrapOrganisation(input: {
     try {
       await session.batch([
         prepareBootstrapOrganisationRow(session, reservation, organisationName),
-        session
-          .prepare(
-            `INSERT INTO organisation_workspace (
-           workspace_id, organisation_id, workspace_handle, name, status, created_at, archived_at
-         ) VALUES (?, ?, ?, ?, 'active', ?, NULL)`,
-          )
-          .bind(
-            workspace.workspaceId,
-            organisationId,
-            workspace.workspaceHandle,
-            workspace.name,
-            workspace.createdAt,
-          ),
-        session
-          .prepare(
-            `INSERT INTO organisation_default_workspace (organisation_id, workspace_id, created_at)
-         VALUES (?, ?, ?)`,
-          )
-          .bind(organisationId, workspace.workspaceId, workspace.createdAt),
+        ...parts.workspace(session, {
+          organisationId,
+          workspaceId: workspace.workspaceId,
+          workspaceHandle: workspace.workspaceHandle,
+          name: workspace.name,
+          createdAt: workspace.createdAt,
+        }),
         prepareBootstrapPlacement(session, reservation, input.environment),
         prepareInitialPlacementActivation(session, {
           organisationId,
@@ -855,7 +837,7 @@ export async function bootstrapOrganisation(input: {
             personId,
             reservation.createdAt,
           ),
-        ...prepareBaseProject(session, {
+        ...parts.baseProject(session, {
           organisationId,
           projectId: defaultProjectId,
           ownerUserId: input.owner.userId,
@@ -867,16 +849,11 @@ export async function bootstrapOrganisation(input: {
           capabilityProfile: "read_and_propose",
           now: reservation.createdAt,
         }),
-        ...prepareReadAndProposeAccessDefaults({
-          source: session,
-          admission: {
-            kind: "organisation_creation",
-            organisationId,
-            placement: reservation.placement,
-          },
+        ...parts.accessDefaults(session, {
+          organisationId,
+          placement: reservation.placement,
           materializationReceiptId: reservation.receiptId,
           now: reservation.createdAt,
-          destination: { kind: "organisation" },
         }),
         prepareOnboardingAuditEvent(session, input.mutation.identity, {
           organisationId,
@@ -1463,6 +1440,7 @@ export async function changeOrganisationServiceRole(input: {
     user_id: input.targetUserId,
     role: input.nextRole,
   };
+  const parts = organisationLifecycleParts().membership;
   const statements: D1PreparedStatement[] = [];
   if (member.role !== input.nextRole) {
     statements.push(
@@ -1473,18 +1451,14 @@ export async function changeOrganisationServiceRole(input: {
          WHERE organisation_id = ? AND user_id = ? AND status = 'active'`,
         )
         .bind(input.nextRole, input.organisationId, input.targetUserId),
-      ...prepareBaseProjectRoleChange(session, {
+      ...parts.baseProjectRoleChange(session, {
         organisationId: input.organisationId,
         userId: input.targetUserId,
         role: input.nextRole,
         now: input.now,
       }),
       prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
-      session
-        .prepare(
-          `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
-        )
-        .bind(input.organisationId),
+      parts.readinessInvalidation(session, input.organisationId),
       prepareOnboardingEvent(session, input.mutation.identity, {
         eventId: `event_${crypto.randomUUID()}`,
         eventType: "readiness_invalidated",
@@ -1612,6 +1586,7 @@ export async function revokeOrganisationMembership(input: {
     organisation_id: input.organisationId,
     user_id: input.targetUserId,
   };
+  const parts = organisationLifecycleParts().membership;
   await session.batch([
     input.execution.prepareMutationFence(),
     session
@@ -1621,30 +1596,13 @@ export async function revokeOrganisationMembership(input: {
        WHERE organisation_id = ? AND user_id = ? AND status = 'active'`,
       )
       .bind(input.now, input.organisationId, input.targetUserId),
-    ...prepareReturnPrivateChatsToDefault(session, {
-      organisationId: input.organisationId,
-      sourceProjectId: null,
-      ownerUserId: input.targetUserId,
-      now: input.now,
-      guard: null,
-    }),
-    ...prepareProjectMembershipRevocation(session, {
+    ...parts.memberRemoval(session, {
       organisationId: input.organisationId,
       userId: input.targetUserId,
       now: input.now,
-      guard: null,
     }),
-    session
-      .prepare(
-        "UPDATE portal_chat_directory SET revision = revision + 1 WHERE organisation_id = ?",
-      )
-      .bind(input.organisationId),
     prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
-    session
-      .prepare(
-        `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
-      )
-      .bind(input.organisationId),
+    parts.readinessInvalidation(session, input.organisationId),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

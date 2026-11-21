@@ -7,7 +7,7 @@ import { shopifyCleanupAdapter } from "../src/shopify/provider-adapter";
 import { slackCleanupAdapter } from "../src/provider-adapters/slack";
 import { stripeCleanupAdapter } from "../src/provider-adapters/stripe";
 import { whatsappCleanupAdapter } from "../src/provider-adapters/whatsapp";
-import type { ProviderCleanupCredentials } from "../src/provider-adapters/domain";
+import type { ProviderCleanupCredentials } from "../src/integrations/contract/provider-adapter";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 
 const ORGANISATION_ID = requireOrganisationId("organisation_cleanup_adapters");

@@ -1,3 +1,4 @@
+import { commerceSystemKindSchema } from "./commerce-system.ts";
 import { Type } from "typebox";
 import {
   countSchema,
@@ -406,7 +407,7 @@ export const integrationAccountAuthoritySchema = Type.Object({
 });
 export const commerceSystemAuthoritySchema = Type.Object({
   kind: Type.Literal("commerce_system"),
-  system: Type.Union([Type.Literal("satyr_commerce"), Type.Literal("shopify")]),
+  system: commerceSystemKindSchema,
   integrationAccountId: nonBlankTextSchema,
   revision: Type.Optional(Type.Unknown()),
 });

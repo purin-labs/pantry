@@ -16,27 +16,22 @@ import {
   type HarnessProductionPlanEdit,
   type HarnessProductionPlanRead,
 } from "./services";
-import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import type { AccessGrant } from "../../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import {
-  CommerceReadRequestError,
-  readNamedCommerceQuery,
-} from "../../context/assembly/commerce";
+import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import { parseProductionRequestFields } from "@purin-labs/commerce-client";
-import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
 import {
   type DraftThreadLink,
-  type PreparedCommerceRead,
   type SharedDraftChat,
-  admitCommerceReadObservation,
   collaborationEditDeadline,
   collaborationMember,
-  prepareSharedCommerceObservation,
   type ToolEffect,
 } from "../session-support";
-import { prepareCommerceReadForEmbeddedHarness } from "../commerce/handlers";
-import type { SessionToolContext } from "../context";
+import type {
+  CommerceToolReads,
+  PreparedCommerceRead,
+} from "../../commerce/contract/tool-reads";
+import type { KitchenToolContext } from "./services";
 
 /**
  * Plan 40D: the production requests of a location, read under a read grant
@@ -53,8 +48,11 @@ function requestableProductionRead(error: unknown): never {
   throw error;
 }
 
-function productionRequestsQuery(locationId: string) {
-  return parseCommerceGraphQuery({
+function productionRequestsQuery(
+  commerce: CommerceToolReads,
+  locationId: string,
+) {
+  return commerce.parseCommerceGraphQuery({
     kind: "commerce_list_page",
     listId: "production_requests",
     filter: {
@@ -71,6 +69,7 @@ function productionRequestsQuery(locationId: string) {
 }
 
 function selectProductionRequestsSourceGrant(
+  commerce: CommerceToolReads,
   lease: HarnessTurnLease,
   locationId: string,
   input: Readonly<{
@@ -80,20 +79,11 @@ function selectProductionRequestsSourceGrant(
     now: string;
   }>,
 ) {
-  const query = productionRequestsQuery(locationId);
-  if (!query.ok) {
-    return query;
-  }
-  return selectNamedCommerceQuerySourceGrant({
-    organisationId: input.organisationId,
-    merchantId: input.merchantId,
-    grants: input.grants,
-    now: input.now,
-    requestAuthority: lease.requestAuthority,
-    causationId: String(lease.turn.turnId),
-    query: query.value,
-    allowedSensitivity: "internal",
-  });
+  return commerce.selectInternalQuerySourceGrant(
+    lease,
+    productionRequestsQuery(commerce, locationId),
+    input,
+  );
 }
 
 type ProductionPlanSources = Readonly<{
@@ -109,6 +99,7 @@ type ProductionPlanSources = Readonly<{
  * the plan.
  */
 async function readProductionPlanSources(
+  commerce: CommerceToolReads,
   env: Env,
   execution: SessionExecutionAdmission,
   lease: HarnessTurnLease,
@@ -117,20 +108,27 @@ async function readProductionPlanSources(
   label: string,
 ): Promise<ProductionPlanSources> {
   const organisationId = execution.scope.organisationId;
-  const source = await prepareCommerceReadForEmbeddedHarness(
-    env,
-    execution,
-    lease,
-    assignment,
-    selectProductionRequestsSourceGrant.bind(null, lease, locationId),
-    label,
-  ).catch(requestableProductionRead);
-  const prepared = await prepareSharedCommerceObservation(source);
-  const query = productionRequestsQuery(locationId);
+  const source = await commerce
+    .prepareCommerceRead(
+      env,
+      execution,
+      lease,
+      assignment,
+      selectProductionRequestsSourceGrant.bind(
+        null,
+        commerce,
+        lease,
+        locationId,
+      ),
+      label,
+    )
+    .catch(requestableProductionRead);
+  const prepared = await commerce.prepareSharedCommerceObservation(source);
+  const query = productionRequestsQuery(commerce, locationId);
   if (!query.ok) {
     throw new Error(`${label} query invalid`);
   }
-  const read = await readNamedCommerceQuery({
+  const read = await commerce.readNamedCommerceQuery({
     organisationId: String(organisationId),
     merchantId: prepared.merchantId,
     grants: prepared.grants,
@@ -219,11 +217,12 @@ function quantityText(
 }
 
 export async function readProductionPlanForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
   request: HarnessProductionPlanRead,
 ): Promise<HarnessProductionPlan> {
   const { env, storage, execution, lease, assignment } = context;
   const read = await readProductionPlanSources(
+    context.commerce,
     env,
     execution,
     lease,
@@ -231,7 +230,7 @@ export async function readProductionPlanForEmbeddedHarness(
     request.locationId,
     "production plan",
   );
-  await admitCommerceReadObservation(
+  await context.commerce.admitCommerceReadObservation(
     storage,
     lease,
     read.prepared,
@@ -243,7 +242,7 @@ export async function readProductionPlanForEmbeddedHarness(
 }
 
 export async function editProductionPlanForEmbeddedHarness(
-  context: SessionToolContext,
+  context: KitchenToolContext,
   request: HarnessProductionPlanEdit,
   operationId: string,
   boundary: CatalogExecutionContext,
@@ -257,6 +256,7 @@ export async function editProductionPlanForEmbeddedHarness(
   );
   const organisationId = execution.scope.organisationId;
   const before = await readProductionPlanSources(
+    context.commerce,
     env,
     execution,
     lease,
@@ -264,7 +264,7 @@ export async function editProductionPlanForEmbeddedHarness(
     request.locationId,
     "production plan edit",
   );
-  await admitCommerceReadObservation(
+  await context.commerce.admitCommerceReadObservation(
     storage,
     lease,
     before.prepared,

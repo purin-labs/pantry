@@ -12,13 +12,11 @@ import type { IntegrationAccountId, OrganisationId, ConnectorId } from "../ids";
 import type { Result } from "../result";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { establishConnectorEmailWatch } from "../actors/connector-email-evaluation";
-import {
-  gmailConnectorIdValue,
-  readEmailMailboxAccount,
-} from "../data/email-mailbox";
+import { readEmailMailboxAccount } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "./contract/connector-ids";
 import { digestCanonical } from "../policy/information-flow/digest";
-import { authorizeMailSource } from "./authorization";
-import { mailInferenceEligible } from "./eligibility";
+import { authorizeMailSource } from "./contract/mail-source-authorization";
+import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import {
   mailOrganizationReadiness,
   queueSelectedMail,

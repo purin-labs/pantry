@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../commerce/app-access";
+import { pantryCommerceAccess } from "../commerce/contract/client";
 import type {
   CommerceGraphQuery,
   CommerceSensitivity,
@@ -7,8 +7,8 @@ import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
-import { BlotterSource } from "../commerce/entity-plane/blotter-source";
-import { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
+import type { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
+import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
 import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
 import {
   resolveOrganisationCommerceSystem,
@@ -97,30 +97,18 @@ export async function openControlCommerceGraph(
     integrationAccountId: binding.value.integrationAccountId,
     client,
   });
-  const reader =
-    commerceSystem.value.kind === "shopify"
-      ? new CommerceGraphReader({
-          organisationId: authorized.organisationId,
-          merchantId: binding.value.merchantId,
-          commerceSystem: commerceSystem.value,
-          underclerk: commerceEngine,
-          blotter: new BlotterSource({
-            organisationId: authorized.organisationId,
-            merchantId: binding.value.merchantId,
-            integrationAccountId: commerceSystem.value.integrationAccountId,
-            organisation: await requireActiveOrganisationActor({
-              env,
-              organisationId: authorized.organisationId,
-              now: Date.now(),
-            }),
-          }),
-        })
-      : new CommerceGraphReader({
-          organisationId: authorized.organisationId,
-          merchantId: binding.value.merchantId,
-          commerceSystem: commerceSystem.value,
-          underclerk: commerceEngine,
-        });
+  const reader = await createCommerceGraphReader({
+    commerceSystem: commerceSystem.value,
+    organisationId: authorized.organisationId,
+    merchantId: binding.value.merchantId,
+    underclerk: commerceEngine,
+    organisation: () =>
+      requireActiveOrganisationActor({
+        env,
+        organisationId: authorized.organisationId,
+        now: Date.now(),
+      }),
+  });
   return { ok: true, value: { reader, merchantId: binding.value.merchantId } };
 }
 

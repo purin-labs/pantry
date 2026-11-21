@@ -27,7 +27,7 @@ import {
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { commerceCanonicalResourceId } from "../../src/commerce/provider";
+import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import type { OrganisationId } from "../../src/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import { attachSharedAccountNativeOrganisation } from "./shared-account-platform-fixture";

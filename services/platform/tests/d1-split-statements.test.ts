@@ -104,22 +104,24 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
   ],
   "data/user-preferences.ts": ["readUserPreferences", "updateUserPreferences"],
   "slack/install-organisation.ts": ["resolveSlackInstallOrganisation"],
-  "slack/organisation-routing.ts": [
+  "slack/installation-store.ts": [
     "activateSlackInstallation",
     "createSlackInstallation",
     "diagnoseChannelBindingFailure",
-    "diagnoseRouteFailure",
     "listSlackOrganisationRouting",
     "parseSlackOrganisationRoutingRow",
     "prepareInitialChannelBinding",
     "prepareReplacementChannelBinding",
-    "prepareSlackChannelThreadClaim",
-    "prepareSlackDmThreadClaim",
     "prepareSlackRoutingAuditEvent",
-    "prepareSlackThreadRouteRead",
-    "prepareSoleConnectionDmSelection",
     "readSlackChannelDefault",
     "resolveSlackInstallation",
+  ],
+  "slack/organisation-routing.ts": [
+    "diagnoseRouteFailure",
+    "prepareSlackChannelThreadClaim",
+    "prepareSlackDmThreadClaim",
+    "prepareSlackThreadRouteRead",
+    "prepareSoleConnectionDmSelection",
   ],
 };
 

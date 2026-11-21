@@ -16,7 +16,7 @@ import {
   isRecord,
   isSha256Hex,
 } from "@purin-labs/std";
-import { isCommerceSensitivity } from "../commerce/sensitivity";
+import { isCommerceSensitivity } from "../commerce/contract/sensitivity";
 
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | readonly JsonValue[] | JsonObject;

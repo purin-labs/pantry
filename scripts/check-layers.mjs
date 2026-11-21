@@ -9,13 +9,23 @@
 //
 // The check counts four kinds of crossing:
 //   upward   a lower layer imports a higher one
-//   areas    one area imports a file of another area. An import of a workspace
-//            package of another area is allowed: the package is the contract
-//            of that area (step A1.10). A package of an area may depend on a
-//            package of another area that `contracts` lists
+//   areas    one area imports a file of another area that is not public. An
+//            import of a workspace package of another area is allowed: the
+//            package is the contract of that area. A package of an area may
+//            depend on a package of another area that `contracts` lists
 //   order    a foundation module imports a foundation module that is later
 //            in foundationOrder
 //   table    a module writes a D1 table that another module owns
+//
+// The contract of an area (step A1.10). `contracts` lists the public parts of
+// the areas: a workspace package folder, or a source file or a source folder
+// (with a final `/`) under `covers`. An import of a public source file from
+// another area is not a crossing. A public file must be honest: it imports no
+// file of its own area that is not public, except with `import type`, so the
+// contract does not pull in the implementation. The check refuses a public
+// file that does. A service whose code needs the inside of its area stays
+// behind an interface that the Worker wires. --report gives the count of the
+// imports between areas that go through a contract.
 //
 // It reads the relative imports and the workspace package imports of each
 // file under `covers`, and the workspace dependencies of each package.json in
@@ -42,7 +52,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import {
-  importsOf,
+  importStatementsOf,
   moduleOf,
   relativeResolver,
   root,
@@ -76,8 +86,19 @@ const orderRank = new Map(
 // The workspace packages that are the contract of their area. A package of
 // another area may depend on them.
 const contractPackages = new Set(
-  (targets.contracts ?? []).map((folder) => posix.basename(folder)),
+  (targets.contracts ?? [])
+    .filter((path) => targets.packages[path] !== undefined)
+    .map((folder) => posix.basename(folder)),
 );
+// The public source files and folders of the areas.
+const publicPaths = (targets.contracts ?? []).filter(
+  (path) => targets.packages[path] === undefined,
+);
+function isPublic(path) {
+  return publicPaths.some((entry) =>
+    entry.endsWith("/") ? path.startsWith(entry) : path === entry,
+  );
+}
 const packageByName = new Map(
   Object.entries(targets.packages).map(([folder, module]) => [
     posix.basename(folder),
@@ -131,12 +152,30 @@ const tracked = trackedFiles(...targets.covers).filter(
 );
 const resolveRelative = relativeResolver(new Set(tracked));
 
+for (const entry of publicPaths) {
+  if (!targets.covers.some((folder) => entry.startsWith(folder))) {
+    faults.push(`${TARGETS}: contracts names ${entry}, which no cover holds`);
+    continue;
+  }
+  const module = entry.endsWith("/")
+    ? (tracked.filter((path) => path.startsWith(entry)).map(moduleOf)[0] ??
+      null)
+    : moduleOf(entry);
+  if (module === null || layerOf(module) !== "areas") {
+    faults.push(
+      `${TARGETS}: contracts names ${entry}, which is not in an area`,
+    );
+  }
+}
+
 const WORKSPACE = /^@[a-z0-9-]+\/([a-z0-9-]+)/;
 
 /** pair -> { kind, count, sites } */
 const found = new Map();
 /** file -> { module: count } for the files that it imports and that import it */
 const links = new Map();
+/** The imports between two areas that go through a contract. */
+const throughContracts = { files: 0, packages: 0 };
 
 function link(path, module) {
   const entry = links.get(path) ?? {};
@@ -160,13 +199,31 @@ for (const path of tracked) {
     faults.push(`${path}: no module. Add a rule or a line to ${TARGETS}.`);
     continue;
   }
-  for (const specifier of importsOf(readFileSync(join(root, path), "utf8"))) {
+  const publicFile = isPublic(path);
+  for (const { specifier, typeOnly } of importStatementsOf(
+    readFileSync(join(root, path), "utf8"),
+  )) {
     if (specifier.startsWith(".")) {
       const target = resolveRelative(path, specifier);
       if (target === null) continue;
       const to = moduleOf(target);
       if (to === null) continue;
-      record(from, to, `${path} -> ${target}`);
+      const targetPublic = isPublic(target);
+      if (publicFile && to === from && !targetPublic && !typeOnly) {
+        faults.push(
+          `${path}: a public file imports ${target}, a file of its area that is not public. Import a public file, use import type, or let the Worker wire the service.`,
+        );
+      }
+      if (
+        targetPublic &&
+        from !== to &&
+        layerOf(from) === "areas" &&
+        layerOf(to) === "areas"
+      ) {
+        throughContracts.files += 1;
+      } else {
+        record(from, to, `${path} -> ${target}`);
+      }
       if (target !== path) {
         link(path, to);
         link(target, from);
@@ -178,7 +235,10 @@ for (const path of tracked) {
     if (to === undefined) continue;
     // A workspace package of an area is the contract of that area: its
     // schemas, its model and its client. Another area may import it.
-    if (layerOf(from) === "areas" && layerOf(to) === "areas") continue;
+    if (layerOf(from) === "areas" && layerOf(to) === "areas") {
+      if (from !== to) throughContracts.packages += 1;
+      continue;
+    }
     record(from, to, `${path} -> ${specifier}`);
   }
 }
@@ -300,11 +360,15 @@ if (mode === "--report") {
   console.log(
     `files ${tracked.length} | upward ${sum.upward} | areas ${sum.areas} | order ${sum.order} | table ${sum.table} | total ${sum.upward + sum.areas + sum.order + sum.table}`,
   );
+  console.log(
+    `through contracts ${throughContracts.files + throughContracts.packages} | public files ${throughContracts.files} | area packages ${throughContracts.packages}`,
+  );
   for (const [pair, { kind, count }] of [...found].sort(
     (a, b) => b[1].count - a[1].count,
   )) {
     console.log(`${String(count).padStart(4)}  ${kind.padEnd(6)}  ${pair}`);
   }
+  if (faults.length > 0) console.error(faults.join("\n"));
   process.exit(faults.length === 0 ? 0 : 1);
 }
 

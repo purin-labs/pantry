@@ -1,9 +1,6 @@
 import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { resolveCanvasCollaborationAgent } from "../../actors/collaboration-agent";
-import type {
-  HarnessToolArgumentObserver,
-  HarnessToolHost,
-} from "../../actors/embedded-harness";
+import type { HarnessToolArgumentObserver } from "../../actors/embedded-harness";
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
@@ -182,23 +179,6 @@ export function createMenuBoardDraftPreview(
         Promise.all(waits),
         new Promise((resolve) => setTimeout(resolve, SETTLE_LIMIT_MS)),
       ]);
-    },
-  };
-}
-
-/**
- * A tool host whose calls wait for the draft frames already sent, so that a
- * late frame never shows after its edit.
- */
-export function withSettledToolArguments(
-  host: HarnessToolHost,
-  observer: HarnessToolArgumentObserver,
-): HarnessToolHost {
-  return {
-    ...host,
-    async executeTool(name, inputJson, callId) {
-      await observer.settle();
-      return host.executeTool(name, inputJson, callId);
     },
   };
 }

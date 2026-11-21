@@ -1,12 +1,11 @@
 import { mailboxReplyDisposition } from "../mail-inbox/direct-reply";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { runtimeFetch } from "../runtime-fetch";
-import { proposeEvalFromCorrection } from "../evals/access";
-import { proposeMemoryFromCorrection } from "../memory/access";
+import { memoryService } from "../memory/contract/memory-service";
 import {
   createMailboxTurnMemoryReader,
   readMailboxSupplierScope,
-} from "../memory/mailbox-turn";
+} from "../mail-inbox/mailbox-turn-memory";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
@@ -76,7 +75,7 @@ import type {
   EmailChatSource,
   EmailReplySources,
 } from "../mail-inbox/reply-sources";
-import type { ShownMemoryRevision } from "../memory/access";
+import type { ShownMemoryRevision } from "../memory/contract/turn-memory";
 import { caseContextCollectionEvidenceDependency } from "../case-context-discovery/evidence";
 import { bindMailboxCaseContextCollectionAuthority } from "../authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "../policy/information-flow";
@@ -98,7 +97,7 @@ import {
   type PinnedSessionPolicy,
 } from "../policy-snapshot";
 import { resolveOrganisationModelRoute } from "../models/route";
-import { readGmailInferenceEligibility } from "../data/gmail-inference-eligibility";
+import { readGmailInferenceEligibility } from "../mail-inbox/contract/gmail-inference-eligibility";
 import {
   BACKGROUND_MEMORY_DEADLINE_MS,
   prepareTurnAuthority,
@@ -1138,8 +1137,10 @@ async function runEmailTurn(
 type EmailReplyTurnSettlement = Readonly<{
   caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"] &
     Pick<
-      import("./case").CaseDO,
-      "acceptEmailProposal" | "transitionEmailProposal"
+      import("./case-inbox/rpc").CaseInboxRpc,
+      | "acceptEmailProposal"
+      | "transitionEmailProposal"
+      | "transitionEmailProposal"
     >;
   prepared: Readonly<{
     assignment: import("@purin-labs/contracts").CaseAssignment;
@@ -1817,7 +1818,7 @@ async function settleCorrectionLearning(
     version: input.correction.version,
     digest: input.correction.bodyDigest,
   } as const;
-  const proposed = await proposeMemoryFromCorrection({
+  const proposed = await memoryService.use().proposeMemoryFromCorrection({
     env,
     execution: input.scope,
     organisationId: turn.organisationId,
@@ -1837,7 +1838,7 @@ async function settleCorrectionLearning(
   // expects that a person is asked, and the reviewer corrects both. A test
   // that cannot be proposed leaves the Memory candidate standing.
   if (turn.outcome.check !== null) {
-    const tested = await proposeEvalFromCorrection({
+    const tested = await memoryService.use().proposeEvalFromCorrection({
       env,
       execution: input.scope,
       organisationId: turn.organisationId,
@@ -2024,7 +2025,7 @@ async function failEmailCompletion(
 async function dispatchAutomaticEmailProposal(
   env: Env,
   input: EmailThreadTurnInput,
-  caseActor: Parameters<typeof settleTransientEmailAssignment>[0]["caseActor"],
+  caseActor: EmailReplyTurnSettlement["caseActor"],
   proposal: Readonly<{ proposalId: string; version: number }>,
 ): Promise<Result<string, EmailThreadTurnError>> {
   if (!(await isEmailTurnActive(input)))

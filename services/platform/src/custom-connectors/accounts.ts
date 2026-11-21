@@ -32,7 +32,18 @@ import {
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import { prepareConfigurationVersionBump } from "../data/organisation-onboarding-row";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
-import { prepareActiveCredentialGeneration } from "../data/provider-credential-generation";
+import {
+  prepareActiveCredentialGeneration,
+  prepareCredentialGenerationSupersession,
+} from "../data/provider-credential-generation";
+import {
+  prepareCustomConnectorConnectionInsert,
+  prepareCustomConnectorConnectionRotation,
+} from "../data/provider-connection-writes";
+import {
+  prepareCustomConnectorAccountInsert,
+  prepareCustomConnectorAccountRotation,
+} from "../data/integration-account-writes";
 
 export type ActiveCustomConnectorAccount = {
   readonly source: {
@@ -162,51 +173,15 @@ export async function commitNewCustomConnectorAccount(input: {
   let results: D1Result[];
   try {
     results = await session.batch([
-      session
-        .prepare(
-          `INSERT INTO provider_connection (
-             provider_connection_id, organisation_id, source_kind, custom_connector_id,
-             provider, auth_mode, authority_kind, credential_generation,
-             credential_ref, lifecycle, granted_scopes,
-             created_by_user_id, created_at, updated_at,
-             disabled_at, revoked_at, environment, provider_subject_id
-           )
-           SELECT ?, setup.organisation_id, 'custom_api', setup.connector_id,
-             'custom_api', 'api_key', 'connection_credential', 1,
-             setup.candidate_credential_ref, 'active', '[]', ?, ?, ?,
-             NULL, NULL, setup.environment, setup.verified_provider_account_id
-           FROM custom_connector_setup_attempt AS setup
-           JOIN custom_connector_revision AS revision
-             ON revision.organisation_id = setup.organisation_id
-            AND revision.connector_id = setup.connector_id
-            AND revision.revision = setup.connector_revision
-            AND revision.definition_digest = setup.definition_digest
-           JOIN custom_connector AS connector
-             ON connector.organisation_id = setup.organisation_id
-            AND connector.connector_id = setup.connector_id
-           JOIN organisation_onboarding AS onboarding
-             ON onboarding.organisation_id = setup.organisation_id
-            AND onboarding.configuration_version = ?
-           JOIN vault_secret AS secret
-             ON secret.organisation_id = setup.organisation_id
-            AND secret.vault_handle = setup.candidate_credential_ref
-            AND secret.revoked_at IS NULL
-           WHERE setup.organisation_id = ? AND setup.attempt_id = ?
-             AND setup.lifecycle = 'verified' AND setup.attempt_revision = ?
-             AND setup.expires_at > ? AND revision.review_state = 'approved'
-             AND connector.lifecycle IN ('draft', 'active')`,
-        )
-        .bind(
-          providerConnectionId,
-          input.committedByUserId,
-          input.now,
-          input.now,
-          input.expectedConfigurationVersion,
-          attempt.organisationId,
-          attempt.attemptId,
-          attempt.attemptRevision,
-          input.now,
-        ),
+      prepareCustomConnectorConnectionInsert(session, {
+        providerConnectionId,
+        createdByUserId: input.committedByUserId,
+        now: input.now,
+        expectedConfigurationVersion: input.expectedConfigurationVersion,
+        organisationId: attempt.organisationId,
+        attemptId: attempt.attemptId,
+        attemptRevision: attempt.attemptRevision,
+      }),
       prepareActiveCredentialGeneration(session, {
         providerConnectionId,
         credentialGeneration: 1,
@@ -217,36 +192,20 @@ export async function commitNewCustomConnectorAccount(input: {
         createdAt: input.now,
         activatedAt: input.now,
       }),
-      session
-        .prepare(
-          `INSERT INTO integration_account (
-             integration_account_id, organisation_id, source_kind, custom_connector_id,
-             provider_connection_id, provider, provider_account_id, account_kind,
-             display_name, lifecycle, lifecycle_reason_code, capability_set,
-             audience_policy, retention_policy, created_at, updated_at,
-             disabled_by_user_id, disabled_at, revoked_at,
-             environment, is_default_for_provider
-           ) VALUES (
-             ?, ?, 'custom_api', ?, ?, 'custom_api', ?, 'api_account', ?,
-             'active', NULL, ?, '{"kind":"operator"}',
-             '{"kind":"organisation_default"}', ?, ?, NULL, NULL, NULL, ?, 0
-           )`,
-        )
-        .bind(
-          integrationAccountId,
-          attempt.organisationId,
+      prepareCustomConnectorAccountInsert(session, {
+        integrationAccountId,
+        organisationId: attempt.organisationId,
+        connectorId: attempt.connectorId,
+        providerConnectionId,
+        providerAccountId: scopedCustomProviderAccountId(
           attempt.connectorId,
-          providerConnectionId,
-          scopedCustomProviderAccountId(
-            attempt.connectorId,
-            attempt.verification.providerAccountId,
-          ),
-          attempt.verification.displayName,
-          JSON.stringify(operationIds),
-          input.now,
-          input.now,
-          attempt.environment,
+          attempt.verification.providerAccountId,
         ),
+        displayName: attempt.verification.displayName,
+        capabilitySet: JSON.stringify(operationIds),
+        now: input.now,
+        environment: attempt.environment,
+      }),
       session
         .prepare(
           `INSERT INTO custom_connector_account_binding (
@@ -388,21 +347,13 @@ export async function commitExistingCustomConnectorAccount(input: {
   let results: D1Result[];
   try {
     results = await session.batch([
-      session
-        .prepare(
-          `UPDATE provider_credential_generation
-           SET lifecycle = 'superseded', superseded_at = ?
-           WHERE organisation_id = ? AND provider_connection_id = ?
-             AND credential_generation = ? AND credential_ref = ?
-             AND lifecycle = 'active'`,
-        )
-        .bind(
-          input.now,
-          attempt.organisationId,
-          current.value.providerConnectionId,
-          current.value.credentialGeneration,
-          current.value.credentialRef,
-        ),
+      prepareCredentialGenerationSupersession(session, {
+        now: input.now,
+        organisationId: attempt.organisationId,
+        providerConnectionId: current.value.providerConnectionId,
+        credentialGeneration: current.value.credentialGeneration,
+        credentialRef: current.value.credentialRef,
+      }),
       prepareActiveCredentialGeneration(session, {
         providerConnectionId: current.value.providerConnectionId,
         credentialGeneration: nextCredentialGeneration,
@@ -413,51 +364,29 @@ export async function commitExistingCustomConnectorAccount(input: {
         createdAt: input.now,
         activatedAt: input.now,
       }),
-      session
-        .prepare(
-          `UPDATE provider_connection
-           SET credential_generation = ?, credential_ref = ?, lifecycle = 'active',
-               updated_at = ?, disabled_at = NULL, revoked_at = NULL
-           WHERE organisation_id = ? AND provider_connection_id = ?
-             AND source_kind = 'custom_api' AND custom_connector_id = ?
-             AND credential_generation = ? AND credential_ref = ?
-             AND lifecycle != 'revoked'`,
-        )
-        .bind(
-          nextCredentialGeneration,
-          input.authorization.candidateCredentialRef,
-          input.now,
-          attempt.organisationId,
-          current.value.providerConnectionId,
+      prepareCustomConnectorConnectionRotation(session, {
+        nextCredentialGeneration,
+        nextCredentialRef: input.authorization.candidateCredentialRef,
+        now: input.now,
+        organisationId: attempt.organisationId,
+        providerConnectionId: current.value.providerConnectionId,
+        connectorId: attempt.connectorId,
+        credentialGeneration: current.value.credentialGeneration,
+        credentialRef: current.value.credentialRef,
+      }),
+      prepareCustomConnectorAccountRotation(session, {
+        displayName: attempt.verification.displayName,
+        capabilitySet: JSON.stringify(operationIds),
+        now: input.now,
+        organisationId: attempt.organisationId,
+        integrationAccountId: target.integrationAccountId,
+        connectorId: attempt.connectorId,
+        providerConnectionId: current.value.providerConnectionId,
+        providerAccountId: scopedCustomProviderAccountId(
           attempt.connectorId,
-          current.value.credentialGeneration,
-          current.value.credentialRef,
+          attempt.verification.providerAccountId,
         ),
-      session
-        .prepare(
-          `UPDATE integration_account
-           SET display_name = ?, lifecycle = 'active', lifecycle_reason_code = NULL,
-               capability_set = ?, updated_at = ?,
-               disabled_by_user_id = NULL, disabled_at = NULL,
-               revoked_at = NULL
-           WHERE organisation_id = ? AND integration_account_id = ?
-             AND source_kind = 'custom_api' AND custom_connector_id = ?
-             AND provider_connection_id = ? AND provider_account_id = ?
-             AND lifecycle != 'revoked'`,
-        )
-        .bind(
-          attempt.verification.displayName,
-          JSON.stringify(operationIds),
-          input.now,
-          attempt.organisationId,
-          target.integrationAccountId,
-          attempt.connectorId,
-          current.value.providerConnectionId,
-          scopedCustomProviderAccountId(
-            attempt.connectorId,
-            attempt.verification.providerAccountId,
-          ),
-        ),
+      }),
       session
         .prepare(
           `UPDATE custom_connector_account_binding

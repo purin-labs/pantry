@@ -1,13 +1,6 @@
+import type { RequestAuthority } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../../database-handles";
 import type { ActionMutationExecution } from "../action-mutation-execution";
-import { parseSourceProvenance } from "../../commerce/source-provenance";
-import type { RequestAuthority } from "@purin-labs/contracts";
-import type { SourceProvenance } from "@purin-labs/commerce-contracts";
-import { parseIntegrationAccountId } from "../../ids";
-import { parseEmailReplyProposalLifecycle } from "../../data/email-mailbox";
-import { parseEmailProposalTarget } from "../../data/email-operational";
-import { parseCommerceSystemRevision } from "../../data/organisation-commerce-system";
-import { parseCommerceProviderReceipt } from "../../commerce/action-model";
 import {
   isCurrentAuthorityPartition,
   parseStoredAuthorityPartition,
@@ -25,7 +18,7 @@ import {
   InformationFlowContext,
   ObservationEvidence,
 } from "../../policy";
-import { parseCommerceEntityPlaneProposal } from "../../commerce/entity-plane/proposals";
+import { caseParts } from "./parts";
 import type { Variant } from "@purin-labs/type-utils";
 import { checked } from "@purin-labs/contracts/connector-rpc";
 import {
@@ -40,12 +33,8 @@ import {
   commerceEntityPlaneCaseProposalSchema,
   commerceProposalAcceptanceSchema,
   commerceProposalOriginSchema,
-  commerceSystemAuthoritySchema,
   dropHeldOutputRequestSchema,
-  integrationAccountAuthoritySchema,
   noteRefusedEffectRequestSchema,
-  operationalEmailProposalSchema,
-  replyEmailProposalSchema,
   resolveCommerceApprovalRequestSchema,
   settleAssignmentRequestSchema,
   waitForCommerceApprovalRequestSchema,
@@ -59,9 +48,7 @@ import {
   parseCaseBinding,
   parseCaseContent,
   parseCaseTrigger,
-  parseCommerceAction,
   parseConnectorDeliveryReceipt,
-  parseEmailProposalEvidence,
   parseSessionProposal,
   parseTerminalDisposition,
 } from "./record-parsers";
@@ -73,11 +60,10 @@ import type {
   AcceptProposalRequest,
   BeginAssignmentRequest,
   CaseCommerceApprovalRecord,
-  CaseEmailProposal,
   CaseEnsureRequest,
   CaseOutputDropReason,
-  CommerceCaseAuthority,
-  CommerceCaseProposal,
+  CaseCommerceProposal,
+  CaseCommerceProposalOrigin,
   CommerceEntityPlaneCaseProposal,
   ParsedAcceptCommerceProposalRequest,
   ParsedDeliveryReceiptRequest,
@@ -362,70 +348,6 @@ export function readCaseMetaId(sql: SqlStorage): string | null {
   return row?.case_id ?? null;
 }
 
-export function parseCaseEmailProposal(
-  value: unknown,
-): CaseEmailProposal | null {
-  if (typeof value !== "object" || value === null || Array.isArray(value))
-    return null;
-  if ((value as Record<string, unknown>).kind === "operational_new_message") {
-    const proposal = checked(operationalEmailProposalSchema, value);
-    if (proposal === null) return null;
-    const lifecycle = parseEmailReplyProposalLifecycle(proposal.lifecycle);
-    const target = parseEmailProposalTarget(proposal.target);
-    if (!lifecycle.ok || target === null) return null;
-    return {
-      kind: "operational_new_message",
-      proposalId: proposal.proposalId,
-      version: proposal.version,
-      caseId: proposal.caseId,
-      integrationAccountId: proposal.integrationAccountId,
-      target,
-      targetDigest: proposal.targetDigest,
-      subjectDigest: proposal.subjectDigest,
-      bodyDigest: proposal.bodyDigest,
-      snapshotDigest: proposal.snapshotDigest,
-      policyVersion: proposal.policyVersion,
-      credentialGeneration: proposal.credentialGeneration,
-      createdAt: proposal.createdAt,
-      expiresAt: proposal.expiresAt,
-      lifecycle: lifecycle.value,
-    };
-  }
-  const proposal = checked(replyEmailProposalSchema, value);
-  if (proposal === null) return null;
-  const lifecycle = parseEmailReplyProposalLifecycle(proposal.lifecycle);
-  const evidence = parseEmailProposalEvidence(proposal.evidence);
-  if (!lifecycle.ok || evidence === null) return null;
-  return {
-    proposalId: proposal.proposalId,
-    version: proposal.version,
-    caseId: proposal.caseId,
-    threadId: proposal.threadId,
-    providerDraftId: proposal.providerDraftId,
-    evidence,
-    providerDraftMessageId: proposal.providerDraftMessageId,
-    triggeringProviderMessageId: proposal.triggeringProviderMessageId,
-    mailboxBindingId: proposal.mailboxBindingId,
-    bindingRevision: proposal.bindingRevision,
-    policyVersion: proposal.policyVersion,
-    targetDigest: proposal.targetDigest,
-    bodyDigest: proposal.bodyDigest,
-    snapshotDigest: proposal.snapshotDigest,
-    createdAt: proposal.createdAt,
-    expiresAt: proposal.expiresAt,
-    lifecycle: lifecycle.value,
-  };
-}
-
-export function parseCaseEmailProposalJson(
-  payload: string,
-): CaseEmailProposal | null {
-  try {
-    return parseCaseEmailProposal(JSON.parse(payload));
-  } catch {
-    return null;
-  }
-}
 
 export function parseWaitForCommerceApprovalRequest(
   value: unknown,
@@ -513,7 +435,7 @@ function assertNeverDecision(value: never): false {
 
 function parseCommerceCaseProposal(
   value: unknown,
-): CommerceCaseProposal | null {
+): CaseCommerceProposal | null {
   const envelope = checked(commerceCaseProposalSchema, value);
   if (envelope === null || !isRecord(value)) return null;
   const origin = parseCommerceProposalOrigin(
@@ -521,128 +443,29 @@ function parseCommerceCaseProposal(
   );
   if (origin === null) return null;
   const requestAuthority = parseStoredRequestAuthority(value.requestAuthority);
-  const action = parseCommerceAction(value.action);
-  if (!requestAuthority.ok || action === null) return null;
-  if (
-    action.kind === "submit_supplier_payout" ||
-    action.kind === "resume_supplier_payout_funding"
-  ) {
-    const authority = checked(integrationAccountAuthoritySchema, value.authority);
-    if (value.provenance !== null || authority === null) return null;
-    const account = parseIntegrationAccountId(authority.integrationAccountId);
-    if (!account.ok) return null;
-    return {
-      proposalId: envelope.proposalId,
-      caseId: envelope.caseId,
-      basedOnRevision: envelope.basedOnRevision,
-      requestAuthority: requestAuthority.value.requestAuthority,
-      action,
-      authority: {
-        kind: "integration_account",
-        integrationAccountId: account.value,
-      },
-      provenance: null,
-      origin,
-    };
-  }
-  if (
-    action.kind === "install_merchant_plugin" ||
-    action.kind === "publish_cafe_menu" ||
-    action.kind === "change_menu_price" ||
-    action.kind === "refund_order" ||
-    action.kind === "stock_operation"
-  ) {
-    const authority = parsePluginCaseAuthority(value.authority);
-    if (value.provenance !== null || authority === null) return null;
-    return {
-      proposalId: envelope.proposalId,
-      caseId: envelope.caseId,
-      basedOnRevision: envelope.basedOnRevision,
-      requestAuthority: requestAuthority.value.requestAuthority,
-      action,
-      authority,
-      provenance: null,
-      origin,
-    };
-  }
-  const provenance = parseSourceProvenance(value.provenance);
-  const authority =
-    provenance === null
-      ? null
-      : parseCommerceCaseAuthority(value.authority, provenance);
-  return !requestAuthority.ok ||
-    action === null ||
-    provenance === null ||
-    authority === null
+  if (!requestAuthority.ok) return null;
+  const body = caseParts().commerce.parseProposalBody({
+    action: value.action,
+    authority: value.authority,
+    provenance: value.provenance,
+  });
+  return body === null
     ? null
     : {
         proposalId: envelope.proposalId,
         caseId: envelope.caseId,
         basedOnRevision: envelope.basedOnRevision,
         requestAuthority: requestAuthority.value.requestAuthority,
-        action,
-        authority,
-        provenance,
+        action: body.action,
+        authority: body.authority,
+        provenance: body.provenance,
         origin,
       };
 }
 
-// A merchant plugin lives in Pantry Commerce (Commerce); no source record
-// names its integration account, so the authority stands on its own.
-function parsePluginCaseAuthority(
-  value: unknown,
-): CommerceCaseAuthority | null {
-  const authority = checked(commerceSystemAuthoritySchema, value);
-  if (authority === null || authority.system !== "satyr_commerce") return null;
-  const revision = parseCommerceSystemRevision(authority.revision);
-  const integrationAccountId = parseIntegrationAccountId(
-    authority.integrationAccountId,
-  );
-  return revision.ok && integrationAccountId.ok
-    ? {
-        kind: "commerce_system",
-        system: "satyr_commerce",
-        revision: revision.value,
-        integrationAccountId: integrationAccountId.value,
-      }
-    : null;
-}
-
-function parseCommerceCaseAuthority(
-  value: unknown,
-  provenance: SourceProvenance,
-): CommerceCaseAuthority | null {
-  if (!isRecord(value)) return null;
-  if (value.kind === "lab") {
-    return provenance.source === "lab" ? { kind: "lab" } : null;
-  }
-  const authority = checked(commerceSystemAuthoritySchema, value);
-  if (authority === null) return null;
-  const revision = parseCommerceSystemRevision(authority.revision);
-  const integrationAccountId = parseIntegrationAccountId(
-    authority.integrationAccountId,
-  );
-  if (
-    !revision.ok ||
-    !integrationAccountId.ok ||
-    integrationAccountId.value !== provenance.integrationAccountId ||
-    (authority.system === "satyr_commerce" &&
-      provenance.source !== "underclerk") ||
-    (authority.system === "shopify" && provenance.source !== "shopify")
-  ) {
-    return null;
-  }
-  return {
-    kind: "commerce_system",
-    system: authority.system,
-    revision: revision.value,
-    integrationAccountId: integrationAccountId.value,
-  };
-}
-
 function parseCommerceProposalOrigin(
   value: Record<string, unknown>,
-): CommerceCaseProposal["origin"] | null {
+): CaseCommerceProposalOrigin | null {
   const origin = checked(commerceProposalOriginSchema, value);
   if (origin === null) return null;
   return origin.kind === "merchant_control"
@@ -661,7 +484,7 @@ function parseCommerceProposalOrigin(
 
 export function parseCommerceCaseProposalJson(
   value: string,
-): CommerceCaseProposal | null {
+): CaseCommerceProposal | null {
   try {
     return parseCommerceCaseProposal(JSON.parse(value));
   } catch {
@@ -689,7 +512,9 @@ function parseCommerceEntityPlaneCaseProposal(
   if (envelope === null) return null;
   const fields = envelope as typeof envelope & Record<string, unknown>;
   const requestAuthority = parseStoredRequestAuthority(fields.requestAuthority);
-  const proposal = parseCommerceEntityPlaneProposal(fields.proposal);
+  const proposal = caseParts().commerce.parseEntityPlaneCommand(
+    fields.proposal,
+  );
   const origin = parseCommerceProposalOrigin(
     envelope.origin as Record<string, unknown>,
   );
@@ -822,10 +647,10 @@ function parseCommerceCaseOutcome(
   if (outcome === null) return null;
   switch (outcome.kind) {
     case "provider_receipt": {
-      const receipt = parseCommerceProviderReceipt(outcome.receipt);
-      return receipt.ok
-        ? { kind: "provider_receipt", receipt: receipt.value }
-        : null;
+      const receipt = caseParts().commerce.parseProviderReceipt(
+        outcome.receipt,
+      );
+      return receipt === null ? null : { kind: "provider_receipt", receipt };
     }
     case "merchant_rejection": {
       const evidence = parseMerchantActionRejectionEvidence(outcome.evidence);

@@ -2,11 +2,11 @@ import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Env } from "../env";
 import { resolveActiveConnectorActorAtScope } from "../actors/actor-router";
 import {
-  gmailConnectorIdValue,
   readAgentMailboxBinding,
   readEmailMailboxAccount,
   readMailboxIngressPolicy,
 } from "../data/email-mailbox";
+import { gmailConnectorIdValue } from "./contract/connector-ids";
 import { resolveIntegrationAccount } from "../data/integration-account";
 import { parseConnectorId, type IntegrationAccountId } from "../ids";
 import { readActiveCredentialAuthorizedAt } from "../data/integration-account-reads";

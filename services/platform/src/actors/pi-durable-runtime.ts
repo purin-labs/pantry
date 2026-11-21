@@ -1,4 +1,3 @@
-import { piToolReplay } from "./pi-tool-replay";
 import { PiToolArgumentStream } from "./pi-tool-argument-stream";
 import { persistedAnswerDeltas } from "./harness-answer";
 import {
@@ -9,7 +8,7 @@ import {
   unplacedSteeringInputs,
 } from "./harness-steering";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
-import type { Context } from "@earendil-works/chord";
+import type { Context } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";
 import {
   createAssistantMessageEventStream,
@@ -323,7 +322,7 @@ class PiDurableRuntime implements EmbeddedHarnessRuntime {
       this.input.toolHost,
       this.preflight.bind(this),
       this.input.turnLease.turn.turnId,
-      piToolReplay,
+      this.input.toolRules,
     );
     const extension = defineExtension({ name: "satyr.tools", tools });
     const codeMode = this.input.toolHost.codeMode.kind === "enabled";
@@ -1107,6 +1106,7 @@ function piThinkingLevel(
       return requested ?? "minimal";
     case "openai":
     case "anthropic":
+    case "google":
       return requested ?? "high";
   }
 }
@@ -1195,7 +1195,7 @@ function initialTool(tool: ToolRegistration): boolean {
 function directTool(tool: ToolRegistration): boolean {
   return !searchTool(tool);
 }
-/** The opening of Pi's fixed compaction prompt (pi-durable 1.5.0). */
+/** The opening of Pi's fixed compaction prompt (pi-durable 1.6.0). */
 const COMPACTION_PROMPT_START = "You are a context summarization assistant.";
 
 function compactionRequest(context: TranscriptContext): boolean {

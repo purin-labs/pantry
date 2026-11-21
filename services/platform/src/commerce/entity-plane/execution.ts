@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { CommerceCommandAuthorityContext } from "@purin-labs/commerce-contracts/relationship-authority";
-import { pantryCommerceAccess } from "../app-access";
+import { pantryCommerceAccess } from "../contract/client";
 import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { decideCurrentAuthorityFlowSink } from "../../chat/information-flow";
@@ -40,8 +40,8 @@ import type { OrganisationCommerce } from "../../actors/organisation/organisatio
 import {
   authorizeCapabilityUse,
   selectActiveGrants,
-  commerceCommandGrantMatchesTarget,
 } from "../../authorization/access-grants";
+import { commerceCommandGrantMatchesTarget } from "./grant-authorities";
 import type { ProviderCapabilityDefinition } from "../../authorization/access-grants/capability-key";
 import { listAccessGrants } from "../../data/access-grants";
 import { parseStoredRequestAuthority } from "../../request-authority";

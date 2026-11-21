@@ -1,3 +1,4 @@
+import type { OrganisationModuleHost } from "./module-host";
 import { ensureJevPaidHold } from "../../jev-features/paid-use";
 import {
   runScreenRelevanceCheck,
@@ -15,6 +16,7 @@ import {
   type MailEvaluationInput,
 } from "../../mail-inbox/evaluation";
 import { reconcileAdmittedOrganisationArchiveCleanup } from "../../data/onboarding-reconciliation";
+import { ARCHIVE_CLEANUP_PARTS } from "../../archive-cleanup-parts";
 import {
   AdmittedOrganisationArchiveCleanup,
   readOrganisationArchiveCleanup,
@@ -37,6 +39,8 @@ import { type ActorExportError } from "../actor-export";
 import {
   acceptShopifyLocationObservation,
   assignShopifyLocationClassification,
+  shopifyLocationClassificationAuthority,
+  shopifyLocationProjectionAuthority,
   type AssignShopifyLocationClassificationInput,
   type ShopifyLocationClassificationAssignmentError,
   type ShopifyLocationClassificationAssignmentResult,
@@ -78,16 +82,18 @@ import { organisationAlarmReconcilers } from "../organisation-alarm";
 import { schemaTransaction } from "./schema";
 import {
   executeOrganisationCommand,
-  organisationPlacementConflict,
   readNextOrganisationAlarmAt,
   resolveOrganisationActorDatabase,
-  validateActionOrganisation,
 } from "./support";
 import type {
   OrganisationMeta,
   OrganisationMetaInput,
   OrganisationStateError,
 } from "./types";
+import {
+  organisationPlacementConflict,
+  validateActionOrganisation,
+} from "./organisation-record";
 
 /**
  * The Organisation actor's state, its command admission and its shared helpers (Refactor 10, step 2.6). The layers above add policy and credentials, then commerce, Code Mode and activation; `OrganisationDO` keeps the members that use its private rooms and drafts.
@@ -560,6 +566,7 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
     if (!database.ok) throw new Error(database.error.code);
     const repaired = await reconcileAdmittedOrganisationArchiveCleanup({
       env: this.env,
+      parts: ARCHIVE_CLEANUP_PARTS,
       db: database.value,
       directory: this.env.DB,
       archive: this.env.ARCHIVE,
@@ -650,18 +657,10 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
       db: scope.database,
       organisationId: input.organisationId,
     });
-    const projectionAuthority =
-      selected.ok &&
-      selected.value.provider === "shopify" &&
-      selected.value.integrationAccountId === input.integrationAccountId
-        ? {
-            kind: "selected" as const,
-            commerceSystem: {
-              kind: "shopify" as const,
-              revision: selected.value.commerceSystem.revision,
-            },
-          }
-        : { kind: "unselected" as const };
+    const projectionAuthority = shopifyLocationProjectionAuthority(
+      selected,
+      input.integrationAccountId,
+    );
     if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
       return organisationPlacementConflict();
     return this.ctx.storage.transactionSync(
@@ -696,16 +695,11 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
       db: scope.database,
       organisationId: input.organisationId,
     });
-    if (
-      !selected.ok ||
-      selected.value.provider !== "shopify" ||
-      selected.value.integrationAccountId !== input.integrationAccountId
-    ) {
-      return {
-        ok: false,
-        error: { code: "commerce_system_authority_mismatch" },
-      };
-    }
+    const commerceSystem = shopifyLocationClassificationAuthority(
+      selected,
+      input.integrationAccountId,
+    );
+    if (!commerceSystem.ok) return commerceSystem;
     if (!(await isOrganisationExecutionActive(this.ctx.storage.sql, scope)))
       return organisationPlacementConflict();
     return this.ctx.storage.transactionSync(
@@ -713,10 +707,7 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
         null,
         this.ctx.storage.sql,
         input,
-        {
-          kind: "shopify",
-          revision: selected.value.commerceSystem.revision,
-        },
+        commerceSystem.value,
       ),
     );
   }
@@ -742,6 +733,21 @@ export abstract class OrganisationActorBase extends PlacedActor<OrganisationId> 
 
     return input;
   }
+
+  /** What this Organisation gives to a module of a product area. */
+  protected readonly moduleHost: OrganisationModuleHost = (() => {
+    const actor = this;
+    return {
+      get ctx() {
+        return actor.ctx;
+      },
+      get env() {
+        return actor.env;
+      },
+      command: (organisationId, start) => actor.command(organisationId, start),
+      rearm: () => actor.rearm(),
+    };
+  })();
 
   /** Sets the alarm from the Organisation's stored work. */
   protected rearm(): Promise<number | null> {

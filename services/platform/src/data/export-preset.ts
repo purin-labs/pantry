@@ -42,6 +42,16 @@ import {
 } from "./capability-policy";
 import type { Variant } from "@purin-labs/type-utils";
 import {
+  prepareExportCoordinationArea,
+  prepareExportCoordinatorInstallation,
+  prepareExportResponsibilityScope,
+} from "./agent-operations/export-coordinator-rows";
+import { prepareGuardedFirstGrant } from "./access-grants";
+import {
+  prepareGuardedConfigurationVersionFence,
+  preparePublicationRevision,
+} from "./organisation-onboarding-row";
+import {
   assertNever,
   isRecord,
   nonNegativeIntegerOrNull,
@@ -329,26 +339,19 @@ export async function publishCommerceExportPreset(
     evidence: authoritative.value.evidence,
   };
   const statements = [
-    session
-      .prepare(
-        `UPDATE organisation_onboarding
-          SET configuration_version = ?, projection_revision = ?, updated_at = ?
-        WHERE organisation_id = ? AND configuration_version = ? AND projection_revision = ?
-          AND lifecycle IN ('configuring', 'active') AND EXISTS (SELECT 1 FROM organisation_placement
-            WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')`,
-      )
-      .bind(
-        publication.configurationVersion,
-        publication.projectionRevision,
-        input.controlMutation.identity.createdAt,
-        input.scope.organisationId,
-        configurationVersion,
-        projectionRevision,
-        input.scope.organisationId,
-        input.scope.placement.placementEpoch,
-        input.scope.placement.placementCellId,
-        input.scope.fenceToken,
-      ),
+    preparePublicationRevision(session, {
+      nextConfigurationVersion: publication.configurationVersion,
+      nextProjectionRevision: publication.projectionRevision,
+      now: input.controlMutation.identity.createdAt,
+      organisationId: input.scope.organisationId,
+      configurationVersion,
+      projectionRevision,
+      placement: {
+        placementEpoch: input.scope.placement.placementEpoch,
+        placementCellId: input.scope.placement.placementCellId,
+        fenceToken: input.scope.fenceToken,
+      },
+    }),
     prepareControlMutationReceiptAfterWrite(session, {
       scope: input.controlMutation.scope,
       boundary: input.controlMutation.boundary,
@@ -440,16 +443,11 @@ async function settleExportReplay(
   });
   try {
     const [admission] = await session.batch([
-      session
-        .prepare(
-          `UPDATE organisation_onboarding SET updated_at = updated_at
-        WHERE organisation_id = ? AND configuration_version = ? AND ${guard.condition}`,
-        )
-        .bind(
-          input.scope.organisationId,
-          input.expectedConfigurationVersion,
-          ...guard.bindings,
-        ),
+      prepareGuardedConfigurationVersionFence(session, {
+        organisationId: input.scope.organisationId,
+        version: input.expectedConfigurationVersion,
+        guard,
+      }),
       prepareControlMutationReceiptAfterWrite(session, {
         scope: input.controlMutation.scope,
         boundary: input.controlMutation.boundary,
@@ -744,187 +742,39 @@ async function buildPublicationRecords(
     grantStatements.push(accessGrantStatement(source, input, entry, admission));
   }
   const statements = [
-    source
-      .prepare(
-        `INSERT INTO operational_area (
-         area_id, organisation_id, name, purpose, lifecycle,
-         created_by_user_id, created_at, updated_at
-       ) SELECT ?, ?, 'Export coordination', ?, 'active', ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_AREA_ID,
-        input.organisationId,
+    prepareExportCoordinationArea(source, {
+      guard,
+      areaId: EXPORT_AREA_ID,
+      organisationId: input.organisationId,
+      purpose:
         "Coordinate published export documents and trade-partner handoffs.",
-        input.userId,
-        input.now,
-        input.now,
-        ...guard.bindings,
-      ),
+      userId: input.userId,
+      now: input.now,
+    }),
     ...scopeStatements,
-    source
-      .prepare(
-        `INSERT INTO skill (
-         skill_id, organisation_id, title, sensitivity, lifecycle, current_revision,
-         created_by_user_id, created_at, updated_at
-       ) SELECT ?, ?, 'Export coordination', 'ordinary', 'published', 1, ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_SKILL_ID,
-        input.organisationId,
-        input.userId,
-        input.now,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO skill_revision (
-         skill_id, organisation_id, revision, markdown_body, content_digest,
-         authored_by_user_id, created_at
-       ) SELECT ?, ?, 1, ?, ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_SKILL_ID,
-        input.organisationId,
-        EXPORT_SKILL_BODY,
-        skillDigest,
-        input.userId,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO agent_definition (
-         agent_definition_id, organisation_id, display_name, role, purpose, lifecycle,
-         current_revision, created_by_user_id, created_at, updated_at
-       ) SELECT ?, ?, 'Export coordinator', 'export_coordinator',
-         'Coordinate export handoffs and resolve missing documents.', 'active', 1, ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_AGENT_ID,
-        input.organisationId,
-        input.userId,
-        input.now,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO agent_definition_revision (
-         agent_definition_id, organisation_id, revision, instructions,
-         requested_capabilities_json, skill_refs_json, content_digest,
-         authored_by_user_id, created_at
-       ) SELECT ?, ?, 1, ?, ?, ?, ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_AGENT_ID,
-        input.organisationId,
-        EXPORT_SKILL_BODY,
-        JSON.stringify([EXPORT_CAPABILITY_ID]),
-        JSON.stringify([{ skillId: EXPORT_SKILL_ID, revision: 1 }]),
-        agentDigest,
-        input.userId,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO agent_installation (
-         installation_id, organisation_id, agent_definition_id, definition_revision,
-         policy_revision, granted_capabilities_json, lifecycle,
-         created_by_user_id, created_at, updated_at
-       ) SELECT ?, ?, ?, 1, ?, ?, 'active', ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_INSTALLATION_ID,
-        input.organisationId,
-        EXPORT_AGENT_ID,
-        input.policyVersion,
-        JSON.stringify([EXPORT_CAPABILITY_ID]),
-        input.userId,
-        input.now,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO agent_area_assignment (
-         installation_id, area_id, responsibility, scope_ids_json, assigned_at
-       ) SELECT ?, ?, 'Export coordination', ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_INSTALLATION_ID,
-        EXPORT_AREA_ID,
-        JSON.stringify(scopeIds),
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO skill_binding (
-         binding_id, organisation_id, target_kind, target_id, skill_id, skill_revision, created_at
-       ) SELECT ?, ?, 'area', ?, ?, 1, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        `skill_binding_${EXPORT_AREA_ID}`,
-        input.organisationId,
-        EXPORT_AREA_ID,
-        EXPORT_SKILL_ID,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO cue_binding (
-         binding_id, organisation_id, area_id, scope_ids_json, installation_id,
-         cue_source, cue_event_type, enabled, instruction_body, revision,
-         updated_by_user_id, created_at, updated_at
-       ) SELECT ?, ?, ?, ?, ?, ?, ?, 1, ?, 1, ?, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_CUE_BINDING_ID,
-        input.organisationId,
-        EXPORT_AREA_ID,
-        JSON.stringify(scopeIds),
-        EXPORT_INSTALLATION_ID,
-        EXPORT_CUE_SOURCE,
-        EXPORT_CUE_EVENT_TYPE,
-        EXPORT_SKILL_BODY,
-        input.userId,
-        input.now,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO agent_installation_governance (
-         installation_id, organisation_id, max_session_budget_tokens, revision,
-         updated_by_user_id, updated_at
-       ) SELECT ?, ?, 64000, 1, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_INSTALLATION_ID,
-        input.organisationId,
-        input.userId,
-        input.now,
-        ...guard.bindings,
-      ),
-    source
-      .prepare(
-        `INSERT INTO escalation_policy (
-         area_id, organisation_id, scope_ids_json, approval_reminder_after_ms,
-         escalate_after_ms, escalate_to, revision,
-         updated_by_user_id, updated_at
-       ) SELECT ?, ?, ?, 900000, 3600000, 'organisation_owner', 1, ?, ? WHERE ${guard.condition}`,
-      )
-      .bind(
-        EXPORT_AREA_ID,
-        input.organisationId,
-        JSON.stringify(scopeIds),
-        input.userId,
-        input.now,
-        ...guard.bindings,
-      ),
+    ...prepareExportCoordinatorInstallation(source, {
+      guard,
+      organisationId: input.organisationId,
+      userId: input.userId,
+      now: input.now,
+      areaId: EXPORT_AREA_ID,
+      skillId: EXPORT_SKILL_ID,
+      skillBody: EXPORT_SKILL_BODY,
+      skillDigest,
+      agentDefinitionId: EXPORT_AGENT_ID,
+      capabilitiesJson: JSON.stringify([EXPORT_CAPABILITY_ID]),
+      skillRefsJson: JSON.stringify([
+        { skillId: EXPORT_SKILL_ID, revision: 1 },
+      ]),
+      agentDigest,
+      installationId: EXPORT_INSTALLATION_ID,
+      policyVersion: input.policyVersion,
+      scopeIdsJson: JSON.stringify(scopeIds),
+      skillBindingId: `skill_binding_${EXPORT_AREA_ID}`,
+      cueBindingId: EXPORT_CUE_BINDING_ID,
+      cueSource: EXPORT_CUE_SOURCE,
+      cueEventType: EXPORT_CUE_EVENT_TYPE,
+    }),
     ...grantStatements,
   ];
   return { ok: true, value: statements };
@@ -982,31 +832,14 @@ function responsibilityScopeStatement(
 ): D1PreparedStatement {
   const guard = capabilityPolicyAdmission(admission);
   const columns = scopeColumns(entry.scope);
-  return source
-    .prepare(
-      `INSERT INTO agent_responsibility_scope (
-       scope_id, organisation_id, area_id, scope_kind,
-       entity_type_origin, entity_type_id, commerce_list_id,
-       relationship_json, list_entry_json, selector_id, selector_revision,
-       selector_query_json, lifecycle, revision, published_at
-     ) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'published', 1, ? WHERE ${guard.condition}`,
-    )
-    .bind(
-      entry.scopeId,
-      input.organisationId,
-      EXPORT_AREA_ID,
-      columns.scopeKind,
-      columns.entityTypeOrigin,
-      columns.entityTypeId,
-      columns.commerceListId,
-      columns.relationshipJson,
-      columns.listEntryJson,
-      columns.selectorId,
-      columns.selectorRevision,
-      columns.selectorQueryJson,
-      input.now,
-      ...guard.bindings,
-    );
+  return prepareExportResponsibilityScope(source, {
+    guard,
+    scopeId: entry.scopeId,
+    organisationId: input.organisationId,
+    areaId: EXPORT_AREA_ID,
+    columns,
+    now: input.now,
+  });
 }
 
 function accessGrantStatement(
@@ -1022,36 +855,29 @@ function accessGrantStatement(
 ): D1PreparedStatement {
   const guard = capabilityPolicyAdmission(admission);
   const scope = grantScope(entry.scope);
-  return source
-    .prepare(
-      `INSERT INTO access_grant (
-       organisation_id, grant_id, subject_json, target_json, lifecycle,
-       revision, reason, provenance_json, changed_at
-     ) SELECT ?, ?, ?, ?, 'active', 1, NULL, ?, ? WHERE ${guard.condition}`,
-    )
-    .bind(
-      input.organisationId,
-      `grant_${entry.scopeId}`,
-      JSON.stringify({
-        kind: "workflow",
-        workflowKind: "cue_subscription",
-        workflowId: EXPORT_CUE_BINDING_ID,
-        workflowRevision: 1,
-      }),
-      JSON.stringify({
-        kind: "commerce_read",
-        capabilityId: EXPORT_READ_CAPABILITY_ID,
-        capabilityVersion: 1,
-        scope,
-      }),
-      JSON.stringify({
-        kind: "operator",
-        userId: input.userId,
-        mutationReceiptId: input.mutationReceiptId,
-      }),
-      input.now,
-      ...guard.bindings,
-    );
+  return prepareGuardedFirstGrant(source, {
+    guard,
+    organisationId: input.organisationId,
+    grantId: `grant_${entry.scopeId}`,
+    subjectJson: JSON.stringify({
+      kind: "workflow",
+      workflowKind: "cue_subscription",
+      workflowId: EXPORT_CUE_BINDING_ID,
+      workflowRevision: 1,
+    }),
+    targetJson: JSON.stringify({
+      kind: "commerce_read",
+      capabilityId: EXPORT_READ_CAPABILITY_ID,
+      capabilityVersion: 1,
+      scope,
+    }),
+    provenanceJson: JSON.stringify({
+      kind: "operator",
+      userId: input.userId,
+      mutationReceiptId: input.mutationReceiptId,
+    }),
+    changedAt: input.now,
+  });
 }
 
 function scopeColumns(scope: ExportScope): Readonly<{

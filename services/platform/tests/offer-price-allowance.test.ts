@@ -9,8 +9,8 @@ const bindingMocks = vi.hoisted(() => ({
   resolveOrganisationCommerceMerchantBinding: vi.fn(),
 }));
 const organisationMocks = vi.hoisted(() => ({ readOrganisationEnvironment: vi.fn() }));
-vi.mock("../src/commerce/outbox-worker", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/outbox-worker")>()),
+vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
   createCommerceClient: clientMocks.createCommerceClient,
 }));
 vi.mock("../src/data/commerce-merchant-binding", async (importOriginal) => ({
@@ -28,7 +28,7 @@ vi.mock("../src/control/organisation-runtime", async (importOriginal) => ({
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,
-} from "../src/data/offer-price-allowance";
+} from "../src/commerce/contract/offer-price-allowance";
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION = requireOrganisationId("organisation_allowance");

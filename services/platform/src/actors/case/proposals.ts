@@ -55,7 +55,7 @@ import type {
   AcceptProposalRequest,
   CaseCommerceApprovalRecord,
   CaseResult,
-  CommerceCaseProposal,
+  CaseCommerceProposal,
   JsonRow,
   ProposalRow,
   RawCaseCommerceOutcomeAcceptance,
@@ -873,8 +873,8 @@ export function acceptCommerceOutcome(
 }
 
 function sameCommerceProposal(
-  left: CommerceCaseProposal,
-  right: CommerceCaseProposal,
+  left: CaseCommerceProposal,
+  right: CaseCommerceProposal,
 ): boolean {
   return (
     left.proposalId === right.proposalId &&

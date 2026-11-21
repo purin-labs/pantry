@@ -9,13 +9,13 @@ import {
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 import type { DiscoveredProviderResource } from "../data/provider-resource";
 import type {
   SquareDelegation,
   CommerceMerchant,
-} from "../commerce/square-link";
-import { createCommerceClient } from "../commerce/outbox-worker";
+} from "../commerce/contract/square-link";
+import { createCommerceClient } from "../commerce/contract/client";
 import { isRecord } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "revoke_square_access_in_square" as const;

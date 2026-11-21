@@ -11,7 +11,7 @@ import type { Env } from "../../env";
 import { handlePantryOnboarding } from "../../account-platform/onboarding";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import { commerceSystemReadiness } from "../../commerce/system-readiness";
+import { commerceSystemReadiness } from "../../commerce/contract/system-readiness";
 import {
   ensureCurrentReadiness,
   ensureCurrentReadinessFromSignals,
@@ -47,9 +47,12 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "../../ids";
-import { resolveOrganisationModelRoute } from "../../models/route";
+import {
+  activationModelRouteError,
+  resolveOrganisationModelRoute,
+} from "../../models/route";
 import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
-import { reconcileProviderManifestObservations } from "../../provider-lifecycle/observation";
+import { providerServices } from "../../integrations/contract/provider-services";
 import {
   admitUserMutation,
   controlMutationIdentity,
@@ -73,7 +76,6 @@ import {
 } from "../http";
 import {
   activationErrorStatus,
-  activationModelRouteError,
   runtimeAdmissionStatus,
 } from "../onboarding-runtime";
 import {
@@ -941,7 +943,7 @@ async function handleReadiness(
     return authorized.response;
   }
   const now = Date.now();
-  await reconcileProviderManifestObservations({
+  await providerServices.use().reconcileProviderManifestObservations({
     env,
     organisationId: authorized.organisationId,
     now,

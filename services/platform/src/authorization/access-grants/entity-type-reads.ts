@@ -1,15 +1,11 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { RequestAuthority } from "@purin-labs/contracts";
-import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
-import { selectNamedCommerceQuerySourceGrant } from "../../context/assembly";
 import { listAccessGrants } from "../../data/access-grants";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import type { OrganisationId } from "../../ids";
 import type { Result } from "../../result";
-import {
-  requestableReadScope,
-  type RequestableEntityTypeRead,
-} from "../requestable-capabilities";
+import type { RequestableEntityTypeRead } from "../requestable-capabilities";
+import { commerceGrantSelection } from "./commerce-grant-selection";
 import type { AccessGrant } from "./types";
 
 /**
@@ -89,26 +85,23 @@ export async function missingEntityTypeReads(
   ]);
   if (!binding.ok || !grants.ok) return unavailable();
   const missing: MissingEntityTypeRead[] = [];
+  const selection = commerceGrantSelection.use();
   for (const read of input.reads) {
-    const query = parseCommerceGraphQuery(requestableReadQuery(read));
-    if (!query.ok) return unavailable();
     for (const audience of entityTypeReadAudiences(
       input.requestAuthority,
       read,
     )) {
-      const selected = selectNamedCommerceQuerySourceGrant({
+      const selected = selection.selectRequestableReadGrant({
         organisationId: String(input.organisationId),
         merchantId: String(binding.value.merchantId),
         grants: grants.value.filter(audienceGrant.bind(null, audience)),
         requestAuthority: audienceAuthority(input.requestAuthority, audience),
         causationId: input.causationId,
-        query: query.value,
-        allowedSensitivity: "internal",
+        read,
         now: new Date(input.now).toISOString(),
       });
       if (selected.ok) continue;
-      if (selected.error.code !== "commerce_context_authority_denied")
-        return unavailable();
+      if (selected.error.code !== "denied") return unavailable();
       missing.push({ read, audience });
     }
   }
@@ -145,30 +138,6 @@ function audienceGrant(
     grant.subject.kind === "organisation_role" &&
     grant.subject.role === audience
   );
-}
-
-/** A query that only a grant over the whole read scope admits. */
-function requestableReadQuery(read: RequestableEntityTypeRead): unknown {
-  const scope = requestableReadScope(read);
-  switch (scope.kind) {
-    case "entity_type":
-      return {
-        kind: "entity_type_page",
-        entityTypeId: { origin: "system", typeId: scope.typeId },
-        filter: { kind: "all" },
-        sorts: [],
-        pagination: { limit: 1, cursor: null },
-        traversal: { maxDepth: 0, resultLimit: 1 },
-      };
-    case "commerce_list":
-      return {
-        kind: "commerce_list_page",
-        listId: scope.listId,
-        filter: { kind: "all" },
-        sorts: [],
-        pagination: { limit: 1, cursor: null },
-      };
-  }
 }
 
 function unavailable(): Result<never, EntityTypeReadsError> {

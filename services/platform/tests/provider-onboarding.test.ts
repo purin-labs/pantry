@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
@@ -8,7 +10,7 @@ import { newControlMutationIdentity } from "../src/data/control-mutation";
 import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
 import { gmailProductFromScopes } from "../src/mail/gmail-authorization";
 import { parseWorkspaceId, type WorkspaceId } from "../src/ids";
-import type { ProviderStartContext } from "../src/provider-adapters/domain";
+import type { ProviderStartContext } from "../src/integrations/contract/provider-adapter";
 import {
   discoverSlackChannels,
   parseSlackChannelPage,

@@ -1,15 +1,17 @@
-import { exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import type { IssuedControlSession } from "../../src/data/control-plane";
 import { preparePortalChatJourney } from "./chat-journey-support";
 import { connectAnthropicApiKey } from "./chatgpt-subscription-support";
-import { commerceHeaders } from "./commerce-support";
 import { MODEL_EXIT_EGRESS_HEADER } from "./model-exit-network";
+import {
+  modelIds,
+  readChat,
+  readWork,
+  sendMessage,
+} from "./chat-model-choice-support";
 import { network } from "./network";
-import { ORGANISATION_ID } from "./slack-journey-support";
 
 /**
  * An owner chats in Portal on the organisation's own Anthropic API key. The
@@ -231,66 +233,4 @@ function requestSummary(body: Record<string, unknown>): unknown {
     outputConfig: body.output_config ?? null,
     thinking: body.thinking ?? null,
   };
-}
-
-function modelIds(menu: Record<string, unknown>): unknown[] {
-  const options = Array.isArray(menu.options) ? menu.options : [];
-  return options.map((option: unknown) =>
-    isRecord(option) ? option.id : null,
-  );
-}
-
-async function readChat(
-  session: IssuedControlSession,
-  conversationId: string | null,
-): Promise<{
-  readonly model: Record<string, unknown>;
-  readonly conversation: Record<string, unknown>;
-}> {
-  const query =
-    conversationId === null ? "" : `?conversation=${conversationId}`;
-  const response = await exports.default.fetch(
-    `https://localhost/v1/control/organisations/${ORGANISATION_ID}/chat${query}`,
-    { headers: commerceHeaders(session) },
-  );
-  const raw: unknown = await response.json();
-  if (response.status !== 200 || !isRecord(raw) || !isRecord(raw.model))
-    throw new Error(`Chat read failed: ${JSON.stringify(raw)}`);
-  return {
-    model: raw.model,
-    conversation: isRecord(raw.conversation) ? raw.conversation : {},
-  };
-}
-
-async function readWork(
-  session: IssuedControlSession,
-  conversationId: string,
-): Promise<unknown> {
-  const { conversation } = await readChat(session, conversationId);
-  return isRecord(conversation.work) ? conversation.work.kind : "missing";
-}
-
-async function sendMessage(
-  session: IssuedControlSession,
-  message: {
-    readonly conversationId: string;
-    readonly requestId: string;
-    readonly model: string;
-    readonly effort?: "low" | "medium" | "high";
-    readonly text: string;
-  },
-): Promise<{ readonly status: number; readonly body: unknown }> {
-  const response = await exports.default.fetch(
-    `https://localhost/v1/control/organisations/${ORGANISATION_ID}/chat`,
-    {
-      method: "POST",
-      headers: commerceHeaders(session),
-      body: JSON.stringify({
-        kind: "message",
-        ...message,
-        surfaceContext: null,
-      }),
-    },
-  );
-  return { status: response.status, body: await response.json() };
 }

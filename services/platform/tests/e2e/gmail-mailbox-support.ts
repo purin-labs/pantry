@@ -16,10 +16,8 @@ import {
 } from "../../src/authorization/capability-catalogue";
 import { storeVaultSecret } from "../../src/credential-vault";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
-import {
-  gmailConnectorId,
-  registerEmailMailboxAccount,
-} from "../../src/data/email-mailbox";
+import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
+import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { persistProviderResourceSnapshot } from "../../src/data/provider-resource";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";

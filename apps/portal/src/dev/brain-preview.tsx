@@ -38,7 +38,7 @@ import {
 } from "./brain-execution-sample";
 import { BrainRoute } from "../features/brain/route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
-import { UNAVAILABLE_ACCESS } from "./unavailable-access";
+import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
 import { PageHeader } from "../page-components";
 import { PortalFrame } from "../shell";

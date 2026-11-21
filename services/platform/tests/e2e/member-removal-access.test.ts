@@ -20,6 +20,7 @@ import {
   installSlackActorFixture,
   openRouterText,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -27,7 +28,7 @@ declare module "vitest" {
   }
 }
 
-const MODEL = "moonshotai/kimi-k3";
+const MODEL = PLATFORM_DEFAULT_PI_MODEL;
 
 // Plan 95 step 1, journey J3. Pantry decides access from its own member
 // records. When an owner removes a member, that member's next message is

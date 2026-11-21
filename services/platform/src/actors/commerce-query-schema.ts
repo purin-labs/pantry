@@ -15,7 +15,7 @@ import {
 } from "./commerce-schema-baseline";
 import type { Result } from "../result";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
-import { isCommerceSensitivity } from "../commerce/sensitivity";
+import { isCommerceSensitivity } from "../commerce/contract/sensitivity";
 const COMMERCE_RELATIONSHIP_INDEX_TABLE =
   "commerce_relationship_relation_index";
 const COMMERCE_ATTRIBUTE_INDEX_TABLE =

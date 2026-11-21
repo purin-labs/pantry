@@ -2,7 +2,6 @@ import type { Env } from "../env";
 import { holdCaseOutput } from "./case-output-hold";
 import type { Outcome } from "@purin-labs/contracts";
 import type { ProjectSnapshot } from "@purin-labs/control-api";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignment,
@@ -13,6 +12,7 @@ import type {
   ConnectorIdentity,
   ConnectorIngress,
   EventPrincipal,
+  PageBrowserContext,
   RequestAuthority,
   SessionBudget,
   SessionBudgetExhaustion,
@@ -36,11 +36,10 @@ import type { OrganisationExecutionScope } from "../organisation-execution-scope
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import {
   decideCaseConversationSink,
-  sinkRefusalAsksPerson,
   type AllowFlowDecision,
 } from "./case-conversation-sink";
 import { traceLog } from "../observability";
-import { FlowBinding } from "../policy";
+import { FlowBinding, sinkRefusalAsksPerson } from "../policy";
 import type { SerializedFlowBinding } from "../policy";
 import type { SlackUserId } from "../slack/events";
 import {
@@ -59,10 +58,10 @@ import type {
   InitializedSessionCommit,
 } from "./actor-journal";
 import type { CanonicalEmbeddedHarnessTextTurnError } from "./session/types";
-import type { SessionDO } from "./agent-session";
-import type { CaseDO } from "./case";
+import type { SessionActor } from "./session/session-actor";
+import type { CaseActor } from "./case/case-actor";
 import type { CaseOutput, CaseSnapshot } from "./case/types";
-import type { ConnectorDO } from "./connector";
+import type { CaseConnectorRpc } from "./case/connector-rpc";
 import type { SessionActorRoute } from "./actor-router";
 import type { ConnectorWarmActorSlots } from "./warm-actor-slots";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "./embedded-harness-adapter";
@@ -77,7 +76,7 @@ import {
 } from "../data/pinned-agent-profile";
 import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { TurnPageState } from "./session/tool-wiring";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   assertNever,
@@ -86,10 +85,7 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 
-export type CaseWalkingConnector = Pick<
-  ConnectorDO,
-  "acceptIngress" | "deliver"
->;
+export type CaseWalkingConnector = CaseConnectorRpc;
 export type OngoingCaseWalkingConnector = CaseWalkingConnector & {
   /** Streams a Case turn; the release check lets its answer reach the thread. */
   streamCaseTurn(
@@ -100,7 +96,7 @@ export type OngoingCaseWalkingConnector = CaseWalkingConnector & {
   readonly warmActorSlots: ConnectorWarmActorSlots;
 };
 export type CaseWalkingCase = Pick<
-  CaseDO,
+  CaseActor,
   | "prepareDirectTurn"
   | "assignSession"
   | "beginAssignment"
@@ -112,13 +108,12 @@ export type CaseWalkingCase = Pick<
   | "holdOutput"
   | "rejectOutput"
   | "inspect"
-  | "transitionEmailProposal"
 >;
 export type OngoingCaseWalkingCase = CaseWalkingCase &
-  Pick<CaseDO, "prepareOngoingTurn">;
+  Pick<CaseActor, "prepareOngoingTurn">;
 export type CaseWalkingSession = {
   initializeCaseSession(
-    input: Parameters<SessionDO["initializeCaseSession"]>[0],
+    input: Parameters<SessionActor["initializeCaseSession"]>[0],
   ): Promise<Result<unknown, { readonly code: string }>>;
   prepareSessionInformationFlow(input: {
     readonly requestingOrganisationId: OrganisationId;
@@ -133,7 +128,7 @@ export type CaseWalkingSession = {
     >
   >;
   startCanonicalEmbeddedHarnessTextTurn(
-    input: Parameters<SessionDO["startCanonicalEmbeddedHarnessTextTurn"]>[0],
+    input: Parameters<SessionActor["startCanonicalEmbeddedHarnessTextTurn"]>[0],
   ): Promise<
     Result<
       {
@@ -148,7 +143,7 @@ export type CaseWalkingSession = {
 };
 
 export type OngoingCaseWalkingSession = CaseWalkingSession &
-  Pick<SessionDO, "inspectTurnStream">;
+  Pick<SessionActor, "inspectTurnStream">;
 
 export type RevalidateTurnAuthority = () => Promise<
   Result<CompiledTurnAuthority, { readonly code: string }>
@@ -302,8 +297,8 @@ export type DirectCasePathInput = {
   readonly context: ContextAssemblyResult;
   readonly projectContext: ProjectSnapshot | null;
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: PageBrowserContext;
+  readonly surfaceContext: TurnPageState;
 };
 
 export type DirectCasePathResult =
@@ -448,8 +443,8 @@ type AssignedCaseSessionInput = {
   readonly context: ContextAssemblyResult;
   readonly projectContext: ProjectSnapshot | null;
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: PageBrowserContext;
+  readonly surfaceContext: TurnPageState;
   /**
    * Derived from the admitted content by `caseContentAttachments`, never
    * supplied alongside it. Keeping the derivation at the construction sites
@@ -491,7 +486,7 @@ export type TransientEmailAssignmentInput = {
   readonly pinnedAgent: PinnedAgentProfile | null;
   readonly caseActor: CaseWalkingCase;
   readonly session: CaseWalkingSession &
-    Pick<SessionDO, "inspectCaseSessionInitialization">;
+    Pick<SessionActor, "inspectCaseSessionInitialization">;
   readonly organisationId: OrganisationId;
   readonly requestId: RequestId;
   readonly sessionId: SessionId;
@@ -1205,9 +1200,9 @@ export async function runOngoingCaseTurn(
 
 export async function admitOngoingCaseTurn(
   input: Readonly<{
-    connector: Pick<ConnectorDO, "acceptIngress">;
+    connector: Pick<CaseConnectorRpc, "acceptIngress">;
     connectorIdentity: ConnectorIdentity;
-    caseActor: Pick<CaseDO, "prepareOngoingTurn">;
+    caseActor: Pick<CaseActor, "prepareOngoingTurn">;
     organisationId: OrganisationId;
     ingress: ConnectorIngress;
     binding: CaseBinding;
@@ -1877,9 +1872,9 @@ function hasActiveCaseAssignment(snapshot: CaseSnapshot): boolean {
 async function holdRefusedOutput(
   input: Pick<CaseWalkingPathInput, "env" | "turnAuthority"> &
     Readonly<{
-      connector: Pick<ConnectorDO, "deliver">;
+      connector: Pick<CaseConnectorRpc, "deliver">;
       connectorIdentity: ConnectorIdentity;
-      caseActor: Pick<CaseDO, "holdOutput">;
+      caseActor: Pick<CaseActor, "holdOutput">;
     }>,
   output: CaseOutput,
   refusal: CaseWalkingPathError,
@@ -1910,7 +1905,7 @@ export async function deliverAndSettleCaseOutput(
     | "ingress"
   > & {
     readonly caseActor: Pick<
-      CaseDO,
+      CaseActor,
       "acceptDeliveryReceipt" | "holdOutput" | "rejectOutput"
     >;
   },

@@ -227,3 +227,15 @@ export function prepareReturnPrivateChatsToDefault(
       ),
   ];
 }
+
+/** Moves the chat directory of every member on, so that each reader fetches it again. */
+export function prepareChatDirectoryRevisionBump(
+  database: OrganisationQuerySource,
+  organisationId: OrganisationId,
+): D1PreparedStatement {
+  return database
+    .prepare(
+      "UPDATE portal_chat_directory SET revision = revision + 1 WHERE organisation_id = ?",
+    )
+    .bind(organisationId);
+}

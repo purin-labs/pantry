@@ -45,6 +45,7 @@ import {
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
 import { exportedItemCount } from "./placement-move-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const CONVERSATION_ID = "conv_c55af3e2-19c2-446a-9f44-e00000000055";
 const USER_ID = "user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab";
@@ -800,13 +801,13 @@ async function send(
               kind,
               conversationId: CONVERSATION_ID,
               requestId,
-              model: "moonshotai/kimi-k3",
+              model: PLATFORM_DEFAULT_PI_MODEL,
             }
           : {
               kind,
               conversationId: CONVERSATION_ID,
               requestId,
-              model: "moonshotai/kimi-k3",
+              model: PLATFORM_DEFAULT_PI_MODEL,
               text: "List connected integrations.",
               surfaceContext: null,
               browserContext: {

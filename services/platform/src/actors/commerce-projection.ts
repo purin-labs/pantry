@@ -1,3 +1,4 @@
+import type { CommerceSystemKind } from "@purin-labs/contracts";
 import type {
   CanonicalCommerceDelivery,
   CommerceCueFact,
@@ -142,7 +143,7 @@ export type CommerceProjectionError =
 
 export type CommerceSystemStorageAuthority =
   | Readonly<{ kind: "lab"; revision: null }>
-  | Readonly<{ kind: "satyr_commerce" | "shopify"; revision: number }>;
+  | Readonly<{ kind: CommerceSystemKind; revision: number }>;
 
 export type ApplyCommerceDeliveryInput = {
   readonly organisationId: OrganisationId;

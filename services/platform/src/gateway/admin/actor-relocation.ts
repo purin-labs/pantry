@@ -1,5 +1,6 @@
 import {
   parseRelocationMailReceipt,
+  reconcileActorRelocationMailReceipt,
   type RelocationMailReceipt,
 } from "../../actors/actor-relocation-mail";
 import { parseCommerceProviderReceipt } from "../../commerce/action-model";
@@ -20,7 +21,6 @@ import {
   waiveActorRelocationRetention,
   abandonActorRelocation,
   reconcileActorRelocationReceipt,
-  reconcileActorRelocationMailReceipt,
   startActorRelocation,
   type ActorRelocationError,
   type ActorRelocationId,

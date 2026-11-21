@@ -23,7 +23,7 @@ import type { Env } from "./env";
 import { parseUserId, parseOrganisationId, type OrganisationId } from "./ids";
 import { requireActiveOrganisationActorAtPlacement } from "./actors/actor-router";
 import { reconcileProviderManifestObservations } from "./provider-lifecycle/observation";
-import { reconcileInterruptedProviderCredentialCutovers } from "./provider-lifecycle/credential-cutover";
+import { reconcileInterruptedProviderCredentialCutovers } from "./integrations/contract/credential-cutover";
 import {
   loadCredentialVaultKeyRing,
   type VaultKeyVersion,

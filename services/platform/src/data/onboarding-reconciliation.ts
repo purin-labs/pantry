@@ -1,12 +1,20 @@
 import { purgeArchivedOrganisation } from "./organisation-purge";
 import {
+  prepareArchiveCleanupAwaitsPurge,
   prepareOrganisationLifecycleMove,
   ARCHIVE_CLEANUP_PLACEMENT_STATUSES,
   type LifecycleFence,
 } from "./organisation-lifecycle-moves";
 import { releaseSlackInstallationCredentials } from "../credential-vault/slack-installation-credential";
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
+import type {
+  OrganisationExecutionScope,
+  OrganisationPlacementBindings,
+} from "../organisation-execution-scope";
 import {
   newRequestId,
   parseProviderConnectionAttemptId,
@@ -27,13 +35,8 @@ import {
 import { actorStub } from "../actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
-import { purgeOrganisationWhatsAppConnectors } from "./whatsapp";
 import type { Env, SessionActorStub } from "../env";
-import { removeVoiceMacNames } from "../voice/dns";
-import { listVoiceMacNameIds } from "../voice/store";
-import { purgeOrganisationDeviceFleets } from "../devices/purge";
-import { closeOrganisationCommerceMerchants } from "../commerce/merchant-closure";
-import { revokeOrganisationDevicesStatements } from "../devices/store";
+import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { parseOrganisationPlacement } from "../placement";
 import type { Result } from "../result";
 import { traceWarn } from "../observability";
@@ -46,15 +49,25 @@ import {
   prepareOnboardingEvent,
   type ControlMutationIdentity,
 } from "./control-mutation";
-import { ensureCurrentReadiness } from "./onboarding";
+import {
+  ensureCurrentReadiness,
+  prepareReadinessAssessmentDeletion,
+} from "./onboarding";
 import { expireProviderAttemptIfDue } from "./provider-attempt";
 import { assertNever, isNonNegativeInteger } from "@purin-labs/std";
 import {
-  listSlackInstallationCredentialHandles,
-  revokeSlackOrganisationConnections,
-} from "../slack/organisation-routing";
+  prepareInvalidAccountsDegradation,
+  prepareMissingAccountDefaults,
+} from "./integration-account-writes";
+import { prepareArchivedOrganisationConnectionsRevocation } from "./provider-connection-writes";
+import { prepareArchivedOrganisationGenerationsRevocation } from "./provider-credential-generation";
+import {
+  prepareArchivedOrganisationCredentialRefsRevocation,
+  prepareArchivedOrganisationSecretsRevocation,
+} from "../credential-vault/secret-revocation";
 import {
   prepareProjectionRevisionBump,
+  prepareRepairConfigurationBump,
 } from "./organisation-onboarding-row";
 
 type OnboardingReconciliationSubject =
@@ -885,14 +898,12 @@ async function degradeInvalidAccounts(
   reasonCode: string,
   now: number,
 ): Promise<number> {
-  const result = await db
-    .prepare(
-      `UPDATE integration_account
-     SET lifecycle = 'degraded', lifecycle_reason_code = ?, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'active' AND (${predicate})`,
-    )
-    .bind(reasonCode, now, organisation.organisationId)
-    .run();
+  const result = await prepareInvalidAccountsDegradation(db, {
+    predicate,
+    reasonCode,
+    now,
+    organisationId: organisation.organisationId,
+  }).run();
   const changes = result.meta.changes ?? 0;
   if (changes > 0) {
     await bumpConfigurationForRepair(db, organisation.organisationId, now);
@@ -905,27 +916,10 @@ async function reconcileDefaultAccounts(
   organisation: RequiredOrganisationReconciliationState,
   now: number,
 ): Promise<number> {
-  const result = await db
-    .prepare(
-      `UPDATE integration_account
-     SET is_default_for_provider = 1, updated_at = ?
-     WHERE organisation_id = ? AND lifecycle = 'active' AND is_default_for_provider = 0
-       AND integration_account_id IN (
-         SELECT MIN(candidate.integration_account_id)
-         FROM integration_account AS candidate
-         WHERE candidate.organisation_id = ? AND candidate.lifecycle = 'active'
-           AND NOT EXISTS (
-             SELECT 1 FROM integration_account AS current_default
-             WHERE current_default.organisation_id = candidate.organisation_id
-               AND current_default.provider = candidate.provider
-               AND current_default.environment = candidate.environment
-               AND current_default.is_default_for_provider = 1
-           )
-         GROUP BY candidate.provider, candidate.environment
-       )`,
-    )
-    .bind(now, organisation.organisationId, organisation.organisationId)
-    .run();
+  const result = await prepareMissingAccountDefaults(db, {
+    now,
+    organisationId: organisation.organisationId,
+  }).run();
   const changes = result.meta.changes ?? 0;
   if (changes > 0) {
     await bumpConfigurationForRepair(db, organisation.organisationId, now);
@@ -967,19 +961,68 @@ async function reconcileSetupSnapshots(
   if (incomplete?.found !== 1) {
     return 0;
   }
-  const result = await db
-    .prepare(
-      `DELETE FROM organisation_readiness_assessment WHERE organisation_id = ?`,
-    )
-    .bind(organisation.organisationId)
-    .run();
+  const result = await prepareReadinessAssessmentDeletion(
+    db,
+    organisation.organisationId,
+  ).run();
   await prepareProjectionRevisionBump(db, organisation.organisationId, { updatedAt: now })
     .run();
   return Math.max(result.meta.changes ?? 0, 1);
 }
 
+/**
+ * The steps of the other areas and the surfaces in the archive cleanup and
+ * the purge of an Organisation: the voice Mac names, the Slack connections of
+ * the directory, the devices and the WhatsApp Connectors. The Worker gives
+ * them, so this module names none of those owners (Refactor 17).
+ */
+export type ArchiveCleanupParts = Readonly<{
+  /** Removes the DNS names of the voice Macs. False when a name stays. */
+  removeVoiceMacNames: (
+    env: Env,
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+  ) => Promise<boolean>;
+  revokeSlackConnections: (
+    directory: GlobalDatabase,
+    input: Readonly<{ organisationId: OrganisationId; now: number }>,
+  ) => Promise<number>;
+  listSlackCredentialHandles: (
+    directory: GlobalDatabase,
+    organisationId: OrganisationId,
+  ) => Promise<readonly string[]>;
+  prepareVoiceMacsRevocation: (
+    db: Pick<OrganisationDatabase, "prepare">,
+    input: Readonly<{
+      now: number;
+      organisationId: string;
+      guard: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+    }>,
+  ) => D1PreparedStatement;
+  revokeDevicesStatements: (
+    session: OrganisationDatabaseSession,
+    organisationId: OrganisationId,
+    now: number,
+  ) => readonly D1PreparedStatement[];
+  purgeDeviceFleets: (
+    env: Env,
+    db: OrganisationDatabase,
+    organisationId: OrganisationId,
+    placement: OrganisationExecutionScope["placement"],
+  ) => Promise<void>;
+  purgeWhatsAppConnectors: (
+    input: Readonly<{
+      db: OrganisationDatabase;
+      namespace: Env["CONNECTOR"];
+      organisationId: OrganisationId;
+      now: number;
+    }>,
+  ) => Promise<number>;
+}>;
+
 export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
   readonly env: Env;
+  readonly parts: ArchiveCleanupParts;
   readonly db: OrganisationDatabase;
   // The global directory, which holds the Slack connection records and the
   // relocation and restore journals.
@@ -1020,6 +1063,7 @@ export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
     throw new Error("organisation_archive_cleanup_conflict");
   return reconcileArchivedOrganisation(
     input.env,
+    input.parts,
     input.db,
     input.directory,
     input.archive,
@@ -1032,6 +1076,7 @@ export async function reconcileAdmittedOrganisationArchiveCleanup(input: {
 
 async function reconcileArchivedOrganisation(
   env: Env,
+  parts: ArchiveCleanupParts,
   db: OrganisationDatabase,
   directory: GlobalDatabase,
   archive: R2Bucket,
@@ -1094,18 +1139,15 @@ async function reconcileArchivedOrganisation(
       return 0;
     }
     // A failed removal here does not hold the revocations. The purge repeats it.
-    await removeVoiceMacNames(
-      env,
-      await listVoiceMacNameIds(db, organisation.organisationId),
-    );
+    await parts.removeVoiceMacNames(env, db, organisation.organisationId);
     // The directory records go first. A repeat after a failed regional batch
     // finds them revoked already.
-    let repaired = await revokeSlackOrganisationConnections(directory, {
+    let repaired = await parts.revokeSlackConnections(directory, {
       organisationId: organisation.organisationId,
       now,
     });
     const sharedCredentials = JSON.stringify(
-      await listSlackInstallationCredentialHandles(
+      await parts.listSlackCredentialHandles(
         directory,
         organisation.organisationId,
       ),
@@ -1115,64 +1157,47 @@ async function reconcileArchivedOrganisation(
     // restore that commits first keeps what it restored (Refactor 15).
     const archived = `EXISTS (SELECT 1 FROM organisation_onboarding AS onboarding
       WHERE onboarding.organisation_id = ? AND onboarding.lifecycle = 'archived')`;
+    const stillArchived = {
+      sql: archived,
+      bindings: [organisation.organisationId],
+    };
     const results = await session.batch([
-      session
-        .prepare(
-          `UPDATE provider_credential_generation
-         SET lifecycle = 'revoked', revoked_at = ?
-         WHERE organisation_id = ? AND lifecycle IN ('active', 'superseded') AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
-      session
-        .prepare(
-          `UPDATE provider_connection
-         SET lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL, updated_at = ?
-         WHERE organisation_id = ? AND lifecycle != 'revoked' AND ${archived}`,
-        )
-        .bind(
-          now,
-          now,
-          organisation.organisationId,
-          organisation.organisationId,
-        ),
-      session
-        .prepare(
-          `UPDATE vault_secret SET revoked_at = ?
-         WHERE organisation_id = ? AND revoked_at IS NULL
-           AND vault_handle NOT IN (SELECT value FROM json_each(?)) AND ${archived}`,
-        )
-        .bind(
-          now,
-          organisation.organisationId,
-          sharedCredentials,
-          organisation.organisationId,
-        ),
-      session
-        .prepare(
-          `UPDATE credential_ref SET revoked_at = ?
-         WHERE organisation_id = ? AND revoked_at IS NULL AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
-      session
-        .prepare(
-          `UPDATE voice_mac
-         SET state = 'revoked', credential_sha256 = NULL, code_sha256 = NULL,
-             code_expires_at = NULL, private_address = NULL, revoked_at = ?
-         WHERE organisation_id = ? AND state != 'revoked' AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
-      ...revokeOrganisationDevicesStatements(
+      prepareArchivedOrganisationGenerationsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationConnectionsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationSecretsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        sharedHandles: sharedCredentials,
+        guard: stillArchived,
+      }),
+      prepareArchivedOrganisationCredentialRefsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      parts.prepareVoiceMacsRevocation(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
+      ...parts.revokeDevicesStatements(
         session,
         organisation.organisationId,
         now,
       ),
-      session
-        .prepare(
-          `UPDATE organisation_archive_cleanup
-         SET status = 'pending_purge', updated_at = ?
-         WHERE organisation_id = ? AND status = 'pending_provider_cleanup' AND ${archived}`,
-        )
-        .bind(now, organisation.organisationId, organisation.organisationId),
+      prepareArchiveCleanupAwaitsPurge(session, {
+        now,
+        organisationId: organisation.organisationId,
+        guard: stillArchived,
+      }),
     ]);
     for (const result of results) repaired += result.meta.changes;
     return repaired;
@@ -1196,11 +1221,7 @@ async function reconcileArchivedOrganisation(
         throw new Error("organisation_purge_lifecycle_conflict");
     }
     // The purge deletes the only rows that name these records.
-    const voiceNames = await listVoiceMacNameIds(
-      db,
-      organisation.organisationId,
-    );
-    if (!(await removeVoiceMacNames(env, voiceNames)))
+    if (!(await parts.removeVoiceMacNames(env, db, organisation.organisationId)))
       throw new Error("voice_mac_names_not_removed");
     const harnessErasure = await reconcileOrganisationHarnessErasure({
       db,
@@ -1223,13 +1244,13 @@ async function reconcileArchivedOrganisation(
     // customer text and proposal bodies. They are purged before the D1 rows
     // that name them are deleted, so erasure cannot lose track of an actor it
     // still needs to empty.
-    await purgeOrganisationDeviceFleets(
+    await parts.purgeDeviceFleets(
       env,
       db,
       organisation.organisationId,
       request.placement.placement,
     );
-    const connectorsPurged = await purgeOrganisationWhatsAppConnectors({
+    const connectorsPurged = await parts.purgeWhatsAppConnectors({
       db,
       namespace: connectorNamespace,
       organisationId: organisation.organisationId,
@@ -2430,16 +2451,7 @@ async function bumpConfigurationForRepair(
   organisationId: OrganisationId,
   now: number,
 ): Promise<void> {
-  await db
-    .prepare(
-      `UPDATE organisation_onboarding
-     SET configuration_version = configuration_version + 1,
-         projection_revision = projection_revision + 1,
-         updated_at = ?
-     WHERE organisation_id = ? AND lifecycle NOT IN ('archived', 'purging', 'purged')`,
-    )
-    .bind(now, organisationId)
-    .run();
+  await prepareRepairConfigurationBump(db, organisationId, now).run();
 }
 
 async function startReconciliationRun(

@@ -1,4 +1,3 @@
-import { pantryCommerceAccess } from "../commerce/app-access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 
@@ -10,10 +9,9 @@ import { processDirectCaseCommand } from "../actors/case-direct-processing";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "./commerce-merchant-binding";
 import {
-  createPublishedResourceClient,
-  resolvePublishedResponsibilityScope,
+  responsibilityScopeCommerce,
   type PublishedResourceBoundaryError,
-} from "../commerce/entity-plane/published-resources";
+} from "./agent-operations/scope-commerce";
 import {
   applyAgentOperation,
   readAgentOperations,
@@ -249,29 +247,14 @@ async function buildAgentOperationCommand(
   if (!binding.ok) {
     return { ok: false, error: { code: "unavailable" } };
   }
-  if (
-    input.env.UNDERCLERK_BASE_URL === undefined ||
-    input.env.UNDERCLERK_SERVICE_TOKEN === undefined
-  ) {
-    return { ok: false, error: { code: "unavailable" } };
-  }
-  const client = createPublishedResourceClient({
-    baseUrl: input.env.UNDERCLERK_BASE_URL,
-    ...pantryCommerceAccess(
-      input.env.UNDERCLERK_SERVICE_TOKEN,
-      String(input.scope.organisationId),
-      input.env.UNDERCLERK.fetch.bind(input.env.UNDERCLERK),
-    ),
-  });
-  if (client === null) {
-    return { ok: false, error: { code: "unavailable" } };
-  }
-  const resolved = await resolvePublishedResponsibilityScope({
-    client,
-    organisationId: input.scope.organisationId,
-    merchantId: binding.value.merchantId,
-    scope: input.input.scope,
-  });
+  const resolved = await responsibilityScopeCommerce
+    .use()
+    .resolvePublishedScope({
+      env: input.env,
+      organisationId: input.scope.organisationId,
+      merchantId: binding.value.merchantId,
+      scope: input.input.scope,
+    });
   if (!resolved.ok) {
     return resolved;
   }

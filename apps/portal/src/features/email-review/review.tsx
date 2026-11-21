@@ -1,3 +1,4 @@
+import { DecisionButtons } from "../../ui";
 import React from "react";
 import { Notice, StatusChip, formatRelativeTime } from "../../page-components";
 import { formatAbsoluteTime } from "../../formatting";
@@ -424,35 +425,32 @@ function renderLoadedReply(
           <div className="connection-actions">
             {props.canManage ? (
               <>
-                <button
-                  type="button"
-                  className="connection-primary-action"
-                  onClick={approveReply.bind(
-                    null,
-                    props,
-                    setPreview,
-                    setLocalMutation,
-                    result,
-                    approveMutation,
-                  )}
+                <DecisionButtons
                   disabled={busy}
-                >
-                  Approve and send
-                </button>
-                <button
-                  type="button"
-                  onClick={rejectReply.bind(
-                    null,
-                    props,
-                    setPreview,
-                    setLocalMutation,
-                    reply,
-                    rejectMutation,
-                  )}
-                  disabled={busy}
-                >
-                  Reject
-                </button>
+                  allow={{
+                    label: "Approve and send",
+                    className: "connection-primary-action",
+                    onSelect: approveReply.bind(
+                      null,
+                      props,
+                      setPreview,
+                      setLocalMutation,
+                      result,
+                      approveMutation,
+                    ),
+                  }}
+                  refuse={{
+                    label: "Reject",
+                    onSelect: rejectReply.bind(
+                      null,
+                      props,
+                      setPreview,
+                      setLocalMutation,
+                      reply,
+                      rejectMutation,
+                    ),
+                  }}
+                />
               </>
             ) : null}
             <a
@@ -480,9 +478,7 @@ async function approveReply(
   setLocalMutation: React.Dispatch<React.SetStateAction<LocalMutationState>>,
   result: Variant<EmailReplyPreviewResult, "current">,
   mutation: EmailReviewMutation,
-  event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
-  void event;
   await performMutation(
     props,
     setPreview,
@@ -502,9 +498,7 @@ async function rejectReply(
   setLocalMutation: React.Dispatch<React.SetStateAction<LocalMutationState>>,
   reply: EmailReplyQueueItem,
   mutation: EmailReviewMutation,
-  event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
-  void event;
   await performMutation(
     props,
     setPreview,
@@ -520,9 +514,7 @@ async function resolveReply(
   setLocalMutation: React.Dispatch<React.SetStateAction<LocalMutationState>>,
   reply: EmailReplyQueueItem,
   mutation: EmailReviewMutation,
-  event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
-  void event;
   await performMutation(
     props,
     setPreview,
@@ -840,37 +832,35 @@ function renderLoadedOperational(
                 >
                   Save changes
                 </button>
-                <button
-                  type="button"
-                  className="connection-primary-action"
-                  onClick={approveOperational.bind(
-                    null,
-                    props,
-                    setPreview,
-                    setLocalMutation,
-                    result,
-                    approveMutation,
-                  )}
+                <DecisionButtons
                   disabled={busy}
-                >
-                  {result.proposal.target.kind === "self_test"
-                    ? "Confirm this is my address and send self-test"
-                    : "Approve and send"}
-                </button>
-                <button
-                  type="button"
-                  onClick={rejectOperational.bind(
-                    null,
-                    props,
-                    setPreview,
-                    setLocalMutation,
-                    proposal.proposalId,
-                    rejectMutation,
-                  )}
-                  disabled={busy}
-                >
-                  Reject
-                </button>
+                  allow={{
+                    label:
+                      result.proposal.target.kind === "self_test"
+                        ? "Confirm this is my address and send self-test"
+                        : "Approve and send",
+                    className: "connection-primary-action",
+                    onSelect: approveOperational.bind(
+                      null,
+                      props,
+                      setPreview,
+                      setLocalMutation,
+                      result,
+                      approveMutation,
+                    ),
+                  }}
+                  refuse={{
+                    label: "Reject",
+                    onSelect: rejectOperational.bind(
+                      null,
+                      props,
+                      setPreview,
+                      setLocalMutation,
+                      proposal.proposalId,
+                      rejectMutation,
+                    ),
+                  }}
+                />
               </div>
             </form>
           ) : null}
@@ -913,9 +903,7 @@ async function approveOperational(
   setLocalMutation: React.Dispatch<React.SetStateAction<LocalMutationState>>,
   result: Variant<EmailOperationalPreviewResult, "current">,
   mutation: EmailReviewMutation,
-  event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
-  void event;
   await performMutation(
     props,
     setPreview,
@@ -942,9 +930,7 @@ async function rejectOperational(
   setLocalMutation: React.Dispatch<React.SetStateAction<LocalMutationState>>,
   proposalId: string,
   mutation: EmailReviewMutation,
-  event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
-  void event;
   await performMutation(
     props,
     setPreview,
@@ -961,9 +947,7 @@ async function attestOperational(
   proposalId: string,
   attestation: "present" | "absent",
   mutation: EmailReviewMutation,
-  event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
-  void event;
   await performMutation(
     props,
     setPreview,

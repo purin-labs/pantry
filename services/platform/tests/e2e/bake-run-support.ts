@@ -12,7 +12,7 @@ import {
 
 import { env } from "cloudflare:workers";
 
-import { deviceFleetStub } from "../../src/actors/device-fleet";
+import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import type { OrganisationId } from "../../src/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";

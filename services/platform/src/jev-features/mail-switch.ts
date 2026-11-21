@@ -4,8 +4,8 @@ import {
   listIntegrationAccounts,
   resolveActiveProviderAccountContext,
 } from "../data/integration-account";
-import { mailSourcePin } from "../mail-inbox/authorization";
-import { mailInferenceEligible } from "../mail-inbox/eligibility";
+import { mailSourcePin } from "../mail-inbox/contract/mail-source-authorization";
+import { mailInferenceEligible } from "../mail-inbox/contract/mail-inference-eligibility";
 import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,

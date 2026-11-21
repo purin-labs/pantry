@@ -9,7 +9,11 @@ import { assertNever, sameJson } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { REPLENISHMENT_QUEUE_LIST_ID } from "@purin-labs/commerce-client";
 import type { Env } from "../env";
-import { readMemoryViews, type ShownMemoryRevision } from "../memory/access";
+import {
+  memoryService,
+  type MemoryReadScope,
+} from "../memory/contract/memory-service";
+import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
 import type { Result } from "../result";
 import { authorizeEmailChatSourceDelivery } from "./chat-source-access";
 import { isOrder, orderQuery, orderSummary } from "./order-context";
@@ -39,7 +43,7 @@ export async function readReplySourceViews(
   env: Env,
   input: Readonly<{
     viewer: ControlAuthority;
-    memoryViewer: Parameters<typeof readMemoryViews>[1];
+    memoryViewer: MemoryReadScope;
     caseId: string;
     sources: readonly LocatedReplySource[];
     memory: readonly ShownMemoryRevision[];
@@ -49,9 +53,10 @@ export async function readReplySourceViews(
     input.memory.length === 0 &&
     !input.sources.some((source) => source.record.kind === "memory")
       ? []
-      : await readMemoryViews(env, input.memoryViewer).then((views) =>
-          views.ok ? views.value : [],
-        );
+      : await memoryService
+          .use()
+          .readMemoryViews(env, input.memoryViewer)
+          .then((views) => (views.ok ? views.value : []));
   const views: MailReplySource[] = [];
   for (const source of input.sources) {
     const shown =

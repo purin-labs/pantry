@@ -16,6 +16,7 @@ import {
 import { commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { commerceActionDetailSummary, renderCommerceActionChange } from "./commerce-action-status";
 import { signInForApproval } from "../../approval-sign-in-popup";
+import { DecisionButtons } from "../../ui";
 import "./chat-commerce-action-card.css";
 
 /**
@@ -83,7 +84,6 @@ function ChatCommerceActionCard(props: Readonly<{
 }>): React.ReactNode {
   const [state, setState] = React.useState<CardState>({ kind: "loading" });
   const [busy, setBusy] = React.useState<"approve" | "reject" | null>(null);
-  const [confirmReject, setConfirmReject] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const read = React.useCallback(async (): Promise<CommerceActionRecord | null> => {
@@ -223,7 +223,6 @@ function ChatCommerceActionCard(props: Readonly<{
       setError(failure instanceof Error ? failure.message : "The change could not be rejected. Try again.");
     } finally {
       setBusy(null);
-      setConfirmReject(false);
     }
   };
 
@@ -235,19 +234,28 @@ function ChatCommerceActionCard(props: Readonly<{
     <p className="chat-commerce-action-summary">{commerceActionDetailSummary(action.details)}</p>
     <div className="chat-commerce-action-change">{renderCommerceActionChange(action, null)}</div>
     {(waiting || signed) && !props.canManage ? <p className="notice-text">An owner or admin can approve this change.</p> : null}
-    {(waiting || signed) && props.canManage ? <div className="chat-commerce-action-buttons" role="group" aria-label="Decide on this change">
-      {confirmReject
-        ? <>
-          <button type="button" className="danger-button" disabled={busy !== null} onClick={() => void reject()}>Reject change</button>
-          <button type="button" className="secondary-button" disabled={busy !== null} onClick={() => setConfirmReject(false)}>Keep proposal</button>
-        </>
-        : <>
-          <button type="button" className="primary-button" disabled={busy !== null} onClick={() => void (signed ? applyNow() : approve())}>
-            {busy === "approve" ? "Applying…" : signed ? "Apply change" : "Approve and apply"}
-          </button>
-          {waiting ? <button type="button" className="secondary-button" disabled={busy !== null} onClick={() => setConfirmReject(true)}>Reject</button> : null}
-        </>}
-    </div> : null}
+    {(waiting || signed) && props.canManage ? <DecisionButtons
+      className="chat-commerce-action-buttons"
+      groupLabel="Decide on this change"
+      disabled={busy !== null}
+      allow={{
+        label: busy === "approve" ? "Applying…" : signed ? "Apply change" : "Approve and apply",
+        className: "primary-button",
+        onSelect: signed ? applyNow : approve,
+      }}
+      refuse={waiting ? {
+        label: "Reject",
+        className: "secondary-button",
+        onSelect: reject,
+        confirm: {
+          label: "Reject change",
+          className: "danger-button",
+          keepLabel: "Keep proposal",
+          keepClassName: "secondary-button",
+          resetWhenDone: true,
+        },
+      } : null}
+    /> : null}
     {error === null ? null : <p className="description-draft-error" role="alert">{error}</p>}
   </section>;
 

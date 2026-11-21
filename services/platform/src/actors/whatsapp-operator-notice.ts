@@ -9,7 +9,7 @@ import type { Env } from "../env";
 import { readOperationsDestination } from "../data/operations-destination";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
-import { resolveActiveSlackDestinationConnection } from "../slack/organisation-routing";
+import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import {
   markWhatsAppNoticeDelivered,
   readWhatsAppOperatorNotice,

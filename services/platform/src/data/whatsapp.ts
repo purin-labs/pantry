@@ -10,7 +10,6 @@ import { listOrganisationActorRegistryEntries } from "../actors/actor-registry";
 import { actorStub } from "../actors/actor-stubs";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
-  D1DatabaseSession,
   D1PreparedStatement,
 } from "@cloudflare/workers-types";
 
@@ -39,6 +38,7 @@ import {
   type WhatsAppPhoneNumberId,
 } from "../whatsapp/identifiers";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { prepareSupportBindingContextGrant } from "./access-grants";
 import { parseVaultHandle, revokeCredential } from "../credential-vault";
 import type { OrganisationEnvironment } from "./control-plane";
 import {
@@ -733,47 +733,37 @@ function prepareWhatsAppSupportContextGrant(
     input.supportBindingId,
     input.bindingRevision,
   ].join(":");
-  return source
-    .prepare(
-      `INSERT INTO access_grant (
-       organisation_id, grant_id, subject_json, target_json, lifecycle,
-       revision, reason, provenance_json, changed_at
-     ) SELECT ?, ?, ?, ?, 'active', 1, NULL, ?, ? WHERE EXISTS (SELECT 1 FROM organisation_placement
-       WHERE organisation_id = ? AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active')
-       AND EXISTS (SELECT 1 FROM whatsapp_support_binding WHERE organisation_id = ? AND integration_account_id = ?
-         AND support_binding_id = ? AND current_revision = ?)${precedingWrite}
-     ON CONFLICT (organisation_id, grant_id) DO NOTHING`,
-    )
-    .bind(
-      input.scope.organisationId,
-      `grant_${materializationReceiptId}_context_case_read`,
-      JSON.stringify({
-        kind: "whatsapp_support",
-        integrationAccountId: input.integrationAccountId,
-        supportBindingId: input.supportBindingId,
-        bindingRevision: input.bindingRevision,
-      }),
-      JSON.stringify({
-        kind: "platform_capability",
-        capabilityId: CAPABILITY_KEYS.contextCaseRead,
-        capabilityVersion: 1,
-      }),
-      JSON.stringify({
-        kind: "integration_setup",
-        integrationAccountId: input.integrationAccountId,
-        setupRevision: input.bindingRevision,
-        materializationReceiptId,
-      }),
-      input.now,
-      input.scope.organisationId,
-      input.scope.placement.placementEpoch,
-      input.scope.placement.placementCellId,
-      input.scope.fenceToken,
-      input.scope.organisationId,
-      input.integrationAccountId,
-      input.supportBindingId,
-      input.bindingRevision,
-    );
+  return prepareSupportBindingContextGrant(source, {
+    organisationId: input.scope.organisationId,
+    grantId: `grant_${materializationReceiptId}_context_case_read`,
+    subjectJson: JSON.stringify({
+      kind: "whatsapp_support",
+      integrationAccountId: input.integrationAccountId,
+      supportBindingId: input.supportBindingId,
+      bindingRevision: input.bindingRevision,
+    }),
+    targetJson: JSON.stringify({
+      kind: "platform_capability",
+      capabilityId: CAPABILITY_KEYS.contextCaseRead,
+      capabilityVersion: 1,
+    }),
+    provenanceJson: JSON.stringify({
+      kind: "integration_setup",
+      integrationAccountId: input.integrationAccountId,
+      setupRevision: input.bindingRevision,
+      materializationReceiptId,
+    }),
+    changedAt: input.now,
+    placement: {
+      placementEpoch: input.scope.placement.placementEpoch,
+      placementCellId: input.scope.placement.placementCellId,
+      fenceToken: input.scope.fenceToken,
+    },
+    integrationAccountId: input.integrationAccountId,
+    supportBindingId: input.supportBindingId,
+    bindingRevision: input.bindingRevision,
+    precedingWrite,
+  });
 }
 
 export async function readWhatsAppSupportBinding(input: {
@@ -1788,47 +1778,6 @@ export async function purgeOrganisationWhatsAppConnectors(input: {
   return purged;
 }
 
-export function whatsappErasureStatements(
-  session: D1DatabaseSession,
-  scope:
-    | {
-        readonly kind: "account";
-        readonly integrationAccountId: IntegrationAccountId;
-      }
-    | {
-        readonly kind: "organisation";
-        readonly organisationId: OrganisationId;
-      },
-): readonly D1PreparedStatement[] {
-  const column =
-    scope.kind === "account" ? "integration_account_id" : "organisation_id";
-  const value =
-    scope.kind === "account"
-      ? scope.integrationAccountId
-      : scope.organisationId;
-  const tables = [
-    "whatsapp_delivery_status",
-    "whatsapp_message_receipt",
-    "whatsapp_reply_proposal",
-    "whatsapp_case_conversation_window",
-    "whatsapp_ingress_policy_revision",
-    "whatsapp_ingress_policy",
-    "whatsapp_support_binding_revision",
-    "whatsapp_support_binding",
-    "whatsapp_phone_number_account",
-  ] as const;
-  return tables.map((table) => {
-    // The binding-revision table is keyed by its binding, not by the account.
-    const where =
-      table === "whatsapp_support_binding_revision" && scope.kind === "account"
-        ? `support_binding_id IN (
-           SELECT support_binding_id FROM whatsapp_support_binding
-           WHERE integration_account_id = ?
-         )`
-        : `${column} = ?`;
-    return session.prepare(`DELETE FROM ${table} WHERE ${where}`).bind(value);
-  });
-}
 
 export async function recordWhatsAppDeliveryStatus(input: {
   readonly db: OrganisationDatabase;

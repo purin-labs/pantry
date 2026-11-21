@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "../../database-handles";
 import type { OrganisationId } from "../../ids";
-import { publishedResourceEvidenceMatchesScope } from "../../commerce/entity-plane/published-resources";
+import { responsibilityScopeCommerce } from "./scope-commerce";
 import type { Variant } from "@purin-labs/type-utils";
 import type { AgentOperationCommand } from "../agent-operations";
 import { AgentOperationFailure, commitWithTrailing } from "./failure";
@@ -50,7 +50,9 @@ export async function publishResponsibilityScope(
       evidence !== null &&
       evidence.kind === "resolved" &&
       evidence.organisationId === organisationId &&
-      publishedResourceEvidenceMatchesScope(command.scope, evidence);
+      responsibilityScopeCommerce
+        .use()
+        .evidenceMatchesScope(command.scope, evidence);
   } catch {
     validEvidence = false;
   }

@@ -1,4 +1,4 @@
-import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
+import { responsibilityScopeCommerce } from "./scope-commerce";
 import { parseOrganisationId, type OrganisationId } from "../../ids";
 import {
   isScheduleWeekday,
@@ -543,11 +543,13 @@ function parseStoredResponsibilityScope(
     } catch {
       return fail("selector query");
     }
-    const query = parseCommerceGraphQuery(queryValue);
-    return query.ok
+    const query = responsibilityScopeCommerce
+      .use()
+      .parseSelectorQuery(queryValue);
+    return query !== null
       ? {
           kind: "saved_selector",
-          selector: { selectorId, revision, query: query.value },
+          selector: { selectorId, revision, query },
         }
       : fail("selector query");
   }

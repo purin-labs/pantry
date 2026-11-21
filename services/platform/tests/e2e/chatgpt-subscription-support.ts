@@ -11,10 +11,9 @@ import {
   startOrganisationCodexAuthorization,
 } from "../../src/models/codex-connection";
 import {
-  parseAnthropicApiKey,
-  parseOpenAiApiKey,
-  storeOrganisationAnthropicModelCredential,
-  storeOrganisationOpenAiModelCredential,
+  parseModelApiKey,
+  storeOrganisationModelCredential,
+  type ModelKeyProvider,
 } from "../../src/credential-vault";
 import {
   readOrganisationInferenceSelection,
@@ -988,32 +987,25 @@ export class FakeOpenAiApi {
   }
 }
 
-/**
- * Store the organisation's own OpenAI API key, as an owner does in Portal,
- * and make it the inference route.
- */
-export async function connectOpenAiApiKey(apiKey: string): Promise<void> {
-  const key = parseOpenAiApiKey(apiKey);
-  if (!key.ok) throw new Error(key.error.code);
-  const stored = await storeOrganisationOpenAiModelCredential({
-    db: fixtureDatabase(),
-    keys: env,
-    organisationId: ORGANISATION_ID,
-    apiKey: key.value,
-    now: Date.now(),
-  });
-  if (!stored.ok) throw new Error(stored.error.code);
-  await selectInference({ kind: "organisation_openai_api_key" });
-}
+/** The key selection of each provider whose key an Organisation stores. */
+const API_KEY_SELECTION = {
+  openai: "organisation_openai_api_key",
+  anthropic: "organisation_anthropic_api_key",
+  google: "organisation_google_api_key",
+} as const satisfies Record<ModelKeyProvider, string>;
 
 /**
- * Store the organisation's own Anthropic API key, as an owner does in
+ * Store the organisation's own API key of `provider`, as an owner does in
  * Portal, and make it the inference route.
  */
-export async function connectAnthropicApiKey(apiKey: string): Promise<void> {
-  const key = parseAnthropicApiKey(apiKey);
+export async function connectModelApiKey(
+  provider: ModelKeyProvider,
+  apiKey: string,
+): Promise<void> {
+  const key = parseModelApiKey(provider, apiKey);
   if (!key.ok) throw new Error(key.error.code);
-  const stored = await storeOrganisationAnthropicModelCredential({
+  const stored = await storeOrganisationModelCredential({
+    provider,
     db: fixtureDatabase(),
     keys: env,
     organisationId: ORGANISATION_ID,
@@ -1021,7 +1013,17 @@ export async function connectAnthropicApiKey(apiKey: string): Promise<void> {
     now: Date.now(),
   });
   if (!stored.ok) throw new Error(stored.error.code);
-  await selectInference({ kind: "organisation_anthropic_api_key" });
+  await selectInference({ kind: API_KEY_SELECTION[provider] });
+}
+
+/** The organisation's own OpenAI API key as its inference route. */
+export function connectOpenAiApiKey(apiKey: string): Promise<void> {
+  return connectModelApiKey("openai", apiKey);
+}
+
+/** The organisation's own Anthropic API key as its inference route. */
+export function connectAnthropicApiKey(apiKey: string): Promise<void> {
+  return connectModelApiKey("anthropic", apiKey);
 }
 
 /**

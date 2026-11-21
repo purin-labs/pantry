@@ -15,11 +15,7 @@ import type {
   HarnessTurnLease,
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
-import {
-  authorizeChatHarnessLease,
-  authorizeSessionTurnExecution,
-  sessionTurnExecution,
-} from "../chat/turn-access";
+import { authorizeSessionTurnLease } from "./session-turn-access";
 import { preflightHarnessTurnLease } from "./agent-session-harness-authority";
 import {
   verifyWorkspaceRevisionReceipt,
@@ -141,7 +137,7 @@ export class SessionExecutionAdmission {
       return false;
     const [active, authorized] = await Promise.all([
       this.isActive(),
-      authorizeChatHarnessLease(
+      authorizeSessionTurnLease(
         this.globalDatabase,
         this.scope.database,
         this.scope.organisationId,
@@ -164,11 +160,11 @@ export class SessionExecutionAdmission {
       !(await this.isActive())
     )
       return false;
-    const authorized = await authorizeSessionTurnExecution(
+    const authorized = await authorizeSessionTurnLease(
       this.globalDatabase,
       this.scope.database,
       this.scope.organisationId,
-      sessionTurnExecution(lease),
+      lease,
       this.scope.accountAccess,
     );
     return authorized && (await this.isActive());
@@ -182,11 +178,11 @@ export class SessionExecutionAdmission {
       !(await this.isActive())
     )
       return false;
-    const authorized = await authorizeSessionTurnExecution(
+    const authorized = await authorizeSessionTurnLease(
       this.globalDatabase,
       this.scope.database,
       this.scope.organisationId,
-      sessionTurnExecution(lease),
+      lease,
       this.scope.accountAccess,
     );
     return (
@@ -293,6 +289,7 @@ export function admittedSessionModelRoute(
     case "organisation_openai_api_key":
     case "organisation_claude_oauth":
     case "organisation_anthropic_api_key":
+    case "organisation_google_api_key":
       return {
         kind: route.kind,
         providerFetch: route.providerFetch,

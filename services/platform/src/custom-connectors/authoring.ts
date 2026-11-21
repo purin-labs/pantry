@@ -6,13 +6,10 @@ import {
 import { parseCustomConnectorDefinition } from "./definition";
 import type { Result } from "../result";
 import { isRecord } from "@purin-labs/std";
+import type { ConversationDocument } from "../chat/conversation";
 
-export type ConnectorDocumentation = {
-  readonly url: string;
-  readonly sha256: string;
-  readonly text: string;
-  readonly truncated: boolean;
-};
+/** The chat record stores the pages that it read. */
+export type ConnectorDocumentation = ConversationDocument;
 
 type AuthoringError = { readonly code: string; readonly reason: string };
 

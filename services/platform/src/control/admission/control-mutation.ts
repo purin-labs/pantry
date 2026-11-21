@@ -19,13 +19,12 @@ import {
   type ControlMutationReceiptScope,
   type StoredControlMutationReceipt,
 } from "../../data/control-mutation";
-import {
-  buildOnboardingProjection,
-  type OnboardingProjection,
-} from "../../data/onboarding-projection";
+import type { OnboardingProjectionV1 } from "@purin-labs/contracts";
+import type { OrganisationDatabase } from "../../database-handles";
+import { definePort } from "../../port";
 import type { QuerySource } from "../../data/query-source";
 import type { Env } from "../../env";
-import type { UserId } from "../../ids";
+import type { OrganisationId, UserId } from "../../ids";
 import type { AuthorizedOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
 import { controlCausationId } from "../mutation";
@@ -233,14 +232,30 @@ export async function recordSessionMutationReceipt(
 }
 
 /**
+ * The onboarding projection of an Organisation, for the answer of a
+ * configuration mutation. The Organisation area builds it, and the Worker
+ * registers the builder (`worker-ports.ts`).
+ */
+export const onboardingProjection = definePort<
+  (
+    input: Readonly<{
+      db: OrganisationDatabase;
+      organisationId: OrganisationId;
+      membership: AuthorizedOrganisationRequest["membership"];
+      now: number;
+    }>,
+  ) => Promise<OnboardingProjectionV1 | null>
+>("onboarding_projection");
+
+/**
  * The Organisation's projection after a mutation. `missing` is the error
  * when the projection is gone, which no mutation allows.
  */
 export async function mutationProjection(
   authorized: AuthorizedOrganisationRequest,
   missing: string,
-): Promise<OnboardingProjection> {
-  const projection = await buildOnboardingProjection({
+): Promise<OnboardingProjectionV1> {
+  const projection = await onboardingProjection.use()({
     db: authorized.executionScope.database,
     organisationId: authorized.organisationId,
     membership: authorized.membership,

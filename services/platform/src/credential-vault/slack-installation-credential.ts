@@ -23,6 +23,7 @@ import {
   type OrganisationId,
   type SlackInstallationId,
 } from "../ids";
+import { organisationLifecycleParts } from "../data/organisation-lifecycle-port";
 import { parseVaultHandle } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";
 import {
@@ -69,6 +70,7 @@ export async function releaseSlackInstallationCredentials(input: {
   readonly organisationId: OrganisationId;
   readonly now: number;
 }): Promise<number> {
+  const parts = organisationLifecycleParts().purge;
   const owned = await input.directory
     .prepare(
       `SELECT installation_id AS installationId, workspace_id AS workspaceId,
@@ -102,14 +104,12 @@ export async function releaseSlackInstallationCredentials(input: {
       .bind(installationId.value, input.organisationId)
       .first<{ readonly organisationId: unknown }>();
     if (next === null) {
-      const revoked = await input.directory
-        .prepare(
-          `UPDATE slack_installation
-           SET lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL, updated_at = ?
-           WHERE installation_id = ? AND credential_organisation_id = ?
-             AND lifecycle != 'revoked'`,
-        )
-        .bind(input.now, input.now, installationId.value, input.organisationId)
+      const revoked = await parts
+        .slackInstallationRevocation(input.directory, {
+          installationId: installationId.value,
+          organisationId: input.organisationId,
+          now: input.now,
+        })
         .run();
       moved += revoked.meta.changes;
       continue;
@@ -144,20 +144,15 @@ export async function releaseSlackInstallationCredentials(input: {
       now: input.now,
     });
     if (!stored.ok) throw new Error(stored.error.code);
-    const changed = await input.directory
-      .prepare(
-        `UPDATE slack_installation
-         SET credential_organisation_id = ?, bot_token_ref = ?, updated_at = ?
-         WHERE installation_id = ? AND credential_organisation_id = ? AND bot_token_ref = ?`,
-      )
-      .bind(
-        nextOrganisationId.value,
-        nextHandle,
-        input.now,
-        installationId.value,
-        input.organisationId,
-        handle.value,
-      )
+    const changed = await parts
+      .slackInstallationCredentialMove(input.directory, {
+        installationId: installationId.value,
+        organisationId: input.organisationId,
+        botTokenRef: handle.value,
+        nextOrganisationId: nextOrganisationId.value,
+        nextBotTokenRef: nextHandle,
+        now: input.now,
+      })
       .run();
     moved += changed.meta.changes;
   }

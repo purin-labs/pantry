@@ -1,42 +1,14 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { conversationCaseIdentity } from "./conversation-access";
 import { listDerivedChats } from "./forks";
 import type { Env } from "../env";
-import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { buildControlAuthority } from "../request-authority";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import type { Conversation } from "./conversation";
 import {
   listConversationDirectory,
   type StoredConversation,
   type ConversationScope,
 } from "./store";
-import { listEmailReviewProjectionsForCase } from "../data/email-review";
-import { emailReviewQueueWire } from "../control/email-review";
 import { listConversationSideCases, readSideCaseSource } from "./side-cases";
-
-const CONVERSATION_EMAIL_REVIEW_LIMIT = 20;
-
-export async function readConversationEmailReviews(
-  placement: OrganisationExecutionScope,
-  scope: ConversationScope,
-  conversation: Conversation,
-): Promise<
-  | { readonly ok: true; readonly value: readonly Record<string, unknown>[] }
-  | { readonly ok: false }
-> {
-  const identities = await deriveDirectCaseIdentities(
-    await conversationCaseIdentity(placement.database, scope, conversation.id),
-  );
-  if (!identities.ok) return { ok: false };
-  const reviews = await listEmailReviewProjectionsForCase({
-    db: placement.database,
-    organisationId: scope.organisationId,
-    caseId: identities.value.caseId,
-    limit: CONVERSATION_EMAIL_REVIEW_LIMIT,
-  });
-  return { ok: true, value: reviews.map(emailReviewQueueWire) };
-}
 
 export function unreadConversationCount(
   directory: Awaited<ReturnType<typeof listConversationDirectory>>,

@@ -3,7 +3,7 @@ import { assertNever } from "@purin-labs/std";
 import { authorizeConversation } from "../chat/conversation-access";
 import type { FlowLabel } from "../policy/information-flow";
 import { slackChannelIsPublic } from "../policy/information-flow/source-labels";
-import { readSlackConversationFact } from "../slack/conversation-facts";
+import { slackSurfaceParts } from "../slack/surface-parts";
 import type {
   FlowAudience,
   FlowPolicyOwner,
@@ -101,12 +101,14 @@ async function slackConversationIsOpen(
   const database = viewer.execution.database;
   if (await slackChannelIsPublic(database, viewer.organisationId, reader))
     return true;
-  const fact = await readSlackConversationFact(
-    viewer.env,
-    database,
-    viewer.organisationId,
-    reader.conversationId,
-  );
+  const fact = await slackSurfaceParts
+    .use()
+    .readConversationFact(
+      viewer.env,
+      database,
+      viewer.organisationId,
+      reader.conversationId,
+    );
   if (fact?.memberIds === null || fact === null) return false;
   const links = await database
     .prepare(

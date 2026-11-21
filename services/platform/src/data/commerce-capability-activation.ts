@@ -1,3 +1,4 @@
+import type { CommerceSystemKind } from "@purin-labs/contracts";
 import type { OrganisationDatabase } from "../database-handles";
 import {
   parseUserId,
@@ -44,7 +45,7 @@ export type CapabilityScope =
   | Readonly<{ kind: "location"; locationId: CommerceLocationId }>;
 
 type CapabilityAuthority = Readonly<{
-  kind: "satyr_commerce" | "shopify";
+  kind: CommerceSystemKind;
   integrationAccountId: IntegrationAccountId;
   commerceSystemRevision: CommerceSystemRevision;
 }>;

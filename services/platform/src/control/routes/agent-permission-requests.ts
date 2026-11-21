@@ -1,3 +1,8 @@
+import type {
+  DecidePendingDecision,
+  PendingDecisionAnswer,
+  PendingDecisionProof,
+} from "../decide-pending-decision";
 import {
   parseAgentPermissionDecision,
   type AgentPermissionGrantTarget,
@@ -37,10 +42,14 @@ import { readOrganisationCapabilityPolicies } from "../../data/capability-policy
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import type { Env } from "../../env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { releaseAgentPermissionDecision } from "../../slack/permission-request-release";
-import { authorizeOrganisationRequest } from "../authorization";
+import { slackSurfaceParts } from "../../slack/surface-parts";
+import {
+  authorizeOrganisationRequest,
+  type AuthorizedOrganisationRequest,
+} from "../authorization";
 import { heldOutputSummaries } from "./held-output-requests";
 import { controlError, controlJson, readJsonRecord } from "../http";
+import type { AgentPermissionRequestSummary } from "@purin-labs/control-api";
 
 export type AgentPermissionRequestRoute =
   | Readonly<{
@@ -101,6 +110,7 @@ export async function handleAgentPermissionRequestRoute(
   request: Request,
   env: Env,
   route: AgentPermissionRequestRoute,
+  decide: DecidePendingDecision,
 ): Promise<Response> {
   if (route.transport === "list") {
     if (request.method !== "GET")
@@ -113,34 +123,11 @@ export async function handleAgentPermissionRequestRoute(
       false,
     );
     if (!authorized.ok) return authorized.response;
-    const mayDecide =
-      authorized.membership.role === "owner" ||
-      authorized.membership.role === "admin";
-    const pending = await listPendingAgentPermissionRequests(
-      authorized.executionScope.database,
-      {
-        organisationId: authorized.organisationId,
-        requesterPersonId: mayDecide
-          ? null
-          : String(authorized.membership.personId),
-        now: Date.now(),
-      },
-    );
+    const mayDecide = mayDecideAgentPermissionRequests(authorized);
     const list: AgentPermissionRequestList = {
       mayDecide,
       heldOutputs: await heldOutputSummaries(env, authorized),
-      requests: pending.map(({ request: stored, requesterName }) => ({
-        requestId: stored.requestId,
-        origin: stored.origin.kind,
-        requesterName,
-        requesterRole: stored.requesterRole,
-        itemLabels: [
-          ...stored.entityTypeReads.map(entityTypeReadLabel),
-          ...stored.capabilityIds.map(capabilityLabel),
-        ],
-        createdAt: stored.createdAt,
-        expiresAt: stored.createdAt + AGENT_PERMISSION_REQUEST_LIFETIME_MS,
-      })),
+      requests: await agentPermissionRequestSummaries(authorized),
     };
     return controlJson(list);
   }
@@ -178,10 +165,30 @@ export async function handleAgentPermissionRequestRoute(
   const decision = body.ok ? parseAgentPermissionDecision(body.value) : null;
   if (decision === null)
     return controlError("agent_permission_decision_invalid", 422);
+  return decide(
+    { request, organisationIdRaw: route.organisationIdRaw },
+    {
+      kind: "permission_request",
+      id: route.requestId,
+      answer: decision === "allow" ? "allow" : "refuse",
+    },
+  );
+}
+
+/**
+ * Records the answer of an owner or admin to one permission request, and
+ * gives it to the thread or the chat that waits.
+ */
+export async function decideAgentPermission(
+  env: Env,
+  proof: PendingDecisionProof,
+  call: Readonly<{ id: string; answer: PendingDecisionAnswer }>,
+): Promise<Response> {
+  const decision = call.answer === "allow" ? "allow" : "deny";
   const authorized = await authorizeOrganisationRequest(
-    request,
+    proof.request,
     env,
-    route.organisationIdRaw,
+    proof.organisationIdRaw,
     "admin",
     true,
   );
@@ -191,7 +198,7 @@ export async function handleAgentPermissionRequestRoute(
   const stored = await readAgentPermissionRequest(
     scope.database,
     authorized.organisationId,
-    route.requestId,
+    call.id,
   );
   if (stored === null)
     return controlError("agent_permission_request_not_found", 404);
@@ -224,7 +231,9 @@ export async function handleAgentPermissionRequestRoute(
   // The decision is stored. When Slack cannot take it now, the scheduled
   // reconciliation hands it to the thread once Slack works; a repeated
   // decision tries again at once.
-  const released = await releaseAgentPermissionDecision(env, scope, decided);
+  const released = await slackSurfaceParts
+    .use()
+    .releaseAgentPermissionDecision(env, scope, decided);
   return controlJson({
     ok: true,
     status: decided.status,
@@ -544,4 +553,46 @@ function readGrantTarget(
     case "commerce_list":
       return { kind: "commerce_list", capabilityRef, listId: scope.listId };
   }
+}
+
+/** An owner or admin decides a permission request. */
+export function mayDecideAgentPermissionRequests(
+  authorized: AuthorizedOrganisationRequest,
+): boolean {
+  return (
+    authorized.membership.role === "owner" ||
+    authorized.membership.role === "admin"
+  );
+}
+
+/**
+ * The permission requests that wait, as this member may read them: an owner
+ * or admin reads every request of the Organisation, and another member reads
+ * their own.
+ */
+export async function agentPermissionRequestSummaries(
+  authorized: AuthorizedOrganisationRequest,
+): Promise<readonly AgentPermissionRequestSummary[]> {
+  const pending = await listPendingAgentPermissionRequests(
+    authorized.executionScope.database,
+    {
+      organisationId: authorized.organisationId,
+      requesterPersonId: mayDecideAgentPermissionRequests(authorized)
+        ? null
+        : String(authorized.membership.personId),
+      now: Date.now(),
+    },
+  );
+  return pending.map(({ request: stored, requesterName }) => ({
+    requestId: stored.requestId,
+    origin: stored.origin.kind,
+    requesterName,
+    requesterRole: stored.requesterRole,
+    itemLabels: [
+      ...stored.entityTypeReads.map(entityTypeReadLabel),
+      ...stored.capabilityIds.map(capabilityLabel),
+    ],
+    createdAt: stored.createdAt,
+    expiresAt: stored.createdAt + AGENT_PERMISSION_REQUEST_LIFETIME_MS,
+  }));
 }

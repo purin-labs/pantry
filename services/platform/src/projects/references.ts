@@ -1,9 +1,8 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import { parseSystemEntityRef } from "@purin-labs/commerce-client";
 import { listAccessGrants } from "../data/access-grants";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import { selectNamedCommerceQuerySourceGrant } from "../context/assembly/commerce";
+import { commerceGrantSelection } from "../authorization/access-grants/commerce-grant-selection";
 import { integrationResourceScopeForGrant } from "../policy/information-flow/source-labels";
 import {
   readChatControlAuthority,
@@ -17,7 +16,11 @@ import {
 import { readGrantedFileMetadata } from "../context/files/tools";
 import { prepareTurnAuthority } from "../context/turn-context";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
-import { parseCaseId, parseIntegrationAccountId } from "../ids";
+import {
+  parseCaseId,
+  parseIntegrationAccountId,
+  type OrganisationId,
+} from "../ids";
 import {
   audiencesForAdmission,
   createCurrentSourceFlowLabel,
@@ -35,10 +38,7 @@ import {
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { resolveActiveCaseActor } from "../actors/actor-router";
-import {
-  bakeryRunSnapshotPrefix,
-  bakeryRunSnapshotSummary,
-} from "../commerce/bakery/saved-runs";
+import { definePort } from "../port";
 import type { Env } from "../env";
 import type { ConversationScope } from "../chat/store";
 import {
@@ -48,13 +48,31 @@ import {
 import { parseConversationActorIdentity } from "../chat/conversation-actor-identity";
 import type { Variant } from "@purin-labs/type-utils";
 
+/**
+ * The saved runs of the bakery workflow in the archive, for the Project
+ * references that name one. Kitchen owns the run snapshots, and the Worker
+ * registers its reader (`worker-ports.ts`).
+ */
+export const bakeryRunSnapshots = definePort<
+  Readonly<{
+    /** The archive prefix of the saved runs of an Organisation. */
+    prefix(organisationId: OrganisationId): string;
+    /** The id and the name of one saved run. */
+    summary(
+      prefix: string,
+      object: R2Object,
+    ): Readonly<{ id: string; name: string }>;
+  }>
+>("bakery_run_snapshots");
+
 export async function searchProjectReferences(
   env: Env,
   execution: OrganisationExecutionScope,
   scope: ConversationScope,
   query: string,
 ): Promise<readonly ProjectReference[]> {
-  const prefix = bakeryRunSnapshotPrefix(scope.organisationId);
+  const runs = bakeryRunSnapshots.use();
+  const prefix = runs.prefix(scope.organisationId);
   const saved = await env.ARCHIVE.list({
     prefix,
     limit: 100,
@@ -62,7 +80,7 @@ export async function searchProjectReferences(
   });
   const references: ProjectReference[] = [];
   for (const object of saved.objects) {
-    const summary = bakeryRunSnapshotSummary(prefix, object);
+    const summary = runs.summary(prefix, object);
     if (summary.name.toLocaleLowerCase().includes(query)) {
       const observed = await observeProjectReference(
         env,
@@ -222,8 +240,9 @@ export async function observeProjectReference(
   if (authority === null) return unavailable(reference, now);
   switch (reference.kind) {
     case "bakery_run": {
+      const runs = bakeryRunSnapshots.use();
       const object = await env.ARCHIVE.head(
-        bakeryRunSnapshotPrefix(scope.organisationId) + reference.id,
+        runs.prefix(scope.organisationId) + reference.id,
       );
       if (object === null) return unavailable(reference, now);
       const label = await createCurrentSourceFlowLabel({
@@ -235,10 +254,7 @@ export async function observeProjectReference(
       const canonical = {
         kind: "bakery_run" as const,
         id: reference.id,
-        label: bakeryRunSnapshotSummary(
-          bakeryRunSnapshotPrefix(scope.organisationId),
-          object,
-        ).name,
+        label: runs.summary(runs.prefix(scope.organisationId), object).name,
       };
       const digest = await referenceMetadataDigest(canonical, object.etag);
       return admittedReference(
@@ -437,19 +453,14 @@ export async function observeProjectReference(
       });
       if (!commerce.ok || !merchant.ok || !grants.ok)
         return unavailable(reference, now);
-      const grant = selectNamedCommerceQuerySourceGrant({
+      const grant = commerceGrantSelection.use().selectRecordGrant({
         organisationId: scope.organisationId,
         merchantId: merchant.value.merchantId,
         grants: grants.value,
         requestAuthority: authority,
         causationId: `project_reference_${reference.id}`,
-        query: {
-          kind: "entity_by_ref",
-          reference: parseSystemEntityRef(reference.type, reference.id),
-          traversal: { maxDepth: 0, resultLimit: 1 },
-          filter: null,
-        },
-        allowedSensitivity: "public",
+        recordType: reference.type,
+        recordId: reference.id,
         now: new Date(now).toISOString(),
       });
       if (!grant.ok) return unavailable(reference, now);

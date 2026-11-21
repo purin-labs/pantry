@@ -9,7 +9,10 @@ import type { OrganisationEnvironment } from "../data/control-plane";
 import type { UserId, IntegrationAccountId, OrganisationId } from "../ids";
 import { parseIntegrationAccountId } from "../ids";
 import type { Result } from "../result";
-import { prepareRevokedFileGrantCleanup } from "../context/files/persistence";
+import {
+  prepareChangedFileGrantSync,
+  prepareRevokedFileGrantCleanup,
+} from "../context/files/persistence";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   prepareControlMutationReceiptAfterWrite,
@@ -18,6 +21,7 @@ import {
   type UnversionedControlMutationBoundary,
 } from "../data/control-mutation";
 import { errorMessage, isPositiveInteger } from "@purin-labs/std";
+import { prepareAccessChangeRevision } from "../data/organisation-onboarding-row";
 
 type AccessControlMutationStateRow = Readonly<{
   environment: unknown;
@@ -150,16 +154,15 @@ export async function createVersionedAccessGrant(
     },
   };
   statements.push(
-    prepareRevisionBump(
-      input.scope.database,
-      input.scope.organisationId,
-      input.expectedProjectionRevision,
-    ),
+    prepareAccessChangeRevision(input.scope.database, {
+      organisationId: input.scope.organisationId,
+      expectedProjectionRevision: input.expectedProjectionRevision,
+    }),
     ...prepareGrantSettlement(input, state.value, grant),
   );
   if (input.target.kind === "file_resource") {
     statements.push(
-      prepareFileGrantSync(input.scope.database, {
+      prepareChangedFileGrantSync(input.scope.database, {
         organisationId: input.scope.organisationId,
         grantId: input.grantId,
         integrationAccountId: requireIntegrationAccountId(
@@ -314,11 +317,10 @@ export async function revokeVersionedAccessGrant(
           input.scope.placement.placementCellId,
           input.scope.fenceToken,
         ),
-      prepareRevisionBump(
-        input.scope.database,
-        input.scope.organisationId,
-        input.expectedProjectionRevision,
-      ),
+      prepareAccessChangeRevision(input.scope.database, {
+        organisationId: input.scope.organisationId,
+        expectedProjectionRevision: input.expectedProjectionRevision,
+      }),
       ...prepareGrantSettlement(input, state.value, grant),
     ];
     if (existing.value.target.kind === "file_resource") {
@@ -399,49 +401,6 @@ async function readMutationState(
   } catch (error) {
     return mutationFailure(errorMessage(error));
   }
-}
-
-function prepareRevisionBump(
-  db: Pick<OrganisationDatabase, "prepare">,
-  organisationId: OrganisationId,
-  expectedProjectionRevision: number,
-): D1PreparedStatement {
-  return db
-    .prepare(
-      `UPDATE organisation_onboarding
-        SET configuration_version = configuration_version + 1,
-            projection_revision = projection_revision + 1
-      WHERE organisation_id = ? AND projection_revision = ? AND changes() = 1`,
-    )
-    .bind(organisationId, expectedProjectionRevision);
-}
-
-function prepareFileGrantSync(
-  db: Pick<OrganisationDatabase, "prepare">,
-  input: Readonly<{
-    organisationId: OrganisationId;
-    grantId: string;
-    integrationAccountId: IntegrationAccountId;
-    now: number;
-  }>,
-): D1PreparedStatement {
-  return db
-    .prepare(
-      `INSERT INTO file_grant_sync (
-       organisation_id, grant_id, grant_revision, integration_account_id,
-       state, next_run_at, updated_at
-     )
-     SELECT organisation_id, grant_id, revision, ?, 'pending', ?, ?
-       FROM access_grant
-      WHERE organisation_id = ? AND grant_id = ? AND lifecycle = 'active' AND changes() = 1`,
-    )
-    .bind(
-      input.integrationAccountId,
-      input.now,
-      input.now,
-      input.organisationId,
-      input.grantId,
-    );
 }
 
 function prepareGrantSettlement(

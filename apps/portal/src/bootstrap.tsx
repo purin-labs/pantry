@@ -40,9 +40,15 @@ async function renderApplication(pathname: string): Promise<void> {
     /^\/(workflow-simulator|bakery|floor-plans)\/?$/u.test(pathname) ||
     searchParams.get("demo") === "1"
   ) {
-    const { WorkflowPreviewApp } = await import("./dev/workflow-preview");
+    const { showRequestedPhysicsEvidence, WorkflowDemoApp } =
+      await import("./workflow-demo");
+    // In development the demo's chat answers from the chat preview data, as
+    // at /workflow-preview.html; a production build drops this import.
+    if (import.meta.env.DEV)
+      (await import("./dev/chat-preview-data")).installChatPreviewFetch();
+    showRequestedPhysicsEvidence(window.location.search);
     document.title = "Workflow simulator · Seams Pantry";
-    portalRoot.render(<WorkflowPreviewApp />);
+    portalRoot.render(<WorkflowDemoApp />);
     return;
   }
   await import("./styles.css");

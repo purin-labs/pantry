@@ -14,8 +14,9 @@ import {
   evaluateChatFlowLabelSink,
 } from "../chat/information-flow";
 import type { ConversationScope } from "../chat/store";
+import type { OrganisationDatabase } from "../database-handles";
 import type { Env } from "../env";
-import { parseCaseId } from "../ids";
+import { parseCaseId, type OrganisationId } from "../ids";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import {
   createCurrentSourceFlowLabel,
@@ -27,12 +28,23 @@ import type {
   CaseContextCollection,
   CaseContextCollectionSelection,
 } from "./relationships";
-import { resolveCaseContextCollectionSelectionVerification } from "./source";
+
+/**
+ * Whether the contact of a selection is still verified for its Case. The
+ * Inbox owns the mailbox of the selection and gives this check through the
+ * Worker router.
+ */
+export type CaseContextSelectionVerification = (
+  db: OrganisationDatabase,
+  organisationId: OrganisationId,
+  selection: CaseContextCollectionSelection,
+) => Promise<Readonly<{ ok: boolean }>>;
 
 export async function readCaseContextCollectionMetadata(
   env: Env,
   scope: ConversationScope,
   caseContextCollection: CaseContextCollection,
+  verifySelection: CaseContextSelectionVerification,
 ): Promise<CaseContextCollectionMetadataView | null> {
   const execution = await OrganisationExecutionScope.resolve(
     env,
@@ -102,7 +114,7 @@ export async function readCaseContextCollectionMetadata(
   for (const selection of selections) {
     const caseId = parseCaseId(selection.caseId);
     if (!caseId.ok || selection.source !== "gmail") return null;
-    const verified = await resolveCaseContextCollectionSelectionVerification(
+    const verified = await verifySelection(
       execution.value.database,
       scope.organisationId,
       selection,
@@ -190,7 +202,7 @@ export async function readCaseContextCollectionMetadata(
   });
   if (!live.ok) return null;
   for (const source of sources) {
-    const verified = await resolveCaseContextCollectionSelectionVerification(
+    const verified = await verifySelection(
       execution.value.database,
       scope.organisationId,
       source.selection,

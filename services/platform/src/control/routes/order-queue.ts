@@ -4,13 +4,13 @@ import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import {
   advanceOrderQueueEntry,
   presentOrderQueueEntry,
-} from "../../commerce/order-queue-commands";
+} from "../../cafe/contract/order-queue-commands";
 import type { Env } from "../../env";
 import { admitUserMutation } from "../admission/control-mutation";
 import {
   authorizeMerchantRead,
   resolveMerchantControlContext,
-} from "../commerce-merchant";
+} from "../../commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";

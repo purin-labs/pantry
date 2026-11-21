@@ -254,8 +254,9 @@ ChatGPT sign-in profiles (a Codex `auth.json`). Ciphertext and lifecycle metadat
 encryption roots live in Cloudflare Secrets Store. Runtime consumers authorize
 an exact purpose before resolving a credential for one trusted operation.
 `OPENROUTER_API_KEY` is a platform deployment secret used only by the explicit
-Seams-funded Pi route. That route runs `moonshotai/kimi-k3`; tests that call
-OpenRouter set the Worker variable `PANTRY_PLATFORM_PI_MODEL` to the cheaper
+Seams-funded Pi route. That route runs `google/gemini-4-hydrogen` (Plan 96);
+open Slack threads that started on `moonshotai/kimi-k3` stay on it. Tests that
+call OpenRouter set the Worker variable `PANTRY_PLATFORM_PI_MODEL` to the cheaper
 `qwen/qwen3.7-flash`.
 
 See the [Vault operations guide](apps/docs/src/operate/vault.md), the

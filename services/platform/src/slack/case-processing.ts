@@ -1,6 +1,8 @@
 import { workspacePortalUrl } from "./portal-links";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
-import { turnMemoryReaderWithoutSubjects } from "../memory/access";
+import {
+  turnMemoryReaderWithoutSubjects,
+} from "../memory/contract/turn-memory";
 import { ensureCaseProject } from "../projects/case-project";
 import { isSlackGoalMessage } from "./goal-command";
 import { deliverAndSettleCaseOutput } from "../actors/case-walking-path";

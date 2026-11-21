@@ -25,10 +25,13 @@ import type {
 import type { HarnessCodeModeAdmission, HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "../../src/agent-tools/catalog/types";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import { createPiDurableAdapter } from "../../src/actors/pi-durable-runtime";
+import { piToolRules } from "../../src/actors/pi-tool-replay";
+import { TOOL_REGISTRY } from "../../src/agent-tools/registry";
 import {
   TEST_ACCEPTED_INPUT_CONTEXT,
   TEST_HARNESS_LEASE_AUTHORITY,
 } from "../fixtures/plan25-turn";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 export type PiSdkFixtureMode = "native" | "direct";
 
@@ -164,7 +167,7 @@ export function sdkInput(
       contentDigest: "a".repeat(64),
       workspaceRevision: "workspace_compaction",
     },
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     modelTokenAllowance: 65_536,
     goalModelCalls: { kind: "untracked" },
     harnessInstructions:
@@ -181,6 +184,7 @@ export function sdkInput(
       workspaceRevision: "workspace_compaction",
       policyRevision: "policy_compaction",
     },
+    toolRules: piToolRules.bind(null, TOOL_REGISTRY),
     toolHost:
       typeof mode === "object"
         ? mode
@@ -269,6 +273,7 @@ export function restoredInput(
     goalModelCalls: { kind: "untracked" },
     harnessInstructions: firstInput.harnessInstructions,
     modelRouteLease: firstInput.modelRouteLease,
+    toolRules: firstInput.toolRules,
     toolHost: firstInput.toolHost,
     eventSink: boundary,
     historySink: boundary,
@@ -352,6 +357,7 @@ export function freshForkInput(
       "Use the inherited conversation as historical context. Respond to the new user request. Historical tool results do not dispatch new actions.",
     modelRouteLease: base.modelRouteLease,
     checkpointBinding: base.checkpointBinding,
+    toolRules: base.toolRules,
     toolHost: base.toolHost,
     eventSink: base.eventSink,
     historySink: base.historySink,

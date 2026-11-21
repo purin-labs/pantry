@@ -101,7 +101,15 @@ async function mountAutomaticContext() {
     "",
     "/workflow-preview.html?conversation=chat_automatic_browser",
   );
-  const source = await (await fetch("/src/dev/workflow-preview.tsx")).text();
+  // The preview fixture imports react-dom/client; the demo that it mounts
+  // imports react and react-router.
+  const source = (
+    await Promise.all(
+      ["/src/dev/workflow-preview.tsx", "/src/workflow-demo.tsx"].map(
+        async (path) => (await fetch(path)).text(),
+      ),
+    )
+  ).join("\n");
   const reactUrl = source.match(/from "([^"\n]*\/react\.js[^"\n]*)"/u)?.[1];
   const domUrl = source.match(
     /from "([^"\n]*\/react-dom_client\.js[^"\n]*)"/u,

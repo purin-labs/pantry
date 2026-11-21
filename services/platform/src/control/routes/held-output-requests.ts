@@ -1,3 +1,8 @@
+import type {
+  DecidePendingDecision,
+  PendingDecisionAnswer,
+  PendingDecisionProof,
+} from "../decide-pending-decision";
 import {
   parseAgentPermissionDecision,
   type HeldOutputSummary,
@@ -22,7 +27,7 @@ import { parseCaseId } from "../../ids";
 import { memberMaySee, type MemberViewer } from "../../memory/member-view";
 import { FlowLabel } from "../../policy/information-flow";
 import { policyLevel } from "../../policy/information-flow/labels";
-import { releaseHeldOutputDecision } from "../../slack/held-output-release";
+import { slackSurfaceParts } from "../../slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -70,6 +75,7 @@ export async function handleHeldOutputRequestRoute(
   request: Request,
   env: Env,
   route: HeldOutputRequestRoute,
+  decide: DecidePendingDecision,
 ): Promise<Response> {
   if (route.transport === "view") {
     if (request.method !== "GET")
@@ -94,15 +100,35 @@ export async function handleHeldOutputRequestRoute(
   const decision = body.ok ? parseAgentPermissionDecision(body.value) : null;
   if (decision === null)
     return controlError("held_output_decision_invalid", 422);
+  return decide(
+    { request, organisationIdRaw: route.organisationIdRaw },
+    {
+      kind: "held_output",
+      id: route.requestId,
+      answer: decision === "allow" ? "allow" : "refuse",
+    },
+  );
+}
+
+/**
+ * Records the answer to one held output and releases it. The person who
+ * asked for the output, or an owner or admin, may answer.
+ */
+export async function decideHeldOutput(
+  env: Env,
+  proof: PendingDecisionProof,
+  call: Readonly<{ id: string; answer: PendingDecisionAnswer }>,
+): Promise<Response> {
+  const decision = call.answer === "allow" ? "allow" : "deny";
   const authorized = await authorizeOrganisationRequest(
-    request,
+    proof.request,
     env,
-    route.organisationIdRaw,
+    proof.organisationIdRaw,
     "viewer",
     true,
   );
   if (!authorized.ok) return authorized.response;
-  const stored = await readDecidable(env, authorized, route.requestId);
+  const stored = await readDecidable(env, authorized, call.id);
   if (stored === null) return controlError("held_output_not_found", 404);
   const now = Date.now();
   let decided = stored;
@@ -122,11 +148,9 @@ export async function handleHeldOutputRequestRoute(
     return controlError("held_output_decided", 409);
   // The decision is stored. When the delivery cannot finish now, the scheduled
   // reconciliation tries again; a repeated decision tries at once.
-  const released = await releaseHeldOutputDecision(
-    env,
-    authorized.executionScope,
-    decided,
-  );
+  const released = await slackSurfaceParts
+    .use()
+    .releaseHeldOutputDecision(env, authorized.executionScope, decided);
   return controlJson({ ok: true, status: decided.status, released });
 }
 

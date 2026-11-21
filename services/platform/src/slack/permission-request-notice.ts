@@ -5,6 +5,7 @@ import {
   type RequestableEntityTypeRead,
 } from "../authorization/requestable-capabilities";
 import type { Env } from "../env";
+import { decisionCardBlocks } from "./decision-card";
 
 /**
  * The one Slack card of a permission request. Its texts hold catalogue labels
@@ -47,47 +48,39 @@ export function permissionCardBlocks(
   requestId: string,
   portalUrl: string | null,
 ): readonly Record<string, unknown>[] {
-  return [
-    { type: "section", text: { type: "mrkdwn", text } },
+  return decisionCardBlocks(text, [
+    ...(portalUrl === null
+      ? []
+      : [
+          {
+            kind: "link",
+            actionId: "permission_request_review",
+            label: "Review and allow",
+            url: portalUrl,
+            primary: true,
+          } as const,
+        ]),
     {
-      type: "actions",
-      elements: [
-        ...(portalUrl === null
-          ? []
-          : [
-              {
-                type: "button",
-                action_id: "permission_request_review",
-                style: "primary",
-                text: { type: "plain_text", text: "Review and allow" },
-                url: portalUrl,
-              },
-            ]),
-        {
-          type: "button",
-          action_id: SLACK_PERMISSION_DENY_ACTION,
-          text: { type: "plain_text", text: "Deny" },
-          value: requestId,
-          confirm: {
-            title: { type: "plain_text", text: "Deny this request?" },
-            text: {
-              type: "plain_text",
-              text: "Sous Chef stops this request. Only an owner or admin can deny.",
-            },
-            confirm: { type: "plain_text", text: "Deny" },
-            deny: { type: "plain_text", text: "Cancel" },
-          },
-        },
-      ],
+      kind: "answer",
+      actionId: SLACK_PERMISSION_DENY_ACTION,
+      label: "Deny",
+      value: requestId,
+      primary: false,
+      confirm: {
+        title: "Deny this request?",
+        text: "Sous Chef stops this request. Only an owner or admin can deny.",
+        confirm: "Deny",
+        deny: "Cancel",
+      },
     },
-  ];
+  ]);
 }
 
 /** The blocks of a card after its decision: the text, with no buttons. */
 export function permissionDecidedCardBlocks(
   text: string,
 ): readonly Record<string, unknown>[] {
-  return [{ type: "section", text: { type: "mrkdwn", text } }];
+  return decisionCardBlocks(text, []);
 }
 
 /** Where an owner or admin decides one request. */

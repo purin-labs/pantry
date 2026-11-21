@@ -5,17 +5,19 @@ import {
   SHORT_PROVIDER_STATE_TTL_MS,
 } from "./authorization";
 import {
-  providerHttpFailure,
   type ProviderCleanupAdapter,
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
 import {
   gmailScopesForProduct,
   parseGmailAuthorizationProduct,
   type GmailAuthorizationProduct,
 } from "../mail/gmail-authorization";
-const MANUAL_INSTRUCTION = "revoke_gmail_access_in_google" as const;
+import {
+  GMAIL_MANUAL_INSTRUCTION as MANUAL_INSTRUCTION,
+  revokeGoogleOAuthToken,
+} from "../integrations/contract/google-oauth-revocation";
 // Google grants the OpenID shorthand "email" under its canonical identifier
 // (".../auth/userinfo.email"), so the shorthand never appears in the token
 // response's scope field and an exact granted-scope comparison against it
@@ -134,28 +136,6 @@ async function revokeGoogleGrant(
   if (tokens === null)
     return permanentFailure("provider_cleanup_credential_missing");
   return revokeGoogleOAuthToken(tokens.refreshToken, input.fetcher);
-}
-
-export async function revokeGoogleOAuthToken(
-  refreshToken: string,
-  fetcher: typeof fetch,
-): Promise<ProviderCleanupResult> {
-  let response: Response;
-  try {
-    response = await fetcher("https://oauth2.googleapis.com/revoke", {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ token: refreshToken }),
-    });
-  } catch {
-    return {
-      kind: "retryable_failure",
-      reason: "provider_cleanup_http_unavailable",
-    };
-  }
-  return response.ok
-    ? { kind: "removed" }
-    : providerHttpFailure(response.status, MANUAL_INSTRUCTION);
 }
 
 function permanentFailure(

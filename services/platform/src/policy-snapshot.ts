@@ -1,9 +1,14 @@
 import type { OrganisationDatabase } from "./database-handles";
 import {
+  isOrganisationPolicyPlacementActive,
   resolveActiveOrganisationPlacementRecord,
-  type OrganisationPlacementFenceToken,
+  type OrganisationPolicyPlacement,
 } from "./data/organisation-placement";
-import type { OrganisationPlacement } from "./placement";
+
+export {
+  isOrganisationPolicyPlacementActive,
+  type OrganisationPolicyPlacement,
+};
 import type {
   AuthzRules,
   Budget,
@@ -70,11 +75,6 @@ type PolicyBindings = {
   db: OrganisationDatabase;
   kv: KVNamespace;
 };
-
-export type OrganisationPolicyPlacement = Readonly<{
-  placement: OrganisationPlacement;
-  fenceToken: OrganisationPlacementFenceToken;
-}>;
 
 type OrganisationPolicyActivator = {
   activatePolicy(input: {
@@ -1302,7 +1302,9 @@ export function parseSessionModelRoute(
 
   if (
     raw.keySource === "organisation_byo" &&
-    (raw.provider === "openai" || raw.provider === "anthropic") &&
+    (raw.provider === "openai" ||
+      raw.provider === "anthropic" ||
+      raw.provider === "google") &&
     hasExactKeys(raw, ["keySource", "provider", "model", "byoKeyRef"]) &&
     typeof raw.byoKeyRef === "string" &&
     raw.byoKeyRef.length > 0
@@ -1557,27 +1559,6 @@ function appendUnique(values: string[], value: string): void {
   if (!values.includes(value)) {
     values.push(value);
   }
-}
-
-export async function isOrganisationPolicyPlacementActive(
-  db: D1Database,
-  organisationId: OrganisationId,
-  expected: OrganisationPolicyPlacement,
-): Promise<boolean> {
-  const row = await db
-    .withSession("first-primary")
-    .prepare(
-      `SELECT 1 FROM organisation_placement WHERE organisation_id = ?
-     AND placement_epoch = ? AND placement_cell_id = ? AND fence_token = ? AND status = 'active'`,
-    )
-    .bind(
-      organisationId,
-      expected.placement.placementEpoch,
-      expected.placement.placementCellId,
-      expected.fenceToken,
-    )
-    .first();
-  return row !== null;
 }
 
 function policyPlacementConflict(): Result<never, OrganisationPolicyError> {

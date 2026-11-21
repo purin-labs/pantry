@@ -48,14 +48,6 @@ import {
   encodeCommerceCursor,
   planCommerceGraphQuery,
 } from "../src/commerce/commerce-wasm";
-import {
-  parseCommerceSystemRevision,
-  parseShopifyShopDomain,
-} from "../src/data/organisation-commerce-system";
-import {
-  parseCommerceBindingId,
-  parseCommerceEngineMerchantId,
-} from "../src/data/commerce-merchant-binding";
 import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
 
 const ORGANISATION_ID = "organisation_entity_plane_parity";
@@ -566,29 +558,11 @@ async function createActualReaderFixture(
       ? new CommerceGraphReader({
           organisationId: ORGANISATION_ID,
           merchantId: MERCHANT_ID,
-          commerceSystem: {
-            kind: "satyr_commerce",
-            organisationId,
-            bindingId: required(
-              parseCommerceBindingId("underclerk_binding_actual_parity"),
-            ),
-            merchantId: required(parseCommerceEngineMerchantId(MERCHANT_ID)),
-            revision: required(parseCommerceSystemRevision(1)),
-          },
           underclerk: boundCommerce,
         })
       : new CommerceGraphReader({
           organisationId: ORGANISATION_ID,
           merchantId: MERCHANT_ID,
-          commerceSystem: {
-            kind: "shopify",
-            organisationId,
-            integrationAccountId,
-            shopDomain: required(
-              parseShopifyShopDomain("actual-parity.myshopify.com"),
-            ),
-            revision: required(parseCommerceSystemRevision(1)),
-          },
           underclerk: boundCommerce,
           blotter: boundBlotter,
         });

@@ -1,7 +1,7 @@
 import type {
   ProviderAdapterByProvider,
   ProviderCleanupByProvider,
-} from "../src/provider-adapters/domain";
+} from "../src/integrations/contract/provider-adapter";
 import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
 
 // @ts-expect-error A compiled catalogue must contain every active provider.

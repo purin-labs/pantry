@@ -2,7 +2,7 @@ import type { OrganisationDatabaseSession } from "../database-handles";
 import {
   readSquareDelegation,
   type SquareDelegation,
-} from "../commerce/square-link";
+} from "../commerce/contract/square-link";
 import {
   OrganisationExecutionScope,
   dispatchWithOrganisationPlacement,
@@ -31,10 +31,15 @@ import type {
   ProviderCleanupCredentials,
   ProviderCleanupReason,
   ProviderManualActionInstruction,
-} from "../provider-adapters/domain";
+} from "../integrations/contract/provider-adapter";
 import type { Variant } from "@purin-labs/type-utils";
 import { backoffDelay, isString } from "@purin-labs/std";
-import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
+import {
+  prepareCredentialRefRevocation,
+  prepareVaultSecretRevocation,
+} from "../credential-vault/secret-revocation";
+import { prepareCleanedConnectionGenerationsRevocation } from "../data/provider-credential-generation";
+import { prepareCleanedConnectionRevocation } from "../data/provider-connection-writes";
 
 type ProviderCleanupEnvironment = ProviderCleanupBindings &
   CredentialVaultBindings &
@@ -393,20 +398,14 @@ async function settleProviderCleanup(
   );
   if (otherAccounts === 0) {
     statements.push(
-      session
-        .prepare(
-          `UPDATE provider_credential_generation
-         SET lifecycle = 'revoked', revoked_at = ?
-         WHERE provider_connection_id = ? AND lifecycle IN ('active', 'superseded')`,
-        )
-        .bind(input.now, input.cleanup.providerConnectionId),
-      session
-        .prepare(
-          `UPDATE provider_connection
-         SET lifecycle = 'revoked', revoked_at = ?, disabled_at = NULL, updated_at = ?
-         WHERE provider_connection_id = ? AND lifecycle != 'revoked'`,
-        )
-        .bind(input.now, input.now, input.cleanup.providerConnectionId),
+      prepareCleanedConnectionGenerationsRevocation(session, {
+        now: input.now,
+        providerConnectionId: input.cleanup.providerConnectionId,
+      }),
+      prepareCleanedConnectionRevocation(session, {
+        now: input.now,
+        providerConnectionId: input.cleanup.providerConnectionId,
+      }),
     );
   }
   statements.push(
@@ -435,12 +434,11 @@ function providerCredentialRevocationStatements(
   const statements: D1PreparedStatement[] = [];
   for (const handle of cleanup.credentialHandles) {
     statements.push(
-      session
-        .prepare(
-          `UPDATE credential_ref SET revoked_at = ?
-         WHERE organisation_id = ? AND vault_handle = ? AND revoked_at IS NULL`,
-        )
-        .bind(now, cleanup.organisationId, handle),
+      prepareCredentialRefRevocation(session, {
+        now,
+        organisationId: cleanup.organisationId,
+        handle,
+      }),
       prepareVaultSecretRevocation(session, {
         organisationId: cleanup.organisationId,
         handle: handle,

@@ -1,16 +1,7 @@
 import type { OrganisationDatabase } from "../database-handles";
 import type { CueEvent, SurfaceRef } from "@purin-labs/contracts";
-import type {
-  CommerceEntityTypeId,
-  CommerceListEntryRef,
-  CommerceListId,
-  CommerceRelationshipRef,
-  PublishedCommerceSelector,
-} from "@purin-labs/commerce-contracts";
-import {
-  parseEntityPlaneObservation,
-  type CommerceEntityPlaneObservationV1,
-} from "@purin-labs/commerce-client";
+import type { CommerceTypeParts } from "../commerce-type-parts";
+import { definePort } from "../port";
 
 import {
   parseChannelId,
@@ -37,6 +28,23 @@ import {
   isPositiveInteger,
   isRecord,
 } from "@purin-labs/std";
+
+type CommerceEntityTypeId = CommerceTypeParts["entityTypeId"];
+type CommerceListEntryRef = CommerceTypeParts["listEntryRef"];
+type CommerceListId = CommerceTypeParts["listId"];
+type CommerceRelationshipRef = CommerceTypeParts["relationshipRef"];
+type PublishedCommerceSelector = CommerceTypeParts["publishedSelector"];
+type CommerceEntityPlaneObservationV1 =
+  CommerceTypeParts["entityPlaneObservation"];
+
+/**
+ * The parser of the observation of an entity plane cue. It throws when the
+ * value is not one. Commerce owns the observation, and the Worker registers
+ * the parser (`worker-ports.ts`).
+ */
+export const entityPlaneObservationParser = definePort<
+  (raw: unknown) => CommerceEntityPlaneObservationV1
+>("entity_plane_observation_parser");
 
 type StripeCueEventBase = Omit<
   CueEvent,
@@ -1009,7 +1017,7 @@ function parseCommerceEntityPlaneCueEvent(
   }
   let observation: CommerceEntityPlaneObservationV1;
   try {
-    observation = parseEntityPlaneObservation(payload.observation);
+    observation = entityPlaneObservationParser.use()(payload.observation);
   } catch {
     return invalidCueField("event.payload.observation");
   }

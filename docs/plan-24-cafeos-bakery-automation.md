@@ -1,7 +1,8 @@
 # Plan 24 — Cobot bakes in the first café kitchen
 
-Status: Rewritten on 3 November 2026 after a review with the owner. S1 to S6 are built on the
-branch `plan-24-simulation` (see "Steps done"), not pushed and not released. The checks of the exit
+Status: Rewritten on 3 November 2026 after a review with the owner. S1 to S6 are built and on
+`dev` since 21 November 2026 (see "Steps done"), and not released. The owner kept the FR10 for the
+simulation on 21 November 2026. The checks of the exit
 gate passed on 21 November 2026 in the simulation: `bake-cafe-day` (the café day two times, the same
 outcomes), the S6 fault journeys `bake-faults`, `bake-pause` and `bake-approval-gate`, and
 `bake-shadow`, `bake-run`, `bake-proposal` and `cobot-gateway`. The full E2E suite passed the same day

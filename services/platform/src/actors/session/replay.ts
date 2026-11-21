@@ -9,7 +9,7 @@ import {
   type SessionTurnStreamRecord,
 } from "../agent-session-turn-stream";
 import { errorMessage } from "@purin-labs/std";
-import type { SessionDO } from "../agent-session";
+import type { SessionActor } from "./session-actor";
 import { SESSION_REPLAY_MAX_POLL_MS, SESSION_REPLAY_POLL_MS } from "./support";
 import type {
   SessionAgentFanout,
@@ -67,7 +67,7 @@ async function closeSessionFanout(fanout: SessionAgentFanout): Promise<void> {
 }
 
 export function createSessionReplayResponse(
-  session: Pick<SessionDO, "sql" | "durableState">,
+  session: Pick<SessionActor, "sql" | "durableState">,
   input: SessionReplayInput,
 ): Result<Response, SessionStateError> {
   const replay = readSessionTurnReplay(session.sql, input);
@@ -101,7 +101,7 @@ export function createSessionReplayResponse(
 }
 
 async function runSessionReplayStream(
-  session: Pick<SessionDO, "sql" | "durableState">,
+  session: Pick<SessionActor, "sql" | "durableState">,
   input: SessionReplayInput,
   writer: WritableStreamDefaultWriter<Uint8Array>,
   metrics: SessionReplayMetrics,

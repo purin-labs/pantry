@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "../../../database-handles";
-import { installPantryCommerceApp } from "../../../commerce/app-access";
+import { installPantryCommerceApp } from "../../../commerce/contract/client";
 import type { Env } from "../../../env";
 import type { Result } from "../../../result";
 import type {
@@ -8,7 +8,7 @@ import type {
   CommerceMerchantSnapshotV1,
 } from "@purin-labs/commerce-client";
 import type { CommerceSystemSyncStatus } from "../../../actors/commerce-projection";
-import { readCommerceSystemSyncStatus } from "../../../commerce/system-readiness";
+import { readCommerceSystemSyncStatus } from "../../../commerce/contract/system-readiness";
 import {
   activateCommerceCapability,
   configureCommerceCapability,
@@ -40,7 +40,8 @@ import {
   type CommerceSystem,
   type CommerceSystemSelection,
 } from "../../../data/organisation-commerce-system";
-import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "../../../commerce/contract/queue-messages";
+import { commerceProvider } from "../../../commerce/commerce-providers";
 import {
   newRequestId,
   parseIntegrationAccountId,
@@ -48,7 +49,7 @@ import {
   type OrganisationId,
   organisationIdUniquePart,
 } from "../../../ids";
-import { createCommerceClient } from "../../../commerce/outbox-worker";
+import { createCommerceClient } from "../../../commerce/contract/client";
 import {
   admitUserMutation,
   controlMutationScope,
@@ -674,24 +675,7 @@ function parseCommerceSystemSelectionBody(
 }
 
 function commerceSystemWire(system: CommerceSystem): unknown {
-  switch (system.kind) {
-    case "satyr_commerce":
-      return {
-        kind: "satyr_commerce",
-        organisationId: system.organisationId,
-        bindingId: system.bindingId,
-        merchantId: system.merchantId,
-        revision: system.revision,
-      };
-    case "shopify":
-      return {
-        kind: "shopify",
-        organisationId: system.organisationId,
-        integrationAccountId: system.integrationAccountId,
-        shopDomain: system.shopDomain,
-        revision: system.revision,
-      };
-  }
+  return commerceProvider(system.kind).wire(system);
 }
 
 function commerceSystemErrorResponse(code: string): Response {

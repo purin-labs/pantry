@@ -2,14 +2,14 @@ import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { createCueQueueMessage } from "../cues/engine";
 import type { Env } from "../env";
 import type { JsonObject } from "../http";
-import { revokeAccountRemovedAtProvider } from "../provider-lifecycle/provider-revocation";
+import { revokeAccountRemovedAtProvider } from "../integrations/contract/provider-revocation";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
   notFound,
 } from "../http";
-import { createCommerceDeliveryQueueMessage } from "../commerce/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
 import { createShopifyCommerceRefreshQueueMessage } from "./queue-messages";
 import {
   newRequestId,
@@ -34,10 +34,10 @@ import type { ShopifyWebhookError } from "./connector";
 import {
   normalizeShopifyCommerceCatalogDelivery,
   normalizeShopifyCommerceInventoryDelivery,
-} from "../commerce/commerce-wasm";
+} from "./delivery-normalizers";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { commerceObservationIdentity } from "../gateway/support";
+import { commerceObservationIdentity } from "../commerce/contract/observation-identity";
 import { decodePathSegmentValue } from "../gateway/request-helpers";
 
 function isShopifyWebhookShopDomain(raw: string | null): raw is string {

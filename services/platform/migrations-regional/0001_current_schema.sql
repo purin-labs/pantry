@@ -3417,6 +3417,7 @@ CREATE TABLE organisation_inference_selection (
       'codex_subscription',
       'organisation_openai_api_key',
       'organisation_anthropic_api_key',
+      'organisation_google_api_key',
       'claude_oauth',
       'satyr_platform'
     )
@@ -3563,7 +3564,7 @@ CREATE TABLE gmail_inference_eligibility (
   PRIMARY KEY (organisation_id, key_source, provider, model),
   CHECK (
     (key_source = 'organisation_subscription' AND provider = 'openai') OR
-    (key_source = 'organisation_byo' AND provider IN ('openai', 'anthropic')) OR
+    (key_source = 'organisation_byo' AND provider IN ('openai', 'anthropic', 'google')) OR
     (key_source = 'platform' AND provider = 'openai-compatible')
   )
 );
@@ -4398,7 +4399,7 @@ CREATE TABLE mail_assistant_eligibility (
   source_pin TEXT NOT NULL CHECK(length(source_pin) = 64),
   model_route_digest TEXT NOT NULL CHECK(length(model_route_digest) = 64),
   purpose TEXT NOT NULL CHECK(purpose = 'mail_inbox_assistance'),
-  disclosed_recipient TEXT NOT NULL CHECK(disclosed_recipient IN ('openrouter', 'openai', 'anthropic')),
+  disclosed_recipient TEXT NOT NULL CHECK(disclosed_recipient IN ('openrouter', 'openai', 'anthropic', 'google')),
   evidence_reference TEXT NOT NULL CHECK(length(trim(evidence_reference)) > 0),
   owner TEXT NOT NULL CHECK(length(trim(owner)) > 0),
   consent_reference TEXT NOT NULL CHECK(length(trim(consent_reference)) > 0),

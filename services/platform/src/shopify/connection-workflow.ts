@@ -5,7 +5,7 @@ import {
   normalizeShopifyCommerceInventoryDelivery,
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
-} from "../commerce/commerce-wasm";
+} from "./delivery-normalizers";
 import type { VaultHandle } from "../credential-vault";
 import {
   createConnectedIntegration,
@@ -22,20 +22,20 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
-import { createCommerceDeliveryQueueMessage } from "../commerce/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
 import {
   discoverShopifyIdentity,
   exchangeShopifyAuthorizationCode,
   shopifyOnboardingAdapter,
   verifyShopifyCallback,
 } from "./provider-adapter";
-import { providerIngressOrigin } from "../provider-lifecycle/authorization";
+import { providerIngressOrigin } from "../integrations/contract/provider-ingress";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -46,7 +46,7 @@ import {
   storeBearerCredential,
   storeHeaderCredential,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 import { fetchShopifyInitialCommerce } from "./connector/initial-sync";
 import { registerShopifyWebhooks } from "./connector/webhook-registration";

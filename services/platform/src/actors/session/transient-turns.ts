@@ -1,24 +1,18 @@
-import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import {
-  COSTS_VIEW_COMMANDS,
-  PASTRY_BENCH_VIEW_COMMANDS,
-  REGISTER_VIEW_COMMANDS,
-} from "@purin-labs/control-api";
 import {
   createTransientGoalExecution,
   type GoalUsageContext,
 } from "../session-goal-usage";
-import { installedBakerySurfaceCommands } from "../../agent-tools/bakery/surface";
-import type { HarnessToolHost } from "../embedded-harness";
-import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
+import type {
+  EmbeddedHarnessConstructionInput,
+  HarnessToolHost,
+} from "../embedded-harness";
 import type {
   AcceptedInputRef,
   SessionIdentity,
   SessionContract,
   HarnessTurnLease,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import { parseSessionId, type OrganisationId } from "../../ids";
+import { parseSessionId } from "../../ids";
 import type { Result } from "../../result";
 import {
   SessionExecutionAdmission,
@@ -27,7 +21,6 @@ import {
 } from "../session-execution-admission";
 import { digestModelRoute } from "../../models/route";
 import { runTransientEmailTurn as runTransientEmailTurnWithSinks } from "../transient-email-turn";
-import { readGmailInferenceEligibility } from "../../data/gmail-inference-eligibility";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
 import { digestCanonical } from "../../policy";
 import {
@@ -42,8 +35,7 @@ import {
   startNoTransientTeardown,
 } from "./turn-completion";
 import type {
-  TransientEmailTurnRequest,
-  TransientMailAssistantRequest,
+  TransientHarnessTurnInput,
   TransientModelTurnError,
 } from "./types";
 
@@ -53,11 +45,9 @@ export async function runTransientMailHarness(
   context: GoalUsageContext,
   identity: SessionIdentity,
   contract: SessionContract,
-  input: Omit<
-    TransientEmailTurnRequest,
-    "manifest" | "responsePolicy" | "evidenceDependency" | "context"
-  >,
+  input: TransientHarnessTurnInput,
   toolHost: HarnessToolHost,
+  toolRules: EmbeddedHarnessConstructionInput["toolRules"],
   reauthorize: () => Promise<Result<null, Readonly<{ code: string }>>>,
 ): Promise<
   Result<
@@ -167,6 +157,7 @@ export async function runTransientMailHarness(
           workspaceRevision: input.workspaceRevision,
           policyRevision: String(contract.policyVersion),
         },
+        toolRules,
         toolHost: admittedSessionToolHost(
           {
             kind: "transient",
@@ -222,71 +213,6 @@ export function transientModelAdmissionError(
   };
 }
 
-export async function rejectMailAssistantTool(): Promise<
-  import("@purin-labs/contracts").AuthorizedHarnessToolResult
-> {
-  const text = "Inbox assistance has no action or code tools.";
-  const digest = await digestCanonical({ text });
-  return {
-    kind: "read",
-    output: { kind: "inline", content: [{ kind: "text", text }], digest },
-    authority: { kind: "read", resultDigest: digest },
-    status: "failed",
-  };
-}
-
-export async function reauthorizeTransientMailAssistant(
-  env: Env,
-  input: TransientMailAssistantRequest,
-): Promise<Result<null, Readonly<{ code: string }>>> {
-  const current = await authorizeMailAssistant(env, input.mailbox);
-  if (!current.ok) return current;
-  return current.value.sourcePin === input.sourcePin &&
-    current.value.modelRouteDigest === input.modelRouteDigest
-    ? { ok: true, value: null }
-    : { ok: false, error: { code: "mail_assistant_authority_changed" } };
-}
-
-export async function reauthorizeTransientEmail(
-  scope: OrganisationExecutionScope,
-  organisationId: OrganisationId,
-  modelRoute: import("../../models/route").OrganisationModelRoute,
-): Promise<Result<null, Readonly<{ code: string }>>> {
-  const eligibility = await readGmailInferenceEligibility({
-    db: scope.database,
-    organisationId,
-    modelRoute,
-    now: Date.now(),
-  });
-  return eligibility.kind === "eligible"
-    ? { ok: true, value: null }
-    : { ok: false, error: { code: "gmail_inference_route_blocked" } };
-}
-
-/**
- * The surface commands that a Portal turn offers (Plan 87, D16): the Pantry
- * Kitchen commands and the Costs & margins view commands, to an owner or an
- * admin, whose browser may read the commands. A command checks the page when
- * it runs.
- */
-export function authorizedBakerySurfaceCommands(
-  authority: HarnessTurnLease["requestAuthority"],
-): readonly string[] {
-  if (authority.kind !== "control") return [];
-  if (authority.role === "admin" || authority.role === "owner") {
-    return [
-      ...installedBakerySurfaceCommands(),
-      ...COSTS_VIEW_COMMANDS,
-      ...PASTRY_BENCH_VIEW_COMMANDS,
-      ...REGISTER_VIEW_COMMANDS,
-    ];
-  }
-  if (authority.role === "operator") {
-    return [...REGISTER_VIEW_COMMANDS];
-  }
-  return [];
-}
-
 export function projectItemForSnapshot(
   digest: string,
   item: import("../../context/assembly").ContextBundle["items"][number],
@@ -296,6 +222,3 @@ export function projectItemForSnapshot(
     item.source.snapshotDigest === digest
   );
 }
-
-/** The byte budget for a mailbox turn's prompt with its accepted Memory. */
-export const TRANSIENT_EMAIL_PROMPT_BYTES = 12_000;

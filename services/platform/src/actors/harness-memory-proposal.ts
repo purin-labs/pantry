@@ -1,9 +1,7 @@
-import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { readAdmittedChatInput } from "../chat/turn-access";
-import { proposeMemoryFromInstruction } from "../memory/access";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
 import type {
@@ -14,21 +12,9 @@ import {
   requireSessionExecution,
 } from "./session-execution-admission";
 import type { SessionToolContext } from "../agent-tools/context";
+import { turnMayProposeMemory } from "./session/turn-tool-offers";
+import type { MemoryProposalPort } from "./session/tool-wiring";
 
-/**
- * Whether a turn is offered the Memory proposal tool. It is the rule of the
- * Memory commands of the Portal: a signed-in owner or admin. The call itself
- * checks that the authority is still live and that the turn started from a
- * message in a Portal conversation.
- */
-export function turnMayProposeMemory(
-  authority: HarnessTurnLease["requestAuthority"],
-): boolean {
-  return (
-    authority.kind === "control" &&
-    (authority.role === "admin" || authority.role === "owner")
-  );
-}
 
 /**
  * The agent's proposal of one Memory from what a person told it in a Portal
@@ -42,6 +28,7 @@ export function turnMayProposeMemory(
  * throws, so the tool reports no outcome that it does not know.
  */
 export async function proposeMemoryForHarness(
+  proposeMemoryFromInstruction: MemoryProposalPort,
   input: SessionToolContext,
   request: HarnessMemoryProposalRequest,
 ): Promise<HarnessMemoryProposalResult> {

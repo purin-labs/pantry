@@ -27,7 +27,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 import { productionClient } from "./inventory-production";
 import {
   type ProductionPlanRoute,

@@ -19,7 +19,7 @@ import type {
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -30,10 +30,10 @@ import {
   storeBearerCredential,
   storeHeaderCredential,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
-import { linkStripePaymentAccount } from "../commerce/stripe-link";
-import { resolveCommerceMerchant } from "../commerce/square-link";
+import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
+import { resolveCommerceMerchant } from "../commerce/contract/square-link";
 
 export async function connectStripe(
   input: CompleteProviderInput,

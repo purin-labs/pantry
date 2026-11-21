@@ -32,7 +32,10 @@ import {
 import type { Result } from "../../result";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { isCommerceSensitivity, sensitivityAtMost } from "../sensitivity";
+import {
+  isCommerceSensitivity,
+  sensitivityAtMost,
+} from "../contract/sensitivity";
 
 export type CommerceGraphReadAuthority = PantryCommerceReadAuthority;
 

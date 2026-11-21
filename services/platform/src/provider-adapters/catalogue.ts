@@ -9,10 +9,6 @@ import {
 } from "./gmail";
 import { gmailMailAdapter } from "../mail/gmail-mail-adapter";
 import { notionCleanupAdapter, notionOnboardingAdapter } from "./notion";
-import {
-  shopifyCleanupAdapter,
-  shopifyOnboardingAdapter,
-} from "../shopify/provider-adapter";
 import { slackCleanupAdapter, slackOnboardingAdapter } from "./slack";
 import {
   readSquareConfiguration,
@@ -27,7 +23,6 @@ import {
   observeStripeConnection,
   type ProviderObservationRequest,
 } from "../provider-workflows/observation";
-import { observeShopifyConnection } from "../shopify/connection-observation";
 import {
   parseProviderOnlyCleanup,
   parseWhatsAppCleanup,
@@ -59,14 +54,13 @@ import {
 } from "../provider-workflows/square-connection";
 import { connectStripe } from "../provider-workflows/stripe-connection";
 import { connectWhatsApp } from "../provider-workflows/whatsapp-connection";
-import { connectShopify } from "../shopify/connection-workflow";
 import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import type { Result } from "../result";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import {
@@ -81,7 +75,8 @@ import {
   type ProviderManualActionInstruction,
   type ProviderStartContext,
   type ProviderStartContextByProvider,
-} from "./domain";
+} from "../integrations/contract/provider-adapter";
+import { providerModules } from "../integrations/contract/provider-modules";
 import {
   PROVIDER_DATA_CLASSES,
   type ActiveIntegrationProvider,
@@ -152,31 +147,9 @@ export const PROVIDER_ADAPTERS = {
     remove: notionCleanupAdapter.remove,
     manualActionInstruction: notionCleanupAdapter.manualActionInstruction,
   },
-  shopify: {
-    provider: "shopify",
-    dataClasses: PROVIDER_DATA_CLASSES.shopify,
-    capabilityIds: [
-      CAPABILITY_KEYS.commerceEntityPlaneContext,
-      CAPABILITY_KEYS.commerceEntityRead,
-      CAPABILITY_KEYS.commerceActionPropose,
-      CAPABILITY_KEYS.commerceCatalogPublish,
-      CAPABILITY_KEYS.commerceOrderCancel,
-      CAPABILITY_KEYS.commerceFulfillmentAttachTracking,
-      CAPABILITY_KEYS.commerceEntityPatch,
-      CAPABILITY_KEYS.commerceRelationshipCreate,
-      CAPABILITY_KEYS.commerceRelationshipDelete,
-      CAPABILITY_KEYS.commerceListEntryAdd,
-      CAPABILITY_KEYS.commerceListEntryPatch,
-      CAPABILITY_KEYS.commerceListEntryRemove,
-      CAPABILITY_KEYS.commerceSavedViewPublish,
-      CAPABILITY_KEYS.shopifyOrderCancel,
-    ],
-    connectionFamily: { kind: "oauth_connection", pkce: "none" },
-    onboarding: shopifyOnboardingAdapter,
-    completeConnection: connectShopify,
-    observe: observeShopifyConnection,
-    remove: shopifyCleanupAdapter.remove,
-    manualActionInstruction: shopifyCleanupAdapter.manualActionInstruction,
+  // The Shopify module gives its entry, and the Worker registers it.
+  get shopify() {
+    return providerModules.use().shopify.adapter;
   },
   slack: {
     provider: "slack",

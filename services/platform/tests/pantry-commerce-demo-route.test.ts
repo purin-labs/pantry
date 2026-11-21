@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import { COMMERCE_API_SCOPES } from "@purin-labs/commerce-client";
 import {
   TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,

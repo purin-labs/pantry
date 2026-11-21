@@ -5,7 +5,11 @@ import type {
 } from "../database-handles";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import type { UserId, IntegrationAccountId, OrganisationId } from "../ids";
-import { whatsappErasureStatements } from "./whatsapp";
+import {
+  prepareAccountContactVerificationsDelete,
+  whatsappErasureStatements,
+} from "../mail-inbox/contract/account-erasure";
+import { prepareProviderAccountCleanup } from "../integrations/contract/provider-account-cleanup";
 import type { Result } from "../result";
 import {
   resolveIntegrationAccount,
@@ -17,17 +21,23 @@ import {
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
 } from "./control-mutation";
-import { readProviderCleanupContext } from "../provider-adapters/catalogue";
+import { providerServices } from "../integrations/contract/provider-services";
 import { parseActiveIntegrationProvider } from "./integration-provider-directory";
 import { fileAccountErasureStatements } from "../context/files";
 import { sha256Hex } from "@purin-labs/std";
 import {
+  prepareRemovedAccountPseudonymization,
+  prepareRemovedAccountWebhooksDelete,
+} from "./integration-account-writes";
+import { prepareRemovedAccountResourcesErasure } from "./provider-resource";
+import { prepareRemovedAccountInstallationDelete } from "./surface-installation-writes";
+import { prepareRemovedConnectionRevocation } from "./provider-connection-writes";
+import { prepareRemovedConnectionGenerationsRevocation } from "./provider-credential-generation";
+import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
-} from "../slack/organisation-routing";
-import {
-  prepareConfigurationVersionBump,
-} from "./organisation-onboarding-row";
+} from "../slack/installation-store";
+import { prepareConfigurationVersionBump } from "./organisation-onboarding-row";
 
 type RemoveIntegrationAccountError =
   | { readonly code: "integration_account_not_found" }
@@ -159,7 +169,7 @@ export async function removeIntegrationAccount(input: {
       );
   const providerContext = sharedSlackInstallation
     ? null
-    : await readProviderCleanupContext({
+    : await providerServices.use().readProviderCleanupContext({
         db: session,
         integrationAccountId: input.integrationAccountId,
         provider,
@@ -179,44 +189,20 @@ export async function removeIntegrationAccount(input: {
   const cleanupId = `provider_cleanup_${crypto.randomUUID()}`;
   const statements: D1PreparedStatement[] = [];
   statements.push(
-    session
-      .prepare(
-        "DELETE FROM contact_endpoint_verification WHERE organisation_id = ? AND integration_account_id = ?",
-      )
-      .bind(input.organisationId, input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_resource_cursor
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_discovered_resource
-       WHERE snapshot_revision IN (
-         SELECT snapshot_revision FROM provider_resource_snapshot
-         WHERE integration_account_id = ?
-       )`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_resource_snapshot
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM provider_webhook
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
-    session
-      .prepare(
-        `DELETE FROM surface_installation
-       WHERE integration_account_id = ?`,
-      )
-      .bind(input.integrationAccountId),
+    prepareAccountContactVerificationsDelete(
+      session,
+      input.organisationId,
+      input.integrationAccountId,
+    ),
+    ...prepareRemovedAccountResourcesErasure(
+      session,
+      input.integrationAccountId,
+    ),
+    prepareRemovedAccountWebhooksDelete(session, input.integrationAccountId),
+    prepareRemovedAccountInstallationDelete(
+      session,
+      input.integrationAccountId,
+    ),
     session
       .prepare(
         `DELETE FROM organisation_communication_destination
@@ -238,24 +224,12 @@ export async function removeIntegrationAccount(input: {
       kind: "account",
       integrationAccountId: input.integrationAccountId,
     }),
-    session
-      .prepare(
-        `UPDATE integration_account
-       SET provider_account_id = ?, display_name = 'Removed account',
-           lifecycle = 'revoked', lifecycle_reason_code = NULL,
-           capability_set = '[]', is_default_for_provider = 0,
-           disabled_by_user_id = NULL, disabled_at = NULL,
-           revoked_at = ?, updated_at = ?
-       WHERE organisation_id = ? AND integration_account_id = ?
-         AND lifecycle = 'disabled' AND is_default_for_provider = 0`,
-      )
-      .bind(
-        `removed:${providerAccountHash}`,
-        input.now,
-        input.now,
-        input.organisationId,
-        input.integrationAccountId,
-      ),
+    prepareRemovedAccountPseudonymization(session, {
+      providerAccountHash,
+      now: input.now,
+      organisationId: input.organisationId,
+      integrationAccountId: input.integrationAccountId,
+    }),
     session
       .prepare(
         `INSERT INTO provider_account_tombstone (
@@ -277,65 +251,38 @@ export async function removeIntegrationAccount(input: {
   );
   if (sharedSlackInstallation) {
     statements.push(
-      session
-        .prepare(
-          `UPDATE provider_credential_generation
-           SET lifecycle = 'revoked', revoked_at = ?, superseded_at = NULL
-           WHERE organisation_id = ? AND provider_connection_id = ?
-             AND lifecycle IN ('active', 'superseded')`,
-        )
-        .bind(
-          input.now,
-          input.organisationId,
-          account.value.providerConnectionId,
-        ),
-      session
-        .prepare(
-          `UPDATE provider_connection
-           SET lifecycle = 'revoked', disabled_at = NULL,
-               revoked_at = ?, updated_at = ?
-           WHERE organisation_id = ? AND provider_connection_id = ?
-             AND lifecycle != 'revoked'`,
-        )
-        .bind(
-          input.now,
-          input.now,
-          input.organisationId,
-          account.value.providerConnectionId,
-        ),
+      prepareRemovedConnectionGenerationsRevocation(session, {
+        now: input.now,
+        organisationId: input.organisationId,
+        providerConnectionId: account.value.providerConnectionId,
+      }),
+      prepareRemovedConnectionRevocation(session, {
+        now: input.now,
+        organisationId: input.organisationId,
+        providerConnectionId: account.value.providerConnectionId,
+      }),
     );
   } else {
     statements.push(
-      session
-        .prepare(
-          `INSERT INTO provider_account_cleanup (
-           cleanup_id, organisation_id, integration_account_id, provider, environment,
-           lifecycle, reason_code, instruction_code, attempt, next_attempt_at,
-           created_at, updated_at, completed_at,
-           provider_account_id, provider_connection_id, credential_handles,
-           provider_webhook_ids, provider_context
-         ) VALUES (?, ?, ?, ?, ?, 'pending_provider_cleanup', NULL, NULL, 0, ?,
-           ?, ?, NULL, ?, ?, ?, ?, ?)`,
-        )
-        .bind(
-          cleanupId,
-          input.organisationId,
-          input.integrationAccountId,
-          account.value.provider,
-          account.value.environment,
-          input.now,
-          input.now,
-          input.now,
-          account.value.providerAccountId,
-          account.value.providerConnectionId,
-          JSON.stringify(cleanupMetadata.credentialHandles),
-          JSON.stringify(cleanupMetadata.providerWebhookIds),
-          providerContext,
-        ),
+      prepareProviderAccountCleanup(session, {
+        cleanupId,
+        organisationId: input.organisationId,
+        integrationAccountId: input.integrationAccountId,
+        provider: account.value.provider,
+        environment: account.value.environment,
+        now: input.now,
+        providerAccountId: account.value.providerAccountId,
+        providerConnectionId: account.value.providerConnectionId,
+        credentialHandles: JSON.stringify(cleanupMetadata.credentialHandles),
+        providerWebhookIds: JSON.stringify(cleanupMetadata.providerWebhookIds),
+        providerContext,
+      }),
     );
   }
   statements.push(
-    prepareConfigurationVersionBump(session, input.organisationId, input.now, { atConfigurationVersion: state.configurationVersion }),
+    prepareConfigurationVersionBump(session, input.organisationId, input.now, {
+      atConfigurationVersion: state.configurationVersion,
+    }),
     prepareControlMutationReceipt(session, {
       scope: input.mutation.scope,
       boundary: input.mutation.boundary,

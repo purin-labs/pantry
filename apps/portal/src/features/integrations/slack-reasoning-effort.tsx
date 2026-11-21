@@ -10,14 +10,10 @@ import { controlMutation, controlRead } from "../../control-client";
 import { inferencePath } from "../../control-paths";
 import { StatusChip } from "../../page-components";
 import { effortDescription, effortLabel } from "../chat/effort-labels";
+import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 
 /** The inference sources, as the settings page names them. */
-type InferenceSourceKind =
-  | "claude_oauth"
-  | "codex_subscription"
-  | "satyr_platform"
-  | "organisation_openai_api_key"
-  | "organisation_anthropic_api_key";
+type InferenceSourceKind = OrganisationInferenceSelection["kind"];
 
 type State =
   | Readonly<{ kind: "loading" }>
@@ -183,6 +179,7 @@ function standardDetail(source: InferenceSourceKind): string {
     case "claude_oauth":
     case "organisation_anthropic_api_key":
     case "organisation_openai_api_key":
+    case "organisation_google_api_key":
     case "codex_subscription":
       return "Deep reasoning.";
     case "satyr_platform":

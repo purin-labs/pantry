@@ -44,6 +44,8 @@ import type {
 } from "./costs";
 import type { SUPPLIER_CREATE_FIELDS } from "./suppliers";
 import type { PreparedEffect } from "../../agent-tools/tool-effect";
+import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
+import type { SessionToolContext } from "../context";
 
 export type HarnessBakerySurfaceToolRequest =
   | Readonly<{ kind: "file_action"; action: BakeryFileAction }>
@@ -349,3 +351,11 @@ export type KitchenToolServices = {
 
 export const defineKitchenTool =
   defineToolFamily<KitchenToolServices>()("kitchen");
+
+/**
+ * The turn context of a Kitchen tool handler: the authority of the turn and
+ * the commerce reads. The Worker gives the commerce reads.
+ */
+export interface KitchenToolContext extends SessionToolContext {
+  readonly commerce: CommerceToolReads;
+}

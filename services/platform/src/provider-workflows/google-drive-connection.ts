@@ -32,14 +32,14 @@ import {
   type ProviderCleanupResult,
   type ProviderObservationRequest,
   type ProviderOnboardingAdapter,
-} from "../provider-adapters/domain";
+} from "../integrations/contract/provider-adapter";
 import { providerCallbackUri } from "../provider-lifecycle/authorization";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../provider-lifecycle/domain";
+} from "../integrations/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,
@@ -48,7 +48,7 @@ import {
   providerCredentialHandle,
   storeOAuthCredential,
   verifyExistingAccountIdentity,
-} from "../provider-lifecycle/provisioning";
+} from "../integrations/contract/provisioning";
 import type { Result } from "../result";
 
 const GOOGLE_DRIVE_MANUAL_INSTRUCTION =

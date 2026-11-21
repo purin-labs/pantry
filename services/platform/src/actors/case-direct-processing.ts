@@ -1,7 +1,9 @@
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
-import type { TurnMemoryReader } from "../context/assembly";
-import { turnMemoryReaderWithoutSubjects } from "../memory/access";
+import {
+  turnMemoryReaderWithoutSubjects,
+  type TurnMemoryReader,
+} from "../context/assembly";
 import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
 import { admitProjectContext } from "../projects/context";
@@ -12,7 +14,6 @@ import {
   type OperatorExecutionOrigin,
 } from "../chat/turn-access";
 import type { ProjectSnapshot } from "@purin-labs/control-api";
-import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type {
   AgentRole,
   CaseAssignmentLifecycle,
@@ -21,6 +22,7 @@ import type {
   ConnectorAddress,
   ConnectorIdentity,
   EventPrincipal,
+  PageBrowserContext,
   RequestAuthority,
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
@@ -76,19 +78,19 @@ import {
   prepareTurnContext,
 } from "../context/turn-context";
 import type { PinnedAgentProfile } from "../data/pinned-agent-profile";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
+import type { TurnPageState } from "./session/tool-wiring";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { traceLog } from "../observability";
-import type { SessionDO } from "./agent-session";
+import type { SessionActor } from "./session/session-actor";
 import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,
 } from "./case/abandoned-assignments";
-import type { CaseDO } from "./case";
+import type { CaseActor } from "./case/case-actor";
 
 export type ConversationCaseActor = DirectCasePathInput["caseActor"] &
-  Pick<CaseDO, "readTail">;
+  Pick<CaseActor, "readTail">;
 
 type DirectCaseIdentities = VariantBy<
   Awaited<ReturnType<typeof deriveDirectCaseIdentities>>,
@@ -131,8 +133,8 @@ type DirectCaseCommand = {
   readonly maxSessionBudgetTokens?: number | null;
   readonly requiredModelRoute?: OrganisationModelRoute;
   readonly thinkingLevel?: EmbeddedHarnessThinkingLevel;
-  readonly browserContext: BakeryBrowserContext;
-  readonly surfaceContext: BakerySurfaceAttachmentV1 | null;
+  readonly browserContext: PageBrowserContext;
+  readonly surfaceContext: TurnPageState;
   /** The installed agent this run was resolved for, when an automation owns it. */
   readonly pinnedAgent?: PinnedAgentProfile | null;
   /**
@@ -388,7 +390,7 @@ async function recoverDirectCaseTurn(
     readonly assignmentId: AssignmentId;
     readonly digest: string;
   },
-  session: Pick<SessionDO, "inspectTurnStream" | "readCompletedTurn">,
+  session: Pick<SessionActor, "inspectTurnStream" | "readCompletedTurn">,
   caseActor: ConversationCaseActor,
   policy: PinnedSessionPolicy,
   surface: "conversation" | "command",

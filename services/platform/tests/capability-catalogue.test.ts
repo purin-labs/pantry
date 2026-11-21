@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { CapabilityDefinition } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 

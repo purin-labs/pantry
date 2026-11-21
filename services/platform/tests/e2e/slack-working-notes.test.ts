@@ -13,6 +13,7 @@ import {
   openRouterToolCall,
   slackSimulator,
 } from "./slack-journey-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 declare module "vitest" {
   interface TaskMeta {
@@ -129,7 +130,7 @@ function prependTextChunk(
     id: `chatcmpl_${callId}`,
     object: "chat.completion.chunk",
     created: 1_787_500_000,
-    model: "moonshotai/kimi-k3",
+    model: PLATFORM_DEFAULT_PI_MODEL,
     choices: [
       {
         index: 0,

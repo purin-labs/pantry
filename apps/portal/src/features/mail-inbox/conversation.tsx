@@ -1,3 +1,4 @@
+import { DecisionButtons } from "../../ui";
 import React from "react";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
@@ -949,27 +950,25 @@ export class MailConversation extends React.Component<Props, State> {
                 </button>
               </>
             ) : (
-              <>
-                <button
-                  type="button"
-                  className="connection-primary-action"
-                  onClick={this.approve}
-                  disabled={busy}
-                >
-                  Approve and send
-                </button>
-                <button
-                  type="button"
-                  ref={this.editButton}
-                  onClick={this.startEdit}
-                  disabled={busy}
-                >
-                  Edit
-                </button>
-                <button type="button" onClick={this.reject} disabled={busy}>
-                  Reject
-                </button>
-              </>
+              <DecisionButtons
+                disabled={busy}
+                allow={{
+                  label: "Approve and send",
+                  className: "connection-primary-action",
+                  onSelect: this.approve,
+                }}
+                between={
+                  <button
+                    type="button"
+                    ref={this.editButton}
+                    onClick={this.startEdit}
+                    disabled={busy}
+                  >
+                    Edit
+                  </button>
+                }
+                refuse={{ label: "Reject", onSelect: this.reject }}
+              />
             )}
           </div>
         ) : null}

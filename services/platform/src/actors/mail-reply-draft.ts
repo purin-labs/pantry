@@ -28,10 +28,8 @@ import {
   readActiveOrganisationMembershipRevision,
   resolveUser,
 } from "../data/control-plane";
-import {
-  gmailConnectorId,
-  readEmailReplyProposalProjection,
-} from "../data/email-mailbox";
+import { readEmailReplyProposalProjection } from "../data/email-mailbox";
+import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env } from "../env";
 import {
   parseIntegrationAccountId,
@@ -40,7 +38,7 @@ import {
   type OrganisationId,
   type UserId,
 } from "../ids";
-import { authorizeMailSource } from "../mail-inbox/authorization";
+import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { buildControlAuthority } from "../request-authority";
 import type { Result } from "../result";

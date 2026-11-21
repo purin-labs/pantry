@@ -1,5 +1,6 @@
 import type { OrganisationDatabase } from "../database-handles";
-import { pantryCommerceAccess } from "../commerce/app-access";
+import { prepareCueLogEntry } from "../cues/cue-log";
+import { pantryCommerceAccess } from "../commerce/contract/client";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
   CommerceEntityRef,
@@ -40,11 +41,10 @@ import {
 import { traceWarn } from "../observability";
 import type { Result } from "../result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
-import { resolveActiveSlackDestinationConnection } from "../slack/organisation-routing";
+import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import { buildWorkflowAuthority } from "../request-authority";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
-import { BlotterSource } from "../commerce/entity-plane/blotter-source";
-import { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
+import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
 import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
@@ -53,8 +53,8 @@ import {
   composeTriggerInstruction,
   inventoryCasePurpose,
   pinnedAgentForAutomation,
-  readOrganisationEnvironment,
 } from "./support";
+import { requireOrganisationEnvironment } from "../integrations/contract/admin-integration";
 
 export const CUE_DELIVERY_LEASE_MS = 30_000;
 
@@ -418,7 +418,7 @@ async function resolveSavedSelectorCueMembership(
     if (!commerceAuthority.ok) {
       return savedSelectorResolverFailure();
     }
-    const environment = await readOrganisationEnvironment(
+    const environment = await requireOrganisationEnvironment(
       scope.database,
       input.organisationId,
     );
@@ -474,32 +474,19 @@ async function resolveSavedSelectorCueMembership(
       integrationAccountId: String(binding.value.integrationAccountId),
       client,
     });
-    const reader =
-      commerceAuthority.value.commerceSystem.kind === "shopify"
-        ? new CommerceGraphReader({
-            organisationId: String(input.organisationId),
-            merchantId: String(binding.value.merchantId),
-            commerceSystem: commerceAuthority.value.commerceSystem,
-            underclerk: commerceEngine,
-            blotter: new BlotterSource({
-              organisation: await requireActiveOrganisationActorAtPlacement({
-                placement: scope.placement,
-                env,
-                organisationId: input.organisationId,
-                now: Date.now(),
-              }),
-              organisationId: input.organisationId,
-              merchantId: String(binding.value.merchantId),
-              integrationAccountId:
-                commerceAuthority.value.integrationAccountId,
-            }),
-          })
-        : new CommerceGraphReader({
-            organisationId: String(input.organisationId),
-            merchantId: String(binding.value.merchantId),
-            commerceSystem: commerceAuthority.value.commerceSystem,
-            underclerk: commerceEngine,
-          });
+    const reader = await createCommerceGraphReader({
+      commerceSystem: commerceAuthority.value.commerceSystem,
+      organisationId: input.organisationId,
+      merchantId: String(binding.value.merchantId),
+      underclerk: commerceEngine,
+      organisation: () =>
+        requireActiveOrganisationActorAtPlacement({
+          placement: scope.placement,
+          env,
+          organisationId: input.organisationId,
+          now: Date.now(),
+        }),
+    });
     const authority = buildSavedSelectorCommerceReadAuthority({
       organisationId: String(input.organisationId),
       merchantId: String(binding.value.merchantId),
@@ -717,29 +704,19 @@ async function writeCueLog(
   input: CueDeliveryLogInput,
 ): Promise<void> {
   const target = cueDeliveryTarget(input);
-  await db
-    .prepare(
-      `INSERT OR IGNORE INTO cue_log (
-         organisation_id, integration_account_id, cue_id, source, native_id,
-         decision, reason, session_id, at,
-         parent_cue_id, surface_kind, surface_thread_id, actor_person_id,
-         response_text
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, ?, ?, NULL, NULL)`,
-    )
-    .bind(
-      input.organisationId,
-      cueLogIntegrationAccountId(input.event),
-      input.cueId,
-      input.event.source,
-      input.event.nativeId,
-      input.decision,
-      input.reason,
-      input.at,
-      input.parentCueId,
-      target.surfaceKind,
-      target.threadId,
-    )
-    .run();
+  await prepareCueLogEntry(db, {
+    organisationId: input.organisationId,
+    integrationAccountId: cueLogIntegrationAccountId(input.event),
+    cueId: input.cueId,
+    source: input.event.source,
+    nativeId: input.event.nativeId,
+    decision: input.decision,
+    reason: input.reason,
+    at: input.at,
+    parentCueId: input.parentCueId,
+    surfaceKind: target.surfaceKind,
+    surfaceThreadId: target.threadId,
+  }).run();
 }
 
 export function cueLogIntegrationAccountId(

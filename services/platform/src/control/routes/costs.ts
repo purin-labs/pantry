@@ -26,7 +26,7 @@ import {
   type CostUnit,
   type CostsSheetWrite,
   type CostsSheetWriteResult,
-} from "@purin-labs/control-api";
+} from "@purin-labs/kitchen-control-api";
 import type { CommerceStockSnapshot } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import {
@@ -42,14 +42,14 @@ import {
 import type { Env } from "../../env";
 import { newRequestId } from "../../ids";
 import { traceWarn } from "../../observability";
-import { createCommerceEntityPlaneClient } from "../../commerce/outbox-worker";
+import { createCommerceEntityPlaneClient } from "../../commerce/contract/client";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {
   finishInventoryOperation,
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 
 export async function handleCosts(
   request: Request,

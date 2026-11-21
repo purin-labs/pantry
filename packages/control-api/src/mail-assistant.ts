@@ -29,7 +29,7 @@ export type MailAssistantStatus =
   | Readonly<{
       kind: "ready";
       model: string;
-      recipient: "openrouter" | "openai" | "anthropic";
+      recipient: "openrouter" | "openai" | "anthropic" | "google";
       modelRouteDigest: string;
     }>
   | Readonly<{
@@ -127,7 +127,8 @@ export function parseMailAssistantStatus(
     raw.model.length > 0 &&
     (raw.recipient === "openrouter" ||
       raw.recipient === "openai" ||
-      raw.recipient === "anthropic")
+      raw.recipient === "anthropic" ||
+      raw.recipient === "google")
   )
     return {
       kind: "ready",

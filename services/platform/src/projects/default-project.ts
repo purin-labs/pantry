@@ -261,3 +261,21 @@ export function prepareProjectMembershipRevocation(
       .bind(input.organisationId, input.userId, ...guard.bindings),
   ];
 }
+
+/**
+ * The delete of an archived Organisation removes the members of each of its
+ * Projects, while the guard holds.
+ */
+export function prepareOrganisationProjectMembersDeletion(
+  database: OrganisationQuerySource,
+  input: Readonly<{
+    organisationId: OrganisationId;
+    guard: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+  }>,
+): D1PreparedStatement {
+  return database
+    .prepare(
+      `DELETE FROM project_member WHERE organisation_id = ? AND ${input.guard.sql}`,
+    )
+    .bind(input.organisationId, ...input.guard.bindings);
+}

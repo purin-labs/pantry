@@ -119,7 +119,8 @@ surfaces/     portal · slack · email · whatsapp · webhooks · storefront · 
 areas/        commerce · cafe · kitchen · inbox · brain · integrations · devices · organisation
                  │ imports the foundation, and the contract of another area
 foundation/   std · kernel · contracts · tenancy · actor-runtime · authority · connections
-              control · agent-tools · agent · conversation · collaboration · ui · testing
+              control · agent-tools · agent · conversation · tool-handlers
+              collaboration · ui · testing
 workers/      the deployed Workers. Each one composes the three layers and holds no logic.
 ```
 
@@ -336,6 +337,15 @@ physical bake. This refactor does not remove `schedule.ts`.
 
 ## Steps done
 
+**The state on `dev`, 21 November 2026.** Each entry below that names a branch is on
+`dev` now, up to and with the class chains of step A1.9 (`b5932670`). They landed in
+seven pushes; the owner agreed to each one. The full E2E suite passed on each merge
+before its push: 236 files and 457 or 458 tests, with 3 files skipped (they need a
+real model). In two of those runs `counter-receipt-printer.test.ts` failed under the
+load of the machine and passed alone three times. The layer count on `dev` is 50
+(1,350 at the start of the refactor). An entry that says "the full E2E suite did not
+run on the branch" is about the worker branch; the merge ran it.
+
 **20 November 2026. Step A0 and step S1 are done.** The owner agreed to the landing,
 and the commits are on `dev` since that day.
 
@@ -515,9 +525,7 @@ the reason: callers use 245 methods of the four Actors at 440 places, in about 1
 files. An interface for each module is a larger piece of work, and it belongs with the
 split of the Actor classes into modules. It is now a part of step A1.9.
 
-**20 November 2026. Step A1.3 is done on the branch
-`refactor-17-a1-3-tool-families`.** The branch starts at `origin/dev` `58b7e5e`. It
-is not on `dev`.
+**20 November 2026. Step A1.3 is done and on `dev`.**
 
 | Part          | What exists                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -757,8 +765,7 @@ No shape, parser or error text changed.
   `menu-board-reviews.ts`, `order-queue.ts`, `mail-*.ts`, `evals.ts` and
   `case-execution.ts`.
 
-**20 November 2026. Step A1.6 is done for the Connector**, on the branch
-`refactor-17-a1-6`. It is not on `dev`.
+**20 November 2026. Step A1.6 is done for the Connector, and it is on `dev`.**
 
 - **The port.** `actors/connector/channel-adapter.ts` defines `ChannelAdapter`:
   the tables of a channel, the due times of its alarm work, its work before
@@ -796,6 +803,1145 @@ surfaces/email` and `-> surfaces/whatsapp` are gone. Copies of product code:
   and the Inbox and email imports of `actors/case*.ts`. They are the Case
   kernel, not the Connector. The Portal chat stream is not a channel adapter
   yet.
+
+**21 November 2026. Step A1.7 is done in part,** on the branch `refactor-17-a1-7`:
+the tool list, the handlers, and the ports of commerce, integrations and Kitchen.
+The Inbox ports and the Slack imports stay open.
+
+- **The Worker gives the tools.** `actors/agent-session.ts` holds only the class
+  `SessionDO`, a shell of the Worker. The Session actor is the abstract class
+  `SessionActor` in `actors/session/session-actor.ts`. `SessionDO` gives it one value,
+  `SessionToolWiring` (`actors/session/tool-wiring.ts`): the tool registry, the tools
+  that a turn adds, the services of each family that an area owns, the page effects
+  and the observer of tool arguments. It is a method, not a field, because the
+  constructor of the Session reads the registry for the Pi recovery.
+- **No Session file imports the registry.** `agent-tools/registry.ts` and the new
+  `agent-tools/session-wiring.ts` are `workers/platform` in the map. The replay rule
+  of a tool is an input of the harness runtime (`toolReplay`), and the Pi recovery
+  takes the registry as an argument.
+- **Each family gives its services.** Each area has a `turn-services.ts` file with one
+  function that builds the services of its families for a turn. The Session names no
+  handler of an area. It builds the turn context (`ToolTurnContext`) once and gives
+  the services of the three foundation families itself: files, messages and turn
+  (`actors/session/own-tool-services.ts`).
+- **Proposal staging left the class chain.** The class `SessionProposalStaging` is
+  deleted. Each area owns its staging function: campaign brief and configuration
+  (commerce), recipe workflow (Kitchen), device, Jev switch and custom connector
+  write (integrations). The shared identity check is
+  `actors/session/proposal-staging.ts`. The Organisation area writes a configuration
+  draft (`agent-tools/organisation/configuration-draft.ts`) and gets two parts as
+  ports: the price reference of an allowance from commerce, and the words of a
+  command from Slack.
+- **Commerce.** The Kitchen costs tools moved from `actors/agent-session-costs.ts` to
+  `agent-tools/kitchen/costs-handlers.ts`. They get the commerce reads and the
+  Underclerk clients as a port (`CostsCommerce`), so the move adds no import from
+  Kitchen to commerce.
+- **Integrations.** The Session no longer compiles the custom connector catalog. The
+  wiring gives `turnTools`, and the Session carries `TurnTool` values of the executor.
+- **Kitchen.** The wiring gives `pageEffects`: the page commands that an authority
+  may use, the check of the page state of a message, the settlement and the repair
+  of a page effect, and the rebind of the receipt collection after a recovery. The
+  RPC method `settleBakerySurfaceEffect` and the alarm step `bakery_surface_effects`
+  keep their names.
+- **Not changed:** no tool, check, order, stored value, journal entry, error text or
+  replay result. The catalog digests of "Baseline" are equal. The tool definitions
+  did not change, so the host digests of Appendix D did not change.
+- **Measures.** Layer crossings: 820 to 754. `foundation/agent` to commerce: 30 to 22.
+  To Inbox: 29 to 27. To Kitchen: 21 to 4. To integrations: 6 to 1. To Slack: 9 to 7.
+  To organisation: 5 to 4. To Café and to devices: 2 to 0 each. `foundation/agent-tools` to an area or a surface: 35 to 11.
+  Copies: 892 to 890. Unused exports: 809, no change.
+  Lines: 2,754 removed and 3,226 added. About 1,500 of each are the move of the
+  Session class to `session-actor.ts`.
+- **Checks.** The static lints, the D1 patch check, the three type checks,
+  `pnpm check:packages`, `pnpm portal:build` and the unit suite (302 files) pass. The
+  98 journey files of the brief ran in five groups: 96 pass and 2 are skipped. The
+  full E2E suite did not run on the branch.
+- **Still open, in Session files.** Each line is an import that stays.
+  - Inbox, 16 imports: `actors/session/session-transient-turns.ts` (7),
+    `transient-turns.ts` (2), `turn-completion.ts` (1) and `types.ts` (6). The mailbox,
+    mail assistant and WhatsApp turns are methods of the Session class, and their RPC
+    types name Inbox types that the Connector files use. They leave with the actor
+    modules of step A1.9.
+  - Kitchen, 4 imports: `actors/session/tool-wiring.ts` names the wire types of a
+    page (2), and `actors/agent-session-continuation.ts` parses the stored page
+    context (1). Both import the package `@purin-labs/bakery-model`: the wire types
+    must move to `contracts` first. `actors/pi-durable-tools.ts` asks if a tool is a
+    Kitchen surface tool (1).
+  - Commerce, 1 import: `actors/pi-durable-tools.ts` names the result type of
+    `commerce_entity_context`. Both imports of that file need a field of the harness
+    tool definition.
+  - Slack, 6 imports: `actors/harness-follow-up.ts` (3),
+    `actors/harness-side-case-proposal.ts` (1), `actors/session/harness-source.ts` (1)
+    and `session-harness-turns.ts` (1). They are the Slack side Case and the Slack
+    notices: the channel adapter of step A1.6 owns them.
+  - Brain, 1 import: `actors/harness-memory-proposal.ts`.
+
+**21 November 2026. Step A2.4 is done,** on the branch `refactor-17-a2-4`.
+
+| Page                                             | Decision                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The workflow demo                                | Production serves it with no sign-in at `/workflow-simulator`, `/bakery`, `/floor-plans` and `?demo=1`. Its frame (the sample Portal frame, the chat pane and the Kitchen page) is now `apps/portal/src/workflow-demo.tsx`, a surface module. It cannot go into the Kitchen folder, because an area imports no shell and no chat. `bootstrap.tsx` imports no file of `dev/` in a production build. `UNAVAILABLE_ACCESS` is in `features/access/` |
+| `/workflow-preview.html`                         | It stays a development fixture, because CI and 33 browser journeys of the index open it with no sign-in. `dev/workflow-preview.tsx` holds only the chat preview data and the mount call. CI and the journeys keep the address. Two journeys load the moved style sheet, and one reads the import addresses of both modules                                                                                                                       |
+| `/eagle-rehearsal.html`, `/linea-rehearsal.html` | No change. They are already Kitchen pages: `features/production-run/linea/espresso-rehearsal.ts`, with real reads through `controlRead` for `?organisation=<id>`. Production serves them, the Kitchen workspace opens them in a new window, and a journey opens them with no sign-in                                                                                                                                                             |
+
+`pnpm lint:kitchen-dom` (`scripts/check-kitchen-dom.mjs`) is in `pnpm lint`. It parses
+each source file of `bakery-model`, `bakery-workflow` and `production-simulation`, and
+fails on `window`, `document` or a global that `lib.dom.d.ts` declares and
+`lib.webworker.d.ts` does not. No file fails, so the check has no ratchet.
+
+Other preview pages in `dev/` still hold their own code. Production serves none of
+them. `appliances-preview.tsx` (1,545 lines) is an appliance viewer with its own
+Three.js loader, and `kitchen-chat-preview.tsx` builds the same frame as the workflow
+demo for a real Organisation. They are separate work.
+
+**21 November 2026. Step A2.5 is done in part,** on the branch `refactor-17-a2-5`: the
+`CommerceProvider` port and its two implementations.
+
+- **The port.** `commerce/commerce-provider.ts` defines `CommerceProvider`. It has five
+  methods, each from a branch on the system kind: `resolveActionCredential` (the
+  effect gate), `executeAction`, `reconcileAction`, `graphSource` (the sources of a
+  graph read) and `wire` (the control API shape). The permit and the result types of
+  an action moved there from `provider-execution.ts`.
+- **Two implementations and one list.** `builtInCommerceProvider` is in
+  `commerce/built-in-commerce-provider.ts`, and the engine paths of
+  `provider-execution.ts` are its execution and its reconciliation.
+  `shopifyCommerceProvider` is in `shopify/commerce-provider.ts`, the old
+  `commerce-action.ts`. `commerce/commerce-providers.ts` holds the one list, and
+  `commerceProvider(kind)` gives the provider of a system.
+- **The callers.** The effect gate, the execution and the reconciliation ask the
+  provider. `createCommerceGraphReader` replaces three copies of the reader set-up
+  (the control graph read, the cue delivery and the supplier context). The graph
+  reader reads the blotter source when the provider gave one; it does not read the
+  system kind. The Shopify location checks of the Organisation actor are functions
+  of `shopify/location-observation.ts`.
+- **One union.** `CommerceSystemKind` and the record source of each kind are in
+  `packages/contracts/src/commerce-system.ts`, as a closed union of wire values. Six
+  copies of the kind union, two schema copies and `CapabilityCommerceSystem` are
+  gone. The Portal and `control-api` have one view type of the selected system.
+  `BankPayout` already had one hand-written type; it stays.
+- **Not changed:** no route, scope, event kind, stored value or error text. The
+  provider list is a function, so the import cycle between the execution module and
+  the list reads nothing at module load.
+- **Measures.** The grep of the brief: 75 lines to 60; 55 to 36 outside `shopify/`
+  and the Portal. Layer crossings: 703 to 702; the Shopify pairs are equal (24).
+  Copies: 890 to 888 (`commerceProjectionRevision` had two). Unused exports: 809.
+- **What stays.** `agent-tools/commerce/handlers.ts` builds its reader by hand (another
+  worker owns the file); after it calls `createCommerceGraphReader`, the reader option
+  `commerceSystem` goes. The access model (`decision-explanation.ts`,
+  `integration-discovery.ts`) is a foundation module, so it needs the port of step
+  A1.8. `data/organisation-commerce-system.ts` parses and writes the stored row of
+  each kind. The onboarding readiness rule (`data/onboarding.ts`) has its own SQL.
+  The Portal shows each kind. The other matches of the grep are provider ids or cue
+  sources, not the system kind.
+
+**21 November 2026. The leftovers of steps A1.11 and A1.7, and the first Session
+module of step A1.9,** on the branch `refactor-17-a1-9-session`. This entry replaces
+the "Costs" row and the open points of the two entries above where it names them.
+
+- **A1.11: `control-api` names no area package.** `costs.ts`, `costs-actuals.ts`,
+  `costs-forecast.ts` and `costs-formulas.ts` moved to
+  `@purin-labs/kitchen-control-api`. A codemod rewrote the import lines of 20 files.
+  `@purin-labs/control-api` no longer depends on `@purin-labs/commerce-contracts`.
+- **A1.7: the browser context is a contract.** `PageBrowserContext`, its binding and
+  the two parsers are in `@purin-labs/contracts`: they name no Kitchen concept, and a
+  turn of the Session carries them. `@purin-labs/bakery-model` keeps its names as
+  aliases, so its other users did not change.
+- **A1.7: the page state and the effect receipt are opaque.** They name Kitchen
+  concepts, so the Session holds them as `unknown`. Kitchen parses them where it
+  did before: `settleBakerySurfaceEffect` takes the receipt as the page sent it.
+- **A1.7: two fields of a tool definition.** `modelOnly`: a Code Mode script does not
+  get the tool. `structuredOutput`: the schema of the value that a script receives.
+  The 38 Kitchen surface tools set the first, and `commerce_entity_context` sets the
+  second. The Pi tools read them through `toolRules`, an input of the harness
+  runtime, and `actors/pi-durable-tools.ts` names no tool. A result with a typed
+  value is a `StructuredToolResult` (`agent-tools/structured-result.ts`). The model
+  definitions do not hold the fields, so the catalog digests are equal.
+- **A1.7: the Slack side Case is a port.** The wiring gives `slackThreadSideCase`:
+  the instruction text and the admission of a side Case that a Slack thread
+  started. No file of `actors/session/` imports a Slack file.
+- **A1.9: the Inbox turns are a module.** The mailbox turn, the eval turn, the mail
+  assistant turn and the WhatsApp turn were methods of the class layer
+  `SessionTransientTurns`. They are functions of `actors/inbox-turns/` (area
+  `inbox`). Each one takes a `SessionTransientHost`
+  (`actors/session/transient-host.ts`). `actors/inbox-turns/rpc.ts` declares
+  `SessionInboxTurnsRpc` with the request and reply types. The class `SessionDO`
+  implements it: each RPC method calls one function of the module. The class layer
+  is deleted, so the chain has 5 levels and not 6. The RPC method names, the
+  argument shapes and the results did not change.
+- **The schema steps.** `agent-session-schema.ts` already holds one ordered list:
+  `createSessionExecutionSchema` calls the schema function of each part in a fixed
+  order. This step did not change it, and no stored version changed.
+- **Measures.** Layer crossings: 703 to 679. `foundation/agent` to Inbox: 27 to 11,
+  and no Session file is among the 11. To Kitchen: 4 to 0. To commerce: 22 to 21. To
+  Slack: 7 to 5. Copies: 890 to 889. Unused exports: 809, no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (302 files) pass. 88 journey files ran in
+  five groups: 87 pass and 1 is skipped. The full E2E suite did not run on the
+  branch.
+- **Still open: the rest of the class chain.** `SessionActorBase`,
+  `SessionCheckpoints`, `SessionHarnessTurns`, `SessionTurnRecovery` and
+  `SessionActor` are still one chain of 5,159 lines. They are all `foundation/agent`
+  and import no area, so the layer count does not need the split. They share 9
+  fields of the base (`canonicalTurn`, `checkpointPublication`,
+  `startedCheckpointPayload`, `activeEmbeddedHarnessTurn`,
+  `activeMessagePreparation`, `transientExecutions`, `liveGoalRuns` and the two
+  Portal chat cleanup promises) and call each other through `this`. Each one needs
+  its own landing with the actor journeys, the relocation journey and the idle
+  tenant journey. Done on 2026-11-21: see "A1.9 — The class chains are
+  modules".
+- **Still open: 4 Slack imports and 1 Brain import.** `actors/harness-follow-up.ts`
+  (3) posts the Slack card of a permission request and of a held effect through the
+  Connector. It is Slack code with a foundation label: the exit check in
+  `agent-tools/session-support.ts` calls it. `actors/harness-side-case-proposal.ts`
+  (1) stores the Slack side Case proposal. `actors/harness-memory-proposal.ts` (1)
+  calls `memory/access.ts`. Each needs a port through the tool effect and the turn
+  tools.
+
+**21 November 2026. The agent foundation: four changes and the measures for the
+rest,** on the branch `refactor-17-agent-foundation`. This is a part of the work,
+not the end of it.
+
+- **A route matcher is a part of the Worker.** `control/routes/agents.ts` matches the
+  paths under an agent and calls the route handler of each owner. It holds no rule,
+  and only `control-router.ts` calls it. The map counts it as `workers/platform`.
+- **Brain.** `actors/harness-memory-proposal.ts` defines `MemoryProposalPort`. The
+  wiring gives the function of `memory/access.ts`.
+- **Slack.** The Slack half of the side Case proposal is in
+  `agent-tools/slack/side-case-proposal.ts`. The port `slackThreadSideCase` has
+  `propose`.
+- **Two helpers at their owner.** `emailAttachmentForHarness` is in the Inbox
+  handlers. `context/untrusted-commerce-text.ts` is `foundation/agent-tools`: it has
+  no import, and the tool files use it.
+- **Measures.** Layer crossings: 674 to 658. `foundation/agent` to Inbox: 11 to 5. To
+  commerce: 21 to 19. To Slack: 5 to 3. To Brain and to WhatsApp: 1 to 0 each.
+  `foundation/agent-tools` to Inbox: 1 to 0. `foundation/agent-tools` to
+  `foundation/agent`: 23 to 21.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite pass. The catalog digests are equal. 81
+  journey files ran in five groups: 80 pass and 1 is skipped. The full E2E suite did
+  not run on the branch.
+
+**The order inside the foundation: measures for a decision.** Each line is one
+choice, measured with `node scripts/check-layers.mjs --report` on a changed copy of
+the map. The base is 660. No line is applied.
+
+| Choice                                                              | Total | Effect                                                                               |
+| ------------------------------------------------------------------- | ----: | ------------------------------------------------------------------------------------ |
+| `packages/control-api` is `foundation/contracts`                    |   642 | Order 126 to 108. One pair is renamed, so the lint needs `--init` for it             |
+| The tool handlers are a module above `agent`                        |   652 | Order 126 to 118. `session-support.ts`, `context.ts`, `files/`, `messages/`, `turn/` |
+| `actors/case-conversation-sink.ts` is `foundation/agent`            |   658 | Order 126 to 124. No pair grows                                                      |
+| `chat/turn-access.ts` is `foundation/agent`                         |   658 | Order 126 to 122, table 117 to 119. `authority -> agent` grows                       |
+| `conversation` goes below `agent` in the order                      |   678 | `conversation -> agent` has 48 imports, and `agent -> conversation` has 28           |
+| `control` goes below `authority` in the order                       |   686 | Worse by 26                                                                          |
+| `case-context-discovery/` is `foundation/authority`                 |   669 | Worse by 9                                                                           |
+| `context/files/persistence.ts` is `foundation/authority`            |   686 | Table 117 to 143                                                                     |
+| `actors/session-execution-admission.ts` is `foundation/agent-tools` |   661 | Worse by 1                                                                           |
+
+The first two lines are the proposal. Together they give 658 to 633. The package `@purin-labs/control-api` imports
+only `contracts`, `contract-schema`, `std` and `type-utils`: it is a contract, and 12
+of the 18 order crossings that it gives are `authority` reading its shapes. The tool
+files have two concerns: the executor (`catalog/`, `define-tool.ts`, `errors.ts`,
+`tool-effect.ts`) is below the Session, and the handlers with their Session support
+are above it.
+
+- **Still open in part 1, with the reason.**
+  - `agent-tools/session-support.ts`, 10 imports of commerce and Café. Kitchen and
+    commerce handlers share its commerce helpers. A move to commerce gives Kitchen
+    4 new imports of commerce. It needs the service interfaces of the commerce
+    contract.
+  - `actors/harness-follow-up.ts`, 3 imports of Slack texts. The exit check of a tool
+    effect calls it 4 levels down, so the port needs a new argument in about 8 functions
+    of `session-support.ts` and in 2 Plan 50 workers.
+  - `context/assembly/commerce.ts` (5), `data/agent-operations*` and its routes (9),
+    `cues/engine.ts` (2): commerce reads of the agent. As commerce files they give
+    more crossings (660 to 665 or 668), because foundation files import them.
+  - `actors/action-ledger.ts` (3) and the access grant files (4): the same result,
+    660 to 665.
+  - `access-control/decision-explanation.ts` (1) and `organisation-policy.ts` (4 Jev
+    files, 3 files of the `OrganisationDO` class chain): step A1.8 and step A1.9 for
+    the Organisation actor.
+  - The route files of `control/` that call Slack, Brain, commerce and integrations
+    (13). A route file with rules is not a part of the Worker, so no map change.
+
+**21 November 2026. Step A1.9 for the Organisation actor, three parts, and the
+custom connector read of step A1.8,** on the branch `refactor-17-a1-9-organisation`.
+The Case context collection and the class chain stay open.
+
+- **Rooms.** `actors/organisation-collaboration-rooms.ts` is deleted, and its `mixed`
+  note is gone. `actors/collaboration-room-dispatch.ts` is the kernel of the room
+  dispatch: the admission of the room, the placement check, the Organisation record,
+  then the room. Each area gives its routes and its socket rooms from its own file:
+  `actors/kitchen-`, `cafe-`, `commerce-` and `inbox-collaboration-rooms.ts`. The
+  class `OrganisationDO` joins them and keeps the old order of the routes.
+- **Jev settings.** `jev-features/organisation-settings.ts` holds the three Jev
+  commands as functions that take an `OrganisationJevHost`, and it declares
+  `OrganisationJevRpc`. `OrganisationDO` implements the interface. The policy file
+  defines `PolicyJevPort` for the two Jev calls that stay inside policy commands:
+  the repin of mail classification and the paid hold. The paid hold reads the clock
+  one time and not two times.
+- **A1.8.** `access-control/decision-explanation.ts` defines
+  `CustomConnectorAccountRead`. The Worker router gives the read to the access
+  control route (`AccessControlParts`), and the route gives it to the explanation.
+- **Not changed:** no path, check, status code, error text, RPC method name,
+  argument shape or stored value. No constructor changed.
+- **Measures.** Layer crossings: 640 to 635. `foundation/authority` to integrations:
+  5 to 0. Copies: 887 to 881. Unused exports: 808, no change. `organisation-policy.ts`:
+  1,483 lines to 1,226.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite pass. 56 journey files ran in four groups,
+  with the idle tenant journey: 55 pass and 1 is skipped. The full E2E suite did not
+  run on the branch.
+- **Still open: the Case context collection (5 imports of the Inbox).**
+  `actors/organisation/case-context-collection.ts` and
+  `case-context-discovery/source.ts` are the Gmail source of a collection: the
+  mailbox binding, the contact verification and the message receipt. As Inbox files
+  they give 635 to 631, but the policy class then imports them (2 new imports from
+  `foundation/authority` to the Inbox), and one imports a helper of the Worker. The
+  eight collection commands of `OrganisationPolicy` read the verified contact and its
+  supplier target, so they are Inbox rules. They must leave the policy class as an
+  Inbox module, as the Jev commands did: about 570 lines and 8 RPC methods.
+- **Still open: the class chain.** `OrganisationActorBase`, `OrganisationPolicy`,
+  `OrganisationCommerce` and `OrganisationDO` are still one chain. `OrganisationPolicy`
+  still holds rules, so no level only composes yet. The schema steps are in
+  `actors/organisation/schema.ts`: this step did not change them.
+
+**21 November 2026. Step A1.10 for the commerce area: one area contract,** on the
+branch `refactor-17-commerce-contract`.
+
+- **The lint knows the public files.** `contracts` in `scripts/layers.json` lists
+  the contract packages and now also public source files and folders. An import of
+  a public file from another area is not a crossing. A public file must be honest:
+  `lint:layers` refuses a value import of a file of its own area that is not
+  public. `import type` is allowed. `--report` prints the imports between areas
+  that go through a contract (181: 59 to public files, 122 to area packages).
+- **The commerce contract.** `services/platform/src/commerce/contract/` holds the
+  client factory of the commerce engine (`createCommerceClient`,
+  `createCommerceEntityPlaneClient`, `pantryCommerceAccess`), the queue messages,
+  the provider port with `commerceProjectionRevision`, the merchant control check,
+  the Square and Stripe links, the merchant closure, the system readiness, the
+  offer price allowance, the resource ids, the list entry commands, the sensitivity
+  guard and `types.ts`. Each file needs only the foundation, the commerce packages
+  and other public files, so its code is the entry point. Four Portal modules are
+  public in place: the commerce graph requests (`entity-plane/api.ts`), the stock
+  rule, the operations types and the action labels. Importers changed import lines
+  only. Test mocks of the client factory follow it to `contract/client.ts`.
+- **A wrong line in the map.** `apps/portal/src/features/content-studio/` is the
+  Café Menus page: it uses the menu draft document and the Café control API. It is
+  now in the area `cafe`.
+- **Measures.** Layer crossings: 674 to 613. Between areas: 214 to 153. The six
+  pairs into commerce: Kitchen 25 to 3, Café 13 to 1, integrations 12 to 1,
+  organisation 8 to 0, Shopify 8 to 4, Inbox 7 to 5. Copies: 887, no change.
+  Unused exports: 808, no change.
+- **What stays, and why.** Each import needs the inside of commerce, so each needs
+  a service interface that the Worker wires. No caller changed its function body.
+  - Shopify (4): the delivery normalizers of `commerce-wasm.ts` and
+    `applyCommerceDelivery` of the projection. Shopify is the second provider; the
+    provider port needs a delivery entry that the commerce server gives.
+  - Inbox (2 Platform): `mailbox-sender-links.ts` opens the commerce graph through
+    `control/commerce-graph.ts`, and `supplier-context.ts` builds a graph reader.
+    Both need a graph read service.
+  - Kitchen (3): `production-plan-handlers.ts` parses a graph query and prepares a
+    commerce read (a Kitchen tool service, A1.7), and
+    `stock-shortage-report.ts` uses the report definitions of commerce.
+  - Portal (4): the draft presence component of commerce is shared by the Café
+    menu editor and the Inbox reply draft. It belongs in
+    `features/collaboration/` with its styles. The integrations page shows the
+    Stripe setup part of commerce.
+- **Commerce imports back.** Commerce imports organisation (12), Kitchen (10),
+  Café (7), Shopify (1), Inbox (1) and integrations (1). The contract imports no
+  area, so the contracts have no cycle. The imports back are in the inside: the
+  access prompts of the Portal, the activation steps of the Organisation actor, the
+  stock and menu actions of the action model, the inventory check of the product
+  routes and the provider list.
+
+**21 November 2026. Steps A1.6 and A1.9 for the Case,** on the branch
+`refactor-17-case-ports`. The Case actor, the chat records and the Projects name
+fewer areas and surfaces.
+
+- **The Worker shell.** `actors/case.ts` holds only the class `CaseDO`, and the map
+  gives it to `workers/platform`. The Case actor is the abstract class `CaseActor`
+  in `actors/case/case-actor.ts`. The Case modules and the area files name
+  `CaseActor`, not `CaseDO`.
+- **The parts.** `actors/case/parts.ts` defines `CaseParts`: the checks of the
+  commerce values (`CaseCommercePart`), the Connector of a mailbox or a WhatsApp
+  trigger (`CaseInboxPart`) and the resume of a Portal chat turn. `CaseDO` gives
+  the parts. `CaseActor` gives them to the Case modules in its constructor, before
+  it reads a stored value. Only the Case actor runs the parsers that read them.
+- **Commerce.** The Case stores a commerce proposal and reads its envelope.
+  `commerce/case-proposals.ts` checks the action, the authority and the source
+  record, and it names the precise types of the body. The parser of a source
+  record moved to `actors/case/source-provenance.ts`: only the Case imports it,
+  and it parses a field of the Case content contract.
+- **Inbox.** The email reply proposals and the mail work of a thread are functions
+  of `actors/case-inbox/` (area `inbox`). `CaseInboxRpc` declares the RPC methods,
+  and `CaseDO` implements them. `readConversationEmailReviews` moved to
+  `mail-inbox/conversation-email-reviews.ts`.
+- **Kitchen.** The Case forwards the page state as `TurnPageState`, as the Session
+  holds it. The browser context is `PageBrowserContext` of `@purin-labs/contracts`.
+- **Slack and the Worker.** The Case walk names `CaseConnectorRpc`, not the class
+  `ConnectorDO`. The map gives `control/routes/chat-configuration-drafts.ts` to
+  `surfaces/portal`: it is a Portal chat route, and only the Portal chat routes
+  import it.
+- **Portal.** `chat/input-admission.ts` is `foundation/conversation` in the map: it
+  imports no Portal file, and only the Case imports it. The read of a canvas chat
+  panel moved to `chat/workspace-canvas-read.ts` (`surfaces/portal`): it returns
+  the Portal shape of the chat. `surfaceObservationField` moved to
+  `chat/timeline.ts`.
+- **Brain and integrations.** `readExecutionRecords` and `readExecutionContent`
+  moved to `CaseDO`. The chat record names the shape of its documents
+  (`ConversationDocument`).
+- **Not changed:** the stored JSON, the key order of a proposal, the schema steps,
+  the table names, the delivery ids, the RPC method names, the argument shapes and
+  the error codes.
+- **Measures.** Layer crossings: 674 to 634. `foundation/conversation` to commerce:
+  12 to 1. To Inbox: 11 to 0. To Kitchen: 10 to 4. To Slack: 7 to 5. To Portal: 7
+  to 2. To Brain: 2 to 1. To `workers/platform`: 2 to 0. To integrations and to
+  organisation: 1 to 0 each. Copies: 887 to 886 (one copy in the Case actor is
+  now one method). Unused exports: 808 to 807.
+- **Still open.** Each line is an import that stays.
+  - `actors/case-walking-path.ts` (Slack, 2): the Slack thread turn builds the
+    stream input and its release. The port goes through
+    `OngoingCaseWalkingConnector`, and its caller is
+    `actors/connector/slack-channel.ts`.
+  - `actors/case-conversation-sink.ts` (Slack, 1): the exit check asks if a Slack
+    channel reaches people outside. The Session, the Connector and the Slack side
+    Cases call it, so the port changes their calls.
+  - `actors/case-output-hold.ts` (Slack, 1): it holds a Slack output and posts the
+    Slack notice text. The Connector side of the walk and the commerce delivery
+    call it.
+  - `chat/side-case-origin.ts` (Slack, 1): it parses the Slack row of
+    `side_case_proposal`. Its callers are Session files.
+  - `chat/conversation.ts` and `chat/timeline.ts` (Kitchen 2, Portal 2): the chat
+    record parser checks the Kitchen view of a message (an old tab attachment and
+    the screen observation). The chat record has no actor that gives a part, and
+    the parser runs in the routes, the store, the Case and 4 unit test files. A
+    surface registry for the state check of each surface is the host.
+  - `projects/references.ts` (Kitchen 1, commerce 1): the observation of a saved
+    Kitchen run and of a commerce record. Six callers in the routes, the Project
+    commands, the membership, the context and the chat directory need a registry
+    of reference kinds that the Worker gives.
+  - `actors/chat-signal-sockets.ts` (Kitchen 1): a chat signal reaches the
+    workflow canvas pages. The port changes the call in `OrganisationDO`.
+  - `actors/case-direct-processing.ts` (Brain 1): the empty Memory reader
+    (`turnMemoryReaderWithoutSubjects`). It is a value of the port
+    `TurnMemoryReader` in `context/assembly`, so it can move there.
+
+**21 November 2026. Step A1.9 for the Organisation actor, the second part,** on the
+branch `refactor-17-a1-9-organisation-2`. This entry replaces the two "Still open"
+points of the entry above where it names them.
+
+- **The Case context collection is an Inbox module.**
+  `actors/organisation/case-context-collection-commands.ts` (area `inbox`) holds the
+  eight collection commands as functions that take an `OrganisationCollectionHost`,
+  and declares `OrganisationCaseContextCollectionRpc`. `case-context-collection.ts`
+  and `case-context-discovery/source.ts` are the Gmail source of a collection, and
+  the map counts them as `areas/inbox`. The discovery commands of the policy read
+  the source through `PolicyCaseContextSourcePort`.
+- **The policy level is a module.** The class `OrganisationPolicy` is gone.
+  `organisation-policy.ts` holds the seven policy commands as functions that take
+  an `OrganisationPolicyHost`, and declares `OrganisationPolicyRpc`. The chain has
+  three levels: `OrganisationActorBase`, `OrganisationCommerce`, `OrganisationDO`.
+  `OrganisationDO` implements three RPC interfaces: policy, Jev and collection.
+- **The helper file.** `actors/organisation/support.ts` lost the helpers of other
+  modules. `organisation-record.ts` (`foundation/tenancy`) holds the Organisation
+  record read, its check and the placement conflict answer. Three copies of that
+  answer are one.
+- **A1.8, the access control routes.** `AccessControlParts` holds three reads of the
+  integrations area: the custom connector account, the custom connector revision
+  and the Airtable token. `control/access-control-parts.ts`, a Worker file, gives
+  the value.
+- **Not changed:** no RPC method name, argument shape, result, schema step, stored
+  value or constructor.
+- **Measures.** Layer crossings: 635 to 621. `foundation/agent` to Inbox: 5 to 1.
+  `foundation/control` to integrations: 3 to 0. `foundation/authority` to the Worker:
+  3 to 0. `foundation/authority` to `foundation/agent`: 14 to 11. Copies: 881, no
+  change. Unused exports: 808, no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages` and the
+  unit suite pass. 64 journey files ran in four groups, with the idle tenant
+  journey and the onboarding journeys: 63 pass and 1 is skipped. The full E2E suite
+  did not run on the branch.
+- **Still open: the commerce level and the base of the chain.**
+  `OrganisationCommerce` has 2,048 lines and 50 RPC methods. 27 of them have the
+  one form `this.command(...)` that a script can move. 23 have their own form.
+  `OrganisationActorBase` (742 lines) holds the commands of Memory, Evals, screen
+  relevance and the Shopify location, and `OrganisationDO` holds 2,302 lines. The
+  class is not yet a list of modules. The schema steps are one ordered list in
+  `actors/organisation/schema.ts`, and this step did not change it.
+- **Still open: the commerce imports of the access control routes (5).** The access
+  grant model of the foundation names types of the commerce contract. A port for
+  the routes needs those types in `contracts` first.
+- **Still open: 1 Inbox import.** `case-context-discovery/metadata.ts` reads the
+  verification of a selection for a conversation.
+
+**21 November 2026. The tool handlers are a module, and the handler support names
+no commerce file,** on the branch `refactor-17-foundation-2`.
+
+- **A new foundation module, `tool-handlers`.** The module `agent-tools` held two
+  concerns. The executor is below the Session. The handlers and their support read
+  the Session and the conversation, so `tool-handlers` is after `conversation` in
+  `foundationOrder`. Its files: `agent-tools/session-support.ts`,
+  `agent-tools/files/handlers.ts`, `actors/session/own-tool-services.ts` and the
+  three `actors/harness-*` files of a follow-up, a Memory proposal and a side Case.
+  `--init` ran one time for the pairs that the new name renames. No pair without
+  the new name grew.
+- **The Session imports no handler file.** `actors/session/turn-tool-offers.ts`
+  holds the rules that say if a turn offers a tool by its origin. The wiring gives
+  `ownServices`, `settleEffect`, `mayRequestPermission` and `requestPermission`.
+- **A service interface of the commerce contract.**
+  `commerce/contract/tool-reads.ts` declares `CommerceToolReads` with `import type`
+  only. The commerce helpers left `session-support.ts` for
+  `agent-tools/commerce/read-support.ts`. Commerce implements the interface, the
+  Worker wiring gives it to Kitchen, and a Kitchen handler reads commerce through
+  `context.commerce`. The `staff_page` effect of the foundation knows only the
+  member of the page.
+- **Two files at the module that they serve.** `organisation-policy.ts` and
+  `actors/message-tools.ts` are `foundation/agent` in the map.
+- **Measures.** Layer crossings: 520 to 477. Order crossings: 103 to 72.
+  `foundation/agent-tools -> foundation/agent`: 21 to 3. `foundation/agent ->
+foundation/conversation`: 28 to 22. `foundation/authority -> foundation/agent`: 11
+  to 5. The handler support to commerce: 9 to 0. Kitchen to commerce: 3 to 1.
+  Copies: 880 to 878. Unused exports: 807, no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite pass. The catalog was not changed. 36
+  journey files of the changed paths pass, in two groups. The full E2E suite did
+  not run on the branch.
+- **Still open: 32 imports of commerce from the foundation.**
+  - `context/assembly/commerce.ts` (5) builds the commerce context of a turn from
+    the graph. Commerce, Kitchen and the handler support import it. It is commerce
+    code. It can go behind `CommerceToolReads`, with its error class in the
+    foundation.
+  - `data/agent-operations*` with its runner and routes (10) and `cues/engine.ts`
+    (2) are the operations and the cues of the merchant agent. They write eight
+    agent tables that the foundation owns. As commerce files they give more crossings: 16 more for the
+    operations and 8 more for the cues, measured.
+  - `actors/action-ledger.ts` (3), the access grant files (4) and the two access
+    control routes (5): the access grant model names the entity types and the graph
+    query of the commerce contract. Those types must go to `contracts`, or the
+    grant target must hold an opaque commerce part.
+  - `control/routes/sessions.ts` (1), `control/agent-operation-activity.ts` (1) and
+    `control/routes/agents/operations.ts` (1).
+- **Still open: the order pairs.** `foundation/agent -> foundation/conversation`
+  (22): `chat/turn-access.ts` (the access of a Session turn) is read by 4 agent
+  files, and the Case context discovery reads the chat store. `foundation/tool-handlers
+-> surfaces/slack` (3): the Slack notices of a permission request and of a held
+  effect.
+
+**21 November 2026. Step A1.10 for the other areas: area contracts,** on the
+branch `refactor-17-area-contracts-2`. Each area got a contract, one at a time.
+
+- **Integrations.** `services/platform/src/integrations/contract/` holds the
+  provider adapter interface, the provider lifecycle types, the provisioning and
+  credential cutover steps, the provider revocation, the credential rotation
+  lifecycle, the Jev draft command, the provider ingress origin, the observation
+  evidence and the Google token revocation. Eight Portal modules are public in
+  place: the provider catalogue, the provider onboarding, the Jev requests and
+  paid use, the custom connector requests and three dialogs.
+- **Inbox.** `services/platform/src/mail-inbox/contract/` holds the Gmail
+  Connector ids, the mail source authorization, the two inference eligibility
+  checks and the control authority of a member request. Five Portal modules are
+  public: the mailbox, WhatsApp and email review requests, the email review panel
+  and the mailbox setup folder.
+- **Organisation.** `services/platform/src/organisation/contract/` holds the
+  activation types, the activation acceptance fault and the provider support
+  references. Seven Portal modules are public: the access requests, the
+  permission parts, the agent console parts and the account invitation link.
+- **Kitchen.** `services/platform/src/kitchen/contract/` holds the stock action
+  of Plan 81 (its record, plan and run), the inventory overview and the
+  inventory request checks. The services type of the Kitchen tools and the
+  Portal bakery browser context are public in place.
+- **Café.** `services/platform/src/cafe/contract/` holds the menu publication,
+  the board media library, the order queue commands and the two menu request
+  errors.
+- **Brain and devices.** `memory/contract/turn-memory.ts` holds the empty turn
+  Memory reader and the shown revision type. `devices/contract/fleet-stub.ts`
+  holds the stub helpers of the device fleet. The Brain and Case execution
+  requests and the Brain address are public in the Portal.
+- **Wrong lines in the map.** The onboarding reconciliation runner is a Worker
+  file. The Portal WhatsApp setup is an integrations page. The stock shortage
+  report is a commerce report. The mailbox turn Memory reader is an Inbox file,
+  and it moved to `mail-inbox/`.
+- **The rule for a public file.** Each public file imports only the foundation,
+  the contract packages and other public files. A function moved out of an
+  inside file with its body unchanged. A file that needs the inside of its area
+  stayed inside: `memory/access.ts` restores the branded revisions of the store,
+  so it is not public.
+- **Measures.** Layer crossings: 520 to 422. Between areas: 153 to 58.
+  Integrations to Inbox 25 to 5. Organisation to integrations 14 to 2. Commerce
+  to organisation 12 to 3. Inbox to Brain 10 to 7. Brain to Inbox 10 to 6.
+  Commerce to Kitchen 10 to 0. Shopify to integrations 9 to 0. Inbox to
+  integrations 7 to 0. Commerce to Café 7 to 1. Copies: 880, no change. Unused
+  exports: 807 to 805.
+- **Still open.** Each import below needs the inside of the other area, so it
+  needs a service interface that the Worker wires, or a later step.
+  - Inbox and Brain (13): the Inbox reads and proposes Memory and Evals through
+    `memory/access.ts` and `evals/access.ts`. The Eval run of an email case
+    (`eval-task-processing.ts`) runs the Inbox email case processing. Evals
+    read the verified contacts.
+  - Integrations to Inbox (5): the Gmail and WhatsApp connection workflows
+    register the mailbox and the phone number in the Inbox stores, and two
+    routes tear down the mailbox agent. A registration port in the integrations
+    contract is the host.
+  - Shopify (9): the provider catalogue lists the Shopify adapter (4), Shopify
+    reads the commerce projection (4), and commerce lists the Shopify provider
+    (1). This is step A2.5.
+  - Organisation (14): the commerce level of the Organisation actor runs the
+    activation steps (2), and the commerce actions route builds the onboarding
+    projection (1). The account removal, the archive cleanup and the operators
+    route erase or read Inbox and device records (5). The configuration draft runs
+    device commands and Kitchen workflow changes, and the Kitchen route
+    confirms the draft (3). The onboarding route and the account removal use
+    the provider catalogue, and the integrations route calls the account
+    removal (3). The account removal belongs to integrations by its content,
+    but a move adds its table writes to the integrations pairs.
+  - Devices and Café (4): the device fleet actor composes the Café terminal
+    collection module (step A1.9), and the devices route reads the menu screens.
+  - Into commerce (Inbox 5, Kitchen 2, Café 1, integrations 1) and from
+    commerce to Café (1): the draft presence component, the commerce graph
+    reads, the production plan reads, the Stripe setup part and the counter
+    register.
+  - Kitchen to Inbox (1) and Café to Kitchen (1): the supplier creation
+    registers the supplier email contact, and the Register view tool reads the
+    bakery surface receipt.
+  - The package `bakery-model` depends on `commerce-client` (1). Step A1.11
+    owns it.
+
+**21 November 2026. Only the owner of a table writes it: 92 of 117 writes moved,** on
+the branch `refactor-17-table-owners`.
+
+- **The method.** A writer in a higher module calls a statement builder of the owner
+  and puts the statement into its own batch, at the same place. 19 owner files hold
+  the builders. 6 of them are new: `integration-account-writes.ts`,
+  `provider-connection-writes.ts`, `surface-installation-writes.ts`,
+  `onboarding-reconciliation-run.ts`, `agent-operations/export-coordinator-rows.ts`
+  and `cues/cue-log.ts`.
+- **The proof of the SQL.** A script compared each SQL write text of the Platform and
+  the Portal before and after the change: 1,334 texts, each one the same. Each bind
+  list keeps its order.
+- **A lower writer with an import that exists.** Four lower files already imported a
+  file of the owner: the Slack install of `data/organisation.ts` (tenancy) imports
+  `data/integration-account.ts`, the grant code of `authority` imports
+  `context/files/persistence.ts`, the membership revocation imports
+  `projects/case-project.ts`, and the archive reconciliation imports
+  `voice/store.ts`. Their statements moved into that file, so no import was added.
+  The import crossing stays in the ratchet, and the port of that crossing removes it.
+- **One wrong owner in the map.** Only the Slack revocation webhook writes
+  `slack_installation_lifecycle_event`, and no code reads it. Its owner is
+  `surfaces/slack`, beside `slack_installation`.
+- **Cleanup.** Seven local helpers that held one statement are gone, and a re-export of
+  `ACTIVE_PLACEMENT` with no other user.
+- **What stays (25), and why.**
+  - The purge (8): `data/organisation-purge.ts` pseudonymizes the account, the
+    connection and the credential generation rows, and erases two Slack rows. The
+    purge catalogue is the hook: tenancy erases or rewrites each regional table by
+    design, and `pnpm lint:purge-catalogue` checks each entry.
+  - The archive (4): `data/organisation-lifecycle.ts` disables the accounts, the
+    connections and the webhooks, and removes the Project members, in its fenced
+    batch. Tenancy imports no file of `connections` or `conversation` there. The
+    hook is an archive part that the Worker gives, and 3 source files and 12 test
+    files call the archive directly. It belongs with the port of the Organisation
+    lifecycle.
+  - Other lower writers with no import of the owner (11): `control-plane.ts` writes
+    the workspace rows of `agent` (2) and the readiness of `organisation` (2);
+    `service-membership.ts` writes an invitation role of `organisation`; the Slack
+    credential of the Vault writes `slack_installation` (2); and
+    `integration-account.ts` and `provider-attempt.ts` (`connections`) write
+    `credential_ref`, the communication destination and the support reference.
+    Each needs a hook, or the file is in the wrong module.
+  - Between two areas (2): the account removal of `organisation` writes the cleanup
+    row of `integrations` and the contact verification of `inbox`. A call needs a
+    public file of that area, and this step changed no contract.
+  - A false match (1): the lint reads the Portal error text "Could not update
+    project access." as a write of `project`. The text stays.
+- **Measures.** Layer crossings: 520 to 428. Table writes: 117 to 25. Upward, between
+  areas and against the order: no change (147, 153, 103). Copies: 880, no change.
+  Unused exports: 807, no change. Lines: 1,531 removed and 2,966 added; a builder
+  names each of its values.
+- **Not changed:** no SQL text, no bind order, no batch order, no D1 baseline, no
+  wire value.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files) pass. The 28 journey files of
+  the brief pass in four groups, with the idle tenant journey: 76 tests. 7 more
+  journey files for the side Cases, the member removal, the custom connector, the
+  voice Macs and the cue claim pass: 11 tests. `wrangler deploy --dry-run` passes
+  for the six Workers. The full E2E suite did not run on the branch.
+
+### A2.1 — One decision API (2026-11-21)
+
+The six parts of the step are done. Three items stay open for the owner or for a later
+step; they are at the end of this entry.
+
+- **The record.** [Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)
+  gives each kind: its store, who reads it, who decides, what happens, and what a
+  person sees in the Portal and in Slack.
+- **The one read.** `GET /v1/control/organisations/{id}/decisions` gives the
+  decisions that wait for the reader. `PendingDecision` in
+  `@purin-labs/control-api` is the union: `governed_action`, `held_output`,
+  `permission_request` and `email_review`. `listPendingDecisions`
+  (`control/pending-decisions.ts`) reads each store one time with the read of its
+  page, copies no record and writes nothing. A Case approval wait is the Case's view
+  of a ledger action, so that action is one entry. No route changed its answer.
+- **The one decide call.** `decidePendingDecision`
+  (`control/decide-pending-decision.ts`) takes a `PendingDecisionCall`: the kind,
+  the id of the entry in the one read, and the answer `allow` or `refuse`. It gives
+  the call to the store that owns the decision. The nine decide routes call it: the
+  held output, the permission request, the approval and the rejection of a commerce
+  action, the approval of a custom connector write, and the approve and reject
+  actions of a Gmail reply and of an operational email.
+- **Each store keeps its checks.** The code of each store did not change: the role,
+  the step-up grant, the mutation boundary, the challenge of an email proposal, the
+  receipt and the effect. Each route answers with the same status and body, and it
+  makes its checks in the same order.
+- **The proof is the request.** The call carries the request as the proof of the
+  person, because the step-up grant, the mutation boundary and the challenge are in
+  it. The stores still answer with a `Response`.
+- **The one Portal component.** `DecisionButtons` (`apps/portal/src/ui/decision-buttons.tsx`)
+  shows allow and refuse, and owns the second question of a refusal. Six places use
+  it: the chat card and the status band of a governed action, the review of a custom
+  connector write, the two email reviews of the mailbox page and the Inbox
+  conversation. Each place gives its labels and classes as props, so each place
+  keeps its look. A temporary check rendered the old and the new markup of the six
+  places: they are equal. The held output and the permission request stay on
+  `PermissionRequestDialog`, and the chat email draft stays on `DraftMessageCard`.
+  Each of the two was one shared component before the step.
+- **The one Slack card builder.** `decisionCardBlocks` (`slack/decision-card.ts`)
+  builds the section and the actions block from a list of buttons: a link to the
+  Portal, or an answer with an optional confirm. The commerce approval card, the
+  permission request card and the notice card use it. A temporary check serialised
+  14 cards before and after: the 7,905 bytes are equal. The check is deleted. The
+  email review notice is plain text and did not change.
+- **The journey of a refused Gmail reply.** `mail-reply-shared-draft.test.ts` has a
+  third journey: a viewer may not reject, a rejection with a reason is refused, an
+  administrator rejects, Gmail loses the draft, the shared draft ends, a late
+  approval sends nothing, and the reply leaves the one read.
+- **Layers and ratchets.** `control/pending-decisions.ts` and
+  `control/decide-pending-decision.ts` are `foundation/control` and name no area.
+  The Worker file `control/pending-decision-parts.ts` gives the readers and the
+  stores. Layer crossings: 477, no change. Copies: 878 to 877. Unused exports: 807,
+  no change.
+- **Open for the owner: two looks of one kind.** The items of "Two looks of one
+  kind, as found" in Appendix E did not change. `DecisionButtons` keeps each look
+  through props. A decision of the owner removes a prop value, not a component.
+- **Open for the owner: a custom connector write has no refusal.** The type of the
+  call permits only `allow` for it, no button refuses it, and it has no refused
+  journey. It can only expire.
+- **Open for a later step: Slack and a `Result` for each store.** The Deny of a
+  permission request (`slack/permission-request-deny.ts`) and the buttons of a
+  commerce action (`slack/commerce-approval.ts`) prove the person through a verified
+  Slack link, not through a Portal session, and they call the stores directly. To
+  send them through the one call, each store must first return a `Result` and take
+  the proof as a value. That change moves the checks of four route files, so it is
+  not a change with no risk for behavior. It is not done.
+- **Found, not changed.** An approval of a Gmail reply after its rejection answers
+  with status 502 and `email_reply_edit_unavailable`. Nothing is sent. A status 409
+  fits better, but the step changes no answer.
+
+**21 November 2026. The crossings that start in an area: 124 to 62,** on the branch
+`refactor-17-areas-rest`. The work list was each pair whose source is an area, a
+surface or a package.
+
+- **Placements with evidence.** A file moved in the map only when its imports and
+  its importers showed its module:
+  - `actors/connector-email.ts`, `actors/connector-email-proposal.ts` and
+    `actors/connector-whatsapp.ts` hold the agent state of a mailbox and a WhatsApp
+    number: drafts, reply turns, budgets and handoff. They import no surface
+    file, so they are `areas/inbox`. `actors/eval-task-processing.ts` is a mailbox
+    reply turn by its own comment, and it is `areas/inbox` too.
+  - `actors/actor-relocation-mail.ts` reads mail receipts, and only the email level
+    of the Connector and the relocation admin route import it: `surfaces/email`.
+    `actors/whatsapp-operator-notice.ts` posts to a Slack channel, and only the
+    WhatsApp RPC file imports it: `surfaces/slack`.
+  - The WhatsApp identifiers, the application configuration and the Graph client
+    import nothing above the kernel: `foundation/connections`.
+  - `slack/card-only-reply.ts` imports nothing: `foundation/tool-handlers`.
+  - In the Portal, the console tools context and the reasoning effort labels are
+    `foundation/ui`, and the approval sign-in window is `foundation/control`.
+    `features/integrations/settings-transport.ts` holds the route transports that
+    the Portal wiring gives two pages: `surfaces/portal`.
+- **Public files.** `mail/gmail-oauth.ts` (integrations) and `evals/scorer.ts`
+  (Brain) import only the foundation and packages. New public files:
+  `evals/contract/eval-task.ts`, `commerce/contract/observation-identity.ts`,
+  `integrations/contract/admin-integration.ts`,
+  `integrations/contract/provider-account-cleanup.ts`,
+  `mail-inbox/contract/account-erasure.ts` and `devices/contract/alert-delivery.ts`.
+  Each function moved with its body. The SQL texts and the bind order are the same.
+- **Ports.**
+  - The Connector class chain is `ConnectorDO`, `ConnectorEmail`,
+    `ConnectorWhatsApp`, `ConnectorEvals`, `ConnectorActorBase`. The Eval level asks
+    the mailbox level two abstract methods: if the agent is active, and to run one
+    task. It passes the Brain services of the task (`EvalTaskServices`). The email
+    schema gets the Eval schema step as an argument, in the same place.
+  - `ArchiveCleanupParts` gives the archive cleanup and the purge of an
+    Organisation the steps of the voice Macs, Slack, the devices and the WhatsApp
+    Connectors. The Worker file `archive-cleanup-parts.ts` gives them, and each
+    part names its function when it runs.
+  - The store of the running chat request is in `features/collaboration`: the
+    chat sets it, and the Café board reads it.
+- **Moves and merges.** The draft presence component and its styles are in
+  `features/collaboration/`, with the pointer names of
+  `@purin-labs/collaboration`. The WhatsApp and the mailbox Connector handles are
+  one helper. The strict read of the Organisation environment uses the read of
+  `control/organisation-runtime.ts`, so the gateway copy of that query is gone.
+  The workspace switcher owns the types of its choices.
+- **Not changed:** no stored value, SQL text, route, message text, delivery id,
+  RPC method name, schema step or schedule.
+- **Measures.** In scope: 124 to 62. Layer crossings: 287 to 222 (upward 134 to
+  84, between areas 56 to 44, order 72 to 71, table writes 25 to 23). Three
+  foundation pairs went down as a result:
+  `foundation/tool-handlers -> surfaces/slack` 3 to 2,
+  `foundation/actor-runtime -> surfaces/email` 2 to 1 and
+  `foundation/actor-runtime -> foundation/connections` 1 to 0. Copies: 878 to 877.
+  Unused exports: 805, no change. Plain D1 handles: 66 to 62.
+- **What stays (62), and what removes it.**
+  - Inbox to Brain (7): the Inbox reads and proposes Memory and Evals through
+    `memory/access.ts` and `evals/access.ts`, which restore branded revisions. A
+    Memory service interface in `memory/contract/` that the Worker gives the
+    Connector and the Inbox routes removes them.
+  - Integrations to Inbox (5): the Gmail and WhatsApp connection workflows register
+    the mailbox, the sender and the phone number, and two routes tear down the
+    mailbox agent. A registration port of the integrations contract, given to the
+    integrations router and the provider workflows, removes them.
+  - Shopify (9): step A2.5 owns them.
+  - Devices to Café (4): the device fleet actor composes the Café terminal module
+    (step A1.9), and the devices route reads the terminal operations and the menu
+    screens (a Café read interface).
+  - Integrations to Slack (4) and Organisation to Slack (1): the Slack routes, the
+    Slack connection workflow and the account removal use the Slack installation
+    store. The store needs one owner below them, with a port for its Vault calls.
+  - Commerce to Slack (3): the commerce action builds the text of its Slack card,
+    and the commerce actions route binds a Slack setup channel. The action can give
+    typed facts, and the Slack surface can build the text.
+  - Commerce to organisation (3) and to the Worker (1): the commerce level of the
+    Organisation actor runs the activation steps and extends
+    `OrganisationActorBase` (step A1.9). The commerce actions route builds the
+    onboarding projection.
+  - Inbox to commerce (3): the sender links and the supplier context read the
+    commerce graph. A graph read service of the commerce contract removes them.
+  - Portal (5): the Café prompt edit reads and sends the Portal chat (a chat port
+    that the shell gives), two Organisation pages render in `PortalFrame`, and the
+    integrations page shows the Stripe setup part.
+  - Devices to voice (2): the shop Mac devices read the voice Mac store.
+  - Organisation to integrations (2): the onboarding route reconciles provider
+    observations, and the account removal reads the provider cleanup context. The
+    route can give that reader as an input; six unit test calls change with it.
+  - One each: Brain to Inbox (the verified contacts of an Eval), Brain to Slack (the
+    members of a Slack channel for a Memory reader), Inbox to WhatsApp (the send
+    ladder store), commerce to Café (the counter sale view), Café to Kitchen (the
+    bakery surface receipt), Kitchen to Inbox (the supplier email contact), Kitchen
+    to organisation (the configuration draft), integrations to organisation (the
+    account removal), organisation to Inbox (the Gmail pilot budget), organisation
+    to devices and to Kitchen (the configuration draft runs a device command and a
+    workflow change).
+  - Packages (2): step A1.11 owns them.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 106
+  journey files whose names hold a word of the brief ran in nine groups: 105 pass
+  and 1 is skipped (208 tests pass, 3 are skipped). `wrangler deploy --dry-run` and
+  the full E2E suite did not run on the branch.
+
+**21 November 2026. The foundation crossings: ports, hooks and true modules,** on
+the branch `refactor-17-foundation-rest`. The work list was each pair whose source
+is a foundation module.
+
+- **The Session reads the conversation through a port.** The wiring gives
+  `conversation` (`actors/session/conversation-port.ts`): the fork history, the
+  side Case and the flow checks of the conversation. `chat/session-conversation.ts`
+  implements it. A side Case is a value with its instruction and its admission.
+  Slack gives the parser of its own proposals, so `chat/` imports no Slack file for
+  it. The access check of a Session turn is a hook that the Session class
+  registers (`actors/session-turn-access.ts`), because the Code Mode and
+  admission functions outside the class call it. The sink refusal type and
+  `sinkRefusalAsksPerson` are in `policy/information-flow/sinks.ts`.
+- **The census list is a part of the Worker.** `actors/actor-machines.ts` holds the
+  list of the machines in the order of before. The census takes it as an argument,
+  and the Case and the Session ask the Worker's class for it.
+- **Routes get parts from the router.** The Case context route gets the Inbox
+  check of a selection and the Portal screen observation route. The session
+  routes get the support role read of the Organisation area.
+- **Types and values at their owner.** The ids of the two Actor moves and the
+  policy placement check are in `data/organisation-placement.ts`. The Vault handle
+  is in `ids.ts`. `TypeSafeAuthority` is in the flow label types. The Code Mode
+  host types and the file tool result types are in `agent-tools/catalog/types.ts`.
+  The empty Memory reader is in `context/assembly`. The model route error map is in
+  `models/route.ts`. The action nonce check is in `approval-authentication.ts`.
+  The label of a native chat source gets the access checks of the conversation
+  with its input. A re-export keeps each old import.
+- **Two splits.** The mail receipt of a frozen relocation moved into
+  `actors/actor-relocation-mail.ts`, which is `surfaces/email`. The commerce
+  receipt of a frozen Organisation is `actors/organisation-relocation-receipt.ts`
+  (`areas/commerce`).
+- **True modules, with evidence.** Each file below imports nothing of its old
+  module that the new one cannot import, and its users are at or above the new
+  module. `case-goals.ts`, `fork-history.ts`, `execution-billing.ts`,
+  `organisation-runtime.ts`, `organisation-inference-selection.ts` and
+  `jev-features/paid-use.ts` are `foundation/agent`. `attachment-collection.ts`,
+  the Case command route, the Case context route and its metadata read, and
+  `action-mutation-execution.ts` are `foundation/conversation`.
+  `organisation-archive-cleanup.ts` and `organisation-regional-copy.ts` are
+  `foundation/actor-runtime`. `case-operations.ts` is `foundation/authority`.
+  `database-handles.ts` is `foundation/kernel`, and `boundary.ts` is
+  `foundation/contracts`. `account-platform/onboarding.ts` is
+  `areas/organisation`. `data/identity-link.ts` is `surfaces/slack`. Five tables
+  follow their only writer.
+- **Not changed:** no path, status code, error text, RPC method name, argument
+  shape, stored value, SQL text, schema step, tool definition or digest. The
+  `foundationOrder` did not change.
+- **Measures.** Layer crossings: 287 to 218. From the foundation: upward 68 to 51,
+  against the order 72 to 20, table writes 22 (no change). Copies: 878, no change.
+  Unused exports: 805, no change. Plain D1 handles: 63, no change; one count moved
+  with the policy placement check.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files) pass. The 79 journey files of
+  the brief ran in four groups: 78 pass and 1 is skipped (144 tests pass, 2 are
+  skipped). `wrangler deploy --dry-run` passes for the six Workers. The full E2E
+  suite did not run on the branch.
+- **Still open, with what removes it.**
+  - Commerce (31). The agent operations (`data/agent-operations*`, the runner, the
+    operations route and activity, 12) and the cue engine (2) name commerce kinds
+    in the responsibility scope and the cue events. The scope needs an opaque
+    commerce part that a commerce parser checks at the input and the row read.
+    `context/assembly/commerce.ts` (5) is commerce code that Kitchen and the Inbox
+    import; it goes behind `CommerceToolReads`. The action ledger (3), the grant
+    compiler, the grants store and the entity type reads (4) and the two access
+    control routes (5) need an opaque commerce part of the grant target.
+  - The tenancy lifecycle (8 imports, 22 table writes). The Organisation creation,
+    the membership, the archive and the purge write rows of `connections`,
+    `authority`, `agent`, `conversation`, `organisation` and Slack in their own
+    batch. One lifecycle port with the statement builders of each owner removes
+    them. Its callers are the routes, the reconciliation and the unit and journey
+    files that call these functions, so it needs its own landing.
+  - The Case and the chat record (Slack 4, Kitchen 4, Portal 2, commerce 1): the
+    Case walk builds the Slack stream input, the output hold posts the Slack
+    notice, the sink asks Slack if a channel reaches outside, the chat parser checks
+    the Kitchen view of a message, and the Project references read a saved run.
+    Each needs a registry of the surface or the reference kind.
+  - The tool handlers to Slack (3): the follow-up posts the Slack card of a
+    permission request and a held effect.
+  - The routes of the approvals (Slack 2, Brain 1, conversation 1): step A2.1 owns
+    `agent-permission-requests.ts` and `held-output-requests.ts`.
+  - Single imports: the file grant statements of the grant code (2), the commerce
+    grant read of the entity type reads in `context/assembly`, the Case snapshot
+    type of `case-operations.ts`, the native chat audience of the context assembly,
+    the agent operation runner (2), the operations snapshot of the activity and the
+    files module of the access control mutations (2), the onboarding projection of a
+    configuration answer, the support references of the integration account, the
+    default agent id of the room presence, the collaboration ping of the socket
+    host and `UserId` of `control-api` in `ids.ts`.
+
+**21 November 2026. The lifecycle port of an Organisation: table writes 23 to 4,**
+on the branch `refactor-17-lifecycle-port`.
+
+- **The port.** `data/organisation-lifecycle-port.ts` (tenancy) has one part type
+  for each lifecycle step: creation, membership, archive and purge. A part gives
+  the prepared statements of the owner's tables for one place in one batch.
+  Tenancy puts them at that place, so each batch keeps the same statements in
+  the same order, with the same bind values. One D1 batch stays one D1 batch.
+- **The Worker gives the parts.** `organisation-lifecycle-parts.ts` (Worker) maps
+  each part to a builder in the owner module. `integration-gateway.ts` gives them
+  when the Worker loads, before a request or an Actor runs. A read before that
+  throws. Each part names its function when it runs, as the archive cleanup parts
+  do, so a test that mocks an owner module still loads. The E2E setup and the unit
+  files that call a lifecycle function import
+  `tests/provide-organisation-lifecycle-parts.ts`. A global unit setup file broke
+  four mocked test files, so the import is in each file.
+- **Creation.** The bootstrap and the surface install get the workspace rows
+  (agent), the base Project (conversation), the access defaults and the replaced
+  token revocation (authority) and the connection rows (connections). The surface
+  provider helpers moved to `data/integration-account.ts`.
+- **Membership.** The role change, the member removal and the invitation
+  acceptance get the Project rows (conversation), the readiness deletion and the
+  invitation acceptance (organisation). One builder in `data/onboarding.ts`
+  replaces three equal readiness deletions.
+- **Archive.** The archive gets the disable of the accounts, the connections and
+  the webhooks (connections). The delete of an archived Organisation gets the
+  removal of the Project members (conversation). The restore writes only tenancy
+  tables.
+- **Purge.** The purge gets the rewrites of the three pseudonymized connection
+  tables (connections) and the directory's Slack records (Slack). The release of
+  the shared Slack bot token gets the revoke and the move of the installation
+  (Slack). The purge context and its guarded statement are in the port. The
+  catalogue order still sets the batch order, and `pnpm lint:purge-catalogue`
+  passes.
+- **Not changed:** no SQL text at run time, bind order, batch order, table, D1
+  baseline, route, status code or error text. A scan of each write literal found
+  two changes in source text only: the three equal readiness deletions are one,
+  and four archive statements read the guard as `${input.guard.sql}`, which is the
+  accepted mutation check of before.
+- **Measures.** Layer crossings: 155 to 128. Table writes 23 to 4, against the
+  order 20 to 12, upward 68 and between areas 44 (no change). Ratchet pairs: 69
+  to 54. Copies: 876, no change. Unused exports: 805, no change.
+- **What stays (4).** Three writes are in connection flows, not in a lifecycle
+  batch: `data/integration-account.ts` writes `credential_ref` (authority) in a
+  reconnect and `organisation_communication_destination` (organisation) in a
+  default account change, and `data/provider-attempt.ts` writes
+  `onboarding_support_reference` (organisation). `connections` is below both
+  owners, so each needs a port of the connection flows. The fourth is the false
+  match of an error text in `apps/portal/src/features/chat/project-sharing.tsx`.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files) pass. The journey files of
+  the brief ran in groups after each step and on the final tree. The full E2E
+  suite did not run on the branch.
+
+**21 November 2026. The last ports: layer crossings 155 to 74,** on the branch
+`refactor-17-ports-rest`. This entry replaces the "Still open" lists of the two
+entries above where it names a crossing.
+
+- **One port pattern.** `port.ts` (`foundation/kernel`) defines `definePort`: a
+  lower module defines a port and reads it at the call, and `worker-ports.ts`
+  (`workers/platform`) registers each implementation once, when the Worker entry
+  loads. A read before the registration throws, because it is a programmer error.
+  The Session turn access check, the one registration of this kind before, uses
+  it. The E2E setup loads the registration. A unit test file that reaches a port
+  loads it too (17 files); a global setup file would load the modules before the
+  mocks of a test.
+- **Commerce in the foundation (33 to 0).** The commerce context read is commerce
+  code (`commerce/entity-plane/context-read.ts`), and its error class is in the
+  commerce contract. The commerce parts of the grant compiler and the parsers of
+  the commerce parts of a grant target are commerce files. The foundation asks
+  commerce through ports: the grant selection, the grant targets, the access
+  targets of the access-control routes, the action ledger rules, the
+  responsibility scope parts of the agent operations and the commerce exceptions
+  of the activity read, and the observation parser of the cue engine. The id of
+  Sous Chef's agent definition is `data/merchant-agent-ids.ts`
+  (`foundation/agent`). `commerce-type-parts.ts` (`foundation/kernel`) holds the
+  interface `CommerceTypeParts`: the commerce types that foundation records carry
+  (the ledger effect, the scope references and query, the cue selectors and
+  observation, the published evidence). Commerce declares each member with a
+  declaration merge in `commerce/contract/types.ts`, as a module declares its
+  binding of `Env` (step A1.2).
+- **Memory.** `memory/contract/memory-service.ts` is the Memory service of Brain.
+  The Inbox reads Memory views, the standing of shown Memory and the mailbox turn
+  reader, and it proposes a Memory and an Eval, through it. `memory/access.ts`
+  stays private. The Eval reads verified contacts through the Inbox contract.
+- **Integrations and the Inbox.** `integrations/contract/connection-parts.ts` is a
+  registration port: the Inbox gives the mailbox part of a Gmail connection and the
+  WhatsApp part. `integrations/contract/provider-services.ts` gives the onboarding
+  route and the account removal the provider services.
+- **The Slack installation store.** `slack/installation-store.ts`
+  (`foundation/authority`) owns the installations, the Organisation connections,
+  the channel defaults and their audit rows, beside the Slack credential of the
+  Vault. The thread routes and the DM choice stay in `slack/organisation-routing.ts`,
+  because the purge and the side Case write those two tables. The store gets the
+  DM part through `slackDmSelection`. `slack/surface-parts.ts` is the port of the
+  other Slack parts: the card texts, the reply after a card, the conversation
+  facts, the reach check and the hand-over of a decision.
+- **Shopify.** The Worker registers the Shopify module in two lines: its commerce
+  provider and its provider module (the catalogue entry and the credential check).
+  The Shopify delivery normalizers are in `shopify/delivery-normalizers.ts`, and
+  they give their normalizer to the delivery intake of commerce. The commerce tool
+  reader uses `createCommerceGraphReader`, and the unread reader option
+  `commerceSystem` is gone. `shopify/REMOVE.md` names the new lines.
+- **Smaller pairs.** The onboarding projection of a configuration answer and the
+  saved runs of a Project reference are ports. Three agent operation files take the
+  module that they serve.
+- **Not changed:** no route, status code, error text, stored value, SQL text, bind
+  order, batch order, RPC shape, journal entry, delivery id, tool definition or
+  tool order. The catalog digest of the default selection and the hash of all
+  model definitions are the same as on the base (a temporary check, not
+  committed).
+- **Measures.** Layer crossings: 155 to 74. Upward 68 to 20, between areas 44 to
+  17, against the order 20 to 16, table writes 23 to 21 (the Slack installation row
+  of the Vault now has its owner). Copies: 876 to 875 (the check of a selected
+  grant is one helper). Unused exports: 805 to 797.
+- **What stays (74), with what removes it.**
+  - Table writes (21) and the tenancy order crossings (8): the lifecycle port,
+    which another worker builds.
+  - The chat record and the Kitchen (5): the chat record stores the Kitchen view of
+    a message, and the chat signal sockets reach the workflow canvas rooms.
+    Remove: the surface registry of Plan 87 for the state check, and a port in the
+    call of the Organisation actor.
+  - The Case walk to Slack (2): it builds the Slack stream input. Remove: the port
+    through `OngoingCaseWalkingConnector`.
+  - Single foundation imports (2 upward): the Memory member view of the held
+    output route and the support references of the integration account.
+  - Order crossings outside tenancy (8): the file grant statements (2) and the
+    files module (1) of the grant code, the Case snapshot type, the native chat
+    audience, the chat flow of the held output route, the collaboration ping of the
+    socket host, and `UserId` of `control-api` in `ids.ts`.
+  - Area pairs (17) and area to a surface or the Worker (10): the device fleet composes the Café terminal module (step
+    A1.9); the commerce level of the Organisation actor (A1.9, the class chain that
+    another session changes); the commerce approval card text (the action gives
+    typed facts, and Slack builds the text); the Portal pages in the shell frame
+    and the Café prompt edit; the voice Mac devices; the WhatsApp send ladder; the
+    configuration draft; and the Stripe setup part, the counter sale view, the
+    Register receipt, the supplier contact and the Gmail pilot budget. Each needs a
+    service interface of the other area, wired by the Worker. The package
+    `bakery-model` is one of the 17.
+  - The package `contracts` depends on `commerce-contracts` (1). Step A1.11 owns
+    it.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 114
+  journey files whose names hold a word of the brief, or project, onboarding,
+  held, permission, provider, inbox, eval, removal, grant, ledger or idle, ran in
+  ten groups: 113 pass and 1 is skipped (227 tests pass, 3 are skipped). After the
+  last port, the 23 cue, commerce, operation and ledger journey files ran again:
+  all pass (41 tests).
+  `wrangler deploy --dry-run` passes for the six Workers. The full E2E suite did
+  not run on the branch.
+
+### A1.9 — The class chains are modules (2026-11-21)
+
+The three Actor class chains are gone. Each Actor class holds its parts as modules. A
+module is a class with a constructor. It gets the state that it needs as one explicit
+value, and it reads no field of the Actor class.
+
+- **The Session.** The chain was `SessionActorBase`, `SessionCheckpoints`,
+  `SessionHarnessTurns`, `SessionTurnRecovery` and `SessionActor`. It is now
+  `SessionActor` over `PlacedActor`, with four modules: `checkpoints`,
+  `harnessTurns`, `recovery` and `chatCleanup`. `SessionShared`
+  (`actors/session/session-shared.ts`) holds the state that the modules share: the
+  nine fields of the old base, the persistence, the two harness sinks and two
+  helpers. `SessionActorBase` is removed. `SessionDO` stays the class of the Worker:
+  it gives the tools.
+- **The Connector.** The chain was `ConnectorActorBase`, `ConnectorWhatsApp`,
+  `ConnectorEvals`, `ConnectorEmail` and `ConnectorDO`. It is now `ConnectorDO` over
+  `ConnectorActorBase`, with three modules: `evals`, `whatsApp` and `email`, beside
+  the Slack channel of step A1.6. `ConnectorModuleHost` is what a module gets: the
+  state, the bindings, `admitExecution`, `armAlarm` and `trackExecution`.
+- **The Organisation.** The chain was `OrganisationActorBase`,
+  `OrganisationCommerce` and `OrganisationDO`. It is now `OrganisationDO` over
+  `OrganisationActorBase`, with the module `commerce`. `OrganisationModuleHost` is
+  what a module gets: the state, the bindings, `command` and `rearm`. The onboarding
+  activation gave the Actor itself to two steps; the module now gets the two methods
+  (`ensureOrganisation` and `activatePolicy`) as an explicit value.
+- **The state and the bindings are read at each use.** A shared value or a host has a
+  getter for `ctx` and for `env`. A module then sees the same bindings as a method of
+  the Actor class. The fault journeys depend on this: they replace `env` of an Actor
+  instance.
+- **RPC.** Each module declares the type of its RPC methods: `SessionCheckpointsRpc`
+  (3 methods), `SessionHarnessTurnsRpc` (2), `ConnectorEvalsRpc` (4),
+  `ConnectorWhatsAppRpc` (16), `ConnectorEmailRpc` (35) and
+  `OrganisationCommerceRpc` (50). The Actor class implements each type with one
+  method for each name. A method takes the arguments of the module method and calls
+  it. No RPC method name and no argument shape changed.
+- **Schema.** No module has schema steps of its own. The Session keeps
+  `initializeAgentSessionPersistence`, the Connector keeps `createSchema` with the
+  ordered list of its channels, and the Organisation keeps its schema file. No schema
+  version, stored value, alarm time or journal entry changed. A module constructor
+  writes nothing.
+- **No hook is hidden.** No method of a module has the name of a method of
+  `PlacedActor` or of a base class. A script compared the names.
+- **Two shared admissions.** `admitNamedConnector` (`actors/connector/module-admission.ts`)
+  replaces 29 copies of one preamble in the WhatsApp and email modules: admit the work
+  at the placement, then check the stored identity. `admitCommerceLab` replaces 3
+  copies in the commerce module. The steps and their order are the same.
+- **The fault hooks of five journeys.** Five journeys patched a method of the Actor
+  instance or of `SessionDO.prototype` as a fault hook. The method is now in a module,
+  so the hook is on the module: `checkpoint-restart`, `checkpoint-atomic-acceptance`,
+  `session-turn-completion` and `session-alarm-steps`. `slack-answer-before-archive`
+  wraps the archive of each Session at `sessionTools`, which the constructor calls. No
+  assertion changed. Before the repair, `session-turn-completion` passed with no
+  fault: its journey does not prove that the fault ran.
+- **Measures.** Layer crossings: 287 to 285. Copies: 877 to 844. Unused exports: 805,
+  no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages` and the unit
+  suite pass on the last commit. After each module, the journeys of its Actor ran: 17
+  files for the Session, 17 for the Connector and `mail-inbox.test.ts`, 18 for the
+  Organisation. Each group has the recovery, relocation and placement journeys and
+  the idle tenant journey. The full E2E suite did not run on the branch.
+- **Still open.** `ConnectorActorBase` and `OrganisationActorBase` stay as the one
+  base of their Actor class: the state, the alarm, the admission and the hosts. The
+  policy, Jev, Memory and Evals parts of the Organisation were modules before this
+  step.
 
 ## Baseline
 
@@ -1730,3 +2876,112 @@ drafts or sends. Each result is plain text with the host's own digest.
 - One branch was not reachable and is still not: `email_reply_now` in a `draft_only`
   turn ("This turn permits review drafts only."). The list of that turn does not
   hold the tool, so the model reads "Unknown tool".
+
+## Appendix E — The decisions that wait for a person, before step A2.1
+
+This record was written on 21 November 2026, before any change of step A2.1. It names
+each kind of decision that waits for a person, where it is stored, who reads and
+decides it, and what a person sees. The texts are the texts of the code on that day.
+
+### The four stores of the plan
+
+| Kind                 | Store                                                                                                                                                                                              | States                                                                                                                 | Life                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Governed action      | `action_ledger` in `OrganisationDO` SQLite (`actors/action-ledger.ts`). A commerce action or a custom connector write                                                                              | `proposed`, `approval_requested`, `signed`, `executing`, `indeterminate`, `confirmed`, `failed`, `rejected`, `expired` | 15 minutes, set by the proposer. The ledger expires an entry when a call reads it     |
+| Case approval wait   | `case_commerce_approval` in `CaseDO` SQLite (`actors/case/proposals.ts`). It is a copy: the Case never decides, it reads the ledger                                                                | `waiting`, `decided`, `lapsed`                                                                                         | The Case alarm reads the ledger each minute for 10 minutes, then each 15 minutes      |
+| Held output          | `held_output_request` in regional D1 (`data/held-output-request.ts`). An answer or a step that an exit check stopped                                                                               | `pending`, `allowed`, `denied`, `expired`                                                                              | 7 days. The 15-minute reconciliation cron sets `expired`                              |
+| Permission request   | `agent_permission_request` in regional D1 (`data/agent-permission-request.ts`). A capability or a record read that a turn lacks                                                                    | `pending`, `allowed`, `denied`                                                                                         | 7 days, checked when a person reads or decides. No stored `expired`                   |
+| Email reply proposal | The Case holds the lifecycle (`case_email_proposal`); `email_reply_proposal` in regional D1 is the projection. The approval challenge is a signed value (`mail-inbox/email-approval-challenge.ts`) | `awaiting_approval`, `approved`, and the end states                                                                    | 72 hours. The challenge has no life: it goes stale with a new version or another user |
+
+### Who reads and who decides
+
+| Kind               | Read                                                                                                                                                                                                 | Decide                                                                                                                                                                                                                                       | Who may decide                                                                                                                                                                                                 |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action    | `GET …/commerce/actions/{nonce}`; `GET …/operations` (all states, 50 newest); `GET …/custom-connectors/{c}/actions/{nonce}`. RPC `readActionActivity`, `getAction`. No read of only the waiting ones | `POST …/commerce/actions/{nonce}/approval`, `/rejection`, `/execute`; `POST …/custom-connectors/{c}/actions/{nonce}/approval`. RPC `requestActionApproval`, `signAction`, `rejectAction`. Slack buttons through `slack/commerce-approval.ts` | Owner or admin. Approval in the Portal needs a session of 10 minutes or less and a Google approval grant for this action. In Slack: owner or admin with a linked Slack account, and no action that moves money |
+| Case approval wait | `CaseDO.inspect()` (`commerceApprovals`), for the activity and execution views                                                                                                                       | Nobody. `syncCommerceApprovalWait` copies the answer of the ledger                                                                                                                                                                           | Not applicable                                                                                                                                                                                                 |
+| Held output        | `GET …/access-control/held-outputs/{id}`; the list is a part of `GET …/access-control/permission-requests`                                                                                           | `POST …/access-control/held-outputs/{id}/decision` with `allow` or `deny`                                                                                                                                                                    | A member who may see the content. `outside_written`: only the person who asked. `outside_organisation`: owner, admin or the person who asked                                                                   |
+| Permission request | `GET …/access-control/permission-requests` (a member below admin sees only their own); `GET …/permission-requests/{id}`                                                                              | `POST …/permission-requests/{id}/decision`. Slack Deny button through `slack/permission-request-deny.ts`. A Portal chat then resumes with `POST …/chat/conversations/{id}/permission`                                                        | Owner or admin. Allow needs that the access is already there: the Portal enables the capabilities and adds the grants first                                                                                    |
+| Email reply        | `GET …/email-reviews` (replies and operational emails); `GET …/email-replies/{id}` gives the preview with the challenge                                                                              | `POST …/email-replies/{id}/approve` with the version, the digest and the challenge; `/reject`; the same for `…/email-operational/{id}`                                                                                                       | Owner or admin. Approve needs the challenge of this user for this version. Reject needs no challenge                                                                                                           |
+
+### What happens
+
+| Kind               | Approve                                                                                                                                                                   | Refuse                                                                                           | Expiry                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Governed action    | The entry is `signed`; the Case wait is synced; a mutation receipt is stored. The Portal then calls `/execute`. The Slack button approves and executes at once            | The entry is `rejected`; the Case wait is synced; the Case gets the outcome; a receipt is stored | The entry is `expired` at the next ledger call. The Case wait lapses and the Case opens again   |
+| Held output        | Answer: the Connector sends it and the Case takes the delivery receipt. Step in Slack: the parked turn continues. Step in a Portal chat: the pass is used at the next ask | Answer: the Case drops it with a fixed note. Step: the Case notes the refused effect             | The cron sets `expired` and ends it as a refusal                                                |
+| Permission request | Slack: the Connector queues the parked turn again and updates the card. Portal chat: the paused run continues when the person selects Continue                            | Slack: the card shows the refusal. Portal chat: the person stops the response                    | The request leaves the list. A decision gets status 409. A paused chat run fails after 24 hours |
+| Email reply        | The Connector sends the mail through Gmail; the lifecycle moves; a receipt is stored                                                                                      | The Connector disposes the proposal; the lifecycle is `rejected`; a receipt is stored            | Found at preview or dispatch, then synced as `expired`                                          |
+
+### What a person sees in the Portal
+
+| Kind               | Component                                                                                                     | Where                                                                                   | Buttons, in order                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action    | `ChatCommerceActionCard` (`features/governed-actions/chat-commerce-action-card.tsx`)                          | A chat, one card for each `?commerceAction=` link of an answer                          | "Approve and apply", "Reject" (then "Reject change", "Keep proposal"). Signed: "Apply change"                                                |
+| Governed action    | `CommerceActionStatus` (`features/governed-actions/commerce-action-status.tsx`)                               | The status band of a page, from Operations › Approvals or a link                        | "Approve and apply", "Reject change" (then "Reject change", "Keep proposal", which resets after 5 seconds). Also "Reconcile approved change" |
+| Governed action    | `CustomConnectorWriteReview` (`features/integrations/custom-connectors.tsx`)                                  | Integrations, from a `?customConnector=&customAction=` link                             | "Verify and approve with Google". Signed: "Run approved action". No button refuses a write                                                   |
+| Held output        | `HeldOutputPrompt` (`features/access/held-output-prompt.tsx`), on `PermissionRequestDialog`                   | Access page link, the Permission requests drawer, and by itself in the chat of the step | Answer: "Do not send", "Send". Step: "Deny", "Allow"                                                                                         |
+| Permission request | `AgentPermissionRequestPrompt` (`features/access/agent-permission-request.tsx`), on `PermissionRequestDialog` | Access page link, the drawer, and the chat that waits                                   | "Deny", "Allow". In a chat after the decision: "Stop response", "Continue"                                                                   |
+| Permission request | `ChatCapabilityPermissionPrompt` (`features/chat/permission-prompt.tsx`), on `PermissionRequestDialog`        | A chat whose turn lacks a capability and stored no request of an agent                  | "Deny", "Allow". A member who cannot decide: "Stop response", "Check again"                                                                  |
+| Email reply        | `EmailReviewSurface` (`features/email-review/review.tsx`)                                                     | Integrations › mailbox                                                                  | "Approve and send", "Reject", "Open in Gmail", "Close"                                                                                       |
+| Email reply        | `ChatEmailDraftCard` (`features/chat/draft-cards.tsx`), on `DraftMessageCard`                                 | A chat                                                                                  | "Send", "Discard", and an edit button                                                                                                        |
+| Email reply        | `MailConversation` (`features/mail-inbox/conversation.tsx`)                                                   | The Inbox                                                                               | "Approve and send", "Edit", "Reject"                                                                                                         |
+
+The list of the waiting ones is `PermissionRequestQueue` on the Access page and
+`PermissionRequestsDrawer` in the account menu. Both show permission requests and held
+outputs from one read, each with a "Review" button. Operations › Approvals lists the
+governed actions. The mailbox page and the Inbox list the email replies.
+
+### What a person sees in Slack
+
+| Kind               | Builder                                                                 | Blocks                                                                                                                                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action    | `commerceCardBlocks` (`slack/commerce-approval-card.ts`)                | A section, then actions: "Approve" (`commerce_action_approve`, primary, with a confirm), "Decline" (`commerce_action_decline`, with a confirm), and a link "Details" or "Review in Portal". An action that moves money has only the link |
+| Held output        | `heldCardBlocks` (`slack/held-output-notice.ts`), on `noticeCardBlocks` | A section and one link button "Review in Portal" (`held_request_review`). No decision in Slack                                                                                                                                           |
+| Permission request | `permissionCardBlocks` (`slack/permission-request-notice.ts`)           | A section, then actions: the link "Review and allow" (`permission_request_review`, primary) and "Deny" (`permission_request_deny`, with a confirm). Allow is only in the Portal                                                          |
+| Email reply        | `buildSlackEmailReviewNotice` (`slack/email-review-notice.ts`)          | Plain text with a link "Review in Portal". No blocks and no decision in Slack                                                                                                                                                            |
+
+### Other decisions that wait for a person
+
+Each one has its own store, route and card. Step A2.1 does not join them, because the
+plan names four stores. They are here so that the next step can decide.
+
+| Kind                     | Store                                                          | Decide                                                                                                             | Card                                                                                        |
+| ------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Configuration draft      | `operator_configuration_draft` in regional D1, 1 hour          | Only the person who asked: a card in a Portal chat (confirm, cancel), or a reply in Slack with the action and code | `ChatConfigurationDraftCard`: the action label, "Discard". Slack: a typed reply, no buttons |
+| Recipe workflow proposal | The same draft table                                           | Owner or admin who asked: `…/bakery/workflows/{id}/proposals/{draft}/(approve\|decline)`                           | The Workflow page of the recipe, and the chat card                                          |
+| Campaign brief           | `campaign_brief` in regional D1, 1 hour                        | Owner or admin: accept or dismiss. A review record only                                                            | No Portal card was found                                                                    |
+| Side Case proposal       | `side_case_proposal` in regional D1, 7 days                    | Start, or do it here. No plain refusal                                                                             | `ChatSideCaseCard`. Slack: "Start thread" (`satyr_side_case_start`)                         |
+| Memory candidate         | `memory_revision` in `OrganisationDO` SQLite, no expiry        | Owner or admin: accept, reject, revoke                                                                             | Brain › Knowledge: "Accept", "Edit first", "Decline"                                        |
+| Eval candidate           | The Evals store of the Organisation actor                      | Owner or admin: accept, reject, revoke                                                                             | Brain › Evals                                                                               |
+| Slack message draft      | `slack_message_proposal` in regional D1, 24 hours              | Owner or admin: send, discard, edit                                                                                | A draft card in the chat                                                                    |
+| WhatsApp reply proposal  | `connector_whatsapp_proposal` in `ConnectorDO` SQLite, 4 hours | Approve, reject, edit, resolve                                                                                     | The Inbox conversation                                                                      |
+| Supplier destination     | `supplier_destination_revision` in regional D1                 | A second owner or admin activates it. The proposer cannot                                                          | The supplier payouts page                                                                   |
+| Kitchen agent save       | The scenario save store of Kitchen, 15 minutes                 | The person approves the save                                                                                       | The Kitchen workspace                                                                       |
+
+### Two looks of one kind, as found
+
+- **Governed action, reject.** The chat card says "Reject" first. The page card says
+  "Reject change" first, and its confirm resets after 5 seconds.
+- **Governed action, approve.** A commerce action approves in a popup and then applies in
+  one click. A custom connector write approves on a full page of Google and then needs
+  a second click, "Run approved action".
+- **Custom connector write.** No route and no button refuses one. It can only expire.
+- **Permission request in a chat.** A request that an agent stored shows "Pantry agent
+  would like to …" with the grants. A capability that a turn lacks with no stored
+  request shows "… would like to {action}" with no grants.
+- **Email reply.** Three places with three button sets: "Approve and send" and "Reject"
+  on the mailbox page; "Send" and "Discard" in a chat; "Approve and send", "Edit" and
+  "Reject" in the Inbox.
+- **Held output in Slack** has no decision button, and a permission request has only
+  Deny. A commerce action has both buttons.
+
+### The journeys that prove each kind today
+
+| Kind                   | Allowed                                                                                    | Refused                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Governed action        | `slack-commerce-approval.test.ts`, `pi-commerce-actions.test.ts`                           | `slack-commerce-approval.test.ts` (decline in Slack and in the Portal), `slack-offer-price-change.test.ts`                                      |
+| Case approval wait     | `portal-chat-approval-wait.test.ts` (the chat waits, then runs after the card expires)     | The same file: a late rejection gets status 409                                                                                                 |
+| Held output            | `slack-held-output.test.ts`, `slack-held-effect.test.ts`, `airtable-exit-approval.test.ts` | `slack-held-output.test.ts`, `slack-held-effect.test.ts`                                                                                        |
+| Permission request     | `slack-permission-request.test.ts`, `chat-permission-request.test.ts`                      | `slack-permission-request.test.ts`, `slack-proposal-permission.test.ts` (the Slack Deny)                                                        |
+| Email reply            | `mail-inbox.test.ts`, `mail-reply-shared-draft.test.ts`                                    | `mail-operational-placement.test.ts` rejects an operational email. `mail-reply-shared-draft.test.ts` rejects a Gmail reply (added in step A2.1) |
+| Custom connector write | `remote-mcp.test.ts`                                                                       | None: no refusal exists                                                                                                                         |

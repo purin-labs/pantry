@@ -11,7 +11,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { readCaseSessionAssignment } from "../../src/actors/actor-journal/transactions";
 import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
 import { SessionDO } from "../../src/actors/agent-session";
-import type { TransientWhatsAppTurnRequest } from "../../src/actors/session/types";
+import type { TransientWhatsAppTurnRequest } from "../../src/actors/inbox-turns/rpc";
 import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
 import {
   startActorRelocation,
@@ -38,6 +38,7 @@ import {
 } from "./slack-journey-support";
 import { storedContent } from "./case-execution-support";
 import { exportedItemCount } from "./placement-move-support";
+import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 it(
   "fences transient WhatsApp proposals at goal stops and timeout, preserves usage after restart, and retains no transcript",
@@ -271,7 +272,7 @@ function whatsappGoalResponse(tool: boolean): Response {
       id: "wa_goal",
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         {
           index: 0,
@@ -299,7 +300,7 @@ function whatsappGoalResponse(tool: boolean): Response {
       id: "wa_goal",
       object: "chat.completion.chunk",
       created: 1787500000,
-      model: "moonshotai/kimi-k3",
+      model: PLATFORM_DEFAULT_PI_MODEL,
       choices: [
         { index: 0, delta: {}, finish_reason: tool ? "tool_calls" : "stop" },
       ],

@@ -1,4 +1,5 @@
 import type { OrganisationDatabase } from "../database-handles";
+import type { PageEffectSettlement } from "./session/tool-wiring";
 import {
   isRehearsalChange,
   quarterTurnDegrees,
@@ -147,18 +148,8 @@ export type BakerySurfaceEffectDispatch = Readonly<{
   receipt: BakerySurfaceReceiptV1;
 }>;
 
-export type BakerySurfaceEffectSettlement =
-  | Readonly<{ ok: true; kind: "accepted" | "duplicate" }>
-  | Readonly<{
-      ok: false;
-      code:
-        | "surface_effect_missing"
-        | "surface_effect_conflict"
-        | "surface_effect_receipt_invalid"
-        | "surface_effect_organisation_mismatch"
-        | "surface_effect_expired"
-        | "surface_effect_authority_invalid";
-    }>;
+/** The Session defines the answer, because its RPC method returns it. */
+export type BakerySurfaceEffectSettlement = PageEffectSettlement;
 
 type PendingBakerySurfaceEffect = Readonly<{
   effect: BakerySurfaceEffectV1;
@@ -410,7 +401,8 @@ export async function settleBakerySurfaceEffect(input: {
   readonly db: OrganisationDatabase;
   readonly storage: DurableObjectStorage;
   readonly organisationId: OrganisationId;
-  readonly receipt: BakerySurfaceReceiptV1;
+  /** The receipt as the page sent it. This function parses it first. */
+  readonly receipt: unknown;
   readonly now?: () => number;
 }): Promise<BakerySurfaceEffectSettlement> {
   const receipt = parseBakerySurfaceReceipt(input.receipt);

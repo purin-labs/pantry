@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/app-access";
+import { pantryCommerceAccess } from "../../commerce/contract/client";
 import type { CommerceListEntry } from "@purin-labs/commerce-contracts";
 import {
   parseInventoryProductionCreation,
@@ -21,14 +21,14 @@ import type { Env } from "../../env";
 import {
   commerceListEntryPatchCommand,
   productionRequestCreateCommand,
-} from "../../commerce/list-entry-commands";
+} from "../../commerce/contract/list-entry-commands";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {
   finishInventoryOperation,
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "./inventory-control";
+} from "../../kitchen/contract/inventory-control";
 import type { Variant } from "@purin-labs/type-utils";
 
 type ProductionAction =

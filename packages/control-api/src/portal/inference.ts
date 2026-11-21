@@ -1,8 +1,30 @@
 import { assertNever } from "@purin-labs/std";
 import type {
+  ApiKeyInferenceSelectionKind,
   OrganisationInferenceSelection,
   SelectInferenceCommand,
 } from "./settings.ts";
+
+/** The form field and the empty-field message of each key selection. */
+const API_KEY_FIELDS: Readonly<
+  Record<
+    ApiKeyInferenceSelectionKind,
+    { readonly field: string; readonly missing: string }
+  >
+> = {
+  organisation_openai_api_key: {
+    field: "openAiApiKey",
+    missing: "Enter an OpenAI API key.",
+  },
+  organisation_anthropic_api_key: {
+    field: "anthropicApiKey",
+    missing: "Enter an Anthropic API key.",
+  },
+  organisation_google_api_key: {
+    field: "googleApiKey",
+    missing: "Enter a Gemini API key.",
+  },
+};
 
 type InferenceSelectionCommandParseResult =
   | { readonly kind: "valid"; readonly command: SelectInferenceCommand }
@@ -23,24 +45,13 @@ export function parseInferenceSelectionCommand(
         kind: "valid",
         command: { kind: "select_inference", selection },
       };
-    case "organisation_openai_api_key": {
-      const rawApiKey = formData.get("openAiApiKey");
+    case "organisation_openai_api_key":
+    case "organisation_anthropic_api_key":
+    case "organisation_google_api_key": {
+      const fields = API_KEY_FIELDS[selection.kind];
+      const rawApiKey = formData.get(fields.field);
       if (typeof rawApiKey !== "string" || rawApiKey.trim().length === 0) {
-        return { kind: "invalid", message: "Enter an OpenAI API key." };
-      }
-      return {
-        kind: "valid",
-        command: {
-          kind: "select_inference",
-          selection,
-          apiKey: rawApiKey.trim(),
-        },
-      };
-    }
-    case "organisation_anthropic_api_key": {
-      const rawApiKey = formData.get("anthropicApiKey");
-      if (typeof rawApiKey !== "string" || rawApiKey.trim().length === 0) {
-        return { kind: "invalid", message: "Enter an Anthropic API key." };
+        return { kind: "invalid", message: fields.missing };
       }
       return {
         kind: "valid",
@@ -56,20 +67,18 @@ export function parseInferenceSelectionCommand(
   }
 }
 
+/** One inference selection from a form value or a server answer. */
 export function parseInferenceSelection(
-  value: FormDataEntryValue | null,
+  value: unknown,
 ): OrganisationInferenceSelection | null {
   switch (value) {
     case "claude_oauth":
-      return { kind: "claude_oauth" };
     case "codex_subscription":
-      return { kind: "codex_subscription" };
     case "satyr_platform":
-      return { kind: "satyr_platform" };
     case "organisation_openai_api_key":
-      return { kind: "organisation_openai_api_key" };
     case "organisation_anthropic_api_key":
-      return { kind: "organisation_anthropic_api_key" };
+    case "organisation_google_api_key":
+      return { kind: value };
     default:
       return null;
   }

@@ -8,14 +8,15 @@ import {
   type OrganisationInferenceSelectionError,
 } from "../../../data/organisation-inference-selection";
 import {
-  parseOpenAiApiKey,
-  parseAnthropicApiKey,
-  storeOrganisationAnthropicModelCredential,
-  storeOrganisationOpenAiModelCredential,
-  type AnthropicApiKey,
-  type OpenAiApiKey,
+  parseModelApiKey,
+  storeOrganisationModelCredential,
+  type ModelApiKey,
+  type ModelKeyProvider,
 } from "../../../credential-vault";
-import { resolveOrganisationModelRouteForSelection } from "../../../models/route";
+import {
+  activationModelRouteError,
+  resolveOrganisationModelRouteForSelection,
+} from "../../../models/route";
 import {
   admitControlMutation,
   controlMutationIdentity,
@@ -28,7 +29,6 @@ import {
   readJsonRecord,
   type JsonRecord,
 } from "../../http";
-import { activationModelRouteError } from "../../onboarding-runtime";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 import { readOnboardingRow } from "../../../data/organisation-onboarding-row";
 
@@ -105,28 +105,20 @@ export async function handleOrganisationInference(
   ) {
     return controlError("organisation_lifecycle_conflict", 409);
   }
-  if (mutation.value.kind === "organisation_openai_api_key") {
-    const stored = await storeOrganisationOpenAiModelCredential({
+  if (mutation.value.kind === "api_key") {
+    const stored = await storeOrganisationModelCredential({
       db: authorized.executionScope.database,
       keys: env,
       organisationId: authorized.organisationId,
+      provider: mutation.value.provider,
       apiKey: mutation.value.apiKey,
       now: Date.now(),
     });
     if (!stored.ok) {
-      return controlError("organisation_openai_api_key_store_failed", 502);
-    }
-  }
-  if (mutation.value.kind === "organisation_anthropic_api_key") {
-    const stored = await storeOrganisationAnthropicModelCredential({
-      db: authorized.executionScope.database,
-      keys: env,
-      organisationId: authorized.organisationId,
-      apiKey: mutation.value.apiKey,
-      now: Date.now(),
-    });
-    if (!stored.ok) {
-      return controlError("organisation_anthropic_api_key_store_failed", 502);
+      return controlError(
+        `organisation_${mutation.value.provider}_api_key_store_failed`,
+        502,
+      );
     }
   }
   if (lifecycle.lifecycle === "active") {
@@ -196,15 +188,25 @@ type OrganisationInferenceMutation =
       readonly apiKey?: never;
     }
   | {
-      readonly kind: "organisation_openai_api_key";
-      readonly selection: { readonly kind: "organisation_openai_api_key" };
-      readonly apiKey: OpenAiApiKey;
-    }
-  | {
-      readonly kind: "organisation_anthropic_api_key";
-      readonly selection: { readonly kind: "organisation_anthropic_api_key" };
-      readonly apiKey: AnthropicApiKey;
+      readonly kind: "api_key";
+      readonly selection: { readonly kind: ApiKeySelectionKind };
+      readonly provider: ModelKeyProvider;
+      readonly apiKey: ModelApiKey<ModelKeyProvider>;
     };
+
+type ApiKeySelectionKind =
+  | "organisation_openai_api_key"
+  | "organisation_anthropic_api_key"
+  | "organisation_google_api_key";
+
+/** The provider of the key that each key selection stores. */
+const API_KEY_SELECTION_PROVIDER: Readonly<
+  Record<ApiKeySelectionKind, ModelKeyProvider>
+> = {
+  organisation_openai_api_key: "openai",
+  organisation_anthropic_api_key: "anthropic",
+  organisation_google_api_key: "google",
+};
 
 function parseOrganisationInferenceMutation(
   body: JsonRecord,
@@ -224,33 +226,21 @@ function parseOrganisationInferenceMutation(
             value: { kind: "selection_only", selection: selection.value },
           }
         : { ok: false, error: { code: "inference_selection_invalid" } };
-    case "organisation_openai_api_key": {
+    case "organisation_openai_api_key":
+    case "organisation_anthropic_api_key":
+    case "organisation_google_api_key": {
       if (!hasExactKeys(body, ["selection", "apiKey"])) {
         return { ok: false, error: { code: "inference_selection_invalid" } };
       }
-      const apiKey = parseOpenAiApiKey(body.apiKey);
+      const provider = API_KEY_SELECTION_PROVIDER[selection.value.kind];
+      const apiKey = parseModelApiKey(provider, body.apiKey);
       return apiKey.ok
         ? {
             ok: true,
             value: {
-              kind: "organisation_openai_api_key",
-              selection: selection.value,
-              apiKey: apiKey.value,
-            },
-          }
-        : { ok: false, error: { code: "inference_selection_invalid" } };
-    }
-    case "organisation_anthropic_api_key": {
-      if (!hasExactKeys(body, ["selection", "apiKey"])) {
-        return { ok: false, error: { code: "inference_selection_invalid" } };
-      }
-      const apiKey = parseAnthropicApiKey(body.apiKey);
-      return apiKey.ok
-        ? {
-            ok: true,
-            value: {
-              kind: "organisation_anthropic_api_key",
-              selection: selection.value,
+              kind: "api_key",
+              selection: { kind: selection.value.kind },
+              provider,
               apiKey: apiKey.value,
             },
           }

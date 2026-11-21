@@ -385,3 +385,25 @@ export async function revokeVoiceMac(
     .first<{ name_id: string }>();
   return row === null ? null : { nameId: row.name_id };
 }
+
+/**
+ * Revokes each Mac of an archived Organisation and clears its secrets and
+ * its address, while the guard holds.
+ */
+export function prepareArchivedOrganisationVoiceMacsRevocation(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: Readonly<{
+    now: number;
+    organisationId: string;
+    guard: Readonly<{ sql: string; bindings: readonly unknown[] }>;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE voice_mac
+         SET state = 'revoked', credential_sha256 = NULL, code_sha256 = NULL,
+             code_expires_at = NULL, private_address = NULL, revoked_at = ?
+         WHERE organisation_id = ? AND state != 'revoked' AND ${input.guard.sql}`,
+    )
+    .bind(input.now, input.organisationId, ...input.guard.bindings);
+}

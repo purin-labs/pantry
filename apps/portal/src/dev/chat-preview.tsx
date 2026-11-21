@@ -11,7 +11,7 @@ import {
 import "../styles.css";
 import { PortalFrame } from "../shell";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
-import { UNAVAILABLE_ACCESS } from "./unavailable-access";
+import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";
 import { ChatExecutionPreviewControls } from "./chat-execution-preview";
 

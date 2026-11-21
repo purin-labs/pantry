@@ -7,7 +7,7 @@ import {
 import type { Env } from "../env";
 import type { MailAssistantStatus } from "@purin-labs/control-api";
 import type { MailOrganizationActorInput } from "./commands";
-import { authorizeMailSource } from "./authorization";
+import { authorizeMailSource } from "./contract/mail-source-authorization";
 import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
 
@@ -90,5 +90,7 @@ function mailAssistantRecipient(
       return "openai";
     case "anthropic":
       return "anthropic";
+    case "google":
+      return "google";
   }
 }

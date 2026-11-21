@@ -40,6 +40,8 @@ export function inferenceRouteName(selection: OrganisationInferenceSelection): s
       return "your OpenAI API key";
     case "organisation_anthropic_api_key":
       return "your Anthropic API key";
+    case "organisation_google_api_key":
+      return "your Gemini API key";
     default:
       return assertNever(selection, "Unexpected settings state");
   }

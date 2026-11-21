@@ -1,3 +1,4 @@
+import type { CommerceSystemKind } from "@purin-labs/contracts";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import React from "react";
 import { CommerceActionTrace } from "./commerce-trace";
@@ -13,6 +14,7 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { formatCommerceActionAmount, formatOfferPrice, commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { runAsync } from "../../pages/agent-console-shared";
+import { DecisionButtons } from "../../ui";
 import {
   commerceSourceLabel,
   formatCommerceTimestamp,
@@ -127,86 +129,33 @@ function ActionDecisionControls(props: {
   readonly reject: () => Promise<void>;
   readonly disabled: boolean;
 }): React.ReactNode {
-  const [decision, setDecision] = React.useState<"idle" | "confirm_rejection">(
-    "idle",
-  );
-  React.useEffect(
-    resetActionDecisionAfterDelay.bind(null, decision, setDecision),
-    [decision],
-  );
-  if (decision === "confirm_rejection") {
-    return (
-      <div
-        className="button-row"
-        role="group"
-        aria-label="Confirm action rejection"
-      >
-        <button
-          type="button"
-          className="danger-button"
-          onClick={runAsync.bind(null, props.reject)}
-          disabled={props.disabled}
-        >
-          Reject change
-        </button>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={setActionDecision.bind(null, setDecision, "idle")}
-          disabled={props.disabled}
-        >
-          Keep proposal
-        </button>
-      </div>
-    );
-  }
   return (
-    <div className="button-row" role="group" aria-label="Action decision">
-      <button
-        type="button"
-        onClick={runAsync.bind(null, props.approve)}
-        disabled={props.disabled}
-      >
-        Approve and apply
-      </button>
-      <button
-        type="button"
-        className="secondary-button"
-        onClick={setActionDecision.bind(null, setDecision, "confirm_rejection")}
-        disabled={props.disabled}
-      >
-        Reject change
-      </button>
-    </div>
+    <DecisionButtons
+      className="button-row"
+      groupLabel="Action decision"
+      disabled={props.disabled}
+      allow={{
+        label: "Approve and apply",
+        onSelect: runAsync.bind(null, props.approve),
+      }}
+      refuse={{
+        label: "Reject change",
+        className: "secondary-button",
+        onSelect: runAsync.bind(null, props.reject),
+        confirm: {
+          label: "Reject change",
+          className: "danger-button",
+          keepLabel: "Keep proposal",
+          keepClassName: "secondary-button",
+          groupLabel: "Confirm action rejection",
+          resetAfterMs: 5_000,
+        },
+      }}
+    />
   );
 }
 
-function resetActionDecisionAfterDelay(
-  decision: "idle" | "confirm_rejection",
-  setDecision: React.Dispatch<
-    React.SetStateAction<"idle" | "confirm_rejection">
-  >,
-): () => void {
-  if (decision === "idle") return noCleanup;
-  const timer = window.setTimeout(
-    setActionDecision.bind(null, setDecision, "idle"),
-    5_000,
-  );
-  return window.clearTimeout.bind(window, timer);
-}
-
-function noCleanup(): void {}
-
-function setActionDecision(
-  setDecision: React.Dispatch<
-    React.SetStateAction<"idle" | "confirm_rejection">
-  >,
-  decision: "idle" | "confirm_rejection",
-): void {
-  setDecision(decision);
-}
-
-function commerceSystemName(system: "satyr_commerce" | "shopify"): string {
+function commerceSystemName(system: CommerceSystemKind): string {
   switch (system) {
     case "satyr_commerce":
       return "Seams Checkout";
