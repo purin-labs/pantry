@@ -39,10 +39,6 @@ export function createOrganisationSchema(storage: DurableObjectStorage): void {
       activated_at INTEGER NOT NULL
     )`,
   );
-  // Releases before 19 November 2026 kept a history budget warning row for
-  // each Session here, and nothing read it. The drop writes nothing once the
-  // table is gone.
-  sql.exec("DROP TABLE IF EXISTS organisation_harness_history_budget_warning");
   createActionLedgerSchema(sql);
   createCueDeliverySchema(sql, transaction);
   transaction(createCaseContextDiscoveryEvaluationSchema.bind(null, sql));
