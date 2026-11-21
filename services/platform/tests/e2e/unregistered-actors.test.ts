@@ -13,7 +13,6 @@ import {
   conversationResidencyStub,
   type ConversationResidencyActor,
 } from "../../src/actors/conversation-residency";
-import { messageLinkFetchObjectName } from "../../src/messages/link-egress";
 import { parseConnectorId } from "../../src/ids";
 import {
   ORGANISATION_ID,
@@ -166,10 +165,6 @@ async function unregisteredActorJourney({ task }: TestContext) {
   await storeResidency(strayResidency, ORGANISATION_ID);
   const goneResidency = residency.get(residency.idFromName("residency:gone"));
   await storeResidency(goneResidency, GONE_ORGANISATION);
-  // One link-fetch Actor serves the region of the live Organisation.
-  const liveLinkFetch = env.MESSAGE_LINK_FETCH.idFromName(
-    messageLinkFetchObjectName(connectorEntry.placement),
-  );
 
   const earlierGovernor = env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.get(
     env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.idFromName(
@@ -193,12 +188,6 @@ async function unregisteredActorJourney({ task }: TestContext) {
     goneResidency: await outcome(
       erase("conversation_residency", goneResidency.id.toString()),
     ),
-    liveLinkFetch: await outcome(
-      erase("message_link_fetch", liveLinkFetch.toString()),
-    ),
-    linkFetchOfNoClass: await outcome(
-      erase("message_link_fetch", goneResidency.id.toString()),
-    ),
     // The governor of this build keeps the budget; one of an earlier name
     // holds a ledger that nothing reads.
     liveGovernor: await outcome(
@@ -212,8 +201,6 @@ async function unregisteredActorJourney({ task }: TestContext) {
     liveResidency: { status: 409, code: "actor_registered" },
     strayResidency: { status: 409, code: "actor_owner_exists" },
     goneResidency: { status: 200, code: null },
-    liveLinkFetch: { status: 409, code: "actor_registered" },
-    linkFetchOfNoClass: { status: 404, code: "actor_not_found" },
     liveGovernor: { status: 409, code: "actor_registered" },
     earlierGovernor: { status: 200, code: null },
   });

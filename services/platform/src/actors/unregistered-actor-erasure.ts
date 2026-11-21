@@ -8,7 +8,6 @@ export type UnregisteredActorKind =
   | "organisation"
   | "conversation_residency"
   | "device_fleet"
-  | "message_link_fetch"
   | "code_mode_governor"
   | "custom_connector_fetch";
 
@@ -35,7 +34,6 @@ export function isUnregisteredActorKind(
     value === "organisation" ||
     value === "conversation_residency" ||
     value === "device_fleet" ||
-    value === "message_link_fetch" ||
     value === "code_mode_governor" ||
     value === "custom_connector_fetch"
   );

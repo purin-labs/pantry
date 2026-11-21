@@ -60,8 +60,7 @@ test and any fixture that exists only for the obsolete behavior.
   `e2e/idle-tenant-cost.test.ts`.
 - `e2e/message-link-fetch-placement.test.ts` follows a documentation read of
   a Portal chat and a link read of a Session to the link-fetch Actor of the
-  Organisation's region, and checks that the operator's erase refuses that
-  Actor.
+  Organisation's region.
 - `e2e/custom-connector-fetch-placement.test.ts` follows the Portal setup of a
   custom connector, from the draft to the test of its key, to the fetch
   container of the Organisation, asked for in the Organisation's region, and

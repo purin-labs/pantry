@@ -76,7 +76,6 @@ import {
   inspectRetainedVaultRootClosure,
   type RetainedVaultRootClosureError,
 } from "../../credential-vault/root-closure";
-import { messageLinkFetchObjectName } from "../../messages/link-egress";
 import { customConnectorFetchObjectName } from "../../custom-connectors/egress";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
@@ -258,8 +257,7 @@ async function eraseUnregisteredActorResponse(
         return actorRegistryReconciliationErrorResponse(entries.error);
       }
       // What serves a registered Actor's Organisation is in use as well: its
-      // custom connector container, the link-fetch Actor of its region and
-      // the residency Actor of its Connector.
+      // custom connector container and the residency Actor of its Connector.
       registered.add(
         env.CUSTOM_CONNECTOR_FETCH.idFromName(
           customConnectorFetchObjectName(organisationId.value),
@@ -268,11 +266,6 @@ async function eraseUnregisteredActorResponse(
       for (const entry of entries.value) {
         const objectId = registeredActorObjectId(env, entry);
         if (objectId !== null) registered.add(objectId);
-        registered.add(
-          env.MESSAGE_LINK_FETCH.idFromName(
-            messageLinkFetchObjectName(entry.placement),
-          ).toString(),
-        );
         if (
           entry.identity.objectKind === "connector" &&
           env.CONVERSATION_RESIDENCY !== undefined
@@ -370,15 +363,6 @@ function unregisteredActorStub(
       return env.DEVICE_FLEET === undefined
         ? null
         : env.DEVICE_FLEET.get(env.DEVICE_FLEET.idFromString(objectId));
-    case "message_link_fetch":
-      try {
-        return env.MESSAGE_LINK_FETCH.get(
-          env.MESSAGE_LINK_FETCH.idFromString(objectId),
-        );
-      } catch {
-        // The identifier is of another class.
-        return null;
-      }
     case "code_mode_governor":
       try {
         return env.CODE_MODE_PLATFORM_GOVERNOR_ACTOR.get(

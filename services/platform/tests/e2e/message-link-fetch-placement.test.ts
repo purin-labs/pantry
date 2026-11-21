@@ -38,11 +38,7 @@ import {
   openRouterText,
   openRouterToolCall,
 } from "./slack-journey-support";
-import {
-  bindLinkFetch,
-  erase,
-  resolvePublicAddress,
-} from "./link-fetch-support";
+import { bindLinkFetch, resolvePublicAddress } from "./link-fetch-support";
 import { conversationCase } from "./chat-journey-support";
 
 declare module "vitest" {
@@ -59,7 +55,7 @@ const LINK_TEXT = "Supplier schedule: Friday delivery at 09:00.";
 const LINK_STABLE_IDENTITY = "link-fetch-placement:message-with-link";
 
 it(
-  "reads a page for a Portal chat and a link of a message through the link-fetch Actor of the organisation's region, and the operator's erase refuses that Actor only",
+  "reads a page for a Portal chat and a link of a message through the link-fetch Actor of the organisation's region",
   { timeout: 120_000 },
   linkFetchPlacementJourney,
 );
@@ -268,21 +264,6 @@ async function linkFetchPlacementJourney({ task }: TestContext): Promise<void> {
     placement.locationHint,
   ]);
 
-  // The operator's erase refuses the Actor that the read used.
-  const addressedObject = await erase(
-    "message_link_fetch",
-    env.MESSAGE_LINK_FETCH.idFromName(name).toString(),
-  );
-  const objectOfAnotherClass = await erase(
-    "message_link_fetch",
-    env.CASE.idFromName("link-fetch-placement").toString(),
-  );
-  expect(addressedObject).toEqual({ status: 409, code: "actor_registered" });
-  expect(objectOfAnotherClass).toEqual({
-    status: 404,
-    code: "actor_not_found",
-  });
-
   task.meta.messageLinkFetchPlacement = {
     organisationLocationHint: placement.locationHint,
     portalChatDocumentationRead: {
@@ -292,10 +273,6 @@ async function linkFetchPlacementJourney({ task }: TestContext): Promise<void> {
     messageLinkRead: {
       addressed: linkRead,
       modelSawPage: model.sawLinkPage,
-    },
-    erase: {
-      addressedObject,
-      objectOfAnotherClass,
     },
   };
 }

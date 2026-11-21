@@ -1,6 +1,5 @@
 import { Container } from "@cloudflare/containers";
 
-import { eraseIdleContainerState } from "../actors/unregistered-actor-erasure";
 import type { Env } from "../env";
 
 const MESSAGE_LINK_FETCH_PORT = 8080;
@@ -18,15 +17,6 @@ export class MessageLinkFetchContainer extends Container<Env> {
 
   override async onActivityExpired(): Promise<void> {
     await this.destroy();
-  }
-
-  /**
-   * Empties this Actor. The operator route calls it only for an object that
-   * the placement of no organisation addresses; a container that runs is in
-   * use.
-   */
-  eraseUnregisteredState() {
-    return eraseIdleContainerState(this.ctx);
   }
 }
 

@@ -69,11 +69,8 @@ export function createWorkerMessageLinkEgress(
  * and a location hint counts only on the first call of a name. So the name
  * holds the hint, and each hint has its own object next to the Sessions that
  * call it. The Actor stores nothing of an organisation.
- *
- * The earlier name `public-links` had no hint. Cloudflare created that object
- * in the United States, and nothing reads it.
  */
-export function messageLinkFetchObjectName(
+function messageLinkFetchObjectName(
   placement: Pick<OrganisationPlacement, "locationHint">,
 ): string {
   return `public-links:${placement.locationHint}`;
