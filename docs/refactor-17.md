@@ -3,10 +3,12 @@
 Date: 2026-11-20. Revised two times on 2026-11-20: after a review of the first version,
 and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
-Status: accepted in part; step A0 and step S1 are done and on `dev` since 2026-11-20
-(see [Steps done](#steps-done) and [Baseline](#baseline)). The owner accepted the two stages, one decision
-API for approvals, specs by subsystem, and the prune of dead code, duplicate code and
-low-impact tests. The other decisions in [Decisions](#decisions) need the owner.
+Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Stage
+S (steps S2 and S3) waits for Plan 91, and Stage B waits for the Plan 93 cutover: the
+owner decided both waits on 2026-11-21. [What is left](#what-is-left) lists the open
+work. The owner accepted the two stages, one decision API for approvals, specs by
+subsystem, and the prune of dead code, duplicate code and low-impact tests. The other
+decisions in [Decisions](#decisions) use their defaults.
 Owner: the whole repository.
 Touches: every folder, every plan document, `AGENTS.md`, the lint scripts, the deploy
 scripts and each open branch.
@@ -334,6 +336,79 @@ physical bake. This refactor does not remove `schedule.ts`.
 - The time of the first three ports is measured, and the estimate for the rest uses
   it.
 - The owner decides Stage B.
+
+## What is left
+
+Updated on 2026-11-21, after Stage A landed on `dev` (`6373495d`). The handoff
+[`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
+the state of the branches and the way to continue.
+
+### The end of Stage A: the state of the exit list
+
+| Item                                                    | State                                                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| The ratchet of `lint:layers` is near zero, with reasons | Done: 10 crossings, each with a reason and a fix in `reasons` of `scripts/layers-ratchet.json`      |
+| Each area has a list of its files, tables, public files | Done: `node scripts/check-layers.mjs --areas` and [`docs/layers.md`](layers.md)                     |
+| No public export without a user in another module       | Done: 17 unused exports stay, each with a reason (the dead code entry of [Steps done](#steps-done)) |
+| No test file without a decision                         | Done: [`refactor-17-test-decisions.md`](refactor-17-test-decisions.md), 317 files                   |
+| The time of the first three ports is measured           | Done: [Cost](#cost)                                                                                 |
+| The owner decides Stage B                               | Decided on 2026-11-21: Stage B waits for the Plan 93 cutover ([D2](#decisions))                     |
+
+### Stage A: the tail
+
+1. **The 10 crossings.** Each one has a fix in its reason. In work on 2026-11-21, not on
+   `dev`: the branch `refactor-17-last10-portal` (the chat port of the Café prompt edit,
+   the Stripe part of the integrations page, and an opaque surface state of the chat
+   record with a surface registry for the Kitchen) and the branch
+   `refactor-17-last10-actor` (an activation module of `OrganisationDO`, and the
+   shared ids below both contract packages). Each needs a full E2E run on the merge and
+   the owner's agreement before a landing.
+2. **Owner decisions of step A2.1** ([Appendix E](#appendix-e--the-decisions-that-wait-for-a-person-before-step-a21)):
+   one look for each kind of decision (the reject label and its confirm, the approval
+   flow of a custom connector write, the two texts of a permission request, the three
+   button sets of an email reply), and a refusal for a custom connector write, which
+   has none today. The one Portal card keeps both looks through props until then.
+3. **The other preview pages of `apps/portal/src/dev/`.** Step A2.4 moved the public
+   workflow demo. The other pages still hold their own code; production serves none of
+   them. The largest is `appliances-preview.tsx` (1,545 lines).
+4. **Product code that the dead code step deleted** because no file used it: two
+   floor plan station helpers, a workspace run save helper, `verifyRevokedVaultSecret`,
+   three Code Mode workspace allocation wrappers and 14 commerce client resource
+   parsers. The owner may bring one back. `openCounterSale` and
+   `manualCashRefundCounterSale` stay, because Plan 90 names them.
+5. **Test follow-ups.** The search for a journey that has the outcome of a unit test
+   covered only the files with mock signals. Two candidates stay for a later pass:
+   `commerce-lab/scenario-catalog.test.ts` and the third case of
+   `commerce-lab/queue-projection-recovery.test.ts`.
+6. **Checks that did not run.** A real Portal chat turn, mailbox turn and WhatsApp turn
+   against the deployed Worker; a browser check of the one Portal decision card; CI for
+   any push of Stage A (GitHub did not start the jobs because of the account billing).
+7. **Outside this refactor.** `counter-receipt-printer.test.ts` fails under the load of
+   the machine: the device fleet waits 8 seconds for the printer (`PRINTER_ANSWER_MS`).
+   It belongs to Plan 90. Decision D6 (capability claims of the mailbox and WhatsApp
+   agents) stays with its default.
+
+### Stage S: waits for Plan 91
+
+Step S1 is done. Steps S2 (the 33 specs, one area at a time, each checked against the
+code before its plans move to `docs/history/`) and S3 (`AGENTS.md` under 250 lines, the
+plan index and the names table move out) start when Plan 91 phase 4 (the domain and
+the provider consoles) is done. The owner decided this on 2026-11-21.
+
+### Stage B: waits for the Plan 93 cutover
+
+Stage B starts after the cutover of [Plan 93](plan-93-clean-cutover.md), which was a
+draft at step 2 on 2026-11-21. Then, in this order:
+
+1. The trial of D1: one foundation module and one area as packages, with the `tsrs`
+   time, the Worker start and the Portal build.
+2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
+   journeys import the inside of the Worker.
+3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of
+   step A0.7, the type checks, a container build, one E2E shard).
+4. A move date for each module, told to the other sessions before.
+5. After the cutover, with its own decision each: one outbox table shape for the 5
+   outboxes, new names for classes and tables, and the deletion of each old-row adapter.
 
 ## Steps done
 
@@ -2393,6 +2468,9 @@ General risks:
     stored data and no deployed name. Stage B and each change of stored data wait for
     the cutover. The spec text waits for the brand names.
   - Default: as recommended.
+  - Decided by the owner on 2026-11-21, after Stage A: Stage S (steps S2 and S3) waits
+    for Plan 91 phase 4, and Stage B waits for the Plan 93 cutover. The trial of D1 also
+    waits.
 - **D3. The commerce engine: an area or a foundation module.**
   - Recommendation: keep the engine whole in the area `commerce`. Its rule stays: it
     imports no Pantry package.
