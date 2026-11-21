@@ -21,13 +21,13 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["CodeModeSandbox"] }],
   "env": {
     "local": {
-      "name": "satyr-code-mode-sandbox-local",
+      "name": "pantry-code-sandbox-local",
       "durable_objects": {
         "bindings": [{ "name": "SANDBOX", "class_name": "CodeModeSandbox" }],
       },
     },
     "production": {
-      "name": "satyr-code-mode-sandbox",
+      "name": "pantry-code-sandbox",
       "durable_objects": {
         "bindings": [{ "name": "SANDBOX", "class_name": "CodeModeSandbox" }],
       },

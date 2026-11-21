@@ -6,7 +6,11 @@ import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { workerDeployArguments } from "../worker-environment.mjs";
+import { createRequire } from "node:module";
+import {
+  requireReleaseTarget,
+  workerDeployArguments,
+} from "../worker-environment.mjs";
 
 export const platformDirectory = resolve(
   import.meta.dirname,
@@ -55,6 +59,15 @@ export function checkAndDeploy({
     rmSync(bundle, { recursive: true, force: true });
   }
   if (operation === "deploy") {
+    const { unstable_readConfig } = createRequire(
+      join(platformDirectory, "package.json"),
+    )("wrangler");
+    requireReleaseTarget(
+      unstable_readConfig({
+        config: join(platformDirectory, profile),
+        env: environment,
+      }),
+    );
     wrangler([...workerDeployArguments(environment), ...target]);
   }
 }

@@ -4,6 +4,9 @@
   "compatibility_date": "2026-07-07",
   "compatibility_flags": ["nodejs_compat"],
   "minify": true,
+  // Plan 93: the Worker has one address, its custom domain on purin.io.
+  "workers_dev": false,
+  "preview_urls": false,
   "dev": {
     "ip": "127.0.0.1",
     "port": 3101,
@@ -71,24 +74,10 @@
       "type": "durable-object",
       "storage": "sqlite",
     },
-    // Plan 72 removed the Codex harness. Cloudflare deletes these classes'
-    // namespaces at the next deploy; remove the entries after that release.
-    "CodexHarnessContainer": {
-      "type": "durable-object",
-      "state": "deleted",
-    },
-    "ApacCodexHarnessContainer": {
-      "type": "durable-object",
-      "state": "deleted",
-    },
-    "EuCodexHarnessContainer": {
-      "type": "durable-object",
-      "state": "deleted",
-    },
   },
   "env": {
     "local": {
-      "name": "satyr-edge",
+      "name": "pantry",
       "triggers": {
         "crons": [],
       },
@@ -119,19 +108,19 @@
       "services": [
         {
           "binding": "UNDERCLERK",
-          "service": "underclerk",
+          "service": "pantry-commerce",
         },
         {
           "binding": "MODEL_EXIT",
-          "service": "satyr-model-exit-local",
+          "service": "pantry-model-exit-local",
         },
         {
           "binding": "CHATGPT_EXIT",
-          "service": "satyr-chatgpt-exit-local",
+          "service": "pantry-chatgpt-exit-local",
         },
         {
           "binding": "VAULT_ONEPASSWORD",
-          "service": "satyr-vault-onepassword-local",
+          "service": "pantry-vault-onepassword-local",
         },
       ],
       "ai": { "binding": "AI" },
@@ -139,17 +128,12 @@
         {
           "binding": "DATA_ENCRYPTION_ROOT",
           "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
-          "secret_name": "data-encryption-root-v1",
+          "secret_name": "pantry-data-encryption-root",
         },
         {
           "binding": "VAULT_ROOT_V1",
           "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
-          "secret_name": "vault-root-v1",
-        },
-        {
-          "binding": "VAULT_ROOT_V2",
-          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
-          "secret_name": "vault-root-v2",
+          "secret_name": "pantry-vault-root",
         },
       ],
       "durable_objects": {
@@ -180,7 +164,7 @@
             // Worker first.
             "name": "CODE_MODE_SANDBOX",
             "class_name": "CodeModeSandbox",
-            "script_name": "satyr-code-mode-sandbox-local",
+            "script_name": "pantry-code-sandbox-local",
           },
           {
             "name": "CONVERSATION_RESIDENCY",
@@ -237,20 +221,20 @@
       "d1_databases": [
         {
           "binding": "DB",
-          "database_name": "satyr",
+          "database_name": "pantry",
           "database_id": "b97fca3b-5335-4888-a0bf-8a5df5ed194c",
           "migrations_dir": "migrations-global",
         },
         // Local emulator databases. These IDs do not name production resources.
         {
           "binding": "ORGANISATION_DB_WNAM",
-          "database_name": "satyr-local-wnam",
+          "database_name": "pantry-local-wnam",
           "database_id": "00000000-0000-4000-8000-000000000055",
           "migrations_dir": "migrations-regional",
         },
         {
           "binding": "ORGANISATION_DB_EU",
-          "database_name": "satyr-local-eu",
+          "database_name": "pantry-local-eu",
           "database_id": "00000000-0000-4000-8000-000000000056",
           "migrations_dir": "migrations-regional",
         },
@@ -265,54 +249,55 @@
       "r2_buckets": [
         {
           "binding": "ARCHIVE",
-          "bucket_name": "satyr-archive",
-          "preview_bucket_name": "satyr-archive-dev",
+          "bucket_name": "pantry-archive",
+          "preview_bucket_name": "pantry-archive-dev",
         },
       ],
       "queues": {
         "producers": [
           {
             "binding": "EVENT_Q",
-            "queue": "satyr-events",
+            "queue": "pantry-events",
           },
           {
             "binding": "CUE_Q",
-            "queue": "satyr-cues",
+            "queue": "pantry-cues",
           },
         ],
         "consumers": [
           {
-            "queue": "satyr-events",
+            "queue": "pantry-events",
             "max_batch_size": 10,
             "max_batch_timeout": 5,
             "max_retries": 5,
             "retry_delay": 30,
-            "dead_letter_queue": "satyr-event-dlq",
+            "dead_letter_queue": "pantry-event-dlq",
           },
           {
-            "queue": "satyr-cues",
+            "queue": "pantry-cues",
             "max_batch_size": 10,
             "max_batch_timeout": 5,
             "max_retries": 5,
             "retry_delay": 30,
-            "dead_letter_queue": "satyr-cue-dlq",
+            "dead_letter_queue": "pantry-cue-dlq",
           },
         ],
       },
     },
     "production": {
-      "name": "satyr-edge",
+      "name": "pantry",
       // Each storage step crosses an ocean when the Worker runs where a request
       // enters, and a browser in Japan can enter at Los Angeles over HTTP/3.
       "placement": {
         "region": "aws:ap-northeast-1",
       },
+      "routes": [{ "pattern": "pantry.purin.io", "custom_domain": true }],
       "triggers": {
         "crons": ["* * * * *", "*/5 * * * *", "*/15 * * * *"],
       },
       "vars": {
-        "PANTRY_PUBLIC_ORIGIN": "https://satyr-edge.n6378056.workers.dev",
-        "PANTRY_OAUTH_CALLBACK_ORIGIN": "https://satyr-edge.n6378056.workers.dev",
+        "PANTRY_PUBLIC_ORIGIN": "https://pantry.purin.io",
+        "PANTRY_OAUTH_CALLBACK_ORIGIN": "https://pantry.purin.io",
         // Production has one cell, in Asia Pacific. The global database, the
         // regional database, the archive bucket and the Actors are in Tokyo.
         "PANTRY_ORGANISATION_PLACEMENT_PROFILE": "{\"kind\":\"affinity\",\"placementCellId\":\"production-apac\",\"locationHint\":\"apac\",\"databaseBinding\":\"ORGANISATION_DB_APAC\"}",
@@ -325,13 +310,13 @@
         "GDRIVE_OAUTH_CLIENT_ID": "791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com",
         "GDRIVE_PICKER_APP_ID": "791319521481",
         "GMAIL_OAUTH_CLIENT_ID": "502066821359-gurke0m6ja02sv7t824lgei8f93vvn04.apps.googleusercontent.com",
-        "GMAIL_PUBSUB_AUDIENCE": "https://satyr-edge.n6378056.workers.dev/hook/email/google",
+        "GMAIL_PUBSUB_AUDIENCE": "https://pantry.purin.io/hook/email/google",
         "GMAIL_PUBSUB_TOPIC": "projects/satyr-gmail-dev/topics/satyr-gmail-push",
         "GMAIL_PUBSUB_SERVICE_ACCOUNT": "satyr-gmail-push@satyr-gmail-dev.iam.gserviceaccount.com",
         "GMAIL_OAUTH_PILOT_EXPIRY_DAYS": "7",
-        "UNDERCLERK_BASE_URL": "https://underclerk.n6378056.workers.dev",
+        "UNDERCLERK_BASE_URL": "https://commerce.pantry.purin.io",
         // No SHOP_ORDER_PAGE_ORIGIN yet: the order page domain is not chosen,
-        // so QR codes keep the shop.seams.tokyo/shops/<merchant> address.
+        // so QR codes keep the shop.purin.io/shops/<merchant> address.
         "WHATSAPP_APP_ID": "3167174123466651",
         "WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID": "1758815688595131",
         "PANTRY_DEPLOYMENT_PROFILE": "production",
@@ -343,21 +328,21 @@
       "services": [
         {
           "binding": "UNDERCLERK",
-          "service": "underclerk",
+          "service": "pantry-commerce",
         },
         // Plan 73: every direct model-provider request leaves through this
         // Worker, which runs near AWS Tokyo. It deploys first.
         {
           "binding": "MODEL_EXIT",
-          "service": "satyr-model-exit",
+          "service": "pantry-model-exit",
         },
         {
           "binding": "CHATGPT_EXIT",
-          "service": "satyr-chatgpt-exit",
+          "service": "pantry-chatgpt-exit",
         },
         {
           "binding": "VAULT_ONEPASSWORD",
-          "service": "satyr-vault-onepassword",
+          "service": "pantry-vault-onepassword",
         },
       ],
       "secrets": {
@@ -395,17 +380,12 @@
         {
           "binding": "DATA_ENCRYPTION_ROOT",
           "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
-          "secret_name": "data-encryption-root-v1",
+          "secret_name": "pantry-data-encryption-root",
         },
         {
           "binding": "VAULT_ROOT_V1",
           "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
-          "secret_name": "vault-root-v1",
-        },
-        {
-          "binding": "VAULT_ROOT_V2",
-          "store_id": "41fe2fa0a4a64d25a120a6c00973da1d",
-          "secret_name": "vault-root-v2",
+          "secret_name": "pantry-vault-root",
         },
       ],
       "durable_objects": {
@@ -436,7 +416,7 @@
             // Worker first.
             "name": "CODE_MODE_SANDBOX",
             "class_name": "CodeModeSandbox",
-            "script_name": "satyr-code-mode-sandbox",
+            "script_name": "pantry-code-sandbox",
           },
           {
             "name": "CONVERSATION_RESIDENCY",
@@ -478,7 +458,7 @@
           "constraints": {
             "regions": ["APAC"],
           },
-          "name": "satyr-edge-messagelinkfetchcontainer",
+          "name": "pantry-message-link-fetch",
         },
         {
           "class_name": "CustomConnectorFetchContainer",
@@ -493,7 +473,7 @@
           "constraints": {
             "regions": ["APAC"],
           },
-          "name": "satyr-edge-customconnectorfetchcontainer",
+          "name": "pantry-custom-connector-fetch",
         },
         {
           "class_name": "WorkspaceExecutorContainer",
@@ -504,69 +484,71 @@
           "constraints": {
             "regions": ["APAC"],
           },
-          "name": "satyr-edge-workspaceexecutorcontainer",
+          "name": "pantry-workspace-executor",
         },
       ],
       "d1_databases": [
         // A location hint names a region, and Cloudflare chooses the site in
-        // it. The first global database of this region was served from Hong
-        // Kong: 66 ms for each read from Tokyo. This one is served from Tokyo
-        // (`served_by_colo` of a query is NRT). Check that value for a new
-        // database before a release binds it.
+        // it. A global database of this region was once served from Hong
+        // Kong: 66 ms for each read from Tokyo. Check that a new database is
+        // served from Tokyo (`served_by_colo` of a query is NRT) before a
+        // release binds it. Plan 93 step 3 makes both databases and writes
+        // their ids here; the release guard refuses the placeholder.
         {
           "binding": "DB",
-          "database_name": "satyr-global-tokyo",
-          "database_id": "9c1e5467-2985-4ca9-8cb0-3b3b933249ef",
+          "database_name": "pantry-global-apac",
+          "database_id": "made-in-plan-93-step-3",
           "migrations_dir": "migrations-global",
         },
         {
           "binding": "ORGANISATION_DB_APAC",
-          "database_name": "satyr-organisation-apac",
-          "database_id": "fe8a597e-b094-4229-8a70-139fa239c168",
+          "database_name": "pantry-organisation-apac",
+          "database_id": "made-in-plan-93-step-3",
           "migrations_dir": "migrations-regional",
         },
       ],
       "kv_namespaces": [
         {
           "binding": "POLICY_KV",
-          "id": "090482885c334e3db277c69a14f5a805",
-          "preview_id": "090482885c334e3db277c69a14f5a805",
+          // The namespace pantry-policy, made in Plan 93 step 3.
+          "id": "made-in-plan-93-step-3",
+          "preview_id": "made-in-plan-93-step-3",
         },
       ],
       "r2_buckets": [
         {
           "binding": "ARCHIVE",
-          "bucket_name": "satyr-archive-apac",
-          "preview_bucket_name": "satyr-archive-dev",
+          "bucket_name": "pantry-archive-apac",
+          "preview_bucket_name": "pantry-archive-dev",
         },
       ],
       "queues": {
         "producers": [
           {
             "binding": "EVENT_Q",
-            "queue": "satyr-events",
+            "queue": "pantry-events",
           },
           {
             "binding": "CUE_Q",
-            "queue": "satyr-cues",
+            "queue": "pantry-cues",
           },
         ],
         "consumers": [
           {
-            "queue": "satyr-events",
+            "queue": "pantry-events",
             "max_batch_size": 10,
             "max_batch_timeout": 5,
             "max_retries": 5,
             "retry_delay": 30,
-            "dead_letter_queue": "satyr-event-dlq",
+            "dead_letter_queue": "pantry-event-dlq",
           },
           {
-            "queue": "satyr-cues",
+            "queue": "pantry-cues",
             "max_batch_size": 10,
             "max_batch_timeout": 5,
             "max_retries": 5,
             "retry_delay": 30,
-            "dead_letter_queue": "satyr-cue-dlq",
+            "dead_letter_queue": "pantry-cue-dlq",
           },
         ],
       },

@@ -10,13 +10,103 @@ const require = createRequire(resolve(root, "services/platform/package.json"));
 const { unstable_readConfig } = require("wrangler");
 
 /**
- * The source folder of a Worker service. `underclerk` is the deployed name of
- * the commerce Worker, not a folder.
+ * The Workers of the Pantry stack (Plan 93), by service and profile. Every
+ * profile check below reads its name here, and a deployment refuses a name
+ * that is not here: no release can reach a Worker of the old stack, or make
+ * a new, empty Worker by mistake.
  */
+export const WORKER_NAMES = {
+  platform: { local: "pantry", production: "pantry" },
+  commerce: { local: "pantry-commerce", production: "pantry-commerce" },
+  "slack-ingress": { production: "pantry-slack-ingress" },
+  "code-mode-sandbox": {
+    local: "pantry-code-sandbox-local",
+    production: "pantry-code-sandbox",
+  },
+  "model-exit": {
+    local: "pantry-model-exit-local",
+    production: "pantry-model-exit",
+  },
+  "chatgpt-exit": {
+    local: "pantry-chatgpt-exit-local",
+    production: "pantry-chatgpt-exit",
+  },
+  "vault-onepassword": {
+    local: "pantry-vault-onepassword-local",
+    production: "pantry-vault-onepassword",
+  },
+  docs: { production: "pantry-docs" },
+  shop: { production: "purin-shop" },
+};
+
+/**
+ * The one address of each public Worker: a custom domain on purin.io. A
+ * production Worker has no workers.dev address and no preview address.
+ */
+export const WORKER_DOMAINS = {
+  pantry: "pantry.purin.io",
+  "pantry-commerce": "commerce.pantry.purin.io",
+  "pantry-slack-ingress": "slack.pantry.purin.io",
+  "pantry-docs": "docs.pantry.purin.io",
+  "purin-shop": "shop.purin.io",
+};
+
+/**
+ * A resource id that Plan 93 step 3 writes when it makes the resource. A
+ * deployment refuses a profile that still holds it.
+ */
+export const UNMADE_RESOURCE_ID = "made-in-plan-93-step-3";
+
+const PRODUCTION_WORKER_NAMES = new Set(
+  Object.values(WORKER_NAMES).map((names) => names.production),
+);
+
+/** Each reason why a resolved production profile may not be deployed. */
+export function releaseTargetProblems(config) {
+  const problems = [];
+  if (!PRODUCTION_WORKER_NAMES.has(config.name))
+    problems.push(`the Worker name ${config.name} is not a Pantry Worker`);
+  if (config.workers_dev !== false) problems.push("a workers.dev address");
+  if (config.preview_urls === true) problems.push("preview addresses");
+  const domain = WORKER_DOMAINS[config.name];
+  const routes = (config.routes ?? []).map(routeTarget);
+  const expected = domain === undefined ? [] : [`${domain} (custom domain)`];
+  if (!sameValue(routes, expected))
+    problems.push(
+      `routes other than ${expected.length === 0 ? "none" : expected[0]}`,
+    );
+  const unmade = [
+    ...(config.d1_databases ?? []).map((database) => database.database_id),
+    ...(config.kv_namespaces ?? []).flatMap((namespace) => [
+      namespace.id,
+      namespace.preview_id,
+    ]),
+  ].filter((id) => id === UNMADE_RESOURCE_ID);
+  if (unmade.length > 0)
+    problems.push(`${unmade.length} resource id(s) that step 3 has not made`);
+  return problems;
+}
+
+/** Refuses a deployment of a production profile that is not a Pantry Worker. */
+export function requireReleaseTarget(config) {
+  const problems = releaseTargetProblems(config);
+  if (problems.length > 0)
+    throw new Error(
+      `${config.name}: the release guard refuses this deployment: ${problems.join("; ")}`,
+    );
+}
+
+function routeTarget(route) {
+  if (typeof route === "string") return route;
+  return route.custom_domain === true
+    ? `${route.pattern} (custom domain)`
+    : route.pattern;
+}
+
+/** The source folder of a Worker service. */
 export function workerDirectory(service) {
   if (service === "platform") return resolve(root, "services/platform");
-  if (service === "commerce" || service === "underclerk")
-    return resolve(root, "services/commerce");
+  if (service === "commerce") return resolve(root, "services/commerce");
   throw new Error("Unknown Worker service");
 }
 
@@ -29,9 +119,8 @@ export function readWorkerEnvironment(service, environment) {
     config: resolve(directory, "wrangler.jsonc"),
     env: environment,
   });
-  const serviceName = service === "platform" ? "satyr-edge" : "underclerk";
   if (
-    config.name !== serviceName ||
+    config.name !== WORKER_NAMES[service][environment] ||
     config.vars.PANTRY_DEPLOYMENT_PROFILE !== environment
   ) {
     throw new Error(
@@ -75,7 +164,8 @@ export function readSlackIngressEnvironment(environment) {
 
 function slackIngressProfileDifferences(platform, ingress) {
   const differences = [];
-  if (ingress.name !== "satyr-slack-ingress") differences.push("Worker name");
+  if (ingress.name !== WORKER_NAMES["slack-ingress"].production)
+    differences.push("Worker name");
   for (const key of ["compatibility_date", "compatibility_flags"]) {
     if (!sameValue(ingress[key], platform[key])) differences.push(key);
   }
@@ -121,10 +211,6 @@ function slackIngressProfileDifferences(platform, ingress) {
 
 const CODE_MODE_SANDBOX_CONFIG =
   "services/platform/wrangler.code-mode-sandbox.jsonc";
-const CODE_MODE_SANDBOX_NAMES = {
-  local: "satyr-code-mode-sandbox-local",
-  production: "satyr-code-mode-sandbox",
-};
 /**
  * The slowest rate of QuickJS interrupt polls that the CPU limit must cover.
  * Cloudflare measured about 10,000 polls for each second of computation, and
@@ -151,7 +237,7 @@ export function readCodeModeSandboxEnvironment(environment) {
   const differences = codeModeSandboxProfileDifferences(
     platform,
     sandbox,
-    CODE_MODE_SANDBOX_NAMES[environment],
+    WORKER_NAMES["code-mode-sandbox"][environment],
   );
   if (differences.length > 0)
     throw new Error(
@@ -215,10 +301,6 @@ const CODE_MODE_SANDBOX_FORBIDDEN_BINDINGS = [
 ];
 
 const MODEL_EXIT_CONFIG = "services/platform/wrangler.model-exit.jsonc";
-const MODEL_EXIT_NAMES = {
-  local: "satyr-model-exit-local",
-  production: "satyr-model-exit",
-};
 /** The data centre closest to AWS Tokyo. Never Smart Placement. */
 const MODEL_EXIT_PLACEMENT = { region: "aws:ap-northeast-1" };
 
@@ -242,7 +324,7 @@ export function readModelExitEnvironment(environment) {
     platform,
     exit,
     environment,
-    MODEL_EXIT_NAMES[environment],
+    WORKER_NAMES["model-exit"][environment],
   );
   if (differences.length > 0)
     throw new Error(
@@ -280,10 +362,6 @@ function modelExitProfileDifferences(platform, exit, environment, name) {
 
 const VAULT_ONEPASSWORD_CONFIG =
   "services/platform/wrangler.vault-onepassword.jsonc";
-const VAULT_ONEPASSWORD_NAMES = {
-  local: "satyr-vault-onepassword-local",
-  production: "satyr-vault-onepassword",
-};
 
 /**
  * The profile of the 1Password store Worker (Plan 79).
@@ -300,7 +378,7 @@ export function readVaultOnePasswordEnvironment(environment) {
     config: resolve(root, VAULT_ONEPASSWORD_CONFIG),
     env: environment,
   });
-  const name = VAULT_ONEPASSWORD_NAMES[environment];
+  const name = WORKER_NAMES["vault-onepassword"][environment];
   const differences = [];
   if (store.name !== name) differences.push("Worker name");
   if (
@@ -334,10 +412,6 @@ export function readVaultOnePasswordEnvironment(environment) {
 }
 
 const CHATGPT_EXIT_CONFIG = "services/platform/wrangler.chatgpt-exit.jsonc";
-const CHATGPT_EXIT_NAMES = {
-  local: "satyr-chatgpt-exit-local",
-  production: "satyr-chatgpt-exit",
-};
 
 /**
  * The profile of the ChatGPT exit Worker (Plan 75).
@@ -356,7 +430,7 @@ export function readChatGptExitEnvironment(environment) {
     config: resolve(root, CHATGPT_EXIT_CONFIG),
     env: environment,
   });
-  const name = CHATGPT_EXIT_NAMES[environment];
+  const name = WORKER_NAMES["chatgpt-exit"][environment];
   const differences = [];
   if (exit.name !== name) differences.push("Worker name");
   if (

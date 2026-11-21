@@ -32,11 +32,11 @@
   },
   "env": {
     "local": {
-      "name": "satyr-model-exit-local",
+      "name": "pantry-model-exit-local",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "local" },
     },
     "production": {
-      "name": "satyr-model-exit",
+      "name": "pantry-model-exit",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "production" },
     },
   },

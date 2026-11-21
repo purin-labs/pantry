@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsrs --noEmit && vite build",
-    "build:seams-shop": "tsrs --noEmit && VITE_SHOP_MERCHANT_ID=merchant_satyr_b43a32c5_f5ff_4ad8_9536_2cdee9dd2958 vite build",
-    "deploy:seams-shop": "pnpm build:seams-shop && pnpm --dir ../../services/commerce exec wrangler deploy --config ../../apps/storefront/wrangler.jsonc",
+    "build:shop": ": \"${VITE_SHOP_MERCHANT_ID:?Set VITE_SHOP_MERCHANT_ID to the merchant of the shop}\" && tsrs --noEmit && vite build",
+    "deploy:shop": "node ../../scripts/check-release-target.mjs wrangler.jsonc && pnpm build:shop && pnpm --dir ../../services/commerce exec wrangler deploy --config ../../apps/storefront/wrangler.jsonc",
     "dev": "vite",
     "check:types": "tsrs --noEmit",
     "test": "vitest run"

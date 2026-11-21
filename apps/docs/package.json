@@ -10,7 +10,7 @@
     "check:links": "node scripts/check-links.mjs",
     "check:fences": "node scripts/check-code-fences.mjs",
     "check": "pnpm check:links && pnpm check:fences && pnpm type-check",
-    "deploy": "pnpm check && pnpm build && wrangler deploy"
+    "deploy": "node ../../scripts/check-release-target.mjs wrangler.jsonc && pnpm check && pnpm build && wrangler deploy"
   },
   "devDependencies": {
     "@types/node": "25.9.3",

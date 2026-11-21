@@ -7,6 +7,7 @@ import {
   readModelExitEnvironment,
   readWorkerEnvironment,
   requireLocalWorkerSecrets,
+  requireReleaseTarget,
   validateWorkerOrigins,
   workerDeployArguments,
   workerDirectory,
@@ -29,6 +30,7 @@ if (operation === "dev" && environment !== "local") {
 if (operation === "deploy" && environment === "local") {
   throw new Error("Deployment requires production");
 }
+if (operation === "deploy") requireReleaseTarget(config);
 if (operation !== "dev" && extra.some(isContainerOption)) {
   throw new Error("Container availability is a local development option");
 }

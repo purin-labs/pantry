@@ -35,7 +35,7 @@
   },
   "env": {
     "local": {
-      "name": "satyr-chatgpt-exit-local",
+      "name": "pantry-chatgpt-exit-local",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "local" },
       "containers": [
         {
@@ -45,7 +45,7 @@
           "instance_type": "lite",
           "max_instances": 1,
           "constraints": { "regions": ["APAC"] },
-          "name": "satyr-chatgpt-exit-container-local",
+          "name": "pantry-chatgpt-exit-local",
         },
       ],
       "durable_objects": {
@@ -58,7 +58,7 @@
       },
     },
     "production": {
-      "name": "satyr-chatgpt-exit",
+      "name": "pantry-chatgpt-exit",
       "vars": { "PANTRY_DEPLOYMENT_PROFILE": "production" },
       "containers": [
         {
@@ -68,7 +68,7 @@
           "instance_type": "lite",
           "max_instances": 1,
           "constraints": { "regions": ["APAC"] },
-          "name": "satyr-chatgpt-exit-container",
+          "name": "pantry-chatgpt-exit",
         },
       ],
       "durable_objects": {
