@@ -2476,6 +2476,22 @@ A full run of the E2E suite takes 54 minutes on the owner's Mac
 the suite in 4 shards. Steps A1.1 to A1.3 give the time for one port. The estimate
 for the rest uses those two numbers.
 
+**Measured, 20 and 21 November 2026.** The times come from the commit log.
+
+| Work                                   | Time                                                                |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| Step A1.1 (typed actor access)         | about 2 hours of code, then about 1 hour of checks and the E2E run  |
+| Step A1.2 (environment parts)          | about 1 hour, in the same branch as the connections module          |
+| Step A1.3 (the executor names no area) | about 1.5 hours in a parallel session                               |
+| The rest of Stage A                    | about 17 hours of wall time, 20 November 17:00 to 21 November 10:00 |
+| Full E2E runs                          | 13 runs of 48 to 66 minutes; a run under machine load is slower     |
+
+Stage A ran as parallel work: one coordinator session, one long session and two to
+four CLI workers at a time, each in its own worktree. The coordinator merged their
+branches, ran one full E2E run on each merge, and pushed only with the agreement of
+the owner. The estimate of 25 landings was close: seven pushes carried 23 steps, and
+each push had its own full run.
+
 Runtime cost: none. The same Workers run the same code.
 
 ## Not in this refactor
