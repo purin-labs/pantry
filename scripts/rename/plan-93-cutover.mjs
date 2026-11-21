@@ -241,8 +241,32 @@ function mask(text) {
   };
 }
 
+/**
+ * A comma-joined key list such as "deviceName,integrationAccountId,…" that
+ * code compares with `Object.keys(…).sort().join(",")`. A renamed key can
+ * move in the sort order, so a list that was sorted is sorted again.
+ */
+const KEY_LIST = /(["'`])([A-Za-z_$][\w$]*(?:,[A-Za-z_$][\w$]*)+)\1/g;
+
+const isSorted = (keys) =>
+  keys.every((key, index) => index === 0 || keys[index - 1] <= key);
+
+function renameKeyLists(text, file) {
+  return text.replace(KEY_LIST, (match, quote, content) => {
+    if (!OLD_NAME.test(content)) return match;
+    const keys = content.split(",");
+    const renamed = keys.map((key) => renameTokens(key, file));
+    const list = isSorted(keys) ? [...renamed].sort() : renamed;
+    return `${quote}${list.join(",")}${quote}`;
+  });
+}
+
 export function renameText(text, file = "") {
   const { masked, unmask } = mask(text);
+  return unmask(renameTokens(renameKeyLists(masked, file), file));
+}
+
+function renameTokens(masked, file) {
   let next = masked;
   for (const [pattern, replacement] of SPECIFIC_RULES)
     next = next.replace(pattern, replacement);
@@ -254,7 +278,7 @@ export function renameText(text, file = "") {
   }
   for (const [pattern, replacement] of DOUBLE_RULES)
     next = next.replace(pattern, replacement);
-  return unmask(next);
+  return next;
 }
 
 const RATCHET = "scripts/doc-links-ratchet.json";
