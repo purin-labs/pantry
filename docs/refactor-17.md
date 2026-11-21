@@ -338,12 +338,12 @@ physical bake. This refactor does not remove `schedule.ts`.
 ## Steps done
 
 **The state on `dev`, 21 November 2026.** Each entry below that names a branch is on
-`dev` now, up to and with the class chains of step A1.9 (`b5932670`). They landed in
-seven pushes; the owner agreed to each one. The full E2E suite passed on each merge
+`dev` now, up to and with the test decisions and the area page. They landed in eight
+pushes; the owner agreed to each one. The full E2E suite passed on each merge
 before its push: 236 files and 457 or 458 tests, with 3 files skipped (they need a
 real model). In two of those runs `counter-receipt-printer.test.ts` failed under the
-load of the machine and passed alone three times. The layer count on `dev` is 50
-(1,350 at the start of the refactor). An entry that says "the full E2E suite did not
+load of the machine and passed alone three times. The layer count on `dev` is 10
+(1,350 at the start of the refactor), and each of the 10 has a written reason. An entry that says "the full E2E suite did not
 run on the branch" is about the worker branch; the merge ran it.
 
 **20 November 2026. Step A0 and step S1 are done.** The owner agreed to the landing,
