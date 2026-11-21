@@ -1,28 +1,18 @@
 {
   "totals": {
-    "upward": 5,
+    "upward": 1,
     "areas": 2,
     "order": 0,
     "table": 0
   },
   "crossings": {
     "areas/commerce -> areas/organisation": 2,
-    "foundation/conversation -> areas/kitchen": 2,
-    "foundation/conversation -> surfaces/portal": 2,
     "package packages/contracts -> @purin-labs/commerce-contracts": 1
   },
   "reasons": {
     "areas/commerce -> areas/organisation": {
       "reason": "The commerce module of the Organisation actor (actors/organisation/organisation-commerce.ts) runs the onboarding activation steps of data/activation.ts and actors/organisation/activation.ts. OrganisationCommerceRpc holds their RPC methods.",
       "fix": "An activation module of OrganisationDO in the organisation area, with its own RPC type, takes the activation methods out of the commerce module (step A1.9). The RPC method names stay."
-    },
-    "foundation/conversation -> areas/kitchen": {
-      "reason": "The chat record (chat/conversation.ts, chat/timeline.ts) parses and stores the Kitchen surface attachment of a message (BakerySurfaceAttachmentV1), also the form of a tab that loaded the Portal before Plan 87 phase 2.",
-      "fix": "The surface registry of Plan 87: the record keeps an opaque surface state, and the Kitchen registers its state check. The Plan 93 cutover can drop the old tab form."
-    },
-    "foundation/conversation -> surfaces/portal": {
-      "reason": "The same chat record calls chat/kitchen-observation.ts, the Portal adapter that makes the Kitchen view of a screen observation from its state.",
-      "fix": "The surface registry of Plan 87, as for the Kitchen pair: the Portal registers the adapter, and the record calls it through the registry."
     },
     "package packages/contracts -> @purin-labs/commerce-contracts": {
       "reason": "The records of contracts carry commerce types and schemas: OrganisationId (7 files), the commerce grant scope, the mutation target, the authority scope wire schemas and the browser validators.",

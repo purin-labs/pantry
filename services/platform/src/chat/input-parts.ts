@@ -1,7 +1,6 @@
 import type { ChatInputMode, SurfaceObservationV2 } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
-import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
-import { kitchenAttachment } from "./kitchen-observation";
+import { surfaceStateOf, type ChatSurfaceState } from "./surface-registry";
 import type {
   ChatAttachmentPart,
   ChatInputPart,
@@ -35,12 +34,12 @@ export function chatInputParts(
   return parts;
 }
 
-/** The Kitchen view of a queued message, for the Kitchen code. */
+/** The page state of a queued message, for the code of its area. */
 export function pendingInputSurfaceContext(
   input: PendingChatInput,
-): BakerySurfaceAttachmentV1 | null {
+): ChatSurfaceState | null {
   for (const part of input.parts)
     if (part.kind === "surface_observation")
-      return kitchenAttachment(part.observation);
+      return surfaceStateOf(part.observation);
   return null;
 }

@@ -49,7 +49,7 @@ import {
   clearSubmittedConversationDraft,
   type ConversationScope,
 } from "../../chat/store";
-import { verifyBakerySurfaceAttachment } from "@purin-labs/bakery-model/bakery-surface";
+import { verifiedKitchenState } from "../../chat/kitchen-observation";
 import { readConversationSlackDrafts } from "./chat-slack-messages";
 import { readConversationConfigurationDrafts } from "./chat-configuration-drafts";
 import { authorizeSideCaseChatRead } from "../../chat/side-cases";
@@ -395,7 +395,7 @@ async function handlePortalChatRequest(
       command.kind === "next" ||
       command.kind === "steer") &&
     command.surfaceContext !== null &&
-    !(await verifyBakerySurfaceAttachment(command.surfaceContext))
+    !(await verifiedKitchenState(command.surfaceContext))
   )
     return chatError(
       "chat_surface_context_invalid",
