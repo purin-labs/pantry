@@ -2071,6 +2071,55 @@ that it checks.
 - **Counts.** The Platform unit suite: 301 files and 1,730 tests before, 301 files and
   1,729 tests after.
 
+### The activation module and the shared contract primitives (2026-11-21)
+
+On the branch `refactor-17-last10-actor`. Layer crossings: 10 to 7. Two pairs and
+their reasons are gone.
+
+- **The onboarding activation is a module (A1.9).** `OrganisationActivation`
+  (`actors/organisation/activation.ts`, area `organisation`) holds the activation
+  steps and the acceptance fault of the activation. It declares
+  `OrganisationActivationRpc` with four methods: `activateOnboarding` and the arm,
+  inspect and clear of the fault. `OrganisationDO` implements it beside
+  `OrganisationCommerceRpc`, which has 45 methods now. The module gets the two
+  methods `ensureOrganisation` and `activatePolicy` as an explicit value, as the
+  commerce module did. The commerce module imports no file of the organisation area.
+- **The schema step of the Actor.** `advanceActivationSchema` is a schema step of the
+  relocation, not a commerce command. It is a method of `OrganisationDO`, beside
+  `acceptsActivation`, as in `ConnectorDO`.
+- **Helpers at their user.** The key and the parser of the Café commerce acceptance
+  fault and the cutover cue check are private to the commerce module. The lease step
+  of the alarm, `expireOrganisationLeases`, is in `actors/organisation/support.ts`.
+- **The shared primitives (A1.11, part 2).** `@purin-labs/contract-schema` holds
+  `OrganisationId` and `IntegrationAccountId` (plain strings, as before) and the
+  integer replacer of the JSON boundary, `jsonSafeInteger`. Both contract packages
+  name them from there. The replacer had three copies.
+- **Opaque commerce parts.** The commerce parts of the records of `contracts` are
+  `ContractCommerceParts` (`packages/contracts/src/commerce-parts.ts`): the scope and
+  the target of a commerce grant, the commerce proposal and the source provenance of
+  a Case. The Platform declares them with a declaration merge in
+  `commerce/contract/types.ts`, as it does for `CommerceTypeParts`. A program without
+  the merge sees an opaque part. The type fixture of the grant selectors moved to
+  `services/platform/tests/`, where the merge holds; its `@ts-expect-error` lines
+  prove the merge.
+- **The browser validators.** The browser validators of `contracts` no longer
+  re-export the commerce validators. The Portal bootstrap imports them from
+  `commerce-contracts`. `decodeAccessGrantTarget` and `decodeGrantSubject` had no
+  caller. They are deleted with their commerce shapes. `packages/contracts/package.json`
+  names no commerce package.
+- **Not changed:** no RPC method name, argument, result, stored value, schema step,
+  constructor write, wire shape or parser result of a caller.
+- **Measures.** Layer crossings 10 to 7: between areas 3 to 1, upward 7 to 6. Copies
+  825 to 824. Unused exports: 17, no change. `organisation-commerce.ts`: 2,143 lines
+  to 1,974.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm underclerk:check`, `pnpm portal:build` and the unit suite (301 files, 1,729
+  tests) pass. The 41 journey files whose names hold `onboarding`, `activation`,
+  `organisation`, `commerce`, `access`, `placement` or `idle-tenant` ran in five
+  groups on the second commit: all pass (87 tests). After the move of
+  `advanceActivationSchema`, six Actor journeys ran again, with the idle tenant
+  journey: all pass. The full E2E suite did not run on the branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,
