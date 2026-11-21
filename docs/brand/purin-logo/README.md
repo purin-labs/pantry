@@ -15,16 +15,24 @@ switch; `apps/portal/public/brand/README.md` describes the goat files.
 
 ## Files
 
-| File                      | What it is                                                                                                   |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `source.jpg`              | The image that the owner supplied                                                                            |
-| `paths.json`              | The traced curves, in a 1024 box                                                                             |
-| `purin-mark.svg`          | The mark on a transparent ground                                                                             |
-| `purin-mark-animated.svg` | The mark with its motion inside the file                                                                     |
-| `purin-icon.svg`          | The mark on its cream tile                                                                                   |
-| `purin-icon-animated.svg` | The tile with its motion inside the file                                                                     |
-| `icon-pack/`              | Favicons, application icons and PNG marks (see below)                                                        |
-| `preview/`                | A GIF and an MP4 of the motion, recorded from `purin-mark-animated.svg`. The build script does not make them |
+| File                      | What it is                                                                                                     |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `source.jpg`              | The image that the owner supplied                                                                              |
+| `paths.json`              | The traced curves, in a 1024 box                                                                               |
+| `purin-mark.svg`          | The mark on a transparent ground                                                                               |
+| `purin-mark-animated.svg` | The mark with its motion inside the file                                                                       |
+| `purin-icon.svg`          | The mark on its cream tile                                                                                     |
+| `purin-icon-animated.svg` | The tile with its motion inside the file                                                                       |
+| `icon-pack/`              | Favicons, application icons and PNG marks (see below)                                                          |
+| `purin-wordmark.svg`      | The cat and the word PURIN in one colour (`currentColor`), traced from `reference/wordmark-black-on-cream.jpg` |
+| `purin-mark-mono.svg`     | The cat of the wordmark alone, in one colour                                                                   |
+| `reference/`              | The images that the owner supplied on 21 November 2026: two colour marks and the black wordmark                |
+| `preview/`                | A GIF and an MP4 of the motion, recorded from `purin-mark-animated.svg`. The build script does not make them   |
+
+`scripts/brand/trace-purin-wordmark.py` writes the two one-colour files. A page
+sets their colour, or uses one as a CSS mask, so they work on a light ground
+and on a dark ground. The company site (`purin.io`) shows the wordmark in its
+header and footer.
 
 The cat is dark, so the mark belongs on a light ground. On a dark ground, use
 the icon: its tile carries its own cream ground.
