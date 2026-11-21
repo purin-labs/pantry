@@ -1,7 +1,8 @@
 # Plan 93 — Clean cutover to new Workers and infrastructure
 
-Status: draft, 19 November 2026. Step 1 is done (see "Step 1 results").
-Steps 0 and 2 to 7 are open.
+Status: 21 November 2026. Steps 0 and 1 are done. Step 2 is on branch
+`plan-93` (see "Step 2 results"); it lands after a short freeze of dev.
+Steps 3 to 7 are open.
 
 Change on 21 November 2026 ([Plan 95](plan-95-pantry-own-accounts.md) step
 4): Pantry no longer binds the Console. The new stack has no
@@ -52,7 +53,9 @@ containers in a transfer) do not matter any more.
 **What the cutover deletes.** The owner said on 8 October 2026: "production
 is actually just test accounts for now". The cutover deletes all of it:
 
-- The organisation "Nuki Inc." and every record in it: chats, Cases, drafts,
+- The organisation "Satyr workspace" (the only live organisation since the
+  regional cutover; an earlier draft named "Nuki Inc.") and every record in
+  it: chats, Cases, drafts,
   products, recipes, workflows, orders, gift cards, devices, saved runs and
   Brain records.
 - Each provider connection: the Slack install, Square, Stripe, Shopify,
@@ -61,7 +64,7 @@ is actually just test accounts for now". The cutover deletes all of it:
 - The objects in `satyr-archive-apac` and every sign-in.
 
 After the cutover, the owner makes a new organisation and connects each
-provider again. The owner confirms this list in step 0.
+provider again. The owner confirmed this list on 21 November 2026 (decision 1).
 
 ## Facts (dev `c677c79` and the Cloudflare account, 19 November 2026)
 
@@ -331,6 +334,76 @@ One branch, from a freeze of dev:
   `pnpm portal:build`, `cargo test --workspace`, and a `git grep` that finds
   `satyr` and `underclerk` only in plans and evidence.
 
+#### Step 2 results (21 November 2026, branch `plan-93`)
+
+**The freeze.** Refactor 17 still landed on dev when step 2 started. The
+owner chose a short freeze later: I wrote and tested the codemod as a script
+on the branch first. Before the branch lands, dev freezes, the branch
+rebases on the newest dev, the codemod runs again and the checks run again.
+The freeze lasts about one working day: the run and the full checks.
+
+**The Console part is not needed.** Since Plan 95 step 4 (dev `396278ef`)
+Pantry names no Console service, binding, package or secret, so the
+seams-monorepo codemod of this step goes. The Console's own record of the
+old Pantry service is the work of the session "Console Pantry service
+removal" and of Refactor 260.
+
+**What the branch holds**, in this order:
+
+1. The new Worker profiles and the release guard (hand-written, new names).
+   Each Worker has `workers_dev: false`, `preview_urls: false` and one
+   custom domain: `pantry.purin.io`, `commerce.pantry.purin.io`,
+   `slack.pantry.purin.io`, `docs.pantry.purin.io` and `shop.purin.io`.
+   The D1 and KV ids are the placeholder `made-in-plan-93-step-3`; step 3
+   writes the real ids. One vault root (`pantry-vault-root`) and one data
+   encryption root. The exports drop the three Codex harness tombstones.
+   `scripts/worker-environment.mjs` holds the one table of Worker names
+   (`WORKER_NAMES`), which every profile check reads; `run-worker.mjs`, the
+   side Worker scripts, the docs site and the shop refuse to deploy any other
+   name, a workers.dev or preview address, another route, or a placeholder
+   id.
+2. The removal of code for old names and old stored states: the agent's
+   old-name note, the finished rename passes, the stale package check of
+   the standalone commerce journey, and the Plan 92 adapters (see "Adapter
+   code with no test").
+3. `scripts/rename/plan-93-cutover.mjs` and its run. It renames `satyr` to
+   `pantry` and `underclerk` to `commerce` in every case form, with these
+   exact rules first: the workers.dev addresses to the purin.io domains;
+   `satyr-edge` to `pantry`, `underclerk` (Worker) to `pantry-commerce`,
+   `satyr-code-mode-sandbox` to `pantry-code-sandbox`, `seams-shop` to
+   `purin-shop`, the containers and storage of the tables above;
+   `satyr_commerce` to `builtin_commerce` ("Satyr Commerce" to "Seams
+   Checkout"); `satyr_control_*` cookies to `pantry_*` (`pantry_session`,
+   `pantry_csrf`); `sh.seams.satyr` to `io.purin.pantry`; the area values
+   to `"kitchen"`, `"cafe"` and `"commerce"`; `@satyr/` to `@purin-labs/`.
+   It changes code, wire values, the two D1 baselines, the Wrangler files
+   and the living documents (READMEs, the commerce spec, runbooks,
+   architecture and reference pages, the docs site). Plans, evidence and
+   handoffs keep their names. After the run it writes the commerce spec
+   tables and the layers page again, and it waives each renamed D1 baseline
+   object in `d1-patch-waivers.txt`: no deployed database takes the
+   rename. `--collisions` lists each new name that the tree already holds:
+   37 on dev `c69563a1`, and each one is a local name or a comment, not a
+   merge of two meanings.
+4. AGENTS.md: the old-name table maps old names for readers of plans and no
+   longer keeps old names in a layer; the runtime, boundary, setup and
+   deployment sections name the new stack and the release guard.
+
+**What keeps an old name on purpose** (the `git grep` exceptions):
+
+- The wake phrase "Hey Satyr", `hey_satyr.onnx` and the wake training
+  scripts, until a "Hey Sous Chef" wake model passes.
+- The Google Cloud project `satyr-gmail-dev`, its topic `satyr-gmail-push`
+  and its service account: a project id cannot change. Step 4 changes only
+  the push endpoint of the subscription.
+- The pinned physics bundles, the `crates/bakery-native` source, the R2
+  file names of `repo-binaries.json` and `scripts/bakery-mujoco`, and the
+  browser folder `satyr-physics-results`: the pinned execution bundle holds
+  that name, and a rename would change the bundle's hash. It changes with
+  the next bundle build.
+- Plan file names and links to them, the applied D1 patch scripts, and the
+  records under `docs/` (plans, refactors, handoffs, evidence, brand work).
+
 ### 3. Build and test the new stack
 
 1. Make the D1 databases (load the two baselines), the buckets, the KV
@@ -425,10 +498,15 @@ removes the staging crons.
 
 ## Decisions for the owner
 
-1. **Confirm the data loss** in "What the cutover deletes". Default: confirm
-   (production holds only test accounts).
-2. **The new names.** Default: the tables above. Rule: each Pantry resource
-   starts with `pantry-`, and storage ends with its region (`-apac`).
+1. **Confirm the data loss** in "What the cutover deletes". Decided on
+   21 November 2026: confirmed. I stated the default "confirm" and the owner
+   did not object. The list now names the live organisation "Satyr
+   workspace".
+2. **The new names.** Decided on 21 November 2026: the tables above. The
+   owner first said "satyr-edge should be renamed something purin-edge or
+   something", then chose "pantry" for the main Worker, on
+   `pantry.purin.io`. Every other Pantry resource starts with `pantry-`, and
+   storage ends with its region (`-apac`).
 3. **Delete the stale Pantry resources now (step 1).** Decided and done on
    19 November 2026.
 4. **No staging stack after the cutover.** Default: none until a plan needs

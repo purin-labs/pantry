@@ -49,7 +49,7 @@ const BASELINES = [
  */
 const LIVING_DOCUMENTS = [
   /^docs\/(?:architecture|deployment|integrations|reference|runbooks|specs)\//,
-  /^docs\/(?:layers|commerce-monorepo|commerce-domain-architecture|code-style|organisation-setup-flow|portal-ui-inventory|style-guide)\.md$/,
+  /^docs\/(?:layers|commerce-monorepo|commerce-domain-architecture|code-style|organisation-setup-flow|portal-ui-inventory|style-guide|workflow-canvas-design-profile|economics-costs|blocked-deferred-tasks)\.md$/,
 ];
 
 /** Paths that keep their text and their names. */
@@ -72,9 +72,10 @@ const EXCLUDED_PATHS = [
   // Pinned Kitchen physics bundles and the native source that they hash: a
   // saved run names its bundle by hash. The bundles hold the old build path.
   /^apps\/portal\/public\/bakery-physics\//,
-  /^crates\/bakery-native\//,
+  /^crates\/bakery-native\/(?!README\.md$)/,
   // The names of the files in R2 and the scripts that build those files: a
-  // model or a mesh keeps the name that its recorded output has.
+  // model or a mesh keeps the name that its recorded output has. The
+  // manifest's bucket changes: renameManifest below.
   /^repo-binaries\.json$/,
   // The known broken links: renameRatchet below handles them.
   /^scripts\/doc-links-ratchet\.json$/,
@@ -254,6 +255,15 @@ export function renameText(text, file = "") {
 }
 
 const RATCHET = "scripts/doc-links-ratchet.json";
+const MANIFEST = "repo-binaries.json";
+
+/** The manifest of the large files names its bucket; the files keep their paths. */
+function renameManifest(text) {
+  return text.replace(
+    /^(  "bucket": ")satyr-repo-binaries-apac(",)$/m,
+    "$1pantry-repo-binaries-apac$2",
+  );
+}
 
 /**
  * The known broken links, as "<source> -> <target>": a link of a living
@@ -293,11 +303,13 @@ for (const file of files) {
   }
   const target = renamePath(file);
   if (target !== file) moves.push([file, target]);
-  const ratchet = file === RATCHET;
-  if (isBinary(file) || (isExcluded(file) && !ratchet)) continue;
+  const special =
+    file === RATCHET ? renameRatchet : file === MANIFEST ? renameManifest : null;
+  if (isBinary(file) || (isExcluded(file) && special === null)) continue;
   const text = fs.readFileSync(file, "utf8");
   if (text.includes("\u0000") || !OLD_NAME.test(text)) continue;
-  const rewritten = ratchet ? renameRatchet(text) : renameText(text, file);
+  const rewritten =
+    special === null ? renameText(text, file) : special(text);
   if (rewritten === text) continue;
   const before = text.split("\n");
   const after = rewritten.split("\n");
