@@ -1982,6 +1982,13 @@ Each pair that stays has a written reason.
 - **Measures.** Layer crossings 50 to 10: upward 19 to 7, between areas 17 to 3,
   against the order 8 to 0, table writes 6 to 0. Copies 842 and unused exports 797,
   no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 87
+  journey files whose names hold a word of the change ran in four groups: 86 pass
+  and 1 is skipped. `counter-receipt-printer` failed once in the first group (the
+  drawer task was `sent`, not yet `done`, while a lint ran beside it), and it
+  passed twice alone. `wrangler deploy --dry-run` and the full E2E suite did not
+  run on the branch.
 
 ## Baseline
 
