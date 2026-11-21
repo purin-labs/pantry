@@ -418,9 +418,10 @@ draft at step 2 on 2026-11-21. Then, in this order:
 ## Steps done
 
 **The state on `dev`, 21 November 2026.** Each entry below that names a branch is on
-`dev` now, up to and with the last 10 crossings. They landed in ten pushes; the owner agreed to each one. The full E2E suite passed on each merge
+`dev` now, up to and with the last 10 crossings. The owner agreed to each push. The full E2E suite passed on each merge
 before its push: 236 files and 457 or 458 tests, with 3 files skipped (they need a
-real model). In two of those runs `counter-receipt-printer.test.ts` failed under the
+real model). The last run had the MuJoCo SDK, so the cobot journeys of Plan 24 ran
+too: 247 files and 478 tests pass. In two of those runs `counter-receipt-printer.test.ts` failed under the
 load of the machine and passed alone three times. The layer count on `dev` is 0
 (1,350 at the start of the refactor). An entry that says "the full E2E suite did not
 run on the branch" is about the worker branch; the merge ran it.
