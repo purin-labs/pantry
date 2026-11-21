@@ -367,9 +367,12 @@ the state of the branches and the way to continue.
    flow of a custom connector write, the two texts of a permission request, the three
    button sets of an email reply), and a refusal for a custom connector write, which
    has none today. The one Portal card keeps both looks through props until then.
-3. **The other preview pages of `apps/portal/src/dev/`.** Step A2.4 moved the public
-   workflow demo. The other pages still hold their own code; production serves none of
-   them. The largest is `appliances-preview.tsx` (1,545 lines).
+3. **Done: the preview pages of `apps/portal/src/dev/` hold no copy of product code.**
+   The clone check finds 4 pairs that touch `dev/`, and each pair joins two preview
+   pages. Production serves none of the pages. The appliance viewer
+   (`appliances-preview.tsx`, 1,545 lines) has no product user, so it stays a preview
+   page. Stage B puts each preview page beside the `ui` folder of its area. See
+   [the entry in Steps done](#the-preview-pages-and-the-browser-check-of-the-decision-buttons-2026-11-21).
 4. **Product code that the dead code step deleted** because no file used it: two
    floor plan station helpers, a workspace run save helper, `verifyRevokedVaultSecret`,
    three Code Mode workspace allocation wrappers and 14 commerce client resource
@@ -380,8 +383,11 @@ the state of the branches and the way to continue.
    `commerce-lab/scenario-catalog.test.ts` and the third case of
    `commerce-lab/queue-projection-recovery.test.ts`.
 6. **Checks that did not run.** A real Portal chat turn, mailbox turn and WhatsApp turn
-   against the deployed Worker; a browser check of the one Portal decision card; CI for
+   against the deployed Worker; a browser check of the decision buttons in the status
+   band of a governed action and on the mailbox page, which need a running Worker; CI for
    any push of Stage A (GitHub did not start the jobs because of the account billing).
+   The browser check of the other three places and of the moved Portal parts ran (the
+   entry in Steps done).
 7. **Outside this refactor.** `counter-receipt-printer.test.ts` fails under the load of
    the machine: the device fleet waits 8 seconds for the printer (`PRINTER_ANSWER_MS`).
    It belongs to Plan 90. Decision D6 (capability claims of the mailbox and WhatsApp
@@ -2227,6 +2233,38 @@ entry closes the Portal, Stripe and chat record pairs of the lists above.
   journey files whose names hold a word of the brief ran in eight groups: 57 pass and
   1 live journey is skipped (75 tests pass, 2 are skipped).
   `wrangler deploy --dry-run` and the full E2E suite did not run on the branch.
+
+### The preview pages and the browser check of the decision buttons (2026-11-21)
+
+On the branch `refactor-17-m`, after the full E2E run. No code changed.
+
+- **The preview pages.** The goal was a preview page with only fixture data and the
+  mount call. The clone check finds no copy of product code in `dev/`: its 4 pairs
+  that touch `dev/` each join two preview pages. A worker moved the appliance viewer
+  (1,545 lines) to `features/workflow-simulator/appliances/`. The move merged no code,
+  and no product page used the viewer, so the move was dropped. The viewer shows one
+  appliance model at a time with its joint controls. Three Kitchen files load GLB
+  models with their own `GLTFLoader` (`bakery-assets.ts`, `spatial/physics-asset-loader.ts`
+  and the viewer); one shared loader is separate work, because the physics loader
+  checks the bytes of each file and the other two do not. Stage B places each preview
+  page beside the `ui` folder of its area.
+- **The decision buttons in the browser**, on the Vite server of the branch:
+  - The chat card of a governed action (`chat-preview.html?scenario=commerce-action`):
+    "Reject" asks "Reject change" or "Keep proposal". "Keep proposal" goes back.
+    "Reject change" sends one rejection, the card says "Rejected", and no button
+    stays. "Approve and apply" sends the approval, then the execute call, and no
+    button stays.
+  - The review of a custom connector write (`integrations-preview.html`): one button,
+    "Verify and approve with Google", and no refusal, as Appendix E records.
+  - The Inbox conversation (the fixture of `scripts/mail-inbox/mount-browser-fixture.js`):
+    "Approve and send", "Edit" and "Reject". "Reject" refuses with one click and opens
+    the next email, as Appendix E records.
+  - Not checked in a browser: the status band of a governed action and the mailbox
+    page. Both need a running Worker.
+- **The moved Portal parts.** The Stripe part shows on the integrations preview. The
+  journeys `scripts/plan-40b/browser-board-chat.js` (9 checks) and
+  `browser-board-agent.js` (102 checks) pass against a local Worker; they drive the
+  chat beside the board through the board chat port.
 
 ## Baseline
 
