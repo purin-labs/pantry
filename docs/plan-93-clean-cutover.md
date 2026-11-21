@@ -340,7 +340,9 @@ One branch, from a freeze of dev:
 owner chose a short freeze later: I wrote and tested the codemod as a script
 on the branch first. Before the branch lands, dev freezes, the branch
 rebases on the newest dev, the codemod runs again and the checks run again.
-The freeze lasts about one working day: the run and the full checks.
+The freeze lasts about two hours: the rebase and the run take minutes, the
+checks other than E2E about 20 minutes, and the full E2E suite about one
+hour.
 
 **The Console part is not needed.** Since Plan 95 step 4 (dev `396278ef`)
 Pantry names no Console service, binding, package or secret, so the
@@ -560,6 +562,10 @@ removes the staging crons.
    one.
 5. **Stale resources of other projects.** Default: keep them until you say
    yes for each group.
+6. **The shop domain.** Default: `purin-shop` on `shop.purin.io`, and the
+   commerce engine's `SHOP_SITE_ORIGIN` names it. The order page domain
+   (`MENU_HOST_SUFFIX`, still `menu.seams.tokyo`, with no route) stays
+   unchosen.
 
 ## Adapter code with no test (19 November 2026)
 
