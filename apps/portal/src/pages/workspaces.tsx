@@ -26,7 +26,6 @@ import {
 } from "../page-components";
 import type { PageContent } from "../page-content";
 import { organisationPath, workspacePagePath } from "../route";
-import { PortalFrame } from "../shell";
 import { AgentModal } from "./agent-modal";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";
 import { assertNever } from "@purin-labs/std";
@@ -80,7 +79,23 @@ export type WorkspaceSupportTools = {
   readonly archive: () => Promise<void>;
 };
 
+/**
+ * The Portal frame around a page of the account before an Organisation
+ * opens: the header with the person and the sign-out. The shell gives it.
+ */
+export type AccountFrame = React.ComponentType<
+  Readonly<{
+    identity: Readonly<{
+      kind: "ready";
+      displayName: string;
+      logout: () => Promise<void>;
+    }>;
+    children: React.ReactNode;
+  }>
+>;
+
 type OrganisationsRouteProps = {
+  readonly Frame: AccountFrame;
   readonly displayName: string;
   readonly membershipAvailability: ControlMembershipAvailability;
   readonly retryMemberships: () => void;
@@ -119,7 +134,7 @@ export function OrganisationsRoute(
     [props.loadOrganisations],
   );
   return (
-    <PortalFrame
+    <props.Frame
       identity={{
         kind: "ready",
         displayName: props.displayName,
@@ -148,7 +163,7 @@ export function OrganisationsRoute(
         organisationName={findOrganisationName.bind(null, content)}
         resume={content.kind !== "loading"}
       />
-    </PortalFrame>
+    </props.Frame>
   );
 }
 
@@ -338,15 +353,7 @@ function OrganisationsRouteContent(props: {
   }
 }
 
-export function OrganisationsLoading(): React.ReactNode {
-  return (
-    <PortalFrame identity={{ kind: "loading" }}>
-      <OrganisationListLoading />
-    </PortalFrame>
-  );
-}
-
-function OrganisationListLoading(): React.ReactNode {
+export function OrganisationListLoading(): React.ReactNode {
   return (
     <OrganisationPage>
       <PageSkeleton label="Loading organisations" />

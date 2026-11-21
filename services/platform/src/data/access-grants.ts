@@ -13,11 +13,7 @@ import {
   type CommerceGrantTargetParse,
 } from "../authorization/access-grants/commerce-grant-targets";
 
-import {
-  prepareNewFileGrantSync,
-  prepareRevokedFileGrantRows,
-  supersedeUnadmittedFileProjectionsStatement,
-} from "../context/files/persistence";
+import { fileGrantParts } from "../authorization/access-grants/file-grant-parts";
 import {
   parseIntegrationAccountId,
   parsePersonId,
@@ -198,7 +194,7 @@ export async function createAccessGrant(
       }
       await input.db.batch([
         create,
-        prepareNewFileGrantSync(input.db, {
+        fileGrantParts.use().prepareNewFileGrantSync(input.db, {
           organisationId: input.organisationId,
           grantId: input.grantId,
           integrationAccountId: input.target.integrationAccountId,
@@ -340,11 +336,11 @@ export async function revokeAccessGrant(
         };
       }
       await input.db.batch([
-        ...prepareRevokedFileGrantRows(input.db, {
+        ...fileGrantParts.use().prepareRevokedFileGrantRows(input.db, {
           organisationId: input.organisationId,
           grantId: input.grantId,
         }),
-        supersedeUnadmittedFileProjectionsStatement({
+        fileGrantParts.use().supersedeUnadmittedFileProjectionsStatement({
           db: input.db,
           organisationId: input.organisationId,
           integrationAccountId: integrationAccountId.value,

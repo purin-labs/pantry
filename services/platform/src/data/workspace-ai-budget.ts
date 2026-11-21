@@ -8,7 +8,8 @@ import {
 import type { OrganisationEnvironment } from "./control-plane";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { SessionBudget } from "@purin-labs/contracts";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 
 export type WorkspaceAiBudgetLimits = Pick<

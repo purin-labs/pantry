@@ -1,14 +1,20 @@
 import type { TextPresenceSelection } from "./text-selection.ts";
-import { decodeBase64Url, isRecord } from "@purin-labs/std";
+import {
+  decodeBase64Url,
+  isRecord,
+  SOCKET_PING,
+  SOCKET_PONG,
+  SOCKET_PRESENCE_EXPIRY_MS,
+} from "@purin-labs/std";
 export const COLLABORATION_FRAME_LIMIT = 384 * 1024;
 export const COLLABORATION_SOCKET_LIMIT = 20;
-// The Actor's runtime answers this text frame without waking the Actor, so a
-// client checks its connection without a charge for the Actor's time.
-export const COLLABORATION_PING = "satyr.ping";
-export const COLLABORATION_PONG = "satyr.pong";
+// The socket liveness frames of `@purin-labs/std`: the Actor's runtime
+// answers the ping without waking the Actor.
+export const COLLABORATION_PING = SOCKET_PING;
+export const COLLABORATION_PONG = SOCKET_PONG;
 export const COLLABORATION_PING_INTERVAL_MS = 30_000;
 export const COLLABORATION_PONG_TIMEOUT_MS = 75_000;
-export const COLLABORATION_PRESENCE_EXPIRY_MS = 90_000;
+export const COLLABORATION_PRESENCE_EXPIRY_MS = SOCKET_PRESENCE_EXPIRY_MS;
 export const COLLABORATION_POINTER_IDLE_MS = 5_000;
 
 /**

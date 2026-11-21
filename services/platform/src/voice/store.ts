@@ -13,7 +13,8 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { readOrganisationCapabilityPolicy } from "../data/capability-policy";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 
 const CODE_TTL_MS = 15 * 60_000;
 /** A Mac sends a heartbeat every 60 s. After three missed, it does not answer. */

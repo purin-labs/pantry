@@ -225,12 +225,12 @@ importers:
 
   packages/bakery-model:
     dependencies:
-      '@purin-labs/commerce-client':
-        specifier: workspace:*
-        version: link:../commerce-client
       '@purin-labs/commerce-contracts':
         specifier: workspace:*
         version: link:../commerce-contracts
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../contract-schema
       '@purin-labs/contracts':
         specifier: workspace:*
         version: link:../contracts

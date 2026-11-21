@@ -20,7 +20,8 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
 import { isCustomCommerceEntity } from "@purin-labs/commerce-contracts";
-import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
+import { decodeRecord } from "@purin-labs/contract-schema";
+import { parseCommerceGraphQuery as parseGraphQueryContract } from "@purin-labs/commerce-contracts/graph-query";
 import type { Variant } from "@purin-labs/type-utils";
 
 export async function readBakeryProcedure(
@@ -42,7 +43,7 @@ async function readBakeryProcedureGraph(
   | Readonly<{ kind: "invalid"; message: string }>
 > {
   const membership = await readGraph(
-    parseCommerceGraphQuery({
+    graphQuery({
       kind: "relationship_traversal",
       seeds: [reference],
       relationshipDefinition: {
@@ -77,7 +78,7 @@ async function readBakeryProcedureGraph(
   }
   // Operation-frontier traversal sees every workflow edge without expanding scenario backlinks.
   const graph = await readGraph(
-    parseCommerceGraphQuery({
+    graphQuery({
       kind: "relationship_traversal",
       seeds,
       relationshipDefinition: null,
@@ -578,4 +579,9 @@ function operationValue(value: string | null): Operation | null {
   return value === "demould" || value === "finishCooling"
     ? value
     : stationValue(value);
+}
+
+/** A graph query of the procedure; a refusal throws its contract error. */
+function graphQuery(value: unknown): CommerceGraphQuery {
+  return decodeRecord(parseGraphQueryContract, value);
 }

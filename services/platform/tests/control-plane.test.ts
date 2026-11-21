@@ -13,7 +13,8 @@ import {
   validateControlCsrf,
 } from "../src/data/control-plane";
 import { newControlMutationIdentity } from "../src/data/control-mutation";
-import { type UserId, type OrganisationId } from "../src/ids";
+import { type OrganisationId } from "../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { createMigratedDatabase } from "./sqlite-d1";

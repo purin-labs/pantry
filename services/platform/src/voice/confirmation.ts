@@ -10,7 +10,8 @@ import {
   type VoiceConfirmationTarget,
 } from "@purin-labs/control-api";
 
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 
 /**
  * Spoken confirmation of approval cards (Plan 82 Phase 3). A receipt names the

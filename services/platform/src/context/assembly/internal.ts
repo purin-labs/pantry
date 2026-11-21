@@ -1,4 +1,4 @@
-import { resolveNativeChatAudience } from "../../chat/information-flow";
+import { nativeChatAudience } from "./native-chat-audience";
 import { isAuthorizedContextRead } from "../turn-context";
 import type {
   ContextProjectionSearchResult,
@@ -332,12 +332,11 @@ async function labelIsAdmitted(
 ): Promise<boolean> {
   const audience =
     permit.requestAuthority.kind === "control"
-      ? await resolveNativeChatAudience(
+      ? await nativeChatAudience.use()(
           permit.db,
           permit.turnAuthority.accountAccess,
           permit.requestAuthority,
           inputLabel,
-          { kind: "current" },
         )
       : null;
   if (permit.requestAuthority.kind === "control" && audience === null)

@@ -1,4 +1,4 @@
-import type { UserId } from "../../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { ConversationId } from "@purin-labs/control-api";
 import type { Env } from "../../env";

@@ -5,7 +5,8 @@ import { parseVaultHandle } from "../credential-vault/domain";
 import { revokeVaultSecret } from "../credential-vault/service";
 import { prepareCustomConnectorAccountsDisable } from "../data/integration-account-writes";
 import { prepareCustomConnectorConnectionsDisable } from "../data/provider-connection-writes";
-import type { UserId, OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type {
   CustomConnectorDefinitionDigest,

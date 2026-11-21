@@ -14,7 +14,7 @@ import {
 } from "./slack-journey-support";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { readChatControlAuthority } from "../../src/chat/information-flow";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { restoreSerializedMemory } from "../../src/memory/store";
 import {
   canonicalFlowLabel,

@@ -3,7 +3,8 @@ import {
   hashOpaqueSecret,
   type VerifiedOidcIdentity,
 } from "../data/control-plane";
-import { parseUserId, parseOrganisationId, type UserId } from "../ids";
+import { parseOrganisationId } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseApprovalProofDigest,
   type ApprovalActionBinding,

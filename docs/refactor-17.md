@@ -1985,6 +1985,62 @@ reason keeps. A hand check came before each deletion.
   tests) pass on the last code commit. No test file is deleted, and no old-row
   adapter is deleted.
 
+### The end of Stage A: the last crossings and the area lists (2026-11-21)
+
+On the branch `refactor-17-last-crossings`. Layer crossings: 50 to 10, in 6 pairs.
+Each pair that stays has a written reason.
+
+- **Ports that `worker-ports.ts` registers.** The context assembly reads the native
+  chat audience (`context/assembly/native-chat-audience.ts`). The grant code reads
+  the file grant statements and the file target check (`file-grant-parts.ts`).
+  A connection flow gets the statements of the support references, the
+  communication destination and the credential reference from their owners
+  (`data/connection-flow-parts.ts`). Commerce gets the texts of its Slack approval
+  card (`commerce/contract/approval-card-texts.ts`), and devices get the shop Macs
+  (`devices/contract/shop-mac-devices.ts`). Each area contract has a service port:
+  `cafeServices`, `inboxServices`, `organisationServices`, `workflowChanges` and
+  `deviceCommands`. 12 unit test files that reach a port import `worker-ports.ts`.
+- **Moves with evidence.** `memberMaySee` is `chat/member-view.ts`
+  (`foundation/conversation`), and the held output route and the permission request
+  route are `foundation/conversation`. The device fleet terminal module is
+  `areas/devices`. The Organisation pages of the Portal get the shell frame as a
+  prop.
+- **Values and types at their owner.** The socket ping, pong and expiry are in
+  `@purin-labs/std`. `UserId` comes from `@purin-labs/control-api/ids`, so `ids.ts`
+  names no contracts module. The stream types and the turn ids of an ongoing Case
+  turn are `actors/case-turn-stream.ts`. The directory Slack record builders are in
+  `slack/organisation-routing.ts`. The WhatsApp proposal invalidation is in
+  `actors/connector-whatsapp.ts`. The Kitchen surface tool results are a public
+  file, `agent-tools/bakery/surface-result.ts`. `bakery-model` reads the graph query
+  parser of `commerce-contracts`, and `decodeRecord` is in `contract-schema`.
+- **The table scan.** A write is an upper-case SQL keyword, as in each SQL text of
+  the repository. The error text of the Portal is no longer a write. A probe write
+  in the Portal is still found.
+- **Written reasons.** `reasons` in `scripts/layers-ratchet.json` gives the reason
+  and the fix of each pair. `pnpm lint:layers` refuses a pair with no reason or no
+  fix, and a reason of a pair that is gone. The pairs that stay: the Café prompt
+  edit and the Portal chat (2), the activation steps in the commerce module of the
+  Organisation actor (2), the Kitchen view of the chat record (4), the Stripe part
+  of the integrations page (1) and the package `contracts` (1).
+- **The mixed notes.** `agent-tools/session-support.ts` imports no area, so its note
+  is gone. The other five notes name what each file joins today.
+- **The area lists.** `node scripts/check-layers.mjs --areas [module]` prints the
+  files by folder, the packages, the tables and the public files of each module.
+  [`docs/layers.md`](layers.md) holds the list. `pnpm lint:layers-page` fails when
+  the page is older than the map or the files.
+- **Not changed:** no SQL text, bind order, route, status code, error text, RPC
+  method name, stored value, tool definition or tool order.
+- **Measures.** Layer crossings 50 to 10: upward 19 to 7, between areas 17 to 3,
+  against the order 8 to 0, table writes 6 to 0. Copies 842 and unused exports 797,
+  no change.
+- **Checks.** `pnpm lint`, the three type checks, `pnpm check:packages`,
+  `pnpm portal:build` and the unit suite (301 files, 1,730 tests) pass. The 87
+  journey files whose names hold a word of the change ran in four groups: 86 pass
+  and 1 is skipped. `counter-receipt-printer` failed once in the first group (the
+  drawer task was `sent`, not yet `done`, while a lint ran beside it), and it
+  passed twice alone. `wrangler deploy --dry-run` and the full E2E suite did not
+  run on the branch.
+
 ## Baseline
 
 Step A0.4, measured on 2026-11-20 at `origin/dev` `e18cecb` with the step A0 commits,

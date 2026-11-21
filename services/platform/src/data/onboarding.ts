@@ -16,12 +16,12 @@ import {
   parseSetupSnapshotId,
   parseWorkspaceId,
   type ChannelId,
-  type UserId,
   type IntegrationAccountId,
   type SetupSnapshotId,
   type OrganisationId,
   type WorkspaceId,
 } from "../ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { OrganisationEnvironment } from "./control-plane";
 import {
@@ -1874,4 +1874,25 @@ function invalidSelection(): Result<
   { readonly code: "invalid_setup_selection" }
 > {
   return { ok: false, error: { code: "invalid_setup_selection" } };
+}
+
+/**
+ * Moves the communication destination of an Organisation to another Slack
+ * account, when the default account changes.
+ */
+export function prepareCommunicationDestinationAccount(
+  db: Pick<OrganisationDatabase, "prepare">,
+  input: Readonly<{
+    organisationId: string;
+    integrationAccountId: string;
+    now: number;
+  }>,
+): D1PreparedStatement {
+  return db
+    .prepare(
+      `UPDATE organisation_communication_destination
+           SET integration_account_id = ?, selected_at = ?
+           WHERE organisation_id = ?`,
+    )
+    .bind(input.integrationAccountId, input.now, input.organisationId);
 }

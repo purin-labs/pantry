@@ -22,7 +22,8 @@ import {
   inspectOnboardingActivationAcceptanceFault,
   type OnboardingActivationAcceptanceFaultStorage,
 } from "../src/organisation/contract/onboarding-activation-acceptance-fault";
-import { newRequestId, type UserId, type OrganisationId } from "../src/ids";
+import { newRequestId, type OrganisationId } from "../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import {
   evaluateAndStoreReadiness,
   ensureCurrentReadiness,

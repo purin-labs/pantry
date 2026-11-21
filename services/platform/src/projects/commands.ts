@@ -15,7 +15,8 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 import type { Env } from "../env";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   authorizeProject,

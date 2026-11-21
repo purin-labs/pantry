@@ -13,7 +13,8 @@ import {
   upsertSurfaceInstallation,
 } from "../src/data/integration-account";
 import { parseVaultHandle } from "../src/credential-vault";
-import type { UserId, OrganisationId } from "../src/ids";
+import type { OrganisationId } from "../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { isRecord } from "@purin-labs/std";

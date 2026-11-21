@@ -35,13 +35,13 @@ import {
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {
   parseCaseId,
-  parseUserId,
   parseControlSessionId,
   parseIntegrationAccountId,
   parsePersonId,
   parseSessionId,
   parseOrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
 import {
   fixtureFlowBinding,

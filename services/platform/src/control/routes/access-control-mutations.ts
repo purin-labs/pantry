@@ -42,7 +42,7 @@ import {
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   SLACK_MESSAGE_RESOURCE_SCOPE,
 } from "../../authorization/capability-catalogue";
-import { validateFileGrantTarget } from "../../context/files";
+import { fileGrantParts } from "../../authorization/access-grants/file-grant-parts";
 import { parseActiveCapabilityId } from "../../data/capability-policy";
 import {
   hashPortalSubject,
@@ -972,7 +972,7 @@ async function validateGrantTarget(
         : { ok: false, error: "access_grant_target_unavailable" };
     }
     case "file_resource": {
-      const validated = await validateFileGrantTarget({
+      const validated = await fileGrantParts.use().validateFileGrantTarget({
         env,
         scope,
         target,

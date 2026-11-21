@@ -13,12 +13,8 @@ import type {
   ContextVisibility,
 } from "../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import type {
-  UserId,
-  IntegrationAccountId,
-  PersonId,
-  OrganisationId,
-} from "../ids";
+import type { IntegrationAccountId, PersonId, OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { FlowLabel } from "../policy";
 import type { Result } from "../result";
 import type { ControlRole } from "../data/control-plane";

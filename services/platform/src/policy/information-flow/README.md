@@ -124,7 +124,7 @@ for each missing approval before it uses a pass (`settleStaffPageEffect`).
 ## Portal views
 
 Permissions decide what a member sees, with one rule: `memberMaySee` in
-`memory/member-view.ts`. A member sees each record of the Organisation, unless each
+`chat/member-view.ts`. A member sees each record of the Organisation, unless each
 reader of one of its policies is another person, a Portal chat that they cannot
 open, or a Slack conversation that they are not in. A stored label converts when it
 is read, so no background job runs. A schedule belongs to the whole Organisation.

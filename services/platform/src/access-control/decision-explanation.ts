@@ -31,12 +31,12 @@ import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-bindin
 import type { Env } from "../env";
 import {
   parseConnectorId,
-  parseUserId,
   parseIntegrationAccountId,
   parsePersonId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,

@@ -5,7 +5,7 @@ import {
   type ConversationId,
 } from "@purin-labs/control-api";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import { prepareChatDirectoryInitialization } from "./projects";
 import type { ConversationScope } from "./store";
 import { readConversation, reconcileRevokedConversationRun } from "./store";

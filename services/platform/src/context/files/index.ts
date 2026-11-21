@@ -28,7 +28,6 @@ export {
 } from "./projection";
 export { runFileContextReconciliation } from "./reconciliation";
 export { ProviderFileProjectionSourceReader } from "./provider-source";
-export { validateFileGrantTarget } from "./grant-validation";
 export { discoverFileResources } from "./discovery";
 export {
   readGrantedFile,

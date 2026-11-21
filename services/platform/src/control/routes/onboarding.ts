@@ -42,11 +42,8 @@ import {
   renameOrganisation,
   restoreOrganisation,
 } from "../../data/organisation-lifecycle";
-import {
-  parseUserId,
-  parseOrganisationId,
-  type OrganisationId,
-} from "../../ids";
+import { parseOrganisationId, type OrganisationId } from "../../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   activationModelRouteError,
   resolveOrganisationModelRoute,

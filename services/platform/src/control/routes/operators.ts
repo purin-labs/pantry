@@ -14,7 +14,7 @@ import {
 } from "../../credential-vault";
 import type { ActivationMutation } from "../../data/activation";
 import { disableIntegrationAccount } from "../../data/integration-account";
-import { readGmailPilotBudget } from "../../data/email-mailbox";
+import { inboxServices } from "../../mail-inbox/contract/inbox-services";
 import {
   hashOpaqueSecret,
   type ActiveControlSession,
@@ -285,7 +285,7 @@ async function handleOperatorGmailPilotBudget(
   if (role === null) return controlError("support_role_required", 403);
   const budgets = await Promise.all(
     (["development", "production"] as const).map((environment) =>
-      readGmailPilotBudget({
+      inboxServices.use().readGmailPilotBudget({
         databases: configuredOrganisationDatabases(env),
         environment,
         operatingCap: positiveConfigInteger(env.GMAIL_PILOT_ACCOUNT_CAP, 80),

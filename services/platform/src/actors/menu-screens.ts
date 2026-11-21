@@ -6,7 +6,7 @@ import {
 import { isNonNegativeInteger, isRecord, sha256Hex } from "@purin-labs/std";
 
 import { controlError } from "../control/http";
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   SOCKET_SILENCE_LIMIT_MS,
   acceptSocket,

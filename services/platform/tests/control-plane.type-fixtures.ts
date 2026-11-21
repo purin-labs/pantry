@@ -6,11 +6,11 @@ import type {
   OrganisationOnboardingLifecycle,
 } from "../src/data/control-plane";
 import {
-  parseUserId,
   parseControlSessionId,
   parsePersonId,
   parseOrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 
 const organisationId = requireParsed(
   parseOrganisationId("organisation_fixture"),

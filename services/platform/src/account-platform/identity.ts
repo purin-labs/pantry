@@ -1,5 +1,5 @@
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
-import type { UserId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import { resolveUser } from "../data/control-plane";
 import type { ActiveControlSession } from "../data/control-plane";

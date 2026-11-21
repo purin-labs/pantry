@@ -19,11 +19,11 @@ import {
   whatsappConversationWindowCaseId,
 } from "../../src/data/whatsapp";
 import {
-  type UserId,
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
 } from "../../src/ids";
+import { type UserId } from "@purin-labs/control-api/ids";
 import { providerCredentialHandle } from "../../src/integrations/contract/provisioning";
 import {
   parseE164PhoneNumber,
@@ -117,7 +117,8 @@ export async function createWhatsAppWorld(
   const organisation = await requireOrganisationBootstrap({
     env: {
       DB: db,
-      PANTRY_ORGANISATION_PLACEMENT_PROFILE: TEST_ORGANISATION_PLACEMENT_PROFILE,
+      PANTRY_ORGANISATION_PLACEMENT_PROFILE:
+        TEST_ORGANISATION_PLACEMENT_PROFILE,
     },
     owner,
     organisationName: "WhatsApp Development Organisation",

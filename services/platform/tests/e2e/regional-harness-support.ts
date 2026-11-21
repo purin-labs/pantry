@@ -15,7 +15,7 @@ import {
   type SharedAccountNativeClient,
 } from "./shared-account-platform-fixture";
 import { createAccessGrant } from "../../src/data/access-grants";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";

@@ -43,6 +43,7 @@ import {
 } from "./route";
 import {
   focusPortalPage,
+  PortalFrame,
   WorkspaceLayout,
   useRoutePageFocus,
 } from "./shell";
@@ -1144,6 +1145,7 @@ export class ControlPortalApp extends React.Component<
     ) {
       return (
         <AccountInvitationPage
+          Frame={PortalFrame}
           route={this.accountInvitationRoute}
           displayName={this.state.identity.displayName}
           logout={this.logout}
@@ -1199,6 +1201,7 @@ export class ControlPortalApp extends React.Component<
   ): React.ReactNode {
     return (
       <OrganisationsRoute
+        Frame={PortalFrame}
         displayName={state.identity.displayName}
         logout={this.logout}
         membershipAvailability={state.membershipAvailability}

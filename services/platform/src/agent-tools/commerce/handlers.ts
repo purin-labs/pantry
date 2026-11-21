@@ -41,7 +41,7 @@ import {
   presentPayments,
   type PaymentsToolRead,
 } from "../../commerce/payments-read";
-import { readCounterSaleView } from "../../commerce/counter-register";
+import { cafeServices } from "../../cafe/contract/cafe-services";
 import {
   PRODUCT_SALES_SOURCE_TYPES,
   readBoundProductSales,
@@ -425,7 +425,7 @@ export async function readCounterSaleForEmbeddedHarness(
     "counter sale",
   );
   await requireSessionExecution(execution, lease);
-  const loaded = await readCounterSaleView(
+  const loaded = await cafeServices.use().readCounterSaleView(
     {
       env,
       scope: execution.scope,

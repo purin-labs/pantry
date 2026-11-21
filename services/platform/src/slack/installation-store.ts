@@ -11,14 +11,12 @@ import type { OrganisationEnvironment } from "../data/control-plane";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 import {
   parseChannelId,
-  parseUserId,
   parseIntegrationAccountId,
   parseSlackInstallationId,
   parseSlackOrganisationConnectionId,
   parseOrganisationId,
   parseWorkspaceId,
   type ChannelId,
-  type UserId,
   type IntegrationAccountId,
   type SlackAppId,
   type SlackInstallationId,
@@ -26,6 +24,7 @@ import {
   type OrganisationId,
   type WorkspaceId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";

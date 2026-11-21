@@ -14,18 +14,20 @@ import type { InstallModel } from "../boundary";
 import {
   newIntegrationAccountId,
   newProviderConnectionId,
-  newUserId,
-  parseUserId,
   parseIntegrationAccountId,
   parseOrganisationId,
   parseWorkspaceId,
-  type UserId,
   type IntegrationAccountId,
   type OrganisationId,
   type WorkspaceId,
   parseVaultHandle,
   type VaultHandle,
 } from "../ids";
+import {
+  newUserId,
+  parseUserId,
+  type UserId,
+} from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type InitialOrganisationPlacement,

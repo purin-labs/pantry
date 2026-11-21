@@ -54,7 +54,7 @@ import {
   joinFlowLabels,
 } from "../policy/information-flow";
 import type { Result } from "../result";
-import { memberMaySee } from "./member-view";
+import { memberMaySee } from "../chat/member-view";
 import {
   readNoTurnMemory,
   type ShownMemoryRevision,

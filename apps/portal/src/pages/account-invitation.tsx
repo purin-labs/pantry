@@ -1,6 +1,6 @@
 import React from "react";
 import { controlMutation } from "../control-client";
-import { PortalFrame } from "../shell";
+import type { AccountFrame } from "./workspaces";
 import { isRecord } from "@purin-labs/std";
 
 type Invitation = Readonly<{
@@ -85,6 +85,7 @@ function validInvitationValue(value: string | null): value is string {
 
 export function AccountInvitationPage(
   props: Readonly<{
+    Frame: AccountFrame;
     route: Exclude<AccountInvitationRoute, { kind: "none" }>;
     displayName: string;
     logout: () => Promise<void>;
@@ -94,7 +95,7 @@ export function AccountInvitationPage(
     kind: "ready",
   });
   return (
-    <PortalFrame
+    <props.Frame
       identity={{
         kind: "ready",
         displayName: props.displayName,
@@ -160,7 +161,7 @@ export function AccountInvitationPage(
           </>
         )}
       </section>
-    </PortalFrame>
+    </props.Frame>
   );
 }
 

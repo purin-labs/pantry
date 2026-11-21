@@ -1,4 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type {
+  OrganisationDatabase,
+  OrganisationDatabaseSession,
+} from "../database-handles";
 import type { OrganisationId } from "../ids";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import {
@@ -1267,4 +1270,32 @@ function vaultRootSelectionResolveError(
     default:
       return assertNever(error, "Unhandled Vault root-selection error");
   }
+}
+
+/**
+ * Points the credential reference of a reconnect at the new Vault handle. A
+ * connection flow puts it in its own batch.
+ */
+export function prepareCredentialRefReplacement(
+  session: Pick<OrganisationDatabaseSession, "prepare">,
+  input: Readonly<{
+    organisationId: string;
+    provider: string;
+    previousCredentialRef: string;
+    replacementCredentialRef: string;
+  }>,
+): D1PreparedStatement {
+  return session
+    .prepare(
+      `UPDATE credential_ref
+       SET vault_handle = ?, revoked_at = NULL
+       WHERE organisation_id = ? AND provider = ? AND vault_handle = ?
+         AND revoked_at IS NULL`,
+    )
+    .bind(
+      input.replacementCredentialRef,
+      input.organisationId,
+      input.provider,
+      input.previousCredentialRef,
+    );
 }

@@ -1,46 +1,42 @@
 {
   "totals": {
-    "upward": 19,
-    "areas": 17,
-    "order": 8,
-    "table": 6
+    "upward": 7,
+    "areas": 3,
+    "order": 0,
+    "table": 0
   },
   "crossings": {
-    "areas/cafe -> areas/kitchen": 1,
     "areas/cafe -> surfaces/portal": 2,
-    "areas/commerce -> areas/cafe": 1,
-    "areas/commerce -> areas/organisation": 3,
-    "areas/commerce -> surfaces/slack": 2,
-    "areas/devices -> areas/cafe": 4,
-    "areas/devices -> surfaces/voice": 2,
-    "areas/inbox -> surfaces/whatsapp": 1,
+    "areas/commerce -> areas/organisation": 2,
     "areas/integrations -> areas/commerce": 1,
-    "areas/integrations -> areas/organisation": 1,
-    "areas/kitchen -> areas/inbox": 1,
-    "areas/kitchen -> areas/organisation": 1,
-    "areas/organisation -> areas/devices": 1,
-    "areas/organisation -> areas/inbox": 1,
-    "areas/organisation -> areas/kitchen": 1,
-    "areas/organisation -> surfaces/portal": 2,
-    "foundation/actor-runtime -> foundation/collaboration": 1,
-    "foundation/agent -> foundation/conversation": 1,
-    "foundation/authority -> foundation/agent": 2,
-    "foundation/authority -> foundation/conversation": 1,
-    "foundation/connections -> areas/organisation": 1,
-    "foundation/control -> areas/brain": 1,
-    "foundation/control -> foundation/agent": 1,
-    "foundation/control -> foundation/conversation": 1,
-    "foundation/conversation -> areas/kitchen": 3,
+    "foundation/conversation -> areas/kitchen": 2,
     "foundation/conversation -> surfaces/portal": 2,
-    "foundation/conversation -> surfaces/slack": 2,
-    "foundation/kernel -> foundation/contracts": 1,
-    "package packages/bakery-model -> @purin-labs/commerce-client": 1,
-    "package packages/contracts -> @purin-labs/commerce-contracts": 1,
-    "table credential_ref (foundation/authority) <- foundation/connections": 1,
-    "table onboarding_support_reference (areas/organisation) <- foundation/connections": 1,
-    "table organisation_communication_destination (areas/organisation) <- foundation/connections": 1,
-    "table project (foundation/conversation) <- surfaces/portal": 1,
-    "table slack_dm_organisation_selection (surfaces/slack) <- foundation/authority": 1,
-    "table slack_thread_case_pin (surfaces/slack) <- foundation/authority": 1
+    "package packages/contracts -> @purin-labs/commerce-contracts": 1
+  },
+  "reasons": {
+    "areas/cafe -> surfaces/portal": {
+      "reason": "The Cafe prompt edit (apps/portal/src/features/menu-boards/prompt-edit.tsx) reads and sends a Portal chat with readChat and sendChat. Their types are the chat read model of features/chat/api.ts, which is Portal code.",
+      "fix": "Move the chat read model types to @purin-labs/control-api/portal/chat. Then give the board a chat port that portal.tsx registers."
+    },
+    "areas/commerce -> areas/organisation": {
+      "reason": "The commerce module of the Organisation actor (actors/organisation/organisation-commerce.ts) runs the onboarding activation steps of data/activation.ts and actors/organisation/activation.ts. OrganisationCommerceRpc holds their RPC methods.",
+      "fix": "An activation module of OrganisationDO in the organisation area, with its own RPC type, takes the activation methods out of the commerce module (step A1.9). The RPC method names stay."
+    },
+    "areas/integrations -> areas/commerce": {
+      "reason": "The integrations page of the Portal (features/integrations/entries.tsx) shows the Stripe setup part of the payment accounts (features/payment-accounts/stripe-account.tsx).",
+      "fix": "The Portal wiring gives the Stripe setup part to the integrations page through the settings transport (features/integrations/settings-transport.ts)."
+    },
+    "foundation/conversation -> areas/kitchen": {
+      "reason": "The chat record (chat/conversation.ts, chat/timeline.ts) parses and stores the Kitchen surface attachment of a message (BakerySurfaceAttachmentV1), also the form of a tab that loaded the Portal before Plan 87 phase 2.",
+      "fix": "The surface registry of Plan 87: the record keeps an opaque surface state, and the Kitchen registers its state check. The Plan 93 cutover can drop the old tab form."
+    },
+    "foundation/conversation -> surfaces/portal": {
+      "reason": "The same chat record calls chat/kitchen-observation.ts, the Portal adapter that makes the Kitchen view of a screen observation from its state.",
+      "fix": "The surface registry of Plan 87, as for the Kitchen pair: the Portal registers the adapter, and the record calls it through the registry."
+    },
+    "package packages/contracts -> @purin-labs/commerce-contracts": {
+      "reason": "The records of contracts carry commerce types and schemas: OrganisationId (7 files), the commerce grant scope, the mutation target, the authority scope wire schemas and the browser validators.",
+      "fix": "Step A1.11, part 2: the shared primitives go to a package below both. The commerce parts of the records become opaque parts that commerce checks, as CommerceTypeParts does for the Platform."
+    }
   }
 }

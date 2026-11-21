@@ -26,8 +26,8 @@
     "check:types": "tsrs --noEmit"
   },
   "dependencies": {
-    "@purin-labs/commerce-client": "workspace:*",
     "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/contracts": "workspace:*",
     "@purin-labs/control-api": "workspace:*",
     "@purin-labs/std": "workspace:*",

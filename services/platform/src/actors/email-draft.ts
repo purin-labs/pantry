@@ -26,13 +26,12 @@ import { listOrganisationMembers, resolveUser } from "../data/control-plane";
 import type { Env } from "../env";
 import {
   parseCaseId,
-  parseUserId,
   parseIntegrationAccountId,
   type CaseId,
-  type UserId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   CollaborationRoom,

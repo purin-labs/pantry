@@ -34,12 +34,12 @@ import {
   type SharedAccountSlotMember,
 } from "./shared-account-platform-fixture";
 import {
-  parseUserId,
   parseSessionId,
   parseOrganisationId,
   parseWorkspaceId,
   type OrganisationId,
 } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { isRecord } from "@purin-labs/std";

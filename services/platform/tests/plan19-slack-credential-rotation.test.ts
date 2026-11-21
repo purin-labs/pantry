@@ -1,3 +1,5 @@
+// The ports that the Worker registers (worker-ports.ts).
+import "../src/worker-ports";
 import type { SingleDatabase } from "../src/database-handles";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 /// <reference types="@cloudflare/workers-types" />
@@ -16,12 +18,12 @@ import {
 } from "../src/data/integration-account";
 import { storeVaultSecret, type VaultHandle } from "../src/credential-vault";
 import type {
-  UserId,
   IntegrationAccountId,
   ProviderConnectionId,
   SlackInstallationId,
   OrganisationId,
 } from "../src/ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   newSlackInstallationId,
   newSlackOrganisationConnectionId,

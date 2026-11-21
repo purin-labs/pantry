@@ -16,7 +16,6 @@ import {
   parseSessionId,
   parseSlackAppId,
   parseThreadKey,
-  parseUserId,
   parseWorkspaceId,
   type AssignmentId,
   type CaseId,
@@ -25,8 +24,8 @@ import {
   type OrganisationId,
   type RequestId,
   type SessionId,
-  type UserId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,

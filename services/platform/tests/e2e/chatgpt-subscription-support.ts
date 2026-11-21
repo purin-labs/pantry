@@ -21,7 +21,8 @@ import {
   selectOrganisationInferenceSelection,
   type OrganisationInferenceSelection,
 } from "../../src/data/organisation-inference-selection";
-import { parseUserId, type OrganisationId, type UserId } from "../../src/ids";
+import { type OrganisationId } from "../../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   ORGANISATION_ID,
   SLACK_ACTOR_USER_ID,

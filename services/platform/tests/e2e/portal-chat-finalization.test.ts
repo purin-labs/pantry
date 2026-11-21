@@ -91,7 +91,8 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseUserId, parseSessionId } from "../../src/ids";
+import { parseSessionId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   readConversation,
   saveConversation,

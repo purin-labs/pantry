@@ -25,7 +25,8 @@ import {
 } from "./conversation-machine";
 import { conversationProjectSnapshots } from "./project-context-binding";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { UserId, OrganisationId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import {
   latestPublicTimelineSequence,
   normalizeConversationTimeline,

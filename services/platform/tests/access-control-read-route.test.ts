@@ -67,13 +67,12 @@ vi.mock("../src/actors/case-operations", async (importOriginal) => ({
 
 import { handleControlRequest } from "../src/control-router";
 import {
-  parseUserId,
   parsePersonId,
   parseOrganisationId,
-  type UserId,
   type PersonId,
   type OrganisationId,
 } from "../src/ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   createCurrentSourceFlowLabel,
   FlowLabel,

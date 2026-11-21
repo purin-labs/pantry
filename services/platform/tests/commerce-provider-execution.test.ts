@@ -81,13 +81,13 @@ import {
 import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
 import {
   parseCaseId,
-  parseUserId,
   parseControlSessionId,
   parseIntegrationAccountId,
   parsePersonId,
   parseSessionId,
   parseOrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   realProviderActionAuthority,
   realProviderExecutionFixture,

@@ -1,17 +1,16 @@
 import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import { connectionFlowParts } from "./connection-flow-parts";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   newProviderConnectionAttemptId,
   newProviderProvisioningAttemptId,
   newProviderStateId,
-  parseUserId,
   parseIntegrationAccountId,
   parseProviderConnectionAttemptId,
   parseProviderConnectionId,
   parseProviderProvisioningAttemptId,
   parseProviderStateId,
   parseOrganisationId,
-  type UserId,
   type IntegrationAccountId,
   type ProviderConnectionAttemptId,
   type ProviderConnectionId,
@@ -19,6 +18,7 @@ import {
   type ProviderStateId,
   type OrganisationId,
 } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import {
   prepareControlMutationReceipt,
@@ -1444,44 +1444,34 @@ export async function failProviderAttempt(input: {
       projectionRevision: organisation.projectionRevision + 1,
       reasonCode: input.reasonCode,
     }),
-    session
-      .prepare(
-        `INSERT INTO onboarding_support_reference (
-         support_reference, organisation_id, environment, actor_user_id,
-         correlation_id, route, operation, reason_code, retry_classification,
-         first_occurred_at, latest_occurred_at, occurrence_count, resolved_at,
-         provider, adapter_operation, lifecycle_before, lifecycle_after,
-         redacted_provider_status, redacted_provider_request_id,
-         durable_receipts, last_successful_phase
-       ) VALUES (
-         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, NULL,
-         ?, ?, ?, 'failed', ?, ?, ?, ?
-       )`,
-      )
-      .bind(
-        supportReference,
-        input.attempt.organisationId,
-        input.attempt.environment,
-        input.attempt.userId,
-        correlationId,
-        `/v1/control/providers/${input.attempt.provider}/callback`,
-        "provider.callback.provision",
-        input.reasonCode,
-        input.retryable ? "retryable" : "terminal",
-        input.now,
-        input.now,
-        input.attempt.provider,
+    connectionFlowParts.use().prepareProviderAttemptSupportReference(session, {
+      supportReference,
+      organisationId: input.attempt.organisationId,
+      environment: input.attempt.environment,
+      actorUserId: input.attempt.userId,
+      correlationId,
+      route: `/v1/control/providers/${input.attempt.provider}/callback`,
+      operation: "provider.callback.provision",
+      reasonCode: input.reasonCode,
+      retryClassification: input.retryable ? "retryable" : "terminal",
+      now: input.now,
+      provider: input.attempt.provider,
+      adapterOperation:
         input.attempt.kind === "provisioning"
           ? input.attempt.provisioningPhase
           : "authorization",
-        input.attempt.kind,
-        input.providerEvidence.redactedProviderStatus,
+      lifecycleBefore: input.attempt.kind,
+      redactedProviderStatus: input.providerEvidence.redactedProviderStatus,
+      redactedProviderRequestId:
         input.providerEvidence.redactedProviderRequestId,
-        JSON.stringify(providerAttemptReceiptReferences(input.attempt)),
+      durableReceipts: JSON.stringify(
+        providerAttemptReceiptReferences(input.attempt),
+      ),
+      lastSuccessfulPhase:
         input.attempt.kind === "provisioning"
           ? input.attempt.provisioningPhase
           : null,
-      ),
+    }),
     prepareOnboardingEvent(session, supportEventIdentity, {
       eventId: supportEventIdentity.auditEventId,
       eventType: "support_reference_created",

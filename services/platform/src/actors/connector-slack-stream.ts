@@ -14,10 +14,6 @@ import {
   parseOrganisationId,
   parseWorkspaceId,
   type ChannelId,
-  type RequestId,
-  type SessionId,
-  type OrganisationId,
-  type WorkspaceId,
 } from "../ids";
 import { traceLog } from "../observability";
 import { parseOrganisationPlacement } from "../placement";
@@ -27,7 +23,6 @@ import {
   screenIncrementalOutput,
   type IncrementalScreenState,
 } from "../incremental-output-screen";
-import type { SerializedFlowBinding } from "../policy/information-flow";
 import {
   SLACK_STREAM_TEXT_LIMIT,
   appendSlackStream,
@@ -58,7 +53,12 @@ import {
   type SessionTurnStreamRecord,
 } from "./agent-session-turn-stream";
 import { isRegisteredActorName } from "./actor-registry";
-import type { SessionActorRoute } from "./actor-router";
+import type {
+  ConnectorCaseStreamRelease,
+  ConnectorCaseTurnStreamError,
+  ConnectorCaseTurnStreamInput,
+  ConnectorCaseTurnStreamResult,
+} from "./case-turn-stream";
 import type { StrictUnion, Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
@@ -67,50 +67,6 @@ import {
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
-
-export type ConnectorCaseTurnStreamInput = {
-  readonly identity: ConnectorIdentity;
-  readonly requestId: RequestId;
-  readonly organisationId: OrganisationId;
-  readonly sessionId: SessionId;
-  readonly sessionRoute: SessionActorRoute;
-  readonly turnId: string;
-  readonly streamId: string;
-  readonly expectedIdempotencyKey: string;
-  readonly target: {
-    readonly workspaceId: WorkspaceId;
-    readonly channelId: ChannelId;
-    readonly threadTs: string;
-    /** The Slack user that the answer replies to. Slack streams need it. */
-    readonly recipientUserId: string;
-  };
-  readonly receivedAt: number;
-};
-
-/**
- * The walking path's check of the turn's current flow binding against the
- * thread, with live delivery authority. `unavailable` means that the check
- * could not run now; it releases nothing and denies nothing.
- */
-export type ConnectorCaseStreamRelease = (
-  binding: SerializedFlowBinding,
-) => Promise<"allow" | "deny" | "unavailable">;
-
-export type ConnectorCaseTurnStreamResult = {
-  readonly finalMessage: string;
-  readonly canonicalMessage: string;
-};
-
-export type ConnectorCaseTurnStreamError =
-  | {
-      readonly kind: "history_corruption";
-      readonly code: VariantBy<
-        EmbeddedHarnessTurnError,
-        "code",
-        "embedded_harness_history_failed"
-      >["code"];
-    }
-  | { readonly kind: "operational"; readonly code: string };
 
 type ConnectorCaseTurnStreamSession = Pick<
   SessionActor,
@@ -701,18 +657,6 @@ export async function stopOpenConnectorSlackStream(input: {
     state.progress,
     "uncertain",
   );
-}
-
-export function slackCaseTurnId(ingressId: string): string {
-  return `turn_${ingressId}`;
-}
-
-export function slackCaseStreamId(ingressId: string): string {
-  return `stream_${slackCaseTurnId(ingressId)}`;
-}
-
-export function slackCaseOutputIdempotencyKey(ingressId: string): string {
-  return `case_output_proposal_${ingressId}_entry_${ingressId}`;
 }
 
 async function openReplayStream(

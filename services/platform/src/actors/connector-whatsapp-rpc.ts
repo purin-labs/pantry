@@ -22,10 +22,10 @@ import type { Env } from "../env";
 import {
   newRequestId,
   parseCaseId,
-  parseUserId,
   parseIntegrationAccountId,
   parseOrganisationId,
 } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { traceWarn } from "../observability";
 import type { Result } from "../result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -40,7 +40,6 @@ import {
   dispatchWhatsAppReply,
   disposeWhatsAppProposal,
   editWhatsAppProposal,
-  invalidateOpenWhatsAppProposal,
   previewWhatsAppProposal,
   resolveWhatsAppIndeterminateSend,
   type WhatsAppDispatchOutcome,
@@ -64,6 +63,7 @@ import {
   recordWhatsAppOperatorNotice,
   recordWhatsAppStatus,
   recordWhatsAppUnsupportedMessage,
+  invalidateOpenWhatsAppProposal,
   scheduleWhatsAppCaseForAgent,
   setWhatsAppCaseOwnership as setConnectorCaseOwnership,
   utcDayKey,

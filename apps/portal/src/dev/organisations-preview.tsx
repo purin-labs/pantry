@@ -6,6 +6,7 @@ import type {
   AccountOnboardingRequest,
 } from "@purin-labs/control-api";
 import "../styles.css";
+import { PortalFrame } from "../shell";
 import {
   OrganisationsRoute,
   type OrganisationActions,
@@ -459,6 +460,7 @@ function PreviewRoute(): React.ReactNode {
   return (
     <>
       <OrganisationsRoute
+        Frame={PortalFrame}
         displayName="Pta"
         membershipAvailability="complete"
         retryMemberships={previewOpen}

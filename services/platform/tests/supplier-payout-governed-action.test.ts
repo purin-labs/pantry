@@ -23,11 +23,11 @@ import {
 } from "../src/data/supplier-payout-certification";
 import {
   parseOrganisationId,
-  parseUserId,
   parseControlSessionId,
   parsePersonId,
   type OrganisationId,
 } from "../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { payoutPlan } from "./supplier-payout-fixtures";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

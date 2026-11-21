@@ -2,7 +2,10 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
-import type { CaseSnapshot } from "./case/types";
+import type {
+  CaseAssignmentLifecycle,
+  CaseLifecycle,
+} from "@purin-labs/contracts";
 import {
   listRecentActiveCaseRegistryEntries,
   type ActiveActorRegistryEntry,
@@ -17,7 +20,7 @@ type ActiveCaseOperationsView = {
   readonly pinnedOrganisationId: OrganisationId;
   readonly purpose: string;
   readonly revision: number;
-  readonly lifecycle: CaseSnapshot["lifecycle"]["kind"];
+  readonly lifecycle: CaseLifecycle["kind"];
   readonly assignments: readonly {
     readonly assignmentId: string;
     readonly sessionId: string;
@@ -28,6 +31,16 @@ type ActiveCaseOperationsView = {
     readonly settled: number;
   };
 };
+
+/** The fields of a Case snapshot that the operations view reads. */
+type CaseOperationsSnapshot = Readonly<{
+  identity: Readonly<{ caseId: string }>;
+  purpose: string;
+  revision: number;
+  lifecycle: CaseLifecycle;
+  assignmentLifecycles: readonly CaseAssignmentLifecycle[];
+  outputs: readonly Readonly<{ kind: string }>[];
+}>;
 
 type CaseOperationsError = { readonly code: "case_operations_unavailable" };
 
@@ -98,7 +111,7 @@ async function readActiveCaseOperation(input: {
 }
 
 function mapActiveCase(
-  snapshot: CaseSnapshot,
+  snapshot: CaseOperationsSnapshot,
   pinnedOrganisationId: OrganisationId,
 ): ActiveCaseOperationsView {
   let pending = 0;

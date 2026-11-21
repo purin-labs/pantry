@@ -1,13 +1,12 @@
 import {
-  parseUserId,
   parseControlSessionId,
   parsePersonId,
   parseOrganisationId,
-  type UserId,
   type ControlSessionId,
   type PersonId,
   type OrganisationId,
 } from "./ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "./result";
 import type { NearEd25519PublicKey, SeamsIdentityId } from "./seams/nep413";
 import type { CanonicalAction } from "@purin-labs/contracts";

@@ -12,7 +12,7 @@ import {
   type IssuedControlSession,
 } from "../../src/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
-import { parseUserId } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";

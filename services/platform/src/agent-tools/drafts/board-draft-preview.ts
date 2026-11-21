@@ -53,7 +53,7 @@ type DraftCall = {
 
 type PreviewAuthority = Readonly<{
   agent: CollaborationAgent;
-  userId: import("../../ids").UserId;
+  userId: import("@purin-labs/control-api/ids").UserId;
 }>;
 
 export function createMenuBoardDraftPreview(

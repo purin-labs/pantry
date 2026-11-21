@@ -6,7 +6,8 @@ import {
   type ControlRole,
 } from "../data/control-plane";
 import type { Env } from "../env";
-import type { ControlSessionId, UserId } from "../ids";
+import type { ControlSessionId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 
 /**

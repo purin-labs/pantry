@@ -22,7 +22,8 @@ import type {
   OrganisationDatabaseSession,
 } from "../database-handles";
 import type { ProjectId } from "@purin-labs/control-api";
-import type { OrganisationId, UserId } from "../ids";
+import type { OrganisationId } from "../ids";
+import type { UserId } from "@purin-labs/control-api/ids";
 import type { InitialOrganisationPlacement } from "../placement";
 import type { RowGuard } from "./shared-rows/organisation-row";
 

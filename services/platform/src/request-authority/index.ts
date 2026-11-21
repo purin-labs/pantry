@@ -13,7 +13,6 @@ import type {
 import type { GrantSubject } from "../authorization/access-grants/types";
 import {
   parseConnectorId,
-  parseUserId,
   parseIntegrationAccountId,
   parsePersonId,
   parseOrganisationId,
@@ -24,6 +23,7 @@ import {
   type OrganisationId,
   type WorkspaceId,
 } from "../ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import type { Result } from "../result";
 import type { Variant } from "@purin-labs/type-utils";
 import {

@@ -1,4 +1,3 @@
-export { parseUserId, newUserId, type UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "./result";
 
 declare const organisationIdBrand: unique symbol;

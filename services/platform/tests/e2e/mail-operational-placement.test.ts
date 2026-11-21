@@ -43,10 +43,10 @@ import {
 } from "../../src/authorization/capability-catalogue";
 import {
   parseConnectorId,
-  parseUserId,
   type ConnectorId,
   type IntegrationAccountId,
 } from "../../src/ids";
+import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   installSlackActorFixture,
   ORGANISATION_ID,

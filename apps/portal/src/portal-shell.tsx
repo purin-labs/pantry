@@ -21,7 +21,7 @@ import {
   PageSkeleton,
 } from "./page-components";
 import {
-  OrganisationsLoading,
+  OrganisationListLoading,
   type OrganisationListItem,
   type WorkspaceSupportTools,
 } from "./pages/workspaces";
@@ -200,7 +200,11 @@ export function PortalLoading(props: {
       </PortalFrame>
     );
   }
-  return <OrganisationsLoading />;
+  return (
+    <PortalFrame identity={{ kind: "loading" }}>
+      <OrganisationListLoading />
+    </PortalFrame>
+  );
 }
 
 /** A page whose code is gone after a release reloads once into the new release. */

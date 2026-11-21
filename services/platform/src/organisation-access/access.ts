@@ -5,12 +5,8 @@ import type {
   RequestAuthority,
 } from "@purin-labs/contracts";
 import { assertNever, canonicalJson } from "@purin-labs/std";
-import {
-  parseControlSessionId,
-  parseUserId,
-  type OrganisationId,
-  type UserId,
-} from "../ids";
+import { parseControlSessionId, type OrganisationId } from "../ids";
+import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { resolveControlSessionById } from "../data/control-plane";
 import type { ActiveControlSession } from "../data/control-plane";
 import type { Env } from "../env";

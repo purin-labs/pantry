@@ -34,6 +34,10 @@
 // a port: the lower module defines an interface, and the higher one gives the
 // implementation. Then lower the baseline with --update.
 //
+// Each pair that stays has a written reason: `reasons` in the same file gives
+// the reason and the fix of each pair, and the check refuses a pair with no
+// reason or no fix. --update drops the reason of a pair that is gone.
+//
 // A file under `covers` with no module is refused: add a rule or a line to
 // scripts/layers.json. A tracked file outside `covers` needs a folder in
 // `packages` or a prefix in `placement`, so that each file has a place in the
@@ -45,6 +49,9 @@
 //   node scripts/check-layers.mjs --report              print the totals and each pair
 //   node scripts/check-layers.mjs --list "<a> -> <b>"   print the imports of one pair
 //   node scripts/check-layers.mjs --tables [--shared]   print the writer modules of each D1 table
+//   node scripts/check-layers.mjs --areas [module]      print the files, tables and public files of each module
+//   node scripts/check-layers.mjs --areas --write       write that list to docs/layers.md
+//   node scripts/check-layers.mjs --areas --check       fail when docs/layers.md is older than the map
 //   node scripts/check-layers.mjs --misfits [share] [links]
 //       print each file whose imports and importers are mostly in another
 //       module (default: a share of 0.6 and 4 links). Such a file has a wrong
@@ -73,6 +80,7 @@ if (
     "--list",
     "--tables",
     "--misfits",
+    "--areas",
   ].includes(mode)
 ) {
   console.error(`unknown argument ${mode}`);
@@ -295,7 +303,9 @@ for (const folder of homeless) {
 // `pnpm lint:lint-paths` checks that each placement key matches a file.
 
 // The writers of each D1 table. A write is INSERT INTO, REPLACE INTO, UPDATE
-// or DELETE FROM with the table name, in a file under `covers`.
+// or DELETE FROM with the table name, in a file under `covers`. The keywords
+// are in upper case, as in each SQL text of the repository, so a sentence
+// such as "Could not update project access" is not a write.
 const tables = new Map();
 for (const database of ["global", "regional"]) {
   const sql = readFileSync(
@@ -312,7 +322,7 @@ for (const database of ["global", "regional"]) {
   }
 }
 const WRITE =
-  /\b(?:insert\s+(?:or\s+\w+\s+)?into|replace\s+into|update|delete\s+from)\s+"?([a-z0-9_]+)"?/gi;
+  /\b(?:INSERT\s+(?:OR\s+\w+\s+)?INTO|REPLACE\s+INTO|UPDATE|DELETE\s+FROM)\s+"?([a-z0-9_]+)"?/g;
 for (const path of tracked) {
   const from = moduleOf(path);
   if (from === null) continue;
@@ -343,6 +353,95 @@ for (const name of Object.keys(targets.tables)) {
   }
 }
 
+const LAYERS_PAGE = "docs/layers.md";
+const LAYERS_PAGE_HEAD = `# The modules of the three layers
+
+This page is made by \`node scripts/check-layers.mjs --areas --write\` from
+\`scripts/layers.json\` and the tracked files. Do not edit it. \`pnpm lint\`
+fails when the page is older than the map or the files: after a new file, a
+new table or a changed line of the map, write the page again. Each section is
+one module, bottom-up: the foundation in its order, the areas, the surfaces
+and the Workers ([Refactor 17](refactor-17.md)). "Files" gives the count of
+the source files of the module and the folders that hold them, with the count
+in each folder. "Packages" gives its workspace packages. "Tables" gives the D1
+tables that the module owns; only the owner writes a table. "Public files"
+gives the contract of an area: the files and folders that another area may
+import. A module with no line for one of these has none.
+
+`;
+
+/** The files, packages, tables and public files of each module. */
+function moduleList(only) {
+  const modules = new Set([
+    ...Object.values(targets.rules),
+    ...Object.values(targets.files),
+    ...Object.values(targets.packages),
+    ...Object.values(targets.tables),
+  ]);
+  // The layers bottom-up, the foundation in its order, then by name.
+  const order = (a, b) =>
+    layerRank.get(layerOf(a)) - layerRank.get(layerOf(b)) ||
+    (orderRank.get(a) ?? 0) - (orderRank.get(b) ?? 0) ||
+    (a < b ? -1 : 1);
+  const selected = [...modules]
+    .filter((module) => layerRank.has(layerOf(module)))
+    .filter(
+      (module) =>
+        only === null || module === only || module === `areas/${only}`,
+    )
+    .sort(order);
+  const sections = [];
+  for (const module of selected) {
+    const lines = [`## ${module}`, ""];
+    const files = tracked.filter((path) => moduleOf(path) === module);
+    if (files.length > 0) {
+      const folders = new Map();
+      for (const path of files) {
+        const folder = `${posix.dirname(path)}/`;
+        folders.set(folder, (folders.get(folder) ?? 0) + 1);
+      }
+      lines.push(`- Files: ${files.length} in ${folders.size} folders`);
+      for (const [folder, count] of [...folders].sort(([a], [b]) =>
+        a < b ? -1 : 1,
+      ))
+        lines.push(`  - \`${folder}\` ${count}`);
+    }
+    const packages = Object.entries(targets.packages)
+      .filter(([, owner]) => owner === module)
+      .map(([folder]) => folder)
+      .sort();
+    if (packages.length > 0)
+      lines.push(
+        `- Packages: ${packages.map((folder) => `\`${folder}\``).join(", ")}`,
+      );
+    const owned = Object.entries(targets.tables)
+      .filter(([, owner]) => owner === module)
+      .map(([name]) => name)
+      .sort();
+    if (owned.length > 0)
+      lines.push(
+        `- Tables (${owned.length}): ${owned.map((name) => `\`${name}\``).join(", ")}`,
+      );
+    const contract = (targets.contracts ?? [])
+      .filter((entry) =>
+        targets.packages[entry] !== undefined
+          ? targets.packages[entry] === module
+          : entry.endsWith("/")
+            ? tracked.some(
+                (path) => path.startsWith(entry) && moduleOf(path) === module,
+              )
+            : moduleOf(entry) === module,
+      )
+      .sort();
+    if (contract.length > 0)
+      lines.push(
+        `- Public files: ${contract.map((entry) => `\`${entry}\``).join(", ")}`,
+      );
+    sections.push(lines.join("\n"));
+  }
+  return sections.length === 0 ? "" : `${sections.join("\n\n")}\n`;
+}
+
 function totals(entries) {
   const sum = { upward: 0, areas: 0, order: 0, table: 0 };
   for (const { kind, count } of entries) sum[kind] += count;
@@ -370,6 +469,32 @@ if (mode === "--report") {
   }
   if (faults.length > 0) console.error(faults.join("\n"));
   process.exit(faults.length === 0 ? 0 : 1);
+}
+
+if (mode === "--areas") {
+  const option = process.argv[3];
+  const text = moduleList(
+    option === undefined || option.startsWith("--") ? null : option,
+  );
+  if (option === "--write" || option === "--check") {
+    const page = `${LAYERS_PAGE_HEAD}${text}`;
+    const path = join(root, LAYERS_PAGE);
+    if (option === "--write") {
+      writeFileSync(path, page);
+      console.log(`wrote ${LAYERS_PAGE}`);
+      process.exit(0);
+    }
+    if (!existsSync(path) || readFileSync(path, "utf8") !== page) {
+      console.error(
+        `${LAYERS_PAGE} is older than the map. Run node scripts/check-layers.mjs --areas --write.`,
+      );
+      process.exit(1);
+    }
+    console.log(`${LAYERS_PAGE} lists the map of today`);
+    process.exit(0);
+  }
+  process.stdout.write(text);
+  process.exit(text === "" ? 2 : 0);
 }
 
 if (mode === "--tables") {
@@ -433,6 +558,12 @@ if (faults.length > 0) {
   process.exit(1);
 }
 
+const stored = existsSync(join(root, BASELINE))
+  ? JSON.parse(readFileSync(join(root, BASELINE), "utf8"))
+  : { crossings: {}, reasons: {} };
+/** pair -> { reason, fix }: why a crossing stays, and what removes it. */
+const reasons = stored.reasons ?? {};
+
 function writeBaseline(crossings) {
   const sum = totals(
     Object.entries(crossings).map(([pair, count]) => ({
@@ -440,10 +571,31 @@ function writeBaseline(crossings) {
       count,
     })),
   );
+  const kept = Object.fromEntries(
+    Object.keys(crossings)
+      .filter((pair) => reasons[pair] !== undefined)
+      .map((pair) => [pair, reasons[pair]]),
+  );
   writeFileSync(
     join(root, BASELINE),
-    `${JSON.stringify({ totals: sum, crossings }, null, 2)}\n`,
+    `${JSON.stringify({ totals: sum, crossings, reasons: kept }, null, 2)}\n`,
   );
+}
+
+/** The pairs of `crossings` with no reason or no fix. */
+function unexplained(crossings) {
+  return Object.keys(crossings)
+    .filter(
+      (pair) =>
+        typeof reasons[pair]?.reason !== "string" ||
+        reasons[pair].reason.trim() === "" ||
+        typeof reasons[pair]?.fix !== "string" ||
+        reasons[pair].fix.trim() === "",
+    )
+    .map(
+      (pair) =>
+        `${pair}: no written reason. Add { "reason": "...", "fix": "..." } for it under reasons in ${BASELINE}.`,
+    );
 }
 
 if (mode === "--init") {
@@ -452,9 +604,7 @@ if (mode === "--init") {
   process.exit(0);
 }
 
-const baseline = JSON.parse(
-  readFileSync(join(root, BASELINE), "utf8"),
-).crossings;
+const baseline = stored.crossings;
 const grown = [];
 for (const [pair, count] of Object.entries(current)) {
   const allowed = baseline[pair];
@@ -477,6 +627,11 @@ if (mode === "--update") {
   }
   writeBaseline(current);
   console.log(`wrote ${BASELINE}: ${Object.keys(current).length} pairs`);
+  const missing = unexplained(current);
+  if (missing.length > 0) {
+    console.error(missing.join("\n"));
+    process.exit(1);
+  }
   process.exit(0);
 }
 
@@ -485,6 +640,20 @@ if (grown.length > 0) {
   console.error(
     "An import may only go down the layers. Use a port: the lower module defines an interface, and the higher one gives the implementation. Only the owner of a table writes it: call a function of the owner. See docs/refactor-17.md.",
   );
+  process.exit(1);
+}
+const stale = Object.keys(reasons).filter(
+  (pair) => current[pair] === undefined,
+);
+const missing = [
+  ...unexplained(current),
+  ...stale.map(
+    (pair) =>
+      `${pair}: a reason for a crossing that is gone. Run node scripts/check-layers.mjs --update.`,
+  ),
+];
+if (missing.length > 0) {
+  console.error(missing.join("\n"));
   process.exit(1);
 }
 const lower = Object.entries(baseline).filter(
