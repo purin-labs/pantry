@@ -1,10 +1,7 @@
 import { readConversationExecution } from "../chat/execution";
 import { readCommerceApproval, readMeta } from "./case/context-source";
 import { parseLifecycle } from "./case/record-parsers";
-import { traceWarn } from "../observability";
-import { errorMessage } from "@purin-labs/std";
-import { newRequestId } from "../ids";
-import { nextAlarmAt, type AlarmReconciler } from "./lifecycle/actor-alarm";
+import type { AlarmReconciler } from "./lifecycle/actor-alarm";
 import { nextUndeliveredOutputAt } from "./case/outputs";
 import { ASSIGNMENT_ABANDON_AFTER_MS } from "./case/assignment.machine";
 import { activeAssignmentTimes } from "./case/lifecycle";
@@ -154,26 +151,4 @@ function openCommerceApprovals(
         requestedAt: typeof row.requestedAt === "number" ? row.requestedAt : 0,
       });
   return open;
-}
-
-/**
- * When a Case that wakes must run its alarm, or null. A row from a release
- * before its alarm step has no wakeup, so the Case sets one by its earliest
- * due step when it wakes; an old assignment is due at once. A read that
- * fails sets no wakeup, so the Case still wakes.
- */
-export function caseWakeAlarmAt(sql: SqlStorage, now: number): number | null {
-  try {
-    const due = [
-      nextAlarmAt(caseAlarmReconcilers(sql), now),
-      oldestAssignmentAbandonAt(sql),
-    ].filter((at) => at !== null);
-    return due.length === 0 ? null : Math.max(now, Math.min(...due));
-  } catch (error) {
-    traceWarn("case.wake_alarm_unread", {
-      requestId: newRequestId(),
-      error: errorMessage(error).slice(0, 300),
-    });
-    return null;
-  }
 }

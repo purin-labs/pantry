@@ -89,13 +89,11 @@ import { sourceReaderForAuthority } from "../../policy/information-flow/source-r
 import { errorMessage, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import { PlacedActor } from "../lifecycle/placed-actor";
 import {
-  armAlarmBy,
   rearmActorAlarm,
   runAlarmStepsTogether,
 } from "../lifecycle/actor-alarm";
 import {
   caseAlarmReconcilers,
-  caseWakeAlarmAt,
   commerceApprovalsToRead,
 } from "../case-alarm";
 import { ASSIGNMENT_ABANDON_AFTER_MS } from "./assignment.machine";
@@ -263,13 +261,6 @@ export abstract class CaseActor
         duration_ms: Date.now() - startedAt,
       }),
     );
-    // Only new work sets the wakeup of its alarm step. A row from a release
-    // before that step has none, so the Case sets it when it wakes.
-    const wakeAt = caseWakeAlarmAt(this.ctx.storage.sql, Date.now());
-    if (wakeAt !== null)
-      void this.ctx.blockConcurrencyWhile(() =>
-        armAlarmBy(this.ctx.storage, wakeAt),
-      );
   }
 
   // Internal RPCs; operator authorization belongs to the control-plane caller.

@@ -286,40 +286,6 @@ export async function assignmentStates(
   );
 }
 
-/** Older than the 30-minute abandon time. */
-const OLD_START_AGE_MS = 31 * 60_000;
-
-/**
- * What a Case of the older release holds: no wakeup, no assignment time, and
- * a start older than the abandon time.
- */
-export async function leaveOldAssignment(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await state.storage.deleteAlarm();
-  const rows = state.storage.sql
-    .exec<{ assignment_id: string; lifecycle_json: string }>(
-      "SELECT assignment_id, lifecycle_json FROM case_assignment",
-    )
-    .toArray();
-  for (const row of rows) {
-    const lifecycle: unknown = JSON.parse(row.lifecycle_json);
-    if (!isRecord(lifecycle) || !isRecord(lifecycle.start))
-      throw new Error("case_assignment_start_missing");
-    const acceptedAt = Number(lifecycle.start.acceptedAt) - OLD_START_AGE_MS;
-    lifecycle.start.acceptedAt =
-      typeof lifecycle.start.acceptedAt === "string"
-        ? String(acceptedAt)
-        : acceptedAt;
-    state.storage.sql.exec(
-      "UPDATE case_assignment SET lifecycle_json = ?, assigned_at = NULL WHERE assignment_id = ?",
-      JSON.stringify(lifecycle),
-      row.assignment_id,
-    );
-  }
-}
-
 /** ChatGPT's answer to one turn, after the journey's next step for it. */
 export async function answerTurn(
   turns: (() => Promise<void>)[],

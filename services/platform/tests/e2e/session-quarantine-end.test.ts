@@ -1,10 +1,7 @@
-import { env, exports } from "cloudflare:workers";
-import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { isRecord } from "@purin-labs/std";
 
-import { failSessionTurnStream } from "../../src/actors/agent-session-turn-stream";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
 import { OrganisationDO } from "../../src/actors/organisation";
@@ -15,7 +12,6 @@ import {
   assignmentStates,
   caseOf,
   dispatchCommand,
-  leaveOldAssignment,
   sessionOf,
 } from "./chat-journey-support";
 import {
@@ -32,33 +28,28 @@ import {
 } from "./slack-journey-support";
 
 /**
- * An old refused Code Mode settlement settles from the Organisation's record,
- * and its quarantine ends (Refactor 15).
+ * A refused Code Mode settlement settles from the Organisation's record, and
+ * its quarantine ends (Refactor 15).
  *
- * The census of 2026-11-09 found three Sessions quarantined since the
- * Organisation refused their settlement while a call of the script was in
- * flight. Two commands run a script each, and a late call of each execution
- * is in flight when the Organisation answers its settlement, so each Session
- * quarantines as in production. The first reservation then passes its lease:
- * the Organisation's record shows that the settlement never happened. The
- * second reservation moved to the lease of the next runtime generation, so no
- * record decides that Session's receipt. A day later the Sessions wake. The
- * first settlement settles, the Session ends and its Case abandons the
- * assignment. The second Session stays quarantined, with its assignment.
+ * Two commands run a script each, and a late call of each execution is in
+ * flight when the Organisation answers its settlement, so each Session
+ * quarantines, its turn fails and its Case settles the assignment as
+ * failed. The first reservation then passes its lease: the Organisation's
+ * record shows that the settlement never happened. The second reservation
+ * moved to the lease of the next runtime generation, so no record decides
+ * that Session's receipt. Two days pass, the idle Sessions stop, and they
+ * wake. The first settlement settles and its quarantine ends. The second
+ * Session stays quarantined.
  */
 it(
-  "settles an old refused Code Mode settlement from the Organisation's record",
+  "settles a refused Code Mode settlement from the Organisation's record",
   refusedSettlementJourney,
   180_000,
 );
 
 const INSTRUCTION = "Count the open supplier orders.";
 
-/** Each model request waits while the phase is `held`. */
-type Model = {
-  readonly requests: unknown[];
-  phase: "held" | "released";
-};
+type Model = { readonly requests: unknown[] };
 
 const SETTLED_KEY = "session_quarantine_settlement_expired";
 const UNDECIDED_KEY = "session_quarantine_settlement_moved";
@@ -72,10 +63,7 @@ type SettleGate = { readonly calls: string[]; held: Promise<void> };
 
 async function refusedSettlementJourney(test: TestContext): Promise<void> {
   const { session } = await preparePortalChatJourney();
-  const model: Model = { requests: [], phase: "held" };
-  test.onTestFinished(() => {
-    model.phase = "released";
-  });
+  const model: Model = { requests: [] };
   network.use(
     http.post(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -113,54 +101,36 @@ async function refusedSettlementJourney(test: TestContext): Promise<void> {
     now: Date.now(),
   });
   expect(moved.ok).toBe(true);
-  expect(await staleAssignmentCount()).toBe(2);
   for (const sessionId of [settled.sessionId, undecided.sessionId])
     expect(await unknownEffects(sessionId)).toEqual(REFUSED_SETTLEMENT);
 
-  // The first reservation passes its lease, and a day passes for both.
+  // The first reservation passes its lease, and two days pass for both
+  // Sessions. Their processes end, as idle Actors do, and they wake.
   await scheduler.wait(Math.max(0, settled.leaseExpiresAt - Date.now() + 500));
   for (const sessionId of [settled.sessionId, undecided.sessionId]) {
     const actor = await sessionOf(sessionId);
-    await runInDurableObject(actor, ageRefusedSettlement);
-    await runInDurableObject(actor, loseProcess).catch(ignoreLostProcess);
-  }
-  for (const caseId of [settled.caseId, undecided.caseId])
-    await runInDurableObject(await caseOf(caseId), loseProcess).catch(
-      ignoreLostProcess,
-    );
-
-  // The Sessions wake, and then the first Case abandons its assignment.
-  for (const sessionId of [settled.sessionId, undecided.sessionId])
+    await runInDurableObject(actor, letTwoDaysPass);
+    await runInDurableObject(actor, endProcess).catch(ignoreEndedProcess);
     await (await sessionOf(sessionId)).ping();
+  }
+  const sessions = {
+    settled: await sessionOf(settled.sessionId),
+    undecided: await sessionOf(undecided.sessionId),
+  };
   await expect
-    .poll(
-      async () => {
-        const woken = await caseOf(settled.caseId);
-        await runDurableObjectAlarm(woken);
-        return assignmentStates(woken);
-      },
-      { timeout: 20_000, interval: 250 },
-    )
-    .toEqual(["settled:abandoned"]);
-  const keptCase = await caseOf(undecided.caseId);
-  await expect
-    .poll(() => runDurableObjectAlarm(keptCase), {
-      timeout: 10_000,
-      interval: 250,
-    })
-    .toBe(true);
-  expect(await assignmentStates(keptCase)).toEqual(["running"]);
+    .poll(() => readLifecycleKind(sessions.settled), { timeout: 20_000 })
+    .not.toBe("quarantined");
+  expect(await readLifecycleKind(sessions.undecided)).toBe("quarantined");
   expect(await unknownEffects(settled.sessionId)).toBeUndefined();
   expect(await unknownEffects(undecided.sessionId)).toEqual({
     "code_mode_execution_settlement.v1:code_mode_capability_calls_in_flight:lt_7d": 1,
   });
-  expect(await staleAssignmentCount()).toBe(1);
 
   Object.assign(test.task.meta, {
     refusedSettlement: {
-      settledAssignment: "settled:abandoned",
-      undecidedAssignment: "running",
-      staleAfter: 1,
+      settledSession: await readLifecycleKind(sessions.settled),
+      undecidedSession: "quarantined",
+      assignments: [settled.assignments, undecided.assignments],
     },
   });
 }
@@ -168,7 +138,8 @@ async function refusedSettlementJourney(test: TestContext): Promise<void> {
 /**
  * Runs a command whose script ends while a late call of its execution is in
  * flight, so the Organisation refuses the settlement and the Session
- * quarantines. Its Case keeps an old `running` assignment with no wakeup.
+ * quarantines. The turn then fails, and its Case settles the assignment as
+ * failed.
  */
 async function refuseSettlement(
   session: IssuedControlSession,
@@ -179,7 +150,8 @@ async function refuseSettlement(
   const released = Promise.withResolvers<void>();
   gate.held = released.promise;
   const before = gate.calls.length;
-  void dispatchCommand(session, key, INSTRUCTION).catch(ignoreLostProcess);
+  // The command answers only after the turn; its result is the failed turn.
+  void dispatchCommand(session, key, INSTRUCTION).catch(ignoreAnswer);
   await expect
     .poll(() => gate.calls.length, { timeout: 30_000 })
     .toBe(before + 1);
@@ -211,17 +183,14 @@ async function refuseSettlement(
   await expect
     .poll(() => readLifecycleKind(sessionActor), { timeout: 20_000 })
     .toBe("quarantined");
-  // The turn's next model request waits, and the process is lost under it.
-  await runInDurableObject(sessionActor, endTurnAsOlderRelease);
-  await runInDurableObject(sessionActor, loseProcess).catch(ignoreLostProcess);
   const caseActor = await caseOf(identities.value.caseId);
   await expect
-    .poll(() => assignmentStates(caseActor), { timeout: 10_000 })
-    .toEqual(["running"]);
-  await runInDurableObject(caseActor, leaveOldAssignment);
+    .poll(() => assignmentStates(caseActor), { timeout: 20_000 })
+    .toEqual(["settled:failed"]);
+  expect(await readLifecycleKind(sessionActor)).toBe("quarantined");
   return {
     sessionId: identities.value.sessionId,
-    caseId: identities.value.caseId,
+    assignments: await assignmentStates(caseActor),
     executionId,
     admissionDigest: String(reservation.admission_digest),
     binding,
@@ -229,7 +198,7 @@ async function refuseSettlement(
   };
 }
 
-/** The model runs one script. Its request after the result waits. */
+/** The model runs one script, then answers. */
 async function answerWithScript(
   model: Model,
   { request }: Parameters<HttpResponseResolver>[0],
@@ -238,7 +207,6 @@ async function answerWithScript(
   const id = `refused_settlement_${model.requests.length}`;
   if (!JSON.stringify(model.requests.at(-1)).includes('"role":"tool"'))
     return openRouterToolCall("codemode", { code: 'text("counted");' }, id);
-  while (model.phase === "held") await scheduler.wait(5);
   return openRouterText("Counted.", id);
 }
 
@@ -269,67 +237,23 @@ function holdSettlements(
   test.onTestFinished(() => void define(original));
 }
 
-/**
- * The older release's recovery of the interrupted turn: its stream fails and
- * its lease goes, as `recoverInterruptedSessionInTransaction` does. That
- * recovery does nothing for a Session that is quarantined already. The older
- * release left the Session with no wakeup.
- */
-async function endTurnAsOlderRelease(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await state.storage.deleteAlarm();
-  const sql = state.storage.sql;
-  state.storage.transactionSync(() => {
-    for (const { turn_id } of sql
-      .exec<{ turn_id: string }>(
-        "SELECT turn_id FROM session_turn_stream WHERE state = 'running'",
-      )
-      .toArray()) {
-      const failed = failSessionTurnStream(
-        sql,
-        turn_id,
-        "session_interrupted",
-        Date.now(),
-      );
-      if (!failed.ok) throw new Error(failed.error.code);
-    }
-    sql.exec("DELETE FROM session_harness_lease");
-  });
-}
-
-/** Two days pass for the refused settlement, with no wakeup. */
-async function ageRefusedSettlement(
-  _actor: unknown,
-  state: DurableObjectState,
-): Promise<void> {
-  await state.storage.deleteAlarm();
+/** Two days pass for the refused settlement and the lease of the failed turn. */
+function letTwoDaysPass(_actor: unknown, state: DurableObjectState): void {
   state.storage.sql.exec(
     "UPDATE actor_outbox SET updated_at = updated_at - ? WHERE state_kind = 'indeterminate'",
     2 * DAY_MS,
   );
+  state.storage.sql.exec(
+    "UPDATE session_harness_lease SET issued_at = issued_at - ?1, expires_at = expires_at - ?1",
+    2 * DAY_MS,
+  );
 }
 
-/** The old active assignments that the admin census route counts. */
-async function staleAssignmentCount(): Promise<number> {
-  const response = await exports.default.fetch(
-    new Request("https://localhost/v1/admin/machine-census", {
-      headers: { authorization: `Bearer ${env.ORGANISATION_ADMIN_TOKEN}` },
-    }),
-  );
-  expect(response.status).toBe(200);
-  const body: unknown = await response.json();
-  const machines =
-    isRecord(body) && isRecord(body.machines) ? body.machines : {};
-  const stale = machines.case_assignment_stale;
-  return isRecord(stale)
-    ? Object.values(stale).reduce<number>(
-        (sum, count) => sum + (typeof count === "number" ? count : 0),
-        0,
-      )
-    : 0;
+function endProcess(_actor: unknown, state: DurableObjectState): void {
+  state.abort("Quarantine journey: the Actor's process ends");
 }
+
+function ignoreEndedProcess(): void {}
 
 /** The Session census entry of effects whose result nobody knows. */
 async function unknownEffects(
@@ -341,8 +265,4 @@ async function unknownEffects(
   )?.states;
 }
 
-function loseProcess(_actor: unknown, state: DurableObjectState): void {
-  state.abort("Quarantine journey: the Actor's process is lost");
-}
-
-function ignoreLostProcess(): void {}
+function ignoreAnswer(): void {}

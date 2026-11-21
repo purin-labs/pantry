@@ -544,15 +544,14 @@ export function abandonCaseAssignment(
 /** The start that an abandon move writes for an assignment that never began. */
 export const ABANDONED_START_PREFIX = "start_abandoned_";
 
-/** When the Case made the assignment; 0 for a row from before version 2. */
+/** When the Case made the assignment. */
 function readAssignedAt(sql: SqlStorage, assignmentId: string): number {
-  const row = sql
-    .exec<{ assigned_at: number | null }>(
+  return sql
+    .exec<{ assigned_at: number }>(
       "SELECT assigned_at FROM case_assignment WHERE assignment_id = ?",
       assignmentId,
     )
-    .toArray()[0];
-  return row?.assigned_at ?? 0;
+    .one().assigned_at;
 }
 
 /** When each active assignment began, or was made if it has not begun. */
@@ -560,7 +559,7 @@ export function activeAssignmentTimes(sql: SqlStorage): readonly number[] {
   return sql
     .exec<{
       started_at: number | null;
-      assigned_at: number | null;
+      assigned_at: number;
     }>(
       `SELECT json_extract(lifecycle_json, '$.start.acceptedAt') AS started_at,
               assigned_at
@@ -569,7 +568,7 @@ export function activeAssignmentTimes(sql: SqlStorage): readonly number[] {
     )
     .toArray()
     .map(function assignmentTime(row) {
-      return row.started_at ?? row.assigned_at ?? 0;
+      return row.started_at ?? row.assigned_at;
     });
 }
 
