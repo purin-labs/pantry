@@ -431,17 +431,37 @@ with a literal table name. These kinds of crossing exist today, and the check do
 count them. Stage B moves files by this map, so each kind needs a decision first: a
 new count with a ratchet, or a written reason to accept it.
 
-| Kind | Today | Example |
-| --- | --- | --- |
-| A `declare module` merge puts a Worker class into `Env`, and lower code calls its methods | 16 merges; 171 methods of `OrganisationDO` and `ConnectorDO` called from below | `actors/harness-follow-up.ts` (foundation) calls `scheduleSlackFollowUp` |
-| Area or surface code in a foundation module, because it imports nothing above | About 40 files | `mail/gmail-adapter.ts` in `foundation/connections` |
-| A read of a D1 table of another module (only writes have a rule) | 91 reads | `access-control/decision-explanation.ts` reads `mailbox_ingress_policy` |
-| A surface imports an area file that is not public | 250 of 294 imports | `actors/connector/email-work.ts` imports `mail-inbox/execution.ts` |
-| Each area package passes as a contract; `contracts` lists one | 78 of 124 imports | `commerce-client` from `areas/kitchen` |
-| Logic in the Worker module | 24 files, 9,800 lines | `readBakeBoard` in `actors/organisation/bake-kitchen.ts` |
-| The Shopify rule of step A2.5 has no check | 5 of 7 importers | `integration-gateway.ts` |
-| A table name in a template string, and each Actor SQLite table | 6 writes | `data/organisation-purge.ts` |
-| A new Portal file gets `surfaces/portal` by the folder rule and is never refused | — | — |
+| Kind | Today | Example | Count in `lint:layer-debts` |
+| --- | --- | --- | --- |
+| A `declare module` merge puts a Worker class into `Env`, and lower code calls its methods | 16 merges; 171 methods of `OrganisationDO` and `ConnectorDO` called from below | `actors/harness-follow-up.ts` (foundation) calls `scheduleSlackFollowUp` | `env-merge`: 16 merges; 83 methods, counted by name |
+| Area or surface code in a foundation module, because it imports nothing above | About 40 files | `mail/gmail-adapter.ts` in `foundation/connections` | `foundation-misfit`: 14 files by their links, 45 files by a word of their path |
+| A read of a D1 table of another module (only writes have a rule) | 91 reads | `access-control/decision-explanation.ts` reads `mailbox_ingress_policy` | `table-read`: 91 reads |
+| A surface imports an area file that is not public | 250 of 294 imports | `actors/connector/email-work.ts` imports `mail-inbox/execution.ts` | `surface-nonpublic`: 249 imports |
+| Each area package passes as a contract; `contracts` lists one | 78 of 124 imports | `commerce-client` from `areas/kitchen` | `area-package`: 78 imports |
+| Logic in the Worker module | 24 files, 9,800 lines | `readBakeBoard` in `actors/organisation/bake-kitchen.ts` | `worker-logic`: 10 files, 3,778 lines |
+| The Shopify rule of step A2.5 has no check | 5 of 7 importers | `integration-gateway.ts` | `shopify-rule`: 10 imports in 6 files |
+| A table name in a template string, and each Actor SQLite table | 6 writes | `data/organisation-purge.ts` | `interpolated-table`: 17 writes (8 to D1, 9 to Actor SQLite) |
+| A new Portal file gets `surfaces/portal` by the folder rule and is never refused | — | — | `portal-default`: 26 files |
+
+`pnpm lint:layer-debts` (`scripts/check-layer-debts.mjs`, a part of `pnpm lint:source`)
+holds each kind since 2026-11-22: a count in `scripts/layer-debts-ratchet.json` may not
+grow, and the file gives the reason and the fix of each kind. The check fixes no
+crossing. How the last column counts:
+
+- `env-merge`: the check reads no types, so a method counts by its name. It counts
+  when one class file declares it, no other file declares a member with that name,
+  and a module that may not import the class calls it. A method with an RPC interface
+  in its own module is therefore not in the 83.
+- `worker-logic`: a file of the Worker module that is not the entry (a default
+  export), not a class shell (a class) and not wiring (no `if`, `for`, `while` or
+  `switch`).
+- `shopify-rule`: each import of the module from outside it, apart from the two
+  registration lines of the Worker.
+- `interpolated-table`: no rule tells a D1 write from an Actor SQLite write, so the
+  count holds both.
+- Each count is by module or by module pair, and the check reads the files only
+  through `scripts/layers.json`. A move of files into a root folder or a workspace
+  package therefore keeps each count.
 
 ### Stage B: open since the Plan 93 cutover (2026-11-22)
 
