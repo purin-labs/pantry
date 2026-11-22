@@ -5,7 +5,8 @@ and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
 S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
-final. Stage B waits for the Plan 93 cutover, as the owner decided on 2026-11-21. On 2026-11-22 the owner asked to finish the
+final. The Plan 93 cutover ended on 2026-11-22, so Stage B is open; its first step is
+the trial of D1. On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
 and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
 lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
@@ -421,11 +422,31 @@ code before its plans move to `docs/history/`) and S3 (`AGENTS.md` under 250 lin
 plan index and the names table move out) start when Plan 91 phase 4 (the domain and
 the provider consoles) is done. The owner decided this on 2026-11-21.
 
-### Stage B: waits for the Plan 93 cutover
+### The layer check: what it does not count
 
-Stage B starts after the cutover of [Plan 93](plan-93-clean-cutover.md). The session
-"Plan 93: clean cutover" landed its step 2 (the codemod) on `dev` on 2026-11-22 and
-builds the new stack next. Then, in this order:
+A review on 2026-11-22 (four readers, each finding confirmed in the code) found that
+"0 crossings" is true for what `scripts/check-layers.mjs` counts: the imports between
+files of the two covered folders, the `package.json` dependencies and the D1 writes
+with a literal table name. These kinds of crossing exist today, and the check does not
+count them. Stage B moves files by this map, so each kind needs a decision first: a
+new count with a ratchet, or a written reason to accept it.
+
+| Kind | Today | Example |
+| --- | --- | --- |
+| A `declare module` merge puts a Worker class into `Env`, and lower code calls its methods | 16 merges; 171 methods of `OrganisationDO` and `ConnectorDO` called from below | `actors/harness-follow-up.ts` (foundation) calls `scheduleSlackFollowUp` |
+| Area or surface code in a foundation module, because it imports nothing above | About 40 files | `mail/gmail-adapter.ts` in `foundation/connections` |
+| A read of a D1 table of another module (only writes have a rule) | 91 reads | `access-control/decision-explanation.ts` reads `mailbox_ingress_policy` |
+| A surface imports an area file that is not public | 250 of 294 imports | `actors/connector/email-work.ts` imports `mail-inbox/execution.ts` |
+| Each area package passes as a contract; `contracts` lists one | 78 of 124 imports | `commerce-client` from `areas/kitchen` |
+| Logic in the Worker module | 24 files, 9,800 lines | `readBakeBoard` in `actors/organisation/bake-kitchen.ts` |
+| The Shopify rule of step A2.5 has no check | 5 of 7 importers | `integration-gateway.ts` |
+| A table name in a template string, and each Actor SQLite table | 6 writes | `data/organisation-purge.ts` |
+| A new Portal file gets `surfaces/portal` by the folder rule and is never refused | — | — |
+
+### Stage B: open since the Plan 93 cutover (2026-11-22)
+
+[Plan 93](plan-93-clean-cutover.md) is done: `pantry.purin.io` serves production and
+the old stack is deleted. Stage B starts with step 1. In this order:
 
 1. The trial of D1: one foundation module and one area as packages, with the `tsrs`
    time, the Worker start and the Portal build.
