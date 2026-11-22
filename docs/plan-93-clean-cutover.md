@@ -939,9 +939,28 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
     `router-ab` and `outlayer1`, the KV `seams-voice-intents-x-cache` and
     the custom domain `api.wallet.seams.sh`. The wallet test groups of
     step 7 were already gone.
+- **Release at 15:32 UTC** from dev `c2348c16`: `pantry` version
+  `fc7b7dcd`, `pantry-slack-ingress` `edca6262`, and new versions of the
+  sandbox, the two exit Workers and the 1Password store Worker. It carries
+  the owner's Gmail model consent at Turn on with Purin's review list in
+  code (Plan 83 D7; Gemini 4 Hydrogen and Kimi K3 through OpenRouter with
+  zero data retention), the fix that gives an email's in-progress place
+  back when its reply turn ends (`af427e0c`), the local Google settings
+  and the Purin cat icon. `gmail-model-consent-d1-patch.sql` ran on
+  `pantry-organisation-apac` before the deploy (the table had no rows).
+  The live version at the start was the Plan 91 upload of 14:47 UTC
+  (`dd9c0bca`), which dev contains. Before the release, the type check,
+  the static lints, the patch lint, the Portal build and the journeys
+  `mailbox-setup`, `mailbox-emails-in-progress`, `mail-inbox` and
+  `new-organisation-first-chat` passed (40 passed, 2 skipped), and one
+  prompt per reviewed model answered with the production OpenRouter key
+  and the new provider rules. After it, all hosts answer, the schema check
+  passes and the live Portal has the consent text. No signed-in journey
+  ran.
 - **Still open:** a test order on `shop.purin.io` (the café menu was
-  closed at midnight); the Gmail model gate (a session builds owner consent)
-  and the email Case that never closes (Plan 83); the zone `seams.tech`,
+  closed at midnight); the owner's first Turn on of the Gmail mailbox with
+  the consent checkbox; the OpenRouter "Input & Output Logging" setting of
+  the Purin account, which the API cannot read; the zone `seams.tech`,
   which Cloudflare refuses to remove because this account holds its
   Cloudflare Registrar registration, expired on 11 October 2026 and now in
   the redemption period (restore: $66.00 plus $49.20 for one year); the
