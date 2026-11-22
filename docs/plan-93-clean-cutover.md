@@ -801,6 +801,49 @@ the Kitchen area (the pins, the 45 `BAKERY_APPLIANCE_BUILDS` entries, the R2
 manifest and the physics lints), not part of the cutover; no saved run can
 name an old bundle now.
 
+**The old Kitchen physics bundles (22 November 2026).** One commit keeps the
+pins and each bundle that a test, a journey or a fixture names, and deletes
+the rest. A journey that names an old bundle proves that a save resumes on
+the bundle that made it; the next engine release needs that proof, so those
+bundles stay.
+
+- Kept, 6 runtime and 10 execution bundles: the pin (runtime `1b418dcc…`,
+  execution `55d9c125…`); the fixture `bakery-persistent-failure` (runtime
+  `64537e66…`, execution `aad23dca…`); the journey `oven-financier` and
+  `bakery-sample.test.ts` (runtime `1fa6f270…`, executions `0dfc4857…` and
+  `b6abbf69…`); the four old saves of the journey `engine-cell-browser`
+  (runtime `dc5c58e2…`, executions `bed7d40d…`, `c5cba9f3…`, `f6c717fd…`
+  and `5c62de98…`); in R2, release A of the journey `file-execution`
+  (runtime `c9f6e8cc…`, execution `8ecd88c1…`) and the old bundle of the
+  journey `workflow-branch` (runtime `993537c2…`, execution `8f9d7129…`).
+- Deleted in git (61 MB): the runtime bundles `31da6f43…` and `419afa85…`,
+  their execution bundles `f18c579b…`, `f7c345c8…` and `b4355d9d…`, and the
+  visual `9be9a2a2….glb`, which only deleted appliance builds named.
+- Deleted from `repo-binaries.json` and `.gitignore`: 20 runtime and 67
+  execution folders (314 files, 603 MB).
+- `BAKERY_APPLIANCE_BUILDS` keeps 8 of its 45 entries: the espresso machines
+  of the runtime bundles `1b418dcc…`, `c9f6e8cc…` and `993537c2…`.
+  `retain-appliance-builds.mjs` loses its special case for the deleted first
+  Linea bundle `e046b4b4…`. The clone baseline of `browser-physics-asset.ts`
+  falls from 35 to 10 copies.
+- The Portal build holds 6 runtime and 10 execution bundles (185 MB).
+
+Checks, in a clean worktree outside the checkout with a MuJoCo 4.0.0 SDK
+from `install-native-sdk.mjs`: `pnpm lint:physics-bundle`, `pnpm
+lint:static`, `pnpm portal:build` then `check-physics-dist.mjs` (6 runtime
+and 10 execution bundles, 63 files match their hashes), the type checks of
+production-simulation, bakery-model and commerce-client, the journey sets
+`ci` (17 passed) and `ci-browser` (22 passed), the journeys
+`retained-case`, `file-execution`, `workflow-branch`, `engine-cell` and
+`workflow-branch-browser`, `bakery-sample.test.ts` (6 passed) and eleven
+Kitchen E2E files of the Platform (27 passed; the one skip needs a real
+OpenRouter key).
+
+R2: 201 objects under `sha256/` in `pantry-repo-binaries-apac` (398 MB)
+belong only to the deleted folders; no kept file shares their hash. A read
+on 22 November 2026 found all 201, and all 3,330 kept objects. The bucket
+also holds 43 objects that no manifest names; this step leaves them.
+
 ### 6. Clean the records
 
 - Update AGENTS.md ("Old and new names", "Active runtime", "Deployment"),
@@ -820,7 +863,7 @@ stack.
 
 **Left as separate work** (briefs in the notes file
 `plan-93-follow-ups.md` of the session group): the old Kitchen physics
-bundles; the 64,000-token default budget of a new organisation; the shop
+bundles (done, see the step 5 results); the 64,000-token default budget of a new organisation; the shop
 Mac voice service and local development on `purin-pantry`, after which the
 old Google projects can go. With the owner: the read-only R2 key of CI
 (add `pantry-repo-binaries-apac`), Google verification of the Gmail scopes,

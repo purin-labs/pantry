@@ -18,12 +18,6 @@ import { applianceTable } from "./appliance-registry.mjs";
 function hash(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
 }
-// Persistence boundary for the first Linea release, before visuals entered assets.json.
-// Both this bundle and this exact GLB were introduced by commit 783acbc85.
-const initialLineaBundle =
-  "e046b4b4f844db621d67698766154bfa634dd1ed8b0f7d47cffca8ddaf9392b5";
-const initialLineaVisual =
-  "142fac26dd1feca6c21395415d0453e9f2c88e7a2c0a05ec35073365b11456f3";
 export async function retainApplianceBuilds(root, current) {
   // The espresso machines of the appliance table, each with its visual.
   const machines = applianceTable(root)
@@ -80,11 +74,7 @@ export async function retainApplianceBuilds(root, current) {
     for (const machine of machines) {
       const visualHash =
         manifest[`assets/bakery-mujoco/${machine}/${machine}.glb`] ??
-        readPreloadedVisualHash(module, machine) ??
-        (id === initialLineaBundle &&
-        machine === "la-marzocco-linea-classic-s-2g"
-          ? initialLineaVisual
-          : undefined);
+        readPreloadedVisualHash(module, machine);
       if (!visualHash || !existsSync(join(visuals, `${visualHash}.glb`)))
         continue;
       const request = {
