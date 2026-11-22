@@ -51,12 +51,6 @@ export const WORKER_DOMAINS = {
   "purin-shop": "shop.purin.io",
 };
 
-/**
- * A resource id that Plan 93 step 3 writes when it makes the resource. A
- * deployment refuses a profile that still holds it.
- */
-export const UNMADE_RESOURCE_ID = "made-in-plan-93-step-3";
-
 const PRODUCTION_WORKER_NAMES = new Set(
   Object.values(WORKER_NAMES).map((names) => names.production),
 );
@@ -75,15 +69,6 @@ export function releaseTargetProblems(config) {
     problems.push(
       `routes other than ${expected.length === 0 ? "none" : expected[0]}`,
     );
-  const unmade = [
-    ...(config.d1_databases ?? []).map((database) => database.database_id),
-    ...(config.kv_namespaces ?? []).flatMap((namespace) => [
-      namespace.id,
-      namespace.preview_id,
-    ]),
-  ].filter((id) => id === UNMADE_RESOURCE_ID);
-  if (unmade.length > 0)
-    problems.push(`${unmade.length} resource id(s) that step 3 has not made`);
   return problems;
 }
 

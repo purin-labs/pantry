@@ -488,31 +488,31 @@
         },
       ],
       "d1_databases": [
-        // A location hint names a region, and Cloudflare chooses the site in
-        // it. A global database of this region was once served from Hong
-        // Kong: 66 ms for each read from Tokyo. Check that a new database is
-        // served from Tokyo (`served_by_colo` of a query is NRT) before a
-        // release binds it. Plan 93 step 3 makes both databases and writes
-        // their ids here; the release guard refuses the placeholder.
+        // Both databases are served from Tokyo (`served_by_colo` of a query
+        // is NRT). A location hint names a region, and Cloudflare chooses the
+        // site in it: the hint "apac" gave Singapore, Seoul and Hong Kong
+        // (66 ms for each read from Tokyo). A database made from Japan with
+        // no hint is served from Tokyo or Osaka. Check the colo of a new
+        // database before a release binds it.
         {
           "binding": "DB",
           "database_name": "pantry-global-apac",
-          "database_id": "made-in-plan-93-step-3",
+          "database_id": "ced3f859-6a2b-4e54-bc8e-92d2dae424fa",
           "migrations_dir": "migrations-global",
         },
         {
           "binding": "ORGANISATION_DB_APAC",
           "database_name": "pantry-organisation-apac",
-          "database_id": "made-in-plan-93-step-3",
+          "database_id": "130a94eb-71a6-40a9-991d-b359f36a939a",
           "migrations_dir": "migrations-regional",
         },
       ],
       "kv_namespaces": [
         {
           "binding": "POLICY_KV",
-          // The namespace pantry-policy, made in Plan 93 step 3.
-          "id": "made-in-plan-93-step-3",
-          "preview_id": "made-in-plan-93-step-3",
+          // The namespace pantry-policy.
+          "id": "1b538734635b4da481ac9cf7c3315d36",
+          "preview_id": "1b538734635b4da481ac9cf7c3315d36",
         },
       ],
       "r2_buckets": [

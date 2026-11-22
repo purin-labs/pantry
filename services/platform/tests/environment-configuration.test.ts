@@ -93,13 +93,7 @@ describe("actual Wrangler configuration loading", function configurationLoading(
       env: "production",
     });
     expect(platform.vars.SQUARE_OAUTH_ENVIRONMENT).toBe("production");
-    // Plan 93 step 3 writes the ids of the databases that it makes; until
-    // then the release guard refuses the platform for that reason only.
-    expect(
-      releaseTargetProblems(platform).filter(
-        (problem: string) => !problem.includes("step 3"),
-      ),
-    ).toEqual([]);
+    expect(releaseTargetProblems(platform)).toEqual([]);
     expect(releaseTargetProblems(commerceEngine)).toEqual([]);
     expect(
       releaseTargetProblems({ ...commerceEngine, name: "pantry-staging" }),

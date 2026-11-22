@@ -44,12 +44,12 @@
         {
           "binding": "DB",
           "database_name": "pantry-global-apac",
-          "database_id": "made-in-plan-93-step-3",
+          "database_id": "ced3f859-6a2b-4e54-bc8e-92d2dae424fa",
         },
         {
           "binding": "ORGANISATION_DB_APAC",
           "database_name": "pantry-organisation-apac",
-          "database_id": "made-in-plan-93-step-3",
+          "database_id": "130a94eb-71a6-40a9-991d-b359f36a939a",
         },
       ],
       "secrets_store_secrets": [
