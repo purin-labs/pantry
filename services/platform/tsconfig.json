@@ -12,5 +12,5 @@
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "../../areas/*/server/**/*.ts"]
 }
