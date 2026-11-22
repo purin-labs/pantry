@@ -160,7 +160,7 @@ def main() -> None:
         env = {**os.environ, "PANTRY_VOICE_HOME": str(voice_home), "PANTRY_VOICE_LABEL": label}
         browser_input = {
             "platform": PORTAL, "worker": PLATFORM, "organisationId": organisation_id, "ownerId": setup["users"]["Owner"],
-            "cookie": owner.cookie, "csrf": owner.csrf,
+            "cookie": owner.cookie, "csrf": owner.csrf, "chatPath": owner.chat_path(),
             "builtWorker": "/assets/" + next((ROOT / "apps/portal/dist/assets").glob("wake-worker-*.js")).name,
             "microphone": str(microphone), "artifacts": str(ARTIFACTS), "macPort": journey.MAC_PORT,
             "scenes": [list(scene) for scene in SCENES],

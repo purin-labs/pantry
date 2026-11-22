@@ -137,7 +137,7 @@ def main() -> None:
         subprocess.run(["xcrun", "simctl", "keychain", SIMULATOR, "add-root-cert", str(ca / "ca.pem")], check=True)
         urllib.request.urlopen(urllib.request.Request(f"{PORTAL}/__probe/cookies", method="POST",
                                                       data=json.dumps(owner.cookie.split("; ")).encode()))
-        chat = "/portal/pantry-kitchen-acceptance/cafe-operations/chat"
+        chat = owner.chat_path()
         subprocess.run(["xcrun", "simctl", "openurl", SIMULATOR, f"{PORTAL}/__probe/open?to={urllib.parse.quote(chat, safe='')}"],
                        check=True)
         print(json.dumps({"ready": True, "organisationId": organisation_id, "csrf": owner.csrf, "chat": chat}), flush=True)

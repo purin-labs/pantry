@@ -173,6 +173,15 @@ class Member:
         except urllib.error.HTTPError as error:
             return error.code, json.load(error)
 
+    def chat_path(self) -> str:
+        """The Portal chat of the organisation's first workspace. The handle comes from its name."""
+        request = urllib.request.Request(f"{PLATFORM}/v1/control/session",
+                                         headers={"cookie": self.cookie, "origin": PLATFORM, "accept": "application/json"})
+        with urllib.request.urlopen(request) as response:
+            memberships = json.load(response)["memberships"]
+        membership = next(m for m in memberships if m["organisationId"] == self.organisation_id)
+        return f"/portal/{membership['organisationHandle']}/{membership['workspaces'][0]['workspaceHandle']}/chat"
+
     def grant(self) -> dict:
         status, body = self.call("POST", "voice/grants", {"deviceId": uuid.uuid4().hex})
         require(status == 200 and body["mac"] is not None, f"grant: {status} {body}")

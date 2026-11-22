@@ -1298,7 +1298,7 @@ async function main() {
       "the production build's worker loads its files from the Worker's assets",
     );
 
-    const chatUrl = `${input.platform}/portal/pantry-kitchen-acceptance/cafe-operations/chat`;
+    const chatUrl = `${input.platform}${input.chatPath}`;
     await page.goto(chatUrl);
     await page
       .waitForSelector("#chat-message", { timeout: 60_000 })
