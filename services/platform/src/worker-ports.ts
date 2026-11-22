@@ -24,17 +24,17 @@ import { parseCommerceEntityPlaneEffect } from "./commerce/entity-plane/proposal
 import { commerceGrantSelection } from "@purin-labs/authority/authorization/access-grants/commerce-grant-selection";
 import { COMMERCE_ACCESS_TARGETS } from "./commerce/entity-plane/access-targets";
 import { RESPONSIBILITY_SCOPE_COMMERCE } from "./commerce/entity-plane/responsibility-scopes";
-import { responsibilityScopeCommerce } from "./data/agent-operations/scope-commerce";
+import { responsibilityScopeCommerce } from "@purin-labs/agent/data/agent-operations/scope-commerce";
 import { commerceGrantTargets } from "@purin-labs/authority/authorization/access-grants/commerce-grant-targets";
 import { COMMERCE_GRANT_TARGETS } from "./commerce/entity-plane/grant-targets";
 import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
 import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
 import { commerceGraphReads } from "./commerce/contract/graph-reads";
 import { parseEntityPlaneObservation } from "@purin-labs/commerce-client";
-import { entityPlaneObservationParser } from "./cues/engine";
+import { entityPlaneObservationParser } from "@purin-labs/agent/cues/engine";
 import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
 import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
-import { commerceExceptionInbox } from "./control/agent-operation-activity";
+import { commerceExceptionInbox } from "@purin-labs/agent/control/agent-operation-activity";
 import { onboardingProjection } from "@purin-labs/control/worker/admission/control-mutation";
 import { buildOnboardingProjection } from "./data/onboarding-projection";
 import {
@@ -129,9 +129,9 @@ import {
   prepareRevokedFileGrantCleanup,
   prepareRevokedFileGrantRows,
   supersedeUnadmittedFileProjectionsStatement,
-} from "./context/files/persistence";
-import { validateFileGrantTarget } from "./context/files/grant-validation";
-import { nativeChatAudience } from "./context/assembly/native-chat-audience";
+} from "@purin-labs/agent/context/files/persistence";
+import { validateFileGrantTarget } from "@purin-labs/agent/context/files/grant-validation";
+import { nativeChatAudience } from "@purin-labs/agent/context/assembly/native-chat-audience";
 import { resolveNativeChatAudience } from "./chat/information-flow";
 import {
   prepareRevokedDmSelectionRelease,

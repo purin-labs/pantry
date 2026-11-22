@@ -4,32 +4,32 @@ import {
   CURRENT_SQLITE_SCHEMA_VERSION,
   SqliteStorage,
 } from "@earendil-works/pi-durable/storage/sqlite";
-import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durable-database.ts";
+import { ActorSqliteDatabase } from "../../foundation/agent/actors/pi-durable-database.ts";
 import { sha256Hex } from "../../packages/std/src/index.ts";
-import { resolvePantryPlatformModelRoute } from "../../services/platform/src/models/route.ts";
+import { resolvePantryPlatformModelRoute } from "../../foundation/agent/models/route.ts";
 export { default } from "./seam-worker.mjs";
 import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
-import { canonicalStopNotice } from "../../services/platform/src/actors/pi-durable-history.ts";
+import { canonicalStopNotice } from "../../foundation/agent/actors/pi-durable-history.ts";
 import { eraseActorContentSql } from "../../foundation/actor-runtime/actors/placement-execution-quiescence.ts";
-import { createSessionSchema } from "../../services/platform/src/actors/agent-session-schema.ts";
+import { createSessionSchema } from "../../foundation/agent/actors/agent-session-schema.ts";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../foundation/actor-runtime/actors/actor-schema-versions.ts";
 import {
   commitInitializedSession,
   commitAcceptedSessionInput,
   commitRuntimeActivatedSession,
   commitCompletedSessionTurn,
-} from "../../services/platform/src/actors/actor-journal.ts";
+} from "../../foundation/agent/actors/actor-journal.ts";
 import {
   commitCheckpointingStartedSession,
   commitPreparedSessionCheckpoint,
   recoverInterruptedSessionInTransaction,
-} from "../../services/platform/src/actors/actor-journal/transactions.ts";
-import { buildCanonicalTextTurnStart } from "../../services/platform/src/actors/agent-session-turn-start.ts";
+} from "../../foundation/agent/actors/actor-journal/transactions.ts";
+import { buildCanonicalTextTurnStart } from "../../foundation/agent/actors/agent-session-turn-start.ts";
 import {
   buildTextTurnCheckpointingCommit,
   buildTextTurnCheckpointCommittedCommit,
-} from "../../services/platform/src/actors/agent-session-text-turn.ts";
-import { readImportedCanonicalSession } from "../../services/platform/src/actors/agent-session-canonical.ts";
+} from "../../foundation/agent/actors/agent-session-text-turn.ts";
+import { readImportedCanonicalSession } from "../../foundation/agent/actors/agent-session-canonical.ts";
 import {
   acceptRunModelUsage,
   createSessionBudgetAccount,
@@ -37,35 +37,35 @@ import {
   readSessionBudgetAccount,
   settleRunBudget,
   sessionBudgetAccountDigest,
-} from "../../services/platform/src/actors/agent-session-budget.ts";
+} from "../../foundation/agent/actors/agent-session-budget.ts";
 import {
   acceptHarnessEvent,
   readLatestHarnessCheckpoint,
   preflightHarnessTurnLease,
   readHarnessCheckpointPublication,
   markHarnessCheckpointPublishedInTransaction,
-} from "../../services/platform/src/actors/agent-session-harness-authority.ts";
+} from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import {
   prepareHarnessCheckpoint,
   loadCanonicalHarnessCheckpoint,
   uploadHarnessCheckpoint,
   validateCheckpointBudgetBinding,
-} from "../../services/platform/src/actors/agent-session-harness-checkpoint.ts";
-import { readAcceptedCheckpointFinalization } from "../../services/platform/src/actors/agent-session-finalization.ts";
+} from "../../foundation/agent/actors/agent-session-harness-checkpoint.ts";
+import { readAcceptedCheckpointFinalization } from "../../foundation/agent/actors/agent-session-finalization.ts";
 import {
   prepareSessionInformationFlow,
   appendSessionInformationFlowInTransaction,
   readSessionTurnFlowBinding,
-} from "../../services/platform/src/actors/agent-session-information-flow.ts";
+} from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import {
   beginSessionTurnStream,
   readSessionTurnReplay,
-} from "../../services/platform/src/actors/agent-session-turn-stream.ts";
+} from "../../foundation/agent/actors/agent-session-turn-stream.ts";
 import {
   parseRequestId,
   parseOrganisationId,
 } from "../../foundation/kernel/ids.ts";
-import { parseSessionTurnInputDigest } from "../../services/platform/src/actors/agent-session-turn-input-digest.ts";
+import { parseSessionTurnInputDigest } from "../../foundation/agent/actors/agent-session-turn-input-digest.ts";
 import {
   captureActorExport,
   importActorExport,

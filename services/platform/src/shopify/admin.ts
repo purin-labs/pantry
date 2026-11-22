@@ -9,7 +9,7 @@ import {
 import {
   compileAndStoreCueSnapshot,
   writeTierOneShopifySubscription,
-} from "../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   requireConnectionCredentialAuthority,
   resolveActiveProviderAccountContext,

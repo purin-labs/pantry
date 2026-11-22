@@ -123,17 +123,18 @@ const rawExecutionRecordsImport = {
 };
 const ifcBoundaryOwners = [
   "services/platform/src/chat/information-flow.ts",
-  "services/platform/src/context/turn-context.ts",
-  "services/platform/src/context/assembly/internal.ts",
-  "services/platform/src/context/assembly/index.ts",
-  "services/platform/src/context/files/tools.ts",
+  "foundation/agent/context/turn-context.ts",
+  "foundation/agent/context/assembly/internal.ts",
+  "foundation/agent/context/assembly/index.ts",
+  "foundation/agent/context/files/tools.ts",
   "services/platform/src/projects/context.ts",
   "services/platform/src/chat/input-admission.ts",
   "services/platform/src/chat/conversation-disclosure.ts",
-  "services/platform/src/actors/actor-journal.ts",
-  "services/platform/src/actors/actor-journal/**/*.ts",
+  "foundation/agent/actors/actor-journal.ts",
+  "foundation/agent/actors/actor-journal/**/*.ts",
   "services/platform/src/actors/agent-session.ts",
   "services/platform/src/actors/session/**/*.ts",
+  "foundation/agent/actors/session/**/*.ts",
 ];
 const localContextProjectionImport = {
   group: [
@@ -226,7 +227,10 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/provider-workflows/**/*.ts"],
+    files: [
+      "services/platform/src/provider-workflows/**/*.ts",
+      "foundation/agent/provider-workflows/**/*.ts",
+    ],
     rules: {
       "no-unused-vars": [
         "error",
@@ -260,7 +264,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/context/turn-context.ts"],
+    files: ["foundation/agent/context/turn-context.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -278,7 +282,7 @@ export default [
   },
   {
     files: [
-      "services/platform/src/context/**/*.ts",
+      "foundation/agent/context/**/*.ts",
       "foundation/agent-tools/context/**/*.ts",
     ],
     ignores: ifcBoundaryOwners,
@@ -302,7 +306,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/context/files/tools.ts"],
+    files: ["foundation/agent/context/files/tools.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -322,14 +326,15 @@ export default [
   },
   {
     files: [
-      "services/platform/src/context/assembly/internal.ts",
-      "services/platform/src/context/assembly/index.ts",
+      "foundation/agent/context/assembly/internal.ts",
+      "foundation/agent/context/assembly/index.ts",
       "services/platform/src/projects/context.ts",
       "services/platform/src/chat/input-admission.ts",
-      "services/platform/src/actors/actor-journal.ts",
-      "services/platform/src/actors/actor-journal/**/*.ts",
+      "foundation/agent/actors/actor-journal.ts",
+      "foundation/agent/actors/actor-journal/**/*.ts",
       "services/platform/src/actors/agent-session.ts",
       "services/platform/src/actors/session/**/*.ts",
+      "foundation/agent/actors/session/**/*.ts",
     ],
     rules: {
       "no-restricted-imports": [
@@ -417,6 +422,7 @@ export default [
       "services/platform/src/actors/organisation.ts",
       "services/platform/src/actors/organisation/organisation-*.ts",
       "foundation/tenancy/actors/organisation/organisation-record.ts",
+      "foundation/agent/actors/organisation/organisation-policy.ts",
       "services/platform/src/memory/access.ts",
       "services/platform/src/evals/access.ts",
     ],
@@ -460,6 +466,7 @@ export default [
     files: [
       "services/platform/src/actors/agent-session.ts",
       "services/platform/src/actors/session/**/*.ts",
+      "foundation/agent/actors/session/**/*.ts",
     ],
     rules: {
       "no-restricted-imports": [

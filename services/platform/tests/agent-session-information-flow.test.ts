@@ -9,7 +9,7 @@ import {
   prepareSessionInformationFlow,
   readSessionInformationFlow,
   readSessionTurnFlowBinding,
-} from "../src/actors/agent-session-information-flow";
+} from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   FlowLabel,
   ObservationEvidence,

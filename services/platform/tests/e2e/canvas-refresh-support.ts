@@ -17,7 +17,7 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 type Counter = {
   calls: number;

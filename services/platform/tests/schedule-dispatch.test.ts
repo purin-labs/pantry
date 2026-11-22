@@ -12,16 +12,16 @@ import { describe, expect, it } from "vitest";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   claimScheduleDispatchWindow,
   listEnabledScheduleBindings,
   readScheduleDispatchReceipt,
   recordScheduleDispatchReceipt,
-} from "../src/data/agent-operations/schedule-dispatch";
-import { resolveManualDispatchAutomation } from "../src/data/agent-operations/automation";
+} from "@purin-labs/agent/data/agent-operations/schedule-dispatch";
+import { resolveManualDispatchAutomation } from "@purin-labs/agent/data/agent-operations/automation";
 import type { IngressQueueMessage } from "../src/ingress-queue";
-import { runScheduleDispatch } from "../src/schedules/dispatch";
+import { runScheduleDispatch } from "@purin-labs/agent/schedules/dispatch";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

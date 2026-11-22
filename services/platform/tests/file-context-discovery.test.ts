@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { discoverFileResources } from "../src/context/files";
+import { discoverFileResources } from "@purin-labs/agent/context/files/index";
 
 describe("file resource discovery", () => {
   it("lists one bounded Dropbox folder page and filters its entries", async () => {

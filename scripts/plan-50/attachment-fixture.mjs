@@ -1,5 +1,5 @@
 import { sha256Hex } from "../../packages/std/src/index.ts";
-import { parseStoredAttachment } from "../../services/platform/src/messages/stored-attachment.ts";
+import { parseStoredAttachment } from "../../foundation/agent/messages/stored-attachment.ts";
 
 export const imageBase64 =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jF9sAAAAASUVORK5CYII=";

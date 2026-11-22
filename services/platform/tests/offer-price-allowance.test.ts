@@ -20,8 +20,8 @@ vi.mock("@purin-labs/connections/data/commerce-merchant-binding", async (importO
   resolveOrganisationCommerceMerchantBinding:
     bindingMocks.resolveOrganisationCommerceMerchantBinding,
 }));
-vi.mock("../src/control/organisation-runtime", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/control/organisation-runtime")>()),
+vi.mock("@purin-labs/agent/control/organisation-runtime", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/control/organisation-runtime")>()),
   readOrganisationEnvironment: organisationMocks.readOrganisationEnvironment,
 }));
 

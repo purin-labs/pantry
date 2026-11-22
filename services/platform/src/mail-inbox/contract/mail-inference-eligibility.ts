@@ -6,7 +6,7 @@ import type {
 import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,
-} from "../../integrations/typesafe/authority";
+} from "@purin-labs/agent/integrations/typesafe/authority";
 
 export async function mailInferenceEligible(
   input: Readonly<{

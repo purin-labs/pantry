@@ -67,9 +67,12 @@ import {
   serializeMemory,
   type AcceptedMemoryCursor,
 } from "../../memory/store";
-import { cleanupTypeSafeCredentials } from "../../integrations/typesafe/connection";
-import { resolveTypeSafeCredential } from "../../integrations/typesafe/authority";
-import { identifier, integerIn } from "../../case-context-discovery/policy";
+import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
+import { resolveTypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/authority";
+import {
+  identifier,
+  integerIn,
+} from "@purin-labs/agent/case-context-discovery/policy";
 import { errorMessage, isRecord } from "@purin-labs/std";
 import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { rearmActorAlarm } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";

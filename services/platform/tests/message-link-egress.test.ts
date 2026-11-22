@@ -5,12 +5,12 @@ import {
   parseMessageLinkFetchResponse,
   type MessageLinkFetchNamespace,
   type MessageLinkFetchTransport,
-} from "../src/messages/link-egress";
+} from "@purin-labs/agent/messages/link-egress";
 import {
   MESSAGE_LINK_POLICY,
   readMessageLink,
   type MessageLinkEgress,
-} from "../src/messages/link-reader";
+} from "@purin-labs/agent/messages/link-reader";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,

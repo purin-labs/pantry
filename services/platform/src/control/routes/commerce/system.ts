@@ -68,7 +68,7 @@ import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutati
 import {
   ensureCreatedOrganisationActor,
   readOrganisationEnvironment,
-} from "../../organisation-runtime";
+} from "@purin-labs/agent/control/organisation-runtime";
 import { assertNever, decodeBase64Url } from "@purin-labs/std";
 
 export async function handleCommerceSystem(

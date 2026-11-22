@@ -1,6 +1,6 @@
 import { setTimeout as delay } from "node:timers/promises";
 import { fixtureDatabase } from "./organisation-database";
-import { CODE_MODE_PILOT_BUDGET } from "../../src/actors/code-mode-budget";
+import { CODE_MODE_PILOT_BUDGET } from "@purin-labs/agent/actors/code-mode-budget";
 import { measureCanvasRefresh } from "./canvas-refresh-support";
 import {
   parseCanvasServerMessage,
@@ -37,7 +37,7 @@ import {
   openRouterToolCall,
 } from "./slack-journey-support";
 import interrupted from "../../../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const CONVERSATION_ID = "conv_c55af3e2-19c2-446a-9f44-e00000000060";
 const RETIRED_CANVAS_CONTEXT =

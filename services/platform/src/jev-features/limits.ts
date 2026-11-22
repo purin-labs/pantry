@@ -3,11 +3,11 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   JEV_MONTHLY_ALLOWANCE_MICROUSD,
   type TypeSafeUsageLimits,
-} from "../integrations/typesafe/evaluation-ledger";
+} from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
 import {
   readMonthlyPantryTypeSafeCost,
   typeSafeMonth,
-} from "../integrations/typesafe/usage-store";
+} from "@purin-labs/agent/integrations/typesafe/usage-store";
 
 /**
  * Daily limits of Related Cases when the Jev switch turns it on. They stay

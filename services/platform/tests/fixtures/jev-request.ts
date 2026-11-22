@@ -2,7 +2,7 @@ import {
   JevRelationshipRequest,
   CASE_CONTEXT_DISCOVERY_JEV_MODEL,
   type JevComparison,
-} from "../../src/case-context-discovery/jev";
+} from "@purin-labs/agent/case-context-discovery/jev";
 
 export async function evaluateFixtureJevRelationships(
   input: Readonly<{

@@ -26,7 +26,7 @@ import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   requireSessionExecution,
   admittedSessionOperation,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import { createCommerceEntityPlaneClient } from "../../commerce/contract/client";
 import {
   recipeCollectionOf,

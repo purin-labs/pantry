@@ -1,7 +1,7 @@
 import {
   parseCommerceCueEvent,
   type CommerceCueEvent,
-} from "../../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

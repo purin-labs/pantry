@@ -2,9 +2,9 @@
 
 import { describe, expect, it, vi } from "vitest";
 
-import { createSessionSchema } from "../src/actors/agent-session-schema";
-import { createSessionReplayResponse } from "../src/actors/session/replay";
-import { persistAgentEventEnvelope } from "../src/actors/agent-session-event-stream";
+import { createSessionSchema } from "@purin-labs/agent/actors/agent-session-schema";
+import { createSessionReplayResponse } from "@purin-labs/agent/actors/session/replay";
+import { persistAgentEventEnvelope } from "@purin-labs/agent/actors/agent-session-event-stream";
 import {
   advanceSessionTurnStream,
   beginSessionTurnStream,
@@ -14,7 +14,7 @@ import {
   parseSessionTurnStreamRecord,
   readRunningSessionTurn,
   readSessionTurnReplay,
-} from "../src/actors/agent-session-turn-stream";
+} from "@purin-labs/agent/actors/agent-session-turn-stream";
 import { type RequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {

@@ -226,14 +226,14 @@ OpenRouter route of Purin AI goes direct.
 
 - `ModelRoute` (`packages/contracts/src/model-route.ts`) and the `modelRoute` field of
   the Session contract (`packages/contracts/src/session-schemas.ts`).
-- The adapter contract: `services/platform/src/actors/embedded-harness.ts`. The
+- The adapter contract: `foundation/agent/actors/embedded-harness.ts`. The
   selection: `actors/embedded-harness-adapter.ts` and `actors/pi-embedded-adapter.ts`.
 - Pi: `actors/pi-durable-runtime.ts`, `pi-model-transport.ts`, `pi-durable-tools.ts`,
   `pi-tool-replay.ts`, `pi-history-adapter.ts`, `pi-durable-checkpoint.ts` and
   `pi-durable-recovery.ts`. The six `@earendil-works` packages are pinned at 1.6.0 in
   `services/platform/package.json`.
 - The lease: `createEmbeddedHarnessModelRouteLease` in `actors/session/model-route.ts`.
-- Routes, models and connections (`services/platform/src/models/`): `route.ts`,
+- Routes, models and connections (`foundation/agent/models/`): `route.ts`,
   `catalog.ts`, `codex-connection.ts`, `chatgpt-agent-oauth.ts`, `chatgpt-oauth.ts`,
   `claude-connection.ts` and `claude-oauth.ts`.
 - Keys: `credential-vault/organisation-model-resolution.ts`, with one row for each of

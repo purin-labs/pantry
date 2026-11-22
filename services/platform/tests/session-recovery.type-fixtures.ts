@@ -4,7 +4,7 @@ import type {
   SessionRecoveryAction,
   SessionRecoveryEvidence,
 } from "@purin-labs/contracts";
-import { buildSessionExecutionResume } from "../src/actors/agent-session-recovery";
+import { buildSessionExecutionResume } from "@purin-labs/agent/actors/agent-session-recovery";
 
 declare const recovering: RecoveringSession;
 declare const lease: HarnessTurnLease;

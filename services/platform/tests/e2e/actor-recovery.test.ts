@@ -14,7 +14,7 @@ import { expect, it, type TestContext } from "vitest";
 
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
-import type { SessionCheckpointInspection } from "../../src/actors/session/types";
+import type { SessionCheckpointInspection } from "@purin-labs/agent/actors/session/types";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CaseDO } from "../../src/actors/case";
 import type { ConnectorDO } from "../../src/actors/connector";
@@ -45,7 +45,7 @@ import {
   requireVaultHandle,
   requireWorkspaceId,
 } from "../test-ids";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const ORGANISATION_ID = requireOrganisationId(
   "organisation_e2e_actor_recovery",

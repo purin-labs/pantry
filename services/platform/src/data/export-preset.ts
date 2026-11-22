@@ -45,7 +45,7 @@ import {
   prepareExportCoordinationArea,
   prepareExportCoordinatorInstallation,
   prepareExportResponsibilityScope,
-} from "./agent-operations/export-coordinator-rows";
+} from "@purin-labs/agent/data/agent-operations/export-coordinator-rows";
 import { prepareGuardedFirstGrant } from "@purin-labs/authority/data/access-grants";
 import {
   prepareGuardedConfigurationVersionFence,

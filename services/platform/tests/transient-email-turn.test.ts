@@ -24,13 +24,13 @@ import type {
   EmbeddedHarnessTurnError,
   EmbeddedHarnessTurnResult,
   EmbeddedHarnessUserInput,
-} from "../src/actors/embedded-harness";
+} from "@purin-labs/agent/actors/embedded-harness";
 import {
   createTransientHarnessSinks,
   runTransientEmailTurn,
   type TransientEmailTeardownOutcome,
-} from "../src/actors/transient-email-turn";
-import { piToolRules } from "../src/actors/pi-tool-replay";
+} from "@purin-labs/agent/actors/transient-email-turn";
+import { piToolRules } from "@purin-labs/agent/actors/pi-tool-replay";
 import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import type { Result } from "@purin-labs/kernel/result";
 

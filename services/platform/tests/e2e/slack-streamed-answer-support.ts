@@ -13,7 +13,7 @@ import {
   signedSlackRequest,
   slackEnvelope,
 } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 // Six parts of a long answer. They arrive 400 ms apart, so the Connector
 // releases them in several parts of about one second each.

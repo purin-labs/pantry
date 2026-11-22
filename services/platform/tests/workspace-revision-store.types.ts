@@ -1,4 +1,4 @@
-import type { PreparedWorkspaceRevisionMutation } from "../src/workspace-revision-store";
+import type { PreparedWorkspaceRevisionMutation } from "@purin-labs/agent/workspace-revision-store";
 
 const rawPreparedMutation = {};
 

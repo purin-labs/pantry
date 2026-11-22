@@ -15,7 +15,7 @@ import {
   SessionExecutionAdmission,
   admittedSessionToolHost,
   requireSessionExecution,
-} from "../../services/platform/src/actors/session-execution-admission.ts";
+} from "../../foundation/agent/actors/session-execution-admission.ts";
 import { authorizeCapabilityUse } from "../../foundation/authority/authorization/access-grants/turn-authority.ts";
 import {
   compileTrialTurnAuthority,
@@ -33,19 +33,19 @@ import {
 import { parseOrganisationPolicySnapshot } from "../../foundation/authority/policy-snapshot.ts";
 import { parseOrganisationId } from "../../foundation/kernel/ids.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
-import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
+import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import {
   admitSessionInformationFlowObservation,
   recordCommerceObservationEntities,
-} from "../../services/platform/src/actors/agent-session-information-flow.ts";
+} from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   ObservationEvidence,
 } from "../../foundation/authority/policy/index.ts";
 import { sha256Hex } from "../../packages/std/src/index.ts";
-import { createHarnessCodeModeAdmission } from "../../services/platform/src/actors/code-mode-admission.ts";
-import { codeModeSandbox } from "../../services/platform/src/actors/embedded-harness-tool-host.ts";
+import { createHarnessCodeModeAdmission } from "../../foundation/agent/actors/code-mode-admission.ts";
+import { codeModeSandbox } from "../../foundation/agent/actors/embedded-harness-tool-host.ts";
 
 export const organisationId = required(
   parseOrganisationId("organisation_plan50_seams"),

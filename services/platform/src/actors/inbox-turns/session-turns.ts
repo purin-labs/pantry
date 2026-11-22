@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { createTransientGoalExecution } from "../session-goal-usage";
-import type { HarnessToolHost } from "../embedded-harness";
+import { createTransientGoalExecution } from "@purin-labs/agent/actors/session-goal-usage";
+import type { HarnessToolHost } from "@purin-labs/agent/actors/embedded-harness";
 import {
   parseMailAssistantResult,
   type MailAssistantResult,
@@ -10,7 +10,7 @@ import {
   decideAutomaticContextAdmission,
   FlowLabel as StoredFlowLabel,
 } from "@purin-labs/authority/policy/information-flow/index";
-import { recordTransientTurnContext } from "../actor-journal/transactions";
+import { recordTransientTurnContext } from "@purin-labs/agent/actors/actor-journal/transactions";
 import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 import type {
   AcceptedInputRef,
@@ -25,13 +25,13 @@ import {
   SessionExecutionAdmission,
   admittedSessionModelRoute,
   admittedSessionToolHost,
-} from "../session-execution-admission";
-import { readCanonicalSessionForPersistence } from "../agent-session-canonical";
-import { readCaseSessionAssignment } from "../actor-journal/transactions";
-import { restoreSessionTurnContext } from "../actor-journal";
-import { renderModelContext } from "../model-context-prompt";
-import { digestModelRoute } from "../../models/route";
-import type { EmbeddedHarnessModelUsage } from "../embedded-harness";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { readCanonicalSessionForPersistence } from "@purin-labs/agent/actors/agent-session-canonical";
+import { readCaseSessionAssignment } from "@purin-labs/agent/actors/actor-journal/transactions";
+import { restoreSessionTurnContext } from "@purin-labs/agent/actors/actor-journal";
+import { renderModelContext } from "@purin-labs/agent/actors/model-context-prompt";
+import { digestModelRoute } from "@purin-labs/agent/models/route";
+import type { EmbeddedHarnessModelUsage } from "@purin-labs/agent/actors/embedded-harness";
 import { createEmailHarnessToolHost } from "../email-harness-tools";
 import { verifyTransientReplySources } from "../email-reply-source-verification";
 import { NO_REPLY_SOURCES } from "../../mail-inbox/reply-sources";
@@ -39,22 +39,22 @@ import { EmailTurnInformationFlow } from "../email-case-context-collection-evide
 import {
   parseCaseContextCollectionEvidenceDependency,
   caseContextCollectionEvidenceDependency,
-} from "../../case-context-discovery/evidence";
+} from "@purin-labs/agent/case-context-discovery/evidence";
 import { readGmailInferenceEligibility } from "../../mail-inbox/contract/gmail-inference-eligibility";
-import { runTransientTurn } from "../transient-turn";
+import { runTransientTurn } from "@purin-labs/agent/actors/transient-turn";
 import { createWhatsAppHarnessToolHost } from "../whatsapp-harness-tools";
-import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
+import { selectEmbeddedHarnessAdapterForModelRoute } from "@purin-labs/agent/actors/embedded-harness-adapter";
 import { authorityPartitionKeyMatchesRequest } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { ObservationEvidence } from "@purin-labs/authority/policy/index";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
-import { memoryModelContext } from "../session/model-context";
-import { createEmbeddedHarnessModelRouteLease } from "../session/model-route";
-import { type TransientSessionExecution } from "../session/support";
+import { memoryModelContext } from "@purin-labs/agent/actors/session/model-context";
+import { createEmbeddedHarnessModelRouteLease } from "@purin-labs/agent/actors/session/model-route";
+import { type TransientSessionExecution } from "@purin-labs/agent/actors/session/support";
 import {
   KNOWN_ZERO_MODEL_USAGE,
   runTransientMailHarness,
   transientModelAdmissionError,
-} from "../session/transient-turns";
+} from "@purin-labs/agent/actors/session/transient-turns";
 import {
   admitTransientHarnessTurn,
   boundRecipients,
@@ -63,9 +63,9 @@ import {
   startNoTransientTeardown,
   transientPlacementFailure,
   transientResultModelUsage,
-} from "../session/turn-completion";
-import type { TransientModelTurnError } from "../session/types";
-import type { SessionTransientHost } from "../session/transient-host";
+} from "@purin-labs/agent/actors/session/turn-completion";
+import type { TransientModelTurnError } from "@purin-labs/agent/actors/session/types";
+import type { SessionTransientHost } from "@purin-labs/agent/actors/session/transient-host";
 import {
   TRANSIENT_EMAIL_PROMPT_BYTES,
   completeTransientWhatsAppTurn,

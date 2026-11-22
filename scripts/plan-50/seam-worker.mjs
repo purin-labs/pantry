@@ -1,4 +1,4 @@
-import { canonicalFact } from "../../services/platform/src/actors/pi-durable-history.ts";
+import { canonicalFact } from "../../foundation/agent/actors/pi-durable-history.ts";
 import { armAlarmBy } from "../../foundation/actor-runtime/actors/lifecycle/actor-alarm.ts";
 import { DurableObject } from "cloudflare:workers";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
@@ -19,8 +19,8 @@ import {
   parsePersistedHarnessTurnLease,
   preflightHarnessTurnLease,
   readHarnessHistory,
-} from "../../services/platform/src/actors/agent-session-harness-authority.ts";
-import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durable-database.ts";
+} from "../../foundation/agent/actors/agent-session-harness-authority.ts";
+import { ActorSqliteDatabase } from "../../foundation/agent/actors/pi-durable-database.ts";
 
 const SESSION_ID = "session_plan50_seams";
 const TURN = {

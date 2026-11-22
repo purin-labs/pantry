@@ -17,8 +17,8 @@ import {
   settleRunBudget,
   validateCheckpointBudgetGap,
   type ReserveRunBudgetInput,
-} from "../src/actors/agent-session-budget";
-import { createSessionSchema } from "../src/actors/agent-session-schema";
+} from "@purin-labs/agent/actors/agent-session-budget";
+import { createSessionSchema } from "@purin-labs/agent/actors/agent-session-schema";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("AgentSession cumulative budget", function budgetSuite() {

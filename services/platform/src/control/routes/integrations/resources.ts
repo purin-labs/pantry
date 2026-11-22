@@ -15,7 +15,7 @@ import {
   refreshProviderResourceSnapshot,
   type DiscoveredProviderResource,
 } from "@purin-labs/connections/data/provider-resource";
-import { discoverFileResources } from "../../../context/files";
+import { discoverFileResources } from "@purin-labs/agent/context/files/index";
 import {
   parseIntegrationAccountId,
   parseWorkspaceId,
@@ -23,7 +23,7 @@ import {
 import {
   resolveFileProviderAccess,
   storeFilePlacementCredential,
-} from "../../../provider-workflows/file-context-credential";
+} from "@purin-labs/agent/provider-workflows/file-context-credential";
 import { configuredValue } from "@purin-labs/connections/provider-adapters/authorization";
 import { discoverSlackChannels } from "../../../provider-adapters/slack";
 import { discoverSquareTerminalResources } from "../../../provider-adapters/square";

@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: "../../../../packages/contracts/media-wasm-pkg/media_inspect_bg.wasm?module",
+        find: "../../../packages/contracts/media-wasm-pkg/media_inspect_bg.wasm?module",
         replacement: fileURLToPath(
           new NodeUrl("./tests/media-wasm-module.ts", import.meta.url),
         ),

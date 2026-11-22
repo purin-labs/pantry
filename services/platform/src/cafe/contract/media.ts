@@ -4,7 +4,7 @@
 // image itself: to the board editor under the person's session, and to a
 // TV only while a published board names it.
 import type { Env } from "@purin-labs/kernel/env";
-import { readOrganisationEnvironment } from "../../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

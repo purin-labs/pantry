@@ -1,7 +1,7 @@
 import type { RuntimeAdmissionStatus } from "../data/onboarding";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { resolveOrganisationModelRoute } from "../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 export async function runtimeAdmissionStatus(
   env: Env,
   organisationId: OrganisationId,

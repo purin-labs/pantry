@@ -13,7 +13,7 @@ import {
   CommerceStorefrontClient,
   type CommerceClientResult,
 } from "@purin-labs/commerce-client";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { placeCafeOrder, publishCafeMenu } from "./cafe-order-support";
 import {

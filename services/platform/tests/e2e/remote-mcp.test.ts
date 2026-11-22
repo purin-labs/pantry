@@ -41,7 +41,7 @@ import {
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   digestApprovalAction,
   parseApprovalEvidence,
@@ -76,7 +76,7 @@ import {
   type CustomConnectorWriteCatalogEntry,
 } from "../../src/custom-connectors";
 import { executeCustomConnectorTransport } from "../../src/custom-connectors/egress";
-import type { HarnessToolDefinition } from "../../src/actors/embedded-harness";
+import type { HarnessToolDefinition } from "@purin-labs/agent/actors/embedded-harness";
 import {
   RecordingBoundary,
   sdkInput,

@@ -22,7 +22,7 @@ import {
   type CaseOutputRecord,
   type CaseSessionProposalRecord,
   type CaseTriggerRecord,
-} from "../case-execution/records";
+} from "@purin-labs/agent/case-execution/records";
 
 type Row = Record<string, SqlStorageValue>;
 

@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   commerceClient,

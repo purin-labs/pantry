@@ -9,7 +9,7 @@ import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import { network } from "./network";
 import { connectorOf, registryEntries } from "./slack-follow-up-support";
 import {

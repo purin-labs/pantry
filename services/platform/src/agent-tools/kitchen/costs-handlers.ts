@@ -75,12 +75,12 @@ import {
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import type {
   CommerceToolReads,
   PreparedCommerceRead,

@@ -14,7 +14,7 @@ import {
   reconcileBakerySurfaceEffects,
   settleBakerySurfaceEffect,
 } from "../../actors/bakery-surface-effect";
-import type { SessionPageEffects } from "../../actors/session/tool-wiring";
+import type { SessionPageEffects } from "@purin-labs/agent/actors/session/tool-wiring";
 import type { Result } from "@purin-labs/kernel/result";
 import { installedBakerySurfaceCommands } from "./surface";
 

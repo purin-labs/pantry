@@ -3,13 +3,13 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import { decideChatFlowDelivery } from "./information-flow";
 import { authorizeConversation } from "./conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";
-import { applyAgentMessageAssemblyEvent } from "../actors/agent-message-assembly";
+import { applyAgentMessageAssemblyEvent } from "@purin-labs/agent/actors/agent-message-assembly";
 import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { SessionActor } from "../actors/session/session-actor";
+import type { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
 import {
   parseSessionTurnStreamRecord,
   type SessionTurnStreamRecord,
-} from "../actors/agent-session-turn-stream";
+} from "@purin-labs/agent/actors/agent-session-turn-stream";
 import type { Env } from "@purin-labs/kernel/env";
 import type { AgentEvent, RequestAuthority } from "@purin-labs/contracts";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";

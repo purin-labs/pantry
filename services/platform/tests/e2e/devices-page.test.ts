@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { activateTerminalAssignment } from "../../src/data/terminal-assignment-store";
 import { MAC_HEARTBEAT_FRESH_MS } from "../../src/voice/store";

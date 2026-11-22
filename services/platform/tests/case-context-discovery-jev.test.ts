@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { CASE_CONTEXT_DISCOVERY_JEV_MODEL } from "../src/case-context-discovery/jev";
+import { CASE_CONTEXT_DISCOVERY_JEV_MODEL } from "@purin-labs/agent/case-context-discovery/jev";
 import { evaluateFixtureJevRelationships } from "./fixtures/jev-request";
 import {
   caseContextDiscoveryReadiness,
   parseCaseContextDiscoveryPolicy,
-} from "../src/case-context-discovery/policy";
+} from "@purin-labs/agent/case-context-discovery/policy";
 
 const KEY = "apikey_synthetic-test-key-never-a-real-credential";
 const COMPARISON = {

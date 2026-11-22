@@ -7,7 +7,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import type { ContextAssemblyResult } from "../../src/context/assembly";
+import type { ContextAssemblyResult } from "@purin-labs/agent/context/assembly/index";
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import {
   parseAssignmentId,

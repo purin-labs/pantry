@@ -8,20 +8,20 @@ import type {
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
-import type { EmbeddedHarnessUserInput } from "../src/actors/embedded-harness";
+import type { EmbeddedHarnessUserInput } from "@purin-labs/agent/actors/embedded-harness";
 import {
   MESSAGE_PREPARATION_LIMITS,
   type MessagePreparationAttempt,
   messagePreparationIdentity,
   prepareAcceptedMessageAttachment,
   readAcceptedMessageAttachment,
-} from "../src/actors/message-preparation";
+} from "@purin-labs/agent/actors/message-preparation";
 import {
   beginMessagePreparation,
   createMessagePreparationSchema,
   readMessagePreparation,
-} from "../src/actors/message-preparation-store";
-import { parseStoredAttachment } from "../src/messages/stored-attachment";
+} from "@purin-labs/agent/actors/message-preparation-store";
+import { parseStoredAttachment } from "@purin-labs/agent/messages/stored-attachment";
 import {
   emptySqliteFixture,
   sqlStorage,
@@ -34,7 +34,7 @@ const mocks = vi.hoisted(function createMocks() {
 });
 
 vi.mock(
-  "../src/actors/agent-session-harness-authority",
+  "@purin-labs/agent/actors/agent-session-harness-authority",
   function mockHarnessAuthority() {
     return { preflightHarnessTurnLease: mocks.preflight };
   },

@@ -15,10 +15,10 @@ import {
   SessionExecutionAdmission,
   requireSessionExecution,
   admittedSessionOperation,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import { commerceGraphResponseBody } from "../../commerce/entity-plane/routes";
 import { merchantReportDefinition } from "../../commerce/entity-plane/merchant-reports";
-import type { CommerceObservationEntity } from "../../actors/agent-session-information-flow";
+import type { CommerceObservationEntity } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { runMerchantReport } from "../../commerce/entity-plane/merchant-report-runner";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
@@ -79,7 +79,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   type ToolEffect,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import {
   type PreparedCommerceRead,
   admitCommerceReadObservation,

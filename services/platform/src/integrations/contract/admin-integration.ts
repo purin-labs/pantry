@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { readOrganisationEnvironment } from "../../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import {
   resolveOrganisationProvisioningActor,
   type OrganisationEnvironment,

@@ -8,7 +8,7 @@ import type {
   SupplierPayoutExecutionPlan,
   SupplierPayoutState,
 } from "@purin-labs/commerce-contracts";
-import { readOrganisationEnvironment } from "../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import {
   createSupplierPayoutAttemptStore,
   listSupplierPayoutAttempts,

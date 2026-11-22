@@ -16,10 +16,10 @@ import {
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
-} from "../../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
+import { resolveOrganisationModelRouteForSelection } from "@purin-labs/agent/models/route";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders, type commerceClient } from "./commerce-support";

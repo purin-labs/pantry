@@ -8,7 +8,7 @@ import {
   inspectMediaMetadata as inspect,
   sampleVideoFrames as sample,
 } from "@purin-labs/contracts/media-wasm";
-import mediaWasm from "../../../../packages/contracts/media-wasm-pkg/media_inspect_bg.wasm?module";
+import mediaWasm from "../../../packages/contracts/media-wasm-pkg/media_inspect_bg.wasm?module";
 
 const decoder = new TextDecoder();
 initSync({ module: mediaWasm });

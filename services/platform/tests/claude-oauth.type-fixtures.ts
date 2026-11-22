@@ -1,5 +1,5 @@
 import type { ModelRoute } from "@purin-labs/contracts";
-import type { ClaudeConnection } from "../src/models/claude-connection";
+import type { ClaudeConnection } from "@purin-labs/agent/models/claude-connection";
 
 const claude: ModelRoute = {
   keySource: "organisation_oauth",

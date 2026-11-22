@@ -3,8 +3,8 @@ import {
   OPERATOR_DRAFT_TTL_MS,
   type ProposalStaging,
   type ProposalTurn,
-} from "../../actors/session/proposal-staging";
-import { requireSessionExecution } from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session/proposal-staging";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import {
   createOperatorConfigurationDraft,
   type OperatorConfigurationDraft,

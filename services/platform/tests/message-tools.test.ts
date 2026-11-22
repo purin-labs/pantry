@@ -5,8 +5,8 @@ import {
   createAttachmentInspectionTool,
   createMessageLinkTool,
   userMessageLinks,
-} from "../src/actors/message-tools";
-import type { EmbeddedHarnessUserInput } from "../src/actors/embedded-harness";
+} from "@purin-labs/agent/actors/message-tools";
+import type { EmbeddedHarnessUserInput } from "@purin-labs/agent/actors/embedded-harness";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 const ORGANISATION = "organisation_tools" as OrganisationId;

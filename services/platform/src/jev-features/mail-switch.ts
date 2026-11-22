@@ -12,7 +12,7 @@ import { mailInferenceEligible } from "../mail-inbox/contract/mail-inference-eli
 import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,
-} from "../integrations/typesafe/authority";
+} from "@purin-labs/agent/integrations/typesafe/authority";
 
 /**
  * The Mail classification switch writes `mail_classification_eligibility`, the

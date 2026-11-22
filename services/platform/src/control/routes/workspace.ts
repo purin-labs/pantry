@@ -10,7 +10,7 @@ import {
 } from "../../data/onboarding-projection";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { readCommerceActionLedger } from "../agent-operation-activity";
+import { readCommerceActionLedger } from "@purin-labs/agent/control/agent-operation-activity";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Variant } from "@purin-labs/type-utils";

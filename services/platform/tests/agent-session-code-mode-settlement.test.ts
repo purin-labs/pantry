@@ -11,10 +11,10 @@ import {
   reconcileCodeModeSettlements,
   recordCodeModeWorkspaceCommit,
   type CodeModeSettlementStorage,
-} from "../src/actors/agent-session-code-mode-settlement";
-import { createSessionHarnessAuthoritySchema } from "../src/actors/agent-session-harness-authority";
-import { createActorJournalSchema } from "../src/actors/agent-session-schema";
-import { type CodeModeOrganisationSettleInput } from "../src/actors/code-mode-budget";
+} from "@purin-labs/agent/actors/agent-session-code-mode-settlement";
+import { createSessionHarnessAuthoritySchema } from "@purin-labs/agent/actors/agent-session-harness-authority";
+import { createActorJournalSchema } from "@purin-labs/agent/actors/agent-session-schema";
+import { type CodeModeOrganisationSettleInput } from "@purin-labs/agent/actors/code-mode-budget";
 import { parseRequestId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { fixtureTurnAuthority } from "./fixtures/plan25-turn";
 import {

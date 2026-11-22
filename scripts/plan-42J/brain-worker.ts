@@ -11,7 +11,7 @@ import {
   resolveActiveConnectorActor,
   resolveActiveSessionActor,
 } from "../../foundation/actor-runtime/actors/actor-router";
-import { readSessionTurnMemoryRecords } from "../../services/platform/src/actors/actor-journal/transactions";
+import { readSessionTurnMemoryRecords } from "../../foundation/agent/actors/actor-journal/transactions";
 import {
   acceptEmailHint,
   activateEmailRuntime,
@@ -29,7 +29,7 @@ import { createAccessGrant } from "../../foundation/authority/data/access-grants
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../../services/platform/src/data/agent-operations";
+} from "../../foundation/agent/data/agent-operations";
 import { publishContactVerification } from "../../services/platform/src/data/contact-verification";
 import {
   assignAgentMailbox,

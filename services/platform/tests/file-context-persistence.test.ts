@@ -25,7 +25,7 @@ import {
   reserveFileExtractionBudget,
   scheduleFileReconciliationHint,
   settleFileGrantReady,
-} from "../src/context/files";
+} from "@purin-labs/agent/context/files/index";
 import { revokeVersionedAccessGrant } from "@purin-labs/authority/access-control/grant-mutations";
 import { d1Database } from "./sqlite-d1";
 import {

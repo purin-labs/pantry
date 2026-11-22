@@ -8,7 +8,7 @@ import type {
   TurnMemoryRead,
   TurnMemoryReader,
   TurnMemoryReadRequest,
-} from "../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";
 import { readVerifiedMessageSender } from "./verified-sender";
 import type { Env } from "@purin-labs/kernel/env";
 import type {

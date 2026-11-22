@@ -1,7 +1,7 @@
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { InboxDoc, ROOT_CONVERSATION_ID } from "@earendil-works/pi-durable";
 import { SqliteStorage } from "@earendil-works/pi-durable/storage/sqlite";
-import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durable-database.ts";
+import { ActorSqliteDatabase } from "../../foundation/agent/actors/pi-durable-database.ts";
 import { parsePortalInputIdentity } from "./portal-input-identity.mjs";
 import {
   authorizePortalObservation,

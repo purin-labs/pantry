@@ -1,7 +1,7 @@
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
-import { readAgentOperations } from "../src/data/agent-operations";
+import { readAgentOperations } from "@purin-labs/agent/data/agent-operations";
 import {
   createOperatorConfigurationDraft,
   readPendingOperatorDraft,

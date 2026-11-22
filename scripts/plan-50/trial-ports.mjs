@@ -5,6 +5,6 @@
 // implementations, before it serves a request.
 import "../../services/platform/src/worker-ports.ts";
 import { authorizeChatHarnessLease } from "../../services/platform/src/chat/turn-access.ts";
-import { registerSessionTurnAccess } from "../../services/platform/src/actors/session-turn-access.ts";
+import { registerSessionTurnAccess } from "../../foundation/agent/actors/session-turn-access.ts";
 
 registerSessionTurnAccess(authorizeChatHarnessLease);

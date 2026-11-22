@@ -15,7 +15,7 @@ import {
   startActorRelocation,
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { SessionDO } from "../../src/actors/agent-session";
-import { listHarnessCheckpointObjectKeys } from "../../src/actors/agent-session-harness-authority";
+import { listHarnessCheckpointObjectKeys } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { freezeOrganisationPlacementMove } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   parseOrganisationPlacementMoveTarget,

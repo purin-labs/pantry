@@ -11,7 +11,7 @@ import {
   saveConversation,
   type ConversationScope,
 } from "../../chat/store";
-import { resolveOrganisationModelRoute } from "../../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import { readProject } from "../../projects/records";
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";

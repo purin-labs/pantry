@@ -4,7 +4,7 @@ import { sessionActionMutationExecution } from "./action-mutation-execution";
 import {
   requireSessionExecution,
   admittedSessionOperation,
-} from "./session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import type {
   CommerceProjection,
   CommerceSource,
@@ -38,7 +38,7 @@ import {
   sessionObservedCommerceEntity,
   sessionObservedCommerceEntityId,
   type CommerceObservationEntity,
-} from "./agent-session-information-flow";
+} from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   merchantPluginInstallation,
   type InstallMerchantPluginAction,
@@ -94,14 +94,14 @@ import { resolveCommerceCancellationAuthority } from "../commerce/provider";
 import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
-import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
+import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
 import { readOfferPriceAllowanceView } from "../commerce/contract/offer-price-allowance";
 import {
   commerceApprovalCardTexts,
   type CommerceChangeFacts,
 } from "../commerce/contract/approval-card-texts";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "../slack/card-only-reply";
-import type { SessionToolContext } from "../agent-tools/context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import type { MenuPriceProposalRequest } from "../commerce/contract/types";
 
 function commerceActionProjectionTarget(action: CommerceActionRequest): {

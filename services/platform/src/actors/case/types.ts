@@ -22,7 +22,7 @@ import type {
   MerchantActionDecision,
   MerchantActionRejectionEvidence,
 } from "@purin-labs/authority/approval-authentication";
-import type { CaseContextReplayAuthority } from "../../context/projection";
+import type { CaseContextReplayAuthority } from "@purin-labs/agent/context/projection/index";
 import { FlowBinding } from "@purin-labs/authority/policy/index";
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";

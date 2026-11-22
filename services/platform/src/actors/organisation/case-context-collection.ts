@@ -12,7 +12,7 @@ import {
   type VerifiedContactEndpoint,
 } from "../../data/contact-verification";
 import type { Result } from "@purin-labs/kernel/result";
-import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
+import { readCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
@@ -24,7 +24,7 @@ import {
   type CaseContextCollection,
   type CaseContextCollectionRelationship,
   type CaseContextCollectionScope,
-} from "../../case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import {
   readAgentMailboxBinding,
   readMailboxIngressPolicy,
@@ -35,11 +35,11 @@ import type {
   OperationalCaseContextDiscoveryEvidence,
   OperationalCaseContextDiscoveryRequest,
   OperationalCaseContextDiscoverySourceRequest,
-} from "../../case-context-discovery/operational-evaluation";
-import { identifier } from "../../case-context-discovery/policy";
+} from "@purin-labs/agent/case-context-discovery/operational-evaluation";
+import { identifier } from "@purin-labs/agent/case-context-discovery/policy";
 import { assertNever, isRecord } from "@purin-labs/std";
 import type { CaseContextCollectionReviewCommand } from "@purin-labs/control-api";
-import type { PolicyCaseContextSourcePort } from "./organisation-policy";
+import type { PolicyCaseContextSourcePort } from "@purin-labs/agent/actors/organisation/organisation-policy";
 import { organisationPlacementConflict } from "@purin-labs/tenancy/actors/organisation/organisation-record";
 
 function parseOperationalCaseContextDiscoverySourceRequest(

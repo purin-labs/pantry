@@ -17,7 +17,7 @@ import {
 import {
   composeAgentInstructions,
   resolveCaseTurnAgentProfile,
-} from "../data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 import {
   createCurrentSourceFlowLabel,
   FlowBinding,
@@ -25,7 +25,7 @@ import {
   joinFlowLabels,
 } from "@purin-labs/authority/policy/information-flow/index";
 import type { RequestAuthority, SessionProposal } from "@purin-labs/contracts";
-import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import {
   deriveGmailReplyTarget,
   digestEmailBody,
@@ -51,8 +51,8 @@ import {
   fenceEmailCaseContextCollectionEffect,
   claimEmailCaseContextCollectionDraft,
 } from "./email-case-context-collection-evidence";
-import type { CaseContextCollectionEvidenceDependency } from "../case-context-discovery/evidence";
-import type { CaseContextCollectionProposalEvidence } from "../case-context-discovery/evidence";
+import type { CaseContextCollectionEvidenceDependency } from "@purin-labs/agent/case-context-discovery/evidence";
+import type { CaseContextCollectionProposalEvidence } from "@purin-labs/agent/case-context-discovery/evidence";
 import {
   clearEmailProposalFlow,
   emailTurnDestinationMayReceive,
@@ -60,7 +60,7 @@ import {
   readEmailProposalFlow,
   readPlainReplyRecipient,
 } from "./email-case-context-collection-evidence";
-import { serializeContextBundle } from "./actor-journal/parsers";
+import { serializeContextBundle } from "@purin-labs/agent/actors/actor-journal/parsers";
 import {
   clearEmailProposalMemory,
   recordEmailProposalMemory,
@@ -76,7 +76,7 @@ import type {
   EmailReplySources,
 } from "../mail-inbox/reply-sources";
 import type { ShownMemoryRevision } from "../memory/contract/turn-memory";
-import { caseContextCollectionEvidenceDependency } from "../case-context-discovery/evidence";
+import { caseContextCollectionEvidenceDependency } from "@purin-labs/agent/case-context-discovery/evidence";
 import { bindMailboxCaseContextCollectionAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 
@@ -96,14 +96,14 @@ import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
 } from "@purin-labs/authority/policy-snapshot";
-import { resolveOrganisationModelRoute } from "../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import { readGmailInferenceEligibility } from "../mail-inbox/contract/gmail-inference-eligibility";
 import {
   BACKGROUND_MEMORY_DEADLINE_MS,
   prepareTurnAuthority,
   prepareTurnContext,
   assembleTurnContext,
-} from "../context/turn-context";
+} from "@purin-labs/agent/context/turn-context";
 import {
   buildAgentMailboxAuthority,
   validateLiveAutomationAuthority,

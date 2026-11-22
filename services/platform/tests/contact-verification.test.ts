@@ -41,7 +41,7 @@ import { handleContactVerification } from "../src/control/routes/contact-verific
 import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionScope,
-} from "../src/case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import { matchAgentControlRoute } from "../src/control/routes/agents";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

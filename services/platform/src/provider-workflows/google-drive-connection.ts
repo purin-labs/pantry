@@ -21,7 +21,7 @@ import {
   refreshGoogleDriveAccessToken,
   revokeGoogleDriveToken,
   type GoogleDriveProtocolError,
-} from "../provider-adapters/google-drive";
+} from "@purin-labs/agent/provider-adapters/google-drive";
 import {
   providerHttpFailure,
   type ProviderCleanupAdapter,

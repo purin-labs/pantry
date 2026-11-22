@@ -22,8 +22,8 @@ import { traceLog } from "@purin-labs/kernel/observability";
 import {
   SessionExecutionAdmission,
   admittedSessionOperation,
-} from "../../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import {
   dispatchBakerySurfaceEffect,
   resumeBakerySurfaceEffect,
@@ -38,7 +38,7 @@ import type {
   HarnessBakerySurfaceToolResult,
 } from "../kitchen/services";
 import { BakeryContextRequestError } from "../kitchen/services";
-import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   ObservationEvidence,

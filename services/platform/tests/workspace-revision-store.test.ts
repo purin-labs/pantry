@@ -14,7 +14,7 @@ import { describe, expect, test } from "vitest";
 import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
-} from "../src/data/organisation-workspace";
+} from "@purin-labs/agent/data/organisation-workspace";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   commitWorkspaceRevision,
@@ -24,7 +24,7 @@ import {
   verifyWorkspaceRevisionReceipt,
   type PreparedWorkspaceRevisionMutation,
   type WorkspaceRevisionProposal,
-} from "../src/workspace-revision-store";
+} from "@purin-labs/agent/workspace-revision-store";
 import { d1Database } from "./sqlite-d1";
 
 describe("workspace revision store", () => {

@@ -4,7 +4,7 @@ import {
   WORKSPACE_EXECUTOR_RESERVED_COST_MICROS,
   type WorkspaceExecutorAllocationParent,
   type WorkspaceExecutorAllocationReservation,
-} from "../src/actors/code-mode-budget";
+} from "@purin-labs/agent/actors/code-mode-budget";
 import type { SessionId, OrganisationId } from "@purin-labs/kernel/ids";
 
 declare const organisationId: OrganisationId;

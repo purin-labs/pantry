@@ -16,7 +16,7 @@ import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-
 import {
   prepareOrganisationSlackReasoningEffortWrite,
   readOrganisationInferenceSelection,
-} from "../../data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 
 /**
  * `/v1/control/organisations/:id/inference/slack-reasoning-effort`: the level

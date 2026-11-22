@@ -8,11 +8,11 @@ import {
   SURFACE_EFFECT_SIGNAL,
 } from "@purin-labs/control-api";
 import { openSocket } from "./hibernatable-socket-support";
-import { parseStoredAttachment } from "../../src/messages/stored-attachment";
+import { parseStoredAttachment } from "@purin-labs/agent/messages/stored-attachment";
 import {
   parseChatForkHistory,
   chatForkHistoryDigest,
-} from "../../src/chat/fork-history";
+} from "@purin-labs/agent/chat/fork-history";
 import {
   parseProjectReference,
   type ProjectSnapshot,
@@ -20,8 +20,8 @@ import {
 import { currentProjectSnapshot } from "../../src/chat/project-context-binding";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
 import { requireDefaultProjectId } from "../fixtures/default-project";
-import { parseContinuation } from "../../src/actors/agent-session-continuation";
-import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
+import { parseContinuation } from "@purin-labs/agent/actors/agent-session-continuation";
+import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { readProjectDirectory } from "../../src/chat/projects";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
@@ -110,7 +110,7 @@ import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorizatio
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { SessionDO } from "../../src/actors/agent-session";
 import type { CaseDO } from "../../src/actors/case";
-import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harness-authority";
+import { readLatestHarnessCheckpoint } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { ObservationEvidence } from "@purin-labs/authority/policy/information-flow/oac";
 import { requireConversationId } from "../test-ids";
 import {
@@ -120,7 +120,7 @@ import {
 } from "../../src/data/merchant-agent-preset";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import { readPortalOutput } from "./full-worker";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const CONVERSATION_ID = "conv_cc97400f-2eb9-52d3-b35e-56a9ef3e6085";
 const LONG_TEXT = 'Canonical long response: café, 焼き菓子, "quoted". '
@@ -4678,7 +4678,7 @@ type SourceCheckpointEvidence =
 ;
 
 function checkpointSourceBinding(
-  binding: import("../../src/chat/fork-history").ChatHistoryBinding,
+  binding: import("@purin-labs/agent/chat/fork-history").ChatHistoryBinding,
 ): boolean {
   return (
     binding.requestId === "project_autumn_request" &&
@@ -4688,7 +4688,7 @@ function checkpointSourceBinding(
 
 async function provePiSourceCheckpoint(
   scope: ConversationScope,
-  cutoff: import("../../src/chat/fork-history").ChatHistoryBinding,
+  cutoff: import("@purin-labs/agent/chat/fork-history").ChatHistoryBinding,
   evidence: ProjectProviderEvidence,
 ): Promise<Extract<SourceCheckpointEvidence, { kind: "checkpointed" }>> {
   const sessionId = parseSessionId(cutoff.sessionId);
@@ -4796,8 +4796,8 @@ async function proveUnavailableForkPrefix(
 }
 
 function corruptForkCursor(
-  binding: import("../../src/chat/fork-history").ChatHistoryBinding,
-): import("../../src/chat/fork-history").ChatHistoryBinding {
+  binding: import("@purin-labs/agent/chat/fork-history").ChatHistoryBinding,
+): import("@purin-labs/agent/chat/fork-history").ChatHistoryBinding {
   return {
     requestId: binding.requestId,
     responseId: binding.responseId,
@@ -4890,7 +4890,7 @@ function hasStopSource(prompt: string): boolean {
 }
 
 function isStoppedSourceBinding(
-  binding: import("../../src/chat/fork-history").ChatHistoryBinding,
+  binding: import("@purin-labs/agent/chat/fork-history").ChatHistoryBinding,
 ): boolean {
   return binding.requestId === "fork_stop_source";
 }

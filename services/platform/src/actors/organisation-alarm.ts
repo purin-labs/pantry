@@ -1,4 +1,4 @@
-import { nextAbandonedCueClaimAt } from "./cue-delivery";
+import { nextAbandonedCueClaimAt } from "@purin-labs/agent/actors/cue-delivery";
 import { readSocketSweepDueAt } from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { nextJevUsageAt } from "../jev-features/usage-records";

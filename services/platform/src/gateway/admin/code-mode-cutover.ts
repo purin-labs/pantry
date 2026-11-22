@@ -2,12 +2,12 @@ import {
   readStringField,
   readOrganisationIdField,
 } from "@purin-labs/contracts/boundary";
-import { codeModeExecutionReceiptId } from "../../actors/agent-session-code-mode-settlement";
+import { codeModeExecutionReceiptId } from "@purin-labs/agent/actors/agent-session-code-mode-settlement";
 import type {
   CodeModePlatformAdmissionControlInput,
   CodeModePlatformGovernorError,
-} from "../../actors/code-mode-platform-governor";
-import { codeModePlatformGovernor } from "../../actors/code-mode-platform-governor-stub";
+} from "@purin-labs/agent/actors/code-mode-platform-governor";
+import { codeModePlatformGovernor } from "@purin-labs/agent/actors/code-mode-platform-governor-stub";
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {

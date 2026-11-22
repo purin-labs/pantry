@@ -74,14 +74,14 @@ a native ancestry pointer. Pi's API establishes library support; the cross-Actor
 initialization path passes acceptance with the currently installed Pi SDK.
 Plan 50's Durable adoption must preserve that contract.
 
-| Existing boundary                                                                             | Required addition                                                                                            |
-| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| [Chat timeline](../services/platform/src/chat/timeline.ts)                                    | Bind each eligible displayed response to its exact completed Actor-history cutoff.                           |
-| [Conversation and lifecycle](../services/platform/src/chat/conversation.ts)                   | Required ancestry variants and explicit fork preparation outcomes.                                           |
-| [Chat storage](../services/platform/src/chat/store.ts)                                        | Persist fork identity, immutable prefix binding, directory visibility, and idempotent creation.              |
-| [Chat application](../services/platform/src/chat/application.ts)                              | Authorize source reads and destination creation; initialize a fresh Case/session through existing admission. |
-| [Actor history authority](../services/platform/src/actors/agent-session-harness-authority.ts) | Validate and initialize accepted inherited context without replaying execution events.                       |
-| [Portal chat](../apps/portal/src/features/chat/route.tsx)                                     | Fork action, preparation state, branch navigation, and independent composer.                                 |
+| Existing boundary                                                                        | Required addition                                                                                            |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [Chat timeline](../services/platform/src/chat/timeline.ts)                               | Bind each eligible displayed response to its exact completed Actor-history cutoff.                           |
+| [Conversation and lifecycle](../services/platform/src/chat/conversation.ts)              | Required ancestry variants and explicit fork preparation outcomes.                                           |
+| [Chat storage](../services/platform/src/chat/store.ts)                                   | Persist fork identity, immutable prefix binding, directory visibility, and idempotent creation.              |
+| [Chat application](../services/platform/src/chat/application.ts)                         | Authorize source reads and destination creation; initialize a fresh Case/session through existing admission. |
+| [Actor history authority](../foundation/agent/actors/agent-session-harness-authority.ts) | Validate and initialize accepted inherited context without replaying execution events.                       |
+| [Portal chat](../apps/portal/src/features/chat/route.tsx)                                | Fork action, preparation state, branch navigation, and independent composer.                                 |
 
 Use [NF9's two history lanes](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-14-nf9-actor-owned-history.md#decision).
 Display messages alone cannot reconstruct model history. A visible message ID

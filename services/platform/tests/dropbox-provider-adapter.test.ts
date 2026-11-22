@@ -8,7 +8,7 @@ import {
   listDropboxFolder,
   refreshDropboxAccessToken,
   verifyDropboxWebhookSignature,
-} from "../src/provider-adapters/dropbox";
+} from "@purin-labs/agent/provider-adapters/dropbox";
 
 describe("Dropbox provider protocol", () => {
   it("constructs an offline PKCE authorization request with exact scopes", () => {

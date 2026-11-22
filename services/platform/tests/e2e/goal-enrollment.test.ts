@@ -1,6 +1,6 @@
 import type { CaseDO } from "../../src/actors/case";
 import { fixtureDatabase } from "./organisation-database";
-import type { GoalCommandRequest } from "../../src/actors/case-goals";
+import type { GoalCommandRequest } from "@purin-labs/agent/actors/case-goals";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
@@ -17,7 +17,7 @@ import {
   signedSlackRequest,
   openRouterStream,
 } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(
   "serializes initial goal enrollment with an in-flight untracked turn across Case eviction",

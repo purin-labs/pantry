@@ -1,5 +1,5 @@
-import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
-import { requireSessionExecution } from "../actors/session-execution-admission";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import type { OrganisationMember } from "@purin-labs/tenancy/data/control-plane";
 import {
   createCurrentSourceFlowLabel,
@@ -7,7 +7,7 @@ import {
   digestCanonical,
   ObservationEvidence,
 } from "@purin-labs/authority/policy/index";
-import type { SessionToolContext } from "./context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import { liveDeviceMember } from "./session-support";
 
 /**

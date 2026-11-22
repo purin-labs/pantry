@@ -10,8 +10,8 @@ import {
   ATTACHMENT_TEXT_LIMITS,
   FRAME_SAMPLING_POLICY_REVISION,
   inspectMessageAttachment,
-} from "../src/messages/attachment-inspection";
-import { persistDerivedStills } from "../src/messages/derived-stills";
+} from "@purin-labs/agent/messages/attachment-inspection";
+import { persistDerivedStills } from "@purin-labs/agent/messages/derived-stills";
 import { h264Fixture, waveHeader } from "./media-fixtures";
 import { sha256Hex } from "@purin-labs/std";
 

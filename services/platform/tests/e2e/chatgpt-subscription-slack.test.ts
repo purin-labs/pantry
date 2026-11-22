@@ -6,7 +6,7 @@ import { expect, it, type TestContext } from "vitest";
 import {
   readOrganisationCodexConnection,
   runWeeklyChatGptLoginRefresh,
-} from "../../src/models/codex-connection";
+} from "@purin-labs/agent/models/codex-connection";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   FakeOpenAiApi,

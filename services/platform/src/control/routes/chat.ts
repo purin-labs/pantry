@@ -29,7 +29,7 @@ import {
   selectOrganisationChatModel,
   organisationChatModelOptions,
   type OrganisationModelRoute,
-} from "../../models/route";
+} from "@purin-labs/agent/models/route";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

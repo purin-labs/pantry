@@ -51,11 +51,11 @@ import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,
-} from "./session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import {
   SLACK_TURN_PREFIX,
   turnMayScheduleFollowUp,
-} from "./session/turn-tool-offers";
+} from "@purin-labs/agent/actors/session/turn-tool-offers";
 
 /**
  * Schedule a new turn in this turn's Slack thread. The thread's Connector

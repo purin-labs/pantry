@@ -13,7 +13,7 @@ import { humanUser } from "./draft-seed.mjs";
 import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
 import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
-import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
+import { SessionExecutionAdmission } from "../../foundation/agent/actors/session-execution-admission.ts";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
 import { handleProductDescriptionDraftRoute } from "../../services/platform/src/control/routes/product-description-draft.ts";

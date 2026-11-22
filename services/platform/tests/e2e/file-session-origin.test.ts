@@ -1,4 +1,4 @@
-import { runFileContextReconciliation } from "../../src/context/files/reconciliation";
+import { runFileContextReconciliation } from "@purin-labs/agent/context/files/reconciliation";
 import { fixtureDatabase } from "./organisation-database";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { env, exports } from "cloudflare:workers";
@@ -40,7 +40,7 @@ import {
   applyFileProjectionCommand,
   createFileProjectionCommand,
   replaceFileGrantAdmissions,
-} from "../../src/context/files";
+} from "@purin-labs/agent/context/files/index";
 import {
   initializeFileGrantSync,
   claimFileGrantReconciliation,
@@ -52,12 +52,12 @@ import {
   reserveFileExtractionBudget,
   scheduleFileReconciliationHint,
   upsertFileResourceSource,
-} from "../../src/context/files/persistence";
+} from "@purin-labs/agent/context/files/persistence";
 import type {
   FileProjectionSourceReader,
   FileProjectionMetadata,
-} from "../../src/context/files/projection";
-import type { CanonicalFileReference } from "../../src/context/files/tools";
+} from "@purin-labs/agent/context/files/projection";
+import type { CanonicalFileReference } from "@purin-labs/agent/context/files/tools";
 import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
 
 const TOKEN = "file-session-origin-fixture-token";

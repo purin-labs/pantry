@@ -28,9 +28,9 @@ vi.mock("@purin-labs/control/worker/authorization", async (importOriginal) => ({
   authorizeOrganisationRequest:
     checkoutControlMocks.authorizeOrganisationRequest,
 }));
-vi.mock("../src/control/organisation-runtime", async (importOriginal) => ({
+vi.mock("@purin-labs/agent/control/organisation-runtime", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/control/organisation-runtime")
+    typeof import("@purin-labs/agent/control/organisation-runtime")
   >()),
   readOrganisationEnvironment: checkoutControlMocks.readOrganisationEnvironment,
 }));

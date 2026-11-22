@@ -39,13 +39,13 @@ vi.mock("../src/actors/case-walking-path", async (importOriginal) => ({
   settleTransientEmailAssignment:
     orchestratorMocks.settleTransientEmailAssignment,
 }));
-vi.mock("../src/context/turn-context", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/context/turn-context")>()),
+vi.mock("@purin-labs/agent/context/turn-context", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/context/turn-context")>()),
   prepareTurnContext: orchestratorMocks.prepareTurnContext,
   prepareTurnAuthority: orchestratorMocks.prepareTurnAuthority,
 }));
-vi.mock("../src/models/route", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/models/route")>()),
+vi.mock("@purin-labs/agent/models/route", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/models/route")>()),
   resolveOrganisationModelRoute: orchestratorMocks.resolveOrganisationModelRoute,
 }));
 vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
@@ -53,8 +53,8 @@ vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
   loadOrganisationPolicyOrDefaultDeny:
     orchestratorMocks.loadOrganisationPolicyOrDefaultDeny,
 }));
-vi.mock("../src/data/organisation-workspace", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/organisation-workspace")>()),
+vi.mock("@purin-labs/agent/data/organisation-workspace", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/data/organisation-workspace")>()),
   ensureOrganisationDefaultWorkspace: orchestratorMocks.ensureOrganisationDefaultWorkspace,
 }));
 vi.mock("../src/data/whatsapp", async (importOriginal) => ({

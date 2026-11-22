@@ -19,7 +19,7 @@ import {
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { saveConversation } from "../../src/chat/store";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { parseActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { newActorExportId } from "@purin-labs/actor-runtime/actors/actor-export";

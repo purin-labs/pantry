@@ -11,7 +11,7 @@ import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionScope,
   type CaseContextCollectionSelection,
-} from "../src/case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 

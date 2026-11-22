@@ -19,8 +19,8 @@ import {
   parseCaseContextCollectionEvidenceDependency,
   type CaseContextCollectionEvidenceDependency,
   type CaseContextCollectionEffectAttempt,
-} from "../case-context-discovery/evidence";
-import { caseContextCollectionEvidenceDependency } from "../case-context-discovery/evidence";
+} from "@purin-labs/agent/case-context-discovery/evidence";
+import { caseContextCollectionEvidenceDependency } from "@purin-labs/agent/case-context-discovery/evidence";
 import {
   FlowBinding,
   FlowLabel,
@@ -869,7 +869,7 @@ export async function readEmailProposalEvidence(
   sql: SqlStorage,
   proposalId: string,
 ): Promise<
-  import("../case-context-discovery/evidence").CaseContextCollectionProposalEvidence
+  import("@purin-labs/agent/case-context-discovery/evidence").CaseContextCollectionProposalEvidence
 > {
   const stored = readEmailProposalFlow(sql, proposalId);
   if (stored === null || stored.dependency.kind === "source_only")

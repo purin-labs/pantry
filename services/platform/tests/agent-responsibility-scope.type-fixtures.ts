@@ -1,4 +1,4 @@
-import type { AgentResponsibilityScope } from "../src/data/agent-operations";
+import type { AgentResponsibilityScope } from "@purin-labs/agent/data/agent-operations";
 
 const entityTypeScope: AgentResponsibilityScope = {
   kind: "entity_type",

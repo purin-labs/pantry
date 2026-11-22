@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
-import { CODE_MODE_EXCHANGE_LIMITS } from "../../src/actors/code-mode-governed-remote";
+import { CODE_MODE_EXCHANGE_LIMITS } from "@purin-labs/agent/actors/code-mode-governed-remote";
 import {
   createWorld,
   dispatchCount,

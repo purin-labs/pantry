@@ -1,5 +1,5 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCueQueueMessage } from "../cues/engine";
+import { createCueQueueMessage } from "@purin-labs/agent/cues/engine";
 import {
   listRegionalProviderAccountTargets,
   type ActiveProviderAccountTarget,

@@ -2,7 +2,7 @@ import {
   selectStoredOrganisationChatModel,
   organisationChatModelOptions,
   type OrganisationModelRoute,
-} from "../../models/route";
+} from "@purin-labs/agent/models/route";
 import type { Conversation } from "../conversation";
 import type { ChatEffort } from "@purin-labs/control-api";
 

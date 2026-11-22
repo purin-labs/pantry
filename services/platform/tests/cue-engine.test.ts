@@ -15,17 +15,17 @@ import {
   type CueSnapshot,
   type StripeChargeFailedCueEvent,
   type TierOneCueSubscription,
-} from "../src/cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   addIgnoredCueToBatch,
   type IgnoredCueAggregate,
-} from "../src/cues/ignore-aggregate";
+} from "@purin-labs/agent/cues/ignore-aggregate";
 import {
   claimCueDelivery,
   completeClaimedCueDelivery,
   createCueDeliverySchema,
   type CueClaimInput,
-} from "../src/actors/cue-delivery";
+} from "@purin-labs/agent/actors/cue-delivery";
 import {
   parseChannelId,
   parseIntegrationAccountId,
@@ -38,7 +38,7 @@ import {
   type CueMutationAuthorization,
   type CueMatchedDelivery,
   type CueSettlement,
-} from "../src/cues/queue-consumer";
+} from "@purin-labs/agent/cues/queue-consumer";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { requireRequestId } from "./test-ids";
 

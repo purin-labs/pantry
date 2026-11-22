@@ -75,7 +75,7 @@ Organisation, and the mail journeys fail. Before the end:
    list of zero-retention endpoints (`https://openrouter.ai/api/v1/endpoints/zdr`).
 2. Check that each request of the model still sets `data_collection: "deny"`
    and `zdr: true` (`PLATFORM_PI_MODEL_TABLE` in
-   `services/platform/src/actors/pi-model-transport.ts`).
+   `foundation/agent/actors/pi-model-transport.ts`).
 3. Check in OpenRouter's privacy settings of the Purin account that Input &
    Output Logging is off, and that "ZDR only" for Google models is off.
    "ZDR only" refuses every Gemini request: Google Vertex AI serves Gemini

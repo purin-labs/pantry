@@ -1,18 +1,18 @@
 import { createMailEvaluationSchema } from "../../mail-inbox/evaluation";
 import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
-import { createCueDeliverySchema } from "../cue-delivery";
+import { createCueDeliverySchema } from "@purin-labs/agent/actors/cue-delivery";
 import { createCommerceProjectionSchema } from "../commerce-projection";
 import { createShopifyLocationObservationSchema } from "../../shopify/location-observation";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
-import { createCaseContextDiscoveryEvaluationSchema } from "../../case-context-discovery/evaluation-store";
+import { createCaseContextDiscoveryEvaluationSchema } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import { createEvalSchema } from "../../evals/store";
 import { createMemorySchema } from "../../memory/store";
-import { createCaseContextCollectionEvidenceSchema } from "../../case-context-discovery/evidence";
-import { createTypeSafeConnectionSchema } from "../../integrations/typesafe/connection";
+import { createCaseContextCollectionEvidenceSchema } from "@purin-labs/agent/case-context-discovery/evidence";
+import { createTypeSafeConnectionSchema } from "@purin-labs/agent/integrations/typesafe/connection";
 import { createJevScreenRelevanceSchema } from "../../jev-features/screen-relevance";
 import { createJevUsageRecordSchema } from "../../jev-features/usage-records";
-import { createJevPaidUseSchema } from "../../jev-features/paid-use";
-import { createCaseContextCollectionRelationshipSchema } from "../../case-context-discovery/relationships";
+import { createJevPaidUseSchema } from "@purin-labs/agent/jev-features/paid-use";
+import { createCaseContextCollectionRelationshipSchema } from "@purin-labs/agent/case-context-discovery/relationships";
 
 export function createOrganisationSchema(storage: DurableObjectStorage): void {
   const sql = storage.sql;

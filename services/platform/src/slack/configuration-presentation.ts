@@ -3,7 +3,7 @@ import type { WorkflowChangeCommand } from "../commerce/bakery/workflow-proposal
 import type {
   AgentOperationInput,
   AgentOperationsSnapshot,
-} from "../data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   previewCode,
   type OperatorConfigurationDraft,

@@ -1,9 +1,9 @@
 import { sha256Hex } from "../../packages/std/src/index.ts";
-import { applyAgentOperation } from "../../services/platform/src/data/agent-operations.ts";
+import { applyAgentOperation } from "../../foundation/agent/data/agent-operations.ts";
 import {
   composeAgentInstructions,
   resolveCaseTurnAgentProfile,
-} from "../../services/platform/src/data/pinned-agent-profile.ts";
+} from "../../foundation/agent/data/pinned-agent-profile.ts";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 
 const installationId = "installation_plan50_native";

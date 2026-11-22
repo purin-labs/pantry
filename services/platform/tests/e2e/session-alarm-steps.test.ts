@@ -3,7 +3,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
-import { SessionTurnRecovery } from "../../src/actors/session/session-turn-recovery";
+import { SessionTurnRecovery } from "@purin-labs/agent/actors/session/session-turn-recovery";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
 import {

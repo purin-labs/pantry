@@ -119,35 +119,36 @@ import. A module with no line for one of these has none.
 ## foundation/agent
 
 - Folders: 29
-  - `services/platform/src/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/actor-journal/`
-  - `services/platform/src/actors/organisation/`
-  - `services/platform/src/actors/session/`
-  - `services/platform/src/agent-tools/`
-  - `services/platform/src/case-context-discovery/`
-  - `services/platform/src/case-execution/`
-  - `services/platform/src/chat/`
-  - `services/platform/src/chatgpt-exit/`
-  - `services/platform/src/code-mode-sandbox/`
-  - `services/platform/src/context/`
-  - `services/platform/src/context/assembly/`
-  - `services/platform/src/context/files/`
-  - `services/platform/src/context/projection/`
-  - `services/platform/src/control/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/control/routes/agents/`
-  - `services/platform/src/cues/`
-  - `services/platform/src/data/`
-  - `services/platform/src/data/agent-operations/`
-  - `services/platform/src/integrations/typesafe/`
-  - `services/platform/src/jev-features/`
-  - `services/platform/src/messages/`
-  - `services/platform/src/model-exit/`
-  - `services/platform/src/models/`
-  - `services/platform/src/provider-adapters/`
-  - `services/platform/src/provider-workflows/`
-  - `services/platform/src/schedules/`
+  - `foundation/agent/`
+  - `foundation/agent/actors/`
+  - `foundation/agent/actors/actor-journal/`
+  - `foundation/agent/actors/organisation/`
+  - `foundation/agent/actors/session/`
+  - `foundation/agent/agent-tools/`
+  - `foundation/agent/case-context-discovery/`
+  - `foundation/agent/case-execution/`
+  - `foundation/agent/chat/`
+  - `foundation/agent/chatgpt-exit/`
+  - `foundation/agent/code-mode-sandbox/`
+  - `foundation/agent/context/`
+  - `foundation/agent/context/assembly/`
+  - `foundation/agent/context/files/`
+  - `foundation/agent/context/projection/`
+  - `foundation/agent/control/`
+  - `foundation/agent/control/routes/`
+  - `foundation/agent/control/routes/agents/`
+  - `foundation/agent/cues/`
+  - `foundation/agent/data/`
+  - `foundation/agent/data/agent-operations/`
+  - `foundation/agent/integrations/typesafe/`
+  - `foundation/agent/jev-features/`
+  - `foundation/agent/messages/`
+  - `foundation/agent/model-exit/`
+  - `foundation/agent/models/`
+  - `foundation/agent/provider-adapters/`
+  - `foundation/agent/provider-workflows/`
+  - `foundation/agent/schedules/`
+- Packages: `foundation/agent`
 - Tables (36): `agent_area_assignment`, `agent_configuration_proposal`, `agent_definition`, `agent_definition_revision`, `agent_installation`, `agent_installation_governance`, `agent_responsibility_scope`, `case_assignment_pin`, `context_projection`, `cue_binding`, `cue_log`, `cue_subscription`, `escalation_policy`, `file_extraction_budget`, `file_grant_admission`, `file_grant_sync`, `file_projection_outbox`, `file_provider_cursor`, `file_resource_source`, `operational_area`, `organisation_claude_authorization`, `organisation_claude_connection`, `organisation_codex_authorization_attempt`, `organisation_codex_connection`, `organisation_default_workspace`, `organisation_inference_selection`, `organisation_slack_reasoning_effort`, `organisation_workspace`, `schedule_binding`, `schedule_dispatch_receipt`, `skill`, `skill_binding`, `skill_revision`, `workspace_revision`, `workspace_revision_head`, `workspace_revision_receipt`
 
 ## foundation/conversation

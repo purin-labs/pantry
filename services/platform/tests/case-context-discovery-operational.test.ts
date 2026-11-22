@@ -3,12 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import {
   createCaseContextDiscoveryEvaluationSchema,
   publishCaseContextDiscoveryPolicy,
-} from "../src/case-context-discovery/evaluation-store";
-import { CASE_CONTEXT_DISCOVERY_JEV_MODEL } from "../src/case-context-discovery/jev";
-import { evaluateOperationalCaseContextDiscovery } from "../src/case-context-discovery/operational-evaluation";
+} from "@purin-labs/agent/case-context-discovery/evaluation-store";
+import { CASE_CONTEXT_DISCOVERY_JEV_MODEL } from "@purin-labs/agent/case-context-discovery/jev";
+import { evaluateOperationalCaseContextDiscovery } from "@purin-labs/agent/case-context-discovery/operational-evaluation";
 import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
-import { parseCaseContextDiscoveryPolicy } from "../src/case-context-discovery/policy";
+import { parseCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/policy";
 import {
   createCaseContextCollectionRelationshipSchema,
   decideCaseContextCollectionRelationship,
@@ -17,10 +17,10 @@ import {
   readCaseContextCollection,
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionSelection,
-} from "../src/case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import { parseOrganisationId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
-import { createTypeSafeConnectionSchema } from "../src/integrations/typesafe/connection";
+import { createTypeSafeConnectionSchema } from "@purin-labs/agent/integrations/typesafe/connection";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";

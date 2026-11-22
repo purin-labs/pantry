@@ -13,7 +13,7 @@ import { parseCanvasServerMessage } from "@purin-labs/workflow-canvas-crdt/proto
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
@@ -31,7 +31,7 @@ import {
 import { control } from "./chat-journey-support";
 import { network } from "./network";
 import { openRouterText, requiredPlacement } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 // A frame that has not come within this time does not come.
 const QUIET_MS = 750;

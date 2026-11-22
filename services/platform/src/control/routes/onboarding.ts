@@ -51,7 +51,7 @@ import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   activationModelRouteError,
   resolveOrganisationModelRoute,
-} from "../../models/route";
+} from "@purin-labs/agent/models/route";
 import { holdOrganisationPolicyDistribution } from "@purin-labs/authority/policy-snapshot";
 import { providerServices } from "../../integrations/contract/provider-services";
 import {

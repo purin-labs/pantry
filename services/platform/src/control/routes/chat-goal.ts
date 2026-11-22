@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { parseGoalCommandRequest } from "../../actors/case-goals";
+import { parseGoalCommandRequest } from "@purin-labs/agent/actors/case-goals";
 import {
   authorizeConversation,
   conversationCaseIdentity,
@@ -17,7 +17,7 @@ import type { Conversation } from "../../chat/conversation";
 import { readConversation, type ConversationScope } from "../../chat/store";
 import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { resolveOrganisationModelRoute } from "../../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {

@@ -5,10 +5,10 @@ import type {
   EmbeddedHarnessModelRouteLease,
   EmbeddedHarnessSource,
   EmbeddedHarnessTurnResult,
-} from "../src/actors/embedded-harness";
-import type { CanonicalHarnessCheckpointInput } from "../src/actors/agent-session-harness-checkpoint";
-import type { CommitHarnessCheckpointInput } from "../src/actors/agent-session-harness-authority";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
+} from "@purin-labs/agent/actors/embedded-harness";
+import type { CanonicalHarnessCheckpointInput } from "@purin-labs/agent/actors/agent-session-harness-checkpoint";
+import type { CommitHarnessCheckpointInput } from "@purin-labs/agent/actors/agent-session-harness-authority";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const invalidAuthorizedRead: AuthorizedHarnessToolResult = {
   kind: "read",

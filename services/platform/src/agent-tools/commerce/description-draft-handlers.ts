@@ -11,8 +11,8 @@ import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-run
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { DescriptionDraftRequestError } from "./services";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
@@ -26,7 +26,7 @@ import {
   type ToolEffect,
 } from "../session-support";
 import { prepareCommerceReadForEmbeddedHarness } from "./handlers";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import {
   admitCommerceReadObservation,
   prepareSharedCommerceObservation,

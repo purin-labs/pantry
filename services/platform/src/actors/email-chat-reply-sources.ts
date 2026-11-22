@@ -1,4 +1,4 @@
-import { memoryObservationRecordId } from "../context/assembly";
+import { memoryObservationRecordId } from "@purin-labs/agent/context/assembly/index";
 import { ObservationEvidence } from "@purin-labs/authority/policy/index";
 import {
   replySourceReference,

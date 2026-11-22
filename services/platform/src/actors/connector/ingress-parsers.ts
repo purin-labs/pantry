@@ -5,7 +5,7 @@ import type {
   ConnectorIdentity,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import { parseStoredAttachmentList } from "../../messages/stored-attachment";
+import { parseStoredAttachmentList } from "@purin-labs/agent/messages/stored-attachment";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   checked,

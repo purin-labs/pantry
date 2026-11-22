@@ -6,7 +6,7 @@ import type {
 import type {
   CaseContextReplayAuthority,
   ContextVisibility,
-} from "../../context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import { FlowBinding, FlowLabel } from "@purin-labs/authority/policy/index";
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";

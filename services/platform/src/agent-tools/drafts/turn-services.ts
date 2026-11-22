@@ -1,5 +1,5 @@
-import type { ToolTurnContext } from "../../actors/session/tool-wiring";
-import { withToolContext } from "../context";
+import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
+import { withToolContext } from "@purin-labs/agent/agent-tools/context";
 import {
   archiveMenuBoardForEmbeddedHarness,
   createMenuBoardForEmbeddedHarness,

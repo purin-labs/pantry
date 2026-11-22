@@ -4,7 +4,10 @@ import {
   goalCommandFailureMessage,
   type SlackGoalCommand,
 } from "../../slack/goal-command";
-import { readCaseGoal, applyCaseGoalCommand } from "../case-goals";
+import {
+  readCaseGoal,
+  applyCaseGoalCommand,
+} from "@purin-labs/agent/actors/case-goals";
 import type {
   CaseAssignment,
   CaseAssignmentLifecycle,

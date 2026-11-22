@@ -55,7 +55,7 @@ import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/ca
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {

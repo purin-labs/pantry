@@ -56,7 +56,7 @@ import {
   type CueClaimInput,
   type CueClaimResult,
   type CueDeliveryError,
-} from "../cue-delivery";
+} from "@purin-labs/agent/actors/cue-delivery";
 import {
   applyCommerceDelivery,
   markCommerceCuesEnqueued,
@@ -120,7 +120,7 @@ import {
   type WorkspaceExecutorAllocationReservation,
   type WorkspaceExecutorAllocationReserveInput,
   type WorkspaceExecutorAllocationSettleInput,
-} from "../code-mode-budget";
+} from "@purin-labs/agent/actors/code-mode-budget";
 import {
   inspectOrganisationCutoverQuiescence,
   type OrganisationCutoverInspectionError,
@@ -138,7 +138,7 @@ import {
 } from "@purin-labs/authority/policy/index";
 import { isNonNegativeInteger } from "@purin-labs/std";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
-import { settleExpiredOrganisationCutoverCue } from "../cue-delivery";
+import { settleExpiredOrganisationCutoverCue } from "@purin-labs/agent/actors/cue-delivery";
 import {
   commerceProjectionKindForRelationType,
   commerceRelationshipTraversalPlan,
@@ -154,7 +154,7 @@ import type {
   ReadCommerceRelationshipStepInput,
 } from "./commerce-types";
 import type { CafeCommerceAcceptanceFaultRecord } from "../../commerce/contract/types";
-import type { CodeModeOrganisationActorError } from "./code-mode-types";
+import type { CodeModeOrganisationActorError } from "@purin-labs/agent/actors/organisation/code-mode-types";
 import type {
   OrganisationCutoverCueSettlementError,
   OrganisationCutoverCueSettlementInput,
@@ -165,7 +165,7 @@ import {
   organisationPlacementConflict,
   validateActionOrganisation,
 } from "@purin-labs/tenancy/actors/organisation/organisation-record";
-import { validateCodeModeOrganisation } from "./code-mode-organisation";
+import { validateCodeModeOrganisation } from "@purin-labs/agent/actors/organisation/code-mode-organisation";
 
 const CAFE_COMMERCE_ACCEPTANCE_FAULT_KEY = "acceptance:cafe-commerce-fault:v1";
 

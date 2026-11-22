@@ -27,7 +27,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionScope,
-} from "../src/case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("Cue CaseContextCollection Actor boundary", suite);

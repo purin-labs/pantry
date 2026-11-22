@@ -1,9 +1,9 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { OrganisationModelRoute } from "../models/route";
+import type { OrganisationModelRoute } from "@purin-labs/agent/models/route";
 import {
   digestModelRoute,
   resolveOrganisationModelRoute,
-} from "../models/route";
+} from "@purin-labs/agent/models/route";
 import type { Env } from "@purin-labs/kernel/env";
 import type { MailAssistantStatus } from "@purin-labs/control-api";
 import type { MailOrganizationActorInput } from "./commands";

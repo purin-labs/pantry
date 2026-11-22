@@ -15,7 +15,7 @@ import {
 } from "../agent-tools/channels/whatsapp-agent";
 import { modelToolDefinition } from "@purin-labs/agent-tools/define-tool";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
-import type { HarnessToolHost } from "./embedded-harness";
+import type { HarnessToolHost } from "@purin-labs/agent/actors/embedded-harness";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

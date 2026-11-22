@@ -24,7 +24,7 @@ import { currentProjectSnapshot } from "../project-context-binding";
 import { resolveCustomConnectorDetail } from "../../custom-connectors/projection";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
-import { readOrganisationCodexConnection } from "../../models/codex-connection";
+import { readOrganisationCodexConnection } from "@purin-labs/agent/models/codex-connection";
 import {
   deriveDirectCaseIdentities,
   deriveConversationTurnStream,
@@ -43,8 +43,8 @@ import {
   traceConversationFailure,
 } from "../generation-failure";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import type { OrganisationModelRoute } from "../../models/route";
-import { createWorkerMessageLinkEgress } from "../../messages/link-egress";
+import type { OrganisationModelRoute } from "@purin-labs/agent/models/route";
+import { createWorkerMessageLinkEgress } from "@purin-labs/agent/messages/link-egress";
 import {
   readConnectorDocumentation,
   parseConnectorAuthoringOutput,

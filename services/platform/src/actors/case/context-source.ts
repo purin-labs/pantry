@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { deriveUserMessageViews } from "../../messages/message-wasm";
+import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-wasm";
 import type {
   CaseAssignment,
   CaseAssignmentLifecycle,
@@ -21,15 +21,15 @@ import type {
   CaseContextSource,
   CaseContextSourceReader,
   CaseContextSourceReaderError,
-} from "../../context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import {
   createContextProjectionCommand,
   MAX_BOUNDED_CONTEXT_TEXT_CHARS,
-} from "../../context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import type {
   CaseContextTailCandidate,
   CaseContextTailReader,
-} from "../../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";
 import {
   encodeContextVisibility,
   parseContextVisibility as parseStoredContextVisibility,

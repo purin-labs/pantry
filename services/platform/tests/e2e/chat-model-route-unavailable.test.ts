@@ -4,7 +4,7 @@ import type { ConversationId } from "@purin-labs/control-api";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
-} from "../../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import {
   controlPaths,
   post,

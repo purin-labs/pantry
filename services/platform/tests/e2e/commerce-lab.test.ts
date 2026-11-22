@@ -13,10 +13,10 @@ import {
   compileAndStoreCueSnapshot,
   writeTierOneCommerceSubscription,
   type CommerceCueEventType,
-} from "../../src/cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CaseSnapshot } from "../../src/actors/case/types";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseCaseId,

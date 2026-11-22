@@ -6,9 +6,9 @@ import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-acc
 import {
   turnMemoryReaderWithoutSubjects,
   type TurnMemoryReader,
-} from "../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";
 import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import type { ContextAssemblyResult } from "../context/assembly";
+import type { ContextAssemblyResult } from "@purin-labs/agent/context/assembly/index";
 import { admitProjectContext } from "../projects/context";
 import { admitChatInput } from "../chat/input-admission";
 import {
@@ -45,13 +45,13 @@ import {
   resolveOrganisationModelRouteAtScope,
   selectOrganisationChatModel,
   type OrganisationModelRoute,
-} from "../models/route";
+} from "@purin-labs/agent/models/route";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
 } from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
-import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { deriveStableCaseId } from "@purin-labs/kernel/case-identity";
 import { ensureCaseProject } from "../projects/case-project";
 import type { Env } from "@purin-labs/kernel/env";
@@ -74,18 +74,18 @@ import {
   type DirectTwoSessionCasePathResult,
   type CaseWalkingPathError,
 } from "./case-walking-path";
-import type { EmbeddedHarnessThinkingLevel } from "./embedded-harness";
+import type { EmbeddedHarnessThinkingLevel } from "@purin-labs/agent/actors/embedded-harness";
 import {
   prepareTurnContextRead,
   prepareTurnAuthority,
   prepareTurnContext,
-} from "../context/turn-context";
-import type { PinnedAgentProfile } from "../data/pinned-agent-profile";
-import type { TurnPageState } from "./session/tool-wiring";
+} from "@purin-labs/agent/context/turn-context";
+import type { PinnedAgentProfile } from "@purin-labs/agent/data/pinned-agent-profile";
+import type { TurnPageState } from "@purin-labs/agent/actors/session/tool-wiring";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { traceLog } from "@purin-labs/kernel/observability";
-import type { SessionActor } from "./session/session-actor";
+import type { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
 import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,

@@ -1,6 +1,6 @@
 import type { Variant } from "@purin-labs/type-utils";
-import { readSessionTurnMemoryRecords } from "./actor-journal/transactions";
-import type { SessionTurnContextLookup } from "./actor-journal";
+import { readSessionTurnMemoryRecords } from "@purin-labs/agent/actors/actor-journal/transactions";
+import type { SessionTurnContextLookup } from "@purin-labs/agent/actors/actor-journal";
 import type { EmailCueOutcome } from "./email-harness-tools";
 import {
   replySourceReference,

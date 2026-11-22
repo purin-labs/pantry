@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { reconcileSupplierPayoutWithLexicon } from "../commerce/commerce-wasm";
-import { readOrganisationEnvironment } from "../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import {
   EVENT_KEY,
   eventKey,

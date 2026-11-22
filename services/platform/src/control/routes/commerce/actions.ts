@@ -69,7 +69,7 @@ import {
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { previewMerchantPluginAction } from "../../../commerce/provider-execution";
 import type { CommerceProviderExecutionError } from "../../../commerce/contract/commerce-provider";
-import { prepareTurnAuthority } from "../../../context/turn-context";
+import { prepareTurnAuthority } from "@purin-labs/agent/context/turn-context";
 import {
   parseCaseId,
   parseChannelId,
@@ -83,7 +83,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { loadOrganisationPolicyOrDefaultDeny } from "@purin-labs/authority/policy-snapshot";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import { resolveOrganisationModelRoute } from "../../../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import { resolveCommerceCancellationAuthority } from "../../../commerce/provider";
 import {
   commerceCanonicalResourceId,
@@ -112,7 +112,7 @@ import { readSupplierDestinationRevision } from "../../../data/supplier-payable-
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
-import { readOrganisationEnvironment } from "../../organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { executeApprovedSupplierPayout } from "../supplier-payout-execution";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

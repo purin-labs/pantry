@@ -10,12 +10,12 @@ import type {
 import {
   createCueQueueMessage,
   type NormalizedCueEvent,
-} from "../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import type { OrganisationInstallRecord } from "@purin-labs/tenancy/data/organisation";
 import {
   resolvePinnedAgentProfile,
   type PinnedAgentProfile,
-} from "../data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type {
   ActorIdentity,

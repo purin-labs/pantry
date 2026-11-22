@@ -9,10 +9,10 @@ import { describe, expect, test } from "vitest";
 import {
   buildTextTurnCheckpointCommittedCommit,
   buildTextTurnCheckpointingCommit,
-} from "../src/actors/agent-session-text-turn";
+} from "@purin-labs/agent/actors/agent-session-text-turn";
 import { TEST_HARNESS_LEASE_AUTHORITY } from "./fixtures/plan25-turn";
 import type { Variant } from "@purin-labs/type-utils";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const DIGEST = "d".repeat(64);
 const MODEL_ROUTE_DIGEST =

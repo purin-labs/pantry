@@ -5,7 +5,7 @@ import type {
   CommerceProjection,
   CommerceSource,
 } from "@purin-labs/commerce-contracts";
-import type { CommerceCueEvent } from "../cues/engine";
+import type { CommerceCueEvent } from "@purin-labs/agent/cues/engine";
 import type {
   IntegrationAccountId,
   OrganisationId,

@@ -1,7 +1,7 @@
 import type {
   HarnessCodeModeSandbox,
   HarnessNativeCodeMode,
-} from "../src/actors/embedded-harness";
+} from "@purin-labs/agent/actors/embedded-harness";
 import type { HarnessCodeModeAdmission } from "@purin-labs/agent-tools/catalog/types";
 
 type Enabled = Extract<HarnessNativeCodeMode, { kind: "enabled" }>;
@@ -70,7 +70,7 @@ void [
 ];
 
 // Actor storage and lease checks are required together at construction.
-import type { EmbeddedHarnessConstructionInput } from "../src/actors/embedded-harness";
+import type { EmbeddedHarnessConstructionInput } from "@purin-labs/agent/actors/embedded-harness";
 declare const storage: DurableObjectStorage;
 declare const checkLease: () => void;
 const actorPersistence: EmbeddedHarnessConstructionInput["persistence"] = {

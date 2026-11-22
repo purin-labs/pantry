@@ -14,24 +14,24 @@ import type {
 import type {
   AcceptHarnessEventInput,
   AppendHarnessHistoryInput,
-} from "../../src/actors/agent-session-harness-authority";
+} from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type {
   CanonicalHarnessEventSink,
   CanonicalHarnessHistorySink,
   EmbeddedHarnessConstructionInput,
   EmbeddedHarnessTurnResult,
   HarnessToolHost,
-} from "../../src/actors/embedded-harness";
+} from "@purin-labs/agent/actors/embedded-harness";
 import type { HarnessCodeModeAdmission, HarnessCodeModeAdmittedExecution, HarnessCodeModeExecutionLease } from "@purin-labs/agent-tools/catalog/types";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
-import { createPiDurableAdapter } from "../../src/actors/pi-durable-runtime";
-import { piToolRules } from "../../src/actors/pi-tool-replay";
+import { createPiDurableAdapter } from "@purin-labs/agent/actors/pi-durable-runtime";
+import { piToolRules } from "@purin-labs/agent/actors/pi-tool-replay";
 import { TOOL_REGISTRY } from "../../src/agent-tools/registry";
 import {
   TEST_ACCEPTED_INPUT_CONTEXT,
   TEST_HARNESS_LEASE_AUTHORITY,
 } from "../fixtures/plan25-turn";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 export type PiSdkFixtureMode = "native" | "direct";
 

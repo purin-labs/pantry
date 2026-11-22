@@ -3,7 +3,7 @@ import type { CaseExecutionEffectState } from "@purin-labs/control-api";
 import type {
   CaseExecutionEffectRecord,
   CaseExecutionEffectRecords,
-} from "../case-execution/records";
+} from "@purin-labs/agent/case-execution/records";
 
 type Row = Record<string, SqlStorageValue>;
 

@@ -40,8 +40,8 @@ vi.mock(
     resolveGrantSubjectReference: subjectMocks.resolveGrantSubjectReference,
   }),
 );
-vi.mock("../src/context/files", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/context/files")>()),
+vi.mock("@purin-labs/agent/context/files/index", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/context/files/index")>()),
   validateFileGrantTarget: fileGrantMocks.validateFileGrantTarget,
 }));
 

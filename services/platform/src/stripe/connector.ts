@@ -12,7 +12,7 @@ import type {
   StripeInvoicePaymentFailedCueEvent,
   StripeRefundFailedCueEvent,
   StripeSubscriptionDeletedCueEvent,
-} from "../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   resolveProviderWebhookCredential,
   type VaultResolveError,

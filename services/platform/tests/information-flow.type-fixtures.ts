@@ -38,7 +38,7 @@ function serializedShapesRemainPrecise(
 
 void serializedShapesRemainPrecise;
 
-import type { AuthorizedContextRead } from "../src/context/turn-context";
+import type { AuthorizedContextRead } from "@purin-labs/agent/context/turn-context";
 import type { NativeChatAudience } from "../src/chat/information-flow";
 import type { DisclosureProof } from "../src/chat/disclosure-evidence";
 import type { ContextAdmissionSubject } from "@purin-labs/authority/policy/information-flow/types";

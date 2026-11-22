@@ -10,7 +10,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const STEERING_INPUT_MACHINE = {
   name: "steering_input",
-  owner: "services/platform/src/actors/harness-steering.ts",
+  owner: "foundation/agent/actors/harness-steering.ts",
   store: {
     table: "session_turn_steering_input",
     key: "input_id",

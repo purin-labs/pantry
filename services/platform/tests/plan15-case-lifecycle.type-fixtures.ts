@@ -97,10 +97,10 @@ void missingOperatorDigest;
 
 // Completion consumers must retain the saved terminal outcome.
 declare const completionWithoutOutcome: Omit<
-  import("../src/actors/session/types").CanonicalEmbeddedHarnessTextTurnResult,
+  import("@purin-labs/agent/actors/session/types").CanonicalEmbeddedHarnessTextTurnResult,
   "outcome"
 >;
 // @ts-expect-error A reconstructed completion requires its terminal outcome.
-const incompleteTurn: import("../src/actors/session/types").CanonicalEmbeddedHarnessTextTurnResult =
+const incompleteTurn: import("@purin-labs/agent/actors/session/types").CanonicalEmbeddedHarnessTextTurnResult =
   { ...completionWithoutOutcome };
 void incompleteTurn;

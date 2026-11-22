@@ -3,7 +3,7 @@ import type {
   CaseExecutionCaseRecords,
   CaseExecutionContentTarget,
   CaseExecutionStoredContent,
-} from "../case-execution/records";
+} from "@purin-labs/agent/case-execution/records";
 import {
   readCaseExecutionContent,
   readCaseExecutionRecords,

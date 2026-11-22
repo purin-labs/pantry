@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { probeTypeSafeConnection } from "../src/integrations/typesafe/connection-probe";
+import { probeTypeSafeConnection } from "@purin-labs/agent/integrations/typesafe/connection-probe";
 
 describe("TypeSafe connection probe", suite);
 

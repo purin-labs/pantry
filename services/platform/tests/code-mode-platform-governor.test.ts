@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   CodeModePlatformGovernorActor,
   type CodeModePlatformReservation,
-} from "../src/actors/code-mode-platform-governor";
+} from "@purin-labs/agent/actors/code-mode-platform-governor";
 import {
   CODE_MODE_ENGINE_RESERVED_COST_MICROS,
   CODE_MODE_PRICE_BOOK_REVISION_V2,
@@ -16,7 +16,7 @@ import {
   type CodeModeOrganisationReserveInput,
   type WorkspaceExecutorAllocationReservation,
   type WorkspaceExecutorAllocationReserveInput,
-} from "../src/actors/code-mode-budget";
+} from "@purin-labs/agent/actors/code-mode-budget";
 import {
   parseRequestId,
   parseSessionId,

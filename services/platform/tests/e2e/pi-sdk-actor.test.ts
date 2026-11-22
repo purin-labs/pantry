@@ -5,17 +5,17 @@ import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harness-authority";
+import { readLatestHarnessCheckpoint } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import {
   PACKAGED_PI_CHECKPOINT_FORMAT,
   PACKAGED_PI_HARNESS_BUILD,
-} from "../../src/actors/pi-embedded-adapter";
+} from "@purin-labs/agent/actors/pi-embedded-adapter";
 import {
   CODE_MODE_PILOT_BUDGET,
   type CodeModeOrganisationSettleInput,
-} from "../../src/actors/code-mode-budget";
-import { CodeModePlatformGovernorActor } from "../../src/actors/code-mode-platform-governor";
-import { codeModePlatformGovernor } from "../../src/actors/code-mode-platform-governor-stub";
+} from "@purin-labs/agent/actors/code-mode-budget";
+import { CodeModePlatformGovernorActor } from "@purin-labs/agent/actors/code-mode-platform-governor";
+import { codeModePlatformGovernor } from "@purin-labs/agent/actors/code-mode-platform-governor-stub";
 import {
   startActorRelocation,
   resumeActorRelocation,

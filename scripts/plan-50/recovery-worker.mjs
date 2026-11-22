@@ -5,19 +5,19 @@ import {
   defineTool,
 } from "@earendil-works/pi-durable";
 import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
-import { createSessionSchema } from "../../services/platform/src/actors/agent-session-schema.ts";
+import { createSessionSchema } from "../../foundation/agent/actors/agent-session-schema.ts";
 import {
   buildSessionExecutionRecovery,
   buildSessionRecoveryAction,
   buildSessionExecutionResume,
   buildRecoveringSessionCancellation,
-} from "../../services/platform/src/actors/agent-session-recovery.ts";
+} from "../../foundation/agent/actors/agent-session-recovery.ts";
 import {
   commitExecutionRecoveryStartedSession,
   commitExecutionRecoveryUpdatedSession,
   commitExecutionResumedSession,
-} from "../../services/platform/src/actors/actor-journal.ts";
-import { commitCancellationStartedSession } from "../../services/platform/src/actors/actor-journal/transactions.ts";
+} from "../../foundation/agent/actors/actor-journal.ts";
+import { commitCancellationStartedSession } from "../../foundation/agent/actors/actor-journal/transactions.ts";
 import {
   readSessionBudgetAccount,
   markRunBudgetIndeterminate,
@@ -25,15 +25,15 @@ import {
   settleRunBudget,
   reconcileRunBudget,
   claimRunCapability,
-} from "../../services/platform/src/actors/agent-session-budget.ts";
-import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
-import { validateCanonicalSessionAdvance } from "../../services/platform/src/actor-wasm.ts";
+} from "../../foundation/agent/actors/agent-session-budget.ts";
+import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
+import { validateCanonicalSessionAdvance } from "../../foundation/agent/actor-wasm.ts";
 import { catalogHarnessToolCatalogDigest } from "../../foundation/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../foundation/agent-tools/catalog/code-mode.ts";
 import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue.ts";
-import { renderHarnessHistoryContent } from "../../services/platform/src/actors/harness-history.ts";
-import { buildTextTurnCancellationStartedCommit } from "../../services/platform/src/actors/agent-session-text-turn.ts";
+import { renderHarnessHistoryContent } from "../../foundation/agent/actors/harness-history.ts";
+import { buildTextTurnCancellationStartedCommit } from "../../foundation/agent/actors/agent-session-text-turn.ts";
 export { default } from "./canonical-worker.mjs";
 
 function required(result) {

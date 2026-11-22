@@ -10,9 +10,9 @@ import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-run
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
-import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
+import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   listOrganisationMembers,
   type OrganisationMember,
@@ -23,7 +23,7 @@ import {
   collaborationEditDeadline,
   type ToolEffect,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 export async function readEmailDraftForEmbeddedHarness(
   context: SessionToolContext,

@@ -16,7 +16,7 @@ import {
   claimCueDelivery,
   completeClaimedCueDelivery,
   createCueDeliverySchema,
-} from "../src/actors/cue-delivery";
+} from "@purin-labs/agent/actors/cue-delivery";
 import { normalizeCommerceEngineDelivery } from "../src/commerce/provider";
 import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { sqlStorage, emptySqliteFixture } from "./sqlite-storage";

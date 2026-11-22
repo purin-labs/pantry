@@ -1,14 +1,14 @@
 import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { resolveCanvasCollaborationAgent } from "../../actors/collaboration-agent";
-import type { HarnessToolArgumentObserver } from "../../actors/embedded-harness";
+import type { HarnessToolArgumentObserver } from "@purin-labs/agent/actors/embedded-harness";
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
+import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { newRequestId } from "@purin-labs/kernel/ids";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import {
   collaborationEditDeadline,
   collaborationMember,

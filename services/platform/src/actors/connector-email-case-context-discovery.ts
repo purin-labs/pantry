@@ -13,7 +13,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { resolveVerifiedContactEndpointByEndpoint } from "../data/contact-verification";
 import { bindEmailMessageReceiptContact } from "../data/email-mailbox";
-import type { CaseContextCollectionSelection } from "../case-context-discovery/relationships";
+import type { CaseContextCollectionSelection } from "@purin-labs/agent/case-context-discovery/relationships";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 
 type EmailCaseContextCollectionReceipt = Readonly<{

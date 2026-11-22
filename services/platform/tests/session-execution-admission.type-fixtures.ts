@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { HarnessToolHost } from "../src/actors/embedded-harness";
+import type { HarnessToolHost } from "@purin-labs/agent/actors/embedded-harness";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { SessionId } from "@purin-labs/kernel/ids";
 import { bindConversationTurnAccess } from "../src/chat/turn-access";
@@ -12,7 +12,7 @@ import { processDirectCaseCommand } from "../src/actors/case-direct-processing";
 import {
   SessionExecutionAdmission,
   admittedSessionToolHost,
-} from "../src/actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 
 declare const scope: OrganisationExecutionScope;
 declare const storage: DurableObjectStorage;
@@ -110,7 +110,7 @@ const mixedMailOrigin: MailDraftOrigin = {
 };
 void mixedMailOrigin;
 
-import type { HarnessExecutionAuthority } from "../src/actors/session-execution-admission";
+import type { HarnessExecutionAuthority } from "@purin-labs/agent/actors/session-execution-admission";
 // @ts-expect-error Transient execution must retain its in-memory lifecycle authority.
 const missingTransientLifecycle: HarnessExecutionAuthority = {
   kind: "transient",

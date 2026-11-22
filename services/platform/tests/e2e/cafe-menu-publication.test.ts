@@ -12,7 +12,7 @@ import {
   type MenuDraftServerMessage,
 } from "@purin-labs/menu-draft-crdt/protocol";
 
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   commerceClient,

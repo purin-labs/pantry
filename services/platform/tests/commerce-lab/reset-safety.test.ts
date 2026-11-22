@@ -10,7 +10,7 @@ import {
   resetCommerceLab,
   seedCommerceLab,
 } from "../../src/actors/commerce-projection";
-import { createCueDeliverySchema } from "../../src/actors/cue-delivery";
+import { createCueDeliverySchema } from "@purin-labs/agent/actors/cue-delivery";
 import { emptySqliteFixture, sqlStorage } from "../sqlite-storage";
 import {
   requireIntegrationAccountId,

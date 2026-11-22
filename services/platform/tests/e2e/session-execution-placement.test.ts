@@ -6,7 +6,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
-import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
+import { SessionExecutionAdmission } from "@purin-labs/agent/actors/session-execution-admission";
 import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   requireActiveOrganisationActor,
@@ -45,7 +45,7 @@ import {
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
 import { exportedItemCount } from "./placement-move-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const CONVERSATION_ID = "conv_c55af3e2-19c2-446a-9f44-e00000000055";
 const USER_ID = "user_ddea8ec2-b424-5505-a2f4-8f66b89b13ab";

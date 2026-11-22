@@ -26,7 +26,7 @@ import {
   socketLastSeenAt,
   socketRouteTag,
 } from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
-import { socketSessionAccess } from "./socket-session-access";
+import { socketSessionAccess } from "@purin-labs/agent/actors/socket-session-access";
 
 /** An open canvas page: a socket of a canvas room, with its canvas and user. */
 type CanvasPage = Readonly<{

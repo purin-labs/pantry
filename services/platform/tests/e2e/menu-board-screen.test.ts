@@ -27,7 +27,7 @@ import {
   CommerceStorefrontClient,
 } from "@purin-labs/commerce-client";
 
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
 import {

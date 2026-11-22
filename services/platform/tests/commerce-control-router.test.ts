@@ -130,12 +130,12 @@ vi.mock(
     authorizeCapabilityUse: turnAuthorityMocks.authorizeCapabilityUse,
   }),
 );
-vi.mock("../src/context/turn-context", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/context/turn-context")>()),
+vi.mock("@purin-labs/agent/context/turn-context", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/context/turn-context")>()),
   prepareTurnAuthority: turnContextMocks.prepareTurnAuthority,
 }));
-vi.mock("../src/models/route", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/models/route")>()),
+vi.mock("@purin-labs/agent/models/route", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/agent/models/route")>()),
   resolveOrganisationModelRoute: modelRouteMocks.resolveOrganisationModelRoute,
 }));
 vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({

@@ -32,7 +32,7 @@ import {
 } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
-import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {

@@ -22,7 +22,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
-import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
@@ -52,7 +52,7 @@ import {
   parseChatForkHistory,
   type ChatForkHistory,
   type ChatHistoryBinding,
-} from "./fork-history";
+} from "@purin-labs/agent/chat/fork-history";
 
 export type ChatForkCommand = Readonly<{
   operationId: string;

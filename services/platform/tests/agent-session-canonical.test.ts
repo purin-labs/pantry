@@ -5,8 +5,8 @@ import { describe, expect, test } from "vitest";
 import {
   parseImportedCanonicalLifecycle,
   readImportedCanonicalSession,
-} from "../src/actors/agent-session-canonical";
-import { createSessionSchema } from "../src/actors/agent-session-schema";
+} from "@purin-labs/agent/actors/agent-session-canonical";
+import { createSessionSchema } from "@purin-labs/agent/actors/agent-session-schema";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("canonical AgentSession persistence", function canonicalSessionSuite() {

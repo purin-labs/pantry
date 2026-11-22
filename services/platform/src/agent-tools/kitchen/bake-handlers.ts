@@ -1,9 +1,9 @@
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { requireSessionExecution } from "../../actors/session-execution-admission";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import { readMemberRecord } from "../member-record-read";
 import { liveDeviceMember, type ToolEffect } from "../session-support";
 import {

@@ -10,7 +10,7 @@ import {
   requestWhatsAppCaseHandoff,
   type WhatsAppReplyAuthor,
 } from "../data/whatsapp";
-import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
@@ -28,7 +28,7 @@ import {
   type SessionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { resolveOrganisationModelRoute } from "../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   loadOrganisationPolicyOrDefaultDeny,
@@ -37,7 +37,7 @@ import {
 import {
   prepareTurnAuthority,
   prepareTurnContext,
-} from "../context/turn-context";
+} from "@purin-labs/agent/context/turn-context";
 import { buildWhatsAppSupportAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {

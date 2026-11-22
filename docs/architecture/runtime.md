@@ -234,7 +234,7 @@ Commerce Read Layer
 
 R2 keys are Organisation-scoped. `harness-checkpoints/<organisation>/…`
 holds AES-GCM encrypted checkpoints
-([`harness-checkpoint.ts`](../../services/platform/src/harness-checkpoint.ts)).
+([`harness-checkpoint.ts`](../../foundation/agent/harness-checkpoint.ts)).
 `attachments/<organisation>/…` holds attachments by content digest and
 their derived objects. A provider filename never builds a key. The cron
 collector
@@ -253,7 +253,7 @@ See the [harness erasure runbook](../runbooks/harness-erasure.md).
 
 `AgentSessionActor` owns one cumulative session budget and at most one
 active Run reservation
-([`agent-session-budget.ts`](../../services/platform/src/actors/agent-session-budget.ts)).
+([`agent-session-budget.ts`](../../foundation/agent/actors/agent-session-budget.ts)).
 The session budget limits model tokens and capability calls; each Run has
 its own time limit. Provider-reported tokens and active time settle as
 actual usage. A capability call commits before its authoritative boundary
@@ -347,7 +347,7 @@ identities.
 ### Message preparation
 
 Before the first model call, the session prepares the turn's attachments
-([`message-preparation.ts`](../../services/platform/src/actors/message-preparation.ts)).
+([`message-preparation.ts`](../../foundation/agent/actors/message-preparation.ts)).
 An image becomes native image input. A document becomes bounded extracted
 text. Audio and video become container facts, with no transcription.
 Sampled video stills become image input; the executor decodes a still once
@@ -365,7 +365,7 @@ a hash chain. The delivery stream (`turn_delivery_segment`) holds progress,
 status and final output for Case, Connector, Slack and Portal consumers. A
 subscriber owns only its connection and cursor. A disconnect never cancels
 a turn, and a reconnect starts no new inference
-([`agent-session-event-stream.ts`](../../services/platform/src/actors/agent-session-event-stream.ts)).
+([`agent-session-event-stream.ts`](../../foundation/agent/actors/agent-session-event-stream.ts)).
 
 A checkpoint is written between turns. It binds both cursors; the backend,
 build and format; the instruction, tool catalog and model route digests;
@@ -388,7 +388,7 @@ never restored. Historical prompts and settled effects never run again.
 Actor construction checks the saved lifecycle before it serves requests:
 
 - A resumable Pi Durable task resumes
-  ([`pi-durable-recovery.ts`](../../services/platform/src/actors/pi-durable-recovery.ts)).
+  ([`pi-durable-recovery.ts`](../../foundation/agent/actors/pi-durable-recovery.ts)).
   Unknown model usage waits for evidence. An unsafe effect blocks replay.
 - A `checkpointing` session with an accepted checkpoint keeps its state; an
   alarm finishes publication and output.
@@ -397,7 +397,7 @@ Actor construction checks the saved lifecycle before it serves requests:
   `effect_indeterminate` and `terminate_only`, deletes the lease, marks the
   reservation indeterminate and fails the turn stream with
   `session_interrupted`
-  ([`actor-journal.ts`](../../services/platform/src/actors/actor-journal.ts)).
+  ([`actor-journal.ts`](../../foundation/agent/actors/actor-journal.ts)).
 
 The Session alarm finishes checkpoint publication, settles budget
 deadlines, reconciles workspace commits and Code Mode settlements, and
@@ -425,11 +425,11 @@ sibling. A budget exhaustion fails the turn and settles the assignment as
 ## Harness adapter
 
 `selectEmbeddedHarnessAdapterForModelRoute`
-([`embedded-harness-adapter.ts`](../../services/platform/src/actors/embedded-harness-adapter.ts))
+([`embedded-harness-adapter.ts`](../../foundation/agent/actors/embedded-harness-adapter.ts))
 returns one Pi Durable adapter for each route and model
-([`pi-embedded-adapter.ts`](../../services/platform/src/actors/pi-embedded-adapter.ts)).
+([`pi-embedded-adapter.ts`](../../foundation/agent/actors/pi-embedded-adapter.ts)).
 The contract is in
-[`embedded-harness.ts`](../../services/platform/src/actors/embedded-harness.ts).
+[`embedded-harness.ts`](../../foundation/agent/actors/embedded-harness.ts).
 The Codex and Picocodex backends are retired; their checkpoints start a
 fresh lineage. `AgentSessionActor` owns identity, lifecycle, leases,
 history, checkpoints and budget. The adapter owns the live conversation.
@@ -465,7 +465,7 @@ history, such as an email turn).
 The route lease carries one authority: `platform_api_key`,
 `organisation_openai_api_key`, `organisation_anthropic_api_key`,
 `organisation_claude_oauth` or `organisation_chatgpt_subscription`
-([`pi-model-transport.ts`](../../services/platform/src/actors/pi-model-transport.ts)).
+([`pi-model-transport.ts`](../../foundation/agent/actors/pi-model-transport.ts)).
 Every route except OpenRouter calls the provider through the lease's
 `providerFetch`, which uses the model exit Worker. Raw credentials stay out
 of Actor state, prompts, generated code and tool arguments. The adapter gets
@@ -483,7 +483,7 @@ accepts completed user, assistant, tool-call and tool-result entries.
 emission names the lease, turn, sequence and digest. The Actor rejects a
 stale lease or cursor. Pi's own database writes use the same queue, so they
 keep their order with the emissions
-([`pi-durable-runtime.ts`](../../services/platform/src/actors/pi-durable-runtime.ts)).
+([`pi-durable-runtime.ts`](../../foundation/agent/actors/pi-durable-runtime.ts)).
 
 ### Tool calls and replay
 
@@ -491,11 +491,11 @@ Pi gets model-visible tools from the accepted catalog
 ([`agent-tools/`](../../services/platform/src/agent-tools/registry.ts), selected by
 [`catalog/selection.ts`](../../foundation/agent-tools/catalog/selection.ts)).
 The Tool Host
-([`embedded-harness-tool-host.ts`](../../services/platform/src/actors/embedded-harness-tool-host.ts))
+([`embedded-harness-tool-host.ts`](../../foundation/agent/actors/embedded-harness-tool-host.ts))
 authorizes each call against the exact capability. Code Mode is one bounded
 tool, and Pantry controls each nested call. Each tool has a replay rule for a
 call that a lost process left in flight
-([`pi-tool-replay.ts`](../../services/platform/src/actors/pi-tool-replay.ts)):
+([`pi-tool-replay.ts`](../../foundation/agent/actors/pi-tool-replay.ts)):
 
 - `any_caller`: the call changes nothing, or its owner repeats it safely.
 - `script`: the owner answers a repeat from its first receipt; only a Code
@@ -508,7 +508,7 @@ the Organisation answer a repeat with the first proposal.
 ### Pi checkpoint
 
 The build is `PI_DURABLE_BUILD`; the format is `pantry-pi-durable-sqlite-v1`
-([`pi-durable-checkpoint.ts`](../../services/platform/src/actors/pi-durable-checkpoint.ts)).
+([`pi-durable-checkpoint.ts`](../../foundation/agent/actors/pi-durable-checkpoint.ts)).
 The checkpoint copies the Pi Durable tables in Session SQLite, with the
 checkpoint binding and history cursor. It holds script store values and the
 Code Mode attempt of a turn (`pantry.codemode.store`), but no active script
@@ -521,7 +521,7 @@ build reads another build's checkpoint; the Session starts a fresh lineage.
 The adapter streams answer text in bounded deltas. The Actor persists
 delivery events before consumers see them. `steer` adds a message from the
 turn's requester
-([`harness-steering.ts`](../../services/platform/src/actors/harness-steering.ts)).
+([`harness-steering.ts`](../../foundation/agent/actors/harness-steering.ts)).
 The Session admits it first. The result is `queued` (Pi places it before the
 next model request) or `refused` (`turn_not_running`,
 `steering_unsupported`); the surface then runs it as the next turn.
@@ -699,7 +699,7 @@ connection. The Case gets a `slack_channel` binding before assignment, and
 the proposal follows the ordinary outbox path. Cues never take a
 destination from model output. A `cue_binding` row may name an operational
 area, an agent installation and instructions for one event type
-([`agent-operations.ts`](../../services/platform/src/data/agent-operations.ts));
+([`agent-operations.ts`](../../foundation/agent/data/agent-operations.ts));
 admission resolves the current revisions and writes a `case_assignment_pin`.
 An inventory cue opens a coordinator and a specialist session; other cues
 open one coordinator. The principal is the system component `cue_engine`.

@@ -19,7 +19,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
-import { readOrganisationEnvironment } from "./organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 
 type ControlCommerceGraph = Readonly<{
   reader: CommerceGraphReader;

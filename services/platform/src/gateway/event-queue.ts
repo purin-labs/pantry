@@ -1,14 +1,14 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchWithOrganisationPlacement } from "@purin-labs/tenancy/organisation-execution-scope";
-import { storeFilePlacementCredential } from "../provider-workflows/file-context-credential";
+import { storeFilePlacementCredential } from "@purin-labs/agent/provider-workflows/file-context-credential";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   readScheduleDispatchReceipt,
   recordScheduleDispatchReceipt,
-} from "../data/agent-operations/schedule-dispatch";
-import { recordCaseAssignmentPin } from "../data/agent-operations/case-assignment-pins";
-import { resolveScheduleAutomation } from "../data/agent-operations/automation";
-import type { ScheduleBinding } from "../data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations/schedule-dispatch";
+import { recordCaseAssignmentPin } from "@purin-labs/agent/data/agent-operations/case-assignment-pins";
+import { resolveScheduleAutomation } from "@purin-labs/agent/data/agent-operations/automation";
+import type { ScheduleBinding } from "@purin-labs/agent/data/agent-operations";
 import { processDirectCaseCommand } from "../actors/case-direct-processing";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -16,7 +16,7 @@ import {
   resolveActiveCaseActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseIngressQueueMessage } from "../ingress-queue";
-import type { AgentScheduleDispatchQueueMessage } from "../schedules/queue-messages";
+import type { AgentScheduleDispatchQueueMessage } from "@purin-labs/agent/schedules/queue-messages";
 import {
   newRequestId,
   parseCaseId,
@@ -30,12 +30,12 @@ import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/
 import {
   handleContextProjectionQueueMessage,
   type ContextProjectionCommand,
-} from "../context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import {
   ProviderFileProjectionSourceReader,
   applyFileProjectionCommand,
   type FileProjectionCommand,
-} from "../context/files";
+} from "@purin-labs/agent/context/files/index";
 import { assertNever } from "@purin-labs/std";
 import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,

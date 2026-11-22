@@ -6,12 +6,12 @@ import {
   parseOrganisationInferenceSelection,
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
-} from "../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
 import {
   digestModelRoute,
   resolvePantryPlatformModelRoute,
-} from "../src/models/route";
+} from "@purin-labs/agent/models/route";
 import { d1Database } from "./sqlite-d1";
 import { readMigration } from "./sqlite-d1";
 import { requireUserId, requireOrganisationId } from "./test-ids";

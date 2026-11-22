@@ -1,4 +1,4 @@
-import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durable-database.ts";
+import { ActorSqliteDatabase } from "../../foundation/agent/actors/pi-durable-database.ts";
 import { DurableObject } from "cloudflare:workers";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";

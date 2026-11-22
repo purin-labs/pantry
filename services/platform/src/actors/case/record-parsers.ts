@@ -1,8 +1,8 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readAdmittedChatInput } from "../../chat/turn-access";
-import { parseGoalIdentity } from "../case-goals";
+import { parseGoalIdentity } from "@purin-labs/agent/actors/case-goals";
 import { parseSourceProvenance } from "./source-provenance";
-import { parseCaseEvidenceDependency } from "../../case-context-discovery/evidence";
+import { parseCaseEvidenceDependency } from "@purin-labs/agent/case-context-discovery/evidence";
 import { parseMessageCaseContent } from "../case-content";
 import type {
   AuthorityPartition,
@@ -23,7 +23,7 @@ import type {
   SessionProposalDisposition,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import { parseStoredAttachmentList } from "../../messages/stored-attachment";
+import { parseStoredAttachmentList } from "@purin-labs/agent/messages/stored-attachment";
 import { parseStoredAuthorityPartition } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { FlowLabel } from "@purin-labs/authority/policy/index";

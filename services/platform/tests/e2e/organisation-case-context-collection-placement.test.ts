@@ -44,7 +44,7 @@ import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   parseVaultHandle,
   storeVaultSecret,
@@ -54,26 +54,26 @@ import { parseCaseId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { OperationalCaseContextDiscoverySourceRequest } from "../../src/case-context-discovery/operational-evaluation";
-import { readDailyTypeSafeUsage } from "../../src/integrations/typesafe/usage-store";
-import { parseCaseContextDiscoveryPolicy } from "../../src/case-context-discovery/policy";
-import { readTypeSafeConnection } from "../../src/integrations/typesafe/connection";
+import type { OperationalCaseContextDiscoverySourceRequest } from "@purin-labs/agent/case-context-discovery/operational-evaluation";
+import { readDailyTypeSafeUsage } from "@purin-labs/agent/integrations/typesafe/usage-store";
+import { parseCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/policy";
+import { readTypeSafeConnection } from "@purin-labs/agent/integrations/typesafe/connection";
 import {
   readCaseContextDiscoveryPolicy,
   publishCaseContextDiscoveryPolicy,
-} from "../../src/case-context-discovery/evaluation-store";
+} from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import {
   recordCaseContextCollectionSuggestion,
   decideCaseContextCollectionRelationship,
   readCaseContextCollection,
   type CaseContextCollectionScope,
   type CaseContextCollectionSelection,
-} from "../../src/case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import type {
   CaseContextCollectionEffectAttempt,
   CaseContextCollectionEvidence,
   CaseContextCollectionEvidenceDependency,
-} from "../../src/case-context-discovery/evidence";
+} from "@purin-labs/agent/case-context-discovery/evidence";
 import {
   installSlackActorFixture,
   ORGANISATION_ID,

@@ -26,7 +26,7 @@ import {
   commerceApprovalNoticeNonce,
   commerceOutcomeNonce,
 } from "../case/commerce-delivery-ids";
-import { readOrganisationDefaultWorkspacePortalAddress } from "../../data/organisation-workspace";
+import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
 import {
   permissionCardBlocks,
   permissionDecidedCardBlocks,

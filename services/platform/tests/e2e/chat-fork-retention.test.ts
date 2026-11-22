@@ -17,7 +17,7 @@ import {
   chatForkHistoryDigest,
   type ChatForkHistory,
   parseChatForkHistory,
-} from "../../src/chat/fork-history";
+} from "@purin-labs/agent/chat/fork-history";
 import { readChatForkHistoryForCase } from "../../src/chat/forks";
 import {
   RecordingBoundary,

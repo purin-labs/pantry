@@ -1,6 +1,6 @@
 import type { CaseGoalCommand, CaseGoalSnapshot } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
-import { parseCaseGoalCommand } from "../actors/case-goals";
+import { parseCaseGoalCommand } from "@purin-labs/agent/actors/case-goals";
 
 export type SlackGoalCommand =
   | { readonly kind: "ordinary" }

@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CaseContextCollectionSelection } from "./relationships";
+import type { CaseContextCollectionSelection } from "@purin-labs/agent/case-context-discovery/relationships";
 import { emailMessageReceiptMatches } from "../data/email-mailbox";
 import {
   resolveVerifiedContactEndpoint,

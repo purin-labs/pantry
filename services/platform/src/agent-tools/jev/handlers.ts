@@ -1,6 +1,6 @@
 import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import { readMemberRecord } from "../member-record-read";
 import { JevFeatureRequestError } from "./services";
 

@@ -7,13 +7,13 @@ import { resolve } from "node:path";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   composeAgentInstructions,
   parseAgentProfileSelection,
   resolveCaseTurnAgentProfile,
   resolvePinnedAgentProfile,
-} from "../src/data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 import { createAgentOperationsDatabase } from "./agent-operations-database";
 import { requireOrganisationId } from "./test-ids";
 

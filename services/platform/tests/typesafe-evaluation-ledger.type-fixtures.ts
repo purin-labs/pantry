@@ -3,7 +3,7 @@ import type {
   TypeSafeSettlement,
   TypeSafeUsageAuthority,
   TypeSafeUsageMeasurement,
-} from "../src/integrations/typesafe/evaluation-ledger";
+} from "@purin-labs/agent/integrations/typesafe/evaluation-ledger";
 
 // @ts-expect-error A cost estimate alone cannot stand in for measured token usage.
 export const incompleteMeasurement: TypeSafeUsageMeasurement = {

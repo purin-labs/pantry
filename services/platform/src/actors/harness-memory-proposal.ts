@@ -3,17 +3,17 @@ import { assertNever } from "@purin-labs/std";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { readAdmittedChatInput } from "../chat/turn-access";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
+import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import type {
   HarnessMemoryProposalRequest,
   HarnessMemoryProposalResult,
 } from "@purin-labs/agent-tools/catalog/types";
 import {
   requireSessionExecution,
-} from "./session-execution-admission";
-import type { SessionToolContext } from "../agent-tools/context";
-import { turnMayProposeMemory } from "./session/turn-tool-offers";
-import type { MemoryProposalPort } from "./session/tool-wiring";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
+import { turnMayProposeMemory } from "@purin-labs/agent/actors/session/turn-tool-offers";
+import type { MemoryProposalPort } from "@purin-labs/agent/actors/session/tool-wiring";
 
 
 /**

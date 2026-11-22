@@ -6,21 +6,24 @@ import {
 import type { FileToolServices } from "@purin-labs/agent-tools/files/files";
 import type { MessageToolServices } from "@purin-labs/agent-tools/messages/messages";
 import type { TurnToolServices } from "@purin-labs/agent-tools/turn/turn";
-import { withToolContext } from "../../agent-tools/context";
+import { withToolContext } from "@purin-labs/agent/agent-tools/context";
 import { scheduleFollowUpForHarness } from "../harness-follow-up";
 import { proposeMemoryForHarness } from "../harness-memory-proposal";
 import { proposeSideCaseForHarness } from "../harness-side-case-proposal";
 import {
   createAttachmentInspectionTool,
   createMessageLinkTool,
-} from "../message-tools";
-import { admittedSessionOperation } from "../session-execution-admission";
-import { readPreparedInspection } from "./attachments";
+} from "@purin-labs/agent/actors/message-tools";
+import { admittedSessionOperation } from "@purin-labs/agent/actors/session-execution-admission";
+import { readPreparedInspection } from "@purin-labs/agent/actors/session/attachments";
 import {
   admittedMessageLinkEgress,
   recordMessageAttachmentObservation,
-} from "./model-route";
-import type { OwnToolServicesSession, ToolTurnContext } from "./tool-wiring";
+} from "@purin-labs/agent/actors/session/model-route";
+import type {
+  OwnToolServicesSession,
+  ToolTurnContext,
+} from "@purin-labs/agent/actors/session/tool-wiring";
 
 /**
  * The services of the tool families that the foundation owns: files, the

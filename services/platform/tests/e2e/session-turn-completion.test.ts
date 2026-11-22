@@ -4,7 +4,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
 import { SessionDO } from "../../src/actors/agent-session";
-import { SessionCheckpoints } from "../../src/actors/session/session-checkpoints";
+import { SessionCheckpoints } from "@purin-labs/agent/actors/session/session-checkpoints";
 import { fixtureDatabase } from "./organisation-database";
 import { network } from "./network";
 import {

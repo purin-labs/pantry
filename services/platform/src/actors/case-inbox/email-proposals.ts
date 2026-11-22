@@ -13,7 +13,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import {
   parseCaseEvidenceDependency,
   type CaseContextCollectionProposalEvidence,
-} from "../../case-context-discovery/evidence";
+} from "@purin-labs/agent/case-context-discovery/evidence";
 import {
   parseEmailReplyProposalLifecycle,
   type EmailReplyProposalLifecycle,

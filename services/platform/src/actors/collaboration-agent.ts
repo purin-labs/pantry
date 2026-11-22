@@ -5,7 +5,7 @@ import {
   type CollaborationAgent,
   type CollaborationAgentColorKey,
 } from "@purin-labs/collaboration";
-import { merchantAgentAgentId } from "../data/merchant-agent-ids";
+import { merchantAgentAgentId } from "@purin-labs/agent/data/merchant-agent-ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /** Names come from the admitted assignment, never from a tool argument. */

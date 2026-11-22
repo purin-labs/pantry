@@ -15,7 +15,7 @@ import {
   submitSupplierPayout,
 } from "../../payouts/supplier-payout-service";
 import { validateSupplierPayoutPlanWithLexicon } from "../../commerce/commerce-wasm";
-import { readOrganisationEnvironment } from "../organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import {
   readSealedPayoutPlan,
   payoutSourceReference,

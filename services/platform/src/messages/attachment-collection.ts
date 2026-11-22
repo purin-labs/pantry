@@ -1,6 +1,6 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
-import { readChatForkAttachmentKeys } from "../chat/fork-history";
+import { readChatForkAttachmentKeys } from "@purin-labs/agent/chat/fork-history";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   listOrganisationActorRegistryEntries,
@@ -17,7 +17,7 @@ import {
   type AttachmentCollectionError,
   type AttachmentCollectionReceipt,
   type AttachmentCollectionUncertainReceipt,
-} from "./attachment-reachability";
+} from "@purin-labs/agent/messages/attachment-reachability";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { assertNever } from "@purin-labs/std";
 /**

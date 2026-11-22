@@ -19,10 +19,10 @@ import {
   compileTrialTurnAuthority,
   trialAccountAccess,
 } from "./account-authority.mjs";
-import { admitSessionInformationFlowObservation } from "../../services/platform/src/actors/agent-session-information-flow.ts";
+import { admitSessionInformationFlowObservation } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import { ObservationEvidence } from "../../foundation/authority/policy/information-flow/index.ts";
 import { digestCanonical } from "../../foundation/authority/policy/information-flow/digest.ts";
-import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
+import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import {
   organisationId,
   sessionId,

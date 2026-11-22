@@ -14,7 +14,7 @@ import {
   refreshDropboxAccessToken,
   revokeDropboxToken,
   type DropboxProtocolError,
-} from "../provider-adapters/dropbox";
+} from "@purin-labs/agent/provider-adapters/dropbox";
 import {
   configuredValue,
   exactScopeIsGranted,

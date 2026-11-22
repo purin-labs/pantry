@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { modelContextPrompt } from "../src/actors/model-context-prompt";
-import type { ModelContextBundle } from "../src/context/assembly";
+import { modelContextPrompt } from "@purin-labs/agent/actors/model-context-prompt";
+import type { ModelContextBundle } from "@purin-labs/agent/context/assembly/index";
 
 it("fits encoded context without truncating the current instruction", function boundedContext() {
   const context: ModelContextBundle = {

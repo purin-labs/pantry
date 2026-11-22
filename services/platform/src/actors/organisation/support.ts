@@ -31,8 +31,8 @@ import {
 import {
   expireCodeModeOrganisationReservations,
   readNextCodeModeOrganisationAlarmAt,
-} from "../code-mode-budget";
-import { expireAbandonedCueClaims } from "../cue-delivery";
+} from "@purin-labs/agent/actors/code-mode-budget";
+import { expireAbandonedCueClaims } from "@purin-labs/agent/actors/cue-delivery";
 import { errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import type { OrganisationMeta, OrganisationMetaRow } from "@purin-labs/tenancy/actors/organisation/types";

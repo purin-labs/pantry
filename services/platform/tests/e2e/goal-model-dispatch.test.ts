@@ -8,8 +8,8 @@ import {
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, vi, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { reconcileSessionGoalUsage } from "../../src/actors/session-goal-usage";
-import { readSessionBudgetAccount } from "../../src/actors/agent-session-budget";
+import { reconcileSessionGoalUsage } from "@purin-labs/agent/actors/session-goal-usage";
+import { readSessionBudgetAccount } from "@purin-labs/agent/actors/agent-session-budget";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { network } from "./network";
@@ -24,7 +24,7 @@ import {
   openRouterText,
   openRouterStream,
 } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(
   "checkpoints goal stops, resumes only by explicit command after eviction, and preserves unknown-usage fences",

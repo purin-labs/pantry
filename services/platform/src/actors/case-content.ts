@@ -3,7 +3,7 @@ import type {
   StoredMessageAttachment,
   UserMessage,
 } from "@purin-labs/contracts";
-import { deriveUserMessageViews } from "../messages/message-wasm";
+import { deriveUserMessageViews } from "@purin-labs/agent/messages/message-wasm";
 import { parseSourceProvenance } from "./case/source-provenance";
 import type { Variant } from "@purin-labs/type-utils";
 

@@ -10,7 +10,7 @@ import type {
   CaseExecutionEffectRecord,
   CaseExecutionSessionRecords,
   SessionExecutionContentTarget,
-} from "./records";
+} from "@purin-labs/agent/case-execution/records";
 
 type DistributiveOmit<Value, Key extends PropertyKey> = Value extends unknown
   ? Omit<Value, Key>

@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
-import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 

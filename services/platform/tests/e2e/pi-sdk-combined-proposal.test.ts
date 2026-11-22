@@ -22,7 +22,7 @@ import {
 import {
   compileAndStoreCueSnapshot,
   writeTierOneCommerceSubscription,
-} from "../../src/cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";

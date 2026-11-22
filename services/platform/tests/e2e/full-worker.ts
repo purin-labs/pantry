@@ -2,7 +2,7 @@ import { isRecord } from "@purin-labs/std";
 import { createCancellableTask } from "@purin-labs/async-control/cancellable-task";
 import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 import { seedMerchantFixture } from "./merchant-fixture";
-import { restoreSessionTurnContext } from "../../src/actors/actor-journal";
+import { restoreSessionTurnContext } from "@purin-labs/agent/actors/actor-journal";
 import { DurableObject } from "cloudflare:workers";
 import { newConversationId } from "@purin-labs/control-api";
 import gateway from "../../src/integration-gateway";
@@ -24,11 +24,11 @@ import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authori
 import { readConversation } from "../../src/chat/store";
 import { conversationTimeline } from "../../src/chat/conversation";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
-export { CodeModePlatformGovernorActor } from "../../src/actors/code-mode-platform-governor";
+export { CodeModePlatformGovernorActor } from "@purin-labs/agent/actors/code-mode-platform-governor";
 
 type Region = "wnam" | "apac";
 type FixtureIdentity = {

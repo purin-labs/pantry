@@ -3,7 +3,7 @@ import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { parseEnv } from "node:util";
 import { requirePublicOrigin } from "../foundation/kernel/public-origin.ts";
-import { CODE_MODE_SANDBOX_INTERRUPT_BUDGET } from "../services/platform/src/code-mode-sandbox/limits.ts";
+import { CODE_MODE_SANDBOX_INTERRUPT_BUDGET } from "../foundation/agent/code-mode-sandbox/limits.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const require = createRequire(resolve(root, "services/platform/package.json"));

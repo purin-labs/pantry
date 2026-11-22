@@ -11,7 +11,7 @@ import { encodeBase64Url, isRecord } from "@purin-labs/std";
 
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
 
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {
   archiveOrganisation,

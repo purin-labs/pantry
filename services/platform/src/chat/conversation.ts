@@ -25,7 +25,7 @@ import {
   parseChatHistoryBindings,
   type ChatThreadLineage,
   type ChatHistoryBinding,
-} from "./fork-history";
+} from "@purin-labs/agent/chat/fork-history";
 import {
   parsePageBrowserContext,
   type ModelRoute,

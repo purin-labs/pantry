@@ -10,13 +10,13 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import type { AgentOperationInput } from "../../src/data/agent-operations";
+import type { AgentOperationInput } from "@purin-labs/agent/data/agent-operations";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import type { IngressQueueMessage } from "../../src/ingress-queue";
 import gateway from "../../src/integration-gateway";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { runScheduleDispatch } from "../../src/schedules/dispatch";
+import { runScheduleDispatch } from "@purin-labs/agent/schedules/dispatch";
 import { executionRequest, readCaseTimeline } from "./case-execution-support";
 import { commerceClient } from "./commerce-support";
 import { network } from "./network";

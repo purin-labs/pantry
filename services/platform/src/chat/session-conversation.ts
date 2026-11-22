@@ -2,7 +2,7 @@ import type {
   SessionConversation,
   SessionSideCase,
   SessionSideCaseSource,
-} from "../actors/session/conversation-port";
+} from "@purin-labs/agent/actors/session/conversation-port";
 import { decideCaseConversationSink } from "../actors/case-conversation-sink";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {

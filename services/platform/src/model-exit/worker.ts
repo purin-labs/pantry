@@ -1,7 +1,7 @@
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { readIsolateLocation } from "@purin-labs/kernel/isolate-location";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
-import { MODEL_EXIT_COLO_HEADER } from "./protocol";
+import { MODEL_EXIT_COLO_HEADER } from "@purin-labs/agent/model-exit/protocol";
 
 /**
  * The model exit Worker (Plan 73). It sends each direct request of the

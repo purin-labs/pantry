@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { observeFileGrantScope } from "../src/context/files/reconciliation";
+import { observeFileGrantScope } from "@purin-labs/agent/context/files/reconciliation";
 
 describe("file context reconciliation cursors", () => {
   it("preserves Dropbox admissions when the durable cursor has no changes", async () => {

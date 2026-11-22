@@ -9,7 +9,7 @@ import type {
 import type {
   CaseContextCollectionRelationship,
   CaseContextCollectionScope,
-} from "../src/case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import type { Variant } from "@purin-labs/type-utils";
 
 declare const scope: CaseContextCollectionScope;

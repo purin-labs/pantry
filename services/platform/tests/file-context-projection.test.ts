@@ -9,10 +9,10 @@ import {
   createFileProjectionCommand,
   searchGrantedFiles,
   type FileProjectionSourceReader,
-} from "../src/context/files";
+} from "@purin-labs/agent/context/files/index";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
-import { searchContextProjections } from "../src/context/projection";
+import { searchContextProjections } from "@purin-labs/agent/context/projection/index";
 import { d1Database } from "./sqlite-d1";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";

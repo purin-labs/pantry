@@ -1,11 +1,11 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { describe, expect, it } from "vitest";
-import { createSessionSchema } from "../src/actors/agent-session-schema";
+import { createSessionSchema } from "@purin-labs/agent/actors/agent-session-schema";
 import {
   persistAgentEventEnvelope,
   type SessionAgentEventInput,
-} from "../src/actors/agent-session-event-stream";
+} from "@purin-labs/agent/actors/agent-session-event-stream";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { requireRequestId, requireOrganisationId } from "./test-ids";
 

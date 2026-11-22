@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   encodeWorkspaceExecutorEnvelope,
   type WorkspaceExecutorInspectionRequest,
-} from "../src/workspace-executor-container";
+} from "@purin-labs/agent/workspace-executor-container";
 import { WORKSPACE_EXECUTOR_ATTACHMENT_ID } from "./workspace-executor-fixtures";
 
 /**

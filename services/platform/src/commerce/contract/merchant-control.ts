@@ -11,7 +11,7 @@ import {
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
 import { controlError } from "@purin-labs/control/worker/http";
-import { readOrganisationEnvironment } from "../../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 
 export type MerchantControlContext = Readonly<{
   merchantId: string;

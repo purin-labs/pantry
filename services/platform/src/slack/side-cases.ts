@@ -41,7 +41,7 @@ import { parsePersonId, type PersonId } from "@purin-labs/authority/data/person-
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import { parseSlackUserId, type SlackUserId } from "./events";
-import type { SessionSideCase } from "../actors/session/conversation-port";
+import type { SessionSideCase } from "@purin-labs/agent/actors/session/conversation-port";
 
 /** The `action_id` of the Start button of a proposal message. */
 export const SLACK_SIDE_CASE_START_ACTION = "pantry_side_case_start";

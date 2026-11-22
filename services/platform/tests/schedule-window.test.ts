@@ -5,7 +5,7 @@ import {
   isTimeOfDay,
   isValidTimeZone,
   scheduleTimeKey,
-} from "../src/schedules/window";
+} from "@purin-labs/agent/schedules/window";
 
 describe("Schedule windows", () => {
   it("computes hourly windows in UTC", () => {

@@ -29,13 +29,13 @@ import {
   handleCompleteOrganisationChatGptSignIn,
   handleOrganisationCodex,
   handleOrganisationCodexAuthorizations,
-} from "./agents/codex";
+} from "@purin-labs/agent/control/routes/agents/codex";
 import {
   handleEmailOperational,
   handleEmailOperationalContactSync,
 } from "./agents/email-operational";
 import { handleEmailReply, handleEmailReviewQueue } from "./agents/email-reply";
-import { handleOrganisationInference } from "./agents/inference";
+import { handleOrganisationInference } from "@purin-labs/agent/control/routes/agents/inference";
 import {
   handleAgentMailbox,
   handleAgentMailboxCheck,

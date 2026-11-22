@@ -18,7 +18,7 @@ import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plan
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
-} from "../../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import {
   placeCafeOrder,
   publishCafeMenu,
@@ -42,7 +42,7 @@ import {
   openRouterText,
   openRouterToolCall,
 } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const TOOLS =
   "commerce_entity_context commerce_propose_refund commerce_propose_action";

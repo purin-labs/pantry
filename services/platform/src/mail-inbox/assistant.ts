@@ -25,7 +25,7 @@ import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
 } from "@purin-labs/authority/policy-snapshot";
-import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { readMailboxIngressPolicy } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
 import {
@@ -39,7 +39,7 @@ import {
 import {
   prepareTurnContext,
   prepareTurnAuthority,
-} from "../context/turn-context";
+} from "@purin-labs/agent/context/turn-context";
 import {
   reserveEmailTokens,
   settleEmailReservation,

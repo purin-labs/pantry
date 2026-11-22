@@ -10,7 +10,7 @@ import {
   prepareOrganisationPurgeAccounts,
 } from "@purin-labs/connections/data/integration-account-writes";
 import type { OrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
-import { prepareInitialOrganisationWorkspace } from "./data/organisation-workspace";
+import { prepareInitialOrganisationWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
 import {
   prepareArchivedOrganisationConnectionsDisable,

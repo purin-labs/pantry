@@ -46,7 +46,7 @@ import {
 import {
   socketSessionAccess,
   socketSessionMembership,
-} from "./socket-session-access";
+} from "@purin-labs/agent/actors/socket-session-access";
 
 type CollaborationRoomClientMessage<Update, StateVector, Selection> =
   | Readonly<{

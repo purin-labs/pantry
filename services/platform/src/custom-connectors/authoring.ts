@@ -2,7 +2,7 @@ import type { JsonRecord } from "@purin-labs/control/worker/http";
 import {
   readMessageLink,
   type MessageLinkEgress,
-} from "../messages/link-reader";
+} from "@purin-labs/agent/messages/link-reader";
 import { parseCustomConnectorDefinition } from "./definition";
 import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";

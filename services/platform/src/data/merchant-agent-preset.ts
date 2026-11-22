@@ -13,13 +13,13 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   merchantAgentAgentId,
   merchantAgentSuffix,
-} from "./merchant-agent-ids";
+} from "@purin-labs/agent/data/merchant-agent-ids";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   applyAgentOperation,
   readAgentOperations,
   type AgentOperationsError,
-} from "./agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import type { AgentSkillRef } from "@purin-labs/control-api";
 /**
  * The capability Sous Chef requests and must be granted to read commerce records.

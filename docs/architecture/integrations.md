@@ -155,7 +155,7 @@ branch with receipts. The gateway loads no provider code at run time.
 Agents and generated code reach providers only through typed capabilities.
 `AgentSessionActor` owns the accepted tool catalog, the tool-call budget,
 private history and the turn. The Harness Tool Host
-([`embedded-harness-tool-host.ts`](../../services/platform/src/actors/embedded-harness-tool-host.ts),
+([`embedded-harness-tool-host.ts`](../../foundation/agent/actors/embedded-harness-tool-host.ts),
 [`agent-tools/`](../../services/platform/src/agent-tools/registry.ts))
 parses arguments and runs the trusted handlers. `OrganisationActor` owns the
 action ledger. A Connector delivers. It is not a tool executor and not a
@@ -200,7 +200,7 @@ Code Mode call use the same claim.
 `inspect_message_attachment` (`message.attachment.inspect`) reads bounded text
 or metadata from one attachment of the current turn. `read_message_link`
 (`message.link.read`) fetches one public HTTP(S) link that the author wrote
-([`message-tools.ts`](../../services/platform/src/actors/message-tools.ts)).
+([`message-tools.ts`](../../foundation/agent/actors/message-tools.ts)).
 An attachment from another message, or a URL that the model composed, is
 refused before any read.
 
@@ -264,7 +264,7 @@ query D1, or approve or settle its own effects. Pi owns the replay of a script
 and the order of its calls. Pantry owns admission, the lease, the deadline,
 capability claims, the source check of each result, receipts, settlement and
 delivery
-([`code-mode-admission.ts`](../../services/platform/src/actors/code-mode-admission.ts)).
+([`code-mode-admission.ts`](../../foundation/agent/actors/code-mode-admission.ts)).
 One script runs in an accepted turn.
 
 After a process loss, the next runtime generation binds the reservation to its
@@ -273,7 +273,7 @@ script resumes only after both confirm. Pi gives each recorded result to the
 script again, and `authorizeSources` checks its sources first. The deadline,
 admission digest and counted calls do not change. An in-flight call runs again
 only when a repeat is safe
-([`pi-tool-replay.ts`](../../services/platform/src/actors/pi-tool-replay.ts)).
+([`pi-tool-replay.ts`](../../foundation/agent/actors/pi-tool-replay.ts)).
 Reads, Kitchen surface commands, `codemode`, `tool_search` and named
 proposals run again from any caller. `commerce_propose_action` and
 `commerce_propose_plugin` run again only from a script, and the owner returns
@@ -287,14 +287,14 @@ owners release the reservation.
 ### Heavy execution and tool errors
 
 `WorkspaceExecutorContainer`
-([`workspace-executor-container.ts`](../../services/platform/src/workspace-executor-container.ts))
+([`workspace-executor-container.ts`](../../foundation/agent/workspace-executor-container.ts))
 materializes an immutable workspace revision and runs the accepted task with
 `enableInternet = false`. It returns content-addressed artifacts, measured
 usage and a `ValidatedProductFolderChangesetV1`.
 [`workspace-execution-coordinator.ts`](../../services/platform/src/actors/workspace-execution-coordinator.ts)
 checks that the changeset names the same Organisation, workspace and base
 revision before
-[`workspace-revision-store.ts`](../../services/platform/src/workspace-revision-store.ts)
+[`workspace-revision-store.ts`](../../foundation/agent/workspace-revision-store.ts)
 accepts a new revision. The released executor keeps no session, Case,
 credential or provider authority.
 

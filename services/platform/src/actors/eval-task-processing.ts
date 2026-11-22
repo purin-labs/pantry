@@ -17,15 +17,15 @@ import {
   BACKGROUND_MEMORY_DEADLINE_MS,
   prepareTurnAuthority,
   prepareTurnContext,
-} from "../context/turn-context";
+} from "@purin-labs/agent/context/turn-context";
 import { readContactVerificationStanding } from "../data/contact-verification";
 import { readAgentMailboxBinding } from "../data/email-mailbox";
 import { readGmailInferenceEligibility } from "../mail-inbox/contract/gmail-inference-eligibility";
-import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import {
   composeAgentInstructions,
   resolveCaseTurnAgentProfile,
-} from "../data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   ClaimedEvalTask,
@@ -47,7 +47,7 @@ import { supplierReplyRecipient } from "../mail-inbox/verified-sender";
 import {
   digestModelRoute,
   resolveOrganisationModelRouteForSelection,
-} from "../models/route";
+} from "@purin-labs/agent/models/route";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -62,7 +62,7 @@ import {
 import { ensureCaseProject } from "../projects/case-project";
 import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { serializeContextBundle } from "./actor-journal/parsers";
+import { serializeContextBundle } from "@purin-labs/agent/actors/actor-journal/parsers";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
@@ -85,7 +85,7 @@ import {
   EMAIL_HARNESS_INSTRUCTIONS,
   emailReplyRequest,
 } from "./email-case-processing";
-import { MODEL_AUTHORITY_EXHAUSTED } from "./transient-turn";
+import { MODEL_AUTHORITY_EXHAUSTED } from "@purin-labs/agent/actors/transient-turn";
 
 /**
  * One task of an eval run: one scenario, under one configuration, on one

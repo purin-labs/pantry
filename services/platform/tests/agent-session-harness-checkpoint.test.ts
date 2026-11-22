@@ -15,8 +15,8 @@ import {
   validateCheckpointBudgetBinding,
   prepareHarnessCheckpoint,
   uploadHarnessCheckpoint,
-} from "../src/actors/agent-session-harness-checkpoint";
-import { sessionBudgetAccountDigest } from "../src/actors/agent-session-budget";
+} from "@purin-labs/agent/actors/agent-session-harness-checkpoint";
+import { sessionBudgetAccountDigest } from "@purin-labs/agent/actors/agent-session-budget";
 import {
   acceptHarnessEvent,
   commitHarnessCheckpoint,
@@ -27,9 +27,9 @@ import {
   appendHarnessHistory,
   issueHarnessTurnLease,
   type HarnessAuthorityStorage,
-} from "../src/actors/agent-session-harness-authority";
-import { createSessionSchema } from "../src/actors/agent-session-schema";
-import { beginSessionTurnStream } from "../src/actors/agent-session-turn-stream";
+} from "@purin-labs/agent/actors/agent-session-harness-authority";
+import { createSessionSchema } from "@purin-labs/agent/actors/agent-session-schema";
+import { beginSessionTurnStream } from "@purin-labs/agent/actors/agent-session-turn-stream";
 import {
   TEST_ACCEPTED_INPUT_CONTEXT,
   TEST_HARNESS_LEASE_AUTHORITY,

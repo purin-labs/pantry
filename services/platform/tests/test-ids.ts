@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { parseConversationId, parseProjectId } from "@purin-labs/control-api";
-import { parseSessionTurnInputDigest } from "../src/actors/agent-session-turn-input-digest";
+import { parseSessionTurnInputDigest } from "@purin-labs/agent/actors/agent-session-turn-input-digest";
 import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import {
   parseCaseId,

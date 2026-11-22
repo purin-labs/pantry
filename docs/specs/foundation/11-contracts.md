@@ -164,7 +164,7 @@ The helpers follow the Rust and serde rules that their comments name. For exampl
   change.
 - `crates/media-inspect` reads media facts and selects video frames. The executor uses
   it as a Rust library, and the Platform Worker uses its Wasm build
-  (`services/platform/src/messages/media-inspect.ts`). `parseMediaMetadata` and
+  (`foundation/agent/messages/media-inspect.ts`). `parseMediaMetadata` and
   `parseFrameSamplingOutcome` check its output.
 - `generate-executor-wire.mjs` writes `crates/workspace-executor/src/wire.rs` and
   `executor-wire.schema.json` from `executorWireSchemas`. The request and response of
@@ -209,11 +209,11 @@ Main files of `packages/contracts/src/`:
   `RequestAuthority`. A hand-written type can name a schema type in a field, such as
   `OrganisationId`.
 
-Other files: `services/platform/src/actor-wasm.ts` calls the Session reducer,
+Other files: `foundation/agent/actor-wasm.ts` calls the Session reducer,
 `services/platform/src/commerce/commerce-wasm.ts` calls the commerce functions, and
-`services/platform/src/messages/message-wasm.ts` calls the message and attachment
+`foundation/agent/messages/message-wasm.ts` calls the message and attachment
 parsers. The three run TypeScript only.
-`services/platform/src/actors/pi-tool-arguments.ts` holds the tool argument check.
+`foundation/agent/actors/pi-tool-arguments.ts` holds the tool argument check.
 `packages/contracts/src/boundary.ts` reads plain request fields.
 
 | Check | Command | Where it runs |

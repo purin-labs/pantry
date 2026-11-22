@@ -13,7 +13,7 @@ export type MenuPriceProposalRequest = Readonly<{
   deal: boolean;
 }>;
 
-export type { PublishedResourceBoundaryError } from "../../data/agent-operations/scope-commerce";
+export type { PublishedResourceBoundaryError } from "@purin-labs/agent/data/agent-operations/scope-commerce";
 
 /** The armed fault of the Café commerce acceptance journey. */
 export type CafeCommerceAcceptanceFaultRecord = Readonly<{

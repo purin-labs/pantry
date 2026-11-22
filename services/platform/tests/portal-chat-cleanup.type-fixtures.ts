@@ -1,7 +1,7 @@
 import type {
   PortalChatCleanupRequest,
   PortalChatErasure,
-} from "../src/actors/portal-chat-cleanup";
+} from "@purin-labs/agent/actors/portal-chat-cleanup";
 import type { SessionDO } from "../src/actors/agent-session";
 
 declare const actor: SessionDO;

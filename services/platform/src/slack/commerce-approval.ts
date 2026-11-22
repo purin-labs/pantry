@@ -18,7 +18,7 @@ import {
   acceptAndDeliverCommerceOutcome,
   executeCommerceAction,
 } from "../commerce/actions";
-import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
+import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
 import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";

@@ -29,7 +29,7 @@ import {
   parseEntityRef,
   SUPPLIER_ENTITY_TYPE_ID,
 } from "@purin-labs/commerce-client";
-import { readSessionTurnMemoryRecords } from "../../src/actors/actor-journal/transactions";
+import { readSessionTurnMemoryRecords } from "@purin-labs/agent/actors/actor-journal/transactions";
 import { createMailboxTurnMemoryReader } from "../../src/mail-inbox/mailbox-turn-memory";
 import {
   canonicalFlowLabel,
@@ -40,7 +40,7 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import {
   prepareWorkspaceRevisionMutation,
   commitWorkspaceRevision,
-} from "../../src/workspace-revision-store";
+} from "@purin-labs/agent/workspace-revision-store";
 import {
   startActorRelocation,
   resumeActorRelocation,
@@ -48,8 +48,8 @@ import {
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import type { MailEvaluationInput } from "../../src/mail-inbox/evaluation";
-import { createTransientGoalExecution } from "../../src/actors/session-goal-usage";
-import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
+import { createTransientGoalExecution } from "@purin-labs/agent/actors/session-goal-usage";
+import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import {
   openRouterText,
   openRouterToolCall,
@@ -82,13 +82,13 @@ import {
   recordCaseContextCollectionSuggestion,
   decideCaseContextCollectionRelationship,
   type CaseContextCollectionScope,
-} from "../../src/case-context-discovery/relationships";
-import { parseCaseContextDiscoveryPolicy } from "../../src/case-context-discovery/policy";
+} from "@purin-labs/agent/case-context-discovery/relationships";
+import { parseCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/policy";
 import { readEmailProposalFlow } from "../../src/actors/email-case-context-collection-evidence";
 import {
   MEMORY_HEADING,
   MEMORY_LIMITATION_NOTICE,
-} from "../../src/actors/model-context-prompt";
+} from "@purin-labs/agent/actors/model-context-prompt";
 import {
   recordEmailProposalFlow,
   authorizeEmailProposalFlow,
@@ -103,7 +103,7 @@ import {
   digestFlowBinding,
   type FlowPolicyInput,
 } from "@purin-labs/authority/policy/information-flow/index";
-import type { CaseContextCollectionEffectAttempt } from "../../src/case-context-discovery/evidence";
+import type { CaseContextCollectionEffectAttempt } from "@purin-labs/agent/case-context-discovery/evidence";
 import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
@@ -114,7 +114,7 @@ import { admitEmailThreadCase } from "../../src/actors/email-case-admission";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
-} from "../../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import {
   grantOwnerOrderRead,
   MAIL_OWNER_ORDER_GRANT,
@@ -141,7 +141,7 @@ import {
   processEmailThreadTurn,
   type EmailThreadTurnInput,
 } from "../../src/actors/email-case-processing";
-import { resolveCaseTurnAgentProfile } from "../../src/data/pinned-agent-profile";
+import { resolveCaseTurnAgentProfile } from "@purin-labs/agent/data/pinned-agent-profile";
 import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
@@ -149,7 +149,7 @@ import {
   digestModelRoute,
   resolveOrganisationModelRoute,
   resolveOrganisationModelRouteForSelection,
-} from "../../src/models/route";
+} from "@purin-labs/agent/models/route";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { env, exports } from "cloudflare:workers";
 import {
@@ -247,7 +247,7 @@ import {
 import {
   applyAgentOperation,
   type AgentOperationCommand,
-} from "../../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   activateEmailRuntime,
   acceptEmailHint,
@@ -272,7 +272,7 @@ import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-p
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 async function prepareMailBudgetJourney() {
   const owner = await client("mail-budget-pi-owner");
@@ -9702,7 +9702,7 @@ function caseContextCollectionReplySelection(
   accountId: string,
   part: string,
   now: number,
-): import("../../src/case-context-discovery/relationships").CaseContextCollectionSelection {
+): import("@purin-labs/agent/case-context-discovery/relationships").CaseContextCollectionSelection {
   return {
     caseId: `case_gmail_${accountId}_case_context_collection_${part}`,
     source: "gmail",

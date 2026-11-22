@@ -14,9 +14,9 @@ import {
   prepareTransientWhatsAppTurn,
 } from "./inbox-turns/session-turns";
 import { ACTOR_MACHINES } from "./actor-machines";
-import { SessionActor } from "./session/session-actor";
-import type { SessionToolWiring } from "./session/tool-wiring";
-import { registerSessionTurnAccess } from "./session-turn-access";
+import { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
+import type { SessionToolWiring } from "@purin-labs/agent/actors/session/tool-wiring";
+import { registerSessionTurnAccess } from "@purin-labs/agent/actors/session-turn-access";
 
 // The conversation module owns the access rule of a Session turn.
 registerSessionTurnAccess(authorizeChatHarnessLease);

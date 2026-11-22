@@ -15,7 +15,7 @@ import {
   openRouterToolCall,
   openRouterStream,
 } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const LARGE_ACCEPTED_RESPONSE = "Accepted batch evidence. ".repeat(5_000);
 

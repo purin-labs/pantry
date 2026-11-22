@@ -5,7 +5,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { admitSessionInformationFlowObservation } from "../../src/actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";

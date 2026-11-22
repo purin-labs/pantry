@@ -15,9 +15,9 @@ import {
   FILE_PROJECTION_COMMAND_TYPE,
   parseFileProjectionCommand,
   type FileProjectionCommand,
-} from "./context/files";
-import type { ContextProjectionCommand } from "./context/projection";
-import { parseContextProjectionCommand } from "./context/projection";
+} from "@purin-labs/agent/context/files/index";
+import type { ContextProjectionCommand } from "@purin-labs/agent/context/projection/index";
+import { parseContextProjectionCommand } from "@purin-labs/agent/context/projection/index";
 import type { JsonObject } from "@purin-labs/kernel/http";
 import { parseCaseId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
@@ -32,7 +32,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   parseAgentScheduleDispatchQueuePayload,
   type AgentScheduleDispatchQueueMessage,
-} from "./schedules/queue-messages";
+} from "@purin-labs/agent/schedules/queue-messages";
 import {
   parseShopifyCommerceRefreshQueuePayload,
   type ShopifyCommerceRefreshQueueMessage,

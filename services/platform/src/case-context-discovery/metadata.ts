@@ -27,7 +27,7 @@ import {
 import type {
   CaseContextCollection,
   CaseContextCollectionSelection,
-} from "./relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 
 /**
  * Whether the contact of a selection is still verified for its Case. The

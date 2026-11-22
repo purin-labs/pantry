@@ -69,10 +69,10 @@ vi.mock("@purin-labs/connections/data/integration-account", async (importOrigina
   listIntegrationAccounts: integrationAccountMocks.listIntegrationAccounts,
 }));
 
-vi.mock("../src/control/organisation-runtime", mockOrganisationRuntime);
+vi.mock("@purin-labs/agent/control/organisation-runtime", mockOrganisationRuntime);
 
 async function mockOrganisationRuntime(
-  importOriginal: () => Promise<typeof import("../src/control/organisation-runtime")>,
+  importOriginal: () => Promise<typeof import("@purin-labs/agent/control/organisation-runtime")>,
 ) {
   return {
     ...(await importOriginal()),

@@ -90,7 +90,7 @@ the CLI loads these as built-in extensions, while SDK sessions explicitly add
 
 Satyr started this experiment with Pi packages pinned to `0.82.0` in
 [`services/platform/package.json`](../services/platform/package.json).
-[`pi-embedded-adapter.ts`](../services/platform/src/actors/pi-embedded-adapter.ts)
+[`pi-embedded-adapter.ts`](../foundation/agent/actors/pi-embedded-adapter.ts)
 constructed the lower-level `pi-agent-core.Agent` and supplied Tool Host tools
 directly at the start of the experiment. That integration did not automatically
 load the advertised extensions.

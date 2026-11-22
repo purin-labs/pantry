@@ -18,8 +18,8 @@ import {
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type { HarnessIntegrationListRequest } from "./services";
 import {
   readIntegrationDiscovery,
@@ -37,7 +37,7 @@ import type { CapabilityDefinition } from "@purin-labs/authority/authorization/a
 import {
   admitSessionInformationFlowObservation,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
-} from "../../actors/agent-session-information-flow";
+} from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -56,7 +56,7 @@ import {
   selectProviderResourceGrants,
   type ToolEffect,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 async function isCustomConnectorTurnActive(
   execution: SessionExecutionAdmission,

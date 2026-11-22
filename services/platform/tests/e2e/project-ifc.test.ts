@@ -1,4 +1,4 @@
-import { storeFilePlacementCredential } from "../../src/provider-workflows/file-context-credential";
+import { storeFilePlacementCredential } from "@purin-labs/agent/provider-workflows/file-context-credential";
 import {
   fixtureDatabase,
   onboardFixtureOrganisation,
@@ -38,20 +38,20 @@ import {
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import { readSessionInformationFlow } from "../../src/actors/agent-session-information-flow";
+import { readSessionInformationFlow } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { audiencesForAdmission } from "@purin-labs/authority/policy/information-flow/index";
 import {
   applyFileProjectionCommand,
   createFileProjectionCommand,
   replaceFileGrantAdmissions,
-} from "../../src/context/files";
-import { ProviderFileProjectionSourceReader } from "../../src/context/files/provider-source";
-import { upsertFileResourceSource } from "../../src/context/files/persistence";
+} from "@purin-labs/agent/context/files/index";
+import { ProviderFileProjectionSourceReader } from "@purin-labs/agent/context/files/provider-source";
+import { upsertFileResourceSource } from "@purin-labs/agent/context/files/persistence";
 import {
   readGrantedFile,
   type FileToolObservation,
   type CanonicalFileReference,
-} from "../../src/context/files/tools";
+} from "@purin-labs/agent/context/files/tools";
 import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import { observeProjectReference } from "../../src/projects/references";
@@ -65,7 +65,7 @@ import {
 } from "./slack-journey-support";
 import { network } from "./network";
 import { revokeAccessGrant } from "@purin-labs/authority/data/access-grants";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const SOURCE_NAME = "Restricted P54B supplier.pdf";
 const SOURCE_ID = "id:p54b-supplier";

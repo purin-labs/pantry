@@ -2,7 +2,7 @@
 // requests of the ChatGPT subscription route, because chatgpt.com refuses
 // them from a Worker and accepts them from a container.
 //
-// The image places services/platform/src/chatgpt-exit/forward.ts next to this
+// The image places foundation/agent/chatgpt-exit/forward.ts next to this
 // file, and Node runs it with its own type stripping. The server never logs a
 // header, a body or a token.
 import { createServer } from "node:http";

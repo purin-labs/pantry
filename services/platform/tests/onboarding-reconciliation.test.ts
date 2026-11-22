@@ -41,7 +41,7 @@ import {
   listOrganisationActorRegistryEntries,
 } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { parseSessionId } from "@purin-labs/kernel/ids";
-import type { HarnessHistoryErasure } from "../src/actors/agent-session-harness-authority";
+import type { HarnessHistoryErasure } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { ActorRegistryEntry } from "@purin-labs/actor-runtime/actors/actor-registry";

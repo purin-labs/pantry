@@ -8,7 +8,7 @@ import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
-} from "../../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import {
   preparePortalChatJourney,
   chat,
@@ -17,7 +17,7 @@ import {
 } from "./chat-journey-support";
 import { ORGANISATION_ID, openRouterStream } from "./slack-journey-support";
 import { network } from "./network";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(
   "retains the request goal across Portal steps and Case eviction, then enrolls a new message in the replacement goal",

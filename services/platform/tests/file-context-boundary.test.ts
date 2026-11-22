@@ -5,8 +5,8 @@ import {
   parseCapabilityKey,
 } from "@purin-labs/authority/authorization/access-grants/index";
 import { parseAccessGrantTarget } from "@purin-labs/authority/data/access-grants";
-import { FILE_EXTRACTED_TEXT_MAX_BYTES } from "../src/context/files/domain";
-import { normalizeFileText } from "../src/context/files/projection";
+import { FILE_EXTRACTED_TEXT_MAX_BYTES } from "@purin-labs/agent/context/files/domain";
+import { normalizeFileText } from "@purin-labs/agent/context/files/projection";
 
 describe("file context boundaries", () => {
   it("bounds normalized extracted text without splitting UTF-8", () => {

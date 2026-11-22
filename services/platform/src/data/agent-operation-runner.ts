@@ -6,12 +6,12 @@ import type { Result } from "@purin-labs/kernel/result";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { processDirectCaseCommand } from "../actors/case-direct-processing";
-import { readOrganisationEnvironment } from "../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import {
   responsibilityScopeCommerce,
   type PublishedResourceBoundaryError,
-} from "./agent-operations/scope-commerce";
+} from "@purin-labs/agent/data/agent-operations/scope-commerce";
 import {
   applyAgentOperation,
   readAgentOperations,
@@ -20,9 +20,9 @@ import {
   type AgentOperationsError,
   type AgentOperationsSnapshot,
   type AgentResponsibilityScopePublicationEvidence,
-} from "./agent-operations";
-import { recordCaseAssignmentPin } from "./agent-operations/case-assignment-pins";
-import { resolveManualDispatchAutomation } from "./agent-operations/automation";
+} from "@purin-labs/agent/data/agent-operations";
+import { recordCaseAssignmentPin } from "@purin-labs/agent/data/agent-operations/case-assignment-pins";
+import { resolveManualDispatchAutomation } from "@purin-labs/agent/data/agent-operations/automation";
 import {
   authorizeOrganisationControl,
   resolveControlSessionById,

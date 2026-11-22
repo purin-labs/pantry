@@ -16,7 +16,7 @@ import {
   organisationChatModelOptions,
   resolveOrganisationModelRouteAtScope,
   type OrganisationModelRoute,
-} from "../models/route";
+} from "@purin-labs/agent/models/route";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import {

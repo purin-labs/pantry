@@ -1,10 +1,10 @@
-import type { TransientModelTurnError } from "../src/actors/session/types";
-import type { GoalUsageAuthority } from "../src/actors/session-goal-usage";
-import type { GoalExecutionRequest } from "../src/actors/case-goals";
+import type { TransientModelTurnError } from "@purin-labs/agent/actors/session/types";
+import type { GoalUsageAuthority } from "@purin-labs/agent/actors/session-goal-usage";
+import type { GoalExecutionRequest } from "@purin-labs/agent/actors/case-goals";
 import type {
   GoalModelCallControl,
   GoalModelStop,
-} from "../src/actors/goal-model-calls";
+} from "@purin-labs/agent/actors/goal-model-calls";
 import type {
   HarnessTurnLease,
   CaseGoalCommand,

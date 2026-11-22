@@ -34,7 +34,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { createCommerceClient } from "../../commerce/contract/client";
-import { readOrganisationEnvironment } from "../organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import {
   resolveCommerceMerchant,
   type CommerceMerchant,

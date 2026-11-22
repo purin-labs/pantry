@@ -10,15 +10,15 @@ import {
   createCommerceEntityPlaneCueEvents,
   createCueQueueMessage,
   parseCueQueueMessage,
-} from "../src/cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   matchesEntityPlaneScope,
   matchesEntityPlaneScopeAtAdmission,
-} from "../src/data/agent-operations/automation";
+} from "@purin-labs/agent/data/agent-operations/automation";
 import type {
   AgentResponsibilityScope,
   SavedSelectorCueResolverInput,
-} from "../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   parseIntegrationAccountId,
   parseRequestId,

@@ -5,17 +5,17 @@ import {
   createTypeSafeConnectionSchema,
   mutateTypeSafeConnection,
   readTypeSafeConnection,
-} from "../src/integrations/typesafe/connection";
-import { resolveTypeSafeCredential as resolveTypeSafeConnection } from "../src/integrations/typesafe/authority";
+} from "@purin-labs/agent/integrations/typesafe/connection";
+import { resolveTypeSafeCredential as resolveTypeSafeConnection } from "@purin-labs/agent/integrations/typesafe/authority";
 import {
   createCaseContextDiscoveryEvaluationSchema,
   publishCaseContextDiscoveryPolicy,
   readCaseContextDiscoveryPolicy,
-} from "../src/case-context-discovery/evaluation-store";
+} from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import {
   caseContextDiscoveryReadiness,
   parseCaseContextDiscoveryPolicy,
-} from "../src/case-context-discovery/policy";
+} from "@purin-labs/agent/case-context-discovery/policy";
 import { SqliteD1Database } from "./sqlite-d1";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { requireOrganisationId } from "./test-ids";

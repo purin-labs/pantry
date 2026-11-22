@@ -16,14 +16,14 @@ import {
   readAgentOperations,
   type AgentOperationCommand,
   type SavedSelectorCueResolverInput,
-} from "../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   readCaseAssignmentPin,
   recordCaseAssignmentPin,
-} from "../src/data/agent-operations/case-assignment-pins";
-import { resolveCueAutomation } from "../src/data/agent-operations/automation";
-import { submitAgentConfigurationProposal } from "../src/data/agent-operations/proposals";
-import { createCommerceEntityPlaneCueEvents } from "../src/cues/engine";
+} from "@purin-labs/agent/data/agent-operations/case-assignment-pins";
+import { resolveCueAutomation } from "@purin-labs/agent/data/agent-operations/automation";
+import { submitAgentConfigurationProposal } from "@purin-labs/agent/data/agent-operations/proposals";
+import { createCommerceEntityPlaneCueEvents } from "@purin-labs/agent/cues/engine";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

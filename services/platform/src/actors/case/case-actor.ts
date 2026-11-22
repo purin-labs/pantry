@@ -24,14 +24,14 @@ import {
   parseGoalCommandRequest,
   parseGoalAdmissionRequest,
   parseGoalUsageRequest,
-} from "../case-goals";
+} from "@purin-labs/agent/actors/case-goals";
 import {
   createConversationExecutionSchema,
   persistConversationExecution,
   readConversationExecution,
   type ConversationExecution,
 } from "../../chat/execution";
-import { reachableAttachmentObjectKeys } from "../../messages/attachment-reachability";
+import { reachableAttachmentObjectKeys } from "@purin-labs/agent/messages/attachment-reachability";
 import type {
   CaseGoalSnapshot,
   CaseAssignmentLifecycle,
@@ -69,11 +69,11 @@ import type {
   CaseContextSource,
   CaseContextSourceReader,
   CaseContextSourceReaderError,
-} from "../../context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import type {
   CaseContextTailCandidate,
   CaseContextTailReader,
-} from "../../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {

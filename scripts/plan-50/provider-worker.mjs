@@ -1,4 +1,4 @@
-import { failNativeStream } from "../../services/platform/src/actors/pi-durable-stream.ts";
+import { failNativeStream } from "../../foundation/agent/actors/pi-durable-stream.ts";
 import { armAlarmBy } from "../../foundation/actor-runtime/actors/lifecycle/actor-alarm.ts";
 import proposalTrial, {
   CandidateActor as ProposalActor,
@@ -19,24 +19,24 @@ import {
   handleCommerceControlRoute,
   matchCommerceControlRoute,
 } from "../../services/platform/src/control/routes/commerce.ts";
-import { readSessionTurnFlowBinding } from "../../services/platform/src/actors/agent-session-information-flow.ts";
+import { readSessionTurnFlowBinding } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";
 import { createAssistantMessageEventStream } from "@earendil-works/pi-ai";
 import {
   resolvePiInferenceRoute,
   dispatchPiModel,
-} from "../../services/platform/src/actors/pi-model-transport.ts";
-import { createEmbeddedHarnessModelRouteLease } from "../../services/platform/src/actors/session/model-route.ts";
+} from "../../foundation/agent/actors/pi-model-transport.ts";
+import { createEmbeddedHarnessModelRouteLease } from "../../foundation/agent/actors/session/model-route.ts";
 import {
   SessionExecutionAdmission,
   admittedSessionModelRoute,
-} from "../../services/platform/src/actors/session-execution-admission.ts";
-import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
-import { readSessionBudgetAccount } from "../../services/platform/src/actors/agent-session-budget.ts";
+} from "../../foundation/agent/actors/session-execution-admission.ts";
+import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
+import { readSessionBudgetAccount } from "../../foundation/agent/actors/agent-session-budget.ts";
 import { compileTrialTurnAuthority } from "./account-authority.mjs";
 import { registerSession } from "./draft-seed.mjs";
-import { createSessionGoalExecution } from "../../services/platform/src/actors/session-goal-usage.ts";
+import { createSessionGoalExecution } from "../../foundation/agent/actors/session-goal-usage.ts";
 import { newRequestId } from "../../foundation/kernel/ids.ts";
 import { bindOperatorTurnAccess } from "../../services/platform/src/chat/turn-access.ts";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
@@ -47,8 +47,8 @@ import {
   publishProfileUpdate,
 } from "./profile-binding.mjs";
 import { SqliteStorage } from "@earendil-works/pi-durable/storage/sqlite";
-import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durable-database.ts";
-import { readCaseAssignmentPin } from "../../services/platform/src/data/agent-operations/case-assignment-pins.ts";
+import { ActorSqliteDatabase } from "../../foundation/agent/actors/pi-durable-database.ts";
+import { readCaseAssignmentPin } from "../../foundation/agent/data/agent-operations/case-assignment-pins.ts";
 
 const merchantId = "merchant_plan50_draft";
 

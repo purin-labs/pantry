@@ -1,8 +1,8 @@
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import type { CheckpointCommittedSessionCommit } from "../src/actors/actor-journal";
-import { buildTextTurnCheckpointCommittedCommit } from "../src/actors/agent-session-text-turn";
-import { uploadHarnessCheckpoint } from "../src/actors/agent-session-harness-checkpoint";
-import type { HarnessCheckpointPublication } from "../src/actors/agent-session-harness-authority";
+import type { CheckpointCommittedSessionCommit } from "@purin-labs/agent/actors/actor-journal";
+import { buildTextTurnCheckpointCommittedCommit } from "@purin-labs/agent/actors/agent-session-text-turn";
+import { uploadHarnessCheckpoint } from "@purin-labs/agent/actors/agent-session-harness-checkpoint";
+import type { HarnessCheckpointPublication } from "@purin-labs/agent/actors/agent-session-harness-authority";
 
 declare const accepted: CheckpointCommittedSessionCommit;
 declare const lease: HarnessTurnLease;

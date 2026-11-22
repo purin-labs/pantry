@@ -29,7 +29,7 @@ import {
 } from "./menu-board-journey-support";
 import { HttpResponse } from "msw";
 import { openRouterText, openRouterToolCall } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 declare module "vitest" {
   interface TaskMeta {

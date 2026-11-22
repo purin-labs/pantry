@@ -26,7 +26,7 @@ import {
   createCommerceEntityPlaneCueEvents,
   createCueQueueMessage,
   ensureCommerceLowStockCueSnapshot,
-} from "../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
@@ -46,7 +46,7 @@ import {
 } from "./provider";
 import { recordPaidReceipts } from "./paid-receipt";
 import { assertNever } from "@purin-labs/std";
-import { CUE_CLAIM_ABANDONED_AFTER_MS } from "../actors/cue-delivery";
+import { CUE_CLAIM_ABANDONED_AFTER_MS } from "@purin-labs/agent/actors/cue-delivery";
 
 /**
  * A cue that the queue has not settled is sent again only after its claim can

@@ -64,7 +64,7 @@ import {
   chatForkAttachments,
   parseChatForkHistory,
   parseChatHistorySnapshot,
-} from "../../src/chat/fork-history";
+} from "@purin-labs/agent/chat/fork-history";
 import { waveHeader, h264Fixture } from "../media-fixtures";
 import { network } from "./network";
 import {
@@ -79,7 +79,7 @@ import {
   slackSimulator,
   SLACK_ACTOR_USER_ID,
 } from "./slack-journey-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const BRIEF = "CONNECTED_FORK_BRIEF: proofing capacity is twelve trays.";
 const SOURCE_TEXT =

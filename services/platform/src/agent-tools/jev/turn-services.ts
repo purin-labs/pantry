@@ -2,10 +2,13 @@ import type { JevFeatureCommand } from "@purin-labs/control-api/portal/jev-featu
 import {
   beginProposalStaging,
   type StageConfigurationDraft,
-} from "../../actors/session/proposal-staging";
-import type { ToolTurnContext } from "../../actors/session/tool-wiring";
+} from "@purin-labs/agent/actors/session/proposal-staging";
+import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
 import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
-import { withToolContext, type SessionToolContext } from "../context";
+import {
+  withToolContext,
+  type SessionToolContext,
+} from "@purin-labs/agent/agent-tools/context";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { liveDeviceMember } from "../session-support";
 import { readJevFeaturesForEmbeddedHarness } from "./handlers";

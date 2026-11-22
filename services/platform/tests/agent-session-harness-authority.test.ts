@@ -26,12 +26,12 @@ import {
   readHarnessHistoryUsage,
   type CommitHarnessCheckpointInput,
   type HarnessAuthorityStorage,
-} from "../src/actors/agent-session-harness-authority";
-import { createSessionSchema } from "../src/actors/agent-session-schema";
+} from "@purin-labs/agent/actors/agent-session-harness-authority";
+import { createSessionSchema } from "@purin-labs/agent/actors/agent-session-schema";
 import {
   beginSessionTurnStream,
   readSessionTurnReplay,
-} from "../src/actors/agent-session-turn-stream";
+} from "@purin-labs/agent/actors/agent-session-turn-stream";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import type { Variant } from "@purin-labs/type-utils";
 import {

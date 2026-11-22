@@ -4,8 +4,8 @@ import {
   commitWorkspaceRevision,
   type WorkspaceRevisionAuthority,
   type WorkspaceRevisionProposal,
-} from "../src/workspace-revision-store";
-import { ensureOrganisationDefaultWorkspace } from "../src/data/organisation-workspace";
+} from "@purin-labs/agent/workspace-revision-store";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import {
   recordEmailThreadCase,
   recordEmailMessageReceipt,

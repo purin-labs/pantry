@@ -41,9 +41,9 @@ import {
   reconcileFrozenOrganisationReceipt,
   type RelocationReceiptRequest,
 } from "./organisation-relocation-receipt";
-import { workspaceRevisionArchiveKeys } from "../workspace-revision-store";
+import { workspaceRevisionArchiveKeys } from "@purin-labs/agent/workspace-revision-store";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
-import { readChatForkAttachmentKeys } from "../chat/fork-history";
+import { readChatForkAttachmentKeys } from "@purin-labs/agent/chat/fork-history";
 import {
   captureOrganisationDataArchive,
   deleteOrganisationDataArchivePages,
@@ -178,15 +178,15 @@ import {
   type ActorImportRequest,
   type ActorImportedState,
 } from "@purin-labs/actor-runtime/actors/actor-export";
-import { createCodeModeBudgetSchema } from "./code-mode-budget";
+import { createCodeModeBudgetSchema } from "@purin-labs/agent/actors/code-mode-budget";
 import {
   type AssignShopifyLocationClassificationInput,
   type ShopifyLocationObservationInput,
 } from "../shopify/location-observation";
-import type { CaseExecutionEffectRecords } from "../case-execution/records";
+import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-execution/records";
 import { readCaseEffectRecords } from "./organisation-execution-records";
 import { type AcceptedMemoryCursor } from "../memory/store";
-import { cleanupTypeSafeCredentials } from "../integrations/typesafe/connection";
+import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";
 import {
@@ -235,7 +235,7 @@ import {
   admittedReadTypeSafeConnectionConfiguration,
   type OrganisationPolicyHost,
   type OrganisationPolicyRpc,
-} from "./organisation/organisation-policy";
+} from "@purin-labs/agent/actors/organisation/organisation-policy";
 import {
   admittedCommitCaseContextCollectionEffectFence,
   admittedEraseCaseContextCollectionSource,

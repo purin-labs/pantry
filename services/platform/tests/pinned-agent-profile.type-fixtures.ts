@@ -1,7 +1,7 @@
 import type {
   AgentProfileSelection,
   CaseTurnAgentProfileResolution,
-} from "../src/data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 
 // @ts-expect-error A resolved outcome requires a profile.
 const missingProfile: CaseTurnAgentProfileResolution = { kind: "resolved" };

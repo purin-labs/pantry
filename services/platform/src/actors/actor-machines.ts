@@ -3,9 +3,9 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
 import { CASE_APPROVAL_WAIT_MACHINE } from "./case/approval-wait.machine";
 import { CASE_ASSIGNMENT_MACHINE } from "./case/assignment.machine";
 import { CASE_OUTPUT_MACHINE } from "./case/output.machine";
-import { CUE_DELIVERY_MACHINE } from "./cue-delivery.machine";
+import { CUE_DELIVERY_MACHINE } from "@purin-labs/agent/actors/cue-delivery.machine";
 import { DEVICE_COMMAND_MACHINE } from "./device-command.machine";
-import { STEERING_INPUT_MACHINE } from "./steering-input.machine";
+import { STEERING_INPUT_MACHINE } from "@purin-labs/agent/actors/steering-input.machine";
 import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "./whatsapp-reply-proposal.machine";
 import { EMAIL_REPLY_PROPOSAL_MACHINE } from "../data/email-reply-proposal.machine";
 

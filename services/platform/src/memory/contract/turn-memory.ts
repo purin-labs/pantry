@@ -9,4 +9,4 @@ export type ShownMemoryRevision = Readonly<{
 export {
   readNoTurnMemory,
   turnMemoryReaderWithoutSubjects,
-} from "../../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";

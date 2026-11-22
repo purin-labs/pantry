@@ -9,8 +9,8 @@ import {
   handleCommerceLabRoute,
   matchCommerceLabRoute,
 } from "./commerce-lab/router";
-import { processCueQueueBatch } from "./cues/queue-consumer";
-import { runScheduleDispatch } from "./schedules/dispatch";
+import { processCueQueueBatch } from "@purin-labs/agent/cues/queue-consumer";
+import { runScheduleDispatch } from "@purin-labs/agent/schedules/dispatch";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
@@ -23,9 +23,9 @@ import { startIsolateLocationRead } from "@purin-labs/kernel/isolate-location";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { runScheduledCommerceOutboxReconciliation } from "./commerce/outbox-worker";
 import { runScheduledPaidReceiptDelivery } from "./commerce/paid-receipt";
-import { runFileContextReconciliation } from "./context/files";
+import { runFileContextReconciliation } from "@purin-labs/agent/context/files/index";
 import { runAttachmentCollection } from "./messages/attachment-collection";
-import { runWeeklyChatGptLoginRefresh } from "./models/codex-connection";
+import { runWeeklyChatGptLoginRefresh } from "@purin-labs/agent/models/codex-connection";
 import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runtime/actors/actor-registry-sweep";
 import { handleCommerceWebhook } from "./commerce/webhooks";
 import { handleMenuScreenRequest } from "./control/routes/menu-screens";
@@ -108,7 +108,7 @@ import { handleWhatsAppWebhook } from "./whatsapp/webhook-route";
 // before it serves a request or starts an Actor.
 import "./worker-ports";
 
-export { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-governor";
+export { CodeModePlatformGovernorActor } from "@purin-labs/agent/actors/code-mode-platform-governor";
 
 export { ConversationResidencyActor } from "@purin-labs/actor-runtime/actors/conversation-residency";
 
@@ -123,9 +123,9 @@ export { CaseDO } from "./actors/case";
 
 export { ConnectorDO } from "./actors/connector";
 
-export { WorkspaceExecutorContainer } from "./workspace-executor-container";
+export { WorkspaceExecutorContainer } from "@purin-labs/agent/workspace-executor-container";
 
-export { MessageLinkFetchContainer } from "./messages/link-fetch-container";
+export { MessageLinkFetchContainer } from "@purin-labs/agent/messages/link-fetch-container";
 
 export { CustomConnectorFetchContainer } from "./custom-connectors/fetch-container";
 

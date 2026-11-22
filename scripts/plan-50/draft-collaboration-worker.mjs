@@ -14,7 +14,7 @@ import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
 import { createCommerceClient } from "../../services/platform/src/commerce/contract/client.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";
-import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
+import { SessionExecutionAdmission } from "../../foundation/agent/actors/session-execution-admission.ts";
 import { createOrganisationInstall } from "../../foundation/tenancy/data/organisation.ts";
 import {
   parseVaultHandle,

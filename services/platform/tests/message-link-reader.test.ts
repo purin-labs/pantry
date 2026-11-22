@@ -7,7 +7,7 @@ import {
   parseAdmissibleUrl,
   readMessageLink,
   type MessageLinkEgress,
-} from "../src/messages/link-reader";
+} from "@purin-labs/agent/messages/link-reader";
 
 describe("public message link reader", function messageLinkReaderSuite() {
   it("refuses every scheme but http and https", function refusesSchemes() {

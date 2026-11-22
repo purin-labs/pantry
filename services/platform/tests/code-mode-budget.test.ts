@@ -21,7 +21,7 @@ import {
   settleCodeModeOrganisationBudget,
   type CodeModeOrganisationReservation,
   type CodeModeOrganisationReserveInput,
-} from "../src/actors/code-mode-budget";
+} from "@purin-labs/agent/actors/code-mode-budget";
 import {
   parseRequestId,
   parseSessionId,
@@ -590,7 +590,7 @@ function requireCounter(
   result:
     | {
         readonly ok: true;
-        readonly value: import("../src/actors/code-mode-budget").CodeModeCapabilityCounter;
+        readonly value: import("@purin-labs/agent/actors/code-mode-budget").CodeModeCapabilityCounter;
       }
     | {
         readonly ok: false;

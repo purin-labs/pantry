@@ -4,7 +4,7 @@ import type {
   EmbeddedHarnessManifest,
   EmbeddedHarnessRuntime,
   EmbeddedHarnessUserInput,
-} from "../src/actors/embedded-harness";
+} from "@purin-labs/agent/actors/embedded-harness";
 
 declare const manifest: EmbeddedHarnessManifest;
 declare const runtime: EmbeddedHarnessRuntime;

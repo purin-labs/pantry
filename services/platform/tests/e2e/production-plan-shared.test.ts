@@ -7,7 +7,7 @@ import {
   type InventoryProductionRequest,
 } from "@purin-labs/kitchen-control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import {
   commerceClient,
   commerceWorkspace,

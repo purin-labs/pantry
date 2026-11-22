@@ -12,17 +12,17 @@ import {
   SessionExecutionAdmission,
   requireSessionExecution,
   admittedSessionOperation,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import {
   recordCommerceObservationEntities,
   type CommerceObservationEntity,
-} from "../../actors/agent-session-information-flow";
+} from "@purin-labs/agent/actors/agent-session-information-flow";
 import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
 import { createCommerceClient } from "../../commerce/contract/client";
 import { productSalesGrantProbe } from "../../commerce/entity-plane/product-sales-report";
 import { isRequestableEntityTypeRead } from "@purin-labs/authority/authorization/requestable-capabilities";
-import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   createCurrentObservedSourceFlowLabel,
   ObservationEvidence,

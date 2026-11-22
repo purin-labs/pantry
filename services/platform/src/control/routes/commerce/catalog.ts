@@ -10,7 +10,7 @@ import {
   enumeratePublishedResources,
 } from "../../../commerce/entity-plane/published-resources";
 import type { PublishedResourceBoundaryError } from "../../../commerce/contract/types";
-import { ensureCommerceLowStockCueSnapshot } from "../../../cues/engine";
+import { ensureCommerceLowStockCueSnapshot } from "@purin-labs/agent/cues/engine";
 import {
   commerceCanonicalResourceId,
   commerceProviderResourceId,

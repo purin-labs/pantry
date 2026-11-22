@@ -3,7 +3,7 @@ import {
   containerRequest,
   exitRefusal,
   forwardChatGptRequest,
-} from "../../src/chatgpt-exit/forward";
+} from "@purin-labs/agent/chatgpt-exit/forward";
 
 /** The mark on each request that left the E2E runtime through the exit Worker. */
 export const MODEL_EXIT_EGRESS_HEADER = "x-e2e-model-exit-egress";

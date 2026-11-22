@@ -18,7 +18,7 @@ import {
   type Conversation,
   type ChatCommand,
 } from "../conversation";
-import type { OrganisationModelRoute } from "../../models/route";
+import type { OrganisationModelRoute } from "@purin-labs/agent/models/route";
 import type { ConversationScope, StoredConversation } from "../store";
 import type { Variant } from "@purin-labs/type-utils";
 import { defaultChatEffort } from "./model";

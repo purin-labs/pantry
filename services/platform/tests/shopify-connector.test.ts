@@ -13,7 +13,7 @@ import {
   parseCueQueueMessage,
   parseCueSnapshot,
   renderCueProposal,
-} from "../src/cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   parseIntegrationAccountId,
   parseRequestId,

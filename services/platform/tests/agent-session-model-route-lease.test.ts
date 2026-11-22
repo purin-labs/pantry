@@ -7,7 +7,7 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { describe, expect, test, vi } from "vitest";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 const organisationCredentialMock = vi.hoisted(() => ({
   resolveOrganisationModelCredentialForRoute: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock(
   }),
 );
 
-import { createEmbeddedHarnessModelRouteLease } from "../src/actors/session/model-route";
+import { createEmbeddedHarnessModelRouteLease } from "@purin-labs/agent/actors/session/model-route";
 import { requireSessionId, requireOrganisationId } from "./test-ids";
 
 const organisationId = requireOrganisationId("organisation_route_lease");

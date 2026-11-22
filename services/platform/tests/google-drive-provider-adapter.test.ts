@@ -6,7 +6,7 @@ import {
   exchangeGoogleDriveAuthorizationCode,
   listGoogleDriveChanges,
   readGoogleDriveFileMetadata,
-} from "../src/provider-adapters/google-drive";
+} from "@purin-labs/agent/provider-adapters/google-drive";
 
 const REVISION = {
   kind: "gdrive" as const,

@@ -20,7 +20,7 @@ import {
   materializeContextBundle,
   type ContextAssemblyResult,
   type ContextItem,
-} from "../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";
 import {
   createProjectSnapshot,
   verifyProjectSnapshot,

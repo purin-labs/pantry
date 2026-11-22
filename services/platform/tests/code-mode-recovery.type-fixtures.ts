@@ -1,20 +1,20 @@
-import type { CodeModeLeaseBinding } from "../src/actors/code-mode-budget";
-import type { CodeModeExecutionAuthority } from "../src/actors/code-mode-execution-record";
+import type { CodeModeLeaseBinding } from "@purin-labs/agent/actors/code-mode-budget";
+import type { CodeModeExecutionAuthority } from "@purin-labs/agent/actors/code-mode-execution-record";
 import type {
   ConfirmedCodeModeLeaseRebind,
   PreparedCodeModeLeaseRebind,
-} from "../src/actors/code-mode-lease-rebind";
+} from "@purin-labs/agent/actors/code-mode-lease-rebind";
 import type {
   CodeModeRecovery,
   RecoverableCodeModeExecution,
-} from "../src/actors/code-mode-recovery";
+} from "@purin-labs/agent/actors/code-mode-recovery";
 import type {
   CodeModeExecutionRelease,
   markCodeModeExecutionReleased,
-} from "../src/actors/code-mode-execution-release";
+} from "@purin-labs/agent/actors/code-mode-execution-release";
 import type { HarnessCodeModeAdmittedExecution } from "@purin-labs/agent-tools/catalog/types";
-import type { CodeModeReceipt } from "../src/actors/pi-durable-code-receipt";
-import type { PiRecoveryLeaseRebind } from "../src/actors/pi-durable-recovery";
+import type { CodeModeReceipt } from "@purin-labs/agent/actors/pi-durable-code-receipt";
+import type { PiRecoveryLeaseRebind } from "@purin-labs/agent/actors/pi-durable-recovery";
 
 declare const binding: CodeModeLeaseBinding;
 declare const intended: CodeModeLeaseBinding;

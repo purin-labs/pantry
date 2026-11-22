@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
 import {

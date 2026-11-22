@@ -9,7 +9,7 @@ import type {
 } from "@purin-labs/kernel/ids";
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { EmbeddedHarnessTurnError } from "./embedded-harness";
+import type { EmbeddedHarnessTurnError } from "@purin-labs/agent/actors/embedded-harness";
 
 // The stream of an ongoing Case turn into its thread: what the Case walk
 // gives the Connector, and the ids of the turn. The Slack channel of the

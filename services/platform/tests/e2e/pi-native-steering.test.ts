@@ -3,16 +3,16 @@ import { runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 
-import { createPiDurableAdapter } from "../../src/actors/pi-durable-runtime";
+import { createPiDurableAdapter } from "@purin-labs/agent/actors/pi-durable-runtime";
 import {
   admitSteeringInput,
   readSteeringInput,
-} from "../../src/actors/harness-steering";
+} from "@purin-labs/agent/actors/harness-steering";
 import type {
   EmbeddedHarnessConstructionInput,
   EmbeddedHarnessUserInput,
-} from "../../src/actors/embedded-harness";
-import { toHistoryContent } from "../../src/actors/pi-user-input";
+} from "@purin-labs/agent/actors/embedded-harness";
+import { toHistoryContent } from "@purin-labs/agent/actors/pi-user-input";
 import type { UserMessage } from "@purin-labs/contracts";
 import { RecordingBoundary, sdkInput } from "./pi-sdk-support";
 import { openRouterText } from "./slack-journey-support";

@@ -23,7 +23,7 @@ import {
   type AgentInstallation,
   type AgentOperationInput,
   type AgentOperationsSnapshot,
-} from "../data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import type { ControlRole } from "@purin-labs/tenancy/data/control-plane";
 import {
   readAgentMailboxBinding,

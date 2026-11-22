@@ -4,7 +4,7 @@ import {
   ProposalOrganisation as ProviderOrganisation,
 } from "./provider-worker.mjs";
 export { default, ProposalCase } from "./provider-worker.mjs";
-export { CodeModePlatformGovernorActor } from "../../services/platform/src/actors/code-mode-platform-governor.ts";
+export { CodeModePlatformGovernorActor } from "../../foundation/agent/actors/code-mode-platform-governor.ts";
 import {
   createRegistry,
   defineExtension,
@@ -41,47 +41,47 @@ import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";
 import { SqliteStorage } from "@earendil-works/pi-durable/storage/sqlite";
 import { CodemodeStoreDoc } from "@earendil-works/pi-durable/codemode";
-import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durable-database.ts";
+import { ActorSqliteDatabase } from "../../foundation/agent/actors/pi-durable-database.ts";
 import {
   CodeModeResult,
   CodeModeStore,
   createDurableHostTools,
-} from "../../services/platform/src/actors/pi-durable-tools.ts";
-import { hasUnfinishedCodeModeCall } from "../../services/platform/src/actors/pi-durable-recovery.ts";
-import { piToolRules } from "../../services/platform/src/actors/pi-tool-replay.ts";
+} from "../../foundation/agent/actors/pi-durable-tools.ts";
+import { hasUnfinishedCodeModeCall } from "../../foundation/agent/actors/pi-durable-recovery.ts";
+import { piToolRules } from "../../foundation/agent/actors/pi-tool-replay.ts";
 import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
-import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
-import { buildCanonicalTextTurnStart } from "../../services/platform/src/actors/agent-session-turn-start.ts";
+import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
+import { buildCanonicalTextTurnStart } from "../../foundation/agent/actors/agent-session-turn-start.ts";
 import {
   commitAcceptedSessionInput,
   commitRuntimeActivatedSession,
-} from "../../services/platform/src/actors/actor-journal.ts";
+} from "../../foundation/agent/actors/actor-journal.ts";
 import {
   commitCancellationStartedSession,
   commitCancellationResolvedSession,
-} from "../../services/platform/src/actors/actor-journal/transactions.ts";
+} from "../../foundation/agent/actors/actor-journal/transactions.ts";
 import {
   reserveRunBudget,
   readSessionBudgetAccount,
   settleRunBudget,
   markRunBudgetIndeterminate,
   reconcileRunBudget,
-} from "../../services/platform/src/actors/agent-session-budget.ts";
+} from "../../foundation/agent/actors/agent-session-budget.ts";
 import {
   buildTextTurnCancellationStartedCommit,
   buildTextTurnCancellationResolvedCommit,
-} from "../../services/platform/src/actors/agent-session-text-turn.ts";
-import { failSessionTurnStream } from "../../services/platform/src/actors/agent-session-turn-stream.ts";
+} from "../../foundation/agent/actors/agent-session-text-turn.ts";
+import { failSessionTurnStream } from "../../foundation/agent/actors/agent-session-turn-stream.ts";
 import { organisationId } from "./proposal-worker.mjs";
 import { installMcpFixture, mcpCatalog, readMcp } from "./mcp-fixture.mjs";
 import { customConnectorTurnTool } from "../../services/platform/src/custom-connectors/catalog-tools.ts";
-import { readSessionTurnFlowBinding } from "../../services/platform/src/actors/agent-session-information-flow.ts";
+import { readSessionTurnFlowBinding } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import {
   toPiPrompt,
   toHistoryContent,
-} from "../../services/platform/src/actors/pi-user-input.ts";
+} from "../../foundation/agent/actors/pi-user-input.ts";
 import { imageInput } from "./attachment-fixture.mjs";
-import { createSessionReplayResponse } from "../../services/platform/src/actors/session/replay.ts";
+import { createSessionReplayResponse } from "../../foundation/agent/actors/session/replay.ts";
 import { exerciseSlowWatch } from "./observation-fixture.mjs";
 import { readPortalTaskItems } from "./portal-task-projection.mjs";
 import {
@@ -94,7 +94,7 @@ import {
   markSteeringInputPlaced,
   markSteeringInputQueued,
   markSteeringInputWithdrawn,
-} from "../../services/platform/src/actors/harness-steering.ts";
+} from "../../foundation/agent/actors/harness-steering.ts";
 import { readJsonRecord } from "../../foundation/control/worker/http.ts";
 import { canonicalJson, sha256Hex } from "../../packages/std/src/index.ts";
 import {

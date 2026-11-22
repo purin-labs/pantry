@@ -13,7 +13,7 @@ import {
 } from "./sqlite-observation";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { SessionDO } from "../../src/actors/agent-session";
-import { preflightHarnessTurnLeaseInTransaction } from "../../src/actors/agent-session-harness-authority";
+import { preflightHarnessTurnLeaseInTransaction } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { closeActorExecutionAdmission } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { readActivationExportSource } from "@purin-labs/actor-runtime/actors/actor-export";
 import { ORGANISATION_ID } from "./slack-journey-support";

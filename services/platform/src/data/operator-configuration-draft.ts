@@ -48,7 +48,7 @@ import {
   type AgentOperationInput,
   type AgentOperationsError,
   type AgentOperationsSnapshot,
-} from "./agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import { assertNever, isRecord } from "@purin-labs/std";
 /**
  * A configuration change an operator asked for, stored before it is shown.

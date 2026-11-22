@@ -36,7 +36,7 @@ import {
   isActorExecutionActive,
 } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { Result } from "@purin-labs/kernel/result";
-import type { EmbeddedHarnessTurnError } from "./embedded-harness";
+import type { EmbeddedHarnessTurnError } from "@purin-labs/agent/actors/embedded-harness";
 import {
   postSlackThreadMessage,
   slackClientMessageId,
@@ -46,12 +46,12 @@ import { CARD_ONLY_REPLY } from "../slack/card-only-reply";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { heldNoticeOfDecision } from "../slack/held-output-notice";
 import { permissionDecisionRequestId } from "../slack/permission-request-notice";
-import { applyAgentMessageAssemblyEvent } from "./agent-message-assembly";
-import type { SessionActor } from "./session/session-actor";
+import { applyAgentMessageAssemblyEvent } from "@purin-labs/agent/actors/agent-message-assembly";
+import type { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
 import {
   parseSessionTurnStreamRecord,
   type SessionTurnStreamRecord,
-} from "./agent-session-turn-stream";
+} from "@purin-labs/agent/actors/agent-session-turn-stream";
 import { isRegisteredActorName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type {
   ConnectorCaseStreamRelease,

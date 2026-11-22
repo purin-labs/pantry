@@ -5,7 +5,7 @@ import {
   officeXmlToText,
   OFFICE_EXTRACTION_LIMITS,
   supportsOfficeExtraction,
-} from "../src/messages/office-document-text";
+} from "@purin-labs/agent/messages/office-document-text";
 
 const DOCX =
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document";

@@ -2,7 +2,7 @@
 
 import { describe, expect, test } from "vitest";
 
-import { inspectLatestMessageLinkReceipt } from "../src/actors/message-link-receipt-inspection";
+import { inspectLatestMessageLinkReceipt } from "@purin-labs/agent/actors/message-link-receipt-inspection";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const RESULT_DIGEST = "a".repeat(64);

@@ -6,7 +6,7 @@ import {
   readSlackChannelOptions,
   slackMessageBodyDigest,
 } from "../../data/slack-message-proposal";
-import { requireSessionExecution } from "../../actors/session-execution-admission";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import {
   SlackDraftRequestError,
   type HarnessSlackMessagePropose,
@@ -22,7 +22,7 @@ import {
   type ToolEffect,
   requireCurrentEmailToolLease,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 /**
  * Saves a Slack message draft for a person to send from the conversation's

@@ -19,10 +19,10 @@ const authority = vi.hoisted(function authorityFixture() {
 });
 
 vi.mock(
-  "../src/actors/agent-session-harness-authority",
+  "@purin-labs/agent/actors/agent-session-harness-authority",
   async function harnessAuthorityMock(
     importOriginal: () => Promise<
-      typeof import("../src/actors/agent-session-harness-authority")
+      typeof import("@purin-labs/agent/actors/agent-session-harness-authority")
     >,
   ) {
     const actual = await importOriginal();
@@ -51,7 +51,7 @@ vi.mock(
   },
 );
 
-import { initializeAgentSessionPersistence } from "../src/actors/agent-session-schema";
+import { initializeAgentSessionPersistence } from "@purin-labs/agent/actors/agent-session-schema";
 import {
   dispatchBakerySurfaceEffect,
   listBakerySurfaceTimelineEvents,

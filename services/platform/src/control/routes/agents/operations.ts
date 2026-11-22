@@ -3,17 +3,17 @@ import {
   parseAgentOperationInput,
   readAgentOperations,
   type AgentOperationInput,
-} from "../../../data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   readAgentDefinitionRevisions,
   readSkillRevisions,
-} from "../../../data/agent-operations/revisions";
+} from "@purin-labs/agent/data/agent-operations/revisions";
 import {
   isPublishedResourceBoundaryError,
   runAgentOperation,
 } from "../../../data/agent-operation-runner";
-import type { PublishedResourceBoundaryError } from "../../../data/agent-operations/scope-commerce";
-import { readAgentOperationsWithActivity } from "../../agent-operation-activity";
+import type { PublishedResourceBoundaryError } from "@purin-labs/agent/data/agent-operations/scope-commerce";
+import { readAgentOperationsWithActivity } from "@purin-labs/agent/control/agent-operation-activity";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
@@ -182,7 +182,7 @@ function operationIdFor(
 }
 
 export function agentOperationsErrorResponse(
-  error: import("../../../data/agent-operations").AgentOperationsError,
+  error: import("@purin-labs/agent/data/agent-operations").AgentOperationsError,
 ): Response {
   switch (error.code) {
     case "agent_operation_invalid":

@@ -1,4 +1,4 @@
-import type { CodeModeReceipt } from "../src/actors/pi-durable-code-receipt";
+import type { CodeModeReceipt } from "@purin-labs/agent/actors/pi-durable-code-receipt";
 
 // @ts-expect-error A completed receipt requires its result.
 const missingResult: CodeModeReceipt = { kind: "completed" };

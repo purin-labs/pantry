@@ -5,7 +5,7 @@ import {
   extractTextOperators,
   legibleRatio,
   PDF_EXTRACTION_LIMITS,
-} from "../src/messages/pdf-document-text";
+} from "@purin-labs/agent/messages/pdf-document-text";
 
 describe("PDF text extraction", function pdfExtractionSuite() {
   it("extracts text from an uncompressed content stream", async function extractsPlainStream() {

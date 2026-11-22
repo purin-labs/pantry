@@ -20,7 +20,7 @@ import type {
 import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
-import type { HarnessToolHost } from "./embedded-harness";
+import type { HarnessToolHost } from "@purin-labs/agent/actors/embedded-harness";
 import {
   type CatalogToolAuthority,
   executeCatalogTool,
@@ -555,12 +555,12 @@ async function refuseCapabilityClaim(): ReturnType<HarnessCapabilityClaim> {
 
 function selectionHasMessage(
   messageId: string,
-  selection: import("../case-context-discovery/evidence").CaseContextCollectionEvidenceSelection,
+  selection: import("@purin-labs/agent/case-context-discovery/evidence").CaseContextCollectionEvidenceSelection,
 ): boolean {
   return selection.source.reference === messageId;
 }
 function selectionMessageId(
-  selection: import("../case-context-discovery/evidence").CaseContextCollectionEvidenceSelection,
+  selection: import("@purin-labs/agent/case-context-discovery/evidence").CaseContextCollectionEvidenceSelection,
 ): string {
   return selection.source.reference;
 }

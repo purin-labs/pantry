@@ -5,14 +5,14 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import type { SessionDO } from "../../src/actors/agent-session";
-import { readImportedCanonicalSession } from "../../src/actors/agent-session-canonical";
-import { codeModePlatformGovernor } from "../../src/actors/code-mode-platform-governor-stub";
+import { readImportedCanonicalSession } from "@purin-labs/agent/actors/agent-session-canonical";
+import { codeModePlatformGovernor } from "@purin-labs/agent/actors/code-mode-platform-governor-stub";
 import {
   parseCodeModeExecutionRecord,
   type CodeModeExecutionRecord,
-} from "../../src/actors/code-mode-execution-record";
-import { CODE_MODE_PILOT_BUDGET } from "../../src/actors/code-mode-budget";
-import { classifyCodeModeRecovery } from "../../src/actors/code-mode-recovery";
+} from "@purin-labs/agent/actors/code-mode-execution-record";
+import { CODE_MODE_PILOT_BUDGET } from "@purin-labs/agent/actors/code-mode-budget";
+import { classifyCodeModeRecovery } from "@purin-labs/agent/actors/code-mode-recovery";
 import { OrganisationDO } from "../../src/actors/organisation";
 import type { Env } from "@purin-labs/kernel/env";
 import { revokeAccessGrant } from "@purin-labs/authority/data/access-grants";

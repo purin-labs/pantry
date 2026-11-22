@@ -16,7 +16,7 @@ import {
   createMessagePreparationSchema,
   listMessagePreparationObjectKeys,
   readMessagePreparation,
-} from "../src/actors/message-preparation-store";
+} from "@purin-labs/agent/actors/message-preparation-store";
 import {
   emptySqliteFixture,
   sqlStorage,

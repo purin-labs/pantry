@@ -45,7 +45,7 @@ import type {
 import type { SUPPLIER_CREATE_FIELDS } from "./suppliers";
 import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 export type HarnessBakerySurfaceToolRequest =
   | Readonly<{ kind: "file_action"; action: BakeryFileAction }>

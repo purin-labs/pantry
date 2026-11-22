@@ -1,8 +1,8 @@
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
-import { ActorSqliteDatabase } from "../../src/actors/pi-durable-database";
+import { deriveCodeModeLeaseBinding } from "@purin-labs/agent/actors/code-mode-execution-record";
+import { ActorSqliteDatabase } from "@purin-labs/agent/actors/pi-durable-database";
 import {
   newRequestId,
   parseOrganisationId,

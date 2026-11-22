@@ -60,7 +60,7 @@ import type {
   CaseExecutionCaseRecords,
   CaseExecutionSessionRecords,
   CaseExecutionStoredContent,
-} from "./records";
+} from "@purin-labs/agent/case-execution/records";
 
 export type CaseExecutionReadError = Readonly<{
   code:

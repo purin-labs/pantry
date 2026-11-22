@@ -1,11 +1,14 @@
 import {
   beginProposalStaging,
   type StageConfigurationDraft,
-} from "../../actors/session/proposal-staging";
-import type { ToolTurnContext } from "../../actors/session/tool-wiring";
+} from "@purin-labs/agent/actors/session/proposal-staging";
+import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
 import { roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
 import { readDevice } from "../../devices/store";
-import { withToolContext, type SessionToolContext } from "../context";
+import {
+  withToolContext,
+  type SessionToolContext,
+} from "@purin-labs/agent/agent-tools/context";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { liveDeviceMember } from "../session-support";
 import {

@@ -28,7 +28,7 @@ import {
   writeTierOneCommerceSubscription,
   writeTierOneShopifySubscription,
   writeTierOneStripeSubscription,
-} from "../../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage } from "@purin-labs/std";
 import {

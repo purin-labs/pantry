@@ -13,8 +13,8 @@ import {
   ProjectAudienceProposal,
   type DisclosureDestination,
 } from "../chat/disclosure-evidence";
-import { readGrantedFileMetadata } from "../context/files/tools";
-import { prepareTurnAuthority } from "../context/turn-context";
+import { readGrantedFileMetadata } from "@purin-labs/agent/context/files/tools";
+import { prepareTurnAuthority } from "@purin-labs/agent/context/turn-context";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   parseCaseId,

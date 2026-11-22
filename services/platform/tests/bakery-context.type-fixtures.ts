@@ -7,7 +7,7 @@ import type {
   ExecutableBakerySurfaceEffectV1,
   BakerySurfaceAttachmentV1,
 } from "@purin-labs/bakery-model/bakery-surface";
-import type { EmbeddedHarnessSource } from "../src/actors/embedded-harness";
+import type { EmbeddedHarnessSource } from "@purin-labs/agent/actors/embedded-harness";
 
 declare const surface: BakerySurfaceAttachmentV1;
 declare const executable: ExecutableBakerySurfaceEffectV1;

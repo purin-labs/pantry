@@ -3,8 +3,8 @@ import {
   parseModelApiKey,
   storeOrganisationModelCredential,
 } from "@purin-labs/authority/credential-vault/index";
-import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
-import { readOrganisationCodexConnectionAtScope } from "../../src/models/codex-connection";
+import { resolveOrganisationModelRouteForSelection } from "@purin-labs/agent/models/route";
+import { readOrganisationCodexConnectionAtScope } from "@purin-labs/agent/models/codex-connection";
 import {
   seedRegionalCanvas,
   verifyRegionalCanvas,
@@ -24,8 +24,8 @@ import { sha256Hex } from "@purin-labs/std";
 import {
   workspaceRevisionArchiveKeys,
   verifyWorkspaceRevisionReceipt,
-} from "../../src/workspace-revision-store";
-import { ensureOrganisationDefaultWorkspace } from "../../src/data/organisation-workspace";
+} from "@purin-labs/agent/workspace-revision-store";
+import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organisation-workspace";
 import {
   beginRegionalProviderRetry,
   finishRegionalProviderRetry,
@@ -75,7 +75,7 @@ import {
 } from "@purin-labs/tenancy/data/organisation-placement";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import {
   actorStubForRegistryEntry,
   requireActiveSessionActor,

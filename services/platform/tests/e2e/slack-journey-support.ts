@@ -19,7 +19,7 @@ import {
   replaceFileGrantAdmissions,
   upsertFileResourceSource,
   type FileProjectionSourceReader,
-} from "../../src/context/files";
+} from "@purin-labs/agent/context/files/index";
 import {
   parseVaultHandle,
   storeVaultSecret,
@@ -43,7 +43,7 @@ import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 export const SLACK_SIGNING_SECRET = "slack-signing-e2e-secret";
 export const ORGANISATION_ID = requiredOrganisationId(
   "organisation_e2e_slack_actor",

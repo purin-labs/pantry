@@ -2,7 +2,7 @@ import {
   handleClaudeConnectionRoute,
   matchClaudeConnectionRoute,
   type ClaudeConnectionRoute,
-} from "./control/routes/claude";
+} from "@purin-labs/agent/control/routes/claude";
 import {
   handleChatGoalRoute,
   matchChatGoalRoute,
@@ -236,7 +236,7 @@ import {
   handleSessionControlRoute,
   matchSessionControlRoute,
   type SessionControlRoute,
-} from "./control/routes/sessions";
+} from "@purin-labs/agent/control/routes/sessions";
 import { resolveControlSupportRole } from "./data/onboarding-support";
 import {
   handleWorkspaceControlRoute,

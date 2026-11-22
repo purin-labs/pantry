@@ -13,7 +13,7 @@ import {
   type DeviceToolRead,
 } from "./services";
 import type { StaffPageToolReceipt } from "@purin-labs/agent-tools/catalog/types";
-import { requireSessionExecution } from "../../actors/session-execution-admission";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -22,7 +22,7 @@ import {
   type ToolEffect,
   untrustedDeviceText,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 import { readMemberRecord } from "../member-record-read";
 
 /**

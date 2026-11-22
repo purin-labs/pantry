@@ -1,5 +1,5 @@
-import type { TypeSafeConnectionView } from "../src/integrations/typesafe/connection";
-import type { EnabledCaseContextDiscoveryPolicy } from "../src/case-context-discovery/policy";
+import type { TypeSafeConnectionView } from "@purin-labs/agent/integrations/typesafe/connection";
+import type { EnabledCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/policy";
 
 const connected = {
   kind: "connected" as const,

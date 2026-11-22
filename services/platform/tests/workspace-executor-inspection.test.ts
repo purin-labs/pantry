@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseWorkspaceExecutorInspectionResponse,
   type WorkspaceExecutorInspectionRequest,
-} from "../src/workspace-executor-container";
+} from "@purin-labs/agent/workspace-executor-container";
 import { WORKSPACE_EXECUTOR_ATTACHMENT_ID } from "./workspace-executor-fixtures";
 
 /** The preparation response is bound to the exact identity and limits. */

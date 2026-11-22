@@ -10,7 +10,7 @@ import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
-import type { TransientSessionExecution } from "../session/support";
+import type { TransientSessionExecution } from "@purin-labs/agent/actors/session/support";
 import type {
   TransientMailAssistantRequest,
   TransientWhatsAppTurnReply,
@@ -45,7 +45,7 @@ export async function reauthorizeTransientMailAssistant(
 export async function reauthorizeTransientEmail(
   scope: OrganisationExecutionScope,
   organisationId: OrganisationId,
-  modelRoute: import("../../models/route").OrganisationModelRoute,
+  modelRoute: import("@purin-labs/agent/models/route").OrganisationModelRoute,
 ): Promise<Result<null, Readonly<{ code: string }>>> {
   const eligibility = await readGmailInferenceEligibility({
     db: scope.database,

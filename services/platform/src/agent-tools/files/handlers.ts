@@ -10,16 +10,16 @@ import {
   readWorkspaceRevision,
   verifyWorkspaceRevisionReceipt,
   type WorkspaceRevisionMaterialization,
-} from "../../workspace-revision-store";
-import type { AgentSessionPersistence } from "../../actors/agent-session-schema";
+} from "@purin-labs/agent/workspace-revision-store";
+import type { AgentSessionPersistence } from "@purin-labs/agent/actors/agent-session-schema";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import { storeSessionExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
-import type { FileProviderCredentialStore } from "../../provider-workflows/file-context-credential";
-import { readCanonicalSessionForPersistence } from "../../actors/agent-session-canonical";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+import type { FileProviderCredentialStore } from "@purin-labs/agent/provider-workflows/file-context-credential";
+import { readCanonicalSessionForPersistence } from "@purin-labs/agent/actors/agent-session-canonical";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type {
   HarnessFileRead,
   HarnessFileSearch,
@@ -32,12 +32,12 @@ import {
   type FileReadToolResult,
   type FileSearchToolResult,
   type FileToolObservation,
-} from "../../context/files";
-import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
+} from "@purin-labs/agent/context/files/index";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { audiencesForAdmission } from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 export async function searchFilesForEmbeddedHarness(
   context: SessionToolContext,

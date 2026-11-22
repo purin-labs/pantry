@@ -22,7 +22,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { OrganisationModelRoute } from "../../models/route";
+import type { OrganisationModelRoute } from "@purin-labs/agent/models/route";
 import {
   readConversation,
   saveConversation,

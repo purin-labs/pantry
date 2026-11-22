@@ -2,7 +2,7 @@ import type { ModelRoute } from "@purin-labs/contracts";
 import {
   platformPiModelName,
   type ZeroRetentionPlatformPiModel,
-} from "../../actors/pi-model-transport";
+} from "@purin-labs/agent/actors/pi-model-transport";
 
 /**
  * Purin's review of one model route for Gmail content.

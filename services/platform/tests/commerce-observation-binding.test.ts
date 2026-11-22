@@ -6,7 +6,7 @@ import {
   createSessionInformationFlowSchema,
   recordCommerceObservationEntities,
   sessionObservedCommerceEntity,
-} from "../src/actors/agent-session-information-flow";
+} from "@purin-labs/agent/actors/agent-session-information-flow";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const ORGANISATION = "organisation_observation_binding";

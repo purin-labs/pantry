@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyAgentOperation,
   readAgentOperations,
-} from "../src/data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import {
   confirmOperatorConfigurationDraft,
   createOperatorConfigurationDraft,
@@ -15,7 +15,7 @@ import {
   merchantAgentDefaultSkills,
   merchantAgentInstallationId,
 } from "../src/data/merchant-agent-preset";
-import { merchantAgentAgentId } from "../src/data/merchant-agent-ids";
+import { merchantAgentAgentId } from "@purin-labs/agent/data/merchant-agent-ids";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

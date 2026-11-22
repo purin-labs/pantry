@@ -60,10 +60,10 @@ failure. `scripts/plan40/real-worker.mjs` and
 
 | Value                      | Where                                                 | Now       |
 | -------------------------- | ----------------------------------------------------- | --------- |
-| Interrupt budget           | `src/code-mode-sandbox/limits.ts`                     | 50,000    |
+| Interrupt budget           | `foundation/agent/code-mode-sandbox/limits.ts`                     | 50,000    |
 | CPU limit of one execution | `limits.cpu_ms` in `wrangler.code-mode-sandbox.jsonc` | 30,000 ms |
 | Deadline of one execution  | `CODE_MODE_PILOT_BUDGET.maxDurationMs`                | 30,000 ms |
-| VM memory limit            | `src/code-mode-sandbox/limits.ts`                     | 32 MB     |
+| VM memory limit            | `foundation/agent/code-mode-sandbox/limits.ts`                     | 32 MB     |
 
 One execution is one call to one sandbox object. QuickJS makes about 10,000
 interrupt polls for each second of computation on Cloudflare, so the budget
@@ -167,7 +167,7 @@ these calls.
 Cloudflare keeps a Durable Object in the region where it was created. A
 location hint counts only on the first call of a name. So a move of the
 governor needs a new name.
-`services/platform/src/actors/code-mode-platform-governor-stub.ts` holds the
+`foundation/agent/actors/code-mode-platform-governor-stub.ts` holds the
 name and the region, and every caller uses that module. The name is
 `code-mode-platform-governor:v3` and the region is `apac-ne`, Northeast
 Asia-Pacific. Cloudflare has no hint for one city, and this is the smallest

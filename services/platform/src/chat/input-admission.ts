@@ -8,9 +8,9 @@ import {
   type ContextAssemblyResult,
   type ContextItem,
   type AuthorizedContextRead,
-} from "../context/assembly";
+} from "@purin-labs/agent/context/assembly/index";
 import type { Result } from "@purin-labs/kernel/result";
-import type { PrepareTurnContextError } from "../context/turn-context";
+import type { PrepareTurnContextError } from "@purin-labs/agent/context/turn-context";
 import { readAdmittedChatInput } from "./turn-access";
 
 export async function admitChatInput(

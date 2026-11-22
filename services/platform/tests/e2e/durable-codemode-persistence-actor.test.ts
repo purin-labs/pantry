@@ -1,8 +1,8 @@
 import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
-import { readImportedCanonicalSession } from "../../src/actors/agent-session-canonical";
-import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harness-authority";
+import { readImportedCanonicalSession } from "@purin-labs/agent/actors/agent-session-canonical";
+import { readLatestHarnessCheckpoint } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import {
   resumeActorRelocation,
   startActorRelocation,

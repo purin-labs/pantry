@@ -1,5 +1,8 @@
 import { Container } from "@cloudflare/containers";
-import { containerRequest, exitRefusal } from "./forward";
+import {
+  containerRequest,
+  exitRefusal,
+} from "@purin-labs/agent/chatgpt-exit/forward";
 
 /**
  * The ChatGPT exit Worker (Plan 75).

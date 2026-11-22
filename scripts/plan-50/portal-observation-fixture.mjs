@@ -8,17 +8,17 @@ import {
   projectAcceptedTurnReplay,
   createPortalChatStreamResponse,
 } from "../../services/platform/src/chat/portal-stream.ts";
-import { createSessionReplayResponse } from "../../services/platform/src/actors/session/replay.ts";
+import { createSessionReplayResponse } from "../../foundation/agent/actors/session/replay.ts";
 import { readChatControlAuthority } from "../../services/platform/src/chat/information-flow.ts";
 import {
   createAccessGrant,
   readAccessGrant,
 } from "../../foundation/authority/data/access-grants.ts";
-import { readSessionTurnFlowBinding } from "../../services/platform/src/actors/agent-session-information-flow.ts";
+import { readSessionTurnFlowBinding } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import {
   readLatestHarnessCheckpoint,
   readHarnessHistory,
-} from "../../services/platform/src/actors/agent-session-harness-authority.ts";
+} from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import {
   parseChatModelAction,
   isChatId,

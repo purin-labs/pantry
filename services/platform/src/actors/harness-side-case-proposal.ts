@@ -8,16 +8,16 @@ import { signalChat } from "../chat/signals";
 import { readAdmittedChatInput } from "../chat/turn-access";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
+import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import type {
   HarnessSideCaseProposalRequest,
   HarnessSideCaseProposalResult,
 } from "@purin-labs/agent-tools/catalog/types";
 import {
   requireSessionExecution,
-} from "./session-execution-admission";
-import type { SessionToolContext } from "../agent-tools/context";
-import type { SlackThreadSideCase } from "./session/harness-source";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
+import type { SlackThreadSideCase } from "@purin-labs/agent/actors/session/harness-source";
 
 /**
  * The agent's proposal of separate work as a side Case of this chat.

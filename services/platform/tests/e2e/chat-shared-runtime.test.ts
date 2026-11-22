@@ -45,7 +45,7 @@ import {
   type OrganisationArchiveCleanupRequest,
 } from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import type { SessionId } from "@purin-labs/kernel/ids";
-import { readPortalChatErasure } from "../../src/actors/portal-chat-cleanup";
+import { readPortalChatErasure } from "@purin-labs/agent/actors/portal-chat-cleanup";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import {
   startActorRelocation,
@@ -98,7 +98,7 @@ import {
   verifyChatCaseExecution,
   verifyExecutionHidden,
 } from "./case-execution-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(
   "shares accepted Actor history, attributes a peer turn, restores history, rejects an incompatible member, and revokes a running contributor",

@@ -21,7 +21,7 @@ import {
   type CommerceClientResult,
 } from "@purin-labs/commerce-client";
 import type { Env } from "@purin-labs/kernel/env";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
 import { handleInventoryProduction } from "../../src/control/routes/inventory-production";
 import { handleInventoryReceipt } from "../../src/control/routes/inventory-receipts";

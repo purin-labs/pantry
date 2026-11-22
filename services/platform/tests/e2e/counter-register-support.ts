@@ -7,7 +7,7 @@ import {
 import type { CounterRegisterSnapshot } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import {
   commerceClient,
   commerceWorkspace,

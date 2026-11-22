@@ -9,7 +9,7 @@ import {
   completeOrganisationChatGptSignIn,
   readOrganisationCodexConnection,
   startOrganisationCodexAuthorization,
-} from "../../src/models/codex-connection";
+} from "@purin-labs/agent/models/codex-connection";
 import {
   parseModelApiKey,
   storeOrganisationModelCredential,
@@ -19,7 +19,7 @@ import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
   type OrganisationInferenceSelection,
-} from "../../src/data/organisation-inference-selection";
+} from "@purin-labs/agent/data/organisation-inference-selection";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {

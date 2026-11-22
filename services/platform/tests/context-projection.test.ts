@@ -13,14 +13,14 @@ import type {
   ContextProjectionCommand,
   ContextProjectionApplyResult,
   ContextVisibility,
-} from "../src/context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import {
   applyContextProjectionCommand,
   createContextProjectionCommand,
   handleContextProjectionQueueMessage,
   parseContextProjectionCommand,
   searchContextProjections,
-} from "../src/context/projection";
+} from "@purin-labs/agent/context/projection/index";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { serializeCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { SqliteD1Database } from "./sqlite-d1";

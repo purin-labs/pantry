@@ -99,13 +99,18 @@ vi.mock(
     };
   },
 );
-vi.mock("../src/models/route", async function modelModule(importOriginal) {
-  return {
-    ...(await importOriginal<typeof import("../src/models/route")>()),
-    resolveOrganisationModelRoute: mocks.model,
-    resolveOrganisationModelRouteAtScope: mocks.model,
-  };
-});
+vi.mock(
+  "@purin-labs/agent/models/route",
+  async function modelModule(importOriginal) {
+    return {
+      ...(await importOriginal<
+        typeof import("@purin-labs/agent/models/route")
+      >()),
+      resolveOrganisationModelRoute: mocks.model,
+      resolveOrganisationModelRouteAtScope: mocks.model,
+    };
+  },
+);
 vi.mock(
   "@purin-labs/tenancy/data/control-plane",
   async function membershipModule(importOriginal) {

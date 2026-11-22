@@ -8,7 +8,7 @@ import {
   derivedStillsPrefix,
   persistDerivedStills,
   readDerivedStills,
-} from "../src/messages/derived-stills";
+} from "@purin-labs/agent/messages/derived-stills";
 import { sha256Hex } from "@purin-labs/std";
 
 const ORGANISATION = "organisation_derived";

@@ -5,9 +5,9 @@ import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/informa
 import {
   TypeSafeDisclosure,
   type TypeSafeDisclosureDenied,
-} from "../integrations/typesafe/disclosure";
-import type { TypeSafeCredential } from "../integrations/typesafe/credential";
-import type { JevError } from "../integrations/typesafe/system-one-client";
+} from "@purin-labs/agent/integrations/typesafe/disclosure";
+import type { TypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/credential";
+import type { JevError } from "@purin-labs/agent/integrations/typesafe/system-one-client";
 
 export const SCREEN_RELEVANCE_JEV_MODEL = "jev-1.13.0";
 /** The most that one check sends: the draft, the last answer and the titles. */

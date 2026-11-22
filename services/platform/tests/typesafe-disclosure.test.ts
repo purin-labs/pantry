@@ -1,10 +1,10 @@
 import { expect, it, vi } from "vitest";
-import { TypeSafeDisclosure } from "../src/integrations/typesafe/disclosure";
+import { TypeSafeDisclosure } from "@purin-labs/agent/integrations/typesafe/disclosure";
 import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { JevRelationshipRequest } from "../src/case-context-discovery/jev";
+import { JevRelationshipRequest } from "@purin-labs/agent/case-context-discovery/jev";
 
 it(
   "pins the exact request, processing authority and connection before asynchronous disclosure",

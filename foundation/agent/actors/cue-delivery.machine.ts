@@ -8,7 +8,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const CUE_DELIVERY_MACHINE = {
   name: "cue_delivery",
-  owner: "services/platform/src/actors/cue-delivery.ts",
+  owner: "foundation/agent/actors/cue-delivery.ts",
   store: {
     table: "cue_delivery",
     key: "cue_id",

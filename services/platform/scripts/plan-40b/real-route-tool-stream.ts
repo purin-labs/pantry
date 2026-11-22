@@ -39,7 +39,7 @@ import { openaiProvider } from "@earendil-works/pi-ai/providers/openai";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { openaiCodexProvider } from "@earendil-works/pi-ai/providers/openai-codex";
 import { anthropicProvider } from "@earendil-works/pi-ai/providers/anthropic";
-import { PiToolArgumentStream } from "../../src/actors/pi-tool-argument-stream";
+import { PiToolArgumentStream } from "@purin-labs/agent/actors/pi-tool-argument-stream";
 import { menuBoardEdit } from "../../src/agent-tools/drafts/drafts";
 import { draftEdit } from "../../src/agent-tools/drafts/board-draft-edit";
 

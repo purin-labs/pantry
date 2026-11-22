@@ -7,7 +7,7 @@ import {
   type CanvasServerMessage,
 } from "@purin-labs/workflow-canvas-crdt/protocol";
 import { WorkflowCanvasDoc, CanvasEncoding } from "@purin-labs/workflow-canvas-crdt";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { isRecord, sha256Hex } from "@purin-labs/std";

@@ -1,4 +1,4 @@
-import { typeSafeMonth } from "../integrations/typesafe/usage-store";
+import { typeSafeMonth } from "@purin-labs/agent/integrations/typesafe/usage-store";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";

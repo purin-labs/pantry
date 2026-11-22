@@ -3,7 +3,7 @@ import {
   type SessionTurnExecution,
 } from "../../src/chat/turn-access";
 import { fixtureDatabase } from "./organisation-database";
-import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
+import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { env, exports } from "cloudflare:workers";
 import {
   evictDurableObject,

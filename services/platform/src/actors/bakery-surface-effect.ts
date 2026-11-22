@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { PageEffectSettlement } from "./session/tool-wiring";
+import type { PageEffectSettlement } from "@purin-labs/agent/actors/session/tool-wiring";
 import {
   isRehearsalChange,
   quarterTurnDegrees,
@@ -33,7 +33,7 @@ import {
   parsePersistedHarnessTurnLease,
   preflightHarnessTurnLease,
   preflightHarnessTurnLeaseInTransaction,
-} from "./agent-session-harness-authority";
+} from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   hasExactKeys,

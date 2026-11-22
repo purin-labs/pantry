@@ -1,16 +1,16 @@
-import { readGrantedFile } from "../src/context/files/tools";
-import { applyFileProjectionCommand } from "../src/context/files/projection";
+import { readGrantedFile } from "@purin-labs/agent/context/files/tools";
+import { applyFileProjectionCommand } from "@purin-labs/agent/context/files/projection";
 import {
   commitFileGrantReconciliation,
   markFileProjectionOutboxDelivered,
   reserveFileExtractionBudget,
   scheduleFileReconciliationHint,
   type FileExtractionBudgetReservation,
-} from "../src/context/files/persistence";
-import { ProviderFileProjectionSourceReader } from "../src/context/files/provider-source";
-import { resolveFileProviderAccess } from "../src/provider-workflows/file-context-credential";
+} from "@purin-labs/agent/context/files/persistence";
+import { ProviderFileProjectionSourceReader } from "@purin-labs/agent/context/files/provider-source";
+import { resolveFileProviderAccess } from "@purin-labs/agent/provider-workflows/file-context-credential";
 import { storeSessionExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
-import { readAcceptedMessageAttachment } from "../src/actors/message-preparation";
+import { readAcceptedMessageAttachment } from "@purin-labs/agent/actors/message-preparation";
 
 declare const fileRead: Parameters<typeof readGrantedFile>[0];
 const { scope: fileScope, ...unscopedFileRead } = fileRead;
@@ -89,7 +89,7 @@ void attachmentAuthorization;
 // @ts-expect-error Prepared attachment reads require live continuation authorization.
 void readAcceptedMessageAttachment(unguardedAttachmentRead);
 
-import { admitSessionInformationFlowObservation } from "../src/actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 declare const observation: Parameters<
   typeof admitSessionInformationFlowObservation
 >[0];

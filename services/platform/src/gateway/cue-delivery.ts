@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { prepareCueLogEntry } from "../cues/cue-log";
+import { prepareCueLogEntry } from "@purin-labs/agent/cues/cue-log";
 import { pantryCommerceAccess } from "../commerce/contract/client";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
@@ -14,17 +14,17 @@ import {
   type CueQueueMessage,
   type NormalizedCueEvent,
   type TierOneCueSubscription,
-} from "../cues/engine";
-import type { CueMutationAuthorizationOutcome } from "../cues/queue-consumer";
-import { recordCaseAssignmentPin } from "../data/agent-operations/case-assignment-pins";
-import { resolveCueAutomation } from "../data/agent-operations/automation";
+} from "@purin-labs/agent/cues/engine";
+import type { CueMutationAuthorizationOutcome } from "@purin-labs/agent/cues/queue-consumer";
+import { recordCaseAssignmentPin } from "@purin-labs/agent/data/agent-operations/case-assignment-pins";
+import { resolveCueAutomation } from "@purin-labs/agent/data/agent-operations/automation";
 import type {
   SavedSelectorCueResolverError,
   SavedSelectorCueResolverInput,
-} from "../data/agent-operations";
+} from "@purin-labs/agent/data/agent-operations";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import type { CueClaimResult } from "../actors/cue-delivery";
+import type { CueClaimResult } from "@purin-labs/agent/actors/cue-delivery";
 import {
   processDirectCaseCommand,
   processTwoSessionDirectCaseCommand,

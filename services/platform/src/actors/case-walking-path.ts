@@ -22,7 +22,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import { caseContentAttachments, caseContentInstruction } from "./case-content";
-import { userMessageLinks } from "./message-tools";
+import { userMessageLinks } from "@purin-labs/agent/actors/message-tools";
 import {
   parseChannelId,
   parseWorkspaceId,
@@ -50,32 +50,32 @@ import {
   type ConnectorCaseTurnStreamError,
   type ConnectorCaseTurnStreamResult,
 } from "./case-turn-stream";
-import { parseSessionTurnInputDigest } from "./agent-session-turn-input-digest";
-import { serializeContextBundle } from "./actor-journal/parsers";
+import { parseSessionTurnInputDigest } from "@purin-labs/agent/actors/agent-session-turn-input-digest";
+import { serializeContextBundle } from "@purin-labs/agent/actors/actor-journal/parsers";
 import type {
   InitializedCaseSessionCommit,
   InitializedSessionCommit,
-} from "./actor-journal";
-import type { CanonicalEmbeddedHarnessTextTurnError } from "./session/types";
-import type { SessionActor } from "./session/session-actor";
+} from "@purin-labs/agent/actors/actor-journal";
+import type { CanonicalEmbeddedHarnessTextTurnError } from "@purin-labs/agent/actors/session/types";
+import type { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
 import type { CaseActor } from "./case/case-actor";
 import type { CaseOutput, CaseSnapshot } from "./case/types";
 import type { CaseConnectorRpc } from "./case/connector-rpc";
 import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorWarmActorSlots } from "@purin-labs/actor-runtime/actors/warm-actor-slots";
-import { selectEmbeddedHarnessAdapterForModelRoute } from "./embedded-harness-adapter";
+import { selectEmbeddedHarnessAdapterForModelRoute } from "@purin-labs/agent/actors/embedded-harness-adapter";
 import type {
   EmbeddedHarnessModelUsage,
   EmbeddedHarnessThinkingLevel,
-} from "./embedded-harness";
-import { EMBEDDED_HARNESS_INSTRUCTIONS } from "./embedded-harness-instructions";
+} from "@purin-labs/agent/actors/embedded-harness";
+import { EMBEDDED_HARNESS_INSTRUCTIONS } from "@purin-labs/agent/actors/embedded-harness-instructions";
 import {
   composeAgentInstructions,
   type PinnedAgentProfile,
-} from "../data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import type { ContextAssemblyResult } from "../context/assembly";
-import type { TurnPageState } from "./session/tool-wiring";
+import type { ContextAssemblyResult } from "@purin-labs/agent/context/assembly/index";
+import type { TurnPageState } from "@purin-labs/agent/actors/session/tool-wiring";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
 import {
   assertNever,

@@ -12,7 +12,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(createMocks);
 
-vi.mock("../src/data/organisation-workspace", () => ({
+vi.mock("@purin-labs/agent/data/organisation-workspace", () => ({
   ensureOrganisationDefaultWorkspace: mocks.ensureOrganisationDefaultWorkspace,
 }));
 

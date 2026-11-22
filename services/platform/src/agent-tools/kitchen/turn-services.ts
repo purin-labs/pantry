@@ -3,9 +3,9 @@ import { collaborationAgentLabel } from "../../actors/collaboration-agent";
 import {
   beginProposalStaging,
   type StageConfigurationDraft,
-} from "../../actors/session/proposal-staging";
-import type { ToolTurnContext } from "../../actors/session/tool-wiring";
-import { requireSessionExecution } from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session/proposal-staging";
+import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import { prepareWorkflowProposal } from "../../commerce/bakery/workflow-proposals";
 import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import {
@@ -13,7 +13,7 @@ import {
   executeBakerySurfaceForHarness,
   readSavedBakeryRunForHarness,
 } from "../bakery/handlers";
-import { withToolContext } from "../context";
+import { withToolContext } from "@purin-labs/agent/agent-tools/context";
 import { executeCostsViewForHarness } from "../costs/view-handler";
 import { ToolRequestError } from "@purin-labs/agent-tools/errors";
 import { liveDeviceMember } from "../session-support";

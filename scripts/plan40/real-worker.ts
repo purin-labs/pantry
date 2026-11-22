@@ -1,7 +1,7 @@
 import gateway from "../../services/platform/src/integration-gateway";
 import { reconcileCommerceOutbox } from "../../services/platform/src/commerce/outbox-worker";
 import { newRequestId, parseIntegrationAccountId } from "../../foundation/kernel/ids";
-import { ensureCreatedOrganisationActor } from "../../services/platform/src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "../../foundation/agent/control/organisation-runtime";
 import {
   bootstrapOrganisation,
   issueControlSession,

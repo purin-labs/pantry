@@ -12,7 +12,7 @@ import type {
   ShopifyCueEvent,
   ShopifyInventoryLevelUpdatedCueEvent,
   ShopifyOrderCreatedCueEvent,
-} from "../../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import { resolveProviderWebhookCredential } from "@purin-labs/authority/credential-vault/index";
 import { decodeBase64, isRecord } from "@purin-labs/std";
 import type {

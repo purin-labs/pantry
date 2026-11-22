@@ -4,7 +4,7 @@ import { sha256Hex, isPositiveInteger } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveOrganisationModelRoute } from "../models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import type { Conversation } from "./conversation";
 import {
   conversationCaseId,

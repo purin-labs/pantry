@@ -5,12 +5,12 @@ import {
   readCaseContextCollectionMetadata,
   type CaseContextSelectionVerification,
 } from "../../case-context-discovery/metadata";
-import { parseCaseContextCollectionReviewCommand } from "../../case-context-discovery/relationships";
+import { parseCaseContextCollectionReviewCommand } from "@purin-labs/agent/case-context-discovery/relationships";
 import type {
   CaseContextCollectionMetadataView,
   UserId,
 } from "@purin-labs/control-api";
-import { identifier } from "../../case-context-discovery/policy";
+import { identifier } from "@purin-labs/agent/case-context-discovery/policy";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { authorizeConfiguredBearer } from "@purin-labs/kernel/fault-injection-auth";

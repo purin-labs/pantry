@@ -7,8 +7,8 @@ import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-run
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import {
   ProductionPlanRequestError,

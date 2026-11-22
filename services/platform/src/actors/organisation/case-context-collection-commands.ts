@@ -2,7 +2,7 @@ import { resolveCaseContextCollectionSelectionVerification } from "../../case-co
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
+import { readCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import {
   commitCaseContextCollectionEffectFence,
   evidenceForCaseContextCollection,
@@ -12,11 +12,11 @@ import {
   validateCaseContextCollectionEvidence,
   replayCaseContextCollectionEffectFence,
   invalidateCaseContextCollectionVerification,
-} from "../../case-context-discovery/evidence";
+} from "@purin-labs/agent/case-context-discovery/evidence";
 import {
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
-} from "../../integrations/typesafe/authority";
+} from "@purin-labs/agent/integrations/typesafe/authority";
 import {
   decideCaseContextCollectionRelationship,
   listCaseContextCollectionIdsForCase,
@@ -26,12 +26,12 @@ import {
   readCaseContextCollection,
   replayCaseContextCollectionRelationshipCommand,
   type CaseContextCollection,
-} from "../../case-context-discovery/relationships";
+} from "@purin-labs/agent/case-context-discovery/relationships";
 import {
   caseContextDiscoveryRouteAuthority,
   identifier,
   integerIn,
-} from "../../case-context-discovery/policy";
+} from "@purin-labs/agent/case-context-discovery/policy";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import {
   caseContextCollectionReviewDecision,

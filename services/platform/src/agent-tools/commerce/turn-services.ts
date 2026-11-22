@@ -1,5 +1,5 @@
 import { sha256Hex } from "@purin-labs/std";
-import { sessionObservedCommerceEntity } from "../../actors/agent-session-information-flow";
+import { sessionObservedCommerceEntity } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   proposeCafeMenuPublicationForHarness,
   proposeCommerceActionForHarness,
@@ -12,19 +12,22 @@ import {
   beginProposalStaging,
   OPERATOR_DRAFT_TTL_MS,
   type StageConfigurationDraft,
-} from "../../actors/session/proposal-staging";
-import type { ToolTurnContext } from "../../actors/session/tool-wiring";
+} from "@purin-labs/agent/actors/session/proposal-staging";
+import type { ToolTurnContext } from "@purin-labs/agent/actors/session/tool-wiring";
 import {
   admittedSessionOperation,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
 } from "../../commerce/contract/client";
 import { proposeCampaignBrief } from "../../data/campaign-brief";
 import { readOfferPriceAllowanceView } from "../../commerce/contract/offer-price-allowance";
-import { withToolContext, type SessionToolContext } from "../context";
+import {
+  withToolContext,
+  type SessionToolContext,
+} from "@purin-labs/agent/agent-tools/context";
 import {
   editProductDescriptionDraftForEmbeddedHarness,
   readProductDescriptionDraftForEmbeddedHarness,

@@ -1,7 +1,7 @@
 import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import type { MailOrganizationActorInput } from "../../mail-inbox/commands";
 import type { Result } from "@purin-labs/kernel/result";
-import type { EmbeddedHarnessModelUsage } from "../embedded-harness";
+import type { EmbeddedHarnessModelUsage } from "@purin-labs/agent/actors/embedded-harness";
 import type {
   EmailCaseManifest,
   EmailCueOutcome,
@@ -10,14 +10,14 @@ import type {
 import type {
   TransientHarnessTurnInput,
   TransientModelTurnError,
-} from "../session/types";
+} from "@purin-labs/agent/actors/session/types";
 import type {
   WhatsAppCaseManifest,
   WhatsAppTurnOutcome,
 } from "../whatsapp-harness-tools";
 
 export type TransientEmailTurnRequest = TransientHarnessTurnInput & {
-  readonly evidenceDependency: import("../../case-context-discovery/evidence").CaseContextCollectionEvidenceDependency;
+  readonly evidenceDependency: import("@purin-labs/agent/case-context-discovery/evidence").CaseContextCollectionEvidenceDependency;
   readonly manifest: EmailCaseManifest;
   /**
    * The accepted context this turn was prepared with. The Session verifies it

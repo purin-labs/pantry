@@ -42,7 +42,7 @@ import { resolveActiveSlackThreadCredential } from "@purin-labs/authority/creden
 import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
-} from "../data/organisation-workspace";
+} from "@purin-labs/agent/data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
@@ -52,7 +52,7 @@ import { samePlacement } from "@purin-labs/tenancy/data/organisation-placement";
 import type { SlackCaseCommand } from "./case-command-message";
 import { buildSlackUserMessage } from "./user-message";
 import { slackAuthoredText } from "./events";
-import { resolveSlackTurnModelRouteAtScope } from "../models/route";
+import { resolveSlackTurnModelRouteAtScope } from "@purin-labs/agent/models/route";
 import { traceLog } from "@purin-labs/kernel/observability";
 import {
   loadOrganisationPolicyOrDefaultDeny,
@@ -65,13 +65,13 @@ import {
 import {
   assembleTurnContext,
   prepareTurnAuthority,
-} from "../context/turn-context";
+} from "@purin-labs/agent/context/turn-context";
 import {
   parseAgentProfileSelection,
   pinCaseTurnAgentProfile,
   readCaseTurnAgentProfile,
   type PinnedAgentProfile,
-} from "../data/pinned-agent-profile";
+} from "@purin-labs/agent/data/pinned-agent-profile";
 import { resolveSlackConfigurationReply } from "./configuration-reply";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";

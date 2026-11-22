@@ -1,5 +1,5 @@
 import type { SessionOwnToolServices } from "../actors/session/own-tool-services";
-import type { SessionToolWiring } from "../actors/session/tool-wiring";
+import type { SessionToolWiring } from "@purin-labs/agent/actors/session/tool-wiring";
 import {
   presentConfigurationCommand,
   previewCode,

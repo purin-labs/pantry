@@ -22,10 +22,10 @@ import { sameCommerceRelationshipRef } from "@purin-labs/commerce-contracts/comm
 
 import type { AccessGrantTarget } from "@purin-labs/authority/authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { AgentResponsibilityScope } from "../../data/agent-operations";
+import type { AgentResponsibilityScope } from "@purin-labs/agent/data/agent-operations";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { readOrganisationEnvironment } from "../../control/organisation-runtime";
+import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import type { Env } from "@purin-labs/kernel/env";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

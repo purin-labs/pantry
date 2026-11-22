@@ -2,16 +2,16 @@ import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
+import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import { decideCaseConversationSink } from "../../actors/case-conversation-sink";
 import {
   SLACK_TURN_PREFIX,
   turnMayScheduleFollowUp,
-} from "../../actors/session/turn-tool-offers";
+} from "@purin-labs/agent/actors/session/turn-tool-offers";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,
-} from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
 import { sideCaseProposalId } from "../../chat/side-cases";
 import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";

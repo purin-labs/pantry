@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { prepareCommerceCueLogDelete } from "../cues/cue-log";
+import { prepareCommerceCueLogDelete } from "@purin-labs/agent/cues/cue-log";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   LabCatalogOptionV1,
@@ -49,7 +49,10 @@ import {
   readJsonObject,
   type JsonObject,
 } from "@purin-labs/kernel/http";
-import { cueSnapshotKey, parseCueSnapshot } from "../cues/engine";
+import {
+  cueSnapshotKey,
+  parseCueSnapshot,
+} from "@purin-labs/agent/cues/engine";
 import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
 import {
   newRequestId,
@@ -59,7 +62,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { ensureCreatedOrganisationActor } from "../control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 

@@ -11,8 +11,8 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
-import { scheduleFileReconciliationHint } from "../context/files";
-import { verifyDropboxWebhookSignature } from "../provider-adapters/dropbox";
+import { scheduleFileReconciliationHint } from "@purin-labs/agent/context/files/index";
+import { verifyDropboxWebhookSignature } from "@purin-labs/agent/provider-adapters/dropbox";
 import { isRecord } from "@purin-labs/std";
 
 export async function handleDropboxWebhook(

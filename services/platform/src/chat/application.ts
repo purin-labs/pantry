@@ -42,7 +42,7 @@ import {
 import {
   resolveOrganisationModelRouteAtScope,
   type OrganisationModelRoute,
-} from "../models/route";
+} from "@purin-labs/agent/models/route";
 import {
   readConversation,
   readConversationForExecution,

@@ -1,18 +1,18 @@
 import {
   commitCaseContextCollectionEffectFence,
   replayCaseContextCollectionEffectFence,
-} from "../src/case-context-discovery/evidence";
+} from "@purin-labs/agent/case-context-discovery/evidence";
 import {
   resolveTypeSafeConnectionKey as resolveTypeSafeConnection,
   mutateTypeSafeConnection,
-} from "../src/integrations/typesafe/connection";
-import { evaluateOperationalCaseContextDiscovery } from "../src/case-context-discovery/operational-evaluation";
+} from "@purin-labs/agent/integrations/typesafe/connection";
+import { evaluateOperationalCaseContextDiscovery } from "@purin-labs/agent/case-context-discovery/operational-evaluation";
 import { bindEmailMessageReceiptContact } from "../src/data/email-mailbox";
 import { storeOrganisationExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import {
   fetchCaseContextDiscoveryEvaluation,
   releaseUnissuedCaseContextDiscoveryEvaluation,
-} from "../src/case-context-discovery/evaluation-store";
+} from "@purin-labs/agent/case-context-discovery/evaluation-store";
 
 declare const transport: Parameters<
   typeof fetchCaseContextDiscoveryEvaluation

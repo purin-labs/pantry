@@ -35,10 +35,10 @@ import {
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../actors/agent-session-harness-authority";
-import { CODE_MODE_PILOT_BUDGET } from "../actors/code-mode-budget";
-import { admittedExecutionDeadline } from "../actors/code-mode-admission";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
+import { CODE_MODE_PILOT_BUDGET } from "@purin-labs/agent/actors/code-mode-budget";
+import { admittedExecutionDeadline } from "@purin-labs/agent/actors/code-mode-admission";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import {
   readControlMutationReplay,
@@ -48,7 +48,7 @@ import type { CapabilityDefinition } from "@purin-labs/authority/authorization/a
 import {
   readSessionInformationFlow,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
-} from "../actors/agent-session-information-flow";
+} from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   labelAllowsAudiences,
   type FlowLabel,

@@ -17,11 +17,11 @@ import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-run
 import {
   SessionExecutionAdmission,
   requireSessionExecution,
-} from "../../actors/session-execution-admission";
-import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
+} from "@purin-labs/agent/actors/session-execution-admission";
+import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
-import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
+import { admitSessionInformationFlowObservation } from "@purin-labs/agent/actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -37,7 +37,7 @@ import {
   requireLiveBakeryReadAuthority,
   type ToolEffect,
 } from "../session-support";
-import type { SessionToolContext } from "../context";
+import type { SessionToolContext } from "@purin-labs/agent/agent-tools/context";
 
 type PreparedWorkflowCanvasRead = Readonly<{
   kind: "saved-run";

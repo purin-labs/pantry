@@ -266,7 +266,7 @@ The kernel is `foundation/authority/policy/information-flow/`, in the module
   and the model `jev-1.13.0`. A `public_fixture` accepts only a label with no policy.
 
 The Session Actor keeps the flow state in its SQLite
-(`services/platform/src/actors/agent-session-information-flow.ts`):
+(`foundation/agent/actors/agent-session-information-flow.ts`):
 
 | Table | Holds |
 | --- | --- |

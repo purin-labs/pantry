@@ -16,9 +16,9 @@ import { runInDurableObject } from "cloudflare:test";
 import {
   readSessionTurnMemoryRecords,
   recordTransientTurnContext,
-} from "../../src/actors/actor-journal/transactions";
-import { restoreSessionTurnContext } from "../../src/actors/actor-journal";
-import { serializeContextBundle } from "../../src/actors/actor-journal/parsers";
+} from "@purin-labs/agent/actors/actor-journal/transactions";
+import { restoreSessionTurnContext } from "@purin-labs/agent/actors/actor-journal";
+import { serializeContextBundle } from "@purin-labs/agent/actors/actor-journal/parsers";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
@@ -31,15 +31,15 @@ import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-process
 import {
   MEMORY_LIMITATION_NOTICE,
   renderModelContext,
-} from "../../src/actors/model-context-prompt";
+} from "@purin-labs/agent/actors/model-context-prompt";
 import { initialConversationCaseIdentity } from "../../src/chat/conversation-actor-identity";
 import { conversationAudienceMayReceive } from "../../src/chat/conversation-disclosure";
 import { readChatControlAuthority } from "../../src/chat/information-flow";
 import {
   digestHistoricalContextBundle,
   type TurnMemoryReader,
-} from "../../src/context/assembly";
-import { prepareTurnContext } from "../../src/context/turn-context";
+} from "@purin-labs/agent/context/assembly/index";
+import { prepareTurnContext } from "@purin-labs/agent/context/turn-context";
 import {
   createTurnMemoryReader,
   TURN_MEMORY_PAGE,

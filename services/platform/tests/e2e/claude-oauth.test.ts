@@ -4,8 +4,8 @@ import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { createEmbeddedHarnessModelRouteLease } from "../../src/actors/session/model-route";
-import { resolveClaudeAccessToken } from "../../src/models/claude-connection";
+import { createEmbeddedHarnessModelRouteLease } from "@purin-labs/agent/actors/session/model-route";
+import { resolveClaudeAccessToken } from "@purin-labs/agent/models/claude-connection";
 import {
   parseVaultHandle,
   storeVaultSecret,
@@ -17,7 +17,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { resolveOrganisationModelRouteAtScope } from "../../src/models/route";
+import { resolveOrganisationModelRouteAtScope } from "@purin-labs/agent/models/route";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { network } from "./network";
 import {

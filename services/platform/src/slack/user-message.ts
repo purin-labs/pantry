@@ -8,7 +8,7 @@ import {
   deriveUserMessageViews,
   type DerivedUserMessage,
   type MessageContractRejection,
-} from "../messages/message-wasm";
+} from "@purin-labs/agent/messages/message-wasm";
 import type { Result } from "@purin-labs/kernel/result";
 import type { SlackAuthoredPart, SlackMessageEvent } from "./events";
 import { assertNever } from "@purin-labs/std";

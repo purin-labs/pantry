@@ -19,7 +19,7 @@ import {
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { admitTurn } from "../../src/chat/turn/admission";
 import { resumeConversationExecution } from "../../src/chat/application";
-import * as modelRoutes from "../../src/models/route";
+import * as modelRoutes from "@purin-labs/agent/models/route";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseChatCommand } from "../../src/chat/conversation";
@@ -60,7 +60,7 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { resolveOrganisationModelRoute } from "../../src/models/route";
+import { resolveOrganisationModelRoute } from "@purin-labs/agent/models/route";
 import {
   readConversation,
   reconcileRevokedConversationRun,
@@ -69,7 +69,7 @@ import {
   updateConversationMetadata,
   type ConversationScope,
 } from "../../src/chat/store";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(
   "organizes an owned directory atomically, preserving unseen chats and fencing competing tabs and retries",

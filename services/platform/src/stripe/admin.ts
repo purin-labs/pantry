@@ -7,7 +7,7 @@ import {
 import {
   compileAndStoreCueSnapshot,
   writeTierOneStripeSubscription,
-} from "../cues/engine";
+} from "@purin-labs/agent/cues/engine";
 import {
   requireConnectionCredentialAuthority,
   resolveActiveProviderAccountContext,

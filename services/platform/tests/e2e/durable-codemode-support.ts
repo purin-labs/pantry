@@ -31,8 +31,8 @@ import {
   type CodeModeExchangeDenial,
   type CodeModeExchangeGate,
   type CodeModeExchangeLimits,
-} from "../../src/actors/code-mode-governed-remote";
-import { ActorSqliteDatabase } from "../../src/actors/pi-durable-database";
+} from "@purin-labs/agent/actors/code-mode-governed-remote";
+import { ActorSqliteDatabase } from "@purin-labs/agent/actors/pi-durable-database";
 
 /**
  * State that outlives a process: the providers behind the tools and the owner

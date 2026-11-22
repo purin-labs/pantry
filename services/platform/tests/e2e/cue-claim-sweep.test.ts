@@ -3,7 +3,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 
 import { inspectOrganisationCutoverQuiescence } from "@purin-labs/tenancy/actors/organisation-cutover-quiescence";
-import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
+import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { CUE_DELIVERY_LEASE_MS } from "../../src/gateway/cue-delivery";
 import { fixtureDatabase } from "./organisation-database";
 import {

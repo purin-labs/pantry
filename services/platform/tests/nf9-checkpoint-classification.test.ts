@@ -4,11 +4,11 @@ import type {
 } from "@purin-labs/contracts";
 import { describe, expect, test } from "vitest";
 
-import { classifyHarnessCheckpoint } from "../src/actors/agent-session-harness-authority";
+import { classifyHarnessCheckpoint } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import {
   assertFreshLineageHistory,
   recoverFreshHarnessHistory,
-} from "../src/actors/session/model-context";
+} from "@purin-labs/agent/actors/session/model-context";
 import { TEST_ACCEPTED_INPUT_CONTEXT } from "./fixtures/plan25-turn";
 
 const CURRENT_MODEL_ROUTE_DIGEST =

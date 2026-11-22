@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { AgentOperationInput } from "../src/data/agent-operations";
+import type { AgentOperationInput } from "@purin-labs/agent/data/agent-operations";
 import type { OperatorDraftCommand } from "../src/data/operator-configuration-draft";
 import {
   presentConfigurationCommand,

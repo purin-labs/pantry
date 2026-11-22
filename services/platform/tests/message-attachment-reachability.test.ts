@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   attachmentObjectReachable,
   collectMessageAttachments,
-} from "../src/messages/attachment-reachability";
+} from "@purin-labs/agent/messages/attachment-reachability";
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION = requireOrganisationId("organisation_reach");

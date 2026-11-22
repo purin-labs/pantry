@@ -2,12 +2,12 @@ import { sha256Hex } from "@purin-labs/std";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { sessionActionMutationExecution } from "../../actors/action-mutation-execution";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
+import { readSessionTurnFlowBinding } from "@purin-labs/agent/actors/agent-session-information-flow";
 import type {
   SessionToolWiring,
   ToolTurnContext,
-} from "../../actors/session/tool-wiring";
-import { requireSessionExecution } from "../../actors/session-execution-admission";
+} from "@purin-labs/agent/actors/session/tool-wiring";
+import { requireSessionExecution } from "@purin-labs/agent/actors/session-execution-admission";
 import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   buildCustomConnectorWriteAuthority,
@@ -16,7 +16,10 @@ import {
   type CustomConnectorWriteCatalogEntry,
 } from "../../custom-connectors";
 import { parseCaseId, parseSessionId } from "@purin-labs/kernel/ids";
-import { withToolContext, type SessionToolContext } from "../context";
+import {
+  withToolContext,
+  type SessionToolContext,
+} from "@purin-labs/agent/agent-tools/context";
 import {
   listIntegrationsForEmbeddedHarness,
   readAirtableForHarness,

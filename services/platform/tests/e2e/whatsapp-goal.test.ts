@@ -8,11 +8,11 @@ import {
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { readCaseSessionAssignment } from "../../src/actors/actor-journal/transactions";
-import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
+import { readCaseSessionAssignment } from "@purin-labs/agent/actors/actor-journal/transactions";
+import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { SessionDO } from "../../src/actors/agent-session";
 import type { TransientWhatsAppTurnRequest } from "../../src/actors/inbox-turns/rpc";
-import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
+import { SessionExecutionAdmission } from "@purin-labs/agent/actors/session-execution-admission";
 import {
   startActorRelocation,
   resumeActorRelocation,
@@ -38,7 +38,7 @@ import {
 } from "./slack-journey-support";
 import { storedContent } from "./case-execution-support";
 import { exportedItemCount } from "./placement-move-support";
-import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
+import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 
 it(
   "fences transient WhatsApp proposals at goal stops and timeout, preserves usage after restart, and retains no transcript",

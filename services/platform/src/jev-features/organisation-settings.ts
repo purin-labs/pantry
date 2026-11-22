@@ -5,11 +5,11 @@ import {
 } from "@purin-labs/control-api/portal/jev-features";
 import { assertNever } from "@purin-labs/std";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { readCaseContextDiscoveryPolicy } from "../case-context-discovery/evaluation-store";
+import { readCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/evaluation-store";
 import {
   caseContextDiscoveryRoute,
   type CaseContextDiscoveryPolicy,
-} from "../case-context-discovery/policy";
+} from "@purin-labs/agent/case-context-discovery/policy";
 import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
@@ -17,10 +17,10 @@ import {
   currentTypeSafeAuthority,
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
-} from "../integrations/typesafe/authority";
+} from "@purin-labs/agent/integrations/typesafe/authority";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
-import type { PolicyJevPort } from "../actors/organisation/organisation-policy";
+import type { PolicyJevPort } from "@purin-labs/agent/actors/organisation/organisation-policy";
 import {
   JEV_RELATED_CASES_LIMITS,
   jevAllowanceView,
@@ -36,7 +36,7 @@ import {
   readJevPaidSpendMinor,
   readJevPaidUse,
   writeJevPaidUse,
-} from "./paid-use";
+} from "@purin-labs/agent/jev-features/paid-use";
 import {
   readJevScreenRelevance,
   writeJevScreenRelevance,
