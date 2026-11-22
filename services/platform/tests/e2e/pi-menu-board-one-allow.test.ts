@@ -16,7 +16,7 @@ import { expect, it, type TestContext } from "vitest";
 import { newConversationId, type SurfaceObservationV2 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import { encodeMenuBoardClientMessage, parseMenuBoardServerMessage } from "@purin-labs/menu-board-crdt/protocol";
-import { boardPageView } from "../../../../apps/portal/src/features/menu-boards/board-page-view";
+import { boardPageView } from "@purin-labs/area-cafe/ui/features/menu-boards/board-page-view";
 import { closeSocket } from "./hibernatable-socket-support";
 import {
   BASE,

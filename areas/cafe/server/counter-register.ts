@@ -32,11 +32,11 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   readCounterSale as readCounterSaleState,
   type CounterSaleReadback,
-} from "../data/counter-sale-readback";
-import { readActiveTerminalAssignment } from "../data/terminal-assignment-store";
+} from "./data/counter-sale-readback";
+import { readActiveTerminalAssignment } from "./data/terminal-assignment-store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { presentOrderQueueEntry } from "../cafe/contract/order-queue-commands";
+import { presentOrderQueueEntry } from "./contract/order-queue-commands";
 
 const DEFAULT_CAFE_MENU_ID = "menu_cafe_main";
 const ALL_JAPAN_METHODS: readonly CounterRegisterPaymentMethod[] = [

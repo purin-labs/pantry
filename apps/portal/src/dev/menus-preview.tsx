@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import "../styles.css";
-import { MenuDraftRoute } from "../features/content-studio/route";
+import { MenuDraftRoute } from "@purin-labs/area-cafe/ui/features/content-studio/route";
 import { registerPortalBoardChat } from "../portal-board-chat";
 
 // Menus (Items, Boards, Screens) against a Worker's control routes, for the

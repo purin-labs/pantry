@@ -8,11 +8,11 @@ import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisat
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCommerceClient } from "../../commerce/contract/client";
+import { createCommerceClient } from "../../../../services/platform/src/commerce/contract/client";
 import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
-import type { MenuBoardCommand, MenuBoardCommandReply } from "../../actors/menu-board-commands";
+import type { MenuBoardCommand, MenuBoardCommandReply } from "../actors/menu-board-commands";
 import { CAFE_STOREFRONT_ID } from "./menu-publication";
 import type { Variant } from "@purin-labs/type-utils";
 

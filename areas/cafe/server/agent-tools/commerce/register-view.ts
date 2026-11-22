@@ -8,7 +8,7 @@ import { defineCafeTool, type CafeToolServices } from "./order-queue";
 import {
   bakerySurfaceToolSucceeded,
   readBakerySurfaceReceiptId,
-} from "../bakery/surface-result";
+} from "../../../../../services/platform/src/agent-tools/bakery/surface-result";
 
 const RERUN = {
   kind: "any_caller",

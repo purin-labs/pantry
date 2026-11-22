@@ -1,6 +1,6 @@
-import type { readCounterSaleView } from "../../commerce/counter-register";
-import type { readMenuScreenList } from "../../control/routes/menu-boards";
-import type { readTerminalOperations } from "../../data/terminal-operations-readback";
+import type { readCounterSaleView } from "../counter-register";
+import type { readMenuScreenList } from "../control/routes/menu-boards";
+import type { readTerminalOperations } from "../data/terminal-operations-readback";
 import { definePort } from "@purin-labs/kernel/port";
 
 /**

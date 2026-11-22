@@ -28,7 +28,7 @@ import { runAttachmentCollection } from "@purin-labs/conversation/messages/attac
 import { runWeeklyChatGptLoginRefresh } from "@purin-labs/agent/models/codex-connection";
 import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runtime/actors/actor-registry-sweep";
 import { handleCommerceWebhook } from "./commerce/webhooks";
-import { handleMenuScreenRequest } from "./control/routes/menu-screens";
+import { handleMenuScreenRequest } from "@purin-labs/area-cafe/server/control/routes/menu-screens";
 import { handleVoiceMacRequest } from "./voice/mac-routes";
 import { handleDeviceGatewayRequest } from "@purin-labs/area-devices/server/gateway-routes";
 import { assertNever } from "@purin-labs/std";

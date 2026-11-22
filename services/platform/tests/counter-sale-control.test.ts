@@ -68,7 +68,7 @@ vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
 }));
 
 import { handleControlRequest } from "../src/control-router";
-import { activateTerminalAssignment } from "../src/data/terminal-assignment-store";
+import { activateTerminalAssignment } from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

@@ -23,7 +23,7 @@ async function renderApplication(pathname: string): Promise<void> {
   // to the Register that opened the app, with the app's answer.
   if (pathname === "/portal/square-pos-return") {
     const { squarePosReturnAddress } =
-      await import("./features/register/square-pos-handoff");
+      await import("@purin-labs/area-cafe/ui/features/register/square-pos-handoff");
     window.location.replace(
       squarePosReturnAddress(window.location.search) ?? "/portal",
     );

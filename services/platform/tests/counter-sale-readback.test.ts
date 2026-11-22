@@ -4,7 +4,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import { describe, expect, it } from "vitest";
 
-import { readCounterSale } from "../src/data/counter-sale-readback";
+import { readCounterSale } from "@purin-labs/area-cafe/server/data/counter-sale-readback";
 
 const AT = "2026-09-05T00:00:00.000Z";
 const DIGEST = `quote_${"ab".repeat(32)}`;

@@ -10,7 +10,7 @@ import {
   runAlarmSteps,
 } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import { screenMediaBase } from "../cafe/contract/media";
+import { screenMediaBase } from "@purin-labs/area-cafe/server/contract/media";
 import {
   CHAT_SIGNAL_SOCKET_HANDLER,
   isChatSignalSocket,
@@ -65,7 +65,7 @@ import {
   type CostsSheetAgentEdit,
   type CostsSheetSettleInput,
 } from "./costs-sheet-draft";
-import { cafeCollaborationRooms } from "./cafe-collaboration-rooms";
+import { cafeCollaborationRooms } from "@purin-labs/area-cafe/server/actors/cafe-collaboration-rooms";
 import {
   dispatchCollaborationFetch,
   resolveCollaborationSocket,
@@ -85,12 +85,15 @@ import {
   MailReplyDraftRooms,
   type MailReplyDraftAgentEdit,
 } from "./mail-reply-draft";
-import { MenuDraftRooms, type MenuDraftAgentEdit } from "./menu-draft";
+import {
+  MenuDraftRooms,
+  type MenuDraftAgentEdit,
+} from "@purin-labs/area-cafe/server/actors/menu-draft";
 import {
   MenuBoardRooms,
   type MenuBoardAgentEdit,
   type MenuBoardAgentPreview,
-} from "./menu-boards";
+} from "@purin-labs/area-cafe/server/actors/menu-boards";
 import {
   MENU_SCREEN_SOCKET_HANDLER,
   MenuScreens,
@@ -98,12 +101,12 @@ import {
   isMenuScreenSocketPath,
   menuScreenSocketToken,
   parseMenuScreenToken,
-} from "./menu-screens";
+} from "@purin-labs/area-cafe/server/actors/menu-screens";
 import {
   runMenuBoardCommand,
   type MenuBoardCommand,
   type MenuBoardCommandReply,
-} from "./menu-board-commands";
+} from "@purin-labs/area-cafe/server/actors/menu-board-commands";
 import {
   ProductionPlanRooms,
   type ProductionPlanAgentEdit,
@@ -147,7 +150,7 @@ import {
 import {
   authorizeMenuBoardSocketRequest,
   matchMenuBoardSocketRoute,
-} from "../control/admission/menu-boards";
+} from "@purin-labs/area-cafe/server/control/admission/menu-boards";
 import {
   controlError,
   readBoundedJsonRecord,

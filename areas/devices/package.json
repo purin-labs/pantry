@@ -29,6 +29,7 @@
     "@purin-labs/tool-handlers": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/ui": "workspace:*",
+    "@purin-labs/area-cafe": "workspace:*",
     "react": "^19.1.1",
     "react-router": "^7.18.2"
   },

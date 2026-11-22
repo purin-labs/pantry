@@ -2,13 +2,13 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import {
   readCafeSoldOutMenu,
   setSoldOutMark,
-} from "../../cafe/contract/order-queue-commands";
+} from "../../contract/order-queue-commands";
 import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeMerchantRead,
   resolveMerchantControlContext,
-} from "../../commerce/contract/merchant-control";
+} from "../../../../../services/platform/src/commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

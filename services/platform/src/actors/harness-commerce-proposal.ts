@@ -73,10 +73,10 @@ import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
   planCafeMenu,
-} from "../cafe/contract/menu-publication";
+} from "@purin-labs/area-cafe/server/contract/menu-publication";
 import type { PublishCafeMenuAction } from "../commerce/cafe-menu-action";
-import { MenuDraftRequestError } from "../cafe/contract/request-errors";
-import { MenuBoardRequestError } from "../cafe/contract/request-errors";
+import { MenuDraftRequestError } from "@purin-labs/area-cafe/server/contract/request-errors";
+import { MenuBoardRequestError } from "@purin-labs/area-cafe/server/contract/request-errors";
 import type { ChangeMenuPriceAction } from "../commerce/menu-price-action";
 import {
   OrderRefundRequestError,

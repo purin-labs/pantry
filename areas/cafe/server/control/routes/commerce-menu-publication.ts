@@ -3,7 +3,7 @@ import { parseMenuHours } from "@purin-labs/control-api";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import { sha256Hex } from "@purin-labs/std";
-import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
+import { resolveMerchantControlContext } from "../../../../../services/platform/src/commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
@@ -17,12 +17,12 @@ import {
   cafeProductPhotos,
   planCafeMenu,
   publishedCafeMenu,
-} from "../../cafe/contract/menu-publication";
+} from "../../contract/menu-publication";
 
 export {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
-} from "../../cafe/contract/menu-publication";
+} from "../../contract/menu-publication";
 
 /**
  * Publishes the shop's café menu from the Portal's shared menu draft. An

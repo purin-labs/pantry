@@ -7,13 +7,13 @@ import {
   type MenuDraftEdit,
   type MenuDraftRead,
 } from "../../actors/menu-draft";
-import { MenuDraftRequestError } from "../../cafe/contract/request-errors";
+import { MenuDraftRequestError } from "../../contract/request-errors";
 import {
   type MenuBoardEdit,
   type MenuBoardEditResult,
 } from "../../actors/menu-boards";
-import { MenuBoardRequestError } from "../../cafe/contract/request-errors";
-import { readCafeImages } from "../../cafe/contract/media";
+import { MenuBoardRequestError } from "../../contract/request-errors";
+import { readCafeImages } from "../../contract/media";
 import { readPublishedCafeMenu } from "../../control/routes/menu-screens";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";

@@ -5,8 +5,8 @@ import {
   readCounterReceiptSettings,
   readCounterSaleReceipt,
   writeCounterReceiptSettings,
-} from "../../commerce/counter-printing";
-import { isTimeZone } from "../../commerce/counter-receipt";
+} from "../../counter-printing";
+import { isTimeZone } from "../../counter-receipt";
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {

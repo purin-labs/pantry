@@ -2,8 +2,8 @@
   "packageEntryExports": 993,
   "files": [],
   "exports": [
-    "apps/portal/src/features/terminals/counter-sale-api.ts#manualCashRefundCounterSale",
-    "apps/portal/src/features/terminals/counter-sale-api.ts#openCounterSale",
+    "areas/cafe/ui/features/terminals/counter-sale-api.ts#manualCashRefundCounterSale",
+    "areas/cafe/ui/features/terminals/counter-sale-api.ts#openCounterSale",
     "foundation/authority/credential-vault/external-import.ts#ExternalVaultSource",
     "foundation/authority/credential-vault/index.ts#ExternalVaultRead",
     "foundation/authority/credential-vault/index.ts#ExternalVaultReadError",

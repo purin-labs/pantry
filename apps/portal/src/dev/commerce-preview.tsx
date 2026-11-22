@@ -28,7 +28,7 @@ import "../styles.css";
 import { CheckoutProfilesRoute } from "../features/checkout-profiles/route";
 import { CommerceEntityPlaneRoute } from "../features/commerce/entity-plane/route";
 import { SupplierPayoutsPanel } from "../features/payouts/route";
-import { CounterSaleRoute } from "../features/terminals/counter-sale-route";
+import { CounterSaleRoute } from "@purin-labs/area-cafe/ui/features/terminals/counter-sale-route";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
 import type { PayoutReadAccess } from "../features/payouts/read-permission";

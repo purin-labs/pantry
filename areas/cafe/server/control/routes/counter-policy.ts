@@ -2,7 +2,7 @@ import type { CommerceClientError } from "@purin-labs/commerce-client";
 
 import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
+import { resolveMerchantControlContext } from "../../../../../services/platform/src/commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

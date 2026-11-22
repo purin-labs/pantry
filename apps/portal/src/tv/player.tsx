@@ -18,7 +18,7 @@ import {
 } from "@purin-labs/control-api";
 import { backoffDelay } from "@purin-labs/std";
 import { webSocketUrl } from "@purin-labs/collaboration/portal/document-client";
-import { ScaledBoard } from "../features/menu-boards/board-view";
+import { ScaledBoard } from "@purin-labs/area-cafe/ui/features/menu-boards/board-view";
 
 /**
  * The shop screen's player at /tv (Plan 40B phase 1). A new screen shows a

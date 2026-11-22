@@ -96,7 +96,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
   "foundation/connections/data/provider-attempt.ts": [
     "readCurrentProviderManifestVersion",
   ],
-  "services/platform/src/data/screen-pairing.ts": [
+  "areas/cafe/server/data/screen-pairing.ts": [
     "claimScreenPairing",
     "countOpenScreenPairings",
     "deleteExpiredScreenPairings",

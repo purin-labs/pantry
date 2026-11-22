@@ -2,7 +2,7 @@ import {
   type MenuDraftEdit,
   type MenuDraftRead,
 } from "../../actors/menu-draft";
-import { MenuDraftRequestError } from "../../cafe/contract/request-errors";
+import { MenuDraftRequestError } from "../../contract/request-errors";
 import {
   isMenuBoardFrameId,
   isMenuBoardItemRow,
@@ -37,7 +37,7 @@ import type {
   MenuBoardStackEdit,
   MenuBoardStackSettings,
 } from "../../actors/menu-boards";
-import type { MenuPriceProposalRequest } from "../../commerce/contract/types";
+import type { MenuPriceProposalRequest } from "../../../../../services/platform/src/commerce/contract/types";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { CatalogExecutionContext } from "@purin-labs/agent-tools/catalog/execute";

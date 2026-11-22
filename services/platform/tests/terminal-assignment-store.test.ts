@@ -17,7 +17,7 @@ import {
   readActiveTerminalAssignment,
   readTerminalAssignmentRevision,
   retireTerminalAssignment,
-} from "../src/data/terminal-assignment-store";
+} from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_1" as OrganisationId;

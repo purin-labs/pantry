@@ -8,7 +8,7 @@ import { PortalFrame } from "../shell";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { workspacePageDescriptor } from "@purin-labs/ui/route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
-import { MenuDraftRoute } from "../features/content-studio/route";
+import { MenuDraftRoute } from "@purin-labs/area-cafe/ui/features/content-studio/route";
 import { registerPortalBoardChat } from "../portal-board-chat";
 import PermissionRequestsDrawer from "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";

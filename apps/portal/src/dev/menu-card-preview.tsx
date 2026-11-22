@@ -3,8 +3,8 @@ import "../styles.css";
 import { CafeMenuPublicationDetails } from "../features/governed-actions/cafe-menu-details";
 import { commerceActionTitle } from "../features/governed-actions/commerce";
 import { MenuPriceChangeDetails } from "../features/governed-actions/menu-price-card";
-import { ScaledBoard } from "../features/menu-boards/board-view";
-import "../features/menu-boards/board-view.css";
+import { ScaledBoard } from "@purin-labs/area-cafe/ui/features/menu-boards/board-view";
+import "@purin-labs/area-cafe/ui/features/menu-boards/board-view.css";
 
 // The owner's approval card for a menu publication, with sample facts, so a
 // browser journey can see it without a step-up sign-in. The server's record

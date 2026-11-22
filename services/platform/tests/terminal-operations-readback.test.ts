@@ -10,8 +10,8 @@ import {
 } from "@purin-labs/commerce-contracts";
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { activateTerminalAssignment } from "../src/data/terminal-assignment-store";
-import { readTerminalOperations } from "../src/data/terminal-operations-readback";
+import { activateTerminalAssignment } from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
+import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_1" as OrganisationId;

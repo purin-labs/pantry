@@ -225,7 +225,7 @@ engine keeps the names (COM-02).
 
 ### Agents
 
-The tools are in `services/platform/src/agent-tools/drafts/drafts.ts`,
+The tools are in `areas/cafe/server/agent-tools/drafts/drafts.ts`,
 `agent-tools/commerce/order-queue.ts` and `agent-tools/commerce/proposals.ts`. A turn
 offers a tool when it holds the capability. The agent acts with the role of the person
 who asked.
@@ -284,7 +284,7 @@ who asked.
 - The Actor's commands are in `actors/menu-board-commands.ts`. The templates, the agent
   actions and the archive columns are in `menu-board-templates.ts`,
   `menu-board-agent-action.ts` and `menu-board-archive.ts`.
-- Shared code for routes and tools is in `services/platform/src/cafe/contract/`:
+- Shared code for routes and tools is in `areas/cafe/server/contract/`:
   `menu-publication.ts` (`planCafeMenu`), `order-queue-commands.ts`, `media.ts` and
   `request-errors.ts`. The price action is `commerce/menu-price-action.ts`, and the menu
   action is `commerce/cafe-menu-action.ts`.

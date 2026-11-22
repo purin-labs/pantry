@@ -208,22 +208,22 @@ import. A module with no line for one of these has none.
 ## areas/cafe
 
 - Folders: 13
-  - `apps/portal/src/features/content-studio/`
-  - `apps/portal/src/features/menu-boards/`
-  - `apps/portal/src/features/order-queue/`
-  - `apps/portal/src/features/register/`
-  - `apps/portal/src/features/terminals/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/agent-tools/commerce/`
-  - `services/platform/src/agent-tools/drafts/`
-  - `services/platform/src/cafe/contract/`
-  - `services/platform/src/commerce/`
-  - `services/platform/src/control/admission/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/data/`
-- Packages: `packages/cafe-control-api`, `packages/menu-board-crdt`, `packages/menu-draft-crdt`
+  - `areas/cafe/server/`
+  - `areas/cafe/server/actors/`
+  - `areas/cafe/server/agent-tools/commerce/`
+  - `areas/cafe/server/agent-tools/drafts/`
+  - `areas/cafe/server/contract/`
+  - `areas/cafe/server/control/admission/`
+  - `areas/cafe/server/control/routes/`
+  - `areas/cafe/server/data/`
+  - `areas/cafe/ui/features/content-studio/`
+  - `areas/cafe/ui/features/menu-boards/`
+  - `areas/cafe/ui/features/order-queue/`
+  - `areas/cafe/ui/features/register/`
+  - `areas/cafe/ui/features/terminals/`
+- Packages: `areas/cafe`, `packages/cafe-control-api`, `packages/menu-board-crdt`, `packages/menu-draft-crdt`
 - Tables (3): `cafe_counter_receipt_setting`, `cafe_terminal_assignment`, `screen_pairing`
-- Public files: `services/platform/src/cafe/contract/`
+- Public files: `areas/cafe/server/contract/`
 
 ## areas/commerce
 

@@ -23,14 +23,14 @@ import {
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { readCafeImageContent } from "../../cafe/contract/media";
+import { readCafeImageContent } from "../../contract/media";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCommerceClient } from "../../commerce/contract/client";
+import { createCommerceClient } from "../../../../../services/platform/src/commerce/contract/client";
 import {
   countOpenScreenPairings,
   deleteExpiredScreenPairings,

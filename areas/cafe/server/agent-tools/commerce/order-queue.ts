@@ -7,14 +7,14 @@ import type {
   OrderQueueToolRead,
   SoldOutMarkRequest,
   SoldOutToolRead,
-} from "../../cafe/contract/order-queue-commands";
+} from "../../contract/order-queue-commands";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   defineToolFamily,
   noArguments,
   stringEnum,
 } from "@purin-labs/agent-tools/define-tool";
-import type { PageViewExecute } from "../kitchen/services";
+import type { PageViewExecute } from "../../../../../services/platform/src/agent-tools/kitchen/services";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 

@@ -9,7 +9,7 @@ import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   activateTerminalAssignment,
   readActiveTerminalAssignment,
-} from "../src/data/terminal-assignment-store";
+} from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
 
 const ORG_ID = "org_11111111-1111-4111-8111-111111111111";
 

@@ -1,7 +1,7 @@
 import type {
   CounterRegisterDeps,
   CounterRegisterFailure,
-} from "../../commerce/counter-register";
+} from "../../counter-register";
 import type {
   ControlMutationReceiptScope,
   UnversionedControlMutationBoundary,
@@ -16,7 +16,7 @@ import {
   authorizeMerchantRead,
   resolveMerchantControlContext,
   type MerchantControlContext,
-} from "../../commerce/contract/merchant-control";
+} from "../../../../../services/platform/src/commerce/contract/merchant-control";
 import {
   controlError,
   controlJson,

@@ -22,7 +22,7 @@ import {
   orderQueueRead,
   soldOutMark,
   soldOutRead,
-} from "./commerce/order-queue";
+} from "@purin-labs/area-cafe/server/agent-tools/commerce/order-queue";
 import { paymentsRead } from "./commerce/payments";
 import {
   campaignBriefProposal,
@@ -33,7 +33,7 @@ import {
   orderRefundProposal,
   stockActionProposal,
 } from "./commerce/proposals";
-import { REGISTER_VIEW_TOOLS } from "./commerce/register-view";
+import { REGISTER_VIEW_TOOLS } from "@purin-labs/area-cafe/server/agent-tools/commerce/register-view";
 import { merchantReport } from "./commerce/reports";
 import { COSTS_VIEW_TOOLS } from "./costs/view";
 import {
@@ -53,7 +53,7 @@ import {
   menuDraftEdit,
   menuDraftRead,
   menuPriceProposal,
-} from "./drafts/drafts";
+} from "@purin-labs/area-cafe/server/agent-tools/drafts/drafts";
 import {
   fileRead,
   fileSearch,

@@ -5,7 +5,7 @@ import {
   retireTerminalCounter,
   type TerminalMutationTransport,
   type TerminalReadTransport,
-} from "../../../apps/portal/src/features/terminals/api";
+} from "@purin-labs/area-cafe/ui/features/terminals/api";
 import type { TerminalCounterReadback } from "@purin-labs/control-api";
 
 const ORGANISATION = "organisation_1";

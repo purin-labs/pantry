@@ -151,21 +151,21 @@ import {
   matchVoiceRoute,
   type VoiceRoute,
 } from "./voice/routes";
-import { handleMenuDraftRoute } from "./control/routes/menu-draft";
+import { handleMenuDraftRoute } from "@purin-labs/area-cafe/server/control/routes/menu-draft";
 import {
   matchMenuDraftRoute,
   type MenuDraftRoute,
-} from "./control/admission/menu-draft";
+} from "@purin-labs/area-cafe/server/control/admission/menu-draft";
 import {
   handleMenuBoardControlRoute,
   handleMenuBoardSocketRoute,
   matchMenuBoardControlRoute,
   type MenuBoardControlRoute,
-} from "./control/routes/menu-boards";
+} from "@purin-labs/area-cafe/server/control/routes/menu-boards";
 import {
   matchMenuBoardSocketRoute,
   type MenuBoardSocketRoute,
-} from "./control/admission/menu-boards";
+} from "@purin-labs/area-cafe/server/control/admission/menu-boards";
 import {
   handleDeviceControlRoute,
   matchDeviceControlRoute,

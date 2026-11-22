@@ -14,11 +14,11 @@ import {
   recordCounterSaleHandoffResult,
   type CounterSaleHandoffResult,
   type CounterSaleAfterSaleAction,
-} from "../../commerce/counter-register";
+} from "../../counter-register";
 import {
   recordCounterCashAndOpenDrawer,
   runCounterAfterSaleWithDrawer,
-} from "../../commerce/counter-printing";
+} from "../../counter-printing";
 import type { Env } from "@purin-labs/kernel/env";
 import { controlError, controlJson, type JsonRecord } from "@purin-labs/control/worker/http";
 import {

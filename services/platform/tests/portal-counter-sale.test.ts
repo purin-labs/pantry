@@ -9,7 +9,7 @@ import {
   refundCounterSale,
   type CounterSaleMutationTransport,
   type CounterSaleReadTransport,
-} from "../../../apps/portal/src/features/terminals/counter-sale-api";
+} from "@purin-labs/area-cafe/ui/features/terminals/counter-sale-api";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 
 const ORGANISATION = "organisation_1";

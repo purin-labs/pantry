@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "../styles.css";
-import { OrderQueueRoute } from "../features/order-queue/route";
+import { OrderQueueRoute } from "@purin-labs/area-cafe/ui/features/order-queue/route";
 
 // The order queue against a Worker's control routes, for the Plan 40B browser
 // journey. `?organisation=<id>` picks the Organisation.

@@ -96,10 +96,10 @@ import {
   commerceChangeSummary,
   commerceWaitingCardText,
 } from "./slack/commerce-approval-card";
-import { cafeServices } from "./cafe/contract/cafe-services";
-import { readCounterSaleView } from "./commerce/counter-register";
-import { readMenuScreenList } from "./control/routes/menu-boards";
-import { readTerminalOperations } from "./data/terminal-operations-readback";
+import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-services";
+import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-register";
+import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
+import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";
 import { inboxServices } from "./mail-inbox/contract/inbox-services";
 import { readGmailPilotBudget } from "./data/email-mailbox";
 import { registerSupplierOperationalEmailContact } from "./data/email-operational";

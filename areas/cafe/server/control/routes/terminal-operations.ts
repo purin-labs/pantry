@@ -33,12 +33,12 @@ import {
   parseIntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { createCommerceClient } from "../../commerce/contract/client";
+import { createCommerceClient } from "../../../../../services/platform/src/commerce/contract/client";
 import { readOrganisationEnvironment } from "@purin-labs/agent/control/organisation-runtime";
 import {
   resolveCommerceMerchant,
   type CommerceMerchant,
-} from "../../commerce/contract/square-link";
+} from "../../../../../services/platform/src/commerce/contract/square-link";
 import type {
   CommerceClientError,
   CommerceSquareDeviceCodeV1,

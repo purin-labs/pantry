@@ -11,8 +11,8 @@ import {
   commerceToolServices,
 } from "./commerce/turn-services";
 import { deviceToolServices } from "@purin-labs/area-devices/server/agent-tools/devices/turn-services";
-import { createMenuBoardDraftPreview } from "./drafts/board-draft-preview";
-import { menuToolServices } from "./drafts/turn-services";
+import { createMenuBoardDraftPreview } from "@purin-labs/area-cafe/server/agent-tools/drafts/board-draft-preview";
+import { menuToolServices } from "@purin-labs/area-cafe/server/agent-tools/drafts/turn-services";
 import {
   customConnectorTurnTools,
   integrationToolServices,

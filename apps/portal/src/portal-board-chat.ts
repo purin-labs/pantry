@@ -1,4 +1,4 @@
-import { registerBoardChat } from "./features/menu-boards/board-chat";
+import { registerBoardChat } from "@purin-labs/area-cafe/ui/features/menu-boards/board-chat";
 
 /**
  * Gives the Café board's prompt edit the Portal chat. The chat code loads

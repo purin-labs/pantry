@@ -3,8 +3,8 @@ import { VOICE_VOCABULARY_TERM_LIMIT } from "@purin-labs/control-api";
 import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,
-} from "../control/routes/commerce-menu-publication";
-import { resolveCafeBuyer } from "../control/routes/menu-screens";
+} from "@purin-labs/area-cafe/server/control/routes/commerce-menu-publication";
+import { resolveCafeBuyer } from "@purin-labs/area-cafe/server/control/routes/menu-screens";
 import { listDevices } from "@purin-labs/area-devices/server/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";

@@ -33,12 +33,12 @@ import {
   handleTerminalOperationsControlRoute,
   matchTerminalOperationsControlRoute,
   type TerminalOperationsControlRoute,
-} from "./terminal-operations";
+} from "@purin-labs/area-cafe/server/control/routes/terminal-operations";
 import {
   handleCounterPolicyControlRoute,
   matchCounterPolicyControlRoute,
   type CounterPolicyControlRoute,
-} from "./counter-policy";
+} from "@purin-labs/area-cafe/server/control/routes/counter-policy";
 import {
   handleCommerceApiKeyControlRoute,
   matchCommerceApiKeyControlRoute,
@@ -53,12 +53,12 @@ import {
   handleCommerceMenuPublicationControlRoute,
   matchCommerceMenuPublicationControlRoute,
   type CommerceMenuPublicationControlRoute,
-} from "./commerce-menu-publication";
+} from "@purin-labs/area-cafe/server/control/routes/commerce-menu-publication";
 import {
   handleCounterSaleControlRoute,
   matchCounterSaleControlRoute,
   type CounterSaleControlRoute,
-} from "./counter-sale";
+} from "@purin-labs/area-cafe/server/control/routes/counter-sale";
 import {
   handleFailedPaymentsControlRoute,
   matchFailedPaymentsControlRoute,
@@ -78,17 +78,17 @@ import {
   handleOrderTimesControlRoute,
   matchOrderTimesControlRoute,
   type OrderTimesControlRoute,
-} from "./order-times";
+} from "@purin-labs/area-cafe/server/control/routes/order-times";
 import {
   handleOrderQueueControlRoute,
   matchOrderQueueControlRoute,
   type OrderQueueControlRoute,
-} from "./order-queue";
+} from "@purin-labs/area-cafe/server/control/routes/order-queue";
 import {
   handleSoldOutControlRoute,
   matchSoldOutControlRoute,
   type SoldOutControlRoute,
-} from "./sold-out";
+} from "@purin-labs/area-cafe/server/control/routes/sold-out";
 import {
   handleSupplierPayoutControlRoute,
   matchSupplierPayoutControlRoute,

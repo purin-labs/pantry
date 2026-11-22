@@ -21,7 +21,7 @@ import { type MenuScreenSummary } from "@purin-labs/cafe-control-api";
 import { type DeviceSample } from "../../actors/device-fleet";
 import { deviceFleetStub } from "../../contract/fleet-stub";
 import { roleMayConfigure, roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
-import { cafeServices } from "../../../../../services/platform/src/cafe/contract/cafe-services";
+import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-services";
 import {
   DEVICE_COMMAND_ROLE,
   runDeviceCommand,

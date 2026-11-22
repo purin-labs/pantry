@@ -27,7 +27,7 @@ import {
 import { MenuDraftClient, type MenuDraftView } from "./menu-client";
 import { MenuBoardsPanel } from "../menu-boards/boards-panel";
 import { MenuScreensPanel } from "../menu-boards/screens-panel";
-import "../commerce/description-draft/styles.css";
+import "../../../../../apps/portal/src/features/commerce/description-draft/styles.css";
 import "./styles.css";
 import {
   assertNever,

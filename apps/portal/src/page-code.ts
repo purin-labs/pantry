@@ -151,22 +151,26 @@ async function loadBakesRoute() {
 }
 
 async function loadOrderQueueRoute() {
-  const { OrderQueueRoute } = await import("./features/order-queue/route");
+  const { OrderQueueRoute } =
+    await import("@purin-labs/area-cafe/ui/features/order-queue/route");
   return { default: OrderQueueRoute };
 }
 
 async function loadRegisterRoute() {
-  const { RegisterRoute } = await import("./features/register/route");
+  const { RegisterRoute } =
+    await import("@purin-labs/area-cafe/ui/features/register/route");
   return { default: RegisterRoute };
 }
 
 async function loadMenuDraftRoute() {
-  const module = await import("./features/content-studio/route");
+  const module =
+    await import("@purin-labs/area-cafe/ui/features/content-studio/route");
   return { default: module.MenuDraftRoute };
 }
 
 async function loadTerminalOperationsPanel() {
-  const module = await import("./features/terminals/route");
+  const module =
+    await import("@purin-labs/area-cafe/ui/features/terminals/route");
   return { default: module.TerminalOperationsPanel };
 }
 

@@ -4,7 +4,7 @@ import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 import {
   CAFE_STOREFRONT_ID,
   planCafeMenu,
-} from "../../src/cafe/contract/menu-publication";
+} from "@purin-labs/area-cafe/server/contract/menu-publication";
 import { providerClient } from "./pi-sdk-effect-support";
 
 /** The café menu of a demo shop, published so that a buyer can order from it. */
