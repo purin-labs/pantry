@@ -1,6 +1,6 @@
 # Plan 91 — Seams Atelier rename
 
-Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phases 4 and 6 open. See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry".
+Status: phases 1, 2, 3 and 5 in production (satyr-edge `347178c4`, released from `peitalin/seams-atelier`; the repository is now `seams-tech/pantry`); phases 4 and 6 open. See "Built". On 18 November 2026 the owner renamed Atelier to **Pantry** and Commis to **Gantry**: see "Pantry and Gantry". On 22 November 2026 the owner chose the Purin names, and phase 4 now follows [Plan 93](plan-93-clean-cutover.md): see "Purin names" and "Phase 4 after Plan 93".
 Date: 16 November 2026.
 Owner: Portal, Platform, commerce, docs and the seams-site.
 Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
@@ -42,6 +42,8 @@ What changed:
 - **Slack.** The Slack app becomes "Seams Pantry" at the release, through the
   manifest API. The bot stays "Sous Chef".
 - **Public domain.** The default is now `pantry.seams.sh` (decision 8).
+  Changed on 22 November 2026: the address is `pantry.purin.io`, and Plan 93
+  owns it.
 
 What stays: Worker names, Durable Object classes, D1, R2, KV and queue names,
 the env names, the cookie, the `satyr:*` keys, the `x-satyr-*` headers, the
@@ -60,6 +62,31 @@ path with the Portal HTML page, so the wake model could not load. The file has
 its old name again. Four strings named files by their old names: the Platform
 unit test `globalSetup`, the café acceptance test list and two docs. They now
 name the new files.
+
+## Purin names
+
+The brand moved from Seams to Purin: the repository is `purin-labs/pantry`
+(Plan 94), and the company site `purin.io` says "Purin Pantry". The Seams
+wallet keeps the Seams brand. On 22 November 2026 the owner chose these names
+for the product text and for every provider console:
+
+| Name today | Purin name | Note |
+|---|---|---|
+| Seams Pantry | **Purin Pantry** | Short form Pantry, as before |
+| Seams Checkout | Purin Checkout | |
+| Seams Vault | Purin Vault | The company site already says it |
+| Seams Gantry | Purin Gantry | Reserved; the Devices page stays "Devices" |
+| Seams, the company, in Pantry text | Purin | The legal name is "Purin Heavy Industries", as on `purin.io/company` |
+| Seams AI, Jev from Seams | Purin AI, Jev from Purin | They follow the company name |
+| Sous Chef | no change | |
+| Seams Pay | no change | A product of the Seams wallet |
+
+The mark is the Purin cat (`docs/brand/purin-logo`). Every console gets
+`icon-pack/icon-1024.png`, or a copy at the size that the console asks for.
+
+The text pass is phase 4A (see "Phase 4 after Plan 93"). It changes the
+display layer only, as phases 2, 3 and 5 did. The rest of this plan keeps the
+names of 16 November 2026.
 
 ## Goal
 
@@ -285,40 +312,140 @@ versions stay.
 
 ### 1. The public address
 
-The production Portal runs on `satyr-edge.n6378056.workers.dev`. Each person
-sees "satyr" in the address bar, in Slack links and on each OAuth consent
-screen. Staging runs on `staging.satyr.seams.sh`.
+Changed on 22 November 2026: [Plan 93](plan-93-clean-cutover.md) owns the
+address switch. It builds a new stack (the Worker `pantry`) with new, empty
+storage on `purin.io` domains, moves the providers to it, and then deletes
+the old stack. This replaces the first design of this section (a custom
+domain on `seams.sh` and a redirect for 90 days):
 
-- Give the Portal a custom domain, for example `atelier.seams.sh`, and
-  staging `staging.atelier.seams.sh`.
-- Change the values of `SATYR_PUBLIC_ORIGIN` and
-  `SATYR_OAUTH_CALLBACK_ORIGIN`. The variable names stay.
-- Add the new callback URL at each provider before the switch: Slack,
-  Google, Square, Stripe, Shopify, Discord and Meta.
-- Keep the old address as a redirect for 90 days. Its OAuth callbacks keep
-  working in that time.
-- Each person signs in one time more after the switch.
-- The Console in seams-monorepo names the Satyr origin
-  (`scripts/deployment-targets.mjs`). Change it in the same release.
+- The Portal address is `pantry.purin.io` (Plan 93, decision 2). The Slack
+  ingress is `slack.pantry.purin.io`, the commerce engine
+  `commerce.pantry.purin.io` and the docs `docs.pantry.purin.io`.
+- No redirect from the old address, and no reader for the old cookie, the
+  old storage keys or the old headers. Each person signs in again on the new
+  address.
+- Plan 93 owns the Worker, the domain routes, the values of
+  `PANTRY_PUBLIC_ORIGIN`, `PANTRY_OAUTH_CALLBACK_ORIGIN` and
+  `GMAIL_PUBSUB_*`, and the switch day (its step 4).
+- The Console item goes: since Plan 95 step 4, Pantry names no Console
+  service.
+- AGENTS.md says that a change of a Worker name, a public origin or a
+  callback path is a release of its own, and that Plan 93 moves the address
+  with no redirect.
 
-AGENTS.md says "Never change the public origin as part of a directory
-rename". This change is a brand change with its own release, so the rule
-does not block it. Update the rule text so that it stays true.
+This plan keeps the provider registrations: the names, the icons and the
+callback URLs at each provider (section 2).
 
 ### 2. Outside app registrations
 
-The owner changes these in each provider console. No code can do it.
+Changed on 22 November 2026 for Plan 93 and the Purin names. The paths come
+from the code on dev `79462c0f` and on the Plan 93 branch (tag
+`plan-93-step-2`); the cutover changes no provider path. Every console gets
+the name "Purin Pantry", the Purin cat icon and these texts, where the
+console has the field:
 
-| Provider | What changes | Risk |
-|---|---|---|
-| Slack | App name "Seams Atelier", bot name `sous-chef`, icon, descriptions | People type `@sous-chef`, not `@satyr`. Each workspace sees the new name at once |
-| Slack workspace | The owner's workspace is named "CafeOS". Rename it | None |
-| Google Cloud (Gmail) | Consent screen name, logo, home page, privacy URL | A name or logo change can start Google brand verification again. Gmail scopes can make this take days |
-| Square | Application name | Low |
-| Stripe | Platform name and icon | Low |
-| Shopify | App name | Low |
-| Discord | Bot name | Low |
-| Meta (WhatsApp) | App name | Blocked by business verification today |
+| Field | Value |
+|---|---|
+| Short description | Bakery operating system |
+| Long description | Purin Pantry: the operating system for modern bakeries & cafés. |
+| Home page | `https://purin.io` |
+| Privacy policy | `https://pantry.purin.io/docs/privacy` |
+| Terms | `https://pantry.purin.io/docs/terms` |
+| Domain | `purin.io` |
+
+The privacy and terms pages are Portal pages, so they answer only after Plan
+93 step 3. purin.io has no privacy or terms page (owner decision, 22 November
+2026).
+
+Each URL change has one of four times:
+
+- **Early.** An added redirect URL. Only a flow that starts on the new stack
+  uses it, so it is safe at once.
+- **Live.** A push endpoint that gets events at once. Add it after Plan 93
+  step 3 attaches the domains, because each event to a dead address fails.
+- **Switch.** A field that holds one value. Change it on the switch day
+  (Plan 93 step 4).
+- **Delete.** Remove the old value or app when Plan 93 step 5 deletes the
+  old stack.
+
+| Provider | URLs on the new stack | Time | Who |
+|---|---|---|---|
+| Slack, app `A0BFVDZLFLM` | Redirect URLs `https://pantry.purin.io/slack/install` and `https://pantry.purin.io/v1/control/providers/slack/callback` | Early | I, through the manifest API, after the owner's yes |
+| | Event request URL `https://slack.pantry.purin.io/slack/events`, interactivity URL `https://slack.pantry.purin.io/slack/interactions`. Slack checks the event URL with a challenge, so the new ingress must answer | Switch | I, through the manifest API |
+| Google, one new project (below) | One Web client. Redirect URIs `https://pantry.purin.io/v1/control/auth/google/callback`, `…/v1/control/providers/gmail/callback`, `…/v1/control/providers/google_drive/callback`; JavaScript origin `https://pantry.purin.io` (Drive Picker). The Picker API key allows the referrer `https://pantry.purin.io/*` | Early | The owner, in the console |
+| | Pub/Sub push subscription to `https://pantry.purin.io/hook/email/google`, with the same URL as the OIDC audience (`GMAIL_PUBSUB_AUDIENCE`) | Live | I, with `gcloud`, after the owner's yes |
+| Square, production app | Point of Sale API web callback `https://pantry.purin.io/portal/square-pos-return` | Early | The owner |
+| | OAuth redirect URL `https://pantry.purin.io/v1/control/providers/square/callback`. Square keeps one redirect URL for each environment | Switch | The owner |
+| Stripe, platform account | Connect OAuth redirect `https://pantry.purin.io/v1/control/providers/stripe/callback` | Early | The owner |
+| | A new Connect webhook endpoint (events of connected accounts) `https://pantry.purin.io/hook/stripe/connect`; its id and signing secret go to `STRIPE_CONNECT_WEBHOOK_ID` and `STRIPE_CONNECT_WEBHOOK_SECRET`. If the commerce engine has `STRIPE_WEBHOOK_SECRET`, a second endpoint `https://commerce.pantry.purin.io/v1/providers/stripe/webhooks` | Live | The owner |
+| Shopify, app "Nuki" (`integrations/shopify/shopify.app.toml`) | `redirect_urls` gets `https://pantry.purin.io/v1/control/providers/shopify/callback` beside the old URL | Early | I, with `shopify app deploy`, after the owner's yes |
+| | `application_url` `https://pantry.purin.io/portal` (one value) | Switch | I, as above |
+| Discord, the owner's application | Interactions endpoint `https://pantry.purin.io/hook/discord/<new organisation id>`. The id exists only after the owner makes the new organisation, and Discord sends a ping when the URL is saved | Switch | The owner, after the Discord install in the new organisation |
+| Meta (WhatsApp), app `316717…` | Valid OAuth redirect URI `https://pantry.purin.io/v1/control/providers/whatsapp/callback` | Early | The owner |
+| | Webhook callback `https://pantry.purin.io/hook/whatsapp` with the new `WHATSAPP_VERIFY_TOKEN`; Meta checks it with a challenge | Switch | The owner |
+| Dropbox | Redirect URI `https://pantry.purin.io/v1/control/providers/dropbox/callback` | Early | The owner |
+| | Webhook URI `https://pantry.purin.io/hook/dropbox`; Dropbox checks it with a challenge | Live | The owner |
+| Notion, public integration | Redirect URI `https://pantry.purin.io/v1/control/providers/notion/callback` | Early | The owner |
+| Airtable, OAuth integration | Redirect URL `https://pantry.purin.io/v1/control/providers/airtable/callback`. If the form holds one URL only, change it on the switch day | Early or Switch | The owner |
+
+Pantry makes the other endpoints itself through each provider's API when a
+person connects: the Stripe endpoint of each organisation
+(`/hook/stripe/<organisation id>`) and the Shopify webhooks of each shop
+(`/hook/shopify/<organisation id>`). The commerce engine's webhook to the
+Platform (`/hook/commerce/<organisation id>` after the cutover) is internal.
+The ChatGPT and Claude sign-ins use the providers' fixed redirect URIs, so
+they need no change.
+
+**Names at the providers.** Change them on the switch day, at the same time
+as the URLs, so that people see one name: the Slack app "Purin Pantry" with
+the bot "Sous Chef" (the manifest API; the icon only in the console), the
+Square application, the Stripe Connect branding (business name and icon),
+the Shopify app (in `shopify.app.toml`), the Discord application, the Meta
+app, the Dropbox app, the Notion and Airtable integrations. The owner also
+renames the Slack workspace "CafeOS".
+
+**Google: one new project.** Pantry's Google sign-in uses the project `seams`
+(`seams-501403`), and the Seams wallet uses the same project and the same
+OAuth client. One project has one consent screen, so a rename there renames
+the wallet's sign-in too. Gmail and Drive use two more projects
+(`satyr-gmail-dev`, `satyr-drive-pilot`). On 22 November 2026 the owner chose
+one new project for Pantry, for example `purin-pantry`:
+
+1. The owner makes the project and sets the consent screen (Google Auth
+   Platform, Branding): the name "Purin Pantry", a 120 × 120 px logo, the
+   support email, the home page, privacy and terms URLs above, and the
+   authorized domain `purin.io`. Google asks for proof of the domain in
+   Search Console; Cloudflare can add the TXT record.
+2. Audience: External, "In production". In "Testing", a Gmail or Drive
+   refresh token ends after 7 days, and only listed test users can sign in.
+   Before Google verifies the Gmail and Drive scopes, a person sees the
+   "unverified app" page for them, and at most 100 people can grant them.
+   Sign-in asks only for `openid`, `email` and `profile`, so it works for
+   every person.
+3. A logo on the consent screen needs brand verification. Google reads the
+   home page and the privacy page for it, so submit it after Plan 93 step 3.
+   It can take some days. Until it passes, the screen shows the name
+   without the logo.
+4. Data access: the scopes that the code asks for (sign-in, Gmail, Drive).
+   Clients: one Web client with the URIs in the table. Its id goes to
+   `GOOGLE_OIDC_CLIENT_ID`, `GMAIL_OAUTH_CLIENT_ID` and
+   `GDRIVE_OAUTH_CLIENT_ID`, and its secret to `GOOGLE_OIDC_CLIENT_SECRET`,
+   `GMAIL_OAUTH_CLIENT_SECRET` and `GDRIVE_OAUTH_CLIENT_SECRET`. A Picker
+   API key, and the project number as `GDRIVE_PICKER_APP_ID`. With the
+   project "In production", the new Worker leaves
+   `GMAIL_OAUTH_PILOT_EXPIRY_DAYS` unset.
+5. I enable the Gmail, Drive, Picker and Pub/Sub APIs with `gcloud`, make the
+   topic `pantry-gmail-push`, give `gmail-api-push@system.gserviceaccount.com`
+   the publisher role on it, make the service account `pantry-gmail-push`
+   for the push token, and make the push subscription when the new stack
+   answers. `GMAIL_PUBSUB_TOPIC` and `GMAIL_PUBSUB_SERVICE_ACCOUNT` then
+   name the new project.
+6. At Plan 93 step 5: delete `satyr-gmail-dev` and `satyr-drive-pilot`, and
+   remove the Pantry redirect URI from the client in `seams-501403`. The
+   wallet keeps that project.
+
+This also ends the Plan 93 exception for `satyr-gmail-dev`: no Google name
+keeps "satyr".
 
 ### 3. Brand marks
 
@@ -436,11 +563,10 @@ production.
    Checks: `pnpm lint:runtime-boundary`, `pnpm lint:ifc-boundaries`, the chat
    journeys and the live Slack journey (`pnpm --filter satyr-edge
    slack:live-reply`), because Slack delivery text changes.
-4. **The public address and the provider consoles.** New callbacks at each
-   provider, then the origin switch with the new cookie and storage names,
-   then the 90-day redirect. The owner renames the Slack app and the bot on
-   the same day. Check: one live sign-in and one live OAuth connect on each
-   provider that matters.
+4. **The public address and the provider consoles.** Changed on 22 November
+   2026: see "Phase 4 after Plan 93". Plan 93 owns the address switch, and
+   this phase owns the Purin text and the provider registrations. Check: one
+   live sign-in and one live OAuth connect on each provider that matters.
 5. **Docs, site and Console.** Release on the same day as phase 2 or 3.
 6. **Voice.** Train and measure "Hey Sous Chef". Switch the wake phrase and
    the voice prompts in one release.
@@ -452,6 +578,48 @@ Changed order, 16 November 2026: the freeze could not start, because
 Refactor 16 is open. So the text phases 2, 3 and 5 went first, and the
 codemod of phase 1 waits for the freeze. The text phases change strings and
 the codemod changes code names, so the two do not touch the same tokens.
+
+### Phase 4 after Plan 93
+
+Decided on 22 November 2026. Plan 93 owns the address, the Worker, the env
+values and the switch day. This phase owns the rest:
+
+- **4A. Purin text.** One pass changes the names in "Purin names" in the
+  Portal, the storefront, the agent and Slack text, the shop programs, the
+  docs site, `AGENTS.md` and the tests that assert the text. It lands
+  before the switch, so that the new stack shows the names that the consent
+  screens show. Checks as for phases 2 and 3.
+- **4B. Registrations.** The list in "Outside app registrations": the Early
+  items now, the Live items after Plan 93 step 3, and the Switch items and
+  the names on the switch day (Plan 93 step 4). The Google project starts
+  first. I make the changes that an API can make (the Slack manifest, the
+  Shopify app file, `gcloud`) after the owner's yes for each one. The owner
+  makes the console changes from the steps that I give.
+- **4C. Live checks**, after the switch, on the new stack: one Google
+  sign-in; one OAuth connect each for Slack (an install and one card),
+  Gmail, Google Drive, Square, Stripe and Shopify; one Dropbox, Notion and
+  Airtable connect if the owner uses them; Discord and WhatsApp only when
+  their accounts can run. The results go into "Built".
+- **4D. Delete**, with Plan 93 step 5: the old redirect URLs and webhook
+  endpoints at each provider, and the two old Google projects.
+
+Phase 4 is done when each provider shows the new name and has only the
+`pantry.purin.io` URLs, and the checks of 4C pass.
+
+State on 22 November 2026:
+
+- **4A** is on the branch `plan-91-purin-text`, on top of the Plan 93
+  branch, so that the first deploy of the new stack shows the Purin names:
+  247 files, about 650 lines. Checks that pass: the Platform types and test
+  types, `pnpm check:packages`, `pnpm lint:static`, `pnpm test:units` (the
+  Platform suite: 301 files, 1,729 tests), `pnpm portal:build`, the three
+  commerce journeys that name the shop, and the 20 Platform E2E files that
+  the pass changed. In the batch run of the 20 files,
+  `counter-receipt-printer` failed one time, because the drawer task was
+  still `sent`; it passed alone. The receipt text is not in that check.
+- **4B**: the Early items wait for the owner (the console steps) and for
+  the owner's yes to the API changes.
+- **4C** and **4D** wait for Plan 93 steps 4 and 5.
 
 ## Built
 
@@ -569,8 +737,7 @@ State on 17 November 2026:
   that time.
 - The text phases are copy edits with test updates: about 1,000 string
   lines in this repository and about 170 in seams-monorepo.
-- The domain switch adds no recurring cost. The redirect runs in the same
-  Worker.
+- The domain switch adds no recurring cost. There is no redirect (Plan 93).
 - The wake model training runs one time on the shop Mac.
 - No phase adds a cron, an alarm, a poll or a write for an idle
   Organisation.
@@ -583,9 +750,14 @@ State on 17 November 2026:
 - People type `@satyr` in Slack after the bot rename. The mention then does
   not reach the agent. Tell each workspace one time in its channel.
 - Google brand verification can stop new Gmail connections until it
-  passes. Existing connections keep their tokens.
+  passes. Existing connections keep their tokens. Changed on 22 November
+  2026: the new Google project starts with no connection. Until the
+  verification passes, the consent screen shows no logo, and the Gmail and
+  Drive scopes show the "unverified app" page.
 - An OAuth callback that a provider does not know fails the connect. Add
-  each new callback before the switch, and keep the old one for 90 days.
+  each new callback before the switch, and keep the old one until Plan 93
+  step 5 deletes the old stack. Square and some single-value fields cannot
+  hold two URLs, so they change on the switch day.
 - A parked branch conflicts with the renamed code. Run the codemod on the
   branch, then rebase it.
 - A local branch that is not pushed stays in the old checkout. Push or land
@@ -613,8 +785,19 @@ State on 17 November 2026:
 6. **The switcher areas.** Default: Commerce, Café and Kitchen.
 7. **The wake phrase.** Default: keep "Hey Satyr" until a "Hey Sous Chef"
    model passes.
-8. **The public domain.** Default: `pantry.seams.sh` (was `atelier.seams.sh`).
+8. **The public domain.** Decided on 21 November 2026 in Plan 93
+   (decision 2): `pantry.purin.io`, with no redirect from the old address.
+   Earlier default: `pantry.seams.sh` (was `atelier.seams.sh`).
 9. **Seams Pay, Seams Vault, Seams AI and Jev from Seams.** Default: use
    these names.
 10. **The subtitle.** "Bakery operating system" leaves out cafés. Default:
     keep the owner's text.
+11. **The Purin names.** Decided on 22 November 2026: "Purin Pantry" on
+    every consent screen and in the product, and Purin Checkout, Purin Vault
+    and Purin Gantry. Seams Pay keeps its name.
+12. **The Google project.** Decided on 22 November 2026: one new project
+    for Pantry's sign-in, Gmail and Drive. The wallet keeps `seams-501403`.
+13. **The legal pages.** Decided on 22 November 2026: the consoles name the
+    Portal pages `https://pantry.purin.io/docs/privacy` and
+    `https://pantry.purin.io/docs/terms`, and the home page
+    `https://purin.io`.
