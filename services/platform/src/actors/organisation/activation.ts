@@ -22,7 +22,7 @@ import {
   type WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   compileAndStoreCueSnapshot,
   writeTierOneCommerceSubscription,

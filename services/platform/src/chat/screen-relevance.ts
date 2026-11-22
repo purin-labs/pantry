@@ -11,7 +11,7 @@ import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime
 import type { Env } from "@purin-labs/kernel/env";
 import type { ScreenRelevanceState } from "../jev-features/screen-relevance-jev";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCurrentSourceFlowLabel } from "../policy/information-flow/source-labels";
+import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/source-labels";
 import type { Result } from "@purin-labs/kernel/result";
 import { timelineVisibleMessages, type Conversation } from "./conversation";
 import type { AuthorizedConversation } from "./conversation-access";

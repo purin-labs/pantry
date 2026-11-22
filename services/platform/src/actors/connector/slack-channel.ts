@@ -8,7 +8,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import {
   resolveActiveSlackThreadCredential,
   type readSlackThreadCredentialRoute,
-} from "../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";

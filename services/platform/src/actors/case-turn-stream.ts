@@ -7,7 +7,7 @@ import type {
   SessionId,
   WorkspaceId,
 } from "@purin-labs/kernel/ids";
-import type { SerializedFlowBinding } from "../policy/information-flow";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { EmbeddedHarnessTurnError } from "./embedded-harness";
 

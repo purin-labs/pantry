@@ -1,12 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../src/credential-vault/service", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/credential-vault/service")>()),
-  resolveVaultHandle: vi.fn().mockResolvedValue({
-    ok: true,
-    value: { kind: "bearer", value: "apikey_organisation-owned-test-key" },
+vi.mock(
+  "@purin-labs/authority/credential-vault/service",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/authority/credential-vault/service")
+    >()),
+    resolveVaultHandle: vi.fn().mockResolvedValue({
+      ok: true,
+      value: { kind: "bearer", value: "apikey_organisation-owned-test-key" },
+    }),
   }),
-}));
+);
 
 import { OrganisationDO } from "../src/actors/organisation";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";

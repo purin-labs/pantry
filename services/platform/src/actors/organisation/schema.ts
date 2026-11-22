@@ -1,5 +1,5 @@
 import { createMailEvaluationSchema } from "../../mail-inbox/evaluation";
-import { createActionLedgerSchema } from "../action-ledger";
+import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
 import { createCueDeliverySchema } from "../cue-delivery";
 import { createCommerceProjectionSchema } from "../commerce-projection";
 import { createShopifyLocationObservationSchema } from "../../shopify/location-observation";

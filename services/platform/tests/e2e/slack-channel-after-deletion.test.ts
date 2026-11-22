@@ -8,9 +8,9 @@ import {
   parseVaultHandle,
   storeVaultSecret,
   type VaultHandle,
-} from "../../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
-import { listAccessGrants } from "../../src/data/access-grants";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   archiveOrganisation,

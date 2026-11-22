@@ -5,7 +5,7 @@ import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
-import { validateLiveRequestAuthority } from "../request-authority";
+import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type {
   HarnessFollowUpRequest,
@@ -22,29 +22,32 @@ import {
   insertHeldOutputRequest,
   type HeldEffectPassUse,
   type HeldOutputReason,
-} from "../data/held-output-request";
+} from "@purin-labs/authority/data/held-output-request";
 import {
   heldEffectActionRecord,
   type EffectAction,
 } from "../agent-tools/effect-action";
-import { FlowLabel, joinFlowLabels } from "../policy/information-flow";
+import {
+  FlowLabel,
+  joinFlowLabels,
+} from "@purin-labs/authority/policy/information-flow/index";
 import {
   insertAgentPermissionRequest,
   isRequesterRole,
-} from "../data/agent-permission-request";
+} from "@purin-labs/authority/data/agent-permission-request";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { isConversationSession } from "../chat/turn-access";
 import {
   missingEntityTypeReads,
   type MissingEntityTypeRead,
-} from "../authorization/access-grants/entity-type-reads";
+} from "@purin-labs/authority/authorization/access-grants/entity-type-reads";
 import {
   impliedEntityTypeReads,
   readNeedsPrivateChat,
   type RequestableEntityTypeRead,
-} from "../authorization/requestable-capabilities";
-import { slackSurfaceParts } from "../slack/surface-parts";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,

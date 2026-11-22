@@ -38,7 +38,7 @@ import {
   registerSupplier,
   type SupplierRegistrationError,
 } from "../../commerce/purchasing/supplier-creation";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import type { CommerceToolReads } from "../../commerce/contract/tool-reads";
 import { assertNever } from "@purin-labs/std";

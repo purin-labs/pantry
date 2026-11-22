@@ -2,12 +2,12 @@ import type {
   PermissionRequired,
   PermissionRequiredGrantTarget,
 } from "@purin-labs/control-api";
-import { opaqueSubjectReference } from "../access-control/references";
+import { opaqueSubjectReference } from "@purin-labs/authority/access-control/references";
 import {
   capabilityDefinitionById,
   type ActiveCapabilityId,
-} from "../authorization/capability-catalogue";
-import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { readOrganisationCapabilityPolicies } from "@purin-labs/authority/data/capability-policy";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlJson } from "./http";
 

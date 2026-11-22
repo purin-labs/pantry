@@ -16,8 +16,8 @@ import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-au
 import type { CatalogExecutionContext } from "../catalog/execute";
 import { DescriptionDraftRequestError } from "./services";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
-import type { AccessGrant } from "../../authorization/access-grants/types";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import {
   type DraftThreadLink,

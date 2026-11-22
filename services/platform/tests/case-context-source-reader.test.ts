@@ -8,11 +8,11 @@ import {
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock(
-  "../src/policy/information-flow/source-labels",
+  "@purin-labs/authority/policy/information-flow/source-labels",
   async function mockSourceLabels() {
-    const { FlowLabel } = await import("../src/policy/information-flow/labels");
+    const { FlowLabel } = await import("@purin-labs/authority/policy/information-flow/labels");
     const { sourceReaderForAuthority } =
-      await import("../src/policy/information-flow/source-readers");
+      await import("@purin-labs/authority/policy/information-flow/source-readers");
     return {
       createCurrentSourceFlowLabel: async function createFixtureSourceLabel(
         input: Readonly<{
@@ -42,10 +42,10 @@ vi.mock(
 
 import { CaseDO } from "../src/actors/case";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { digestCanonical } from "../src/policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { fixtureControlRequestAuthority } from "./fixtures/plan25-turn";
-import { authorityPartitionKey } from "../src/authorization/access-grants/turn-authority";
+import { authorityPartitionKey } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { Variant } from "@purin-labs/type-utils";
 import { requireCaseId, requireOrganisationId } from "./test-ids";
 import { platformEnv } from "./worker-fakes";

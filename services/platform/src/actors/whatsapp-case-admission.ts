@@ -8,7 +8,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
-import { buildWhatsAppSupportAuthority } from "../request-authority";
+import { buildWhatsAppSupportAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { sha256Hex } from "@purin-labs/std";

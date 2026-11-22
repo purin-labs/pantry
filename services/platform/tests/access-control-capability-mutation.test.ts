@@ -10,12 +10,12 @@ import { describe, expect, it } from "vitest";
 import {
   applyVersionedAccessDefaults,
   changeVersionedCapabilityPolicy,
-} from "../src/access-control/capability-mutations";
+} from "@purin-labs/authority/access-control/capability-mutations";
 import {
   CAPABILITY_CATALOGUE,
   CAPABILITY_KEYS,
-} from "../src/authorization/capability-catalogue";
-import { prepareReadAndProposeCapabilityPolicies } from "../src/data/capability-policy";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { prepareReadAndProposeCapabilityPolicies } from "@purin-labs/authority/data/capability-policy";
 import {
   parseOrganisationId,
   type OrganisationId,

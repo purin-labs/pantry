@@ -16,10 +16,10 @@ Read [the tool contract](../../../docs/architecture/integrations.md#capabilities
 Inspect the matching code in:
 
 - `services/platform/src/provider-adapters/` for provider behavior and lifecycle;
-- `services/platform/src/authorization/capability-catalogue.ts` for capability definitions;
+- `foundation/authority/authorization/capability-catalogue.ts` for capability definitions;
 - `services/platform/src/agent-tools/` (one `defineTool` per tool, `registry.ts`, and `catalog/` for selection and calls) for model-facing exposure;
 - `services/platform/src/integration-gateway.ts` for governed provider execution;
-- `services/platform/src/credential-vault/` for purpose-bound credential resolution.
+- `foundation/authority/credential-vault/` for purpose-bound credential resolution.
 
 For a merchant-configured REST or MCP connection, first inspect
 [Integration architecture: custom API connectors (was Spec 14)](../../../docs/architecture/integrations.md#custom-api-connectors) and the existing
@@ -34,7 +34,7 @@ For a merchant-configured REST or MCP connection, first inspect
 5. Preserve live authorization, approval, stable effect identity, and receipt reconciliation.
 6. Expose bounded results through the existing Tool Host.
 
-Use [the information-flow guide](../../../services/platform/src/policy/information-flow/README.md)
+Use [the information-flow guide](../../../foundation/authority/policy/information-flow/README.md)
 when a capability introduces protected context or an output. Preserve source
 restrictions through summaries, errors, replay, and delivery. Generated code,
 prompts, transcripts, and executor storage receive no provider credentials.

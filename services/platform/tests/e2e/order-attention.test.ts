@@ -25,8 +25,8 @@ import {
   MERCHANT_AGENT_READ_CAPABILITY,
 } from "../../src/data/merchant-agent-preset";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 
 const MERCHANT_ID = "merchant_bakery_c3_order_attention";
 const OUTPUT_SHAPE =

@@ -13,16 +13,16 @@ import {
   deriveDirectCaseIdentities,
   processDirectCaseCommand,
 } from "../../src/actors/case-direct-processing";
-import { createAccessGrant } from "../../src/data/access-grants";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import {
   readActiveOrganisationMembership,
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { deriveUserMessageViews } from "../../src/messages/message-wasm";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { buildControlAuthority } from "../../src/request-authority";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   createConversation,

@@ -30,7 +30,7 @@ import {
   type SessionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { PinnedSessionPolicy } from "../policy-snapshot";
+import type { PinnedSessionPolicy } from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
@@ -39,8 +39,8 @@ import {
   type AllowFlowDecision,
 } from "./case-conversation-sink";
 import { traceLog } from "@purin-labs/kernel/observability";
-import { FlowBinding, sinkRefusalAsksPerson } from "../policy";
-import type { SerializedFlowBinding } from "../policy";
+import { FlowBinding, sinkRefusalAsksPerson } from "@purin-labs/authority/policy/index";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import {
   slackCaseOutputIdempotencyKey,
   slackCaseStreamId,
@@ -73,7 +73,7 @@ import {
   composeAgentInstructions,
   type PinnedAgentProfile,
 } from "../data/pinned-agent-profile";
-import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
+import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
 import type { TurnPageState } from "./session/tool-wiring";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";

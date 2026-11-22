@@ -12,11 +12,11 @@ import {
   type AccessControlResourceProjection,
   type AccessControlViewInput,
   type TrustedSourcePolicyProjection,
-} from "../src/access-control/view";
-import { opaqueContextVisibilityReference } from "../src/access-control/references";
-import type { AccessGrant } from "../src/authorization/access-grants/types";
+} from "@purin-labs/authority/access-control/view";
+import { opaqueContextVisibilityReference } from "@purin-labs/authority/access-control/references";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { parsePersonId } from "@purin-labs/kernel/ids";
-import { FlowLabel } from "../src/policy";
+import { FlowLabel } from "@purin-labs/authority/policy/index";
 import {
   requireUserId,
   requireIntegrationAccountId,

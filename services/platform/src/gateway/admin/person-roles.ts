@@ -10,7 +10,7 @@ import {
   parsePersonId,
   parsePersonRoleOperation,
   type PersonRoleAdminError,
-} from "../../data/person-authz";
+} from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,

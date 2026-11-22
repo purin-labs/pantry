@@ -6,10 +6,10 @@ import { fileURLToPath, URL as NodeUrl } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
-import { resolveVaultHandle } from "../src/credential-vault/service";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
-import { compileEffectiveGrantSet } from "../src/authorization/access-grants";
+import { compileEffectiveGrantSet } from "@purin-labs/authority/authorization/access-grants/index";
 import {
   buildCustomConnectorWriteAuthority,
   buildCustomConnectorOperationRequest,

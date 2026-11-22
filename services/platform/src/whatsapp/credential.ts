@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { resolveActiveProviderConnectionCredential } from "../credential-vault";
+import { resolveActiveProviderConnectionCredential } from "@purin-labs/authority/credential-vault/index";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,

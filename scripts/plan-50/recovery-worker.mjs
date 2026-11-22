@@ -31,7 +31,7 @@ import { validateCanonicalSessionAdvance } from "../../services/platform/src/act
 import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
 import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
-import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue.ts";
+import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue.ts";
 import { renderHarnessHistoryContent } from "../../services/platform/src/actors/harness-history.ts";
 import { buildTextTurnCancellationStartedCommit } from "../../services/platform/src/actors/agent-session-text-turn.ts";
 export { default } from "./canonical-worker.mjs";

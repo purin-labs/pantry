@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
@@ -26,7 +26,7 @@ import {
   conversationCaseId,
   initialConversationCaseIdentity,
 } from "../../src/chat/conversation-actor-identity";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { ask } from "./chat-permission-support";
 import { commerceHeaders } from "./commerce-support";

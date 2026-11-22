@@ -4,7 +4,7 @@ import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, vi, type TestContext } from "vitest";
 import { BindingObservation } from "./binding-observation";
 import * as placementData from "@purin-labs/tenancy/data/organisation-placement";
-import * as policy from "../../src/policy-snapshot";
+import * as policy from "@purin-labs/authority/policy-snapshot";
 import {
   startActorRelocation,
   resumeActorRelocation,

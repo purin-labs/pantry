@@ -31,7 +31,7 @@ import {
   type ModelRoute,
   type PageBrowserContext,
 } from "@purin-labs/contracts";
-import { parseSessionModelRoute } from "../policy-snapshot";
+import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
 import type { JsonRecord } from "../control/http";
 import {
   parseCustomConnectorId,

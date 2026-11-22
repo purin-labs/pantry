@@ -24,7 +24,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   parseVaultHandle,
   storeVaultSecret,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   assertNever,
   isRecord,

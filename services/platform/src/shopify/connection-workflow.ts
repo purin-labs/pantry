@@ -6,7 +6,7 @@ import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,
 } from "./delivery-normalizers";
-import type { VaultHandle } from "../credential-vault";
+import type { VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import {
   createConnectedIntegration,
   requireConnectionCredentialAuthority,

@@ -32,7 +32,7 @@ import {
 } from "../provider-workflows/cleanup-context";
 import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
-import type { VaultHandle } from "../credential-vault";
+import type { VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { connectExternalRecordsOAuth } from "../provider-workflows/external-records-connection";
 import { connectGmail } from "../provider-workflows/gmail-connection";
 import {
@@ -62,7 +62,7 @@ import type {
   ProviderOnboardingError,
 } from "../integrations/contract/provider-lifecycle";
 import type { Result } from "@purin-labs/kernel/result";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   type ProviderAuthorizationInput,
   type ProviderAuthorizationConfigurationByProvider,

@@ -18,7 +18,7 @@ import {
 } from "../actors/connector-email-evaluation";
 import type { GmailHistoryMessage } from "@purin-labs/connections/mail/gmail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";
 import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import type { MailOrganizationHead, MailWork } from "./types";

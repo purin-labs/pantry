@@ -58,7 +58,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "completeGoogleOidc",
     "consumeGoogleApprovalCeremony",
   ],
-  "services/platform/src/credential-vault/root-rotation.ts": [
+  "foundation/authority/credential-vault/root-rotation.ts": [
     "failVaultRootRotation",
     "hasActiveRotation",
     "pauseVaultRootRotation",
@@ -106,7 +106,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
   "foundation/tenancy/data/shared-rows/placement-row.ts": [
     "publishOrganisationPlacementMove",
   ],
-  "services/platform/src/data/slack-installation-records.ts": [
+  "foundation/authority/data/slack-installation-records.ts": [
     "prepareSlackDmSelectionAuditEvent",
     "prepareSlackInstallationDisconnectAuditEvent",
     "readSlackConnectionIntegrationAccountId",
@@ -118,7 +118,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
   "services/platform/src/slack/install-organisation.ts": [
     "resolveSlackInstallOrganisation",
   ],
-  "services/platform/src/slack/installation-store.ts": [
+  "foundation/authority/slack/installation-store.ts": [
     "activateSlackInstallation",
     "createSlackInstallation",
     "diagnoseChannelBindingFailure",

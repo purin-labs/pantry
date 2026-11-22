@@ -22,7 +22,7 @@ import {
 import { digestModelRoute } from "../../models/route";
 import { runTransientEmailTurn as runTransientEmailTurnWithSinks } from "../transient-email-turn";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
-import { digestCanonical } from "../../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import {
   authorizedTransientModelLease,
   createEmbeddedHarnessModelRouteLease,

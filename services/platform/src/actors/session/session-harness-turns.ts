@@ -99,14 +99,14 @@ import {
   authorizeCapabilityUseWithAuthority,
   type CapabilityAuthorizationRequest,
   CONTEXT_CASE_READ_CAPABILITY,
-} from "../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ModelRoute } from "@purin-labs/contracts";
 import { failSessionTurnStream } from "../agent-session-turn-stream";
 import {
   buildCanonicalTextTurnStart,
   withNextRuntimeGeneration,
 } from "../agent-session-turn-start";
-import { sinkRefusalAsksPerson } from "../../policy";
+import { sinkRefusalAsksPerson } from "@purin-labs/authority/policy/index";
 import {
   prepareSessionInformationFlow,
   readSessionInformationFlow,

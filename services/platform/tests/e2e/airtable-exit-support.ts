@@ -5,12 +5,15 @@ import { expect } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { accessControlPath, enableCapability } from "./access-route-support";
 import { commerceHeaders } from "./commerce-support";
 import { fixtureDatabase } from "./organisation-database";

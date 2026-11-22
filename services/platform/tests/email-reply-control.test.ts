@@ -26,9 +26,9 @@ import {
 import { requireVaultHandle } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
-import { createAccessGrant } from "../src/data/access-grants";
-import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 
 const NOW = 1_784_016_325_277;

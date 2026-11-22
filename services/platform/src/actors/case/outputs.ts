@@ -7,9 +7,9 @@ import type {
   CaseContextReplayAuthority,
   ContextVisibility,
 } from "../../context/projection";
-import { FlowBinding, FlowLabel } from "../../policy";
-import type { SerializedFlowBinding } from "../../policy";
-import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
+import { FlowBinding, FlowLabel } from "@purin-labs/authority/policy/index";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
+import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   caseContentPreview,

@@ -7,7 +7,7 @@ import { storeSideCaseProposal } from "../chat/side-cases";
 import { signalChat } from "../chat/signals";
 import { readAdmittedChatInput } from "../chat/turn-access";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { validateLiveRequestAuthority } from "../request-authority";
+import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { readSessionTurnFlowBinding } from "./agent-session-information-flow";
 import type {
   HarnessSideCaseProposalRequest,

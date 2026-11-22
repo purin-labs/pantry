@@ -19,10 +19,10 @@ import {
 import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { authorityPartitionKey } from "../../src/authorization/access-grants/turn-authority";
+import { authorityPartitionKey } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { fixtureFlowBinding } from "../fixtures/plan25-turn";
-import { FlowLabel } from "../../src/policy/information-flow";
-import type { ProposeActionInput } from "../../src/actors/action-ledger";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
+import type { ProposeActionInput } from "@purin-labs/authority/actors/action-ledger";
 import type { ActionMutationExecution } from "../../src/actors/action-mutation-execution";
 
 type Pause = {

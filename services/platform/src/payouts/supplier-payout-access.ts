@@ -1,8 +1,11 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { AccessGrant } from "../authorization/access-grants/types";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { createCurrentSourceFlowLabel, type FlowLabel } from "../policy";
+import {
+  createCurrentSourceFlowLabel,
+  type FlowLabel,
+} from "@purin-labs/authority/policy/index";
 
 /**
  * Who may read what a merchant pays its suppliers.

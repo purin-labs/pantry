@@ -4,8 +4,8 @@ import { expect, it, vi, type TestContext } from "vitest";
 import {
   createVersionedAccessGrant,
   revokeVersionedAccessGrant,
-} from "../../src/access-control/grant-mutations";
-import { readAccessGrant } from "../../src/data/access-grants";
+} from "@purin-labs/authority/access-control/grant-mutations";
+import { readAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { readControlMutationReplay } from "@purin-labs/tenancy/data/control-mutation";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";

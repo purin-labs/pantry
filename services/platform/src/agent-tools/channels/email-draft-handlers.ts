@@ -17,7 +17,7 @@ import {
   listOrganisationMembers,
   type OrganisationMember,
 } from "@purin-labs/tenancy/data/control-plane";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   type DraftThreadLink,
   collaborationEditDeadline,

@@ -11,8 +11,8 @@ import {
   type TypeSafeUsageLimits,
 } from "../integrations/typesafe/evaluation-ledger";
 import { traceLog } from "@purin-labs/kernel/observability";
-import { FlowLabel } from "../policy/information-flow/labels";
-import type { SerializedFlowLabel } from "../policy/information-flow/types";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
+import type { SerializedFlowLabel } from "@purin-labs/authority/policy/information-flow/types";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   insertScreenRelevanceRecord,

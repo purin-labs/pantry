@@ -3,17 +3,17 @@ import type { ProviderFileRevision } from "@purin-labs/contracts";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { fileProjectionFence } from "./authority-sql";
 
-import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
+import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
 import type {
   AccessGrant,
   ContextVisibility,
-} from "../../authorization/access-grants/types";
-import { readAccessGrant } from "../../data/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/types";
+import { readAccessGrant } from "@purin-labs/authority/data/access-grants";
 import {
   createCurrentSourceFlowLabel,
   integrationResourceScopeForGrant,
   visibilityForGrantSubject,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   FILE_EXTRACTED_TEXT_MAX_BYTES,

@@ -24,7 +24,7 @@ import { parseContinuation } from "../../src/actors/agent-session-continuation";
 import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
 import { readProjectDirectory } from "../../src/chat/projects";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { connectCommerceFixture } from "./commerce-support";
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
@@ -105,13 +105,13 @@ import {
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import { createAccessGrant } from "../../src/data/access-grants";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { SessionDO } from "../../src/actors/agent-session";
 import type { CaseDO } from "../../src/actors/case";
 import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harness-authority";
-import { ObservationEvidence } from "../../src/policy/information-flow/oac";
+import { ObservationEvidence } from "@purin-labs/authority/policy/information-flow/oac";
 import { requireConversationId } from "../test-ids";
 import {
   installMerchantAgent,

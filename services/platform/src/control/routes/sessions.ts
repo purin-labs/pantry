@@ -1,11 +1,11 @@
 import type { UserId } from "@purin-labs/control-api";
 import type { GlobalQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import type { ApprovalActionBinding } from "../../approval-authentication";
+import type { ApprovalActionBinding } from "@purin-labs/authority/approval-authentication";
 import {
   digestApprovalAction,
   isCommerceActionNonce,
-} from "../../approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   beginGoogleOidc,

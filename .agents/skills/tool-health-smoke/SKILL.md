@@ -18,7 +18,7 @@ whose provider connectivity was actually exercised.
 Read [integration discovery](../../../docs/runbooks/integration-discovery.md)
 and [the tool contract](../../../docs/architecture/integrations.md#capabilities-and-tools).
 The production catalog is defined in
-`services/platform/src/authorization/capability-catalogue.ts` and exposed through
+`foundation/authority/authorization/capability-catalogue.ts` and exposed through
 `services/platform/src/agent-tools/` (`registry.ts` and `catalog/selection.ts`).
 
 ## Run

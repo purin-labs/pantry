@@ -24,7 +24,7 @@ import {
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
-} from "../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import { readMailboxIngressPolicy } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
@@ -51,7 +51,7 @@ import {
   FlowBinding,
   InformationFlowContext,
   digestCanonical,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { MailOrganizationActorInput } from "./commands";
 import {
   authorizeMailAssistant,

@@ -26,12 +26,12 @@ import type {
 import {
   authorizeCapabilityUse,
   compileTurnAuthority,
-} from "../../src/authorization/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/index";
 import {
   createAccessGrant,
   readAccessGrant,
   revokeAccessGrant,
-} from "../../src/data/access-grants";
+} from "@purin-labs/authority/data/access-grants";
 import { parseCaseId, parseSessionId } from "@purin-labs/kernel/ids";
 import { parseUserId, newUserId } from "@purin-labs/control-api/ids";
 import {
@@ -45,15 +45,15 @@ import {
 import {
   digestApprovalAction,
   parseApprovalEvidence,
-} from "../../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { changeVersionedCapabilityPolicy } from "../../src/access-control/capability-mutations";
-import { readOrganisationCapabilityPolicies } from "../../src/data/capability-policy";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
+import { changeVersionedCapabilityPolicy } from "@purin-labs/authority/access-control/capability-mutations";
+import { readOrganisationCapabilityPolicies } from "@purin-labs/authority/data/capability-policy";
 import {
   FlowBinding,
   InformationFlowContext,
-} from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import {
   prepareCustomConnectorDraftDocument,
   createCustomConnectorDraft,

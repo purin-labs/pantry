@@ -9,7 +9,7 @@ import {
   parseIntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { readEmailReplyRecipient } from "../mail-inbox/verified-sender";
-import type { FlowRecipient } from "../policy/information-flow/types";
+import type { FlowRecipient } from "@purin-labs/authority/policy/information-flow/types";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   requireActiveOrganisationActor,
@@ -35,9 +35,9 @@ import {
   digestCanonical,
   digestFlowBinding,
   type SerializedFlowBinding,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   extractMailbox,
@@ -262,7 +262,7 @@ async function selectedCaseContextCollectionSourceLabels(
   return { ok: true, value: labels };
 }
 function policyReaders(
-  policy: import("../policy/information-flow").CanonicalFlowPolicy,
+  policy: import("@purin-labs/authority/policy/information-flow/index").CanonicalFlowPolicy,
 ) {
   return policy.readers;
 }
@@ -735,7 +735,7 @@ export async function emailTurnDestinationMayReceive(
 }
 
 function isRecipientConstraint(
-  policy: import("../policy/information-flow").CanonicalFlowPolicy,
+  policy: import("@purin-labs/authority/policy/information-flow/index").CanonicalFlowPolicy,
 ): boolean {
   return policy.owner.kind === "recipient_constraint";
 }

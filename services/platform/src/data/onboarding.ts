@@ -38,7 +38,7 @@ import {
   prepareReadAndProposeAccessDefaults,
   slackConversationBaselineGrantId,
   type CapabilityPolicyAdmission,
-} from "./capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationQuerySource } from "@purin-labs/tenancy/data/query-source";
 import { isRecord, sha256Hex } from "@purin-labs/std";

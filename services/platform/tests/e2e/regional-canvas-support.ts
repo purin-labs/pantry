@@ -11,10 +11,10 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { createAccessGrant } from "../../src/data/access-grants";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";

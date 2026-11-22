@@ -16,7 +16,7 @@ import type {
   HarnessHistoryContent,
 } from "../harness-history";
 import type { EmbeddedHarnessSource } from "../embedded-harness";
-import { ObservationEvidence } from "../../policy";
+import { ObservationEvidence } from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { materializedHarnessHistory } from "./harness-source";

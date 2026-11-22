@@ -13,13 +13,13 @@ import { settleToolEffect } from "../../services/platform/src/agent-tools/sessio
 import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
 import { createCommerceClient } from "../../services/platform/src/commerce/contract/client.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
-import { createAccessGrant } from "../../services/platform/src/data/access-grants.ts";
+import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { createOrganisationInstall } from "../../foundation/tenancy/data/organisation.ts";
 import {
   parseVaultHandle,
   storeVaultSecret,
-} from "../../services/platform/src/credential-vault/index.ts";
+} from "../../foundation/authority/credential-vault/index.ts";
 import { parseWorkspaceId } from "../../foundation/kernel/ids.ts";
 import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement.ts";
 import { browserFixture } from "./browser-fixture.mjs";

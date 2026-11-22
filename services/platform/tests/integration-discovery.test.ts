@@ -2,7 +2,7 @@
 import "../src/worker-ports";
 import type { IntegrationDiscoveryView } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
-import { parseIntegrationDiscoveryView } from "../src/access-control/integration-discovery";
+import { parseIntegrationDiscoveryView } from "@purin-labs/authority/access-control/integration-discovery";
 import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
 import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 

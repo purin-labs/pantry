@@ -2,7 +2,7 @@ import { organisationDatabase as organisationHandle } from "@purin-labs/kernel/d
 import {
   parseModelApiKey,
   storeOrganisationModelCredential,
-} from "../../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
 import { readOrganisationCodexConnectionAtScope } from "../../src/models/codex-connection";
 import {

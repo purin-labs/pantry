@@ -12,7 +12,7 @@ import {
   setIntegrationAccountLifecycle,
   upsertSurfaceInstallation,
 } from "@purin-labs/connections/data/integration-account";
-import { parseVaultHandle } from "../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";

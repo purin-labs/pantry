@@ -29,8 +29,8 @@ import {
   readAgentMailboxBinding,
   readMailboxIngressPolicy,
 } from "../../data/email-mailbox";
-import { buildAgentMailboxAuthority } from "../../request-authority";
-import { createCurrentSourceFlowLabel } from "../../policy/information-flow/source-labels";
+import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
+import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/source-labels";
 import type {
   OperationalCaseContextDiscoveryEvidence,
   OperationalCaseContextDiscoveryRequest,

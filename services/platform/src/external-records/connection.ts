@@ -7,8 +7,8 @@ import {
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { parseVaultHandle } from "../credential-vault";
-import { storeVaultSecret } from "../credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import {
   validateAirtableBaseAccess,
   validateExternalProviderToken,

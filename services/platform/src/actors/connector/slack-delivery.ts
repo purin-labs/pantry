@@ -6,7 +6,7 @@ import {
   resolveActiveSlackOrganisationCredential,
   resolveRoutedSlackThreadCredential,
   slackThreadCredentialIsAtScope,
-} from "../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   newRequestId,
   parseChannelId,
@@ -67,7 +67,7 @@ import {
   isDeviceAlertDelivery,
 } from "../../devices/contract/alert-delivery";
 import { slackMayApproveAction } from "../../commerce/action-model";
-import { resolveActiveSlackDestinationConnection } from "../../slack/installation-store";
+import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { checkPreparedConnectorDelivery } from "../connector-slack-stream";
 import {

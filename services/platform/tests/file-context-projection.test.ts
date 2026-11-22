@@ -11,7 +11,7 @@ import {
   type FileProjectionSourceReader,
 } from "../src/context/files";
 import { parseCaseId } from "@purin-labs/kernel/ids";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { searchContextProjections } from "../src/context/projection";
 import { d1Database } from "./sqlite-d1";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";

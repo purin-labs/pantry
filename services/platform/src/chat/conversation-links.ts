@@ -1,7 +1,7 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { listDerivedChats } from "./forks";
 import type { Env } from "@purin-labs/kernel/env";
-import { buildControlAuthority } from "../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import {
   listConversationDirectory,

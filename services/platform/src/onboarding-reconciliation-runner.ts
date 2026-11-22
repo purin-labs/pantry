@@ -28,13 +28,13 @@ import { reconcileInterruptedProviderCredentialCutovers } from "./integrations/c
 import {
   loadCredentialVaultKeyRing,
   type VaultKeyVersion,
-} from "./credential-vault/keyring";
-import { sweepVaultAlertSignals } from "./credential-vault";
+} from "@purin-labs/authority/credential-vault/keyring";
+import { sweepVaultAlertSignals } from "@purin-labs/authority/credential-vault/index";
 import { reconcileOrganisationEmailWatches } from "./mail/watch-reconciliation";
 import {
   holdOrganisationPolicyDistribution,
   reconcileOrganisationPolicyPublication,
-} from "./policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 type StalledActivationRow = {
   readonly configurationVersion: unknown;
   readonly readinessVersion: unknown;

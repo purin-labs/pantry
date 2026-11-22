@@ -7,16 +7,16 @@ import {
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   modelProviderFetch,
   type ModelExitBinding,
 } from "../model-exit/provider-fetch";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
+import { parseVaultHandle, type VaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import {
   resolveVaultHandle,
   storeOrganisationPlacementVaultSecret,
-} from "../credential-vault/service";
+} from "@purin-labs/authority/credential-vault/service";
 import {
   claudeAuthorizationUrl,
   createClaudeAuthorization,
@@ -30,7 +30,7 @@ import type {
   ClaudeAuthorization,
   ClaudeAuthorizationState,
 } from "@purin-labs/control-api";
-import { prepareGuardedVaultSecretRevocation } from "../credential-vault/secret-revocation";
+import { prepareGuardedVaultSecretRevocation } from "@purin-labs/authority/credential-vault/secret-revocation";
 export type { ClaudeConnection, ClaudeAuthorization } from "@purin-labs/control-api";
 
 /**

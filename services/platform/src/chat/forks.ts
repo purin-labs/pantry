@@ -9,11 +9,11 @@ import {
 import { initialConversationCaseIdentity } from "./conversation-actor-identity";
 import { parseConversationId, isConversationId } from "@purin-labs/control-api";
 import type { ConversationId } from "@purin-labs/control-api";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   compileTurnAuthority,
   CONTEXT_CASE_READ_CAPABILITY,
-} from "../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { canonicalJson, sha256Hex, isRecord } from "@purin-labs/std";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
@@ -27,7 +27,10 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import { FlowBinding, ObservationEvidence } from "../policy/information-flow";
+import {
+  FlowBinding,
+  ObservationEvidence,
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import {
@@ -906,7 +909,7 @@ export async function authorizeForkHistoryAccess(
   return decisionDigests;
 }
 function isCaseReadCapability(
-  capability: import("../authorization/access-grants/compiler").EffectiveCapability,
+  capability: import("@purin-labs/authority/authorization/access-grants/compiler").EffectiveCapability,
 ): boolean {
   return (
     capability.definition.kind === "platform_capability" &&

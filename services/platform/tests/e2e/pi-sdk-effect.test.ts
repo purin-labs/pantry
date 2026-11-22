@@ -10,7 +10,7 @@ import {
   resolveActiveCaseActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import type { ActionLedgerEntry } from "../../src/actors/action-ledger";
+import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import { type IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";

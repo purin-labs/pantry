@@ -176,7 +176,7 @@ Platform's fallback then returns the text after the engine rule only, as the Mac
   Vocabulary). The route asks for the operator role and the voice capability, as the grant does,
   so a member gets no name that their pages do not show. The Portal compares a transcript with the
   names and shows them nowhere. They are Organisation records with no flow label, so no
-  [IFC](../services/platform/src/policy/information-flow/README.md) sink or label applies.
+  [IFC](../foundation/authority/policy/information-flow/README.md) sink or label applies.
 - The benches score with the shipped Portal code through `scripts/shop-voice/portal-voice.mjs`,
   which bundles `command.ts` with `@seams/control-api`, so a bench cannot drift again. For the Mac's
   engine rule, `confidence-bench.py` imports `shop_voice.engines`. The cloud engine rule keeps its

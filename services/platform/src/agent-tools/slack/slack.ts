@@ -1,9 +1,9 @@
 import {
   parseIntegrationAccountReference,
-} from "../../access-control/integration-discovery";
+} from "@purin-labs/authority/access-control/integration-discovery";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import type { IntegrationAccountReference } from "../../access-control/integration-discovery";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import type { IntegrationAccountReference } from "@purin-labs/authority/access-control/integration-discovery";
 import { defineToolFamily, jsonSchema } from "../define-tool";
 import { ToolRequestError } from "../errors";
 import type { PreparedEffect } from "../tool-effect";

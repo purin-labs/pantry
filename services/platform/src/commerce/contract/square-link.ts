@@ -10,7 +10,7 @@ import type {
 } from "@purin-labs/commerce-client";
 import { isRecord } from "@purin-labs/std";
 
-import type { VaultSecret } from "../../credential-vault/domain";
+import type { VaultSecret } from "@purin-labs/authority/credential-vault/domain";
 import { resolveOrganisationCommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";

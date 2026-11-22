@@ -7,7 +7,7 @@ join of all its labels. Pantry checks that label when an answer, a message or a 
 effect leaves the Session. A block asks a person, and it does not fail the work. Grants
 and capability rules decide what an agent reads. In the Portal, two rules decide what a
 member sees: one for a record with a label, and one for a connected source. The
-[integration guide](../../../services/platform/src/policy/information-flow/README.md)
+[integration guide](../../../foundation/authority/policy/information-flow/README.md)
 stays beside the code. It tells a developer how to add a source or an output.
 
 ## What it does
@@ -228,7 +228,7 @@ To any other member the request does not exist (`held_output_not_found`).
 
 ## Contracts
 
-The kernel is `services/platform/src/policy/information-flow/`, in the module
+The kernel is `foundation/authority/policy/information-flow/`, in the module
 `foundation/authority`. `policy/index.ts` only exports it again.
 
 | File | Holds |

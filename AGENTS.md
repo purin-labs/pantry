@@ -285,7 +285,7 @@ gives the agent a way to do it:
   approvals and receipts, and it reads only what the person can read
   ([Plan 81](docs/plan-81-agent-portal-control.md)).
 - If the tool needs a new capability, add it to
-  `services/platform/src/authorization/capability-catalogue.ts`. Apply
+  `foundation/authority/authorization/capability-catalogue.ts`. Apply
   `node scripts/capability-policy-backfill-sql.mjs` before the release.
 - Prove it with a chat journey: the agent does the action, and a person
   without the right stays refused.
@@ -487,7 +487,7 @@ shapes of one area are in the control API package of that area, for example
 
 Source-derived model and user-visible content must use the established live
 authorization and IFC boundaries, including titles, previews, errors and replay.
-Use the [IFC integration guide](services/platform/src/policy/information-flow/README.md)
+Use the [IFC integration guide](foundation/authority/policy/information-flow/README.md)
 when adding a source or output. Preserve contributing restrictions through moves,
 summaries, forks and restore. Update the guide when an entry-point contract changes;
 run `pnpm lint:ifc-boundaries` and an allowed/denied E2E journey for new sources.

@@ -6,8 +6,11 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { createEmbeddedHarnessModelRouteLease } from "../../src/actors/session/model-route";
 import { resolveClaudeAccessToken } from "../../src/models/claude-connection";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { resolveVaultHandle } from "../../src/credential-vault/service";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import {
   issueControlSession,
   type IssuedControlSession,

@@ -14,7 +14,7 @@ import {
   FlowLabel,
   ObservationEvidence,
   decideAutomaticContextAdmission,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import {
   digestContextBundle,
   materializeContextBundle,

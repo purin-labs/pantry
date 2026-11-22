@@ -4,20 +4,20 @@ import type { ActionMutationExecution } from "../action-mutation-execution";
 import {
   isCurrentAuthorityPartition,
   parseStoredAuthorityPartition,
-} from "../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   parseMerchantActionRejectionEvidence,
   parseMerchantActionDecision,
   type MerchantActionDecision,
-} from "../../approval-authentication";
-import { parseStoredRequestAuthority } from "../../request-authority";
+} from "@purin-labs/authority/approval-authentication";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   advanceInformationFlowContext,
   FlowBinding,
   flowBindingForContext,
   InformationFlowContext,
   ObservationEvidence,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import { caseParts } from "./parts";
 import type { Variant } from "@purin-labs/type-utils";
 import { checked } from "@purin-labs/contracts/connector-rpc";

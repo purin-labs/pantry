@@ -11,9 +11,9 @@ import {
   type ExternalVaultAdapter,
   type VaultHandle,
   type VaultSecret,
-} from "../src/credential-vault";
-import { resolveVaultHandle } from "../src/credential-vault/service";
-import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/index";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { d1Database } from "./sqlite-d1";

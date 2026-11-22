@@ -9,7 +9,7 @@ import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import {
   decideAutomaticContextAdmission,
   FlowLabel as StoredFlowLabel,
-} from "../../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { recordTransientTurnContext } from "../actor-journal/transactions";
 import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 import type {
@@ -44,9 +44,9 @@ import { readGmailInferenceEligibility } from "../../mail-inbox/contract/gmail-i
 import { runTransientTurn } from "../transient-turn";
 import { createWhatsAppHarnessToolHost } from "../whatsapp-harness-tools";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "../embedded-harness-adapter";
-import { authorityPartitionKeyMatchesRequest } from "../../authorization/access-grants/turn-authority";
-import { ObservationEvidence } from "../../policy";
-import { digestCanonical } from "../../policy";
+import { authorityPartitionKeyMatchesRequest } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { ObservationEvidence } from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { memoryModelContext } from "../session/model-context";
 import { createEmbeddedHarnessModelRouteLease } from "../session/model-route";
 import { type TransientSessionExecution } from "../session/support";

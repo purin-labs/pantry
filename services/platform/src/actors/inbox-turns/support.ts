@@ -8,7 +8,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { digestCanonical } from "../../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
 import type { TransientSessionExecution } from "../session/support";
 import type {

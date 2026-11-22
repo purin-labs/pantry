@@ -14,11 +14,11 @@ import {
   type VaultBackupEnvelope,
   type VaultHandle,
   type VaultSecret,
-} from "../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type {
   CredentialVaultBindings,
   VaultKeyVersion,
-} from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/keyring";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import { schemaDatabase } from "./split-topology";

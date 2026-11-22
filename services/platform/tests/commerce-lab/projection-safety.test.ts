@@ -7,7 +7,7 @@ import {
 } from "../../src/commerce-lab/scenarios";
 import type { CommerceLabRunEvidence } from "../../src/commerce-lab/lab-metadata";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../../src/commerce-lab/lab-metadata";
-import { createActionLedgerSchema } from "../../src/actors/action-ledger";
+import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
 import {
   applyCommerceDelivery as applyCommerceDeliveryWithAuthority,
   createCommerceProjectionSchema,

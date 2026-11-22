@@ -2,7 +2,7 @@ import type { HeldEffectAction } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
 import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
-import { digestCanonical } from "../policy/information-flow";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/index";
 
 /**
  * One tool effect as its handler is about to run it: the operation and the

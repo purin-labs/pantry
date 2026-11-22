@@ -242,6 +242,40 @@ importers:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929
 
+  foundation/authority:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../actor-runtime
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../connections
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   foundation/connections:
     dependencies:
       '@purin-labs/contracts':
@@ -862,6 +896,9 @@ importers:
       '@purin-labs/async-control':
         specifier: workspace:*
         version: link:../../packages/async-control
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
       '@purin-labs/bakery-model':
         specifier: workspace:*
         version: link:../../packages/bakery-model

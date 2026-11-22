@@ -201,7 +201,7 @@ The learning log needs no new read. The page derives it from the Memory
 histories and the Eval run lists that it already reads.
 
 Each new read follows the
-[IFC integration guide](../services/platform/src/policy/information-flow/README.md).
+[IFC integration guide](../foundation/authority/policy/information-flow/README.md).
 A count, a title, a preview and an empty state are source-derived content. A
 person who may not read sees the same state as a person with no records.
 

@@ -3,13 +3,13 @@ import type {
   SerializedFlowLabel,
   SerializedInformationFlowContext,
   SerializedObservationEvidence,
-} from "../src/policy";
+} from "@purin-labs/authority/policy/index";
 import {
   FlowBinding,
   FlowLabel,
   InformationFlowContext,
   ObservationEvidence,
-} from "../src/policy";
+} from "@purin-labs/authority/policy/index";
 
 // @ts-expect-error Flow labels require the validating async builder.
 new FlowLabel([], "0".repeat(64));
@@ -41,7 +41,7 @@ void serializedShapesRemainPrecise;
 import type { AuthorizedContextRead } from "../src/context/turn-context";
 import type { NativeChatAudience } from "../src/chat/information-flow";
 import type { DisclosureProof } from "../src/chat/disclosure-evidence";
-import type { ContextAdmissionSubject } from "../src/policy/information-flow/types";
+import type { ContextAdmissionSubject } from "@purin-labs/authority/policy/information-flow/types";
 import type {
   ChatDisclosureFailure,
   ProjectLayer,
@@ -113,19 +113,21 @@ function nativeIdentityEscapeHatches(
   projectId: import("@purin-labs/control-api").ProjectId,
   conversationId: import("@purin-labs/control-api").ConversationId,
 ): void {
-  const raw: import("../src/policy/information-flow").FlowAudience = {
-    kind: "project",
-    organisationId,
-    // @ts-expect-error Canonical project IDs cannot be replaced by arbitrary text.
-    projectId: "project_raw",
-  };
-  const swapped: import("../src/policy/information-flow").FlowAudience = {
-    kind: "project",
-    organisationId,
-    // @ts-expect-error Project and conversation identities belong to distinct domains.
-    projectId: conversationId,
-  };
-  const swappedConversation: import("../src/policy/information-flow").FlowAudience =
+  const raw: import("@purin-labs/authority/policy/information-flow/index").FlowAudience =
+    {
+      kind: "project",
+      organisationId,
+      // @ts-expect-error Canonical project IDs cannot be replaced by arbitrary text.
+      projectId: "project_raw",
+    };
+  const swapped: import("@purin-labs/authority/policy/information-flow/index").FlowAudience =
+    {
+      kind: "project",
+      organisationId,
+      // @ts-expect-error Project and conversation identities belong to distinct domains.
+      projectId: conversationId,
+    };
+  const swappedConversation: import("@purin-labs/authority/policy/information-flow/index").FlowAudience =
     {
       kind: "chat_conversation",
       organisationId,

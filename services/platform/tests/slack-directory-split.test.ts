@@ -6,7 +6,7 @@ import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
 } from "@purin-labs/connections/data/integration-account";
-import { parseVaultHandle } from "../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
@@ -14,7 +14,7 @@ import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
   revokeSlackOrganisationConnections,
-} from "../src/slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { schemaDatabase } from "./split-topology";
 
 const NOW = 1_791_470_000_000;

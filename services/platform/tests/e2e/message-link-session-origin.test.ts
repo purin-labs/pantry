@@ -20,13 +20,13 @@ import {
   readActiveOrganisationMembershipRevision,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { buildControlAuthority } from "../../src/request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { processDirectCaseCommand } from "../../src/actors/case-direct-processing";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { deriveUserMessageViews } from "../../src/messages/message-wasm";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,

@@ -1,5 +1,5 @@
-import { storeOrganisationPlacementVaultSecret } from "../credential-vault/service";
-import { WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE } from "../authorization/capability-catalogue";
+import { storeOrganisationPlacementVaultSecret } from "@purin-labs/authority/credential-vault/service";
+import { WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   attachIntegrationAccount,
   createConnectedIntegration,

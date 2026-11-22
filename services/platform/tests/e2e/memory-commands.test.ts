@@ -21,7 +21,7 @@ import {
   createCurrentSourceFlowLabel,
   FlowLabel,
   joinFlowLabels,
-} from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 
 const OPERATOR = { kind: "operator", personId: "person_e2e-slack-actor" };
 const AGENT = {

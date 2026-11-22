@@ -25,17 +25,17 @@ vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
   resolveControlSession: controlMocks.resolveControlSession,
   validateControlCsrf: controlMocks.validateControlCsrf,
 }));
-vi.mock("../src/access-control/grant-mutations", async (importOriginal) => ({
+vi.mock("@purin-labs/authority/access-control/grant-mutations", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/access-control/grant-mutations")
+    typeof import("@purin-labs/authority/access-control/grant-mutations")
   >()),
   createVersionedAccessGrant: grantMutationMocks.createVersionedAccessGrant,
 }));
 vi.mock(
-  "../src/access-control/decision-explanation",
+  "@purin-labs/authority/access-control/decision-explanation",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("../src/access-control/decision-explanation")
+      typeof import("@purin-labs/authority/access-control/decision-explanation")
     >()),
     resolveGrantSubjectReference: subjectMocks.resolveGrantSubjectReference,
   }),

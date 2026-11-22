@@ -3,7 +3,7 @@ import type { D1PreparedStatement } from "@cloudflare/workers-types";
 
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
-import { buildControlAuthority } from "../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { processDirectCaseCommand } from "../actors/case-direct-processing";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";

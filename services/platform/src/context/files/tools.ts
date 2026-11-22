@@ -10,12 +10,12 @@ import type {
   FileReadToolResult,
   FileSearchToolResult,
 } from "../../agent-tools/catalog/types";
-import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
+import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
 import type {
   AccessGrantTarget,
   ContextVisibility,
-} from "../../authorization/access-grants/types";
-import { readAccessGrant } from "../../data/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/types";
+import { readAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
@@ -29,7 +29,7 @@ import {
   joinFlowLabels,
   FlowLabel,
   ObservationEvidence,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import { createContextProjectionReader } from "../projection";
 import {
   FILE_SOURCE_MAX_BYTES,

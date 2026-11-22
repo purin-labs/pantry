@@ -379,7 +379,7 @@ Preserve accepted-history restrictions, terminate unauthorized subscriptions, an
 
 ## Context, RBAC, and IFC
 
-Reuse [the IFC integration guide](../services/platform/src/policy/information-flow/README.md) for every source and output.
+Reuse [the IFC integration guide](../foundation/authority/policy/information-flow/README.md) for every source and output.
 Role-based access control (RBAC) governs operations alongside existing grants and approvals.
 Permission-Aware Context (PAC) controls source admission.
 Observation-Aware Context (OAC) retains restrictions from admitted information.

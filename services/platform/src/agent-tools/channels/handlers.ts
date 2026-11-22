@@ -50,28 +50,28 @@ import type {
   HarnessWhatsAppSupportReplyReceipt,
   HarnessWhatsAppSupportReplySend,
 } from "./services";
-import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   parseCapabilityKey,
   type CapabilityDefinition,
-} from "../../authorization/access-grants/capability-key";
+} from "@purin-labs/authority/authorization/access-grants/capability-key";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   ObservationEvidence,
   type FlowLabel,
-} from "../../policy";
-import { digestCanonical } from "../../policy";
-import { listAccessGrants } from "../../data/access-grants";
-import { selectActiveGrants } from "../../authorization/access-grants/compiler";
+} from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import { listOrganisationMembers } from "@purin-labs/tenancy/data/control-plane";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
-} from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   projectEmailReplyProposal,
   readEmailReplyProposalProjection,

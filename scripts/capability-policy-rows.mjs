@@ -2,7 +2,7 @@
 // `pnpm backend` fail when an Organisation lacks the policy row of any
 // capability of the catalogue, because the Access read then answers
 // `access_control_read_unavailable`.
-import { CAPABILITY_CATALOGUE } from "../services/platform/src/authorization/capability-catalogue.ts";
+import { CAPABILITY_CATALOGUE } from "../foundation/authority/authorization/capability-catalogue.ts";
 
 export const POLICY_TABLE = "organisation_capability_policy";
 

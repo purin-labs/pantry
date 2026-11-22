@@ -35,7 +35,7 @@ import {
   type ProviderActionResolutionError,
   type VaultResolveError,
   type VaultSecret,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord, isString } from "@purin-labs/std";
 

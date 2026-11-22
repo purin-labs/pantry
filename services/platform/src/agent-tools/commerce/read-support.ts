@@ -21,15 +21,15 @@ import {
 import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
 import { createCommerceClient } from "../../commerce/contract/client";
 import { productSalesGrantProbe } from "../../commerce/entity-plane/product-sales-report";
-import { isRequestableEntityTypeRead } from "../../authorization/requestable-capabilities";
+import { isRequestableEntityTypeRead } from "@purin-labs/authority/authorization/requestable-capabilities";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {
   createCurrentObservedSourceFlowLabel,
   ObservationEvidence,
   type FlowLabel,
-} from "../../policy";
-import { digestCanonical } from "../../policy";
-import type { AccessGrant } from "../../authorization/access-grants/types";
+} from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import {
   listOrganisationMembers,
   roleMayOperate,
@@ -55,7 +55,7 @@ export type PreparedCommerceRead = Readonly<{
   merchantId: string;
   integrationAccountId: string;
   resourceScope: string;
-  grants: readonly import("../../authorization/access-grants/types").AccessGrant[];
+  grants: readonly import("@purin-labs/authority/authorization/access-grants/types").AccessGrant[];
   label: FlowLabel;
   reader: CommerceGraphReader;
   now: string;

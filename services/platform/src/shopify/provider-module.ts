@@ -1,7 +1,7 @@
 // The Shopify provider module (Refactor 17, step A2.5): its entry of the
 // provider catalogue and its check of a replacement credential. The Worker
 // registers it (`worker-ports.ts`).
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { PROVIDER_DATA_CLASSES } from "@purin-labs/connections/data/integration-provider-directory";
 import type { ProviderModule } from "../integrations/contract/provider-modules";
 import { observeShopifyConnection } from "./connection-observation";

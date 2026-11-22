@@ -67,12 +67,12 @@ import {
   type SessionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   inspectRetainedVaultRootClosure,
   type RetainedVaultRootClosureError,
-} from "../../credential-vault/root-closure";
+} from "@purin-labs/authority/credential-vault/root-closure";
 import { customConnectorFetchObjectName } from "../../custom-connectors/egress";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

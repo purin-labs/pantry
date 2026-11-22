@@ -8,7 +8,7 @@ import type {
   ToolTurnContext,
 } from "../../actors/session/tool-wiring";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
-import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   buildCustomConnectorWriteAuthority,
   compileCustomConnectorCatalog,

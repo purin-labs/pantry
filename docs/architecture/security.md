@@ -11,7 +11,7 @@ owners and the modules that enforce them. Module paths are relative to
 | Spec 6 — Seams Vault, Policy, and Revocation          | [Vault, policy and revocation](#vault-policy-and-revocation)                 |
 | Spec 8 — Identity, Approval, and Action Authorization | [Identity, approval and authorization](#identity-approval-and-authorization) |
 
-The [IFC integration guide](../../services/platform/src/policy/information-flow/README.md)
+The [IFC integration guide](../../foundation/authority/policy/information-flow/README.md)
 owns information-flow labels, flow bindings and destination checks. The
 [Vault runbook](../runbooks/vault-operations.md) owns key provisioning and
 operator procedures. This document does not repeat them.

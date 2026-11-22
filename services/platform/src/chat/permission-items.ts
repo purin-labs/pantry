@@ -2,8 +2,8 @@ import type {
   ChatPermissionItem,
   ChatPermissionRequest,
 } from "@purin-labs/control-api";
-import { readAgentPermissionRequest } from "../data/agent-permission-request";
-import { readOrganisationCapabilityPolicies } from "../data/capability-policy";
+import { readAgentPermissionRequest } from "@purin-labs/authority/data/agent-permission-request";
+import { readOrganisationCapabilityPolicies } from "@purin-labs/authority/data/capability-policy";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ConversationScope } from "./store";
 

@@ -4,7 +4,7 @@ import type {
   CommerceSensitivity,
 } from "@purin-labs/commerce-contracts";
 
-import type { AccessGrant } from "../../authorization/access-grants/types";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import {
   readNamedCommerceQuery,
   type CommerceContextAssemblyError,

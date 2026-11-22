@@ -33,16 +33,16 @@ import type {
 import {
   encodeContextVisibility,
   parseContextVisibility as parseStoredContextVisibility,
-} from "../../authorization/access-grants/visibility";
-import { parseStoredRequestAuthority } from "../../request-authority";
+} from "@purin-labs/authority/authorization/access-grants/visibility";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   createCurrentSourceFlowLabel,
   FlowBinding,
   flowBindingMatchesTurn,
   FlowLabel,
-} from "../../policy";
-import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
+} from "@purin-labs/authority/policy/index";
+import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";
 import {
   assertNever,
   isNonBlankString,

@@ -33,7 +33,7 @@ import { resolveStripeWriteCredential } from "./action-execution";
 import {
   parseVaultHandle,
   storeVaultSecret,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,

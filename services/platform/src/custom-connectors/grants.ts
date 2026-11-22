@@ -3,14 +3,14 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   EffectiveCapability,
   EffectiveGrantSet,
-} from "../authorization/access-grants";
-import { encodeCapabilityKey } from "../authorization/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/index";
+import { encodeCapabilityKey } from "@purin-labs/authority/authorization/access-grants/index";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   CustomConnectorAuthentication,

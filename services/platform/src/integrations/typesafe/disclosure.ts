@@ -2,13 +2,13 @@ import {
   FlowLabel,
   emptyFlowLabel,
   joinFlowLabels,
-} from "../../policy/information-flow/labels";
-import { digestCanonical } from "../../policy/information-flow/digest";
-import { evaluateFlowLabelSink } from "../../policy/information-flow/sinks";
+} from "@purin-labs/authority/policy/information-flow/labels";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
+import { evaluateFlowLabelSink } from "@purin-labs/authority/policy/information-flow/sinks";
 import type {
   FlowLabelDecision,
   TypeSafeInferenceSink,
-} from "../../policy/information-flow/types";
+} from "@purin-labs/authority/policy/information-flow/types";
 import type { Result } from "@purin-labs/kernel/result";
 import type { TypeSafeCredential } from "./credential";
 import { sameTypeSafeAuthority } from "./authority";

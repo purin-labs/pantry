@@ -7,7 +7,7 @@ import {
   CommerceContextToolResult,
   commerceContextOutputSchema,
 } from "../../actors/commerce-context-tool-result";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { parseCommerceGraphQuery } from "../../commerce/entity-plane/routes";
 import { COMMERCE_SENSITIVITIES } from "../../commerce/contract/sensitivity";
 import { jsonSchema } from "../define-tool";

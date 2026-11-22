@@ -4,7 +4,7 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { listAccessGrants } from "../../src/data/access-grants";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { network } from "./network";
 import {

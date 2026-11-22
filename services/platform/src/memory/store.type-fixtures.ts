@@ -1,6 +1,6 @@
 import type { MemoryRevisionView } from "@purin-labs/control-api";
 
-import type { FlowLabel } from "../policy/information-flow";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import type { MemoryRevision, MemoryStoreCommand } from "./store";
 
 declare const view: MemoryRevisionView;

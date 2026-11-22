@@ -3,9 +3,9 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { describe, expect, it } from "vitest";
 
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
-import { readAccessControlView } from "../src/access-control/read-model";
-import { READ_AND_PROPOSE_ORGANISATION_GRANT_IDS } from "../src/data/capability-policy";
-import { parseVaultHandle } from "../src/credential-vault";
+import { readAccessControlView } from "@purin-labs/authority/access-control/read-model";
+import { READ_AND_PROPOSE_ORGANISATION_GRANT_IDS } from "@purin-labs/authority/data/capability-policy";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import {
   newSlackInstallationId,
   parseSlackAppId,
@@ -13,7 +13,7 @@ import {
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { admitSlackInstallOrganisation } from "../src/slack/install-organisation";
 import type { SlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { createSlackInstallation } from "../src/slack/installation-store";
+import { createSlackInstallation } from "@purin-labs/authority/slack/installation-store";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationId, requireWorkspaceId } from "./test-ids";
 import "./provide-organisation-lifecycle-parts";

@@ -18,7 +18,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import { establishConnectorEmailWatch } from "../actors/connector-email-evaluation";
 import { readEmailMailboxAccount } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";
 import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import {

@@ -52,7 +52,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   parseVaultHandle,
   storeVaultSecret,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { assertNever } from "@purin-labs/std";
 import { createActiveAdminIntegration } from "../integrations/contract/admin-integration";
 import {

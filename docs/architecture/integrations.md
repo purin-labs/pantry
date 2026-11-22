@@ -15,7 +15,7 @@ code as built. Commerce behavior belongs to Commerce; see
 
 Related: [Security architecture](./security.md) (egress, Vault, action
 ledger, approval), [Onboarding architecture](./onboarding.md), the
-[IFC integration guide](../../services/platform/src/policy/information-flow/README.md),
+[IFC integration guide](../../foundation/authority/policy/information-flow/README.md),
 and provider setup for [Shopify](../integrations/shopify.md),
 [Google OAuth](../integrations/google-oauth.md),
 [OAuth configuration](../deployment/organisation-integration-oauth-configuration.md),
@@ -175,7 +175,7 @@ commerce source of truth.
 ### Catalog and admission
 
 `CAPABILITY_KEYS` in
-[`capability-catalogue.ts`](../../services/platform/src/authorization/capability-catalogue.ts)
+[`capability-catalogue.ts`](../../foundation/authority/authorization/capability-catalogue.ts)
 is the closed list of capability identities, such as `message.link.read`,
 `integration.discovery.read`, `commerce.order.cancel` and
 `custom_connector.read`. Each built-in provider declares the capability IDs
@@ -224,7 +224,7 @@ action binds that system and its revision.
 A provider mutation starts as a typed proposal, such as
 `commerce_propose_action`. `OrganisationActor` records the normalized
 parameters in the ledger
-([`action-ledger.ts`](../../services/platform/src/actors/action-ledger.ts));
+([`action-ledger.ts`](../../foundation/authority/actors/action-ledger.ts));
 see [Action ledger](./security.md#action-ledger) and
 [Approval](./security.md#approval). `ActionAuthority` is `commerce_system`,
 `integration_account` or `custom_connector`.

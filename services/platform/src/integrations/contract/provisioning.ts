@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { storeOrganisationPlacementVaultSecret } from "../../credential-vault/service";
+import { storeOrganisationPlacementVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   completeProviderProvisioning,
@@ -34,7 +34,7 @@ import {
   parseVaultHandle,
   type VaultHandle,
   type VaultOAuthTokens,
-} from "../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   CompleteProviderInput,

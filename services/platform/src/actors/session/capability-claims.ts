@@ -15,12 +15,12 @@ import type { HarnessCapabilityClaimInput } from "../../agent-tools/catalog/type
 import {
   authorizeCapabilityUse,
   type CapabilityAuthorizationError,
-} from "../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   parseCapabilityKey,
   type CapabilityDefinition,
-} from "../../authorization/access-grants/capability-key";
-import { parseStoredRequestAuthority } from "../../request-authority";
+} from "@purin-labs/authority/authorization/access-grants/capability-key";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Variant } from "@purin-labs/type-utils";
 import type { CanonicalRunBudgetIdentity } from "./types";
 

@@ -18,20 +18,23 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   issueControlSession,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 
 const TOKEN = "airtable-session-origin-fixture-token";
 const BASE_ID = "appP55OriginAcceptance";

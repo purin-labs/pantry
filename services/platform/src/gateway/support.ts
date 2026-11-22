@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { prepareSlackInstallationLifecycleEvent } from "../data/slack-installation-records";
+import { prepareSlackInstallationLifecycleEvent } from "@purin-labs/authority/data/slack-installation-records";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Track } from "@purin-labs/contracts";
@@ -60,7 +60,7 @@ import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connecti
 import {
   disconnectSlackInstallation,
   resolveSlackInstallation,
-} from "../slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import {
   normalizeShopifyCommerceOrderDelivery,
   normalizeShopifyCommerceResourceDelivery,

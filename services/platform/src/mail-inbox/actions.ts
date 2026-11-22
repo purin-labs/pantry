@@ -21,7 +21,7 @@ import {
 } from "../actors/connector-email-evaluation";
 import type { GmailMessageMetadata } from "@purin-labs/connections/mail/gmail-adapter";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { mailClassificationEvidence } from "./evidence";
 import {
   listMailClassifications,

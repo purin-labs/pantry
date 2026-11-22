@@ -36,9 +36,9 @@ import {
   type WhatsAppCustomerId,
   type WhatsAppPhoneNumberId,
 } from "@purin-labs/connections/whatsapp/identifiers";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import { prepareSupportBindingContextGrant } from "./access-grants";
-import { parseVaultHandle, revokeCredential } from "../credential-vault";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { prepareSupportBindingContextGrant } from "@purin-labs/authority/data/access-grants";
+import { parseVaultHandle, revokeCredential } from "@purin-labs/authority/credential-vault/index";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   exhaustiveList,

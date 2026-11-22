@@ -6,12 +6,12 @@ import { parseSystemEntityRef } from "@purin-labs/commerce-client";
 import type {
   CommerceGrantSelection,
   CommerceGrantSelectionError,
-} from "../../authorization/access-grants/commerce-grant-selection";
-import type { AccessGrant } from "../../authorization/access-grants/types";
+} from "@purin-labs/authority/authorization/access-grants/commerce-grant-selection";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import {
   requestableReadScope,
   type RequestableEntityTypeRead,
-} from "../../authorization/requestable-capabilities";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceContextAssemblyError } from "../contract/read-errors";
 import { selectNamedCommerceQuerySourceGrant } from "./context-read";

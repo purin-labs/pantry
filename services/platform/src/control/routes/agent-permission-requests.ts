@@ -10,19 +10,19 @@ import {
   type AgentPermissionRequestItem,
   type AgentPermissionRequestView,
 } from "@purin-labs/control-api";
-import { opaqueSubjectReference } from "../../access-control/references";
+import { opaqueSubjectReference } from "@purin-labs/authority/access-control/references";
 import {
   entityTypeReadAudiences,
   isOrganisationReadRole,
   missingEntityTypeReads,
   type EntityTypeReadAudience,
   type MissingEntityTypeRead,
-} from "../../authorization/access-grants/entity-type-reads";
-import { currentGrantedCapabilityIds } from "../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/entity-type-reads";
+import { currentGrantedCapabilityIds } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
-} from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   ENTITY_TYPE_READ_CAPABILITY,
   entityTypeReadDescription,
@@ -30,19 +30,19 @@ import {
   requestableReadScope,
   type RequestableCapability,
   type RequestableEntityTypeRead,
-} from "../../authorization/requestable-capabilities";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
 import {
   AGENT_PERMISSION_REQUEST_LIFETIME_MS,
   decideAgentPermissionRequest,
   listPendingAgentPermissionRequests,
   readAgentPermissionRequest,
   type AgentPermissionRequest,
-} from "../../data/agent-permission-request";
-import { readOrganisationCapabilityPolicies } from "../../data/capability-policy";
+} from "@purin-labs/authority/data/agent-permission-request";
+import { readOrganisationCapabilityPolicies } from "@purin-labs/authority/data/capability-policy";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { slackSurfaceParts } from "../../slack/surface-parts";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

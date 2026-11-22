@@ -1,5 +1,5 @@
-import type { OrganisationActivatePolicyInput } from "../src/actors/organisation/policy-types";
-import type { OrganisationPolicyPlacement } from "../src/policy-snapshot";
+import type { OrganisationActivatePolicyInput } from "@purin-labs/authority/actors/organisation/policy-types";
+import type { OrganisationPolicyPlacement } from "@purin-labs/authority/policy-snapshot";
 
 declare const input: OrganisationActivatePolicyInput;
 

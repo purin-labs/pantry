@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   encodeCapabilityKey,
   parseCapabilityKey,
-} from "../src/authorization/access-grants";
-import { parseAccessGrantTarget } from "../src/data/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/index";
+import { parseAccessGrantTarget } from "@purin-labs/authority/data/access-grants";
 
 const target = {
   kind: "custom_connector_operation" as const,

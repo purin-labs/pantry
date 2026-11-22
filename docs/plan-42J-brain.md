@@ -379,7 +379,7 @@ chain of thought remains excluded.
 
 ## Authorization, lifecycle, and persistence
 
-Apply the [IFC integration guide](../services/platform/src/policy/information-flow/README.md)
+Apply the [IFC integration guide](../foundation/authority/policy/information-flow/README.md)
 to every new source and output. Information Flow Control preserves restrictions
 from observed sources through derived records and delivery.
 

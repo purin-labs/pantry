@@ -11,8 +11,8 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { digestCanonical } from "../policy/information-flow/digest";
-import type { FlowRecipient } from "../policy/information-flow/types";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
+import type { FlowRecipient } from "@purin-labs/authority/policy/information-flow/types";
 import type { Variant } from "@purin-labs/type-utils";
 
 type VerifiedSupplierEndpoint = Omit<

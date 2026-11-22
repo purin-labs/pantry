@@ -2,7 +2,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "@purin-labs/kernel/database-handles";
-import { parseVaultHandle, type VaultHandle } from "../../credential-vault";
+import {
+  parseVaultHandle,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/index";
 import {
   parseIntegrationAccountId,
   parseProviderConnectionId,
@@ -38,7 +41,7 @@ import {
 } from "@purin-labs/connections/data/provider-credential-generation";
 import { prepareDefaultAccountReplacement } from "@purin-labs/connections/data/integration-account-writes";
 import { prepareConnectionCredentialRotation } from "@purin-labs/connections/data/provider-connection-writes";
-import { prepareCredentialRefRotation } from "../../credential-vault/secret-revocation";
+import { prepareCredentialRefRotation } from "@purin-labs/authority/credential-vault/secret-revocation";
 
 const CREDENTIAL_ROTATION_FAILURE_CODES = [
   "replacement_environment_mismatch",

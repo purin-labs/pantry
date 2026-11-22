@@ -4,7 +4,7 @@ import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
 import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
 import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
@@ -29,7 +29,7 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { network } from "./network";
 import {

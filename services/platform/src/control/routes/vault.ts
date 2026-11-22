@@ -15,7 +15,7 @@ import {
   moveVaultItems,
   readVaultStoreSummary,
   type VaultItemStoreError,
-} from "../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

@@ -6,10 +6,10 @@ import {
   decideFlowSink,
   type CaseConversationSinkRefusal,
   type FlowBinding,
-} from "../policy";
-import type { FlowDecision } from "../policy";
+} from "@purin-labs/authority/policy/index";
+import type { FlowDecision } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
-import { slackSurfaceParts } from "../slack/surface-parts";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 
 export type AllowFlowDecision = Variant<FlowDecision, "allow">;
 

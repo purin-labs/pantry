@@ -24,8 +24,8 @@ import type { HarnessIntegrationListRequest } from "./services";
 import {
   readIntegrationDiscovery,
   type IntegrationDiscoveryObservation,
-} from "../../access-control/integration-discovery";
-import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/access-control/integration-discovery";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   authorizeCustomConnectorRead,
   customConnectorResourceScope,
@@ -33,7 +33,7 @@ import {
   type CustomConnectorReadCatalogEntry,
 } from "../../custom-connectors";
 import { customConnectorFetchOf } from "../../custom-connectors/egress";
-import type { CapabilityDefinition } from "../../authorization/access-grants/capability-key";
+import type { CapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   admitSessionInformationFlowObservation,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
@@ -42,12 +42,12 @@ import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   ObservationEvidence,
-} from "../../policy";
-import { digestCanonical } from "../../policy";
-import { listAccessGrants } from "../../data/access-grants";
-import { selectActiveGrants } from "../../authorization/access-grants/compiler";
-import type { EffectiveGrantSet } from "../../authorization/access-grants";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
+import type { EffectiveGrantSet } from "@purin-labs/authority/authorization/access-grants/index";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   type EmailMailboxReadScope,

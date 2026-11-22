@@ -19,7 +19,7 @@ import {
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { authorityPartitionKey } from "../../src/authorization/access-grants/turn-authority";
+import { authorityPartitionKey } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { fixtureFlowBinding } from "../fixtures/plan25-turn";
 import {
   controlActionMutationExecution,

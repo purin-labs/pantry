@@ -3,7 +3,7 @@ import {
   permissionLabels,
   type RequestableCapability,
   type RequestableEntityTypeRead,
-} from "../authorization/requestable-capabilities";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
 import type { Env } from "@purin-labs/kernel/env";
 import { decisionCardBlocks } from "./decision-card";
 

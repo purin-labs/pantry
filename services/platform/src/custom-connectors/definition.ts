@@ -3,7 +3,7 @@ import type { JsonRecord } from "../control/http";
 import {
   digestCanonical,
   serializeCanonical,
-} from "../policy/information-flow/digest";
+} from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   parseCustomConnectorDefinitionDigest,

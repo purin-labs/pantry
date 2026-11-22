@@ -41,7 +41,7 @@ import {
 } from "../commerce/contract/offer-price-allowance";
 import type { PublishedResourceBoundaryError } from "../commerce/contract/types";
 import type { Result } from "@purin-labs/kernel/result";
-import { digestCanonical } from "../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import {
   parseAgentOperationInput,
   readAgentOperations,

@@ -81,11 +81,11 @@ import {
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
-} from "../src/actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseCaseId,
@@ -107,7 +107,7 @@ import {
   InformationFlowContext,
   type FlowAudience,
   type SerializedFlowBinding,
-} from "../src/policy";
+} from "@purin-labs/authority/policy/index";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 
 const NOW = Date.parse("2026-08-04T00:00:00.000Z");

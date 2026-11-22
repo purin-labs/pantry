@@ -5,7 +5,7 @@ import {
   ARCHIVE_CLEANUP_PLACEMENT_STATUSES,
   type LifecycleFence,
 } from "@purin-labs/tenancy/data/organisation-lifecycle-moves";
-import { releaseSlackInstallationCredentials } from "../credential-vault/slack-installation-credential";
+import { releaseSlackInstallationCredentials } from "@purin-labs/authority/credential-vault/slack-installation-credential";
 import type {
   GlobalDatabase,
   OrganisationDatabase,
@@ -65,7 +65,7 @@ import { prepareArchivedOrganisationGenerationsRevocation } from "@purin-labs/co
 import {
   prepareArchivedOrganisationCredentialRefsRevocation,
   prepareArchivedOrganisationSecretsRevocation,
-} from "../credential-vault/secret-revocation";
+} from "@purin-labs/authority/credential-vault/secret-revocation";
 import {
   prepareProjectionRevisionBump,
   prepareRepairConfigurationBump,

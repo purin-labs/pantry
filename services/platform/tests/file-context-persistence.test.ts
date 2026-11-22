@@ -26,7 +26,7 @@ import {
   scheduleFileReconciliationHint,
   settleFileGrantReady,
 } from "../src/context/files";
-import { revokeVersionedAccessGrant } from "../src/access-control/grant-mutations";
+import { revokeVersionedAccessGrant } from "@purin-labs/authority/access-control/grant-mutations";
 import { d1Database } from "./sqlite-d1";
 import {
   requireUserId,

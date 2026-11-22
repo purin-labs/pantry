@@ -1,13 +1,13 @@
 import type { Result } from "@purin-labs/kernel/result";
-import { CONTEXT_CASE_READ_SCOPE } from "../../authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_SCOPE } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   SLACK_MESSAGE_RESOURCE_SCOPE,
   WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
-} from "../../authorization/capability-catalogue";
-import { parseCapabilityKey } from "../../authorization/access-grants/capability-key";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { parseCapabilityKey } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   type CatalogToolAuthority,
   executeCatalogTool,

@@ -28,7 +28,7 @@ import {
   authorizeCapabilityUse,
   compileTurnAuthority,
   CONTEXT_CASE_READ_CAPABILITY,
-} from "../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { readChatControlAuthority } from "../chat/information-flow";
 import type {
   TurnMemoryCandidate,
@@ -45,7 +45,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   canonicalFlowLabel,
   createCurrentSourceFlowLabel,
@@ -53,7 +53,7 @@ import {
   FlowBinding,
   FlowLabel,
   joinFlowLabels,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { memberMaySee } from "../chat/member-view";
 import {

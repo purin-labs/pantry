@@ -4,7 +4,7 @@ import type {
   VaultHandle,
   VaultSecret,
   VaultOAuthTokens,
-} from "../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   IntegrationAccountId,
@@ -22,7 +22,7 @@ import type {
   ProviderOnboardingError,
 } from "./provider-lifecycle";
 import type { Result } from "@purin-labs/kernel/result";
-import type { ActiveCapabilityId } from "../../authorization/capability-catalogue";
+import type { ActiveCapabilityId } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { IntegrationDiscoveryDataClass } from "@purin-labs/contracts";
 import type { GmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";
 import type { Variant } from "@purin-labs/type-utils";

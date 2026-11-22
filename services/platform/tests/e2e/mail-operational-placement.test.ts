@@ -23,7 +23,10 @@ import {
 } from "../../src/actors/connector-email-operational";
 import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { reconcileActorRelocationMailReceipt } from "../../src/actors/actor-relocation-mail";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   registerEmailSenderAccount,
@@ -40,7 +43,7 @@ import { GMAIL_SEND_ONLY_SCOPES } from "@purin-labs/connections/mail/gmail-autho
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
-} from "../../src/authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   parseConnectorId,
   type ConnectorId,
@@ -60,7 +63,7 @@ import {
   issueControlSession,
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
-import { buildControlAuthority } from "../../src/request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { SessionTurnExecution } from "../../src/chat/turn-access";
 import { selfTestCount } from "./gmail-mailbox-support";
 import {

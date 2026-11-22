@@ -17,9 +17,9 @@ import {
   resolveActiveCaseActorAtPlacement,
   requireActiveOrganisationActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { ActionLedgerEntry } from "../../../actors/action-ledger";
+import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import type { CaseSnapshot } from "../../../actors/case/types";
-import { authorizeCapabilityUse } from "../../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { authorizeCommerceEntityPlaneCommand } from "../../../commerce/entity-plane/execution";
 import { readCommerceActivity } from "../../../commerce/entity-plane/activity";
 import {
@@ -31,7 +31,7 @@ import {
   type CommerceListEntryPatchError,
 } from "../../../commerce/entity-plane/list-entry-mutations";
 import { proposalFromCommand } from "../../../commerce/entity-plane/proposals";
-import { CAPABILITY_KEYS } from "../../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   commerceActivityErrorStatus,
   commerceGraphErrorStatus,
@@ -75,7 +75,7 @@ import {
   compilePublishAndActivateOrganisationPolicy,
   loadOrganisationPolicyOrDefaultDeny,
   readCurrentOrganisationPolicySnapshot,
-} from "../../../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   advanceInformationFlowContext,
   createCurrentSourceFlowLabel,
@@ -84,8 +84,8 @@ import {
   InformationFlowContext,
   ObservationEvidence,
   type SerializedFlowBinding,
-} from "../../../policy";
-import { buildControlAuthority } from "../../../request-authority";
+} from "@purin-labs/authority/policy/index";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveOrganisationModelRoute } from "../../../models/route";
 import {
   admitUserMutation,

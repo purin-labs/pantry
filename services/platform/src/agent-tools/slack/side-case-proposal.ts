@@ -13,11 +13,11 @@ import {
   type SessionExecutionAdmission,
 } from "../../actors/session-execution-admission";
 import { sideCaseProposalId } from "../../chat/side-cases";
-import { parsePersonId } from "../../data/person-authz";
+import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { validateLiveRequestAuthority } from "../../request-authority";
+import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { storeSlackSideCaseProposal } from "../../slack/side-cases";
 import type {
   HarnessSideCaseProposalRequest,

@@ -21,21 +21,21 @@ import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   type ActiveCapabilityId,
-} from "../../src/authorization/capability-catalogue";
-import { storeVaultSecret } from "../../src/credential-vault";
-import { parseVaultHandle } from "../../src/credential-vault/domain";
-import { createAccessGrant } from "../../src/data/access-grants";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
-} from "../../src/data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

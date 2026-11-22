@@ -5,7 +5,7 @@
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import type { CaseActor } from "../actors/case/case-actor";
 import type { CaseOutput } from "../actors/case/types";
-import { sinkRefusalAsksPerson } from "../policy";
+import { sinkRefusalAsksPerson } from "@purin-labs/authority/policy/index";
 import { holdCaseOutput } from "../actors/case-output-hold";
 import { authorizeCaseConversationOutput } from "../actors/case-walking-path";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -14,7 +14,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../models/route";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { loadOrganisationPolicyOrDefaultDeny } from "../policy-snapshot";
+import { loadOrganisationPolicyOrDefaultDeny } from "@purin-labs/authority/policy-snapshot";
 import type { RequestAuthority } from "@purin-labs/contracts";
 
 type CommerceCaseOutputDelivery =

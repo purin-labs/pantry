@@ -8,16 +8,16 @@ import { join } from "node:path";
 import { backup, DatabaseSync } from "node:sqlite";
 import { describe, expect, it, vi } from "vitest";
 
-import { encryptVaultPayload } from "../src/credential-vault/crypto";
-import { type VaultHandle } from "../src/credential-vault/domain";
+import { encryptVaultPayload } from "@purin-labs/authority/credential-vault/crypto";
+import { type VaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import {
   loadCredentialVaultKeyRing,
   vaultRootForVersion,
   type CredentialVaultBindings,
   type VaultKeyVersion,
-} from "../src/credential-vault/keyring";
-import { inspectRetainedVaultRootClosure } from "../src/credential-vault/root-closure";
-import { resolveVaultHandle } from "../src/credential-vault/service";
+} from "@purin-labs/authority/credential-vault/keyring";
+import { inspectRetainedVaultRootClosure } from "@purin-labs/authority/credential-vault/root-closure";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import gateway from "../src/integration-gateway";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";

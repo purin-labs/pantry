@@ -52,7 +52,7 @@ import {
   activationModelRouteError,
   resolveOrganisationModelRoute,
 } from "../../models/route";
-import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
+import { holdOrganisationPolicyDistribution } from "@purin-labs/authority/policy-snapshot";
 import { providerServices } from "../../integrations/contract/provider-services";
 import {
   admitUserMutation,

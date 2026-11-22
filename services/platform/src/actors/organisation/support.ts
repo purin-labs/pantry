@@ -22,7 +22,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   expireDueActionExecutions,
   readNextActionExecutionLeaseDeadline,
-} from "../action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   readActivationExportSource,

@@ -3,11 +3,11 @@ import {
   listHeldAgentPermissionDecisions,
   markAgentPermissionRequestReleased,
   type AgentPermissionRequest,
-} from "../data/agent-permission-request";
+} from "@purin-labs/authority/data/agent-permission-request";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { refreshSlackRequestAuthority } from "../request-authority";
+import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { permissionDecisionNoticeText } from "./permission-request-notice";
 
 /**

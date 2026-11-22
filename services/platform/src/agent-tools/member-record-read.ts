@@ -6,7 +6,7 @@ import {
   decideContextAdmission,
   digestCanonical,
   ObservationEvidence,
-} from "../policy";
+} from "@purin-labs/authority/policy/index";
 import type { SessionToolContext } from "./context";
 import { liveDeviceMember } from "./session-support";
 

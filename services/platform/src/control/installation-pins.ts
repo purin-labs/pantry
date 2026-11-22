@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { digestCanonical } from "../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 
 export async function readInstallationPins(
   scope: OrganisationExecutionScope,

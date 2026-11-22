@@ -2,10 +2,10 @@ import type {
   AuthorizedProviderAction,
   ProviderActionResolution,
   VaultHandle,
-} from "../src/credential-vault";
-import type { ActionLedgerEntry } from "../src/actors/action-ledger";
+} from "@purin-labs/authority/credential-vault/index";
+import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 // @ts-expect-error Generic plaintext resolution is private to the Vault module.
-import { resolveVaultHandle } from "../src/credential-vault";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 declare const authorizedAction: AuthorizedProviderAction;
@@ -65,7 +65,7 @@ void resolveVaultHandle;
 
 declare const mutationExecution: import("../src/actors/action-mutation-execution").ActionMutationExecution;
 declare const actionOrganisation: import("../src/actors/organisation").OrganisationDO;
-declare const actionProposal: import("../src/actors/action-ledger").ProposeActionInput;
+declare const actionProposal: import("@purin-labs/authority/actors/action-ledger").ProposeActionInput;
 // @ts-expect-error An Organisation proposal RPC requires captured execution authority.
 void actionOrganisation.proposeAction(actionProposal);
 const { fenceToken: actionFence, ...unfencedExecution } = mutationExecution;

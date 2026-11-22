@@ -13,8 +13,8 @@ import {
   type VaultHandle,
   type VaultSecret,
   type VaultOAuthTokens,
-} from "../credential-vault/domain";
-import { resolveAccountRemovalCredential } from "../credential-vault/account-removal-resolution";
+} from "@purin-labs/authority/credential-vault/domain";
+import { resolveAccountRemovalCredential } from "@purin-labs/authority/credential-vault/account-removal-resolution";
 import type {
   IntegrationAccountId,
   OrganisationId,
@@ -24,7 +24,7 @@ import {
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   manualInstructionForProvider,
   parseProviderCleanup,
@@ -43,7 +43,7 @@ import { backoffDelay, isString } from "@purin-labs/std";
 import {
   prepareCredentialRefRevocation,
   prepareVaultSecretRevocation,
-} from "../credential-vault/secret-revocation";
+} from "@purin-labs/authority/credential-vault/secret-revocation";
 import { prepareCleanedConnectionGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
 import { prepareCleanedConnectionRevocation } from "@purin-labs/connections/data/provider-connection-writes";
 

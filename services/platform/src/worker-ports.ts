@@ -17,15 +17,15 @@ import {
   setWhatsAppProviderHealth,
 } from "./data/whatsapp";
 import { proposeEvalFromCorrection } from "./evals/access";
-import { commerceAccessTargets } from "./access-control/commerce-access-targets";
-import { actionLedgerCommerce } from "./actors/action-ledger";
+import { commerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
+import { actionLedgerCommerce } from "@purin-labs/authority/actors/action-ledger";
 import { slackMayApproveAction } from "./commerce/action-model";
 import { parseCommerceEntityPlaneEffect } from "./commerce/entity-plane/proposals";
-import { commerceGrantSelection } from "./authorization/access-grants/commerce-grant-selection";
+import { commerceGrantSelection } from "@purin-labs/authority/authorization/access-grants/commerce-grant-selection";
 import { COMMERCE_ACCESS_TARGETS } from "./commerce/entity-plane/access-targets";
 import { RESPONSIBILITY_SCOPE_COMMERCE } from "./commerce/entity-plane/responsibility-scopes";
 import { responsibilityScopeCommerce } from "./data/agent-operations/scope-commerce";
-import { commerceGrantTargets } from "./authorization/access-grants/commerce-grant-targets";
+import { commerceGrantTargets } from "@purin-labs/authority/authorization/access-grants/commerce-grant-targets";
 import { COMMERCE_GRANT_TARGETS } from "./commerce/entity-plane/grant-targets";
 import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
 import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
@@ -81,10 +81,10 @@ import {
   heldOutputNoticeText,
 } from "./slack/held-output-notice";
 import { releaseHeldOutputDecision } from "./slack/held-output-release";
-import { slackDmSelection } from "./slack/installation-store";
+import { slackDmSelection } from "@purin-labs/authority/slack/installation-store";
 import { permissionRequestNoticeText } from "./slack/permission-request-notice";
 import { releaseAgentPermissionDecision } from "./slack/permission-request-release";
-import { slackSurfaceParts } from "./slack/surface-parts";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import { shopMacDevices } from "./devices/contract/shop-mac-devices";
 import { readShopMacDevices } from "./voice/mac-devices";
 import { commerceApprovalCardTexts } from "./commerce/contract/approval-card-texts";
@@ -116,13 +116,13 @@ import { applyApprovedWorkflowChange } from "./commerce/bakery/workflow-proposal
 import { deviceCommands } from "./devices/contract/device-commands";
 import { runDeviceCommand } from "./devices/commands";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
-import { prepareCredentialRefReplacement } from "./credential-vault/service";
+import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
 import { prepareCommunicationDestinationAccount } from "./data/onboarding";
 import {
   prepareProviderAttemptSupportReference,
   prepareResolveOpenSupportReferences,
 } from "./organisation/contract/provider-support-references";
-import { fileGrantParts } from "./authorization/access-grants/file-grant-parts";
+import { fileGrantParts } from "@purin-labs/authority/authorization/access-grants/file-grant-parts";
 import {
   prepareChangedFileGrantSync,
   prepareNewFileGrantSync,

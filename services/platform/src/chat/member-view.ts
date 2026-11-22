@@ -6,13 +6,13 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { AuthorizedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { FlowLabel } from "../policy/information-flow";
-import { slackChannelIsPublic } from "../policy/information-flow/source-labels";
-import { slackSurfaceParts } from "../slack/surface-parts";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
+import { slackChannelIsPublic } from "@purin-labs/authority/policy/information-flow/source-labels";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import type {
   FlowAudience,
   FlowPolicyOwner,
-} from "../policy/information-flow/types";
+} from "@purin-labs/authority/policy/information-flow/types";
 import type { Variant } from "@purin-labs/type-utils";
 
 /** The member that a view is for, with what is needed to judge a reader. */

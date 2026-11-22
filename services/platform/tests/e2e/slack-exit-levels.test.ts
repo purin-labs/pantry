@@ -12,8 +12,8 @@ import {
   flowBindingForContext,
   InformationFlowContext,
   ObservationEvidence,
-} from "../../src/policy";
-import type { FlowPolicyInput } from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/index";
+import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
 import { network } from "./network";
 import {
   CHANNEL_ID,

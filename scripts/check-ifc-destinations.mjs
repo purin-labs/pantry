@@ -4,7 +4,7 @@
 // The exit check treats a destination by its class, so a destination with no
 // class would pass as if it stayed inside the Organisation. A tool effect names
 // its capability, and that capability must be in one of the class sets at the
-// top of the exit rule in services/platform/src/policy/information-flow/sinks.ts.
+// top of the exit rule in foundation/authority/policy/information-flow/sinks.ts.
 // A conversation delivery reaches outside only through `reachesOutside`, so a
 // new file that builds one must be added to the list below after a look at where
 // it delivers.
@@ -17,12 +17,12 @@ import { resolve } from "node:path";
 import { PLATFORM_SOURCE } from "./lib/source-roots.mjs";
 
 const root = resolve(import.meta.dirname, "..");
-const SINKS = "services/platform/src/policy/information-flow/sinks.ts";
+const SINKS = "foundation/authority/policy/information-flow/sinks.ts";
 
 // These files name no capability, because the capability comes from the caller.
 // Each caller that names one is checked.
 const EFFECTS_WITH_A_NAMED_CALLER = new Set([
-  "services/platform/src/access-control/decision-explanation.ts",
+  "foundation/authority/access-control/decision-explanation.ts",
   "services/platform/src/control/routes/access-control-explain.ts",
   "services/platform/src/actors/agent-session.ts",
   // Refactor 10 moved these effects out of agent-session.ts unchanged.
@@ -33,7 +33,7 @@ const EFFECTS_WITH_A_NAMED_CALLER = new Set([
 // These files check a read for a member, or deliver through the one Slack sink
 // `actors/case-conversation-sink.ts`, which reads `reachesOutside`.
 const CONVERSATION_DELIVERIES = new Set([
-  "services/platform/src/access-control/decision-explanation.ts",
+  "foundation/authority/access-control/decision-explanation.ts",
   "services/platform/src/actors/case-conversation-sink.ts",
   "services/platform/src/case-context-discovery/metadata.ts",
   "services/platform/src/chat/application.ts",

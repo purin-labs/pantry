@@ -1,5 +1,5 @@
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { resolveCaseReference } from "../../access-control/references";
+import { resolveCaseReference } from "@purin-labs/authority/access-control/references";
 import type { ConversationScope } from "../../chat/store";
 import {
   readCaseContextCollectionMetadata,

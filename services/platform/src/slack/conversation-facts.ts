@@ -13,11 +13,11 @@ import {
   policyAllowsAudiences,
   policyLevel,
   type FlowLabel,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault/surface-installation-resolution";
+import { resolveActiveSlackPhysicalInstallationCredential } from "@purin-labs/authority/credential-vault/surface-installation-resolution";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import type { SlackConversationFact } from "./surface-parts";
+import type { SlackConversationFact } from "@purin-labs/authority/slack/surface-parts";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";
 

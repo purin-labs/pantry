@@ -17,8 +17,8 @@ import { isRecord, positiveIntegerOrNull } from "@purin-labs/std";
 import type {
   CommerceGrantTargetParse,
   CommerceGrantTargets,
-} from "../../authorization/access-grants/commerce-grant-targets";
-import type { CommerceReadGrantScope } from "../../authorization/access-grants/types";
+} from "@purin-labs/authority/authorization/access-grants/commerce-grant-targets";
+import type { CommerceReadGrantScope } from "@purin-labs/authority/authorization/access-grants/types";
 
 export const COMMERCE_GRANT_TARGETS: CommerceGrantTargets = {
   parseReadScope: (raw) => parseCommerceReadScope(raw),

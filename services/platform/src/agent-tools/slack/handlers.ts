@@ -12,11 +12,11 @@ import {
   type HarnessSlackMessagePropose,
   type HarnessSlackMessageProposalReceipt,
 } from "./slack";
-import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   CAPABILITY_KEYS,
   SLACK_MESSAGE_RESOURCE_SCOPE,
-} from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   proposalFlowEffect,
   type ToolEffect,

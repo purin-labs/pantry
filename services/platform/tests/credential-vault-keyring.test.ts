@@ -7,7 +7,7 @@ import {
   loadCredentialVaultKeyRing,
   loadVaultKeyRing,
   vaultRootForVersion,
-} from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/keyring";
 import { TestSecretsStoreSecret } from "./secrets-store";
 
 describe("Credential Vault root keyring", vaultRootKeyRingSuite);

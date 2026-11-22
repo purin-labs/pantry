@@ -12,9 +12,9 @@ import type {
   CaseContent,
   RequestAuthority,
 } from "@purin-labs/contracts";
-import { parseStoredRequestAuthority } from "../../request-authority";
-import { FlowBinding, FlowLabel } from "../../policy";
-import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
+import { FlowBinding, FlowLabel } from "@purin-labs/authority/policy/index";
+import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";
 import type { Variant } from "@purin-labs/type-utils";
 import { isNonBlankString, isRecord, parseJsonOrNull } from "@purin-labs/std";
 import {

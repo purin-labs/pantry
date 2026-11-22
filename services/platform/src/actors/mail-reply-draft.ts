@@ -40,7 +40,7 @@ import {
 import { type UserId } from "@purin-labs/control-api/ids";
 import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { buildControlAuthority } from "../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";

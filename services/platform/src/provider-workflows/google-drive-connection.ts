@@ -1,8 +1,8 @@
-import { storeOrganisationPlacementVaultSecret } from "../credential-vault/service";
+import { storeOrganisationPlacementVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import {
   resolveProviderManifestCredential,
   type VaultOAuthTokens,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
 import { createConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import type { ProvisioningProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";

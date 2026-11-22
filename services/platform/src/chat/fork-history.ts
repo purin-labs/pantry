@@ -5,7 +5,7 @@ import type {
   StoredMessageAttachment,
   HarnessHistoryContent,
 } from "@purin-labs/contracts";
-import { parseSessionModelRoute } from "../policy-snapshot";
+import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   parseHarnessHistoryEntry,
@@ -15,7 +15,7 @@ import {
 import {
   FlowBinding,
   type SerializedFlowBinding,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 
 export type { ChatThreadLineage } from "@purin-labs/control-api";
 import {

@@ -1,5 +1,5 @@
-import { prepareReplacedSurfaceTokenRevocation } from "./credential-vault";
-import { prepareReadAndProposeAccessDefaults } from "./data/capability-policy";
+import { prepareReplacedSurfaceTokenRevocation } from "@purin-labs/authority/credential-vault/index";
+import { prepareReadAndProposeAccessDefaults } from "@purin-labs/authority/data/capability-policy";
 import {
   prepareSurfaceInstallConnectionRows,
   prepareSurfaceReinstallConnectionRows,
@@ -20,7 +20,7 @@ import { prepareOrganisationPurgeCredentialGenerations } from "@purin-labs/conne
 import {
   prepareSlackInstallationCredentialMove,
   prepareSlackInstallationRevocation,
-} from "./data/slack-installation-records";
+} from "@purin-labs/authority/data/slack-installation-records";
 import {
   directorySlackRecordDeletions,
 } from "./slack/organisation-routing";

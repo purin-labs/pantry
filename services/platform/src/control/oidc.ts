@@ -8,7 +8,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseApprovalProofDigest,
   type ApprovalActionBinding,
-} from "../approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { decodeBase64Url, encodeBase64Url, isRecord } from "@purin-labs/std";

@@ -3,7 +3,7 @@ import { SURFACE_EFFECT_SIGNAL } from "@purin-labs/control-api";
 import { signalChat } from "../../chat/signals";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { validateLiveRequestAuthority } from "../../request-authority";
+import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   readSavedBakeryRun,
   type SavedBakeryRunQuery,
@@ -42,8 +42,8 @@ import { admitSessionInformationFlowObservation } from "../../actors/agent-sessi
 import {
   createCurrentSourceFlowLabel,
   ObservationEvidence,
-} from "../../policy";
-import { digestCanonical } from "../../policy";
+} from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { assertNever } from "@purin-labs/std";
 import { requireLiveBakeryReadAuthority } from "../session-support";
 

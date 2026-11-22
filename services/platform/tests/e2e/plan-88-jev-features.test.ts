@@ -13,20 +13,20 @@ import {
 import { encodeBase64Url, isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { typeSafeMonth } from "../../src/integrations/typesafe/usage-store";
-import { createAccessGrant } from "../../src/data/access-grants";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import {
   bootstrapOrganisation,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
-import { storeVaultSecret } from "../../src/credential-vault";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { defaultDenyPolicy } from "../../src/policy-snapshot";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { requireVaultHandle } from "../test-ids";
 import { commerceClient } from "./commerce-support";
 import { network } from "./network";

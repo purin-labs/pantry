@@ -39,14 +39,14 @@ import {
 import { scopesAreComplete } from "@purin-labs/connections/provider-adapters/authorization";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { slackInstallationOwnerIsLive } from "../credential-vault/slack-installation-credential";
+import { slackInstallationOwnerIsLive } from "@purin-labs/authority/credential-vault/slack-installation-credential";
 import {
   activateSlackInstallation,
   createSlackInstallation,
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,
   resolveSlackInstallation,
-} from "../slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 
 export async function connectSlack(
   input: CompleteProviderInput,

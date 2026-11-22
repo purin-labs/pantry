@@ -5,7 +5,7 @@ import {
   OrganisationExecutionScope,
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
+import { resolveActiveSlackOrganisationCredential } from "@purin-labs/authority/credential-vault/index";
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,

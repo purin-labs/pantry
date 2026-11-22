@@ -11,7 +11,10 @@ import { expect, it } from "vitest";
 
 import { bytesToHex, encodeBase64 } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
+import {
+  storeVaultSecret,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/index";
 import { upsertUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,

@@ -1,12 +1,12 @@
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { describe, expect, it } from "vitest";
 
 import {
   FlowLabel,
   evaluateFlowLabelSink,
   organisationAuthzFromPolicy,
-} from "../src/policy/information-flow";
-import type { ContextVisibility } from "../src/authorization/access-grants/types";
+} from "@purin-labs/authority/policy/information-flow/index";
+import type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 

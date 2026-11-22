@@ -319,7 +319,7 @@ Portal origin (`PANTRY_PUBLIC_ORIGIN`). The role "Admin" includes the owner.
 
 The tools are in `services/platform/src/agent-tools/commerce/description-draft.ts` and
 `agent-tools/channels/email-draft.ts`, and Code Mode can call them. The two edit
-capabilities are in `services/platform/src/authorization/capability-catalogue.ts`. A new
+capabilities are in `foundation/authority/authorization/capability-catalogue.ts`. A new
 Organisation has both switched off. An agent can ask for each one in the permission
 prompt (`PERMISSION_REQUESTABLE`).
 

@@ -1,5 +1,5 @@
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {
   FileRead,

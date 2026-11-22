@@ -6,7 +6,10 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 
-import { parsePersonId, type PersonId } from "../data/person-authz";
+import {
+  parsePersonId,
+  type PersonId,
+} from "@purin-labs/authority/data/person-authz";
 import type { JsonObject } from "@purin-labs/kernel/http";
 import {
   parseAssignmentId,
@@ -39,7 +42,7 @@ import {
   readRequiredString,
   type IngressQueueMessageError,
 } from "@purin-labs/kernel/queue-fields";
-import { parseStoredRequestAuthority } from "../request-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   parseSlackEventId,

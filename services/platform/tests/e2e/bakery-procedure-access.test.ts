@@ -1,10 +1,10 @@
 import {
   createCurrentObservedSourceFlowLabel,
   integrationResourceScopeForGrant,
-} from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
-import type { AccessGrant } from "../../src/authorization/access-grants/types";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import {
@@ -15,13 +15,13 @@ import {
 } from "./commerce-support";
 import { activateOrganisation } from "./organisation-fixture";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { opaqueSubjectReference } from "../../src/access-control/references";
-import { listAccessGrants } from "../../src/data/access-grants";
+import { opaqueSubjectReference } from "@purin-labs/authority/access-control/references";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import {
   readActiveOrganisationMembershipRevision,
   readActiveOrganisationMembership,
 } from "@purin-labs/tenancy/data/control-plane";
-import { buildControlAuthority } from "../../src/request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readNamedCommerceQuery } from "../../src/commerce/entity-plane/context-read";
 import { CommerceGraphReader } from "../../src/commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../../src/commerce/entity-plane/commerce-source";

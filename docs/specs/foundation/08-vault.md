@@ -295,7 +295,7 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
 | `POST …/root-rotations/:id/step`, `/pause`, `/resume` | `support_admin` | Run a step with `limit`, pause or resume |
 | `GET /v1/admin/vault-root-closure` | Bearer `ORGANISATION_ADMIN_TOKEN` | The retained-root check |
 
-- `services/platform/src/credential-vault/` is in the module `foundation/authority`
+- `foundation/authority/credential-vault/` is in the module `foundation/authority`
   (`scripts/layers.json`). Its files: `service.ts` (store, read, revoke), `crypto.ts`,
   `keyring.ts`, `domain.ts`, the resolvers (`*-resolution.ts`), `secret-revocation.ts`,
   `root-rotation.ts`, `root-closure.ts`, `backup.ts`, `alerts.ts`, `items.ts`,
@@ -313,7 +313,7 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
 - Worker bindings: `VAULT_ROOT_V1`, `VAULT_ROOT_V2`, `PANTRY_VAULT_ACTIVE_KEY_VERSION`
   and the service binding `VAULT_ONEPASSWORD`.
 - The Vault has no agent tool and no capability in
-  `services/platform/src/authorization/capability-catalogue.ts`.
+  `foundation/authority/authorization/capability-catalogue.ts`.
 - Operator procedures:
   [the Vault operations runbook](../../runbooks/vault-operations.md).
 

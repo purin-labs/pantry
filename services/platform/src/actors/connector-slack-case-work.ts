@@ -10,7 +10,7 @@ import {
   parseSlackCaseCommand,
   type SlackCaseCommand,
 } from "../slack/case-command-message";
-import { parseStoredRequestAuthority } from "../request-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { SlackEventId } from "../slack/events";
 import {
   acceptConnectorCaseWork,

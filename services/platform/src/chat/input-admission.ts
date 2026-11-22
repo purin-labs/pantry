@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
-import { ObservationEvidence } from "../policy/information-flow";
+import { ObservationEvidence } from "@purin-labs/authority/policy/information-flow/index";
 import {
   digestContextBundle,
   materializeContextBundle,

@@ -2,7 +2,7 @@ import {
   OrganisationExecutionScope,
   fetchWithOrganisationPlacement,
 } from "@purin-labs/tenancy/organisation-execution-scope";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault";
+import { parseVaultHandle, type VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import {
   recordProviderManifestObservation,
   type ProviderManifestEvidence,

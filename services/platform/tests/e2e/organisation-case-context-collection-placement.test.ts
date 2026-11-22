@@ -49,11 +49,11 @@ import {
   parseVaultHandle,
   storeVaultSecret,
   revokeVaultSecret,
-} from "../../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { parseCaseId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { OperationalCaseContextDiscoverySourceRequest } from "../../src/case-context-discovery/operational-evaluation";
 import { readDailyTypeSafeUsage } from "../../src/integrations/typesafe/usage-store";
 import { parseCaseContextDiscoveryPolicy } from "../../src/case-context-discovery/policy";

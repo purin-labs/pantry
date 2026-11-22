@@ -39,7 +39,7 @@ import type {
 } from "../../actors/menu-boards";
 import type { MenuPriceProposalRequest } from "../../commerce/contract/types";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { CommerceActionProposalOrigin } from "../catalog/types";
 import { defineToolFamily, jsonSchema } from "../define-tool";

@@ -20,12 +20,12 @@ import {
   type AuthorizedProviderAction,
   type VaultHandle,
   type VaultStoredSecret,
-} from "../src/credential-vault";
-import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/index";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import {
   parseDiscordApplicationId,
   parseDiscordGuildId,

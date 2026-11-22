@@ -40,7 +40,7 @@ import { harnessCapabilitiesFromCapabilityKeys } from "../../agent-tools/catalog
 import {
   type CurrentEffectiveGrantAuthority,
   resolveEffectiveGrantSetForAuthorityPartition,
-} from "../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, errorMessage, sha256Hex } from "@purin-labs/std";
 import {

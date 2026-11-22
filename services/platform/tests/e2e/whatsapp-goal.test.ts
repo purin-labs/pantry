@@ -25,7 +25,7 @@ import {
   freezeOrganisationPlacementMove,
   freezeRegionalOrganisationPlacement,
 } from "@purin-labs/tenancy/data/shared-rows/placement-row";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { network } from "./network";
 import {
   ORGANISATION_ID,

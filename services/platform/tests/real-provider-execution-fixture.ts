@@ -5,9 +5,9 @@ import type {
   RequestAuthority,
 } from "@purin-labs/contracts";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
-import { createAccessGrant } from "../src/data/access-grants";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import type {
   IntegrationAccountId,
   OrganisationId,

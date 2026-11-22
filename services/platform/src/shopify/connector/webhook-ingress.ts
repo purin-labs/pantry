@@ -13,7 +13,7 @@ import type {
   ShopifyInventoryLevelUpdatedCueEvent,
   ShopifyOrderCreatedCueEvent,
 } from "../../cues/engine";
-import { resolveProviderWebhookCredential } from "../../credential-vault";
+import { resolveProviderWebhookCredential } from "@purin-labs/authority/credential-vault/index";
 import { decodeBase64, isRecord } from "@purin-labs/std";
 import type {
   ShopifyCommerceCatalogEnvelope,

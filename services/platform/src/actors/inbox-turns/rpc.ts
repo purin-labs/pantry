@@ -1,4 +1,4 @@
-import type { SerializedFlowBinding } from "../../policy";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import type { MailOrganizationActorInput } from "../../mail-inbox/commands";
 import type { Result } from "@purin-labs/kernel/result";
 import type { EmbeddedHarnessModelUsage } from "../embedded-harness";

@@ -1,19 +1,22 @@
 import type { PermissionRequired } from "@purin-labs/control-api";
 import type { RequestAuthority } from "@purin-labs/contracts";
-import { selectActiveGrants } from "../authorization/access-grants/compiler";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import {
   CAPABILITY_KEYS,
   WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
   capabilityDefinitionById,
-} from "../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import { personPermission } from "../control/permission-required";
-import { listAccessGrants } from "../data/access-grants";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../policy";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
-import { validateNativeRequestAuthority } from "../request-authority";
+import {
+  createCurrentSourceFlowLabel,
+  evaluateFlowLabelSink,
+} from "@purin-labs/authority/policy/index";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
+import { validateNativeRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

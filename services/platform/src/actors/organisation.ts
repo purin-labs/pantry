@@ -257,7 +257,7 @@ import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
   OrganisationPolicyActivationError,
-} from "./organisation/policy-types";
+} from "@purin-labs/authority/actors/organisation/policy-types";
 import {
   organisationPlacementConflict,
   readOrganisationMetaRow,

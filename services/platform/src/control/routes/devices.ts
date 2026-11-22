@@ -1,5 +1,5 @@
-import { currentGrantedCapabilityIds } from "../../authorization/access-grants/turn-authority";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { currentGrantedCapabilityIds } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";

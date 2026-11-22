@@ -4,7 +4,7 @@ import type {
 } from "@purin-labs/connections/data/integration-account";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseVaultHandle } from "../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 
 const organisationId = requireParsed(
   parseOrganisationId("organisation_fixture"),

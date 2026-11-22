@@ -1,5 +1,5 @@
 import type { Result } from "@purin-labs/kernel/result";
-import type { VaultSecret } from "../credential-vault";
+import type { VaultSecret } from "@purin-labs/authority/credential-vault/index";
 import { isRecord } from "@purin-labs/std";
 
 type StripeFailedChargeTrigger = {

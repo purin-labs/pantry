@@ -18,7 +18,7 @@ import { OrganisationDO } from "../src/actors/organisation";
 import { activateOrganisationFixture } from "./fixtures/organisation-activation";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
-import { parseVaultHandle } from "../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseContactVerificationCommand,

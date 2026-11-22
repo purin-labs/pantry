@@ -6,7 +6,7 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
 
-import { storeVaultSecret } from "../src/credential-vault";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { createConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
@@ -41,7 +41,7 @@ import { providerCredentialHandle } from "../src/integrations/contract/provision
 import {
   validateNativeRequestAuthority,
   buildWhatsAppSupportAuthority,
-} from "../src/request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import { resolveWhatsAppOrganisationCredential } from "../src/whatsapp/credential";
 import {
   parseE164PhoneNumber,

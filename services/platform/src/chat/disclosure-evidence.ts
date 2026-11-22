@@ -16,8 +16,8 @@ import type { ConversationScope } from "./store";
 import { authorizeProject, listProjectMembers } from "../projects/access";
 import { listOrganisationMembers } from "@purin-labs/tenancy/data/control-plane";
 import { readProject } from "../projects/records";
-import { listAccessGrants } from "../data/access-grants";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import { authorizeConversation } from "./conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";
 import type { ConversationSharingCommand } from "./conversation-sharing";
@@ -290,7 +290,7 @@ export async function readDisclosureState(
   };
 }
 function grantRevision(
-  grant: import("../authorization/access-grants/types").AccessGrant,
+  grant: import("@purin-labs/authority/authorization/access-grants/types").AccessGrant,
 ): DisclosureState["grants"][number] {
   if (grant.lifecycle.kind !== "active")
     throw new Error("disclosure_grant_inactive");

@@ -5,9 +5,9 @@ import { listProviderResourcePage } from "@purin-labs/connections/data/provider-
 import {
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   SLACK_MESSAGE_RESOURCE_SCOPE,
-} from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import { discoverAirtableBases } from "@purin-labs/connections/external-records/records";
-import { readActiveCaseOperations } from "../../actors/case-operations";
+import { readActiveCaseOperations } from "@purin-labs/authority/actors/case-operations";
 import { resolveIntegrationAccount } from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -16,17 +16,17 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { digestCanonical } from "../../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
-import { commerceAccessTargets } from "../../access-control/commerce-access-targets";
+import { commerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
 import {
   readAccessControlOrganisationProjection,
   readAccessControlView,
-} from "../../access-control/read-model";
+} from "@purin-labs/authority/access-control/read-model";
 import {
   opaqueCaseReference,
   opaqueSubjectReference,
-} from "../../access-control/references";
+} from "@purin-labs/authority/access-control/references";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
 import {
@@ -46,7 +46,7 @@ import {
   readSubjectOptionRows,
   type IntegrationOptionRow,
   type SubjectOptionRow,
-} from "../../data/access-control-options";
+} from "@purin-labs/authority/data/access-control-options";
 
 const OPTIONS_PAGE_LIMIT = 50;
 const OPTIONS_QUERY_LIMIT = 100;

@@ -8,7 +8,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import {
   parseModelApiKey,
   storeOrganisationModelCredential,
-} from "../../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   issueControlSession,
   type IssuedControlSession,
@@ -20,7 +20,7 @@ import {
 import { parseUserId } from "@purin-labs/control-api/ids";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders, type commerceClient } from "./commerce-support";
 

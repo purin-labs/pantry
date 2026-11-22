@@ -13,7 +13,7 @@ import { parseEmailProposalTarget } from "../../data/email-operational";
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
-} from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import type { EmailIngressLimits } from "../connector-email";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {

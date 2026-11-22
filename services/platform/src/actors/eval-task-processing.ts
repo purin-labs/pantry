@@ -53,14 +53,14 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
-} from "../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   canonicalFlowLabel,
   digestCanonical,
   FlowBinding,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { ensureCaseProject } from "../projects/case-project";
-import { buildAgentMailboxAuthority } from "../request-authority";
+import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { serializeContextBundle } from "./actor-journal/parsers";
 import {

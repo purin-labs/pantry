@@ -24,9 +24,9 @@ import type {
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
 import { parseStoredAttachmentList } from "../../messages/stored-attachment";
-import { parseStoredAuthorityPartition } from "../../authorization/access-grants/turn-authority";
-import { parseStoredRequestAuthority } from "../../request-authority";
-import { FlowLabel } from "../../policy";
+import { parseStoredAuthorityPartition } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
+import { FlowLabel } from "@purin-labs/authority/policy/index";
 import { caseParts } from "./parts";
 import type { Variant } from "@purin-labs/type-utils";
 import {

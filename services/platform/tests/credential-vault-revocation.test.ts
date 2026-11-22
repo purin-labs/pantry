@@ -7,7 +7,7 @@ import {
   activateCredentialRevocationPolicy,
   recordCredentialRestrictionDeliveryProgress,
   revokeCredential,
-} from "../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { d1Database } from "./sqlite-d1";
 import { requireOrganisationId, requireVaultHandle } from "./test-ids";
 

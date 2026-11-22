@@ -2,7 +2,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { expect, it } from "vitest";
 import { exports } from "cloudflare:workers";
 
-import { revokeAccessGrant } from "../../src/data/access-grants";
+import { revokeAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { network } from "./network";
 import {
   CHANNEL_ID,

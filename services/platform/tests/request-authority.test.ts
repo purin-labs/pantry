@@ -6,11 +6,11 @@ import {
   parseDirectSlackAuthority,
   grantSubjectsForAuthority,
   parseSharedSlackAuthority,
-} from "../src/request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import {
   authorityPartitionKey,
   parseStoredAuthorityPartition,
-} from "../src/authorization/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/index";
 
 function validSlackAuthority(
   conversationKind: string,

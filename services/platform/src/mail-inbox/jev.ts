@@ -5,8 +5,8 @@ import {
   TypeSafeDisclosure,
   type TypeSafeDisclosureDenied,
 } from "../integrations/typesafe/disclosure";
-import type { TypeSafeInferenceSink } from "../policy/information-flow/types";
-import type { FlowLabel } from "../policy/information-flow/labels";
+import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import type { JevError } from "../integrations/typesafe/system-one-client";
 import type { Result } from "@purin-labs/kernel/result";

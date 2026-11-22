@@ -42,9 +42,9 @@ import { readSupplierDestinationRevision } from "../src/data/supplier-payable-st
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
-import { createAccessGrant } from "../src/data/access-grants";
-import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 
 const ORGANISATION_ID = "organisation_payout_control";
 const BASE = `https://pantry.example/v1/control/organisations/${ORGANISATION_ID}/commerce`;

@@ -5,7 +5,7 @@ import { revokeOrganisationDevicesStatements } from "./devices/store";
 import {
   listSlackInstallationCredentialHandles,
   revokeSlackOrganisationConnections,
-} from "./slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { removeVoiceMacNames } from "./voice/dns";
 import {
   listVoiceMacNameIds,

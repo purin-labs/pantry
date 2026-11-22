@@ -9,12 +9,12 @@ import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import {
   CONTEXT_CASE_READ_CAPABILITY,
   CASE_CONTEXT_COLLECTION_METADATA_READ_CAPABILITY,
-} from "../src/authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   CAPABILITY_CATALOGUE,
   CAPABILITY_KEYS,
   compileCapabilityCatalogue,
-} from "../src/authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
 import { CUSTOM_CONNECTOR_CAPABILITY_IDS } from "../src/custom-connectors";
 

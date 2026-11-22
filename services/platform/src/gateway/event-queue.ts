@@ -26,7 +26,7 @@ import {
   traceLog,
   traceWarn,
 } from "@purin-labs/kernel/observability";
-import { buildWorkflowAuthority } from "../request-authority";
+import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   handleContextProjectionQueueMessage,
   type ContextProjectionCommand,

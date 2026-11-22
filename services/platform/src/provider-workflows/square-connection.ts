@@ -6,7 +6,7 @@ import {
   squareDelegationSecret,
   type SquareDelegation,
 } from "../commerce/contract/square-link";
-import { storeOrganisationPlacementVaultSecret } from "../credential-vault/service";
+import { storeOrganisationPlacementVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import {
   createConnectedIntegration,
   finalizeConnectedIntegrationAccount,
@@ -20,7 +20,7 @@ import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/pr
 import {
   resolveProviderManifestCredential,
   type VaultHandle,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   advanceProviderPhase,
   completeProviderCredentialCutover,

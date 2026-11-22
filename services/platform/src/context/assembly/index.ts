@@ -34,12 +34,12 @@ import type {
   PolicyVersion,
   Timestamp,
 } from "./types";
-import type { FlowRecipient } from "../../policy/information-flow/types";
+import type { FlowRecipient } from "@purin-labs/authority/policy/information-flow/types";
 import type {
   FlowLabel,
   ObservationEvidence,
   SerializedFlowLabel,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 
 export const CONTEXT_ASSEMBLY_STRATEGY_VERSION: ContextAssemblyStrategyVersion =

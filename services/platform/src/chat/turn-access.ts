@@ -28,7 +28,7 @@ import {
   VISIBLE_CONVERSATIONS_SQL,
 } from "./conversation-access";
 import { authorizeProject } from "../projects/access";
-import { createCurrentSourceFlowLabel } from "../policy/information-flow";
+import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import {
   parseControlSessionId,
   parseSessionId,
@@ -39,7 +39,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   parseStoredRequestAuthority,
   validateLiveRequestAuthority,
-} from "../request-authority";
+} from "@purin-labs/authority/request-authority/index";
 
 export type SessionTurnExecution = Readonly<{
   sessionId: SessionId;

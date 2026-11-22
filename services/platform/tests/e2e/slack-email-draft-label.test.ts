@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { SLACK_PERMISSION_RESUME_TEXT } from "../../src/actors/connector-slack-case-work";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import type { FlowPolicyInput } from "../../src/policy/information-flow";
+import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
 import { lastCalledTool } from "./chat-permission-support";
 import { commerceHeaders } from "./commerce-support";
 import { raiseLabel } from "./held-exit-support";

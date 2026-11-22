@@ -8,10 +8,10 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import {
   CAPABILITY_KEYS,
   SLACK_MESSAGE_RESOURCE_SCOPE,
-} from "../../src/authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { FlowPolicyInput } from "../../src/policy/information-flow";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { CARD_ONLY_REPLY } from "../../src/slack/card-only-reply";
 import { reconcileHeldOutputRequests } from "../../src/slack/held-output-release";
 import { enableCapability } from "./access-route-support";

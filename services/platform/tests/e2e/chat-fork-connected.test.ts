@@ -50,11 +50,11 @@ import {
 import {
   createAccessGrant,
   revokeAccessGrant,
-} from "../../src/data/access-grants";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/data/access-grants";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,

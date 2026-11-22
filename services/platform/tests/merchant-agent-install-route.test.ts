@@ -31,8 +31,8 @@ vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => (
   readControlMutationReplay: mutationMocks.readControlMutationReplay,
   prepareControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
 }));
-vi.mock("../src/policy-snapshot", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/policy-snapshot")>()),
+vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/authority/policy-snapshot")>()),
   readCurrentOrganisationPolicySnapshot: policyMocks.readCurrentOrganisationPolicySnapshot,
 }));
 vi.mock("../src/data/merchant-agent-preset", async (importOriginal) => ({

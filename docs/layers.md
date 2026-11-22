@@ -70,20 +70,21 @@ import. A module with no line for one of these has none.
 ## foundation/authority
 
 - Folders: 14
-  - `services/platform/src/`
-  - `services/platform/src/access-control/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/organisation/`
-  - `services/platform/src/authorization/`
-  - `services/platform/src/authorization/access-grants/`
-  - `services/platform/src/credential-vault/`
-  - `services/platform/src/data/`
-  - `services/platform/src/policy/`
-  - `services/platform/src/policy/information-flow/`
-  - `services/platform/src/request-authority/`
-  - `services/platform/src/seams/`
-  - `services/platform/src/slack/`
-  - `services/platform/src/vault-onepassword/`
+  - `foundation/authority/`
+  - `foundation/authority/access-control/`
+  - `foundation/authority/actors/`
+  - `foundation/authority/actors/organisation/`
+  - `foundation/authority/authorization/`
+  - `foundation/authority/authorization/access-grants/`
+  - `foundation/authority/credential-vault/`
+  - `foundation/authority/data/`
+  - `foundation/authority/policy/`
+  - `foundation/authority/policy/information-flow/`
+  - `foundation/authority/request-authority/`
+  - `foundation/authority/seams/`
+  - `foundation/authority/slack/`
+  - `foundation/authority/vault-onepassword/`
+- Packages: `foundation/authority`
 - Tables (24): `access_grant`, `agent_permission_request`, `credential_access_denial`, `credential_ref`, `credential_revocation_operation`, `external_vault_import`, `held_output_request`, `organisation_capability_policy`, `person_authz_audit`, `person_authz_role`, `policy_snapshot`, `slack_channel_default`, `slack_channel_default_revision`, `slack_dm_organisation_selection_audit_event`, `slack_installation`, `slack_installation_audit_event`, `slack_installation_lifecycle_event`, `slack_organisation_connection`, `slack_routing_audit_event`, `vault_item`, `vault_item_event`, `vault_root_rotation_job`, `vault_secret`, `vault_store`
 
 ## foundation/control

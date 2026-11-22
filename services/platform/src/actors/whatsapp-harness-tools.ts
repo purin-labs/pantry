@@ -3,7 +3,7 @@ import type {
   HarnessToolOutput,
 } from "@purin-labs/contracts";
 
-import { digestCanonical } from "../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import {
   type CatalogToolAuthority,
   executeCatalogTool,

@@ -9,7 +9,7 @@ import {
 import { isRecord } from "@purin-labs/std";
 
 import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

@@ -9,7 +9,7 @@ import {
   storeVaultSecret,
   type AuthorizedProviderAction,
   type VaultHandle,
-} from "../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,
@@ -20,7 +20,7 @@ import {
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import {
   parseCaseId,
   parseControlSessionId,
@@ -31,12 +31,12 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import { credentialPolicyRuleId } from "../src/policy-rule-id";
+import { credentialPolicyRuleId } from "@purin-labs/authority/policy-rule-id";
 import {
   compilePublishAndActivateOrganisationPolicy,
   type OrganisationPolicySnapshot,
   writeStripeReadCredentialRef,
-} from "../src/policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import {

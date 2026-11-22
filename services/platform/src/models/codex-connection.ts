@@ -17,17 +17,17 @@ import { type UserId } from "@purin-labs/control-api/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   modelProviderFetch,
   type ModelExitBinding,
 } from "../model-exit/provider-fetch";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
+import { parseVaultHandle, type VaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import {
   resolveVaultHandle,
   revokeVaultSecret,
   storeVaultSecret,
-} from "../credential-vault/service";
+} from "@purin-labs/authority/credential-vault/service";
 import {
   assertNever,
   isPositiveInteger,

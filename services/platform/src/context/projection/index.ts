@@ -9,12 +9,15 @@ import type {
   UserMessage,
   FileContextProvider,
 } from "@purin-labs/contracts";
-import { FlowLabel, type SerializedFlowLabel } from "../../policy";
+import {
+  FlowLabel,
+  type SerializedFlowLabel,
+} from "@purin-labs/authority/policy/index";
 import {
   encodeContextVisibility,
   parseContextVisibility as parseStoredContextVisibility,
-} from "../../authorization/access-grants/visibility";
-import type { ContextVisibility } from "../../authorization/access-grants/types";
+} from "@purin-labs/authority/authorization/access-grants/visibility";
+import type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
 import { ACTIVE_FILE_GRANT_VISIBILITY_SQL } from "../files/authority-sql";
 import { deriveUserMessageViews } from "../../messages/message-wasm";
 import type { VariantBy } from "@purin-labs/type-utils";
@@ -27,7 +30,7 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 
-export type { ContextVisibility } from "../../authorization/access-grants/types";
+export type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
 
 const CONTEXT_PROJECTION_COMMAND_TYPE = "context.projection.v1" as const;
 export const MAX_BOUNDED_CONTEXT_TEXT_CHARS = 4_096;

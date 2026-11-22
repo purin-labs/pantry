@@ -7,7 +7,10 @@ import {
   type OrganisationPlacementBindings,
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
+import {
+  parseVaultHandle,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/domain";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -33,7 +36,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import type { Variant } from "@purin-labs/type-utils";
 import { isPositiveInteger } from "@purin-labs/std";
-import { parseStringId } from "./installation-store";
+import { parseStringId } from "@purin-labs/authority/slack/installation-store";
 
 export type SlackThreadRouteRequest =
   | {

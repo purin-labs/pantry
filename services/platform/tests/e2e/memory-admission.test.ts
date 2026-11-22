@@ -26,7 +26,7 @@ import {
 import {
   canonicalFlowLabel,
   FlowLabel,
-} from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import {
   MEMORY_LIMITATION_NOTICE,
@@ -55,7 +55,7 @@ import {
   type SessionId,
 } from "@purin-labs/kernel/ids";
 import { memoryApplicabilityKey } from "../../src/memory/store";
-import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   incoming,

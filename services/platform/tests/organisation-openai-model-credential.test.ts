@@ -7,8 +7,8 @@ import {
   resolveCurrentOrganisationModelCredential,
   resolveOrganisationModelCredentialForRoute,
   storeOrganisationModelCredential,
-} from "../src/credential-vault";
-import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/index";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import { d1Database } from "./sqlite-d1";
 import { requireOrganisationId } from "./test-ids";
 import { readMigration } from "./sqlite-d1";

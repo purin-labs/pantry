@@ -1,9 +1,9 @@
-import { readActiveCaseOperations } from "../actors/case-operations";
+import { readActiveCaseOperations } from "@purin-labs/authority/actors/case-operations";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   isCommerceLedgerAction,
   type ActionLedgerActivity,
-} from "../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { AgentOperationsSnapshot } from "../data/agent-operations";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";

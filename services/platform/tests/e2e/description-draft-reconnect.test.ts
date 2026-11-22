@@ -11,7 +11,7 @@ import {
 } from "@purin-labs/product-description-crdt/protocol";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { opaqueSubjectReference } from "../../src/access-control/references";
+import { opaqueSubjectReference } from "@purin-labs/authority/access-control/references";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createGrant, enableCapability } from "./access-route-support";

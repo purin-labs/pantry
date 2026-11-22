@@ -8,7 +8,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   isCommerceLedgerAction,
   type ActionLedgerEntry,
-} from "../../../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { CaseBinding } from "@purin-labs/contracts";
 import type { CommerceSource } from "@purin-labs/commerce-contracts";
 import {
@@ -21,9 +21,9 @@ import {
   isCommerceActionNonce as isActionNonce,
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
-} from "../../../approval-authentication";
-import { authorizeCapabilityUse } from "../../../authorization/access-grants/turn-authority";
-import type { ProviderCapabilityDefinition } from "../../../authorization/access-grants/capability-key";
+} from "@purin-labs/authority/approval-authentication";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   buildCommerceActionDraft,
   buildSupplierPayoutActionDraft,
@@ -39,7 +39,7 @@ import {
 import { commerceProjectionRevision } from "../../../commerce/contract/commerce-provider";
 import { listPublishedCommerceTargets } from "../../../commerce/entity-plane/published-resources";
 import type { PermissionRequired } from "@purin-labs/control-api";
-import { CAPABILITY_KEYS } from "../../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   permissionRequiredResponse,
   personPermission,
@@ -65,7 +65,7 @@ import {
   bindUnboundSetupChannel,
   prepareSlackRoutingAuditEvent,
   resolveActiveSlackDestinationConnection,
-} from "../../../slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { previewMerchantPluginAction } from "../../../commerce/provider-execution";
 import type { CommerceProviderExecutionError } from "../../../commerce/contract/commerce-provider";
@@ -81,8 +81,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { loadOrganisationPolicyOrDefaultDeny } from "../../../policy-snapshot";
-import { buildControlAuthority } from "../../../request-authority";
+import { loadOrganisationPolicyOrDefaultDeny } from "@purin-labs/authority/policy-snapshot";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveOrganisationModelRoute } from "../../../models/route";
 import { resolveCommerceCancellationAuthority } from "../../../commerce/provider";
 import {

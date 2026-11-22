@@ -4,7 +4,7 @@ import {
 } from "../../src/actors/connector-email";
 import { fixtureDatabase } from "./organisation-database";
 import { projectMailClassifications } from "../../src/mail-inbox/store";
-import { opaqueCaseReference } from "../../src/access-control/references";
+import { opaqueCaseReference } from "@purin-labs/authority/access-control/references";
 import {
   compareEvalRun,
   evalConfigurationVerdict,
@@ -34,8 +34,8 @@ import { createMailboxTurnMemoryReader } from "../../src/mail-inbox/mailbox-turn
 import {
   canonicalFlowLabel,
   joinFlowLabels,
-} from "../../src/policy/information-flow";
-import { createCurrentSourceFlowLabel } from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
+import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   prepareWorkspaceRevisionMutation,
@@ -102,9 +102,9 @@ import {
   InformationFlowContext,
   digestFlowBinding,
   type FlowPolicyInput,
-} from "../../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { CaseContextCollectionEffectAttempt } from "../../src/case-context-discovery/evidence";
-import { sourceReaderForAuthority } from "../../src/policy/information-flow/source-readers";
+import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   previewEmailProposal,
@@ -131,7 +131,7 @@ import {
   EmailSupplierContext,
   readEmailCommerceEvidence,
 } from "../../src/mail-inbox/supplier-context";
-import { buildAgentMailboxAuthority } from "../../src/request-authority";
+import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { admitControlTurnFixture } from "../organisation-execution-fixture";
 import type { SessionTurnExecution } from "../../src/chat/turn-access";
@@ -143,14 +143,14 @@ import {
 } from "../../src/actors/email-case-processing";
 import { resolveCaseTurnAgentProfile } from "../../src/data/pinned-agent-profile";
 import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
-import { buildControlAuthority } from "../../src/request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
   digestModelRoute,
   resolveOrganisationModelRoute,
   resolveOrganisationModelRouteForSelection,
 } from "../../src/models/route";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { env, exports } from "cloudflare:workers";
 import {
   runInDurableObject,
@@ -188,19 +188,19 @@ import { createActiveConnectedIntegration } from "@purin-labs/connections/data/i
 import {
   createAccessGrant,
   revokeAccessGrant,
-} from "../../src/data/access-grants";
+} from "@purin-labs/authority/data/access-grants";
 import { requireVaultHandle } from "../test-ids";
-import { storeVaultSecret } from "../../src/credential-vault";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
   defaultDenyPolicy,
   readCurrentOrganisationPolicySnapshot,
-} from "../../src/policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   GMAIL_FULL_MAILBOX_SCOPES,
   GMAIL_SEND_ONLY_SCOPES,
 } from "@purin-labs/connections/mail/gmail-authorization";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   parseIntegrationAccountId,
   type ConnectorId,
@@ -213,7 +213,7 @@ import {
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
-import { digestCanonical } from "../../src/policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import {
   readMailHead,
   claimMailWork,

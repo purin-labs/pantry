@@ -1,4 +1,4 @@
-import { resolveCaseReference } from "../../access-control/references";
+import { resolveCaseReference } from "@purin-labs/authority/access-control/references";
 import { readCaseScreenObservations } from "../../chat/case-screen-observations";
 import type { ConversationScope } from "../../chat/store";
 import type { Env } from "@purin-labs/kernel/env";

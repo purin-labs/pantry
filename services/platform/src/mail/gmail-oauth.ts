@@ -7,7 +7,7 @@ import {
   storeVaultSecret,
   type VaultHandle,
   type VaultOAuthTokens,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { isRecord } from "@purin-labs/std";
 
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";

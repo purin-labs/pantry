@@ -59,7 +59,7 @@ import {
   liveDeviceMember,
   type ToolEffect,
 } from "../session-support";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import {
   readCostsOverview,

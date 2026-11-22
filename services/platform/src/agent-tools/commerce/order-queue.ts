@@ -8,7 +8,7 @@ import type {
   SoldOutMarkRequest,
   SoldOutToolRead,
 } from "../../cafe/contract/order-queue-commands";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { defineToolFamily, noArguments, stringEnum } from "../define-tool";
 import type { PageViewExecute } from "../kitchen/services";
 import { ProposalArgumentError } from "../errors";

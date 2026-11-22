@@ -6,10 +6,13 @@ import type {
   Sha256Digest,
   Timestamp,
 } from "../projection";
-import type { FlowLabel, ObservationEvidence } from "../../policy";
+import type {
+  FlowLabel,
+  ObservationEvidence,
+} from "@purin-labs/authority/policy/index";
 import type { FileContextProvider } from "@purin-labs/contracts";
 
-export type { ContextVisibility } from "../../authorization/access-grants/types";
+export type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
 
 export type {
   CanonicalContextSourceRef,
@@ -72,7 +75,7 @@ export type ContextItem = {
     | CanonicalContextSourceRef
     | Readonly<{
         kind: "project_observation";
-        source: import("../../policy/information-flow").FlowSource;
+        source: import("@purin-labs/authority/policy/information-flow/index").FlowSource;
         snapshotDigest: string;
       }>
     | (ContextMemoryRef & Readonly<{ kind: "memory" }>);

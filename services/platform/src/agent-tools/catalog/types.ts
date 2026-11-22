@@ -6,7 +6,7 @@ import type {
 } from "@purin-labs/contracts";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { JsonSchema } from "./selection";
 import type { TurnTool } from "./tool-registry";
 

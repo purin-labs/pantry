@@ -22,7 +22,7 @@ import { timeThreadRead } from "../../chat/thread-read-timing";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import { setAdmittedConversationGoal } from "./chat-goal";
-import { buildControlAuthority } from "../../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
   resolveOrganisationModelRoute,

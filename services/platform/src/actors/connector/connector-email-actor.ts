@@ -28,7 +28,7 @@ import {
   type MailAssistantActorInput,
 } from "../../mail-inbox/assistant";
 import { eraseMailClassificationRecords } from "../../mail-inbox/store";
-import { parseStoredRequestAuthority } from "../../request-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { readClassifiedPage, readDecision } from "../../mail-inbox/reads";
 import {
   readOrganization,

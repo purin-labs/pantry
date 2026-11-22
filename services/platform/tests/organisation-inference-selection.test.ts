@@ -7,7 +7,7 @@ import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
 } from "../src/data/organisation-inference-selection";
-import { parseSessionModelRoute } from "../src/policy-snapshot";
+import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
 import {
   digestModelRoute,
   resolvePantryPlatformModelRoute,

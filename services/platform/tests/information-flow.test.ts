@@ -1,5 +1,5 @@
-import { organisationAuthzFromPolicy } from "../src/policy/information-flow";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+import { organisationAuthzFromPolicy } from "@purin-labs/authority/policy/information-flow/index";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 
@@ -16,7 +16,7 @@ import {
   InformationFlowContext,
   joinFlowLabels,
   ObservationEvidence,
-} from "../src/policy";
+} from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 
 const directAuthority: Variant<RequestAuthority, "direct_conversation"> = {

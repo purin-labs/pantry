@@ -74,7 +74,7 @@ import type {
   CaseContextTailCandidate,
   CaseContextTailReader,
 } from "../../context/assembly";
-import { parseStoredRequestAuthority } from "../../request-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   advanceInformationFlowContext,
@@ -83,9 +83,9 @@ import {
   FlowLabel,
   InformationFlowContext,
   ObservationEvidence,
-} from "../../policy";
-import type { SerializedFlowBinding } from "../../policy";
-import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
+} from "@purin-labs/authority/policy/index";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
+import { sourceReaderForAuthority } from "@purin-labs/authority/policy/information-flow/source-readers";
 import { errorMessage, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
 import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import {

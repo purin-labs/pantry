@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { enableCapability } from "./access-route-support";
 import { connectCommerceFixture } from "./commerce-support";
 import { network } from "./network";

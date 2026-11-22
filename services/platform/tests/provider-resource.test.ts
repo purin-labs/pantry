@@ -20,7 +20,7 @@ import {
   refreshProviderResourceSnapshot,
   type DiscoveredProviderResource,
 } from "@purin-labs/connections/data/provider-resource";
-import { parseVaultHandle } from "../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

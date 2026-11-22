@@ -19,7 +19,7 @@ import {
   createSlackCaseCommand,
   parseSlackCaseCommand,
 } from "../src/slack/case-command-message";
-import { parsePersonId } from "../src/data/person-authz";
+import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import {
   parseAssignmentId,
   parseCaseId,

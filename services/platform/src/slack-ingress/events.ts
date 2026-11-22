@@ -49,7 +49,7 @@ import {
 } from "../slack/ingress-admission";
 import { buildAdmittedSlackCaseCommand } from "../slack/case-command";
 import { verifySlackSignature } from "../slack/signature";
-import { resolveActiveSlackPhysicalInstallationCredential } from "../credential-vault";
+import { resolveActiveSlackPhysicalInstallationCredential } from "@purin-labs/authority/credential-vault/index";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,

@@ -1,4 +1,4 @@
-import type { EffectiveGrantSet } from "../src/authorization/access-grants";
+import type { EffectiveGrantSet } from "@purin-labs/authority/authorization/access-grants/index";
 import type {
   AuthorizedCustomConnectorRead,
   CustomConnectorReadCatalogEntry,

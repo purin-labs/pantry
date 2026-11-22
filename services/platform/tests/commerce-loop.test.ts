@@ -10,7 +10,7 @@ import {
   proposeAction,
   requestActionApproval,
   signAction,
-} from "../src/actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import {
   applyCommerceDelivery as applyCommerceDeliveryWithAuthority,
   createCommerceProjectionSchema,
@@ -33,7 +33,7 @@ import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organi
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import {
   parseCaseId,
   parseControlSessionId,

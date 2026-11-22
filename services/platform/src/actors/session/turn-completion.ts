@@ -151,11 +151,11 @@ export function settleTransientHarnessTurn(
 
 /** Each recipient a label binds its content to, once. */
 export function boundRecipients(
-  label: import("../../policy/information-flow").FlowLabel,
-): readonly import("../../policy/information-flow/types").FlowRecipient[] {
+  label: import("@purin-labs/authority/policy/information-flow/index").FlowLabel,
+): readonly import("@purin-labs/authority/policy/information-flow/types").FlowRecipient[] {
   const recipients = new Map<
     string,
-    import("../../policy/information-flow/types").FlowRecipient
+    import("@purin-labs/authority/policy/information-flow/types").FlowRecipient
   >();
   for (const policy of label.policies) {
     if (policy.owner.kind === "recipient_constraint")

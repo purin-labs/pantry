@@ -3,12 +3,12 @@ import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-te
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { evaluateChatFlowLabelSink } from "../chat/information-flow";
 import { isConversationId, isProjectId } from "@purin-labs/control-api";
-import { validateLiveRequestAuthority } from "../request-authority";
+import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   exitApprovalPassReady,
   passOrAskForExitApproval,
 } from "../actors/harness-follow-up";
-import type { HeldOutputReason } from "../data/held-output-request";
+import type { HeldOutputReason } from "@purin-labs/authority/data/held-output-request";
 import type { EffectAction } from "./effect-action";
 import type {
   HarnessCapabilityName,
@@ -22,8 +22,8 @@ import {
   emptyFlowLabel,
   FlowLabel as StoredFlowLabel,
   toolEffectAsksAfterOutsideText,
-} from "../policy/information-flow";
-import { buildControlAuthority } from "../request-authority";
+} from "@purin-labs/authority/policy/information-flow/index";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -44,22 +44,25 @@ import {
   readControlMutationReplay,
   recordOrganisationCommerceMutationReceipt,
 } from "@purin-labs/tenancy/data/control-mutation";
-import type { CapabilityDefinition } from "../authorization/access-grants/capability-key";
+import type { CapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   readSessionInformationFlow,
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "../actors/agent-session-information-flow";
-import { labelAllowsAudiences, type FlowLabel } from "../policy";
-import { digestCanonical } from "../policy";
-import type { AccessGrant } from "../authorization/access-grants/types";
+import {
+  labelAllowsAudiences,
+  type FlowLabel,
+} from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
   resolveUser,
   type OrganisationMember,
 } from "@purin-labs/tenancy/data/control-plane";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import { heldEffectCoversRequest } from "../data/held-output-request";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { heldEffectCoversRequest } from "@purin-labs/authority/data/held-output-request";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 
@@ -148,7 +151,7 @@ type StaffPageMember = Readonly<{ member: OrganisationMember }>;
 
 type StaffPageEffect = Readonly<{
   flowLabel: StoredFlowLabel;
-  sink: import("../policy/information-flow").ToolEffectSink;
+  sink: import("@purin-labs/authority/policy/information-flow/index").ToolEffectSink;
   route: string;
   operation: string;
   body: unknown;
@@ -306,7 +309,8 @@ async function draftSharedReaders(
   lease: HarnessTurnLease,
   edit: SharedDraftEdit,
 ): Promise<
-  readonly import("../policy/information-flow").FlowAudience[] | null
+  | readonly import("@purin-labs/authority/policy/information-flow/index").FlowAudience[]
+  | null
 > {
   const authority = lease.requestAuthority;
   if (authority.kind === "shared_conversation") {
@@ -366,7 +370,7 @@ export async function passSharedDraftExit(
     "draft" | "capabilityId" | "integrationAccountId" | "resourceScope"
   >,
   flowLabel: StoredFlowLabel,
-  sharedWith: readonly import("../policy/information-flow").FlowAudience[],
+  sharedWith: readonly import("@purin-labs/authority/policy/information-flow/index").FlowAudience[],
   /**
    * `check` asks nobody and takes no approval pass: a draft preview (Plan
    * 40B phase 7) shows only an edit that would pass the exit now.
@@ -512,8 +516,8 @@ async function toolEffectPassesExit(
   lease: HarnessTurnLease,
   input: {
     decision: Awaited<ReturnType<typeof evaluateHarnessFlowSink>>;
-    flowLabel: import("../policy/information-flow").FlowLabel;
-    sink: import("../policy/information-flow").ToolEffectSink;
+    flowLabel: import("@purin-labs/authority/policy/information-flow/index").FlowLabel;
+    sink: import("@purin-labs/authority/policy/information-flow/index").ToolEffectSink;
     repeatInRequest?: boolean;
     /**
      * The operation and its arguments. A Session that read outside-written
@@ -595,8 +599,8 @@ async function evaluateHarnessFlowSink(
   accountAccess: import("@purin-labs/tenancy/organisation-access/access").OrganisationAccess,
   userAuthority: import("@purin-labs/tenancy/organisation-access/access").OrganisationUserAuthority,
   input: {
-    flowLabel: import("../policy/information-flow").FlowLabel;
-    sink: import("../policy/information-flow").ToolEffectSink;
+    flowLabel: import("@purin-labs/authority/policy/information-flow/index").FlowLabel;
+    sink: import("@purin-labs/authority/policy/information-flow/index").ToolEffectSink;
   },
 ) {
   const authority = input.sink.destinationAuthority;
@@ -695,7 +699,7 @@ export type ToolEffect<Result = unknown> =
        * label of the Session. `unavailable` is the error with no label.
        */
       label: Readonly<{ source: "turn" | "work"; unavailable: string }>;
-      sink: import("../policy/information-flow").ToolEffectSink;
+      sink: import("@purin-labs/authority/policy/information-flow/index").ToolEffectSink;
       /** The operation and its arguments, when the person's Allow shows them. */
       action?: EffectAction;
       /** The error of a check that does not pass, from the decision kind. */
@@ -823,7 +827,7 @@ export async function settleToolEffect(
     case "shared_draft": {
       const flowLabel = await turnFlowLabel(context, effect.unavailable);
       const { draft } = effect;
-      let sharedWith: readonly import("../policy/information-flow").FlowAudience[] =
+      let sharedWith: readonly import("@purin-labs/authority/policy/information-flow/index").FlowAudience[] =
         [];
       if (draft.shared === "lookup") {
         const everyRoleReads = (

@@ -19,7 +19,7 @@ import {
   settleTypeSafeEvaluation,
   type TypeSafeUsageAuthority,
 } from "../integrations/typesafe/evaluation-ledger";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";
 import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import { JevMailRequest } from "./jev";

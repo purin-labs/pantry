@@ -22,21 +22,24 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import {
   compileTurnAuthority,
   CONTEXT_CASE_READ_CAPABILITY,
-} from "../../src/authorization/access-grants/turn-authority";
-import { encodeContextVisibility } from "../../src/authorization/access-grants/visibility";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
-import { buildControlAuthority } from "../../src/request-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { readSessionInformationFlow } from "../../src/actors/agent-session-information-flow";
-import { audiencesForAdmission } from "../../src/policy/information-flow";
+import { audiencesForAdmission } from "@purin-labs/authority/policy/information-flow/index";
 import {
   applyFileProjectionCommand,
   createFileProjectionCommand,
@@ -61,7 +64,7 @@ import {
   ORGANISATION_ID,
 } from "./slack-journey-support";
 import { network } from "./network";
-import { revokeAccessGrant } from "../../src/data/access-grants";
+import { revokeAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 const SOURCE_NAME = "Restricted P54B supplier.pdf";

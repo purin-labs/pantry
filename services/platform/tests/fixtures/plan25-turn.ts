@@ -6,9 +6,9 @@ import type {
   RequestAuthority,
 } from "@purin-labs/contracts";
 
-import type { CompiledTurnAuthority } from "../../src/authorization/access-grants/turn-authority";
+import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../../src/context/assembly";
-import type { SerializedFlowBinding } from "../../src/policy";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import {
   parseAssignmentId,
   parseCaseId,

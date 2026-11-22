@@ -16,21 +16,21 @@ import {
   admittedSessionToolHost,
   requireSessionExecution,
 } from "../../services/platform/src/actors/session-execution-admission.ts";
-import { authorizeCapabilityUse } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
+import { authorizeCapabilityUse } from "../../foundation/authority/authorization/access-grants/turn-authority.ts";
 import {
   compileTrialTurnAuthority,
   trialAccountAccess,
 } from "./account-authority.mjs";
 import { acceptedExecutionAuthority } from "../../foundation/tenancy/organisation-access/access.ts";
-import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue.ts";
+import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue.ts";
 import { catalogHarnessToolCatalogDigest } from "../../services/platform/src/agent-tools/catalog/selection.ts";
 import { createCatalogHarnessCodeMode } from "../../services/platform/src/agent-tools/catalog/code-mode.ts";
 import { TOOL_REGISTRY } from "../../services/platform/src/agent-tools/registry.ts";
 import {
   createAccessGrant,
   revokeAccessGrant,
-} from "../../services/platform/src/data/access-grants.ts";
-import { parseOrganisationPolicySnapshot } from "../../services/platform/src/policy-snapshot.ts";
+} from "../../foundation/authority/data/access-grants.ts";
+import { parseOrganisationPolicySnapshot } from "../../foundation/authority/policy-snapshot.ts";
 import { parseOrganisationId } from "../../foundation/kernel/ids.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
@@ -42,7 +42,7 @@ import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   ObservationEvidence,
-} from "../../services/platform/src/policy/index.ts";
+} from "../../foundation/authority/policy/index.ts";
 import { sha256Hex } from "../../packages/std/src/index.ts";
 import { createHarnessCodeModeAdmission } from "../../services/platform/src/actors/code-mode-admission.ts";
 import { codeModeSandbox } from "../../services/platform/src/actors/embedded-harness-tool-host.ts";

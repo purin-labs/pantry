@@ -13,11 +13,16 @@ const organisationCredentialMock = vi.hoisted(() => ({
   resolveOrganisationModelCredentialForRoute: vi.fn(),
 }));
 
-vi.mock("../src/credential-vault", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/credential-vault")>()),
-  resolveOrganisationModelCredentialForRoute:
-    organisationCredentialMock.resolveOrganisationModelCredentialForRoute,
-}));
+vi.mock(
+  "@purin-labs/authority/credential-vault/index",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/authority/credential-vault/index")
+    >()),
+    resolveOrganisationModelCredentialForRoute:
+      organisationCredentialMock.resolveOrganisationModelCredentialForRoute,
+  }),
+);
 
 import { createEmbeddedHarnessModelRouteLease } from "../src/actors/session/model-route";
 import { requireSessionId, requireOrganisationId } from "./test-ids";

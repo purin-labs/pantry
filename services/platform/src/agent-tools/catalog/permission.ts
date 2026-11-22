@@ -1,7 +1,7 @@
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
-} from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   isRequestableCapability,
   isRequestableEntityTypeRead,
@@ -9,7 +9,7 @@ import {
   REQUESTABLE_ENTITY_TYPE_READS,
   type RequestableCapability,
   type RequestableEntityTypeRead,
-} from "../../authorization/requestable-capabilities";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type { CatalogExecutionContext } from "./execute";
 import type { HarnessCapabilityName, HarnessToolDefinition } from "./types";

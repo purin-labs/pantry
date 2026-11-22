@@ -3,7 +3,7 @@ import type {
   CustomConnectorDefinitionV1,
   CustomConnectorSetupAttempt,
 } from "../src/custom-connectors";
-import type { VaultHandle } from "../src/credential-vault";
+import type { VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 declare const attempt: VariantBy<

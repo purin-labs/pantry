@@ -7,11 +7,11 @@ import { parseRunSnapshot } from "../../packages/bakery-model/src/bakery-run-sna
 import interrupted from "../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
 import gateway from "../../services/platform/src/integration-gateway";
 import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/actors/actor-router";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../services/platform/src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
 import { bakeryRunSnapshotPrefix } from "../../services/platform/src/commerce/bakery/saved-runs";
-import { createAccessGrant } from "../../services/platform/src/data/access-grants";
+import { createAccessGrant } from "../../foundation/authority/data/access-grants";
 import type { Env } from "../../foundation/kernel/env";
-import { compilePublishAndActivateOrganisationPolicy } from "../../services/platform/src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "../../foundation/authority/policy-snapshot";
 import { fixturePeople } from "../plan-42J/account-authority";
 
 export {

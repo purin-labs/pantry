@@ -32,10 +32,10 @@ vi.mock(
   }),
 );
 vi.mock(
-  "../src/credential-vault/provider-connection-resolution",
+  "@purin-labs/authority/credential-vault/provider-connection-resolution",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("../src/credential-vault/provider-connection-resolution")
+      typeof import("@purin-labs/authority/credential-vault/provider-connection-resolution")
     >()),
     resolveActiveProviderConnectionCredential:
       credentialMocks.resolveActiveProviderConnectionCredential,

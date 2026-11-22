@@ -10,7 +10,7 @@ import {
   handleOnePasswordOperation,
   parseOnePasswordRequest,
   type OnePasswordClient,
-} from "./handler";
+} from "@purin-labs/authority/vault-onepassword/handler";
 
 /**
  * The 1Password store Worker (Plan 79). The Platform posts one operation

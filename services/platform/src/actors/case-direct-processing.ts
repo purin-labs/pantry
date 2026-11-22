@@ -7,7 +7,7 @@ import {
   turnMemoryReaderWithoutSubjects,
   type TurnMemoryReader,
 } from "../context/assembly";
-import type { CompiledTurnAuthority } from "../authorization/access-grants/turn-authority";
+import type { CompiledTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { ContextAssemblyResult } from "../context/assembly";
 import { admitProjectContext } from "../projects/context";
 import { admitChatInput } from "../chat/input-admission";
@@ -49,7 +49,7 @@ import {
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
-} from "../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import { deriveStableCaseId } from "@purin-labs/kernel/case-identity";

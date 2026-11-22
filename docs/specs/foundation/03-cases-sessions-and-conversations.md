@@ -462,7 +462,7 @@ channel; side Cases for email, WhatsApp, canvas chats and scheduled turns.
 - [Runtime architecture](../../architecture/runtime.md), sections "Case coordination
   and connector delivery" and "Cues and proactive work". Where a source differs from the
   code, this spec follows the code. The checks are in the
-  [information-flow guide](../../../services/platform/src/policy/information-flow/README.md).
+  [information-flow guide](../../../foundation/authority/policy/information-flow/README.md).
 - E2E journeys in `services/platform/tests/e2e/`: `case-command-recovery.test.ts`,
   `case-undelivered-output.test.ts`, `case-projection-outbox.test.ts`,
   `slack-connector-admission.test.ts`, `slack-concurrent-cases.test.ts`,

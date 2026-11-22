@@ -3,7 +3,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
@@ -11,7 +11,7 @@ import {
   CASE_CONTEXT_DISCOVERY_JEV_MODEL,
   type JevRelationshipDecision,
 } from "./jev";
-import type { FlowLabel } from "../policy/information-flow/labels";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   readCaseContextDiscoveryPolicy,

@@ -27,7 +27,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { CanonicalActionDraft } from "./action-ledger";
+import type { CanonicalActionDraft } from "@purin-labs/authority/actors/action-ledger";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
@@ -92,8 +92,8 @@ import { stockOperationResourceId } from "../kitchen/contract/stock-action";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { resolveCommerceCancellationAuthority } from "../commerce/provider";
 import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
-import { authorizeCapabilityUse } from "../authorization/access-grants/turn-authority";
-import type { ProviderCapabilityDefinition } from "../authorization/access-grants/capability-key";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
 import { readOfferPriceAllowanceView } from "../commerce/contract/offer-price-allowance";
 import {

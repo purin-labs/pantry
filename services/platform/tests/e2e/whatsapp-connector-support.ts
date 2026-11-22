@@ -15,7 +15,10 @@ import {
   type WhatsAppIngressLimits,
 } from "../../src/actors/connector-whatsapp";
 import { createWhatsAppContentCipher } from "../../src/actors/whatsapp-active-content";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {

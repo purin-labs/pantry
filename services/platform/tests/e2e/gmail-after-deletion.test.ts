@@ -3,7 +3,10 @@ import { HttpResponse, http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { registerEmailSenderAccount } from "../../src/data/email-operational";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";

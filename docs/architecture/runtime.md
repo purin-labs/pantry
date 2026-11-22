@@ -630,7 +630,7 @@ output it names. A delivery is `sending` (under a lease), `retryable`,
 until the turn's current information-flow binding passes the destination
 check, and the final binding must pass before the stream ends
 ([`case-conversation-sink.ts`](../../services/platform/src/actors/case-conversation-sink.ts),
-[IFC guide](../../services/platform/src/policy/information-flow/README.md)).
+[IFC guide](../../foundation/authority/policy/information-flow/README.md)).
 
 ### Recovery
 

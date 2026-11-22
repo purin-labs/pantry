@@ -3,8 +3,8 @@ import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import { definePort } from "@purin-labs/kernel/port";
-import type { FlowLabel } from "../../policy/information-flow";
-import type { NativeChatAudience } from "../../policy/information-flow/native-audience";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
+import type { NativeChatAudience } from "@purin-labs/authority/policy/information-flow/native-audience";
 
 /**
  * The readers of a native chat turn now, for a context candidate under

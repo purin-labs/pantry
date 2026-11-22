@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import { readCurrentOrganisationPolicySnapshot } from "../../../policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   installMerchantAgent,
   merchantAgentDefaultSkills,

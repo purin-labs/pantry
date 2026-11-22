@@ -9,11 +9,11 @@ import {
 import type { OrganisationUserAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   resolveVaultSecretRow,
   type VaultSecretRow,
-} from "../credential-vault/service";
+} from "@purin-labs/authority/credential-vault/service";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
@@ -32,7 +32,10 @@ import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
 } from "@purin-labs/tenancy/placement";
-import { parsePersonId, type PersonId } from "../data/person-authz";
+import {
+  parsePersonId,
+  type PersonId,
+} from "@purin-labs/authority/data/person-authz";
 import type { SlackMessageEvent } from "./events";
 import {
   deriveSlackCaseId,

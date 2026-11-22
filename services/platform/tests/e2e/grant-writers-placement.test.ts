@@ -8,7 +8,7 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import { parseVaultHandle } from "../../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import {
   issueControlSession,
   type IssuedControlSession,
@@ -19,11 +19,11 @@ import {
   readControlMutationReplay,
   type ControlMutationIdentity,
 } from "@purin-labs/tenancy/data/control-mutation";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   applyVersionedAccessDefaults,
   changeVersionedCapabilityPolicy,
-} from "../../src/access-control/capability-mutations";
+} from "@purin-labs/authority/access-control/capability-mutations";
 import {
   parseSetupSelection,
   selectSetupTemplates,

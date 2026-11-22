@@ -20,16 +20,16 @@ import {
 } from "../../actors/session-execution-admission";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import type { CatalogExecutionContext } from "../catalog/execute";
-import { authorizeCapabilityUse } from "../../authorization/access-grants/turn-authority";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   ObservationEvidence,
   type FlowLabel,
-} from "../../policy";
-import { digestCanonical } from "../../policy";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/policy/index";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { sha256Hex } from "@purin-labs/std";
 import {
   collaborationEditDeadline,

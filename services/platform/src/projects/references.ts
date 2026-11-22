@@ -1,9 +1,9 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { listAccessGrants } from "../data/access-grants";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { commerceGrantSelection } from "../authorization/access-grants/commerce-grant-selection";
-import { integrationResourceScopeForGrant } from "../policy/information-flow/source-labels";
+import { commerceGrantSelection } from "@purin-labs/authority/authorization/access-grants/commerce-grant-selection";
+import { integrationResourceScopeForGrant } from "@purin-labs/authority/policy/information-flow/source-labels";
 import {
   readChatControlAuthority,
   resolveNativeChatAudience,
@@ -15,7 +15,7 @@ import {
 } from "../chat/disclosure-evidence";
 import { readGrantedFileMetadata } from "../context/files/tools";
 import { prepareTurnAuthority } from "../context/turn-context";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -27,7 +27,7 @@ import {
   decideContextAdmission,
   FlowLabel,
   ObservationEvidence,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import {
   projectReferenceIdentity,
   isConversationId,
@@ -596,7 +596,7 @@ async function admittedReference(
   observedAt: number,
   revision: string,
   inputLabel: FlowLabel,
-  source: import("../policy/information-flow").FlowSource,
+  source: import("@purin-labs/authority/policy/information-flow/index").FlowSource,
   sourceRevision: number,
   contentDigest: string,
 ): Promise<ProjectReferenceObservation> {

@@ -9,7 +9,7 @@ import {
 } from "../src/context/files/persistence";
 import { ProviderFileProjectionSourceReader } from "../src/context/files/provider-source";
 import { resolveFileProviderAccess } from "../src/provider-workflows/file-context-credential";
-import { storeSessionExecutionVaultSecret } from "../src/credential-vault/service";
+import { storeSessionExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import { readAcceptedMessageAttachment } from "../src/actors/message-preparation";
 
 declare const fileRead: Parameters<typeof readGrantedFile>[0];

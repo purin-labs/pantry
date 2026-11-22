@@ -44,10 +44,10 @@ import {
   InformationFlowContext,
   evaluateFlowLabelSink,
   organisationAuthzFromPolicy,
-} from "../src/policy/information-flow";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
-import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
-import { buildControlAuthority } from "../src/request-authority";
+} from "@purin-labs/authority/policy/information-flow/index";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { deriveDirectCaseIdentities } from "../src/actors/case-direct-processing";
 import { projectEmailOperationalProposal } from "../src/data/email-operational";
 import {
@@ -82,18 +82,23 @@ const mocks = vi.hoisted(function chatMocks() {
     },
   };
 });
-vi.mock("../src/policy-snapshot", async function policyModule(importOriginal) {
-  const original =
-    await importOriginal<typeof import("../src/policy-snapshot")>();
-  // The current organisation policy, with no capability rules.
-  return {
-    ...original,
-    readCurrentOrganisationPolicySnapshot: async () => ({
-      ok: true,
-      value: original.defaultDenyPolicy({ now: 0 }),
-    }),
-  };
-});
+vi.mock(
+  "@purin-labs/authority/policy-snapshot",
+  async function policyModule(importOriginal) {
+    const original =
+      await importOriginal<
+        typeof import("@purin-labs/authority/policy-snapshot")
+      >();
+    // The current organisation policy, with no capability rules.
+    return {
+      ...original,
+      readCurrentOrganisationPolicySnapshot: async () => ({
+        ok: true,
+        value: original.defaultDenyPolicy({ now: 0 }),
+      }),
+    };
+  },
+);
 vi.mock("../src/models/route", async function modelModule(importOriginal) {
   return {
     ...(await importOriginal<typeof import("../src/models/route")>()),

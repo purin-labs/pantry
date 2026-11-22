@@ -32,7 +32,7 @@ import {
   identifier,
   integerIn,
 } from "../../case-context-discovery/policy";
-import { digestCanonical } from "../../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import {
   caseContextCollectionReviewDecision,
   caseContextCollectionSourceAccess,

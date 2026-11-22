@@ -23,7 +23,7 @@ import {
   FlowBinding,
   InformationFlowContext,
   joinFlowLabels,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { RequestAuthority, SessionProposal } from "@purin-labs/contracts";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import {
@@ -77,8 +77,8 @@ import type {
 } from "../mail-inbox/reply-sources";
 import type { ShownMemoryRevision } from "../memory/contract/turn-memory";
 import { caseContextCollectionEvidenceDependency } from "../case-context-discovery/evidence";
-import { bindMailboxCaseContextCollectionAuthority } from "../authorization/access-grants/turn-authority";
-import type { SerializedFlowBinding } from "../policy/information-flow";
+import { bindMailboxCaseContextCollectionAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 
 import {
   newRequestId,
@@ -95,7 +95,7 @@ import {
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
-} from "../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import { resolveOrganisationModelRoute } from "../models/route";
 import { readGmailInferenceEligibility } from "../mail-inbox/contract/gmail-inference-eligibility";
 import {
@@ -107,7 +107,7 @@ import {
 import {
   buildAgentMailboxAuthority,
   validateLiveAutomationAuthority,
-} from "../request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
@@ -149,7 +149,7 @@ import {
   type EmailCommerceEvidence,
 } from "../mail-inbox/supplier-context";
 import { mailClassificationEvidence } from "../mail-inbox/evidence";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import {
   recoverAbandonedAssignments,
   sessionQuiescenceProver,

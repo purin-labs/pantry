@@ -7,7 +7,7 @@ import {
   parseNep413Proof,
   verifyNep413Proof,
   type Nep413Challenge,
-} from "../src/seams/nep413";
+} from "@purin-labs/authority/seams/nep413";
 
 const BASE58_ALPHABET =
   "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";

@@ -9,7 +9,7 @@ import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
   LedgerCanonicalAction,
-} from "../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   buildShopifyOrderCancelDraft,

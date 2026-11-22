@@ -12,7 +12,7 @@ import type {
 import {
   explainAccessDecision,
   type CustomConnectorAccountRead,
-} from "../../access-control/decision-explanation";
+} from "@purin-labs/authority/access-control/decision-explanation";
 
 import type { Env } from "@purin-labs/kernel/env";
 import type { Result } from "@purin-labs/kernel/result";

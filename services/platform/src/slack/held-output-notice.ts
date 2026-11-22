@@ -1,5 +1,5 @@
 import { workspacePortalUrl } from "./portal-links";
-import type { HeldOutputReason } from "../data/held-output-request";
+import type { HeldOutputReason } from "@purin-labs/authority/data/held-output-request";
 import type { Env } from "@purin-labs/kernel/env";
 import { noticeCardBlocks } from "./notice-card";
 

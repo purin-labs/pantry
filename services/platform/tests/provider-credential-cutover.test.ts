@@ -14,7 +14,7 @@ import {
 import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
-} from "../src/actors/organisation/policy-types";
+} from "@purin-labs/authority/actors/organisation/policy-types";
 import type {
   ProviderConnectionId,
   OrganisationId,
@@ -23,13 +23,16 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import {
   writeStripeReadCredentialRef,
   type OrganisationPolicySnapshot,
-} from "../src/policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   activateProviderCredentialCutover,
   reconcileInterruptedProviderCredentialCutovers,
 } from "../src/integrations/contract/credential-cutover";
 import type { Result } from "@purin-labs/kernel/result";
-import { storeVaultSecret, type VaultHandle } from "../src/credential-vault";
+import {
+  storeVaultSecret,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/index";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { testRoot } from "./secrets-store";

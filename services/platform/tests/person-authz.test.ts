@@ -7,7 +7,7 @@ import {
   parsePersonId,
   parsePersonRoleOperation,
   parsePersonRoleRecords,
-} from "../src/data/person-authz";
+} from "@purin-labs/authority/data/person-authz";
 import { parseRequestId } from "@purin-labs/kernel/ids";
 import { requireOrganisationId } from "./test-ids";
 

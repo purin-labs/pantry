@@ -19,7 +19,7 @@ import type {
   ActionExecutionRetryEvidence,
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
-} from "../../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import type { ActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
@@ -29,7 +29,7 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { FlowDecision } from "../../policy/index";
+import type { FlowDecision } from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceActionError, CommerceActionPath } from "../action-model";
 

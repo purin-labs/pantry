@@ -1,14 +1,14 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 import type { CustomConnectorAuthentication } from "./egress";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   resolveVaultHandle,
   revokeVaultSecret,
   storeVaultSecret,
-} from "../credential-vault/service";
-import type { VaultHandle, VaultSecret } from "../credential-vault/domain";
-import { parseVaultHandle } from "../credential-vault/domain";
+} from "@purin-labs/authority/credential-vault/service";
+import type { VaultHandle, VaultSecret } from "@purin-labs/authority/credential-vault/domain";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseIntegrationAccountId,
@@ -20,7 +20,7 @@ import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   digestCanonical,
   serializeCanonical,
-} from "../policy/information-flow/digest";
+} from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   CustomConnectorDefinitionV1,

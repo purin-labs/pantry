@@ -35,7 +35,10 @@ import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { FlowBinding, ObservationEvidence } from "../policy/information-flow";
+import {
+  FlowBinding,
+  ObservationEvidence,
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { Conversation } from "./conversation";
 import { conversationCaseIdentity } from "./conversation-access";
 import type { DisclosureDestination } from "./disclosure-evidence";

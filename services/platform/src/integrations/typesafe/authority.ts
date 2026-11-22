@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import type { CredentialVaultBindings } from "../../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { TypeSafeAuthority } from "../../policy/information-flow/types";
+import type { TypeSafeAuthority } from "@purin-labs/authority/policy/information-flow/types";
 import type { TypeSafeCredential } from "./credential";
 import {
   readTypeSafeConnection,

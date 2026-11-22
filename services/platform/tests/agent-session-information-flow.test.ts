@@ -10,7 +10,10 @@ import {
   readSessionInformationFlow,
   readSessionTurnFlowBinding,
 } from "../src/actors/agent-session-information-flow";
-import { FlowLabel, ObservationEvidence } from "../src/policy";
+import {
+  FlowLabel,
+  ObservationEvidence,
+} from "@purin-labs/authority/policy/index";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("AgentSession OAC persistence", () => {

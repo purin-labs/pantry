@@ -14,9 +14,9 @@ import {
 } from "./services";
 import type { StaffPageToolReceipt } from "../catalog/types";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
-import { digestCanonical } from "../../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { roleMayOperate } from "@purin-labs/tenancy/data/control-plane";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   liveDeviceMember,
   type ToolEffect,

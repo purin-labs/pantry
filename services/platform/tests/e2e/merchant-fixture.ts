@@ -6,11 +6,11 @@ import {
   createAccessGrant,
   readAccessGrant,
   type CreateAccessGrantInput,
-} from "../../src/data/access-grants";
+} from "@purin-labs/authority/data/access-grants";
 import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
-} from "../../src/data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 export async function seedMerchantFixture(

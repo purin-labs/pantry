@@ -8,13 +8,13 @@ import {
   resolveActiveProviderAccountContext,
   requireConnectionCredentialAuthority,
 } from "@purin-labs/connections/data/integration-account";
-import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
+import { resolveActiveProviderConnectionCredential } from "@purin-labs/authority/credential-vault/provider-connection-resolution";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   storeVaultSecret,
   type VaultHandle,
   type VaultOAuthTokens,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { isRecord } from "@purin-labs/std";
 
 const NOTION_API_VERSION = "2026-03-11";

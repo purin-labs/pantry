@@ -1,13 +1,13 @@
 import {
   applyVersionedAccessDefaults,
   changeVersionedCapabilityPolicy,
-} from "../src/access-control/capability-mutations";
+} from "@purin-labs/authority/access-control/capability-mutations";
 import {
   prepareReadAndProposeAccessDefaults,
   writeOrganisationCapabilityPolicy,
   type CapabilityPolicyAdmission,
   type CapabilityPolicyWrite,
-} from "../src/data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import { selectSetupTemplates } from "../src/data/onboarding";
 import { publishCommerceExportPreset } from "../src/data/export-preset";
 import {

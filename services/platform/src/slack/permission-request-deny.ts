@@ -6,7 +6,7 @@ import {
   AGENT_PERMISSION_REQUEST_LIFETIME_MS,
   decideAgentPermissionRequest,
   readAgentPermissionRequest,
-} from "../data/agent-permission-request";
+} from "@purin-labs/authority/data/agent-permission-request";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";

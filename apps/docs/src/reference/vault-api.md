@@ -26,7 +26,7 @@ repository runbook `docs/runbooks/vault-operations.md`.
 
 ## Public API
 
-The public exports live in `services/platform/src/credential-vault/index.ts`.
+The public exports live in `foundation/authority/credential-vault/index.ts`.
 
 | Operation                             | API                                                                                   |
 | ------------------------------------- | ------------------------------------------------------------------------------------- |

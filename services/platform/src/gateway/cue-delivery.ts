@@ -41,8 +41,8 @@ import {
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
-import { buildWorkflowAuthority } from "../request-authority";
+import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
+import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
 import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
 import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";

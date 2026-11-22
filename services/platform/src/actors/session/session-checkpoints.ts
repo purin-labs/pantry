@@ -2,7 +2,7 @@ import type { SessionShared } from "./session-shared";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { Outcome } from "@purin-labs/contracts";
-import { validateLiveRequestAuthority } from "../../request-authority";
+import { validateLiveRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
 import type {
   HarnessCheckpointRecord,
@@ -53,7 +53,7 @@ import {
   type SessionTurnStreamError,
 } from "../agent-session-turn-stream";
 import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../agent-session-information-flow";
-import type { SerializedFlowBinding } from "../../policy";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import { checkpointPublicationFailure } from "./harness-source";
 import { checkpointReceipt } from "./support";
 import { traceSessionTurnCompletion } from "./traces";

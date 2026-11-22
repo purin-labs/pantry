@@ -5,7 +5,7 @@ import { exports } from "cloudflare:workers";
 import { http, HttpResponse } from "msw";
 import { isRecord } from "@purin-labs/std";
 
-import { createAccessGrant } from "../../src/data/access-grants";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import {
   ROOT_TS,
   ORGANISATION_ID,

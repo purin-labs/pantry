@@ -175,7 +175,7 @@ routes, the agent tools, the configuration drafts (the `deviceCommands` port) an
 Plan 24 bake runs. The control route checks the role in `DEVICE_COMMAND_ROLE`. The agent
 tools and the drafts check `roleMayOperate`. A bake run uses no role map. The same `Idempotency-Key` gives the same receipt. The
 capabilities `device.read`, `device.pause` and `device.camera.read` are in
-`services/platform/src/authorization/capability-catalogue.ts`. An agent can ask for each
+`foundation/authority/authorization/capability-catalogue.ts`. An agent can ask for each
 in the permission prompt. Each needs `scripts/capability-policy-backfill-sql.mjs`. An
 agent read enters the turn under the `device_fleet` information-flow source label.
 

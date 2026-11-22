@@ -5,7 +5,7 @@ import {
   type OnePasswordClient,
   type OnePasswordItem,
   type OnePasswordItemCreate,
-} from "../../src/vault-onepassword/handler";
+} from "@purin-labs/authority/vault-onepassword/handler";
 
 /**
  * 1Password as the store Worker reaches it in the E2E runtime (Plan 79).

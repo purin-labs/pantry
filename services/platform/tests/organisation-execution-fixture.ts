@@ -18,7 +18,7 @@ import {
   type OrganisationBootstrap,
 } from "@purin-labs/tenancy/data/control-plane";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
-import { buildControlAuthority } from "../src/request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Env } from "@purin-labs/kernel/env";
 import type { UnitTestEnv } from "./worker-fakes";

@@ -14,10 +14,10 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { createAccessGrant } from "../../src/data/access-grants";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import {

@@ -16,7 +16,7 @@ import {
 import {
   buildControlAuthority,
   validateLiveRequestAuthority,
-} from "../request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import {
   audiencesForDestination,
   createCurrentObservedSourceFlowLabel,
@@ -26,8 +26,8 @@ import {
   type FlowSinkCheck,
   type FlowLabel,
   type FlowAudience,
-} from "../policy/information-flow";
-import { decideFlowSink } from "../policy";
+} from "@purin-labs/authority/policy/information-flow/index";
+import { decideFlowSink } from "@purin-labs/authority/policy/index";
 import { authorizeProject } from "../projects/access";
 import { authorizeConversation } from "./conversation-access";
 import type { ConversationScope } from "./store";
@@ -35,13 +35,13 @@ import type { Variant } from "@purin-labs/type-utils";
 import {
   createNativeChatAudience,
   type NativeChatAudience,
-} from "../policy/information-flow/native-audience";
-export type { NativeChatAudience } from "../policy/information-flow/native-audience";
+} from "@purin-labs/authority/policy/information-flow/native-audience";
+export type { NativeChatAudience } from "@purin-labs/authority/policy/information-flow/native-audience";
 import type {
   ConversationDeliverySink,
   ToolEffectSink,
   FlowLabelDecision,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 
 export async function readChatControlAuthority(
   db: OrganisationDatabase,
@@ -311,8 +311,8 @@ export async function decideChatFlowSink(
   binding: FlowBinding,
   authority: Variant<RequestAuthority, "control">,
   sink:
-    | import("../policy/information-flow").ConversationDeliverySink
-    | import("../policy/information-flow").ToolEffectSink,
+    | import("@purin-labs/authority/policy/information-flow/index").ConversationDeliverySink
+    | import("@purin-labs/authority/policy/information-flow/index").ToolEffectSink,
   destination: DisclosureDestination = { kind: "current" },
 ) {
   const audience = await resolveNativeChatAudience(

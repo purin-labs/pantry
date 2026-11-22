@@ -4,23 +4,23 @@ import {
   type OrganisationPlacementBindings,
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseOrganisationId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
-import type { FlowLabel } from "../../policy/information-flow/labels";
-import { digestCanonical } from "../../policy/information-flow/digest";
-import { selectActiveGrants } from "../../authorization/access-grants/compiler";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
-} from "../../authorization/capability-catalogue";
-import { listAccessGrants } from "../../data/access-grants";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import {
   resolveActiveProviderAccountContext,
   resolveIntegrationAccount,
   resolveProviderConnection,
 } from "@purin-labs/connections/data/integration-account";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { validateNativeRequestAuthority } from "../../request-authority";
-import { readCurrentOrganisationPolicySnapshot } from "../../policy-snapshot";
-import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../../policy";
+import { validateNativeRequestAuthority } from "@purin-labs/authority/request-authority/index";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
+import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 export async function authorizeMailSource(
   env: OrganisationPlacementBindings,

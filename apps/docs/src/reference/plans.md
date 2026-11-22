@@ -39,7 +39,7 @@ Simulation and provider Sandbox acceptance do not establish physical readiness.
 | `docs/plan-14-actor-runtime-architecture.md` and `docs/plan-15.md`                                  | Actor ownership, recovery, and coordinated work          |
 | `docs/architecture/runtime.md#harness-adapter`                                                      | Three pinned Codex/Pi inference authorities              |
 | `docs/architecture/security.md#vault-policy-and-revocation` and `docs/runbooks/vault-operations.md` | Credential lifecycle and purpose-bound resolution        |
-| `services/platform/src/policy/information-flow/README.md`                                           | Protected context, authorization, and output integration |
+| `foundation/authority/policy/information-flow/README.md`                                            | Protected context, authorization, and output integration |
 | `docs/commerce-domain-architecture.md` and `docs/commerce-monorepo.md`                              | Commerce contracts, authority, and source ownership      |
 
 ## Evidence and deferred work

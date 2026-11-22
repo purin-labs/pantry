@@ -4,7 +4,7 @@ import {
   parseVaultHandle,
   revokeCredential,
   storeVaultSecret,
-} from "../../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   authorizeCredentialRevocation,
   beginCredentialRotation,

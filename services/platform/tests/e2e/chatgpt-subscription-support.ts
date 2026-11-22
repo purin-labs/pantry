@@ -14,7 +14,7 @@ import {
   parseModelApiKey,
   storeOrganisationModelCredential,
   type ModelKeyProvider,
-} from "../../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,

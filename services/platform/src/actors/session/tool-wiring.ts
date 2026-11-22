@@ -2,7 +2,7 @@ import type {
   HarnessTurnLease,
   PageBrowserContext,
 } from "@purin-labs/contracts";
-import type { EffectiveGrantSet } from "../../authorization/access-grants";
+import type { EffectiveGrantSet } from "@purin-labs/authority/authorization/access-grants/index";
 import type {
   ToolRegistry,
   ToolServiceSet,
@@ -22,7 +22,7 @@ import type {
   HarnessPermissionRequest,
   HarnessPermissionRequestResult,
 } from "../../agent-tools/catalog/permission";
-import type { FlowLabel } from "../../policy/information-flow";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
 
 /** What a person's browser gave with a message. The contracts own the form. */

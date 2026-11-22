@@ -11,9 +11,9 @@ import {
   bindMailboxCaseContextCollectionAuthority,
   CONTEXT_CASE_READ_CAPABILITY,
   type CompiledTurnAuthority,
-} from "../authorization/access-grants/turn-authority";
-import { audiencesForAdmission } from "../policy";
-import type { FlowRecipient } from "../policy/information-flow/types";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { audiencesForAdmission } from "@purin-labs/authority/policy/index";
+import type { FlowRecipient } from "@purin-labs/authority/policy/information-flow/types";
 import {
   newRequestId,
   type CaseId,
@@ -22,8 +22,8 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
-import type { PinnedSessionPolicy } from "../policy-snapshot";
-import { parseStoredRequestAuthority } from "../request-authority";
+import type { PinnedSessionPolicy } from "@purin-labs/authority/policy-snapshot";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   CONTEXT_ASSEMBLY_STRATEGY_VERSION,

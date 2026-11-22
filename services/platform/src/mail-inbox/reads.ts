@@ -7,7 +7,7 @@ import type { MailDecision } from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";
 import type {
   MailClassifiedPageInput,

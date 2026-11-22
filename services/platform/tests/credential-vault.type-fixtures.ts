@@ -3,8 +3,8 @@ import type {
   VaultRootRotationId,
   VaultRotationBatchLimit,
   VaultSecret,
-} from "../src/credential-vault";
-import type { VaultKeyRing } from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/index";
+import type { VaultKeyRing } from "@purin-labs/authority/credential-vault/keyring";
 
 // @ts-expect-error VaultHandle must cross the parser boundary.
 const handle: VaultHandle = "vault:stripe:acct_1";

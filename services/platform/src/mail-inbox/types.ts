@@ -7,7 +7,7 @@ import {
 } from "@purin-labs/control-api";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { isRecord } from "@purin-labs/std";
-import { parseStoredRequestAuthority } from "../request-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

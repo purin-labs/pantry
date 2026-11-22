@@ -12,13 +12,13 @@ import {
 } from "./email-case-context-collection-evidence";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { SerializedFlowBinding } from "../policy/information-flow";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type {
   GmailAttachmentRef,
   GmailMessageContent,
 } from "@purin-labs/connections/mail/gmail-adapter";
 import type { Result } from "@purin-labs/kernel/result";
-import { digestCanonical } from "../policy";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
 import type { HarnessToolHost } from "./embedded-harness";
 import {

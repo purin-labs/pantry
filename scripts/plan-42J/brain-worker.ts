@@ -21,11 +21,11 @@ import {
 } from "../../services/platform/src/actors/connector-email";
 import { runConnectorEmailEvaluation } from "../../services/platform/src/actors/connector-email-evaluation";
 import { emailTurnSessionId } from "../../services/platform/src/actors/email-case-processing";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../services/platform/src/authorization/access-grants/turn-authority";
-import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue";
-import { parseVaultHandle } from "../../services/platform/src/credential-vault/domain";
-import { storeVaultSecret } from "../../services/platform/src/credential-vault";
-import { createAccessGrant } from "../../services/platform/src/data/access-grants";
+import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
+import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue";
+import { parseVaultHandle } from "../../foundation/authority/credential-vault/domain";
+import { storeVaultSecret } from "../../foundation/authority/credential-vault";
+import { createAccessGrant } from "../../foundation/authority/data/access-grants";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
@@ -52,7 +52,7 @@ import {
 } from "../../foundation/kernel/ids";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope";
 import { acceptMailboxModelTerms } from "../../services/platform/tests/mailbox-model-consent-fixture";
-import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
+import { defaultDenyPolicy } from "../../foundation/authority/policy-snapshot";
 import { fixturePeople } from "./account-authority";
 
 export {

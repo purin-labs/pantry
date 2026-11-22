@@ -42,8 +42,8 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   CUSTOMER_ID,
   installFixture,

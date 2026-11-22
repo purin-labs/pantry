@@ -15,7 +15,7 @@ import {
   resolveIntegrationAccount,
   resolveProviderConnection,
 } from "@purin-labs/connections/data/integration-account";
-import { parseVaultHandle, type VaultHandle } from "../src/credential-vault";
+import { parseVaultHandle, type VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { createMigratedDatabase } from "./sqlite-d1";

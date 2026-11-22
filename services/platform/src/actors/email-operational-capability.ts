@@ -1,16 +1,16 @@
 import {
   parseCapabilityKey,
   type CapabilityDefinition,
-} from "../authorization/access-grants/capability-key";
+} from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   integrationAccountReference,
   type IntegrationAccountReference,
-} from "../access-control/integration-discovery";
+} from "@purin-labs/authority/access-control/integration-discovery";
 import {
   CAPABILITY_KEYS,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   SLACK_MESSAGE_RESOURCE_SCOPE,
-} from "../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,

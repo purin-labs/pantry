@@ -10,7 +10,7 @@ import {
   flowBindingForContext,
   InformationFlowContext,
   ObservationEvidence,
-} from "../policy";
+} from "@purin-labs/authority/policy/index";
 import { isRecord } from "@purin-labs/std";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;

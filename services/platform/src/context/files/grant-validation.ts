@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchWithOrganisationPlacement } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { FileResourceAccessGrantTarget } from "../../authorization/access-grants/types";
+import type { FileResourceAccessGrantTarget } from "@purin-labs/authority/authorization/access-grants/types";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
@@ -16,8 +16,8 @@ import {
 import type { Result } from "@purin-labs/kernel/result";
 import type { FileContextProvider } from "@purin-labs/contracts";
 
-import type { FileGrantValidationError } from "../../authorization/access-grants/file-grant-parts";
-export type { FileGrantValidationError } from "../../authorization/access-grants/file-grant-parts";
+import type { FileGrantValidationError } from "@purin-labs/authority/authorization/access-grants/file-grant-parts";
+export type { FileGrantValidationError } from "@purin-labs/authority/authorization/access-grants/file-grant-parts";
 
 export async function validateFileGrantTarget(
   input: Readonly<{

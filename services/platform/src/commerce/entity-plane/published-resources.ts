@@ -20,8 +20,8 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import { sameCommerceRelationshipRef } from "@purin-labs/commerce-contracts/commerce-relationship-references";
 
-import type { AccessGrantTarget } from "../../authorization/access-grants/types";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import type { AccessGrantTarget } from "@purin-labs/authority/authorization/access-grants/types";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { AgentResponsibilityScope } from "../../data/agent-operations";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
@@ -29,8 +29,8 @@ import { readOrganisationEnvironment } from "../../control/organisation-runtime"
 import type { Env } from "@purin-labs/kernel/env";
 import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { opaqueAccessTargetReference } from "../../access-control/references";
-import type { PublishedCommerceTarget } from "../../access-control/commerce-access-targets";
+import { opaqueAccessTargetReference } from "@purin-labs/authority/access-control/references";
+import type { PublishedCommerceTarget } from "@purin-labs/authority/access-control/commerce-access-targets";
 import { commerceCanonicalResourceId } from "../contract/resource-ids";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

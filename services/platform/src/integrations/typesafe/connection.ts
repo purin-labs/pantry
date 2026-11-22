@@ -3,15 +3,15 @@ import { type SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-
 import {
   parseVaultHandle,
   type VaultHandle,
-} from "../../credential-vault/domain";
+} from "@purin-labs/authority/credential-vault/domain";
 import {
   resolveVaultHandle,
   revokeVaultSecret,
   storeOrganisationExecutionVaultSecret,
-} from "../../credential-vault/service";
+} from "@purin-labs/authority/credential-vault/service";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import type { CredentialVaultBindings } from "../../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import { validJevApiKey, type JevError } from "./system-one-client";

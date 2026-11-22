@@ -9,13 +9,13 @@ import {
   compileEffectiveGrantSet,
   type AccessGrant,
   type EffectiveGrantSet,
-} from "../src/authorization/access-grants";
-import { digestSelectedGrantSet } from "../src/authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/index";
+import { digestSelectedGrantSet } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   buildDirectSlackAuthority,
   buildSharedSlackAuthority,
   buildWorkflowAuthority,
-} from "../src/request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

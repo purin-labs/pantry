@@ -3,7 +3,7 @@ import { encodeBase64Url } from "@purin-labs/std";
 import {
   digestApprovalAction,
   type ApprovalActionBinding,
-} from "../../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import {
   beginGoogleOidc,
   completeGoogleOidc,

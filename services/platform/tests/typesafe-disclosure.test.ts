@@ -1,8 +1,8 @@
 import { expect, it, vi } from "vitest";
 import { TypeSafeDisclosure } from "../src/integrations/typesafe/disclosure";
-import { FlowLabel } from "../src/policy/information-flow/labels";
-import type { TypeSafeInferenceSink } from "../src/policy/information-flow/types";
-import { buildWorkflowAuthority } from "../src/request-authority";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
+import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
+import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { JevRelationshipRequest } from "../src/case-context-discovery/jev";
 

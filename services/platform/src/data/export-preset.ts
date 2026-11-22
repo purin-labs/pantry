@@ -22,7 +22,7 @@ import {
   type CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 
-import type { CommerceReadGrantScope } from "../authorization/access-grants/types";
+import type { CommerceReadGrantScope } from "@purin-labs/authority/authorization/access-grants/types";
 import {
   prepareControlMutationReceiptAfterWrite,
   readControlMutationReplay,
@@ -34,19 +34,19 @@ import {
 import type { OrganisationEnvironment } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   prepareCapabilityPolicyWrite,
   capabilityPolicyAdmission,
   type CapabilityPolicyAdmission,
-} from "./capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   prepareExportCoordinationArea,
   prepareExportCoordinatorInstallation,
   prepareExportResponsibilityScope,
 } from "./agent-operations/export-coordinator-rows";
-import { prepareGuardedFirstGrant } from "./access-grants";
+import { prepareGuardedFirstGrant } from "@purin-labs/authority/data/access-grants";
 import {
   prepareGuardedConfigurationVersionFence,
   preparePublicationRevision,

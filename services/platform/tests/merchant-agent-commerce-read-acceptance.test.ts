@@ -19,7 +19,7 @@ import { TOOL_REGISTRY } from "../src/agent-tools/registry";
 import type {
   HarnessCodeModeAuthority,
 } from "../src/agent-tools/catalog/types";
-import type { AccessGrant } from "../src/authorization/access-grants/types";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";

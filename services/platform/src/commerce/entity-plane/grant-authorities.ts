@@ -16,8 +16,8 @@ import {
   hasValidMembershipRevision,
   selectedGrantError,
   type EffectiveGrantCompileError,
-} from "../../authorization/access-grants/compiler";
-import type { AccessGrant } from "../../authorization/access-grants/types";
+} from "@purin-labs/authority/authorization/access-grants/compiler";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 

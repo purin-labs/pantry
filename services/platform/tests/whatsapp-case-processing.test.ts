@@ -48,8 +48,8 @@ vi.mock("../src/models/route", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/models/route")>()),
   resolveOrganisationModelRoute: orchestratorMocks.resolveOrganisationModelRoute,
 }));
-vi.mock("../src/policy-snapshot", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/policy-snapshot")>()),
+vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/authority/policy-snapshot")>()),
   loadOrganisationPolicyOrDefaultDeny:
     orchestratorMocks.loadOrganisationPolicyOrDefaultDeny,
 }));

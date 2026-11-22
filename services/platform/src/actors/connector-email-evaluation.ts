@@ -7,7 +7,7 @@ import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-e
 import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 
-import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
+import { resolveActiveProviderConnectionCredential } from "@purin-labs/authority/credential-vault/provider-connection-resolution";
 import {
   gmailThreadCaseIdValue,
   bindAdmittedEmailMessageSender,

@@ -13,7 +13,7 @@ import { workspacePortalUrl } from "./portal-links";
  * The summary holds typed facts of the change. The status is fixed text.
  */
 
-import type { ActionLedgerEntry } from "../actors/action-ledger";
+import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import {
   parseCommerceActionPath,
   type CommerceActionPath,

@@ -12,7 +12,7 @@ import {
 } from "../actors/agent-session-turn-stream";
 import type { Env } from "@purin-labs/kernel/env";
 import type { AgentEvent, RequestAuthority } from "@purin-labs/contracts";
-import { FlowBinding } from "../policy/information-flow";
+import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import { conversationTimeline, type ConversationStream } from "./conversation";
 import type { ConversationScope } from "./store";
 import {

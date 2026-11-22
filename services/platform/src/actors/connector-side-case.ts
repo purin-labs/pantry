@@ -2,8 +2,8 @@ import { isSideCaseProposalId } from "@purin-labs/control-api";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import { isNonBlankString, isRecord } from "@purin-labs/std";
 
-import { resolveActiveSlackThreadCredential } from "../credential-vault";
-import { parsePersonId } from "../data/person-authz";
+import { resolveActiveSlackThreadCredential } from "@purin-labs/authority/credential-vault/index";
+import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseChannelId,
@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { SlackCaseCommand } from "../slack/case-command-message";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { refreshSlackRequestAuthority } from "../request-authority";
+import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveSlackLinkedMember } from "./action-mutation-execution";
 import { deriveSlackCaseRouteIdentities } from "../slack/case-routing";
 import {

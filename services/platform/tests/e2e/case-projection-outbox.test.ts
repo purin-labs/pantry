@@ -18,7 +18,7 @@ import {
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { CaseDO } from "../../src/actors/case";
 import { parseCaseId } from "@purin-labs/kernel/ids";
-import { buildControlAuthority } from "../../src/request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
   installDiscoveryActorFixture,

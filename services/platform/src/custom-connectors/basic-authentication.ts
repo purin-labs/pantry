@@ -1,4 +1,4 @@
-import type { VaultSecret } from "../credential-vault";
+import type { VaultSecret } from "@purin-labs/authority/credential-vault/index";
 
 export function basicApiKeyVaultSecret(value: string): VaultSecret | null {
   if (!/^[\x21-\x39\x3b-\x7e]+$/u.test(value)) return null;

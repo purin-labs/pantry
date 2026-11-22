@@ -16,8 +16,8 @@ import {
   type HarnessProductionPlanEdit,
   type HarnessProductionPlanRead,
 } from "./services";
-import type { AccessGrant } from "../../authorization/access-grants/types";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import { parseProductionRequestFields } from "@purin-labs/commerce-client";
 import {

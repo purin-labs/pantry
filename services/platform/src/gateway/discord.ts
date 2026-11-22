@@ -32,7 +32,7 @@ import {
   parseVaultHandle,
   resolveDiscordInteractionVerificationCredential,
   storeVaultSecret,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { assertNever } from "@purin-labs/std";
 import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath } from "./request-helpers";
 

@@ -1,5 +1,5 @@
 import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
-import type { VaultHandle } from "../credential-vault";
+import type { VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import type { ProviderCleanupByProvider } from "../integrations/contract/provider-adapter";
 import type {
   IntegrationAccountId,

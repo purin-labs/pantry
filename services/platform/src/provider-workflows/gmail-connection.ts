@@ -1,7 +1,7 @@
 import {
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
-} from "../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import { connectionParts } from "../integrations/contract/connection-parts";
 import {
   createConnectedIntegration,

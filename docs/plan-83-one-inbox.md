@@ -195,7 +195,7 @@ an allergy that contains the word "orders" can match. D5 exists for this reason.
 ## Access and information flow
 
 - A list preview is source-derived content, so it follows the
-  [IFC integration guide](../services/platform/src/policy/information-flow/README.md).
+  [IFC integration guide](../foundation/authority/policy/information-flow/README.md).
 - The route reads with the requester's live authority and stores nothing.
 - A person without a mailbox grant sees no row from that mailbox.
 - A refused source raises the access request modal in the page. It does not send the

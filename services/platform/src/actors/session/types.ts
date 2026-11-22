@@ -1,7 +1,7 @@
 import type { SteeringRequester } from "../harness-steering";
 import type { Outcome } from "@purin-labs/contracts";
 import type { HarnessTurnContinuation } from "../agent-session-continuation";
-import type { LiveRequestAuthorityValidationError } from "../../request-authority";
+import type { LiveRequestAuthorityValidationError } from "@purin-labs/authority/request-authority/index";
 import type {
   AcceptedHarnessEventCursor,
   UserMessage,
@@ -50,7 +50,7 @@ import type { CanonicalTextTurnStartError } from "../agent-session-turn-start";
 import type {
   CaseConversationSinkRefusal,
   SerializedFlowBinding,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

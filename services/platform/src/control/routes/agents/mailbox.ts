@@ -14,8 +14,8 @@ import {
   readMailboxIngressPolicy,
 } from "../../../data/email-mailbox";
 import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
-import { revokeCredential } from "../../../credential-vault";
-import { resolveCredentialRevocationSecret } from "../../../credential-vault/credential-revocation-resolution";
+import { revokeCredential } from "@purin-labs/authority/credential-vault/index";
+import { resolveCredentialRevocationSecret } from "@purin-labs/authority/credential-vault/credential-revocation-resolution";
 import { revokeGoogleOAuthToken } from "../../../integrations/contract/google-oauth-revocation";
 import {
   newRequestId,

@@ -294,7 +294,7 @@ The control routes (`services/platform/src/control/routes/commerce/system.ts`) a
 - The tool `integration_list` (capability `integration.discovery.read`) lists Purin
   Checkout as an account only when it is the selected system. It marks commerce data as
   readable only for the selected system. No tool gives the revision or the sync state.
-- The capabilities are in `services/platform/src/authorization/capability-catalogue.ts`.
+- The capabilities are in `foundation/authority/authorization/capability-catalogue.ts`.
   A capability with the target `commerce_read`, `provider_resource` or
   `commerce_command` names what it needs: one of the two commerce systems,
   `builtin_commerce` only, or the Shopify provider. A `commerce.*` capability with the

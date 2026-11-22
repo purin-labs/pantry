@@ -21,10 +21,10 @@ import type {
 import type {
   MerchantActionDecision,
   MerchantActionRejectionEvidence,
-} from "../../approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import type { CaseContextReplayAuthority } from "../../context/projection";
-import { FlowBinding } from "../../policy";
-import type { SerializedFlowBinding } from "../../policy";
+import { FlowBinding } from "@purin-labs/authority/policy/index";
+import type { SerializedFlowBinding } from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { CaseSourceProvenance } from "./source-provenance";

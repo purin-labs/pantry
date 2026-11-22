@@ -33,7 +33,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import { revokeCredential, type VaultHandle } from "../src/credential-vault";
+import { revokeCredential, type VaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { requireUserId, requireVaultHandle } from "./test-ids";

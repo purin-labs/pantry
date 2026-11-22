@@ -18,7 +18,7 @@ import {
   FlowBinding,
   labelAllowsAudiences,
   type FlowLabel,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { ConversationId, UserId } from "@purin-labs/control-api";
 import { listProjectMembers } from "../projects/access";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
@@ -27,7 +27,7 @@ import {
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
-import { buildControlAuthority } from "../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { authorizeProjectContextDisclosure } from "../projects/context";
 import { projectSnapshotFromParts } from "./project-context-binding";
 import type { ChatTimelineEvent } from "./timeline";
@@ -488,7 +488,7 @@ function disclosureStream(
 }
 
 export function workspaceCanvasLabelAllowsReaders(
-  label: import("../policy/information-flow").FlowLabel,
+  label: import("@purin-labs/authority/policy/information-flow/index").FlowLabel,
 ): boolean {
   for (const role of ["owner", "admin", "operator", "viewer"] as const) {
     if (!labelAllowsAudiences(label, [{ kind: "organisation_role", role }]))

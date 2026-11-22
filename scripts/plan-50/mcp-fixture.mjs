@@ -14,14 +14,14 @@ import {
   executeAuthorizedCustomConnectorRead,
 } from "../../services/platform/src/custom-connectors/index.ts";
 import { customConnectorResourceScope } from "../../services/platform/src/custom-connectors/execution.ts";
-import { createAccessGrant } from "../../services/platform/src/data/access-grants.ts";
+import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";
 import {
   compileTrialTurnAuthority,
   trialAccountAccess,
 } from "./account-authority.mjs";
 import { admitSessionInformationFlowObservation } from "../../services/platform/src/actors/agent-session-information-flow.ts";
-import { ObservationEvidence } from "../../services/platform/src/policy/information-flow/index.ts";
-import { digestCanonical } from "../../services/platform/src/policy/information-flow/digest.ts";
+import { ObservationEvidence } from "../../foundation/authority/policy/information-flow/index.ts";
+import { digestCanonical } from "../../foundation/authority/policy/information-flow/digest.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import {
   organisationId,

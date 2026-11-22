@@ -5,7 +5,7 @@ import {
   type Tool,
 } from "@earendil-works/pi-mcp";
 import { assertNever, isRecord } from "@purin-labs/std";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   executeCustomConnectorTransport,

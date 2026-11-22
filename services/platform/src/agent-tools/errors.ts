@@ -1,4 +1,4 @@
-import type { RequestableEntityTypeRead } from "../authorization/requestable-capabilities";
+import type { RequestableEntityTypeRead } from "@purin-labs/authority/authorization/requestable-capabilities";
 
 /**
  * A tool request that was refused, in words that the agent can act on. The

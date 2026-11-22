@@ -5,8 +5,8 @@ import { expect, it, type TestContext } from "vitest";
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { FlowPolicyInput } from "../../src/policy/information-flow";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import type { FlowPolicyInput } from "@purin-labs/authority/policy/information-flow/index";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { reconcileHeldOutputRequests } from "../../src/slack/held-output-release";
 import {
   admin,

@@ -1,7 +1,7 @@
 import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { ConnectorSlackIngressOutcome } from "../actors/connector-slack-ingress";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import type { RequestId } from "@purin-labs/kernel/ids";
 import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import { deriveSlackCaseRouteIdentities } from "./case-routing";

@@ -1,7 +1,10 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
+import {
+  parseVaultHandle,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/domain";
 
 declare const discordApplicationIdBrand: unique symbol;
 declare const discordGuildIdBrand: unique symbol;

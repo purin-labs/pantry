@@ -15,7 +15,7 @@ import type {
 import type {
   CanonicalActionDraft,
   LedgerCanonicalAction,
-} from "../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   MERCHANT_PLUGIN_INSTALL_VERB,
@@ -60,7 +60,7 @@ import {
   reconcileActionExecution,
   type ActionLedgerEntry,
   type ActionLedgerError,
-} from "../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   hasExactKeys,

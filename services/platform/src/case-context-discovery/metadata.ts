@@ -4,11 +4,11 @@ import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveCaseActorAtPlacement,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   authorizeCapabilityUse,
   compileTurnAuthority,
-} from "../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   readChatControlAuthority,
   evaluateChatFlowLabelSink,
@@ -17,13 +17,13 @@ import type { ConversationScope } from "../chat/store";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   FlowLabel,
   joinFlowLabels,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type {
   CaseContextCollection,
   CaseContextCollectionSelection,
@@ -247,7 +247,7 @@ function relationshipView(
 }
 function mailboxGrant(
   selection: CaseContextCollectionSelection,
-  grant: import("../authorization/access-grants/types").AccessGrant,
+  grant: import("@purin-labs/authority/authorization/access-grants/types").AccessGrant,
 ): boolean {
   return (
     grant.target.kind === "provider_resource" &&
@@ -256,12 +256,12 @@ function mailboxGrant(
   );
 }
 function grantId(
-  grant: import("../authorization/access-grants/types").AccessGrant,
+  grant: import("@purin-labs/authority/authorization/access-grants/types").AccessGrant,
 ): string {
   return grant.grantId;
 }
 function requestedCapability(
-  claim: import("../authorization/access-grants/turn-authority").AuthorizedCapabilityClaim,
+  claim: import("@purin-labs/authority/authorization/access-grants/turn-authority").AuthorizedCapabilityClaim,
 ) {
   return claim.requested;
 }

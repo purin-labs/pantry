@@ -6,8 +6,8 @@ import {
 } from "../src/case-context-discovery/evaluation-store";
 import { CASE_CONTEXT_DISCOVERY_JEV_MODEL } from "../src/case-context-discovery/jev";
 import { evaluateOperationalCaseContextDiscovery } from "../src/case-context-discovery/operational-evaluation";
-import { FlowLabel } from "../src/policy/information-flow/labels";
-import { buildAgentMailboxAuthority } from "../src/request-authority";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/labels";
+import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { parseCaseContextDiscoveryPolicy } from "../src/case-context-discovery/policy";
 import {
   createCaseContextCollectionRelationshipSchema,

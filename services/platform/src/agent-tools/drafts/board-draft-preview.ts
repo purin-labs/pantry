@@ -5,7 +5,7 @@ import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import { sessionTurnExecution } from "../../chat/turn-access";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import type { SessionToolContext } from "../context";

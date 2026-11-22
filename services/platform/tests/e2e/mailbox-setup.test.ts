@@ -12,8 +12,8 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { compileTurnAuthority } from "../../src/authorization/access-grants/turn-authority";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { compileTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { readAgentMailboxBinding } from "../../src/data/email-mailbox";
 import {
   readActiveOrganisationMembership,
@@ -24,11 +24,11 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
-import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   buildAgentMailboxAuthority,
   buildControlAuthority,
-} from "../../src/request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import { setUpMailbox } from "../../../../apps/portal/src/features/mail-setup/turn-on";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";

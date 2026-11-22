@@ -54,16 +54,16 @@ import {
   isRequestableEntityTypeRead,
   readNeedsPrivateChat,
   type RequestableEntityTypeRead,
-} from "../../authorization/requestable-capabilities";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
 import { commerceCanonicalResourceId } from "../../commerce/contract/resource-ids";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
   integrationResourceScopeForGrant,
-} from "../../policy";
-import { listAccessGrants } from "../../data/access-grants";
-import type { AccessGrant } from "../../authorization/access-grants/types";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+} from "@purin-labs/authority/policy/index";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { CommerceEngineSource } from "../../commerce/entity-plane/commerce-source";
 import type { BlotterOrganisationReader } from "../../commerce/entity-plane/blotter-source";
 import { createCommerceGraphReader } from "../../commerce/entity-plane/selected-graph-reader";
@@ -97,11 +97,11 @@ export async function prepareCommerceReadForEmbeddedHarness(
     input: Readonly<{
       organisationId: string;
       merchantId: string;
-      grants: readonly import("../../authorization/access-grants/types").AccessGrant[];
+      grants: readonly import("@purin-labs/authority/authorization/access-grants/types").AccessGrant[];
       now: string;
     }>,
   ) => Result<
-    import("../../authorization/access-grants/types").AccessGrant,
+    import("@purin-labs/authority/authorization/access-grants/types").AccessGrant,
     CommerceContextAssemblyError
   >,
   label: string,

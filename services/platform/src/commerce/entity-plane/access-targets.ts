@@ -2,7 +2,7 @@
 // is access-control/commerce-access-targets.ts, and the Worker registers
 // this implementation.
 import { parseEntityTypeId } from "@purin-labs/commerce-client";
-import type { CommerceAccessTargets } from "../../access-control/commerce-access-targets";
+import type { CommerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
 import {
   listPublishedCommerceTargets,
   resolvePublishedCommerceTarget,

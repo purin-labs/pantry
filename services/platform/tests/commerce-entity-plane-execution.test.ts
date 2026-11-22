@@ -6,8 +6,8 @@ import { describe, expect, it, vi } from "vitest";
 import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
 import type { CommerceMutationReceiptV1 } from "@purin-labs/commerce-contracts";
 import type { CommerceEntityPlaneCaseProposal } from "../src/actors/case/types";
-import type { ActionLedgerEntry } from "../src/actors/action-ledger";
-import { parseApprovalEvidence } from "../src/approval-authentication";
+import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
+import { parseApprovalEvidence } from "@purin-labs/authority/approval-authentication";
 import {
   executeCommerceEntityPlaneAction,
   type CommerceEntityPlaneExecutionEnv,
@@ -21,14 +21,14 @@ import {
 import {
   compileTurnAuthority,
   type CompiledTurnAuthority,
-} from "../src/authorization/access-grants/turn-authority";
-import { createAccessGrant } from "../src/data/access-grants";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   FlowBinding,
   InformationFlowContext,
-} from "../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {

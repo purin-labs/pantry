@@ -13,8 +13,8 @@ import {
   bakerySurfaceTimelineResult,
   bakerySurfaceTimelineTool,
 } from "../bakery-surface-timeline-labels";
-import type { FlowSink } from "../../policy/information-flow";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import type { FlowSink } from "@purin-labs/authority/policy/information-flow/index";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   parseChatModelAction,
   parseSteeredChatModelAction,

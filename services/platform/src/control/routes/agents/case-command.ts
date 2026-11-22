@@ -3,7 +3,7 @@ import { processDirectCaseCommand } from "../../../actors/case-direct-processing
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import { parseRequestId } from "@purin-labs/kernel/ids";
-import { buildControlAuthority } from "../../../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   admitUserMutation,
   controlMutationIdentity,

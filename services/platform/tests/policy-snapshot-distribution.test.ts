@@ -9,7 +9,7 @@ import {
   parseOrganisationPolicySnapshot,
   reconcileOrganisationPolicyPublication,
   type OrganisationPolicySnapshot,
-} from "../src/policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   parseOrganisationId,
   type OrganisationId,

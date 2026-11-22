@@ -7,7 +7,7 @@ import {
   parseVaultHandle,
   storeVaultSecret,
   type VaultHandle,
-} from "../../src/credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   createActiveConnectedIntegration,
   upsertSurfaceInstallation,

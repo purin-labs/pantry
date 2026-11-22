@@ -1,5 +1,5 @@
 import type { CommerceSystem } from "@purin-labs/connections/data/organisation-commerce-system";
-import type { ActionAuthority } from "../src/actors/action-ledger";
+import type { ActionAuthority } from "@purin-labs/authority/actors/action-ledger";
 import {
   parseCommerceSystemRevision,
   parseShopifyShopDomain,

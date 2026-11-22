@@ -12,7 +12,7 @@ import {
   approvalActionBindingMatches,
   parseApprovalEvidence,
   parseApprovalProofDigest,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import {
   parseIntegrationAccountId,
   parseSessionId,

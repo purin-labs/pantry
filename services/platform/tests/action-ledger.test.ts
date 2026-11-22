@@ -23,7 +23,7 @@ import {
   type ActionLedgerEntry,
   type ExecutingActionLedgerEntry,
   type ProposeActionInput,
-} from "../src/actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import {
   parseControlSessionId,
   parsePersonId,
@@ -37,7 +37,7 @@ import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {
   fixtureCustomConnectorActionAuthority,

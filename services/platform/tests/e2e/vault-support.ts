@@ -2,8 +2,8 @@
 // 1Password service, and a login's handle and the secret it resolves to.
 import { env } from "cloudflare:workers";
 import { parseVaultItemResult, type VaultItemView } from "@purin-labs/control-api";
-import { parseVaultHandle } from "../../src/credential-vault/domain";
-import { resolveVaultHandle } from "../../src/credential-vault/service";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 

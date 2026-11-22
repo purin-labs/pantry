@@ -31,7 +31,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
-} from "../../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type {
   CaseResult,
   CommerceEntityPlaneCaseProposal,
@@ -40,13 +40,16 @@ import type { OrganisationCommerce } from "../../actors/organisation/organisatio
 import {
   authorizeCapabilityUse,
   selectActiveGrants,
-} from "../../authorization/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/index";
 import { commerceCommandGrantMatchesTarget } from "./grant-authorities";
-import type { ProviderCapabilityDefinition } from "../../authorization/access-grants/capability-key";
-import { listAccessGrants } from "../../data/access-grants";
-import { parseStoredRequestAuthority } from "../../request-authority";
-import { readCurrentOrganisationPolicySnapshot } from "../../policy-snapshot";
-import { flowBindingMatchesIdentity, FlowBinding } from "../../policy";
+import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
+import {
+  flowBindingMatchesIdentity,
+  FlowBinding,
+} from "@purin-labs/authority/policy/index";
 import {
   resolveCommerceMerchantBinding,
   type CommerceMerchantBinding,

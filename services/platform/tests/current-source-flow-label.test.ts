@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   createCurrentSourceFlowLabel,
   integrationResourceScopeForGrant,
-} from "../src/policy";
+} from "@purin-labs/authority/policy/index";
 import { d1Database } from "./sqlite-d1";
 import type { Variant } from "@purin-labs/type-utils";
 import { requireOrganisationId } from "./test-ids";

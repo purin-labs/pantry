@@ -1,6 +1,6 @@
 import { Type } from "typebox";
 import { isPaymentWindow } from "../../commerce/payments-read";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { defineCommerceTool } from "./services";
 import { ProposalArgumentError } from "../errors";
 

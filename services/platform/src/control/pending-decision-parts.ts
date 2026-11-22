@@ -2,7 +2,7 @@ import type {
   PendingEmailReview,
   PendingGovernedAction,
 } from "@purin-labs/control-api";
-import { isCommerceLedgerAction } from "../actors/action-ledger";
+import { isCommerceLedgerAction } from "@purin-labs/authority/actors/action-ledger";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { listEmailReviewProjections } from "../data/email-review";
 import type { Env } from "@purin-labs/kernel/env";

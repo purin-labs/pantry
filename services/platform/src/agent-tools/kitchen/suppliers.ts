@@ -1,5 +1,5 @@
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type { SupplierCreateRequest } from "./services";
 import { jsonSchema } from "../define-tool";
 import { defineKitchenTool } from "./services";

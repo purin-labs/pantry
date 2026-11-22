@@ -8,7 +8,7 @@ import {
 } from "../src/integrations/typesafe/connection";
 import { evaluateOperationalCaseContextDiscovery } from "../src/case-context-discovery/operational-evaluation";
 import { bindEmailMessageReceiptContact } from "../src/data/email-mailbox";
-import { storeOrganisationExecutionVaultSecret } from "../src/credential-vault/service";
+import { storeOrganisationExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import {
   fetchCaseContextDiscoveryEvaluation,
   releaseUnissuedCaseContextDiscoveryEvaluation,

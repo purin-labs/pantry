@@ -9,14 +9,14 @@ import type {
 import { MAILBOX_SETUP_REQUIREMENTS } from "@purin-labs/control-api";
 import type { CapabilityMode } from "@purin-labs/contracts";
 
-import { readAccessControlView } from "../access-control/read-model";
-import { opaqueSubjectReference } from "../access-control/references";
-import type { AccessGrant } from "../authorization/access-grants/types";
+import { readAccessControlView } from "@purin-labs/authority/access-control/read-model";
+import { opaqueSubjectReference } from "@purin-labs/authority/access-control/references";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
-} from "../authorization/capability-catalogue";
-import { listAccessGrants } from "../data/access-grants";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import {
   readAgentOperations,
   type AgentDefinition,

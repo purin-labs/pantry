@@ -20,10 +20,10 @@ import {
 } from "@purin-labs/kernel/ids";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
-import { parseVaultHandle } from "../../src/credential-vault/domain";
-import { resolveActiveSlackOrganisationCredential } from "../../src/credential-vault/surface-installation-resolution";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
+import { resolveActiveSlackOrganisationCredential } from "@purin-labs/authority/credential-vault/surface-installation-resolution";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { createSlackOrganisationConnection } from "../../src/slack/installation-store";
+import { createSlackOrganisationConnection } from "@purin-labs/authority/slack/installation-store";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
 import { expect, it, vi, type TestContext } from "vitest";
@@ -61,9 +61,9 @@ import {
   type UserId,
 } from "@purin-labs/control-api";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { createAccessGrant } from "../../src/data/access-grants";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,

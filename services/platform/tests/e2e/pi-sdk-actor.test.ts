@@ -21,7 +21,7 @@ import {
   resumeActorRelocation,
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
-import { revokeAccessGrant } from "../../src/data/access-grants";
+import { revokeAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { network } from "./network";
 import {
   ROOT_TS,

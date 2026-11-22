@@ -4,7 +4,7 @@ import { HttpResponse, http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { resolveProviderManifestCredential } from "../../src/credential-vault";
+import { resolveProviderManifestCredential } from "@purin-labs/authority/credential-vault/index";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import {
   parseIntegrationAccountId,

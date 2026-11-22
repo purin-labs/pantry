@@ -1,6 +1,6 @@
 import type {
   IntegrationAccountReference,
-} from "../../access-control/integration-discovery";
+} from "@purin-labs/authority/access-control/integration-discovery";
 import type {
   EmailDraftEditRequest,
   EmailDraftRead,

@@ -1,5 +1,5 @@
 import { memoryObservationRecordId } from "../context/assembly";
-import { ObservationEvidence } from "../policy";
+import { ObservationEvidence } from "@purin-labs/authority/policy/index";
 import {
   replySourceReference,
   verifyReplySources,

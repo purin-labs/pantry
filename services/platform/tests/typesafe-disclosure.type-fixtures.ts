@@ -1,5 +1,5 @@
 import type { TypeSafeDisclosure } from "../src/integrations/typesafe/disclosure";
-import type { TypeSafeInferenceSink } from "../src/policy/information-flow/types";
+import type { TypeSafeInferenceSink } from "@purin-labs/authority/policy/information-flow/types";
 import { JevRelationshipRequest } from "../src/case-context-discovery/jev";
 
 export function rejectForgedDisclosure(

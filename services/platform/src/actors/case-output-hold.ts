@@ -4,11 +4,11 @@ import { sha256Hex } from "@purin-labs/std";
 import {
   insertHeldOutputRequest,
   type HeldOutputReason,
-} from "../data/held-output-request";
+} from "@purin-labs/authority/data/held-output-request";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { slackSurfaceParts } from "../slack/surface-parts";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import type { CaseOutput } from "./case/types";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { CaseConnectorRpc } from "./case/connector-rpc";

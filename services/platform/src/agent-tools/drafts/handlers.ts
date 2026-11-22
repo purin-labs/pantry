@@ -25,7 +25,7 @@ import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-au
 import type { CatalogExecutionContext } from "../catalog/execute";
 import type { MenuBoardArchiveRequest, MenuBoardCreateRequest } from "./drafts";
 import { readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { assertNever } from "@purin-labs/std";
 import {
   MENU_BOARD_LAYOUTS,

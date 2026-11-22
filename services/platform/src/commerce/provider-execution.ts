@@ -23,7 +23,7 @@ import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
   LedgerCanonicalAction,
-} from "../actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   commerceProviderUnsupported,
@@ -58,14 +58,14 @@ import {
   reconcileCommerceOrderCancellation,
 } from "./provider";
 import { commerceProviderResourceId } from "./contract/resource-ids";
-import { authorizeCapabilityUse } from "../authorization/access-grants/turn-authority";
-import type { ProviderCapabilityDefinition } from "../authorization/access-grants/capability-key";
-import { parseStoredRequestAuthority } from "../request-authority";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import type { ProviderCapabilityDefinition } from "@purin-labs/authority/authorization/access-grants/capability-key";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   flowBindingMatchesIdentity,
   FlowBinding,
   type FlowDecision,
-} from "../policy";
+} from "@purin-labs/authority/policy/index";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type { CommerceMutationErrorV1 } from "@purin-labs/commerce-client";
 import type { CommerceEngineProviderReceipt } from "@purin-labs/control-api";

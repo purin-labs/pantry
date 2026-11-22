@@ -6,7 +6,7 @@ import type {
   IntegrationAccountId,
   OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { VaultResolveError } from "../credential-vault";
+import type { VaultResolveError } from "@purin-labs/authority/credential-vault/index";
 import type { ShopifyRegistrationOperation } from "./connector/webhook-registration";
 
 export type ShopifyWebhookError =

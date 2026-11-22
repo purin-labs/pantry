@@ -12,7 +12,7 @@ import type { SqlStorage, SqlStorageValue } from "@cloudflare/workers-types";
 import {
   resolveActiveProviderConnectionCredential,
   resolveActiveProviderConnectionBinding,
-} from "../credential-vault/provider-connection-resolution";
+} from "@purin-labs/authority/credential-vault/provider-connection-resolution";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
@@ -47,7 +47,7 @@ import {
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
-} from "../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import { isNonNegativeInteger, isSha256Hex, sha256Hex } from "@purin-labs/std";
 
 const OPERATIONAL_EMAIL_PROJECTION_BATCH_SIZE = 100;

@@ -5,7 +5,7 @@ import type {
   RecipeWorkflowProposeRequest,
   RecipeWorkflowReadRequest,
 } from "./services";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
 import { defineKitchenTool } from "./services";
 

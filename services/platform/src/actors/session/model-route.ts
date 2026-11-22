@@ -24,12 +24,12 @@ import {
   resolveOrganisationChatGptAccessToken,
 } from "../../models/codex-connection";
 import type { ChatGptSubscriptionApi } from "../embedded-harness";
-import { resolveOrganisationModelCredentialForRoute } from "../../credential-vault";
+import { resolveOrganisationModelCredentialForRoute } from "@purin-labs/authority/credential-vault/index";
 import { admitSessionInformationFlowObservation } from "../agent-session-information-flow";
 import {
   createCurrentSourceFlowLabel,
   ObservationEvidence,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { VariantBy } from "@purin-labs/type-utils";
 

@@ -5,7 +5,7 @@ import {
   parseVaultRootRotationId,
   parseVaultRotationBatchLimit,
   vaultRootVersionRemovalStatus,
-} from "../../src/credential-vault/root-rotation";
+} from "@purin-labs/authority/credential-vault/root-rotation";
 import { env } from "cloudflare:workers";
 import {
   createExecutionContext,
@@ -19,7 +19,10 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { runAgentOperation } from "../../src/data/agent-operation-runner";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   registerWhatsAppPhoneNumberAccount,

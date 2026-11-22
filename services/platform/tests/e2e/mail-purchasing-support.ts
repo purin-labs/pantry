@@ -5,9 +5,9 @@ import type {
   OrganisationId,
   IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { createAccessGrant } from "../../src/data/access-grants";
-import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 
 export async function seedPurchasingContext(

@@ -4,13 +4,16 @@ import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceSensitivity } from "@purin-labs/commerce-contracts";
 
-import type { EffectiveGrantSet } from "../authorization/access-grants";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
-import type { VaultHandle, VaultSecret } from "../credential-vault/domain";
-import { parseVaultHandle } from "../credential-vault/domain";
-import { resolveVaultHandle } from "../credential-vault/service";
-import { readAccessGrant } from "../data/access-grants";
-import { encodeCapabilityKey } from "../authorization/access-grants";
+import type { EffectiveGrantSet } from "@purin-labs/authority/authorization/access-grants/index";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
+import type {
+  VaultHandle,
+  VaultSecret,
+} from "@purin-labs/authority/credential-vault/domain";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
+import { readAccessGrant } from "@purin-labs/authority/data/access-grants";
+import { encodeCapabilityKey } from "@purin-labs/authority/authorization/access-grants/index";
 import {
   executeReviewedConnectorOperation,
   type ReviewedConnectorOperationRequest,
@@ -25,7 +28,7 @@ import {
   createCurrentSourceFlowLabel,
   type FlowBinding,
   type FlowLabel,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   customConnectorValueMatchesSchema,

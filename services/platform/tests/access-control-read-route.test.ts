@@ -6,8 +6,8 @@ import {
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { AccessGrant } from "../src/authorization/access-grants/types";
-import { CAPABILITY_CATALOGUE } from "../src/authorization/capability-catalogue";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
+import { CAPABILITY_CATALOGUE } from "@purin-labs/authority/authorization/capability-catalogue";
 
 const controlMocks = vi.hoisted(() => ({
   authorizeOrganisationControl: vi.fn(),
@@ -36,15 +36,22 @@ vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
   listOrganisationMembers: controlMocks.listOrganisationMembers,
   resolveControlSession: controlMocks.resolveControlSession,
 }));
-vi.mock("../src/data/access-grants", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/access-grants")>()),
+vi.mock("@purin-labs/authority/data/access-grants", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("@purin-labs/authority/data/access-grants")
+  >()),
   listAccessGrants: grantMocks.listAccessGrants,
 }));
-vi.mock("../src/data/capability-policy", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/capability-policy")>()),
-  readOrganisationCapabilityPolicies:
-    policyMocks.readOrganisationCapabilityPolicies,
-}));
+vi.mock(
+  "@purin-labs/authority/data/capability-policy",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/authority/data/capability-policy")
+    >()),
+    readOrganisationCapabilityPolicies:
+      policyMocks.readOrganisationCapabilityPolicies,
+  }),
+);
 vi.mock(
   "@purin-labs/connections/data/integration-account",
   async (importOriginal) => ({
@@ -66,14 +73,24 @@ vi.mock(
       commerceMocks.resolveOrganisationCommerceSystemAuthority,
   }),
 );
-vi.mock("../src/policy/information-flow", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/policy/information-flow")>()),
-  createCurrentSourceFlowLabel: flowMocks.createCurrentSourceFlowLabel,
-}));
-vi.mock("../src/actors/case-operations", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/actors/case-operations")>()),
-  readActiveCaseOperations: caseMocks.readActiveCaseOperations,
-}));
+vi.mock(
+  "@purin-labs/authority/policy/information-flow/index",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/authority/policy/information-flow/index")
+    >()),
+    createCurrentSourceFlowLabel: flowMocks.createCurrentSourceFlowLabel,
+  }),
+);
+vi.mock(
+  "@purin-labs/authority/actors/case-operations",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/authority/actors/case-operations")
+    >()),
+    readActiveCaseOperations: caseMocks.readActiveCaseOperations,
+  }),
+);
 
 import { handleControlRequest } from "../src/control-router";
 import {
@@ -87,7 +104,7 @@ import {
   createCurrentSourceFlowLabel,
   FlowLabel,
   integrationResourceScopeForGrant,
-} from "../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID_RAW = "organisation_access_control_read";

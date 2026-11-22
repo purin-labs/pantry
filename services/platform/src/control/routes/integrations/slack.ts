@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
+import { resolveActiveSlackOrganisationCredential } from "@purin-labs/authority/credential-vault/index";
 import {
   prepareControlMutationReceipt,
   readControlMutationReplay,
@@ -40,17 +40,17 @@ import {
   prepareSlackRoutingAuditEvent,
   slackDmSelection,
   type SlackChannelDefaultChange,
-} from "../../../slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { isPositiveInteger, isRecord } from "@purin-labs/std";
 import {
   prepareSlackDmSelectionAuditEvent,
   prepareSlackInstallationDisconnectAuditEvent,
-} from "../../../data/slack-installation-records";
+} from "@purin-labs/authority/data/slack-installation-records";
 import {
   findSlackInstallationRouting,
   grantSlackChannelBaseline,
-} from "../../../slack/channel-baseline-grant";
+} from "@purin-labs/authority/slack/channel-baseline-grant";
 
 export async function handleSlackRouting(
   request: Request,

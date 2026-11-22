@@ -12,7 +12,7 @@ import {
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
 import type { SessionCheckpointInspection } from "../../src/actors/session/types";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
@@ -25,11 +25,11 @@ import {
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { freezePlacement, type PlacementRace } from "./placement-race-support";
-import { storeVaultSecret } from "../../src/credential-vault";
-import { createAccessGrant } from "../../src/data/access-grants";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { type SessionId } from "@purin-labs/kernel/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { network } from "./network";
 import {
   seedSlackActorOwner,

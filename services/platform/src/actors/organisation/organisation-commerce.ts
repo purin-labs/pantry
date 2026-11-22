@@ -48,7 +48,7 @@ import {
   type ReconcileActionExecutionInput,
   type RetryIndeterminateActionExecutionInput,
   type SignActionInput,
-} from "../action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import {
   claimCueDelivery,
   completeClaimedCueDelivery,
@@ -135,7 +135,7 @@ import {
   digestFlowBinding,
   flowBindingMatchesIdentity,
   FlowBinding,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import { isNonNegativeInteger } from "@purin-labs/std";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import { settleExpiredOrganisationCutoverCue } from "../cue-delivery";
@@ -160,7 +160,7 @@ import type {
   OrganisationCutoverCueSettlementInput,
   OrganisationStateError,
 } from "@purin-labs/tenancy/actors/organisation/types";
-import { armActionExecutionAlarm } from "../action-ledger";
+import { armActionExecutionAlarm } from "@purin-labs/authority/actors/action-ledger";
 import {
   organisationPlacementConflict,
   validateActionOrganisation,

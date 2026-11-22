@@ -11,7 +11,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import { validateCanonicalSessionRestore } from "../actor-wasm";
-import { parseSessionModelRoute } from "../policy-snapshot";
+import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseWorkspaceReceipt } from "../workspace-revision-store";
 import { type AgentSessionPersistence } from "./agent-session-schema";

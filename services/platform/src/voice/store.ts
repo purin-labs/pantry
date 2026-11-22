@@ -11,8 +11,8 @@ import {
 } from "@purin-labs/control-api";
 import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import { readOrganisationCapabilityPolicy } from "../data/capability-policy";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
+import { readOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 

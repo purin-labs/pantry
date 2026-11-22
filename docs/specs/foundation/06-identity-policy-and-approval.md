@@ -283,7 +283,7 @@ decision.
   `packages/contracts/src/` (`types/RequestAuthority.ts`, `organisation-access.ts`,
   `access-control.ts`). `PendingDecision` and `readOrganisationCreationRequest` are in
   `packages/control-api/src/` (`pending-decisions.ts`, `organisations.ts`).
-- **Capabilities:** `services/platform/src/authorization/capability-catalogue.ts`. A
+- **Capabilities:** `foundation/authority/authorization/capability-catalogue.ts`. A
   new capability needs `node scripts/capability-policy-backfill-sql.mjs`, which adds a
   `disabled` row for each Organisation that lacks one.
 - **Agent tool:** `request_permission` (`agent-tools/catalog/permission.ts`). A Slack

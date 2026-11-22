@@ -48,7 +48,7 @@ import {
   digestCanonical,
   FlowLabel,
   joinFlowLabels,
-} from "../policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   restoreSerializedEval,

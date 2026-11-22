@@ -26,12 +26,12 @@ import {
   requestActionApproval,
   signAction,
   type LedgerCanonicalAction,
-} from "../src/actors/action-ledger";
+} from "@purin-labs/authority/actors/action-ledger";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../src/commerce-lab/lab-metadata";
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,
-} from "../src/approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {
   parseCaseId,

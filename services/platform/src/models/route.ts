@@ -16,7 +16,7 @@ import {
 import {
   resolveCurrentOrganisationModelCredential,
   type ModelKeyProvider,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   readOrganisationInferenceSelection,
   type OrganisationInferenceSelection,

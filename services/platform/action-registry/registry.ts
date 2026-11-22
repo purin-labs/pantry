@@ -1,4 +1,4 @@
-import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue.ts";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 
 export type ActionFieldSource =
   | {

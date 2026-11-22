@@ -56,8 +56,8 @@ import {
   readSessionBudgetAccount,
   canonicalRunBudgetIdentity,
 } from "../agent-session-budget";
-import { authorityPartitionKey } from "../../authorization/access-grants/turn-authority";
-import { parseStoredRequestAuthority } from "../../request-authority";
+import { authorityPartitionKey } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Variant } from "@purin-labs/type-utils";
 import { encodeBase64 } from "@purin-labs/std";
 import { claimCanonicalRunCapability } from "./capability-claims";

@@ -23,8 +23,8 @@ import {
   parseChannelId,
   parseThreadKey,
 } from "@purin-labs/kernel/ids";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
-import { createAccessGrant } from "../../src/data/access-grants";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { requireUserId } from "../test-ids";
 import { verifyParallelAssignmentExecution } from "./case-execution-support";
 import { network } from "./network";

@@ -18,11 +18,12 @@ import type {
 } from "@purin-labs/contracts";
 
 vi.mock(
-  "../src/policy/information-flow/source-labels",
+  "@purin-labs/authority/policy/information-flow/source-labels",
   async function mockSourceLabels() {
-    const { FlowLabel } = await import("../src/policy/information-flow/labels");
+    const { FlowLabel } =
+      await import("@purin-labs/authority/policy/information-flow/labels");
     const { sourceReaderForAuthority } =
-      await import("../src/policy/information-flow/source-readers");
+      await import("@purin-labs/authority/policy/information-flow/source-readers");
     return {
       createCurrentSourceFlowLabel: async function createFixtureSourceLabel(
         input: Readonly<{
@@ -111,8 +112,8 @@ import {
   flowBindingForContext,
   InformationFlowContext,
   type SerializedFlowBinding,
-} from "../src/policy";
-import { authorityPartitionKey } from "../src/authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/policy/index";
+import { authorityPartitionKey } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

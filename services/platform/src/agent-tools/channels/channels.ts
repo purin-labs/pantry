@@ -1,7 +1,7 @@
 import { parseReplyCitations } from "../../mail-inbox/reply-sources";
 import {
   parseIntegrationAccountReference,
-} from "../../access-control/integration-discovery";
+} from "@purin-labs/authority/access-control/integration-discovery";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseOperationalEmailTarget } from "../../data/email-operational";
 import {
@@ -18,7 +18,7 @@ import type {
   HarnessWhatsAppSupportRead,
   HarnessWhatsAppSupportReplySend,
 } from "./services";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
 import { uncheckedEffect } from "../tool-effect";
 import { defineChannelTool } from "./services";

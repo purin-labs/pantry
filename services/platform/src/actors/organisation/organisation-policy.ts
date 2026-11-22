@@ -6,7 +6,7 @@ import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   isOrganisationPolicyPlacementActive,
   parseOrganisationPolicySnapshot,
-} from "../../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   publishCaseContextDiscoveryPolicy,
@@ -32,7 +32,7 @@ import {
   identifier,
   integerIn,
 } from "../../case-context-discovery/policy";
-import { digestCanonical } from "../../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { errorMessage, isRecord, sha256Hex } from "@purin-labs/std";
 import type {
   OrganisationActivatePolicyInput,
@@ -40,10 +40,10 @@ import type {
   OrganisationPolicyActivationError,
   OrganisationPolicyHead,
   OrganisationPolicyHeadRow,
-} from "./policy-types";
+} from "@purin-labs/authority/actors/organisation/policy-types";
 import type { Env } from "@purin-labs/kernel/env";
 import type { RequestAuthority } from "@purin-labs/contracts";
-import type { FlowLabel } from "../../policy/information-flow";
+import type { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import type {
   OperationalCaseContextDiscoveryRequest,
   OperationalCaseContextDiscoverySourceRequest,

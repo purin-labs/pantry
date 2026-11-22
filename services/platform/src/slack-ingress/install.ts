@@ -36,12 +36,12 @@ import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connecti
 import {
   createSlackInstallation,
   createSlackOrganisationConnection,
-} from "../slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import {
   parseVaultHandle,
   storeVaultSecret,
   type VaultHandle,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import {
   assertNever,
   encodeBase64Url,

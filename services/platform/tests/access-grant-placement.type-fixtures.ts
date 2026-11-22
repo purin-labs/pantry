@@ -1,7 +1,7 @@
 import {
   createVersionedAccessGrant,
   revokeVersionedAccessGrant,
-} from "../src/access-control/grant-mutations";
+} from "@purin-labs/authority/access-control/grant-mutations";
 
 declare const creation: Parameters<typeof createVersionedAccessGrant>[0];
 declare const revocation: Parameters<typeof revokeVersionedAccessGrant>[0];

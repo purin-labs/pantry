@@ -10,7 +10,10 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationAccess } from "@purin-labs/tenancy/organisation-access/access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { CaseConversationSinkRefusal, FlowBinding } from "../../policy";
+import type {
+  CaseConversationSinkRefusal,
+  FlowBinding,
+} from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
 
 /** What the side Case of a turn needs before inference. */

@@ -17,8 +17,8 @@ import {
 import { assertNever, isPositiveInteger, isRecord, isSha256Hex } from "@purin-labs/std";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { listAccessGrants } from "../data/access-grants";
-import { selectActiveGrants } from "../authorization/access-grants/compiler";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { commerceGraphReads } from "../commerce/contract/graph-reads";
@@ -27,12 +27,12 @@ import {
   validateLiveRequestAuthority,
   validateLiveAutomationAuthority,
   validateNativeRequestAuthority,
-} from "../request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import { extractMailbox, type GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
-} from "../authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   createCurrentSourceFlowLabel,
   currentFlowSinkCheck,
@@ -40,10 +40,10 @@ import {
   evaluateFlowLabelSink,
   integrationResourceScopeForGrant,
   type FlowLabel,
-} from "../policy";
+} from "@purin-labs/authority/policy/index";
 import {
   digestCanonical,
-} from "../policy/information-flow/digest";
+} from "@purin-labs/authority/policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
 import type {
   MailRelationshipLookup,

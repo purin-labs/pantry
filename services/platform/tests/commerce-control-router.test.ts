@@ -122,10 +122,10 @@ vi.mock("../src/commerce/provider-execution", async (importOriginal) => ({
     providerExecutionMocks.reconcileCommerceProviderAction,
 }));
 vi.mock(
-  "../src/authorization/access-grants/turn-authority",
+  "@purin-labs/authority/authorization/access-grants/turn-authority",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("../src/authorization/access-grants/turn-authority")
+      typeof import("@purin-labs/authority/authorization/access-grants/turn-authority")
     >()),
     authorizeCapabilityUse: turnAuthorityMocks.authorizeCapabilityUse,
   }),
@@ -138,13 +138,13 @@ vi.mock("../src/models/route", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/models/route")>()),
   resolveOrganisationModelRoute: modelRouteMocks.resolveOrganisationModelRoute,
 }));
-vi.mock("../src/policy-snapshot", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/policy-snapshot")>()),
+vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/authority/policy-snapshot")>()),
   loadOrganisationPolicyOrDefaultDeny: policyMocks.loadOrganisationPolicyOrDefaultDeny,
 }));
-vi.mock("../src/slack/installation-store", async (importOriginal) => ({
+vi.mock("@purin-labs/authority/slack/installation-store", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/slack/installation-store")
+    typeof import("@purin-labs/authority/slack/installation-store")
   >()),
   resolveActiveSlackDestinationConnection:
     slackRoutingMocks.resolveActiveSlackDestinationConnection,

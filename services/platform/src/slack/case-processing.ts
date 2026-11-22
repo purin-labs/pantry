@@ -38,7 +38,7 @@ import {
   admittedCaseHoldsAssignment,
   type OngoingCaseWalkingConnector,
 } from "../actors/case-walking-path";
-import { resolveActiveSlackThreadCredential } from "../credential-vault";
+import { resolveActiveSlackThreadCredential } from "@purin-labs/authority/credential-vault/index";
 import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
@@ -57,7 +57,7 @@ import { traceLog } from "@purin-labs/kernel/observability";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
-} from "../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   acquireSlackAttachmentBatch,
   type AttachmentRejection,
@@ -74,7 +74,7 @@ import {
 } from "../data/pinned-agent-profile";
 import { resolveSlackConfigurationReply } from "./configuration-reply";
 import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
-import { refreshSlackRequestAuthority } from "../request-authority";
+import { refreshSlackRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   isDeferredSlackCaseWork,
   isSlackSideCaseWork,

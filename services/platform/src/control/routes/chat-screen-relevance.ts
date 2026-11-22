@@ -21,7 +21,7 @@ import {
 import { readConversation, type ConversationScope } from "../../chat/store";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
-import { buildControlAuthority } from "../../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 

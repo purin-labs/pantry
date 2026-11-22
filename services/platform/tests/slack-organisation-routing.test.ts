@@ -3,7 +3,7 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { describe, expect, it } from "vitest";
 
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
-import { parseVaultHandle } from "../src/credential-vault/domain";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import {
   parseCaseId,
   parseChannelId,
@@ -36,7 +36,7 @@ import {
   createSlackOrganisationConnection,
   disconnectSlackInstallation,
   listSlackOrganisationRouting,
-} from "../src/slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { createMigratedDatabase } from "./sqlite-d1";
 import "./provide-organisation-lifecycle-parts";
 

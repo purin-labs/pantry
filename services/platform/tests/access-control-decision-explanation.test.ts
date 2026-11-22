@@ -13,7 +13,7 @@ import type {
 } from "@purin-labs/contracts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { AccessGrant } from "../src/authorization/access-grants/types";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 
 const accessMocks = vi.hoisted(function createAccessMocks() {
   return {
@@ -28,50 +28,56 @@ const caseMocks = vi.hoisted(function createCaseMocks() {
 });
 
 vi.mock(
-  "../src/data/access-grants",
+  "@purin-labs/authority/data/access-grants",
   async function mockAccessGrants(importOriginal) {
     return {
-      ...(await importOriginal<typeof import("../src/data/access-grants")>()),
+      ...(await importOriginal<
+        typeof import("@purin-labs/authority/data/access-grants")
+      >()),
       listAccessGrants: accessMocks.grants,
     };
   },
 );
 vi.mock(
-  "../src/data/capability-policy",
+  "@purin-labs/authority/data/capability-policy",
   async function mockCapabilityPolicy(importOriginal) {
     return {
       ...(await importOriginal<
-        typeof import("../src/data/capability-policy")
+        typeof import("@purin-labs/authority/data/capability-policy")
       >()),
       readOrganisationCapabilityPolicies: accessMocks.policies,
     };
   },
 );
 vi.mock(
-  "../src/request-authority",
+  "@purin-labs/authority/request-authority/index",
   async function mockRequestAuthority(importOriginal) {
     return {
-      ...(await importOriginal<typeof import("../src/request-authority")>()),
+      ...(await importOriginal<
+        typeof import("@purin-labs/authority/request-authority/index")
+      >()),
       validateNativeRequestAuthority: accessMocks.validateAuthority,
     };
   },
 );
 vi.mock(
-  "../src/policy/information-flow",
+  "@purin-labs/authority/policy/information-flow/index",
   async function mockInformationFlow(importOriginal) {
     return {
       ...(await importOriginal<
-        typeof import("../src/policy/information-flow")
+        typeof import("@purin-labs/authority/policy/information-flow/index")
       >()),
       createCurrentSourceFlowLabel: accessMocks.createSourceLabel,
     };
   },
 );
 vi.mock(
-  "../src/policy-snapshot",
+  "@purin-labs/authority/policy-snapshot",
   async function mockPolicySnapshot(importOriginal) {
     const original =
-      await importOriginal<typeof import("../src/policy-snapshot")>();
+      await importOriginal<
+        typeof import("@purin-labs/authority/policy-snapshot")
+      >();
     // The current organisation policy, with no capability rules.
     return {
       ...original,
@@ -83,11 +89,11 @@ vi.mock(
   },
 );
 vi.mock(
-  "../src/actors/case-operations",
+  "@purin-labs/authority/actors/case-operations",
   async function mockCaseOperations(importOriginal) {
     return {
       ...(await importOriginal<
-        typeof import("../src/actors/case-operations")
+        typeof import("@purin-labs/authority/actors/case-operations")
       >()),
       readActiveCaseOperations: caseMocks.readActiveCaseOperations,
     };
@@ -97,13 +103,13 @@ vi.mock(
 import {
   explainAccessDecision,
   resolveGrantSubjectReference,
-} from "../src/access-control/decision-explanation";
+} from "@purin-labs/authority/access-control/decision-explanation";
 import {
   opaqueAccessTargetReference,
   opaqueCaseReference,
   opaqueInformationSourceReference,
   opaqueSubjectReference,
-} from "../src/access-control/references";
+} from "@purin-labs/authority/access-control/references";
 import {
   parseCaseId,
   parsePersonId,
@@ -114,8 +120,8 @@ import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   FlowLabel,
   evaluateFlowLabelSink,
-} from "../src/policy/information-flow";
-import { buildSharedSlackAuthority } from "../src/request-authority";
+} from "@purin-labs/authority/policy/information-flow/index";
+import { buildSharedSlackAuthority } from "@purin-labs/authority/request-authority/index";
 import { requireConnectorId, requireIntegrationAccountId } from "./test-ids";
 import { resolveActiveCustomConnectorAccount } from "../src/custom-connectors/accounts";
 

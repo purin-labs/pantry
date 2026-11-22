@@ -4,7 +4,7 @@ import type {
   ConnectorIdentity,
 } from "@purin-labs/contracts";
 
-import { resolveActiveSlackThreadCredential } from "../credential-vault";
+import { resolveActiveSlackThreadCredential } from "@purin-labs/authority/credential-vault/index";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseChannelId,
@@ -17,12 +17,12 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { screenTextForSurface } from "../redaction";
+import { screenTextForSurface } from "@purin-labs/authority/redaction";
 import {
   initialIncrementalScreenState,
   screenIncrementalOutput,
   type IncrementalScreenState,
-} from "../incremental-output-screen";
+} from "@purin-labs/authority/incremental-output-screen";
 import {
   SLACK_STREAM_TEXT_LIMIT,
   appendSlackStream,

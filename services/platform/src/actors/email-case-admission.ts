@@ -6,7 +6,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
-import { buildAgentMailboxAuthority } from "../request-authority";
+import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";

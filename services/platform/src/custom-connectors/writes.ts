@@ -1,8 +1,8 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
-import type { CustomConnectorActionAuthority } from "../actors/action-ledger";
-import type { CredentialVaultBindings } from "../credential-vault/keyring";
-import { resolveVaultHandle } from "../credential-vault/service";
+import type { CustomConnectorActionAuthority } from "@purin-labs/authority/actors/action-ledger";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import type {
   IntegrationAccountId,
   OrganisationId,
@@ -11,7 +11,10 @@ import {
   executeCustomConnectorTransport,
   type CustomConnectorFetchNamespace,
 } from "./egress";
-import { digestCanonical, serializeCanonical } from "../policy";
+import {
+  digestCanonical,
+  serializeCanonical,
+} from "@purin-labs/authority/policy/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCustomConnectorAccount } from "./accounts";
 import {

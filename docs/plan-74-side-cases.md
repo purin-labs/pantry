@@ -323,7 +323,7 @@ every restriction of that turn.
   readers who are not the starter only "Started". Child content never
   enters the parent. The guide forbids a new path that widens a label.
 
-The [IFC guide](../services/platform/src/policy/information-flow/README.md)
+The [IFC guide](../foundation/authority/policy/information-flow/README.md)
 lists these entry points.
 
 ## Cost

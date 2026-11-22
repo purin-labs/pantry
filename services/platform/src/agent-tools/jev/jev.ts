@@ -2,7 +2,7 @@ import {
   parseJevFeatureCommand,
   type JevFeatureCommand,
 } from "@purin-labs/control-api/portal/jev-features";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
 import { defineJevTool } from "./services";
 import { ProposalArgumentError } from "../errors";

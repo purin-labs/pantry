@@ -22,7 +22,7 @@ import {
   searchContextProjections,
 } from "../src/context/projection";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
-import { serializeCanonical } from "../src/policy/information-flow/digest";
+import { serializeCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import { SqliteD1Database } from "./sqlite-d1";
 import { requireCaseId, requireOrganisationId } from "./test-ids";
 

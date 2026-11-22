@@ -10,7 +10,7 @@ import {
 import {
   buildDirectSlackAuthority,
   buildSharedSlackAuthority,
-} from "../request-authority";
+} from "@purin-labs/authority/request-authority/index";
 import type { SlackMessageEvent } from "./events";
 import type { AuthorizedSlackCaseIngress } from "./ingress-admission";
 

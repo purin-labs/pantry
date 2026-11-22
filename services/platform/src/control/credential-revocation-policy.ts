@@ -2,10 +2,10 @@ import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-run
 import {
   activateCredentialRevocationPolicy,
   type CredentialRevocationCommit,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { compilePublishAndActivateOrganisationPolicy } from "../policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 
 export async function activateRevocationPolicy(
   env: Env,

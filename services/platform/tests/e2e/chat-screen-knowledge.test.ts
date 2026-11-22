@@ -13,7 +13,7 @@ import { isRecord } from "@purin-labs/std";
 import { env } from "cloudflare:workers";
 
 import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { opaqueCaseReference } from "../../src/access-control/references";
+import { opaqueCaseReference } from "@purin-labs/authority/access-control/references";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import {

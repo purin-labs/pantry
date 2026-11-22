@@ -11,7 +11,7 @@ import {
   resolveActiveSessionActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
 import { processTwoSessionDirectCaseCommand } from "../../src/actors/case-direct-processing";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   newRequestId,
   parseChannelId,
@@ -23,7 +23,7 @@ import {
   compileAndStoreCueSnapshot,
   writeTierOneCommerceSubscription,
 } from "../../src/cues/engine";
-import { buildWorkflowAuthority } from "../../src/request-authority";
+import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import {

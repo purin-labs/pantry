@@ -13,7 +13,7 @@ import { readChatControlAuthority } from "../../services/platform/src/chat/infor
 import {
   createAccessGrant,
   readAccessGrant,
-} from "../../services/platform/src/data/access-grants.ts";
+} from "../../foundation/authority/data/access-grants.ts";
 import { readSessionTurnFlowBinding } from "../../services/platform/src/actors/agent-session-information-flow.ts";
 import {
   readLatestHarnessCheckpoint,

@@ -23,8 +23,8 @@ import {
   decideAutomaticContextAdmission,
   FlowLabel,
   ObservationEvidence,
-} from "../../policy";
-import type { FlowRecipient } from "../../policy/information-flow/types";
+} from "@purin-labs/authority/policy/index";
+import type { FlowRecipient } from "@purin-labs/authority/policy/information-flow/types";
 import { assertNever } from "@purin-labs/std";
 import type {
   CanonicalContextSourceRef,
@@ -39,7 +39,7 @@ import type {
   Sha256Digest,
   Timestamp,
 } from "./types";
-import type { ContextVisibility } from "../../authorization/access-grants/types";
+import type { ContextVisibility } from "@purin-labs/authority/authorization/access-grants/types";
 
 type AssemblyCandidate = {
   readonly organisationId: string;

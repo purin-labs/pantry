@@ -1,12 +1,12 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { storeOrganisationPlacementVaultSecret } from "../credential-vault/service";
+import { storeOrganisationPlacementVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   parseVaultHandle,
   resolveProviderManifestCredential,
   type VaultHandle,
   type VaultOAuthTokens,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   IntegrationAccountId,

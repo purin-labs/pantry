@@ -33,9 +33,9 @@ import {
 import { proposeSupplierPayout } from "../../payouts/supplier-payout-service";
 import { applySupplierPayableCommandWithLexicon } from "../../commerce/commerce-wasm";
 import { recordCommerceMutationReceipt } from "../mutation-receipt";
-import { listAccessGrants } from "../../data/access-grants";
-import { selectActiveGrants } from "../../authorization/access-grants/compiler";
-import { evaluateFlowLabelSink } from "../../policy";
+import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
+import { evaluateFlowLabelSink } from "@purin-labs/authority/policy/index";
 import { supplierPayoutLabel } from "../../payouts/supplier-payout-access";
 import {
   mailControlAuthority,

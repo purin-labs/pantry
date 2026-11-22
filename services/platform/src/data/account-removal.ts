@@ -3,7 +3,10 @@ import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
 } from "@purin-labs/kernel/database-handles";
-import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
+import {
+  parseVaultHandle,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/domain";
 import type {
   IntegrationAccountId,
   OrganisationId,
@@ -40,7 +43,7 @@ import { prepareRemovedConnectionGenerationsRevocation } from "@purin-labs/conne
 import {
   hasSlackOrganisationConnection,
   revokeDisabledSlackOrganisationConnection,
-} from "../slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { prepareConfigurationVersionBump } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 type RemoveIntegrationAccountError =

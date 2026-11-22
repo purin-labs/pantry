@@ -3,7 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 
 import { describe, expect, it } from "vitest";
 
-import { revokeCredential } from "../src/credential-vault";
+import { revokeCredential } from "@purin-labs/authority/credential-vault/index";
 import {
   authorizeCredentialRevocation,
   beginCredentialRotation,

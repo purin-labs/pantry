@@ -14,9 +14,9 @@ import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
-} from "../../src/authorization/capability-catalogue";
-import { storeVaultSecret } from "../../src/credential-vault";
-import { parseVaultHandle } from "../../src/credential-vault/domain";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";

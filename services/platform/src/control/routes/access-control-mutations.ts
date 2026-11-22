@@ -13,37 +13,37 @@ import type {
 import {
   commerceAccessTargets,
   type CommerceGrantEntityTypeId,
-} from "../../access-control/commerce-access-targets";
+} from "@purin-labs/authority/access-control/commerce-access-targets";
 
 import {
   applyVersionedAccessDefaults,
   changeVersionedCapabilityPolicy,
   type AccessCapabilityMutationError,
-} from "../../access-control/capability-mutations";
+} from "@purin-labs/authority/access-control/capability-mutations";
 import {
   createVersionedAccessGrant,
   revokeVersionedAccessGrant,
   type AccessGrantMutationError,
   type AccessGrantMutationResult,
-} from "../../access-control/grant-mutations";
+} from "@purin-labs/authority/access-control/grant-mutations";
 import {
   resolveGrantSubjectReference,
   resolveGrantTargetReference,
-} from "../../access-control/decision-explanation";
+} from "@purin-labs/authority/access-control/decision-explanation";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type {
   AccessGrantTarget,
   FileResourceAccessGrantTarget,
-} from "../../authorization/access-grants/types";
-import { parseFileResourceScope } from "../../authorization/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/types";
+import { parseFileResourceScope } from "@purin-labs/authority/authorization/access-grants/index";
 import {
   CAPABILITY_CATALOGUE,
   CAPABILITY_KEYS,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
   SLACK_MESSAGE_RESOURCE_SCOPE,
-} from "../../authorization/capability-catalogue";
-import { fileGrantParts } from "../../authorization/access-grants/file-grant-parts";
-import { parseActiveCapabilityId } from "../../data/capability-policy";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { fileGrantParts } from "@purin-labs/authority/authorization/access-grants/file-grant-parts";
+import { parseActiveCapabilityId } from "@purin-labs/authority/data/capability-policy";
 import {
   hashPortalSubject,
   readControlMutationReplay,
@@ -67,10 +67,10 @@ import {
   readWorkspaceAiBudget,
   WORKSPACE_AI_BUDGET_MAXIMUM,
 } from "@purin-labs/tenancy/data/workspace-ai-budget";
-import { readAccessControlOrganisationProjection } from "../../access-control/read-model";
+import { readAccessControlOrganisationProjection } from "@purin-labs/authority/access-control/read-model";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
-import { digestCanonical } from "../../policy";
-import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
+import { digestCanonical } from "@purin-labs/authority/policy/index";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import { controlCausationId } from "../mutation";
 import {

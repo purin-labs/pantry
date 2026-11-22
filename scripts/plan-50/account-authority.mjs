@@ -2,7 +2,7 @@
 // Workers. Pantry keeps its own members (Plan 95), so the trial needs no
 // outside account authority.
 import { acceptedExecutionAuthority } from "../../foundation/tenancy/organisation-access/access.ts";
-import { compileTurnAuthority } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
+import { compileTurnAuthority } from "../../foundation/authority/authorization/access-grants/turn-authority.ts";
 import { parseUserId } from "../../packages/control-api/src/ids.ts";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope.ts";
 

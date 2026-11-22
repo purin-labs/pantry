@@ -12,8 +12,8 @@ import {
   resolveGmailAccessToken,
   type GmailOAuthClientEnv,
 } from "../src/mail/gmail-oauth";
-import { type VaultOAuthTokens } from "../src/credential-vault";
-import { resolveVaultHandle } from "../src/credential-vault/service";
+import { type VaultOAuthTokens } from "@purin-labs/authority/credential-vault/index";
+import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import { requireOrganisationId, requireVaultHandle } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

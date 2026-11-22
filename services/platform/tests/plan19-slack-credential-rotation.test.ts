@@ -16,7 +16,10 @@ import {
   upsertSurfaceInstallation,
   type ConnectedIntegrationSeed,
 } from "@purin-labs/connections/data/integration-account";
-import { storeVaultSecret, type VaultHandle } from "../src/credential-vault";
+import {
+  storeVaultSecret,
+  type VaultHandle,
+} from "@purin-labs/authority/credential-vault/index";
 import type {
   IntegrationAccountId,
   ProviderConnectionId,
@@ -36,7 +39,7 @@ import {
   configureSlackChannelDefault,
   createSlackInstallation,
   createSlackOrganisationConnection,
-} from "../src/slack/installation-store";
+} from "@purin-labs/authority/slack/installation-store";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,

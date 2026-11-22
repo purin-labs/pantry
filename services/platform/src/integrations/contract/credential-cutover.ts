@@ -3,16 +3,16 @@ import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
   OrganisationPolicyActivationError,
-} from "../../actors/organisation/policy-types";
+} from "@purin-labs/authority/actors/organisation/policy-types";
 import {
   parseProviderConnectionId,
   type ProviderConnectionId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import { prepareSupersededGenerationsRevocation } from "@purin-labs/connections/data/provider-credential-generation";
-import { prepareSupersededGenerationSecretsRevocation } from "../../credential-vault/secret-revocation";
+import { prepareSupersededGenerationSecretsRevocation } from "@purin-labs/authority/credential-vault/secret-revocation";
 
 export type ProviderCredentialCutoverError = {
   readonly code: "provider_policy_activation_failed";

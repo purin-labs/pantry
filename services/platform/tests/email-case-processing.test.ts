@@ -7,9 +7,9 @@ import {
 } from "../src/data/email-mailbox";
 import { requireIntegrationAccountId } from "./test-ids";
 import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { defaultDenyPolicy } from "../src/policy-snapshot";
+import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { createMigratedDatabase } from "./sqlite-d1";
 import {
@@ -73,8 +73,10 @@ vi.mock("../src/models/route", async (importOriginal) => ({
   resolveOrganisationModelRoute:
     orchestratorMocks.resolveOrganisationModelRoute,
 }));
-vi.mock("../src/policy-snapshot", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/policy-snapshot")>()),
+vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("@purin-labs/authority/policy-snapshot")
+  >()),
   loadOrganisationPolicyOrDefaultDeny:
     orchestratorMocks.loadOrganisationPolicyOrDefaultDeny,
 }));
@@ -131,7 +133,7 @@ import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {
   FlowBinding,
   InformationFlowContext,
-} from "../src/policy/information-flow";
+} from "@purin-labs/authority/policy/information-flow/index";
 import { isRecord } from "@purin-labs/std";
 
 const NOW = 1_784_016_325_277;

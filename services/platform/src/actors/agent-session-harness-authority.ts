@@ -21,7 +21,7 @@ import type {
 
 import type { Result } from "@purin-labs/kernel/result";
 import { MAX_CHECKPOINT_PLAINTEXT_BYTES } from "../harness-checkpoint";
-import { parseStoredRequestAuthority } from "../request-authority";
+import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
 import {
   digestHarnessHistoryEntry,
   encodeHarnessHistoryEntry,

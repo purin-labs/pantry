@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   integrationAccountReference,
   parseIntegrationAccountReference,
-} from "../src/access-control/integration-discovery";
+} from "@purin-labs/authority/access-control/integration-discovery";
 import { resolveEmailOperationalCapability } from "../src/actors/email-operational-capability";
-import { encodeCapabilityKey } from "../src/authorization/access-grants/capability-key";
+import { encodeCapabilityKey } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,

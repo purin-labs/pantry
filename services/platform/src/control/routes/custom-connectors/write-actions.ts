@@ -12,8 +12,8 @@ import {
   digestApprovalAction,
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
-} from "../../../approval-authentication";
-import { authorizeCapabilityUse } from "../../../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/approval-authentication";
+import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   consumeGoogleApprovalCeremony,
   verifyGoogleApprovalGrant,
@@ -31,7 +31,7 @@ import type {
   UnversionedControlMutationBoundary,
   ControlMutationReceiptScope,
 } from "@purin-labs/tenancy/data/control-mutation";
-import { FlowBinding } from "../../../policy/information-flow";
+import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import {
   controlMutationScope,
   parseMutationBoundary,

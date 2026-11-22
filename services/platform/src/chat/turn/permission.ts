@@ -1,12 +1,12 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { missingChatPermissionItems } from "../permission-items";
-import type { AgentPermissionRequest } from "../../data/agent-permission-request";
+import type { AgentPermissionRequest } from "@purin-labs/authority/data/agent-permission-request";
 import {
   ENTITY_TYPE_READ_CAPABILITY,
   entityTypeReadDescription,
   entityTypeReadLabel,
   permissionLabels,
-} from "../../authorization/requestable-capabilities";
+} from "@purin-labs/authority/authorization/requestable-capabilities";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   ChatPermissionDecision,
@@ -14,12 +14,15 @@ import type {
   ChatPermissionRequest,
   ConversationId,
 } from "@purin-labs/control-api";
-import type { FlowDecision, FlowSink } from "../../policy/information-flow";
-import { capabilityDefinitionById } from "../../authorization/capability-catalogue";
+import type {
+  FlowDecision,
+  FlowSink,
+} from "@purin-labs/authority/policy/information-flow/index";
+import { capabilityDefinitionById } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   parseActiveCapabilityId,
   readOrganisationCapabilityPolicies,
-} from "../../data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import {
   parseChatModelAction,
   conversationTimeline,

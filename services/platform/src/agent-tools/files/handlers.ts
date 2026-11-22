@@ -16,7 +16,7 @@ import {
   SessionExecutionAdmission,
   requireSessionExecution,
 } from "../../actors/session-execution-admission";
-import { storeSessionExecutionVaultSecret } from "../../credential-vault/service";
+import { storeSessionExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import type { FileProviderCredentialStore } from "../../provider-workflows/file-context-credential";
 import { readCanonicalSessionForPersistence } from "../../actors/agent-session-canonical";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
@@ -34,7 +34,7 @@ import {
   type FileToolObservation,
 } from "../../context/files";
 import { admitSessionInformationFlowObservation } from "../../actors/agent-session-information-flow";
-import { audiencesForAdmission } from "../../policy";
+import { audiencesForAdmission } from "@purin-labs/authority/policy/index";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { SessionToolContext } from "../context";

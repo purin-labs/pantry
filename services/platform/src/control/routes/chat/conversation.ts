@@ -7,7 +7,7 @@ import {
   saveResponseFeedback,
 } from "../../../chat/feedback";
 import type { Env } from "@purin-labs/kernel/env";
-import { buildControlAuthority } from "../../../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";

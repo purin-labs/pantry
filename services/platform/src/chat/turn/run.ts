@@ -2,7 +2,7 @@ import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
 } from "@purin-labs/tenancy/data/control-plane";
-import { readPendingSessionPermissionRequest } from "../../data/agent-permission-request";
+import { readPendingSessionPermissionRequest } from "@purin-labs/authority/data/agent-permission-request";
 import { decideChatFlowSink } from "../information-flow";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { chatUserMessage } from "../attachments";
@@ -22,7 +22,7 @@ import type {
 import { bindCompletedChatHistory } from "../forks";
 import { currentProjectSnapshot } from "../project-context-binding";
 import { resolveCustomConnectorDetail } from "../../custom-connectors/projection";
-import { FlowBinding } from "../../policy/information-flow";
+import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
 import { readOrganisationCodexConnection } from "../../models/codex-connection";
 import {
@@ -42,7 +42,7 @@ import {
   conversationCommandFailure,
   traceConversationFailure,
 } from "../generation-failure";
-import { buildControlAuthority } from "../../request-authority";
+import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import type { OrganisationModelRoute } from "../../models/route";
 import { createWorkerMessageLinkEgress } from "../../messages/link-egress";
 import {

@@ -1,10 +1,13 @@
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 
 import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
-import { FlowBinding, digestFlowBinding } from "../policy/information-flow";
+import {
+  FlowBinding,
+  digestFlowBinding,
+} from "@purin-labs/authority/policy/information-flow/index";
 import type { Result } from "@purin-labs/kernel/result";
 import { reconcileCommerceProviderReceipt } from "../commerce/action-model";
-import { readActionResult } from "./action-ledger";
+import { readActionResult } from "@purin-labs/authority/actors/action-ledger";
 import { readActivationExportSource } from "@purin-labs/actor-runtime/actors/actor-export";
 import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { ActorRelocationId } from "@purin-labs/actor-runtime/actors/actor-relocation";

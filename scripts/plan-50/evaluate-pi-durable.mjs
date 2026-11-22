@@ -442,7 +442,7 @@ async function sourceEvidence() {
       "services/platform/src/agent-tools/catalog/selection.ts",
       "services/platform/src/agent-tools/catalog/code-mode.ts",
       "services/platform/src/actors/airtable-tool-input.ts",
-      "services/platform/src/authorization/capability-catalogue.ts",
+      "foundation/authority/authorization/capability-catalogue.ts",
     );
   if (draft || proposal || providerTrial)
     files.push(
@@ -465,11 +465,11 @@ async function sourceEvidence() {
       "scripts/plan-50/proposal-worker.mjs",
       "services/platform/src/actors/harness-commerce-proposal.ts",
       "services/platform/src/actors/case.ts",
-      "services/platform/src/actors/action-ledger.ts",
+      "foundation/authority/actors/action-ledger.ts",
       "services/platform/src/actors/organisation.ts",
-      "services/platform/src/authorization/access-grants/turn-authority.ts",
-      "services/platform/src/data/access-grants.ts",
-      "services/platform/src/policy/information-flow/source-labels.ts",
+      "foundation/authority/authorization/access-grants/turn-authority.ts",
+      "foundation/authority/data/access-grants.ts",
+      "foundation/authority/policy/information-flow/source-labels.ts",
     );
   const sourcePaths = new Set(files);
   if (draftBrowser)

@@ -2,7 +2,7 @@ import {
   admittedCodeModeExecutionRecord,
   encodeCodeModeExecutionRecord,
 } from "../code-mode-execution-record";
-import { parseFlowSource } from "../../policy/information-flow/oac";
+import { parseFlowSource } from "@purin-labs/authority/policy/information-flow/oac";
 import { parseProjectSnapshot, type ProjectSnapshot } from "@purin-labs/control-api";
 import type {
   AcceptedInputRef,
@@ -15,7 +15,7 @@ import {
   canonicalFlowLabel,
   FlowLabel,
   ObservationEvidence,
-} from "../../policy";
+} from "@purin-labs/authority/policy/index";
 import {
   memoryObservationRecordId,
   type ContextBundle,

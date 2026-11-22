@@ -5,13 +5,13 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import type { ActionLedgerEntry } from "../actors/action-ledger";
+import type { ActionLedgerEntry } from "@purin-labs/authority/actors/action-ledger";
 import { resolveSlackApprover } from "../actors/action-mutation-execution";
 import {
   digestApprovalAction,
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
-} from "../approval-authentication";
+} from "@purin-labs/authority/approval-authentication";
 import { slackMayApproveAction } from "../commerce/action-model";
 import { syncCaseApprovalWait } from "../commerce/case-approval-sync";
 import {
@@ -19,7 +19,7 @@ import {
   executeCommerceAction,
 } from "../commerce/actions";
 import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
-import { parsePersonId } from "../data/person-authz";
+import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";

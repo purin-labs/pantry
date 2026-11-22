@@ -8,7 +8,7 @@ import {
 } from "@purin-labs/workflow-canvas-crdt/protocol";
 import { parseChat } from "@purin-labs/control-api/portal/chat";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { env, exports } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { OrganisationDO } from "../../src/actors/organisation";
@@ -22,11 +22,11 @@ import {
   type IssuedControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
-import { encodeContextVisibility } from "../../src/authorization/access-grants";
-import { FlowLabel } from "../../src/policy/information-flow";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/index";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import { network } from "./network";
 import { commerceClient, commerceHeaders } from "./commerce-support";
 import {

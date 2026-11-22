@@ -17,7 +17,7 @@ import {
   type ProviderActionResolutionError,
   type VaultResolveError,
   type VaultSecret,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 
 type StripeExecutionError =
   | OrganisationExecutionScopeError

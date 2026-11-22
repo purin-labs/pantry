@@ -11,7 +11,7 @@ import {
 
 import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import { resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { capabilityDefinitionById } from "../../authorization/capability-catalogue";
+import { capabilityDefinitionById } from "@purin-labs/authority/authorization/capability-catalogue";
 import { readChatControlAuthority } from "../../chat/information-flow";
 import {
   decideHeldOutputRequest,
@@ -20,14 +20,14 @@ import {
   listPendingHeldOutputRequests,
   readHeldOutputRequest,
   type HeldOutputRequest,
-} from "../../data/held-output-request";
+} from "@purin-labs/authority/data/held-output-request";
 import type { Env } from "@purin-labs/kernel/env";
-import { parseActiveCapabilityId } from "../../data/capability-policy";
+import { parseActiveCapabilityId } from "@purin-labs/authority/data/capability-policy";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import { memberMaySee, type MemberViewer } from "../../chat/member-view";
-import { FlowLabel } from "../../policy/information-flow";
-import { policyLevel } from "../../policy/information-flow/labels";
-import { slackSurfaceParts } from "../../slack/surface-parts";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
+import { policyLevel } from "@purin-labs/authority/policy/information-flow/labels";
+import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
@@ -36,7 +36,7 @@ import { controlError, controlJson, readJsonRecord } from "../http";
 import {
   readDiscoveredResourceLabel,
   readSessionConversationId,
-} from "../../data/held-output-context";
+} from "@purin-labs/authority/data/held-output-context";
 
 export type HeldOutputRequestRoute = Readonly<{
   kind: "heldOutputRequest";

@@ -4,7 +4,7 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "../fixtures/organisation-pl
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";
 
-import { storeVaultSecret } from "../../src/credential-vault";
+import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,

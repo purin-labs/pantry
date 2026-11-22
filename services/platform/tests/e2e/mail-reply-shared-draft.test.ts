@@ -17,14 +17,14 @@ import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   type ActiveCapabilityId,
-} from "../../src/authorization/capability-catalogue";
-import { createAccessGrant } from "../../src/data/access-grants";
+} from "@purin-labs/authority/authorization/capability-catalogue";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
-} from "../../src/data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import { type IntegrationAccountId, type OrganisationId } from "@purin-labs/kernel/ids";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { closeSocket, openSocket } from "./hibernatable-socket-support";

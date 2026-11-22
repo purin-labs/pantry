@@ -10,7 +10,7 @@ import type {
 } from "../src/data/whatsapp";
 import type { WhatsAppSendOutcome } from "@purin-labs/connections/whatsapp/graph";
 import type { WhatsAppWebhookEvent } from "../src/whatsapp/webhook";
-import { parseVaultHandle } from "../src/credential-vault";
+import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   parseWhatsAppCustomerId,

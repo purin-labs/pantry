@@ -1,6 +1,6 @@
 import { decodeBase64Url, encodeBase64Url } from "@purin-labs/std";
 import type { Env } from "@purin-labs/kernel/env";
-import { digestCanonical } from "../policy/information-flow/digest";
+import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 
 /**
  * The approval challenge binds one rendered preview to one approver. It is a

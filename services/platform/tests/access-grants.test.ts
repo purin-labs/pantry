@@ -27,14 +27,14 @@ import {
   parseCapabilityKey,
   type AccessGrant,
   type ImmutableCapabilityDefinition,
-} from "../src/authorization/access-grants";
+} from "@purin-labs/authority/authorization/access-grants/index";
 import {
   createAccessGrant,
   parseAccessGrantRow,
   revokeAccessGrant,
   readAccessGrant,
   listAccessGrants,
-} from "../src/data/access-grants";
+} from "@purin-labs/authority/data/access-grants";
 import { d1Database } from "./sqlite-d1";
 import type { Variant } from "@purin-labs/type-utils";
 import { requireOrganisationId } from "./test-ids";

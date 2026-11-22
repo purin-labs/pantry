@@ -7,7 +7,7 @@ import { decideCaseConversationSink } from "../actors/case-conversation-sink";
 import {
   compileTurnAuthority,
   type CompiledTurnAuthority,
-} from "../authorization/access-grants/turn-authority";
+} from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import {
   listSupplierPayoutsForSupplier,
   listUnresolvedSupplierPayouts,
@@ -23,8 +23,8 @@ import {
   ObservationEvidence,
   type FlowBinding,
   type FlowLabel,
-} from "../policy";
-import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
+} from "@purin-labs/authority/policy/index";
+import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import { supplierPayoutLabel } from "../payouts/supplier-payout-access";
 import {
   renderOutgoingPayouts,

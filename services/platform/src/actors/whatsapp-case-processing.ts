@@ -33,12 +33,12 @@ import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
-} from "../policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import {
   prepareTurnAuthority,
   prepareTurnContext,
 } from "../context/turn-context";
-import { buildWhatsAppSupportAuthority } from "../request-authority";
+import { buildWhatsAppSupportAuthority } from "@purin-labs/authority/request-authority/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveActiveCaseActorAtPlacement,

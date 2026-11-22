@@ -11,7 +11,7 @@ import { isRecord } from "@purin-labs/std";
 import { reconcileSessionGoalUsage } from "../../src/actors/session-goal-usage";
 import { readSessionBudgetAccount } from "../../src/actors/agent-session-budget";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { network } from "./network";
 import { requireRequestId, requireSessionId } from "../test-ids";
 import {

@@ -16,7 +16,7 @@ import type {
 import {
   resolveProviderWebhookCredential,
   type VaultResolveError,
-} from "../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import { bytesToHex, errorMessage, isRecord } from "@purin-labs/std";
 
 export type StripeWebhookError =

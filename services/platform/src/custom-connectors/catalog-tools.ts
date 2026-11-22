@@ -2,7 +2,7 @@ import { assertNever } from "@purin-labs/std";
 import type { TurnTool } from "../agent-tools/catalog/tool-registry";
 import { jsonSchema } from "../agent-tools/define-tool";
 import { defineIntegrationTool } from "../agent-tools/integrations/services";
-import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import type {
   CustomConnectorScalarConstraint,
   CustomConnectorSchema,

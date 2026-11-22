@@ -9,14 +9,14 @@ import { describe, expect, it } from "vitest";
 import {
   CAPABILITY_CATALOGUE,
   CAPABILITY_KEYS,
-} from "../src/authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   prepareReadAndProposeAccessDefaults,
   prepareCapabilityPolicyWrite,
   prepareReadAndProposeCapabilityPolicies,
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
-} from "../src/data/capability-policy";
+} from "@purin-labs/authority/data/capability-policy";
 import {
   parseOrganisationId,
   type OrganisationId,
@@ -24,7 +24,7 @@ import {
 import {
   compilePublishAndActivateOrganisationPolicy,
   type OrganisationPolicySnapshot,
-} from "../src/policy-snapshot";
+} from "@purin-labs/authority/policy-snapshot";
 import { d1Database } from "./sqlite-d1";
 import { requireChannelId, requireIntegrationAccountId } from "./test-ids";
 

@@ -22,7 +22,10 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import {
   issueControlSession,
@@ -46,15 +49,15 @@ import {
 import {
   integrationAccountReference,
   type IntegrationAccountReference,
-} from "../../src/access-control/integration-discovery";
+} from "@purin-labs/authority/access-control/integration-discovery";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
-import { writeOrganisationCapabilityPolicy } from "../../src/data/capability-policy";
+import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
 } from "../../src/data/agent-operations";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
@@ -64,7 +67,7 @@ import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
   EMAIL_OPERATIONAL_RESOURCE_SCOPE,
-} from "../../src/authorization/capability-catalogue";
+} from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   EMAIL_SELF_TEST_SUBJECT,
   EMAIL_SELF_TEST_BODY,

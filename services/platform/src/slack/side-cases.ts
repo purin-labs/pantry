@@ -37,9 +37,9 @@ import {
   sideCaseContentDigest,
   sideCaseProposalId,
 } from "../chat/side-cases";
-import { parsePersonId, type PersonId } from "../data/person-authz";
+import { parsePersonId, type PersonId } from "@purin-labs/authority/data/person-authz";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { FlowBinding } from "../policy/information-flow";
+import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import type { SessionSideCase } from "../actors/session/conversation-port";
 

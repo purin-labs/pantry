@@ -11,8 +11,8 @@ import {
   storeVaultSecret,
   type VaultHandle,
   type VaultSecret,
-} from "../src/credential-vault";
-import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
+} from "@purin-labs/authority/credential-vault/index";
+import type { CredentialVaultBindings } from "@purin-labs/authority/credential-vault/keyring";
 import {
   parseDiscordApplicationId,
   parseDiscordGuildId,

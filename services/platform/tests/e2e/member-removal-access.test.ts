@@ -3,9 +3,9 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { saveConversation } from "../../src/chat/store";
-import { createAccessGrant } from "../../src/data/access-grants";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { newConversationId, newProjectId } from "@purin-labs/control-api";
 import type { UserId } from "@purin-labs/control-api/ids";

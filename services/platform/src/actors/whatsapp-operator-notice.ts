@@ -4,12 +4,12 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
-import { resolveActiveSlackOrganisationCredential } from "../credential-vault";
+import { resolveActiveSlackOrganisationCredential } from "@purin-labs/authority/credential-vault/index";
 import type { Env } from "@purin-labs/kernel/env";
 import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
+import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import {
   markWhatsAppNoticeDelivered,
   readWhatsAppOperatorNotice,

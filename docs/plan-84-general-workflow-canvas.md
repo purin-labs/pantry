@@ -388,7 +388,7 @@ Apply writes the same shape, with no Session. The Brain and chat timeline can re
 **Information flow.** A proposal's reason and labels are model output from a turn with a flow
 label. Store the turn's `FlowBinding` with the proposal, and check it on each read, each chat
 delivery and each restore. Node text carries its restriction through revisions, summaries and
-forks. Update the [IFC guide](../services/platform/src/policy/information-flow/README.md), run
+forks. Update the [IFC guide](../foundation/authority/policy/information-flow/README.md), run
 `pnpm lint:ifc-boundaries`, and add the allowed and denied journey J7.
 
 ## 5. Phases, costs and acceptance

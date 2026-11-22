@@ -8,9 +8,9 @@ import { env, exports } from "cloudflare:workers";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect } from "vitest";
 
-import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
-import { encodeContextVisibility } from "../../src/authorization/access-grants/visibility";
-import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
+import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
+import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CaseSnapshot } from "../../src/actors/case/types";
 import {
@@ -20,8 +20,11 @@ import {
   upsertFileResourceSource,
   type FileProjectionSourceReader,
 } from "../../src/context/files";
-import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
-import { createAccessGrant } from "../../src/data/access-grants";
+import {
+  parseVaultHandle,
+  storeVaultSecret,
+} from "@purin-labs/authority/credential-vault/index";
+import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import {
@@ -37,7 +40,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { isRecord } from "@purin-labs/std";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";

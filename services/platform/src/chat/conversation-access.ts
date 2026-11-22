@@ -14,7 +14,7 @@ import type { ConversationScope } from "./store";
 import { parseConversationActorIdentity } from "./conversation-actor-identity";
 import { parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import { authorizeProject } from "../projects/access";
-import type { NativeChatSourceAccess } from "../policy/information-flow/source-labels";
+import type { NativeChatSourceAccess } from "@purin-labs/authority/policy/information-flow/source-labels";
 
 export type AuthorizedConversation = Readonly<{
   creatorUserId: UserId;

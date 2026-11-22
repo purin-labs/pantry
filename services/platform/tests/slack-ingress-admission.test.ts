@@ -3,7 +3,7 @@
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it, vi, type TestContext } from "vitest";
 
-import { parseVaultHandle, storeVaultSecret } from "../src/credential-vault";
+import { parseVaultHandle, storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import { testRoot } from "./secrets-store";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import type {

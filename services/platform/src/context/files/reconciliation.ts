@@ -7,11 +7,11 @@ import type {
   ProviderFileCursor,
 } from "@purin-labs/contracts";
 
-import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
-import { readAccessGrant } from "../../data/access-grants";
+import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/visibility";
+import { readAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
-import { visibilityForGrantSubject } from "../../policy";
+import { visibilityForGrantSubject } from "@purin-labs/authority/policy/index";
 import {
   dropboxDeepLink,
   listDropboxFolder,

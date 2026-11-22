@@ -23,7 +23,7 @@ import {
   locateReplySources,
   type LocatedReplySource,
 } from "../mail-inbox/reply-sources";
-import type { FlowBinding } from "../policy/information-flow";
+import type { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type {
   SqlStorage,
   DurableObjectStorage,
@@ -73,7 +73,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { buildAgentMailboxAuthority } from "../request-authority";
+import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
 import { authorizeEmailChatSourceDelivery } from "../mail-inbox/chat-source-access";
 import {

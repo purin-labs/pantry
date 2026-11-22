@@ -1,6 +1,6 @@
 import type { EmailDraftEditRequest } from "../../actors/email-draft";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { jsonSchema } from "../define-tool";
 import { defineChannelTool } from "./services";
 

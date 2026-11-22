@@ -45,7 +45,7 @@ import {
   viewerMayRead,
   type MemoryViewer,
 } from "../memory/access";
-import { FlowLabel } from "../policy/information-flow";
+import { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   projectCaseRecords,

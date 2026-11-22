@@ -18,9 +18,9 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { selectActiveGrants } from "../../authorization/access-grants/compiler";
+import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import { compileCommerceReadAuthorities } from "./grant-authorities";
-import type { AccessGrant } from "../../authorization/access-grants/types";
+import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { enforceCommerceGraphReadAuthority } from "./authority";
 import type { CommerceGraphReader } from "./graph-reader";
 import { sensitivityAtMost } from "../contract/sensitivity";

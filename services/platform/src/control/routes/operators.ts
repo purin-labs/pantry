@@ -11,7 +11,7 @@ import {
   runVaultRootRotationStep,
   startVaultRootRotation,
   type VaultRootRotationError,
-} from "../../credential-vault";
+} from "@purin-labs/authority/credential-vault/index";
 import type { ActivationMutation } from "../../data/activation";
 import { disableIntegrationAccount } from "@purin-labs/connections/data/integration-account";
 import { inboxServices } from "../../mail-inbox/contract/inbox-services";
@@ -47,7 +47,7 @@ import {
   type IntegrationAccountId,
   type ProviderConnectionAttemptId,
 } from "@purin-labs/kernel/ids";
-import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
+import { holdOrganisationPolicyDistribution } from "@purin-labs/authority/policy-snapshot";
 import {
   controlMutationIdentity,
   parseMutationBoundary,

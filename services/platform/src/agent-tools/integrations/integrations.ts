@@ -2,7 +2,7 @@ import {
   parseAirtableReadArgs,
   parseAirtableWriteArgs,
 } from "../../actors/airtable-tool-input";
-import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
+import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { isRecord } from "@purin-labs/std";
 import type { HarnessIntegrationListRequest } from "./services";
 import { jsonSchema } from "../define-tool";

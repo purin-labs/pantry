@@ -20,7 +20,7 @@ import {
   upsertUser,
   issueControlSession,
 } from "@purin-labs/tenancy/data/control-plane";
-import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
+import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { readConversation } from "../../src/chat/store";
 import { conversationTimeline } from "../../src/chat/conversation";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
