@@ -10,7 +10,7 @@ import {
   parseRequestId,
   parseSlackInstallationId,
   parseSlackOrganisationConnectionId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
 import {
   createSlackOrganisationConnection,

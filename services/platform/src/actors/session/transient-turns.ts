@@ -12,8 +12,8 @@ import type {
   SessionContract,
   HarnessTurnLease,
 } from "@purin-labs/contracts";
-import { parseSessionId } from "../../ids";
-import type { Result } from "../../result";
+import { parseSessionId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
   admittedSessionModelRoute,

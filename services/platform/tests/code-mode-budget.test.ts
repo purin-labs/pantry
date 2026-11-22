@@ -26,7 +26,7 @@ import {
   parseRequestId,
   parseSessionId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const DIGEST = "a".repeat(64);

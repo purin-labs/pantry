@@ -14,18 +14,18 @@ import {
   type WhatsAppWebhookEvent,
 } from "./webhook";
 import type { WhatsAppAdmissionRequest } from "../actors/connector-whatsapp-rpc";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import {
   newRequestId,
   parseConnectorId,
   parseOrganisationId,
   type RequestId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   traceLog,
   traceWarn,
-} from "../observability";
+} from "@purin-labs/kernel/observability";
 
 /**
  * Meta's single WhatsApp callback. `GET` answers the subscription challenge;

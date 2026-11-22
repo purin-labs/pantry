@@ -9,7 +9,7 @@ import {
   restoreSession as restoreSessionTypescript,
   validateHarnessCheckpointRestoreRecord as validateHarnessCheckpointRestoreRecordTypescript,
 } from "@purin-labs/contracts/session-reducer";
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 
 const ADVANCE_SCHEMA = "pantry.actor.advance-session-command.v1";

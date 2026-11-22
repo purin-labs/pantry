@@ -11,14 +11,14 @@ import type {
 } from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
   parseSessionId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
-import { traceLog, traceWarn } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   CODE_MODE_PILOT_BUDGET,
   CODE_MODE_ENGINE_RESERVED_COST_MICROS,

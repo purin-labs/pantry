@@ -38,7 +38,7 @@ import {
   matchMailOrganizationRoute,
   type MailOrganizationRoute,
 } from "./control/routes/mail-organization";
-import type { Env } from "./env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   handleProjectsRoute,
   matchProjectsRoute,

@@ -14,7 +14,7 @@ import { listEmailReviewProjections } from "../../data/email-review";
 import { listIntegrationAccounts } from "../../data/integration-account";
 import { extractMailbox } from "../../mail/gmail-adapter";
 import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   listWhatsAppCaseConversationWindows,
   listWhatsAppPhoneNumberAccounts,
@@ -25,10 +25,10 @@ import {
   type WhatsAppReplyProposalProjection,
 } from "../../data/whatsapp";
 import { whatsappConnector } from "../../mail-inbox/agent-mailbox-connector";
-import type { Env } from "../../env";
-import { newRequestId, parseIntegrationAccountId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
-import { traceWarn } from "../../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,

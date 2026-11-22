@@ -12,7 +12,7 @@ import type {
   Sha256Digest,
 } from "@purin-labs/contracts";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,

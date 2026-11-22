@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ConversationId } from "@purin-labs/control-api";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { StoredMessageAttachment, UserMessage } from "@purin-labs/contracts";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
@@ -11,7 +11,7 @@ import {
   deriveUserMessageViews,
   validateStoredMessageAttachment,
 } from "../messages/message-wasm";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseChatCommand,
   parseConversation,

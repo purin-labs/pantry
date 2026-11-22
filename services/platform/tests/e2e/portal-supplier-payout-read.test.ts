@@ -5,7 +5,7 @@ import { isRecord } from "@purin-labs/std";
 
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   accessControlPath,
   createGrant,

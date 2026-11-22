@@ -1,12 +1,12 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { parseMailReplyEdit } from "@purin-labs/control-api";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { EmailReplyProposalProjection } from "../data/email-mailbox";
-import { newRequestId, type OrganisationId } from "../ids";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import type { RequestAuthority } from "@purin-labs/contracts";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import type { AgentMailboxConnectorHandle } from "./agent-mailbox-connector";
 import { emailApprovalChallenge } from "./email-approval-challenge";

@@ -1,7 +1,7 @@
 import type { ControlRole } from "../../data/control-plane";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
-import { requirePublicOrigin } from "../../public-origin";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

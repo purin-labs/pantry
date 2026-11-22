@@ -2,7 +2,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   parseStripeConnectAccountId,
   parseStripeCueEvent,

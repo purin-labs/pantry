@@ -21,9 +21,9 @@ import {
   readHeldOutputRequest,
   type HeldOutputRequest,
 } from "../../data/held-output-request";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { parseActiveCapabilityId } from "../../data/capability-policy";
-import { parseCaseId } from "../../ids";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import { memberMaySee, type MemberViewer } from "../../chat/member-view";
 import { FlowLabel } from "../../policy/information-flow";
 import { policyLevel } from "../../policy/information-flow/labels";

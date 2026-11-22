@@ -41,7 +41,7 @@ vi.mock(
 );
 
 import { CaseDO } from "../src/actors/case";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../src/policy";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { fixtureControlRequestAuthority } from "./fixtures/plan25-turn";

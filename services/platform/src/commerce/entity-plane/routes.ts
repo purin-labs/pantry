@@ -16,7 +16,7 @@ import type {
   SavedCommerceViewId,
   SavedCommerceViewRevision,
 } from "@purin-labs/commerce-contracts";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   assertCommerceEntityPlaneCommandWithLexicon,
   assertCommerceGraphQueryWithLexicon,

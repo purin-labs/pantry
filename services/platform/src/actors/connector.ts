@@ -5,7 +5,7 @@ import {
 import { ACTOR_MACHINES } from "./actor-machines";
 import { readWarmActorSlots } from "./warm-actor-slots";
 import { invalidateEmailCaseContextCollectionProposals } from "./email-case-context-collection-evidence";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   actorExecutionAdmissionOpen,
   closeActorExecutionAdmission,
@@ -62,7 +62,7 @@ import {
 } from "../slack/ingress-admission";
 import { reopenWithheldConnectorSlackDelivery } from "./connector-slack-stream";
 import { deliverSlackPermissionNotice } from "../slack/case-processing";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { type PlacedActorExportSource } from "./lifecycle/placed-actor";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
 import { inspectConnector } from "./connector/delivery";
@@ -461,7 +461,7 @@ export class ConnectorDO
   async advanceActivationSchema(
     input: ActorActivationSchemaAdvance,
   ): Promise<
-    import("../result").Result<
+    import("@purin-labs/kernel/result").Result<
       { readonly kind: "advanced"; readonly stateVersion: number },
       ActorActivationSchemaAdvanceError
     >
@@ -914,7 +914,7 @@ export class ConnectorDO
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     CONNECTOR: DurableObjectNamespace<ConnectorDO>;
   }

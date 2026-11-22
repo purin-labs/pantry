@@ -37,8 +37,8 @@ import {
   parseCustomConnectorId,
   type CustomConnectorId,
 } from "../custom-connectors/identity";
-import type { Result } from "../result";
-import { parseSessionId, type SessionId } from "../ids";
+import type { Result } from "@purin-labs/kernel/result";
+import { parseSessionId, type SessionId } from "@purin-labs/kernel/ids";
 import {
   parseChatTimelineEvent,
   parseInputParts,

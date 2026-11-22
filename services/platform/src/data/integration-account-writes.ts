@@ -4,7 +4,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   purgeGuarded,
   type OrganisationPurgeContext,

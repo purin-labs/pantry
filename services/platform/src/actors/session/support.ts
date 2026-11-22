@@ -4,9 +4,9 @@ import type {
   StoredMessageAttachment,
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import type { RequestId, OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { RequestId, OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CheckpointCommittedSessionCommit } from "../actor-journal";
 import {
   listHarnessCheckpointObjectKeys,

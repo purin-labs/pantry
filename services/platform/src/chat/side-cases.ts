@@ -10,7 +10,7 @@
  * stays with the new chat. A started proposal is the evidence of its side
  * Case and outlives the source chat.
  */
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   isConversationId,
   isSideCaseProposalId,

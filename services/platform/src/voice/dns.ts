@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 const CLOUDFLARE_API = "https://api.cloudflare.com/client/v4";
 const RECORD_TTL_SECONDS = 60;

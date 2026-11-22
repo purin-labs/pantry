@@ -28,7 +28,7 @@ import { parseEntityRef } from "@purin-labs/commerce-client";
 
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { CountRow } from "../actors/sql-rows";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   acceptedByPersonFlowLabel,
   canonicalFlowLabel,
@@ -36,7 +36,7 @@ import {
   FlowLabel,
   joinFlowLabels,
 } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 declare const memoryRevisionBrand: unique symbol;
 

@@ -64,7 +64,7 @@ import {
 import {
   parseRequestId,
   parseOrganisationId,
-} from "../../services/platform/src/ids.ts";
+} from "../../foundation/kernel/ids.ts";
 import { parseSessionTurnInputDigest } from "../../services/platform/src/actors/agent-session-turn-input-digest.ts";
 import {
   captureActorExport,

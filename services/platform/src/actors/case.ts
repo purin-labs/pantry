@@ -91,7 +91,7 @@ export class CaseDO extends CaseActor implements CaseInboxRpc {
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     CASE: DurableObjectNamespace<CaseDO>;
   }

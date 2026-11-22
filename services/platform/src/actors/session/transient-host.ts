@@ -1,4 +1,4 @@
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { AgentSessionPersistence } from "../agent-session-schema";
 import type { PiToolRules } from "../pi-tool-replay";
 

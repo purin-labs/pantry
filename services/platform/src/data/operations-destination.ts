@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   parseChannelId,
   parseConnectorId,
@@ -9,8 +9,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * The Organisation's operations channel in Slack: the setup's communication

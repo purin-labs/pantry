@@ -37,16 +37,16 @@ import {
   parseConversationActorIdentity,
 } from "../chat/conversation-actor-identity";
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "../actors/actor-stubs";
-import { parseCaseId, parseSessionId, type CaseId } from "../ids";
+import { parseCaseId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
 import {
   resolveMemoryViewer,
   viewerMayRead,
   type MemoryViewer,
 } from "../memory/access";
 import { FlowLabel } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   projectCaseRecords,
   projectSessionRecords,

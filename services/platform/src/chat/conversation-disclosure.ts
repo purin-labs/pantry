@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
@@ -26,7 +26,7 @@ import {
   listOrganisationMembers,
   readActiveOrganisationMembershipRevision,
 } from "../data/control-plane";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../request-authority";
 import { authorizeProjectContextDisclosure } from "../projects/context";
 import { projectSnapshotFromParts } from "./project-context-binding";

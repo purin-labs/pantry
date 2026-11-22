@@ -7,7 +7,7 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import type { SurfaceKind } from "@purin-labs/contracts";
 
 import type { InstallModel } from "../boundary";
@@ -22,7 +22,7 @@ import {
   type WorkspaceId,
   parseVaultHandle,
   type VaultHandle,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   newUserId,
   parseUserId,
@@ -33,7 +33,7 @@ import {
   type InitialOrganisationPlacement,
   type OrganisationPlacement,
 } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   organisationLifecycleParts,
   type OrganisationCreationParts,

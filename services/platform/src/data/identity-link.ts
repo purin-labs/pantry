@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -10,9 +10,9 @@ import {
   type ProviderConnectionId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseSlackUserId,
   type SlackEventId,

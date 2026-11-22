@@ -1,7 +1,7 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { ActiveControlSession } from "../data/control-plane";
 import { hashOpaqueSecret } from "../data/control-plane";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   createAuthorizingProviderAttempt,
   providerAttemptWire,
@@ -9,7 +9,7 @@ import {
   type ProviderAttemptMutation,
 } from "../data/provider-attempt";
 import type { IntegrationAccount } from "../data/integration-account";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   providerAuthorizationSecret,
   providerAuthorizationUrl as buildProviderAuthorizationUrl,
@@ -18,8 +18,8 @@ import {
   providerUsesPkce,
 } from "../provider-adapters/catalogue";
 import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
-import type { Result } from "../result";
-import { requirePublicOrigin } from "../public-origin";
+import type { Result } from "@purin-labs/kernel/result";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import { readSquareConfiguration } from "../provider-adapters/square";
 import type {
   OnboardingProvider,

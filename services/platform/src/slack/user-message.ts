@@ -9,7 +9,7 @@ import {
   type DerivedUserMessage,
   type MessageContractRejection,
 } from "../messages/message-wasm";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SlackAuthoredPart, SlackMessageEvent } from "./events";
 import { assertNever } from "@purin-labs/std";
 

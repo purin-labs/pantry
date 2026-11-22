@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
@@ -13,7 +13,7 @@ import {
   listUnresolvedSupplierPayouts,
   type SupplierPayoutRow,
 } from "../data/supplier-payout-store";
-import type { OrganisationId, SessionId } from "../ids";
+import type { OrganisationId, SessionId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   advanceInformationFlowContext,

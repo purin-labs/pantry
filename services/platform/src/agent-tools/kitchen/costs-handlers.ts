@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   FORECAST_CAPEX_MINOR_CELL_KEY,
   FORECAST_DEMAND_CURVE_CELL_KEY,
@@ -73,7 +73,7 @@ import {
   type LotCostSaveResult,
 } from "../../commerce/cost-plan-store";
 import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { preflightHarnessTurnLease } from "../../actors/agent-session-harness-authority";
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";

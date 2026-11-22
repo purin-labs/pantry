@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type {
   AccessDecisionExplanation,
@@ -28,14 +28,14 @@ import {
 } from "../data/integration-account";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseConnectorId,
   parseIntegrationAccountId,
   parsePersonId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   createCurrentSourceFlowLabel,
@@ -55,7 +55,7 @@ import {
   buildWorkflowAuthority,
   validateNativeRequestAuthority,
 } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   grantSubjectFromReferenceInput,
   opaqueAccessTargetReference,

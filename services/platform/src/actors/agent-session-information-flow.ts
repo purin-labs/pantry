@@ -2,7 +2,7 @@ import {
   memoryObservationRecordId,
   type ContextBundle,
 } from "../context/assembly";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   advanceInformationFlowContext,
   FlowBinding,

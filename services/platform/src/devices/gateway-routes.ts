@@ -5,8 +5,8 @@ import {
 
 import { deviceFleetStub } from "./contract/fleet-stub";
 import { controlError, controlJson } from "../control/http";
-import type { Env } from "../env";
-import { parseOrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   SNAPSHOT_BYTE_LIMIT,

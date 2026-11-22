@@ -19,7 +19,7 @@ import {
   type PageBrowserContext,
 } from "@purin-labs/contracts";
 import type { JsonRecord } from "../control/http";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
 import { parseCustomConnectorId } from "../custom-connectors/identity";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";

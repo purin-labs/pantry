@@ -15,8 +15,8 @@ import {
   parseOrganisationId,
   type OrganisationId,
   type IntegrationAccountId,
-} from "../../ids";
-import type { Env } from "../../env";
+} from "@purin-labs/kernel/ids";
+import type { Env } from "@purin-labs/kernel/env";
 export type MailOrganizationRoute = Readonly<{
   kind: "mailOrganization";
   organisationId: OrganisationId;

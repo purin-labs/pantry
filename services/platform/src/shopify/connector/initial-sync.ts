@@ -1,6 +1,9 @@
 import type { ShopifyResourceEnvelopeV202607 } from "@purin-labs/commerce-contracts";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 import type {
   ShopifyCommerceCatalogEnvelope,

@@ -3,7 +3,7 @@ import { DatabaseSync } from "node:sqlite";
 import { expect, it } from "vitest";
 import { readGmailInferenceEligibility } from "../src/mail-inbox/contract/gmail-inference-eligibility";
 import { GMAIL_MODEL_REVIEWS } from "../src/mail-inbox/contract/gmail-model-reviews";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 
 it("sends mail only to a reviewed route whose terms the Organisation accepted, until the review ends", async function checksEligibility() {

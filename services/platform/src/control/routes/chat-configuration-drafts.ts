@@ -14,7 +14,7 @@ import {
   readOperatorDraft,
   type OperatorConfigurationDraft,
 } from "../../data/operator-configuration-draft";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   presentConfigurationCommand,

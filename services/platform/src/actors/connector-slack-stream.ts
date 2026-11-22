@@ -5,7 +5,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import { resolveActiveSlackThreadCredential } from "../credential-vault";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseChannelId,
   parseConnectorId,
@@ -14,8 +14,8 @@ import {
   parseOrganisationId,
   parseWorkspaceId,
   type ChannelId,
-} from "../ids";
-import { traceLog } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { parseOrganisationPlacement } from "../placement";
 import { screenTextForSurface } from "../redaction";
 import {
@@ -35,7 +35,7 @@ import {
   actorExecutionAdmissionOpen,
   isActorExecutionActive,
 } from "./actor-execution-quiescence";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { EmbeddedHarnessTurnError } from "./embedded-harness";
 import {
   postSlackThreadMessage,

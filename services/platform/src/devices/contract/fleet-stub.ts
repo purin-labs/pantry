@@ -1,6 +1,6 @@
 import type { DeviceFleetActor } from "../../actors/device-fleet";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 
 /** The Actor of one shop location, placed where the Organisation is. */

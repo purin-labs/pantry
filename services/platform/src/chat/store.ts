@@ -1,5 +1,5 @@
 import { chatOriginField, conversationOrigin } from "./origin";
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ConversationExecution } from "./execution";
 import {
   chatThreadActivity,
@@ -25,7 +25,7 @@ import {
 } from "./conversation-machine";
 import { conversationProjectSnapshots } from "./project-context-binding";
 import type { D1Database } from "@cloudflare/workers-types";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   latestPublicTimelineSequence,

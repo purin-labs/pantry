@@ -1,5 +1,5 @@
-import { runtimeFetch } from "../runtime-fetch";
-import type { Env } from "../env";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Env } from "@purin-labs/kernel/env";
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,

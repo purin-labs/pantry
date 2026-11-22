@@ -1,6 +1,9 @@
-import { parseOrganisationId, type OrganisationId } from "../../ids";
-import type { JsonObject } from "../../http";
-import type { Result } from "../../result";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CaseContent,
   UserMessage,

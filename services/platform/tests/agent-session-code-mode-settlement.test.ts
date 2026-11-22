@@ -15,7 +15,7 @@ import {
 import { createSessionHarnessAuthoritySchema } from "../src/actors/agent-session-harness-authority";
 import { createActorJournalSchema } from "../src/actors/agent-session-schema";
 import { type CodeModeOrganisationSettleInput } from "../src/actors/code-mode-budget";
-import { parseRequestId, parseOrganisationId } from "../src/ids";
+import { parseRequestId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { fixtureTurnAuthority } from "./fixtures/plan25-turn";
 import {
   emptySqliteFixture,

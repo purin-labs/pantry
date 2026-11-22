@@ -1,5 +1,5 @@
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CodeModeOrganisationActorError } from "./code-mode-types";
 import { readOrganisationMetaRow } from "./organisation-record";
 import type { OrganisationMetaRow } from "./types";

@@ -1,5 +1,5 @@
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
-import type { OrganisationDatabaseSession } from "../../database-handles";
+import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
 
 /**
  * The cleanup of a removed account at its provider (Plan 80). The account

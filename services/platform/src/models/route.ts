@@ -3,9 +3,9 @@ import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { ModelRoute } from "@purin-labs/contracts";
 import type { ChatEffort, ChatModelCapabilities } from "@purin-labs/control-api";
 
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { readOrganisationCodexConnectionAtScope } from "./codex-connection";
 import {
   PLATFORM_DEFAULT_PI_MODEL,

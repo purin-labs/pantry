@@ -26,7 +26,7 @@ import {
   composeAgentInstructions,
   resolveCaseTurnAgentProfile,
 } from "../data/pinned-agent-profile";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type {
   ClaimedEvalTask,
   EvalTaskEnd,
@@ -42,13 +42,13 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
   parseSessionId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { supplierReplyRecipient } from "../mail-inbox/verified-sender";
 import {
   digestModelRoute,
   resolveOrganisationModelRouteForSelection,
 } from "../models/route";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   loadOrganisationPolicyOrDefaultDeny,

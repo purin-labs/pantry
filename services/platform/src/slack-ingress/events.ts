@@ -1,22 +1,22 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { issueIdentityLink } from "../data/identity-link";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
-} from "../http";
+} from "@purin-labs/kernel/http";
 import type { SlackCaseCommand } from "../slack/case-command-message";
 import {
   newRequestId,
   type RequestId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   traceLog,
   traceWarn,
-} from "../observability";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseSlackEnvelope,
   slackAuthoredText,

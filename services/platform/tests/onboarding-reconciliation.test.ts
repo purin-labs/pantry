@@ -4,7 +4,7 @@ import {
   singleDatabase,
   type GlobalDatabase,
   type SingleDatabase,
-} from "../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
@@ -40,10 +40,10 @@ import {
   reserveActor,
   listOrganisationActorRegistryEntries,
 } from "../src/actors/actor-registry";
-import { parseSessionId } from "../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import type { HarnessHistoryErasure } from "../src/actors/agent-session-harness-authority";
-import type { Result } from "../src/result";
-import type { OrganisationId } from "../src/ids";
+import type { Result } from "@purin-labs/kernel/result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { ActorRegistryEntry } from "../src/actors/actor-registry";
 import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
 import {

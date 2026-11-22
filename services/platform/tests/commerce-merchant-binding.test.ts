@@ -6,7 +6,10 @@ import {
   resolveCurrentOrganisationCommerceMerchantBinding,
   resolveCommerceMerchantBinding,
 } from "../src/data/commerce-merchant-binding";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
 import { requireIntegrationAccountId } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 

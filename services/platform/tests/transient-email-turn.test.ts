@@ -32,7 +32,7 @@ import {
 } from "../src/actors/transient-email-turn";
 import { piToolRules } from "../src/actors/pi-tool-replay";
 import { TOOL_REGISTRY } from "../src/agent-tools/registry";
-import type { Result } from "../src/result";
+import type { Result } from "@purin-labs/kernel/result";
 
 const NOW = 1_784_016_325_277;
 

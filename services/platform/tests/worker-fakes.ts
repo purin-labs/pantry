@@ -1,5 +1,5 @@
-import type { SingleDatabase } from "../src/database-handles";
-import type { Env } from "../src/env";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
 
 /**
  * A unit test's `Env`: its one database holds both schemas, so `DB` serves

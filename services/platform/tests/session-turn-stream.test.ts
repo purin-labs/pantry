@@ -15,7 +15,7 @@ import {
   readRunningSessionTurn,
   readSessionTurnReplay,
 } from "../src/actors/agent-session-turn-stream";
-import { type RequestId, type OrganisationId } from "../src/ids";
+import { type RequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {
   requireRequestId,

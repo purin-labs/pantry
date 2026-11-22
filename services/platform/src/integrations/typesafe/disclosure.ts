@@ -9,7 +9,7 @@ import type {
   FlowLabelDecision,
   TypeSafeInferenceSink,
 } from "../../policy/information-flow/types";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { TypeSafeCredential } from "./credential";
 import { sameTypeSafeAuthority } from "./authority";
 import {

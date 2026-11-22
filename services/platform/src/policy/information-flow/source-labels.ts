@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { parseControlRole } from "../../data/control-plane";
 import {
   isUserId,
@@ -26,10 +26,10 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { readCurrentOrganisationPolicySnapshot } from "../../policy-snapshot";
 import { validateNativeRequestAuthority } from "../../request-authority";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { FlowLabel } from "./labels";
 import { sourceReaderForAuthority } from "./source-readers";
 import type {

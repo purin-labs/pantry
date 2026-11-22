@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { proposalFixtureAuthority } from "./agent-operations-database";
 import { describe, expect, it } from "vitest";
 import { mkdir, writeFile } from "node:fs/promises";

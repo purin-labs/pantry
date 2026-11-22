@@ -14,9 +14,9 @@ import {
   evaluateChatFlowLabelSink,
 } from "../chat/information-flow";
 import type { ConversationScope } from "../chat/store";
-import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
-import { parseCaseId, type OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import {
   createCurrentSourceFlowLabel,

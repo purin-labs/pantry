@@ -10,13 +10,13 @@ import type {
   UnversionedControlMutationBoundary,
   ControlMutationReceiptScope,
 } from "../../data/control-mutation";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
 import {
   newRequestId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { admitUserMutation } from "../admission/control-mutation";
 import { resolveMerchantBinding } from "../../commerce/contract/merchant-control";
 import {

@@ -205,7 +205,7 @@ import {
   parseIntegrationAccountId,
   type ConnectorId,
   type OrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
@@ -237,7 +237,7 @@ import {
   parseSessionId,
   type IntegrationAccountId,
   type CaseId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   recordEmailThreadCase,
   projectEmailReplyProposal,
@@ -2146,7 +2146,7 @@ async function verifyDraftAssignmentPlacement(
       import("../../src/actors/connector").ConnectorDO
     >;
     organisationId: OrganisationId;
-    connectorId: import("../../src/ids").ConnectorId;
+    connectorId: import("@purin-labs/kernel/ids").ConnectorId;
     caseId: CaseId;
     model: DraftModelFixture;
     context: TestContext;
@@ -2370,7 +2370,7 @@ async function verifyDraftExecutionPlacement(
       import("../../src/actors/connector").ConnectorDO
     >;
     organisationId: OrganisationId;
-    connectorId: import("../../src/ids").ConnectorId;
+    connectorId: import("@purin-labs/kernel/ids").ConnectorId;
     caseId: CaseId;
     integrationAccountId: IntegrationAccountId;
     model: DraftModelFixture;
@@ -2670,7 +2670,7 @@ async function verifyDraftReplyPlacement(
       import("../../src/actors/connector").ConnectorDO
     >;
     organisationId: OrganisationId;
-    connectorId: import("../../src/ids").ConnectorId;
+    connectorId: import("@purin-labs/kernel/ids").ConnectorId;
     model: DraftModelFixture;
     context: TestContext;
   }>,
@@ -8472,7 +8472,7 @@ function assistantSend(
 function seedAssistantDecision(
   input: Readonly<{
     organisationId: OrganisationId;
-    accountId: import("../../src/ids").IntegrationAccountId;
+    accountId: import("@purin-labs/kernel/ids").IntegrationAccountId;
     authority: Extract<
       import("@purin-labs/contracts").RequestAuthority,
       { kind: "control" }

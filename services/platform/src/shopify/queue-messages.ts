@@ -4,8 +4,12 @@
 
 import { isRecord } from "@purin-labs/std";
 
-import type { JsonObject } from "../http";
-import type { IntegrationAccountId, OrganisationId, RequestId } from "../ids";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+  RequestId,
+} from "@purin-labs/kernel/ids";
 import {
   readIntegrationAccountId,
   readOrganisationId,
@@ -13,8 +17,8 @@ import {
   readRequiredNumber,
   readRequiredString,
   type IngressQueueMessageError,
-} from "../queue-fields";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/queue-fields";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type ShopifyCommerceRefreshQueueMessage = {
   readonly type: "shopify.commerce_refresh.v1";

@@ -32,7 +32,7 @@ void emailExecution;
 // @ts-expect-error Email edits require their captured Session execution.
 void email.edit(originlessEmailEdit, scope);
 
-declare const controlSessionId: import("../src/ids").ControlSessionId;
+declare const controlSessionId: import("@purin-labs/kernel/ids").ControlSessionId;
 const invalidHumanOrigin: CollaborationMutationAuthority = {
   ...authority,
   // @ts-expect-error Human origin cannot carry an agent execution identity.

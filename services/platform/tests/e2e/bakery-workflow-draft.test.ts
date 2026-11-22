@@ -21,7 +21,10 @@ import { expect, it } from "vitest";
 import * as Y from "yjs";
 import { bakeryWorkflowPrefix } from "../../src/commerce/bakery/workflow-revisions";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { parseOrganisationId, type OrganisationId } from "../../src/ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { WorkflowDraftPeer } from "./workflow-draft-peer";
 import {

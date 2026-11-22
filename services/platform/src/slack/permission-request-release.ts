@@ -4,8 +4,8 @@ import {
   markAgentPermissionRequestReleased,
   type AgentPermissionRequest,
 } from "../data/agent-permission-request";
-import type { Env } from "../env";
-import { parseConnectorId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseConnectorId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { refreshSlackRequestAuthority } from "../request-authority";
 import { permissionDecisionNoticeText } from "./permission-request-notice";

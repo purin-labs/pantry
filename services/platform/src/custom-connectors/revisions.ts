@@ -1,12 +1,12 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
-import { parseOrganisationId, type OrganisationId } from "../ids";
+import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   digestCanonical,
   serializeCanonical,
 } from "../policy/information-flow/digest";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseCustomConnectorDefinition,
   type CustomConnectorDefinitionError,

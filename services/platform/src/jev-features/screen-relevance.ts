@@ -2,7 +2,7 @@ import type {
   ScreenRelevanceBand,
   ScreenRelevanceChoice,
 } from "@purin-labs/control-api";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /**
  * The Screen relevance switch (Plan 88 section 2, Plan 87 section 3A). It is the

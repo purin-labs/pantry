@@ -1,7 +1,7 @@
 import { Container } from "@cloudflare/containers";
 
 import { eraseIdleContainerState } from "../actors/unregistered-actor-erasure";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 const CUSTOM_CONNECTOR_FETCH_PORT = 8080;
 
@@ -22,7 +22,7 @@ export class CustomConnectorFetchContainer extends Container<Env> {
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     CUSTOM_CONNECTOR_FETCH: DurableObjectNamespace<CustomConnectorFetchContainer>;
   }

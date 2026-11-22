@@ -1,6 +1,6 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";
@@ -29,9 +29,9 @@ import {
   recordWhatsAppMessageReceipt,
   requestWhatsAppCaseHandoff,
 } from "../src/data/whatsapp";
-import type { OrganisationId } from "../src/ids";
-import { traceLog, traceWarn } from "../src/observability";
-import { newRequestId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import { createFakeGraph } from "./whatsapp/fake-graph";
 import {
   WHATSAPP_TEST_NOW,

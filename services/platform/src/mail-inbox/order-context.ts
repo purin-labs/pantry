@@ -5,9 +5,9 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import { isRecord, sameJson } from "@purin-labs/std";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { GmailMessageContent } from "../mail/gmail-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   MAX_EMAIL_ORDER_READS,
   readMailboxCommerceQuery,

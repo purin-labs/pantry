@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 import {
@@ -9,9 +9,9 @@ import {
   type ControlMutationReceiptScope,
 } from "./control-mutation";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { roleMayConfigure, type ControlRole } from "./control-plane";
-import type { ControlSessionId, OrganisationId } from "../ids";
+import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runAgentOperation } from "./agent-operation-runner";
 import { parseProposalChangeSummary } from "@purin-labs/bakery-workflow/changes";
@@ -40,7 +40,7 @@ import {
   type OfferPriceAllowanceCommand,
 } from "../commerce/contract/offer-price-allowance";
 import type { PublishedResourceBoundaryError } from "../commerce/contract/types";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "../policy";
 import {
   parseAgentOperationInput,

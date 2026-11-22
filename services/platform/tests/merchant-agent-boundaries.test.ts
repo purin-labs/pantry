@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -62,7 +62,7 @@ describe("Urk release boundaries", () => {
       throw new Error(`slack draft failed: ${JSON.stringify(draft.error)}`);
     const confirmed = await confirmOperatorConfigurationDraft({
       db: slackDb,
-      env: { DB: slackDb, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
+      env: { DB: slackDb, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("@purin-labs/kernel/env").Env,
       organisationId: ORGANISATION,
       draftId: draft.value.draftId,
       actorUserId: OWNER,

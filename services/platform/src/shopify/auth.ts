@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VaultSecret } from "../credential-vault";
 import { isRecord } from "@purin-labs/std";
 

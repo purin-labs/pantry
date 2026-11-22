@@ -1,8 +1,8 @@
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import { queueAllCaseContextCollectionInvalidations } from "./relationships";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { assertRequiredColumns } from "../actors/schema-migrations";
 import { createTypeSafeUsageSchema } from "../integrations/typesafe/usage-store";

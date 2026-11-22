@@ -1,7 +1,7 @@
 import type { readCounterSaleView } from "../../commerce/counter-register";
 import type { readMenuScreenList } from "../../control/routes/menu-boards";
 import type { readTerminalOperations } from "../../data/terminal-operations-readback";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * The Café reads that other areas use: the menu screens and the payment

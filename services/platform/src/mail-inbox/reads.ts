@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
@@ -6,7 +6,7 @@ import { assertNever } from "@purin-labs/std";
 import type { MailDecision } from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "../policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";
 import type {

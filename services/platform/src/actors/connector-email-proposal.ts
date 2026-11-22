@@ -40,9 +40,9 @@ import {
   type GmailReplyTarget,
 } from "../mail/reply-target";
 import { extractMailbox } from "../mail/gmail-adapter";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { GmailDraft } from "../mail/gmail-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   MailReplyEdit,
@@ -72,7 +72,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { buildAgentMailboxAuthority } from "../request-authority";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
 import { authorizeEmailChatSourceDelivery } from "../mail-inbox/chat-source-access";

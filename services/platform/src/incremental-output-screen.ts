@@ -1,4 +1,4 @@
-import type { ChannelId } from "./ids";
+import type { ChannelId } from "@purin-labs/kernel/ids";
 import {
   containsInternalModelProtocol,
   detectSensitiveEntities,

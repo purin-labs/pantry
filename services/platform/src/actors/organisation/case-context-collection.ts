@@ -1,14 +1,17 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { resolveCaseContextCollectionSelectionVerification } from "../../case-context-discovery/source";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
-import type { Env } from "../../env";
-import { parseIntegrationAccountId, type OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseIntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   resolveVerifiedContactEndpoint,
   type VerifiedContactEndpoint,
 } from "../../data/contact-verification";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActor } from "../actor-router";

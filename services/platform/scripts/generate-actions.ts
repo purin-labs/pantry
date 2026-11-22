@@ -127,7 +127,7 @@ function renderTypeScript(actions: readonly ActionSource[]): string {
     `import type { ActionDef } from "@purin-labs/contracts";\n` +
     `import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";\n` +
     `import type { Variant } from "@purin-labs/type-utils";\n` +
-    `import type { Result } from "../result";\n\n` +
+    `import type { Result } from "@purin-labs/kernel/result";\n\n` +
     `${definitions}\n\n` +
     `export const GENERATED_ACTION_TOOLS = [\n` +
     `  STRIPE_CHARGE_CREATE_TOOL,\n` +

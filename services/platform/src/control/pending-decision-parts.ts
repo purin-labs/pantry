@@ -5,7 +5,7 @@ import type {
 import { isCommerceLedgerAction } from "../actors/action-ledger";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { listEmailReviewProjections } from "../data/email-review";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   decidePendingDecision,
   type DecidePendingDecision,

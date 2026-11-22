@@ -1,5 +1,5 @@
 import type { SurfaceKind } from "@purin-labs/contracts";
-import type { JsonObject } from "./http";
+import type { JsonObject } from "@purin-labs/kernel/http";
 import {
   parseChannelId,
   parseIntegrationAccountId,
@@ -9,8 +9,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
   type WorkspaceId,
-} from "./ids";
-import type { Result } from "./result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { exhaustiveList } from "@purin-labs/std";
 
 export type InstallModel = "unlisted" | "marketplace" | "custom";

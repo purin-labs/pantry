@@ -8,12 +8,15 @@ import type {
 import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt/limits";
 
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../commerce-lab/lab-metadata";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type {
   CanonicalActionDraft,
   LedgerCanonicalAction,
 } from "../actors/action-ledger";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   MERCHANT_PLUGIN_INSTALL_VERB,
   merchantPluginActionPath,

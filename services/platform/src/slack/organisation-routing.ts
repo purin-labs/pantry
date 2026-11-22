@@ -1,7 +1,7 @@
 import type {
   GlobalDatabase,
   GlobalDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -23,13 +23,13 @@ import {
   type SlackOrganisationConnectionId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,
 } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import type { Variant } from "@purin-labs/type-utils";
 import { isPositiveInteger } from "@purin-labs/std";

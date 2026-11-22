@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   CommerceSystemKind,
   CapabilityDefinition,
@@ -27,13 +27,13 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   createCurrentSourceFlowLabel,
   integrationResourceScopeForGrant,
   type CurrentSourceFlowLabelError,
 } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   assembleAccessControlView,
   type AccessControlIntegrationProjection,

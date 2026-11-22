@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import type { UnitTestEnv } from "./worker-fakes";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 
@@ -32,7 +32,7 @@ import {
   parseCaseId,
   parseOrganisationId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import { prepareActorRestoreManifest } from "../src/actors/actor-restore-manifest";
 import {

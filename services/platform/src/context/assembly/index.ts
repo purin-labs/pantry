@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   ContextAssemblyStrategyVersion,
   ContextBundle,
@@ -26,7 +26,7 @@ import type {
   CaseId,
   SessionId,
   OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import type { ContextProjectionReader } from "../projection";
 import type {
   ContextProjectionRevision,

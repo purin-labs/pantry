@@ -10,9 +10,13 @@ import {
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
-import { parseCaseId, parseOrganisationId, type RequestId } from "../ids";
-import type { Result } from "../result";
-import type { Env } from "../env";
+import {
+  parseCaseId,
+  parseOrganisationId,
+  type RequestId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub } from "./actor-stubs";
 import {
   findActiveCaseActorAtScope,

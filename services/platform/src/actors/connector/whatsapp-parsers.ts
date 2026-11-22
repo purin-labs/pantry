@@ -1,5 +1,5 @@
 import type { ConnectorIdentity } from "@purin-labs/contracts";
-import type { IntegrationAccountId } from "../../ids";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { WhatsAppIngressLimits } from "../connector-whatsapp";
 import {
   parseWhatsAppReplyOrigin,

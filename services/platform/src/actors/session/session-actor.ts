@@ -66,7 +66,7 @@ import type {
   HarnessTurnLease,
 } from "@purin-labs/contracts";
 import type { ActorActivationRequest } from "../actor-registry";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseRequestId,
   parseSessionId,
@@ -74,10 +74,10 @@ import {
   type RequestId,
   type SessionId,
   type OrganisationId,
-} from "../../ids";
-import { traceLog } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { verifyWorkspaceRevisionReceipt } from "../../workspace-revision-store";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { initializeAgentSessionPersistence } from "../agent-session-schema";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "../actor-schema-versions";
 import {

@@ -18,13 +18,13 @@ import {
   type IntegrationAccountId,
   type SessionId,
   type OrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   createOrganisationAccess,
   acceptedExecutionAuthority,
 } from "../../src/organisation-access/access";
-import type { SingleDatabase } from "../../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { createMigratedDatabase } from "../sqlite-d1";
 
 // Serialization and Case-state fixtures have no shared binding. Their real port

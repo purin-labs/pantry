@@ -8,11 +8,11 @@ import {
   readWorkspaceIdField,
   type FieldError,
 } from "../boundary";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeConfiguredBearer,
   authorizeFaultInjectionBearer,
-} from "../fault-injection-auth";
+} from "@purin-labs/kernel/fault-injection-auth";
 import {
   errorResponse,
   methodNotAllowed,
@@ -20,7 +20,7 @@ import {
   readJsonObject,
   type JsonBodyError,
   type JsonObject,
-} from "../http";
+} from "@purin-labs/kernel/http";
 import {
   parseOrganisationId,
   parseThreadKey,
@@ -29,9 +29,9 @@ import {
   type OrganisationId,
   type ThreadKey,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * The request helpers of a gateway route (Refactor 17): the path segments, the

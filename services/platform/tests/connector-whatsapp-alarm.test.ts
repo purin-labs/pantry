@@ -14,7 +14,7 @@ vi.mock(
 );
 
 import { ConnectorDO } from "../src/actors/connector";
-import { parseConnectorId } from "../src/ids";
+import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { activateConnectorFixture } from "./fixtures/connector-activation";
 import {
   createWhatsAppWorld,

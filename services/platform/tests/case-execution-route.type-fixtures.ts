@@ -1,5 +1,5 @@
 import type { ConversationId } from "@purin-labs/control-api";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { CaseExecutionRoute } from "../src/control/routes/case-execution";
 
 declare const organisationId: OrganisationId;

@@ -1,7 +1,7 @@
 import { resolveCaseReference } from "../../access-control/references";
 import { readCaseScreenObservations } from "../../chat/case-screen-observations";
 import type { ConversationScope } from "../../chat/store";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { controlError, controlJson } from "../http";
 

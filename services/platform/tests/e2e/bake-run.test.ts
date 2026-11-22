@@ -11,7 +11,7 @@ import { expect, it } from "vitest";
 import { parseDeviceActivity } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   DEVICES,
   controllerState,

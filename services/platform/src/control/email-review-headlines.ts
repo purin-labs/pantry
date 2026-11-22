@@ -7,11 +7,14 @@ import {
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
 import type { EmailReviewProjection } from "../data/email-review";
-import type { Env } from "../env";
-import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseIntegrationAccountId,
+  type IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

@@ -12,7 +12,7 @@ import type {
 } from "../data/provider-attempt";
 import { persistProviderResourceSnapshot } from "../data/provider-resource";
 import { connectionParts } from "../integrations/contract/connection-parts";
-import type { IntegrationAccountId } from "../ids";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { whatsappOnboardingAdapter } from "../provider-adapters/whatsapp";
 import { providerCallbackUri } from "../provider-lifecycle/authorization";
 import type {
@@ -31,7 +31,7 @@ import {
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
 import { scopesAreComplete } from "../provider-adapters/authorization";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveWhatsAppEmbeddedSignupCredential } from "../whatsapp/application";
 import {
   exchangeWhatsAppSignupCode,

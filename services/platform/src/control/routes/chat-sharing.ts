@@ -6,7 +6,7 @@ import {
 } from "../../chat/store";
 import { isProjectId, isConversationId } from "@purin-labs/control-api";
 import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { authorizeConversation } from "../../chat/conversation-access";
 import {
   authorizeProject,

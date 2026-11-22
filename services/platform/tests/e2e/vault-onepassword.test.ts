@@ -6,7 +6,7 @@ import {
   parseVaultStoreResult,
 } from "@purin-labs/control-api";
 
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture, post, type Member } from "./memory-support";
 import {

@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, afterEach, describe, expect, it } from "vitest";
@@ -7,7 +7,7 @@ import {
   listUnappliedEvents,
   type SupplierPayoutEvidence,
 } from "../src/data/supplier-payout-event-inbox";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import type { VariantBy } from "@purin-labs/type-utils";
 

@@ -1,8 +1,8 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CommerceEntityPlaneCueEvent } from "../cues/engine";
-import type { CommerceTypeParts } from "../commerce-type-parts";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { CommerceTypeParts } from "@purin-labs/kernel/commerce-type-parts";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 import type { AgentSkillRef, ScheduleSpec } from "@purin-labs/control-api";

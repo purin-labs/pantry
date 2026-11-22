@@ -5,8 +5,8 @@ import {
   parseProjectCommand,
   projectReferenceIdentity,
 } from "@purin-labs/control-api";
-import type { Env } from "../../env";
-import { parseCaseId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   listProjectCases,

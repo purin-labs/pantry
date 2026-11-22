@@ -2,7 +2,7 @@ import type {
   CustomConnectorOperationRequest,
   CustomConnectorTransportRequest,
 } from "../src/custom-connectors/egress";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 declare const organisationId: OrganisationId;
 declare const url: URL;

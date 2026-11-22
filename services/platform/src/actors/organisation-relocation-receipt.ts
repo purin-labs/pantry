@@ -1,8 +1,8 @@
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 
-import type { GlobalDatabase } from "../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import { FlowBinding, digestFlowBinding } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { reconcileCommerceProviderReceipt } from "../commerce/action-model";
 import { readActionResult } from "./action-ledger";
 import { readActivationExportSource } from "./actor-export";

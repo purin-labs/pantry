@@ -1,7 +1,7 @@
 // The writes of the table `cue_log` (Refactor 17: only the owner of a table
 // writes it). The cue module owns the log of each cue decision. Each
 // statement keeps the text of the site that it came from.
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 /** Adds the log entry of one cue decision. An entry that exists stays. */
 export function prepareCueLogEntry(

@@ -10,7 +10,7 @@ import {
   type OrganisationPlacementCell,
   type RequestLocation,
 } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 type OrganisationHomeRegionError =
   | { readonly code: "organisation_placement_configuration_invalid" }

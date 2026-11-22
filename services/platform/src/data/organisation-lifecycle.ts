@@ -7,10 +7,13 @@ import {
 import type {
   GlobalDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
-import { parseOrganisationId, type OrganisationId } from "../ids";
+} from "@purin-labs/kernel/database-handles";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareControlMutationReceiptAfterWrite,
   prepareOnboardingAuditEventAfterWrite,

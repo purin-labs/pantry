@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   lowerWorkflowDocument,
   parseWorkflowDocument,
@@ -10,8 +10,8 @@ import {
 } from "@purin-labs/bakery-workflow/findings";
 import { admitScenario } from "@purin-labs/production-simulation";
 import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 
 /**

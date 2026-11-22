@@ -1,5 +1,5 @@
-import { newRequestId } from "../../ids";
-import { traceWarn } from "../../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 
 /**
  * One alarm for each actor (Refactor 10, step 2). Each reconciler names the

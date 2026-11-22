@@ -1,5 +1,5 @@
 import { isRecord } from "@purin-labs/std";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   InspectedCommerceObservation,
   ProjectionRow,

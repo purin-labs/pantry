@@ -2,16 +2,19 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   prepareAccountContactVerificationsDelete,
   whatsappErasureStatements,
 } from "../mail-inbox/contract/account-erasure";
 import { prepareProviderAccountCleanup } from "../integrations/contract/provider-account-cleanup";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveIntegrationAccount,
   resolveProviderConnection,

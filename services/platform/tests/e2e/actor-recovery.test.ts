@@ -28,7 +28,7 @@ import { freezePlacement, type PlacementRace } from "./placement-race-support";
 import { storeVaultSecret } from "../../src/credential-vault";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { createOrganisationInstall } from "../../src/data/organisation";
-import { type SessionId } from "../../src/ids";
+import { type SessionId } from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { network } from "./network";
 import {

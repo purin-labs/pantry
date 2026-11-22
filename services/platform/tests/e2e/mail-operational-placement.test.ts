@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import {
@@ -45,7 +45,7 @@ import {
   parseConnectorId,
   type ConnectorId,
   type IntegrationAccountId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   installSlackActorFixture,

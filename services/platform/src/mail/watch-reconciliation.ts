@@ -1,14 +1,14 @@
 import { prepareEmailWatchReconciliationRun } from "../data/onboarding-reconciliation-run";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import {
   newRequestId,
   parseConnectorId,
   parseIntegrationAccountId,
-} from "../ids";
-import { traceWarn } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 
 const WATCH_RENEWAL_MARGIN_MS = 24 * 3_600_000;
 

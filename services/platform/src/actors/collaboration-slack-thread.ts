@@ -1,12 +1,12 @@
 import type { CaseBinding } from "@purin-labs/contracts";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   type CaseId,
   type IntegrationAccountId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActor } from "./actor-router";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 

@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationAccess,
   OrganisationUserAuthority,
@@ -20,11 +20,11 @@ import {
   type AssignmentId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
-import { traceLog } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import type { PinnedSessionPolicy } from "../policy-snapshot";
 import { parseStoredRequestAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   CONTEXT_ASSEMBLY_STRATEGY_VERSION,
   normalizeContextQuery,

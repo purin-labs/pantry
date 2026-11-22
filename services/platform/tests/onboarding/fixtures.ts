@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "../fixtures/organisation-placement";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";

@@ -3,7 +3,7 @@ import {
   assertSupplierPayoutPlanWithLexicon,
   validateSupplierPayoutPlanWithLexicon,
 } from "../commerce/commerce-wasm";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { SupplierPayoutRow } from "./supplier-payout-store";
 import { isRecord } from "@purin-labs/std";
 

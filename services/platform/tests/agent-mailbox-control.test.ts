@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { describe, expect, it } from "vitest";
@@ -11,7 +11,7 @@ import {
   setIntegrationAccountLifecycle,
   type ConnectedIntegrationSeed,
 } from "../src/data/integration-account";
-import { type IntegrationAccountId, type OrganisationId } from "../src/ids";
+import { type IntegrationAccountId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

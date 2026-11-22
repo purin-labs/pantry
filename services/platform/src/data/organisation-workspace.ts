@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import type { WorkspaceRevisionReceipt } from "@purin-labs/contracts";
 
 import {
@@ -12,8 +12,8 @@ import {
   type OrganisationId,
   type WorkspaceHandle,
   type WorkspaceId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   commitWorkspaceRevision,
   prepareWorkspaceRevisionMutation,

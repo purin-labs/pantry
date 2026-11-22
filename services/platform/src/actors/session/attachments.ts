@@ -8,10 +8,10 @@ import type {
   HarnessTurnLease,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import { newRequestId, type OrganisationId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

@@ -1,8 +1,8 @@
 import { signalChat } from "../../../chat/signals";
 import { isConversationId } from "@purin-labs/control-api";
 import { parseBakeryBrowserBinding } from "@purin-labs/bakery-model/bakery-context";
-import type { Env } from "../../../env";
-import { parseSessionId } from "../../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import { resolveActiveSessionActor } from "../../../actors/actor-router";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";

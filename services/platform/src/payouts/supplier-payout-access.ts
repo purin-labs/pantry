@@ -1,7 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { AccessGrant } from "../authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { createCurrentSourceFlowLabel, type FlowLabel } from "../policy";
 
 /**

@@ -1,4 +1,4 @@
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /**
  * Plan 88 section 4: paid Jev use above the free use of the month. The owner

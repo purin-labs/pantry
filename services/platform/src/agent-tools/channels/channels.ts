@@ -2,7 +2,7 @@ import { parseReplyCitations } from "../../mail-inbox/reply-sources";
 import {
   parseIntegrationAccountReference,
 } from "../../access-control/integration-discovery";
-import { parseIntegrationAccountId } from "../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseOperationalEmailTarget } from "../../data/email-operational";
 import {
   parseEmailSelfTestRequest,

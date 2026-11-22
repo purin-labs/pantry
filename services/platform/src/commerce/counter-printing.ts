@@ -5,8 +5,8 @@ import type {
   PrinterTask,
 } from "@purin-labs/control-api";
 
-import type { OrganisationDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   renderCounterReceipt,
   type CounterReceiptLine,

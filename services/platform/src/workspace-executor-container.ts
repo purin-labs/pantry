@@ -7,8 +7,8 @@ import type {
   WorkspaceExecutorInspectionResponse,
 } from "@purin-labs/contracts/workspace-executor";
 
-import type { Env } from "./env";
-import type { Result } from "./result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import { hasExactKeys, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 const WORKSPACE_EXECUTOR_PORT = 8080;
@@ -590,7 +590,7 @@ const ATTACHMENT_NOT_INSPECTABLE_KEYS = [
   "sourceSha256",
 ] as const;
 
-declare module "./env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     WORKSPACE_EXECUTOR: DurableObjectNamespace<WorkspaceExecutorContainer>;
   }

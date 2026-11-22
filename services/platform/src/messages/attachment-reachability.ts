@@ -1,7 +1,7 @@
 import type { StoredMessageAttachment } from "@purin-labs/contracts";
 
 import { derivedSourceSha256 } from "./derived-stills";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /**
  * Attachment reachability and collection.

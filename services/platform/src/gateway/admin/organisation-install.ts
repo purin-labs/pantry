@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
@@ -20,7 +20,7 @@ import {
 } from "../../data/organisation";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
 import type { OrganisationEnvironment } from "../../data/control-plane";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,
@@ -32,13 +32,13 @@ import {
   notFound,
   readJsonObject,
   type JsonObject,
-} from "../../http";
+} from "@purin-labs/kernel/http";
 import {
   newRequestId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "../../placement";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import { fieldErrorResponse, isAuthorizedFaultInjectionRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath, parseSurfaceKindPath, parseWorkspacePath, routeParamErrorResponse } from "../request-helpers";
 

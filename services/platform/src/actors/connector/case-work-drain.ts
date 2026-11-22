@@ -1,7 +1,7 @@
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "../actor-stubs";
-import { newRequestId, parseSessionId } from "../../ids";
-import { traceLog } from "../../observability";
+import { newRequestId, parseSessionId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { actorExecutionAdmissionOpen } from "../actor-execution-quiescence";
 import { admitActorRecovery } from "../actor-activation";

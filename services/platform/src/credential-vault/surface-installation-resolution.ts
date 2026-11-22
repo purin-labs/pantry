@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -11,8 +11,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SlackInstallationIdentity } from "../slack/installation-identity";
 import type { VaultResolveError, VaultSecret } from "./domain";
 import { parseVaultHandle, type VaultHandle } from "./domain";

@@ -23,10 +23,10 @@ import {
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError } from "../control/http";
 import { listOrganisationMembers, resolveUser } from "../data/control-plane";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { admitActorRecovery } from "./actor-activation";
 import {
@@ -195,7 +195,7 @@ export class WorkflowCanvasRooms {
     expectedRevision: number,
     operationId: string,
     userId: UserId,
-    controlSessionId: import("../ids").ControlSessionId,
+    controlSessionId: import("@purin-labs/kernel/ids").ControlSessionId,
   ) {
     const owned = await this.#resolve(scope, reference);
     if (!owned.ok) return owned;

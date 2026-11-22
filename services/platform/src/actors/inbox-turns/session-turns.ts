@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { createTransientGoalExecution } from "../session-goal-usage";
 import type { HarnessToolHost } from "../embedded-harness";
 import {
@@ -18,9 +18,9 @@ import type {
   SessionContract,
   HarnessTurnLease,
 } from "@purin-labs/contracts";
-import { parseSessionId, newRequestId } from "../../ids";
-import { traceWarn } from "../../observability";
-import type { Result } from "../../result";
+import { parseSessionId, newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
   admittedSessionModelRoute,

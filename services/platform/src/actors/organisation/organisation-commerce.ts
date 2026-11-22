@@ -15,13 +15,13 @@ import {
   type IntegrationAccountId,
   type RequestId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   listCommerceLabRuns,
   requireCommerceLabOrganisationMarker,
   type CommerceLabMetadataError,
 } from "../../commerce-lab/lab-metadata";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   beginActionExecution,
   completeActionExecution,

@@ -14,8 +14,8 @@ import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { openaiCodexProvider } from "@earendil-works/pi-ai/providers/openai-codex";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Result } from "../result";
-import { runtimeFetch } from "../runtime-fetch";
+import type { Result } from "@purin-labs/kernel/result";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   isOrganisationAnthropicModel,
   isOrganisationCodexModel,

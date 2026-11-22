@@ -1,5 +1,5 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   memoryService,
   type MemoryReadScope,
@@ -15,7 +15,7 @@ import {
   parseCaseId,
   parseIntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 
 export async function syncEmailProposalLifecycle(

@@ -15,9 +15,9 @@ import {
   type CommerceSystemError,
 } from "../data/organisation-commerce-system";
 import { resolveOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
-import type { Env } from "../env";
-import { newRequestId, type OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { AuthorizedOrganisationRequest } from "./authorization";
 import { readOrganisationEnvironment } from "./organisation-runtime";
 

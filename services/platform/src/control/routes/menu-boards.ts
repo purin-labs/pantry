@@ -16,7 +16,7 @@ import type {
 } from "../../actors/menu-board-commands";
 import { menuScreenToken } from "../../actors/menu-screens";
 import { readMenuScreenFacts } from "./menu-screens";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

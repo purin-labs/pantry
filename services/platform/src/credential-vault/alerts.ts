@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
-import { newRequestId, type OrganisationId } from "../ids";
-import { traceWarn } from "../observability";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { VaultKeyVersion } from "./keyring";
 
 // Plan 12 V3: the provisional benign-policy staleness budget, adopted as

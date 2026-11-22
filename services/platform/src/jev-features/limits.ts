@@ -1,5 +1,5 @@
 import type { JevAllowance } from "@purin-labs/control-api/portal/jev-features";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   JEV_MONTHLY_ALLOWANCE_MICROUSD,
   type TypeSafeUsageLimits,

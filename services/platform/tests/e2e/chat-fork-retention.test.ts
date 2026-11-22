@@ -3,7 +3,10 @@ import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { sha256Hex } from "@purin-labs/std";
-import { parseOrganisationId, parseIntegrationAccountId } from "../../src/ids";
+import {
+  parseOrganisationId,
+  parseIntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { acquireSlackAttachmentBatch } from "../../src/slack/attachments";
 import { parseSlackEnvelope } from "../../src/slack/events";
 import {

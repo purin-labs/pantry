@@ -27,7 +27,7 @@ import {
   parseJsonOrNull,
 } from "@purin-labs/std";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import type {

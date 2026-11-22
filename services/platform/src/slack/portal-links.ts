@@ -1,5 +1,5 @@
-import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
+import type { Env } from "@purin-labs/kernel/env";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 
 /** The handles of the workspace whose Portal a Slack card links to. */
 export type PortalWorkspaceAddress = Readonly<{

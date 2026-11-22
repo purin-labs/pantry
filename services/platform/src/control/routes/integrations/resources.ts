@@ -1,10 +1,10 @@
 import { resolveCommerceMerchant } from "../../../commerce/contract/square-link";
-import { runtimeFetch } from "../../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   fetchWithOrganisationPlacement,
   OrganisationExecutionScope,
 } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
 import {
   resolveActiveProviderAccountContext,
@@ -16,7 +16,10 @@ import {
   type DiscoveredProviderResource,
 } from "../../../data/provider-resource";
 import { discoverFileResources } from "../../../context/files";
-import { parseIntegrationAccountId, parseWorkspaceId } from "../../../ids";
+import {
+  parseIntegrationAccountId,
+  parseWorkspaceId,
+} from "@purin-labs/kernel/ids";
 import {
   resolveFileProviderAccess,
   storeFilePlacementCredential,

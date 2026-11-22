@@ -11,7 +11,7 @@ import {
   parseStoredMessageAttachment as parseStoredMessageAttachmentTypescript,
 } from "@purin-labs/contracts/message";
 import { parseMessageAttachmentPreparationState as parsePreparationTypescript } from "@purin-labs/contracts/attachment-preparation";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * The untrusted claims a provider adapter collects, plus the facts the transfer

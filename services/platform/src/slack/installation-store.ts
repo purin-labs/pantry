@@ -1,7 +1,7 @@
 import type {
   GlobalDatabase,
   GlobalDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -23,12 +23,12 @@ import {
   type SlackOrganisationConnectionId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
-import { definePort } from "../port";
+import { definePort } from "@purin-labs/kernel/port";
 import { isNonNegativeInteger, isPositiveInteger } from "@purin-labs/std";
 import { prepareVaultSecretRevocation } from "../credential-vault/secret-revocation";
 import { prepareDisconnectedAccountRevocation } from "../data/integration-account-writes";

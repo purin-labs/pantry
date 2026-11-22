@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   readIntegrationAccountIdField,
@@ -10,16 +10,16 @@ import {
   resolveActiveProviderAccountContext,
 } from "../data/integration-account";
 import { resolveOrganisationProvisioningActor } from "../data/control-plane";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
   notFound,
   readJsonObject,
-} from "../http";
-import { newRequestId } from "../ids";
-import { traceLog } from "../observability";
+} from "@purin-labs/kernel/http";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import {
   parseExternalRecordsRead,
   readExternalRecords,

@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it, vi, type TestContext } from "vitest";
 
 import { parseVaultHandle, storeVaultSecret } from "../src/credential-vault";
@@ -12,7 +12,7 @@ import type {
 } from "../src/actors/actor-registry";
 import { issueControlSession, upsertUser } from "../src/data/control-plane";
 import { createOrganisationInstall } from "../src/data/organisation";
-import { parseSlackAppId, type OrganisationId } from "../src/ids";
+import { parseSlackAppId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseSlackEnvelope } from "../src/slack/events";
 import {
   authorizeResolvedSlackCaseIngress,

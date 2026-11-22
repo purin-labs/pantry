@@ -81,7 +81,7 @@ async function mockOrganisationRuntime(
 }
 
 import { handleControlRequest } from "../src/control-router";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_demo_profiles";

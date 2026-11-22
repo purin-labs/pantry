@@ -23,7 +23,7 @@ import {
   commerceAppInstallationToken,
   type CommerceCredential,
 } from "@purin-labs/commerce-client";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 const PANTRY_COMMERCE_APP_ID = "pantry";
 

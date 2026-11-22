@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { normalizeUntrustedCommerceText } from "../context/untrusted-commerce-text";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { evaluateChatFlowLabelSink } from "../chat/information-flow";
@@ -25,13 +25,13 @@ import {
 } from "../policy/information-flow";
 import { buildControlAuthority } from "../request-authority";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

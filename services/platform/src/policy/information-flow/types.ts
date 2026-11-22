@@ -113,12 +113,12 @@ export type IntegrationResourceFlowSource = Readonly<{
 export type NativeChatFlowSource =
   | Readonly<{
       kind: "project";
-      organisationId: import("../../ids").OrganisationId;
+      organisationId: import("@purin-labs/kernel/ids").OrganisationId;
       projectId: import("@purin-labs/control-api").ProjectId;
     }>
   | Readonly<{
       kind: "chat_conversation";
-      organisationId: import("../../ids").OrganisationId;
+      organisationId: import("@purin-labs/kernel/ids").OrganisationId;
       conversationId: import("@purin-labs/control-api").ConversationId;
     }>;
 

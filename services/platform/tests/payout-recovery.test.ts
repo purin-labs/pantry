@@ -1,11 +1,11 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { beforeEach, afterEach, describe, expect, it } from "vitest";
 import type { SupplierPayable } from "@purin-labs/commerce-contracts";
 import { d1Database } from "./sqlite-d1";
 import { payoutPlan } from "./supplier-payout-fixtures";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { createSupplierPayout } from "../src/data/supplier-payout-store";
 import { createSupplierPayoutAttemptStore } from "../src/data/supplier-payout-attempt";
 import {

@@ -12,12 +12,12 @@
  * - A move provisions the row in the target cell (regional-move.ts) before
  *   the copy of the other rows, and cleanup blanks it in the old cell.
  */
-import { traceWarn } from "../../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type {
   GlobalDatabase,
   OrganisationDatabase,
-} from "../../database-handles";
-import { newRequestId, type OrganisationId } from "../../ids";
+} from "@purin-labs/kernel/database-handles";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationBootstrapReservation } from "../control-plane";
 import type { OrganisationQuerySource, QuerySource } from "../query-source";
 

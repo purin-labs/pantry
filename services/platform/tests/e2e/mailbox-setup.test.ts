@@ -19,7 +19,10 @@ import {
   readActiveOrganisationMembership,
   readActiveOrganisationMembershipRevision,
 } from "../../src/data/control-plane";
-import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
+import {
+  type IntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
 import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
 import {

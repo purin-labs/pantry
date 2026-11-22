@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   recordOrganisationCommerceMutationReceipt,
   type UnversionedControlMutationBoundary,

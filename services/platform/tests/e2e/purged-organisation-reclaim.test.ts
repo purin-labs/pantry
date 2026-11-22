@@ -7,7 +7,7 @@ import {
   createCustomConnectorDraft,
   prepareCustomConnectorDraftDocument,
 } from "../../src/custom-connectors/revisions";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { network } from "./network";
 import {

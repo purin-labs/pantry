@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
@@ -22,8 +22,8 @@ import {
   type SetupSnapshotId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { prepareActivationProjectionBump } from "./organisation-onboarding-row";
 import {
   prepareFirstActiveAccountDefaults,

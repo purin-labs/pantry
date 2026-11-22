@@ -7,7 +7,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   type IntegrationAccountId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { gmailConnectorIdValue } from "../../mail-inbox/contract/connector-ids";
 import { parseEmailProposalTarget } from "../../data/email-operational";
 import {

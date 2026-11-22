@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
@@ -58,7 +58,7 @@ import {
   reconcileBakerySurfaceEffects,
   settleBakerySurfaceEffect,
 } from "../src/actors/bakery-surface-effect";
-import { parseOrganisationId, type OrganisationId } from "../src/ids";
+import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { SqliteD1Database, type SqliteD1Statement } from "./sqlite-d1";
 

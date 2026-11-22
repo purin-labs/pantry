@@ -1,6 +1,6 @@
 import type { OrganisationEnvironment } from "../data/control-plane";
-import { parseSlackAppId, type SlackAppId } from "../ids";
-import type { Result } from "../result";
+import { parseSlackAppId, type SlackAppId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type SlackInstallationIdentity = {
   readonly environment: OrganisationEnvironment;

@@ -6,7 +6,7 @@ import {
   type MailboxIngressDebounce,
 } from "../data/email-mailbox";
 import { compareGmailHistoryIds } from "../mail/gmail-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import { createMailOrganizationSchema } from "../mail-inbox/store";
 import { createEmailCommerceSchema } from "../mail-inbox/supplier-context";

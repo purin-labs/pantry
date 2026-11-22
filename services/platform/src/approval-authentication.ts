@@ -5,9 +5,9 @@ import {
   type ControlSessionId,
   type PersonId,
   type OrganisationId,
-} from "./ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { NearEd25519PublicKey, SeamsIdentityId } from "./seams/nep413";
 import type { CanonicalAction } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";

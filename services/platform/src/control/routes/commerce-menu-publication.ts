@@ -1,7 +1,7 @@
 import { parseMenuHours } from "@purin-labs/control-api";
 
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { sha256Hex } from "@purin-labs/std";
 import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
 import { authorizeOrganisationRequest } from "../authorization";

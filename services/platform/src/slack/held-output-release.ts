@@ -10,9 +10,9 @@ import {
   markHeldOutputRequestReleased,
   type HeldOutputRequest,
 } from "../data/held-output-request";
-import type { Env } from "../env";
-import { newRequestId, parseCaseId, parseConnectorId } from "../ids";
-import { traceWarn } from "../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, parseCaseId, parseConnectorId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { approvedOutputDecision } from "../policy/information-flow";
 import { refreshSlackRequestAuthority } from "../request-authority";

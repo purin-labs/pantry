@@ -12,7 +12,7 @@ import {
   conversationResidencyStub,
   type ConversationResidencyActor,
 } from "../../src/actors/conversation-residency";
-import { parseConnectorId } from "../../src/ids";
+import { parseConnectorId } from "@purin-labs/kernel/ids";
 import {
   ORGANISATION_ID,
   installSlackActorFixture,

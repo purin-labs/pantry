@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 import {
   readPlacementByEpoch,

@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   WHATSAPP_DEFAULT_ALWAYS_WAIT_TOPICS,
   type WhatsAppAgentMode,
@@ -21,9 +21,9 @@ import {
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,
@@ -47,7 +47,7 @@ import {
   positiveIntegerOrNull,
 } from "@purin-labs/std";
 import type { WhatsAppProviderHealth } from "@purin-labs/control-api";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 /**
  * Durable WhatsApp metadata. Every row here holds identifiers, digests,

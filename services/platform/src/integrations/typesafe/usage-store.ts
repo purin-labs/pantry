@@ -1,5 +1,5 @@
 import { assertRequiredColumns } from "../../actors/schema-migrations";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 export type TypeSafePurpose =
   | "case_context_discovery_relationship"

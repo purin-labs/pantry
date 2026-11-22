@@ -6,7 +6,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import { nextEmailCorrectionLearningAt } from "../../src/actors/connector-email";
-import { parseCaseId, type OrganisationId } from "../../src/ids";
+import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readVerifiedMessageSender } from "../../src/mail-inbox/verified-sender";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";

@@ -1,8 +1,11 @@
 import { DatabaseSync } from "node:sqlite";
 import type { SQLInputValue, StatementSync } from "node:sqlite";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
-import { singleDatabase, type SingleDatabase } from "../src/database-handles";
-import type { OrganisationId } from "../src/ids";
+import {
+  singleDatabase,
+  type SingleDatabase,
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationPlacement } from "../src/placement";
 import type { ActorRegistryId } from "../src/actors/actor-registry";
 import { readRegistryEntryById } from "../src/actors/actor-registry";

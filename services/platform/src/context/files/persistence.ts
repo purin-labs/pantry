@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   FileContextProvider,
@@ -13,7 +13,7 @@ import {
   parseOrganisationId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   ACTIVE_FILE_GRANT_VISIBILITY_SQL,
   fileExecutionFence,

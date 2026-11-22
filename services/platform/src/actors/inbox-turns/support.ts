@@ -4,12 +4,12 @@ import {
   type TaskCancellationReason,
 } from "@purin-labs/async-control/cancellable-task";
 import { readGmailInferenceEligibility } from "../../mail-inbox/contract/gmail-inference-eligibility";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { digestCanonical } from "../../policy";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { TransientSessionExecution } from "../session/support";
 import type {
   TransientMailAssistantRequest,

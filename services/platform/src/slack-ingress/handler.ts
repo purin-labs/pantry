@@ -1,8 +1,8 @@
 import { errorMessage } from "@purin-labs/std";
 
-import { errorResponse, jsonResponse } from "../http";
-import { newRequestId, type RequestId } from "../ids";
-import { traceLog, traceWarn } from "../observability";
+import { errorResponse, jsonResponse } from "@purin-labs/kernel/http";
+import { newRequestId, type RequestId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { setSlackThreadStatus } from "../slack/messages";
 import { SLACK_INTERACTIONS_PATH } from "../gateway-routing/slack";
 import { isSlackCaseRoutingCandidate } from "../slack/case-routing";

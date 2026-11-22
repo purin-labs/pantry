@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { SURFACE_EFFECT_SIGNAL } from "@purin-labs/control-api";
 import { signalChat } from "../../chat/signals";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
@@ -15,10 +15,10 @@ import type {
   BakerySurfaceCommandV1,
 } from "@purin-labs/bakery-model/bakery-surface";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import { type RequestId, type OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { type RequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { traceLog } from "../../observability";
+import { traceLog } from "@purin-labs/kernel/observability";
 import {
   SessionExecutionAdmission,
   admittedSessionOperation,

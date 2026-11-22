@@ -9,7 +9,7 @@ import {
   type CaseExecutionNode,
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import { resolveActiveSessionActor } from "../../src/actors/actor-router";
 import {
   createConversation,

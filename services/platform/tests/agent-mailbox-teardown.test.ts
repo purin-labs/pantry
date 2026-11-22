@@ -15,7 +15,7 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

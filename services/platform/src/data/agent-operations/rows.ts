@@ -1,5 +1,8 @@
 import { responsibilityScopeCommerce } from "./scope-commerce";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   isScheduleWeekday,
   isTimeOfDay,

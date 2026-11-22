@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "./database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   CausationRef,
   CorrelationId,
@@ -10,11 +10,14 @@ import type {
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
 
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "./organisation-execution-scope";
-import { parseOrganisationId, type OrganisationId } from "./ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const WORKSPACE_PATH_PATTERN =

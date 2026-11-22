@@ -9,7 +9,7 @@ import { parseTerminalAssignment } from "@purin-labs/commerce-contracts";
 import { isRecord } from "@purin-labs/std";
 
 import { activateTerminalAssignment } from "../../src/data/terminal-assignment-store";
-import { parseOrganisationId } from "../../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { TOOLS } from "../../src/agent-tools/registry";
 import { authorizedBakerySurfaceCommands } from "../../src/agent-tools/bakery/page-effects";
 import {

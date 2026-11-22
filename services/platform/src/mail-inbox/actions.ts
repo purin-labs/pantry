@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";

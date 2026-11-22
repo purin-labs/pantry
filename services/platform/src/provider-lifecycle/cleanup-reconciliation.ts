@@ -1,4 +1,4 @@
-import type { OrganisationDatabaseSession } from "../database-handles";
+import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
 import {
   readSquareDelegation,
   type SquareDelegation,
@@ -15,9 +15,15 @@ import {
   type VaultOAuthTokens,
 } from "../credential-vault/domain";
 import { resolveAccountRemovalCredential } from "../credential-vault/account-removal-resolution";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import { parseIntegrationAccountId, parseOrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import {
   manualInstructionForProvider,

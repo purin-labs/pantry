@@ -1,4 +1,4 @@
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OnboardingProvider } from "../../integrations/contract/provider-lifecycle";
 import { assertNever } from "@purin-labs/std";
 import {

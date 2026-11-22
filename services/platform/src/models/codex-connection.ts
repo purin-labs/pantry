@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
@@ -12,11 +12,11 @@ import {
   parseOrganisationId,
   type CodexAuthorizationAttemptId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import { traceWarn } from "../observability";
-import type { Env } from "../env";
-import type { Result } from "../result";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import {
   modelProviderFetch,

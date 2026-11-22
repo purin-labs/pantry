@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { storeOrganisationPlacementVaultSecret } from "../../credential-vault/service";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
@@ -20,8 +20,11 @@ import {
   resolveProviderConnection,
   type createConnectedIntegration,
 } from "../../data/integration-account";
-import type { Env } from "../../env";
-import type { ProviderConnectionId, OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type {
+  ProviderConnectionId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   activateProviderCredentialCutover,
   type ProviderCredentialCutoverError,
@@ -32,7 +35,7 @@ import {
   type VaultHandle,
   type VaultOAuthTokens,
 } from "../../credential-vault";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CompleteProviderInput,
   OnboardingProvider,

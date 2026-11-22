@@ -1,6 +1,6 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import { DatabaseSync } from "node:sqlite";
 

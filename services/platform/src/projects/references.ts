@@ -20,7 +20,7 @@ import {
   parseCaseId,
   parseIntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   audiencesForAdmission,
   createCurrentSourceFlowLabel,
@@ -38,8 +38,8 @@ import {
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { resolveActiveCaseActor } from "../actors/actor-router";
-import { definePort } from "../port";
-import type { Env } from "../env";
+import { definePort } from "@purin-labs/kernel/port";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ConversationScope } from "../chat/store";
 import {
   authorizeConversation,

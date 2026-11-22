@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   AccessGrant,
   AccessGrantLifecycle,
@@ -19,8 +19,8 @@ import {
   parsePersonId,
   parseOrganisationId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,

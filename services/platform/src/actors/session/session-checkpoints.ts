@@ -14,10 +14,10 @@ import {
   type RequestId,
   type SessionId,
   type OrganisationId,
-} from "../../ids";
-import { traceWarn } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { verifyWorkspaceRevisionReceipt } from "../../workspace-revision-store";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
   reusableWorkspaceReceiptCheck,

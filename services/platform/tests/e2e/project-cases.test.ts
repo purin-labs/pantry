@@ -8,7 +8,7 @@ import {
   type UserId,
 } from "@purin-labs/control-api";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { ensureCaseProject } from "../../src/projects/case-project";

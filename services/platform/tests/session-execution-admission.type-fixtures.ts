@@ -1,7 +1,7 @@
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import type { HarnessToolHost } from "../src/actors/embedded-harness";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import type { SessionId } from "../src/ids";
+import type { SessionId } from "@purin-labs/kernel/ids";
 import { bindConversationTurnAccess } from "../src/chat/turn-access";
 import type {
   OperatorExecutionOrigin,

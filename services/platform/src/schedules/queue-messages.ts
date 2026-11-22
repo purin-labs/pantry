@@ -2,16 +2,16 @@
 // This file holds its type, its constructor and its parser.
 // `ingress-queue.ts` calls the parser when it reads the event queue.
 
-import type { JsonObject } from "../http";
-import type { OrganisationId, RequestId } from "../ids";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
 import {
   readOrganisationId,
   readRequestId,
   readRequiredNumber,
   readRequiredString,
   type IngressQueueMessageError,
-} from "../queue-fields";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/queue-fields";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type AgentScheduleDispatchQueueMessage = {
   readonly type: "agent_schedule.dispatch.v1";

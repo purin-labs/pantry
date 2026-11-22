@@ -22,7 +22,7 @@ import type {
   CommerceQueryProjection,
   SourceProvenance,
 } from "@purin-labs/commerce-contracts";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage, isNormalizedText } from "@purin-labs/std";
 
 export type CommerceGraphSourceError = Readonly<{

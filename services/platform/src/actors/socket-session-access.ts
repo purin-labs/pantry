@@ -5,8 +5,8 @@ import {
   type ActiveOrganisationMembership,
   type ControlRole,
 } from "../data/control-plane";
-import type { Env } from "../env";
-import type { ControlSessionId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 

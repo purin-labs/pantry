@@ -15,7 +15,7 @@ identifier, and time window from the report. Ask only for identifiers needed
 to locate the failure. Inspect the selected deployment profile and the existing
 Worker logs or configured Cloudflare observability surface.
 
-`services/platform/src/observability.ts` defines structured trace records.
+`foundation/kernel/observability.ts` defines structured trace records.
 Correlate the ingress request with Connector, Case, Session, gateway, and provider
 records. Use retained logs for past failures; a live tail only captures new events.
 Read [the observability contract](../../../docs/architecture/onboarding.md#onboarding-operations-and-observability)

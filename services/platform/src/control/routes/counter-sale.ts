@@ -19,7 +19,7 @@ import {
   recordCounterCashAndOpenDrawer,
   runCounterAfterSaleWithDrawer,
 } from "../../commerce/counter-printing";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { controlError, controlJson, type JsonRecord } from "../http";
 import {
   beginMutation,

@@ -6,12 +6,12 @@ import type {
 import type { Variant } from "@purin-labs/type-utils";
 
 import type { ChatForkHistory } from "../../chat/fork-history";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Env } from "../../env";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationAccess } from "../../organisation-access/access";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { CaseConversationSinkRefusal, FlowBinding } from "../../policy";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /** What the side Case of a turn needs before inference. */
 type SessionSideCaseAdmission = Readonly<{

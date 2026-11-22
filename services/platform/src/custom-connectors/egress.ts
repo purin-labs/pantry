@@ -1,7 +1,7 @@
-import { RequestDeadline } from "../request-deadline";
-import { runtimeFetch } from "../runtime-fetch";
-import type { Result } from "../result";
-import type { OrganisationId } from "../ids";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Result } from "@purin-labs/kernel/result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationPlacement } from "../placement";
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 import {

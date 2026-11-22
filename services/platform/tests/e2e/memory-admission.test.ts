@@ -53,7 +53,7 @@ import {
   parseSessionId,
   type AssignmentId,
   type SessionId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { memoryApplicabilityKey } from "../../src/memory/store";
 import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

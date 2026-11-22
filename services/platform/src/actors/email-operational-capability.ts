@@ -15,7 +15,7 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 
 type AccountCapability = Variant<CapabilityDefinition, "provider_resource"> & {

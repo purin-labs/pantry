@@ -10,7 +10,7 @@ import type {
   ExecutingActionLedgerEntry,
   LedgerCanonicalAction,
 } from "../actors/action-ledger";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   buildShopifyOrderCancelDraft,
   parseShopifyOrderCancelArgs,
@@ -23,7 +23,7 @@ import {
   resolveShopifyWriteCredentialForAction,
 } from "./action-execution";
 import type { ShopifyExecutionReceipt } from "./action-execution";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import type { CommerceShopifyProviderReceipt } from "@purin-labs/control-api";
 import {
@@ -35,7 +35,7 @@ import {
   type CommerceProviderReconciliation,
 } from "../commerce/contract/commerce-provider";
 import { resolveActiveProviderAccountContext } from "../data/integration-account";
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 
 async function reconcileShopifyCommerceAction(
   input: Readonly<{

@@ -214,6 +214,19 @@ importers:
         specifier: ^4.1.0
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(msw@2.15.0(@types/node@25.9.3)(typescript@5.9.3))(vite@8.0.16(@types/node@25.9.3)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
 
+  foundation/kernel:
+    dependencies:
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
   packages/async-control:
     devDependencies:
       tsrs:
@@ -804,6 +817,9 @@ importers:
       '@purin-labs/email-draft-crdt':
         specifier: workspace:*
         version: link:../../packages/email-draft-crdt
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
       '@purin-labs/kitchen-control-api':
         specifier: workspace:*
         version: link:../../packages/kitchen-control-api

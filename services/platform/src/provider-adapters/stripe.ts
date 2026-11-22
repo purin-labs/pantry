@@ -10,9 +10,9 @@ import {
   type ProviderCleanupResult,
   type ProviderOnboardingAdapter,
 } from "../integrations/contract/provider-adapter";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
-import type { Result } from "../result";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord, isString } from "@purin-labs/std";
 
 const MANUAL_INSTRUCTION = "revoke_stripe_access_in_stripe" as const;

@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { describe, expect, it } from "vitest";
 
@@ -6,7 +6,10 @@ import { createOrganisationInstall } from "../src/data/organisation";
 import { readAccessControlView } from "../src/access-control/read-model";
 import { READ_AND_PROPOSE_ORGANISATION_GRANT_IDS } from "../src/data/capability-policy";
 import { parseVaultHandle } from "../src/credential-vault";
-import { newSlackInstallationId, parseSlackAppId } from "../src/ids";
+import {
+  newSlackInstallationId,
+  parseSlackAppId,
+} from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "../src/placement";
 import { admitSlackInstallOrganisation } from "../src/slack/install-organisation";
 import type { SlackInstallationIdentity } from "../src/slack/installation-identity";

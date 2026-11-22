@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationStatement,
-} from "../../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { fixtureDatabase } from "./organisation-database";
 import { readControlMutationReplay } from "../../src/data/control-mutation";
@@ -41,7 +41,7 @@ import {
   parseMenuDraftServerMessage,
   type MenuDraftServerMessage,
 } from "@purin-labs/menu-draft-crdt/protocol";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,

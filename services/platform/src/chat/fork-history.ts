@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type {
   ModelRoute,
@@ -6,7 +6,7 @@ import type {
   HarnessHistoryContent,
 } from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "../policy-snapshot";
-import { parseSessionId } from "../ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   parseHarnessHistoryEntry,
   type HarnessHistoryCursor,
@@ -167,7 +167,7 @@ export async function parseChatHistorySnapshot(
 
 export async function readChatForkAttachmentKeys(
   db: OrganisationDatabase,
-  organisationId: import("../ids").OrganisationId,
+  organisationId: import("@purin-labs/kernel/ids").OrganisationId,
 ): Promise<readonly string[]> {
   const rows = await db
     .prepare(

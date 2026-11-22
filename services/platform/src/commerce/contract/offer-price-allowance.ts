@@ -1,8 +1,8 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { createCommerceClient } from "./client";
 import { readOrganisationEnvironment } from "../../control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";

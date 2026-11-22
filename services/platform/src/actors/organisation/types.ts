@@ -1,7 +1,7 @@
 // The base types of the Organisation actor: its record and its state errors.
 // The types of each module that the actor hosts are in a file of that module:
 // commerce-types.ts, policy-types.ts, activation-types.ts and code-mode-types.ts.
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 export type OrganisationPing = {
   ok: true;

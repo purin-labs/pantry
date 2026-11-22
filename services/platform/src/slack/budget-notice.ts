@@ -1,6 +1,6 @@
 import { workspacePortalUrl } from "./portal-links";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { noticeCardBlocks } from "./notice-card";
 
 /**

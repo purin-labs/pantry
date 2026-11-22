@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { requirePublicOrigin } from "../src/public-origin";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 
 describe("control public origin", () => {
   it("accepts HTTPS origins and HTTP loopback origins", () => {

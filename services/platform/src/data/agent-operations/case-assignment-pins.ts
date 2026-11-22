@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { CaseAssignmentPin } from "../agent-operations";
 import { type RawCaseAssignmentPin, parseCaseAssignmentPinRow } from "./rows";
 import { encodeSkillRefs } from "./skills";

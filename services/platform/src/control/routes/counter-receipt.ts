@@ -7,7 +7,7 @@ import {
   writeCounterReceiptSettings,
 } from "../../commerce/counter-printing";
 import { isTimeZone } from "../../commerce/counter-receipt";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, type JsonRecord } from "../http";
 import {

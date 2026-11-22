@@ -6,10 +6,10 @@ import {
   type FrozenOrganisationPlacementMove,
   type OrganisationPlacementFenceToken,
 } from "../data/organisation-placement";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { OrganisationPlacement } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { ActorRelocationId } from "./actor-relocation";
 import type { ActorRestoreId } from "./actor-restore";
 import type { ActorIdentity } from "./actor-registry";

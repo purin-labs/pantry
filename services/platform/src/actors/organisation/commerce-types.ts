@@ -5,7 +5,10 @@ import type {
   CommerceReadWatermark,
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { CafeCommerceAcceptanceFaultRecord } from "../../commerce/contract/types";
 import type {
   ApplyCommerceDeliveryInput,

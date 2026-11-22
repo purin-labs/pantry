@@ -1,4 +1,4 @@
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { handlePortalChat, type PortalChatExecution } from "../chat";
 import { handlePortalChatCancel } from "./cancel";
 import {

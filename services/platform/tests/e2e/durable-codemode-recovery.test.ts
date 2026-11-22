@@ -7,7 +7,7 @@ import {
   newRequestId,
   parseOrganisationId,
   parseSessionId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   DISCOVER_INTEGRATION_LIST,
   READ_DATA,

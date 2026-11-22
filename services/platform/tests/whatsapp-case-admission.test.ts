@@ -21,7 +21,7 @@ vi.mock("../src/actors/actor-router", () => ({
 }));
 
 import { admitWhatsAppSupportCase } from "../src/actors/whatsapp-case-admission";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 
 const META_MESSAGE_ID =
   "wamid.HBgMNjE0MzM2NDE3NzAVAgARGBI3QjQ4RkZGQ0Q0QTQxRDgA==";

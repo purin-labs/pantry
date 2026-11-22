@@ -2,8 +2,11 @@ import { env } from "cloudflare:workers";
 import {
   organisationDatabase as organisationHandle,
   type OrganisationDatabase,
-} from "../../src/database-handles";
-import { parseOrganisationId, type OrganisationId } from "../../src/ids";
+} from "@purin-labs/kernel/database-handles";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { upsertUser, type User } from "../../src/data/control-plane";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";

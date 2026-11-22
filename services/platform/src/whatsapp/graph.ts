@@ -1,5 +1,5 @@
-import { RequestDeadline } from "../request-deadline";
-import type { Result } from "../result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

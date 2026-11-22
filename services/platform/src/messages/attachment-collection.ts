@@ -6,19 +6,19 @@ import {
   listOrganisationActorRegistryEntries,
   type ActorRegistryEntry,
 } from "../actors/actor-registry";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
   type RequestId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   collectMessageAttachments,
   type AttachmentCollectionError,
   type AttachmentCollectionReceipt,
   type AttachmentCollectionUncertainReceipt,
 } from "./attachment-reachability";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { assertNever } from "@purin-labs/std";
 /**
  * The scheduled attachment collection pass.

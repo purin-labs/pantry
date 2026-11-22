@@ -7,7 +7,7 @@ import {
   userMessageLinks,
 } from "../src/actors/message-tools";
 import type { EmbeddedHarnessUserInput } from "../src/actors/embedded-harness";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 const ORGANISATION = "organisation_tools" as OrganisationId;
 

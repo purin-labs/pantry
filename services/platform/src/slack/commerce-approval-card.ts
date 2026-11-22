@@ -24,7 +24,7 @@ import {
   type MenuPriceSide,
 } from "../commerce/menu-price-action";
 import type { CommerceChangeFacts } from "../commerce/contract/approval-card-texts";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { decisionCardBlocks, type DecisionCardButton } from "./decision-card";
 import { assertNever } from "@purin-labs/std";
 

@@ -23,7 +23,7 @@ import {
   parseActorExportEnvelope,
   type ActorExportEnvelopeV1,
 } from "../src/actors/actor-export";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import {
   emptySqliteFixture,

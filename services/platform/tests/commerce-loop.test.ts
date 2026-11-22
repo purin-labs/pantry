@@ -41,7 +41,7 @@ import {
   parsePersonId,
   parseSessionId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {
   fixtureFlowBinding,

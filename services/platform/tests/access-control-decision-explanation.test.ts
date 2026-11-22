@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import {
   TEST_ACTIVE_ORGANISATION_PLACEMENT_ROW,
@@ -109,7 +109,7 @@ import {
   parsePersonId,
   parseOrganisationId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   FlowLabel,

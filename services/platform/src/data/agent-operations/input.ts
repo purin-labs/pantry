@@ -1,9 +1,9 @@
 import { responsibilityScopeCommerce } from "./scope-commerce";
-import type { CommerceTypeParts } from "../../commerce-type-parts";
+import type { CommerceTypeParts } from "@purin-labs/kernel/commerce-type-parts";
 
 type CommerceListEntryRef = CommerceTypeParts["listEntryRef"];
 type CommerceRelationshipRef = CommerceTypeParts["relationshipRef"];
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   isScheduleWeekday,
   isTimeOfDay,

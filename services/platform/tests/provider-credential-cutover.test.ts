@@ -1,6 +1,6 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
@@ -15,7 +15,10 @@ import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
 } from "../src/actors/organisation/policy-types";
-import type { ProviderConnectionId, OrganisationId } from "../src/ids";
+import type {
+  ProviderConnectionId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   writeStripeReadCredentialRef,
@@ -25,7 +28,7 @@ import {
   activateProviderCredentialCutover,
   reconcileInterruptedProviderCredentialCutovers,
 } from "../src/integrations/contract/credential-cutover";
-import type { Result } from "../src/result";
+import type { Result } from "@purin-labs/kernel/result";
 import { storeVaultSecret, type VaultHandle } from "../src/credential-vault";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

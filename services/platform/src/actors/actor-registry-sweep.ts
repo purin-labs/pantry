@@ -9,10 +9,10 @@
  * quarantines its entry when the activation conflicts. A quarantined entry no
  * longer holds a move; the relocation leaves it out with a receipt.
  */
-import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
-import { newRequestId, parseOrganisationId } from "../ids";
-import { traceWarn } from "../observability";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, parseOrganisationId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,

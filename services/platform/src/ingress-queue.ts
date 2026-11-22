@@ -18,8 +18,8 @@ import {
 } from "./context/files";
 import type { ContextProjectionCommand } from "./context/projection";
 import { parseContextProjectionCommand } from "./context/projection";
-import type { JsonObject } from "./http";
-import { parseCaseId, parseOrganisationId } from "./ids";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import { parseCaseId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   parseEmailChangeQueuePayload,
   type EmailChangeQueueMessage,
@@ -27,8 +27,8 @@ import {
 import {
   readRequiredString,
   type IngressQueueMessageError,
-} from "./queue-fields";
-import type { Result } from "./result";
+} from "@purin-labs/kernel/queue-fields";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseAgentScheduleDispatchQueuePayload,
   type AgentScheduleDispatchQueueMessage,
@@ -120,7 +120,7 @@ function parseContextProjectionQueuePayload(
       };
 }
 
-declare module "./env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     EVENT_Q: Queue<IngressQueueMessage>;
   }

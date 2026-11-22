@@ -32,7 +32,7 @@ import {
   type IntegrationAccountId,
   type SessionId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,

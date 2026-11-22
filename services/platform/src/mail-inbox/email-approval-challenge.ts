@@ -1,5 +1,5 @@
 import { decodeBase64Url, encodeBase64Url } from "@purin-labs/std";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { digestCanonical } from "../policy/information-flow/digest";
 
 /**

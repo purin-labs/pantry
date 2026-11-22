@@ -1,9 +1,9 @@
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchWithOrganisationPlacement } from "../../organisation-execution-scope";
 import type { FileResourceAccessGrantTarget } from "../../authorization/access-grants/types";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { parseIntegrationAccountId } from "../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   readDropboxMetadata,
   type DropboxListEntry,
@@ -13,7 +13,7 @@ import {
   resolveFileProviderAccess,
   storeFilePlacementCredential,
 } from "../../provider-workflows/file-context-credential";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { FileContextProvider } from "@purin-labs/contracts";
 
 import type { FileGrantValidationError } from "../../authorization/access-grants/file-grant-parts";

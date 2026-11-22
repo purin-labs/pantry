@@ -31,7 +31,10 @@ import {
   warnRelocationExclusions,
   type ActorRelocationExclusion,
 } from "./actor-relocation-exclusion";
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { RelocationReceiptError } from "./actor-relocation-state";
 import {
@@ -89,10 +92,14 @@ import {
   type ActorExportId,
   type ActorExportRef,
 } from "./actor-export";
-import { traceLog, traceWarn } from "../observability";
-import type { Env } from "../env";
-import { newRequestId, parseOrganisationId, type OrganisationId } from "../ids";
-import type { Result } from "../result";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  newRequestId,
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   definitiveActorImportFailure,
   importActorCopyTarget,

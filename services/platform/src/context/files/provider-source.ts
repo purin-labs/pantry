@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Env } from "../../env";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   downloadDropboxFile,
   dropboxDeepLink,
@@ -22,7 +22,7 @@ import {
   type FileProviderAccessError,
   type FileProviderCredentialStore,
 } from "../../provider-workflows/file-context-credential";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { FILE_SOURCE_MAX_BYTES, type FileProjectionCommand } from "./domain";
 import type {
   FileProjectionMetadata,

@@ -40,7 +40,7 @@ import {
   parsePersonId,
   parseSessionId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseCommerceSystemRevision } from "../src/data/organisation-commerce-system";
 import {

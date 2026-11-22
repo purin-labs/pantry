@@ -14,8 +14,8 @@ import {
 } from "../../actors/session-execution-admission";
 import { sideCaseProposalId } from "../../chat/side-cases";
 import { parsePersonId } from "../../data/person-authz";
-import type { Env } from "../../env";
-import { parseConnectorId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { validateLiveRequestAuthority } from "../../request-authority";
 import { storeSlackSideCaseProposal } from "../../slack/side-cases";

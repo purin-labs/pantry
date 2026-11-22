@@ -6,7 +6,7 @@
  * cannot see or act on its drafts.
  */
 import { SLACK_APP_NAME, SLACK_BOT_NAME } from "@purin-labs/control-api";
-import type { GlobalDatabase } from "../../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import { signalChat } from "../../chat/signals";
 import { isConversationId } from "@purin-labs/control-api";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
@@ -14,7 +14,7 @@ import {
   resolveActiveConnectorActorAtPlacement,
   type ActorResolutionError,
 } from "../../actors/actor-router";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
 import { conversationCaseIdentity } from "../../chat/conversation-access";
 import type { ConversationScope } from "../../chat/store";
@@ -32,9 +32,9 @@ import {
   type SlackChannelOptions,
   type SlackMessageProposal,
 } from "../../data/slack-message-proposal";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "../../actors/actor-stubs";
-import { parseConnectorId } from "../../ids";
+import { parseConnectorId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";

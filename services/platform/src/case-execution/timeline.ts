@@ -16,14 +16,14 @@ import { assertNever, parseJsonOrNull } from "@purin-labs/std";
 
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
 import { listVisibleChatTitles } from "../chat/store";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   resolveMemoryViewer,
   viewerMayRead,
   type MemoryViewer,
 } from "../memory/access";
 import { FlowBinding } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   listCaseExecutionCases,
   readCaseExecutionPage,

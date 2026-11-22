@@ -1,9 +1,9 @@
 import type { DeviceView, VoiceEngineId } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
-import { definePort } from "../../port";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
 
 /** A shop Mac as the Devices page and the agent's `device_read` see it. */
 export type ShopMacDevice = Readonly<{

@@ -8,7 +8,7 @@ import {
   upsertUser,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseIntegrationAccountId, parseOrganisationId } from "../../src/ids";
+import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { newControlMutationIdentity } from "../../src/data/control-mutation";
 import { expect } from "vitest";

@@ -1,8 +1,8 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { readEmailMailboxAccount } from "../data/email-mailbox";
 import { resolveEmailSenderAccount } from "../data/email-operational";
-import type { IntegrationAccountId } from "../ids";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { agentMailboxConnector } from "./agent-mailbox-connector";
 
 type AgentMailboxTeardown =

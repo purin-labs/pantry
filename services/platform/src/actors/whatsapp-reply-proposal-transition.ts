@@ -18,7 +18,7 @@ import {
   type MachineState,
 } from "@purin-labs/std/state-machine";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { writeActorTransition } from "./lifecycle/state-transition";
 import {
   assertRequiredColumns,

@@ -24,8 +24,12 @@ import {
   type SessionCutoverBlocker,
 } from "../agent-session-cutover-quiescence";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
-import { parseOrganisationId, parseSessionId, newRequestId } from "../../ids";
-import { traceWarn } from "../../observability";
+import {
+  parseOrganisationId,
+  parseSessionId,
+  newRequestId,
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { SessionExecutionAdmission } from "../session-execution-admission";
 import { settleActorExecution } from "../actor-execution-quiescence";
 import { readCanonicalSessionForPersistence } from "../agent-session-canonical";

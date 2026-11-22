@@ -43,7 +43,7 @@ import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
 } from "../data/organisation-workspace";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, SessionActorStub } from "../actors/actor-stubs";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
@@ -53,7 +53,7 @@ import type { SlackCaseCommand } from "./case-command-message";
 import { buildSlackUserMessage } from "./user-message";
 import { slackAuthoredText } from "./events";
 import { resolveSlackTurnModelRouteAtScope } from "../models/route";
-import { traceLog } from "../observability";
+import { traceLog } from "@purin-labs/kernel/observability";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
@@ -73,7 +73,7 @@ import {
   type PinnedAgentProfile,
 } from "../data/pinned-agent-profile";
 import { resolveSlackConfigurationReply } from "./configuration-reply";
-import { requirePublicOrigin } from "../public-origin";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import { refreshSlackRequestAuthority } from "../request-authority";
 import {
   isDeferredSlackCaseWork,
@@ -84,7 +84,7 @@ import {
   roleMayConfigure,
   type ControlRole,
 } from "../data/control-plane";
-import { parseAssignmentId, parseSessionId, type CaseId } from "../ids";
+import { parseAssignmentId, parseSessionId, type CaseId } from "@purin-labs/kernel/ids";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
 import {
   readLatestEmailReviewProjectionForCase,

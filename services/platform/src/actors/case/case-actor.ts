@@ -36,15 +36,15 @@ import type {
   CaseGoalSnapshot,
   CaseAssignmentLifecycle,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActor } from "../actor-router";
 import {
   newRequestId,
   parseOrganisationId,
   type CaseId,
   type OrganisationId,
-} from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   createActorActivationSchema,
   admitActorRecovery,
@@ -75,7 +75,7 @@ import type {
   CaseContextTailReader,
 } from "../../context/assembly";
 import { parseStoredRequestAuthority } from "../../request-authority";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   advanceInformationFlowContext,
   digestFlowBinding,

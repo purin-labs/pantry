@@ -1,9 +1,9 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { listAccessGrants } from "../../data/access-grants";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { RequestableEntityTypeRead } from "../requestable-capabilities";
 import { commerceGrantSelection } from "./commerce-grant-selection";
 import type { AccessGrant } from "./types";

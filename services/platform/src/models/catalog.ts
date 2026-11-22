@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { ChatModelCapabilities } from "@purin-labs/control-api";
 
 const TEXT_TOOLS_CAPABILITIES: ChatModelCapabilities = {

@@ -9,7 +9,7 @@ import {
   parseControlSessionId,
   parsePersonId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 
 const organisationId = requireParsed(

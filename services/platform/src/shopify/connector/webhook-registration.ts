@@ -1,5 +1,5 @@
-import type { JsonObject } from "../../http";
-import type { Result } from "../../result";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 import type {

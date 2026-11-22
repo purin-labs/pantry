@@ -1,6 +1,6 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import {
   resolveUser,
@@ -178,7 +178,10 @@ import {
   parseChatCommand,
   parseChatModelAction,
 } from "../src/chat/conversation";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   advanceConversationRead,

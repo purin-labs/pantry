@@ -1,6 +1,6 @@
-import { RequestDeadline } from "../request-deadline";
-import type { ChannelId } from "../ids";
-import type { Result } from "../result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import type { ChannelId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage, isRecord } from "@purin-labs/std";
 
 const SLACK_THREAD_STATUS_TIMEOUT_MS = 2_000;

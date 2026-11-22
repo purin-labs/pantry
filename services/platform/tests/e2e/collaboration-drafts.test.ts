@@ -37,7 +37,7 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import {
   PUBLIC_ORIGIN,

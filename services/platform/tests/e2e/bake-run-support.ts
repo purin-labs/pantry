@@ -14,7 +14,7 @@ import { env } from "cloudflare:workers";
 
 import { deviceFleetStub } from "../../src/devices/contract/fleet-stub";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { organisationDatabase } from "./organisation-database";
 import {

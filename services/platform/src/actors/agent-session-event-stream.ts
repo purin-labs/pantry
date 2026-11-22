@@ -1,7 +1,7 @@
 import type { AgentEventEnvelope } from "@purin-labs/contracts";
 
-import type { RequestId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { RequestId, OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   advanceSessionTurnStream,
   parseAgentEventEnvelope,

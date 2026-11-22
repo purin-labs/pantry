@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it, vi } from "vitest";
 
 const caseMocks = vi.hoisted(() => ({ processDirectCaseCommand: vi.fn() }));
@@ -86,7 +86,7 @@ describe("shared agent operation runner", () => {
     });
 
     const result = await runAgentOperation({
-      env: { DB: db } as unknown as import("../src/env").Env,
+      env: { DB: db } as unknown as import("@purin-labs/kernel/env").Env,
       scope: (await proposalFixtureAuthority(db, ORGANISATION)).scope,
       operation: {
         kind: "dispatch_manual_run",

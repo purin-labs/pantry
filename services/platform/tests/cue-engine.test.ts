@@ -32,7 +32,7 @@ import {
   parseOrganisationId,
   parseThreadKey,
   parseWorkspaceId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   processCueQueueBatch,
   type CueMutationAuthorization,

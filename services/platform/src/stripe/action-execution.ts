@@ -6,9 +6,12 @@ import {
   resolveActiveProviderAccountContext,
   type ProviderAccountContextError,
 } from "../data/integration-account";
-import type { Env } from "../env";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveActiveProviderConnectionCredential,
   type ProviderActionResolutionError,

@@ -20,7 +20,7 @@ import {
   parseVaultHandle,
   storeVaultSecret,
 } from "../../services/platform/src/credential-vault/index.ts";
-import { parseWorkspaceId } from "../../services/platform/src/ids.ts";
+import { parseWorkspaceId } from "../../foundation/kernel/ids.ts";
 import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement.ts";
 import { browserFixture } from "./browser-fixture.mjs";
 import { authorizeOrganisationRequest } from "../../services/platform/src/control/authorization.ts";

@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareSlackInstallationLifecycleEvent } from "../data/slack-installation-records";
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Track } from "@purin-labs/contracts";
 import type {
@@ -21,7 +21,7 @@ import type {
   ActorIdentity,
   ActorRegistryEntry,
 } from "../actors/actor-registry";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,
@@ -31,27 +31,27 @@ import {
 import {
   errorResponse,
   jsonResponse,
-} from "../http";
+} from "@purin-labs/kernel/http";
 import {
   createCommerceDeliveryQueueMessage,
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
 } from "../commerce/contract/queue-messages";
 import type { EmailChangeQueueMessage } from "../mail/queue-messages";
-import type { IngressQueueMessageError } from "../queue-fields";
+import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
 import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
 import {
   parseConnectorId,
   type RequestId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   traceLog,
   traceWarn,
-} from "../observability";
+} from "@purin-labs/kernel/observability";
 import { fetchShopifyOrderCommerceRefresh } from "../shopify/connector/initial-sync";
 import { resolveShopifyWriteCredential } from "../shopify/action-execution";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   SlackEnvelope,
   SlackPayloadError,

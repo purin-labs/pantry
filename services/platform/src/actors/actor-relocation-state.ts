@@ -1,11 +1,11 @@
-import type { GlobalDatabase } from "../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import {
   assertNever,
   isNonEmptyString,
   isNonNegativeInteger,
 } from "@purin-labs/std";
-import type { Env } from "../env";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import type { ActorFenceToken } from "./actor-registry";
 import type { ActorRelocationId } from "./actor-relocation";
 import {

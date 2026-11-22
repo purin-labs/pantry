@@ -1,9 +1,9 @@
-import { runtimeFetch } from "../../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { hashOpaqueSecret } from "../../../data/control-plane";
 import type { ProviderAttemptStateWire } from "../../../data/provider-attempt";
-import { parseOrganisationId } from "../../../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   completeProviderOAuth,
   resolveProviderCallbackScope,
@@ -12,7 +12,7 @@ import type {
   OnboardingProvider,
   ProviderOnboardingError,
 } from "../../../integrations/contract/provider-lifecycle";
-import { requirePublicOrigin as requireConfiguredPublicOrigin } from "../../../public-origin";
+import { requirePublicOrigin as requireConfiguredPublicOrigin } from "@purin-labs/kernel/public-origin";
 import { controlError } from "../../http";
 import { assertNever } from "@purin-labs/std";
 import { readProviderAuthorizationState } from "../../../data/provider-authorization-state";

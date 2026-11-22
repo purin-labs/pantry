@@ -13,8 +13,8 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
-import type { OrganisationId } from "../ids";
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { assertNever } from "@purin-labs/std";
 import { hashOpaqueSecret } from "./control-plane";
 import {

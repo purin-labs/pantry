@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type {
   ScheduleBinding,

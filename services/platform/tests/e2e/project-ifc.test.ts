@@ -49,7 +49,7 @@ import {
   type FileToolObservation,
   type CanonicalFileReference,
 } from "../../src/context/files/tools";
-import { parseSessionId, type OrganisationId } from "../../src/ids";
+import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import { observeProjectReference } from "../../src/projects/references";
 import { platformConversation } from "./chat-journey-support";

@@ -1,10 +1,10 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { env } from "cloudflare:workers";
 import { expect, vi } from "vitest";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import {
   startActorRelocation,

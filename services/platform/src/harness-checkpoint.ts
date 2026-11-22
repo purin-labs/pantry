@@ -1,4 +1,4 @@
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 import { decodeBase64, sha256Hex } from "@purin-labs/std";
 
 export type HarnessCheckpointError =

@@ -1,10 +1,10 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
 import { acceptedExecutionAuthority } from "../organisation-access/access";
-import type { Env } from "../env";
-import { parseConnectorId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { validateLiveRequestAuthority } from "../request-authority";
 import { resolveActiveConnectorActorAtPlacement } from "./actor-router";
 import type {

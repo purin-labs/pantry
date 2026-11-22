@@ -20,7 +20,7 @@ import {
   type CommerceMutationResultV1,
   type CommerceClientResult,
 } from "@purin-labs/commerce-client";
-import type { Env } from "../../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
 import { handleInventoryProduction } from "../../src/control/routes/inventory-production";

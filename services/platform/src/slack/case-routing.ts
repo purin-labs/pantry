@@ -8,8 +8,8 @@ import {
   type ConnectorId,
   type IntegrationAccountId,
   type SessionId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SlackMessageEvent } from "./events";
 
 type SlackCaseRouteError = {

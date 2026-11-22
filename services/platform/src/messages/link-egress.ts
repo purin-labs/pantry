@@ -1,12 +1,12 @@
-import { RequestDeadline } from "../request-deadline";
-import { runtimeFetch } from "../runtime-fetch";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   LinkTransferLimitError,
   MESSAGE_LINK_POLICY,
   type MessageLinkEgress,
 } from "./link-reader";
 import type { OrganisationPlacement } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { decodeCanonicalBase64, hasExactKeys, isRecord } from "@purin-labs/std";
 
 /** Cloudflare's resolver, reached over DoH so no ambient DNS config applies. */

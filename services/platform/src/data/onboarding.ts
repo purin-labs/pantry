@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   prepareOrganisationLifecycleMove,
   type LifecycleFence,
@@ -20,9 +20,9 @@ import {
   type SetupSnapshotId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationEnvironment } from "./control-plane";
 import {
   prepareControlMutationReceiptAfterWrite,

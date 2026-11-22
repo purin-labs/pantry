@@ -25,7 +25,7 @@ import {
   type ConnectorId,
   type SessionId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,

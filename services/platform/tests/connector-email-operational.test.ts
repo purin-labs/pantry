@@ -23,7 +23,7 @@ import {
   parseOrganisationId,
   parseConnectorId,
   parseIntegrationAccountId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const NOW = 1_790_000_000_000;

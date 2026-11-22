@@ -44,7 +44,7 @@ import {
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
 import { finishProviderManagedConnection } from "./provider-managed-connection";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 const DROPBOX_MANUAL_INSTRUCTION = "revoke_dropbox_access_in_dropbox" as const;
 

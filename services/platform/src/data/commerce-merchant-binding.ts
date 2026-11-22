@@ -1,11 +1,11 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationEnvironment } from "./control-plane";
 import { decodeBase64Url, encodeBase64Url } from "@purin-labs/std";
 

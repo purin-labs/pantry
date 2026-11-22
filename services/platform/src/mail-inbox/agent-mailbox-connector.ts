@@ -1,6 +1,6 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "../actors/actor-stubs";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveConnectorActor } from "../actors/actor-router";
 import { type MailboxIngressPolicy } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
@@ -9,7 +9,7 @@ import {
   parseConnectorId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 
 export function emailLimitsFromPolicy(

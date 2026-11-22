@@ -30,7 +30,7 @@ import {
   parseConnectorId,
   type ConnectorId,
   type IntegrationAccountId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   parseE164PhoneNumber,

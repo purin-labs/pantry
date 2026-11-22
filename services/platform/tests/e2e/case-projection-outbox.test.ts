@@ -17,7 +17,7 @@ import {
 } from "../../src/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import { CaseDO } from "../../src/actors/case";
-import { parseCaseId } from "../../src/ids";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import { buildControlAuthority } from "../../src/request-authority";
 import { readActiveOrganisationMembershipRevision } from "../../src/data/control-plane";
 import {

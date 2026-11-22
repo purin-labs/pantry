@@ -1,4 +1,4 @@
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { AuthorizedOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";
 import type {

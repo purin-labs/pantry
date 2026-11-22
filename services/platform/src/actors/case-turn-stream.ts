@@ -6,7 +6,7 @@ import type {
   RequestId,
   SessionId,
   WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { SerializedFlowBinding } from "../policy/information-flow";
 import type { SessionActorRoute } from "./actor-router";
 import type { EmbeddedHarnessTurnError } from "./embedded-harness";

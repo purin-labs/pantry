@@ -1,5 +1,5 @@
-import { runtimeFetch } from "../../../runtime-fetch";
-import type { Env } from "../../../env";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveSlackOrganisationCredential } from "../../../credential-vault";
 import {
   prepareControlMutationReceipt,
@@ -13,7 +13,7 @@ import {
   parseOrganisationId,
   parseWorkspaceId,
   type OrganisationId,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import { configuredValue } from "../../../provider-adapters/authorization";
 import { uninstallSlackApplication } from "../../../provider-adapters/slack";
 import {

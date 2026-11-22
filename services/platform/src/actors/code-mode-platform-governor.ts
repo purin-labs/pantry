@@ -1,14 +1,14 @@
 import { DurableObject } from "cloudflare:workers";
 
-import type { Env } from "../env";
-import { readIsolateLocation } from "../isolate-location";
+import type { Env } from "@purin-labs/kernel/env";
+import { readIsolateLocation } from "@purin-labs/kernel/isolate-location";
 import {
   parseRequestId,
   parseSessionId,
   parseOrganisationId,
   type RequestId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   decideCodeModeLeaseRebind,
   parseCodeModeCancelInput,
@@ -2058,7 +2058,7 @@ function isPlatformOutcome(
   );
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     CODE_MODE_PLATFORM_GOVERNOR_ACTOR: DurableObjectNamespace<CodeModePlatformGovernorActor>;
   }

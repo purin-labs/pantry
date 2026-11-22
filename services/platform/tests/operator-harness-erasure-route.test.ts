@@ -9,7 +9,7 @@ import { issueControlSession, upsertUser } from "../src/data/control-plane";
 import { newControlMutationIdentity } from "../src/data/control-mutation";
 import { archiveOrganisation } from "../src/data/organisation-lifecycle";
 import type { SessionDO } from "../src/actors/agent-session";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,

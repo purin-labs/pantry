@@ -19,7 +19,7 @@ import {
   readActiveOrganisationMembership,
   readActiveOrganisationMembershipRevision,
 } from "../../src/data/control-plane";
-import { parseRequestId } from "../../src/ids";
+import { parseRequestId } from "@purin-labs/kernel/ids";
 import { deriveUserMessageViews } from "../../src/messages/message-wasm";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { buildControlAuthority } from "../../src/request-authority";

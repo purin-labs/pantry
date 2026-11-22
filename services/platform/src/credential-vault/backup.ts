@@ -15,9 +15,12 @@
  * Organisation's regional database, so export and restore take both.
  */
 
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VaultHandle, VaultResolveError } from "./domain";
 import type { CredentialVaultBindings, VaultKeyVersion } from "./keyring";
 import { resolveVaultHandle } from "./service";

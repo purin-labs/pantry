@@ -48,9 +48,9 @@ import type {
   HarnessHistoryEntry,
   EmbeddedHarnessModelUsage,
 } from "@purin-labs/contracts";
-import { newRequestId } from "../ids";
-import { traceLog } from "../observability";
-import type { Result } from "../result";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   EmbeddedHarnessAdapter,
   EmbeddedHarnessConstructionInput,

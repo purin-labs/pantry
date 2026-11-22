@@ -1,12 +1,12 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 import { parseStoredRequestAuthority } from "../request-authority";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   isRequestableCapability,

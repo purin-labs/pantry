@@ -2,7 +2,7 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import type { ScreenRelevanceBand } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 import type { SchemaTransaction } from "../actors/schema-migrations";
-import { newRequestId, type OrganisationId } from "../ids";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import {
   reserveTypeSafeEvaluation,
@@ -10,10 +10,10 @@ import {
   type TypeSafeUsageAuthority,
   type TypeSafeUsageLimits,
 } from "../integrations/typesafe/evaluation-ledger";
-import { traceLog } from "../observability";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { FlowLabel } from "../policy/information-flow/labels";
 import type { SerializedFlowLabel } from "../policy/information-flow/types";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   insertScreenRelevanceRecord,
   readJevScreenRelevanceSwitch,

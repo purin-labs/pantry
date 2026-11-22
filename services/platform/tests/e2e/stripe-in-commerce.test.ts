@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { parseOrganisationId } from "../../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { reconcileProviderManifestObservations } from "../../src/provider-lifecycle/observation";
 import {
   commerceClient,

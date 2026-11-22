@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   actorActivationIdentity,
   parseActorRegistryId,
@@ -23,10 +23,10 @@ import {
   type OrganisationPlacementBindings,
 } from "../organisation-execution-scope";
 import { parseOrganisationPlacement } from "../placement";
-import { parseOrganisationId } from "../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { assertNever } from "@purin-labs/std";
 import type { StrictUnion, VariantBy } from "@purin-labs/type-utils";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 type ActivationRow = Record<string, SqlStorageValue> & {
   registry_id: string;

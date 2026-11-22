@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   isVoiceEngineId,
   normalizeVoicePhrase,
@@ -10,7 +10,7 @@ import {
   type VoiceConfirmationTarget,
 } from "@purin-labs/control-api";
 
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 
 /**

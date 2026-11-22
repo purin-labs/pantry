@@ -24,7 +24,8 @@ import. A module with no line for one of these has none.
 ## foundation/kernel
 
 - Folders: 1
-  - `services/platform/src/`
+  - `foundation/kernel/`
+- Packages: `foundation/kernel`
 
 ## foundation/contracts
 

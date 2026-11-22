@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { type SchemaTransaction } from "../../actors/schema-migrations";
 import {
   parseVaultHandle,
@@ -12,8 +12,8 @@ import {
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../../actors/actor-execution-quiescence";
 import type { CredentialVaultBindings } from "../../credential-vault/keyring";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { validJevApiKey, type JevError } from "./system-one-client";
 import { probeTypeSafeConnection } from "./connection-probe";
 import { isRecord } from "@purin-labs/std";

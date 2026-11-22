@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { createHash } from "node:crypto";
 import type {
   AuthorityPartition,
@@ -8,7 +8,10 @@ import { upsertUser } from "../src/data/control-plane";
 import { createAccessGrant } from "../src/data/access-grants";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
-import type { IntegrationAccountId, OrganisationId } from "../src/ids";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { platformEnv } from "./worker-fakes";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";

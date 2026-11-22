@@ -32,7 +32,7 @@ import {
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
 import { scopesAreComplete } from "../provider-adapters/authorization";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { linkStripePaymentAccount } from "../commerce/contract/stripe-link";
 import { resolveCommerceMerchant } from "../commerce/contract/square-link";
 

@@ -1,8 +1,8 @@
 import type { Variant } from "@purin-labs/type-utils";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
-import { definePort } from "../../port";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   AgentResponsibilityScope,
   AgentResponsibilityScopePublicationEvidence,

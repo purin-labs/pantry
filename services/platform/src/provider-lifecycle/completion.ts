@@ -2,7 +2,7 @@ import {
   OrganisationExecutionScope,
   dispatchWithOrganisationPlacement,
 } from "../organisation-execution-scope";
-import { parseOrganisationId } from "../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { hashOpaqueSecret } from "../data/control-plane";
 import {
   beginProviderProvisioning,
@@ -12,14 +12,14 @@ import {
   type ProviderAuthorizationContext,
   type ProviderFailureEvidence,
 } from "../data/provider-attempt";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   completeProviderConnection,
   parseProviderStartContext,
 } from "../provider-adapters/catalogue";
 import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
 import type { ProviderStartContext } from "../integrations/contract/provider-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CompleteProviderInput,
   OnboardingProvider,

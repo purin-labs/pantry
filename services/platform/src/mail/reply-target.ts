@@ -1,6 +1,6 @@
 import type { GmailMessageHeaders } from "./gmail-adapter";
 import { extractMailbox } from "./gmail-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { encodeBase64, encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 /**

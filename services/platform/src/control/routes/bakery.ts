@@ -22,7 +22,7 @@ import {
   parseScenarioCopy,
   type ScenarioCopy,
 } from "@purin-labs/bakery-model/bakery-scenario";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   controlMutationScope,
   parseMutationBoundary,

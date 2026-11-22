@@ -4,7 +4,7 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 
 import { parseFlowReader as parseContextVisibility } from "./readers";
 import type { FlowAudience as ContextVisibility } from "./types";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "./digest";
 import type {
   CanonicalFlowPolicy,

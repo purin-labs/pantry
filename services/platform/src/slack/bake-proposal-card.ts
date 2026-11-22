@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { BakeProposal } from "../kitchen/bakes/records";
 import { cardDeliveryIds } from "./card-delivery-ids";
 import {

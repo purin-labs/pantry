@@ -1,11 +1,11 @@
 import type { BakeRunSeen } from "@purin-labs/kitchen-control-api";
 import { machineTransition } from "@purin-labs/std/state-machine";
 import type { Variant } from "@purin-labs/type-utils";
-import { deriveStableCaseId } from "../../case-identity";
+import { deriveStableCaseId } from "@purin-labs/kernel/case-identity";
 import { readAppliedWorkflowHead } from "../../commerce/bakery/workflow-revisions";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { BAKE_PROPOSAL_MACHINE } from "./bake-proposal.machine";
 import type { BakeRunError, RunActor } from "./run";
 import { bakeRunIdOf, readBakeRun, writeBakeRunCheck } from "./run-records";

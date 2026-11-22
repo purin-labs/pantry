@@ -6,9 +6,12 @@ import type {
   ShopifyTrackingEventKindV202607,
   ShopifyTrackingEventV202607,
 } from "@purin-labs/commerce-contracts";
-import type { JsonObject } from "../../http";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import { isNonEmptyString, isRecord } from "@purin-labs/std";
 import type {

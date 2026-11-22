@@ -5,7 +5,7 @@ import type {
   HarnessTurnLease,
   TurnIdentity,
 } from "@purin-labs/contracts";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   preflightHarnessTurnLease,
   type HarnessAuthorityError,

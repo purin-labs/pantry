@@ -2,7 +2,7 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
 import type { ConversationExecution } from "../../chat/execution";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { ConversationCaseActor } from "../case-direct-processing";
 import type { CaseCommerceProposalBody, CaseEntityPlaneCommand } from "./types";

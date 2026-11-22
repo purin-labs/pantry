@@ -14,9 +14,9 @@ import {
 import { CODE_MODE_PILOT_BUDGET } from "../../src/actors/code-mode-budget";
 import { classifyCodeModeRecovery } from "../../src/actors/code-mode-recovery";
 import { OrganisationDO } from "../../src/actors/organisation";
-import type { Env } from "../../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import { revokeAccessGrant } from "../../src/data/access-grants";
-import { newRequestId } from "../../src/ids";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import { network } from "./network";
 import { installEffectAuthority } from "./pi-sdk-effect-support";
 import {

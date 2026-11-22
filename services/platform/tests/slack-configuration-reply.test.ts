@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
 import { readAgentOperations } from "../src/data/agent-operations";
@@ -212,7 +212,7 @@ function resolve(
 ) {
   return resolveSlackConfigurationReply({
     db,
-    env: { DB: db, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("../src/env").Env,
+    env: { DB: db, PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({ databaseBinding: "DB", kind: "affinity", placementCellId: "test", locationHint: "wnam" }) } as unknown as import("@purin-labs/kernel/env").Env,
     organisationId: ORGANISATION,
     caseId: CASE,
     operator,

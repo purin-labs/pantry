@@ -4,7 +4,7 @@ import {
   digestCanonical,
   serializeCanonical,
 } from "../policy/information-flow/digest";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseCustomConnectorDefinitionDigest,
   type CustomConnectorDefinitionDigest,

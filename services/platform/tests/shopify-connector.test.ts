@@ -18,7 +18,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   parseShopifyCommerceCatalogEnvelopeBody,
   parseShopifyCommerceInventoryLevelEnvelopeBody,

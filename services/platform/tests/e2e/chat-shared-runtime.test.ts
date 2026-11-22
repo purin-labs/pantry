@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   parseChatSummary,
   type ChatConversationSummary,
@@ -17,7 +17,7 @@ import {
   newSlackOrganisationConnectionId,
   parseSessionId,
   parseSlackInstallationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { createOrganisationInstall } from "../../src/data/organisation";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
@@ -44,7 +44,7 @@ import {
   readOrganisationArchiveCleanup,
   type OrganisationArchiveCleanupRequest,
 } from "../../src/actors/organisation-archive-cleanup";
-import type { SessionId } from "../../src/ids";
+import type { SessionId } from "@purin-labs/kernel/ids";
 import { readPortalChatErasure } from "../../src/actors/portal-chat-cleanup";
 import { parseOrganisationPlacementMoveTarget } from "../../src/data/organisation-placement";
 import {

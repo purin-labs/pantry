@@ -3,7 +3,7 @@ import {
   parseControlSessionId,
   parseOrganisationId,
   type ControlSessionId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import type { ConversationScope } from "./store";
 import { isConversationId } from "@purin-labs/control-api";

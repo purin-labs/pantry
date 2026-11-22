@@ -1,8 +1,8 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   readCaseAssignmentPin,
   recordCaseAssignmentPin,

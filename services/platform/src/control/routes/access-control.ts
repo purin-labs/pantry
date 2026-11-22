@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { OrganisationPlacementBindings } from "../../organisation-execution-scope";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { listProviderResourcePage } from "../../data/provider-resource";
@@ -9,15 +9,15 @@ import {
 import { discoverAirtableBases } from "../../external-records/records";
 import { readActiveCaseOperations } from "../../actors/case-operations";
 import { resolveIntegrationAccount } from "../../data/integration-account";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../../policy";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { commerceAccessTargets } from "../../access-control/commerce-access-targets";
 import {
   readAccessControlOrganisationProjection,

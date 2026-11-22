@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   parseHeldEffectAction,
@@ -11,7 +11,7 @@ import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { parseStoredRequestAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * Something that the exit check stopped and that waits for a person (Plan

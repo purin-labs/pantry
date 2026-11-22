@@ -1,15 +1,15 @@
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { bootstrapOrganisation, type User } from "../data/control-plane";
 import {
   hashPortalSubject,
   newControlMutationIdentity,
 } from "../data/control-mutation";
 import { readControlMutationReplay } from "../data/shared-rows/mutation-receipt";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { configuredOrganisationDatabases } from "../organisation-execution-scope";
 import { parseOrganisationPlacementCells } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationCreationRequest } from "@purin-labs/control-api";
 
 /**

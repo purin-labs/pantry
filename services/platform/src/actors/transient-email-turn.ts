@@ -1,7 +1,7 @@
 import type { EmbeddedHarnessModelUsage } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   runTransientTurn,
   type TransientTeardownOutcome,

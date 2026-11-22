@@ -1,5 +1,5 @@
 import type { runDeviceCommand } from "../../devices/commands";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * A command to a shop device, for a configuration draft that a person

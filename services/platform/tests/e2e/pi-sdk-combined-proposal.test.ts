@@ -18,7 +18,7 @@ import {
   parseConnectorId,
   parseSessionId,
   parseThreadKey,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   compileAndStoreCueSnapshot,
   writeTierOneCommerceSubscription,

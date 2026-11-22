@@ -1,16 +1,16 @@
-import { RequestDeadline } from "../request-deadline";
-import { runtimeFetch } from "../runtime-fetch";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { StoredMessageAttachment } from "@purin-labs/contracts";
 
 import {
   newRequestId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 import { buildStoredMessageAttachment } from "../messages/message-wasm";
-import { traceLog } from "../observability";
-import type { Result } from "../result";
+import { traceLog } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SlackHostedFileMetadata, SlackMessageEvent } from "./events";
 import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 /**

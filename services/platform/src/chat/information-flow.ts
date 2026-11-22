@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "../organisation-access/access";
 import type { DisclosureDestination } from "./disclosure-evidence";
 import {
@@ -6,7 +6,7 @@ import {
   ProjectAudienceProposal,
 } from "./disclosure-evidence";
 import { readProject } from "../projects/records";
-import { parseOrganisationId } from "../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { isUserId } from "@purin-labs/control-api";
 import {

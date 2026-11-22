@@ -16,8 +16,11 @@ import {
   readVaultStoreSummary,
   type VaultItemStoreError,
 } from "../../credential-vault";
-import type { Env } from "../../env";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import type { Variant } from "@purin-labs/type-utils";

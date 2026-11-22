@@ -1,9 +1,12 @@
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationAccess } from "../organisation-access/access";
-import { definePort } from "../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * Whether the person of a Session turn may still use it: the live authority

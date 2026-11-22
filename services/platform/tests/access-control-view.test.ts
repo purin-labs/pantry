@@ -15,7 +15,7 @@ import {
 } from "../src/access-control/view";
 import { opaqueContextVisibilityReference } from "../src/access-control/references";
 import type { AccessGrant } from "../src/authorization/access-grants/types";
-import { parsePersonId } from "../src/ids";
+import { parsePersonId } from "@purin-labs/kernel/ids";
 import { FlowLabel } from "../src/policy";
 import {
   requireUserId,

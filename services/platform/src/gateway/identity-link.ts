@@ -16,7 +16,7 @@ import {
   resolveControlSession,
   validateControlCsrf,
 } from "../data/control-plane";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
@@ -24,9 +24,9 @@ import {
   notFound,
   readJsonObject,
   type JsonObject,
-} from "../http";
-import { newRequestId } from "../ids";
-import { traceLog } from "../observability";
+} from "@purin-labs/kernel/http";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { parseSlackUserId } from "../slack/events";
 import { assertNever } from "@purin-labs/std";
 import { identityLinkBrowserUrl } from "./support";

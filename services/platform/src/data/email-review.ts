@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   listEmailReplyProposalProjectionsForCase,
   listEmailReplyProposalProjections,
@@ -12,7 +12,7 @@ import {
   type EmailOperationalProposalProjection,
   type EmailProposalTarget,
 } from "./email-operational";
-import type { CaseId, OrganisationId } from "../ids";
+import type { CaseId, OrganisationId } from "@purin-labs/kernel/ids";
 
 type EmailReviewCommon = Readonly<{
   proposalId: string;

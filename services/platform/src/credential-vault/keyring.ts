@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseBase64 } from "./crypto";
 
 const vaultKeyRingBrand: unique symbol = Symbol("VaultKeyRing");

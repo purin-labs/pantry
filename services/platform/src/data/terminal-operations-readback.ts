@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   terminalAssignmentPaymentBinding,
   terminalTargetDeviceId,
@@ -6,7 +6,7 @@ import {
   type TerminalAssignment,
 } from "@purin-labs/commerce-contracts";
 
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { listActiveTerminalAssignments } from "./terminal-assignment-store";
 import type { Variant } from "@purin-labs/type-utils";
 import type { TerminalCounterReadback } from "@purin-labs/control-api";

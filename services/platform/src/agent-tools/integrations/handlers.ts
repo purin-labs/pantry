@@ -8,13 +8,13 @@ import {
 import { callAirtableApi } from "../../integrations/airtable-api";
 import { resolveAirtableAccountToken } from "../../external-records/oauth";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

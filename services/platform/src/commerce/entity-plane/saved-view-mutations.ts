@@ -12,7 +12,7 @@ import {
   type CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { enumeratePublishedResources } from "./published-resources";
 import { type PublishedResourceBoundaryError } from "../contract/types";
 import type { SavedCommerceViewPresentationPatch } from "./routes";

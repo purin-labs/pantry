@@ -9,10 +9,10 @@ import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 /** The top-level folders that hold product source. */
-export const SOURCE_ROOTS = ["apps", "packages", "services"];
+export const SOURCE_ROOTS = ["apps", "foundation", "packages", "services"];
 
 /** The folders that hold the source of the Platform Worker. */
-export const PLATFORM_SOURCE = ["services/platform/src"];
+export const PLATFORM_SOURCE = ["services/platform/src", "foundation"];
 
 const SKIPPED = new Set(["node_modules", "dist", ".wrangler", "target"]);
 

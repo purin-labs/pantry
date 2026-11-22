@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { Outcome, RequestAuthority } from "@purin-labs/contracts";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";

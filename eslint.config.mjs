@@ -153,7 +153,7 @@ const localContextProjectionImport = {
  * called, and it may not be passed, stored, bound or returned.
  */
 const fetchValueMessage =
-  'Do not use the global fetch as a value: a call through another object throws "Illegal invocation". Pass runtimeFetch from services/platform/src/runtime-fetch.ts.';
+  'Do not use the global fetch as a value: a call through another object throws "Illegal invocation". Pass runtimeFetch from foundation/kernel/runtime-fetch.ts.';
 const fetchValueSelectors = [
   'Property > Identifier.value[name="fetch"]',
   'CallExpression > Identifier.arguments[name="fetch"]',

@@ -37,13 +37,13 @@ import type {
   TurnMemoryReadRequest,
 } from "../context/assembly";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "../actors/actor-stubs";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { readCurrentOrganisationPolicySnapshot } from "../policy-snapshot";
 import {
@@ -54,7 +54,7 @@ import {
   FlowLabel,
   joinFlowLabels,
 } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { memberMaySee } from "../chat/member-view";
 import {
   readNoTurnMemory,

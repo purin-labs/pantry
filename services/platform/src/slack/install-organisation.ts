@@ -8,7 +8,7 @@ import {
   type GlobalDatabase,
   type OrganisationDatabase,
   sameBinding,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   selectOrganisationPlacementDatabase,
   type OrganisationPlacementBindings,
@@ -25,8 +25,8 @@ import {
   parseOrganisationId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SlackInstallationIdentity } from "./installation-identity";
 
 type SlackInstallOrganisationResolution =

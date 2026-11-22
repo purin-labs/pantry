@@ -7,7 +7,7 @@ import type { Quantity } from "@purin-labs/commerce-contracts";
 import type { ListEntryAttributeValue } from "@purin-labs/commerce-contracts";
 
 import { ToolRequestError } from "../../agent-tools/errors";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /** A refusal that the agent can act on, returned as the tool's words. */
 export class StockActionRequestError extends ToolRequestError {}

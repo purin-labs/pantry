@@ -4,7 +4,7 @@ import {
   type ConversationStream,
   type ConversationWork,
 } from "../src/chat/conversation";
-import { parseSessionId } from "../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 
 it("keeps a chat in its Project while a retryable turn or a queued message remains", function admittedWork() {
   const sessionId = parseSessionId("session_admitted_work");

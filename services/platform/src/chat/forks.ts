@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "../organisation-access/access";
 import { decideChatFlowDelivery } from "./information-flow";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -20,12 +20,12 @@ import {
   resolveActiveSessionActor,
   type ActorResolutionError,
 } from "../actors/actor-router";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "../actors/actor-stubs";
-import { parseSessionId, type OrganisationId } from "../ids";
+import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { FlowBinding, ObservationEvidence } from "../policy/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";

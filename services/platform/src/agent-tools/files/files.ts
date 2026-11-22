@@ -1,4 +1,4 @@
-import { parseIntegrationAccountId } from "../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 import type {

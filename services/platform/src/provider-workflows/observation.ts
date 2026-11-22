@@ -1,7 +1,7 @@
 import { resolveSlackHealthCheckCredential } from "../credential-vault";
 import type { ProviderManifestEvidence } from "../data/provider-attempt";
-import { newRequestId, parseWorkspaceId } from "../ids";
-import { traceWarn } from "../observability";
+import { newRequestId, parseWorkspaceId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   observeSlackProviderIdentity,
   type SlackProviderIdentityObservation,

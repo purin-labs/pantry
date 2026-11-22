@@ -11,7 +11,7 @@ import {
   type WhatsAppReplyAuthor,
 } from "../data/whatsapp";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, SessionActorStub } from "./actor-stubs";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
@@ -27,9 +27,9 @@ import {
   type RequestId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../models/route";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
@@ -39,7 +39,7 @@ import {
   prepareTurnContext,
 } from "../context/turn-context";
 import { buildWhatsAppSupportAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveSessionActorAtPlacement,

@@ -5,7 +5,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
-import type { ChannelId, WorkspaceId } from "../ids";
+import type { ChannelId, WorkspaceId } from "@purin-labs/kernel/ids";
 
 /** One online order that a feed delivery placed and paid in one commit. */
 type PaidPlacement = Readonly<{

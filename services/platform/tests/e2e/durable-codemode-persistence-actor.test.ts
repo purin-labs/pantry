@@ -7,7 +7,7 @@ import {
   resumeActorRelocation,
   startActorRelocation,
 } from "../../src/actors/actor-relocation";
-import { parseOrganisationId, parseSessionId } from "../../src/ids";
+import { parseOrganisationId, parseSessionId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {
   DISCOVER_INTEGRATION_LIST,

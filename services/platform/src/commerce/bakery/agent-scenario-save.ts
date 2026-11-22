@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   agentScenarioSaveManifest,
   type AgentScenarioSaveManifest,
@@ -12,7 +12,7 @@ import {
   verifyBakerySurfaceEffect,
   verifyBakerySurfaceReceipt,
 } from "@purin-labs/bakery-model/bakery-surface";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 
 const PROPOSAL_TTL_MS = 15 * 60_000;

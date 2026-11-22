@@ -1,5 +1,5 @@
-import { runtimeFetch } from "../runtime-fetch";
-import type { Result } from "../result";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Result } from "@purin-labs/kernel/result";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
 
 const NOTION_API_VERSION = "2026-03-11";

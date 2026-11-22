@@ -8,12 +8,12 @@ import type {
   HeldOutputReason,
   HeldOutputRequest,
 } from "../data/held-output-request";
-import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { FlowLabel } from "../policy/information-flow";
-import { definePort } from "../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * Slack's answer about one conversation. `memberIds` is null for a public

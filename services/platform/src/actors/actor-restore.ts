@@ -1,4 +1,7 @@
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
 import {
   provisionRegionalMoveTarget,
   resumeRegionalPlacement,
@@ -55,9 +58,12 @@ import {
   type OrganisationPlacementMoveTarget,
   type ActorRestoreId,
 } from "../data/organisation-placement";
-import type { Env } from "../env";
-import { parseOrganisationId, type OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   definitiveActorImportFailure,
   importActorCopyTarget,

@@ -1,5 +1,5 @@
 import { canonicalJson } from "@purin-labs/std";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /**
  * Plan 88 section 3: each closed UTC hour of Jev use on Pantry's key becomes one

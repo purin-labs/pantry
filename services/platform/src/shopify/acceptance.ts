@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 
 const SHOPIFY_ADMIN_API_VERSION = "2026-07";

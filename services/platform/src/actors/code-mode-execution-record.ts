@@ -6,7 +6,10 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";
-import { parseOrganisationId, type OrganisationId } from "../ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type {
   CodeModeLeaseBinding,
   CodeModeOrganisationReserveInput,

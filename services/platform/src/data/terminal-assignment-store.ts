@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   parseTerminalAssignment,
   terminalTargetDeviceId,
@@ -6,8 +6,8 @@ import {
   type TerminalRetirementReason,
 } from "@purin-labs/commerce-contracts";
 
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * Which terminal a Pantry location currently sells through.

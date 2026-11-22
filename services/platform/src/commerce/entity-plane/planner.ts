@@ -14,7 +14,7 @@ import {
   planCommerceGraphQuery,
   type CommerceWasmError,
 } from "../commerce-wasm";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 

@@ -1,10 +1,10 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 export async function readOrganisationEnvironment(
   db: OrganisationDatabase,

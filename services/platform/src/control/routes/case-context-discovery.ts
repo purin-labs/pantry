@@ -11,19 +11,19 @@ import type {
   UserId,
 } from "@purin-labs/control-api";
 import { identifier } from "../../case-context-discovery/policy";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../../actors/actor-stubs";
-import { authorizeConfiguredBearer } from "../../fault-injection-auth";
+import { authorizeConfiguredBearer } from "@purin-labs/kernel/fault-injection-auth";
 import {
   parseCaseId,
   parseOrganisationId,
   type CaseId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { assertNever } from "@purin-labs/std";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 const CASE_CONTEXT_COLLECTION_OPERATOR_ID = "operator_organisation_admin";
 

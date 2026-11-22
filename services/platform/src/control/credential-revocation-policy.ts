@@ -3,7 +3,7 @@ import {
   activateCredentialRevocationPolicy,
   type CredentialRevocationCommit,
 } from "../credential-vault";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { compilePublishAndActivateOrganisationPolicy } from "../policy-snapshot";
 

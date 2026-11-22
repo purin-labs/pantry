@@ -5,7 +5,10 @@ import {
   prepareFirstOperationalTask,
   readFirstOperationalTask,
 } from "../../src/data/first-operational-task";
-import { newActivationAttemptId, newActivationReceiptId } from "../../src/ids";
+import {
+  newActivationAttemptId,
+  newActivationReceiptId,
+} from "@purin-labs/kernel/ids";
 import {
   createOnboardingDatabase,
   createOnboardingOrganisation,

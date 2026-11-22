@@ -14,8 +14,8 @@ import type {
 } from "../../actors/case/types";
 import type { ActionLedgerActivity as OrganisationActionLedgerActivity } from "../../actors/action-ledger";
 import type { OrganisationCommerce } from "../../actors/organisation/organisation-commerce";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceProjectionHistoryEntry } from "../../actors/commerce-projection";
 import { projectionKindForEntityType } from "./blotter-source";
 import { assertNever } from "@purin-labs/std";

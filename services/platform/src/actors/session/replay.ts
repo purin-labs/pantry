@@ -1,6 +1,6 @@
-import { newRequestId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
-import type { Result } from "../../result";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   failSessionTurnStream,
   readSessionTurnReplay,

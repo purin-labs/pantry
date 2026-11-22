@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { readOrganisationEnvironment } from "../../control/organisation-runtime";
 import {
   resolveOrganisationProvisioningActor,
@@ -9,7 +9,7 @@ import {
   type ActiveProviderAccountContext,
   type ConnectedIntegrationSeed,
 } from "../../data/integration-account";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 
 type AdminConnectedIntegrationSeed = Omit<

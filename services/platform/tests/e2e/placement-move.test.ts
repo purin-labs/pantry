@@ -31,7 +31,7 @@ import {
 } from "../../src/actors/actor-registry";
 import { resolveActorExecutionAdmission } from "../../src/actors/actor-placement-admission";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
-import { parseSessionId, type SessionId } from "../../src/ids";
+import { parseSessionId, type SessionId } from "@purin-labs/kernel/ids";
 import { moveTarget, placementEntries } from "./placement-move-support";
 
 it(

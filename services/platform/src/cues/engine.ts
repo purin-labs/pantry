@@ -1,7 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CueEvent, SurfaceRef } from "@purin-labs/contracts";
-import type { CommerceTypeParts } from "../commerce-type-parts";
-import { definePort } from "../port";
+import type { CommerceTypeParts } from "@purin-labs/kernel/commerce-type-parts";
+import { definePort } from "@purin-labs/kernel/port";
 
 import {
   parseChannelId,
@@ -16,9 +16,9 @@ import {
   type OrganisationId,
   type ThreadKey,
   type WorkspaceId,
-} from "../ids";
-import type { JsonObject } from "../http";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { JsonObject } from "@purin-labs/kernel/http";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import {
   assertNever,
@@ -2123,7 +2123,7 @@ function invalidCueField(field: string): Result<never, CueBoundaryError> {
   return { ok: false, error: { code: "invalid_field", field } };
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     CUE_Q: Queue<CueQueueMessage>;
   }

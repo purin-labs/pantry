@@ -2,7 +2,7 @@ import { mailboxModelConsentRequest } from "@purin-labs/control-api";
 import type { UserId } from "@purin-labs/control-api/ids";
 
 import { newControlMutationIdentity } from "../src/data/control-mutation";
-import type { Env } from "../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   consentToGmailModel,
   readGmailModelState,

@@ -1,8 +1,8 @@
 import type { DeviceReadiness } from "@purin-labs/control-api";
 import type { BakeRunInput } from "@purin-labs/production-simulation/physical";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { readBakeAuthority } from "./authority";
 import type { BakeProposal } from "./records";
 import type { BakeRunError, BakeRunStart } from "./run";

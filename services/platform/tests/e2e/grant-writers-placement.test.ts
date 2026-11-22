@@ -3,7 +3,10 @@ import { fixtureDatabase } from "./organisation-database";
 import { expect, it, vi, type TestContext } from "vitest";
 import { assertNever } from "@purin-labs/std";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
-import { type OrganisationId, type IntegrationAccountId } from "../../src/ids";
+import {
+  type OrganisationId,
+  type IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle } from "../../src/credential-vault";
 import {

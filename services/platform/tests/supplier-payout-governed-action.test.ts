@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { createOrganisationExecutionFixture } from "./organisation-execution-fixture";
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
@@ -26,7 +26,7 @@ import {
   parseControlSessionId,
   parsePersonId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { payoutPlan } from "./supplier-payout-fixtures";
 import { d1Database } from "./sqlite-d1";

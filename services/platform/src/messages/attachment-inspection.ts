@@ -10,7 +10,7 @@ import {
   supportsOfficeExtraction,
 } from "./office-document-text";
 import { extractPdfText } from "./pdf-document-text";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { readDerivedStills } from "./derived-stills";
 import type { Variant } from "@purin-labs/type-utils";
 import { sha256Hex } from "@purin-labs/std";

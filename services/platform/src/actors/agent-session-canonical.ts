@@ -12,7 +12,7 @@ import type {
 
 import { validateCanonicalSessionRestore } from "../actor-wasm";
 import { parseSessionModelRoute } from "../policy-snapshot";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseWorkspaceReceipt } from "../workspace-revision-store";
 import { type AgentSessionPersistence } from "./agent-session-schema";
 import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";

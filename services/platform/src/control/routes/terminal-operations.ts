@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   parseTerminalAssignment,
@@ -6,7 +6,7 @@ import {
   type TerminalAssignment,
 } from "@purin-labs/commerce-contracts";
 
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";
@@ -25,7 +25,10 @@ import {
 } from "../../data/terminal-assignment-store";
 import { readTerminalOperations } from "../../data/terminal-operations-readback";
 import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
-import { parseIntegrationAccountId, type OrganisationId } from "../../ids";
+import {
+  parseIntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { createCommerceClient } from "../../commerce/contract/client";
 import { readOrganisationEnvironment } from "../organisation-runtime";
 import {

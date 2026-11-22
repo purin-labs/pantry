@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { createTypeSafeConnectionSchema } from "../src/integrations/typesafe/connection";
 import {
   invalidateTypeSafeEvaluations,

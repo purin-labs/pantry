@@ -1,7 +1,7 @@
 import type { DecidePendingDecision } from "../decide-pending-decision";
 import { handleRecipes } from "./recipes";
 import { handleCosts } from "./costs";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { handleInventoryProduction } from "./inventory-production";
 import {
   handleInventoryDeliveries,

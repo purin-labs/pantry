@@ -10,7 +10,11 @@ import type {
   SessionBudgetUsage,
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
-import type { RequestId, SessionId, OrganisationId } from "../../ids";
+import type {
+  RequestId,
+  SessionId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { WorkspaceRevisionStoreError } from "../../workspace-revision-store";
 import type {
   SessionCutoverInspectionError,

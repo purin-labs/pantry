@@ -16,14 +16,14 @@ import {
   sameBinding,
   type GlobalDatabase,
   type OrganisationDatabase,
-} from "../../database-handles";
-import type { OrganisationId } from "../../ids";
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   parseOrganisationPlacement,
   type InitialOrganisationPlacement,
   type OrganisationPlacement,
 } from "../../placement";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   GlobalQuerySource,
   OrganisationQuerySource,

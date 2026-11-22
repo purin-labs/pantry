@@ -1,5 +1,5 @@
-import type { Env } from "../../../env";
-import type { Result } from "../../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   decideCampaignBrief,
   listCaseCampaignBriefs,

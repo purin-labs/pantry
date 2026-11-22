@@ -13,7 +13,7 @@ import {
   COMMERCE_QUERY_SCHEMA_V5,
   execSchemaStatements,
 } from "./commerce-schema-baseline";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 import { isCommerceSensitivity } from "../commerce/contract/sensitivity";
 const COMMERCE_RELATIONSHIP_INDEX_TABLE =

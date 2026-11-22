@@ -1,9 +1,9 @@
 import { DurableObject } from "cloudflare:workers";
 import { errorMessage } from "@purin-labs/std";
 
-import type { Env } from "../../env";
-import { startIsolateLocationRead } from "../../isolate-location";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import { startIsolateLocationRead } from "@purin-labs/kernel/isolate-location";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   activateActor,
   admitActorActivation,

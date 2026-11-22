@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { verifyStoredDisclosureProof } from "./disclosure-evidence";
@@ -14,7 +14,7 @@ import {
   type ConversationId,
 } from "@purin-labs/control-api";
 import { canonicalJson, isNonNegativeInteger, sha256Hex } from "@purin-labs/std";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ConversationScope } from "./store";
 import { readConversation } from "./store";
 import { holdsAdmittedWork } from "./conversation";

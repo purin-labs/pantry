@@ -5,15 +5,15 @@ import {
   insertHeldOutputRequest,
   type HeldOutputReason,
 } from "../data/held-output-request";
-import type { Env } from "../env";
-import { newRequestId, parseOrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { slackSurfaceParts } from "../slack/surface-parts";
 import type { CaseOutput } from "./case/types";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { CaseConnectorRpc } from "./case/connector-rpc";
 import type { CaseActor } from "./case/case-actor";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 
 /**
  * Hold an output that the exit check stopped, and ask for approval (Plan 27C).

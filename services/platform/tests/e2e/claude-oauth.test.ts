@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../src/database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
@@ -12,7 +12,7 @@ import {
   issueControlSession,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { resolveOrganisationModelRouteAtScope } from "../../src/models/route";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

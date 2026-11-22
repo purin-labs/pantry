@@ -134,7 +134,7 @@ import {
   readSocketSweepDueAt,
   scheduleSocketSweep,
 } from "./hibernatable-sockets";
-import type { ControlSessionId } from "../ids";
+import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   CanvasAgentRequest,
@@ -149,10 +149,14 @@ import {
   matchMenuBoardSocketRoute,
 } from "../control/admission/menu-boards";
 import { controlError, readBoundedJsonRecord } from "../control/http";
-import type { Env } from "../env";
-import { parseOrganisationId, newRequestId, type OrganisationId } from "../ids";
-import { traceLog, traceWarn } from "../observability";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseOrganisationId,
+  newRequestId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   admitActorRecovery,
   advanceActorActivationSchema,
@@ -2775,7 +2779,7 @@ export class OrganisationDO
   private readonly alarmRetries = { failures: 0 };
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     ORGANISATION: DurableObjectNamespace<OrganisationDO>;
   }

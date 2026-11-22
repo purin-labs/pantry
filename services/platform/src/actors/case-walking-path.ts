@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { holdCaseOutput } from "./case-output-hold";
 import type { Outcome } from "@purin-labs/contracts";
 import type { ProjectSnapshot } from "@purin-labs/control-api";
@@ -29,16 +29,16 @@ import {
   type RequestId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { PinnedSessionPolicy } from "../policy-snapshot";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import {
   decideCaseConversationSink,
   type AllowFlowDecision,
 } from "./case-conversation-sink";
-import { traceLog } from "../observability";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { FlowBinding, sinkRefusalAsksPerson } from "../policy";
 import type { SerializedFlowBinding } from "../policy";
 import {

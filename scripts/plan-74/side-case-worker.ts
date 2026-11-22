@@ -11,8 +11,8 @@ import { prepareWorkflowProposal } from "../../services/platform/src/commerce/ba
 import { readCurrentWorkflow } from "../../services/platform/src/commerce/bakery/workflow-revisions";
 import { createOperatorConfigurationDraft } from "../../services/platform/src/data/operator-configuration-draft";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
-import type { Env } from "../../services/platform/src/env";
-import type { OrganisationId } from "../../services/platform/src/ids";
+import type { Env } from "../../foundation/kernel/env";
+import type { OrganisationId } from "../../foundation/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../services/platform/src/policy-snapshot";
 import { fixturePeople } from "../plan-42J/account-authority";
 

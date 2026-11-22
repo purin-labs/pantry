@@ -18,14 +18,14 @@ import {
   actorPlacementDirectoryAdmits,
   type ActorPlacementAdmission,
 } from "./actor-placement-admission";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   actorStubForRegistryEntry,
   type ActorNamespaces,
 } from "./actor-router";
 import type { VariantBy } from "@purin-labs/type-utils";
-import { newRequestId } from "../ids";
-import { traceLog } from "../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 
 export type ActorCopyError =
   | OrganisationExecutionScopeError

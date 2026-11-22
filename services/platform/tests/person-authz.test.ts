@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -8,7 +8,7 @@ import {
   parsePersonRoleOperation,
   parsePersonRoleRecords,
 } from "../src/data/person-authz";
-import { parseRequestId } from "../src/ids";
+import { parseRequestId } from "@purin-labs/kernel/ids";
 import { requireOrganisationId } from "./test-ids";
 
 describe("person role administration boundary", function personRoleAdminSuite() {

@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { parseProject, type Project, type ProjectId } from "@purin-labs/control-api";
 import type { ProjectAccessScope } from "./access";
 

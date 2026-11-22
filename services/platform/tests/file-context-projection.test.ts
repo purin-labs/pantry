@@ -1,4 +1,4 @@
-import { type SingleDatabase } from "../src/database-handles";
+import { type SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
@@ -10,7 +10,7 @@ import {
   searchGrantedFiles,
   type FileProjectionSourceReader,
 } from "../src/context/files";
-import { parseCaseId } from "../src/ids";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
 import { searchContextProjections } from "../src/context/projection";
 import { d1Database } from "./sqlite-d1";

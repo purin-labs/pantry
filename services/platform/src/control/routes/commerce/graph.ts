@@ -3,9 +3,9 @@ import { ensureCaseProject } from "../../../projects/case-project";
 import type { OrganisationPlacementBindings } from "../../../organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../../../actors/actor-stubs";
-import type { Result } from "../../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
 import {
@@ -70,7 +70,7 @@ import {
   type IntegrationAccountId,
   type SessionId,
   type OrganisationId,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   compilePublishAndActivateOrganisationPolicy,
   loadOrganisationPolicyOrDefaultDeny,

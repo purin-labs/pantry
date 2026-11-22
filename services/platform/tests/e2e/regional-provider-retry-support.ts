@@ -8,7 +8,7 @@ import {
 } from "../../src/actors/actor-relocation";
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
 import { readProviderCleanupContext } from "../../src/provider-adapters/catalogue";
-import type { IntegrationAccountId } from "../../src/ids";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 
 export async function beginRegionalProviderRetry(

@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
@@ -14,7 +14,7 @@ import {
   SUPPLIER_PAYOUT_ADAPTER_VERSIONS,
   type SupplierPayoutCertification,
 } from "../src/data/supplier-payout-certification";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_cert" as OrganisationId;
 const OTHER = "organisation_other" as OrganisationId;

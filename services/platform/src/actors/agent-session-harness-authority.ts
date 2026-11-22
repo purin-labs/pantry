@@ -19,7 +19,7 @@ import type {
   TurnIdentity,
 } from "@purin-labs/contracts";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { MAX_CHECKPOINT_PLAINTEXT_BYTES } from "../harness-checkpoint";
 import { parseStoredRequestAuthority } from "../request-authority";
 import {

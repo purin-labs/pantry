@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchWithOrganisationPlacement } from "../organisation-execution-scope";
 import { storeFilePlacementCredential } from "../provider-workflows/file-context-credential";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -10,7 +10,7 @@ import { recordCaseAssignmentPin } from "../data/agent-operations/case-assignmen
 import { resolveScheduleAutomation } from "../data/agent-operations/automation";
 import type { ScheduleBinding } from "../data/agent-operations";
 import { processDirectCaseCommand } from "../actors/case-direct-processing";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActorAtPlacement,
@@ -21,11 +21,11 @@ import {
   newRequestId,
   parseCaseId,
   parseOrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   traceLog,
   traceWarn,
-} from "../observability";
+} from "@purin-labs/kernel/observability";
 import { buildWorkflowAuthority } from "../request-authority";
 import {
   handleContextProjectionQueueMessage,

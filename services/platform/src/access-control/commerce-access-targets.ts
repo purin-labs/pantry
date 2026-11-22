@@ -4,10 +4,10 @@ import type {
   AccessGrantTarget,
   CommerceReadGrantScope,
 } from "../authorization/access-grants/types";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
-import { definePort } from "../port";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
+import type { Result } from "@purin-labs/kernel/result";
 
 type CommerceCommandTarget = Variant<AccessGrantTarget, "commerce_command">;
 type CommerceProviderTarget = Variant<AccessGrantTarget, "provider_resource">;

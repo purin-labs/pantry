@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -33,7 +33,7 @@ import {
   type ProviderConnectionId,
   type OrganisationId,
   type WorkspaceId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import { createMigratedDatabase } from "./sqlite-d1";
 import {

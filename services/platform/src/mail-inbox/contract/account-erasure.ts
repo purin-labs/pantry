@@ -1,6 +1,9 @@
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
-import type { OrganisationDatabaseSession } from "../../database-handles";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 
 /** The verified contacts of one removed account. */
 export function prepareAccountContactVerificationsDelete(

@@ -5,19 +5,19 @@ import type {
   RequestAuthority,
 } from "@purin-labs/contracts";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   EmailTurnInformationFlow,
   validateCaseContextCollectionEmailMessage,
 } from "./email-case-context-collection-evidence";
-import { parseOrganisationId } from "../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { requireActiveOrganisationActor } from "./actor-router";
 import type { SerializedFlowBinding } from "../policy/information-flow";
 import type {
   GmailAttachmentRef,
   GmailMessageContent,
 } from "../mail/gmail-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "../policy";
 import { resolveConnectorGmailAccess } from "./connector-email-evaluation";
 import type { HarnessToolHost } from "./embedded-harness";

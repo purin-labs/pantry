@@ -17,7 +17,7 @@ import {
   deleteArchivedOrganisation,
   type ArchiveOrganisationMutation,
 } from "../../src/data/organisation-lifecycle";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";

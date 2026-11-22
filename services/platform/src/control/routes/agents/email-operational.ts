@@ -1,4 +1,4 @@
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOperationalEmailTarget,
   recordOperationalEmailAttestation,
@@ -8,7 +8,7 @@ import {
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import { admitUserMutation } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {

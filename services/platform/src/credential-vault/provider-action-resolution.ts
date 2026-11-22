@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
@@ -9,8 +9,12 @@ import {
 } from "../data/integration-account";
 import type { OrganisationEnvironment } from "../data/control-plane";
 import type { ExecutingActionLedgerEntry } from "../actors/action-ledger";
-import type { IntegrationAccountId, SessionId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  IntegrationAccountId,
+  SessionId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { recordCredentialAccessDenial } from "./alerts";
 import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";

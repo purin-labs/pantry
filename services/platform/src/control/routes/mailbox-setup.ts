@@ -1,7 +1,7 @@
 import { parseMailboxSetupAgentChoice } from "@purin-labs/control-api";
 
-import type { Env } from "../../env";
-import { parseIntegrationAccountId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { readMailboxSetupPlan } from "../../mail-inbox/mailbox-setup";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";

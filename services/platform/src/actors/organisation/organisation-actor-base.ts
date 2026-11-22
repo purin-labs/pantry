@@ -5,7 +5,7 @@ import {
 } from "../../jev-features/screen-relevance-check";
 import { decideScreenRelevanceRecord } from "../../jev-features/screen-relevance";
 import type { ScreenRelevanceChoice } from "@purin-labs/control-api";
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   evaluateMail,
   type MailEvaluationInput,
@@ -27,8 +27,8 @@ import {
   settleActorExecution,
   isOrganisationExecutionActive,
 } from "../actor-execution-quiescence";
-import { type OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import { type OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { admitActorRecovery } from "../actor-activation";
 import { type ActorExportError } from "../actor-export";
 import {

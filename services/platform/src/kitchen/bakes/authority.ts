@@ -3,9 +3,9 @@ import type {
   BakeAuthorityMode,
   BakeAuthorityView,
 } from "@purin-labs/kitchen-control-api";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * The authority of the bake runs at each kitchen location (Plan 24 S5). The

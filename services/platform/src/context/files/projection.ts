@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ProviderFileRevision } from "@purin-labs/contracts";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { fileProjectionFence } from "./authority-sql";
@@ -14,7 +14,7 @@ import {
   integrationResourceScopeForGrant,
   visibilityForGrantSubject,
 } from "../../policy";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   FILE_EXTRACTED_TEXT_MAX_BYTES,
   FILE_SOURCE_MAX_BYTES,

@@ -7,11 +7,11 @@ import type {
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
 
-import { newRequestId } from "../ids";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import { validateMessageAttachmentPreparationReceipt } from "../messages/message-wasm";
-import { traceLog } from "../observability";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { attachmentManifestLine } from "../messages/attachment-inspection";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseStoredAttachment } from "../messages/stored-attachment";
 import type { EmbeddedHarnessUserInput } from "./embedded-harness";
 import { preflightHarnessTurnLease } from "./agent-session-harness-authority";

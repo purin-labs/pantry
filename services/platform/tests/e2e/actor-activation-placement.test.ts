@@ -42,7 +42,11 @@ import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,
 } from "../../src/actors/actor-schema-versions";
-import { parseCaseId, parseConnectorId, parseSessionId } from "../../src/ids";
+import {
+  parseCaseId,
+  parseConnectorId,
+  parseSessionId,
+} from "@purin-labs/kernel/ids";
 import { readOrganisationPlacementMove } from "../../src/data/organisation-placement";
 import {
   installDiscoveryActorFixture,

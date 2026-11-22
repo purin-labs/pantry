@@ -4,7 +4,7 @@ import {
 } from "../organisation-execution-scope";
 import type { CanonicalAction } from "@purin-labs/contracts";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   resolveActiveProviderAccountContext,
   type ProviderAccountContextError,
@@ -16,8 +16,11 @@ import {
   type GeneratedShopifyActionCall,
   type ShopifyOrderCancelReason,
 } from "../generated/action-registry";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   acquireShopifyAdminAccess,
   isShopifyAdminDomain,

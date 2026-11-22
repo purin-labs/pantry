@@ -1,6 +1,6 @@
 import type { AgentSessionLifecycle } from "@purin-labs/contracts";
-import type { SessionId, OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { SessionId, OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   classifyHarnessCheckpoint,
   inspectLatestStoredHarnessCheckpoint,

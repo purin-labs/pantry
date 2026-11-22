@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CodeModePlatformGovernorActor } from "./code-mode-platform-governor";
 
 // v3 starts empty. Cloudflare created the v2 object in the United States, and

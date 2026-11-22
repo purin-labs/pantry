@@ -10,7 +10,7 @@ import {
   readUserPreferences,
   updateUserPreferences,
 } from "../../data/user-preferences";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   authenticateControlRead,
   authenticateControlMutation,

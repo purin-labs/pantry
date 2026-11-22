@@ -15,7 +15,7 @@ import {
   customConnectorTurnTool,
   type CustomConnectorWriteCatalogEntry,
 } from "../../custom-connectors";
-import { parseCaseId, parseSessionId } from "../../ids";
+import { parseCaseId, parseSessionId } from "@purin-labs/kernel/ids";
 import { withToolContext, type SessionToolContext } from "../context";
 import {
   listIntegrationsForEmbeddedHarness,

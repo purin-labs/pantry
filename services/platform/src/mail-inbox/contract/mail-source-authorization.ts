@@ -3,7 +3,7 @@ import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
 } from "../../organisation-execution-scope";
-import { parseOrganisationId, type IntegrationAccountId } from "../../ids";
+import { parseOrganisationId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { FlowLabel } from "../../policy/information-flow/labels";
 import { digestCanonical } from "../../policy/information-flow/digest";
 import { selectActiveGrants } from "../../authorization/access-grants/compiler";
@@ -17,7 +17,7 @@ import {
   resolveIntegrationAccount,
   resolveProviderConnection,
 } from "../../data/integration-account";
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { validateNativeRequestAuthority } from "../../request-authority";
 import { readCurrentOrganisationPolicySnapshot } from "../../policy-snapshot";
 import { createCurrentSourceFlowLabel, evaluateFlowLabelSink } from "../../policy";

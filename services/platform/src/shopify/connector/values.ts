@@ -1,4 +1,4 @@
-import type { JsonObject } from "../../http";
+import type { JsonObject } from "@purin-labs/kernel/http";
 
 export function shopifyProductDescription(product: JsonObject): string {
   if (typeof product.body_html === "string") {

@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { parseVaultHandle, type VaultHandle } from "../../credential-vault";
 import {
   parseIntegrationAccountId,
@@ -9,9 +9,9 @@ import {
   type IntegrationAccountId,
   type ProviderConnectionId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,

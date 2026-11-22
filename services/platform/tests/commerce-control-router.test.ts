@@ -152,7 +152,7 @@ vi.mock("../src/slack/installation-store", async (importOriginal) => ({
 
 import { handleControlRequest } from "../src/control-router";
 import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../src/commerce-lab/lab-metadata";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { fixtureFlowBinding } from "./fixtures/plan25-turn";
 import { isRecord } from "@purin-labs/std";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

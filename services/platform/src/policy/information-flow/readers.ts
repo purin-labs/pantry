@@ -1,6 +1,6 @@
 import { isProjectId, isConversationId } from "@purin-labs/control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { parseOrganisationId } from "../../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseContextVisibility } from "../../authorization/access-grants/visibility";
 import type { FlowAudience } from "./types";
 

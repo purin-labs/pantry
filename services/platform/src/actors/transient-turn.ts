@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/async-control/cancellable-task";
 import { runTaskBeforeDeadline } from "@purin-labs/async-control/deadline";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   AcceptHarnessEventInput,
   AppendHarnessHistoryInput,

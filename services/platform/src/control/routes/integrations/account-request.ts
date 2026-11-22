@@ -1,9 +1,9 @@
 import type { ControlRole } from "../../../data/control-plane";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

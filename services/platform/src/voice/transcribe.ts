@@ -1,6 +1,6 @@
 import { CLOUD_VOICE_ENGINE } from "@purin-labs/control-api";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { hearWithWorkersAiWhisper } from "./engines/workers-ai-whisper";
 
 /** The Portal's own limit is 6 s at p95; this only ends a call that hangs. */

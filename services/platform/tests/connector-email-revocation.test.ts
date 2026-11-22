@@ -1,7 +1,7 @@
 import { createMigratedDatabase } from "./sqlite-d1";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,

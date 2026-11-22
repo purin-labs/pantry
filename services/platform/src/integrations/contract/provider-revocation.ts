@@ -11,11 +11,11 @@ import {
   resolveProviderConnection,
   type IntegrationProvider,
 } from "../../data/integration-account";
-import type { Env } from "../../env";
-import { newRequestId, type IntegrationAccountId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareConfigurationVersionBump,
 } from "../../data/organisation-onboarding-row";

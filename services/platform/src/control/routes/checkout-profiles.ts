@@ -9,7 +9,7 @@ import {
   type CommerceClientError,
 } from "@purin-labs/commerce-client";
 
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type {
   ControlMutationReceiptScope,
   UnversionedControlMutationBoundary,

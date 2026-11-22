@@ -3,8 +3,8 @@ import { errorMessage, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import type { SlackSideCaseStartRefusal } from "../actors/connector-side-case";
-import type { Env } from "../env";
-import { errorResponse, methodNotAllowed } from "../http";
+import type { Env } from "@purin-labs/kernel/env";
+import { errorResponse, methodNotAllowed } from "@purin-labs/kernel/http";
 import {
   newRequestId,
   parseChannelId,
@@ -15,8 +15,8 @@ import {
   type RequestId,
   type SlackAppId,
   type WorkspaceId,
-} from "../ids";
-import { traceLog, traceWarn } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { parseSlackUserId, type SlackUserId } from "./events";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";
 import { resolveOrClaimSlackThreadRoute } from "./organisation-routing";

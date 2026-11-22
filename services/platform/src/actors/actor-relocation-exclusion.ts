@@ -8,9 +8,9 @@
  * shows the receipts. A new request for the same identity at the target gets
  * a new Actor, as after the operator's discard of a quarantined Actor.
  */
-import type { GlobalDatabase } from "../database-handles";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   parseActorRegistryId,
   type ActorRegistryEntry,

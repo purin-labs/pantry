@@ -4,7 +4,7 @@ import {
   type CanonicalAction,
   type RequestAuthority,
 } from "@purin-labs/contracts";
-import type { CommerceTypeParts } from "../commerce-type-parts";
+import type { CommerceTypeParts } from "@purin-labs/kernel/commerce-type-parts";
 
 type CommerceEntityPlaneEffect = CommerceTypeParts["entityPlaneEffect"];
 
@@ -17,8 +17,8 @@ import {
   type IntegrationAccountId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseCommerceSystemRevision,
   type CommerceSystem,
@@ -41,7 +41,7 @@ import {
 } from "../authorization/access-grants/turn-authority";
 import type { SerializedFlowBinding } from "../policy";
 import { flowBindingMatchesIdentity } from "../policy";
-import { definePort } from "../port";
+import { definePort } from "@purin-labs/kernel/port";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isRecord, isSha256Hex } from "@purin-labs/std";
 import { armAlarmBy } from "./lifecycle/actor-alarm";

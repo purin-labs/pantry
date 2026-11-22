@@ -5,7 +5,7 @@ import { OrganisationExecutionScope } from "../src/organisation-execution-scope"
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
 import { parseInitialOrganisationPlacement } from "../src/placement";
 import { d1Database } from "./sqlite-d1";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   changeWorkspaceAiBudget,
   parseWorkspaceAiBudgetLimits,

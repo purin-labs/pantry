@@ -11,19 +11,19 @@ import {
   parsePersonRoleOperation,
   type PersonRoleAdminError,
 } from "../../data/person-authz";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
   notFound,
   readJsonObject,
-} from "../../http";
+} from "@purin-labs/kernel/http";
 import {
   newRequestId,
   parseOrganisationId,
-} from "../../ids";
-import { traceLog } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { assertNever } from "@purin-labs/std";
 import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
 

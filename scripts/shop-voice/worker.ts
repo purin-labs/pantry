@@ -4,8 +4,8 @@
 import kitchen from "../plan-81/kitchen-worker";
 import { CAPABILITY_KEYS } from "../../services/platform/src/authorization/capability-catalogue";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants";
-import type { Env } from "../../services/platform/src/env";
-import type { OrganisationId } from "../../services/platform/src/ids";
+import type { Env } from "../../foundation/kernel/env";
+import type { OrganisationId } from "../../foundation/kernel/ids";
 
 export {
   OrganisationDO,

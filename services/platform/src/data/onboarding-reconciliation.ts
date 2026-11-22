@@ -10,7 +10,7 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationExecutionScope,
   OrganisationPlacementBindings,
@@ -22,7 +22,7 @@ import {
   parseOrganisationId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   listOrganisationActorRegistryEntries,
   parseActorRegistryId,
@@ -35,12 +35,12 @@ import {
 import { actorStub } from "../actors/actor-stubs";
 import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "./organisation-placement";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "../actors/actor-stubs";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { parseOrganisationPlacement } from "../placement";
-import type { Result } from "../result";
-import { traceWarn } from "../observability";
+import type { Result } from "@purin-labs/kernel/result";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   hashOpaqueSecret,
   type OrganisationEnvironment,

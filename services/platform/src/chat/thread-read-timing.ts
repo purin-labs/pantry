@@ -1,6 +1,6 @@
-import type { Env } from "../env";
-import { newRequestId } from "../ids";
-import { traceLog } from "../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 
 /** One database step of a thread read: start and duration in ms, and its label. */
 type TimedStep = readonly [startMs: number, durationMs: number, label: string];

@@ -1,4 +1,4 @@
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 /**
  * The storage key of a fault journey (Refactor 15, refactor 9): while it is

@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareCueLogEntry } from "../cues/cue-log";
 import { pantryCommerceAccess } from "../commerce/contract/client";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -30,16 +30,16 @@ import {
   processTwoSessionDirectCaseCommand,
   type DirectCaseCommandDelivery,
 } from "../actors/case-direct-processing";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
 import {
   newRequestId,
   parseConnectorId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
-import { traceWarn } from "../observability";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import { buildWorkflowAuthority } from "../request-authority";

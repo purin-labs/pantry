@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationAccess,
   OrganisationAdmissionAction,
@@ -12,7 +12,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import { listAccessGrants } from "../../data/access-grants";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   readCurrentOrganisationPolicySnapshot,
   type PinnedSessionPolicy,
@@ -21,7 +21,7 @@ import {
   parseStoredRequestAuthority,
   validateLiveRequestAuthority,
 } from "../../request-authority";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   encodeCapabilityKey,
   parseCapabilityKey,

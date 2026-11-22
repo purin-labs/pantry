@@ -1,13 +1,13 @@
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
-import { newRequestId, type OrganisationId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   isOrganisationPolicyPlacementActive,
   parseOrganisationPolicySnapshot,
 } from "../../policy-snapshot";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   publishCaseContextDiscoveryPolicy,
   repinCaseContextDiscoveryPolicy,
@@ -41,7 +41,7 @@ import type {
   OrganisationPolicyHead,
   OrganisationPolicyHeadRow,
 } from "./policy-types";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { FlowLabel } from "../../policy/information-flow";
 import type {

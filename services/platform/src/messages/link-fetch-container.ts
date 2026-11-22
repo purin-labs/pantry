@@ -1,6 +1,6 @@
 import { Container } from "@cloudflare/containers";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 const MESSAGE_LINK_FETCH_PORT = 8080;
 
@@ -20,7 +20,7 @@ export class MessageLinkFetchContainer extends Container<Env> {
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     MESSAGE_LINK_FETCH: DurableObjectNamespace<MessageLinkFetchContainer>;
   }

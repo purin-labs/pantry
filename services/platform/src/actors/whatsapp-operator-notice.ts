@@ -5,9 +5,9 @@ import { isActorExecutionActive } from "./actor-execution-quiescence";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import { resolveActiveSlackOrganisationCredential } from "../credential-vault";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { readOperationsDestination } from "../data/operations-destination";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "../slack/installation-store";
 import {

@@ -1,4 +1,4 @@
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type { GlobalDatabase, OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   acceptedExecutionAuthority,
   type OrganisationAccess,
@@ -19,7 +19,7 @@ import {
   isNonBlankString,
   isNonNegativeInteger,
 } from "@purin-labs/std";
-import type { ControlSessionId, SessionId, OrganisationId } from "../ids";
+import type { ControlSessionId, SessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveControlSessionById } from "../data/control-plane";
 import type { ConversationScope } from "./store";
 import {
@@ -33,7 +33,7 @@ import {
   parseControlSessionId,
   parseSessionId,
   parseOrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {

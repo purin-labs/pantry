@@ -8,7 +8,7 @@ import {
   buildOnboardingProjection,
   type OnboardingProjection,
 } from "../../data/onboarding-projection";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { readCommerceActionLedger } from "../agent-operation-activity";
 import { authorizeOrganisationRequest } from "../authorization";

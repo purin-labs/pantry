@@ -10,7 +10,7 @@ import {
   parseSlackInstallationId,
   parseSlackOrganisationConnectionId,
   type RequestId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseSlackCaseEventEnvelope } from "../slack/case-command-message";
 import type { SlackMessageEvent } from "../slack/events";
 import type {

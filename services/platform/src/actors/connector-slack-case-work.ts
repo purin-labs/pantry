@@ -1,7 +1,11 @@
 import { isSideCaseProposalId } from "@purin-labs/control-api";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 
-import { parseConnectorId, parseOrganisationId, type RequestId } from "../ids";
+import {
+  parseConnectorId,
+  parseOrganisationId,
+  type RequestId,
+} from "@purin-labs/kernel/ids";
 import {
   parseSlackCaseCommand,
   type SlackCaseCommand,

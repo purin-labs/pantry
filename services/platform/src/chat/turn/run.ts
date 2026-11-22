@@ -23,7 +23,7 @@ import { bindCompletedChatHistory } from "../forks";
 import { currentProjectSnapshot } from "../project-context-binding";
 import { resolveCustomConnectorDetail } from "../../custom-connectors/projection";
 import { FlowBinding } from "../../policy/information-flow";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { readOrganisationCodexConnection } from "../../models/codex-connection";
 import {
   deriveDirectCaseIdentities,
@@ -35,8 +35,8 @@ import {
   parseRequestId,
   type ControlSessionId,
   type RequestId,
-} from "../../ids";
-import { traceLog } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import {
   ConversationGenerationFailure,
   conversationCommandFailure,

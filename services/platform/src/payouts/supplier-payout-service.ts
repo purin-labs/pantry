@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { PAYOUT_EVENT_ATTEMPT_MATCH } from "../data/supplier-payout-event-inbox";
 import type {
   SupplierPayable,
@@ -32,7 +32,7 @@ import {
   type SupplierPayoutProvider,
 } from "./executor";
 import { listSupplierPayoutAttempts } from "../data/supplier-payout-attempt";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";
 

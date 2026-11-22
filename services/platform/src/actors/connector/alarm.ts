@@ -1,5 +1,5 @@
-import type { RequestId } from "../../ids";
-import { traceLog } from "../../observability";
+import type { RequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import { nextAlarmAt, setActorAlarm } from "../lifecycle/actor-alarm";
 import { connectorAlarmReconcilers } from "../connector-alarm";
 import type { ChannelAlarmDue } from "./channel-adapter";

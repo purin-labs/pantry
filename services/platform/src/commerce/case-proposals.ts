@@ -13,7 +13,7 @@ import { isRecord } from "@purin-labs/std";
 import type { CaseCommercePart } from "../actors/case/parts";
 import { parseSourceProvenance } from "../actors/case/source-provenance";
 import type { CaseCommerceProposal } from "../actors/case/types";
-import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
+import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   parseCommerceSystemRevision,
   type CommerceSystemRevision,

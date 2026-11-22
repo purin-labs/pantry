@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { nativeChatAudienceMatchesAuthority } from "./native-audience";
 import { digestCanonical } from "./digest";
 import {
@@ -29,8 +29,8 @@ import {
   readCurrentOrganisationAuthz,
   type CurrentOrganisationAuthz,
 } from "./organisation-authz";
-import { parseOrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 /** The audience of an effect that every member of the Organisation reads. */
 const EVERY_ROLE: readonly FlowAudience[] = [

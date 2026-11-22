@@ -15,12 +15,12 @@ import {
 } from "../data/integration-account";
 import type { ProvisioningProviderConnectionAttempt } from "../data/provider-attempt";
 import { persistProviderResourceSnapshot } from "../data/provider-resource";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
 import {
   discoverShopifyIdentity,
@@ -45,7 +45,7 @@ import {
   verifyExistingAccountIdentity,
   finalizeProviderConnection,
 } from "../integrations/contract/provisioning";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { fetchShopifyInitialCommerce } from "./connector/initial-sync";
 import { registerShopifyWebhooks } from "./connector/webhook-registration";
 import type {

@@ -22,10 +22,10 @@ import type { CollaborationAgent } from "@purin-labs/collaboration";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import { controlError } from "../control/http";
 import { resolveUser } from "../data/control-plane";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   CollaborationRoom,
   type CollaborationRoomBacking,

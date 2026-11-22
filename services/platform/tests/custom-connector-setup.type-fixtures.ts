@@ -2,7 +2,7 @@ import type {
   CustomConnectorSetupAttempt,
   CustomConnectorSetupTarget,
 } from "../src/custom-connectors";
-import { parseIntegrationAccountId } from "../src/ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 type AwaitingCredentialAttempt = VariantBy<

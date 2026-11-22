@@ -18,7 +18,11 @@ import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import type { CaseSnapshot } from "../../src/actors/case/types";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { issueControlSession } from "../../src/data/control-plane";
-import { parseCaseId, parseChannelId, parseThreadKey } from "../../src/ids";
+import {
+  parseCaseId,
+  parseChannelId,
+  parseThreadKey,
+} from "@purin-labs/kernel/ids";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { requireUserId } from "../test-ids";

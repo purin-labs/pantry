@@ -3,7 +3,7 @@ import { expect } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import {
   accessControlPath,

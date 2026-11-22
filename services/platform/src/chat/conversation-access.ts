@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   isProjectId,
   isUserId,
@@ -12,7 +12,7 @@ import {
 import { isNonNegativeInteger } from "@purin-labs/std";
 import type { ConversationScope } from "./store";
 import { parseConversationActorIdentity } from "./conversation-actor-identity";
-import { parseCaseId, type CaseId } from "../ids";
+import { parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import { authorizeProject } from "../projects/access";
 import type { NativeChatSourceAccess } from "../policy/information-flow/source-labels";
 

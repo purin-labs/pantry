@@ -19,7 +19,7 @@ import {
 } from "@purin-labs/std/state-machine";
 
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { SIDE_CASE_MACHINE } from "./side-case.machine";
 
 /** A start that did not finish in ten minutes lets go of its proposal. */

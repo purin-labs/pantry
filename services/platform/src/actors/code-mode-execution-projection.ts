@@ -1,5 +1,8 @@
-import { parseOrganisationId, type OrganisationId } from "../ids";
-import type { Result } from "../result";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { HarnessCodeModeExecutionLease } from "../agent-tools/catalog/types";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 

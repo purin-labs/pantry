@@ -1,4 +1,4 @@
-import type { GlobalDatabase } from "../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import {
   applyPreferenceEdit,
   defaultPreferenceDocument,

@@ -30,18 +30,18 @@ import {
 } from "../data/control-plane";
 import { readEmailReplyProposalProjection } from "../data/email-mailbox";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
   type ControlSessionId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authorization";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { buildControlAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import { resolveActiveConnectorActorAtPlacement } from "./actor-router";
 import {

@@ -1,6 +1,6 @@
-import type { OrganisationDatabaseSession } from "../database-handles";
-import type { OrganisationId } from "../ids";
-import { definePort } from "../port";
+import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
 
 type StatementSession = Pick<OrganisationDatabaseSession, "prepare">;
 

@@ -1,4 +1,4 @@
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 /**
  * Whisper large-v3-turbo on Workers AI: the fallback's engine (Plan 82C). It

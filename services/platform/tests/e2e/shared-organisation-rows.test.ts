@@ -14,7 +14,7 @@ import {
   restoreOrganisation,
   type ArchiveOrganisationMutation,
 } from "../../src/data/organisation-lifecycle";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { parseInitialOrganisationPlacement } from "../../src/placement";

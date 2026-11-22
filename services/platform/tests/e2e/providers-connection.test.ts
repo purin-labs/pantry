@@ -8,7 +8,10 @@ import {
   upsertUser,
   type IssuedControlSession,
 } from "../../src/data/control-plane";
-import { parseIntegrationAccountId, type OrganisationId } from "../../src/ids";
+import {
+  parseIntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { network } from "./network";
 import { commerceWorkspace } from "./commerce-support";
 import { controlReadHeaders } from "./hibernatable-socket-support";

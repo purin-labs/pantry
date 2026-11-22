@@ -1,5 +1,5 @@
-import { runtimeFetch } from "../../../runtime-fetch";
-import type { Env } from "../../../env";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeCredentialRevocation,
   recordCredentialRevocationMutation,
@@ -17,8 +17,11 @@ import { setIntegrationAccountLifecycle } from "../../../data/integration-accoun
 import { revokeCredential } from "../../../credential-vault";
 import { resolveCredentialRevocationSecret } from "../../../credential-vault/credential-revocation-resolution";
 import { revokeGoogleOAuthToken } from "../../../integrations/contract/google-oauth-revocation";
-import { newRequestId, parseIntegrationAccountId } from "../../../ids";
-import { traceWarn } from "../../../observability";
+import {
+  newRequestId,
+  parseIntegrationAccountId,
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { activateRevocationPolicy } from "../../credential-revocation-policy";
 import {
   admitUserMutation,

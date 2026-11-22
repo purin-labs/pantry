@@ -18,7 +18,7 @@ import {
   selectOrganisationInferenceSelection,
 } from "../../src/data/organisation-inference-selection";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRouteForSelection } from "../../src/models/route";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

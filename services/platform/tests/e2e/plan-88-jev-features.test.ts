@@ -23,7 +23,7 @@ import { createActiveConnectedIntegration } from "../../src/data/integration-acc
 import { storeVaultSecret } from "../../src/credential-vault";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { defaultDenyPolicy } from "../../src/policy-snapshot";

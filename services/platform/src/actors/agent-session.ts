@@ -64,7 +64,7 @@ export class SessionDO extends SessionActor implements SessionInboxTurnsRpc {
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     SESSION: DurableObjectNamespace<SessionDO>;
   }

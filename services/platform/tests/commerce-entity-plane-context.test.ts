@@ -24,7 +24,7 @@ import {
 } from "../src/commerce/entity-plane/routes";
 import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
-import { parseOrganisationId as parsePlatformOrganisationId } from "../src/ids";
+import { parseOrganisationId as parsePlatformOrganisationId } from "@purin-labs/kernel/ids";
 import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
 import { isRecord } from "@purin-labs/std";
 

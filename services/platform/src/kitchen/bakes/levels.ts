@@ -1,8 +1,8 @@
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import { readAppliedWorkflowHead } from "../../commerce/bakery/workflow-revisions";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { writeBakeStockLevel, type BakeStockLevel } from "./records";
 
 /**

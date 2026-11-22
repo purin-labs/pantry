@@ -7,7 +7,7 @@ import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
 import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";
 import type { MerchantReportName } from "../src/commerce/entity-plane/merchant-reports";
 import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 
 const ORGANISATION_ID = "organisation_urk_brief";
 const MERCHANT_ID = "merchant_urk_brief";

@@ -1,8 +1,8 @@
 import { controlError } from "../control/http";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
 import type {
   CollaborationRoomKind,

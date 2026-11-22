@@ -16,7 +16,7 @@ import {
   isRecord,
   parseJsonOrNull,
 } from "@purin-labs/std";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 type Identity = { readonly organisationId: string; readonly caseId: string };
 export type GoalCommandRequest = Identity & {

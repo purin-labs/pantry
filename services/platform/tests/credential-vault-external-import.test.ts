@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
@@ -14,8 +14,8 @@ import {
 } from "../src/credential-vault";
 import { resolveVaultHandle } from "../src/credential-vault/service";
 import type { CredentialVaultBindings } from "../src/credential-vault/keyring";
-import { type OrganisationId } from "../src/ids";
-import type { Result } from "../src/result";
+import { type OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { d1Database } from "./sqlite-d1";
 import { requireOrganisationId, requireVaultHandle } from "./test-ids";
 

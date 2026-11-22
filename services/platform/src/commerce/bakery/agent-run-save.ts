@@ -1,11 +1,11 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   MAX_RUN_SNAPSHOT_BYTES,
   parseRunSnapshot,
   parseRunSnapshotSummary,
   type RunSnapshotSummary,
 } from "@purin-labs/bakery-model/bakery-run-snapshot";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { sha256Hex } from "@purin-labs/std";
 
 export type AgentRunSaveVerification =

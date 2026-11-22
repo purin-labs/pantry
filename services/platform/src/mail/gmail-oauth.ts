@@ -1,7 +1,7 @@
-import type { Env } from "../env";
-import { jwtClaims } from "../lenient-base64";
+import type { Env } from "@purin-labs/kernel/env";
+import { jwtClaims } from "@purin-labs/kernel/lenient-base64";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { GmailAuthorizationProduct } from "./gmail-authorization";
 import {
   storeVaultSecret,

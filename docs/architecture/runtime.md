@@ -103,7 +103,7 @@ Cross-boundary contracts are TypeBox 1.x schemas with `Value` checks in
 `packages/contracts`, which re-exports `packages/commerce-contracts`. No
 contract remains in Rust. The session reducer is TypeScript
 ([`session-reducer.ts`](../../packages/contracts/src/session-reducer.ts)).
-Branded Platform identities are in [`ids.ts`](../../services/platform/src/ids.ts).
+Branded Platform identities are in [`ids.ts`](../../foundation/kernel/ids.ts).
 
 - Parse raw D1 rows, requests, Queue bodies and provider payloads once, at
   the boundary.

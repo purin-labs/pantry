@@ -1,6 +1,9 @@
 import { authenticatedConversationScope } from "../../organisation-access/access";
-import type { Env } from "../../env";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   commandMemoryAsOperator,
   readMemoryViews,

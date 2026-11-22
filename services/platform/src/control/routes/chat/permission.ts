@@ -2,7 +2,7 @@ import {
   isConversationId,
   parseChatPermissionDecision,
 } from "@purin-labs/control-api";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readJsonRecord } from "../../http";
 import { isChatId } from "../../../chat/conversation";

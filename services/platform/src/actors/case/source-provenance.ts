@@ -1,6 +1,9 @@
 import type { CaseContent } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
-import { parseOrganisationId, parseIntegrationAccountId } from "../../ids";
+import {
+  parseOrganisationId,
+  parseIntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 
 /**

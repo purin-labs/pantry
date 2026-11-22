@@ -1,7 +1,10 @@
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { expect } from "vitest";
-import type { OrganisationId, IntegrationAccountId } from "../../src/ids";
+import type {
+  OrganisationId,
+  IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";

@@ -10,7 +10,7 @@ import type {
   ControlMutationReceiptScope,
 } from "../data/control-mutation";
 import { prepareOrganisationControlMutationReceipt } from "../data/shared-rows/mutation-receipt";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   organisationChatModelOptions,
@@ -18,7 +18,7 @@ import {
   type OrganisationModelRoute,
 } from "../models/route";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareGmailModelConsentAfterReceipt,
   readGmailInferenceEligibility,

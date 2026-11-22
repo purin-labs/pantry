@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { CommerceCommandAuthorityContext } from "@purin-labs/commerce-contracts/relationship-authority";
 import { pantryCommerceAccess } from "../contract/client";
 import { acceptedExecutionAuthority } from "../../organisation-access/access";
@@ -26,8 +26,8 @@ import {
 } from "@purin-labs/commerce-client";
 import type { CommerceEntityPlaneFetch } from "@purin-labs/commerce-client";
 
-import type { Result } from "../../result";
-import type { OrganisationId } from "../../ids";
+import type { Result } from "@purin-labs/kernel/result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,

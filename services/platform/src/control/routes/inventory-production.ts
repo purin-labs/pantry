@@ -17,7 +17,7 @@ import {
   CommerceEntityPlaneClient,
   type CommerceStockSnapshot,
 } from "@purin-labs/commerce-client";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   commerceListEntryPatchCommand,
   productionRequestCreateCommand,

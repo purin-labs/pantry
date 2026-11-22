@@ -11,8 +11,8 @@ import {
   parseOrganisationId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
-import type { Result } from "../../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   hasExactKeys,
   isNonNegativeInteger,

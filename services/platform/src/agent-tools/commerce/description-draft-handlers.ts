@@ -6,7 +6,7 @@ import type {
   DraftAgentSnapshot,
 } from "../../actors/product-description-draft";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,

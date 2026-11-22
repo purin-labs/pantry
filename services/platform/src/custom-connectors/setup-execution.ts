@@ -3,7 +3,7 @@ import {
   executeCustomConnectorTransport,
   type CustomConnectorFetchNamespace,
 } from "./egress";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { type CustomConnectorOperation, type JsonValue } from "./definition";
 import type {
   CustomConnectorIdentityTestRequest,

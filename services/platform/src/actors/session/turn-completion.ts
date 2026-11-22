@@ -8,7 +8,7 @@ import {
   runTaskBeforeDeadline,
   type DeadlineOutcome,
 } from "@purin-labs/async-control/deadline";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { SessionExecutionAdmission } from "../session-execution-admission";
 import { commitPreparedSessionCheckpoint } from "../actor-journal/transactions";
 import type { CheckpointingStartedSessionCommit } from "../actor-journal";

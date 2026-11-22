@@ -1,18 +1,18 @@
-import type { GlobalDatabase } from "../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import {
   hashOpaqueSecret,
   type VerifiedOidcIdentity,
 } from "../data/control-plane";
-import { parseOrganisationId } from "../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseApprovalProofDigest,
   type ApprovalActionBinding,
 } from "../approval-authentication";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { decodeBase64Url, encodeBase64Url, isRecord } from "@purin-labs/std";
-import { paddedStandardBase64 } from "../lenient-base64";
+import { paddedStandardBase64 } from "@purin-labs/kernel/lenient-base64";
 
 export type GoogleOidcConfig = {
   readonly clientId: string;

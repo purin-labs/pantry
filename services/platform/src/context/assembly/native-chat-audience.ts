@@ -1,8 +1,8 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "../../organisation-access/access";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 import type { FlowLabel } from "../../policy/information-flow";
 import type { NativeChatAudience } from "../../policy/information-flow/native-audience";
 

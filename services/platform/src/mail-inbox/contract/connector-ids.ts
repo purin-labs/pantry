@@ -1,5 +1,5 @@
-import type { Result } from "../../result";
-import { parseConnectorId, type ConnectorId } from "../../ids";
+import type { Result } from "@purin-labs/kernel/result";
+import { parseConnectorId, type ConnectorId } from "@purin-labs/kernel/ids";
 
 /** The Connector id of a Gmail mailbox, by its integration account. */
 export function gmailConnectorIdValue(integrationAccountId: string): string {

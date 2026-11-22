@@ -1,9 +1,9 @@
 import type { DeviceConnection, DeviceView } from "@purin-labs/control-api";
 
 import type { ShopMacDevice } from "../devices/contract/shop-mac-devices";
-import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { voiceMacHostname } from "./dns";
 import { listVoiceMacs, MAC_HEARTBEAT_FRESH_MS, type VoiceMac } from "./store";
 import type { Variant } from "@purin-labs/type-utils";

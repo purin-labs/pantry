@@ -1,6 +1,6 @@
 import type { Variant } from "@purin-labs/type-utils";
-import { definePort } from "../../port";
-import type { Result } from "../../result";
+import { definePort } from "@purin-labs/kernel/port";
+import type { Result } from "@purin-labs/kernel/result";
 import type { AccessGrantTarget, CommerceReadGrantScope } from "./types";
 
 /** A commerce part of a grant target, or the field that it refuses. */

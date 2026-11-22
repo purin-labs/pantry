@@ -11,9 +11,9 @@ import {
   type ActiveActorRegistryEntry,
 } from "./actor-registry";
 import { resolveActiveCaseActor } from "./actor-router";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 type ActiveCaseOperationsView = {
   readonly caseId: string;

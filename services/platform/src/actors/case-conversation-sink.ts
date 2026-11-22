@@ -1,14 +1,14 @@
 import type { AuthorityPartition, RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   decideFlowSink,
   type CaseConversationSinkRefusal,
   type FlowBinding,
 } from "../policy";
 import type { FlowDecision } from "../policy";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { slackSurfaceParts } from "../slack/surface-parts";
 
 export type AllowFlowDecision = Variant<FlowDecision, "allow">;

@@ -9,7 +9,7 @@ import type {
   EventEnvelope,
   SessionTransition,
 } from "@purin-labs/contracts";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { readCanonicalSessionProjection } from "../agent-session-canonical";
 import {
   canonicalFlowLabel,

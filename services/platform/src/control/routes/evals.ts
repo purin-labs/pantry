@@ -1,5 +1,5 @@
 import { authenticatedConversationScope } from "../../organisation-access/access";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   commandEvalAsOperator,
   commandEvalRunAsOperator,
@@ -8,7 +8,10 @@ import {
   readEvalViews,
   type EvalAccessError,
 } from "../../evals/access";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import { assertNever } from "@purin-labs/std";

@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 import type { CustomConnectorAuthentication } from "./egress";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
@@ -15,13 +15,13 @@ import {
   parseOrganisationId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   digestCanonical,
   serializeCanonical,
 } from "../policy/information-flow/digest";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CustomConnectorDefinitionV1,
   CustomConnectorOperation,

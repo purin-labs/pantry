@@ -19,8 +19,8 @@ import {
   sameJson,
 } from "@purin-labs/std";
 import type { StrictUnion } from "@purin-labs/type-utils";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { bakeryRunSnapshotPrefix } from "../../commerce/bakery/saved-runs";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";

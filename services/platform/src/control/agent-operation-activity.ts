@@ -5,10 +5,10 @@ import {
   type ActionLedgerActivity,
 } from "../actors/action-ledger";
 import type { AgentOperationsSnapshot } from "../data/agent-operations";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../actors/actor-stubs";
-import type { OrganisationId } from "../ids";
-import { definePort } from "../port";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import { definePort } from "@purin-labs/kernel/port";
 import type { CommerceExceptionInbox } from "@purin-labs/control-api";
 
 /**

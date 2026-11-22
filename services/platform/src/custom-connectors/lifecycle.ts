@@ -1,13 +1,13 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import { parseVaultHandle } from "../credential-vault/domain";
 import { revokeVaultSecret } from "../credential-vault/service";
 import { prepareCustomConnectorAccountsDisable } from "../data/integration-account-writes";
 import { prepareCustomConnectorConnectionsDisable } from "../data/provider-connection-writes";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CustomConnectorDefinitionDigest,
   CustomConnectorId,

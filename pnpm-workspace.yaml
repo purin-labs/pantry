@@ -4,6 +4,7 @@ packages:
   - services/platform
   - scripts/punter
   - services/commerce
+  - foundation/*
 
 allowBuilds:
   esbuild: true

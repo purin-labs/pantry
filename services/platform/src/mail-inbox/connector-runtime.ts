@@ -1,5 +1,5 @@
 import { typeSafeMonth } from "../integrations/typesafe/usage-store";
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
@@ -17,7 +17,7 @@ import {
   establishConnectorEmailWatch,
 } from "../actors/connector-email-evaluation";
 import type { GmailHistoryMessage } from "../mail/gmail-adapter";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { digestCanonical } from "../policy/information-flow/digest";
 import { authorizeMailSource } from "./contract/mail-source-authorization";
 import { mailInferenceEligible } from "./contract/mail-inference-eligibility";

@@ -3,7 +3,7 @@
 import type { ActionDef } from "@purin-labs/contracts";
 import { assertNever, isRecord, sha256Hex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export const STRIPE_CHARGE_CREATE_TOOL = "pantry-stripe-charge";
 

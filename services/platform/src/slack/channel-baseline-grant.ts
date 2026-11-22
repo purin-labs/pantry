@@ -1,10 +1,10 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   prepareSlackConversationBaselineGrants,
   slackConversationBaselineGrantId,
 } from "../data/capability-policy";
-import { parseIntegrationAccountId } from "../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import type {
   SlackChannelDefault,
   SlackOrganisationRoutingProjection,

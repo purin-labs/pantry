@@ -1,6 +1,6 @@
 import type { readGmailPilotBudget } from "../../data/email-mailbox";
 import type { registerSupplierOperationalEmailContact } from "../../data/email-operational";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * The Inbox records that other areas use: the Gmail pilot budget that the

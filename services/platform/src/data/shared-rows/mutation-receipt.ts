@@ -19,7 +19,7 @@ import type {
   OrganisationQuerySource,
   QuerySource,
 } from "../query-source";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 type MutationReceiptRow = {
   readonly requestHash: unknown;

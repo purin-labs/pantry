@@ -1,14 +1,14 @@
 import { admitNamedConnector } from "./module-admission";
 import type { ConnectorModuleHost } from "./channel-adapter";
 import type { ConnectorEvals } from "./connector-evals";
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   createContinueSerialQueue,
   createKeyedContinueSerialQueue,
 } from "@purin-labs/async-control/serial-queue";
 import { runMailOrganization } from "../../mail-inbox/connector-runtime";
-import { newRequestId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   reconcileFrozenMailReceipt,
   type RelocationMailReceiptRequest,
@@ -44,7 +44,7 @@ import {
   parseCaseId,
   parseIntegrationAccountId,
   parseOrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { readAgentMailboxBinding } from "../../data/email-mailbox";
 import {
   connectionCredentialAuthority,

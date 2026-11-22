@@ -3,7 +3,7 @@ import { TypeSafeDisclosure } from "../src/integrations/typesafe/disclosure";
 import { FlowLabel } from "../src/policy/information-flow/labels";
 import type { TypeSafeInferenceSink } from "../src/policy/information-flow/types";
 import { buildWorkflowAuthority } from "../src/request-authority";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { JevRelationshipRequest } from "../src/case-context-discovery/jev";
 
 it(

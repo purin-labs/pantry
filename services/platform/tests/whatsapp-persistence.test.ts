@@ -15,7 +15,7 @@ import type {
   IntegrationAccountId,
   ProviderConnectionId,
   OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   closeWhatsAppCaseConversationWindow,
   listWhatsAppPhoneNumberAccounts,

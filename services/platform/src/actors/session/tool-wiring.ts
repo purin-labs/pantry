@@ -9,9 +9,9 @@ import type {
   TurnTool,
 } from "../../agent-tools/catalog/tool-registry";
 import type { SessionToolContext } from "../../agent-tools/context";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId, RequestId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { HarnessToolArgumentObserver } from "../embedded-harness";
 import type { SlackThreadSideCase } from "./harness-source";
 import type { SessionConversation } from "./conversation-port";
@@ -23,7 +23,7 @@ import type {
   HarnessPermissionRequestResult,
 } from "../../agent-tools/catalog/permission";
 import type { FlowLabel } from "../../policy/information-flow";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 /** What a person's browser gave with a message. The contracts own the form. */
 export type TurnPageContext = PageBrowserContext;

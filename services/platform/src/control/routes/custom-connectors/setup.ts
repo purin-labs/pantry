@@ -1,5 +1,5 @@
 import { customConnectorFetchOf } from "../../../custom-connectors/egress";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   attachCustomConnectorCandidateCredential,
   authorizeCustomConnectorSetupCommit,
@@ -17,7 +17,7 @@ import {
   type CustomConnectorSetupAttemptId,
   type CustomConnectorSetupTarget,
 } from "../../../custom-connectors";
-import { parseIntegrationAccountId } from "../../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {
   controlError,

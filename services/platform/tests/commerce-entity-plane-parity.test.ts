@@ -48,7 +48,7 @@ import {
   encodeCommerceCursor,
   planCommerceGraphQuery,
 } from "../src/commerce/commerce-wasm";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 
 const ORGANISATION_ID = "organisation_entity_plane_parity";
 const MERCHANT_ID = "merchant_entity_plane_parity";

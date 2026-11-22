@@ -27,7 +27,7 @@ import {
   parseActorRegistryId,
   type ActorActivationIdentity,
 } from "../src/actors/actor-registry";
-import { parseCaseId, parseOrganisationId } from "../src/ids";
+import { parseCaseId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 

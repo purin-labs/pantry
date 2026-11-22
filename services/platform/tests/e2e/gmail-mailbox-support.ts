@@ -26,7 +26,7 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   runMailboxSetup,
   type MailboxSetupTransport,

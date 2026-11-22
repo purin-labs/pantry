@@ -24,7 +24,10 @@ import {
   latestWhatsAppProposal,
 } from "../../src/actors/connector-whatsapp";
 import { resumeActorRelocation } from "../../src/actors/actor-relocation";
-import { parseSessionId, type IntegrationAccountId } from "../../src/ids";
+import {
+  parseSessionId,
+  type IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

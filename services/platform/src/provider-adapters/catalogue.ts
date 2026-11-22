@@ -1,4 +1,4 @@
-import type { OrganisationDatabaseSession } from "../database-handles";
+import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-handles";
 import { airtableCleanupAdapter, airtableOnboardingAdapter } from "./airtable";
 import {
   gmailAuthorizationClientId,
@@ -31,7 +31,7 @@ import {
   type ProviderCleanupBaseInput,
 } from "../provider-workflows/cleanup-context";
 import type { ProviderManifestEvidence } from "../data/provider-attempt";
-import type { IntegrationAccountId } from "../ids";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { VaultHandle } from "../credential-vault";
 import { connectExternalRecordsOAuth } from "../provider-workflows/external-records-connection";
 import { connectGmail } from "../provider-workflows/gmail-connection";
@@ -61,7 +61,7 @@ import type {
   ProviderOAuthAttempt,
   ProviderOnboardingError,
 } from "../integrations/contract/provider-lifecycle";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import {
   type ProviderAuthorizationInput,

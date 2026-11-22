@@ -1,13 +1,13 @@
 import { ensureCaseProject } from "../projects/case-project";
 import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   parseOrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { buildAgentMailboxAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import { resolveActiveCaseActor } from "./actor-router";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";

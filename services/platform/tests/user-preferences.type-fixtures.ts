@@ -11,7 +11,7 @@ import type {
   WorkspaceId,
   PersonId,
   ControlSessionId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 
 declare const organisation: OrganisationId;
 declare const workspace: WorkspaceId;

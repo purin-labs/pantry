@@ -5,7 +5,10 @@ import {
 } from "../src/access-control/integration-discovery";
 import { resolveEmailOperationalCapability } from "../src/actors/email-operational-capability";
 import { encodeCapabilityKey } from "../src/authorization/access-grants/capability-key";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
 
 describe("operational email account resolution", operationalEmailSuite);
 

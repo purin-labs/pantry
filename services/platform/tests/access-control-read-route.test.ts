@@ -71,7 +71,7 @@ import {
   parseOrganisationId,
   type PersonId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   createCurrentSourceFlowLabel,

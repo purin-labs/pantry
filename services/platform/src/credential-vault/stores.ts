@@ -14,7 +14,7 @@ import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
 } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseOnePasswordResponse,
   type OnePasswordErrorCode,

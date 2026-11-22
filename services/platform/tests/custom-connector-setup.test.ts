@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
@@ -39,7 +39,7 @@ import {
   type JsonObject,
   type CustomConnectorOperation,
 } from "../src/custom-connectors";
-import { type OrganisationId } from "../src/ids";
+import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import type { CustomConnectorWriteCatalogEntry } from "../src/custom-connectors/grants";
 import { d1Database } from "./sqlite-d1";

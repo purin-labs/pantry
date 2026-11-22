@@ -4,7 +4,10 @@ import type { UnitTestEnv } from "./worker-fakes";
 import { describe, expect, it, vi } from "vitest";
 
 import { OrganisationDO } from "../src/actors/organisation";
-import { parseOrganisationId, type OrganisationId } from "../src/ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   emptySqliteFixture,
   sqlStorage,

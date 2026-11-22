@@ -2,7 +2,7 @@ import type { MenuBoardCommentThread } from "@purin-labs/control-api";
 import { normalizePlainText } from "@purin-labs/collaboration";
 
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * Comments pinned to a board's elements (Plan 40B phase 5, slice 6). A

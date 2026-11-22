@@ -2,7 +2,7 @@
 
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 import {
   parseCommerceGraphQuery,
@@ -24,7 +24,10 @@ import {
 import { resolveCueAutomation } from "../src/data/agent-operations/automation";
 import { submitAgentConfigurationProposal } from "../src/data/agent-operations/proposals";
 import { createCommerceEntityPlaneCueEvents } from "../src/cues/engine";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

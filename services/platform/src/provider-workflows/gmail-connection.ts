@@ -30,7 +30,7 @@ import {
   verifyExistingAccountIdentity,
   finalizeProviderConnection,
 } from "../integrations/contract/provisioning";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export async function connectGmail(
   input: CompleteProviderInput,

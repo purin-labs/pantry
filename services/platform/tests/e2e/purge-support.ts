@@ -16,7 +16,7 @@ import {
   eraseEntryWhere,
   PURGE_CATALOGUE,
 } from "../../src/data/purge-catalogue";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { runScheduledOnboardingReconciliation } from "../../src/onboarding-reconciliation-runner";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

@@ -12,7 +12,7 @@ import {
 
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { opaqueSubjectReference } from "../../src/access-control/references";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { createGrant, enableCapability } from "./access-route-support";
 import { installMemoryFixture, type Member } from "./memory-support";

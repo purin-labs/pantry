@@ -1,5 +1,5 @@
 import type { applyApprovedWorkflowChange } from "../../commerce/bakery/workflow-proposals";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 export type { WorkflowChangeCommand } from "../../commerce/bakery/workflow-proposals";
 

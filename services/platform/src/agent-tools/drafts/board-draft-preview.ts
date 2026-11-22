@@ -6,8 +6,8 @@ import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-ro
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
-import { traceLog, traceWarn } from "../../observability";
-import { newRequestId } from "../../ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import type { SessionToolContext } from "../context";
 import {
   collaborationEditDeadline,

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { authorizeFaultInjectionBearer } from "../src/fault-injection-auth";
+import { authorizeFaultInjectionBearer } from "@purin-labs/kernel/fault-injection-auth";
 
 const TOKEN = "0123456789abcdef0123456789abcdef";
 

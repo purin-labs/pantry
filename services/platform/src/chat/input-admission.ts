@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import { ObservationEvidence } from "../policy/information-flow";
@@ -9,7 +9,7 @@ import {
   type ContextItem,
   type AuthorizedContextRead,
 } from "../context/assembly";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { PrepareTurnContextError } from "../context/turn-context";
 import { readAdmittedChatInput } from "./turn-access";
 

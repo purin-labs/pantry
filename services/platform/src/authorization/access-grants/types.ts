@@ -1,4 +1,4 @@
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   AccessGrantLifecycle as ContractAccessGrantLifecycle,
   AccessGrantTarget as ContractAccessGrantTarget,

@@ -7,7 +7,7 @@ import {
   parseRunSnapshotSummary,
   type RunSnapshotSummary,
 } from "@purin-labs/bakery-model/bakery-run-snapshot";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 export type SavedBakeryRunQuery = StrictUnion<
   | Readonly<{ kind: "list"; cursor: string | null }>

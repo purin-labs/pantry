@@ -1,5 +1,5 @@
-import { runtimeFetch } from "../runtime-fetch";
-import type { Env } from "../env";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Env } from "@purin-labs/kernel/env";
 import { createEmailChangeQueueMessage } from "../mail/queue-messages";
 import {
   parseGmailPushEnvelope,
@@ -11,11 +11,11 @@ import {
   newRequestId,
   parseIntegrationAccountId,
   parseOrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   traceLog,
   traceWarn,
-} from "../observability";
+} from "@purin-labs/kernel/observability";
 
 /**
  * Gmail Pub/Sub push boundary. The push token is verified against Google's

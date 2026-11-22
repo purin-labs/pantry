@@ -3,7 +3,7 @@ import type {
   ActorRelocationId,
   RelocationPreflightInventory,
 } from "../src/actors/actor-relocation";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 declare const relocationId: ActorRelocationId;
 declare const organisationId: OrganisationId;

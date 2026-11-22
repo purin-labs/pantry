@@ -1,4 +1,4 @@
-import { organisationDatabase as organisationHandle } from "../../src/database-handles";
+import { organisationDatabase as organisationHandle } from "@purin-labs/kernel/database-handles";
 import {
   parseModelApiKey,
   storeOrganisationModelCredential,
@@ -82,7 +82,7 @@ import {
   requireActiveOrganisationActorAtPlacement,
 } from "../../src/actors/actor-router";
 import { actorStub } from "../../src/actors/actor-stubs";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   listPlacementActorRegistryEntries,
   beginActorExport,
@@ -95,7 +95,7 @@ import {
   countRegionalOrganisationRows,
 } from "../../src/data/organisation-regional-copy";
 import type { ActorImportRequest } from "../../src/actors/actor-export";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 it(
   "onboards isolated regional organisations and recovers their Actors after eviction",

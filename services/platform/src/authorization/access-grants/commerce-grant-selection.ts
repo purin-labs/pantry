@@ -1,8 +1,8 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { ProjectReference } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
-import { definePort } from "../../port";
-import type { Result } from "../../result";
+import { definePort } from "@purin-labs/kernel/port";
+import type { Result } from "@purin-labs/kernel/result";
 import type { RequestableEntityTypeRead } from "../requestable-capabilities";
 import type { AccessGrant } from "./types";
 

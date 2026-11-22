@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { describe, expect, it } from "vitest";
 
@@ -21,7 +21,7 @@ import {
   type SlackOrganisationConnectionId,
   type OrganisationId,
   type WorkspaceId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseSlackUserId } from "../src/slack/events";
 import { parseInitialOrganisationPlacement } from "../src/placement";

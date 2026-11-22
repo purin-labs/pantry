@@ -52,7 +52,7 @@ export default {
   },
 } satisfies ExportedHandler;
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     /**
      * The sandbox Worker that runs the VM of a Pi Code Mode script. Absent in a

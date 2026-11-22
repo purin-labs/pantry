@@ -4,7 +4,7 @@ import {
   parseOrganisationId,
   type ActivationReceiptId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   parseCommerceSystemRevision,
   type CommerceSystemRevision,

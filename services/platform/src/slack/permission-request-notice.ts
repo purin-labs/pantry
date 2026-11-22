@@ -4,7 +4,7 @@ import {
   type RequestableCapability,
   type RequestableEntityTypeRead,
 } from "../authorization/requestable-capabilities";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { decisionCardBlocks } from "./decision-card";
 
 /**

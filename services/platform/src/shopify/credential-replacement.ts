@@ -4,7 +4,7 @@ import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
 } from "../integrations/contract/credential-lifecycle";
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { discoverShopifyIdentity } from "./provider-adapter";
 
 export async function validateShopifyReplacementCredential(

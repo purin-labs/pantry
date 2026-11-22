@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { missingChatPermissionItems } from "../permission-items";
 import type { AgentPermissionRequest } from "../../data/agent-permission-request";
 import {

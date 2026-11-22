@@ -1,6 +1,6 @@
 import type { DropboxListEntry } from "../../provider-adapters/dropbox";
 import { listDropboxFolder } from "../../provider-adapters/dropbox";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { FileProviderAccess } from "../../provider-workflows/file-context-credential";
 import type { FileResourceDiscoveryEntry } from "@purin-labs/control-api";
 

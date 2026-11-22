@@ -2,8 +2,8 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import { isProjectId, isUserId } from "@purin-labs/control-api";
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { listAccessGrants } from "../data/access-grants";
-import type { Env } from "../env";
-import { parseOrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { memoryService } from "../memory/contract/memory-service";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
@@ -13,7 +13,7 @@ import {
 import { digestCanonical } from "../policy/information-flow/digest";
 import { authorizeProject } from "../projects/access";
 import { validateLiveRequestAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { EmailChatContext, EmailChatSource } from "./reply-sources";
 import type { Variant } from "@purin-labs/type-utils";
 

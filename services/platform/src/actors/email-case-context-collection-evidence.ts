@@ -1,16 +1,16 @@
-import type { OrganisationDatabase } from "../database-handles";
-import { runtimeFetch } from "../runtime-fetch";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
   parseCaseId,
   parseIntegrationAccountId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { readEmailReplyRecipient } from "../mail-inbox/verified-sender";
 import type { FlowRecipient } from "../policy/information-flow/types";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,

@@ -18,8 +18,8 @@ import {
   type EffectiveGrantCompileError,
 } from "../../authorization/access-grants/compiler";
 import type { AccessGrant } from "../../authorization/access-grants/types";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type CompileCommerceReadAuthoritiesInput = Readonly<{
   readonly organisationId: OrganisationId;

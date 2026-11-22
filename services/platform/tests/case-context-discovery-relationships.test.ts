@@ -12,7 +12,7 @@ import {
   type CaseContextCollectionScope,
   type CaseContextCollectionSelection,
 } from "../src/case-context-discovery/relationships";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const NOW = 1_789_000_000_000;

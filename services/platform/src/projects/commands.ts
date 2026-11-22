@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   isProjectId,
   type Project,
@@ -14,8 +14,8 @@ import {
   isPositiveInteger,
   sha256Hex,
 } from "@purin-labs/std";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {

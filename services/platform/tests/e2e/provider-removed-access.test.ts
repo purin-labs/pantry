@@ -22,7 +22,7 @@ import {
   requireConnectionCredentialAuthority,
   upsertProviderWebhook,
 } from "../../src/data/integration-account";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";
 import { requireVaultHandle } from "../test-ids";

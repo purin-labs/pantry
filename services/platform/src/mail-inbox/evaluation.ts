@@ -8,8 +8,11 @@ import {
   type MailRule,
 } from "@purin-labs/control-api";
 import { resolveConnectorGmailAccess } from "../actors/connector-email-evaluation";
-import type { Env } from "../env";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import {
   reserveTypeSafeEvaluation,
@@ -22,7 +25,7 @@ import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import { JevMailRequest } from "./jev";
 import { mailClassificationEvidence } from "./evidence";
 import type { SchemaTransaction } from "../actors/schema-migrations";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 
 export type MailEvaluationInput = Readonly<{

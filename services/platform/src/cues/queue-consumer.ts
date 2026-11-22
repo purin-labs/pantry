@@ -13,8 +13,8 @@ import {
   type IgnoredCueAggregate,
   type IgnoredCueKv,
 } from "./ignore-aggregate";
-import { newRequestId } from "../ids";
-import { traceLog, traceWarn } from "../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 
 type CueMatchedDeliveryOutcome =
   { kind: "complete" } | { kind: "retry"; retryAt: number };

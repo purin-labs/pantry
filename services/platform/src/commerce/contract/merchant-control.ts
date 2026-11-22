@@ -4,8 +4,8 @@ import {
   resolveOrganisationCommerceMerchantBinding,
   type CommerceMerchantBinding,
 } from "../../data/commerce-merchant-binding";
-import type { Env } from "../../env";
-import type { IntegrationAccountId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

@@ -38,7 +38,7 @@ import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
 } from "../actors/commerce-projection";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever, isRecord } from "@purin-labs/std";
 

@@ -1,5 +1,5 @@
-import type { ChannelId, WorkspaceId } from "../ids";
-import type { Result } from "../result";
+import type { ChannelId, WorkspaceId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { isAmbiguousSlackOutcome, slackRetryAt } from "./messages";
 import { errorMessage, isRecord } from "@purin-labs/std";
 

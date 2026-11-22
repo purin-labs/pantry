@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Variant } from "@purin-labs/type-utils";
 import { sha256Hex } from "@purin-labs/std";
 import type { AgentSkillRef } from "@purin-labs/control-api";

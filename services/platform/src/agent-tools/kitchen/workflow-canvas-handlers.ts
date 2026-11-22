@@ -10,9 +10,9 @@ import {
   sessionTurnExecution,
 } from "../../chat/turn-access";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import { newRequestId } from "../../ids";
-import { traceWarn } from "../../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,

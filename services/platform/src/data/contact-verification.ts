@@ -1,11 +1,11 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { digestCanonical } from "../policy/information-flow/digest";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseOperationalEmailTarget,
   resolveOperationalEmailContact,

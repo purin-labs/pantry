@@ -31,7 +31,7 @@ import {
   revokeAccessGrant,
 } from "../../services/platform/src/data/access-grants.ts";
 import { parseOrganisationPolicySnapshot } from "../../services/platform/src/policy-snapshot.ts";
-import { parseOrganisationId } from "../../services/platform/src/ids.ts";
+import { parseOrganisationId } from "../../foundation/kernel/ids.ts";
 import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import {

@@ -23,7 +23,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 
 it("derives exact entity-plane selectors and rejects a nonmatching responsibility scope", () => {
   const organisationId = parseOrganisationId("organisation_entity_plane_cue");

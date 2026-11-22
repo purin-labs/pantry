@@ -2,9 +2,9 @@ import type {
   CaseContextCollectionRelationshipDecision,
   CaseContextCollectionReviewCommand,
 } from "@purin-labs/control-api";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { SchemaTransaction } from "../actors/schema-migrations";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CaseContextCollectionRelationshipOutcome } from "./jev";
 import { identifier, integerIn } from "./policy";
 import { assertNever, isRecord, parseJsonOrNull } from "@purin-labs/std";

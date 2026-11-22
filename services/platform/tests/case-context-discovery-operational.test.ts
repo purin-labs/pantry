@@ -18,7 +18,7 @@ import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionSelection,
 } from "../src/case-context-discovery/relationships";
-import { parseOrganisationId, parseIntegrationAccountId } from "../src/ids";
+import { parseOrganisationId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { createTypeSafeConnectionSchema } from "../src/integrations/typesafe/connection";
 import type { SchemaTransaction } from "../src/actors/schema-migrations";

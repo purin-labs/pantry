@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   AccessGrant,
   AccessGrantTarget,
@@ -6,10 +6,13 @@ import type {
 } from "../authorization/access-grants/types";
 import { readAccessGrant } from "../data/access-grants";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { parseIntegrationAccountId } from "../ids";
-import type { Result } from "../result";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { fileGrantParts } from "../authorization/access-grants/file-grant-parts";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {

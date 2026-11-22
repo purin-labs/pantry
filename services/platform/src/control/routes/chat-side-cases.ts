@@ -28,7 +28,7 @@ import type { ChatTimelineEvent } from "../../chat/timeline";
 import { signalChat } from "../../chat/signals";
 import { readConversation, type ConversationScope } from "../../chat/store";
 import { readActiveOrganisationMembershipRevision } from "../../data/control-plane";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../../request-authority";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readJsonRecord } from "../http";

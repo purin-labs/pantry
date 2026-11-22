@@ -23,10 +23,14 @@ import {
   turnMayScheduleFollowUp,
 } from "./turn-tool-offers";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import { parseSessionId, type RequestId, type OrganisationId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import {
+  parseSessionId,
+  type RequestId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { verifyWorkspaceRevisionReceipt } from "../../workspace-revision-store";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

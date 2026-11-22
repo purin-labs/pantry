@@ -14,7 +14,7 @@ import {
   createActorActivationSchema,
   inspectActorActivation,
 } from "../src/actors/actor-activation";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import { emptySqliteFixture } from "./sqlite-storage";
 

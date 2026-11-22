@@ -2,8 +2,11 @@ import { DurableObject } from "cloudflare:workers";
 import type { CobotRunSignal } from "@purin-labs/control-api";
 import type { BakeRunRecord } from "@purin-labs/kitchen-control-api";
 
-import type { Env } from "../env";
-import { parseOrganisationId, type OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { BakeRunAction } from "../kitchen/bakes/commands";
 import {
   pauseBakeRun,
@@ -24,7 +27,7 @@ import {
   runBakeRunSchemaMigrations,
 } from "../kitchen/bakes/run-store";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActorAtScope } from "./actor-router";
 import { bakeRunDevicePorts, bakeRunNotices } from "./bake-run-ports";
 
@@ -175,7 +178,7 @@ export class BakeRunActor extends DurableObject<Env> {
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     BAKE_RUN?: DurableObjectNamespace<BakeRunActor>;
   }

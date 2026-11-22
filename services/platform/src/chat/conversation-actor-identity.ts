@@ -1,7 +1,7 @@
 import type { ConversationId } from "@purin-labs/control-api";
 import { isNonEmptyString } from "@purin-labs/std";
-import { deriveStableCaseId } from "../case-identity";
-import type { CaseId } from "../ids";
+import { deriveStableCaseId } from "@purin-labs/kernel/case-identity";
+import type { CaseId } from "@purin-labs/kernel/ids";
 import type { ConversationScope } from "./store";
 
 // Persist this address once so representation changes preserve durable history.

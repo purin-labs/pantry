@@ -1,13 +1,13 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   parsePersonId as parseCanonicalPersonId,
   type PersonId,
   type RequestId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
-export type { PersonId } from "../ids";
+export type { PersonId } from "@purin-labs/kernel/ids";
 
 type ApprovalRole = "approve";
 type PersonRoleOperation = "grant" | "revoke";

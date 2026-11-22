@@ -1,12 +1,12 @@
 import { authorizeMailAssistant } from "../../mail-inbox/assistant-eligibility";
 import { parseMailAssistantCommand } from "@purin-labs/control-api";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
   parseIntegrationAccountId,
   type OrganisationId,
   type IntegrationAccountId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 import {

@@ -23,7 +23,7 @@ import { ensureCreatedOrganisationActor } from "../../src/control/organisation-r
 import { parseActorFenceToken } from "../../src/actors/actor-registry";
 import type { IssuedControlSession } from "../../src/data/control-plane";
 import { newActorExportId } from "../../src/actors/actor-export";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import {
   requireOrganisationBootstrap,

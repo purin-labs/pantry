@@ -2,9 +2,9 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { isNonNegativeInteger, sha256Hex } from "@purin-labs/std";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 
 /**

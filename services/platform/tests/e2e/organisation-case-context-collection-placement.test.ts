@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationStatement,
-} from "../../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import { env } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import {
@@ -50,7 +50,7 @@ import {
   storeVaultSecret,
   revokeVaultSecret,
 } from "../../src/credential-vault";
-import { parseCaseId, type IntegrationAccountId } from "../../src/ids";
+import { parseCaseId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";

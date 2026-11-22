@@ -1,6 +1,6 @@
 import type { ActionLedgerEntry } from "../../actors/action-ledger";
-import type { Env } from "../../env";
-import { definePort } from "../../port";
+import type { Env } from "@purin-labs/kernel/env";
+import { definePort } from "@purin-labs/kernel/port";
 import type {
   CommerceActionPath,
   CommerceActionRequest,

@@ -1,6 +1,6 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
@@ -21,7 +21,7 @@ import {
   type DiscoveredProviderResource,
 } from "../src/data/provider-resource";
 import { parseVaultHandle } from "../src/credential-vault";
-import type { IntegrationAccountId, OrganisationId } from "../src/ids";
+import type { IntegrationAccountId, OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { createMigratedDatabase } from "./sqlite-d1";

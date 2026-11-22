@@ -18,7 +18,7 @@ import {
   createCueDeliverySchema,
 } from "../src/actors/cue-delivery";
 import { normalizeCommerceEngineDelivery } from "../src/commerce/provider";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { sqlStorage, emptySqliteFixture } from "./sqlite-storage";
 
 const ORGANISATION_ID = parseOrganisationId(

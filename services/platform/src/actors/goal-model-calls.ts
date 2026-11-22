@@ -1,6 +1,6 @@
 import type { CaseGoalOperationOutcome } from "@purin-labs/contracts";
 import type { StrictUnion } from "@purin-labs/type-utils";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 
 export type GoalModelCallTicket = {

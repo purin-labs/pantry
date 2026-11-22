@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   isConversationId,
   type ChatGoalSupport,
@@ -16,9 +16,9 @@ import { selectStoredConversationModel } from "../../chat/turn/model";
 import type { Conversation } from "../../chat/conversation";
 import { readConversation, type ConversationScope } from "../../chat/store";
 import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../../models/route";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
 

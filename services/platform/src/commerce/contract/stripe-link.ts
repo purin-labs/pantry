@@ -3,8 +3,8 @@
 // Pantry only names the account: at connection and in each provider check it
 // links the organisation's connected Stripe account to the merchant under
 // the primary online binding, which checkout profiles name.
-import { newRequestId, type OrganisationId } from "../../ids";
-import { traceWarn } from "../../observability";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { CommerceMerchant } from "./square-link";
 
 /** The online payment binding that the shop's checkout profiles name. */

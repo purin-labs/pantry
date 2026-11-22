@@ -1,5 +1,5 @@
-import { paddedStandardBase64 } from "../lenient-base64";
-import type { Result } from "../result";
+import { paddedStandardBase64 } from "@purin-labs/kernel/lenient-base64";
+import type { Result } from "@purin-labs/kernel/result";
 import { decodeBase64, isRecord, parseJsonOrNull } from "@purin-labs/std";
 
 /**

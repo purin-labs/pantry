@@ -1,8 +1,8 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationQuerySource } from "../../data/query-source";
 import type { ModelRoute } from "@purin-labs/contracts";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isNonBlankString, isNonNegativeInteger } from "@purin-labs/std";
 import {
   findGmailModelReview,

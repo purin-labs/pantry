@@ -6,9 +6,9 @@ import {
   parseOrganisationId,
   type OrganisationId,
   type RequestId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SessionActorRoute } from "./actor-router";
 import type { CountRow } from "./sql-rows";
 import {

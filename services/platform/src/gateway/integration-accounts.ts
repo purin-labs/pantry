@@ -1,14 +1,14 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { readOrganisationIdField } from "../boundary";
 import { listIntegrationAccounts } from "../data/integration-account";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
   notFound,
   readJsonObject,
-} from "../http";
+} from "@purin-labs/kernel/http";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,

@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import {
   fetchConnectorMail,
@@ -34,9 +34,12 @@ import {
 } from "../mail/operational-message";
 import type { GmailApiError } from "../mail/gmail-adapter";
 import { resolveGmailAccessToken } from "../mail/gmail-oauth";
-import type { Env } from "../env";
-import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseIntegrationAccountId,
+  type IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   createEmailContentCipher,
   type EmailContentCipher,

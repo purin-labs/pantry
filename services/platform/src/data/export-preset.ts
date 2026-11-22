@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 import type {
@@ -32,8 +32,8 @@ import {
   type ControlMutationReceiptScope,
 } from "./control-mutation";
 import type { OrganisationEnvironment } from "./control-plane";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import {
   prepareCapabilityPolicyWrite,

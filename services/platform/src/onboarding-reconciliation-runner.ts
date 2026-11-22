@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "./database-handles";
-import { runtimeFetch } from "./runtime-fetch";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { reconcileHeldOutputRequests } from "./slack/held-output-release";
 import { reconcileHeldPermissionDecisions } from "./slack/permission-request-release";
 import {
@@ -19,8 +19,8 @@ import { reconcileProviderAccountCleanup } from "./provider-lifecycle/cleanup-re
 import { archiveOrganisation } from "./data/organisation-lifecycle";
 import { publishOrganisationDirectoryRow } from "./data/shared-rows/organisation-row";
 import { publishStoppedInitialPlacement } from "./data/shared-rows/placement-row";
-import type { Env } from "./env";
-import { parseOrganisationId, type OrganisationId } from "./ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "./actors/actor-router";
 import { reconcileProviderManifestObservations } from "./provider-lifecycle/observation";

@@ -1,6 +1,6 @@
 import type { UserId } from "@purin-labs/control-api";
 import type { GlobalQuerySource } from "../../data/query-source";
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import type { ApprovalActionBinding } from "../../approval-authentication";
 import {
   digestApprovalAction,
@@ -23,8 +23,8 @@ import {
   validateControlCsrf,
   type ActiveControlSession,
 } from "../../data/control-plane";
-import type { Env } from "../../env";
-import { requirePublicOrigin } from "../../public-origin";
+import type { Env } from "@purin-labs/kernel/env";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 import {
   APPROVAL_GRANT_COOKIE,
   CSRF_COOKIE,

@@ -1,7 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "../organisation-access/access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
 import {
@@ -28,7 +28,7 @@ import {
   type ProjectSnapshot,
   type ProjectReferenceObservation,
 } from "@purin-labs/control-api";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ProjectAccessScope } from "./access";
 import { NATIVE_CHAT_SOURCE_ACCESS } from "../chat/conversation-access";
 import { readProject } from "./records";

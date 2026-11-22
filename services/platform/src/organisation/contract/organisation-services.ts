@@ -5,7 +5,7 @@ import type {
   previewCode,
   readOperatorDraft,
 } from "../../data/operator-configuration-draft";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * The Organisation records that other areas use: the removal of an

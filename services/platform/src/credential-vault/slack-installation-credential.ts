@@ -12,7 +12,10 @@
  * - A connect to a workspace whose owner has no active connection there makes
  *   the connecting Organisation the owner (`slackInstallationOwnerIsLive`).
  */
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -22,7 +25,7 @@ import {
   parseSlackInstallationId,
   type OrganisationId,
   type SlackInstallationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { organisationLifecycleParts } from "../data/organisation-lifecycle-port";
 import { parseVaultHandle } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";

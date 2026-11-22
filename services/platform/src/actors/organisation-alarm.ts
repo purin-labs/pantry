@@ -2,7 +2,7 @@ import { nextAbandonedCueClaimAt } from "./cue-delivery";
 import { readSocketSweepDueAt } from "./hibernatable-sockets";
 import type { AlarmReconciler } from "./lifecycle/actor-alarm";
 import { nextJevUsageAt } from "../jev-features/usage-records";
-import { parseOrganisationId } from "../ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 
 /** How often the Organisation retries stored work that waits. */
 const ORGANISATION_RETRY_MS = 30_000;

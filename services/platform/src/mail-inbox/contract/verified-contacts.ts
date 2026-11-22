@@ -1,5 +1,5 @@
 import type { listVerifiedContactEndpoints } from "../../data/contact-verification";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * The verified contacts of a mailbox, as a service interface of the Inbox

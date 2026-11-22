@@ -1,5 +1,5 @@
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { parseGmailAuthorizationProduct } from "../../../mail/gmail-authorization";
 import { hashPortalSubject } from "../../../data/control-mutation";
 import {
@@ -21,7 +21,7 @@ import {
   parseProviderConnectionAttemptId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   beginProviderOAuth,
   providerAuthorizationUrlForMutation,

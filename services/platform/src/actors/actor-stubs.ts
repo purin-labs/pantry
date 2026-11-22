@@ -1,4 +1,4 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationPlacement } from "../placement";
 import type { PlacedActor } from "./lifecycle/placed-actor";
 

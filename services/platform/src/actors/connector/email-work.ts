@@ -1,12 +1,12 @@
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchConnectorMail } from "../../mail-inbox/execution";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   type CaseId,
   type IntegrationAccountId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { recordEmailMessageReceipt } from "../../data/email-mailbox";
 import { projectEmailOperationalProposal } from "../../data/email-operational";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
@@ -33,7 +33,7 @@ import {
   rejectOperationalEmailProposal,
   type OperationalEmailProposalRecord,
 } from "../connector-email-operational";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import { invalid } from "./support";
 import type { ConnectorResult } from "./types";

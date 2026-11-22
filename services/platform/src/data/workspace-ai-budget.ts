@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   prepareControlMutationReceiptAfterWrite,
   prepareOnboardingAuditEventAfterWrite,
@@ -8,9 +8,9 @@ import {
 import type { OrganisationEnvironment } from "./control-plane";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { SessionBudget } from "@purin-labs/contracts";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type WorkspaceAiBudgetLimits = Pick<
   SessionBudget,

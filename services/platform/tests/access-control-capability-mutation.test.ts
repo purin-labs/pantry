@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import type { ControlMutationIdentity } from "../src/data/control-mutation";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
@@ -16,7 +16,10 @@ import {
   CAPABILITY_KEYS,
 } from "../src/authorization/capability-catalogue";
 import { prepareReadAndProposeCapabilityPolicies } from "../src/data/capability-policy";
-import { parseOrganisationId, type OrganisationId } from "../src/ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { prepareInitialOrganisationPlacementInsert } from "../src/data/shared-rows/placement-row";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";

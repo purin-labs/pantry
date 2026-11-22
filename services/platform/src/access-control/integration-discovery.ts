@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationAccess,
   OrganisationUserAuthority,
@@ -33,7 +33,11 @@ import {
   type CommerceSystem,
 } from "../data/organisation-commerce-system";
 import { resolveCommerceMerchantBindingById } from "../data/commerce-merchant-binding";
-import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
+import type {
+  CaseId,
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   createCurrentSourceFlowLabel,
   decideContextAdmission,
@@ -46,7 +50,7 @@ import {
   PROVIDER_DATA_CLASSES,
   type ActiveIntegrationProvider,
 } from "../data/integration-provider-directory";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   assertNever,
   exhaustiveList,

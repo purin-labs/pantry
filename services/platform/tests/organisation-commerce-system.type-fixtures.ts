@@ -8,7 +8,10 @@ import {
   parseCommerceBindingId,
   parseCommerceEngineMerchantId,
 } from "../src/data/commerce-merchant-binding";
-import { parseIntegrationAccountId, parseOrganisationId } from "../src/ids";
+import {
+  parseIntegrationAccountId,
+  parseOrganisationId,
+} from "@purin-labs/kernel/ids";
 
 const organisationId = requireParsed(
   parseOrganisationId("organisation_commerce_type_fixture"),

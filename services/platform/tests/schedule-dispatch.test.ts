@@ -6,7 +6,7 @@ const TEST_ORGANISATION_PLACEMENT_PROFILE = JSON.stringify({
 });
 /// <reference types="@cloudflare/workers-types" />
 
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
 import {

@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 
 import { parsePersonId, type PersonId } from "../data/person-authz";
-import type { JsonObject } from "../http";
+import type { JsonObject } from "@purin-labs/kernel/http";
 import {
   parseAssignmentId,
   parseCaseId,
@@ -24,7 +24,7 @@ import {
   type OrganisationId,
   type RequestId,
   type SessionId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,
@@ -38,9 +38,9 @@ import {
   readRequiredObject,
   readRequiredString,
   type IngressQueueMessageError,
-} from "../queue-fields";
+} from "@purin-labs/kernel/queue-fields";
 import { parseStoredRequestAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseSlackEventId,
   parseSlackMessageTrigger,

@@ -1,5 +1,5 @@
 import { workspacePortalUrl } from "./portal-links";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 /**
  * One Slack card for one device incident (Plan 85). A reconnect updates the

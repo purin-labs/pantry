@@ -1,5 +1,5 @@
-import { newRequestId } from "../../ids";
-import { traceWarn } from "../../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { MachineCensus } from "../lifecycle/machine-census";
 import { ASSIGNMENT_ABANDON_AFTER_MS } from "./assignment.machine";
 import { activeAssignmentTimes } from "./lifecycle";

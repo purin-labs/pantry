@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   CapabilityMode,
   CapabilityPolicyModes,
@@ -12,8 +12,12 @@ import {
   capabilityDefinitionById,
   type ActiveCapabilityId,
 } from "../authorization/capability-catalogue";
-import type { ChannelId, IntegrationAccountId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  ChannelId,
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { InitialOrganisationPlacement } from "../placement";
 import type { StrictUnion } from "@purin-labs/type-utils";

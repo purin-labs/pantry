@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "../organisation-access/access";
 import { decideCurrentAuthorityFlowSink } from "../chat/information-flow";
 import type { RequestAuthority } from "@purin-labs/contracts";
@@ -26,7 +26,7 @@ import {
   type FlowBinding,
   type FlowLabel,
 } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   customConnectorValueMatchesSchema,
   type CustomConnectorOperation,
@@ -42,7 +42,7 @@ import {
 import { CUSTOM_CONNECTOR_LIMITS } from "./limits";
 import { basicApiKeyFromVault } from "./basic-authentication";
 import { projectReviewedResponse } from "./response-projection";
-import { paddedStandardBase64 } from "../lenient-base64";
+import { paddedStandardBase64 } from "@purin-labs/kernel/lenient-base64";
 import {
   decodeBase64,
   encodeBase64Url,

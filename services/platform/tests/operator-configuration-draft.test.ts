@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { describe, expect, it } from "vitest";
 
 import { readAgentOperations } from "../src/data/agent-operations";
@@ -610,5 +610,5 @@ function fixtureEnv(db: SingleDatabase) {
       placementCellId: "test",
       locationHint: "wnam",
     }),
-  } as unknown as import("../src/env").Env;
+  } as unknown as import("@purin-labs/kernel/env").Env;
 }

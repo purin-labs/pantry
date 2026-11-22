@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import { sessionActionMutationExecution } from "./action-mutation-execution";
 import {
@@ -16,9 +16,9 @@ import {
 } from "@purin-labs/std";
 import type { CommerceOrderV1 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "./actor-stubs";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   newRequestId,
   parseCaseId,
@@ -26,7 +26,7 @@ import {
   parseSessionId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import type { CanonicalActionDraft } from "./action-ledger";
 import {
   requireActiveOrganisationActor,
@@ -89,7 +89,7 @@ import {
   type StockProposalRequest,
 } from "../kitchen/contract/stock-action-plan";
 import { stockOperationResourceId } from "../kitchen/contract/stock-action";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { resolveCommerceCancellationAuthority } from "../commerce/provider";
 import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
 import { authorizeCapabilityUse } from "../authorization/access-grants/turn-authority";

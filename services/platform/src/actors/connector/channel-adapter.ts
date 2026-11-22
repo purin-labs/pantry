@@ -3,9 +3,9 @@ import type {
   ConnectorDeliveryReceipt,
   ConnectorIdentity,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "../actor-stubs";
-import type { SessionId } from "../../ids";
+import type { SessionId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { AlarmReconciler } from "../lifecycle/actor-alarm";
 import type { SessionActorRoute } from "../actor-router";

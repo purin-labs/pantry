@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 import type {
   EffectiveCapability,
@@ -9,9 +9,9 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../policy/information-flow/digest";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CustomConnectorAuthentication,
   CustomConnectorDefinitionLimits,

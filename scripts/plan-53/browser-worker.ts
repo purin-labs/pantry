@@ -6,7 +6,7 @@ import {
   issueControlSession,
   upsertUser,
 } from "../../services/platform/src/data/control-plane";
-import type { Env } from "../../services/platform/src/env";
+import type { Env } from "../../foundation/kernel/env";
 
 // This entry point is used only by the isolated local acceptance Worker.
 export default {

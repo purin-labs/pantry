@@ -1,4 +1,4 @@
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { postSystemOne, type JevError } from "./system-one-client";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
 

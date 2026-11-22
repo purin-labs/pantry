@@ -1,5 +1,5 @@
-import type { GlobalDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 // Slack installation records that the integration routes write and read.
 
 type Database = Pick<D1Database, "prepare">;

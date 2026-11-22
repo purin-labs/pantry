@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import type { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
@@ -15,7 +15,7 @@ import {
   ensureOrganisationDefaultWorkspace,
   readOrganisationDefaultWorkspacePortalAddress,
 } from "../src/data/organisation-workspace";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   commitWorkspaceRevision,
   prepareWorkspaceRevisionMutation,

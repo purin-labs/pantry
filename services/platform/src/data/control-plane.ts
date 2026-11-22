@@ -5,7 +5,7 @@ import {
   prepareInitialPlacementActivation,
 } from "./shared-rows/placement-row";
 import { prepareBootstrapReceiptPublication } from "./shared-rows/mutation-receipt";
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type { GlobalDatabase, OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ControlMembershipAvailability } from "@purin-labs/control-api";
 import type {
   OrganisationAccess,
@@ -37,7 +37,7 @@ import {
   type OrganisationId,
   type WorkspaceHandle,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   newUserId,
   parseUserId,
@@ -47,7 +47,7 @@ import {
   parseInitialOrganisationPlacement,
   type InitialOrganisationPlacement,
 } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   readControlMutationReplay,
   prepareControlMutationReceipt,

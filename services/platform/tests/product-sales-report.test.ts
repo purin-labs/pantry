@@ -10,7 +10,7 @@ import {
   productSalesGrantProbe,
   readBoundProductSales,
 } from "../src/commerce/entity-plane/product-sales-report";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { fixtureRequestAuthority } from "./fixtures/plan25-turn";
 
 const NOW = "2026-09-08T00:00:00.000Z";

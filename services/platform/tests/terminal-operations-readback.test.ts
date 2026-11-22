@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
@@ -12,7 +12,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { activateTerminalAssignment } from "../src/data/terminal-assignment-store";
 import { readTerminalOperations } from "../src/data/terminal-operations-readback";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_1" as OrganisationId;
 const OTHER_ORGANISATION = "organisation_2" as OrganisationId;

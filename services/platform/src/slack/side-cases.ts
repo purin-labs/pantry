@@ -11,8 +11,8 @@
  * binding as an observation, so every restriction of the proposing turn stays
  * with the new thread.
  */
-import type { OrganisationDatabase } from "../database-handles";
-import type { Env } from "../env";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   isSideCaseProposalId,
   isUserId,

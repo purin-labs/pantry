@@ -21,7 +21,7 @@ import {
   parseOrganisationId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 
 type Plan25AuthorityFixture = {

@@ -1,6 +1,6 @@
 import type { ConversationId } from "@purin-labs/control-api";
 import { canonicalJson, sha256Hex } from "@purin-labs/std";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { authorizeConversation } from "./conversation-access";

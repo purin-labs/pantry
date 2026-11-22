@@ -7,15 +7,15 @@ import {
   type ActorExportError,
   type ActorExportRef,
 } from "./actor-export";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseConnectorId,
   parseSessionId,
   parseOrganisationId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   readRetainedActorRelocationExports,
   type ActorRelocationError,

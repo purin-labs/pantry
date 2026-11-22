@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationStatement,
-} from "../../src/database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   shareConversation,
   type ConversationSharingCommand,

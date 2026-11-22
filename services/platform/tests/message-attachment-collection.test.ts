@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 /// <reference types="@cloudflare/workers-types" />
@@ -18,7 +18,7 @@ import {
   parseSessionId,
   parseOrganisationId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   ATTACHMENT_COLLECTION_GRACE_MS,
   ATTACHMENT_COLLECTION_INTERVAL_MS,

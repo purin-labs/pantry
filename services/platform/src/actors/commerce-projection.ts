@@ -6,8 +6,11 @@ import type {
   CommerceSource,
 } from "@purin-labs/commerce-contracts";
 import type { CommerceCueEvent } from "../cues/engine";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceLabRunEvidence } from "../commerce-lab/lab-metadata";
 import {
   assertRequiredColumns,

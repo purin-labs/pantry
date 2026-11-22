@@ -24,8 +24,11 @@ import { controlError, controlJson } from "../http";
 import { readOrganisationEnvironment } from "../organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "../../data/commerce-merchant-binding";
 import { readCafeImageContent } from "../../cafe/contract/media";
-import type { Env } from "../../env";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { createCommerceClient } from "../../commerce/contract/client";
 import {

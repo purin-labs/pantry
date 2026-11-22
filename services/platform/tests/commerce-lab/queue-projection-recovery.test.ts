@@ -43,7 +43,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   parseOrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { platformEnv } from "../worker-fakes";
 
 const ORGANISATION_ID = requiredOrganisationId();

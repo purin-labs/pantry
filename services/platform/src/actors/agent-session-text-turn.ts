@@ -9,7 +9,7 @@ import type {
 } from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CheckpointCommittedSessionCommit,
   CheckpointingStartedSessionCommit,

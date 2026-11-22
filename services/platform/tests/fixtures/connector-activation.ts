@@ -6,7 +6,7 @@ import {
   reserveActor,
 } from "../../src/actors/actor-registry";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
-import type { ConnectorId, OrganisationId } from "../../src/ids";
+import type { ConnectorId, OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { requireActorExecutionAdmission } from "../sqlite-d1";
 

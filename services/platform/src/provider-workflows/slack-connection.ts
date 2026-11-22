@@ -8,13 +8,13 @@ import {
 import {
   newSlackInstallationId,
   newSlackOrganisationConnectionId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   type ProvisioningProviderConnectionAttempt,
   type ProviderManifestEvidence,
 } from "../data/provider-attempt";
 import { persistProviderResourceSnapshot } from "../data/provider-resource";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   discoverSlackChannels,
   exchangeSlackAuthorizationCode,
@@ -37,7 +37,7 @@ import {
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
 import { scopesAreComplete } from "../provider-adapters/authorization";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "../slack/installation-identity";
 import { slackInstallationOwnerIsLive } from "../credential-vault/slack-installation-credential";
 import {

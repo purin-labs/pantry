@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { createOrganisationExecutionFixture } from "./organisation-execution-fixture";
 /// <reference types="@cloudflare/workers-types" />
@@ -69,7 +69,7 @@ vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
 
 import { handleControlRequest } from "../src/control-router";
 import { activateTerminalAssignment } from "../src/data/terminal-assignment-store";
-import { parseOrganisationId, type OrganisationId } from "../src/ids";
+import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 

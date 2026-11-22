@@ -29,14 +29,14 @@ import type { Variant } from "@purin-labs/type-utils";
 
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import type { CountRow } from "../actors/sql-rows";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   canonicalFlowLabel,
   digestCanonical,
   FlowLabel,
   joinFlowLabels,
 } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 declare const evalRevisionBrand: unique symbol;
 

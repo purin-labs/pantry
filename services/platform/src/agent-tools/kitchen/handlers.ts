@@ -22,7 +22,7 @@ import {
   type SupplierToolRead,
 } from "./services";
 import type { StaffPageToolReceipt } from "../catalog/types";
-import { parseIntegrationAccountId } from "../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   requireSessionExecution,
   admittedSessionOperation,

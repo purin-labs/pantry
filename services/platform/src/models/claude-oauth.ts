@@ -1,7 +1,7 @@
 import { pkceChallenge } from "../provider-adapters/authorization";
 import { encodeBase64Url, isRecord } from "@purin-labs/std";
-import type { Result } from "../result";
-import { RequestDeadline } from "../request-deadline";
+import type { Result } from "@purin-labs/kernel/result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 
 // Pi 1.1.0's copy-code OAuth protocol. This callback is hosted by Anthropic.
 // Each token request takes the `providerFetch` of the model exit Worker

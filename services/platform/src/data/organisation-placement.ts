@@ -12,7 +12,7 @@ export type ActorRelocationId = string & {
 export type ActorRestoreId = string & {
   readonly [actorRestoreIdBrand]: "ActorRestoreId";
 };
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   parseOrganisationPlacement,
   type PlacementCellId,
@@ -20,7 +20,7 @@ import {
   type ResidencyJurisdiction,
   type OrganisationPlacement,
 } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import type { QuerySource } from "./query-source";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";

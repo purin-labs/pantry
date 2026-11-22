@@ -59,8 +59,8 @@ import {
   type CodeModeRemoteTerminal,
 } from "./code-mode-governed-remote";
 import { CODE_MODE_PILOT_BUDGET } from "./code-mode-budget";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { CODE_MODE_SANDBOX_MEMORY_BYTES } from "../code-mode-sandbox/limits";
 
 type EnabledCodeMode = Variant<HarnessNativeCodeMode, "enabled">;

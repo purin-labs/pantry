@@ -4,13 +4,13 @@ import {
   readOperationsDestination,
   type OperationsDestination,
 } from "../data/operations-destination";
-import type { Env } from "../env";
-import { newRequestId, parseCaseId, type CaseId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import {
   markBakeProposalAnnounced,
   type BakeProposal,
 } from "../kitchen/bakes/records";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { ensureCaseProject } from "../projects/case-project";
 import { BAKE_PROPOSAL_CARD, bakeProposalCardText } from "./bake-proposal-card";

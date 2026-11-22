@@ -1,4 +1,4 @@
-import { organisationDatabase as organisationHandle } from "../../src/database-handles";
+import { organisationDatabase as organisationHandle } from "@purin-labs/kernel/database-handles";
 import {
   startVaultRootRotation,
   runVaultRootRotationStep,
@@ -33,7 +33,7 @@ import {
 } from "../../src/whatsapp/identifiers";
 import { resolveWhatsAppOrganisationCredential } from "../../src/whatsapp/credential";
 import type { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
-import type { Result } from "../../src/result";
+import type { Result } from "@purin-labs/kernel/result";
 
 const PHONE = "510000000000055";
 const WABA = "410000000000055";

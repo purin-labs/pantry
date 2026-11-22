@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "./database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   isOrganisationPolicyPlacementActive,
   resolveActiveOrganisationPlacementRecord,
@@ -17,10 +17,10 @@ import type {
   ModelRoute,
 } from "@purin-labs/contracts";
 
-import { newRequestId, type OrganisationId } from "./ids";
-import { traceWarn } from "./observability";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { credentialPolicyRuleId } from "./policy-rule-id";
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 import { readOrganisationCapabilityPolicies } from "./data/capability-policy";
 import { readWorkspaceAiBudget } from "./data/workspace-ai-budget";
 import {

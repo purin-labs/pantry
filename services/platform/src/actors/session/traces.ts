@@ -1,6 +1,10 @@
 import type { HarnessTurnLease, TurnIdentity } from "@purin-labs/contracts";
-import { newRequestId, type RequestId, type OrganisationId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import {
+  newRequestId,
+  type RequestId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import type {
   HarnessHistoryMaterialization,
   HarnessHistoryUsage,

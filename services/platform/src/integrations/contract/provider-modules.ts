@@ -1,4 +1,4 @@
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,

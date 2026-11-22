@@ -1,8 +1,13 @@
 import { resolveSlackLinkedMember } from "../actors/action-mutation-execution";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
-import type { Env } from "../env";
-import type { ChannelId, RequestId, SlackAppId, WorkspaceId } from "../ids";
-import { traceWarn } from "../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import type {
+  ChannelId,
+  RequestId,
+  SlackAppId,
+  WorkspaceId,
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { SlackUserId } from "./events";
 import { resolveConfiguredSlackInstallationIdentity } from "./installation-identity";

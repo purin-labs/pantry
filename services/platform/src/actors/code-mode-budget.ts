@@ -5,8 +5,8 @@ import {
   type RequestId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 import type { CodeModeExecutionOutcome } from "@purin-labs/contracts";
 

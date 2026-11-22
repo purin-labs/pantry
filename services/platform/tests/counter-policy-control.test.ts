@@ -52,7 +52,7 @@ vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
 }));
 
 import { handleControlRequest } from "../src/control-router";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 
 const ORGANISATION_ID = "organisation_counter_policy";

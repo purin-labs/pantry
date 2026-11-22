@@ -1,4 +1,4 @@
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type { GlobalDatabase, OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { connectionFlowParts } from "./connection-flow-parts";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
@@ -17,9 +17,9 @@ import {
   type ProviderProvisioningAttemptId,
   type ProviderStateId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   prepareControlMutationReceipt,
   prepareOnboardingAuditEvent,

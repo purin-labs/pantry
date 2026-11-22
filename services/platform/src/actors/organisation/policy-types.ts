@@ -1,5 +1,5 @@
 // The types of the policy methods of the Organisation actor.
-import type { RequestId, OrganisationId } from "../../ids";
+import type { RequestId, OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   OrganisationPolicyPlacement,
   OrganisationPolicySnapshot,

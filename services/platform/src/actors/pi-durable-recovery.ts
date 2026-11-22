@@ -33,9 +33,9 @@ import {
   reserveRunBudget,
 } from "./agent-session-budget";
 import { readPiUsage } from "./pi-durable-usage";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { deriveCodeModeLeaseBinding } from "./code-mode-execution-record";
 import {
   adoptCodeModeLeaseRebind,
@@ -52,7 +52,7 @@ import { PI_DURABLE_BUILD } from "./pi-durable-checkpoint";
 import { mayRerunToolCall, type ToolCaller } from "./pi-tool-replay";
 import type { ToolRegistry } from "../agent-tools/catalog/tool-registry";
 import type { SessionPageEffects } from "./session/tool-wiring";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /** An unfinished Pi turn that the Session resumes. */
 export type SavedRecovery = {

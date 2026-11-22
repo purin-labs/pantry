@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   parseIntegrationAccountId,
@@ -6,8 +6,8 @@ import {
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { isSha256Hex } from "@purin-labs/std";
 
 export type OperationalEmailTarget =

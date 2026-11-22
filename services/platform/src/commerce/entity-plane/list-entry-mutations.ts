@@ -6,7 +6,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import type { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolvePublishedResponsibilityScope } from "./published-resources";
 import { type PublishedResourceBoundaryError } from "../contract/types";
 import type { CommerceListEntryPatchCommand } from "./routes";

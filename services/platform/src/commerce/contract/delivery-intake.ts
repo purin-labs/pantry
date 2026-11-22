@@ -1,6 +1,6 @@
 import type { applyCommerceDelivery } from "../../actors/commerce-projection";
 import type { normalizeCommerceDelivery } from "../commerce-wasm";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 export type {
   AppliedCommerceDeliveryResult,

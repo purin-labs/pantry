@@ -10,9 +10,9 @@ import {
   parseIntegrationAccountId,
   type ConnectorId,
   type IntegrationAccountId,
-} from "../ids";
-import type { Env } from "../env";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import { readPlacementByEpoch } from "../data/organisation-placement";
 import { selectOrganisationPlacementDatabase } from "../organisation-execution-scope";
 import { dispatchRfcMessageId } from "../mail/reply-target";

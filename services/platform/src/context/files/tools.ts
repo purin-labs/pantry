@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   FileContextProvider,
   ProviderFileRevision,
@@ -16,13 +16,13 @@ import type {
   ContextVisibility,
 } from "../../authorization/access-grants/types";
 import { readAccessGrant } from "../../data/access-grants";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   decideContextAdmission,
   createCurrentSourceFlowLabel,

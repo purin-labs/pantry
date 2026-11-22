@@ -1,6 +1,6 @@
 import type { SerializedFlowBinding } from "../../policy";
 import type { MailOrganizationActorInput } from "../../mail-inbox/commands";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { EmbeddedHarnessModelUsage } from "../embedded-harness";
 import type {
   EmailCaseManifest,

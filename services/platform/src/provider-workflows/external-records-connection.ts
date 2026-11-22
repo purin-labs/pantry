@@ -24,7 +24,7 @@ import {
 } from "../integrations/contract/provisioning";
 import { finishProviderManagedConnection } from "./provider-managed-connection";
 import { scopesAreComplete } from "../provider-adapters/authorization";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export async function connectExternalRecordsOAuth(
   input: CompleteProviderInput,

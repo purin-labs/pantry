@@ -13,8 +13,8 @@
  */
 import type { MachineEvent } from "@purin-labs/std/state-machine";
 
-import type { GlobalDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { GlobalQuerySource } from "./query-source";
 import { PLACEMENT_MOVE_MACHINE } from "./placement-move.machine";
 

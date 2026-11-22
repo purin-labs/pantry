@@ -12,7 +12,7 @@ import {
   reserveActor,
 } from "../../src/actors/actor-registry";
 import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { requireActorExecutionAdmission } from "../sqlite-d1";
 

@@ -34,7 +34,7 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

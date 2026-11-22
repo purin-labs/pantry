@@ -1,11 +1,11 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   createActiveConnectedIntegration,
   type ActiveIntegrationAccount,
 } from "../data/integration-account";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { parseVaultHandle } from "../credential-vault";
 import { storeVaultSecret } from "../credential-vault";
@@ -15,7 +15,7 @@ import {
   type ExternalRecordsError,
   type ExternalRecordsProvider,
 } from "./records";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 type ExternalRecordsConnectionInput = Readonly<{
   env: Env;

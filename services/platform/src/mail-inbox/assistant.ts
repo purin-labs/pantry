@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   turnMemoryReaderWithoutSubjects,
 } from "../memory/contract/turn-memory";
@@ -12,15 +12,15 @@ import type {
   MailDecision,
 } from "@purin-labs/control-api";
 import type { SessionProposal } from "@purin-labs/contracts";
-import type { Env } from "../env";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   newRequestId,
   parseCaseId,
   parseSessionId,
   parseAssignmentId,
   type ControlSessionId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,

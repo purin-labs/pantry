@@ -1,9 +1,12 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Env } from "../../env";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import { definePort } from "../../port";
-import type { Result } from "../../result";
+import { definePort } from "@purin-labs/kernel/port";
+import type { Result } from "@purin-labs/kernel/result";
 import type { FileResourceAccessGrantTarget } from "./types";
 
 type StatementDatabase = Pick<OrganisationDatabase, "prepare">;

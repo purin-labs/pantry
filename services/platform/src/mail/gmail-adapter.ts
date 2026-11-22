@@ -1,6 +1,9 @@
-import { paddedStandardBase64, standardBase64 } from "../lenient-base64";
-import { RequestDeadline } from "../request-deadline";
-import type { Result } from "../result";
+import {
+  paddedStandardBase64,
+  standardBase64,
+} from "@purin-labs/kernel/lenient-base64";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import type { Result } from "@purin-labs/kernel/result";
 import { decodeBase64, isRecord } from "@purin-labs/std";
 import type {
   MailInboxMessage,

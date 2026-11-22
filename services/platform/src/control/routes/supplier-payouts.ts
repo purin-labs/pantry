@@ -3,7 +3,7 @@ import {
   readSupplierPayoutAuditEvents,
 } from "../../data/supplier-payout-event-inbox";
 import { listSupplierPayoutAttempts } from "../../data/supplier-payout-attempt";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "../admission/control-mutation";
 import {
   authorizeOrganisationRequest,

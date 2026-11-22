@@ -1,9 +1,9 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ControlRole } from "../data/control-plane";
 
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,

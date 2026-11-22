@@ -16,7 +16,7 @@ import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import { createAccessGrant } from "../../src/data/access-grants";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import { requireOrganisationBootstrap } from "../organisation-execution-fixture";

@@ -4,8 +4,8 @@ import {
   parseSessionId,
   parseOrganisationId,
   type OrganisationId,
-} from "../ids";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { organisationDataArchivePrefix } from "../data/organisation-regional-copy";
 import {
   parseActorFenceToken,

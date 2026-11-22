@@ -1,6 +1,6 @@
 import type { GoogleOidcConfig } from "./oidc";
-import type { Env } from "../env";
-import { requirePublicOrigin } from "../public-origin";
+import type { Env } from "@purin-labs/kernel/env";
+import { requirePublicOrigin } from "@purin-labs/kernel/public-origin";
 
 export function googleConfig(env: Env): GoogleOidcConfig | null {
   if (

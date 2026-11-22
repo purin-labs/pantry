@@ -11,7 +11,7 @@ import {
   requireActiveOrganisationActor,
   requireActiveSessionActor,
 } from "../../src/actors/actor-router";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   issueControlSession,
   type IssuedControlSession,

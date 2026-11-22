@@ -1,6 +1,12 @@
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   authorizeSessionTurnExecution,

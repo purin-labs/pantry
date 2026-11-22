@@ -27,7 +27,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { parseSlackEnvelope } from "../src/slack/events";
 import { parseOrganisationPlacement } from "../src/placement";

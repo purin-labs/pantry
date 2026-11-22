@@ -1,6 +1,6 @@
-import { newRequestId } from "../ids";
-import { readIsolateLocation } from "../isolate-location";
-import { traceLog, traceWarn } from "../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { readIsolateLocation } from "@purin-labs/kernel/isolate-location";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { MODEL_EXIT_COLO_HEADER } from "./protocol";
 
 /**

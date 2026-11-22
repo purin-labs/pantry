@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { reconcileSupplierPayoutWithLexicon } from "../commerce/commerce-wasm";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";
 import {
@@ -14,7 +14,7 @@ import {
   readSealedPayoutPlan,
 } from "../data/supplier-payout-plan";
 import { readSupplierPayout } from "../data/supplier-payout-store";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 
 type PayoutEventResult = "applied" | "waiting" | "conflict" | "retry";

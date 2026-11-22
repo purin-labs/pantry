@@ -22,9 +22,9 @@ import { assertNever } from "@purin-labs/std";
 
 import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
 import { parseDelivery } from "../actors/connector/ingress-parsers";
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { readOperationsDestination } from "../data/operations-destination";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "../actors/actor-stubs";
 import {
   newRequestId,
@@ -32,13 +32,13 @@ import {
   parseOrganisationId,
   type ConnectorId,
   type OrganisationId,
-} from "../ids";
-import { traceWarn } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
 } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { PAID_RECEIPT_MACHINE } from "./paid-receipt.machine";
 import {
   paidPlacementConnectorDelivery,

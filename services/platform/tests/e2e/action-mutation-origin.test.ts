@@ -16,7 +16,7 @@ import {
   issueControlSession,
   type ActiveControlSession,
 } from "../../src/data/control-plane";
-import { parseCaseId, parseIntegrationAccountId } from "../../src/ids";
+import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { authorityPartitionKey } from "../../src/authorization/access-grants/turn-authority";

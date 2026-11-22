@@ -3,7 +3,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { setUpMailbox } from "../../../../apps/portal/src/features/mail-setup/turn-on";
 import { modelToolResults } from "./chat-journey-support";
 import { commerceHeaders } from "./commerce-support";

@@ -1,10 +1,10 @@
-import type { OrganisationDatabase } from "../../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { ensureCaseProject } from "../../../projects/case-project";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub, OrganisationActorStub } from "../../../actors/actor-stubs";
-import type { Result } from "../../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   isCommerceLedgerAction,
   type ActionLedgerEntry,
@@ -80,7 +80,7 @@ import {
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import { loadOrganisationPolicyOrDefaultDeny } from "../../../policy-snapshot";
 import { buildControlAuthority } from "../../../request-authority";
 import { resolveOrganisationModelRoute } from "../../../models/route";

@@ -12,7 +12,7 @@ import {
   createActiveConnectedIntegration,
   upsertSurfaceInstallation,
 } from "../../src/data/integration-account";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";

@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isSha256Hex } from "@purin-labs/std";
 
 declare const customConnectorIdBrand: unique symbol;

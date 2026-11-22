@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import {
   reserveActor,
   actorActivationRequest,
@@ -20,14 +20,14 @@ import {
 import { readActiveOrganisationMembershipRevision } from "../src/data/control-plane";
 import { buildControlAuthority } from "../src/request-authority";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Env } from "../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { UnitTestEnv } from "./worker-fakes";
 import {
   parseSessionId,
   parseOrganisationId,
   type ControlSessionId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../src/organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {

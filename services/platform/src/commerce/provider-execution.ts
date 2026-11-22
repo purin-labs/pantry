@@ -1,5 +1,5 @@
 import { commerceSystemKindOfSource } from "@purin-labs/contracts";
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationAccess } from "../organisation-access/access";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
@@ -24,7 +24,7 @@ import type {
   ExecutingActionLedgerEntry,
   LedgerCanonicalAction,
 } from "../actors/action-ledger";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   commerceProviderUnsupported,
   type CommerceEffectGatePermit,
@@ -38,7 +38,7 @@ import {
   commerceProvider,
   commerceProviderOfPermit,
 } from "./commerce-providers";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import {
   createCommerceClient,
@@ -88,8 +88,8 @@ import {
 } from "../kitchen/contract/stock-action-execution";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 
 type ApprovedCommerceActionEntry = VariantBy<
   ActionLedgerEntry,

@@ -7,7 +7,7 @@ import {
   parseIntegrationAccountId,
   parseRequestId,
   parseOrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 
 describe("ingress queue boundary", function ingressQueueSuite() {
   it("classifies only canonical Slack direct and shared channel prefixes", function classifiesSlackChannels() {

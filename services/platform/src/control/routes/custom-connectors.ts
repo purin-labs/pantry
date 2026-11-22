@@ -1,5 +1,5 @@
 import type { DecidePendingDecision } from "../decide-pending-decision";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { parseCustomConnectorRevision } from "../../custom-connectors";
 import { controlError } from "../http";
 import { decodeSegment as decode, matchPath as match } from "../path-match";

@@ -1,6 +1,6 @@
 import type { SurfaceObservationV2 } from "@purin-labs/control-api";
 import type { PageBrowserContext } from "@purin-labs/contracts";
-import { definePort } from "../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * The typed state of a page that a message carried (Plan 87). The area of

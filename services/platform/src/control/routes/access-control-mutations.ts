@@ -59,7 +59,7 @@ import {
   parseCustomConnectorId,
   parseCustomConnectorRevision,
 } from "../../custom-connectors/identity";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   settleWorkspaceAiBudget,
   changeWorkspaceAiBudget,
@@ -68,10 +68,10 @@ import {
   WORKSPACE_AI_BUDGET_MAXIMUM,
 } from "../../data/workspace-ai-budget";
 import { readAccessControlOrganisationProjection } from "../../access-control/read-model";
-import { parseIntegrationAccountId } from "../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../../policy";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { controlCausationId } from "../mutation";
 import {
   controlMutationScope,

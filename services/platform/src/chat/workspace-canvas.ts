@@ -3,7 +3,7 @@ import { isConversationId, type ConversationId } from "@purin-labs/control-api";
 import { sha256Hex, isPositiveInteger } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { resolveOrganisationModelRoute } from "../models/route";
 import type { Conversation } from "./conversation";
 import {

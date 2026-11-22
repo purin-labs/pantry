@@ -1,5 +1,5 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ActionMutationExecution } from "../action-mutation-execution";
 import {
   isCurrentAuthorityPartition,

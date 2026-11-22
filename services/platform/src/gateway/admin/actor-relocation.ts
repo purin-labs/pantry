@@ -13,7 +13,7 @@ import {
   parseOrganisationPlacementMoveTarget,
   type OrganisationPlacementMoveTarget,
 } from "../../data/organisation-placement";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   inspectActorRelocation,
   parseActorRelocationId,
@@ -46,9 +46,9 @@ import {
   notFound,
   readJsonObject,
   type JsonObject,
-} from "../../http";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+} from "@purin-labs/kernel/http";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
 

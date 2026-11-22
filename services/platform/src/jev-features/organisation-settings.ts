@@ -11,15 +11,15 @@ import {
   type CaseContextDiscoveryPolicy,
 } from "../case-context-discovery/policy";
 import { listIntegrationAccounts } from "../data/integration-account";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   currentTypeSafeAuthority,
   resolveTypeSafeCredential,
   sameTypeSafeAuthority,
 } from "../integrations/typesafe/authority";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { PolicyJevPort } from "../actors/organisation/organisation-policy";
 import {
   JEV_RELATED_CASES_LIMITS,

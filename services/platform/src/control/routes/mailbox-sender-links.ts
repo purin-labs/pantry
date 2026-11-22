@@ -11,11 +11,11 @@ import {
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";
 import { resolveActiveProviderAccountContext } from "../../data/integration-account";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import {
   linkSenderToSupplier,
   readSenderSupplierLink,

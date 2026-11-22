@@ -1,7 +1,7 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import { canonicalJson } from "@purin-labs/std";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { FlowAudience } from "./types";
 
 type NativeAudienceRevisions = readonly Readonly<{

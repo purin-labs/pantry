@@ -1,4 +1,4 @@
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 import type { readProviderCleanupContext } from "../../provider-adapters/catalogue";
 import type { reconcileProviderManifestObservations } from "../../provider-lifecycle/observation";
 

@@ -7,12 +7,12 @@ import {
   recordProviderManifestObservation,
   type ProviderManifestEvidence,
 } from "../data/provider-attempt";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { observeProviderConnection } from "../provider-adapters/catalogue";
 import { parseActiveIntegrationProvider } from "../data/integration-provider-directory";
 import { prepareObservedAccountLifecycle } from "../data/integration-account-writes";

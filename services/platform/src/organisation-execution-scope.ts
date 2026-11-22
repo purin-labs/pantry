@@ -14,15 +14,15 @@ import {
   organisationDatabase,
   sameBinding,
   type OrganisationDatabase,
-} from "./database-handles";
-import type { Env } from "./env";
-import type { OrganisationId } from "./ids";
+} from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   parseOrganisationPlacementCells,
   type PlacementBoundaryError,
   type OrganisationPlacement,
 } from "./placement";
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type OrganisationPlacementBindings = Pick<
   Env,

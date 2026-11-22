@@ -15,7 +15,7 @@ import {
 } from "cloudflare:test";
 import { isRecord } from "@purin-labs/std";
 
-import type { Env } from "../../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import gateway from "../../src/integration-gateway";
 
 /** Writes by meter line, for example `rows ORGANISATION`. Zero lines are left out. */

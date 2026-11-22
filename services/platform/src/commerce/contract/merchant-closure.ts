@@ -5,9 +5,9 @@
 // D1 batch; the merchant bindings stay after the purge, so a purge that
 // stopped here finds the same merchants again, and a repeated close changes
 // nothing.
-import type { OrganisationDatabase } from "../../database-handles";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { createCommerceClient } from "./client";
 
 export async function closeOrganisationCommerceMerchants(

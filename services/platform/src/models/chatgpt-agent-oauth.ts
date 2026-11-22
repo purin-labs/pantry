@@ -1,8 +1,8 @@
 import { encodeBase64Url, isRecord, parseJsonOrNull } from "@purin-labs/std";
-import { jwtClaims } from "../lenient-base64";
+import { jwtClaims } from "@purin-labs/kernel/lenient-base64";
 import { pkceChallenge } from "../provider-adapters/authorization";
-import type { Result } from "../result";
-import { RequestDeadline } from "../request-deadline";
+import type { Result } from "@purin-labs/kernel/result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 
 // "Sign in with ChatGPT" for agents of other companies (Plan 74B): OpenAI's
 // public route that lets the ChatGPT plan pay for requests to

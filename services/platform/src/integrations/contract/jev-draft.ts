@@ -3,9 +3,9 @@ import {
   type JevFeatureCommand,
 } from "@purin-labs/control-api/portal/jev-features";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * A change to a Jev switch that the chat agent proposed (Plan 88 section 6).

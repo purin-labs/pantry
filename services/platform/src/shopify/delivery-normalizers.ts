@@ -12,7 +12,7 @@ import {
   commerceDeliveryIntake,
   type CommerceWasmError,
 } from "../commerce/contract/delivery-intake";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export function normalizeShopifyCommerceOrderDelivery(
   input: unknown,

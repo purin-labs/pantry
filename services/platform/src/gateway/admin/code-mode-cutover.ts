@@ -8,7 +8,7 @@ import type {
   CodeModePlatformGovernorError,
 } from "../../actors/code-mode-platform-governor";
 import { codeModePlatformGovernor } from "../../actors/code-mode-platform-governor-stub";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { resolveActiveOrganisationActor } from "../../actors/actor-router";
 import {
   errorResponse,
@@ -16,8 +16,8 @@ import {
   methodNotAllowed,
   notFound,
   readJsonObject,
-} from "../../http";
-import { newRequestId } from "../../ids";
+} from "@purin-labs/kernel/http";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import { actorResolutionErrorResponse } from "../support";
 import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
 

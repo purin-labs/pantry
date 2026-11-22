@@ -15,7 +15,7 @@ import {
   type CommerceStockSnapshot,
 } from "@purin-labs/commerce-client";
 import { inventoryQuantity } from "../../kitchen/contract/inventory-overview";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { controlError, controlJson, readJsonRecord } from "../http";
 import {
   resolveInventoryAccess,

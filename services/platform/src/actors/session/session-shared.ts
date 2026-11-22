@@ -5,15 +5,15 @@ import {
 } from "../harness-steering";
 import { armAlarmBy } from "../lifecycle/actor-alarm";
 import type { AcceptedInputRef, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseOrganisationId,
   newRequestId,
   type SessionId,
-} from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
-import type { Result } from "../../result";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActorAtPlacement } from "../actor-router";
 import { type AgentSessionPersistence } from "../agent-session-schema";
 import { SessionExecutionAdmission } from "../session-execution-admission";

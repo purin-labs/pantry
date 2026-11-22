@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   DEVICE_GATEWAY_CODE_TTL_MS,
   type DeviceAlertSetting,
@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/control-api";
 import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { DeviceEnrollmentState, DeviceWorkState } from "./readiness";
 
 /**

@@ -2,7 +2,7 @@ import { OrganisationExecutionScope } from "../src/organisation-execution-scope"
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,

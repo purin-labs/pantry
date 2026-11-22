@@ -1,7 +1,7 @@
 import type { AlarmReconciler } from "./lifecycle/actor-alarm";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { backoffDelay, isRecord } from "@purin-labs/std";
 import type { SchemaTransaction } from "./schema-migrations";
 import {

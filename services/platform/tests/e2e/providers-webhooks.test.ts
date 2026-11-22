@@ -15,7 +15,7 @@ import {
   type ControlMutationReceiptScope,
 } from "../../src/data/control-mutation";
 import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever, bytesToHex, encodeBase64 } from "@purin-labs/std";
 import { requireVaultHandle } from "../test-ids";

@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { ActionLedgerEntry } from "../actors/action-ledger";
 import { resolveCustomConnectorWritePreview } from ".";
 import type { AuthorizedOrganisationRequest } from "../control/authorization";

@@ -1,7 +1,7 @@
 import type { HarnessHistoryContent } from "@purin-labs/contracts";
 import type { ImageContent } from "@earendil-works/pi-ai";
 import { assertNever } from "@purin-labs/std";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   EmbeddedHarnessUserInput,
   EmbeddedHarnessTurnError,

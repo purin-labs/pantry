@@ -1,7 +1,7 @@
 import { hasExactKeys } from "@purin-labs/std";
 import { isChatEffort, type ChatEffort } from "@purin-labs/control-api";
 
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   admitUserMutation,
   controlMutationIdentity,

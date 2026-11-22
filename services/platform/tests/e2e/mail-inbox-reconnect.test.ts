@@ -3,7 +3,10 @@ import { HttpResponse, http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../src/mail/gmail-authorization";
-import type { IntegrationAccountId, OrganisationId } from "../../src/ids";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { commerceHeaders } from "./commerce-support";
 import {
   connectGmailMailbox,

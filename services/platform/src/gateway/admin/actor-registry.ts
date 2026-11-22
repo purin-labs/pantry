@@ -28,7 +28,7 @@ import type {
   ActorActivationSchemaAdvanceError,
 } from "../../actors/actor-activation";
 import { currentActorSchemaVersion } from "../../actors/current-actor-schema-version";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type {
   OrganisationActorStub,
   SessionActorStub,
@@ -55,7 +55,7 @@ import {
   notFound,
   readJsonObject,
   type JsonObject,
-} from "../../http";
+} from "@purin-labs/kernel/http";
 import {
   newRequestId,
   parseCaseId,
@@ -66,9 +66,9 @@ import {
   type ConnectorId,
   type SessionId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   inspectRetainedVaultRootClosure,
   type RetainedVaultRootClosureError,

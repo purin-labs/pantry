@@ -3,7 +3,7 @@ import {
   type CustomConnectorSchema,
   type JsonValue,
 } from "./definition";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 type Projection = Result<
   JsonValue,

@@ -1,4 +1,4 @@
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { CONTEXT_CASE_READ_SCOPE } from "../../authorization/access-grants/turn-authority";
 import {
   CAPABILITY_KEYS,

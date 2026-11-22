@@ -3,8 +3,8 @@ import type {
   HarnessCheckpointRecord,
 } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
-import { parseOrganisationId } from "../ids";
-import type { Result } from "../result";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { readImportedCanonicalSession } from "./agent-session-canonical";
 import { readSessionBudgetAccount } from "./agent-session-budget";
 import {

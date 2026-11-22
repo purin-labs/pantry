@@ -10,13 +10,13 @@ import {
   listInstallLiveness,
   type InstallLivenessRecord,
 } from "../data/organisation";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
   notFound,
-} from "../http";
+} from "@purin-labs/kernel/http";
 import {
   newRequestId,
   newSlackInstallationId,
@@ -25,9 +25,9 @@ import {
   parseWorkspaceId,
   type SlackAppId,
   type WorkspaceId,
-} from "../ids";
-import { traceLog, traceWarn } from "../observability";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   admitSlackInstallOrganisation,
   type SlackInstallOrganisationAdmissionError,

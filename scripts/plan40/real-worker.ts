@@ -1,6 +1,6 @@
 import gateway from "../../services/platform/src/integration-gateway";
 import { reconcileCommerceOutbox } from "../../services/platform/src/commerce/outbox-worker";
-import { newRequestId, parseIntegrationAccountId } from "../../services/platform/src/ids";
+import { newRequestId, parseIntegrationAccountId } from "../../foundation/kernel/ids";
 import { ensureCreatedOrganisationActor } from "../../services/platform/src/control/organisation-runtime";
 import {
   bootstrapOrganisation,
@@ -15,7 +15,7 @@ import { ConnectorDO } from "../../services/platform/src/actors/connector";
 import { SessionDO } from "../../services/platform/src/actors/agent-session";
 import { OrganisationDO } from "../../services/platform/src/actors/organisation";
 import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
-import type { Env } from "../../services/platform/src/env";
+import type { Env } from "../../foundation/kernel/env";
 import {
   CommerceAdminClient,
   type PrepareCommerceCatalogListingV1,

@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { OrganisationId } from "../../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /**
  * The records of Plan 24 S1: the stock level of each fresh product and the

@@ -9,7 +9,7 @@ vi.mock("../src/credential-vault/service", async (importOriginal) => ({
 }));
 
 import { OrganisationDO } from "../src/actors/organisation";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { platformEnv } from "./worker-fakes";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "../src/data/shared-rows/placement-row";
@@ -18,7 +18,7 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { activateOrganisationFixture } from "./fixtures/organisation-activation";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionScope,

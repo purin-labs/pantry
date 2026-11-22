@@ -28,7 +28,7 @@ import type {
   SourceProvenance,
 } from "@purin-labs/commerce-contracts";
 import type { CommerceCancellationAuthority } from "./action-model";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   type InstallCommerceMerchantPluginV1,
   type CommerceCommandInput,

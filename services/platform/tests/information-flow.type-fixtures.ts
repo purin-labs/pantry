@@ -109,7 +109,7 @@ new NativeChatAudience({});
 new DisclosureProof({});
 
 function nativeIdentityEscapeHatches(
-  organisationId: import("../src/ids").OrganisationId,
+  organisationId: import("@purin-labs/kernel/ids").OrganisationId,
   projectId: import("@purin-labs/control-api").ProjectId,
   conversationId: import("@purin-labs/control-api").ConversationId,
 ): void {

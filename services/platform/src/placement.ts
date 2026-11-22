@@ -1,4 +1,4 @@
-import type { Result } from "./result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 
 declare const placementCellIdBrand: unique symbol;

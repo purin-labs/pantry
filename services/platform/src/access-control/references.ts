@@ -3,10 +3,14 @@ import type {
   GrantSubject,
 } from "../authorization/access-grants/types";
 import { readActiveCaseOperations } from "../actors/case-operations";
-import type { Env } from "../env";
-import { parseCaseId, type CaseId, type OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  parseCaseId,
+  type CaseId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../policy";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 export type SubjectReferenceInput = Readonly<{
   kind:

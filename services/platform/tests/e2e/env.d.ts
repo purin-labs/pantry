@@ -1,6 +1,6 @@
 import type { D1Migration } from "@cloudflare/vitest-plugin";
 
-import type { Env as PantryEnv } from "../../src/env";
+import type { Env as PantryEnv } from "@purin-labs/kernel/env";
 
 declare global {
   namespace Cloudflare {

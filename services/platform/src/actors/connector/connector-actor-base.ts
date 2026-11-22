@@ -29,7 +29,7 @@ import {
   createConnectorCaseWorkSchema,
   renewRunningConnectorCaseWorkLeases,
 } from "../connector-case-work";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { PlacedActor } from "../lifecycle/placed-actor";
 import { armConnectorAlarm } from "./alarm";
 import {

@@ -6,11 +6,14 @@ import {
   sharedRowOwnerColumn,
 } from "./shared-rows/regional-copy-rules";
 import { prepareRetiredCellOrganisationRow } from "./shared-rows/organisation-row";
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
-import type { Result } from "../result";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
+import type { Result } from "@purin-labs/kernel/result";
 import { encodeBase64, isRecord } from "@purin-labs/std";
 import type { ActorRelocationId } from "./organisation-placement";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type {
   ActorExportEnvelopeV1,
   ActorExportId,

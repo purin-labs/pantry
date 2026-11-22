@@ -8,7 +8,7 @@ import {
 import { ensureInitialOrganisationPlacement } from "../../src/data/shared-rows/placement-row";
 import { parseOrganisationPlacementProfile } from "../../src/placement";
 import { newConversationId } from "@purin-labs/control-api";
-import { parseSessionId } from "../../src/ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import type { Conversation } from "../../src/chat/conversation";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import { readProjectDirectory } from "../../src/chat/projects";
@@ -30,7 +30,7 @@ import type { IssuedControlSession } from "../../src/data/control-plane";
 import { platformConversation } from "./chat-journey-support";
 import { commerceClient } from "./commerce-support";
 import { type OrganisationClient } from "./organisation-fixture";
-import { newOrganisationId, type OrganisationId } from "../../src/ids";
+import { newOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 
 it(
   "shares project context with explicit roles, protects the last owner, and revokes live member access",

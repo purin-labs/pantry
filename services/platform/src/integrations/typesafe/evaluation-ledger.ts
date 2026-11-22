@@ -1,5 +1,5 @@
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   sameTypeSafeAuthority,
   typeSafeAuthorityFromStored,

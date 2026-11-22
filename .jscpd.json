@@ -1,5 +1,5 @@
 {
-  "path": ["apps", "packages", "services", "crates"],
+  "path": ["apps", "foundation", "packages", "services", "crates"],
   "format": ["typescript", "tsx", "javascript", "jsx", "rust"],
   "minTokens": 70,
   "mode": "weak",

@@ -1,5 +1,5 @@
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { controlError } from "../http";
 import {
   type MailReplyDraftRoute,

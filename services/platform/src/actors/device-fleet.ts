@@ -43,9 +43,13 @@ import {
   recordGatewayHeard,
 } from "../devices/store";
 import { changeDeviceWork, type DeviceWorkChange } from "../devices/work";
-import type { Env } from "../env";
-import { traceWarn } from "../observability";
-import { newRequestId, parseOrganisationId, type OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import {
+  newRequestId,
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   answerDeviceCommand,
@@ -1355,7 +1359,7 @@ function readAttachment(socket: WebSocket): GatewaySocketAttachment | null {
   return null;
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     DEVICE_FLEET?: DurableObjectNamespace<DeviceFleetActor>;
   }

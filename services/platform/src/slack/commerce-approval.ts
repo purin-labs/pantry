@@ -20,9 +20,9 @@ import {
 } from "../commerce/actions";
 import { readOrganisationDefaultWorkspacePortalAddress } from "../data/organisation-workspace";
 import { parsePersonId } from "../data/person-authz";
-import type { Env } from "../env";
-import type { OrganisationId, RequestId } from "../ids";
-import { traceLog, traceWarn } from "../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId, RequestId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   commerceActionCardText,

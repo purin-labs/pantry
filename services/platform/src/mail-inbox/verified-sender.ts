@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   readContactVerificationStanding,
   type ContactEndpoint,
@@ -6,7 +6,11 @@ import {
 } from "../data/contact-verification";
 import { readEmailMessageReceiptContact } from "../data/email-mailbox";
 import type { OperationalEmailTarget } from "../data/email-operational";
-import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
+import type {
+  CaseId,
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { digestCanonical } from "../policy/information-flow/digest";
 import type { FlowRecipient } from "../policy/information-flow/types";
 import type { Variant } from "@purin-labs/type-utils";

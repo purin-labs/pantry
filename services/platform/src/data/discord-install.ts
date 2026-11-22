@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseVaultHandle, type VaultHandle } from "../credential-vault/domain";
 
 declare const discordApplicationIdBrand: unique symbol;

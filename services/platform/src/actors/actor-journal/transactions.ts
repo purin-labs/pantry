@@ -9,7 +9,7 @@ import type {
 } from "@purin-labs/contracts";
 import { validateCanonicalSessionAdvance } from "../../actor-wasm";
 import { parseStoredAuthorityPartition } from "../../authorization/access-grants/turn-authority";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   readCanonicalSessionProjection,
   readImportedCanonicalSession,

@@ -1,5 +1,5 @@
-import { parseCaseId } from "../../ids";
-import type { Result } from "../../result";
+import { parseCaseId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { ContextVisibility } from "./types";
 import { assertNever, isRecord, positiveIntegerOrNull } from "@purin-labs/std";
 

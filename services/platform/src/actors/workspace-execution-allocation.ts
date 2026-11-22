@@ -1,8 +1,12 @@
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 
-import type { Env } from "../env";
-import { newRequestId, parseSessionId, type OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import {
+  newRequestId,
+  parseSessionId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActor } from "./actor-router";
 import {
   CODE_MODE_PRICE_BOOK_REVISION_V2,

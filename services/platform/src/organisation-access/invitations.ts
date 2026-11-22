@@ -6,10 +6,10 @@ import {
   type User,
 } from "../data/control-plane";
 import type { UserId } from "@purin-labs/control-api/ids";
-import { newPersonId } from "../ids";
+import { newPersonId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { organisationLifecycleParts } from "../data/organisation-lifecycle-port";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * Plan 95 step 2: Pantry keeps the invitations of an organisation. An admin

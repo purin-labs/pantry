@@ -8,13 +8,13 @@ import type {
 import { assertNever, sameJson } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { REPLENISHMENT_QUEUE_LIST_ID } from "@purin-labs/commerce-client";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   memoryService,
   type MemoryReadScope,
 } from "../memory/contract/memory-service";
 import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { authorizeEmailChatSourceDelivery } from "./chat-source-access";
 import { isOrder, orderQuery, orderSummary } from "./order-context";
 import type { LocatedReplySource } from "./reply-sources";

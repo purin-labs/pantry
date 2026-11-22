@@ -1,6 +1,6 @@
 // The writes of the table `onboarding_reconciliation_run` that another module
 // puts into its own batch (Refactor 17: only the owner of a table writes it).
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 
 /** Records a finished run of the email watch reconciliation. */
 export function prepareEmailWatchReconciliationRun(

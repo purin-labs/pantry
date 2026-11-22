@@ -8,7 +8,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
   parseRequestId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
 import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
 import {

@@ -9,7 +9,7 @@ import type {
 } from "@purin-labs/commerce-client";
 
 import { ToolRequestError } from "../agent-tools/errors";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export const ORDER_REFUND_VERB = "commerce.order.refund";
 

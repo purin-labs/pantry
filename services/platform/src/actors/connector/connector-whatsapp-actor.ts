@@ -1,6 +1,6 @@
 import { admitNamedConnector } from "./module-admission";
 import type { ConnectorModuleHost } from "./channel-adapter";
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { isActorExecutionActive } from "../actor-execution-quiescence";
 import { admitActorRecovery } from "../actor-activation";
 import { readWhatsAppIngressPolicy } from "../../data/whatsapp";
@@ -8,8 +8,8 @@ import {
   newRequestId,
   parseIntegrationAccountId,
   parseOrganisationId,
-} from "../../ids";
-import { traceWarn } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import {
   activateWhatsAppRuntime,

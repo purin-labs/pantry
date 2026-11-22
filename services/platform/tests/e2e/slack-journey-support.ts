@@ -34,7 +34,7 @@ import {
   parseOrganisationId,
   parseWorkspaceId,
   type OrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";

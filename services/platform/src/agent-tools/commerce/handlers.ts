@@ -8,8 +8,8 @@ import type {
 } from "../catalog/types";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   SessionExecutionAdmission,

@@ -22,9 +22,12 @@ import {
 import type { AuthorizedConversationScope as ConversationScope } from "../organisation-access/access";
 import { verifiedContacts } from "../mail-inbox/contract/verified-contacts";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../actors/actor-stubs";
-import { parseIntegrationAccountId, type OrganisationId } from "../ids";
+import {
+  parseIntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   citedRecord,
   inspectableMemory,
@@ -46,7 +49,7 @@ import {
   FlowLabel,
   joinFlowLabels,
 } from "../policy/information-flow";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   restoreSerializedEval,
   restoreSerializedEvalRunResult,

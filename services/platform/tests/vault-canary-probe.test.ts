@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
@@ -52,10 +52,10 @@ import {
   type SessionId,
   type OrganisationId,
   type WorkspaceId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { parseOrganisationPlacement } from "../src/placement";
-import type { Result } from "../src/result";
+import type { Result } from "@purin-labs/kernel/result";
 import { d1Database } from "./sqlite-d1";
 import {
   fixtureFlowBinding,

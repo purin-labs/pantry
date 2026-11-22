@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 
@@ -11,7 +11,7 @@ import {
   listSupplierPayoutAttempts,
   readSupplierPayoutAttempt,
 } from "../src/data/supplier-payout-attempt";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   executeSupplierPayout,
   type SupplierPayoutProvider,

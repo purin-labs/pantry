@@ -6,7 +6,7 @@
 // new price with the earlier price kept as the offer's compare-at price.
 import { isRecord } from "@purin-labs/std";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export const MENU_PRICE_CHANGE_VERB = "commerce.menu.change_price";
 

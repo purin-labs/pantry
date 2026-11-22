@@ -1,4 +1,4 @@
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   cancelOrganisationCodexAuthorization,
   completeOrganisationChatGptSignIn,
@@ -8,7 +8,7 @@ import {
   type CodexConnectionError,
   type OrganisationCodexConnection,
 } from "../../../models/codex-connection";
-import { parseCodexAuthorizationAttemptId } from "../../../ids";
+import { parseCodexAuthorizationAttemptId } from "@purin-labs/kernel/ids";
 import { authorizeOrganisationRequest } from "../../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../../http";
 import { assertNever, hasExactKeys } from "@purin-labs/std";

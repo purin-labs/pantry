@@ -3,9 +3,9 @@ import { requireActiveOrganisationActor } from "../../actors/actor-router";
 import type { CommerceSystemSyncStatus } from "../../actors/commerce-projection";
 import { ensureCreatedOrganisationActor } from "../../control/organisation-runtime";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 
 export async function readCommerceSystemSyncStatus(
   input: Readonly<{

@@ -6,13 +6,13 @@ import { restoreSessionTurnContext } from "../../src/actors/actor-journal";
 import { DurableObject } from "cloudflare:workers";
 import { newConversationId } from "@purin-labs/control-api";
 import gateway from "../../src/integration-gateway";
-import type { Env } from "../../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import { CaseDO } from "../../src/actors/case";
 import { SessionDO } from "../../src/actors/agent-session";
 import { OrganisationDO } from "../../src/actors/organisation";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { parseInitialOrganisationPlacement } from "../../src/placement";
 import {

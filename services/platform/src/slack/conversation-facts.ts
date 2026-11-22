@@ -1,13 +1,13 @@
-import type { OrganisationDatabase } from "../database-handles";
-import { traceWarn } from "../observability";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { traceWarn } from "@purin-labs/kernel/observability";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
   parseOrganisationId,
   parseWorkspaceId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   audiencesForDestination,
   policyAllowsAudiences,

@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   CapabilityMode,
   CapabilityPolicyModes,
@@ -17,9 +17,9 @@ import {
   readOrganisationCapabilityPolicies,
 } from "../data/capability-policy";
 import type { OrganisationEnvironment } from "../data/control-plane";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { OrganisationQuerySource } from "../data/query-source";
 import {

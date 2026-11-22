@@ -1,7 +1,7 @@
-import type { OrganisationDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationQuerySource } from "./query-source";
 import { isRecord } from "@purin-labs/std";
 import { prepareInferenceSelectionRevision } from "./organisation-onboarding-row";

@@ -23,16 +23,16 @@ import {
 import type { AuthorizedOrganisationRequest } from "../control/authorization";
 import { controlError, readJsonRecord } from "../control/http";
 import { listOrganisationMembers, resolveUser } from "../data/control-plane";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   CollaborationRoom,
   type CollaborationRoomBacking,

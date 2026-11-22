@@ -1,5 +1,5 @@
-import { RequestDeadline } from "../../request-deadline";
-import type { Result } from "../../result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseSystemOneJson } from "./response-json";
 
 const SYSTEM_ONE_URL = "https://api.typesafe.ai/v1/systemone";

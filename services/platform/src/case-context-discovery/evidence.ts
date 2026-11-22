@@ -1,12 +1,12 @@
 import { isRecord, isSha256Hex, parseJsonOrNull } from "@purin-labs/std";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { SchemaTransaction } from "../actors/schema-migrations";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { digestCanonical } from "../policy/information-flow/digest";
 import { parseFlowRecipient } from "../policy/information-flow/labels";
 import type { FlowRecipient } from "../policy/information-flow/types";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { identifier, integerIn } from "./policy";
 import { readCaseContextDiscoveryPolicy } from "./evaluation-store";
 import {

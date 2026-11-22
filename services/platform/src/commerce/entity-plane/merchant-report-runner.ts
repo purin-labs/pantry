@@ -10,7 +10,7 @@ import {
   type CommerceContextAssemblyError,
 } from "./context-read";
 import { normalizeUntrustedCommerceText } from "../../context/untrusted-commerce-text";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceGraphReader } from "./graph-reader";
 import {
   merchantReportDefinition,

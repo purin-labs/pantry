@@ -1,6 +1,6 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
-import type { OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { AccessGrant, GrantSubject } from "./types";
 import {
   encodeCapabilityKey,

@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   fetchConnectorMail,
   type MailConnectorContext,
@@ -20,7 +20,7 @@ import {
   resolveActiveProviderAccountContext,
   setIntegrationAccountLifecycle,
 } from "../data/integration-account";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { readEndpointVerificationStanding } from "../data/contact-verification";
 import {
@@ -38,10 +38,10 @@ import {
   newRequestId,
   parseIntegrationAccountId,
   parseOrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { admitEmailThreadCase } from "./email-case-admission";
-import type { Result } from "../result";
-import { traceLog, traceWarn } from "../observability";
+import type { Result } from "@purin-labs/kernel/result";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { readMailHead } from "../mail-inbox/store";
 import { claimMailResponseOwner } from "../mail-inbox/response-store";
 import {

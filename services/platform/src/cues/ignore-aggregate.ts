@@ -3,7 +3,7 @@ import type {
   NormalizedCueEvent,
   NormalizedCueEventType,
 } from "./engine";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
 
 type IgnoredCueSample = {

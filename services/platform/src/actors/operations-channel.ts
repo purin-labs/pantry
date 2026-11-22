@@ -1,8 +1,8 @@
 import type { ConnectorDelivery } from "@purin-labs/contracts";
 import type { OperationsDestination } from "../data/operations-destination";
-import type { Env } from "../env";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { resolveActiveConnectorActorAtPlacement } from "./actor-router";
 

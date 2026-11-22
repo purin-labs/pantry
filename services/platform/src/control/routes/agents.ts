@@ -1,5 +1,5 @@
 import { decidePendingDecisionWith } from "../pending-decision-parts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { handleContactVerification } from "./contact-verification";
 import { handleAgentMailboxSetup } from "./mailbox-setup";
 import { handleOrganisationSlackReasoningEffort } from "./slack-reasoning-effort";

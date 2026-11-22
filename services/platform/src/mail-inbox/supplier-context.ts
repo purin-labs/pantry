@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { pantryCommerceAccess } from "../commerce/contract/client";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
@@ -15,8 +15,8 @@ import {
   parseCommerceGraphQuery,
 } from "@purin-labs/commerce-client";
 import { assertNever, isPositiveInteger, isRecord, isSha256Hex } from "@purin-labs/std";
-import type { Env } from "../env";
-import { parseOrganisationId, type OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { listAccessGrants } from "../data/access-grants";
 import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
@@ -44,7 +44,7 @@ import {
 import {
   digestCanonical,
 } from "../policy/information-flow/digest";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   MailRelationshipLookup,
   MailSupplierCandidate,

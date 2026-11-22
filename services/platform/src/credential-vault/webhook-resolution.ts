@@ -1,10 +1,10 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   IntegrationProvider,
   LiveProviderWebhookContext,
 } from "../data/integration-account";
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { recordCredentialAccessDenial } from "./alerts";
 import type { VaultHandle, VaultResolveError, VaultSecret } from "./domain";
 import type { CredentialVaultBindings } from "./keyring";

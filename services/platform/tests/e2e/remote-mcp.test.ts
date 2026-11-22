@@ -32,7 +32,7 @@ import {
   readAccessGrant,
   revokeAccessGrant,
 } from "../../src/data/access-grants";
-import { parseCaseId, parseSessionId } from "../../src/ids";
+import { parseCaseId, parseSessionId } from "@purin-labs/kernel/ids";
 import { parseUserId, newUserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,

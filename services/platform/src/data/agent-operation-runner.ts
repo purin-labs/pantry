@@ -1,10 +1,10 @@
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { D1PreparedStatement } from "@cloudflare/workers-types";
 
-import type { Env } from "../env";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import { buildControlAuthority } from "../request-authority";
-import { parseRequestId } from "../ids";
+import { parseRequestId } from "@purin-labs/kernel/ids";
 import { processDirectCaseCommand } from "../actors/case-direct-processing";
 import { readOrganisationEnvironment } from "../control/organisation-runtime";
 import { resolveOrganisationCommerceMerchantBinding } from "./commerce-merchant-binding";

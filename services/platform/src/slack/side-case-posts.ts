@@ -1,8 +1,8 @@
 import { SLACK_NO_LINK_PREVIEW } from "./messages";
 import { errorMessage, isRecord } from "@purin-labs/std";
 
-import { RequestDeadline } from "../request-deadline";
-import type { Result } from "../result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SlackSideCaseMessage } from "./side-cases";
 
 /**

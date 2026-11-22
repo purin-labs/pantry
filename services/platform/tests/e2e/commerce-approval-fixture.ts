@@ -1,4 +1,4 @@
-import type { GlobalDatabase } from "../../src/database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import { encodeBase64Url } from "@purin-labs/std";
 import {
   digestApprovalAction,
@@ -10,7 +10,7 @@ import {
   issueGoogleApprovalGrant,
   type GoogleOidcConfig,
 } from "../../src/control/oidc";
-import { parseOrganisationId } from "../../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 
 export async function completeCommerceApprovalFixture(input: {

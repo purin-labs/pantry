@@ -1,14 +1,14 @@
 import { DurableObject } from "cloudflare:workers";
 import { assertNever, isRecord } from "@purin-labs/std";
 
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
   parseOrganisationId,
   type ConnectorId,
   type OrganisationId,
-} from "../ids";
-import { traceWarn } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { selectOrganisationPlacementDatabase } from "../organisation-execution-scope";
 import {
   parseOrganisationPlacement,
@@ -578,7 +578,7 @@ function callResident(
   }
 }
 
-declare module "../env" {
+declare module "@purin-labs/kernel/env" {
   interface Env {
     /** Absent in a harness Worker, which then keeps no conversation resident. */
     CONVERSATION_RESIDENCY?: DurableObjectNamespace<ConversationResidencyActor>;

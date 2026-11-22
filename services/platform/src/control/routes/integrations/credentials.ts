@@ -1,4 +1,4 @@
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActor } from "../../../actors/actor-router";
 import {
   parseVaultHandle,

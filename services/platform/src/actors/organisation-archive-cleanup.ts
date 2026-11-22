@@ -7,7 +7,7 @@ import {
   parseOrganisationId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../placement";
 import {
   isOrganisationPolicyPlacementActive,
@@ -16,7 +16,7 @@ import {
 } from "../data/organisation-placement";
 import type { ActorFenceToken } from "./actor-registry";
 import type { ActorExportError } from "./actor-export";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export type OrganisationArchiveCleanupRequest = Readonly<{
   organisationId: OrganisationId;

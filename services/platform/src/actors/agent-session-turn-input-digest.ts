@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 declare const sessionTurnInputDigestBrand: unique symbol;
 

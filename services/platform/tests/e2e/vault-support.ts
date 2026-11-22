@@ -4,7 +4,7 @@ import { env } from "cloudflare:workers";
 import { parseVaultItemResult, type VaultItemView } from "@purin-labs/control-api";
 import { parseVaultHandle } from "../../src/credential-vault/domain";
 import { resolveVaultHandle } from "../../src/credential-vault/service";
-import type { OrganisationId } from "../../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 
 /** The item of a Vault answer. Any other answer fails the read. */

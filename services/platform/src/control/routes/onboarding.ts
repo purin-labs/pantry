@@ -1,7 +1,7 @@
 import { lifecycleFenceOf } from "../../data/organisation-lifecycle-moves";
 import { signalChat } from "../../chat/signals";
-import { runtimeFetch } from "../../runtime-fetch";
-import type { Env } from "../../env";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
+import type { Env } from "@purin-labs/kernel/env";
 import { createOwnedOrganisation } from "../../organisation-access/creation";
 import { readOrganisationCreationRequest } from "@purin-labs/control-api";
 import {
@@ -43,7 +43,10 @@ import {
   renameOrganisation,
   restoreOrganisation,
 } from "../../data/organisation-lifecycle";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import {
   activationModelRouteError,

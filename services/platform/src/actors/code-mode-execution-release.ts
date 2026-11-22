@@ -1,7 +1,7 @@
 import { errorMessage } from "@purin-labs/std";
 import type { StrictUnion, Variant } from "@purin-labs/type-utils";
-import { newRequestId } from "../ids";
-import type { Result } from "../result";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CodeModeBudgetError,
   CodeModeOrganisationCancelInput,

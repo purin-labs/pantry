@@ -12,7 +12,7 @@ import type {
   SourceProvenance,
   SystemCommerceEntityRef,
 } from "@purin-labs/commerce-contracts";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceWasmError } from "../commerce-wasm";
 import { commerceBlotterSystemAttributeIds } from "../../actors/commerce-query-schema";
 import type { BlotterQueryPlanResult } from "./blotter-source";

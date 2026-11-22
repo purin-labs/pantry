@@ -4,7 +4,7 @@ import {
   type MessageLinkEgress,
 } from "../messages/link-reader";
 import { parseCustomConnectorDefinition } from "./definition";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 import type { ConversationDocument } from "../chat/conversation";
 

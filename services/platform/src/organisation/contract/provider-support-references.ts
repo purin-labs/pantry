@@ -1,8 +1,8 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../../database-handles";
-import type { OrganisationId } from "../../ids";
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { OrganisationEnvironment } from "../../data/control-plane";
 import type { ProviderAttemptSupportReference } from "../../data/connection-flow-parts";

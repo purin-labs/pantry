@@ -15,7 +15,7 @@ import { env } from "cloudflare:workers";
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
 import { opaqueCaseReference } from "../../src/access-control/references";
 import { conversationCaseId } from "../../src/chat/conversation-actor-identity";
-import { parseCaseId } from "../../src/ids";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import {
   createConversation,
   installMemoryFixture,

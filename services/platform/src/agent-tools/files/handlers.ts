@@ -4,8 +4,8 @@ import type {
   HarnessTurnLease,
   WorkspaceRevisionReceipt,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import { parseCaseId, type CaseId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import {
   readWorkspaceRevision,
   verifyWorkspaceRevisionReceipt,

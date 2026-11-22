@@ -1,4 +1,7 @@
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -23,7 +26,7 @@ import {
   type SlackOrganisationConnectionId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   parseOrganisationPlacement,

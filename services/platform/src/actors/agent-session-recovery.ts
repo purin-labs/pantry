@@ -12,7 +12,7 @@ import type {
 } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   ExecutionRecoveryStartedSessionCommit,
   ExecutionRecoveryUpdatedSessionCommit,

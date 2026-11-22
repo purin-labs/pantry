@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { parseEnv } from "node:util";
-import { requirePublicOrigin } from "../services/platform/src/public-origin.ts";
+import { requirePublicOrigin } from "../foundation/kernel/public-origin.ts";
 import { CODE_MODE_SANDBOX_INTERRUPT_BUDGET } from "../services/platform/src/code-mode-sandbox/limits.ts";
 
 const root = resolve(import.meta.dirname, "..");

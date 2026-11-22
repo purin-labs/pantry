@@ -2,8 +2,8 @@ import { assertNever } from "@purin-labs/std";
 
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { authorizeConversation } from "./conversation-access";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { AuthorizedConversationScope } from "../organisation-access/access";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { FlowLabel } from "../policy/information-flow";

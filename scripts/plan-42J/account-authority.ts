@@ -10,8 +10,8 @@ import {
   type ControlRole,
   type User,
 } from "../../services/platform/src/data/control-plane";
-import type { Env } from "../../services/platform/src/env";
-import type { OrganisationId } from "../../services/platform/src/ids";
+import type { Env } from "../../foundation/kernel/env";
+import type { OrganisationId } from "../../foundation/kernel/ids";
 import { parseInitialOrganisationPlacement } from "../../services/platform/src/placement";
 
 /** A person with a role in one Organisation and a control session. */

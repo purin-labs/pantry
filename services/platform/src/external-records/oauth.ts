@@ -1,15 +1,15 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ExternalRecordsProvider } from "./records";
-import type { OrganisationId } from "../ids";
-import type { IntegrationAccountId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   resolveActiveProviderAccountContext,
   requireConnectionCredentialAuthority,
 } from "../data/integration-account";
 import { resolveActiveProviderConnectionCredential } from "../credential-vault/provider-connection-resolution";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   storeVaultSecret,
   type VaultHandle,

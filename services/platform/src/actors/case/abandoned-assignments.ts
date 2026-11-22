@@ -1,15 +1,15 @@
 import type { CaseAssignmentLifecycle } from "@purin-labs/contracts";
 import type { Variant } from "@purin-labs/type-utils";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
   parseSessionId,
   type OrganisationId,
   type SessionId,
-} from "../../ids";
-import { traceWarn } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveSessionActorAtPlacement } from "../actor-router";
 import type { CaseActor } from "./case-actor";
 import { logAbandonSkipped } from "./assignment-census";

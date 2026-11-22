@@ -1,5 +1,8 @@
-import type { OrganisationDatabase } from "../../database-handles";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,

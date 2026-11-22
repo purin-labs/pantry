@@ -2,7 +2,7 @@ import type {
   MailboxConnectionPart,
   WhatsAppConnectionPart,
 } from "../../mail-inbox/contract/connection-parts";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 /**
  * The parts that another area registers with the connection workflows and

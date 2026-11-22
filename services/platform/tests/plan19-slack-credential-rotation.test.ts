@@ -1,6 +1,6 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 /// <reference types="@cloudflare/workers-types" />
 
@@ -22,7 +22,7 @@ import type {
   ProviderConnectionId,
   SlackInstallationId,
   OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   newSlackInstallationId,
@@ -30,7 +30,7 @@ import {
   parseChannelId,
   parseSlackAppId,
   parseWorkspaceId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import {
   activateSlackInstallation,
   configureSlackChannelDefault,

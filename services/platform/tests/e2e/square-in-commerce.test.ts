@@ -10,7 +10,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type OrganisationId,
-} from "../../src/ids";
+} from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "../../src/organisation-execution-scope";
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
 import { createCommerceClient } from "../../src/commerce/contract/client";

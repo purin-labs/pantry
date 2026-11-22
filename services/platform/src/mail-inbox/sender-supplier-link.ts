@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { sha256Hex } from "@purin-labs/std";
 
 import {
@@ -12,8 +12,11 @@ import {
   registerOperationalEmailContact,
   type OperationalEmailTarget,
 } from "../data/email-operational";
-import type { IntegrationAccountId, OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

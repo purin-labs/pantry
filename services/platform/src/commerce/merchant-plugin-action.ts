@@ -15,7 +15,7 @@ import type {
   CommercePluginSettingsV1,
 } from "@purin-labs/commerce-client";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 export const MERCHANT_PLUGIN_INSTALL_VERB = "commerce.plugin.install";
 

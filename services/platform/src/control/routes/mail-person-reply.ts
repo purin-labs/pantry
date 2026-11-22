@@ -18,11 +18,11 @@ import {
   dispatchRfcMessageId,
 } from "../../mail/reply-target";
 import { extractMailbox } from "../../mail/gmail-adapter";
-import type { Env } from "../../env";
-import { parseIntegrationAccountId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
 import { GMAIL_MAILBOX } from "../../mail/gmail-mail-adapter";
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   controlMutationScope,
   parseMutationBoundary,

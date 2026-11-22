@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   projectRoleAllows,
   isUserId,
@@ -10,7 +10,7 @@ import {
   type ProjectRole,
 } from "@purin-labs/control-api";
 import type { ProjectId, UserId } from "@purin-labs/control-api";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 export type ProjectAccessScope = Readonly<{
   organisationId: OrganisationId;

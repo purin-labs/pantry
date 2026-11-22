@@ -13,8 +13,11 @@ import {
   parseCommercePrincipalId,
   parseCommerceTimestamp,
 } from "@purin-labs/commerce-client";
-import type { Result } from "../../result";
-import { parseOrganisationId, type OrganisationId } from "../../ids";
+import type { Result } from "@purin-labs/kernel/result";
+import {
+  parseOrganisationId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { selectActiveGrants } from "../../authorization/access-grants/compiler";
 import { compileCommerceReadAuthorities } from "./grant-authorities";
 import type { AccessGrant } from "../../authorization/access-grants/types";

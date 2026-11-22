@@ -7,7 +7,7 @@ import { organisationDatabase, fixtureDatabase, onboardFixtureOrganisation } fro
 import { env, exports } from "cloudflare:workers";
 import { expect, it, vi } from "vitest";
 import { assertNever } from "@purin-labs/std";
-import { type OrganisationId } from "../../src/ids";
+import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   issueControlSession,

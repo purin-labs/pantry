@@ -1,5 +1,5 @@
 import { isConversationId } from "@purin-labs/control-api";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "../../../request-authority";
 import { readActiveOrganisationMembershipRevision } from "../../../data/control-plane";
 import { authorizeOrganisationRequest } from "../../authorization";

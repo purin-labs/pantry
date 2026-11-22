@@ -5,7 +5,7 @@ import { parseTerminalAssignment } from "@purin-labs/commerce-contracts";
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { createOrganisationExecutionFixture } from "./organisation-execution-fixture";
 import { d1Database } from "./sqlite-d1";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   activateTerminalAssignment,
   readActiveTerminalAssignment,

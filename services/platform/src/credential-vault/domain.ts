@@ -1,7 +1,7 @@
-import type { OrganisationId, VaultHandle } from "../ids";
+import type { OrganisationId, VaultHandle } from "@purin-labs/kernel/ids";
 
 // The Vault handle is an opaque id, so the kernel ids define it.
-export { parseVaultHandle, type VaultHandle } from "../ids";
+export { parseVaultHandle, type VaultHandle } from "@purin-labs/kernel/ids";
 import type { VaultKeyVersion } from "./keyring";
 import type { Variant } from "@purin-labs/type-utils";
 

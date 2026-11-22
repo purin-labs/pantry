@@ -54,7 +54,7 @@ import type {
   CommerceRelationshipRelationRow,
 } from "../../actors/commerce-query-schema";
 import { materializeCommerceRelationText } from "../../actors/commerce-query-schema";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { encodeCommerceCursor } from "../commerce-wasm";
 import type {
   CommerceGraphSourceError,
@@ -90,9 +90,9 @@ export type BlotterQueryPlanResult = Result<
 >;
 
 type BlotterSourceOptions = Readonly<{
-  organisationId: import("../../ids").OrganisationId;
+  organisationId: import("@purin-labs/kernel/ids").OrganisationId;
   merchantId: string;
-  integrationAccountId: import("../../ids").IntegrationAccountId;
+  integrationAccountId: import("@purin-labs/kernel/ids").IntegrationAccountId;
   organisation: BlotterOrganisationReader;
   now?: () => number;
 }>;

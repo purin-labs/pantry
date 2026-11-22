@@ -20,7 +20,7 @@ import {
   selectOrganisationInferenceSelection,
   type OrganisationInferenceSelection,
 } from "../../src/data/organisation-inference-selection";
-import { type OrganisationId } from "../../src/ids";
+import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import {
   ORGANISATION_ID,

@@ -9,9 +9,9 @@ import {
   resolveActiveSlackThreadCredential,
   type readSlackThreadCredentialRoute,
 } from "../../credential-vault";
-import { traceWarn } from "../../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   createSlackCaseCommand,
   type SlackCaseCommand,

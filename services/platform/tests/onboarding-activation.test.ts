@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
@@ -22,7 +22,7 @@ import {
   inspectOnboardingActivationAcceptanceFault,
   type OnboardingActivationAcceptanceFaultStorage,
 } from "../src/organisation/contract/onboarding-activation-acceptance-fault";
-import { newRequestId, type OrganisationId } from "../src/ids";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import {
   evaluateAndStoreReadiness,

@@ -23,7 +23,7 @@ import {
   readOrganisationCapabilityPolicies,
   writeOrganisationCapabilityPolicy,
 } from "../../src/data/capability-policy";
-import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
+import { type IntegrationAccountId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";

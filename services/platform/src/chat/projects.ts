@@ -1,8 +1,8 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { UserId } from "@purin-labs/control-api/ids";
 import { moveChatDirectoryEntry } from "./directory-move";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { authorizeProject } from "../projects/access";
 import { observeProjectReference } from "../projects/references";
 import { VISIBLE_PROJECTS, parseProjectRecord } from "../projects/records";

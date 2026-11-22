@@ -1,15 +1,15 @@
 import { ensureCaseProject } from "../projects/case-project";
 import { whatsappConnectorIdValue } from "../data/whatsapp";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   parseCaseId,
   parseIntegrationAccountId,
   parseOrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { buildWhatsAppSupportAuthority } from "../request-authority";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActorAtPlacement } from "./actor-router";
 import { sha256Hex } from "@purin-labs/std";
 

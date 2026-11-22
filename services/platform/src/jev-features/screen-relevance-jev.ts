@@ -1,5 +1,5 @@
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { FlowLabel } from "../policy/information-flow/labels";
 import type { TypeSafeInferenceSink } from "../policy/information-flow/types";
 import {

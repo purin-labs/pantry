@@ -9,12 +9,12 @@ import {
   claimScheduleDispatchWindow,
   listEnabledScheduleBindings,
 } from "../data/agent-operations/schedule-dispatch";
-import { newRequestId } from "../ids";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import {
   createAgentScheduleDispatchQueueMessage,
   type AgentScheduleDispatchQueueMessage,
 } from "./queue-messages";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { computeScheduleWindowKey } from "./window";
 
 type ScheduleDispatchOutcome = {

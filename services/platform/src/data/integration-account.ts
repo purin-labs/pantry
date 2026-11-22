@@ -1,7 +1,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
@@ -33,10 +33,10 @@ import {
   type OrganisationId,
   parseVaultHandle,
   type VaultHandle,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { connectionFlowParts } from "./connection-flow-parts";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   gmailProductFromScopes,
   parseGmailAuthorizationProduct,

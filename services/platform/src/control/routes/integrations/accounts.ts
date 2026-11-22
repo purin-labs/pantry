@@ -1,4 +1,4 @@
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { organisationServices } from "../../../organisation/contract/organisation-services";
 import {
   disableIntegrationAccount,

@@ -7,7 +7,7 @@ import type {
   LabTrackingEventV1,
 } from "@purin-labs/commerce-contracts";
 
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { COMMERCE_LAB_CATALOG_VERSION, COMMERCE_LAB_PRODUCTS } from "./catalog";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { exhaustiveList } from "@purin-labs/std";

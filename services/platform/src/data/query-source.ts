@@ -3,7 +3,7 @@ import type {
   GlobalDatabaseSession,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 
 /** Anything that can prepare a D1 statement: the database or one of its sessions. */
 export type QuerySource =

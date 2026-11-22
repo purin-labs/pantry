@@ -4,7 +4,7 @@ import { sha256Hex, assertNever } from "@purin-labs/std";
 import type { ChatContextDetails } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { kitchenState } from "../kitchen-observation";
 import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
 import {

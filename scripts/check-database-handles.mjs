@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Each D1 handle in the platform says which database it is (Refactor 12).
 //
-// 1. Only services/platform/src/database-handles.ts makes a handle: no other
+// 1. Only foundation/kernel/database-handles.ts makes a handle: no other
 //    source file may cast to GlobalDatabase, OrganisationDatabase or
 //    SingleDatabase (or their sessions), and only the placement selection in
 //    organisation-execution-scope.ts may call organisationDatabase().
@@ -27,7 +27,7 @@ import { filesIn, PLATFORM_SOURCE } from "./lib/source-roots.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BASELINE = "scripts/database-handles-ratchet.json";
-const HANDLES = "services/platform/src/database-handles.ts";
+const HANDLES = "foundation/kernel/database-handles.ts";
 const MAKER_ALLOWED = new Set([
   HANDLES,
   "services/platform/src/organisation-execution-scope.ts",

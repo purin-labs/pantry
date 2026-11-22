@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { isActorExecutionActive } from "./actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
@@ -10,7 +10,7 @@ import {
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { resolveVerifiedContactEndpointByEndpoint } from "../data/contact-verification";
 import { bindEmailMessageReceiptContact } from "../data/email-mailbox";
 import type { CaseContextCollectionSelection } from "../case-context-discovery/relationships";

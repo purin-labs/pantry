@@ -1,5 +1,5 @@
-import type { OrganisationDatabase } from "../database-handles";
-import type { OrganisationId } from "../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 /**
  * Persistence for what a supplier is owed and where they are paid.

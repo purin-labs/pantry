@@ -23,7 +23,7 @@ import {
   type EmailProposalTarget,
 } from "../../data/email-operational";
 import { emailReplyProposalTransition } from "../../data/email-reply-proposal-lifecycle";
-import type { CaseId, OrganisationId } from "../../ids";
+import type { CaseId, OrganisationId } from "@purin-labs/kernel/ids";
 import {
   mailWorkAssignment,
   mailWorkCaseState,

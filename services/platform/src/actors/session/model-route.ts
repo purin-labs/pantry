@@ -4,12 +4,12 @@ import type {
   HarnessTurnLease,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
-import { newRequestId, type SessionId } from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, type SessionId } from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { MODEL_EXIT_COLO_HEADER } from "../../model-exit/protocol";
 import { modelProviderFetch } from "../../model-exit/provider-fetch";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   readIntegrationAccountIdField,
@@ -15,7 +15,7 @@ import {
   resolveActiveProviderAccountContext,
   upsertProviderWebhook,
 } from "../data/integration-account";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
@@ -23,14 +23,14 @@ import {
   notFound,
   readJsonObject,
   type JsonObject,
-} from "../http";
+} from "@purin-labs/kernel/http";
 import {
   newRequestId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   traceLog,
   traceWarn,
-} from "../observability";
+} from "@purin-labs/kernel/observability";
 import { registerShopifyWebhooks } from "./connector/webhook-registration";
 import type {
   ShopifyWebhookRegistration,
@@ -48,7 +48,7 @@ import {
   triggerShopifyDevelopmentOrder,
   type ShopifyDevelopmentOrderTriggerError,
 } from "./acceptance";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseVaultHandle,
   storeVaultSecret,

@@ -1,4 +1,4 @@
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   approveCustomConnectorRevision,
   CUSTOM_CONNECTOR_REJECTION_REASON_MAX_LENGTH,

@@ -10,7 +10,7 @@ import { requireActiveOrganisationActor } from "../../services/platform/src/acto
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../services/platform/src/authorization/access-grants/turn-authority";
 import { bakeryRunSnapshotPrefix } from "../../services/platform/src/commerce/bakery/saved-runs";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants";
-import type { Env } from "../../services/platform/src/env";
+import type { Env } from "../../foundation/kernel/env";
 import { compilePublishAndActivateOrganisationPolicy } from "../../services/platform/src/policy-snapshot";
 import { fixturePeople } from "../plan-42J/account-authority";
 

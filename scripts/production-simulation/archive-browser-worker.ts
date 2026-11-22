@@ -6,8 +6,8 @@
 // browser cannot do alone.
 import gateway from "../../services/platform/src/integration-gateway";
 import { issueControlSession } from "../../services/platform/src/data/control-plane";
-import type { Env } from "../../services/platform/src/env";
-import type { OrganisationId } from "../../services/platform/src/ids";
+import type { Env } from "../../foundation/kernel/env";
+import type { OrganisationId } from "../../foundation/kernel/ids";
 import { fixturePeople } from "../plan-42J/account-authority";
 
 export {

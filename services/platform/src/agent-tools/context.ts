@@ -1,5 +1,5 @@
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { SessionExecutionAdmission } from "../actors/session-execution-admission";
 
 /**

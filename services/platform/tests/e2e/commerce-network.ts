@@ -1,6 +1,6 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
 
-import type { Env } from "../../src/env";
+import type { Env } from "@purin-labs/kernel/env";
 import platform from "../../src/integration-gateway";
 
 /**

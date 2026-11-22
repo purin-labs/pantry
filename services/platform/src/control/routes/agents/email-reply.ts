@@ -1,6 +1,6 @@
 import { authenticatedConversationScope } from "../../../organisation-access/access";
 import { OrganisationExecutionScope } from "../../../organisation-execution-scope";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   mailControlAuthority,
 } from "../../../mail-inbox/contract/control-authority";
@@ -15,7 +15,7 @@ import { readEmailReplyProposalProjection } from "../../../data/email-mailbox";
 import { listEmailReviewProjections } from "../../../data/email-review";
 import { emailReviewQueueItemWire } from "../../email-review";
 import { readEmailReplyHeadlines } from "../../email-review-headlines";
-import { parseIntegrationAccountId } from "../../../ids";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { admitUserMutation } from "../../admission/control-mutation";
 import { authorizeOrganisationRequest } from "../../authorization";
 import {

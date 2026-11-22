@@ -5,7 +5,7 @@ import type {
   readMemoryViews,
   readShownMemoryStanding,
 } from "../access";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 
 export type { TurnMemoryDestination } from "../access";
 

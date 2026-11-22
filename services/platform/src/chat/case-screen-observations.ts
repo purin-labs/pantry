@@ -1,5 +1,5 @@
 import type { CaseScreenObservationView } from "@purin-labs/control-api";
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { VISIBLE_CONVERSATIONS_SQL } from "./conversation-access";
 import { parseConversation } from "./conversation";
 import type { ConversationScope } from "./store";

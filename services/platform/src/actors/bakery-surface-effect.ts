@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { PageEffectSettlement } from "./session/tool-wiring";
 import {
   isRehearsalChange,
@@ -28,7 +28,7 @@ import {
   type BakeryStoreInteriorAction,
   type BakerySurfaceStoreInterior,
 } from "@purin-labs/bakery-model/bakery-surface";
-import { newRequestId, type OrganisationId } from "../ids";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import {
   parsePersistedHarnessTurnLease,
   preflightHarnessTurnLease,
@@ -44,7 +44,7 @@ import {
   sha256Hex,
 } from "@purin-labs/std";
 import { armAlarmBy } from "./lifecycle/actor-alarm";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 
 export const SURFACE_EFFECT_TTL_MS = 20_000;
 const SURFACE_SIMULATION_TTL_MS = 150_000;

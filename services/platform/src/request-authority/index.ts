@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationAccess,
   OrganisationAdmissionAction,
@@ -22,9 +22,9 @@ import {
   type PersonId,
   type OrganisationId,
   type WorkspaceId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,

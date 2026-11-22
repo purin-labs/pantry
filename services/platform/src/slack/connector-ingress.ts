@@ -2,7 +2,7 @@ import { actorPhysicalName } from "../actors/actor-registry";
 import { actorStub } from "../actors/actor-stubs";
 import type { ConnectorSlackIngressOutcome } from "../actors/connector-slack-ingress";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
-import type { RequestId } from "../ids";
+import type { RequestId } from "@purin-labs/kernel/ids";
 import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
 import { deriveSlackCaseRouteIdentities } from "./case-routing";
 import type { SlackMessageEvent } from "./events";
@@ -11,7 +11,7 @@ import {
   type PendingSlackIngressCredential,
 } from "./ingress-admission";
 import type { ResolvedSlackThreadRoute } from "./organisation-routing";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 
 /** What a Worker needs to hand a Slack message to its Connector. */
 export type ConnectorSlackIngressBindings = OrganisationPlacementBindings &

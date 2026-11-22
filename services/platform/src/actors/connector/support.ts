@@ -1,6 +1,6 @@
 import type { ConnectorIdentity } from "@purin-labs/contracts";
-import type { RequestId } from "../../ids";
-import { traceWarn } from "../../observability";
+import type { RequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import type { CountRow } from "../sql-rows";
 import { scheduleCaseWorkAlarm } from "./alarm";

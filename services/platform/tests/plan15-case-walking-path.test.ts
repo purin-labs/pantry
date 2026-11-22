@@ -2,7 +2,7 @@ import { createMigratedDatabase } from "./sqlite-d1";
 import { activateActorFixture } from "./organisation-execution-fixture";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
-import { parseCaseId } from "../src/ids";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import {
   withCaseMutationExecution,
   admitCaseMutationFixture,
@@ -95,7 +95,7 @@ import {
   parseOrganisationId,
   type SessionId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import { parseSlackUserId } from "../src/slack/events";
 import {

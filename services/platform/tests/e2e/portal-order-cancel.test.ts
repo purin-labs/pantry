@@ -9,7 +9,7 @@ import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { advanceOrderQueueEntry } from "../../src/cafe/contract/order-queue-commands";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { parseIntegrationAccountId, parseRequestId } from "../../src/ids";
+import { parseIntegrationAccountId, parseRequestId } from "@purin-labs/kernel/ids";
 import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
 import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
 import {

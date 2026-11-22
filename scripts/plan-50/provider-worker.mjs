@@ -37,7 +37,7 @@ import { readSessionBudgetAccount } from "../../services/platform/src/actors/age
 import { compileTrialTurnAuthority } from "./account-authority.mjs";
 import { registerSession } from "./draft-seed.mjs";
 import { createSessionGoalExecution } from "../../services/platform/src/actors/session-goal-usage.ts";
-import { newRequestId } from "../../services/platform/src/ids.ts";
+import { newRequestId } from "../../foundation/kernel/ids.ts";
 import { bindOperatorTurnAccess } from "../../services/platform/src/chat/turn-access.ts";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope.ts";
 

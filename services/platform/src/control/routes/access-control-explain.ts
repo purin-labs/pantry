@@ -14,8 +14,8 @@ import {
   type CustomConnectorAccountRead,
 } from "../../access-control/decision-explanation";
 
-import type { Env } from "../../env";
-import type { Result } from "../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import { authorizeOrganisationRequest } from "../authorization";
 import {
   controlError,
@@ -29,8 +29,11 @@ import type {
   CustomConnectorId,
   CustomConnectorRevision,
 } from "../../custom-connectors/identity";
-import type { OrganisationDatabase } from "../../database-handles";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 
 /**
  * The parts of the product areas that the access control routes read. The

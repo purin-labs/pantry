@@ -10,7 +10,7 @@ import {
   parseGeneratedActionCall,
   type GeneratedShopifyActionCall,
 } from "../src/generated/action-registry";
-import { parseSessionId, parseOrganisationId } from "../src/ids";
+import { parseSessionId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import {
   executeShopifyAction,
   materializeShopifyWriteCredential,

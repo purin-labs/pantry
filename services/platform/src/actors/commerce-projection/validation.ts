@@ -3,8 +3,11 @@ import {
   type CommerceCueFact,
   type CommerceProjection,
 } from "@purin-labs/commerce-contracts";
-import type { IntegrationAccountId, OrganisationId } from "../../ids";
-import type { Result } from "../../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertRequiredColumns } from "../schema-migrations";
 import {
   canonicalJson,

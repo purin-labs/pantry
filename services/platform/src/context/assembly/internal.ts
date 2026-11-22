@@ -4,7 +4,7 @@ import type {
   ContextProjectionSearchResult,
   ContextVisibility as ProjectionContextVisibility,
 } from "../projection";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   digestContextBundle,
   materializeContextBundle,

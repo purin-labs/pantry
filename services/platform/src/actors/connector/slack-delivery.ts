@@ -1,6 +1,6 @@
 import { SLACK_STREAM_TEXT_LIMIT } from "../../slack/stream";
 import type { ConnectorDelivery } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   readSlackThreadCredentialRoute,
   resolveActiveSlackOrganisationCredential,
@@ -13,8 +13,8 @@ import {
   parseOrganisationId,
   type OrganisationId,
   parseWorkspaceId,
-} from "../../ids";
-import { traceLog } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
 import {

@@ -1,6 +1,6 @@
 import { parseFlowReader as parseContextVisibility } from "./readers";
-import { parseCaseId } from "../../ids";
-import type { Result } from "../../result";
+import { parseCaseId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "./digest";
 import {
   canonicalFlowLabel,

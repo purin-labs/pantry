@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   CommerceCommandResult,
   CommerceSnapshotRevision,
@@ -20,8 +20,8 @@ import {
   newRequestId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
-import type { Result } from "../../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { SupplierCreation } from "@purin-labs/commerce-control-api";
 
 export type SupplierCreationError = Readonly<{

@@ -6,7 +6,7 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../../database-handles";
+} from "@purin-labs/kernel/database-handles";
 
 type Database =
   Pick<OrganisationDatabase, "prepare"> | OrganisationDatabaseSession;

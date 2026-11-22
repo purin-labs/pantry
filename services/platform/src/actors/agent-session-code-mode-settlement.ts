@@ -7,15 +7,15 @@ import type {
 } from "@purin-labs/contracts";
 
 import { validateCanonicalSessionAdvance } from "../actor-wasm";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
   parseRequestId,
   parseOrganisationId,
   type OrganisationId,
-} from "../ids";
-import { traceLog, traceWarn } from "../observability";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import { parseWorkspaceReceipt } from "../workspace-revision-store";
 import {
   commitExecutionSettledSession,

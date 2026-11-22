@@ -2,7 +2,10 @@ import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, HttpResponse } from "msw";
-import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
+import {
+  type IntegrationAccountId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { installMemoryFixture } from "./memory-support";
 import { network } from "./network";

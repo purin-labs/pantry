@@ -1,4 +1,4 @@
-import { type SessionId, parseRequestId, type ControlSessionId } from "../ids";
+import { type SessionId, parseRequestId, type ControlSessionId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   attachmentParts,
@@ -22,7 +22,7 @@ import {
   normalizeConversationTimeline,
   type Conversation,
 } from "./conversation";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CaseActorStub } from "../actors/actor-stubs";
 import {
   deriveDirectCaseIdentities,

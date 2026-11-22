@@ -1,7 +1,7 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { samePlacement } from "../data/organisation-placement";
-import { newRequestId, type OrganisationId } from "../ids";
-import { traceWarn } from "../observability";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import {
   parseOrganisationPlacement,
   type OrganisationPlacement,

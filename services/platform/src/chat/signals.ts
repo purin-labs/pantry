@@ -9,8 +9,8 @@ import { waitUntil } from "cloudflare:workers";
 
 import { actorPhysicalName } from "../actors/actor-registry";
 import { actorStub } from "../actors/actor-stubs";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 
 /**

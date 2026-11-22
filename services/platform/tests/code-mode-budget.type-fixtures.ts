@@ -5,7 +5,7 @@ import {
   type WorkspaceExecutorAllocationParent,
   type WorkspaceExecutorAllocationReservation,
 } from "../src/actors/code-mode-budget";
-import type { SessionId, OrganisationId } from "../src/ids";
+import type { SessionId, OrganisationId } from "@purin-labs/kernel/ids";
 
 declare const organisationId: OrganisationId;
 declare const sessionId: SessionId;

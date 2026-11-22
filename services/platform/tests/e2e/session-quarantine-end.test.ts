@@ -6,7 +6,7 @@ import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-process
 import { deriveCodeModeLeaseBinding } from "../../src/actors/code-mode-execution-record";
 import { OrganisationDO } from "../../src/actors/organisation";
 import type { IssuedControlSession } from "../../src/data/control-plane";
-import { newRequestId } from "../../src/ids";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import {
   preparePortalChatJourney,
   assignmentStates,

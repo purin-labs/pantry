@@ -6,7 +6,7 @@ import {
   type BakeRunActionInput,
 } from "@purin-labs/kitchen-control-api";
 import { requireActiveOrganisationActor } from "../../actors/actor-router";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   mayDecideBakes,
   type BakeCommand,

@@ -1,6 +1,6 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { VISIBLE_CONVERSATIONS_SQL } from "./conversation-access";
 import { authorizeConversation } from "./conversation-access";
 import { isConversationId, isUserId, type UserId } from "@purin-labs/control-api";
@@ -20,8 +20,8 @@ import {
   parseSessionId,
   type OrganisationId,
   type SessionId,
-} from "../ids";
-import type { Env } from "../env";
+} from "@purin-labs/kernel/ids";
+import type { Env } from "@purin-labs/kernel/env";
 import { readConversation, type ConversationScope } from "./store";
 import { prepareSourceSideCaseErasure } from "./side-cases";
 import { parseConversationActorIdentity } from "./conversation-actor-identity";

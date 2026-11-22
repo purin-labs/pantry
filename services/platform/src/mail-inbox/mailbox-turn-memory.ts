@@ -10,8 +10,12 @@ import type {
   TurnMemoryReadRequest,
 } from "../context/assembly";
 import { readVerifiedMessageSender } from "./verified-sender";
-import type { Env } from "../env";
-import type { CaseId, IntegrationAccountId, OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type {
+  CaseId,
+  IntegrationAccountId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   memoryService,

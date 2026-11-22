@@ -7,7 +7,7 @@ import {
   parseCommerceSnapshotRevision,
 } from "@purin-labs/commerce-client";
 import type { CommerceSqliteRelationshipTraversalPlan } from "@purin-labs/commerce-query-sqlite";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceProjectionKind } from "../commerce-projection";
 import {
   assertCommerceQueryPlanWithLexicon,

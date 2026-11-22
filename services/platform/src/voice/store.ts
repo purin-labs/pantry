@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   DEFAULT_MAC_VOICE_ENGINE,
   isVoiceEngineId,
@@ -13,7 +13,7 @@ import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import { readOrganisationCapabilityPolicy } from "../data/capability-policy";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 
 const CODE_TTL_MS = 15 * 60_000;

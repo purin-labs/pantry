@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchWithOrganisationPlacement } from "../../organisation-execution-scope";
 import type {
   FileContextProvider,
@@ -9,8 +9,8 @@ import type {
 
 import { encodeContextVisibility } from "../../authorization/access-grants/visibility";
 import { readAccessGrant } from "../../data/access-grants";
-import type { Env } from "../../env";
-import { parseIntegrationAccountId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { visibilityForGrantSubject } from "../../policy";
 import {
   dropboxDeepLink,
@@ -34,7 +34,7 @@ import {
   type FileProviderAccess,
   type FileProviderAccessError,
 } from "../../provider-workflows/file-context-credential";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,

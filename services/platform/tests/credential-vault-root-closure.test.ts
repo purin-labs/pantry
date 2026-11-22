@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 /// <reference types="@cloudflare/workers-types" />
 
@@ -19,7 +19,7 @@ import {
 import { inspectRetainedVaultRootClosure } from "../src/credential-vault/root-closure";
 import { resolveVaultHandle } from "../src/credential-vault/service";
 import gateway from "../src/integration-gateway";
-import { type OrganisationId } from "../src/ids";
+import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import { testRoot } from "./secrets-store";
 import { requireOrganisationId, requireVaultHandle } from "./test-ids";

@@ -2,7 +2,7 @@ import type {
   DiscordApplicationId,
   DiscordGuildId,
 } from "../data/discord-install";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { isRecord } from "@purin-labs/std";
 
 type DiscordPublicKey = Uint8Array & { readonly length: 32 };

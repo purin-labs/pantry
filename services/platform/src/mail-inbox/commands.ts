@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
 import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
 import type { RequestAuthority } from "@purin-labs/contracts";
@@ -8,8 +8,12 @@ import type {
   MailClassifiedFilter,
   MailRule,
 } from "@purin-labs/control-api";
-import type { IntegrationAccountId, OrganisationId, ConnectorId } from "../ids";
-import type { Result } from "../result";
+import type {
+  IntegrationAccountId,
+  OrganisationId,
+  ConnectorId,
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActor } from "../actors/actor-router";
 import { establishConnectorEmailWatch } from "../actors/connector-email-evaluation";
 import { readEmailMailboxAccount } from "../data/email-mailbox";

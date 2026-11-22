@@ -1,7 +1,7 @@
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { CodemodeRemote } from "@earendil-works/pi-codemode/portable";
 import type { HarnessCodeModeSandbox } from "./embedded-harness";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { RequestableCapability } from "../authorization/requestable-capabilities";
 import { createCatalogHarnessCodeMode, harnessCapabilitiesFromCapabilityKeys } from "../agent-tools/catalog/code-mode";
 import { catalogHarnessToolCatalogDigest, harnessBaseCapabilities } from "../agent-tools/catalog/selection";

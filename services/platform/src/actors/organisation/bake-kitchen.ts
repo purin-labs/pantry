@@ -10,7 +10,7 @@ import {
   findActiveDeviceWithCapability,
   listGateways,
 } from "../../devices/store";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type {
   BakeKitchenPorts,
   CounterStockChange,

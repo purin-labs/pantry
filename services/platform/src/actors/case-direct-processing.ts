@@ -1,4 +1,7 @@
-import type { GlobalDatabase, OrganisationDatabase } from "../database-handles";
+import type {
+  GlobalDatabase,
+  OrganisationDatabase,
+} from "@purin-labs/kernel/database-handles";
 import { acceptedExecutionAuthority } from "../organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
@@ -36,7 +39,7 @@ import {
   type RequestId,
   type SessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import {
   digestModelRoute,
   resolveOrganisationModelRouteAtScope,
@@ -47,11 +50,11 @@ import {
   loadOrganisationPolicyOrDefaultDeny,
   type PinnedSessionPolicy,
 } from "../policy-snapshot";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import { deriveStableCaseId } from "../case-identity";
+import { deriveStableCaseId } from "@purin-labs/kernel/case-identity";
 import { ensureCaseProject } from "../projects/case-project";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   resolveActiveCaseActorAtPlacement,
@@ -81,7 +84,7 @@ import type { PinnedAgentProfile } from "../data/pinned-agent-profile";
 import type { TurnPageState } from "./session/tool-wiring";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { traceLog } from "../observability";
+import { traceLog } from "@purin-labs/kernel/observability";
 import type { SessionActor } from "./session/session-actor";
 import {
   recoverAbandonedAssignments,

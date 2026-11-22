@@ -27,7 +27,7 @@ import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
 } from "../src/commerce/entity-plane/context-read";
-import { parseOrganisationId } from "../src/ids";
+import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 import {
   startCommerceWorker,

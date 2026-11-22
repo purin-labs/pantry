@@ -1,4 +1,7 @@
-import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
+import {
+  parseIntegrationAccountId,
+  type IntegrationAccountId,
+} from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 
 export type AirtableReadRequest = Readonly<{

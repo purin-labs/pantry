@@ -41,7 +41,7 @@ import {
 } from "../../services/platform/src/mail-inbox/contract/connector-ids";
 import { registerOperationalEmailContact } from "../../services/platform/src/data/email-operational";
 import { createActiveConnectedIntegration } from "../../services/platform/src/data/integration-account";
-import type { Env } from "../../services/platform/src/env";
+import type { Env } from "../../foundation/kernel/env";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../services/platform/src/mail/gmail-authorization";
 import {
   parseIntegrationAccountId,
@@ -49,7 +49,7 @@ import {
   parseSessionId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../services/platform/src/ids";
+} from "../../foundation/kernel/ids";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
 import { acceptMailboxModelTerms } from "../../services/platform/tests/mailbox-model-consent-fixture";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";

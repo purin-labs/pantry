@@ -1,4 +1,4 @@
-import { RequestDeadline } from "../request-deadline";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 import {
   McpClient,
   StreamableHttpTransport,
@@ -6,7 +6,7 @@ import {
 } from "@earendil-works/pi-mcp";
 import { assertNever, isRecord } from "@purin-labs/std";
 import { digestCanonical } from "../policy/information-flow/digest";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   executeCustomConnectorTransport,
   type CustomConnectorOperationRequest,

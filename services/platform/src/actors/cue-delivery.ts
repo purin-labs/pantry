@@ -1,6 +1,6 @@
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { CueSource } from "../cues/engine";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   assertRequiredColumns,
   assertTableExists,

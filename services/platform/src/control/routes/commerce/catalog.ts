@@ -1,10 +1,10 @@
 import { pantryCommerceAccess } from "../../../commerce/contract/client";
-import type { Env } from "../../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   connectedStockOverview,
   productPhotos,
 } from "../../../kitchen/contract/inventory-overview";
-import type { Result } from "../../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   createPublishedResourceClient,
   enumeratePublishedResources,

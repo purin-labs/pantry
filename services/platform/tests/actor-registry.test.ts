@@ -1,4 +1,4 @@
-import type { SingleDatabase } from "../src/database-handles";
+import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
 /// <reference types="@cloudflare/workers-types" />
 
@@ -28,7 +28,7 @@ import {
   parseSessionId,
   parseOrganisationId,
   type OrganisationId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "../src/placement";
 import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
 import { reconcileOrganisationActorRegistry } from "../src/actors/actor-registry-reconciliation";

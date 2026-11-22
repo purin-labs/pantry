@@ -1,9 +1,9 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   assertSupplierPayoutObservationWithLexicon,
   type SupplierPayoutObservation,
 } from "../commerce/commerce-wasm";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { SupplierPayoutRail } from "./supplier-payout-certification";
 import type { Variant } from "@purin-labs/type-utils";
 

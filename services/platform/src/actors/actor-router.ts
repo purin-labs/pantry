@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   OrganisationExecutionScope,
   type OrganisationPlacementBindings,
@@ -24,9 +24,14 @@ import {
   CONNECTOR_ACTOR_SCHEMA_VERSION,
   ORGANISATION_ACTOR_SCHEMA_VERSION,
 } from "./actor-schema-versions";
-import type { CaseId, ConnectorId, SessionId, OrganisationId } from "../ids";
+import type {
+  CaseId,
+  ConnectorId,
+  SessionId,
+  OrganisationId,
+} from "@purin-labs/kernel/ids";
 import type { OrganisationPlacement } from "../placement";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
 import {
   actorExecutionAdmission,

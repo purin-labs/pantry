@@ -17,17 +17,17 @@ import {
   verifyDiscordInteractionSignature,
   type DiscordInteractionError,
 } from "./discord-interactions";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   errorResponse,
   jsonResponse,
   methodNotAllowed,
   notFound,
   readJsonObject,
-} from "../http";
-import { newRequestId } from "../ids";
-import { traceLog } from "../observability";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/http";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceLog } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseVaultHandle,
   resolveDiscordInteractionVerificationCredential,

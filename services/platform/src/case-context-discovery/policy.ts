@@ -1,4 +1,4 @@
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import type { TypeSafeUsageLimits } from "../integrations/typesafe/evaluation-ledger";
 import { parseTypeSafeUsageLimits } from "../integrations/typesafe/evaluation-ledger";

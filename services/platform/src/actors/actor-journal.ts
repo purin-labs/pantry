@@ -18,13 +18,13 @@ import type {
   Sha256Digest,
   StoredMessageAttachment,
 } from "@purin-labs/contracts";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { CodeModeOrganisationReserveInput } from "./code-mode-budget";
 import type { SessionBudgetError } from "./agent-session-budget";
 import type { HarnessAuthorityError } from "./agent-session-harness-authority";
 import type { SessionTurnStreamError } from "./agent-session-turn-stream";
 import type { SessionTurnInputDigest } from "./agent-session-turn-input-digest";
-import type { RequestId, OrganisationId } from "../ids";
+import type { RequestId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { SessionInformationFlowCommit } from "./agent-session-information-flow";
 import {
   digestContextBundle,

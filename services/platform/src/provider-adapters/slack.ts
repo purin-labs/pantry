@@ -17,10 +17,10 @@ import {
   parseWorkspaceId,
   type SlackAppId,
   type WorkspaceId,
-} from "../ids";
-import { traceWarn } from "../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { DiscoveredProviderResource } from "../data/provider-resource";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";
 

@@ -20,9 +20,9 @@ import type {
   GlobalDatabase,
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
+} from "@purin-labs/kernel/database-handles";
 import type { ProjectId } from "@purin-labs/control-api";
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { InitialOrganisationPlacement } from "../placement";
 import type { RowGuard } from "./shared-rows/organisation-row";

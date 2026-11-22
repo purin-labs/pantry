@@ -40,7 +40,7 @@ import {
   squareOnboardingAdapter,
 } from "../provider-adapters/square";
 import type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * Complete a Square merchant connection.

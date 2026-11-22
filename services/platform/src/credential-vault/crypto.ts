@@ -1,5 +1,5 @@
-import type { OrganisationId } from "../ids";
-import type { Result } from "../result";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VaultHandle } from "./domain";
 import type { VaultKeyVersion } from "./keyring";
 import { decodeBase64, encodeBase64 } from "@purin-labs/std";

@@ -1,4 +1,4 @@
-import { runtimeFetch } from "../runtime-fetch";
+import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { readInstallationPins } from "../control/installation-pins";
 import { recordCommerceMutationReceipt } from "../control/mutation-receipt";
@@ -39,7 +39,7 @@ import {
   type WhatsAppIngressPolicy,
   type WhatsAppPhoneNumber,
 } from "../data/whatsapp";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { permissionRequiredResponse } from "../control/permission-required";
 import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
 import { whatsappConnector } from "../mail-inbox/agent-mailbox-connector";
@@ -47,7 +47,7 @@ import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,
 } from "./read-authorization";
-import { parseIntegrationAccountId, type IntegrationAccountId } from "../ids";
+import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { resolveWhatsAppApplicationConfiguration } from "./application";
 import { resolveWhatsAppOrganisationCredential } from "./credential";
 import { unsubscribeWhatsAppApp } from "./graph";

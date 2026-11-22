@@ -1,16 +1,19 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationAdmissionAction,
   OrganisationUserAuthority,
   RequestAuthority,
 } from "@purin-labs/contracts";
 import { assertNever, canonicalJson } from "@purin-labs/std";
-import { parseControlSessionId, type OrganisationId } from "../ids";
+import {
+  parseControlSessionId,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { resolveControlSessionById } from "../data/control-plane";
 import type { ActiveControlSession } from "../data/control-plane";
-import type { Env } from "../env";
-import type { Result } from "../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 
 export type { OrganisationAdmissionAction, OrganisationUserAuthority };

@@ -1,7 +1,7 @@
 // The commerce types that other areas name. A type that the inside of
 // commerce defines is exported here with `export type`, so the contract
 // pulls in no implementation.
-import type { RequestId } from "../../ids";
+import type { RequestId } from "@purin-labs/kernel/ids";
 
 export type { CommerceActionPath } from "../action-model";
 
@@ -44,7 +44,7 @@ declare module "@purin-labs/contracts/commerce-parts" {
 }
 
 // The commerce types that foundation records carry (`commerce-type-parts.ts`).
-declare module "../../commerce-type-parts" {
+declare module "@purin-labs/kernel/commerce-type-parts" {
   interface CommerceTypeParts {
     /** The commerce effect of an action ledger entry. */
     entityPlaneEffect: import("@purin-labs/commerce-contracts").CommerceEntityPlaneEffect;

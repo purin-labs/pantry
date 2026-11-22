@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { newRequestId } from "../../src/ids";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
 import {
   commerceClient,

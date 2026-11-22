@@ -7,7 +7,7 @@ import type {
   ConversationWork,
   ConnectorCardTarget,
 } from "../src/chat/conversation";
-import type { SessionId } from "../src/ids";
+import type { SessionId } from "@purin-labs/kernel/ids";
 
 declare const sessionId: SessionId;
 declare const conversation: Conversation;

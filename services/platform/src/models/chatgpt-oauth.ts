@@ -1,8 +1,8 @@
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import type { CodexAllowance } from "@purin-labs/control-api";
-import { jwtClaims } from "../lenient-base64";
-import type { Result } from "../result";
-import { RequestDeadline } from "../request-deadline";
+import { jwtClaims } from "@purin-labs/kernel/lenient-base64";
+import type { Result } from "@purin-labs/kernel/result";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 
 // The ChatGPT sign-in of the Codex CLI, which pi-ai's legacy `openai-codex`
 // provider also uses. pi-ai keeps these flows internal, so Pantry owns them.

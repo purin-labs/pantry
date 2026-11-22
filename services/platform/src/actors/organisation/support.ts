@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { readPlacementByEpoch } from "../../data/organisation-placement";
 import {
   OrganisationExecutionScope,
@@ -11,14 +11,14 @@ import {
   SOCKET_SWEEP_INTERVAL_MS,
   openSockets,
 } from "../hibernatable-sockets";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
   newRequestId,
   type OrganisationId,
-} from "../../ids";
-import { traceWarn } from "../../observability";
-import type { Result } from "../../result";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   expireDueActionExecutions,
   readNextActionExecutionLeaseDeadline,

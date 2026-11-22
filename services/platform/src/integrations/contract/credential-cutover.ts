@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,
@@ -8,9 +8,9 @@ import {
   parseProviderConnectionId,
   type ProviderConnectionId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { prepareSupersededGenerationsRevocation } from "../../data/provider-credential-generation";
 import { prepareSupersededGenerationSecretsRevocation } from "../../credential-vault/secret-revocation";
 

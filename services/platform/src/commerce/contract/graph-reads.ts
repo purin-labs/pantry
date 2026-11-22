@@ -3,7 +3,7 @@ import type {
   controlCommerceSensitivityCeiling,
   openControlCommerceGraph,
 } from "../../control/commerce-graph";
-import { definePort } from "../../port";
+import { definePort } from "@purin-labs/kernel/port";
 import type { CommerceEngineSource } from "../entity-plane/commerce-source";
 import type {
   readNamedCommerceQuery,

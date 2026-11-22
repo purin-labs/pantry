@@ -1,4 +1,4 @@
-import type { GlobalDatabase } from "../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 // The audit row of each support lookup of an organisation's onboarding.
 
 export function operatorSupportAccessStatement(

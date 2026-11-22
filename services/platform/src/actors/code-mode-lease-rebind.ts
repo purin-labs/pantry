@@ -1,6 +1,6 @@
 import type { StrictUnion } from "@purin-labs/type-utils";
-import type { Env } from "../env";
-import { newRequestId, type OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { requireActiveOrganisationActorAtPlacement } from "./actor-router";
 import type {
   CodeModeLeaseBinding,

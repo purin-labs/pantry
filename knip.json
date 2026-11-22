@@ -70,6 +70,9 @@
       ],
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
     },
+    "foundation/*": {
+      "project": ["**/*.ts"]
+    },
     "packages/*": {
       "entry": [
         "src/**/*.fixtures.ts",

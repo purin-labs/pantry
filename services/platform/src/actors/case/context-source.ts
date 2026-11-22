@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { deriveUserMessageViews } from "../../messages/message-wasm";
 import type {
   CaseAssignment,
@@ -8,12 +8,12 @@ import type {
   RequestAuthority,
   UserMessage,
 } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseCaseId,
   parseOrganisationId,
   type OrganisationId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { caseParts } from "./parts";
 import type {
   CaseContextReplayAuthority,
@@ -35,7 +35,7 @@ import {
   parseContextVisibility as parseStoredContextVisibility,
 } from "../../authorization/access-grants/visibility";
 import { parseStoredRequestAuthority } from "../../request-authority";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   createCurrentSourceFlowLabel,
   FlowBinding,

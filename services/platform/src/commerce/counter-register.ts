@@ -34,8 +34,8 @@ import {
   type CounterSaleReadback,
 } from "../data/counter-sale-readback";
 import { readActiveTerminalAssignment } from "../data/terminal-assignment-store";
-import type { Env } from "../env";
-import type { OrganisationId } from "../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { presentOrderQueueEntry } from "../cafe/contract/order-queue-commands";
 
 const DEFAULT_CAFE_MENU_ID = "menu_cafe_main";

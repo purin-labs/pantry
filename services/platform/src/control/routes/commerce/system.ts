@@ -1,7 +1,7 @@
-import type { OrganisationDatabase } from "../../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { installPantryCommerceApp } from "../../../commerce/contract/client";
-import type { Env } from "../../../env";
-import type { Result } from "../../../result";
+import type { Env } from "@purin-labs/kernel/env";
+import type { Result } from "@purin-labs/kernel/result";
 import type {
   CommerceClientError,
   CommerceDemoProfile,
@@ -47,7 +47,7 @@ import {
   parseIntegrationAccountId,
   type OrganisationId,
   organisationIdUniquePart,
-} from "../../../ids";
+} from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { createCommerceClient } from "../../../commerce/contract/client";
 import {

@@ -1,7 +1,7 @@
 import type { StoredMessageAttachment } from "@purin-labs/contracts";
 
 import { validateStoredMessageAttachment } from "./message-wasm";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 type StoredAttachmentParseError = { code: "invalid_stored_attachment" };
 

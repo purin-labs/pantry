@@ -1,4 +1,7 @@
-import { organisationIdUniquePart, type OrganisationId } from "../ids";
+import {
+  organisationIdUniquePart,
+  type OrganisationId,
+} from "@purin-labs/kernel/ids";
 
 /**
  * Sous Chef's record identifiers, one set per organisation.

@@ -1,7 +1,7 @@
-import type { GlobalDatabase } from "../database-handles";
+import type { GlobalDatabase } from "@purin-labs/kernel/database-handles";
 import { assertNever } from "@purin-labs/std";
 import type { OrganisationPlacementBindings } from "../organisation-execution-scope";
-import type { SessionId, OrganisationId } from "../ids";
+import type { SessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { resolveActorRecoveryAdmission } from "./actor-activation";
 import type {
@@ -10,7 +10,7 @@ import type {
   HarnessToolHost,
 } from "./embedded-harness";
 import { canAdmitSessionWork } from "./portal-chat-cleanup";
-import { parseSessionId } from "../ids";
+import { parseSessionId } from "@purin-labs/kernel/ids";
 import type {
   HarnessTurnLease,
   WorkspaceRevisionReceipt,
@@ -21,7 +21,7 @@ import {
   verifyWorkspaceRevisionReceipt,
   type WorkspaceRevisionStoreError,
 } from "../workspace-revision-store";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /** A receipt check whose statement also read the placement fence. */
 export type FencedWorkspaceReceiptCheck = {

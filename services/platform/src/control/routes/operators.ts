@@ -1,6 +1,6 @@
 import { configuredOrganisationDatabases } from "../../organisation-execution-scope";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
 import {
   parseVaultRootRotationId,
@@ -46,7 +46,7 @@ import {
   parseOrganisationId,
   type IntegrationAccountId,
   type ProviderConnectionAttemptId,
-} from "../../ids";
+} from "@purin-labs/kernel/ids";
 import { holdOrganisationPolicyDistribution } from "../../policy-snapshot";
 import {
   controlMutationIdentity,

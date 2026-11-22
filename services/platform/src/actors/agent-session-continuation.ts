@@ -13,7 +13,7 @@ import {
   parseOrganisationId,
   type RequestId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 
 export type HarnessTurnContinuation = Readonly<{
   kind: "harness_turn_continuation.v1";

@@ -1,7 +1,7 @@
 import type { StoredMessageAttachment, UserMessage } from "@purin-labs/contracts";
 
 import { attachmentManifestLine } from "../messages/attachment-inspection";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   readMessageLink,
   type MessageLinkEgress,

@@ -20,11 +20,11 @@ import {
   type StoredControlMutationReceipt,
 } from "../../data/control-mutation";
 import type { OnboardingProjectionV1 } from "@purin-labs/contracts";
-import type { OrganisationDatabase } from "../../database-handles";
-import { definePort } from "../../port";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
+import { definePort } from "@purin-labs/kernel/port";
 import type { QuerySource } from "../../data/query-source";
-import type { Env } from "../../env";
-import type { OrganisationId } from "../../ids";
+import type { Env } from "@purin-labs/kernel/env";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { AuthorizedOrganisationRequest } from "../authorization";
 import { controlError, controlJson } from "../http";

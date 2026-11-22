@@ -21,8 +21,8 @@ import {
 import type { EvalTaskServices } from "../../evals/contract/eval-task";
 import { publishEvalRunResult, readEvalRunFixture } from "../../evals/access";
 import { createEvalTurnMemoryReader } from "../../memory/access";
-import { newRequestId } from "../../ids";
-import { traceWarn } from "../../observability";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "../../organisation-execution-scope";
 import { isActorExecutionActive } from "../actor-execution-quiescence";
 import { invalid } from "./support";

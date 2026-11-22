@@ -6,7 +6,7 @@ import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,
 } from "../src/agent-tools/commerce/description-draft-handlers";
-import type { OrganisationId } from "../src/ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 type WorkflowReadAdmission = Parameters<
   typeof readWorkflowCanvasForEmbeddedHarness

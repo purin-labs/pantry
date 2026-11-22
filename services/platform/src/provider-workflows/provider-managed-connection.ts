@@ -10,7 +10,7 @@ import {
   advanceProviderPhase,
   finalizeProviderConnection,
 } from "../integrations/contract/provisioning";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 /**
  * The end of an OAuth connection whose provider manages the resource

@@ -6,7 +6,7 @@ import type {
   ControlMutationReceiptScope,
   UnversionedControlMutationBoundary,
 } from "../../data/control-mutation";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { admitUserMutation } from "../admission/control-mutation";
 import {
   authorizeOrganisationRequest,

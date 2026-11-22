@@ -11,9 +11,9 @@ import {
   parseSessionId,
   parseOrganisationId,
   parseWorkspaceId,
-} from "../src/ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import type { Result } from "../src/result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   parseWhatsAppCustomerId,
   parseWhatsAppPhoneNumberId,

@@ -1,7 +1,7 @@
 import type { OrganisationModuleHost } from "./module-host";
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { OrganisationExecutionScope } from "../../organisation-execution-scope";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   activatePendingIntegrationAccounts,
   beginOnboardingActivation,
@@ -20,8 +20,8 @@ import {
   type OrganisationId,
   type ThreadKey,
   type WorkspaceId,
-} from "../../ids";
-import { traceWarn } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import { compilePublishAndActivateOrganisationPolicy } from "../../policy-snapshot";
 import {
   compileAndStoreCueSnapshot,
@@ -29,7 +29,7 @@ import {
   writeTierOneShopifySubscription,
   writeTierOneStripeSubscription,
 } from "../../cues/engine";
-import type { Result } from "../../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { errorMessage } from "@purin-labs/std";
 import {
   armOnboardingActivationAcceptanceFault,

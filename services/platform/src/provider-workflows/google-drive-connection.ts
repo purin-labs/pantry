@@ -44,7 +44,7 @@ import {
   verifyExistingAccountIdentity,
 } from "../integrations/contract/provisioning";
 import { finishProviderManagedConnection } from "./provider-managed-connection";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 
 const GOOGLE_DRIVE_MANUAL_INSTRUCTION =
   "revoke_google_drive_access_in_google" as const;

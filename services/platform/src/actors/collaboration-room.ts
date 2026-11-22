@@ -21,16 +21,16 @@ import {
   listOrganisationMembers,
   type ActiveOrganisationMembership,
 } from "../data/control-plane";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import {
   parseControlSessionId,
   type ControlSessionId,
   type OrganisationId,
-} from "../ids";
+} from "@purin-labs/kernel/ids";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import { newRequestId } from "../ids";
-import { traceWarn } from "../observability";
-import type { Result } from "../result";
+import { newRequestId } from "@purin-labs/kernel/ids";
+import { traceWarn } from "@purin-labs/kernel/observability";
+import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import { admitActorRecovery } from "./actor-activation";
 import { isOrganisationExecutionActive } from "./actor-execution-quiescence";

@@ -1,7 +1,7 @@
 import { OrganisationExecutionScope } from "../organisation-execution-scope";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationActorStub } from "../actors/actor-stubs";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "../actors/actor-router";
 import type { ActionLedgerEntry } from "../actors/action-ledger";
 import type { OrganisationCommerce } from "../actors/organisation/organisation-commerce";
@@ -12,11 +12,11 @@ import { admitCommerceCapability } from "../data/commerce-capability-activation"
 import { admitCommerceActionCapability, executeCommerceProviderAction, reconcileCommerceProviderAction, validateCommerceActionAuthorityBeforeExecution } from "./provider-execution";
 import type { CommerceProviderExecutionError } from "./contract/commerce-provider";
 import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
-import { newRequestId } from "../ids";
+import { newRequestId } from "@purin-labs/kernel/ids";
 import { parseStoredRequestAuthority } from "../request-authority";
 import { deliverCommerceCaseOutput } from "./case-commerce-delivery";
 import { commerceApprovalCardTexts } from "./contract/approval-card-texts";
-import { traceWarn } from "../observability";
+import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Variant, VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type { CommerceActionFollowUp } from "@purin-labs/commerce-control-api";

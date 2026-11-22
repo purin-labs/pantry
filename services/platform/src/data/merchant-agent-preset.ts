@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import {
   MERCHANT_AGENT_DISPLAY_NAME,
   MERCHANT_AGENT_INSTRUCTIONS,
@@ -9,12 +9,12 @@ import {
   type MerchantAgentSkillName,
 } from "./merchant-agent-skills";
 
-import type { OrganisationId } from "../ids";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   merchantAgentAgentId,
   merchantAgentSuffix,
 } from "./merchant-agent-ids";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   applyAgentOperation,
   readAgentOperations,

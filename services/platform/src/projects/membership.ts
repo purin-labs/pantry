@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   validStoredDisclosureState,
@@ -30,7 +30,7 @@ import {
   isNonNegativeInteger,
   sha256Hex,
 } from "@purin-labs/std";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import { authorizeProject, type ProjectAccessScope } from "./access";
 import { prepareReturnPrivateChatsToDefault } from "./case-project";
 import { readProject } from "./records";

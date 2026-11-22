@@ -1,15 +1,15 @@
 import type {
   OrganisationDatabase,
   OrganisationDatabaseSession,
-} from "../database-handles";
-import type { OrganisationId } from "../ids";
+} from "@purin-labs/kernel/database-handles";
+import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
 import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,
 } from "../organisation-execution-scope";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import type { Result } from "../result";
+import type { Result } from "@purin-labs/kernel/result";
 import {
   activeVaultRoot,
   loadCredentialVaultKeyRing,

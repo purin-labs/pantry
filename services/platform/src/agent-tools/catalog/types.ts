@@ -4,8 +4,8 @@ import type {
   CodeModeExecutionOutcome,
   FileContextProvider,
 } from "@purin-labs/contracts";
-import type { IntegrationAccountId } from "../../ids";
-import type { Result } from "../../result";
+import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import type { JsonSchema } from "./selection";
 import type { TurnTool } from "./tool-registry";

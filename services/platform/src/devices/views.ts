@@ -7,7 +7,7 @@ import {
 } from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "./contract/fleet-stub";
-import type { Env } from "../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import {
   deviceConnection,

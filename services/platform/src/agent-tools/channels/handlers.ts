@@ -1,4 +1,4 @@
-import type { OrganisationDatabase } from "../../database-handles";
+import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
 import { acceptedExecutionAuthority } from "../../organisation-access/access";
 import { sessionTurnExecution } from "../../chat/turn-access";
@@ -6,7 +6,7 @@ import { registerEmailSelfTest } from "../../data/email-self-test";
 import { resolveEmailOperationalCapability } from "../../actors/email-operational-capability";
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
-import type { Env } from "../../env";
+import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "../../actors/actor-stubs";
 import {
   parseCaseId,
@@ -15,8 +15,8 @@ import {
   type CaseId,
   type IntegrationAccountId,
   type OrganisationId,
-} from "../../ids";
-import { traceLog, traceWarn } from "../../observability";
+} from "@purin-labs/kernel/ids";
+import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveCaseActorAtPlacement,

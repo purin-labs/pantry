@@ -1,4 +1,4 @@
-import { RequestDeadline } from "../request-deadline";
+import { RequestDeadline } from "@purin-labs/kernel/request-deadline";
 
 /**
  * An answer to one Slack interaction through its response URL. Slack accepts

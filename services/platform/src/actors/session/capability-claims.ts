@@ -5,8 +5,8 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
   type IntegrationAccountId,
-} from "../../ids";
-import type { Result } from "../../result";
+} from "@purin-labs/kernel/ids";
+import type { Result } from "@purin-labs/kernel/result";
 import { SessionExecutionAdmission } from "../session-execution-admission";
 import { readCaseSessionAssignment } from "../actor-journal/transactions";
 import { preflightHarnessTurnLease } from "../agent-session-harness-authority";

@@ -1,6 +1,6 @@
 import type { SurfaceKind } from "@purin-labs/contracts";
 
-import type { JsonObject } from "../http";
+import type { JsonObject } from "@purin-labs/kernel/http";
 import {
   parseChannelId,
   parseSlackAppId,
@@ -12,9 +12,12 @@ import {
   type SessionId,
   type ThreadKey,
   type WorkspaceId,
-} from "../ids";
-import { readRequiredObject, readRequiredString } from "../queue-fields";
-import type { Result } from "../result";
+} from "@purin-labs/kernel/ids";
+import {
+  readRequiredObject,
+  readRequiredString,
+} from "@purin-labs/kernel/queue-fields";
+import type { Result } from "@purin-labs/kernel/result";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonEmptyString, isRecord } from "@purin-labs/std";
 

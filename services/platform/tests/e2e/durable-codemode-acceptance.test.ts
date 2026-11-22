@@ -2,7 +2,7 @@ import { env } from "cloudflare:workers";
 import { runInDurableObject } from "cloudflare:test";
 import { expect, it } from "vitest";
 import { resolveActiveCaseActor } from "../../src/actors/actor-router";
-import { parseCaseId } from "../../src/ids";
+import { parseCaseId } from "@purin-labs/kernel/ids";
 import {
   countCalls,
   countRecordedScriptCalls,
