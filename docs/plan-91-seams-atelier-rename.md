@@ -663,9 +663,20 @@ State on 22 November 2026:
     `https://pantry.purin.io/hook/dropbox`, which Dropbox shows as
     "Enabled" after its challenge to the new stack. The Dropbox icons are
     not changed: the console opens a native file picker.
-  - Square and Stripe Connect: the owner changes the redirect fields in the
-    console, because the Chrome sign-ins were not the accounts that own the
-    apps.
+  - Square (console, the Japanese business login): the application
+    (`sq0idp-fSopNCB…`, before "Satyr") is now "Purin Pantry"; its
+    Production OAuth redirect URL is
+    `https://pantry.purin.io/v1/control/providers/square/callback` (Pantry
+    sends no `redirect_uri` to Square, so this one field decides); the
+    Point of Sale web callback `https://pantry.purin.io/portal/square-pos-return`
+    is added (the production list was empty).
+  - Stripe Connect (console, test mode, account `acct_1TMMrqQ1O5Xa8Eic`,
+    "Seams Sandbox"): the redirect
+    `https://pantry.purin.io/v1/control/providers/stripe/callback` is added
+    and is the default; the old `satyr-edge` redirect is removed; the two
+    `localhost` redirects stay. The Seams wallet uses the same Stripe
+    account, so its name does not change. Moving Pantry to its own Purin
+    Stripe account is separate work (owner, 22 November 2026).
   - Airtable, Notion and Meta keep their old names and URLs: Airtable and
     Notion until the owner uses them on the new stack, Meta until its
     business verification passes (its Graph API answers "API access
