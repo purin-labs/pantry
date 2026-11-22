@@ -522,6 +522,43 @@ matched. The read-only R2 key of CI (`R2_READ_*`) reads only the old bucket
 (HEAD answers 403 on the new one). The owner chose to push anyway, so the CI
 fetch fails until that key can read `pantry-repo-binaries-apac`.
 
+**Step 2 landed** on dev as `79462c0f..a2086e94` on 22 November 2026, after
+the freeze-run checks.
+
+**3.3 to 3.5 The first deploy** (12:00 to 12:07 JST, release commit
+`a2086e94`, from a clean worktree at the dev tip). The first deploy of a new
+Worker refuses a missing required secret, so the Platform and the commerce
+engine took their secrets with `--secrets-file`: the generated values, the
+OpenRouter key, and the placeholder `unset-until-plan-93-step-4` for each
+provider secret that step 4 sets. Live versions:
+
+| Worker | Version | Address |
+|---|---|---|
+| `pantry-code-sandbox` | `03b5179f` | none |
+| `pantry-model-exit` | `9fdd76fb` | none |
+| `pantry-chatgpt-exit` | `71fe480a` | none; container application `pantry-chatgpt-exit` |
+| `pantry-vault-onepassword` | `068bf92b` | none |
+| `pantry-commerce` | `d4ba7af8` | `commerce.pantry.purin.io` |
+| `pantry` | `e73c7cb8` | `pantry.purin.io`; container applications `pantry-message-link-fetch`, `pantry-custom-connector-fetch`, `pantry-workspace-executor` |
+| `pantry-slack-ingress` | `db668e42` | `slack.pantry.purin.io` |
+| `pantry-docs` | `a977225c` | `docs.pantry.purin.io` |
+
+`purin-shop` is not deployed: its build needs `VITE_SHOP_MERCHANT_ID`, and
+the new commerce engine has no merchant until the owner makes the new
+organisation. The old Workers kept their live versions, and
+`satyr-edge` and `underclerk` still answer `/health`. No new Worker has a
+workers.dev address (each answers 404 there).
+
+Checks after the deploy: `https://pantry.purin.io/` (the Portal) and
+`/health` answer 200, `https://commerce.pantry.purin.io/health` answers
+200, `https://docs.pantry.purin.io/` answers 200, an unsigned post to
+`https://slack.pantry.purin.io/slack/events` answers 401, and the Google
+sign-in start sends
+`redirect_uri=https://pantry.purin.io/v1/control/auth/google/callback`. The
+two names under `pantry.purin.io` had no TLS for about five minutes after
+the deploy, while Cloudflare issued their certificates. The live versions of
+the nine old Workers did not change.
+
 ### 4. Switch the outside parties
 
 The owner does the provider consoles. I do the rest.
