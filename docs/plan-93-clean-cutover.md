@@ -921,8 +921,13 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
     sign-in ran. The projects `satyr-gmail-dev` and `satyr-drive-pilot` are
     deleted (Google can restore them until 22 December 2026), and the old
     client "Satyr Portal" in `seams-501403` has no Pantry address left.
-  - The 38 R2 objects that no commit names (198 MB) are deleted; the
-    bucket holds 3,335 objects, each named by a commit.
+  - Of the 38 R2 objects that no commit names, the 31 simulation build
+    files (21 copies of files in git, 10 files of deleted bundles) are
+    deleted. The other 7 were store-layout drafts (3 `.glb`, 4 `.blend`) of
+    `hongo-8257562`, `kinshicho-6992842011` and `machiya-sun-reve`; they
+    were deleted by mistake and uploaded again the same night from
+    `~/.cache/repo-binaries`, each checked by SHA-256. All 12 store layouts
+    stay in the bucket.
   - The MCP check passed with a read-only key that was then revoked:
     `tools/list` offered only `list_storefronts` and `read_catalog`, the
     shop had 1 storefront and 12 listings, and `read_order` was refused for
