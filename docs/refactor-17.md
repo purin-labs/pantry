@@ -5,7 +5,7 @@ and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
 S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
-final; 13 of the 33 specs are written, and the other 20 are in work. The Plan 93
+final; each of the 33 specs is written since 2026-11-23. The Plan 93
 cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and each
 foundation module is a package since 2026-11-23. On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
@@ -400,10 +400,14 @@ the state of the branches and the way to continue.
 
 ### Stage S: started 2026-11-22
 
-State on 2026-11-23: 13 specs are written, each with a second reader and a correction:
-`DEV-01`, `FND-01` to `FND-11` and `COM-01`. The second readers found 3 to 8 false
-statements in each first version, and each spec lists the places where its source
-plans differ from the code. The other 20 specs are in work. A source plan moves to
+State on 2026-11-23: each of the 33 specs is written, each with a second reader and a
+correction. The first 13 are `DEV-01`, `FND-01` to `FND-11` and `COM-01`: the second
+readers found 3 to 8 false statements in each first version. For the other 20 specs
+(about 7,900 lines), the second readers found 143 false statements, 105 statements
+that the code cannot prove and 119 omissions. The writers corrected 354 of these
+findings and refused 18, each with its reason. Each spec lists the places where its
+source plans differ from the code: 291 places in the 20 specs. The writers also
+reported 142 possible code faults. No one has checked them yet. A source plan moves to
 `docs/history/` when each spec that it feeds is written.
 
 The condition of step S2 was final brand names (D2: "The spec text waits for the
