@@ -33,9 +33,11 @@ import {
 } from "./commerce-support";
 import { placePickupOrder } from "./cafe-order-support";
 
+// About 80 s on a laptop. A CI runner drains one queue message a second and
+// passed 180 s (2026-11-21), so the limit leaves about five times the local time.
 it(
   "reconciles supplier deliveries, counts, linked production and fulfilled or cancelled orders",
-  { timeout: 180000 },
+  { timeout: 420_000 },
   inventoryJourney,
 );
 

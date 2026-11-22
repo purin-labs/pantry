@@ -3,12 +3,14 @@
 import {
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   readdirSync,
+  rmSync,
   writeFileSync,
 } from "node:fs";
 import { dirname, resolve, join } from "node:path";
-import { homedir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { parseArgs } from "node:util";
 import { runBrowserCli } from "../browser-cli.mjs";
 import { pageHelperSource } from "../lib/browser-journey.mjs";
@@ -48,6 +50,9 @@ const options = {
   },
 };
 
+// Outside the artifact directory, so that CI does not upload it.
+const profile = mkdtempSync(join(tmpdir(), "bakery-acceptance-profile-"));
+
 function run(command, args = [], timeoutMs = options.timeoutMs) {
   process.stdout.write(`Browser acceptance: ${command}\n`);
   return runBrowserCli({ ...options, timeoutMs }, command, args);
@@ -74,7 +79,10 @@ async function main() {
     if (!response.ok)
       throw new Error(`Target returned HTTP ${response.status}`);
     mkdirSync(options.env.PWTEST_DAEMON_SESSION_DIR, { recursive: true });
-    run("open", ["about:blank"]);
+    // A fresh profile on disk, as in a normal browser window. A profile in
+    // memory (the CLI default) gets the small quota of a private window,
+    // and the saved runs of one journey need about 1 GB of OPFS.
+    run("open", ["about:blank", `--profile=${profile}`]);
     if (values.mode === "fallback")
       run("run-code", [
         "--filename",
@@ -152,6 +160,7 @@ async function main() {
     } catch {
       /* Failure diagnostics were retained above. */
     }
+    rmSync(profile, { recursive: true, force: true });
     printJourneyProgress();
   }
 }

@@ -7,6 +7,7 @@ import {
   MAX_ENCODED_ARTIFACT_BYTES,
   RunArtifactFile,
 } from "@purin-labs/production-simulation/runs/run-artifact-file";
+import { releasePhysicsResultCache } from "./physics-result-directory";
 
 // The browser releases this lock when the page closes or crashes. A later page
 // removes abandoned staging directories without touching another active tab.
@@ -105,13 +106,13 @@ export class RunArtifactStore {
     const file = await this.directory.getFileHandle(digest, {
       create: true,
     });
-    const writer = await file.createWritable();
     try {
-      await writer.write(encoded);
-      await writer.close();
+      await writeArtifact(file, encoded);
     } catch (error) {
-      await writer.abort().catch(discardCleanupFailure);
-      throw error;
+      // The optional physics result cache can fill the quota; the save cannot wait.
+      if (!isQuotaExceeded(error) || !(await releasePhysicsResultCache()))
+        throw error;
+      await writeArtifact(file, encoded);
     }
     const artifact = await RunArtifactFile.open(await file.getFile());
     if (artifact.digest !== digest)
@@ -119,6 +120,24 @@ export class RunArtifactStore {
     this.retained.set(artifact.digest, artifact);
     this.bytes += encoded.size;
   }
+}
+
+async function writeArtifact(
+  file: FileSystemFileHandle,
+  encoded: Blob,
+): Promise<void> {
+  const writer = await file.createWritable();
+  try {
+    await writer.write(encoded);
+    await writer.close();
+  } catch (error) {
+    await writer.abort().catch(discardCleanupFailure);
+    throw error;
+  }
+}
+
+function isQuotaExceeded(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "QuotaExceededError";
 }
 
 function discardCleanupFailure(): void {}

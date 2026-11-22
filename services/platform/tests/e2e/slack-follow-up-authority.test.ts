@@ -91,10 +91,14 @@ async function followUpAuthorityJourney(test: TestContext): Promise<void> {
     { thread: ROOT_TS, text: ANSWERS.scheduledDough },
     { thread: ROOT_TS, text: ANSWERS.followedUp },
   ]);
-  const doughFollowUp = await runInDurableObject(connector, readFollowUps);
-  expect(doughFollowUp).toEqual([
-    { eventId: expect.any(String), dueAt: null, outcome: "completed" },
-  ]);
+  // The Connector settles the work after the reply is visible in Slack.
+  await expect
+    .poll(() => runInDurableObject(connector, readFollowUps), {
+      timeout: 30_000,
+    })
+    .toEqual([
+      { eventId: expect.any(String), dueAt: null, outcome: "completed" },
+    ]);
 
   // 3. A follow-up whose requester left runs no turn and posts nothing.
   await postMention(

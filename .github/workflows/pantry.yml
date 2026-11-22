@@ -216,17 +216,16 @@ jobs:
         run: |
           pnpm --filter @purin-labs/portal dev --host 127.0.0.1 --port 5194 --strictPort > output/bakery-ci/vite.log 2>&1 &
           bakery_vite_pid=$!
-          output/bakery-ci/tools/node_modules/.bin/tsx scripts/production-simulation/serve-oven-authoring.mjs output/bakery-ci/oven-authoring-storage > output/bakery-ci/oven-authoring-storage.log 2>&1 &
-          bakery_authoring_pid=$!
-          trap 'kill "$bakery_vite_pid" "$bakery_authoring_pid"' EXIT
+          # The journey oven-authoring-browser starts its own storage fixture on
+          # port 5197 (its "server" in journeys.json), so this step starts none.
+          trap 'kill "$bakery_vite_pid"' EXIT
           node --input-type=module <<'JS'
           import { setTimeout } from "node:timers/promises";
           let ready = false;
           for (let attempt = 0; attempt < 30; attempt++) {
             try {
               const response = await fetch("http://127.0.0.1:5194/workflow-preview.html");
-              const fixture = await fetch("http://127.0.0.1:5197/fixture.json");
-              if (response.ok && fixture.ok) {
+              if (response.ok) {
                 ready = true;
                 break;
               }
@@ -235,7 +234,7 @@ jobs:
             }
             await setTimeout(1000);
           }
-          if (!ready) throw new Error("Portal and storage fixture did not start within 30 seconds.");
+          if (!ready) throw new Error("The Portal did not start within 30 seconds.");
           JS
           # The journey index (scripts/production-simulation/journeys.json) holds the
           # commands, their order and their time limits; set ci-browser is this step.

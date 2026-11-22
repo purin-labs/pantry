@@ -70,7 +70,20 @@ for (const robot of ROBOT_IDS) {
     expected.events.map(eventStep),
   );
   assert.equal(actual.samples.length, expected.samples.length);
-  const loadDifference = motionDifference(actual, expected);
+  // A run that loses its grasp is chaotic once the clamp closes. On a Linux
+  // x86_64 runner the native build and the Wasm build of the FR10 offset load
+  // differ by 9.1e-4 from step 3128 of the grasp phase (CI, 2026-11-21); on
+  // macOS arm64 by 1.1e-6. Such a run must fail for the same reason at the
+  // same step, and its motion must agree up to the grasp phase.
+  const lostGrasp =
+    expected.outcome.kind === "failed" &&
+    expected.outcome.reason === "lost-grasp";
+  if (lostGrasp) assert.equal(actual.outcome.step, expected.outcome.step);
+  const loadDifference = motionDifference(
+    actual,
+    expected,
+    lostGrasp ? phaseStep(expected, "grasp") : Infinity,
+  );
   assert.ok(
     loadDifference < MOTION_TOLERANCE,
     `${robot}: load-specific native/Wasm mismatch`,
@@ -227,13 +240,15 @@ function eventStep(event) {
   return `${event.step}:${event.kind}`;
 }
 
-function motionDifference(actualRecording, reference) {
+/** The largest difference of the samples before `untilStep`. */
+function motionDifference(actualRecording, reference, untilStep = Infinity) {
   assert.equal(actualRecording.samples.length, reference.samples.length);
   let maximumDifference = 0;
   for (let index = 0; index < reference.samples.length; index++) {
     const actual = actualRecording.samples[index];
     const expected = reference.samples[index];
     assert.equal(actual.step, expected.step);
+    if (expected.step >= untilStep) break;
     for (const field of ["joints", "tray", "tool", "jaw"]) {
       for (let axis = 0; axis < expected[field].length; axis++) {
         maximumDifference = Math.max(
@@ -244,6 +259,14 @@ function motionDifference(actualRecording, reference) {
     }
   }
   return maximumDifference;
+}
+
+function phaseStep(recording, label) {
+  const phase = recording.events.find(
+    (event) => event.kind === "phase" && event.label === label,
+  );
+  assert.ok(phase, `The recording has no ${label} phase`);
+  return phase.step;
 }
 
 function isWristSpacer(geometry) {
