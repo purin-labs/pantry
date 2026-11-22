@@ -106,14 +106,6 @@ export interface Env {
   GMAIL_PUBSUB_TOPIC?: string;
   GMAIL_PUBSUB_AUDIENCE?: string;
   GMAIL_PUBSUB_SERVICE_ACCOUNT?: string;
-  /**
-   * Days a Gmail refresh token survives in this deployment's Google
-   * project. Google expires them after seven days while an OAuth consent
-   * screen is in Testing status, so pilot deployments set this and the
-   * Portal projects each mailbox's expiry. A verified production project
-   * leaves it unset and no expiry is shown.
-   */
-  GMAIL_OAUTH_PILOT_EXPIRY_DAYS?: string;
   /** Connected Google accounts this project may consume. Defaults to 80. */
   GMAIL_PILOT_ACCOUNT_CAP?: string;
   /** Consumption at which to begin production verification. Defaults to 50. */

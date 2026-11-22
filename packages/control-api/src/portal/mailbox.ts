@@ -28,32 +28,12 @@ export function parseAgentMailboxResponse(raw: unknown): AgentMailboxView {
     integrationAccountId: mailbox.integration_account_id,
     observedAddress: mailbox.observed_address,
     connectionLifecycle: mailbox.connection_lifecycle,
-    authorization: parseMailboxAuthorization(mailbox.authorization),
     binding: parseAgentMailboxBinding(mailbox.binding),
     policy: parseMailboxPolicyView(mailbox.policy),
     runtime:
       mailbox.runtime === null
         ? null
         : parseAgentMailboxRuntime(mailbox.runtime),
-  };
-}
-
-function parseMailboxAuthorization(
-  raw: unknown,
-): AgentMailboxView["authorization"] {
-  if (raw === null || raw === undefined) return null;
-  if (!isRecord(raw) || typeof raw.authorized_at !== "number") {
-    throw new Error(
-      "The server returned an invalid Gmail authorization window.",
-    );
-  }
-  return {
-    authorizedAt: raw.authorized_at,
-    expiresAt: typeof raw.expires_at === "number" ? raw.expires_at : null,
-    expiryWindowDays:
-      typeof raw.expiry_window_days === "number"
-        ? raw.expiry_window_days
-        : null,
   };
 }
 

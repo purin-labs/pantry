@@ -9,34 +9,6 @@ import {
 import { gmailConnectorIdValue } from "./contract/connector-ids";
 import { resolveIntegrationAccount } from "../data/integration-account";
 import { parseConnectorId, type IntegrationAccountId } from "../ids";
-import { readActiveCredentialAuthorizedAt } from "../data/integration-account-reads";
-
-/**
- * When this mailbox's Gmail authorization was granted, and when it is expected
- * to lapse. A pilot runs on a Testing-status Google project whose refresh
- * tokens expire on a fixed clock, so an operator needs the date before it
- * passes rather than a mailbox that quietly stops. Deployments without a
- * configured window report no expiry at all instead of inventing one.
- */
-async function readMailboxAuthorizationWindow(
-  env: Env,
-  scope: OrganisationExecutionScope,
-  integrationAccountId: IntegrationAccountId,
-): Promise<Record<string, unknown> | null> {
-  const authorizedAt = await readActiveCredentialAuthorizedAt(
-    scope.database,
-    scope.organisationId,
-    integrationAccountId,
-  );
-  if (authorizedAt === null) return null;
-  const days = Number(env.GMAIL_OAUTH_PILOT_EXPIRY_DAYS ?? "");
-  const windowed = Number.isSafeInteger(days) && days > 0;
-  return {
-    authorized_at: authorizedAt,
-    expires_at: windowed ? authorizedAt + days * 86_400_000 : null,
-    expiry_window_days: windowed ? days : null,
-  };
-}
 
 export async function readAgentMailboxProjection(
   env: Env,
@@ -48,12 +20,11 @@ export async function readAgentMailboxProjection(
     organisationId: scope.organisationId,
     integrationAccountId,
   };
-  // The four records are read by the same key and decide nothing together.
-  const [mailbox, account, binding, authorization] = await Promise.all([
+  // The three records are read by the same key and decide nothing together.
+  const [mailbox, account, binding] = await Promise.all([
     readEmailMailboxAccount(target),
     resolveIntegrationAccount(target),
     readAgentMailboxBinding(target),
-    readMailboxAuthorizationWindow(env, scope, integrationAccountId),
   ]);
   if (!mailbox.ok || !account.ok) return null;
   // The Connector is addressed only for a mailbox that is connected.
@@ -70,7 +41,6 @@ export async function readAgentMailboxProjection(
     observed_address: mailbox.value.observedAddress,
     address_observed_at: mailbox.value.addressObservedAt,
     connection_lifecycle: account.value.lifecycle.kind,
-    authorization,
     binding: binding.ok
       ? {
           mailbox_binding_id: binding.value.binding.mailboxBindingId,

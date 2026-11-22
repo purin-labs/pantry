@@ -26,7 +26,6 @@ import {
   editEmailOperational,
   loadEmailOperationalPreview,
   loadEmailReplyPreview,
-  publishMailboxPolicy,
   reconnectAgentMailbox,
   rejectEmailOperational,
   rejectEmailReply,
@@ -141,7 +140,6 @@ export function createIntegrationsPageActions(
     saveSetup: saveIntegrationsSetup.bind(null, context),
     rotateCredential: rotateAccountCredential.bind(null, context),
     revokeCredential: revokeAccountCredential.bind(null, context),
-    publishMailboxPolicy: publishMailboxPolicy.bind(null, context),
     readMailboxSetup: context.props.transport.readMailboxSetup.bind(
       null,
       context.props.organisationId,

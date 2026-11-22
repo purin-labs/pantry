@@ -10,10 +10,6 @@ import {
   PageSkeleton,
   RecoverableError,
 } from "../../page-components";
-import {
-  workspaceAccessSubviewPath,
-  workspacePagePath,
-} from "../../route";
 import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
 import { MutationLedger } from "../../mutation-state";
@@ -412,27 +408,10 @@ function mailboxSettingsBody(
   const panel: GmailIntegrationPanelProps = {
     accounts: data.accounts.filter(isGmailAccount),
     selectedAccountId: props.accountId,
-    accessPath: workspaceAccessSubviewPath(
-      props.organisationHandle,
-      props.workspaceHandle,
-      "capabilities",
-    ),
-    inboxPath: workspacePagePath(
-      props.organisationHandle,
-      props.workspaceHandle,
-      "inbox",
-    ),
-    agentsPath: workspacePagePath(
-      props.organisationHandle,
-      props.workspaceHandle,
-      "agents",
-    ),
-    credentialInventory: detail.data.credentialInventory,
     agentMailboxes: detail.data.agentMailboxes,
     emailReplies: detail.data.emailReplies,
     emailOperational: detail.data.emailOperational,
     installations: detail.data.mailboxInstallations,
-    inferenceSelection: data.inferenceSelection,
     canManage: props.canManage && content.freshness.kind === "current",
     mutations: route.mutations,
     pendingAuthorization: route.pendingAuthorization,

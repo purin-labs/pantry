@@ -79,17 +79,8 @@ export function EmailReviewSurface(
   ]);
   const replies = props.queue.replies.filter(isVisibleReply);
   const operational = props.queue.operational.filter(isVisibleOperational);
-  if (replies.length === 0 && operational.length === 0) {
-    return props.context === "workspace" ? (
-      <div className="integration-setup">
-        <h4>Email approvals</h4>
-        <p className="notice-text">
-          No email is waiting for review. Inbox keeps the replies that were sent
-          or closed.
-        </p>
-      </div>
-    ) : null;
-  }
+  // Nothing waits: the surface takes no room. Inbox keeps the closed replies.
+  if (replies.length === 0 && operational.length === 0) return null;
   return (
     <section
       className={

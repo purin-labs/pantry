@@ -43,17 +43,10 @@ export type AgentMailboxRuntime = {
   };
 };
 
-type MailboxAuthorizationView = {
-  readonly authorizedAt: number;
-  readonly expiresAt: number | null;
-  readonly expiryWindowDays: number | null;
-};
-
 export type AgentMailboxView = {
   readonly integrationAccountId: string;
   readonly observedAddress: string;
   readonly connectionLifecycle: string;
-  readonly authorization: MailboxAuthorizationView | null;
   readonly binding: {
     readonly mailboxBindingId: string;
     readonly currentRevision: number;

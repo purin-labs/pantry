@@ -1,20 +1,9 @@
 import React from "react";
-import type { MailboxSetupAgentChoice } from "@purin-labs/control-api";
 
 import { controlMutation, controlRead } from "../../control-client";
 import { ProviderTile } from "../../page-components";
-import { DEFAULT_MAILBOX_POLICY } from "../../pages/agent-mailbox";
-import { ConsentPoint } from "../integrations/connect-consent-dialog";
 import { ConnectionDialog } from "../integrations/connection-dialog";
-import {
-  actionHint,
-  ACCESS_REQUIREMENTS,
-  agentSentence,
-  mailboxSetupAction,
-  modelSentence,
-  requirementIsMet,
-  type MailboxSetupAction,
-} from "../mail-setup/model";
+import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";
 import {
   readMailboxSetup,
   type MailboxSetupTransport,
@@ -40,24 +29,24 @@ type Props = Readonly<{
   close: () => void;
   /** The mailbox is on now. */
   onTurnedOn: () => void;
-  /** The mailbox's full settings, for its limits and its agent. */
+  /** The mailbox's own view. */
   settingsHref: string;
 }>;
 
 /**
- * Turns a mailbox on from the Inbox. The sheet shows what the mailbox still
- * needs and makes it through the same setup as the Integrations page, with
- * the default limits. The full settings stay one link away.
+ * Turns a mailbox on from the Inbox, with the same one press as the
+ * mailbox's own view: the setup that it still needs, then the default
+ * limits.
  */
 export function MailboxTurnOnSheet(props: Props): React.ReactNode {
   const [run, setRun] = React.useState<Run>({ kind: "idle" });
   const [revision, setRevision] = React.useState(0);
   const read = React.useCallback(
-    (integrationAccountId: string, choice: MailboxSetupAgentChoice) =>
+    (integrationAccountId: string) =>
       readMailboxSetup(
         TRANSPORT,
         { organisationId: props.organisationId, integrationAccountId },
-        choice,
+        { kind: "automatic" },
       ),
     [props.organisationId],
   );
@@ -67,11 +56,9 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
     String(revision),
     run.kind !== "running",
   );
+  const plan = setup.state.kind === "ready" ? setup.state.plan : null;
   const turnOn = async (): Promise<void> => {
-    if (setup.state.kind !== "ready") return;
-    const plan = setup.state.plan;
-    const action = mailboxSetupAction(plan);
-    if (action === "wait_for_model") return;
+    if (plan === null || !mailboxCanTurnOn(plan)) return;
     setRun({ kind: "running" });
     try {
       await setUpMailbox(
@@ -81,18 +68,18 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
           integrationAccountId: props.accountId,
         },
         plan.agent.choice,
-        action === "set_up" ? null : DEFAULT_MAILBOX_POLICY,
+        true,
       );
       setRun({ kind: "idle" });
       setRevision(nextRevision);
-      if (action !== "set_up") props.onTurnedOn();
+      props.onTurnedOn();
     } catch (error) {
       setRun({
         kind: "failed",
         message:
           error instanceof Error
             ? error.message
-            : "The setup did not finish. Try again.",
+            : "The mailbox did not turn on. Try again.",
       });
       setRevision(nextRevision);
     }
@@ -105,40 +92,9 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
       description="Turn on the agent for this mailbox."
       close={props.close}
     >
-      {setup.state.kind === "ready" ? (
-        <section
-          className="provider-consent"
-          aria-label="What turning on needs"
-        >
-          <ul className="connect-consent-points">
-            <ConsentPoint
-              title={setup.state.plan.agent.name}
-              detail={agentSentence(setup.state.plan.agent)}
-              mark={
-                requirementIsMet(setup.state.plan, "agent") ? "done" : "todo"
-              }
-            />
-            <ConsentPoint
-              title="Access"
-              detail={`${setup.state.plan.agent.name} may write reply drafts and read the Case of each thread. Owners and admins may review them.`}
-              mark={
-                ACCESS_REQUIREMENTS.every(
-                  (requirement) =>
-                    setup.state.kind === "ready" &&
-                    requirementIsMet(setup.state.plan, requirement.id),
-                )
-                  ? "done"
-                  : "todo"
-              }
-            />
-            <ConsentPoint
-              title="AI model"
-              detail={modelSentence(setup.state.plan)}
-              mark={
-                setup.state.plan.model.kind === "approved" ? "done" : "todo"
-              }
-            />
-          </ul>
+      {plan !== null ? (
+        <section className="provider-consent" aria-label="Turn on">
+          <p className="notice-text">{turnOnHint(plan)}</p>
           {run.kind === "failed" ? (
             <p className="error-text" role="alert">
               {run.message}
@@ -152,17 +108,14 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
               disabled={
                 run.kind === "running" ||
                 setup.reading ||
-                mailboxSetupAction(setup.state.plan) === "wait_for_model"
+                !mailboxCanTurnOn(plan)
               }
             >
-              {run.kind === "running"
-                ? "Turning on…"
-                : turnOnLabel(mailboxSetupAction(setup.state.plan))}
+              {run.kind === "running" ? "Turning on…" : "Turn on"}
             </button>
           </div>
           <p className="notice-text">
-            {actionHint(setup.state.plan, mailboxSetupAction(setup.state.plan))}{" "}
-            <a href={props.settingsHref}>All mailbox settings</a>
+            <a href={props.settingsHref}>Open the mailbox</a>
           </p>
         </section>
       ) : setup.state.kind === "failed" ? (
@@ -179,18 +132,6 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
       )}
     </ConnectionDialog>
   );
-}
-
-function turnOnLabel(action: MailboxSetupAction): string {
-  switch (action) {
-    case "set_up_and_turn_on":
-      return "Set up and turn on";
-    case "set_up":
-      return "Set up";
-    case "turn_on":
-    case "wait_for_model":
-      return "Turn on";
-  }
 }
 
 function nextRevision(revision: number): number {

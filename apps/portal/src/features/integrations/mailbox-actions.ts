@@ -1,6 +1,4 @@
 import React from "react";
-import type { OrganisationMutation } from "../../mutation-state";
-import { parseMailboxPolicyDraft, type MailboxPolicyDraft } from "../../pages/agent-mailbox";
 import type { EmailReplyPreviewResult, EmailOperationalPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { MailboxSetupAgent } from "@purin-labs/control-api";
 import {
@@ -69,89 +67,35 @@ export async function connectWhatsApp(
   );
 }
 
-export async function publishMailboxPolicy(
-  context: IntegrationsRouteMutationContext,
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  const formData = new FormData(event.currentTarget);
-  const integrationAccountId = formData.get("integrationAccountId");
-  if (typeof integrationAccountId !== "string") return;
-  const mutation: OrganisationMutation = {
-    kind: "agent_mailbox",
-    integrationAccountId,
-  };
-  const parsed = parseMailboxPolicyDraft(formData);
-  if (parsed.kind === "invalid") {
-    context.setFeedback({ mutation, message: parsed.message });
-    return;
-  }
-  await runIntegrationsCommand(
-    context,
-    {
-      kind: "publish_mailbox_policy",
-      integrationAccountId,
-      policy: parsed.policy,
-    },
-    mutation,
-    parsed.policy.kind === "enabled"
-      ? "Saved. Processing is on with these limits."
-      : "Processing is off. New mail stays in Gmail untouched.",
-  );
-}
-
-/** One press of the mailbox's setup action. */
+/** One press of the mailbox's Turn on, or of Finish setup while it is on. */
 export type MailboxSetupRequest = {
   readonly integrationAccountId: string;
   readonly address: string;
   readonly agent: MailboxSetupAgent;
-  /** The limits form to turn the mailbox on with. Null leaves it as it is. */
-  readonly limitsFormId: string | null;
+  /** Turn the mailbox on after the setup. False leaves it as it is. */
+  readonly turnOn: boolean;
 };
 
 /**
- * Makes each change that the mailbox's setup names. With a limits form, it
- * then turns the mailbox on with the limits on screen.
+ * Makes each change that the mailbox's setup names. With `turnOn`, it then
+ * turns the mailbox on with the server's default limits.
  */
 export async function setUpMailbox(
   context: IntegrationsRouteMutationContext,
   request: MailboxSetupRequest,
 ): Promise<void> {
-  const integrationAccountId = request.integrationAccountId;
-  const mutation: OrganisationMutation = {
-    kind: "agent_mailbox",
-    integrationAccountId,
-  };
-  let policy: MailboxPolicyDraft | null = null;
-  if (request.limitsFormId !== null) {
-    const form = document.getElementById(request.limitsFormId);
-    if (!(form instanceof HTMLFormElement)) return;
-    // A closed Limits section cannot show which field is invalid.
-    if (!form.checkValidity()) {
-      const section = form.closest("details");
-      if (section !== null) section.open = true;
-      form.reportValidity();
-      return;
-    }
-    const parsed = parseMailboxPolicyDraft(new FormData(form));
-    if (parsed.kind === "invalid") {
-      context.setFeedback({ mutation, message: parsed.message });
-      return;
-    }
-    policy = parsed.policy;
-  }
   await runIntegrationsCommand(
     context,
     {
       kind: "set_up_mailbox",
-      integrationAccountId,
+      integrationAccountId: request.integrationAccountId,
       agent: request.agent.choice,
-      policy,
+      turnOn: request.turnOn,
     },
-    mutation,
-    policy === null
-      ? `${request.agent.name} is set up for ${request.address}.`
-      : `${request.agent.name} now reads new mail in ${request.address}.`,
+    { kind: "agent_mailbox", integrationAccountId: request.integrationAccountId },
+    request.turnOn
+      ? `${request.agent.name} now reads new mail in ${request.address}.`
+      : `${request.agent.name} has the access it needs again.`,
   );
 }
 

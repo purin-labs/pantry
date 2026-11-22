@@ -5,10 +5,7 @@ import {
   controlSecretMutation,
 } from "../../control-client";
 import { accountInvitationHref } from "../../pages/account-invitation-link";
-import {
-  mailboxPolicyWireBody,
-  setUpMailbox,
-} from "../mail-setup/turn-on";
+import { setUpMailbox } from "../mail-setup/turn-on";
 import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "./settings-types";
 import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
@@ -646,17 +643,10 @@ export async function executeIntegrationsRoute(
         MAILBOX_SETUP_TRANSPORT,
         target,
         command.agent,
-        command.policy,
+        command.turnOn,
       );
       return { kind: "completed" };
     }
-    case "publish_mailbox_policy":
-      await controlMutation(
-        `${agentMailboxPath(organisationId, command.integrationAccountId)}/policy`,
-        "POST",
-        { policy: mailboxPolicyWireBody(command.policy) },
-      );
-      return { kind: "completed" };
     case "resume_mailbox":
       await controlMutation(
         `${agentMailboxPath(organisationId, command.integrationAccountId)}/resume`,

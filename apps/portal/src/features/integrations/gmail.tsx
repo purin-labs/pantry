@@ -1,6 +1,5 @@
 import React from "react";
 import { useLocation } from "react-router";
-import type { CredentialInventory } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   EmptyState,
   ProviderTile,
@@ -33,22 +32,17 @@ import {
   mutationFeedbackMessage,
   providerConnectionState,
 } from "./settings-support";
-import type { IntegrationAccount, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
+import type { IntegrationAccount } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsPageActions, PendingProviderAuthorization, SettingsMutationFeedback } from "./settings-types";
 
 export type GmailIntegrationPanelProps = {
   readonly accounts: readonly IntegrationAccount[];
   /** The `account` query parameter: one mailbox's view, or null for the list. */
   readonly selectedAccountId: string | null;
-  readonly accessPath: string;
-  readonly inboxPath: string;
-  readonly agentsPath: string;
-  readonly credentialInventory: CredentialInventory | null;
   readonly agentMailboxes: readonly AgentMailboxView[];
   readonly emailReplies: readonly EmailReplyQueueItem[];
   readonly emailOperational: readonly EmailOperationalQueueItem[];
   readonly installations: readonly MailboxInstallationOption[];
-  readonly inferenceSelection: OrganisationInferenceSelection;
   readonly canManage: boolean;
   readonly mutations: MutationLedger;
   readonly pendingAuthorization: PendingProviderAuthorization | null;
@@ -229,7 +223,7 @@ function focusGmailViewAfterSwitch(
   if (switched) document.getElementById(GMAIL_VIEW_FOCUS_ID)?.focus();
 }
 
-export function emailDraftsWaiting(
+function emailDraftsWaiting(
   replies: readonly EmailReplyQueueItem[],
   operational: readonly EmailOperationalQueueItem[],
   integrationAccountId: string,
@@ -245,13 +239,13 @@ export function emailDraftsWaiting(
   return waiting;
 }
 
-export function formatDraftsWaiting(waiting: number): string {
+function formatDraftsWaiting(waiting: number): string {
   if (waiting === 0) return "No drafts waiting";
   return `${waiting} ${waiting === 1 ? "draft" : "drafts"} waiting`;
 }
 
 /** The assigned agent's name, or null when the list of agents lacks it. */
-export function mailboxAgentName(
+function mailboxAgentName(
   installations: readonly MailboxInstallationOption[],
   mailbox: AgentMailboxView,
 ): string | null {
@@ -270,7 +264,7 @@ function matchesMailboxInstallation(
   return option.installationId === installationId;
 }
 
-export function gmailMailboxEntryStatus(entry: GmailMailboxEntry): StatusChipStatus {
+function gmailMailboxEntryStatus(entry: GmailMailboxEntry): StatusChipStatus {
   if (entry.kind === "mailbox") return gmailMailboxStatus(entry.mailbox);
   if (entry.account.lifecycle.kind !== "active")
     return integrationLifecycleStatus(entry.account.lifecycle.kind);

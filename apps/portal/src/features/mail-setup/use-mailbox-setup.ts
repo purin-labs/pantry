@@ -1,34 +1,27 @@
 import * as React from "react";
-import {
-  encodeMailboxSetupAgentChoice,
-  type MailboxSetupAgentChoice,
-  type MailboxSetupPlan,
-} from "@purin-labs/control-api";
+import type { MailboxSetupPlan } from "@purin-labs/control-api";
 
 import type { MailboxSetupState } from "./model";
 
 export type MailboxSetupControl = Readonly<{
   state: MailboxSetupState;
   /**
-   * True while a setup is read. The setup on screen can then be the one of
-   * an earlier choice, so the page offers no action on it.
+   * True while a setup is read. The setup on screen can then be an earlier
+   * one, so the page offers no action on it.
    */
   reading: boolean;
-  /** The agent the person chose. The setup settles `automatic` by itself. */
-  choice: MailboxSetupAgentChoice;
-  choose: (choice: MailboxSetupAgentChoice) => void;
   retry: () => void;
 }>;
 
-type ReadMailboxSetup = (
+/** Reads the setup of one mailbox with the automatic agent choice. */
+export type ReadMailboxSetup = (
   integrationAccountId: string,
-  choice: MailboxSetupAgentChoice,
 ) => Promise<MailboxSetupPlan>;
 
 /**
- * The setup of one mailbox, read again when the person chooses another agent
- * and after each change of the mailbox. `integrationAccountId` is null for a
- * person who cannot change the mailbox: the page then reads nothing.
+ * The setup of one mailbox, read again after each change of the mailbox.
+ * `integrationAccountId` is null for a person who cannot change the mailbox:
+ * the page then reads nothing.
  *
  * `revision` names the state of the mailbox that the page shows. `settled`
  * is false while a change of the mailbox runs, and the read waits for it.
@@ -39,9 +32,6 @@ export function useMailboxSetup(
   revision: string,
   settled: boolean,
 ): MailboxSetupControl {
-  const [choice, choose] = React.useState<MailboxSetupAgentChoice>({
-    kind: "automatic",
-  });
   const [state, setState] = React.useState<MailboxSetupState>(
     integrationAccountId === null ? { kind: "absent" } : { kind: "loading" },
   );
@@ -49,7 +39,6 @@ export function useMailboxSetup(
   const [attempt, setAttempt] = React.useState(0);
   const latestRead = React.useRef(read);
   latestRead.current = read;
-  const chosen = encodeMailboxSetupAgentChoice(choice);
   React.useEffect(() => {
     if (integrationAccountId === null) {
       setState({ kind: "absent" });
@@ -60,7 +49,7 @@ export function useMailboxSetup(
     // The earlier setup stays on screen while the new one is read.
     setState(keepReady);
     setReading(true);
-    latestRead.current(integrationAccountId, choice).then(
+    latestRead.current(integrationAccountId).then(
       (plan) => {
         if (!current) return;
         setState({ kind: "ready", plan });
@@ -75,10 +64,9 @@ export function useMailboxSetup(
     return () => {
       current = false;
     };
-    // `chosen` stands for `choice`, which is a new object on each render.
-  }, [integrationAccountId, chosen, revision, settled, attempt]);
+  }, [integrationAccountId, revision, settled, attempt]);
   const retry = React.useCallback(() => setAttempt(next), []);
-  return { state, reading, choice, choose, retry };
+  return { state, reading, retry };
 }
 
 function keepReady(state: MailboxSetupState): MailboxSetupState {

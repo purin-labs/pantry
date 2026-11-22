@@ -721,21 +721,10 @@ body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
 .connection-dialog .setup-form label {
   align-self: start;
 }
-.connection-dialog .mailbox-setup dl {
-  border-radius: 14px;
-  background: none;
-  box-shadow: 0 0 0 1px var(--border) inset;
-}
-/* A mailbox's own view is a wide sheet in two columns, built like the wide
-   permission screen: the mailbox and what it does on the left, and what it
-   is allowed to do on a band on the right. The mailbox heading takes the
-   place of the sheet's heading, which stays for screen readers. Below 760px
-   the columns stack. */
-.connection-dialog:has(.mailbox-detail[data-layout="split"]) {
-  width: min(860px, calc(100vw - 32px));
-}
-.connection-dialog:has(.mailbox-detail[data-layout="split"])
-  .connection-dialog-head {
+/* A mailbox's own view is one short column. The mailbox heading, with the
+   Gmail tile, takes the place of the sheet's heading, which stays for screen
+   readers. */
+.connection-dialog:has(.mailbox-detail) .connection-dialog-head {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -744,108 +733,25 @@ body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
   clip-path: inset(50%);
   white-space: nowrap;
 }
-.mailbox-detail-main,
-.mailbox-detail-rest {
-  min-width: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-  gap: 18px;
-}
-.mailbox-detail:not([data-layout="split"])
-  .mailbox-detail-head
-  > .provider-tile {
-  display: none;
-}
-.mailbox-detail[data-layout="split"] .mailbox-detail-head {
+.connection-dialog .mailbox-detail .mailbox-detail-head {
   display: grid;
   justify-items: start;
   gap: 10px;
 }
-.mailbox-detail[data-layout="split"] .mailbox-detail-head > .provider-tile {
+.connection-dialog .mailbox-detail-head > .provider-tile {
   width: 52px;
   height: 52px;
   border-radius: 14px;
 }
-.mailbox-detail[data-layout="split"]
-  .mailbox-detail-head
-  > .provider-tile
-  :is(svg, img) {
+.connection-dialog .mailbox-detail-head > .provider-tile :is(svg, img) {
   width: 30px;
   height: 30px;
 }
-.mailbox-detail[data-layout="split"] .mailbox-detail-head h3 {
+.connection-dialog .mailbox-detail-head h3 {
   font-family: var(--display);
   font-size: 24px;
   font-weight: 400;
   line-height: 1.22;
-}
-.connection-dialog .mailbox-detail[data-layout="split"] {
-  gap: 0;
-  margin: -32px -24px -24px;
-}
-.connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-main {
-  padding: 28px 24px 24px;
-}
-.connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-rest {
-  padding: 24px;
-}
-.connection-dialog .mailbox-detail-aside {
-  padding: 20px 24px 24px;
-  border-block: 1px solid var(--border);
-  background: color-mix(in oklch, var(--surface) 55%, var(--paper));
-}
-/* On the band the setup is a plain list: each row's name above its text. */
-.connection-dialog .mailbox-detail-aside .mailbox-setup {
-  gap: 14px;
-}
-.connection-dialog .mailbox-detail-aside .mailbox-setup h4 {
-  padding-inline-end: 28px;
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 500;
-}
-.connection-dialog .mailbox-detail-aside .mailbox-setup dl {
-  gap: 18px;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-}
-.connection-dialog .mailbox-detail-aside .mailbox-setup dl > div {
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
-  padding: 0;
-}
-.connection-dialog .mailbox-detail-aside .mailbox-setup dl > div + div {
-  border-top: 0;
-}
-@media (min-width: 760px) {
-  .connection-dialog .mailbox-detail[data-layout="split"] {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      "lead aside"
-      "rest aside";
-    grid-template-rows: auto 1fr;
-  }
-  .connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-main {
-    grid-area: lead;
-    padding: 32px 32px 0;
-  }
-  .connection-dialog .mailbox-detail[data-layout="split"] .mailbox-detail-rest {
-    grid-area: rest;
-    padding: 18px 32px 32px;
-  }
-  .connection-dialog .mailbox-detail-aside {
-    grid-area: aside;
-    padding: 32px;
-    border-block: 0;
-    border-inline-start: 1px solid var(--border);
-  }
-  /* The setup stays in view while the left column scrolls. */
-  .connection-dialog .mailbox-detail-aside > .mailbox-setup {
-    position: sticky;
-    top: 32px;
-  }
 }
 .typesafe-key-link {
   color: var(--ink);
@@ -869,15 +775,6 @@ body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
   }
   .connection-dialog-content {
     padding: 28px 16px 16px;
-  }
-  .connection-dialog .mailbox-detail[data-layout="split"] {
-    margin: -28px -16px -16px;
-  }
-  .connection-dialog
-    .mailbox-detail[data-layout="split"]
-    :is(.mailbox-detail-main, .mailbox-detail-rest),
-  .connection-dialog .mailbox-detail-aside {
-    padding-inline: 16px;
   }
 }
 .custom-connector-editor:has(.connector-method-tabs) {

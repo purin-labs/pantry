@@ -818,6 +818,23 @@ export async function publishMailboxIngressPolicy(input: {
   };
 }
 
+/**
+ * The limits that a mailbox turns on with. The Portal sends none, so every
+ * mailbox that a person turns on gets these. Processing pauses at a limit
+ * until a person resumes it.
+ */
+const DEFAULT_MAILBOX_LIMITS = {
+  maxActiveCases: 3,
+  maxMessagesPerHour: 20,
+  dailyTokenBudget: 1_000_000,
+  maxMessageBytes: 262_144,
+  maxAttachmentBytes: 5_242_880,
+} as const;
+
+/**
+ * An enabled policy with no limits takes `DEFAULT_MAILBOX_LIMITS`. A request
+ * that names limits names all five, with the fixed debounce and overflow.
+ */
 export function parseMailboxIngressPolicyPublishRequest(
   raw: unknown,
 ): Result<MailboxIngressPolicyPublishRequest, EmailFieldError> {
@@ -828,6 +845,20 @@ export function parseMailboxIngressPolicyPublishRequest(
       : invalid("policy");
   }
   if (raw.kind !== "enabled") return invalid("policy.kind");
+  if (hasOnlyKeys(raw, ["kind"])) {
+    return {
+      ok: true,
+      value: {
+        kind: "enabled",
+        ...DEFAULT_MAILBOX_LIMITS,
+        debounce: {
+          kind: "push_triggered",
+          coalesceSeconds: EMAIL_CUE_COALESCE_SECONDS,
+        },
+        overflow: "pause_and_notify",
+      },
+    };
+  }
   if (
     !hasOnlyKeys(raw, [
       "kind",

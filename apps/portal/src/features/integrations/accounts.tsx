@@ -301,7 +301,7 @@ function connectionCause(service: string, reasonCode: string): string {
   }
 }
 
-export function isCredentialReplacementCandidate(
+function isCredentialReplacementCandidate(
   integrationAccountId: string,
   account: IntegrationAccount,
 ): boolean {
@@ -311,7 +311,7 @@ export function isCredentialReplacementCandidate(
   );
 }
 
-export function renderIntegrationAccountDetails(
+function renderIntegrationAccountDetails(
   account: IntegrationAccount,
 ): React.ReactNode {
   return (
@@ -578,7 +578,7 @@ export function integrationAccountCommands(
  * back, and cleared before the request leaves the component. Revocation is
  * metadata only and never touches secret values.
  */
-export function CredentialRecoveryActions(props: {
+function CredentialRecoveryActions(props: {
   readonly account: IntegrationAccount;
   readonly record: CredentialAccountRecord;
   readonly candidates: readonly IntegrationAccount[];

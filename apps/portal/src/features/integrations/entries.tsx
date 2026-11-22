@@ -4,10 +4,7 @@ import {
   TypeSafeConnectionPanel,
   type TypeSafeConnectionState,
 } from "./typesafe-connection";
-import {
-  workspaceAccessSubviewPath,
-  workspacePagePath,
-} from "../../route";
+import { workspacePagePath } from "../../route";
 import { PROVIDER_PRESENTATION } from "../../integration-catalogue";
 import {
   onePasswordStatusLabel,
@@ -535,27 +532,10 @@ function integrationEntries(
         <GmailIntegrationPanel
           accounts={gmail}
           selectedAccountId={props.initialAccountId ?? null}
-          accessPath={workspaceAccessSubviewPath(
-            props.organisationHandle,
-            props.workspaceHandle,
-            "capabilities",
-          )}
-          inboxPath={workspacePagePath(
-            props.organisationHandle,
-            props.workspaceHandle,
-            "inbox",
-          )}
-          agentsPath={workspacePagePath(
-            props.organisationHandle,
-            props.workspaceHandle,
-            "agents",
-          )}
-          credentialInventory={props.credentialInventory}
           agentMailboxes={props.agentMailboxes}
           emailReplies={props.emailReplies}
           emailOperational={props.emailOperational}
           installations={props.mailboxInstallations}
-          inferenceSelection={props.inferenceSelection}
           canManage={props.canManage}
           mutations={props.mutations}
           pendingAuthorization={props.pendingAuthorization}

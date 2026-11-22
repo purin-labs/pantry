@@ -12,12 +12,13 @@ import {
   type OrganisationMutation,
 } from "../../mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
-import type { MailboxInstallationOption, MailboxPolicyDraft } from "../../pages/agent-mailbox";
+import type { MailboxInstallationOption } from "../../pages/agent-mailbox";
 import type { IntegrationRouteId } from "./model";
 import type { EmailReviewActions } from "../email-review/api";
 import type { Variant } from "@purin-labs/type-utils";
 import type { MailboxSetupAgentChoice, MailboxSetupPlan } from "@purin-labs/control-api";
 import type { MailboxSetupRequest } from "./mailbox-actions";
+import type { ReadMailboxSetup } from "../mail-setup/use-mailbox-setup";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
 
 type OrganisationLifecycle = OrganisationOnboardingLifecycle["kind"];
@@ -134,11 +135,7 @@ export type IntegrationsPageActions = EmailReviewActions & {
     integrationAccountId: string,
     replacementIntegrationAccountId: string | null,
   ) => Promise<CredentialActionOutcome>;
-  readonly publishMailboxPolicy: SettingsFormHandler;
-  readonly readMailboxSetup: (
-    integrationAccountId: string,
-    choice: MailboxSetupAgentChoice,
-  ) => Promise<MailboxSetupPlan>;
+  readonly readMailboxSetup: ReadMailboxSetup;
   readonly setUpMailbox: (request: MailboxSetupRequest) => void;
   readonly resumeMailbox: SettingsMouseHandler;
   readonly skipAndResumeMailbox: SettingsMouseHandler;
@@ -243,16 +240,11 @@ export type IntegrationsCommand =
       readonly replacementIntegrationAccountId: string | null;
     }
   | {
-      readonly kind: "publish_mailbox_policy";
-      readonly integrationAccountId: string;
-      readonly policy: MailboxPolicyDraft;
-    }
-  | {
       readonly kind: "set_up_mailbox";
       readonly integrationAccountId: string;
       readonly agent: MailboxSetupAgentChoice;
-      /** The limits to turn the mailbox on with. Null leaves it as it is. */
-      readonly policy: MailboxPolicyDraft | null;
+      /** Turn the mailbox on after the setup, with the server's limits. */
+      readonly turnOn: boolean;
     }
   | { readonly kind: "resume_mailbox"; readonly integrationAccountId: string }
   | {
@@ -448,7 +440,6 @@ export type IntegrationsRouteTransport = {
   readonly readMailboxSetup: (
     organisationId: string,
     integrationAccountId: string,
-    choice: MailboxSetupAgentChoice,
   ) => Promise<MailboxSetupPlan>;
   readonly readEmailReply: (
     organisationId: string,

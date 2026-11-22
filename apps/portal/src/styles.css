@@ -3476,30 +3476,26 @@ a.commerce-count:hover {
   font-size: 15px;
 }
 
-/* A field with no hint keeps its input's height beside one with a hint. */
-.mailbox-detail[data-presentation="page"] .setup-form {
-  align-items: start;
-}
-
 .mailbox-detail[data-presentation="page"] .mailbox-section {
   gap: 14px;
   padding-block-start: 28px;
 }
 
-.mailbox-detail[data-presentation="page"]
-  :is(.mailbox-setup h4, .mailbox-section > h4) {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-/* The switch and the sentence that explains it share one row. */
+/* The switch, with the sentence that says what it does under it. */
 .mailbox-switch {
-  align-items: center;
+  display: grid;
+  justify-items: start;
+  gap: 10px;
   margin: 0;
 }
 
 .mailbox-switch .notice-text {
-  flex: 1 1 320px;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.mailbox-switch .connection-actions {
+  margin: 0;
 }
 
 .mailbox-switch button:not(:where(.pantry-select-trigger)):disabled {
@@ -3525,98 +3521,8 @@ a.commerce-count:hover {
   margin: 0;
 }
 
-.mailbox-setup {
-  display: grid;
-  gap: 10px;
-}
-
-.mailbox-setup h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.mailbox-setup dl {
-  display: grid;
-  margin: 0;
-  border-radius: 16px;
-  background: var(--surface);
-}
-
-.mailbox-setup dl > div {
-  display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 16px;
-  padding: 14px 18px;
-}
-
-.mailbox-setup dl > div + div {
-  border-top: 1px solid var(--border);
-}
-
-.mailbox-setup dt {
-  color: var(--ink-2);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.mailbox-setup dd {
-  min-width: 0;
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  font-size: 14px;
-}
-
-.mailbox-setup dd > p {
-  max-width: 70ch;
-  margin: 0;
-  line-height: 1.5;
-}
-
-.mailbox-setup dd a {
-  color: var(--ink);
-  font-weight: 500;
-  text-underline-offset: 3px;
-}
-
-/* What the setup has done and what it still does, one line each. The word
-   at the end of a line says the state, so the mark is not its only sign. */
-.mailbox-setup-list {
-  display: grid;
-  gap: 8px;
-  max-width: 70ch;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.mailbox-setup-list li {
-  display: grid;
-  grid-template-columns: 16px minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: start;
-  line-height: 1.5;
-}
-
-/* The mark sits on the first line of its label. */
-.mailbox-setup-mark {
-  margin-block-start: 3px;
-  color: var(--ink-3);
-}
-
-.mailbox-setup-list li[data-state="met"] .mailbox-setup-mark {
-  color: var(--success-text);
-}
-
-.mailbox-setup-state {
-  color: var(--ink-2);
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-/* A section of the mailbox view: its name, a hairline above it, and its
-   content. Nothing folds. */
+/* The remove section of the mailbox view: a hairline above it and its one
+   action. Nothing folds. */
 .mailbox-section {
   display: grid;
   gap: 10px;
@@ -3624,62 +3530,15 @@ a.commerce-count:hover {
   border-block-start: 1px solid var(--border);
 }
 
-.mailbox-section > h4 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.mailbox-section-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-}
-
-/* The connection body borrows the card's button and disclosure treatment,
-   not its box: the section already draws one. */
-.mailbox-section-body.connection-card {
-  padding: 0;
-  background: none;
-}
-
-/* The onboarding card is a box of the same colour; inside a section it is
-   plain content. */
-.mailbox-section-body > .provider-onboarding {
-  padding: 0;
-  background: none;
-}
-
 .mailbox-section .connection-actions,
 .mailbox-banner .connection-actions {
   margin: 0;
-}
-
-.mailbox-danger > h4 {
-  color: var(--danger-text);
 }
 
 .mailbox-danger-actions > button:not(:where(.pantry-select-trigger)) {
   min-height: 40px;
   color: var(--danger-text);
   box-shadow: var(--pantry-danger-ring);
-}
-
-@media (max-width: 640px) {
-  .mailbox-setup dl > div {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-  }
-
-  /* A narrow row keeps its width for the label: the state goes under it. */
-  .mailbox-setup-list li {
-    grid-template-columns: 16px minmax(0, 1fr);
-    row-gap: 0;
-  }
-
-  .mailbox-setup-state {
-    grid-column: 2;
-  }
 }
 
 /* Provider onboarding (file storage, email, WhatsApp) ------------------- */
@@ -8360,7 +8219,6 @@ textarea:focus-visible {
       .ecommerce-mobile-navigation,
       .agent-work-row,
       .connection-advanced,
-      .mailbox-section,
       .workflow-batch-delay
     )
   )
@@ -8410,7 +8268,6 @@ textarea:focus-visible {
           .ecommerce-mobile-navigation,
           .agent-work-row,
           .connection-advanced,
-          .mailbox-section,
           .workflow-batch-delay
         )
     )

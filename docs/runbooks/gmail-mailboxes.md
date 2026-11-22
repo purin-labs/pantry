@@ -26,7 +26,6 @@ process mail.
 | `GMAIL_PUBSUB_SERVICE_ACCOUNT`   | var           | Exact `email` claim on the push token                                                                            |
 | `GMAIL_PILOT_ACCOUNT_CAP`        | var, optional | Connected Google accounts this project may consume. Defaults to 80                                               |
 | `GMAIL_PILOT_SUBMISSION_TRIGGER` | var, optional | Consumption at which to begin verification. Defaults to 50                                                       |
-| `GMAIL_OAUTH_PILOT_EXPIRY_DAYS`  | var, optional | Refresh-token lifetime of this Google project. Set to `7` on a Testing-status project; leave unset once verified |
 
 Two URLs are registered with Google and must match byte for byte:
 
@@ -38,8 +37,8 @@ ${PANTRY_OAUTH_CALLBACK_ORIGIN}/hook/email/google
 Production Gmail runs in the Google Cloud project `purin-pantry` (Plan 93
 step 4), with one web client for sign-in, Gmail and Drive (the owner's
 decision in Plan 91 phase 4). Its consent screen is External and "In
-production", so refresh tokens do not end after seven days, and
-`GMAIL_OAUTH_PILOT_EXPIRY_DAYS` is not set. Until Google verifies the
+production", so refresh tokens do not end after seven days. The Portal shows
+no expiry date for a Gmail sign-in. Until Google verifies the
 restricted Gmail scopes, a connect shows Google's "unverified app" screen,
 and at most 100 people can connect. Because sign-in shares the project, a
 restriction on the project would also stop sign-in. Local development still
@@ -121,6 +120,12 @@ can be connected until the production project is verified.
 Processing pauses fail closed and never resumes on its own. Every pause names
 its exact limit.
 
+The Portal turns a mailbox on with one press and the server's default limits:
+3 emails in progress, 20 new emails an hour, 1,000,000 tokens a day, 256 KiB
+for one email and 5 MiB for one attachment. The Portal has no form to change
+them. To raise a limit, an owner or admin posts the full enabled policy to
+`POST /v1/control/organisations/:organisationId/agent-mailboxes/:integrationAccountId/policy`.
+
 | Pause reason                 | Operator action                                         |
 | ---------------------------- | ------------------------------------------------------- |
 | `active_case_limit`          | Close Cases or raise the limit, then resume             |
@@ -136,10 +141,12 @@ stays in Gmail while paused and was never sent to the agent.
 
 ## Recovery
 
-**Watch expired or lost.** Reconnect the mailbox from the Portal. That
-re-establishes `users.watch` and reactivates processing under the current
-enabled policy, keeping the accepted history cursor. The scheduled reconciler
-performs the same repair daily.
+**Watch expired or lost.** The scheduled reconciler re-establishes
+`users.watch` daily and reactivates processing under the current enabled
+policy, keeping the accepted history cursor. An owner or admin can do the same
+at once with `POST …/agent-mailboxes/:integrationAccountId/reconnect`. The
+Portal offers it as Restart mail sync or Resume only when the mailbox shows
+one of the two cases below.
 
 **How Reconnect chooses.** Reconnect keeps the cursor by default, so anything
 that arrived during an outage is still caught up on the next evaluation. It
@@ -161,8 +168,8 @@ hourly and active-Case limits.
 on the mailbox card. Re-authorize through the standard provider flow, then
 Reconnect. The cursor is preserved, so mail that arrived while authorization
 was broken is admitted rather than skipped. On a Testing-status project this
-is expected weekly, and the console projects the expiry date in advance when
-`GMAIL_OAUTH_PILOT_EXPIRY_DAYS` is set.
+is expected weekly. After the reconnect, Resume on the mailbox starts the
+mail sync again.
 
 **Ambiguous send.** A send whose result is unknown records
 `send_indeterminate` and never retries blindly. Resolution searches Gmail for

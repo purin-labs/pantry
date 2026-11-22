@@ -1,7 +1,4 @@
-import type {
-  MailboxSetupAgentChoice,
-  MailboxSetupPlan,
-} from "@purin-labs/control-api";
+import type { MailboxSetupPlan } from "@purin-labs/control-api";
 import {
   controlRead,
   controlSignal,
@@ -78,12 +75,11 @@ const WHATSAPP_ROUTE_TRANSPORT: WhatsAppRouteTransport = {
 function readMailboxSetupTransport(
   organisationId: string,
   integrationAccountId: string,
-  choice: MailboxSetupAgentChoice,
 ): Promise<MailboxSetupPlan> {
   return readMailboxSetup(
     MAILBOX_SETUP_TRANSPORT,
     { organisationId, integrationAccountId },
-    choice,
+    { kind: "automatic" },
   );
 }
 

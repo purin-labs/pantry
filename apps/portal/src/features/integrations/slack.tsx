@@ -25,27 +25,8 @@ import {
   setupFieldHasError,
   setupFormHasError,
 } from "./settings-support";
-import type { IntegrationAccount, OrganisationInferenceSelection, ProviderResource, SlackRoutingConnection } from "@purin-labs/control-api/portal/settings";
+import type { IntegrationAccount, ProviderResource, SlackRoutingConnection } from "@purin-labs/control-api/portal/settings";
 import type { IntegrationsPageActions, IntegrationsPageProps, SettingsMutationFeedback, SetupFeedback, SetupFormDefaults, SlackWorkspaceCatalog } from "./settings-types";
-
-export function inferenceRouteName(selection: OrganisationInferenceSelection): string {
-  switch (selection.kind) {
-    case "claude_oauth":
-      return "your Claude account";
-    case "codex_subscription":
-      return "your ChatGPT subscription";
-    case "pantry_platform":
-      return "Purin AI";
-    case "organisation_openai_api_key":
-      return "your OpenAI API key";
-    case "organisation_anthropic_api_key":
-      return "your Anthropic API key";
-    case "organisation_google_api_key":
-      return "your Gemini API key";
-    default:
-      return assertNever(selection, "Unexpected settings state");
-  }
-}
 
 /**
  * When Slack connects while this panel shows, the Connect button that had

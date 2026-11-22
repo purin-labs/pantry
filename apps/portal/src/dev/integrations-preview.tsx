@@ -20,10 +20,10 @@
  * Email has two views. `?integration=gmail&scenario=connected` lists five
  * connections: one on, one off, one paused, one with no agent and one that
  * only sends. Add `&account=intacc_gmail_orders` (or click a row) for one
- * mailbox's own view. A mailbox with no agent shows its setup: `&setup=new`
- * for a workspace with no agent, `&setup=nuki` for an agent that is not
- * active, `&setup=model` for a model that is not approved, and
- * `&setup=failed` for a setup that cannot be read.
+ * mailbox's own view. A mailbox that is off shows Turn on: `&setup=new` for
+ * a workspace with no agent, `&setup=model` for a model that is not
+ * approved (Turn on waits), and `&setup=failed` for a setup that cannot be
+ * read.
  *
  * Route mode (`?mode=route&integration=<tile>&scenario=…`) mounts the real
  * IntegrationsRoute over an in-memory transport, so the consent-window watch
@@ -90,20 +90,6 @@ const NOW = Date.parse("2026-09-05T09:00:00+09:00");
 
 const settle = async (): Promise<void> => {};
 
-/**
- * The mailbox forms post nowhere in page mode. Keep the page in place and log
- * the fields, so a reviewer can read what each control sends.
- */
-async function logPreviewForm(
-  event: React.FormEvent<HTMLFormElement>,
-): Promise<void> {
-  event.preventDefault();
-  console.log(
-    "[preview] submit",
-    Object.fromEntries(new FormData(event.currentTarget)),
-  );
-}
-
 async function logPreviewClick(
   event: React.MouseEvent<HTMLButtonElement>,
 ): Promise<void> {
@@ -160,7 +146,6 @@ const ACTIONS: IntegrationsPageActions = {
     errorKind: "unknown",
     message: "Preview only.",
   }),
-  publishMailboxPolicy: logPreviewForm,
   readMailboxSetup: previewMailboxSetup,
   setUpMailbox: (request) => {
     console.log("[preview] set up mailbox", request);
@@ -345,11 +330,6 @@ const MAILBOX: AgentMailboxView = {
   integrationAccountId: GMAIL_ACCOUNT.integrationAccountId,
   observedAddress: GMAIL_ACCOUNT.displayName,
   connectionLifecycle: "active",
-  authorization: {
-    authorizedAt: NOW - 86_400_000,
-    expiresAt: NOW + 86_400_000 * 150,
-    expiryWindowDays: 180,
-  },
   binding: null,
   policy: { kind: "disabled_by_default" },
   runtime: null,
@@ -474,8 +454,8 @@ function previewSetupAgent(
 /** The setup of a sample mailbox, as the `setup` query value asks. */
 async function previewMailboxSetup(
   integrationAccountId: string,
-  choice: MailboxSetupAgentChoice,
 ): Promise<MailboxSetupPlan> {
+  const choice: MailboxSetupAgentChoice = { kind: "automatic" };
   const variant = new URLSearchParams(window.location.search).get("setup");
   if (variant === "failed") throw new Error("Preview only.");
   const assigned = ASSIGNED_MAILBOXES.includes(integrationAccountId);
@@ -1166,8 +1146,8 @@ function buildRouteTransport(
       scenario === "loading"
         ? readPendingPreviewDetail
         : readPreviewDetail.bind(null, detailData, previewDetailDelay()),
-    readMailboxSetup: (_organisationId, integrationAccountId, choice) =>
-      previewMailboxSetup(integrationAccountId, choice),
+    readMailboxSetup: (_organisationId, integrationAccountId) =>
+      previewMailboxSetup(integrationAccountId),
     execute: async (
       _organisationId,
       _organisationHandle,
