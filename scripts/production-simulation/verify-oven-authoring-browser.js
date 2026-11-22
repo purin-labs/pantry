@@ -160,14 +160,16 @@ async function forwardAuthorRequest(route) {
   await route.fulfill({ response });
 }
 async function mountAuthorWorkspace(organisationId) {
+  const { sourceUrl } = await import("/source-url.js");
   const { initializeBrowserValidators } =
     await import("/@id/@purin-labs/commerce-contracts/browser-validators");
   await initializeBrowserValidators();
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
+  const { default: WorkflowSimulatorRoute } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
   document.getElementById("root").remove();
   const host = document.createElement("div");
   document.body.append(host);

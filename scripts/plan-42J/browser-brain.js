@@ -26,9 +26,9 @@ async (page) => {
   // closes its popup.
   async function chooseOption(page, trigger, choice) {
     await trigger.click();
-    const popup = page.locator('.pantry-select-popup[data-open]');
+    const popup = page.locator(".pantry-select-popup[data-open]");
     await popup.waitFor();
-    const items = popup.locator('.pantry-select-item');
+    const items = popup.locator(".pantry-select-item");
     if ("values" in choice) {
       const wanted = choice.values.map(String);
       for (const item of await items.all()) {
@@ -44,7 +44,9 @@ async (page) => {
         )
         .click();
     } else if ("label" in choice) {
-      await popup.getByRole("option", { name: choice.label, exact: true }).click();
+      await popup
+        .getByRole("option", { name: choice.label, exact: true })
+        .click();
     } else {
       await items.nth(choice.index).click();
     }
@@ -55,10 +57,10 @@ async (page) => {
   // closes.
   async function selectItems(page, trigger) {
     await trigger.click();
-    const popup = page.locator('.pantry-select-popup[data-open]');
+    const popup = page.locator(".pantry-select-popup[data-open]");
     await popup.waitFor();
     const items = await popup
-      .locator('.pantry-select-item')
+      .locator(".pantry-select-item")
       .evaluateAll(function readSelectItems(nodes) {
         return nodes.map(function readSelectItem(node) {
           return {
@@ -108,9 +110,7 @@ async (page) => {
     }
     async send(target, path, body) {
       const cookies = await target.context().cookies(WORKER);
-      const csrf = cookies.find(
-        (cookie) => cookie.name === "pantry_csrf",
-      );
+      const csrf = cookies.find((cookie) => cookie.name === "pantry_csrf");
       if (!csrf) throw new Error("CSRF cookie missing");
       return target.request.fetch(this.url(path), {
         method: "POST",
@@ -1137,8 +1137,10 @@ async (page) => {
       // assignment has its own lane.
       const placed = await this.owner.evaluate(
         async (execution) => {
-          const { layoutExecution } =
-            await import("/src/features/brain/execution-layout.ts");
+          const { sourceUrl } = await import("/source-url.js");
+          const { layoutExecution } = await import(
+            sourceUrl("areas/brain/ui/features/brain/execution-layout.ts")
+          );
           const layout = layoutExecution(execution);
           const at = new Map(
             layout.nodes.map((entry) => [entry.node.nodeId, entry]),
@@ -1274,7 +1276,9 @@ async (page) => {
       this.check(
         "the other administrator reads the Case and its execution",
         otherCases.status === 200 &&
-          otherCases.body.cases.some((entry) => entry.caseId === sourceCaseId) &&
+          otherCases.body.cases.some(
+            (entry) => entry.caseId === sourceCaseId,
+          ) &&
           ownerCase.status === 200 &&
           otherCase.status === 200 &&
           JSON.stringify(otherCase.body) === JSON.stringify(ownerCase.body) &&

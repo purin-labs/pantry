@@ -132,7 +132,7 @@ async function verifyOperatingDefaults(page) {
 // synthetic shift: an old schema version, and cooling that starts before
 // the unload ends.
 async function rejectedObservations(page) {
-  const fixture = `${new URL(page.url()).origin}/@fs${checkoutRoot()}/apps/portal/src/features/workflow-simulator/fixtures/measured-shift-synthetic.json`;
+  const fixture = `${new URL(page.url()).origin}${checkoutUrl("areas/kitchen/ui/features/workflow-simulator/fixtures/measured-shift-synthetic.json")}`;
   const shift = await (await page.request.get(fixture)).json();
   const old = { ...shift, schemaVersion: 1 };
   const overlapping = structuredClone(shift);

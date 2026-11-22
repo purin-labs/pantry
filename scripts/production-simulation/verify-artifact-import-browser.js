@@ -52,11 +52,15 @@ async function verifyArtifactImportBrowser(page) {
 }
 
 async function stageArtifactLifetime(mode) {
+  const { sourceUrl } = await import("/source-url.js");
   const content =
     'A checkpoint with Unicode 水 and escaped framing: "{}[]\\\n\u0000';
   if (mode === "create") {
-    const { RunArtifactStore } =
-      await import("/src/features/production-run/run-artifact-store.ts");
+    const { RunArtifactStore } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/production-run/run-artifact-store.ts",
+      )
+    );
     const { sha256Hex } = await import("/@id/@purin-labs/std");
     const store = await RunArtifactStore.create();
     const digest = await sha256Hex(new TextEncoder().encode(content));
@@ -80,13 +84,16 @@ function addArchiveInput() {
 }
 
 async function importStoredRun(snapshot) {
+  const { sourceUrl } = await import("/source-url.js");
   const { readSavedRunFile } =
     await import("/@id/@purin-labs/production-simulation/runs/run-file-reader");
-  const { RunArtifactStore } =
-    await import("/src/features/production-run/run-artifact-store.ts");
+  const { RunArtifactStore } = await import(
+    sourceUrl("areas/kitchen/ui/features/production-run/run-artifact-store.ts")
+  );
   const { OvenRecordings } =
     await import("/@id/@purin-labs/production-simulation/runs/oven-recordings");
-  const { openResumable } = await import("/@id/@purin-labs/production-simulation");
+  const { openResumable } =
+    await import("/@id/@purin-labs/production-simulation");
   const input = document.querySelector("#archive-input");
   const file = input.files[0];
   // At twice the 128 MiB heap ceiling below, an import that read the file as

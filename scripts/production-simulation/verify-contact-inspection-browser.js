@@ -1,7 +1,9 @@
 async function verifyContactInspectionBrowser(page) {
   await page.route("**/src/dev/workflow-preview.tsx", previewStyles);
   await openPhysicsEvidence(page);
-  const source = `/@fs${checkoutRoot()}/services/platform/tests/fixtures/bakery-persistent-failure.json`;
+  const source = checkoutUrl(
+    "services/platform/tests/fixtures/bakery-persistent-failure.json",
+  );
   const reference = await page.evaluate(readContactReference, source);
   await page.evaluate(showPortalPhysicsEvidence, portalSimulationSource());
   await page.evaluate(mountWorkflowSimulator, { kind: "preview" });

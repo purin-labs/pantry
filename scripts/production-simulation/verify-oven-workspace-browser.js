@@ -1,5 +1,4 @@
 async function verifyOvenWorkspaceBrowser(page) {
-  await exposeCheckout(page);
   globalThis.ovenRecipeArchive = new Map();
   globalThis.ovenRecipeLoseReply = true;
   await page.route(
@@ -338,6 +337,7 @@ function ovenLiveReady() {
 }
 
 async function checkLiveOvenPhysics(path) {
+  const { sourceUrl } = await import("/source-url.js");
   const saved = await (await fetch(`/@fs/${path}`)).json();
   const section = document.querySelector(
     '[aria-label="Live accepted physics"]',
@@ -346,7 +346,7 @@ async function checkLiveOvenPhysics(path) {
   const task = section.dataset.physicsTask;
   const purpose = section.dataset.purpose;
   const { nativeIdentity } = await import(
-    `/@fs${window.pantryCheckout}/packages/production-simulation/src/native/cell-adapter.ts`
+    sourceUrl("packages/production-simulation/src/native/cell-adapter.ts")
   );
   let attempt = null;
   let startedAt = 0;
@@ -428,22 +428,26 @@ async function checkLiveOvenPhysics(path) {
 }
 
 async function checkLiveRecordingBoundaries(evidence) {
+  const { sourceUrl } = await import("/source-url.js");
   const records = await (
     await fetch(`${evidence}/live-observations.json`)
   ).json();
   const { readPhysicsView } =
     await import("/@id/@purin-labs/production-simulation");
   const { parsePersistentCell } = await import(
-    `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-physics.ts`
+    sourceUrl("packages/bakery-model/src/bakery-physics.ts")
   );
   const { readOvenScene, readOvenLiveFrame, ovenFrameMotion, ovenSampleTime } =
     await import(
-      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
+      sourceUrl("packages/production-simulation/src/runs/oven-live-physics.ts")
     );
-  const { PhysicsModel, disposePhysicsObject, samplePhysics } =
-    await import("/src/features/workflow-simulator/spatial/physics-model.ts");
+  const { PhysicsModel, disposePhysicsObject, samplePhysics } = await import(
+    sourceUrl(
+      "areas/kitchen/ui/features/workflow-simulator/spatial/physics-model.ts",
+    )
+  );
   const { ROBOTS } = await import(
-    `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-robots.ts`
+    sourceUrl("packages/bakery-model/src/bakery-robots.ts")
   );
   const scenes = new Map();
   let model = null;
@@ -459,7 +463,9 @@ async function checkLiveRecordingBoundaries(evidence) {
     if (scene === undefined) {
       const setup = await (
         await fetch(
-          `/@fs${window.pantryCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+          sourceUrl(
+            `assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+          ),
         )
       ).json();
       scene = readOvenScene(cell, {
@@ -789,6 +795,7 @@ async function checkStorageHistory(path) {
 // The stubbed preview module would turn on the evidence views; the mount
 // does it on the Portal's own module instance.
 async function mountConnectedOvenWorkspace(simulationSource) {
+  const { sourceUrl } = await import("/source-url.js");
   const { showPhysicsEvidence } = await import(
     `${simulationSource}/runs/physics-evidence.ts`
   );
@@ -796,8 +803,9 @@ async function mountConnectedOvenWorkspace(simulationSource) {
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
+  const { default: WorkflowSimulatorRoute } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
   ReactDOM.createRoot(document.getElementById("root")).render(
     React.createElement(
       MemoryRouter,
@@ -815,8 +823,10 @@ async function mountConnectedOvenWorkspace(simulationSource) {
 }
 
 async function rememberOvenSurface() {
-  const { bakerySurfaceForOrganisation } =
-    await import("/src/features/bakery-surface-registry.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { bakerySurfaceForOrganisation } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+  );
   const surface = bakerySurfaceForOrganisation("oven-ui-acceptance");
   if (surface === null)
     throw new Error("The finite workspace surface was not restored.");
@@ -824,8 +834,10 @@ async function rememberOvenSurface() {
 }
 
 async function checkOvenSurfaceSuspended() {
-  const { bakerySurfaceForOrganisation } =
-    await import("/src/features/bakery-surface-registry.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { bakerySurfaceForOrganisation } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+  );
   if (bakerySurfaceForOrganisation("oven-ui-acceptance") !== null)
     throw new Error(
       "The hidden finite run is still exposed to agent controls.",
@@ -1100,9 +1112,10 @@ function ovenPhysicsReady() {
 }
 
 async function checkOvenPhysicsSample({ path, task, endpoint }) {
+  const { sourceUrl } = await import("/source-url.js");
   const saved = await (await fetch(`/@fs/${path}`)).json();
   const { nativeIdentity } = await import(
-    `/@fs${window.pantryCheckout}/packages/production-simulation/src/native/cell-adapter.ts`
+    sourceUrl("packages/production-simulation/src/native/cell-adapter.ts")
   );
   let native = null;
   let startedAt = 0;
@@ -1165,25 +1178,30 @@ async function checkOvenPhysicsSample({ path, task, endpoint }) {
   }
   if (endpoint === "last") {
     const { readOvenSave } = await import(
-      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
+      sourceUrl("packages/production-simulation/src/runs/oven-run-file.ts")
     );
     const { OvenRecordings, ovenRecordingArchive } = await import(
-      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-recordings.ts`
+      sourceUrl("packages/production-simulation/src/runs/oven-recordings.ts")
     );
     const { readOvenScene } = await import(
-      `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
+      sourceUrl("packages/production-simulation/src/runs/oven-live-physics.ts")
     );
-    const { PhysicsModel, disposePhysicsObject, samplePhysics } =
-      await import("/src/features/workflow-simulator/spatial/physics-model.ts");
+    const { PhysicsModel, disposePhysicsObject, samplePhysics } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/spatial/physics-model.ts",
+      )
+    );
     const { ROBOTS } = await import(
-      `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-robots.ts`
+      sourceUrl("packages/bakery-model/src/bakery-robots.ts")
     );
     const checked = await readOvenSave(saved, new Map());
     if (!checked.ok) throw new Error(checked.error);
     const cell = checked.value.cells[0];
     const setup = await (
       await fetch(
-        `/@fs${window.pantryCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+        sourceUrl(
+          `assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+        ),
       )
     ).json();
     const scene = {
@@ -1433,17 +1451,18 @@ async function checkSchedulingHistory(path) {
 }
 
 async function checkIndexedRecordingAccess(paths) {
+  const { sourceUrl } = await import("/source-url.js");
   const { readOvenSave } = await import(
-    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
+    sourceUrl("packages/production-simulation/src/runs/oven-run-file.ts")
   );
   const { OvenRecordings, ovenRecordingArchive } = await import(
-    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-recordings.ts`
+    sourceUrl("packages/production-simulation/src/runs/oven-recordings.ts")
   );
   const { readOvenScene, ovenFrameMotion, ovenSampleTime } = await import(
-    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-live-physics.ts`
+    sourceUrl("packages/production-simulation/src/runs/oven-live-physics.ts")
   );
   const { ROBOTS } = await import(
-    `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-robots.ts`
+    sourceUrl("packages/bakery-model/src/bakery-robots.ts")
   );
   const reader = new OvenRecordings();
   const seenPacks = new Set();
@@ -1459,7 +1478,9 @@ async function checkIndexedRecordingAccess(paths) {
     if (scene === undefined) {
       const setup = await (
         await fetch(
-          `/@fs${window.pantryCheckout}/assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+          sourceUrl(
+            `assets/bakery-mujoco/fr10-workcell/native/${cell.robot}/combined-nominal.json`,
+          ),
         )
       ).json();
       scene = readOvenScene(cell, {
@@ -1543,7 +1564,7 @@ async function checkIndexedRecordingAccess(paths) {
     `/bakery-physics/executions/${latestSave.document.bundle.id}/production-engine.mjs`
   );
   const { exportOvenSave } = await import(
-    `/@fs${window.pantryCheckout}/packages/production-simulation/src/runs/oven-run-file.ts`
+    sourceUrl("packages/production-simulation/src/runs/oven-run-file.ts")
   );
   const edited = JSON.parse(await exportOvenSave(latestSave).text());
   let packEntry;

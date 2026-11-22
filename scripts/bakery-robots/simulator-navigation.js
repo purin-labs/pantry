@@ -46,25 +46,20 @@ function productionSceneLoaded() {
   );
 }
 
+// The address of a checkout file on the dev server, from its path in the
+// repository, for the code of a journey that runs in Node. Page code gets the
+// same address from sourceUrl of /source-url.js (apps/portal/vite.config.ts).
+function checkoutUrl(path) {
+  const evidence = globalThis.bakeryEvidence;
+  return `/@fs${evidence.slice(0, evidence.lastIndexOf("/output/"))}/${path}`;
+}
+
 // The Portal imports @purin-labs/production-simulation as /@fs/<checkout>/... and
 // keeps state in some of its modules (the live floor plan's walk routes, the
 // evidence views). A journey that reads or sets that state imports the same
 // module instance through this path, not through /@id/.
-function checkoutRoot() {
-  const evidence = globalThis.bakeryEvidence;
-  return evidence.slice(0, evidence.lastIndexOf("/output/"));
-}
-
 function portalSimulationSource() {
-  return `/@fs${checkoutRoot()}/packages/production-simulation/src`;
-}
-
-// Page code that reads checkout files uses window.pantryCheckout; it stays set
-// across reloads.
-async function exposeCheckout(page) {
-  const script = `window.pantryCheckout = ${JSON.stringify(checkoutRoot())};`;
-  await page.addInitScript(script);
-  await page.evaluate(script);
+  return checkoutUrl("packages/production-simulation/src");
 }
 
 async function openWorkflowCatalog(page) {
@@ -384,11 +379,13 @@ async function showPortalPhysicsEvidence(simulationSource) {
 // ({ kind: "preview" }, { kind: "standalone" } or a "workspace"). A workspace
 // saves through window.saveRecipeCopy, which installRecipeMutation sets.
 async function mountWorkflowSimulator(connection) {
+  const { sourceUrl } = await import("/source-url.js");
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");
-  const { default: WorkflowSimulatorRoute } =
-    await import("/src/features/workflow-simulator/route.tsx");
+  const { default: WorkflowSimulatorRoute } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
   ReactDOM.createRoot(document.getElementById("root")).render(
     React.createElement(
       MemoryRouter,
@@ -452,7 +449,10 @@ function signInToArchive(session) {
 // Page code: the workspace's control write and read, with the CSRF token of
 // the person whom signInToArchive signed in.
 async function archiveMutation(path, body) {
-  const { responseJson } = await import("/src/control-client.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { responseJson } = await import(
+    sourceUrl("foundation/control/portal/control-client.ts")
+  );
   return responseJson(
     await fetch(path, {
       method: "POST",
@@ -466,6 +466,9 @@ async function archiveMutation(path, body) {
   );
 }
 async function archiveRead(path) {
-  const { responseJson } = await import("/src/control-client.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { responseJson } = await import(
+    sourceUrl("foundation/control/portal/control-client.ts")
+  );
   return responseJson(await fetch(path, { credentials: "same-origin" }));
 }

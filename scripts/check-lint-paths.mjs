@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// Fails when a lint names a path that matches no file (Refactor 17, step A0.7).
+// Fails when a lint or a browser journey names a path that matches no file
+// (Refactor 17, step A0.7).
 //
 // eslint.config.mjs, the check scripts and the ratchet files name source files
 // by path. When such a file moves or goes, its rule stops without an error:
@@ -8,6 +9,13 @@
 //
 // A path may hold `*` and `**`. A path that is absent on purpose (a list of
 // deleted files, an output file) goes into ABSENT below, with its reason.
+//
+// A browser journey loads source files from the Portal dev server. It names
+// a file by its path in the repository, through `sourceUrl` in the page
+// (/source-url.js of apps/portal/vite.config.ts) and `checkoutUrl` in Node
+// (scripts/bakery-robots/simulator-navigation.js), or by its address below
+// the Portal folder (`/src/styles.css`). When the file moves, the journey
+// fails late, in a browser. This check reads those paths too.
 //
 //   node scripts/check-lint-paths.mjs
 //
@@ -118,14 +126,69 @@ for (const source of SOURCES) {
   }
 }
 
+// The browser journeys. A path with `${...}` is checked up to its last whole
+// folder; the large files of repo-binaries.json are in R2 and not in git.
+const JOURNEYS = tracked.filter((path) => /^scripts\/.*\.m?js$/.test(path));
+const BY_HELPER = /\b(?:sourceUrl|checkoutUrl)\(\s*(["'`])([^"'`]+)\1/g;
+const PORTAL_ADDRESS = /(?<![\w.@-])\/src\/[\w./-]+\.(?:tsx?|css)\b/g;
+const binaries = JSON.parse(
+  readFileSync(join(root, "repo-binaries.json"), "utf8"),
+);
+const stored = [
+  ...Object.keys(binaries.files),
+  ...Object.keys(binaries.folders),
+];
+const isFile = (path) => tracked.some(matcher(path));
+// A folder of the list ends with "/".
+const inStore = (path) =>
+  stored.some(
+    (key) => path === key || (key.endsWith("/") && path.startsWith(key)),
+  );
+let journeyPaths = 0;
+const journeyFaults = [];
+for (const journey of JOURNEYS) {
+  if (journey === "scripts/check-lint-paths.mjs") continue;
+  const text = readFileSync(join(root, journey), "utf8");
+  const lineOf = (index) => text.slice(0, index).split("\n").length;
+  for (const match of text.matchAll(BY_HELPER)) {
+    const whole = !match[2].includes("${");
+    const path = whole
+      ? match[2]
+      : match[2].slice(0, match[2].lastIndexOf("/", match[2].indexOf("${")));
+    journeyPaths += 1;
+    if (!isFile(path) && !inStore(path)) {
+      journeyFaults.push(
+        `${journey}:${lineOf(match.index)}: ${path} matches no file`,
+      );
+    }
+  }
+  for (const match of text.matchAll(PORTAL_ADDRESS)) {
+    journeyPaths += 1;
+    if (!isFile(`apps/portal${match[0]}`)) {
+      journeyFaults.push(
+        `${journey}:${lineOf(match.index)}: apps/portal${match[0]} matches no file`,
+      );
+    }
+  }
+}
+
 if (faults.length > 0) {
   console.error(faults.join("\n"));
   console.error(
     "A lint path that matches no file turns its rule off. Correct the path, or add it to ABSENT in scripts/check-lint-paths.mjs with its reason.",
   );
-  process.exit(1);
 }
+if (journeyFaults.length > 0) {
+  console.error(journeyFaults.join("\n"));
+  console.error(
+    'A browser journey that names a source file that is gone fails in the browser. Name the file by its path in the repository: sourceUrl("<path>") in the page, checkoutUrl("<path>") in Node.',
+  );
+}
+if (faults.length > 0 || journeyFaults.length > 0) process.exit(1);
 console.log(`${checked} lint paths in ${SOURCES.length} files match a file`);
+console.log(
+  `${journeyPaths} source paths in the browser journeys match a file`,
+);
 
 function kindOfBound(path) {
   const name = posix.basename(path);

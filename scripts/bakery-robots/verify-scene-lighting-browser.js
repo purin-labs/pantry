@@ -28,15 +28,15 @@ async function verifySceneLightingBrowser(page) {
   });
 
   await page.evaluate(async function installProbes() {
+    const { sourceUrl } = await import("/source-url.js");
+    const scene = sourceUrl(
+      "areas/kitchen/ui/features/workflow-simulator/scene.ts",
+    );
     const entries = performance.getEntriesByType("resource");
     const sceneEntry = entries.find(function findScene(e) {
-      return (
-        new URL(e.name).pathname === "/src/features/workflow-simulator/scene.ts"
-      );
+      return new URL(e.name).pathname === scene;
     });
-    const { BakeryScene } = await import(
-      sceneEntry ? sceneEntry.name : "/src/features/workflow-simulator/scene.ts"
-    );
+    const { BakeryScene } = await import(sceneEntry ? sceneEntry.name : scene);
     const origUpdate = BakeryScene.prototype.update;
     BakeryScene.prototype.update = function captureUpdate(frame) {
       window.__bakeryScene = this;
@@ -389,18 +389,17 @@ async function verifySceneLightingBrowser(page) {
   await openRecordingViewer(page);
 
   await page.evaluate(async function installHostProbe() {
+    const { sourceUrl } = await import("/source-url.js");
+    const host = sourceUrl(
+      "areas/kitchen/ui/features/workflow-simulator/spatial/physics-scene-host.ts",
+    );
     const hostEntry = performance
       .getEntriesByType("resource")
       .find(function findHost(e) {
-        return (
-          new URL(e.name).pathname ===
-          "/src/features/workflow-simulator/spatial/physics-scene-host.ts"
-        );
+        return new URL(e.name).pathname === host;
       });
     const { PhysicsSceneHost } = await import(
-      hostEntry
-        ? hostEntry.name
-        : "/src/features/workflow-simulator/spatial/physics-scene-host.ts"
+      hostEntry ? hostEntry.name : host
     );
     if (!PhysicsSceneHost.prototype.__lightingWrapped) {
       const origHostLoad = PhysicsSceneHost.prototype.load;
@@ -736,6 +735,7 @@ async function verifySceneLightingBrowser(page) {
   // obstruction_rack_low, FR10 pan-staging receiving pan, FR10 combined rack + obstruction_oven_pan,
   // and showRackLayout visual/collision translation lockstep).
   const variantMatrix = await page.evaluate(async function verifyAllVariants() {
+    const { sourceUrl } = await import("/source-url.js");
     const entries = performance.getEntriesByType("resource");
     const findMod = function findModule(suffix) {
       const hit = entries.find(function match(e) {
@@ -743,7 +743,9 @@ async function verifySceneLightingBrowser(page) {
       });
       return hit
         ? hit.name
-        : `/src/features/workflow-simulator/spatial/${suffix}`;
+        : sourceUrl(
+            `areas/kitchen/ui/features/workflow-simulator/spatial/${suffix}`,
+          );
     };
     const [{ PhysicsModel }, { loadWorkcellVisuals }] = await Promise.all([
       import(findMod("physics-model.ts")),

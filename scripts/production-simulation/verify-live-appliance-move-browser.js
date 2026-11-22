@@ -351,7 +351,9 @@ async function driveRestoredShiftToCompletion(page, savedTarget) {
     }
     await page.waitForTimeout(100);
   }
-  throw new Error("Restored shift did not reach completed status within timeout.");
+  throw new Error(
+    "Restored shift did not reach completed status within timeout.",
+  );
 }
 
 function filterViteFullReload(ws) {
@@ -392,6 +394,7 @@ async function installLiveMoveHarness(page, paceDriveMs) {
 }
 
 async function mountLiveMoveApp(paceDriveMs) {
+  const { sourceUrl } = await import("/source-url.js");
   if (!window.__pacedWorkerPostMessage) {
     const origPostMessage = Worker.prototype.postMessage;
     Worker.prototype.postMessage = function pacedPostMessage(message, ...rest) {
@@ -432,13 +435,27 @@ async function mountLiveMoveApp(paceDriveMs) {
     import("/@id/react"),
     import("/@id/react-dom/client"),
     import("/@id/react-router"),
-    import("/src/features/workflow-simulator/route.tsx"),
-    import("/src/features/bakery-surface-effect-bridge.tsx"),
+    import(sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")),
+    import(
+      sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
+    ),
     import("/@id/@purin-labs/bakery-model/bakery-surface"),
-    import("/src/features/bakery-surface-registry.ts"),
-    import("/src/features/workflow-simulator/floor-plan-workspace.ts"),
-    import("/src/features/workflow-simulator/bakery-appliance-layout.ts"),
-    import("/src/features/production-run/morning-shift-appliances.ts"),
+    import(sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")),
+    import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/floor-plan-workspace.ts",
+      )
+    ),
+    import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/bakery-appliance-layout.ts",
+      )
+    ),
+    import(
+      sourceUrl(
+        "areas/kitchen/ui/features/production-run/morning-shift-appliances.ts",
+      )
+    ),
   ]);
   window.persistentChat = {
     effects: [],

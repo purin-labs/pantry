@@ -160,6 +160,7 @@ async function verifyPastryBenchBrowser(page) {
 }
 
 async function verifyPieFactoryStations() {
+  const { sourceUrl } = await import("/source-url.js");
   const [
     { compilePieRecipe, pieRecipeInput },
     { PIE_STATIONS, factoryStationsForScenario, isPieScenario },
@@ -167,9 +168,19 @@ async function verifyPieFactoryStations() {
     { FactoryStations },
   ] = await Promise.all([
     import("/@id/@purin-labs/production-simulation/recipes/bakery/pie"),
-    import("/src/features/production-run/factory-places.ts"),
-    import("/src/features/production-run/morning-shift-appliances.ts"),
-    import("/src/features/workflow-simulator/spatial/factory-stations.ts"),
+    import(
+      sourceUrl("areas/kitchen/ui/features/production-run/factory-places.ts")
+    ),
+    import(
+      sourceUrl(
+        "areas/kitchen/ui/features/production-run/morning-shift-appliances.ts",
+      )
+    ),
+    import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/spatial/factory-stations.ts",
+      )
+    ),
   ]);
 
   const compiled = await compilePieRecipe(
@@ -188,7 +199,9 @@ async function verifyPieFactoryStations() {
   }
   const resolvedStations = factoryStationsForScenario(scenario);
   if (resolvedStations !== PIE_STATIONS) {
-    throw new Error("Expected factoryStationsForScenario to return PIE_STATIONS");
+    throw new Error(
+      "Expected factoryStationsForScenario to return PIE_STATIONS",
+    );
   }
   const morningOven = MORNING_SHIFT_STATIONS.find(
     (s) => s.id === "station-oven",

@@ -3,6 +3,7 @@ async function mountMailInbox(page) {
   await page.goto(new URL("/theme-preview.html", page.url()).href);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.evaluate(async function mount() {
+    const { sourceUrl } = await import("/source-url.js");
     let reactUrl = null;
     let reactDomUrl = null;
     for (const resource of performance.getEntriesByType("resource")) {
@@ -15,10 +16,13 @@ async function mountMailInbox(page) {
     }
     const { default: React } = await import(reactUrl);
     const { default: ReactDOM } = await import(reactDomUrl);
-    const { MailInboxRoute } =
-      await import("/src/features/mail-inbox/route.tsx");
+    const { MailInboxRoute } = await import(
+      sourceUrl("areas/inbox/ui/features/mail-inbox/route.tsx")
+    );
     // The Inbox renders in the Portal's own frame, as on the real page.
-    const { PortalFrame } = await import("/src/shell.tsx");
+    const { PortalFrame } = await import(
+      sourceUrl("apps/portal/src/shell.tsx")
+    );
     // The frame's router context must come from the same module instance.
     const router = performance
       .getEntriesByType("resource")

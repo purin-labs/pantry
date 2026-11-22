@@ -1,4 +1,5 @@
-import { defineConfig } from "vite";
+import { defineConfig, normalizePath } from "vite";
+import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
@@ -11,6 +12,23 @@ export default defineConfig({
       },
       configurePreviewServer(server) {
         server.middlewares.use(serveTvPage);
+      },
+    },
+    // A browser journey mounts a page from its source files. A file of
+    // areas/, foundation/ or packages/ has no fixed address on the dev
+    // server: Vite serves it below /@fs/ and the folder of the checkout.
+    // /source-url.js gives the address of a source file from its path in the
+    // repository. It is the address that the imports of the Portal get, so
+    // the journey and the Portal share one instance of the module.
+    {
+      name: "pantry-source-url",
+      apply: "serve",
+      configureServer(server) {
+        const module = sourceUrlModule(server.config.root);
+        server.middlewares.use("/source-url.js", (_request, response) => {
+          response.setHeader("Content-Type", "text/javascript");
+          response.end(module);
+        });
       },
     },
   ],
@@ -49,6 +67,21 @@ export default defineConfig({
     },
   },
 });
+
+// Vite gives a file below its root the path from the root, and each other
+// file /@fs/ and its real absolute path.
+function sourceUrlModule(portalRoot: string): string {
+  const real = (path: string) => normalizePath(realpathSync(path));
+  const repository = `${real(fileURLToPath(new URL("../../", import.meta.url)))}/`;
+  const portal = `${real(portalRoot).slice(repository.length)}/`;
+  return `const portal = ${JSON.stringify(portal)};
+export function sourceUrl(path) {
+  return path.startsWith(portal)
+    ? path.slice(portal.length - 1)
+    : ${JSON.stringify(`/@fs${repository}`)} + path;
+}
+`;
+}
 
 function serveTvPage(
   request: { url?: string },

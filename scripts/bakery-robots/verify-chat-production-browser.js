@@ -15,15 +15,19 @@ async function verifyProductionChatParity(page) {
   );
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.evaluate(async function mountWorkspace() {
+    const { sourceUrl } = await import("/source-url.js");
     const { default: React } = await import("/@id/react");
     const { default: ReactDOM } = await import("/@id/react-dom/client");
     const { MemoryRouter } = await import("/@id/react-router");
-    const { default: WorkflowSimulatorRoute } =
-      await import("/src/features/workflow-simulator/route.tsx");
-    const { BakerySurfaceEffectBridge } =
-      await import("/src/features/bakery-surface-effect-bridge.tsx");
-    const { bakerySurfaceForOrganisation } =
-      await import("/src/features/bakery-surface-registry.ts");
+    const { default: WorkflowSimulatorRoute } = await import(
+      sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+    );
+    const { BakerySurfaceEffectBridge } = await import(
+      sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
+    );
+    const { bakerySurfaceForOrganisation } = await import(
+      sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    );
     const { createBakerySurfaceEffect } =
       await import("/@id/@purin-labs/bakery-model/bakery-surface");
     const fixture = {

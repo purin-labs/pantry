@@ -61,8 +61,10 @@ async function injectedArtifactFailure(state, retain, digest, file) {
 }
 
 async function runArtifactStorageStage(stage) {
-  const { openExecutionWorker } =
-    await import("/src/features/production-run/execution-client.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { openExecutionWorker } = await import(
+    sourceUrl("areas/kitchen/ui/features/production-run/execution-client.ts")
+  );
   const { exportOvenSave, ovenCheckpointContents } =
     await import("/@id/@purin-labs/production-simulation/runs/oven-run-file");
   const { canonicalJson } = await import("/@id/@purin-labs/std");

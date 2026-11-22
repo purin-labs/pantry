@@ -96,6 +96,7 @@ async function verifyAutomaticContext(page) {
 }
 
 async function mountAutomaticContext() {
+  const { sourceUrl } = await import("/source-url.js");
   history.replaceState(
     null,
     "",
@@ -122,15 +123,20 @@ async function mountAutomaticContext() {
   const { default: React } = await import(reactUrl);
   const { default: ReactDOM } = await import(domUrl);
   const { MemoryRouter } = await import(routerUrl);
-  await import("/src/styles.css");
-  const { default: Bakery } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  const { BakeryWorkspaceReveal } =
-    await import("/src/features/bakery-workspace-reveal.tsx");
-  const { BakerySurfaceEffectBridge } =
-    await import("/src/features/bakery-surface-effect-bridge.tsx");
+  await import(sourceUrl("apps/portal/src/styles.css"));
+  const { default: Bakery } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
+  const { BakeryWorkspaceReveal } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-workspace-reveal.tsx")
+  );
+  const { BakerySurfaceEffectBridge } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
+  );
   const bridgeSource = await (
-    await fetch("/src/features/bakery-surface-effect-bridge.tsx")
+    await fetch(
+      sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx"),
+    )
   ).text();
   const registryUrl = bridgeSource.match(
     /from "([^"\n]*bakery-surface-registry\.ts[^"\n]*)"/u,
@@ -148,7 +154,9 @@ async function mountAutomaticContext() {
   )?.[1];
   if (!protocolUrl) throw new Error("Missing protocol import");
   const protocol = await import(protocolUrl);
-  const { ChatContextChip } = await import("/src/features/chat/context.tsx");
+  const { ChatContextChip } = await import(
+    sourceUrl("apps/portal/src/features/chat/context.tsx")
+  );
   const organisationId = "automatic-browser";
   const fixture = {
     organisationId,
@@ -297,8 +305,7 @@ async function mountAutomaticContext() {
   window.automaticContextAcceptance = fixture;
   // Chrome does not show a cookie with Path=/workflow-preview.html to this
   // page, whose document began at /@vite/client; the dev origin is a test one.
-  document.cookie =
-    "pantry_csrf=automatic-fixture; Path=/; SameSite=Strict";
+  document.cookie = "pantry_csrf=automatic-fixture; Path=/; SameSite=Strict";
   window.fetch = fixture.transport.bind(fixture, window.fetch.bind(window));
   document.getElementById("root").remove();
   const host = document.createElement("div");
@@ -553,7 +560,10 @@ function uncertainInspectionSettled() {
   return false;
 }
 async function duplicateBrowserIdentity(id) {
+  const { sourceUrl } = await import("/source-url.js");
   sessionStorage.setItem("pantry:bakery-browser-instance", id);
-  const browser = await import("/src/features/bakery-browser-context.ts");
+  const browser = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-browser-context.ts")
+  );
   return browser.bakeryBrowserInstanceId();
 }

@@ -306,6 +306,7 @@ async function twoCellStyles(route) {
 // The stubbed preview module would turn on the evidence views; the mount
 // does it on the Portal's own module instance.
 async function mountTwoCellWorkspace(simulationSource) {
+  const { sourceUrl } = await import("/source-url.js");
   if (document.documentElement.dataset.factoryFixture === "compiled") return;
   const { showPhysicsEvidence } = await import(
     `${simulationSource}/runs/physics-evidence.ts`
@@ -314,8 +315,9 @@ async function mountTwoCellWorkspace(simulationSource) {
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");
-  const { default: Route } =
-    await import("/src/features/workflow-simulator/route.tsx");
+  const { default: Route } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
   ReactDOM.createRoot(document.getElementById("root")).render(
     React.createElement(
       MemoryRouter,

@@ -15,15 +15,19 @@ async function verifyScheduledChatParity(page) {
   );
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.evaluate(async function mountWorkspace() {
+    const { sourceUrl } = await import("/source-url.js");
     const { default: React } = await import("/@id/react");
     const { default: ReactDOM } = await import("/@id/react-dom/client");
     const { MemoryRouter } = await import("/@id/react-router");
-    const { default: WorkflowSimulatorRoute } =
-      await import("/src/features/workflow-simulator/route.tsx");
-    const { BakerySurfaceEffectBridge } =
-      await import("/src/features/bakery-surface-effect-bridge.tsx");
-    const { bakerySurfaceForOrganisation } =
-      await import("/src/features/bakery-surface-registry.ts");
+    const { default: WorkflowSimulatorRoute } = await import(
+      sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+    );
+    const { BakerySurfaceEffectBridge } = await import(
+      sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
+    );
+    const { bakerySurfaceForOrganisation } = await import(
+      sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+    );
     const { createBakerySurfaceEffect } =
       await import("/@id/@purin-labs/bakery-model/bakery-surface");
     const { parseRunSnapshot } =
@@ -947,8 +951,10 @@ async function verifyScheduledFiles(page, run, capture, evidence) {
 }
 
 async function attachScheduledFile(text) {
-  const { bakerySurfaceForOrganisation } =
-    await import("/src/features/bakery-surface-registry.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { bakerySurfaceForOrganisation } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+  );
   return bakerySurfaceForOrganisation("parity-42f").attachFile(
     new File([text], "attached-rehearsal.json", {
       type: "application/json",
@@ -957,14 +963,16 @@ async function attachScheduledFile(text) {
 }
 
 async function twoColdTrays() {
+  const { sourceUrl } = await import("/source-url.js");
   const {
     parseRehearsalWorkcells,
     compileRehearsalWorkcells,
     exportRehearsalWorkcells,
   } =
     await import("/@id/@purin-labs/production-simulation/recipes/bakery/production-workcells");
-  const { readBundledExample } =
-    await import("/src/features/workflow-simulator/bundled-example.ts");
+  const { readBundledExample } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/bundled-example.ts")
+  );
   const { compileWorkcellInput } =
     await import("/@id/@purin-labs/production-simulation/recipes/bakery/workcell-input");
   const saved = await parseRehearsalWorkcells(
@@ -1264,6 +1272,7 @@ function bufferHeld(resource) {
 }
 
 async function inspectHumanTransfer({ text, portalSource }) {
+  const { sourceUrl } = await import("/source-url.js");
   const m = await import(`${portalSource}/production-workcells.ts`);
   const { simulateProduction } = await import(`${portalSource}/schedule.ts`);
   const { productionMaterialAt } = await import(
@@ -1274,8 +1283,11 @@ async function inspectHumanTransfer({ text, portalSource }) {
   );
   const { parsePhysicsReplay } =
     await import("/@id/@purin-labs/bakery-model/bakery-physics");
-  const { buildLiveScheduleSpatialLayout } =
-    await import("/src/features/workflow-simulator/bakery-appliance-layout.ts");
+  const { buildLiveScheduleSpatialLayout } = await import(
+    sourceUrl(
+      "areas/kitchen/ui/features/workflow-simulator/bakery-appliance-layout.ts",
+    )
+  );
   const layout = buildLiveScheduleSpatialLayout();
   const parsed = await m.parseRehearsalWorkcells(text);
   if (parsed.kind !== "ready") throw new Error(parsed.message);

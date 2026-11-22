@@ -229,13 +229,16 @@ async function installPersistentChat(page) {
   await page.evaluate(mountPersistentChat);
 }
 async function mountPersistentChat() {
+  const { sourceUrl } = await import("/source-url.js");
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");
-  const { default: Route } =
-    await import("/src/features/workflow-simulator/route.tsx");
-  const { BakerySurfaceEffectBridge } =
-    await import("/src/features/bakery-surface-effect-bridge.tsx");
+  const { default: Route } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
+  const { BakerySurfaceEffectBridge } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-effect-bridge.tsx")
+  );
   window.persistentChat = {
     effects: [],
     receipts: [],
@@ -289,8 +292,10 @@ async function persistentChatFetch(input, init) {
   return fixture.originalFetch(input, init);
 }
 async function persistentChatCapture() {
-  const { bakerySurfaceForOrganisation } =
-    await import("/src/features/bakery-surface-registry.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { bakerySurfaceForOrganisation } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+  );
   const surface = bakerySurfaceForOrganisation("plan70-chat");
   return surface === null ? null : (await surface.capture()).context;
 }
@@ -381,8 +386,10 @@ function persistentChatSwitch(conversation) {
   window.dispatchEvent(new PopStateEvent("popstate"));
 }
 async function persistentChatRedeliver(effect) {
-  const { deliverBakerySurfaceEffect } =
-    await import("/src/features/bakery-surface-registry.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { deliverBakerySurfaceEffect } = await import(
+    sourceUrl("areas/kitchen/ui/features/bakery-surface-registry.ts")
+  );
   return deliverBakerySurfaceEffect("plan70-chat", effect);
 }
 

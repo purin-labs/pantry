@@ -283,7 +283,10 @@ async (page) => {
     }
 
     static async mountQueueControls(userId) {
-      const { UserPreferenceOwner } = await import("/src/preferences/owner.ts");
+      const { sourceUrl } = await import("/source-url.js");
+      const { UserPreferenceOwner } = await import(
+        sourceUrl("foundation/ui/preferences/owner.ts")
+      );
       class Controls {
         constructor(userId) {
           this.owner = new UserPreferenceOwner(userId);

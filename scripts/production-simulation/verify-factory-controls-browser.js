@@ -183,11 +183,13 @@ async function factoryControlStyles(route) {
   });
 }
 async function mountFactoryControls() {
+  const { sourceUrl } = await import("/source-url.js");
   const { default: React } = await import("/@id/react");
   const { default: ReactDOM } = await import("/@id/react-dom/client");
   const { MemoryRouter } = await import("/@id/react-router");
-  const { default: Route } =
-    await import("/src/features/workflow-simulator/route.tsx");
+  const { default: Route } = await import(
+    sourceUrl("areas/kitchen/ui/features/workflow-simulator/route.tsx")
+  );
   ReactDOM.createRoot(document.getElementById("root")).render(
     React.createElement(
       MemoryRouter,

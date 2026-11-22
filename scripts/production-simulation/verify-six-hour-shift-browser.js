@@ -225,12 +225,18 @@ async function verifySixHourShiftBrowser(page) {
   }
 
   async function mountShiftAuthor() {
+    const { sourceUrl } = await import("/source-url.js");
     const { default: React } = await import("/@id/react");
     const { default: ReactDOM } = await import("/@id/react-dom/client");
-    const { BakeryShiftAuthor } =
-      await import("/src/features/production-run/bakery-shift-author.tsx");
-    await import("/src/styles.css");
-    await import("/src/features/production-run/oven-workspace.css");
+    const { BakeryShiftAuthor } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/production-run/bakery-shift-author.tsx",
+      )
+    );
+    await import(sourceUrl("apps/portal/src/styles.css"));
+    await import(
+      sourceUrl("areas/kitchen/ui/features/production-run/oven-workspace.css")
+    );
     if (window.shiftAcceptanceRoot) window.shiftAcceptanceRoot.unmount();
     window.shiftAcceptanceRoot = ReactDOM.createRoot(
       document.getElementById("shift-acceptance"),
@@ -252,12 +258,16 @@ async function verifySixHourShiftBrowser(page) {
   }
 
   async function mountAcceptedShiftResults() {
+    const { sourceUrl } = await import("/source-url.js");
     const base = "/six-hour-evidence";
     const scenario = await (await fetch(`${base}/scenario.json`)).json();
     const view = await (await fetch(`${base}/view.json`)).json();
     const { default: React } = await import("/@id/react");
-    const { ProductionResults } =
-      await import("/src/features/production-run/production-results.tsx");
+    const { ProductionResults } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/production-run/production-results.tsx",
+      )
+    );
     const { reportBakeryShift } =
       await import("/@id/@purin-labs/production-simulation/recipes/bakery/shift-report");
     const shift = reportBakeryShift(
@@ -278,13 +288,17 @@ async function verifySixHourShiftBrowser(page) {
   }
 
   async function mountMissingShiftResults() {
+    const { sourceUrl } = await import("/source-url.js");
     const base = "/six-hour-evidence";
     const shift = await (
       await fetch(`${base}/withheld-evidence-report.json`)
     ).json();
     const { default: React } = await import("/@id/react");
-    const { ProductionResults } =
-      await import("/src/features/production-run/production-results.tsx");
+    const { ProductionResults } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/production-run/production-results.tsx",
+      )
+    );
     window.shiftAcceptanceRoot.render(
       React.createElement(ProductionResults, {
         time: 0,

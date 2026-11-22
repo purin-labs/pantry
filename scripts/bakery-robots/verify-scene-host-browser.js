@@ -6,8 +6,12 @@ async function verifySceneHost(page) {
     // The Portal loads this module on demand, and the resource timing buffer
     // keeps only the first 250 of Vite's module requests, so the journey
     // imports it by the path that the Portal uses: the same module instance.
-    const { PhysicsSceneHost } =
-      await import("/src/features/workflow-simulator/spatial/physics-scene-host.ts");
+    const { sourceUrl } = await import("/source-url.js");
+    const { PhysicsSceneHost } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/spatial/physics-scene-host.ts",
+      )
+    );
     window.sceneHosts = new Set();
     const load = PhysicsSceneHost.prototype.load;
     PhysicsSceneHost.prototype.load = function observeLoad(element, source) {
@@ -23,8 +27,11 @@ async function verifySceneHost(page) {
     };
     // The visual bytes are fetched one time and then cached, so the gate
     // holds each scene's asset load, the step where its visuals arrive.
-    const { PhysicsScene } =
-      await import("/src/features/workflow-simulator/spatial/physics-scene.ts");
+    const { PhysicsScene } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/spatial/physics-scene.ts",
+      )
+    );
     const loadAssets = PhysicsScene.prototype.load;
     PhysicsScene.prototype.load = async function holdVisual() {
       const gate = window.visualGate;
@@ -108,14 +115,21 @@ async function verifySceneHost(page) {
     return window.observedSceneHost.life.kind === "ready";
   });
   await page.evaluate(async function mountOtherOwners() {
+    const { sourceUrl } = await import("/source-url.js");
     const source = window.observedSceneHost.source;
     const { default: React } = await import("/@id/react");
     const { default: ReactDOM } = await import("/@id/react-dom/client");
     const { MemoryRouter } = await import("/@id/react-router");
-    const { ProductionNativeScene } =
-      await import("/src/features/workflow-simulator/production-native-scene.tsx");
-    const { RecordingCandidatePreview } =
-      await import("/src/features/workflow-simulator/recording-candidate-preview.tsx");
+    const { ProductionNativeScene } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/production-native-scene.tsx",
+      )
+    );
+    const { RecordingCandidatePreview } = await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/recording-candidate-preview.tsx",
+      )
+    );
     const { compileWorkcellInput } =
       await import("/@id/@purin-labs/production-simulation/recipes/bakery/workcell-input");
     const { reserveWorkcell, settleWorkcell } =

@@ -78,10 +78,16 @@ function archiveMemoryDelay(resolve) {
   setTimeout(resolve, 50);
 }
 async function publishLargeArchive(fixture) {
-  const { readOvenRunFile } =
-    await import("/src/features/production-run/oven-recipe-file.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { readOvenRunFile } = await import(
+    sourceUrl("areas/kitchen/ui/features/production-run/oven-recipe-file.ts")
+  );
   const { preparePersistentWorkspaceRun, savePreparedWorkspaceRun } =
-    await import("/src/features/workflow-simulator/workspace-runs-api.ts");
+    await import(
+      sourceUrl(
+        "areas/kitchen/ui/features/workflow-simulator/workspace-runs-api.ts",
+      )
+    );
   const source = new URL(location.href).searchParams.get("archive");
   if (source === null)
     throw new Error("Provide the full recurring-run archive URL.");
@@ -119,8 +125,12 @@ async function publishLargeArchive(fixture) {
   };
 }
 async function reopenLargeArchive({ fixture, published }) {
-  const { openPersistentWorkspaceRun } =
-    await import("/src/features/workflow-simulator/shared-production-run.ts");
+  const { sourceUrl } = await import("/source-url.js");
+  const { openPersistentWorkspaceRun } = await import(
+    sourceUrl(
+      "areas/kitchen/ui/features/workflow-simulator/shared-production-run.ts",
+    )
+  );
   const started = performance.now();
   const opened = await openPersistentWorkspaceRun(
     fixture.organisationId,
