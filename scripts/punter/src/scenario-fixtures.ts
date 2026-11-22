@@ -429,7 +429,7 @@ export const LOCAL_CAFE_PATISSERIE_SCENARIO = {
       "quote_9dfb8b9b00fcdfff737d0e86aa3bce30633d018290f2571447f4d4ddefec222b",
     initialExpiresAt: "2026-08-14T10:10:00.000Z",
     quoteDigest:
-      "quote_3a78aa843607f1a73f59aa6ca4d4b4e4de39f4cc3f2b5bd7e859a762baec0112",
+      "quote_3a8e2a198f2243ee23302377dc4fe1bf22a7ac9fcd1373bef4a1fcb190a08767",
     expiresAt: "2026-08-14T10:10:00.000Z",
     readyAt: "2026-08-14T10:15:00.000Z",
   },
@@ -443,13 +443,13 @@ export const LOCAL_ONLINE_COOKIE_SCENARIO = {
     initialQuoteDigest:
       "quote_740eb295722332093cb5ed25778d2c3ede421b989881209bc109b666012d26bf",
     quoteDigest:
-      "quote_85066f8be849170d9a7555d822e4b8d0eda3c90638a5de3dc6b20b01a5041564",
+      "quote_c875af9f493f8f49f7600505bdc3671860b8604f0453a376bf50836a2d948150",
     estimatedDelivery: {
       earliest: "2026-08-17T10:00:00.000Z",
       latest: "2026-08-19T10:00:00.000Z",
     },
     packagePlanDigest:
-      "f951507e8e47ffd3c80c5b85e9ff5b3099574bd5bacd991440757094a2540636",
+      "d95a8fa8d3a33c07e2b492e9134271278b105a7f6535a8b3cebaa36169db10aa",
     packageId:
       "package_15779fde077f6489ac7cd2ef510e2eb618fa3c106bc0fb52f7028339198800eb",
     initialCarrierQuote: {
@@ -472,19 +472,19 @@ export const LOCAL_ONLINE_COOKIE_SCENARIO = {
     carrierQuote: {
       ...ONLINE_COOKIE_SCENARIO.expectedQuote.carrierQuote,
       reference:
-        "rate_8a59dff2694a5f3ba1ab349a7fff691676cceaa951e73852b212cfa891b89292",
+        "rate_2ce62e536808890ad6e001eb4d83a30550556cbba791692d6b59d1322255345f",
     },
     taxQuote: {
       ...ONLINE_COOKIE_SCENARIO.expectedQuote.taxQuote,
       registrationPolicyReference:
         "tax_registration_storefront_cookie_store_sg",
       reference:
-        "tax_b472f2bdd5e7623c41be1c19afde27a26f5771f41a57f71175fd2c6cf6de3276",
+        "tax_efc726d3bee3747ff02c748742d7ccf6dc14213c6bf49bd47bf8fb2a3f9aba5d",
     },
     dutyQuote: {
       ...ONLINE_COOKIE_SCENARIO.expectedQuote.dutyQuote,
       reference:
-        "duty_28656ba46c2f526ad10f8802e26f154ce6196f0dd97355a2cbabaea340737554",
+        "duty_60ad44349c5e6ffe8a2bfaa78e51d3d20c5ec32be6600ac58ede1ccce012ff7a",
     },
   },
 } satisfies PunterOnlineCookieScenario;
