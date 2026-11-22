@@ -3,9 +3,9 @@
 Date: 2026-11-20. Revised two times on 2026-11-20: after a review of the first version,
 and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
-Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Stage
-S (steps S2 and S3) waits for Plan 91, and Stage B waits for the Plan 93 cutover: the
-owner decided both waits on 2026-11-21. On 2026-11-22 the owner asked to finish the
+Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
+S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
+final. Stage B waits for the Plan 93 cutover, as the owner decided on 2026-11-21. On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
 and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
 lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
@@ -396,10 +396,27 @@ the state of the branches and the way to continue.
    It belongs to Plan 90. Decision D6 (capability claims of the mailbox and WhatsApp
    agents) stays with its default.
 
-### Stage S: waits for Plan 91
+### Stage S: started 2026-11-22
 
-The session "Plan 91 phase 4" finishes the provider consoles and the callbacks
-(started 2026-11-22). Step S1 is done. Steps S2 (the 33 specs, one area at a time, each checked against the
+The condition of step S2 was final brand names (D2: "The spec text waits for the
+brand names"). The Purin names are on `dev` since Plan 91 phase 4A, so S2 started on
+2026-11-22 with one pilot spec, `DEV-01` (Devices, from Plan 85):
+
+- A writer made the spec from Plan 85 and the code: 250 lines, about 400,000 tokens
+  and 19 minutes. It found 13 places where the code differs from the plan.
+- A second reader checked each statement against the code: about 300,000 tokens and
+  7 minutes. It found 9 false statements, 3 that the code cannot prove and 5
+  omissions. The writer corrected each one.
+- `scripts/move-plan-to-history.mjs` moved Plan 85 to `docs/history/` and corrected
+  the 12 links to and from it.
+- The read found two code faults in the area. A comment in `devices/store.ts` said
+  that the text cleaner removes link marks; it does not, and it need not, because the
+  Slack card shows plain text. The comment is correct now. The other fault is open: a
+  fleet Actor that knows only revoked gateways still writes its daily upkeep row.
+
+The other 32 specs cost about 22 million tokens at the pilot rate. The session
+"Plan 91 phase 4" still finishes the provider consoles and the callbacks. Step S1 is
+done. Steps S2 (the 33 specs, one area at a time, each checked against the
 code before its plans move to `docs/history/`) and S3 (`AGENTS.md` under 250 lines, the
 plan index and the names table move out) start when Plan 91 phase 4 (the domain and
 the provider consoles) is done. The owner decided this on 2026-11-21.

@@ -3,9 +3,14 @@
 A spec describes what is built, for one subsystem. A plan describes work that is not
 built. [Refactor 17](../refactor-17.md) gives the rules and the reasons.
 
-State on 2026-11-20: the list of specs and the table of old plan numbers are set.
-**No spec is written yet** (step S2 of Refactor 17). Until a spec exists, its source
-documents are the reference.
+State on 2026-11-22: step S2 of Refactor 17 has started. A written spec is the
+reference for its subsystem, and its source plans are in `docs/history/`. Until a spec
+exists, its source documents are the reference.
+
+How a spec is accepted: a writer makes it from its source plans and the code. A second
+reader checks each statement against the code, and the writer corrects each fault.
+Then `node scripts/move-plan-to-history.mjs <plan>` moves each source plan unchanged to
+`docs/history/` and corrects the links to it.
 
 ## The layers
 
@@ -57,7 +62,7 @@ each source file its module.
 | INB-01 | One Inbox | `areas/inbox/` | Plan 83 | Not written |
 | BRN-01 | Brain | `areas/brain/` | Plans 42J and 42K | Not written |
 | INT-01 | Integrations and connectors | `areas/integrations/` | `architecture/integrations.md`, `integrations/google-oauth.md` | Not written |
-| DEV-01 | Devices | `areas/devices/` | Plan 85 | Not written |
+| DEV-01 | [Devices](areas/devices/01-devices.md) | `areas/devices/` | Plan 85 | Written 2026-11-22 |
 | ORG-01 | Onboarding and lifecycle | `areas/organisation/` | `architecture/onboarding.md`, `organisation-setup-flow.md` | Not written |
 | ORG-02 | Jev from Seams | `areas/organisation/` | Plan 88 | Not written |
 | PRT-01 | The Portal | `surfaces/portal/` | Plan 21, `portal-ui-inventory.md`, `style-guide.md` | Not written |
@@ -165,7 +170,7 @@ Refactors 1 to 8 are also the numbers of the items of Refactor 15.
 | Plan 82C | VOX-01 | [plan-82C-speech-engines.md](../plan-82C-speech-engines.md) | 68 |
 | Plan 83 | INB-01 | [plan-83-one-inbox.md](../plan-83-one-inbox.md) | 18 |
 | Plan 84 | KIT-03 | [plan-84-general-workflow-canvas.md](../plan-84-general-workflow-canvas.md) | 32 |
-| Plan 85 | DEV-01 | [plan-85-device-fleet-page.md](../plan-85-device-fleet-page.md) | 29 |
+| Plan 85 | DEV-01 | [plan-85-device-fleet-page.md](../history/plan-85-device-fleet-page.md) | 29 |
 | Plan 86 | KIT-04 | [plan-86-bakery-costs-and-margins.md](../plan-86-bakery-costs-and-margins.md) | 9 |
 | Plan 87 | FND-09 | [plan-87-screen-context.md](../plan-87-screen-context.md) | 89 |
 | Plan 88 | ORG-02 | [plan-88-satyr-funded-jev.md](../plan-88-satyr-funded-jev.md) | 65 |

@@ -56,7 +56,7 @@ same run, with the planned and the observed times.
 
 | Need | Owner today | This plan adds |
 | --- | --- | --- |
-| Devices, gateway, readiness, one task for each device, pause, Slack alerts | [Plan 85](plan-85-device-fleet-page.md), live | Nothing. It calls `deviceReadiness` and `reserveDeviceWork` |
+| Devices, gateway, readiness, one task for each device, pause, Slack alerts | [Plan 85](history/plan-85-device-fleet-page.md), live | Nothing. It calls `deviceReadiness` and `reserveDeviceWork` |
 | Scheduling, queues, resource reservations, occupancy, the execution adapter boundary | [Plan 70A](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/plan-70A-production-engine.md) `packages/production-simulation` | A physical execution adapter, beside the MuJoCo one |
 | Oven, rack and robot models, MuJoCo cells | [Plan 60A](plan-60A-bakery-equipment-models.md), [Plan 42B](plan-42B-mujoco-workcell-simulation.md), `crates/bakery-native` | A controller simulator mode that answers like a cobot controller |
 | Recipe definitions and revisions | Plan 84 | Nothing |

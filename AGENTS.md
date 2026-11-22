@@ -181,7 +181,7 @@ the engine on every transcript, and Qwen3-ASR as a choice for each Mac.
 [The voice handover](docs/plan-82-voice-handover.md) gives the state and the remaining steps of
 Plans 82, 82B and 82C. Plan 24 owns the cobot bake path in the
 first café kitchen: two simulated cobots first, then governed dispatch and receipts.
-[Plan 85](docs/plan-85-device-fleet-page.md) owns the Devices page: one list of
+[Plan 85](docs/history/plan-85-device-fleet-page.md) owns the Devices page: one list of
 shop devices, with gateway enrollment, health, alerts and device access, and it
 gives Plan 24 its enrollment record. A shop gateway dials out from
 `crates/shop-gateway`; `DeviceFleetActor` holds its socket.

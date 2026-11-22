@@ -163,7 +163,10 @@ function deviceFromRow(row: DeviceRow): DeviceRecord {
   };
 }
 
-/** Removes control characters and the marks of a Slack or Markdown link. */
+/**
+ * Removes control characters and folds white space. A Slack card shows this
+ * text as plain_text, so the marks of a link stay text there.
+ */
 function cleanGatewayText(value: string): string {
   return value
     .replaceAll(/\p{Cc}/gu, " ")

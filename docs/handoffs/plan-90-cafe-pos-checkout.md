@@ -3,7 +3,7 @@
 Date: 19 November 2026
 Target repository: `/Users/pta/Dev/purin-labs/pantry` (`purin-labs/pantry`)
 Owning plan: [`docs/plan-90-cafe-pos-checkout.md`](../plan-90-cafe-pos-checkout.md) (already committed in `pantry`)
-Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`docs/plan-33D-square-release-acceptance.md`](../plan-33D-square-release-acceptance.md), [`docs/plan-40B-collaborative-menu-editor.md`](../plan-40B-collaborative-menu-editor.md), [`docs/plan-80-underclerk-multi-tenant-backend.md`](../plan-80-underclerk-multi-tenant-backend.md), [`docs/plan-85-device-fleet-page.md`](../plan-85-device-fleet-page.md), [`docs/plan-91-seams-atelier-rename.md`](../plan-91-seams-atelier-rename.md), and [`docs/plan-92-new-pantry-repository.md`](../plan-92-new-pantry-repository.md).
+Related plans: [`docs/plan-33C-POS-systems.md`](../plan-33C-POS-systems.md), [`docs/plan-33D-square-release-acceptance.md`](../plan-33D-square-release-acceptance.md), [`docs/plan-40B-collaborative-menu-editor.md`](../plan-40B-collaborative-menu-editor.md), [`docs/plan-80-underclerk-multi-tenant-backend.md`](../plan-80-underclerk-multi-tenant-backend.md), [`docs/plan-85-device-fleet-page.md`](../history/plan-85-device-fleet-page.md), [`docs/plan-91-seams-atelier-rename.md`](../plan-91-seams-atelier-rename.md), and [`docs/plan-92-new-pantry-repository.md`](../plan-92-new-pantry-repository.md).
 
 ## Current state
 

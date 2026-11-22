@@ -70,7 +70,7 @@ Follows:
 [Plan 33D — Square release acceptance](./plan-33D-square-release-acceptance.md),
 [Plan 40B — Collaborative Menu Editor](./plan-40B-collaborative-menu-editor.md),
 [Plan 80 — Underclerk as a Multi-Tenant Headless Backend](./plan-80-underclerk-multi-tenant-backend.md),
-and [Plan 85 — Devices page for Satyr Kitchen](./plan-85-device-fleet-page.md).
+and [Plan 85 — Devices page for Satyr Kitchen](history/plan-85-device-fleet-page.md).
 
 Touches:
 [Plan 81 — Agent Portal control](./plan-81-agent-portal-control.md),

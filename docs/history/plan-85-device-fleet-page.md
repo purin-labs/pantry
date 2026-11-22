@@ -38,10 +38,10 @@ A release at 02:56 UTC restored the installer, and each served build matches its
   accepts an operator, and a setup change still needs an admin.
 - A revoke of a gateway also revokes its devices, because no device can report without it.
 
-This plan builds on [Plan 24](plan-24-cafeos-bakery-automation.md),
-[Plan 40B](plan-40B-collaborative-menu-editor.md),
-[Plan 81](plan-81-agent-portal-control.md) and
-[Plan 82](plan-82-portal-voice-control.md). Plan 24 keeps physical dispatch and receipt
+This plan builds on [Plan 24](../plan-24-cafeos-bakery-automation.md),
+[Plan 40B](../plan-40B-collaborative-menu-editor.md),
+[Plan 81](../plan-81-agent-portal-control.md) and
+[Plan 82](../plan-82-portal-voice-control.md). Plan 24 keeps physical dispatch and receipt
 reconciliation. This plan owns the device list, enrollment, health and device access.
 The public name is Satyr Kitchen. Code identifiers keep `bakery`.
 
@@ -335,7 +335,7 @@ The cost column states what the recommendation costs beyond the phase, or what i
 | D1 | First release | Show the three existing device kinds first, before any robot work | About 3 agent days. The page has no robots until Phase 2 | Recommendation |
 | D2 | Place in the Portal | **Devices** in the Satyr Kitchen navigation group. Screens and terminals stay managed on their current pages | A menu screen shows under a kitchen heading | Recommendation |
 | D3 | Connection home | A new `DeviceFleetActor` for each Organisation and location, with hibernating WebSockets, so that telemetry does not load `OrganisationDO` | One more Durable Object class and one more migration | Recommendation |
-| D4 | Engineer repair access | Build none in the Portal. When the first real gateway is installed, use Cloudflare Tunnel with Access for SSH, by the [repair access runbook](runbooks/shop-gateway-repair-access.md). Tailscale is the alternative if direct manual control is needed later | About 30 minutes for each gateway. Tunnel has no charge, and Access has no charge below 50 users (checked 3 November 2026) | Recommendation |
+| D4 | Engineer repair access | Build none in the Portal. When the first real gateway is installed, use Cloudflare Tunnel with Access for SSH, by the [repair access runbook](../runbooks/shop-gateway-repair-access.md). Tailscale is the alternative if direct manual control is needed later | About 30 minutes for each gateway. Tunnel has no charge, and Access has no charge below 50 users (checked 3 November 2026) | Recommendation |
 | D5 | Cameras | Keep Phase 5 optional: snapshots on a fault or on request, 7 days, no live video and no recording. Four cameras at one 200 KB image a minute for 12 h a day cost about $0.45 a month, and on-demand use costs less. Staff images are personal data, so check the privacy duty first | An operator cannot watch motion remotely | No cameras |
 | D6 | Telemetry rate and retention | One sample a minute for 7 days, and state changes for 90 days | No fine-grained motion history. A rate of one every 10 s adds about $4.30 a month for each shop | Recommendation |
 | D7 | Agent authority | Agents read and pause. They propose a restriction or a resume. They never enroll, move, lift a restriction or revoke | A person must act in a fault | Recommendation |

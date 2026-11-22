@@ -7,7 +7,7 @@ Replaces: the Antigravity draft `seams_product_rename_plan.md` (outside this
 repository).
 Touches: [Plan 82 — voice control](plan-82-portal-voice-control.md),
 [Plan 82B — ambient voice](plan-82B-ambient-voice.md),
-[Plan 85 — Devices page](plan-85-device-fleet-page.md),
+[Plan 85 — Devices page](history/plan-85-device-fleet-page.md),
 [Plan 88 — Jev from Satyr](plan-88-satyr-funded-jev.md),
 [Plan 90 — café Register](plan-90-cafe-pos-checkout.md),
 [Plan 80 — multi-tenant Underclerk](plan-80-underclerk-multi-tenant-backend.md)
