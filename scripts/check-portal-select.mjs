@@ -20,16 +20,18 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { PORTAL_SOURCE } from "./lib/source-roots.mjs";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SOURCE = /^apps\/portal\/src\/.+\.(ts|tsx)$/;
-const STYLE = /^apps\/portal\/src\/.+\.css$/;
+const SOURCE = /\.(ts|tsx)$/;
+const STYLE = /\.css$/;
 const COMPONENT = "apps/portal/src/ui/select.tsx";
 const COMPONENT_STYLE = "apps/portal/src/ui/select.css";
 const USE = "Use Select from apps/portal/src/ui/select.tsx.";
 
 const files = execFileSync(
   "git",
-  ["ls-files", "--cached", "--others", "--exclude-standard", "apps/portal/src"],
+  ["ls-files", "--cached", "--others", "--exclude-standard", ...PORTAL_SOURCE],
   { cwd: root, encoding: "utf8" },
 )
   .split("\n")

@@ -1,7 +1,7 @@
 import parser from "@typescript-eslint/parser";
 import stylistic from "@stylistic/eslint-plugin";
 
-import { PLATFORM_SOURCE } from "./scripts/lib/source-roots.mjs";
+import { PLATFORM_SOURCE, PORTAL_SOURCE } from "./scripts/lib/source-roots.mjs";
 
 const definitions = [
   "function",
@@ -174,7 +174,7 @@ const fetchValueSelectors = [
 // The source of the Platform Worker and of the Portal.
 const workerAndPortalSource = [
   ...PLATFORM_SOURCE.map((folder) => `${folder}/**/*.ts`),
-  "apps/portal/src/**/*.{ts,tsx}",
+  ...PORTAL_SOURCE.map((folder) => `${folder}/**/*.{ts,tsx}`),
 ];
 
 export default [

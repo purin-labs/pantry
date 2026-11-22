@@ -17,12 +17,13 @@
 //   node scripts/check-portal-requests-ratchet.mjs --update   lower entries, drop files with no call
 //   node scripts/check-portal-requests-ratchet.mjs --init     write the baseline from the current tree
 import { runCountRatchet } from "./lib/count-ratchet.mjs";
+import { inFolders, PORTAL_SOURCE } from "./lib/source-roots.mjs";
 
-const SOURCE = /^apps\/portal\/src\/.+\.(ts|tsx)$/;
+const SOURCE = /\.(ts|tsx)$/;
 const EXCLUDED = [
   /^apps\/portal\/src\/dev\//,
   /\.test\.[a-z]+$/,
-  /^apps\/portal\/src\/control-client\.ts$/,
+  /^(apps\/portal\/src|foundation\/control\/portal)\/control-client\.ts$/,
 ];
 const IMPORTS_REACT = /from\s+["']react["']/u;
 // The reads and the writes of the control client. The other functions of the
@@ -36,6 +37,7 @@ runCountRatchet({
   script: "scripts/check-portal-requests-ratchet.mjs",
   baseline: "scripts/portal-requests-ratchet.json",
   count: (file, read) =>
+    inFolders(file, PORTAL_SOURCE) &&
     SOURCE.test(file) &&
     !EXCLUDED.some((pattern) => pattern.test(file)) &&
     (file.endsWith(".tsx") || IMPORTS_REACT.test(read()))

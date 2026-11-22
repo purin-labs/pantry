@@ -13,12 +13,13 @@
 //   node scripts/check-portal-fetch-ratchet.mjs --update   lower entries, drop files with no call
 //   node scripts/check-portal-fetch-ratchet.mjs --init     write the baseline from the current tree
 import { runCountRatchet } from "./lib/count-ratchet.mjs";
+import { inFolders, PORTAL_SOURCE } from "./lib/source-roots.mjs";
 
-const SOURCE = /^apps\/portal\/src\/.+\.(ts|tsx|mjs|js|jsx)$/;
+const SOURCE = /\.(ts|tsx|mjs|js|jsx)$/;
 const EXCLUDED = [
   /^apps\/portal\/src\/dev\//,
   /\.test\.[a-z]+$/,
-  /^apps\/portal\/src\/control-client\.ts$/,
+  /^(apps\/portal\/src|foundation\/control\/portal)\/control-client\.ts$/,
 ];
 // Files that fetch assets, models, bundles or another origin, not the control API.
 const NOT_CONTROL = new Set([
@@ -43,6 +44,7 @@ runCountRatchet({
   script: "scripts/check-portal-fetch-ratchet.mjs",
   baseline: "scripts/portal-fetch-ratchet.json",
   count: (file, read) =>
+    inFolders(file, PORTAL_SOURCE) &&
     SOURCE.test(file) &&
     !EXCLUDED.some((pattern) => pattern.test(file)) &&
     !NOT_CONTROL.has(file)

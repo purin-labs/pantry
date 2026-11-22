@@ -14,6 +14,19 @@ export const SOURCE_ROOTS = ["apps", "foundation", "packages", "services"];
 /** The folders that hold the source of the Platform Worker. */
 export const PLATFORM_SOURCE = ["services/platform/src", "foundation"];
 
+/**
+ * The folders that hold the source of the Portal, in the browser. The package
+ * foundation/ui and the Portal files of foundation/control leave
+ * apps/portal/src with their moves (Refactor 17, Stage B); the control move
+ * adds its folder here.
+ */
+export const PORTAL_SOURCE = ["apps/portal/src", "foundation/ui"];
+
+/** True when a repository path is in one of `folders`. */
+export function inFolders(path, folders) {
+  return folders.some((folder) => path.startsWith(`${folder}/`));
+}
+
 const SKIPPED = new Set(["node_modules", "dist", ".wrangler", "target"]);
 
 function filesUnder(directory, test) {
