@@ -53,6 +53,9 @@ const BOX = 1024;
 const MARK_VIEW_BOX = "67 97 860 860";
 const CAT_PIVOT = traced.catPivot; // the middle of the cat's bottom edge
 const PUDDING_PIVOT = traced.puddingPivot; // the bottom of the pudding
+// Where each ear meets the head. An ear is the part of the cat over `cut`, at
+// one side of `left` or `right`; it leans about the line `base`.
+const EARS = traced.ears;
 const CENTRE = [
   Math.round((traced.bbox[0] + traced.bbox[2]) / 2),
   Math.round((traced.bbox[1] + traced.bbox[3]) / 2),
@@ -71,6 +74,20 @@ const JIGGLE = {
   squashHz: 3.1,
   squashFade: 0.35,
 };
+// One ear flicks, then the other, one time in two sways. An ear leans away
+// from the head about its base, and springs back.
+const FLICK = {
+  period: 2 * SWAY.period,
+  start: 3.8, // seconds into the loop: the pudding is almost at rest
+  gap: 0.55, // seconds from the left ear to the right ear
+  // [seconds after the start, lean in degrees, height]
+  steps: [
+    [0.098, 17, 0.9],
+    [0.224, -6, 1.02],
+    [0.336, 3, 1],
+  ],
+  end: 0.448,
+};
 const round = (value, digits = 3) => Number(value.toFixed(digits));
 
 /** One burst of jelly wobble at `t` seconds: a lean and a squash that both fade. */
@@ -85,6 +102,26 @@ function wobble(t, direction) {
     Math.exp(-t / JIGGLE.squashFade) *
     Math.sin(2 * Math.PI * JIGGLE.squashHz * t);
   return `skewX(${round(lean, 2)}deg) scale(${round(1 + 0.6 * squash)},${round(1 - squash)})`;
+}
+
+/**
+ * The flick of one ear. `out` is 1 for the left ear and -1 for the right ear,
+ * so each ear leans away from the head. A lean keeps the base line of the ear
+ * in its place, so the ear stays joined to the head.
+ */
+function flick(name, start, out) {
+  const at = (seconds) =>
+    `${round(((start + seconds) / FLICK.period) * 100, 2)}%`;
+  const steps = FLICK.steps
+    .map(
+      ([seconds, lean, height]) =>
+        `${at(seconds)}{transform:skewX(${out * lean}deg) scaleY(${height})}`,
+    )
+    .join("");
+  return (
+    `@keyframes ${name}{0%,${at(0)}{transform:none}${steps}` +
+    `${at(FLICK.end)},100%{transform:none}}`
+  );
 }
 
 /** The pudding wobbles each time the cat turns round: two bursts in one sway. */
@@ -103,7 +140,9 @@ function keyframes(name) {
   return (
     `@keyframes ${name}-sway{0%,100%{transform:skewX(${SWAY.lean}deg) rotate(${-SWAY.tilt}deg)}` +
     `50%{transform:skewX(${-SWAY.lean}deg) rotate(${SWAY.tilt}deg)}}` +
-    `@keyframes ${name}-jiggle{${jiggle}}`
+    `@keyframes ${name}-jiggle{${jiggle}}` +
+    flick(`${name}-flick-left`, FLICK.start, 1) +
+    flick(`${name}-flick-right`, FLICK.start + FLICK.gap, -1)
   );
 }
 
@@ -112,25 +151,55 @@ const about = (pivot, className, inner) =>
   `<g transform="translate(${pivot[0]} ${pivot[1]})"><g class="${className}">` +
   `<g transform="translate(${-pivot[0]} ${-pivot[1]})">${inner}</g></g></g>`;
 
+/**
+ * The clip shapes that divide the cat into its body and its two ears. The
+ * shapes reach past the box, because a lean moves an ear.
+ */
+const EAR_CLIPS = (() => {
+  const far = 2 * BOX;
+  const sheet = `M${-far} ${-far}H${far}V${far}H${-far}Z`;
+  return {
+    body: `${sheet}M${-far} ${-far}H${EARS.left}V${EARS.cut}H${-far}ZM${EARS.right} ${-far}H${far}V${EARS.cut}H${EARS.right}Z`,
+    left: `M${-far} ${-far}H${EARS.left}V${EARS.base}H${-far}Z`,
+    right: `M${EARS.right} ${-far}H${far}V${EARS.base}H${EARS.right}Z`,
+  };
+})();
+
 /** The drawing with no <svg> wrapper. `id` keeps the mask and clip names apart. */
 function artwork(id, animated) {
   const pudding = (inner) =>
     animated ? about(PUDDING_PIVOT, `${id}-pudding`, inner) : inner;
+  // The cat that moves is one shape that is drawn three times: the body, and
+  // each ear in a group that leans about the base of the ear.
+  const part = (name) =>
+    `<use href="#${id}-shape" clip-path="url(#${id}-clip-${name})"/>`;
+  const ear = (side) =>
+    about([EARS[side], EARS.base], `${id}-ear-${side}`, part(side));
   const cat =
-    `<path d="${PATHS.cat}" fill="${COLOURS.cat}"/>` +
+    (animated
+      ? `<g fill="${COLOURS.cat}">${part("body")}${ear("left")}${ear("right")}</g>`
+      : `<path d="${PATHS.cat}" fill="${COLOURS.cat}"/>`) +
     `<path d="${PATHS.face}" fill="${COLOURS.cream}"/>`;
   const style = animated
     ? `<style>.${id}-cat{transform-origin:0 0;animation:${id}-sway ${SWAY.period}s ease-in-out infinite}` +
       `.${id}-pudding{transform-origin:0 0;animation:${id}-jiggle ${SWAY.period}s linear infinite}` +
+      `.${id}-ear-left{transform-origin:0 0;animation:${id}-flick-left ${FLICK.period}s linear infinite}` +
+      `.${id}-ear-right{transform-origin:0 0;animation:${id}-flick-right ${FLICK.period}s linear infinite}` +
       keyframes(id) +
-      `@media (prefers-reduced-motion:reduce){.${id}-cat,.${id}-pudding{animation:none}}</style>`
+      `@media (prefers-reduced-motion:reduce){.${id}-cat,.${id}-pudding,.${id}-ear-left,.${id}-ear-right{animation:none}}</style>`
+    : "";
+  const earDefs = animated
+    ? `<path id="${id}-shape" d="${PATHS.cat}"/>` +
+      `<clipPath id="${id}-clip-body"><path clip-rule="evenodd" d="${EAR_CLIPS.body}"/></clipPath>` +
+      `<clipPath id="${id}-clip-left"><path d="${EAR_CLIPS.left}"/></clipPath>` +
+      `<clipPath id="${id}-clip-right"><path d="${EAR_CLIPS.right}"/></clipPath>`
     : "";
   return (
     style +
     // The cream gap round the pudding is a cut-out in the cat, so the ground shows through.
     `<defs><mask id="${id}-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="${BOX}" height="${BOX}">` +
     `<rect width="${BOX}" height="${BOX}" fill="#fff"/>${pudding(`<path d="${PATHS.gap}" fill="#000"/>`)}</mask>` +
-    `<clipPath id="${id}-rim"><path d="${PATHS.pudding}"/></clipPath></defs>` +
+    `<clipPath id="${id}-rim"><path d="${PATHS.pudding}"/></clipPath>${earDefs}</defs>` +
     `<g mask="url(#${id}-gap)">${animated ? about(CAT_PIVOT, `${id}-cat`, cat) : cat}</g>` +
     pudding(
       `<path d="${PATHS.pudding}" fill="${COLOURS.custard}"/>` +
@@ -305,6 +374,8 @@ export const PURIN_MARK = ${JSON.stringify(
     box: BOX,
     catPivot: CAT_PIVOT,
     puddingPivot: PUDDING_PIVOT,
+    ears: EARS,
+    earClips: EAR_CLIPS,
     colours: COLOURS,
     paths: PATHS,
   },
@@ -315,7 +386,9 @@ export const PURIN_MARK = ${JSON.stringify(
 const css = `/* ${generated} */
 
 .purin-mark-cat,
-.purin-mark-pudding {
+.purin-mark-pudding,
+.purin-mark-ear-left,
+.purin-mark-ear-right {
   transform-origin: 0 0;
 }
 
@@ -328,11 +401,22 @@ const css = `/* ${generated} */
   animation: purin-mark-jiggle ${SWAY.period}s linear infinite;
 }
 
+/* One ear flicks, then the other, one time in two sways. */
+.purin-mark[data-animated] .purin-mark-ear-left {
+  animation: purin-mark-flick-left ${FLICK.period}s linear infinite;
+}
+
+.purin-mark[data-animated] .purin-mark-ear-right {
+  animation: purin-mark-flick-right ${FLICK.period}s linear infinite;
+}
+
 ${keyframes("purin-mark")}
 
 @media (prefers-reduced-motion: reduce) {
   .purin-mark[data-animated] .purin-mark-cat,
-  .purin-mark[data-animated] .purin-mark-pudding {
+  .purin-mark[data-animated] .purin-mark-pudding,
+  .purin-mark[data-animated] .purin-mark-ear-left,
+  .purin-mark[data-animated] .purin-mark-ear-right {
     animation: none;
   }
 }

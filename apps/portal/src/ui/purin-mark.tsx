@@ -5,8 +5,8 @@ import "./purin-mark.css";
 
 export type PurinMarkProps = {
   /**
-   * The cat sways and the pudding jiggles. The less-motion setting of the
-   * device stops the motion.
+   * The cat sways, the pudding jiggles and the ears flick, one then the
+   * other. The less-motion setting of the device stops the motion.
    */
   animated?: boolean;
   /** The accessible name. Without one, the mark is decoration. */
@@ -38,10 +38,46 @@ function About({
 }
 
 /**
- * The drawing: the cat behind, the pudding in front. The cream gap round the
- * pudding is a cut-out in the cat, and it moves with the pudding.
+ * The cat that moves: one shape that is drawn three times. The body stays,
+ * and each ear is in a group that leans about the base of the ear.
  */
-function Artwork(): React.ReactNode {
+function CatWithEars({ id }: { id: string }): React.ReactNode {
+  const { ears, earClips } = PURIN_MARK;
+  const shape = `${id}-shape`;
+  const part = (name: keyof typeof earClips): React.ReactNode => (
+    <use href={`#${shape}`} clipPath={`url(#${id}-clip-${name})`} />
+  );
+  return (
+    <g fill={colours.cat}>
+      <defs>
+        <path id={shape} d={paths.cat} />
+        <clipPath id={`${id}-clip-body`}>
+          <path clipRule="evenodd" d={earClips.body} />
+        </clipPath>
+        <clipPath id={`${id}-clip-left`}>
+          <path d={earClips.left} />
+        </clipPath>
+        <clipPath id={`${id}-clip-right`}>
+          <path d={earClips.right} />
+        </clipPath>
+      </defs>
+      {part("body")}
+      <About pivot={[ears.left, ears.base]} className="purin-mark-ear-left">
+        {part("left")}
+      </About>
+      <About pivot={[ears.right, ears.base]} className="purin-mark-ear-right">
+        {part("right")}
+      </About>
+    </g>
+  );
+}
+
+/**
+ * The drawing: the cat behind, the pudding in front. The cream gap round the
+ * pudding is a cut-out in the cat, and it moves with the pudding. The mark
+ * that does not move draws the cat as one shape.
+ */
+function Artwork({ animated }: { animated: boolean }): React.ReactNode {
   const id = useId();
   const gap = `${id}-gap`;
   const rim = `${id}-rim`;
@@ -67,7 +103,11 @@ function Artwork(): React.ReactNode {
       </defs>
       <g mask={`url(#${gap})`}>
         <About pivot={PURIN_MARK.catPivot} className="purin-mark-cat">
-          <path d={paths.cat} fill={colours.cat} />
+          {animated ? (
+            <CatWithEars id={id} />
+          ) : (
+            <path d={paths.cat} fill={colours.cat} />
+          )}
           <path d={paths.face} fill={colours.cream} />
         </About>
       </g>
@@ -118,7 +158,7 @@ function Frame({
 export function PurinMark(props: PurinMarkProps): React.ReactNode {
   return (
     <Frame viewBox={PURIN_MARK.markViewBox} {...props}>
-      <Artwork />
+      <Artwork animated={props.animated ?? false} />
     </Frame>
   );
 }
@@ -137,7 +177,7 @@ export function PurinIcon(props: PurinMarkProps): React.ReactNode {
         fill={colours.cream}
       />
       <g transform={PURIN_MARK.iconTransform}>
-        <Artwork />
+        <Artwork animated={props.animated ?? false} />
       </g>
     </Frame>
   );

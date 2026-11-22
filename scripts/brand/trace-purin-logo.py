@@ -14,7 +14,7 @@ Needs Pillow, numpy, scipy and contourpy.
 The image has four flat colours, so three channel thresholds split it:
 luminance finds the cat, blue finds the pudding and green finds the caramel.
 Each layer becomes a mask, and `curve_fit.py` turns its outline into a few
-cubic curves.
+cubic curves. `eyes.py` makes the eyes a little taller than the eyes of the image.
 """
 
 import json
@@ -25,6 +25,7 @@ from PIL import Image
 from scipy import ndimage as ndi
 
 from curve_fit import outlines as mask_outlines
+from eyes import eye_holes, eye_outline
 
 SOURCE = "docs/brand/purin-logo/source.jpg"
 OUTPUT = "docs/brand/purin-logo/paths.json"
@@ -56,12 +57,12 @@ def main():
     caramel = largest((green < 128) & pudding)
 
     # the eyes and the mouth: the holes in the cat
-    holes = ndi.binary_fill_holes(cat) & ~cat
-    labels, count = ndi.label(holes)
-    face = np.zeros_like(cat)
+    eyes = eye_holes(cat)
+    labels, count = ndi.label(ndi.binary_fill_holes(cat) & ~cat & ~eyes[0] & ~eyes[1])
+    mouth = np.zeros_like(cat)
     for i in range(1, count + 1):
         if (labels == i).sum() > 400:
-            face |= labels == i
+            mouth |= labels == i
 
     ys, xs = np.where(pudding)
     x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
@@ -90,6 +91,19 @@ def main():
         grow[:-k] |= caramel[k:]
     caramel_out = caramel | (grow & ~ndi.binary_erosion(pudding, structure=disk(5)))
 
+    # The ears. The motion files cut the cat where each ear meets the top of the
+    # head, so that an ear can flick. `top` is the first row of the cat in a column.
+    columns = np.flatnonzero(cat.any(axis=0))
+    top = cat.argmax(axis=0)
+    middle = int((columns.min() + columns.max()) // 2)
+    tip_left = columns.min() + int(top[columns.min() : middle].argmin())
+    tip_right = middle + int(top[middle : columns.max() + 1].argmin())
+    # the lowest point of the outline between a tip and the middle; if some
+    # columns are equal, the one nearest the middle
+    join_left = middle - 1 - int(top[tip_left:middle][::-1].argmax())
+    join_right = middle + int(top[middle : tip_right + 1].argmax())
+    ear_cut = int(np.ceil(max(top[join_left], top[join_right]) * scale)) + 1
+
     def outlines(mask):
         return mask_outlines(mask, scale, TOLERANCE)
 
@@ -100,8 +114,18 @@ def main():
         "catPivot": [unit((cxs.min() + cxs.max()) / 2), unit(cat_bottom + 0.5)],
         "puddingPivot": [unit((x0 + x1) / 2), unit(y1 + 0.5)],
         "bbox": [unit(min(cxs.min(), x0)), unit(cys.min()), unit(max(cxs.max(), x1)), unit(y1)],
+        # An ear is the part of the cat over the line `cut`, to the left of `left`
+        # or to the right of `right`. It leans about the line `base`, a little
+        # under the cut, so that no gap opens between the ear and the head.
+        "ears": {
+            "cut": ear_cut,
+            "base": ear_cut + 4,
+            "left": int(round(join_left * scale)) + 1,
+            "right": int(round(join_right * scale)) - 1,
+        },
         "cat": outlines(cat_full)[0],
-        "face": outlines(face),
+        # the left eye, the right eye, then the mouth
+        "face": [eye_outline(eye, scale, TOLERANCE) for eye in eyes] + outlines(mouth),
         "pudding": outlines(pudding)[0],
         "caramel": outlines(caramel_out),
         "gap": outlines(gap)[0],
