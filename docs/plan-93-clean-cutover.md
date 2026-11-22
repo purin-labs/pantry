@@ -77,49 +77,49 @@ the names that the repositories know (see "Open item").
 
 ### The Pantry production stack and its new names
 
-| Old Worker | Last deploy | New Worker | Public address |
-|---|---|---|---|
-| `satyr-edge` | 18 Nov | `pantry` | `pantry.purin.io` |
-| `underclerk` | 15 Nov | `pantry-commerce` | `commerce.pantry.purin.io` (API and MCP) |
-| `satyr-slack-ingress` | 18 Nov | `pantry-slack-ingress` | `slack.pantry.purin.io` |
-| `satyr-model-exit` | 18 Nov | `pantry-model-exit` | none |
-| `satyr-chatgpt-exit` | 18 Nov | `pantry-chatgpt-exit` | none |
-| `satyr-vault-onepassword` | 18 Nov | `pantry-vault-onepassword` | none |
-| `satyr-code-mode-sandbox` | 18 Nov | `pantry-code-sandbox` | none |
-| `satyr-docs` | 3 Sep | `pantry-docs` | `docs.pantry.purin.io` |
-| `seams-shop` | 5 Nov | `purin-shop` | the shop domain of the brand plan |
+| Old Worker                | Last deploy | New Worker                 | Public address                           |
+| ------------------------- | ----------- | -------------------------- | ---------------------------------------- |
+| `satyr-edge`              | 18 Nov      | `pantry`                   | `pantry.purin.io`                        |
+| `underclerk`              | 15 Nov      | `pantry-commerce`          | `commerce.pantry.purin.io` (API and MCP) |
+| `satyr-slack-ingress`     | 18 Nov      | `pantry-slack-ingress`     | `slack.pantry.purin.io`                  |
+| `satyr-model-exit`        | 18 Nov      | `pantry-model-exit`        | none                                     |
+| `satyr-chatgpt-exit`      | 18 Nov      | `pantry-chatgpt-exit`      | none                                     |
+| `satyr-vault-onepassword` | 18 Nov      | `pantry-vault-onepassword` | none                                     |
+| `satyr-code-mode-sandbox` | 18 Nov      | `pantry-code-sandbox`      | none                                     |
+| `satyr-docs`              | 3 Sep       | `pantry-docs`              | `docs.pantry.purin.io`                   |
+| `seams-shop`              | 5 Nov       | `purin-shop`               | the shop domain of the brand plan        |
 
 Each new Worker has `workers_dev: false`, so it has one address only.
 
-| Old resource | New resource |
-|---|---|
-| D1 `satyr-global-tokyo`, `satyr-organisation-apac` | `pantry-global-apac`, `pantry-organisation-apac` |
-| R2 `satyr-archive-apac`, `underclerk-apac` | `pantry-archive-apac`, `pantry-commerce-apac` |
-| R2 `satyr-repo-binaries-apac` (CI and build files) | `pantry-repo-binaries-apac`. Copy its files: they are build input, not tenant data. Make a new read-only R2 token for CI |
-| KV `POLICY_KV` | `pantry-policy` |
-| Queues `satyr-events`, `satyr-cues`, `satyr-event-dlq`, `satyr-cue-dlq` | `pantry-events`, `pantry-cues`, `pantry-event-dlq`, `pantry-cue-dlq` |
-| Containers `satyr-edge-workspaceexecutorcontainer`, `-messagelinkfetchcontainer`, `-customconnectorfetchcontainer`, `satyr-chatgpt-exit-container` | `pantry-workspace-executor`, `pantry-message-link-fetch`, `pantry-custom-connector-fetch`, `pantry-chatgpt-exit` |
-| Secrets Store `data-encryption-root-v1`, `vault-root-v1`, `vault-root-v2` | `pantry-data-encryption-root`, `pantry-vault-root`. One vault root: no old data needs `v1` |
-| Durable Object classes `UnderclerkMerchantDO`, `UnderclerkShopNameDO` | `CommerceMerchantDO`, `CommerceShopNameDO`. The `exports` of each new Worker start with only `created` entries. The three `CodexHarness` tombstones go |
+| Old resource                                                                                                                                       | New resource                                                                                                                                           |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1 `satyr-global-tokyo`, `satyr-organisation-apac`                                                                                                 | `pantry-global-apac`, `pantry-organisation-apac`                                                                                                       |
+| R2 `satyr-archive-apac`, `underclerk-apac`                                                                                                         | `pantry-archive-apac`, `pantry-commerce-apac`                                                                                                          |
+| R2 `satyr-repo-binaries-apac` (CI and build files)                                                                                                 | `pantry-repo-binaries-apac`. Copy its files: they are build input, not tenant data. Make a new read-only R2 token for CI                               |
+| KV `POLICY_KV`                                                                                                                                     | `pantry-policy`                                                                                                                                        |
+| Queues `satyr-events`, `satyr-cues`, `satyr-event-dlq`, `satyr-cue-dlq`                                                                            | `pantry-events`, `pantry-cues`, `pantry-event-dlq`, `pantry-cue-dlq`                                                                                   |
+| Containers `satyr-edge-workspaceexecutorcontainer`, `-messagelinkfetchcontainer`, `-customconnectorfetchcontainer`, `satyr-chatgpt-exit-container` | `pantry-workspace-executor`, `pantry-message-link-fetch`, `pantry-custom-connector-fetch`, `pantry-chatgpt-exit`                                       |
+| Secrets Store `data-encryption-root-v1`, `vault-root-v1`, `vault-root-v2`                                                                          | `pantry-data-encryption-root`, `pantry-vault-root`. One vault root: no old data needs `v1`                                                             |
+| Durable Object classes `UnderclerkMerchantDO`, `UnderclerkShopNameDO`                                                                              | `CommerceMerchantDO`, `CommerceShopNameDO`. The `exports` of each new Worker start with only `created` entries. The three `CodexHarness` tombstones go |
 
 ### Names in the code and on the wire
 
 There is no stored data to keep, so these change without a reader for the
 old value. Counts are lines outside the docs, on dev `c677c79`.
 
-| Old name | Lines | New name |
-|---|---|---|
-| `satyr` (any case) | 2,859 in 857 files | `pantry` |
-| `underclerk` (any case) | 3,693 in 579 files | `commerce` |
-| Event kinds `underclerk.*.v1` | 1,287 | `commerce.*.v1` |
-| `UNDERCLERK_*` variables and secrets | 1,066 | `COMMERCE_*` |
-| `SATYR_*` variables | 817 | `PANTRY_*` |
-| Provider id `satyr_commerce` | 194 | `builtin_commerce` |
-| Area values `"BakeryOS"`, `"CafeOS"`, `"AgentCommerce"` | 146 | `"kitchen"`, `"cafe"`, `"commerce"` |
-| Headers `x-satyr-*` | 172 | `x-pantry-*` |
-| Cookie `satyr_control_session` and `satyr:*` storage keys | 152 | `pantry_session`, `pantry:*` |
-| launchd label `sh.seams.satyr.*`, folder `~/.satyr-voice` | — | `io.purin.pantry.*`, `~/.pantry-voice` |
-| Console service id `satyr` (seams-monorepo) | part of 888 lines | `pantry` |
+| Old name                                                  | Lines              | New name                               |
+| --------------------------------------------------------- | ------------------ | -------------------------------------- |
+| `satyr` (any case)                                        | 2,859 in 857 files | `pantry`                               |
+| `underclerk` (any case)                                   | 3,693 in 579 files | `commerce`                             |
+| Event kinds `underclerk.*.v1`                             | 1,287              | `commerce.*.v1`                        |
+| `UNDERCLERK_*` variables and secrets                      | 1,066              | `COMMERCE_*`                           |
+| `SATYR_*` variables                                       | 817                | `PANTRY_*`                             |
+| Provider id `satyr_commerce`                              | 194                | `builtin_commerce`                     |
+| Area values `"BakeryOS"`, `"CafeOS"`, `"AgentCommerce"`   | 146                | `"kitchen"`, `"cafe"`, `"commerce"`    |
+| Headers `x-satyr-*`                                       | 172                | `x-pantry-*`                           |
+| Cookie `satyr_control_session` and `satyr:*` storage keys | 152                | `pantry_session`, `pantry:*`           |
+| launchd label `sh.seams.satyr.*`, folder `~/.satyr-voice` | —                  | `io.purin.pantry.*`, `~/.pantry-voice` |
+| Console service id `satyr` (seams-monorepo)               | part of 888 lines  | `pantry`                               |
 
 The two D1 baselines stay one file each
 (`migrations-global/0001_current_schema.sql`,
@@ -136,13 +136,13 @@ these are names, not dead code. They fall into two groups.
 other repository knows.** Done on 19 November 2026, with
 `scripts/rename/plan-93-test-names.mjs`: 330 lines in 172 files.
 
-| Kind | Old | New |
-|---|---|---|
-| Reserved test hosts | `satyr.example`, `satyr.test`, `satyr-test.myshopify.com`, `e2e-satyr` | `pantry.example`, `pantry.test`, `pantry-test.myshopify.com`, `e2e-pantry` |
-| Slack fixture user ids | `U0SATYR`, `U0BGSATYR` | `U0PANTRY`, `U0BGPANTRY` |
-| Fixture location ids | `satyr_location_1` and three more | `pantry_location_1` |
-| Phrases | "Satyr Kitchen", "Satyr Worker" | "Kitchen", "Pantry Worker" |
-| The word "Satyr" in code comments | "Satyr" | "Pantry" |
+| Kind                              | Old                                                                    | New                                                                        |
+| --------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Reserved test hosts               | `satyr.example`, `satyr.test`, `satyr-test.myshopify.com`, `e2e-satyr` | `pantry.example`, `pantry.test`, `pantry-test.myshopify.com`, `e2e-pantry` |
+| Slack fixture user ids            | `U0SATYR`, `U0BGSATYR`                                                 | `U0PANTRY`, `U0BGPANTRY`                                                   |
+| Fixture location ids              | `satyr_location_1` and three more                                      | `pantry_location_1`                                                        |
+| Phrases                           | "Satyr Kitchen", "Satyr Worker"                                        | "Kitchen", "Pantry Worker"                                                 |
+| The word "Satyr" in code comments | "Satyr"                                                                | "Pantry"                                                                   |
 
 The first estimate for group A was about 1,100 lines. A check of each of the
 678 distinct names showed that most of the rest are not safe now:
@@ -163,15 +163,15 @@ change breaks the data and the sessions of the stack that runs today, or it
 needs a change in another repository. They change in step 2, for the new
 stack:
 
-| Kind | Examples | Lines |
-|---|---|---|
-| Cookie, CSRF and headers | `satyr_control_session`, `satyr_control_csrf`, `x-satyr-csrf`, `x-satyr-configuration-version` | about 430 |
-| Provider and platform ids | `satyr_commerce`, `satyr_platform`, `shared_satyr_app` | about 370 |
-| Contract fields, event kinds and hash domains | `satyrLocationId`, `satyr_location_id`, `satyr.checkout.*`, `satyr.counter-sale.v1`, `urn:satyr` | about 450 |
-| Deployed names | Workers, queues, D1 and R2 names | 148 |
-| Shop Mac | `sh.seams.satyr.*`, `~/.satyr-voice`, `hey_satyr` | 55 |
-| `SATYR_*` constants | `SATYR_COMMERCE`, `SATYR_ECOMMERCE_FIXTURE_TIMESTAMP` | 63 |
-| Identifiers, test harness names, brand files and display text | `SatyrProvisionEnvelopeV1`, `satyr-plan40-browser`, `satyr-mark-dark-64.png`, "Satyr Commerce" | the rest |
+| Kind                                                          | Examples                                                                                         | Lines     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | --------- |
+| Cookie, CSRF and headers                                      | `satyr_control_session`, `satyr_control_csrf`, `x-satyr-csrf`, `x-satyr-configuration-version`   | about 430 |
+| Provider and platform ids                                     | `satyr_commerce`, `satyr_platform`, `shared_satyr_app`                                           | about 370 |
+| Contract fields, event kinds and hash domains                 | `satyrLocationId`, `satyr_location_id`, `satyr.checkout.*`, `satyr.counter-sale.v1`, `urn:satyr` | about 450 |
+| Deployed names                                                | Workers, queues, D1 and R2 names                                                                 | 148       |
+| Shop Mac                                                      | `sh.seams.satyr.*`, `~/.satyr-voice`, `hey_satyr`                                                | 55        |
+| `SATYR_*` constants                                           | `SATYR_COMMERCE`, `SATYR_ECOMMERCE_FIXTURE_TIMESTAMP`                                            | 63        |
+| Identifiers, test harness names, brand files and display text | `SatyrProvisionEnvelopeV1`, `satyr-plan40-browser`, `satyr-mark-dark-64.png`, "Satyr Commerce"   | the rest  |
 
 Not changed by any codemod: the pinned Kitchen physics bundles under
 `apps/portal/public/bakery-physics` hold the build path
@@ -187,14 +187,14 @@ and recurring-logistics prove its outcome.
 
 ### Stale Pantry resources (delete them)
 
-| Resource | Why it is stale |
-|---|---|
-| Staging Workers `satyr-edge-staging` (last deploy 16 Oct), `underclerk-staging` (14 Oct), `satyr-code-mode-sandbox-staging` (16 Oct) | Nobody deployed them for a month. The staging config binds `satyr-model-exit-staging`, `satyr-chatgpt-exit-staging` and `satyr-vault-onepassword-staging`, and those Workers do not exist. So staging cannot run a model call |
-| Staging D1 `satyr-staging-global-apac`, `satyr-staging-organisation-apac` (42 MiB) | The staging crons still run: 3,009 writes and 6,671 reads in 24 hours, for nobody |
-| Staging R2 `satyr-staging-archive-apac`, KV `satyr-staging-policy`, queues `satyr-staging-events`, `-cues`, `-event-dlq`, `-cue-dlq` | Part of the staging stack |
-| Staging containers `satyr-edge-staging-workspaceexecutorcontainer`, `-customconnectorfetchcontainer`, `-messagelinkfetchcontainer`, `-apaccodexharnesscontainer` | Part of the staging stack. The Codex harness class is deleted |
-| Domain `staging.satyr.seams.sh` | Staging address |
-| Queues `satyr-thread-files`, `satyr-thread-file-dlq` | No producer. `satyr-edge` is still listed as the consumer, but no Wrangler file names the queue |
+| Resource                                                                                                                                                         | Why it is stale                                                                                                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Staging Workers `satyr-edge-staging` (last deploy 16 Oct), `underclerk-staging` (14 Oct), `satyr-code-mode-sandbox-staging` (16 Oct)                             | Nobody deployed them for a month. The staging config binds `satyr-model-exit-staging`, `satyr-chatgpt-exit-staging` and `satyr-vault-onepassword-staging`, and those Workers do not exist. So staging cannot run a model call |
+| Staging D1 `satyr-staging-global-apac`, `satyr-staging-organisation-apac` (42 MiB)                                                                               | The staging crons still run: 3,009 writes and 6,671 reads in 24 hours, for nobody                                                                                                                                             |
+| Staging R2 `satyr-staging-archive-apac`, KV `satyr-staging-policy`, queues `satyr-staging-events`, `-cues`, `-event-dlq`, `-cue-dlq`                             | Part of the staging stack                                                                                                                                                                                                     |
+| Staging containers `satyr-edge-staging-workspaceexecutorcontainer`, `-customconnectorfetchcontainer`, `-messagelinkfetchcontainer`, `-apaccodexharnesscontainer` | Part of the staging stack. The Codex harness class is deleted                                                                                                                                                                 |
+| Domain `staging.satyr.seams.sh`                                                                                                                                  | Staging address                                                                                                                                                                                                               |
+| Queues `satyr-thread-files`, `satyr-thread-file-dlq`                                                                                                             | No producer. `satyr-edge` is still listed as the consumer, but no Wrangler file names the queue                                                                                                                               |
 
 No test Worker that the repository names exists any more. I checked 14
 names (`satyr-plan42j-brain-acceptance`, `satyr-voice-path-test`,
@@ -210,13 +210,13 @@ These are not Pantry resources. Each one had no query in 24 hours, or its
 Worker is gone. Delete each group only after the owner says yes for that
 group.
 
-| Group | Resources | Owner repository |
-|---|---|---|
-| `ml-dsa-sdk-set-1101-77af96` | 4 D1 databases, 2 R2 backup buckets. Its 23 Workers were deleted on 15 Nov | seams-wallet |
-| `r150-bench-20260925` and `-20261001` | 10 D1 databases, 4 R2 backup buckets, the Worker `r150-bench-20260925-probe` (deployed 7 Oct) and its 3 probe containers | seams-wallet `tests/r150-hosted` |
-| Old Seams databases with no query in 24 h | `seams-console-sin` (empty), `seams-console-staging`, `seams-console-staging-sin`, `seams-console-testnet`, `seams-signer-staging`, `seams-signer-testnet`, `router-ab-deriver-a-testnet-private-tokyo`, `router-ab-deriver-b-testnet-private-nrt`, `router-ab-signing-worker-testnet-private` | seams-monorepo, seams-wallet |
-| `hadimar` | D1 `hadimar` (no query in 24 h), R2 `hadimar-media` | `~/Dev/web2/hadima` |
-| Buckets with no known owner | R2 `outlayer1`, `w3a-sdk`, `watchbook-analytics` | none of the repositories names them |
+| Group                                     | Resources                                                                                                                                                                                                                                                                                      | Owner repository                    |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `ml-dsa-sdk-set-1101-77af96`              | 4 D1 databases, 2 R2 backup buckets. Its 23 Workers were deleted on 15 Nov                                                                                                                                                                                                                     | seams-wallet                        |
+| `r150-bench-20260925` and `-20261001`     | 10 D1 databases, 4 R2 backup buckets, the Worker `r150-bench-20260925-probe` (deployed 7 Oct) and its 3 probe containers                                                                                                                                                                       | seams-wallet `tests/r150-hosted`    |
+| Old Seams databases with no query in 24 h | `seams-console-sin` (empty), `seams-console-staging`, `seams-console-staging-sin`, `seams-console-testnet`, `seams-signer-staging`, `seams-signer-testnet`, `router-ab-deriver-a-testnet-private-tokyo`, `router-ab-deriver-b-testnet-private-nrt`, `router-ab-signing-worker-testnet-private` | seams-monorepo, seams-wallet        |
+| `hadimar`                                 | D1 `hadimar` (no query in 24 h), R2 `hadimar-media`                                                                                                                                                                                                                                            | `~/Dev/web2/hadima`                 |
+| Buckets with no known owner               | R2 `outlayer1`, `w3a-sdk`, `watchbook-analytics`                                                                                                                                                                                                                                               | none of the repositories names them |
 
 Keep `seams-console-sin-candidate-20261014`. Its name says "candidate", but it
 is in use (15,570 reads and 1,456 writes in 24 hours). Keep the speak-to-sign
@@ -501,14 +501,14 @@ no new review.
 
 **3.1 Resources.** Made with Wrangler and the account token:
 
-| Resource | Name | Id or note |
-|---|---|---|
-| D1 (global) | `pantry-global-apac` | `ced3f859-6a2b-4e54-bc8e-92d2dae424fa`, served from NRT |
-| D1 (regional) | `pantry-organisation-apac` | `130a94eb-71a6-40a9-991d-b359f36a939a`, served from NRT |
-| R2 | `pantry-archive-apac`, `pantry-commerce-apac`, `pantry-repo-binaries-apac` | location hint `apac` |
-| KV | `pantry-policy` | `1b538734635b4da481ac9cf7c3315d36` |
-| Queues | `pantry-events`, `pantry-cues`, `pantry-event-dlq`, `pantry-cue-dlq` | |
-| Secrets Store | `pantry-data-encryption-root`, `pantry-vault-root` | 32 random bytes each, in store `41fe2fa0…` |
+| Resource      | Name                                                                       | Id or note                                              |
+| ------------- | -------------------------------------------------------------------------- | ------------------------------------------------------- |
+| D1 (global)   | `pantry-global-apac`                                                       | `ced3f859-6a2b-4e54-bc8e-92d2dae424fa`, served from NRT |
+| D1 (regional) | `pantry-organisation-apac`                                                 | `130a94eb-71a6-40a9-991d-b359f36a939a`, served from NRT |
+| R2            | `pantry-archive-apac`, `pantry-commerce-apac`, `pantry-repo-binaries-apac` | location hint `apac`                                    |
+| KV            | `pantry-policy`                                                            | `1b538734635b4da481ac9cf7c3315d36`                      |
+| Queues        | `pantry-events`, `pantry-cues`, `pantry-event-dlq`, `pantry-cue-dlq`       |                                                         |
+| Secrets Store | `pantry-data-encryption-root`, `pantry-vault-root`                         | 32 random bytes each, in store `41fe2fa0…`              |
 
 The two baselines loaded with `d1 execute --file`, and
 `run-worker.mjs platform schema production` reports 50 and 375 objects that
@@ -543,16 +543,16 @@ engine took their secrets with `--secrets-file`: the generated values, the
 OpenRouter key, and the placeholder `unset-until-plan-93-step-4` for each
 provider secret that step 4 sets. Live versions:
 
-| Worker | Version | Address |
-|---|---|---|
-| `pantry-code-sandbox` | `03b5179f` | none |
-| `pantry-model-exit` | `9fdd76fb` | none |
-| `pantry-chatgpt-exit` | `71fe480a` | none; container application `pantry-chatgpt-exit` |
-| `pantry-vault-onepassword` | `068bf92b` | none |
-| `pantry-commerce` | `d4ba7af8` | `commerce.pantry.purin.io` |
-| `pantry` | `e73c7cb8` | `pantry.purin.io`; container applications `pantry-message-link-fetch`, `pantry-custom-connector-fetch`, `pantry-workspace-executor` |
-| `pantry-slack-ingress` | `db668e42` | `slack.pantry.purin.io` |
-| `pantry-docs` | `a977225c` | `docs.pantry.purin.io` |
+| Worker                     | Version    | Address                                                                                                                             |
+| -------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `pantry-code-sandbox`      | `03b5179f` | none                                                                                                                                |
+| `pantry-model-exit`        | `9fdd76fb` | none                                                                                                                                |
+| `pantry-chatgpt-exit`      | `71fe480a` | none; container application `pantry-chatgpt-exit`                                                                                   |
+| `pantry-vault-onepassword` | `068bf92b` | none                                                                                                                                |
+| `pantry-commerce`          | `d4ba7af8` | `commerce.pantry.purin.io`                                                                                                          |
+| `pantry`                   | `e73c7cb8` | `pantry.purin.io`; container applications `pantry-message-link-fetch`, `pantry-custom-connector-fetch`, `pantry-workspace-executor` |
+| `pantry-slack-ingress`     | `db668e42` | `slack.pantry.purin.io`                                                                                                             |
+| `pantry-docs`              | `a977225c` | `docs.pantry.purin.io`                                                                                                              |
 
 `purin-shop` is not deployed: its build needs `VITE_SHOP_MERCHANT_ID`, and
 the new commerce engine has no merchant until the owner makes the new
@@ -876,6 +876,42 @@ old Google projects can go. With the owner: the read-only R2 key of CI
 a test order, an MCP call). With the Plan 91 phase 4 session: the Square and
 Stripe Connect redirects, the Meta webhook and the remaining console names.
 
+#### Follow-up results (22 November 2026)
+
+- **Release at 14:04 UTC** from dev `3988fbd0`: `pantry` version
+  `54eee412`, `pantry-slack-ingress` `61024b78`, and new versions of the
+  sandbox, the two exit Workers and the 1Password store Worker. The live
+  versions were the measured ones when the release started. Production
+  code before it was the upload of 09:44 UTC; the later versions were
+  secret changes only. The release carries the one-press Gmail drawer
+  (`dd743bba`, Plan 83), the Portal without the old physics bundles, the
+  Refactor 17 review fixes and the new budget default. Commerce, the shop
+  and the docs did not change and were not deployed.
+- **Budget default:** `default-ai-budget-d1-patch.sql` ran on
+  `pantry-organisation-apac` before the deploy, in one attempt. The one row
+  ("Purin workspace") kept 500,000 tokens, and the table default is now
+  500,000. Before the release, the type check, the patch lint and the
+  journeys `new-organisation-first-chat` and `regional-onboarding` passed on
+  the release commit. The production schema check passed again in the
+  deploy.
+- **Checks after the release:** `pantry.purin.io` (`/` and `/health`),
+  `commerce.pantry.purin.io/health`, `shop.purin.io` and
+  `docs.pantry.purin.io` answer 200; the Slack ingress answers 405 to a GET
+  on `/slack/events`. The live Portal chunk with the Gmail drawer has no
+  pilot text and no limits form. No signed-in journey ran after the release.
+- **Closed:** the CI R2 key reaches `pantry-repo-binaries-apac` (the CI run
+  of `fc937924` fetched from it); `TYPESAFE_API_KEY` on `pantry` is the
+  owner's real key; Plan 91 phase 4 is done (`87fcd22c`), with Gmail,
+  Google Drive, Square and Slack connected on the new stack. The owner's own
+  Gmail connects through the unverified Google app, so the verification of
+  the Gmail scopes waits until outside users connect.
+- **Still open:** the shop Mac voice service and local development on
+  `purin-pantry` (they wait for the owner's DNS token for `purin.io`); the
+  Gmail model-approval gate (the owner's decision) and an email Case that
+  never closes, which stops a live mailbox at its fourth thread (Plan 83);
+  38 R2 objects in `pantry-repo-binaries-apac` that no commit names (the
+  owner's decision); a test order on `shop.purin.io` and an MCP call.
+
 ### 7. Other projects (separate)
 
 Delete the groups in "Stale resources of other projects" when the owner says
@@ -889,14 +925,14 @@ rollback.
 
 ## Risks
 
-| Risk | Control |
-|---|---|
-| A deploy reaches an old Worker name, or makes an empty Worker by mistake | The release guard of step 2 |
-| A provider keeps an old callback URL | The checks of step 4 cover each provider that matters. The old stack stays until they pass |
-| Google asks for brand verification again | Start the Google console work first. Gmail scopes can take days |
-| A secret is lost | Each new secret goes into `.env.local.production` when it is set |
-| The codemod changes a third-party name that contains `satyr` or `underclerk` | The codemod has a list of protected names, as the Plan 91 codemod had |
-| Another session lands work during the freeze | One freeze, announced to the open sessions before step 2 |
+| Risk                                                                         | Control                                                                                    |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| A deploy reaches an old Worker name, or makes an empty Worker by mistake     | The release guard of step 2                                                                |
+| A provider keeps an old callback URL                                         | The checks of step 4 cover each provider that matters. The old stack stays until they pass |
+| Google asks for brand verification again                                     | Start the Google console work first. Gmail scopes can take days                            |
+| A secret is lost                                                             | Each new secret goes into `.env.local.production` when it is set                           |
+| The codemod changes a third-party name that contains `satyr` or `underclerk` | The codemod has a list of protected names, as the Plan 91 codemod had                      |
+| Another session lands work during the freeze                                 | One freeze, announced to the open sessions before step 2                                   |
 
 No step adds a cron, an alarm, a poll or a write for an idle tenant. Step 1
 removes the staging crons.
