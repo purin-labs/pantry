@@ -6,6 +6,9 @@ of each noise train the model. Speakers 800-903 and the last 30% of each noise o
 
 Inputs and licences:
   speech voices   Piper en_US-libritts_r-medium, CC BY 4.0
+  accent voices   Piper en_GB-vctk-medium (109 VCTK speakers of many English accents), CC BY 4.0.
+                  Both Piper voices start from the Piper lessac voice (Blizzard 2013 licence).
+                  Only the `accents` step uses it, into <data>/voice-vctk.
   general speech  LibriSpeech train-clean-100, dev-clean and test-clean, CC BY 4.0. It is read
                   from the network and not kept. 30% of the train-clean-100 speakers only measure.
   noise           DEMAND DKITCHEN, PCAFETER, DWASHING, CC BY 4.0
@@ -23,6 +26,7 @@ Usage:
   wake.py phrase --phrase sous-chef --wake 7000 --near 6000
   wake.py more --phrase sous-chef --wake 7000 --near 30000
   wake.py kokoro --phrase sous-chef --wake 10000 --near 16000
+  wake.py accents --phrase sous-chef --wake 7000 --near 7000
 """
 import argparse
 import concurrent.futures as futures
@@ -120,19 +124,24 @@ def place_at_end(speech: np.ndarray, rng: np.random.Generator, total: int = WIND
 
 # Worker state. Each process holds one voice and one feature model.
 _voice = None
+_train_speakers = TRAIN_SPEAKERS
 _features = None
 _noises = None
+ACCENT_VOICE = "voice-vctk/en_GB-vctk-medium.onnx"
 
 
-def _init_worker(data: str, models: str, split: str) -> None:
-    global _voice, _features, _noises
+def _init_worker(data: str, models: str, split: str, voice: str = "voice/lr.onnx", speakers: int | None = None) -> None:
+    """`voice` is a Piper model in <data>. With `speakers`, training clips use all its speakers."""
+    global _voice, _train_speakers, _features, _noises
     from piper import PiperVoice
-    _voice = PiperVoice.load(str(Path(data) / "voice" / "lr.onnx"))
+    _voice = PiperVoice.load(str(Path(data) / voice))
+    if speakers is not None:
+        _train_speakers = range(speakers)
     # Piper's session uses every core. The pool already gives one core to each worker.
     options = ort.SessionOptions()
     options.intra_op_num_threads = 1
     options.inter_op_num_threads = 1
-    _voice.session = ort.InferenceSession(str(Path(data) / "voice" / "lr.onnx"), options, providers=["CPUExecutionProvider"])
+    _voice.session = ort.InferenceSession(str(Path(data) / voice), options, providers=["CPUExecutionProvider"])
     _features = Features(Path(models))
     _noises = dict(np.load(Path(data) / f"noise-{split}.npz"))
 
@@ -153,7 +162,7 @@ def _speak(text: str, rng: np.random.Generator, speakers: range) -> np.ndarray:
 def _train_clip(task: tuple[str, int, bool]) -> np.ndarray:
     text, seed, noisy = task
     rng = np.random.default_rng(seed)
-    speech = level(_speak(text, rng, TRAIN_SPEAKERS), rng.uniform(-35, -18))
+    speech = level(_speak(text, rng, _train_speakers), rng.uniform(-35, -18))
     if rng.random() < 0.7:
         speech = fftconvolve(speech, room(rng, rng.uniform(0.3, 3.0)))
     window = place_at_end(speech, rng)
@@ -432,6 +441,30 @@ def phrase_only(args: argparse.Namespace) -> None:
     print(f"phrase {args.phrase.key} done", flush=True)
 
 
+def accents(args: argparse.Namespace) -> None:
+    """Wake and near clips from 109 speakers of many English accents. The test sets stay as they
+    are, so a phrase still compares with "Hey Satyr" on the same clips. train.py finds both files."""
+    data, phrase = args.data, args.phrase
+    out = phrase.features(data)
+    rng = np.random.default_rng(88)
+    seeds = [int(x) for x in rng.integers(0, 2**31, args.wake + args.near)]
+    said = phrase.near_train + phrase.talk
+    texts = phrase.near_phonemes(rng, args.near // 2) + [said[i % len(said)] for i in range(args.near - args.near // 2)]
+
+    def run(tasks: list, name: str) -> np.ndarray:
+        with futures.ProcessPoolExecutor(args.workers, initializer=_init_worker,
+                                         initargs=(str(data), str(args.models), "train", ACCENT_VOICE, 109)) as pool:
+            result = np.stack(list(pool.map(_train_clip, tasks, chunksize=16)))
+        print(f"{name}: {len(result)} items, disk free {free_bytes(data) / 1e9:.1f} GB", flush=True)
+        return result
+
+    wake = [(phrase.wake[i % len(phrase.wake)], seeds[i], True) for i in range(args.wake)]
+    np.save(out / "train-wake-accents.npy", run(wake, "accents wake"))
+    near = [(text, seeds[args.wake + i], True) for i, text in enumerate(texts)]
+    np.save(out / "train-near-accents.npy", run(near, "accents near"))
+    print("accents done", flush=True)
+
+
 def prepare(args: argparse.Namespace) -> None:
     data, models = args.data, args.models
     out = data / "features"
@@ -465,7 +498,7 @@ def prepare(args: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["prepare", "phrase", "more", "kokoro", "focus"])
+    parser.add_argument("command", choices=["prepare", "phrase", "more", "kokoro", "focus", "accents"])
     parser.add_argument("--phrase", type=PHRASES.__getitem__, default=PHRASES["satyr"], help=" or ".join(PHRASES))
     parser.add_argument("--data", type=Path, default=DATA)
     parser.add_argument("--models", type=Path, default=DATA / "models")
@@ -477,4 +510,5 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     if arguments.command == "prepare" and arguments.demand is None:
         parser.error("prepare needs --demand")
-    {"prepare": prepare, "phrase": phrase_only, "more": more, "kokoro": second_engine, "focus": focus}[arguments.command](arguments)
+    {"prepare": prepare, "phrase": phrase_only, "more": more, "kokoro": second_engine, "focus": focus,
+     "accents": accents}[arguments.command](arguments)

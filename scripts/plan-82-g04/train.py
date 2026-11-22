@@ -108,7 +108,7 @@ def main() -> None:
     rng = np.random.default_rng(82)
 
     wake = np.concatenate([np.load(path).astype(np.float32) for path in sorted(own.glob("train-wake*.npy"))])
-    near = np.concatenate([np.load(own / name).astype(np.float32) for name in ("train-near.npy", "train-near2.npy", "train-near3.npy")])
+    near = np.concatenate([np.load(path).astype(np.float32) for path in sorted(own.glob("train-near*.npy"))])
     speech, speech_starts = load_sequences([features / "train-train-clean-100.npz", features / "train-speech.npz", features / "train-noise.npz"])
     print(f"wake {len(wake)}, near {len(near)}, speech hours {len(speech) / FRAMES_PER_HOUR:.1f}", flush=True)
 
