@@ -1,0 +1,203 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the area organisation join one workspace package @purin-labs/area-organisation in areas/organisation. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is organisation/ or commerce/ (the longer lines of sourcePrefixes give this rule, one time for each file, and no two files then share a place), a Portal file goes to ui/ and keeps its sub-path below apps/portal/src/. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker and the Portal manifests. The exports map gives each .ts file of server/ and of ui/ and each style sheet of ui/ as an entry; a .tsx file that another module imports has an entry of its own. The tsconfig of the package reads server/ only. The Worker tsconfigs include areas/*/server and the Portal tsconfig includes areas/*/ui (the preparation commit \"Type checks: the Worker and the Portal programs read the area packages\"), so each file stays in the program that checked it before the move. edits: text edits of the files that name a root folder or a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Its own files (server/control/routes/operators.ts, server/data/onboarding-reconciliation.ts) read the Env keys CONNECTOR, ORGANISATION, SESSION, which the Actor files of the Worker and the commerce area merge with declare module. Through the foundation packages that it imports the program also lacks BAKE_RUN, CASE, CODE_MODE_SANDBOX, EVENT_Q, MESSAGE_LINK_FETCH. The package alone gives 175 errors, 32 of them in its own files. The Worker program checks each file of server/. ",
+  "module": "areas/organisation",
+  "target": "areas/organisation",
+  "workspaceEntry": "areas/*",
+  "sourcePrefixes": {
+    "services/platform/src/organisation/": "server/",
+    "services/platform/src/commerce/": "server/",
+    "services/platform/src/": "server/",
+    "apps/portal/src/": "ui/"
+  },
+  "package": {
+    "name": "@purin-labs/area-organisation",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/access/agent-permission-request": "./ui/features/access/agent-permission-request.tsx",
+      "./ui/features/access/chat-held-step-prompt": "./ui/features/access/chat-held-step-prompt.tsx",
+      "./ui/features/access/permission-requests-drawer": "./ui/features/access/permission-requests-drawer.tsx",
+      "./ui/features/access/permission-required-prompt": "./ui/features/access/permission-required-prompt.tsx",
+      "./ui/features/access/route": "./ui/features/access/route.tsx",
+      "./ui/features/agent-schedules/route": "./ui/features/agent-schedules/route.tsx",
+      "./ui/features/agent-schedules/schedule-lanes": "./ui/features/agent-schedules/schedule-lanes.tsx",
+      "./ui/features/billing/route": "./ui/features/billing/route.tsx",
+      "./ui/pages/account-invitation": "./ui/pages/account-invitation.tsx",
+      "./ui/pages/account-onboarding": "./ui/pages/account-onboarding.tsx",
+      "./ui/pages/agent-console-shared": "./ui/pages/agent-console-shared.tsx",
+      "./ui/pages/agent-console": "./ui/pages/agent-console.tsx",
+      "./ui/pages/agent-documents": "./ui/pages/agent-documents.tsx",
+      "./ui/pages/automation": "./ui/pages/automation.tsx",
+      "./ui/pages/workspaces": "./ui/pages/workspaces.tsx",
+      "./ui/workspace-switcher": "./ui/workspace-switcher.tsx"
+    },
+    "dependencies": {
+      "@base-ui/react": "^1.8.0",
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/area-brain": "workspace:*",
+      "@purin-labs/area-devices": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/bakery-workflow": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/commerce-control-api": "workspace:*",
+      "@purin-labs/connections": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/kitchen-control-api": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "lucide-react": "^0.542.0",
+      "react": "^19.1.1",
+      "react-router": "^7.18.2",
+      "sonner": "^2.0.7"
+    },
+    "devDependencies": [
+      "@cloudflare/workers-types",
+      "@types/react",
+      "tsrs"
+    ],
+    "versionsFrom": [
+      "services/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": [
+          "ESNext"
+        ],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": [
+          "@cloudflare/workers-types"
+        ],
+        "allowImportingTsExtensions": true
+      },
+      "include": [
+        "server/**/*.ts"
+      ]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"areas/brain/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/brain/server\");\n// The Worker side of the area organisation (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/organisation/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the package",
+      "find": "PORTAL_SOURCE.push(\"areas/brain/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/brain/ui\");\n// The Portal side of the area organisation (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/organisation/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": [
+        "node",
+        "scripts/check-layers.mjs",
+        "--areas",
+        "--write"
+      ],
+      "writes": [
+        "docs/layers.md"
+      ]
+    }
+  ],
+  "files": {
+    "apps/portal/src/agent-operations.ts": "ui/agent-operations.ts",
+    "apps/portal/src/features/access/access-check.tsx": "ui/features/access/access-check.tsx",
+    "apps/portal/src/features/access/agent-permission-request.tsx": "ui/features/access/agent-permission-request.tsx",
+    "apps/portal/src/features/access/ai-budget-raise.tsx": "ui/features/access/ai-budget-raise.tsx",
+    "apps/portal/src/features/access/ai-budget.tsx": "ui/features/access/ai-budget.tsx",
+    "apps/portal/src/features/access/api.ts": "ui/features/access/api.ts",
+    "apps/portal/src/features/access/capability-policy.tsx": "ui/features/access/capability-policy.tsx",
+    "apps/portal/src/features/access/case-screen-observations.css": "ui/features/access/case-screen-observations.css",
+    "apps/portal/src/features/access/case-screen-observations.tsx": "ui/features/access/case-screen-observations.tsx",
+    "apps/portal/src/features/access/chat-held-step-prompt.tsx": "ui/features/access/chat-held-step-prompt.tsx",
+    "apps/portal/src/features/access/custom-operation-picker.tsx": "ui/features/access/custom-operation-picker.tsx",
+    "apps/portal/src/features/access/data-flow.tsx": "ui/features/access/data-flow.tsx",
+    "apps/portal/src/features/access/decision-explanation.tsx": "ui/features/access/decision-explanation.tsx",
+    "apps/portal/src/features/access/defaults-dialog.tsx": "ui/features/access/defaults-dialog.tsx",
+    "apps/portal/src/features/access/dialog-elements.tsx": "ui/features/access/dialog-elements.tsx",
+    "apps/portal/src/features/access/file-resource-boundary.ts": "ui/features/access/file-resource-boundary.ts",
+    "apps/portal/src/features/access/file-resource-picker.tsx": "ui/features/access/file-resource-picker.tsx",
+    "apps/portal/src/features/access/google-drive-picker.ts": "ui/features/access/google-drive-picker.ts",
+    "apps/portal/src/features/access/grant-dialog.tsx": "ui/features/access/grant-dialog.tsx",
+    "apps/portal/src/features/access/held-output-prompt.tsx": "ui/features/access/held-output-prompt.tsx",
+    "apps/portal/src/features/access/organisation-requests.ts": "ui/features/access/organisation-requests.ts",
+    "apps/portal/src/features/access/permission-enable.ts": "ui/features/access/permission-enable.ts",
+    "apps/portal/src/features/access/permission-request-queue.tsx": "ui/features/access/permission-request-queue.tsx",
+    "apps/portal/src/features/access/permission-requests-drawer.css": "ui/features/access/permission-requests-drawer.css",
+    "apps/portal/src/features/access/permission-requests-drawer.tsx": "ui/features/access/permission-requests-drawer.tsx",
+    "apps/portal/src/features/access/permission-requests-summary.ts": "ui/features/access/permission-requests-summary.ts",
+    "apps/portal/src/features/access/permission-required-prompt.tsx": "ui/features/access/permission-required-prompt.tsx",
+    "apps/portal/src/features/access/presentation.tsx": "ui/features/access/presentation.tsx",
+    "apps/portal/src/features/access/related-cases.tsx": "ui/features/access/related-cases.tsx",
+    "apps/portal/src/features/access/route.tsx": "ui/features/access/route.tsx",
+    "apps/portal/src/features/access/system-access-model.ts": "ui/features/access/system-access-model.ts",
+    "apps/portal/src/features/access/system-access.css": "ui/features/access/system-access.css",
+    "apps/portal/src/features/access/system-access.tsx": "ui/features/access/system-access.tsx",
+    "apps/portal/src/features/access/unavailable-access.ts": "ui/features/access/unavailable-access.ts",
+    "apps/portal/src/features/agent-schedules/route.tsx": "ui/features/agent-schedules/route.tsx",
+    "apps/portal/src/features/agent-schedules/schedule-lanes.tsx": "ui/features/agent-schedules/schedule-lanes.tsx",
+    "apps/portal/src/features/agent-schedules/windows.ts": "ui/features/agent-schedules/windows.ts",
+    "apps/portal/src/features/billing/route.tsx": "ui/features/billing/route.tsx",
+    "apps/portal/src/pages/account-invitation-link.ts": "ui/pages/account-invitation-link.ts",
+    "apps/portal/src/pages/account-invitation.tsx": "ui/pages/account-invitation.tsx",
+    "apps/portal/src/pages/account-onboarding-jev.tsx": "ui/pages/account-onboarding-jev.tsx",
+    "apps/portal/src/pages/account-onboarding.css": "ui/pages/account-onboarding.css",
+    "apps/portal/src/pages/account-onboarding.tsx": "ui/pages/account-onboarding.tsx",
+    "apps/portal/src/pages/agent-console-shared.tsx": "ui/pages/agent-console-shared.tsx",
+    "apps/portal/src/pages/agent-console.tsx": "ui/pages/agent-console.tsx",
+    "apps/portal/src/pages/agent-detail.tsx": "ui/pages/agent-detail.tsx",
+    "apps/portal/src/pages/agent-documents.tsx": "ui/pages/agent-documents.tsx",
+    "apps/portal/src/pages/agent-modal.tsx": "ui/pages/agent-modal.tsx",
+    "apps/portal/src/pages/agent-templates.ts": "ui/pages/agent-templates.ts",
+    "apps/portal/src/pages/automation.tsx": "ui/pages/automation.tsx",
+    "apps/portal/src/pages/workspaces.tsx": "ui/pages/workspaces.tsx",
+    "apps/portal/src/workspace-switcher.css": "ui/workspace-switcher.css",
+    "apps/portal/src/workspace-switcher.tsx": "ui/workspace-switcher.tsx",
+    "services/platform/src/actors/organisation/activation.ts": "server/actors/organisation/activation.ts",
+    "services/platform/src/agent-tools/organisation/configuration-draft.ts": "server/agent-tools/organisation/configuration-draft.ts",
+    "services/platform/src/control/onboarding-runtime.ts": "server/control/onboarding-runtime.ts",
+    "services/platform/src/control/routes/onboarding.ts": "server/control/routes/onboarding.ts",
+    "services/platform/src/control/routes/operators.ts": "server/control/routes/operators.ts",
+    "services/platform/src/control/routes/user-preferences.ts": "server/control/routes/user-preferences.ts",
+    "services/platform/src/control/routes/workspace.ts": "server/control/routes/workspace.ts",
+    "services/platform/src/data/account-removal.ts": "server/data/account-removal.ts",
+    "services/platform/src/data/activation.ts": "server/data/activation.ts",
+    "services/platform/src/data/first-operational-task.ts": "server/data/first-operational-task.ts",
+    "services/platform/src/data/onboarding-projection.ts": "server/data/onboarding-projection.ts",
+    "services/platform/src/data/onboarding-reconciliation-run.ts": "server/data/onboarding-reconciliation-run.ts",
+    "services/platform/src/data/onboarding-reconciliation.ts": "server/data/onboarding-reconciliation.ts",
+    "services/platform/src/data/onboarding-support-audit.ts": "server/data/onboarding-support-audit.ts",
+    "services/platform/src/data/onboarding-support.ts": "server/data/onboarding-support.ts",
+    "services/platform/src/data/onboarding.ts": "server/data/onboarding.ts",
+    "services/platform/src/data/operator-configuration-draft.ts": "server/data/operator-configuration-draft.ts",
+    "services/platform/src/data/user-preferences.ts": "server/data/user-preferences.ts",
+    "services/platform/src/organisation/contract/activation-types.ts": "server/contract/activation-types.ts",
+    "services/platform/src/organisation/contract/onboarding-activation-acceptance-fault.ts": "server/contract/onboarding-activation-acceptance-fault.ts",
+    "services/platform/src/organisation/contract/organisation-services.ts": "server/contract/organisation-services.ts",
+    "services/platform/src/organisation/contract/provider-support-references.ts": "server/contract/provider-support-references.ts"
+  }
+}
