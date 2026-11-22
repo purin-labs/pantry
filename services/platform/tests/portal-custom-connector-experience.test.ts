@@ -4,7 +4,7 @@ import React from "../../../apps/portal/node_modules/react";
 import { renderToStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
 import { describe, expect, it } from "vitest";
 // @ts-expect-error The portal build type-checks its JSX modules.
-import { CustomConnectorWriteFields } from "../../../apps/portal/src/features/integrations/custom-connectors";
+import { CustomConnectorWriteFields } from "@purin-labs/area-integrations/ui/features/integrations/custom-connectors";
 
 function writeFieldReview(): string {
   return renderToStaticMarkup(

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   whatsappSubscriptionIsLive,
   whatsappExchangeFailure,
-} from "../src/provider-workflows/whatsapp-connection";
+} from "@purin-labs/area-integrations/server/provider-workflows/whatsapp-connection";
 import {
   resolveWhatsAppApplicationConfiguration,
   resolveWhatsAppEmbeddedSignupCredential,

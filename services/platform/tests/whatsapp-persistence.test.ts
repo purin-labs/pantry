@@ -37,7 +37,7 @@ import {
   whatsappConversationWindowCaseId,
 } from "@purin-labs/area-inbox/server/data/whatsapp";
 import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
-import { providerCredentialHandle } from "../src/integrations/contract/provisioning";
+import { providerCredentialHandle } from "@purin-labs/area-integrations/server/contract/provisioning";
 import {
   validateNativeRequestAuthority,
   buildWhatsAppSupportAuthority,

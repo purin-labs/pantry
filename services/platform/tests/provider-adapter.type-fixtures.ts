@@ -1,8 +1,8 @@
 import type {
   ProviderAdapterByProvider,
   ProviderCleanupByProvider,
-} from "../src/integrations/contract/provider-adapter";
-import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
+} from "@purin-labs/area-integrations/server/contract/provider-adapter";
+import { PROVIDER_ADAPTERS } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
 
 // @ts-expect-error A compiled catalogue must contain every active provider.
 const incompleteCatalogue: ProviderAdapterByProvider = {

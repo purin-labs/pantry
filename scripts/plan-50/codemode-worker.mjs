@@ -74,7 +74,7 @@ import {
 import { failSessionTurnStream } from "../../foundation/agent/actors/agent-session-turn-stream.ts";
 import { organisationId } from "./proposal-worker.mjs";
 import { installMcpFixture, mcpCatalog, readMcp } from "./mcp-fixture.mjs";
-import { customConnectorTurnTool } from "../../services/platform/src/custom-connectors/catalog-tools.ts";
+import { customConnectorTurnTool } from "../../areas/integrations/server/custom-connectors/catalog-tools.ts";
 import { readSessionTurnFlowBinding } from "../../foundation/agent/actors/agent-session-information-flow.ts";
 import {
   toPiPrompt,

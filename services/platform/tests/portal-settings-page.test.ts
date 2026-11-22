@@ -4,7 +4,7 @@ import React from "../../../apps/portal/node_modules/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import { parseIntegrationRouteSelection } from "../../../apps/portal/src/features/integrations/model";
+import { parseIntegrationRouteSelection } from "@purin-labs/area-integrations/ui/features/integrations/model";
 import {
   executeIntegrationsRoute,
   // @ts-expect-error The portal build type-checks this JSX module.
@@ -21,7 +21,7 @@ import {
   navigateProviderAuthorizationSurface,
   openProviderAuthorizationSurface,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/features/integrations/settings-routes";
+} from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
 import {
   INTEGRATIONS_PAGE_PROPS,
   PORTAL_ACTIONS,

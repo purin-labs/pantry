@@ -190,7 +190,7 @@ Other lints guard one subsystem. The spec of that subsystem describes these:
   `pnpm format:check` reports. CI and `pnpm lint` do not run Prettier.
 - ESLint has three style rules: `curly`, `one-var` and the padding rule of `@stylistic`.
   `pnpm lint:provider-workflows` applies them and `no-unused-vars` to
-  `services/platform/src/provider-workflows`. `pnpm lint:fix` repairs that folder.
+  `areas/integrations/server/provider-workflows`. `pnpm lint:fix` repairs that folder.
 - `pnpm lint:ifc-boundaries` first runs `scripts/check-ifc-destinations.mjs`, which
   refuses a new information-flow destination with no class. It then runs ESLint on
   `services/platform/src`, `foundation` and `apps/portal/src` with the style rules off.
@@ -315,7 +315,7 @@ acceptance before Stage B moves its files.
   `@purin-labs/commerce-worker`. `lint:runtime-boundary` refuses that import outside
   the commerce code.
 - CI does not run Prettier, and the ESLint style rules apply only to
-  `services/platform/src/provider-workflows`. The pre-push hook is off in a new clone.
+  `areas/integrations/server/provider-workflows`. The pre-push hook is off in a new clone.
 - `lint:runtime-boundary` looks only for `.prepare(` in a route file. Route files still
   run D1 writes with `.batch(`, on statements that helpers prepare.
 - No CI step runs `probe-write`, so no check proves that the `R2_READ_*` key cannot

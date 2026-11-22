@@ -4,7 +4,7 @@ import {
   it,
 } from "vitest";
 
-import { parseDropboxWebhookAccountIds } from "../src/gateway/dropbox-webhook";
+import { parseDropboxWebhookAccountIds } from "@purin-labs/area-integrations/server/gateway/dropbox-webhook";
 
 describe("Dropbox file-context webhook boundary", () => {
   it("accepts only bounded account hint payloads and removes duplicates", () => {

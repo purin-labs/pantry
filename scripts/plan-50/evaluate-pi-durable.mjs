@@ -441,7 +441,7 @@ async function sourceEvidence() {
       "packages/contracts/src/session-recovery.ts",
       "foundation/agent-tools/catalog/selection.ts",
       "foundation/agent-tools/catalog/code-mode.ts",
-      "services/platform/src/actors/airtable-tool-input.ts",
+      "areas/integrations/server/actors/airtable-tool-input.ts",
       "foundation/authority/authorization/capability-catalogue.ts",
     );
   if (draft || proposal || providerTrial)

@@ -5,7 +5,7 @@ import {
   type CustomConnectorFetchNamespace,
   type CustomConnectorFetchTransport,
   type CustomConnectorTransportRequest,
-} from "../src/custom-connectors/egress";
+} from "@purin-labs/area-integrations/server/custom-connectors/egress";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { encodeBase64, isRecord } from "@purin-labs/std";
 

@@ -33,7 +33,7 @@ import {
   normalizeOperationalSubject,
 } from "@purin-labs/connections/mail/operational-message";
 import type { GmailApiError } from "@purin-labs/connections/mail/gmail-adapter";
-import { resolveGmailAccessToken } from "../mail/gmail-oauth";
+import { resolveGmailAccessToken } from "@purin-labs/area-integrations/server/mail/gmail-oauth";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,

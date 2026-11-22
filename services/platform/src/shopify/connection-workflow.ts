@@ -28,13 +28,13 @@ import {
   shopifyOnboardingAdapter,
   verifyShopifyCallback,
 } from "./provider-adapter";
-import { providerIngressOrigin } from "../integrations/contract/provider-ingress";
+import { providerIngressOrigin } from "@purin-labs/area-integrations/server/contract/provider-ingress";
 import type {
   CompleteProviderInput,
   ProviderCompletion,
   ProviderOAuthAttempt,
   ProviderOnboardingError,
-} from "../integrations/contract/provider-lifecycle";
+} from "@purin-labs/area-integrations/server/contract/provider-lifecycle";
 import {
   advanceProviderPhase,
   failProviderCompletion,
@@ -44,7 +44,7 @@ import {
   storeHeaderCredential,
   verifyExistingAccountIdentity,
   finalizeProviderConnection,
-} from "../integrations/contract/provisioning";
+} from "@purin-labs/area-integrations/server/contract/provisioning";
 import type { Result } from "@purin-labs/kernel/result";
 import { fetchShopifyInitialCommerce } from "./connector/initial-sync";
 import { registerShopifyWebhooks } from "./connector/webhook-registration";

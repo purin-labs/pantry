@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 // @ts-expect-error Platform test TypeScript excludes portal JSX; the portal build validates it.
-import { executeIntegrationsCommand } from "../../../apps/portal/src/features/integrations/settings-routes";
+import { executeIntegrationsCommand } from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
 
 describe("integrations command configuration conflicts", conflictSuite);
 

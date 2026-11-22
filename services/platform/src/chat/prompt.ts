@@ -1,5 +1,5 @@
 import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
-import { connectorDefinitionInstructions } from "../custom-connectors/authoring";
+import { connectorDefinitionInstructions } from "@purin-labs/area-integrations/server/custom-connectors/authoring";
 import {
   timelineVisibleMessages,
   type Conversation,

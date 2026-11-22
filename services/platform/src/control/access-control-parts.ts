@@ -1,6 +1,6 @@
-import { resolveActiveCustomConnectorAccount } from "../custom-connectors/accounts";
-import { resolveCustomConnectorRevision } from "../custom-connectors/revisions";
-import { resolveAirtableAccountToken } from "../external-records/oauth";
+import { resolveActiveCustomConnectorAccount } from "@purin-labs/area-integrations/server/custom-connectors/accounts";
+import { resolveCustomConnectorRevision } from "@purin-labs/area-integrations/server/custom-connectors/revisions";
+import { resolveAirtableAccountToken } from "@purin-labs/area-integrations/server/external-records/oauth";
 import type { AccessControlParts } from "@purin-labs/control/worker/routes/access-control-explain";
 
 /**

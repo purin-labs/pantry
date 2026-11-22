@@ -12,7 +12,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
+import { reconcileProviderAccountCleanup } from "@purin-labs/area-integrations/server/provider-lifecycle/cleanup-reconciliation";
 import { createCommerceClient } from "../../src/commerce/contract/client";
 import {
   commerceClient,

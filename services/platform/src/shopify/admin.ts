@@ -54,7 +54,7 @@ import {
   storeVaultSecret,
 } from "@purin-labs/authority/credential-vault/index";
 import { assertNever } from "@purin-labs/std";
-import { createActiveAdminIntegration } from "../integrations/contract/admin-integration";
+import { createActiveAdminIntegration } from "@purin-labs/area-integrations/server/contract/admin-integration";
 import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,

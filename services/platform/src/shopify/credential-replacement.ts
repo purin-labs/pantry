@@ -3,7 +3,7 @@
 import type {
   BegunCredentialRotation,
   CredentialRotationFailureCode,
-} from "../integrations/contract/credential-lifecycle";
+} from "@purin-labs/area-integrations/server/contract/credential-lifecycle";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { discoverShopifyIdentity } from "./provider-adapter";
 

@@ -5,13 +5,13 @@ import {
   readConnectorDocumentation,
   parseConnectorAuthoringOutput,
   type ConnectorDocumentation,
-} from "../src/custom-connectors/authoring";
-import { parseCustomConnectorDefinition } from "../src/custom-connectors/definition";
-import { projectCustomConnectorResponse } from "../src/custom-connectors/execution";
+} from "@purin-labs/area-integrations/server/custom-connectors/authoring";
+import { parseCustomConnectorDefinition } from "@purin-labs/area-integrations/server/custom-connectors/definition";
+import { projectCustomConnectorResponse } from "@purin-labs/area-integrations/server/custom-connectors/execution";
 import {
   basicApiKeyVaultSecret,
   basicApiKeyFromVault,
-} from "../src/custom-connectors/basic-authentication";
+} from "@purin-labs/area-integrations/server/custom-connectors/basic-authentication";
 import type { MessageLinkEgress } from "@purin-labs/agent/messages/link-reader";
 import type { JsonRecord } from "@purin-labs/control/worker/http";
 import { isRecord } from "@purin-labs/std";

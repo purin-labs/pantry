@@ -83,12 +83,12 @@ import {
   handleJevFeaturesRoute,
   matchJevFeaturesRoute,
   type JevFeaturesRoute,
-} from "./control/routes/jev-features";
+} from "@purin-labs/area-integrations/server/control/routes/jev-features";
 import {
   handleTypeSafeConnectionRoute,
   matchTypeSafeConnectionRoute,
   type TypeSafeConnectionRoute,
-} from "./control/routes/typesafe";
+} from "@purin-labs/area-integrations/server/control/routes/typesafe";
 import {
   handleCaseContextDiscoveryRoute,
   matchCaseContextDiscoveryRoute,
@@ -211,12 +211,12 @@ import {
   handleIntegrationControlRoute,
   matchIntegrationControlRoute,
   type IntegrationControlRoute,
-} from "./control/routes/integrations";
+} from "@purin-labs/area-integrations/server/control/routes/integrations";
 import {
   handleCustomConnectorControlRoute,
   matchCustomConnectorControlRoute,
   type CustomConnectorControlRoute,
-} from "./control/routes/custom-connectors";
+} from "@purin-labs/area-integrations/server/control/routes/custom-connectors";
 import {
   handlePortalChatControlRoute,
   matchPortalChatControlRoute,

@@ -7,7 +7,7 @@
 //         docs/brand/purin-logo/icon-pack/*            favicons, app icons and PNG marks
 //         foundation/ui/purin-mark-paths.ts       the curves for the PurinMark component
 //         foundation/ui/purin-mark.css            the motion for the PurinMark component
-//         services/platform/src/control/routes/integrations/purin-icon.ts
+//         areas/integrations/server/control/routes/integrations/purin-icon.ts
 //                                                      the icon for the pages that the Worker serves
 //
 // The PNG and ICO files need `sharp`. No package declares it; pnpm hoists it
@@ -29,7 +29,7 @@ const packDir = path.join(logoDir, "icon-pack");
 const uiDir = path.join(root, "foundation/ui");
 const workerIconFile = path.join(
   root,
-  "services/platform/src/control/routes/integrations/purin-icon.ts",
+  "areas/integrations/server/control/routes/integrations/purin-icon.ts",
 );
 const withPng = !process.argv.includes("--no-png");
 

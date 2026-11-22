@@ -48,15 +48,15 @@ import { installVaultIntegrationPreview } from "./vault-integration-preview";
 import { installCustomConnectorPreview } from "./custom-connector-preview";
 import { MutationLedger, type MutationProvider } from "@purin-labs/control/portal/mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
-import { IntegrationsPage } from "../features/integrations/integrations-page";
+import { IntegrationsPage } from "@purin-labs/area-integrations/ui/features/integrations/integrations-page";
 import { StripePaymentAccountSetup } from "../features/payment-accounts/stripe-account";
 import {
   IntegrationsRoute,
   MailboxSettingsRoute,
-} from "../features/integrations/settings-routes";
+} from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
 import type { IntegrationAccount, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
-import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback } from "../features/integrations/settings-types";
-import type { WhatsAppPanelActions } from "../pages/whatsapp";
+import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
+import type { WhatsAppPanelActions } from "@purin-labs/area-integrations/ui/pages/whatsapp";
 import type {
   MailboxModelReview,
   MailboxSetupAgent,

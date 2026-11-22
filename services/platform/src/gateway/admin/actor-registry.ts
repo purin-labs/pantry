@@ -73,7 +73,7 @@ import {
   inspectRetainedVaultRootClosure,
   type RetainedVaultRootClosureError,
 } from "@purin-labs/authority/credential-vault/root-closure";
-import { customConnectorFetchObjectName } from "../../custom-connectors/egress";
+import { customConnectorFetchObjectName } from "@purin-labs/area-integrations/server/custom-connectors/egress";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { conversationResidencyStub } from "@purin-labs/actor-runtime/actors/conversation-residency";

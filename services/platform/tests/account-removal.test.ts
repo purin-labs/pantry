@@ -6,7 +6,7 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it, vi } from "vitest";
 
 import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
-import { reconcileProviderAccountCleanup } from "../src/provider-lifecycle/cleanup-reconciliation";
+import { reconcileProviderAccountCleanup } from "@purin-labs/area-integrations/server/provider-lifecycle/cleanup-reconciliation";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import {

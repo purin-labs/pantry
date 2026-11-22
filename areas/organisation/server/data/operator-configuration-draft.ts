@@ -32,7 +32,7 @@ import {
   parseJevDraftCommand,
   type JevDraftCommand,
   type JevDraftRefusal,
-} from "../../../../services/platform/src/integrations/contract/jev-draft";
+} from "@purin-labs/area-integrations/server/contract/jev-draft";
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,

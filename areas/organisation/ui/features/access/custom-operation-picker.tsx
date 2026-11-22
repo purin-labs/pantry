@@ -1,6 +1,6 @@
 import { Select } from "@purin-labs/ui/select";
 import React from "react";
-import { readCustomConnectorCatalog, readCustomConnectorDetail, type CustomConnectorDetail } from "../../../../../apps/portal/src/features/integrations/custom-connector-api";
+import { readCustomConnectorCatalog, readCustomConnectorDetail, type CustomConnectorDetail } from "@purin-labs/area-integrations/ui/features/integrations/custom-connector-api";
 import type { CustomConnectorSummary } from "@purin-labs/control-api/portal/custom-connectors";
 import { isRecord } from "@purin-labs/std";
 

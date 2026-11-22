@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   exchangeExternalRecordsOAuthCode,
   type ExternalOAuthClientEnv,
-} from "../src/external-records/oauth";
+} from "@purin-labs/area-integrations/server/external-records/oauth";
 
 const NOW = 1_787_241_600_000;
 const ENV: ExternalOAuthClientEnv = {

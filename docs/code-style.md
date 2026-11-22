@@ -23,7 +23,7 @@ pnpm lint:fix
 pnpm lint:provider-workflows
 ```
 
-The green lint baseline currently covers `services/platform/src/provider-workflows`.
+The green lint baseline currently covers `areas/integrations/server/provider-workflows`.
 The root lint commands run that scope so CI and local checks have a stable signal.
 Expand the baseline one ownership area at a time after making the added area green.
 

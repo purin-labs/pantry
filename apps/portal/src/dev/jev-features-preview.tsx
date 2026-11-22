@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
 import "../styles.css";
 import { BillingRoute } from "@purin-labs/area-organisation/ui/features/billing/route";
-import { JevFeaturesRoute } from "../features/jev-features/route";
+import { JevFeaturesRoute } from "@purin-labs/area-integrations/ui/features/jev-features/route";
 
 // Settings › Jev and Settings › Billing with a stand-in Platform.
 // `?case=` picks the data:

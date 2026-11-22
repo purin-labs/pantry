@@ -90,7 +90,7 @@ rows in the Plan 93 cutover.
 ## 7. The Portal
 
 The Integrations page, the access pages and the commerce pages show Shopify as a
-choice. Remove the entry from `apps/portal/src/integration-catalogue.ts` first; the
+choice. Remove the entry from `areas/integrations/ui/integration-catalogue.ts` first; the
 type check then shows the pages that still handle it.
 
 ## 8. The map and the lints

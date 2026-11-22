@@ -1,6 +1,6 @@
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, ReadinessAssessment, SetupSelection } from "@purin-labs/control-api/portal/settings";
-import type { SetupFormDefaults } from "./features/integrations/settings-types";
+import type { SetupFormDefaults } from "@purin-labs/area-integrations/ui/features/integrations/settings-types";
 import type { Membership, OrganisationWorkspace, ReadinessBlocker } from "@purin-labs/control-api/portal/portal-types";
 import { isPortalHandle } from "@purin-labs/control-api/portal/portal-projection";
 

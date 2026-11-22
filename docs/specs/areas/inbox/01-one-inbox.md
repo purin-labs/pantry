@@ -193,7 +193,7 @@ An owner or admin opens the sheet "How should the agent help?" from the list hea
 - The Portal: `areas/inbox/ui/features/mail-inbox/` (`route.tsx`, `conversation.tsx`,
   `whatsapp-conversation.tsx`, `reply-draft-editor.tsx`, `reply-composer.tsx`,
   `draft-sources.tsx`, `claim-trace.tsx`, `agent-sheet.tsx`, `turn-on-sheet.tsx`).
-  `apps/portal/src/pages/whatsapp.tsx` keeps the number's connection, binding, policy
+  `areas/integrations/ui/pages/whatsapp.tsx` keeps the number's connection, binding, policy
   and reconnect. It says that conversations and replies are in the Inbox.
 
 Control routes under `/v1/control/organisations/:id/`:

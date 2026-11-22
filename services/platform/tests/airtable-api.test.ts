@@ -3,8 +3,8 @@ import {
   parseAirtableReadArgs,
   parseAirtableWriteArgs,
   airtableBaseScope,
-} from "../src/actors/airtable-tool-input";
-import { callAirtableApi } from "../src/integrations/airtable-api";
+} from "@purin-labs/area-integrations/server/actors/airtable-tool-input";
+import { callAirtableApi } from "@purin-labs/area-integrations/server/airtable-api";
 
 afterEach(restoreFetch);
 it(

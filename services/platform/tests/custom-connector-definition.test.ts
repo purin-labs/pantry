@@ -10,7 +10,7 @@ import {
   parseCustomConnectorDefinitionDigest,
   parseCustomConnectorId,
   parseCustomConnectorRevision,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 import { isRecord } from "@purin-labs/std";
 
 describe("custom connector definition v1", function definitionSuite() {

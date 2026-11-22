@@ -16,7 +16,7 @@ import {
   validateCustomConnectorRevision,
   type CustomConnectorApprovalReview,
   type JsonObject,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 import { d1Database } from "./sqlite-d1";
 import { isRecord } from "@purin-labs/std";
 import { requireUserId, requireOrganisationId } from "./test-ids";

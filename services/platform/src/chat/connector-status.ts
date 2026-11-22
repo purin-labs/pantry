@@ -1,7 +1,7 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { parseCustomConnectorSetupAttemptId } from "@purin-labs/connections/custom-connectors/identity";
-import { resolveCustomConnectorSetupAttempt } from "../custom-connectors/setup";
-import { listCustomConnectorSummaries } from "../custom-connectors/projection";
+import { resolveCustomConnectorSetupAttempt } from "@purin-labs/area-integrations/server/custom-connectors/setup";
+import { listCustomConnectorSummaries } from "@purin-labs/area-integrations/server/custom-connectors/projection";
 import type { ConversationScope } from "@purin-labs/conversation/chat/store";
 
 export async function readChatConnectorStatus(

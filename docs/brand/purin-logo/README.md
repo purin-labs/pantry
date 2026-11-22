@@ -14,7 +14,7 @@ The Portal shows the goat mark until the brand switch;
 `apps/portal/public/brand/README.md` describes the goat files. The page that
 the Worker shows after a provider sign-in shows the icon beside the name
 Purin Pantry
-(`services/platform/src/control/routes/integrations/provider-callback-page.ts`).
+(`areas/integrations/server/control/routes/integrations/provider-callback-page.ts`).
 
 ## Files
 
@@ -130,7 +130,7 @@ The first command writes `paths.json`. It needs Pillow, numpy, scipy and
 contourpy. The second command writes every other file in this folder,
 `purin-mark-paths.ts` and `purin-mark.css` in `foundation/ui`, and
 `purin-icon.ts` for the Worker pages in
-`services/platform/src/control/routes/integrations`. The Worker imports no
+`areas/integrations/server/control/routes/integrations`. The Worker imports no
 Portal code, so it gets its own copy of the icon. The PNG and ICO files need
 `sharp`; with `--no-png`, the script writes the other files and keeps the PNG
 and ICO files as they are. After a change to `eyes.py`, run

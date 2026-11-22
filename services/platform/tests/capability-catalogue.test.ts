@@ -15,8 +15,8 @@ import {
   CAPABILITY_KEYS,
   compileCapabilityCatalogue,
 } from "@purin-labs/authority/authorization/capability-catalogue";
-import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
-import { CUSTOM_CONNECTOR_CAPABILITY_IDS } from "../src/custom-connectors";
+import { PROVIDER_ADAPTERS } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
+import { CUSTOM_CONNECTOR_CAPABILITY_IDS } from "@purin-labs/area-integrations/server/custom-connectors/index";
 
 describe("capability catalogue", capabilityCatalogueSuite);
 

@@ -11,9 +11,9 @@ import type {
 } from "@purin-labs/control-api";
 
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
-import type { VaultTransport } from "../features/vault/api";
-import type { VaultKeyView } from "../features/vault/keys";
-import { VaultRoute } from "../features/vault/route";
+import type { VaultTransport } from "@purin-labs/area-integrations/ui/features/vault/api";
+import type { VaultKeyView } from "@purin-labs/area-integrations/ui/features/vault/keys";
+import { VaultRoute } from "@purin-labs/area-integrations/ui/features/vault/route";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { workspacePageDescriptor } from "@purin-labs/ui/route";
 import { PortalFrame } from "../shell";

@@ -9,7 +9,7 @@ import { bytesToHex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ScreenRelevanceState } from "../jev-features/screen-relevance-jev";
+import type { ScreenRelevanceState } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-jev";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCurrentSourceFlowLabel } from "@purin-labs/authority/policy/information-flow/source-labels";
 import type { Result } from "@purin-labs/kernel/result";

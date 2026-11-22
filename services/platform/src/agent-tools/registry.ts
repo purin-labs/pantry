@@ -66,8 +66,11 @@ import {
   airtableApiRead,
   airtableApiWrite,
   integrationList,
-} from "./integrations/integrations";
-import { jevFeaturesManage, jevFeaturesRead } from "./jev/jev";
+} from "@purin-labs/area-integrations/server/agent-tools/integrations/integrations";
+import {
+  jevFeaturesManage,
+  jevFeaturesRead,
+} from "@purin-labs/area-integrations/server/agent-tools/jev/jev";
 import {
   bakeProposal,
   bakeRead,

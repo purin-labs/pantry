@@ -21,7 +21,7 @@ import type {
 } from "@purin-labs/control-api";
 import { bindCompletedChatHistory } from "@purin-labs/conversation/chat/forks";
 import { currentProjectSnapshot } from "@purin-labs/conversation/chat/project-context-binding";
-import { resolveCustomConnectorDetail } from "../../custom-connectors/projection";
+import { resolveCustomConnectorDetail } from "@purin-labs/area-integrations/server/custom-connectors/projection";
 import { FlowBinding } from "@purin-labs/authority/policy/information-flow/index";
 import type { Env } from "@purin-labs/kernel/env";
 import { readOrganisationCodexConnection } from "@purin-labs/agent/models/codex-connection";
@@ -48,7 +48,7 @@ import { createWorkerMessageLinkEgress } from "@purin-labs/agent/messages/link-e
 import {
   readConnectorDocumentation,
   parseConnectorAuthoringOutput,
-} from "../../custom-connectors/authoring";
+} from "@purin-labs/area-integrations/server/custom-connectors/authoring";
 import { readChatConnectorStatus } from "../connector-status";
 import {
   conversationTimeline,

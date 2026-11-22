@@ -963,7 +963,7 @@ function readEntityContext(
 }
 
 function listIntegrations(
-  request: import("../src/agent-tools/integrations/services").HarnessIntegrationListRequest,
+  request: import("@purin-labs/area-integrations/server/agent-tools/integrations/services").HarnessIntegrationListRequest,
 ): Promise<import("@purin-labs/contracts").IntegrationDiscoveryView> {
   if (request.kind !== "list")
     throw new Error("integration list request invalid");

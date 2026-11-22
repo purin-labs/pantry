@@ -308,7 +308,7 @@ Operator routes (`control/routes/operators.ts`, `gateway/admin/actor-registry.ts
   before the Platform Worker.
 - `packages/control-api/src/vault.ts` (`@purin-labs/control-api`) holds the TypeBox
   schemas, the parsers and `normalizeVaultOrigin`.
-- `apps/portal/src/features/vault/` holds the page. The preview is
+- `areas/integrations/ui/features/vault/` holds the page. The preview is
   `apps/portal/vault-preview.html`.
 - Worker bindings: `VAULT_ROOT_V1`, `VAULT_ROOT_V2`, `PANTRY_VAULT_ACTIVE_KEY_VERSION`
   and the service binding `VAULT_ONEPASSWORD`.

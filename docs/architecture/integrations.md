@@ -305,19 +305,19 @@ text, and audit records hold no credentials.
 
 This section covers the built-in providers. Model route sign-ins and the
 Commerce merchant binding have their own flows.
-[`provider-lifecycle/`](../../services/platform/src/provider-lifecycle/)
+[`provider-lifecycle/`](../../areas/integrations/server/provider-lifecycle/)
 owns attempts, provisioning and observation.
 [`data/integration-account.ts`](../../foundation/connections/data/integration-account.ts)
 owns the connected identity. The Vault owns credential values.
-[`provider-workflows/`](../../services/platform/src/provider-workflows/) own
+[`provider-workflows/`](../../areas/integrations/server/provider-workflows/) own
 provider sequencing, and
-[`provider-adapters/`](../../services/platform/src/provider-adapters/) own
+[`provider-adapters/`](../../areas/integrations/server/provider-adapters/) own
 URLs, requests and parsers. Shared code accepts only provider-neutral results.
 
 ### Compiled provider catalogue
 
 `PROVIDER_ADAPTERS` in
-[`provider-adapters/catalogue.ts`](../../services/platform/src/provider-adapters/catalogue.ts)
+[`provider-adapters/catalogue.ts`](../../areas/integrations/server/provider-adapters/catalogue.ts)
 is the only behavioral registry. Each entry declares its data classes,
 capability IDs, connection family, onboarding adapter, `completeConnection`,
 `observe`, `remove` and `manualActionInstruction`. Shared code has no
@@ -345,7 +345,7 @@ cannot report a connection healthy from stored configuration alone.
 ### Connection routes
 
 Routes are in
-[`control/routes/integrations.ts`](../../services/platform/src/control/routes/integrations.ts),
+[`control/routes/integrations.ts`](../../areas/integrations/server/control/routes/integrations.ts),
 under `/v1/control/organisations/:organisationId` unless shown. The patterns
 accept only the ten providers.
 
@@ -446,7 +446,7 @@ capabilities. An observation writes `provider_manifest_observation` with
 `blocked` (reason code) or `observation_unsupported`. An unhealthy observation
 moves an `active` account to `degraded`, and a healthy one clears it.
 `observation_unsupported` changes nothing
-([`observation.ts`](../../services/platform/src/provider-lifecycle/observation.ts)).
+([`observation.ts`](../../areas/integrations/server/provider-lifecycle/observation.ts)).
 
 Provider notes:
 
@@ -500,7 +500,7 @@ stays connected.
   ID.
 
 `provider_account_cleanup`
-([`cleanup-reconciliation.ts`](../../services/platform/src/provider-lifecycle/cleanup-reconciliation.ts))
+([`cleanup-reconciliation.ts`](../../areas/integrations/server/provider-lifecycle/cleanup-reconciliation.ts))
 moves through `pending_provider_cleanup`, `running_provider_cleanup`,
 `retry_scheduled`, `manual_action_required` and `completed`. A job runs under a
 two-minute lease, and retries back off from 30 seconds to one hour. After five
@@ -516,7 +516,7 @@ diagnostics.
 
 An Organisation can connect its own HTTPS JSON API or MCP server. One compiled
 adapter runs reviewed, Organisation-owned operation definitions
-([`custom-connectors/`](../../services/platform/src/custom-connectors/)). A
+([`custom-connectors/`](../../areas/integrations/server/custom-connectors/)). A
 definition is data and schemas. It cannot contain code, packages,
 credentials, callbacks or authorization decisions.
 
@@ -552,7 +552,7 @@ namespace. A custom account cannot be the provider default.
 ### Definition format v1
 
 `parseCustomConnectorDefinition`
-([`definition.ts`](../../services/platform/src/custom-connectors/definition.ts))
+([`definition.ts`](../../areas/integrations/server/custom-connectors/definition.ts))
 accepts exactly these fields:
 
 | Field                 | Content                                                                         |
@@ -597,7 +597,7 @@ field that affects execution.
   whole-segment placeholders exactly. Query names that differ only by case are
   refused. There is no expression language.
 - **MCP** (`kind: "mcp"`) has a fixed `endpointPath` and a bounded `toolName`
-  ([`mcp.ts`](../../services/platform/src/custom-connectors/mcp.ts)). Each call
+  ([`mcp.ts`](../../areas/integrations/server/custom-connectors/mcp.ts)). Each call
   connects over Streamable HTTP, lists the tools, checks that the reviewed tool
   exists and calls it. A `tools/call` must match the reviewed name and the
   digest of the admitted arguments. Every MCP request uses the fetch
@@ -611,7 +611,7 @@ References, composition and patterns are refused.
 `response` has 1 to 10 2xx `successStatuses`, a `resultPointer`, an
 `outputSchema` and a `classification` (`CommerceSensitivity`). The adapter
 projects only the declared properties, recursively, then validates them
-([`response-projection.ts`](../../services/platform/src/custom-connectors/response-projection.ts)).
+([`response-projection.ts`](../../areas/integrations/server/custom-connectors/response-projection.ts)).
 Extra fields never reach the agent or the preview. A missing field or wrong
 type fails with `custom_connector_response_contract_changed`.
 
@@ -621,7 +621,7 @@ one call. The returned cursor is signed, bound to the Organisation, account,
 connector, revision, digest, binding revision, credential generation and
 operation, and expires after 10 minutes. There is no automatic page loop.
 
-| `CUSTOM_CONNECTOR_LIMITS` ([`limits.ts`](../../services/platform/src/custom-connectors/limits.ts)) | Ceiling                |
+| `CUSTOM_CONNECTOR_LIMITS` ([`limits.ts`](../../areas/integrations/server/custom-connectors/limits.ts)) | Ceiling                |
 | -------------------------------------------------------------------------------------------------- | ---------------------- |
 | Canonical definition                                                                               | 256 KiB                |
 | Operations per connector / in one catalog                                                          | 20 / 64                |
@@ -633,7 +633,7 @@ operation, and expires after 10 minutes. There is no automatic page loop.
 ### Review, setup and commit
 
 Revision content is immutable
-([`revisions.ts`](../../services/platform/src/custom-connectors/revisions.ts)).
+([`revisions.ts`](../../areas/integrations/server/custom-connectors/revisions.ts)).
 An edit writes a new revision with a compare-and-swap on the head. The review
 path is `draft -> validated -> approved -> retired`, and validation errors stay
 on the draft. Only an owner or admin approves; approval records the digest,
@@ -646,7 +646,7 @@ revision but keeps receipt history.
 
 One setup workflow serves `new_account`, `rotate_account`, `upgrade_account`
 and `resume_account`
-([`setup.ts`](../../services/platform/src/custom-connectors/setup.ts)):
+([`setup.ts`](../../areas/integrations/server/custom-connectors/setup.ts)):
 
 ```text
 awaiting_credential -> credential_stored -> testing -> verified -> committed
@@ -659,17 +659,17 @@ receives a key. An existing-account target needs the exact account and binding
 revision. Rotation accepts an `active`, `degraded` or `reauth_required`
 account, upgrade an `active` one and resume a `disabled` one, so rotation or
 upgrade cannot resume a disabled account
-([`setup-target.ts`](../../services/platform/src/custom-connectors/setup-target.ts)).
+([`setup-target.ts`](../../areas/integrations/server/custom-connectors/setup-target.ts)).
 The key enters only the `credential` route and goes to the Vault as a
 candidate; the response has no value, handle or fingerprint. **Test
 connection** runs only the fixed identity probe
-([`setup-execution.ts`](../../services/platform/src/custom-connectors/setup-execution.ts)).
+([`setup-execution.ts`](../../areas/integrations/server/custom-connectors/setup-execution.ts)).
 The live response may show up to 8 KiB of projected sample to the operator.
 Only the verified identity, display name and result-schema digest persist.
 
 Commit needs an admin, an approved revision, a verified test, the matching
 identity and the expected versions
-([`accounts.ts`](../../services/platform/src/custom-connectors/accounts.ts)).
+([`accounts.ts`](../../areas/integrations/server/custom-connectors/accounts.ts)).
 In one D1 batch it activates the candidate generation, writes the binding,
 marks the connector `active` and increments the onboarding
 `configuration_version`. A rotation revokes the old generation in the same
@@ -680,7 +680,7 @@ verifies another account fails with
 `custom_connector_account_identity_mismatch`. A connection creates no grants,
 and grants name an exact revision, so an upgrade does not carry them over.
 
-[`lifecycle.ts`](../../services/platform/src/custom-connectors/lifecycle.ts):
+[`lifecycle.ts`](../../areas/integrations/server/custom-connectors/lifecycle.ts):
 **Disable** sets the connector, its accounts, bindings and connections to
 `disabled`. **Resume** makes the connector `active`; its accounts stay disabled
 until a `resume_account` setup commits. **Remove** needs a disabled connector
@@ -698,7 +698,7 @@ immutable.
 
 A `custom_connector_operation` grant holds the capability, account, connector,
 revision, digest and operation. The Organisation capability policy stays the
-ceiling. [`grants.ts`](../../services/platform/src/custom-connectors/grants.ts)
+ceiling. [`grants.ts`](../../areas/integrations/server/custom-connectors/grants.ts)
 compiles catalog entries from the effective grants. A tool name is `cc_` plus
 a digest of the capability key, so a definition cannot replace a built-in
 tool. More than 64 operations fail with
@@ -708,7 +708,7 @@ catalog. Model arguments hold only operation inputs, so a guessed account ID
 cannot redirect a tool.
 
 A read
-([`execution.ts`](../../services/platform/src/custom-connectors/execution.ts))
+([`execution.ts`](../../areas/integrations/server/custom-connectors/execution.ts))
 compiles the catalog again and fails with `custom_connector_read_stale` if the
 accepted entry is gone. It checks the grant revision, the binding and the
 lease. It decides the outbound information-flow sink before any request,
@@ -742,7 +742,7 @@ scheme needs a new credential.
 ### Writes and reconciliation
 
 A write needs `post_json` or MCP transport
-([`writes.ts`](../../services/platform/src/custom-connectors/writes.ts)).
+([`writes.ts`](../../areas/integrations/server/custom-connectors/writes.ts)).
 `CustomConnectorActionAuthority` in the ledger pins the revision, digest,
 binding revision, credential generation, operation, canonical input, resource
 identity and provider effect identity, so a rotation invalidates a queued
@@ -771,7 +771,7 @@ outcome. Changed arguments need a new proposal.
 
 Portal chat can draft a connector
 ([`chat/application.ts`](../../services/platform/src/chat/application.ts),
-[`authoring.ts`](../../services/platform/src/custom-connectors/authoring.ts)).
+[`authoring.ts`](../../areas/integrations/server/custom-connectors/authoring.ts)).
 A turn has at most eight model steps: replies, documentation reads through the
 credential-free link path, and new or revised definitions. The real parser
 checks each definition, and errors return to the model. Approval, the key, the
@@ -780,9 +780,9 @@ test and the commit stay human steps. Keys never enter chat or prompts.
 ### Custom connector routes
 
 Paths are under `/v1/control/organisations/:organisationId/custom-connectors`
-([`control/routes/custom-connectors.ts`](../../services/platform/src/control/routes/custom-connectors.ts);
+([`control/routes/custom-connectors.ts`](../../areas/integrations/server/control/routes/custom-connectors.ts);
 portal client
-[`custom-connector-api.ts`](../../apps/portal/src/features/integrations/custom-connector-api.ts)).
+[`custom-connector-api.ts`](../../areas/integrations/ui/features/integrations/custom-connector-api.ts)).
 Mutations use the control session, CSRF, idempotency, the configuration version
 fence and the mutation receipt. Reads are `no-store`. Viewers read metadata.
 Owners and admins make every change.

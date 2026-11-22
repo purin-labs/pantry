@@ -14,7 +14,7 @@ import {
   whatsappAccountActionPath,
   whatsappAccountsPath,
 } from "../../whatsapp";
-import { ConnectionDialog } from "../../../../../apps/portal/src/features/integrations/connection-dialog";
+import { ConnectionDialog } from "@purin-labs/area-integrations/ui/features/integrations/connection-dialog";
 import { disableMailAgent } from "./api";
 import type { MailAgentState } from "@purin-labs/control-api/portal/mail-agent";
 

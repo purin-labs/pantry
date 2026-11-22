@@ -44,10 +44,15 @@ vi.mock(
       credentialMocks.resolveActiveProviderConnectionCredential,
   }),
 );
-vi.mock("../src/mail/gmail-oauth", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/mail/gmail-oauth")>()),
-  resolveGmailAccessToken: credentialMocks.resolveGmailAccessToken,
-}));
+vi.mock(
+  "@purin-labs/area-integrations/server/mail/gmail-oauth",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-integrations/server/mail/gmail-oauth")
+    >()),
+    resolveGmailAccessToken: credentialMocks.resolveGmailAccessToken,
+  }),
+);
 
 import {
   activateEmailRuntime,

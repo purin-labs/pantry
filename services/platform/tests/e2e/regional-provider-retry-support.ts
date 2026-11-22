@@ -6,8 +6,8 @@ import {
   startActorRelocation,
   type ActorRelocationId,
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
-import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
-import { readProviderCleanupContext } from "../../src/provider-adapters/catalogue";
+import { reconcileProviderAccountCleanup } from "@purin-labs/area-integrations/server/provider-lifecycle/cleanup-reconciliation";
+import { readProviderCleanupContext } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 

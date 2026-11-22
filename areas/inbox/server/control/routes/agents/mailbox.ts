@@ -3,7 +3,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeCredentialRevocation,
   recordCredentialRevocationMutation,
-} from "../../../../../../services/platform/src/integrations/contract/credential-lifecycle";
+} from "@purin-labs/area-integrations/server/contract/credential-lifecycle";
 import {
   assignAgentMailbox,
   parseMailboxIngressPolicyPublishRequest,
@@ -16,7 +16,7 @@ import {
 import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
 import { revokeCredential } from "@purin-labs/authority/credential-vault/index";
 import { resolveCredentialRevocationSecret } from "@purin-labs/authority/credential-vault/credential-revocation-resolution";
-import { revokeGoogleOAuthToken } from "../../../../../../services/platform/src/integrations/contract/google-oauth-revocation";
+import { revokeGoogleOAuthToken } from "@purin-labs/area-integrations/server/contract/google-oauth-revocation";
 import {
   newRequestId,
   parseIntegrationAccountId,

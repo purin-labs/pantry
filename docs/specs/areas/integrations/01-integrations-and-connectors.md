@@ -13,7 +13,7 @@ Slack sends its events and interactions to `slack.pantry.purin.io`.
 
 ### Built-in providers
 
-`PROVIDER_ADAPTERS` (`services/platform/src/provider-adapters/catalogue.ts`) is the one
+`PROVIDER_ADAPTERS` (`areas/integrations/server/provider-adapters/catalogue.ts`) is the one
 registry of provider behavior. Each entry gives the data classes, the capability IDs, the
 connection family, the onboarding adapter, `completeConnection`, `observe`, `remove` and
 `manualActionInstruction`. Some shared code still branches on a provider name, for
@@ -121,7 +121,7 @@ any open state -> cancelled | failed | expired
 
 ### Custom connectors
 
-One compiled adapter (`services/platform/src/custom-connectors/`) runs a reviewed
+One compiled adapter (`areas/integrations/server/custom-connectors/`) runs a reviewed
 definition. A definition holds no code, packages, credentials, callbacks or
 authorization decisions. The API key goes to the remote service, so the approval of a
 destination is a trust decision. Pantry enforces the declared request contract, but it

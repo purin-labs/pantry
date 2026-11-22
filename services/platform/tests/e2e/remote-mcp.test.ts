@@ -2,7 +2,7 @@ import { decidePendingDecisionWith } from "../../src/control/pending-decision-pa
 import {
   handleCustomConnectorControlRoute,
   matchCustomConnectorControlRoute,
-} from "../../src/control/routes/custom-connectors";
+} from "@purin-labs/area-integrations/server/control/routes/custom-connectors";
 import { fixtureDatabase } from "./organisation-database";
 import { pendingDecisionsOf } from "./access-route-support";
 import { commerceHeaders } from "./commerce-support";
@@ -74,8 +74,8 @@ import {
   CUSTOM_CONNECTOR_LIMITS,
   type CustomConnectorReadCatalogEntry,
   type CustomConnectorWriteCatalogEntry,
-} from "../../src/custom-connectors";
-import { executeCustomConnectorTransport } from "../../src/custom-connectors/egress";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
+import { executeCustomConnectorTransport } from "@purin-labs/area-integrations/server/custom-connectors/egress";
 import type { HarnessToolDefinition } from "@purin-labs/agent/actors/embedded-harness";
 import {
   RecordingBoundary,

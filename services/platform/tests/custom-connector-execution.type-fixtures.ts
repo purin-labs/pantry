@@ -2,15 +2,15 @@ import type { EffectiveGrantSet } from "@purin-labs/authority/authorization/acce
 import type {
   AuthorizedCustomConnectorRead,
   CustomConnectorReadCatalogEntry,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 import type {
   ReviewedConnectorOperationRequest,
   ReviewedConnectorFailure,
-} from "../src/custom-connectors/mcp";
+} from "@purin-labs/area-integrations/server/custom-connectors/mcp";
 import type {
   CustomConnectorOperationRequest,
   CustomConnectorTransportError,
-} from "../src/custom-connectors/egress";
+} from "@purin-labs/area-integrations/server/custom-connectors/egress";
 
 declare const entry: CustomConnectorReadCatalogEntry;
 declare const effectiveGrants: EffectiveGrantSet;

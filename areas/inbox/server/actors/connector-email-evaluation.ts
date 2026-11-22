@@ -33,7 +33,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   gmailGrantRefused,
   resolveGmailAccessToken,
-} from "../../../../services/platform/src/mail/gmail-oauth";
+} from "@purin-labs/area-integrations/server/mail/gmail-oauth";
 import {
   newRequestId,
   parseIntegrationAccountId,

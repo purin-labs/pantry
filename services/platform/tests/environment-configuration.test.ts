@@ -7,7 +7,7 @@ import {
   readSquareConfiguration,
   squareOnboardingAdapter,
   type SquareApplication,
-} from "../src/provider-adapters/square";
+} from "@purin-labs/area-integrations/server/provider-adapters/square";
 import { releaseTargetProblems } from "../../../scripts/worker-environment.mjs";
 
 describe("actual Wrangler configuration loading", function configurationLoading() {

@@ -7,11 +7,11 @@ import {
   providerAuthorizationOutcome,
   providerConnectionState,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/features/integrations/settings-routes";
+} from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
 // @ts-expect-error The portal's JSX module is type-checked by its app-local build.
-import { providerAttemptFailureCopy } from "../../../apps/portal/src/provider-onboarding";
+import { providerAttemptFailureCopy } from "@purin-labs/area-integrations/ui/provider-onboarding";
 // @ts-expect-error The portal's JSX module is type-checked by its app-local build.
-import { whatsappAttemptFailureCopy } from "../../../apps/portal/src/pages/whatsapp";
+import { whatsappAttemptFailureCopy } from "@purin-labs/area-integrations/ui/pages/whatsapp";
 import {
   INTEGRATIONS_PAGE_PROPS,
   renderIntegrationsPage,

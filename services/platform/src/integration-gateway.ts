@@ -59,20 +59,20 @@ import { handleCueStatus } from "./gateway/cue-status";
 import {
   handleConfigureDiscordInteraction,
   handleDiscordInteraction,
-} from "./gateway/discord";
-import { handleDropboxWebhook } from "./gateway/dropbox-webhook";
+} from "@purin-labs/area-integrations/server/gateway/discord";
+import { handleDropboxWebhook } from "@purin-labs/area-integrations/server/gateway/dropbox-webhook";
 import { handleEventQueueMessage } from "./gateway/event-queue";
 import {
   handleConfigureExternalRecordsCredential,
   handleReadExternalRecords,
-} from "./gateway/external-records";
+} from "@purin-labs/area-integrations/server/gateway/external-records";
 import {
   handleCompleteIdentityLink,
   handleIdentityLinkChallenge,
   handleIdentityUiConfig,
   handleIssueIdentityLink,
 } from "./gateway/identity-link";
-import { handleListIntegrationAccounts } from "./gateway/integration-accounts";
+import { handleListIntegrationAccounts } from "@purin-labs/area-integrations/server/gateway/integration-accounts";
 import { handleEmailGoogleWebhook } from "./gateway/mail-webhooks";
 import {
   EVENT_QUEUE_RETRY_DELAY_SECONDS,
@@ -127,7 +127,7 @@ export { WorkspaceExecutorContainer } from "@purin-labs/agent/workspace-executor
 
 export { MessageLinkFetchContainer } from "@purin-labs/agent/messages/link-fetch-container";
 
-export { CustomConnectorFetchContainer } from "./custom-connectors/fetch-container";
+export { CustomConnectorFetchContainer } from "@purin-labs/area-integrations/server/custom-connectors/fetch-container";
 
 const SUPPORTED_TRACKS = [
   "managed-agents",

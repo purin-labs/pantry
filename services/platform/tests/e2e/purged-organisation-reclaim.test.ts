@@ -6,7 +6,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   createCustomConnectorDraft,
   prepareCustomConnectorDraftDocument,
-} from "../../src/custom-connectors/revisions";
+} from "@purin-labs/area-integrations/server/custom-connectors/revisions";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { network } from "./network";

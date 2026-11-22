@@ -228,7 +228,7 @@ export default [
   },
   {
     files: [
-      "services/platform/src/provider-workflows/**/*.ts",
+      "areas/integrations/server/provider-workflows/**/*.ts",
       "foundation/agent/provider-workflows/**/*.ts",
     ],
     rules: {

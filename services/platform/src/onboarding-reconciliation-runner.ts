@@ -15,7 +15,7 @@ import {
   listOnboardingReconciliationOrganisationIds,
   reconcileOrganisationOnboarding,
 } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
-import { reconcileProviderAccountCleanup } from "./provider-lifecycle/cleanup-reconciliation";
+import { reconcileProviderAccountCleanup } from "@purin-labs/area-integrations/server/provider-lifecycle/cleanup-reconciliation";
 import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { publishOrganisationDirectoryRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";
 import { publishStoppedInitialPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
@@ -23,8 +23,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
-import { reconcileProviderManifestObservations } from "./provider-lifecycle/observation";
-import { reconcileInterruptedProviderCredentialCutovers } from "./integrations/contract/credential-cutover";
+import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
+import { reconcileInterruptedProviderCredentialCutovers } from "@purin-labs/area-integrations/server/contract/credential-cutover";
 import {
   loadCredentialVaultKeyRing,
   type VaultKeyVersion,

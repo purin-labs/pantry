@@ -2,8 +2,8 @@ import type { OrganisationModuleHost } from "@purin-labs/tenancy/actors/organisa
 import {
   runScreenRelevanceCheck,
   type ScreenRelevanceCheckInput,
-} from "../../jev-features/screen-relevance-check";
-import { decideScreenRelevanceRecord } from "../../jev-features/screen-relevance";
+} from "@purin-labs/area-integrations/server/jev-features/screen-relevance-check";
+import { decideScreenRelevanceRecord } from "@purin-labs/area-integrations/server/jev-features/screen-relevance";
 import type { ScreenRelevanceChoice } from "@purin-labs/control-api";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {

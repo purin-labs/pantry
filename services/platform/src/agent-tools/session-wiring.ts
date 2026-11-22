@@ -16,8 +16,8 @@ import { menuToolServices } from "@purin-labs/area-cafe/server/agent-tools/draft
 import {
   customConnectorTurnTools,
   integrationToolServices,
-} from "./integrations/turn-services";
-import { jevToolServices } from "./jev/turn-services";
+} from "@purin-labs/area-integrations/server/agent-tools/integrations/turn-services";
+import { jevToolServices } from "@purin-labs/area-integrations/server/agent-tools/jev/turn-services";
 import {
   kitchenToolServices,
   pageViewCommandExecutor,

@@ -11,7 +11,7 @@ import {
   exchangeGmailOAuthCode,
   resolveGmailAccessToken,
   type GmailOAuthClientEnv,
-} from "../src/mail/gmail-oauth";
+} from "@purin-labs/area-integrations/server/mail/gmail-oauth";
 import { type VaultOAuthTokens } from "@purin-labs/authority/credential-vault/index";
 import { resolveVaultHandle } from "@purin-labs/authority/credential-vault/service";
 import { requireOrganisationId, requireVaultHandle } from "./test-ids";

@@ -107,13 +107,13 @@ import {
   noteVoiceConversation,
   voiceSessionFor,
 } from "../voice/host";
-import { CustomConnectorsWorkspace } from "../integrations/custom-connectors";
+import { CustomConnectorsWorkspace } from "@purin-labs/area-integrations/ui/features/integrations/custom-connectors";
 import {
   customConnectorCollectionPath,
   customConnectorPath,
   customConnectorRevisionPath,
   mutateCustomConnector,
-} from "../integrations/custom-connector-api";
+} from "@purin-labs/area-integrations/ui/features/integrations/custom-connector-api";
 import { createProjectChat, forkChatThread, makeDefaultProject, cancelChat, ChatDraftConflictError, ChatNotRunningError, ChatAccessError, markChatRead, rateChatResponse, readChat, saveChatDraft, updateChatConversation } from "./api";
 import { sendChat } from "./screen-send";
 import type { Chat, ChatConversationSummary, ChatMessage, ChatModelOption, ChatPageData, ChatTimelineView, ChatAttachmentView } from "@purin-labs/control-api/portal/chat";

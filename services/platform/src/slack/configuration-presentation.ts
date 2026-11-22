@@ -13,7 +13,7 @@ import {
 
 export { previewCode };
 import type { OfferPriceAllowanceCommand } from "../commerce/contract/offer-price-allowance";
-import { presentJevDraftCommand } from "../integrations/contract/jev-draft";
+import { presentJevDraftCommand } from "@purin-labs/area-integrations/server/contract/jev-draft";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 

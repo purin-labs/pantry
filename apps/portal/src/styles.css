@@ -1,5 +1,5 @@
 @import "../../../packages/frontend-theme.css";
-@import "./features/integrations/styles.css";
+@import "../../../areas/integrations/ui/features/integrations/styles.css";
 @import "./workspace-header.css";
 @import "../../../foundation/ui/resize-handle.css";
 

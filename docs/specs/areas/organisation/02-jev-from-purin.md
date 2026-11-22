@@ -32,7 +32,7 @@ Chef reads the settings and proposes a switch change on a card that an admin app
 
 ### Settings › Jev
 
-The page is in the Settings group of the Portal (`apps/portal/src/features/jev-features/`).
+The page is in the Settings group of the Portal (`areas/integrations/ui/features/jev-features/`).
 
 | Switch              | What it turns on                                                                      | Record that it writes                                                                                         |
 | ------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -151,7 +151,7 @@ only Screen relevance turns on there. ORG-01 owns the rest of the setup.
 
 ### Agents
 
-The tools are in `services/platform/src/agent-tools/jev/`, the family `jev`.
+The tools are in `areas/integrations/server/agent-tools/jev/`, the family `jev`.
 
 | Tool                  | Capability            | Effect   | What it does                                                                                                                                                 |
 | --------------------- | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |

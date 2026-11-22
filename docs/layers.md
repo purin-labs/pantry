@@ -304,30 +304,31 @@ import. A module with no line for one of these has none.
 ## areas/integrations
 
 - Folders: 22
-  - `apps/portal/src/`
-  - `apps/portal/src/features/integrations/`
-  - `apps/portal/src/features/jev-features/`
-  - `apps/portal/src/features/vault/`
-  - `apps/portal/src/pages/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/agent-tools/integrations/`
-  - `services/platform/src/agent-tools/jev/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/control/routes/custom-connectors/`
-  - `services/platform/src/control/routes/integrations/`
-  - `services/platform/src/custom-connectors/`
-  - `services/platform/src/data/`
-  - `services/platform/src/external-records/`
-  - `services/platform/src/gateway/`
-  - `services/platform/src/integrations/`
-  - `services/platform/src/integrations/contract/`
-  - `services/platform/src/jev-features/`
-  - `services/platform/src/mail/`
-  - `services/platform/src/provider-adapters/`
-  - `services/platform/src/provider-lifecycle/`
-  - `services/platform/src/provider-workflows/`
+  - `areas/integrations/server/`
+  - `areas/integrations/server/actors/`
+  - `areas/integrations/server/agent-tools/integrations/`
+  - `areas/integrations/server/agent-tools/jev/`
+  - `areas/integrations/server/contract/`
+  - `areas/integrations/server/control/routes/`
+  - `areas/integrations/server/control/routes/custom-connectors/`
+  - `areas/integrations/server/control/routes/integrations/`
+  - `areas/integrations/server/custom-connectors/`
+  - `areas/integrations/server/data/`
+  - `areas/integrations/server/external-records/`
+  - `areas/integrations/server/gateway/`
+  - `areas/integrations/server/jev-features/`
+  - `areas/integrations/server/mail/`
+  - `areas/integrations/server/provider-adapters/`
+  - `areas/integrations/server/provider-lifecycle/`
+  - `areas/integrations/server/provider-workflows/`
+  - `areas/integrations/ui/`
+  - `areas/integrations/ui/features/integrations/`
+  - `areas/integrations/ui/features/jev-features/`
+  - `areas/integrations/ui/features/vault/`
+  - `areas/integrations/ui/pages/`
+- Packages: `areas/integrations`
 - Tables (8): `credential_rotation`, `custom_connector`, `custom_connector_account_binding`, `custom_connector_revision`, `custom_connector_setup_attempt`, `discord_interaction_install`, `mail_classification_eligibility`, `provider_account_cleanup`
-- Public files: `apps/portal/src/features/integrations/archive-confirm.tsx`, `apps/portal/src/features/integrations/connect-consent-dialog.tsx`, `apps/portal/src/features/integrations/connection-dialog.tsx`, `apps/portal/src/features/integrations/custom-connector-api.ts`, `apps/portal/src/features/jev-features/api.ts`, `apps/portal/src/features/jev-features/paid-use.tsx`, `apps/portal/src/features/jev-features/styles.css`, `apps/portal/src/features/vault/styles.css`, `apps/portal/src/integration-catalogue.ts`, `apps/portal/src/provider-onboarding.tsx`, `services/platform/src/integrations/contract/`, `services/platform/src/mail/gmail-oauth.ts`
+- Public files: `areas/integrations/server/contract/`, `areas/integrations/server/mail/gmail-oauth.ts`, `areas/integrations/ui/features/integrations/archive-confirm.tsx`, `areas/integrations/ui/features/integrations/connect-consent-dialog.tsx`, `areas/integrations/ui/features/integrations/connection-dialog.tsx`, `areas/integrations/ui/features/integrations/custom-connector-api.ts`, `areas/integrations/ui/features/jev-features/api.ts`, `areas/integrations/ui/features/jev-features/paid-use.tsx`, `areas/integrations/ui/features/jev-features/styles.css`, `areas/integrations/ui/features/vault/styles.css`, `areas/integrations/ui/integration-catalogue.ts`, `areas/integrations/ui/provider-onboarding.tsx`
 
 ## areas/kitchen
 

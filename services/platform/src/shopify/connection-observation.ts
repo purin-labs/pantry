@@ -1,12 +1,12 @@
 // The health check of a Shopify connection: the webhooks of the shop are
 // registered, and the shop answers with the stored credential.
 import type { ProviderManifestEvidence } from "@purin-labs/connections/data/provider-attempt";
-import type { ProviderObservationRequest } from "../integrations/contract/provider-adapter";
-import { providerIngressOrigin } from "../integrations/contract/provider-ingress";
+import type { ProviderObservationRequest } from "@purin-labs/area-integrations/server/contract/provider-adapter";
+import { providerIngressOrigin } from "@purin-labs/area-integrations/server/contract/provider-ingress";
 import {
   blockedEvidence,
   resolveStoredObservationBearer,
-} from "../integrations/contract/observation-evidence";
+} from "@purin-labs/area-integrations/server/contract/observation-evidence";
 import { isShopifyAdminDomain } from "./auth";
 import { registerShopifyWebhooks } from "./connector/webhook-registration";
 

@@ -5,12 +5,12 @@ import { describe, expect, it } from "vitest";
 import {
   parseDiscordApplicationId,
   parseDiscordGuildId,
-} from "../src/data/discord-install";
+} from "@purin-labs/area-integrations/server/data/discord-install";
 import {
   parseDiscordInteraction,
   parseDiscordPublicKey,
   verifyDiscordInteractionSignature,
-} from "../src/gateway/discord-interactions";
+} from "@purin-labs/area-integrations/server/gateway/discord-interactions";
 import { bytesToHex } from "@purin-labs/std";
 
 describe("Discord interactions boundary", function discordInteractionSuite() {

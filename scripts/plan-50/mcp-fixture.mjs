@@ -12,8 +12,8 @@ import {
   compileCustomConnectorReadCatalog,
   authorizeCustomConnectorRead,
   executeAuthorizedCustomConnectorRead,
-} from "../../services/platform/src/custom-connectors/index.ts";
-import { customConnectorResourceScope } from "../../services/platform/src/custom-connectors/execution.ts";
+} from "../../areas/integrations/server/custom-connectors/index.ts";
+import { customConnectorResourceScope } from "../../areas/integrations/server/custom-connectors/execution.ts";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";
 import {
   compileTrialTurnAuthority,

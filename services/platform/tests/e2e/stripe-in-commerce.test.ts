@@ -5,7 +5,7 @@ import { isRecord } from "@purin-labs/std";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { reconcileProviderManifestObservations } from "../../src/provider-lifecycle/observation";
+import { reconcileProviderManifestObservations } from "@purin-labs/area-integrations/server/provider-lifecycle/observation";
 import {
   commerceClient,
   commerceWorkspace,

@@ -21,7 +21,7 @@ import {
 import {
   approveCustomConnectorWriteAction,
   rejectCustomConnectorWriteAction,
-} from "./routes/custom-connectors/write-actions";
+} from "@purin-labs/area-integrations/server/control/routes/custom-connectors/write-actions";
 import {
   agentPermissionRequestSummaries,
   decideAgentPermission,

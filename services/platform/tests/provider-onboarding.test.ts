@@ -10,20 +10,20 @@ import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mut
 import { createAuthorizingProviderAttempt } from "@purin-labs/connections/data/provider-attempt";
 import { gmailProductFromScopes } from "@purin-labs/connections/mail/gmail-authorization";
 import { parseWorkspaceId, type WorkspaceId } from "@purin-labs/kernel/ids";
-import type { ProviderStartContext } from "../src/integrations/contract/provider-adapter";
+import type { ProviderStartContext } from "@purin-labs/area-integrations/server/contract/provider-adapter";
 import {
   discoverSlackChannels,
   parseSlackChannelPage,
   parseSlackInstallation,
   observeSlackProviderIdentity,
-} from "../src/provider-adapters/slack";
+} from "@purin-labs/area-integrations/server/provider-adapters/slack";
 import { parseShopifyIdentityResponse } from "../src/shopify/provider-adapter";
 import {
   parseStripeAccountSummary,
   stripeCredentialEnvironment,
-} from "../src/provider-adapters/stripe";
-import { providerOAuthStateTtlMs } from "../src/provider-lifecycle/authorization";
-import { completeProviderOAuth } from "../src/provider-lifecycle/completion";
+} from "@purin-labs/area-integrations/server/provider-adapters/stripe";
+import { providerOAuthStateTtlMs } from "@purin-labs/area-integrations/server/provider-lifecycle/authorization";
+import { completeProviderOAuth } from "@purin-labs/area-integrations/server/provider-lifecycle/completion";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { createFakeGraph } from "./whatsapp/fake-graph";

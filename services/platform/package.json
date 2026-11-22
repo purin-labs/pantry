@@ -83,6 +83,7 @@
     "@purin-labs/area-organisation": "workspace:*",
     "@purin-labs/area-cafe": "workspace:*",
     "@purin-labs/area-inbox": "workspace:*",
+    "@purin-labs/area-integrations": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

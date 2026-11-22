@@ -38,10 +38,10 @@ import {
   type ActiveCustomConnectorAccount,
   type JsonObject,
   type CustomConnectorOperation,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import type { CustomConnectorWriteCatalogEntry } from "../src/custom-connectors/grants";
+import type { CustomConnectorWriteCatalogEntry } from "@purin-labs/area-integrations/server/custom-connectors/grants";
 import { d1Database } from "./sqlite-d1";
 import {
   requireUserId,

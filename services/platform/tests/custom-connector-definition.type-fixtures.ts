@@ -6,7 +6,7 @@ import type {
   CustomConnectorMcpTransport,
   CustomConnectorRevision,
   CustomConnectorRevisionIdentity,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 
 declare const connectorId: CustomConnectorId;
 declare const revision: CustomConnectorRevision;
@@ -94,7 +94,7 @@ void validMcp;
 void missingMcpTool;
 void invalidMcpSpread;
 
-import { executeCustomConnectorTransport } from "../src/custom-connectors/egress";
+import { executeCustomConnectorTransport } from "@purin-labs/area-integrations/server/custom-connectors/egress";
 declare const transportInput: Parameters<
   typeof executeCustomConnectorTransport
 >[0];

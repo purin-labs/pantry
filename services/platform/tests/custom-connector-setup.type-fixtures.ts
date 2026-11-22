@@ -1,7 +1,7 @@
 import type {
   CustomConnectorSetupAttempt,
   CustomConnectorSetupTarget,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import type { VariantBy } from "@purin-labs/type-utils";
 

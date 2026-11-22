@@ -8,7 +8,7 @@ import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   IntegrationsPage,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/features/integrations/settings-routes";
+} from "@purin-labs/area-integrations/ui/features/integrations/settings-routes";
 
 const noOp = async (): Promise<void> => {};
 

@@ -3,7 +3,7 @@
 // registers it (`worker-ports.ts`).
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { PROVIDER_DATA_CLASSES } from "@purin-labs/connections/data/integration-provider-directory";
-import type { ProviderModule } from "../integrations/contract/provider-modules";
+import type { ProviderModule } from "@purin-labs/area-integrations/server/contract/provider-modules";
 import { observeShopifyConnection } from "./connection-observation";
 import { connectShopify } from "./connection-workflow";
 import { validateShopifyReplacementCredential } from "./credential-replacement";

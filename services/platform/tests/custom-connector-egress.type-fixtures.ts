@@ -1,7 +1,7 @@
 import type {
   CustomConnectorOperationRequest,
   CustomConnectorTransportRequest,
-} from "../src/custom-connectors/egress";
+} from "@purin-labs/area-integrations/server/custom-connectors/egress";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 declare const organisationId: OrganisationId;

@@ -37,7 +37,7 @@ import { resumeConversationExecution } from "../src/chat/application";
 import {
   createCustomConnectorDraft,
   prepareCustomConnectorDraftDocument,
-} from "../src/custom-connectors/revisions";
+} from "@purin-labs/area-integrations/server/custom-connectors/revisions";
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { URL as NodeUrl } from "node:url";
@@ -179,11 +179,11 @@ vi.mock(
   },
 );
 vi.mock(
-  "../src/custom-connectors/authoring",
+  "@purin-labs/area-integrations/server/custom-connectors/authoring",
   async function authoringModule(importOriginal) {
     return {
       ...(await importOriginal<
-        typeof import("../src/custom-connectors/authoring")
+        typeof import("@purin-labs/area-integrations/server/custom-connectors/authoring")
       >()),
       readConnectorDocumentation: mocks.documentation,
     };

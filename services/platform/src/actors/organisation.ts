@@ -1,5 +1,5 @@
-import type { ScreenRelevanceCheckInput } from "../jev-features/screen-relevance-check";
-import { sealJevUsageHours } from "../jev-features/usage-records";
+import type { ScreenRelevanceCheckInput } from "@purin-labs/area-integrations/server/jev-features/screen-relevance-check";
+import { sealJevUsageHours } from "@purin-labs/area-integrations/server/jev-features/usage-records";
 import {
   actorMachineCensus,
   type MachineCensus,
@@ -261,7 +261,7 @@ import {
   readJevFeaturesForOrganisation,
   type OrganisationJevHost,
   type OrganisationJevRpc,
-} from "../jev-features/organisation-settings";
+} from "@purin-labs/area-integrations/server/jev-features/organisation-settings";
 import type {
   OrganisationActivatePolicyInput,
   OrganisationPolicyActivation,

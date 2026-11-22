@@ -15,7 +15,7 @@ Read [the tool contract](../../../docs/architecture/integrations.md#capabilities
 [the provider connection contract](../../../docs/architecture/integrations.md#provider-connections).
 Inspect the matching code in:
 
-- `services/platform/src/provider-adapters/` for provider behavior and lifecycle;
+- `areas/integrations/server/provider-adapters/` for provider behavior and lifecycle;
 - `foundation/authority/authorization/capability-catalogue.ts` for capability definitions;
 - `services/platform/src/agent-tools/` (one `defineTool` per tool, `registry.ts`, and `catalog/` for selection and calls) for model-facing exposure;
 - `services/platform/src/integration-gateway.ts` for governed provider execution;
@@ -23,7 +23,7 @@ Inspect the matching code in:
 
 For a merchant-configured REST or MCP connection, first inspect
 [Integration architecture: custom API connectors (was Spec 14)](../../../docs/architecture/integrations.md#custom-api-connectors) and the existing
-`services/platform/src/custom-connectors/` boundary. Reuse that path when it fits.
+`areas/integrations/server/custom-connectors/` boundary. Reuse that path when it fits.
 
 ## Implement the capability
 

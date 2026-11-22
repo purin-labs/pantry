@@ -74,7 +74,7 @@ import { registerPortalBoardChat } from "./portal-board-chat";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { CommerceActionStatus } from "./features/governed-actions/commerce-action-status";
-import { fetchCodexUsagePercent } from "./features/integrations/codex-transport";
+import { fetchCodexUsagePercent } from "@purin-labs/area-integrations/ui/features/integrations/codex-transport";
 import { signInForApproval } from "@purin-labs/control/portal/approval-sign-in-popup";
 import {
   clearPendingCommerceApproval,

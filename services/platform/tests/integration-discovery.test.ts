@@ -3,7 +3,7 @@ import "../src/worker-ports";
 import type { IntegrationDiscoveryView } from "@purin-labs/contracts";
 import { describe, expect, it } from "vitest";
 import { parseIntegrationDiscoveryView } from "@purin-labs/authority/access-control/integration-discovery";
-import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
+import { PROVIDER_ADAPTERS } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
 import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 
 describe("agent integration discovery", function integrationDiscoverySuite() {

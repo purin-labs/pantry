@@ -30,7 +30,7 @@ import {
   parseDiscordApplicationId,
   parseDiscordGuildId,
   type DiscordInteractionInstall,
-} from "../src/data/discord-install";
+} from "@purin-labs/area-integrations/server/data/discord-install";
 import {
   resolveActiveProviderAccountContext,
   type ActiveProviderAccountContext,

@@ -27,7 +27,7 @@ import {
 import {
   activateProviderCredentialCutover,
   reconcileInterruptedProviderCredentialCutovers,
-} from "../src/integrations/contract/credential-cutover";
+} from "@purin-labs/area-integrations/server/contract/credential-cutover";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   storeVaultSecret,

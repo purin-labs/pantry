@@ -123,7 +123,7 @@ import {
 } from "@purin-labs/authority/policy/information-flow/index";
 import { buildSharedSlackAuthority } from "@purin-labs/authority/request-authority/index";
 import { requireConnectorId, requireIntegrationAccountId } from "./test-ids";
-import { resolveActiveCustomConnectorAccount } from "../src/custom-connectors/accounts";
+import { resolveActiveCustomConnectorAccount } from "@purin-labs/area-integrations/server/custom-connectors/accounts";
 
 const ORGANISATION_ID = requiredOrganisationId();
 const GRANT = activeGrant();

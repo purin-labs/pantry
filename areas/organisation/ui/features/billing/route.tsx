@@ -4,7 +4,7 @@ import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-feature
 import {
   jevFeatureErrorMessage,
   readJevFeatures,
-} from "../../../../../apps/portal/src/features/jev-features/api";
+} from "@purin-labs/area-integrations/ui/features/jev-features/api";
 import {
   JEV_PAID_USE_ID,
   JevUsePrompt,
@@ -12,8 +12,8 @@ import {
   microDollars,
   pricedNote,
   resetDate,
-} from "../../../../../apps/portal/src/features/jev-features/paid-use";
-import "../../../../../apps/portal/src/features/jev-features/styles.css";
+} from "@purin-labs/area-integrations/ui/features/jev-features/paid-use";
+import "@purin-labs/area-integrations/ui/features/jev-features/styles.css";
 
 /**
  * Settings › Billing (Plan 88 section 4): the Jev use of the month against

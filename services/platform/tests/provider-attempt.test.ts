@@ -33,7 +33,7 @@ import {
   beginProviderOAuth,
   providerAuthorizationUrlForMutation,
   type ProviderOAuthStartEnv,
-} from "../src/provider-lifecycle/authorization";
+} from "@purin-labs/area-integrations/server/provider-lifecycle/authorization";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { requireVaultHandle } from "./test-ids";

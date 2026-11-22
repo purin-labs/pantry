@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { airtableCleanupAdapter } from "../src/provider-adapters/airtable";
-import { gmailCleanupAdapter } from "../src/provider-adapters/gmail";
-import { notionCleanupAdapter } from "../src/provider-adapters/notion";
+import { airtableCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/airtable";
+import { gmailCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/gmail";
+import { notionCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/notion";
 import { shopifyCleanupAdapter } from "../src/shopify/provider-adapter";
-import { slackCleanupAdapter } from "../src/provider-adapters/slack";
-import { stripeCleanupAdapter } from "../src/provider-adapters/stripe";
-import { whatsappCleanupAdapter } from "../src/provider-adapters/whatsapp";
-import type { ProviderCleanupCredentials } from "../src/integrations/contract/provider-adapter";
+import { slackCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/slack";
+import { stripeCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/stripe";
+import { whatsappCleanupAdapter } from "@purin-labs/area-integrations/server/provider-adapters/whatsapp";
+import type { ProviderCleanupCredentials } from "@purin-labs/area-integrations/server/contract/provider-adapter";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 
 const ORGANISATION_ID = requireOrganisationId("organisation_cleanup_adapters");

@@ -1,5 +1,5 @@
-import { PROVIDER_ADAPTERS } from "../src/provider-adapters/catalogue";
-import type { ProviderAdapter } from "../src/integrations/contract/provider-adapter";
+import { PROVIDER_ADAPTERS } from "@purin-labs/area-integrations/server/provider-adapters/catalogue";
+import type { ProviderAdapter } from "@purin-labs/area-integrations/server/contract/provider-adapter";
 import type { ActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import type { MailProviderAdapter } from "@purin-labs/connections/mail/provider-adapter";
 import type { GmailAuthorizationProduct } from "@purin-labs/connections/mail/gmail-authorization";

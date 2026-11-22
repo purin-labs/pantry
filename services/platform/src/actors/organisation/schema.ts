@@ -9,8 +9,8 @@ import { createEvalSchema } from "@purin-labs/area-brain/server/evals/store";
 import { createMemorySchema } from "@purin-labs/area-brain/server/memory/store";
 import { createCaseContextCollectionEvidenceSchema } from "@purin-labs/agent/case-context-discovery/evidence";
 import { createTypeSafeConnectionSchema } from "@purin-labs/agent/integrations/typesafe/connection";
-import { createJevScreenRelevanceSchema } from "../../jev-features/screen-relevance";
-import { createJevUsageRecordSchema } from "../../jev-features/usage-records";
+import { createJevScreenRelevanceSchema } from "@purin-labs/area-integrations/server/jev-features/screen-relevance";
+import { createJevUsageRecordSchema } from "@purin-labs/area-integrations/server/jev-features/usage-records";
 import { createJevPaidUseSchema } from "@purin-labs/agent/jev-features/paid-use";
 import { createCaseContextCollectionRelationshipSchema } from "@purin-labs/agent/case-context-discovery/relationships";
 

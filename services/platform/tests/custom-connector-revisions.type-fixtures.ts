@@ -1,7 +1,7 @@
 import type {
   CustomConnectorRevisionRecord,
   ParsedCustomConnectorDefinition,
-} from "../src/custom-connectors";
+} from "@purin-labs/area-integrations/server/custom-connectors/index";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 type DraftRevision = VariantBy<

@@ -186,7 +186,8 @@ async function loadCommerceApiKeysRoute() {
 }
 
 async function loadJevFeaturesRoute() {
-  const module = await import("./features/jev-features/route");
+  const module =
+    await import("@purin-labs/area-integrations/ui/features/jev-features/route");
   return { default: module.JevFeaturesRoute };
 }
 
@@ -197,7 +198,8 @@ async function loadBillingRoute() {
 }
 
 async function loadVaultRoute() {
-  const module = await import("./features/vault/route");
+  const module =
+    await import("@purin-labs/area-integrations/ui/features/vault/route");
   return { default: module.VaultRoute };
 }
 
@@ -207,17 +209,20 @@ async function loadBrainRoute() {
 }
 
 async function loadIntegrationsRoute() {
-  const module = await import("./features/integrations/settings-routes");
+  const module =
+    await import("@purin-labs/area-integrations/ui/features/integrations/settings-routes");
   return { default: module.IntegrationsRoute };
 }
 
 async function loadMailboxSettingsRoute() {
-  const module = await import("./features/integrations/settings-routes");
+  const module =
+    await import("@purin-labs/area-integrations/ui/features/integrations/settings-routes");
   return { default: module.MailboxSettingsRoute };
 }
 
 async function loadWorkspaceSettingsRoute() {
-  const module = await import("./features/integrations/settings-routes");
+  const module =
+    await import("@purin-labs/area-integrations/ui/features/integrations/settings-routes");
   return { default: module.WorkspaceSettingsRoute };
 }
 

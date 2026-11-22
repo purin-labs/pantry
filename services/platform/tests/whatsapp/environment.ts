@@ -24,7 +24,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
-import { providerCredentialHandle } from "../../src/integrations/contract/provisioning";
+import { providerCredentialHandle } from "@purin-labs/area-integrations/server/contract/provisioning";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,
