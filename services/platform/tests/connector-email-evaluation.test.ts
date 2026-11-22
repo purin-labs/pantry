@@ -14,12 +14,15 @@ const admissionMocks = vi.hoisted(() => ({
   admitEmailThreadCase: vi.fn(),
 }));
 
-vi.mock("../src/actors/email-case-admission", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/actors/email-case-admission")
-  >()),
-  admitEmailThreadCase: admissionMocks.admitEmailThreadCase,
-}));
+vi.mock(
+  "@purin-labs/area-inbox/server/actors/email-case-admission",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-inbox/server/actors/email-case-admission")
+    >()),
+    admitEmailThreadCase: admissionMocks.admitEmailThreadCase,
+  }),
+);
 
 vi.mock(
   "@purin-labs/connections/data/integration-account",
@@ -61,15 +64,15 @@ import {
   emailMessageDisposition,
   readEmailRuntime,
   type EmailIngressLimits,
-} from "../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
-import { runConnectorEmailEvaluation } from "../src/actors/connector-email-evaluation";
+import { runConnectorEmailEvaluation } from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   assignAgentMailbox,
   readEmailThreadCase,
   registerEmailMailboxAccount,
-} from "../src/data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

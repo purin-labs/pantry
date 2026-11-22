@@ -33,7 +33,7 @@ import {
   utcDayKey,
   whatsAppTokenWindowTotals,
   type WhatsAppIngressLimits,
-} from "../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 /** A controllable clock: every assertion advances time explicitly. */

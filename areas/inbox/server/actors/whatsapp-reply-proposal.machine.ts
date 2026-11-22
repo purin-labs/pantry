@@ -15,7 +15,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const WHATSAPP_REPLY_PROPOSAL_MACHINE = {
   name: "whatsapp_reply_proposal",
-  owner: "services/platform/src/actors/whatsapp-reply-proposal-transition.ts",
+  owner: "areas/inbox/server/actors/whatsapp-reply-proposal-transition.ts",
   store: {
     table: "connector_whatsapp_proposal",
     key: "proposal_id",

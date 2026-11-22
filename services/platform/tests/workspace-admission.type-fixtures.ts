@@ -9,7 +9,7 @@ import { ensureOrganisationDefaultWorkspace } from "@purin-labs/agent/data/organ
 import {
   recordEmailThreadCase,
   recordEmailMessageReceipt,
-} from "../src/data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 
 declare const scope: OrganisationExecutionScope;
 declare const archive: R2Bucket;

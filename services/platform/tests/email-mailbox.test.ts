@@ -18,8 +18,8 @@ import {
   recordEmailMessageReceipt,
   recordEmailThreadCase,
   registerEmailMailboxAccount,
-} from "../src/data/email-mailbox";
-import { gmailConnectorIdValue } from "../src/mail-inbox/contract/connector-ids";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

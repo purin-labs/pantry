@@ -3,9 +3,9 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it } from "vitest";
 
-import { tearDownAgentMailboxForRemoval } from "../src/mail-inbox/agent-mailbox-teardown";
+import { tearDownAgentMailboxForRemoval } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-teardown";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
-import { registerEmailMailboxAccount } from "../src/data/email-mailbox";
+import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

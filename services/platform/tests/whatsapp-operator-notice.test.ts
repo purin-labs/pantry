@@ -14,7 +14,7 @@ import {
   updateWhatsAppRuntimePolicy,
   type WhatsAppIngressLimits,
   type WhatsAppPauseReason,
-} from "../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { deliverWhatsAppOperatorNotice } from "../src/actors/whatsapp-operator-notice";
 import {
   WHATSAPP_TEST_NOW,

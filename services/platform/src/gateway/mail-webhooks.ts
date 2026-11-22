@@ -6,7 +6,7 @@ import {
   readGmailPushBody,
   verifyGooglePushToken,
 } from "@purin-labs/connections/mail/google-pubsub";
-import { findEmailMailboxByAddress } from "../data/email-mailbox";
+import { findEmailMailboxByAddress } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   newRequestId,
   parseIntegrationAccountId,

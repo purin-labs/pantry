@@ -14,7 +14,7 @@ import {
   type CommercePurchasingReconcileResponse,
 } from "@purin-labs/commerce-client";
 
-import { inboxServices } from "../../mail-inbox/contract/inbox-services";
+import { inboxServices } from "@purin-labs/area-inbox/server/mail-inbox/contract/inbox-services";
 import { createCommerceOutboxReconcileQueueMessage } from "../contract/queue-messages";
 import {
   newRequestId,

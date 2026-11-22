@@ -6,7 +6,7 @@ import { resolveActiveOrganisationPlacement } from "@purin-labs/tenancy/data/org
 import {
   routeWhatsAppWebhookAccount,
   whatsappConnectorIdValue,
-} from "../data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import {
   parseWhatsAppWebhookBody,
   verifyWhatsAppWebhookChallenge,

@@ -19,16 +19,16 @@ import {
   readWhatsAppEnvelope,
   recordWhatsAppProposal,
   type WhatsAppIngressLimits,
-} from "../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
-import { createWhatsAppContentCipher } from "../src/actors/whatsapp-active-content";
+import { createWhatsAppContentCipher } from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 
 import {
   closeWhatsAppCaseConversationWindow,
   recordWhatsAppDeliveryStatus,
   recordWhatsAppMessageReceipt,
   requestWhatsAppCaseHandoff,
-} from "../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import { newRequestId } from "@purin-labs/kernel/ids";

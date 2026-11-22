@@ -5,7 +5,7 @@ import type {
 import type {
   ContactEndpoint,
   ContactVerificationCommand,
-} from "../src/data/contact-verification";
+} from "@purin-labs/area-inbox/server/data/contact-verification";
 import type {
   CaseContextCollectionRelationship,
   CaseContextCollectionScope,

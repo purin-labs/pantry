@@ -33,12 +33,12 @@ import {
   registerOperationalEmailContact,
   readEmailOperationalProposalProjection,
   type EmailProposalTarget,
-} from "../../src/data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   EMAIL_SELF_TEST_SUBJECT,
   EMAIL_SELF_TEST_BODY,
   registerEmailSelfTest,
-} from "../../src/data/email-self-test";
+} from "@purin-labs/area-inbox/server/data/email-self-test";
 import { GMAIL_SEND_ONLY_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
 import {
   CAPABILITY_KEYS,

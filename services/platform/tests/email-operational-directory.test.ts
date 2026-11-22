@@ -10,7 +10,7 @@ import {
   registerEmailSenderAccount,
   registerOperationalEmailContact,
   registerSupplierOperationalEmailContact,
-} from "../src/data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {

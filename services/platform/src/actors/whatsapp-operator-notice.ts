@@ -14,7 +14,7 @@ import {
   markWhatsAppNoticeDelivered,
   readWhatsAppOperatorNotice,
   type WhatsAppPauseReason,
-} from "./connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 
 /**
  * The notify half of `pause_and_notify`. When an account stops taking agent

@@ -1,21 +1,21 @@
 // The Worker registers each port of a lower module here, once, when its
 // entry module loads (Refactor 17). A port reads its implementation at the
 // call, so each part names its function when it runs.
-import { listVerifiedContactEndpoints } from "./data/contact-verification";
+import { listVerifiedContactEndpoints } from "@purin-labs/area-inbox/server/data/contact-verification";
 import { provideOrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { ORGANISATION_LIFECYCLE_PARTS } from "./organisation-lifecycle-parts";
 import {
   readEmailMailboxIdentityClaimant,
   registerEmailMailboxAccount,
-} from "./data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   readEmailSenderIdentityClaimant,
   registerEmailSenderAccount,
-} from "./data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   registerWhatsAppPhoneNumberAccount,
   setWhatsAppProviderHealth,
-} from "./data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import { proposeEvalFromCorrection } from "@purin-labs/area-brain/server/evals/access";
 import { commerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
 import { actionLedgerCommerce } from "@purin-labs/authority/actors/action-ledger";
@@ -62,8 +62,8 @@ import { readProviderCleanupContext } from "./provider-adapters/catalogue";
 import { reconcileProviderManifestObservations } from "./provider-lifecycle/observation";
 import { shopifyCommerceProvider } from "./shopify/commerce-provider";
 import { SHOPIFY_PROVIDER_MODULE } from "./shopify/provider-module";
-import { tearDownAgentMailboxForRemoval } from "./mail-inbox/agent-mailbox-teardown";
-import { verifiedContacts } from "./mail-inbox/contract/verified-contacts";
+import { tearDownAgentMailboxForRemoval } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-teardown";
+import { verifiedContacts } from "@purin-labs/area-inbox/server/mail-inbox/contract/verified-contacts";
 import {
   createTurnMemoryReader,
   proposeMemoryFromCorrection,
@@ -100,9 +100,9 @@ import { cafeServices } from "@purin-labs/area-cafe/server/contract/cafe-service
 import { readCounterSaleView } from "@purin-labs/area-cafe/server/counter-register";
 import { readMenuScreenList } from "@purin-labs/area-cafe/server/control/routes/menu-boards";
 import { readTerminalOperations } from "@purin-labs/area-cafe/server/data/terminal-operations-readback";
-import { inboxServices } from "./mail-inbox/contract/inbox-services";
-import { readGmailPilotBudget } from "./data/email-mailbox";
-import { registerSupplierOperationalEmailContact } from "./data/email-operational";
+import { inboxServices } from "@purin-labs/area-inbox/server/mail-inbox/contract/inbox-services";
+import { readGmailPilotBudget } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { registerSupplierOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
 import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import {

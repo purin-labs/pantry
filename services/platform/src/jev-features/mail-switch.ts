@@ -7,8 +7,8 @@ import {
   listIntegrationAccounts,
   resolveActiveProviderAccountContext,
 } from "@purin-labs/connections/data/integration-account";
-import { mailSourcePin } from "../mail-inbox/contract/mail-source-authorization";
-import { mailInferenceEligible } from "../mail-inbox/contract/mail-inference-eligibility";
+import { mailSourcePin } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-source-authorization";
+import { mailInferenceEligible } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-inference-eligibility";
 import {
   typeSafeAuthorityRevision,
   type TypeSafeAuthority,

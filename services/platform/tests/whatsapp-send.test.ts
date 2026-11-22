@@ -14,7 +14,7 @@ import {
   recordWhatsAppProposal,
   requestWhatsAppHandoff,
   type WhatsAppIngressLimits,
-} from "../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import {
   dispatchWhatsAppReply,
   disposeWhatsAppProposal,
@@ -25,8 +25,8 @@ import {
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
-} from "../src/actors/whatsapp-active-content";
-import { publishWhatsAppIngressPolicy } from "../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
+import { publishWhatsAppIngressPolicy } from "@purin-labs/area-inbox/server/data/whatsapp";
 import { createFakeGraph } from "./whatsapp/fake-graph";
 import {
   WHATSAPP_TEST_NOW,

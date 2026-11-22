@@ -89,7 +89,7 @@ import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connecti
 import {
   readLatestEmailReviewProjectionForCase,
   type EmailReviewProjection,
-} from "../data/email-review";
+} from "@purin-labs/area-inbox/server/data/email-review";
 import { buildSlackEmailReviewNotice } from "./email-review-notice";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

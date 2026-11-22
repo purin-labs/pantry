@@ -35,7 +35,7 @@ import {
   setWhatsAppProviderHealth,
   whatsappConnectorIdValue,
   whatsappConversationWindowCaseId,
-} from "../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import { setIntegrationAccountLifecycle } from "@purin-labs/connections/data/integration-account";
 import { providerCredentialHandle } from "../src/integrations/contract/provisioning";
 import {

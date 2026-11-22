@@ -1,6 +1,6 @@
-import { evaluateMail } from "../src/mail-inbox/evaluation";
+import { evaluateMail } from "@purin-labs/area-inbox/server/mail-inbox/evaluation";
 import { prepareTransientEmailAssignment } from "@purin-labs/conversation/actors/case-walking-path";
-import type { EmailThreadTurnOutcome } from "../src/actors/email-case-processing";
+import type { EmailThreadTurnOutcome } from "@purin-labs/area-inbox/server/actors/email-case-processing";
 declare const completedReply: Extract<
   EmailThreadTurnOutcome,
   { kind: "proposed" }
@@ -30,8 +30,11 @@ void scope;
 // @ts-expect-error Mail evaluation must retain its admitted Organisation placement.
 void evaluateMail({ ...withoutScope });
 
-import { readOrganization } from "../src/mail-inbox/commands";
-import { readClassifiedPage, readDecision } from "../src/mail-inbox/reads";
+import { readOrganization } from "@purin-labs/area-inbox/server/mail-inbox/commands";
+import {
+  readClassifiedPage,
+  readDecision,
+} from "@purin-labs/area-inbox/server/mail-inbox/reads";
 declare const readContext: Parameters<typeof readDecision>[0];
 const { scope: readScope, ...unscopedRead } = readContext;
 void readScope;
@@ -45,8 +48,8 @@ void readClassifiedPage(unscopedRead, page);
 // @ts-expect-error Organization summaries require captured Connector authority.
 void readOrganization(unscopedRead, organization);
 
-import { manageOrganization } from "../src/mail-inbox/commands";
-import { queueSelectedMail } from "../src/mail-inbox/connector-runtime";
+import { manageOrganization } from "@purin-labs/area-inbox/server/mail-inbox/commands";
+import { queueSelectedMail } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
 declare const command: Parameters<typeof manageOrganization>[1];
 // @ts-expect-error Mutation commands require the admitted Connector scope.
 void manageOrganization(unscopedRead, command);
@@ -56,8 +59,8 @@ void queueScope;
 // @ts-expect-error Queue preparation must retain authority through provider reads.
 void queueSelectedMail({ ...unscopedQueue });
 
-import { runMailOrganization } from "../src/mail-inbox/connector-runtime";
-import { projectMailClassifications } from "../src/mail-inbox/store";
+import { runMailOrganization } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
+import { projectMailClassifications } from "@purin-labs/area-inbox/server/mail-inbox/store";
 // @ts-expect-error Background work must retain the alarm admission scope.
 void runMailOrganization(unscopedRead);
 declare const projection: Parameters<typeof projectMailClassifications>[0];
@@ -66,12 +69,12 @@ void projectionScope;
 // @ts-expect-error Projection writes require the captured placement fence.
 void projectMailClassifications({ ...unscopedProjection });
 
-import { runInboxResponses } from "../src/mail-inbox/actions";
+import { runInboxResponses } from "@purin-labs/area-inbox/server/mail-inbox/actions";
 declare const responseHead: Parameters<typeof runInboxResponses>[1];
 // @ts-expect-error Reply preparation must retain the alarm admission scope.
 void runInboxResponses(unscopedRead, responseHead);
 
-import { admitEmailThreadCase } from "../src/actors/email-case-admission";
+import { admitEmailThreadCase } from "@purin-labs/area-inbox/server/actors/email-case-admission";
 declare const admission: Parameters<typeof admitEmailThreadCase>[1];
 declare const mailEnv: Parameters<typeof admitEmailThreadCase>[0];
 const { scope: admissionScope, ...unscopedAdmission } = admission;
@@ -79,14 +82,14 @@ void admissionScope;
 // @ts-expect-error Case admission cannot replace its originating placement scope.
 void admitEmailThreadCase(mailEnv, unscopedAdmission);
 
-import { runConnectorEmailEvaluation } from "../src/actors/connector-email-evaluation";
+import { runConnectorEmailEvaluation } from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
 declare const cueEvaluation: Parameters<typeof runConnectorEmailEvaluation>[0];
 const { scope: cueScope, ...unscopedCueEvaluation } = cueEvaluation;
 void cueScope;
 // @ts-expect-error Cue evaluation must retain its originating alarm scope.
 void runConnectorEmailEvaluation(unscopedCueEvaluation);
 
-import type { InboxResponseSettlement } from "../src/mail-inbox/response-store";
+import type { InboxResponseSettlement } from "@purin-labs/area-inbox/server/mail-inbox/response-store";
 const invalidRetry: InboxResponseSettlement = {
   kind: "retry",
   // @ts-expect-error An admission retry has no settled reply outcome.
@@ -94,8 +97,8 @@ const invalidRetry: InboxResponseSettlement = {
 };
 void invalidRetry;
 
-import { createEmailProposalDraft } from "../src/actors/email-case-processing";
-import { projectEmailReplyProposal } from "../src/data/email-mailbox";
+import { createEmailProposalDraft } from "@purin-labs/area-inbox/server/actors/email-case-processing";
+import { projectEmailReplyProposal } from "@purin-labs/area-inbox/server/data/email-mailbox";
 declare const draftInput: Parameters<typeof createEmailProposalDraft>[1];
 declare const draftProposal: Parameters<typeof createEmailProposalDraft>[2];
 const { scope: draftScope, ...unscopedDraftInput } = draftInput;
@@ -116,7 +119,7 @@ import {
   editEmailReplyBody,
   resolveEmailProposalState,
   disposeEmailProposal,
-} from "../src/actors/connector-email-proposal";
+} from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
 declare const proposalReview: Parameters<typeof previewEmailProposal>[0];
 const { scope: proposalScope, ...unscopedProposalReview } = proposalReview;
 void proposalScope;
@@ -146,7 +149,7 @@ import {
   establishConnectorEmailWatch,
   renewConnectorEmailWatch,
   stopConnectorEmailWatch,
-} from "../src/actors/connector-email-evaluation";
+} from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
 declare const watchInput: Parameters<typeof establishConnectorEmailWatch>[0];
 const { scope: watchScope, ...unscopedWatch } = watchInput;
 void watchScope;
@@ -163,7 +166,7 @@ import {
   previewOperationalEmailProposal,
   dispatchOperationalEmail,
 } from "../src/actors/connector-email-operational";
-import { projectEmailOperationalProposal } from "../src/data/email-operational";
+import { projectEmailOperationalProposal } from "@purin-labs/area-inbox/server/data/email-operational";
 declare const operationalCreate: Parameters<
   typeof createOperationalEmailProposal
 >[0];
@@ -177,7 +180,7 @@ const { execution: operationalExecution, ...unboundOperationalCreate } =
 void operationalExecution;
 // @ts-expect-error Session compose requires its originating turn authority.
 void createOperationalEmailProposal(unboundOperationalCreate);
-import { registerEmailSelfTest } from "../src/data/email-self-test";
+import { registerEmailSelfTest } from "@purin-labs/area-inbox/server/data/email-self-test";
 declare const selfTestRegistration: Parameters<typeof registerEmailSelfTest>[0];
 const { scope: selfTestScope, ...unscopedSelfTest } = selfTestRegistration;
 void selfTestScope;
@@ -225,7 +228,7 @@ void operationalProjectionScope;
 // @ts-expect-error Operational metadata writes require atomic placement fencing.
 void projectEmailOperationalProposal(unscopedOperationalProjection);
 
-import { runMailAssistant } from "../src/mail-inbox/assistant";
+import { runMailAssistant } from "@purin-labs/area-inbox/server/mail-inbox/assistant";
 declare const assistantContext: Parameters<typeof runMailAssistant>[0];
 declare const assistant: Parameters<typeof runMailAssistant>[1];
 const { controlSessionId: assistantOrigin, ...withoutAssistantOrigin } =

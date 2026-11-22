@@ -5,7 +5,7 @@ import {
   previewCode,
 } from "../slack/configuration-presentation";
 import { KITCHEN_PAGE_EFFECTS } from "./bakery/page-effects";
-import { channelToolServices } from "./channels/turn-services";
+import { channelToolServices } from "@purin-labs/area-inbox/server/agent-tools/channels/turn-services";
 import {
   bindAllowanceReference,
   commerceToolServices,

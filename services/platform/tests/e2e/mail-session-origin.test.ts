@@ -35,17 +35,17 @@ import {
   registerEmailMailboxAccount,
   assignAgentMailbox,
   publishMailboxIngressPolicy,
-} from "../../src/data/email-mailbox";
-import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import {
   registerEmailSenderAccount,
   registerOperationalEmailContact,
-} from "../../src/data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   activateEmailRuntime,
   claimDueEmailEvaluation,
   completeEmailEvaluation,
-} from "../../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import {
   integrationAccountReference,
   type IntegrationAccountReference,
@@ -72,7 +72,7 @@ import {
   EMAIL_SELF_TEST_SUBJECT,
   EMAIL_SELF_TEST_BODY,
   resolveEmailProposalRecipient,
-} from "../../src/data/email-self-test";
+} from "@purin-labs/area-inbox/server/data/email-self-test";
 import { selfTestCount } from "./gmail-mailbox-support";
 
 const TOKEN = "mail-session-origin-fixture-token";

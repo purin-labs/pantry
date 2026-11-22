@@ -2,7 +2,7 @@ import { currentGrantedCapabilityIds } from "@purin-labs/authority/authorization
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import {
   mailControlAuthority,
-} from "../../../../../services/platform/src/mail-inbox/contract/control-authority";
+} from "@purin-labs/area-inbox/server/mail-inbox/contract/control-authority";
 import {
   parseDeviceAlertSetting,
   parseDeviceStationId,

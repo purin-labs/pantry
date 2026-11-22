@@ -25,11 +25,11 @@ import {
   publishContactVerification,
   resolveVerifiedContactEndpoint,
   type ContactVerificationCommand,
-} from "../src/data/contact-verification";
+} from "@purin-labs/area-inbox/server/data/contact-verification";
 import {
   registerOperationalEmailContact,
   type OperationalEmailTarget,
-} from "../src/data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
@@ -37,7 +37,7 @@ import {
 import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { bindCommerceMerchant } from "@purin-labs/connections/data/commerce-merchant-binding";
-import { handleContactVerification } from "../src/control/routes/contact-verification";
+import { handleContactVerification } from "@purin-labs/area-inbox/server/control/routes/contact-verification";
 import {
   recordCaseContextCollectionSuggestion,
   type CaseContextCollectionScope,

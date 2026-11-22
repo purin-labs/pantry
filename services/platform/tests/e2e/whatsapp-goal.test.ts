@@ -11,7 +11,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import { readCaseSessionAssignment } from "@purin-labs/agent/actors/actor-journal/transactions";
 import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { SessionDO } from "../../src/actors/agent-session";
-import type { TransientWhatsAppTurnRequest } from "../../src/actors/inbox-turns/rpc";
+import type { TransientWhatsAppTurnRequest } from "@purin-labs/area-inbox/server/actors/inbox-turns/rpc";
 import { SessionExecutionAdmission } from "@purin-labs/agent/actors/session-execution-admission";
 import {
   startActorRelocation,

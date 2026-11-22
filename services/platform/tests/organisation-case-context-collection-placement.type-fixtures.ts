@@ -7,7 +7,7 @@ import {
   mutateTypeSafeConnection,
 } from "@purin-labs/agent/integrations/typesafe/connection";
 import { evaluateOperationalCaseContextDiscovery } from "@purin-labs/agent/case-context-discovery/operational-evaluation";
-import { bindEmailMessageReceiptContact } from "../src/data/email-mailbox";
+import { bindEmailMessageReceiptContact } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { storeOrganisationExecutionVaultSecret } from "@purin-labs/authority/credential-vault/service";
 import {
   fetchCaseContextDiscoveryEvaluation,

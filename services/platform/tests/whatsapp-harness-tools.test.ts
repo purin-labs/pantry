@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createWhatsAppHarnessToolHost,
   type WhatsAppCaseManifest,
-} from "../src/actors/whatsapp-harness-tools";
+} from "@purin-labs/area-inbox/server/actors/whatsapp-harness-tools";
 
 /**
  * The complete agent authority for a WhatsApp Case. These tests are the

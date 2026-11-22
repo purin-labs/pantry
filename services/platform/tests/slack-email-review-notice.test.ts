@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { EmailReviewProjection } from "../src/data/email-review";
+import type { EmailReviewProjection } from "@purin-labs/area-inbox/server/data/email-review";
 import { buildSlackEmailReviewNotice } from "../src/slack/email-review-notice";
 
 describe("Slack email review notice", () => {

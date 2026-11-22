@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   parseEmailProposalTarget,
   parseOperationalEmailTarget,
-} from "../src/data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   EMAIL_SELF_TEST_BODY,
   EMAIL_SELF_TEST_SUBJECT,
   parseEmailSelfTestRequest,
   validEmailSelfTestContent,
-} from "../src/data/email-self-test";
+} from "@purin-labs/area-inbox/server/data/email-self-test";
 
 describe("email self-test", selfTestSuite);
 

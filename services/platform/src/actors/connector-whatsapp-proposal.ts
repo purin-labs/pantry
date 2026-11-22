@@ -4,7 +4,7 @@ import {
   readWhatsAppSendAuthority,
   recordWhatsAppMessageReceipt,
   type WhatsAppSendRefusal,
-} from "../data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
@@ -28,12 +28,12 @@ import {
   recordWhatsAppProposal,
   WHATSAPP_DISPOSAL_EVENTS,
   type WhatsAppProposalRow,
-} from "./connector-whatsapp";
-import type { WhatsAppContentCipher } from "./whatsapp-active-content";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
+import type { WhatsAppContentCipher } from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 import {
   advanceWhatsAppProposal,
   WHATSAPP_SEND_ATTEMPT_LEASE_MS,
-} from "./whatsapp-reply-proposal-transition";
+} from "@purin-labs/area-inbox/server/actors/whatsapp-reply-proposal-transition";
 
 /**
  * The WhatsApp proposal store and the immutable send ladder.

@@ -7,8 +7,8 @@ import {
   parseVaultHandle,
   storeVaultSecret,
 } from "@purin-labs/authority/credential-vault/index";
-import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
-import { registerEmailSenderAccount } from "../../src/data/email-operational";
+import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { registerEmailSenderAccount } from "@purin-labs/area-inbox/server/data/email-operational";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";

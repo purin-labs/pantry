@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { handleControlRequest } from "../src/control-router";
 import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
-import { registerEmailMailboxAccount } from "../src/data/email-mailbox";
+import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

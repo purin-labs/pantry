@@ -21,7 +21,7 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   activateEmailRuntime,
   recordEmailCaseContextDiscovery,
-} from "../../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import {
   startActorRelocation,
@@ -31,16 +31,16 @@ import {
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
-import { publishContactVerification } from "../../src/data/contact-verification";
-import { registerOperationalEmailContact } from "../../src/data/email-operational";
+import { publishContactVerification } from "@purin-labs/area-inbox/server/data/contact-verification";
+import { registerOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   registerEmailMailboxAccount,
   assignAgentMailbox,
   publishMailboxIngressPolicy,
   recordEmailMessageReceipt,
   bindEmailMessageReceiptContact,
-} from "../../src/data/email-mailbox";
-import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import {
   applyAgentOperation,
   type AgentOperationCommand,

@@ -3,7 +3,7 @@ import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { fetchConnectorMail } from "../mail-inbox/execution";
+import { fetchConnectorMail } from "@purin-labs/area-inbox/server/mail-inbox/execution";
 import { extractMailbox } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   parseCaseId,
@@ -11,8 +11,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { resolveVerifiedContactEndpointByEndpoint } from "../data/contact-verification";
-import { bindEmailMessageReceiptContact } from "../data/email-mailbox";
+import { resolveVerifiedContactEndpointByEndpoint } from "@purin-labs/area-inbox/server/data/contact-verification";
+import { bindEmailMessageReceiptContact } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import type { CaseContextCollectionSelection } from "@purin-labs/agent/case-context-discovery/relationships";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 

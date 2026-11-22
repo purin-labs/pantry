@@ -26,7 +26,7 @@ import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
 } from "@purin-labs/control/worker/authorization";
-import { commerceGraphReads } from "../../commerce/contract/graph-reads";
+import { commerceGraphReads } from "../../../../../services/platform/src/commerce/contract/graph-reads";
 import {
   controlError,
   controlJson,

@@ -13,8 +13,8 @@ import {
   completeWhatsAppProcessing,
   recordWhatsAppProposal,
   type WhatsAppIngressLimits,
-} from "../../src/actors/connector-whatsapp";
-import { createWhatsAppContentCipher } from "../../src/actors/whatsapp-active-content";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
+import { createWhatsAppContentCipher } from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 import {
   parseVaultHandle,
   storeVaultSecret,
@@ -28,7 +28,7 @@ import {
   publishWhatsAppIngressPolicy,
   registerWhatsAppPhoneNumberAccount,
   whatsappConversationWindowCaseId,
-} from "../../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import {
   parseConnectorId,
   type ConnectorId,

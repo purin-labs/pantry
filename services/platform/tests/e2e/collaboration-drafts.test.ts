@@ -1085,7 +1085,7 @@ function emailAgentRequest(
   oldText: string,
   newText: string,
   expectedRevision: number,
-): import("../../src/actors/email-draft").EmailDraftAgentEdit {
+): import("@purin-labs/area-inbox/server/actors/email-draft").EmailDraftAgentEdit {
   return {
     agent: { sessionId: execution.sessionId, displayName },
     organisationId: scenario.organisationId,

@@ -26,7 +26,7 @@ const EFFECTS_WITH_A_NAMED_CALLER = new Set([
   "foundation/control/worker/routes/access-control-explain.ts",
   "services/platform/src/actors/agent-session.ts",
   // Refactor 10 moved these effects out of agent-session.ts unchanged.
-  "services/platform/src/agent-tools/channels/handlers.ts",
+  "areas/inbox/server/agent-tools/channels/handlers.ts",
   "foundation/tool-handlers/agent-tools/session-support.ts",
 ]);
 
@@ -43,10 +43,10 @@ const CONVERSATION_DELIVERIES = new Set([
   "foundation/conversation/chat/information-flow.ts",
   "foundation/control/worker/routes/access-control-explain.ts",
   "services/platform/src/control/routes/supplier-payouts.ts",
-  "services/platform/src/mail-inbox/contract/mail-source-authorization.ts",
-  "services/platform/src/mail-inbox/chat-source-access.ts",
-  "services/platform/src/mail-inbox/supplier-context.ts",
-  "services/platform/src/whatsapp/read-authorization.ts",
+  "areas/inbox/server/mail-inbox/contract/mail-source-authorization.ts",
+  "areas/inbox/server/mail-inbox/chat-source-access.ts",
+  "areas/inbox/server/mail-inbox/supplier-context.ts",
+  "areas/inbox/server/whatsapp/read-authorization.ts",
   "foundation/conversation/projects/context.ts",
   "foundation/conversation/projects/references.ts",
 ]);

@@ -5,20 +5,23 @@ const accessMocks = vi.hoisted(() => ({
   resolveConnectorGmailAccess: vi.fn(),
 }));
 
-vi.mock("../src/actors/connector-email-evaluation", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/actors/connector-email-evaluation")
-  >()),
-  resolveConnectorGmailAccess: accessMocks.resolveConnectorGmailAccess,
-}));
+vi.mock(
+  "@purin-labs/area-inbox/server/actors/connector-email-evaluation",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-inbox/server/actors/connector-email-evaluation")
+    >()),
+    resolveConnectorGmailAccess: accessMocks.resolveConnectorGmailAccess,
+  }),
+);
 
 import type { AuthorizedHarnessToolResult } from "@purin-labs/contracts";
 
 import {
   createEmailHarnessToolHost,
   type EmailCaseManifest,
-} from "../src/actors/email-harness-tools";
-import { EmailTurnInformationFlow } from "../src/actors/email-case-context-collection-evidence";
+} from "@purin-labs/area-inbox/server/actors/email-harness-tools";
+import { EmailTurnInformationFlow } from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 
 const NOW = 1_784_016_325_277;
 

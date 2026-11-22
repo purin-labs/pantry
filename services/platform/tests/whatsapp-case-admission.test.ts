@@ -20,7 +20,7 @@ vi.mock("@purin-labs/actor-runtime/actors/actor-router", () => ({
   resolveActiveCaseActorAtPlacement: mocks.resolveActiveCaseActorAtPlacement,
 }));
 
-import { admitWhatsAppSupportCase } from "../src/actors/whatsapp-case-admission";
+import { admitWhatsAppSupportCase } from "@purin-labs/area-inbox/server/actors/whatsapp-case-admission";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 
 const META_MESSAGE_ID =

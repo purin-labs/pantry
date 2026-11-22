@@ -4,7 +4,7 @@ import {
   registerEmailMailboxAccount,
   assignAgentMailbox,
   publishMailboxIngressPolicy,
-} from "../src/data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { requireIntegrationAccountId } from "./test-ids";
 import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
@@ -39,10 +39,13 @@ const orchestratorMocks = vi.hoisted(() => ({
   dispatchEmailReply: vi.fn(),
 }));
 
-vi.mock("../src/mail-inbox/contract/gmail-inference-eligibility", () => ({
-  readGmailInferenceEligibility:
-    orchestratorMocks.readGmailInferenceEligibility,
-}));
+vi.mock(
+  "@purin-labs/area-inbox/server/mail-inbox/contract/gmail-inference-eligibility",
+  () => ({
+    readGmailInferenceEligibility:
+      orchestratorMocks.readGmailInferenceEligibility,
+  }),
+);
 
 vi.mock(
   "@purin-labs/actor-runtime/actors/actor-router",
@@ -97,12 +100,15 @@ vi.mock(
       orchestratorMocks.ensureOrganisationDefaultWorkspace,
   }),
 );
-vi.mock("../src/actors/connector-email-evaluation", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/actors/connector-email-evaluation")
-  >()),
-  resolveConnectorGmailAccess: orchestratorMocks.resolveConnectorGmailAccess,
-}));
+vi.mock(
+  "@purin-labs/area-inbox/server/actors/connector-email-evaluation",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-inbox/server/actors/connector-email-evaluation")
+    >()),
+    resolveConnectorGmailAccess: orchestratorMocks.resolveConnectorGmailAccess,
+  }),
+);
 vi.mock(
   "@purin-labs/agent/data/pinned-agent-profile",
   async (importOriginal) => ({
@@ -122,13 +128,16 @@ vi.mock(
     gmailCreateDraft: orchestratorMocks.gmailCreateDraft,
   }),
 );
-vi.mock("../src/actors/connector-email-proposal", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/actors/connector-email-proposal")
-  >()),
-  previewEmailProposal: orchestratorMocks.previewEmailProposal,
-  dispatchEmailReply: orchestratorMocks.dispatchEmailReply,
-}));
+vi.mock(
+  "@purin-labs/area-inbox/server/actors/connector-email-proposal",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-inbox/server/actors/connector-email-proposal")
+    >()),
+    previewEmailProposal: orchestratorMocks.previewEmailProposal,
+    dispatchEmailReply: orchestratorMocks.dispatchEmailReply,
+  }),
+);
 
 import {
   createConnectorEmailSchema,
@@ -137,10 +146,10 @@ import {
   activateEmailRuntime,
   utcDayKey,
   type EmailIngressLimits,
-} from "../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
-import { processEmailThreadTurn } from "../src/actors/email-case-processing";
-import { claimMailResponseOwner } from "../src/mail-inbox/response-store";
+import { processEmailThreadTurn } from "@purin-labs/area-inbox/server/actors/email-case-processing";
+import { claimMailResponseOwner } from "@purin-labs/area-inbox/server/mail-inbox/response-store";
 import { platformEnv } from "./worker-fakes";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import {

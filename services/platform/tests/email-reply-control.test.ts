@@ -9,8 +9,8 @@ import {
   projectEmailReplyProposal,
   readEmailReplyProposalProjection,
   registerEmailMailboxAccount,
-} from "../src/data/email-mailbox";
-import { projectEmailOperationalProposal } from "../src/data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { projectEmailOperationalProposal } from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

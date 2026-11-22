@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/authority/credential-vault/index";
 import type { ActivationMutation } from "../../data/activation";
 import { disableIntegrationAccount } from "@purin-labs/connections/data/integration-account";
-import { inboxServices } from "../../../../../services/platform/src/mail-inbox/contract/inbox-services";
+import { inboxServices } from "@purin-labs/area-inbox/server/mail-inbox/contract/inbox-services";
 import {
   hashOpaqueSecret,
   type ActiveControlSession,

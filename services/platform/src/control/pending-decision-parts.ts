@@ -4,7 +4,7 @@ import type {
 } from "@purin-labs/control-api";
 import { isCommerceLedgerAction } from "@purin-labs/authority/actors/action-ledger";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { listEmailReviewProjections } from "../data/email-review";
+import { listEmailReviewProjections } from "@purin-labs/area-inbox/server/data/email-review";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   decidePendingDecision,
@@ -12,8 +12,8 @@ import {
   type PendingDecisionDeciders,
 } from "@purin-labs/control/worker/decide-pending-decision";
 import type { PendingDecisionSources } from "@purin-labs/control/worker/pending-decisions";
-import { handleEmailOperational } from "./routes/agents/email-operational";
-import { handleEmailReply } from "./routes/agents/email-reply";
+import { handleEmailOperational } from "@purin-labs/area-inbox/server/control/routes/agents/email-operational";
+import { handleEmailReply } from "@purin-labs/area-inbox/server/control/routes/agents/email-reply";
 import {
   handleCommerceActionApproval,
   handleCommerceActionRejection,

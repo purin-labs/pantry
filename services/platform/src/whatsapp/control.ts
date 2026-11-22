@@ -38,15 +38,15 @@ import {
   revokeWhatsAppConnection,
   type WhatsAppIngressPolicy,
   type WhatsAppPhoneNumber,
-} from "../data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
 import { permissionRequiredResponse } from "@purin-labs/control/worker/permission-required";
-import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
-import { whatsappConnector } from "../mail-inbox/agent-mailbox-connector";
+import { mailControlAuthority } from "@purin-labs/area-inbox/server/mail-inbox/contract/control-authority";
+import { whatsappConnector } from "@purin-labs/area-inbox/server/mail-inbox/agent-mailbox-connector";
 import {
   authorizeWhatsAppSupportRead,
   whatsappSupportReadPermission,
-} from "./read-authorization";
+} from "@purin-labs/area-inbox/server/whatsapp/read-authorization";
 import { parseIntegrationAccountId, type IntegrationAccountId } from "@purin-labs/kernel/ids";
 import { resolveWhatsAppApplicationConfiguration } from "@purin-labs/connections/whatsapp/application";
 import { resolveWhatsAppOrganisationCredential } from "./credential";

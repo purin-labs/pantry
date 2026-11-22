@@ -38,6 +38,7 @@
     "@purin-labs/area-brain": "workspace:*",
     "@purin-labs/area-organisation": "workspace:*",
     "@purin-labs/area-cafe": "workspace:*",
+    "@purin-labs/area-inbox": "workspace:*",
     "lucide-react": "^0.542.0",
     "onnxruntime-web": "1.22.0",
     "qrcode-generator": "^2.0.4",

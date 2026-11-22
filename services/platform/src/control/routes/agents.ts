@@ -1,9 +1,9 @@
 import { decidePendingDecisionWith } from "../pending-decision-parts";
 import type { Env } from "@purin-labs/kernel/env";
-import { handleContactVerification } from "./contact-verification";
-import { handleAgentMailboxSetup } from "./mailbox-setup";
+import { handleContactVerification } from "@purin-labs/area-inbox/server/control/routes/contact-verification";
+import { handleAgentMailboxSetup } from "@purin-labs/area-inbox/server/control/routes/mailbox-setup";
 import { handleOrganisationSlackReasoningEffort } from "./slack-reasoning-effort";
-import { handleAgentMailboxSenderLinks } from "./mailbox-sender-links";
+import { handleAgentMailboxSenderLinks } from "@purin-labs/area-inbox/server/control/routes/mailbox-sender-links";
 import {
   handleWhatsAppAccount,
   handleWhatsAppAccounts,
@@ -33,15 +33,15 @@ import {
 import {
   handleEmailOperational,
   handleEmailOperationalContactSync,
-} from "./agents/email-operational";
-import { handleEmailReply, handleEmailReviewQueue } from "./agents/email-reply";
+} from "@purin-labs/area-inbox/server/control/routes/agents/email-operational";
+import { handleEmailReply, handleEmailReviewQueue } from "@purin-labs/area-inbox/server/control/routes/agents/email-reply";
 import { handleOrganisationInference } from "@purin-labs/agent/control/routes/agents/inference";
 import {
   handleAgentMailbox,
   handleAgentMailboxCheck,
   isAgentMailboxRouteAction,
   type AgentMailboxRouteAction,
-} from "./agents/mailbox";
+} from "@purin-labs/area-inbox/server/control/routes/agents/mailbox";
 import {
   handleAgentOperationRevisions,
   handleAgentOperations,

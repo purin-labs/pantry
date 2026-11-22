@@ -57,8 +57,8 @@ vi.mock("@purin-labs/agent/data/organisation-workspace", async (importOriginal) 
   ...(await importOriginal<typeof import("@purin-labs/agent/data/organisation-workspace")>()),
   ensureOrganisationDefaultWorkspace: orchestratorMocks.ensureOrganisationDefaultWorkspace,
 }));
-vi.mock("../src/data/whatsapp", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/whatsapp")>()),
+vi.mock("@purin-labs/area-inbox/server/data/whatsapp", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-inbox/server/data/whatsapp")>()),
   projectWhatsAppReplyProposal: orchestratorMocks.projectWhatsAppReplyProposal,
   requestWhatsAppCaseHandoff: orchestratorMocks.requestWhatsAppCaseHandoff,
   readWhatsAppSendAuthority: orchestratorMocks.readWhatsAppSendAuthority,
@@ -84,14 +84,14 @@ import {
   utcDayKey,
   whatsAppTokenWindowTotals,
   type WhatsAppIngressLimits,
-} from "../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
 import { readWhatsAppCasePanel } from "../src/actors/connector-whatsapp-rpc";
-import { processWhatsAppCaseTurn } from "../src/actors/whatsapp-case-processing";
+import { processWhatsAppCaseTurn } from "@purin-labs/area-inbox/server/actors/whatsapp-case-processing";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
-} from "../src/actors/whatsapp-active-content";
+} from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { testRootSecret } from "./whatsapp/environment";
 import { createFakeGraph } from "./whatsapp/fake-graph";

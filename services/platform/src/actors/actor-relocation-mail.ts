@@ -33,7 +33,7 @@ import {
   latestEmailDraftOperation,
   readEmailRuntime,
   updateEmailDraftState,
-} from "./connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import {
   latestOperationalEmailProposal,
   readOperationalEmailDispatchId,

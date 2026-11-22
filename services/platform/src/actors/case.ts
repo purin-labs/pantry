@@ -13,9 +13,9 @@ import {
   readCaseEmailProposals,
   readCaseMailWork,
   transitionCaseEmailProposal,
-} from "./case-inbox/email-proposals";
-import { caseInboxPart } from "./case-inbox/part";
-import type { CaseInboxRpc } from "./case-inbox/rpc";
+} from "@purin-labs/area-inbox/server/actors/case-inbox/email-proposals";
+import { caseInboxPart } from "@purin-labs/area-inbox/server/actors/case-inbox/part";
+import type { CaseInboxRpc } from "@purin-labs/area-inbox/server/actors/case-inbox/rpc";
 import { ACTOR_MACHINES } from "./actor-machines";
 import { CaseActor } from "@purin-labs/conversation/actors/case/case-actor";
 import type { CaseParts } from "@purin-labs/conversation/actors/case/parts";

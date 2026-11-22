@@ -22,7 +22,7 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   deferWhatsAppNotice,
   latestWhatsAppProposal,
-} from "../../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   parseSessionId,

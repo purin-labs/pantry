@@ -27,7 +27,7 @@ import { createActiveConnectedIntegration } from "@purin-labs/connections/data/i
 import {
   registerWhatsAppPhoneNumberAccount,
   selectWhatsAppPhoneNumberAccount,
-} from "../../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

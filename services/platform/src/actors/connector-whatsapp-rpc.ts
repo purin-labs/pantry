@@ -17,7 +17,7 @@ import {
   clearWhatsAppCaseHandoff,
   whatsappConversationWindowCaseId,
   type WhatsAppReplyProposalLifecycle,
-} from "../data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   newRequestId,
@@ -34,7 +34,7 @@ import {
   parseWhatsAppCustomerId,
   parseWhatsAppMessageId,
 } from "@purin-labs/connections/whatsapp/identifiers";
-import { admitWhatsAppSupportCase } from "./whatsapp-case-admission";
+import { admitWhatsAppSupportCase } from "@purin-labs/area-inbox/server/actors/whatsapp-case-admission";
 import {
   composeWhatsAppHumanReply,
   dispatchWhatsAppReply,
@@ -71,12 +71,12 @@ import {
   type WhatsAppOwnership,
   type WhatsAppPauseReason,
   type WhatsAppRuntimeSnapshot,
-} from "./connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { deliverWhatsAppOperatorNotice } from "./whatsapp-operator-notice";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
-} from "./whatsapp-active-content";
+} from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 import type { Variant } from "@purin-labs/type-utils";
 import type { WhatsAppCasePanelEntry } from "@purin-labs/control-api";
 

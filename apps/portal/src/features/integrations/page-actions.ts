@@ -9,7 +9,7 @@ import {
   editEmailReply as editReplyBody,
   reloadEmailReplyDraft,
   saveEmailReplyDraft,
-} from "../email-review/api";
+} from "@purin-labs/area-inbox/ui/features/email-review/api";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { saveInferenceSelection } from "./inference-actions";

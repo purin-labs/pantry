@@ -8,24 +8,24 @@ import {
   parseRequestId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { gmailConnectorIdValue } from "../../mail-inbox/contract/connector-ids";
-import { parseEmailProposalTarget } from "../../data/email-operational";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
+import { parseEmailProposalTarget } from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,
 } from "@purin-labs/authority/authorization/capability-catalogue";
-import type { EmailIngressLimits } from "../connector-email";
+import type { EmailIngressLimits } from "@purin-labs/area-inbox/server/actors/connector-email";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import {
   parseEmailChatContext,
   parseEmailChatSources,
   parseEmailReplySources,
-} from "../email-proposal-sources";
+} from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
 import type {
   EmailChatContext,
   EmailChatSource,
   EmailReplySources,
-} from "../../mail-inbox/reply-sources";
+} from "@purin-labs/area-inbox/server/mail-inbox/reply-sources";
 import {
   checked,
   emailActivationFieldsSchema,
@@ -72,7 +72,7 @@ type EmailOperationalProposalCreateRequest = ConnectorEmailIdentityRequest & {
   readonly integrationAccountId: string;
   readonly caseId: string;
   readonly proposalId: string;
-  readonly target: import("../../data/email-operational").EmailProposalTarget;
+  readonly target: import("@purin-labs/area-inbox/server/data/email-operational").EmailProposalTarget;
   readonly subject: string;
   readonly body: string;
   readonly policyVersion: number;

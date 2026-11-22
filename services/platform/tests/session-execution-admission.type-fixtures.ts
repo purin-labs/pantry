@@ -7,7 +7,7 @@ import type {
   OperatorExecutionOrigin,
   SessionTurnExecution,
 } from "@purin-labs/conversation/chat/turn-access";
-import type { MailDraftOrigin } from "../src/actors/email-case-processing";
+import type { MailDraftOrigin } from "@purin-labs/area-inbox/server/actors/email-case-processing";
 import { processDirectCaseCommand } from "@purin-labs/conversation/actors/case-direct-processing";
 import {
   SessionExecutionAdmission,

@@ -85,7 +85,7 @@ import {
   readConversationLinks,
   unreadConversationCount,
 } from "@purin-labs/conversation/chat/conversation-links";
-import { readConversationEmailReviews } from "../../mail-inbox/conversation-email-reviews";
+import { readConversationEmailReviews } from "@purin-labs/area-inbox/server/mail-inbox/conversation-email-reviews";
 import { chatError, chatSaveError } from "./chat/errors";
 
 export type PortalChatExecution = Pick<ExecutionContext, "waitUntil">;

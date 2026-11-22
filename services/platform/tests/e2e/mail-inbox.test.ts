@@ -1,9 +1,9 @@
 import {
   readEmailRuntime,
   EMAIL_RESOLVE_GRACE_MS,
-} from "../../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { fixtureDatabase } from "./organisation-database";
-import { projectMailClassifications } from "../../src/mail-inbox/store";
+import { projectMailClassifications } from "@purin-labs/area-inbox/server/mail-inbox/store";
 import { opaqueCaseReference } from "@purin-labs/authority/access-control/references";
 import {
   compareEvalRun,
@@ -30,7 +30,7 @@ import {
   SUPPLIER_ENTITY_TYPE_ID,
 } from "@purin-labs/commerce-client";
 import { readSessionTurnMemoryRecords } from "@purin-labs/agent/actors/actor-journal/transactions";
-import { createMailboxTurnMemoryReader } from "../../src/mail-inbox/mailbox-turn-memory";
+import { createMailboxTurnMemoryReader } from "@purin-labs/area-inbox/server/mail-inbox/mailbox-turn-memory";
 import {
   canonicalFlowLabel,
   joinFlowLabels,
@@ -47,7 +47,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import type { MailEvaluationInput } from "../../src/mail-inbox/evaluation";
+import type { MailEvaluationInput } from "@purin-labs/area-inbox/server/mail-inbox/evaluation";
 import { createTransientGoalExecution } from "@purin-labs/agent/actors/session-goal-usage";
 import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import {
@@ -72,19 +72,19 @@ import {
   type ChatGptAnswer,
   type ChatGptModelRequest,
 } from "./chatgpt-subscription-support";
-import { registerOperationalEmailContact } from "../../src/data/email-operational";
-import { publishContactVerification } from "../../src/data/contact-verification";
+import { registerOperationalEmailContact } from "@purin-labs/area-inbox/server/data/email-operational";
+import { publishContactVerification } from "@purin-labs/area-inbox/server/data/contact-verification";
 import {
   recordEmailMessageReceipt,
   bindEmailMessageReceiptContact,
-} from "../../src/data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   recordCaseContextCollectionSuggestion,
   decideCaseContextCollectionRelationship,
   type CaseContextCollectionScope,
 } from "@purin-labs/agent/case-context-discovery/relationships";
 import { parseCaseContextDiscoveryPolicy } from "@purin-labs/agent/case-context-discovery/policy";
-import { readEmailProposalFlow } from "../../src/actors/email-case-context-collection-evidence";
+import { readEmailProposalFlow } from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 import {
   MEMORY_HEADING,
   MEMORY_LIMITATION_NOTICE,
@@ -95,7 +95,7 @@ import {
   claimEmailCaseContextCollectionDraft,
   emailTurnDestinationMayReceive,
   readPlainReplyRecipient,
-} from "../../src/actors/email-case-context-collection-evidence";
+} from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 import {
   FlowBinding,
   FlowLabel,
@@ -109,8 +109,8 @@ import type { RequestAuthority } from "@purin-labs/contracts";
 import {
   previewEmailProposal,
   dispatchEmailReply,
-} from "../../src/actors/connector-email-proposal";
-import { admitEmailThreadCase } from "../../src/actors/email-case-admission";
+} from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
+import { admitEmailThreadCase } from "@purin-labs/area-inbox/server/actors/email-case-admission";
 import {
   readOrganisationInferenceSelection,
   selectOrganisationInferenceSelection,
@@ -126,11 +126,11 @@ import {
 import {
   readEmailProposalSourceOutcome,
   readEmailProposalSources,
-} from "../../src/actors/email-proposal-sources";
+} from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
 import {
   EmailSupplierContext,
   readEmailCommerceEvidence,
-} from "../../src/mail-inbox/supplier-context";
+} from "@purin-labs/area-inbox/server/mail-inbox/supplier-context";
 import { buildAgentMailboxAuthority } from "@purin-labs/authority/request-authority/index";
 import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { admitControlTurnFixture } from "../organisation-execution-fixture";
@@ -140,9 +140,9 @@ import {
   emailTurnSessionId,
   processEmailThreadTurn,
   type EmailThreadTurnInput,
-} from "../../src/actors/email-case-processing";
+} from "@purin-labs/area-inbox/server/actors/email-case-processing";
 import { resolveCaseTurnAgentProfile } from "@purin-labs/agent/data/pinned-agent-profile";
-import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-source-authorization";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import {
@@ -210,23 +210,23 @@ import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
 } from "@purin-labs/actor-runtime/actors/actor-router";
-import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
-import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
+import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import { digestCanonical } from "@purin-labs/authority/policy/information-flow/digest";
 import {
   readMailHead,
   claimMailWork,
   writeMailHead,
-} from "../../src/mail-inbox/store";
-import { mailEvaluationInput } from "../../src/mail-inbox/connector-runtime";
-import { runMailOrganization } from "../../src/mail-inbox/connector-runtime";
-import { runConnectorEmailEvaluation } from "../../src/actors/connector-email-evaluation";
+} from "@purin-labs/area-inbox/server/mail-inbox/store";
+import { mailEvaluationInput } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
+import { runMailOrganization } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
+import { runConnectorEmailEvaluation } from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
 import {
   readMailResponseOwner,
   claimMailResponseOwner,
-} from "../../src/mail-inbox/response-store";
-import type { InboxResponseOwner } from "../../src/mail-inbox/response-store";
+} from "@purin-labs/area-inbox/server/mail-inbox/response-store";
+import type { InboxResponseOwner } from "@purin-labs/area-inbox/server/mail-inbox/response-store";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
@@ -243,7 +243,7 @@ import {
   projectEmailReplyProposal,
   assignAgentMailbox,
   publishMailboxIngressPolicy,
-} from "../../src/data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   applyAgentOperation,
   type AgentOperationCommand,
@@ -258,8 +258,8 @@ import {
   emailTokenWindowTotals,
   reserveEmailTokens,
   utcDayKey,
-} from "../../src/actors/connector-email";
-import { readEmailProposalMemory } from "../../src/actors/email-proposal-memory";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
+import { readEmailProposalMemory } from "@purin-labs/area-inbox/server/actors/email-proposal-memory";
 import {
   dispatchRfcMessageId,
   deriveGmailReplyTarget,
@@ -268,7 +268,7 @@ import {
   digestEmailSnapshot,
 } from "@purin-labs/connections/mail/reply-target";
 import type { CaseAssignment } from "@purin-labs/contracts";
-import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-proposals";
+import type { CaseGmailReplyProposal } from "@purin-labs/area-inbox/server/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
 import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
@@ -1286,7 +1286,7 @@ function runMailboxPlacementCommand(
   boundary: MailboxPlacementBoundary,
   connector: ProposalPlacementFixture["connector"],
   input: ProposalPlacementFixture,
-  runtime: import("../../src/actors/connector-email").EmailRuntimeSnapshot,
+  runtime: import("@purin-labs/area-inbox/server/actors/connector-email").EmailRuntimeSnapshot,
 ) {
   const request = { identity: input.identity, now: Date.now() };
   switch (boundary) {
@@ -1320,7 +1320,7 @@ function runMailboxPlacementCommand(
 
 async function verifyRetiredMailbox(
   input: ProposalPlacementFixture,
-  runtime: import("../../src/actors/connector-email").EmailRuntimeSnapshot,
+  runtime: import("@purin-labs/area-inbox/server/actors/connector-email").EmailRuntimeSnapshot,
 ): Promise<void> {
   const request = { identity: input.identity, now: Date.now() };
   const activation = {
@@ -1515,7 +1515,7 @@ type ProposalPlacementFixture = Readonly<{
 type ProposalPlacementCommand =
   | Readonly<{
       kind: Exclude<ProposalPlacementBoundary, "correction">;
-      snapshot: import("../../src/actors/connector-email-proposal").EmailProposalPreview;
+      snapshot: import("@purin-labs/area-inbox/server/actors/connector-email-proposal").EmailProposalPreview;
       correction?: never;
     }>
   | Readonly<{
@@ -1527,7 +1527,7 @@ type ProposalPlacementCommand =
 async function prepareProposalPlacementCommand(
   boundary: ProposalPlacementBoundary,
   input: ProposalPlacementFixture,
-  snapshot: import("../../src/actors/connector-email-proposal").EmailProposalPreview,
+  snapshot: import("@purin-labs/area-inbox/server/actors/connector-email-proposal").EmailProposalPreview,
 ): Promise<ProposalPlacementCommand> {
   if (boundary !== "correction") return { kind: boundary, snapshot };
   const selected = await input.connector.previewEmailRelationship({
@@ -6904,7 +6904,7 @@ async function verifyMailReadPlacement(
   connector: DurableObjectStub<
     import("../../src/actors/connector").ConnectorDO
   >,
-  input: import("../../src/mail-inbox/commands").MailOrganizationActorInput,
+  input: import("@purin-labs/area-inbox/server/mail-inbox/commands").MailOrganizationActorInput,
   active: boolean,
 ): Promise<void> {
   const organization = await connector.readMailOrganization({
@@ -15561,7 +15561,7 @@ function readObservationHead(_actor: unknown, state: DurableObjectState) {
 
 function attemptFrozenMailProjection(
   scope: OrganisationExecutionScope,
-  head: import("../../src/mail-inbox/types").MailOrganizationHead,
+  head: import("@purin-labs/area-inbox/server/mail-inbox/types").MailOrganizationHead,
 ): Promise<void> {
   return projectMailClassifications({
     scope,

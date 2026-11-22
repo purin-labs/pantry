@@ -7,7 +7,7 @@ import type {
   WhatsAppIngressPolicy,
   WhatsAppIngressPolicyPublishRequest,
   WhatsAppReplyProposalLifecycle,
-} from "../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import type { WhatsAppSendOutcome } from "@purin-labs/connections/whatsapp/graph";
 import type { WhatsAppWebhookEvent } from "../src/whatsapp/webhook";
 import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";

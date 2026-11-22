@@ -18,9 +18,9 @@ import {
   updateEmailDraftState,
   type EmailDraftState,
   type EmailIngressLimits,
-} from "../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
-import { dispatchEmailReply } from "../src/actors/connector-email-proposal";
+import { dispatchEmailReply } from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { platformEnv } from "./worker-fakes";
 

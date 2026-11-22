@@ -8,19 +8,19 @@ import {
   type ProviderAttemptDiagnostics,
   type ProviderConnectionState,
 } from "../../provider-onboarding";
-import { gmailPauseCopy } from "../../pages/agent-mailbox";
+import { gmailPauseCopy } from "@purin-labs/area-inbox/ui/pages/agent-mailbox";
 import type { AgentMailboxView } from "@purin-labs/control-api/portal/agent-mailbox";
 import { ConsentPoint } from "./connect-consent-dialog";
-import { EmailReviewSurface } from "../email-review/review";
-import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";
+import { EmailReviewSurface } from "@purin-labs/area-inbox/ui/features/email-review/review";
+import { mailboxCanTurnOn, turnOnHint } from "@purin-labs/area-inbox/ui/features/mail-setup/model";
 import {
   MailboxModelConsent,
   useMailboxModelConsent,
-} from "../mail-setup/model-consent";
+} from "@purin-labs/area-inbox/ui/features/mail-setup/model-consent";
 import {
   useMailboxSetup,
   type MailboxSetupControl,
-} from "../mail-setup/use-mailbox-setup";
+} from "@purin-labs/area-inbox/ui/features/mail-setup/use-mailbox-setup";
 import {
   type IntegrationAccountCommands,
   integrationAccountCommands,

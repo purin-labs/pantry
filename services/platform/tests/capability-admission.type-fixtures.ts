@@ -13,7 +13,7 @@ import { publishCommerceExportPreset } from "../src/data/export-preset";
 import {
   assignWhatsAppSupportAgent,
   ensureWhatsAppSupportContextGrant,
-} from "../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 
 declare const change: Parameters<typeof changeVersionedCapabilityPolicy>[0];
 declare const defaults: Parameters<typeof applyVersionedAccessDefaults>[0];

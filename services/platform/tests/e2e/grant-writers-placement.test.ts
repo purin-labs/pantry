@@ -33,7 +33,7 @@ import {
   assignWhatsAppSupportAgent,
   ensureWhatsAppSupportContextGrant,
   registerWhatsAppPhoneNumberAccount,
-} from "../../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import {
   parseE164PhoneNumber,
   parseMetaBusinessPortfolioId,

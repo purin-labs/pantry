@@ -16,7 +16,7 @@ import {
   readEmailProposalChatSources,
   readEmailProposalSourceOutcome,
   readEmailProposalSources,
-} from "../../src/actors/email-proposal-sources";
+} from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,

@@ -9,8 +9,11 @@ import {
   emailReplyProposal,
   whatsAppSupportRead,
   whatsAppSupportReplySend,
-} from "./channels/channels";
-import { emailDraftEdit, emailDraftRead } from "./channels/email-draft";
+} from "@purin-labs/area-inbox/server/agent-tools/channels/channels";
+import {
+  emailDraftEdit,
+  emailDraftRead,
+} from "@purin-labs/area-inbox/server/agent-tools/channels/email-draft";
 import {
   productDescriptionDraftEdit,
   productDescriptionDraftRead,

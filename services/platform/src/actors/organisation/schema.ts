@@ -1,4 +1,4 @@
-import { createMailEvaluationSchema } from "../../mail-inbox/evaluation";
+import { createMailEvaluationSchema } from "@purin-labs/area-inbox/server/mail-inbox/evaluation";
 import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
 import { createCueDeliverySchema } from "@purin-labs/agent/actors/cue-delivery";
 import { createCommerceProjectionSchema } from "../commerce-projection";

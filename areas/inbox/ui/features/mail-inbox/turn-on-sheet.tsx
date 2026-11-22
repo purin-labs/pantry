@@ -5,7 +5,7 @@ import {
   controlRead,
 } from "@purin-labs/control/portal/control-client";
 import { ProviderTile } from "@purin-labs/ui/page-components";
-import { ConnectionDialog } from "../integrations/connection-dialog";
+import { ConnectionDialog } from "../../../../../apps/portal/src/features/integrations/connection-dialog";
 import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";
 import {
   MailboxModelConsent,

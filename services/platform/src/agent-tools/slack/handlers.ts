@@ -1,5 +1,5 @@
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { resolveSlackMessageCapability } from "../../actors/email-operational-capability";
+import { resolveSlackMessageCapability } from "@purin-labs/area-inbox/server/actors/email-operational-capability";
 import {
   insertSlackMessageProposal,
   matchSlackChannel,

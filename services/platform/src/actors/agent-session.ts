@@ -6,13 +6,13 @@ import type {
   TransientEvalTurnRequest,
   TransientMailAssistantRequest,
   TransientWhatsAppTurnRequest,
-} from "./inbox-turns/rpc";
+} from "@purin-labs/area-inbox/server/actors/inbox-turns/rpc";
 import {
   prepareTransientEmailTurn,
   prepareTransientEvalTurn,
   prepareTransientMailAssistant,
   prepareTransientWhatsAppTurn,
-} from "./inbox-turns/session-turns";
+} from "@purin-labs/area-inbox/server/actors/inbox-turns/session-turns";
 import { ACTOR_MACHINES } from "./actor-machines";
 import { SessionActor } from "@purin-labs/agent/actors/session/session-actor";
 import type { SessionToolWiring } from "@purin-labs/agent/actors/session/tool-wiring";

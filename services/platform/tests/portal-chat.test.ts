@@ -54,7 +54,7 @@ import { defaultDenyPolicy } from "@purin-labs/authority/policy-snapshot";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
 import { deriveDirectCaseIdentities } from "@purin-labs/conversation/actors/case-direct-processing";
-import { projectEmailOperationalProposal } from "../src/data/email-operational";
+import { projectEmailOperationalProposal } from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   bakeryEffectDeliveryTarget,
   createBakerySurfaceAttachment,

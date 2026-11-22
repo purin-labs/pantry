@@ -30,7 +30,7 @@ import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-m
 import {
   commerceCollectionQuery,
   readCommerceGraph,
-} from "../commerce/entity-plane/api";
+} from "../../../../../apps/portal/src/features/commerce/entity-plane/api";
 import {
   type MailAgentState,
   parseMailAgentState,

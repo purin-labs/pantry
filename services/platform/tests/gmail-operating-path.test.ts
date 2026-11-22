@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import worker from "../src/integration-gateway";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
-import { registerEmailMailboxAccount } from "../src/data/email-mailbox";
+import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,

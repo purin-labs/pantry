@@ -3,7 +3,7 @@ import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-e
 import {
   fetchConnectorMail,
   isSessionMailExecutionActive,
-} from "../mail-inbox/execution";
+} from "@purin-labs/area-inbox/server/mail-inbox/execution";
 import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { gmailMailAdapter } from "@purin-labs/connections/mail/gmail-mail-adapter";
@@ -21,11 +21,11 @@ import {
   resolveEmailSenderAccount,
   parseEmailProposalTarget,
   type EmailProposalTarget,
-} from "../data/email-operational";
+} from "@purin-labs/area-inbox/server/data/email-operational";
 import {
   resolveEmailProposalRecipient,
   validEmailSelfTestContent,
-} from "../data/email-self-test";
+} from "@purin-labs/area-inbox/server/data/email-self-test";
 import { dispatchRfcMessageId } from "@purin-labs/connections/mail/reply-target";
 import {
   buildOperationalEmailRaw,
@@ -43,7 +43,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   createEmailContentCipher,
   type EmailContentCipher,
-} from "./email-active-content";
+} from "@purin-labs/area-inbox/server/actors/email-active-content";
 import {
   CAPABILITY_KEYS,
   capabilityDefinitionById,

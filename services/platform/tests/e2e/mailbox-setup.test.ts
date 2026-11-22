@@ -14,7 +14,7 @@ import { isRecord } from "@purin-labs/std";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { compileTurnAuthority } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { readAgentMailboxBinding } from "../../src/data/email-mailbox";
+import { readAgentMailboxBinding } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   readActiveOrganisationMembership,
   readActiveOrganisationMembershipRevision,
@@ -23,13 +23,13 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
+import { authorizeMailSource } from "@purin-labs/area-inbox/server/mail-inbox/contract/mail-source-authorization";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import {
   buildAgentMailboxAuthority,
   buildControlAuthority,
 } from "@purin-labs/authority/request-authority/index";
-import { setUpMailbox } from "../../../../apps/portal/src/features/mail-setup/turn-on";
+import { setUpMailbox } from "@purin-labs/area-inbox/ui/features/mail-setup/turn-on";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";

@@ -1,8 +1,8 @@
 import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { expect, it } from "vitest";
-import { readGmailInferenceEligibility } from "../src/mail-inbox/contract/gmail-inference-eligibility";
-import { GMAIL_MODEL_REVIEWS } from "../src/mail-inbox/contract/gmail-model-reviews";
+import { readGmailInferenceEligibility } from "@purin-labs/area-inbox/server/mail-inbox/contract/gmail-inference-eligibility";
+import { GMAIL_MODEL_REVIEWS } from "@purin-labs/area-inbox/server/mail-inbox/contract/gmail-model-reviews";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 

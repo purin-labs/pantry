@@ -7,7 +7,7 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("cloudflare:workers", cloudflareWorkersMock);
-vi.mock("../src/data/whatsapp", whatsappDataMockFactory);
+vi.mock("@purin-labs/area-inbox/server/data/whatsapp", whatsappDataMockFactory);
 vi.mock("@purin-labs/actor-runtime/actors/actor-router", actorRouterMockFactory);
 
 const gatewayMocks = vi.hoisted(createGatewayMocks);

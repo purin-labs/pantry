@@ -1,0 +1,57 @@
+{
+  "name": "@purin-labs/area-inbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server/*": {
+      "types": "./server/*.ts",
+      "default": "./server/*.ts"
+    },
+    "./ui/*.css": "./ui/*.css",
+    "./ui/*": {
+      "types": "./ui/*.ts",
+      "default": "./ui/*.ts"
+    },
+    "./ui/features/email-review/review": "./ui/features/email-review/review.tsx",
+    "./ui/features/mail-inbox/claim-trace": "./ui/features/mail-inbox/claim-trace.tsx",
+    "./ui/features/mail-inbox/draft-sources": "./ui/features/mail-inbox/draft-sources.tsx",
+    "./ui/features/mail-inbox/route": "./ui/features/mail-inbox/route.tsx",
+    "./ui/features/mail-setup/model-consent": "./ui/features/mail-setup/model-consent.tsx"
+  },
+  "dependencies": {
+    "@purin-labs/actor-runtime": "workspace:*",
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/agent-tools": "workspace:*",
+    "@purin-labs/area-brain": "workspace:*",
+    "@purin-labs/area-organisation": "workspace:*",
+    "@purin-labs/async-control": "workspace:*",
+    "@purin-labs/authority": "workspace:*",
+    "@purin-labs/collaboration": "workspace:*",
+    "@purin-labs/commerce-client": "workspace:*",
+    "@purin-labs/commerce-contracts": "workspace:*",
+    "@purin-labs/connections": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/conversation": "workspace:*",
+    "@purin-labs/email-draft-crdt": "workspace:*",
+    "@purin-labs/inbox-control-api": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/mail-reply-crdt": "workspace:*",
+    "@purin-labs/std": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/tool-handlers": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/ui": "workspace:*",
+    "@radix-ui/react-dropdown-menu": "^2.1.24",
+    "lucide-react": "^0.542.0",
+    "react": "^19.1.1",
+    "sonner": "^2.0.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260707.1",
+    "@types/react": "^19.1.12",
+    "tsrs": "0.18.0-ts7.1.0-dev.20260929"
+  }
+}

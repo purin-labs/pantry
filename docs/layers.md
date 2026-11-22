@@ -278,28 +278,28 @@ import. A module with no line for one of these has none.
 ## areas/inbox
 
 - Folders: 19
-  - `apps/portal/src/`
-  - `apps/portal/src/features/email-review/`
-  - `apps/portal/src/features/mail-inbox/`
-  - `apps/portal/src/features/mail-setup/`
-  - `apps/portal/src/pages/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/case-inbox/`
-  - `services/platform/src/actors/inbox-turns/`
-  - `services/platform/src/actors/organisation/`
-  - `services/platform/src/agent-tools/channels/`
-  - `services/platform/src/case-context-discovery/`
-  - `services/platform/src/control/`
-  - `services/platform/src/control/admission/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/control/routes/agents/`
-  - `services/platform/src/data/`
-  - `services/platform/src/mail-inbox/`
-  - `services/platform/src/mail-inbox/contract/`
-  - `services/platform/src/whatsapp/`
-- Packages: `packages/email-draft-crdt`, `packages/inbox-control-api`, `packages/mail-reply-crdt`
+  - `areas/inbox/server/actors/`
+  - `areas/inbox/server/actors/case-inbox/`
+  - `areas/inbox/server/actors/inbox-turns/`
+  - `areas/inbox/server/actors/organisation/`
+  - `areas/inbox/server/agent-tools/channels/`
+  - `areas/inbox/server/case-context-discovery/`
+  - `areas/inbox/server/control/`
+  - `areas/inbox/server/control/admission/`
+  - `areas/inbox/server/control/routes/`
+  - `areas/inbox/server/control/routes/agents/`
+  - `areas/inbox/server/data/`
+  - `areas/inbox/server/mail-inbox/`
+  - `areas/inbox/server/mail-inbox/contract/`
+  - `areas/inbox/server/whatsapp/`
+  - `areas/inbox/ui/`
+  - `areas/inbox/ui/features/email-review/`
+  - `areas/inbox/ui/features/mail-inbox/`
+  - `areas/inbox/ui/features/mail-setup/`
+  - `areas/inbox/ui/pages/`
+- Packages: `areas/inbox`, `packages/email-draft-crdt`, `packages/inbox-control-api`, `packages/mail-reply-crdt`
 - Tables (26): `agent_mailbox_binding`, `agent_mailbox_binding_revision`, `contact_endpoint_verification`, `email_mailbox_account`, `email_message_receipt`, `email_operational_attestation`, `email_operational_contact`, `email_operational_proposal_projection`, `email_reply_proposal`, `email_self_test`, `email_sender_account`, `email_thread_case`, `gmail_inference_eligibility`, `mail_assistant_eligibility`, `mail_classification`, `mailbox_ingress_policy`, `mailbox_ingress_policy_revision`, `whatsapp_case_conversation_window`, `whatsapp_delivery_status`, `whatsapp_ingress_policy`, `whatsapp_ingress_policy_revision`, `whatsapp_message_receipt`, `whatsapp_phone_number_account`, `whatsapp_reply_proposal`, `whatsapp_support_binding`, `whatsapp_support_binding_revision`
-- Public files: `apps/portal/src/features/email-review/api.ts`, `apps/portal/src/features/email-review/decision-labels.ts`, `apps/portal/src/features/email-review/review.tsx`, `apps/portal/src/features/mail-setup/`, `apps/portal/src/pages/agent-mailbox.ts`, `apps/portal/src/whatsapp.ts`, `services/platform/src/mail-inbox/contract/`
+- Public files: `areas/inbox/server/mail-inbox/contract/`, `areas/inbox/ui/features/email-review/api.ts`, `areas/inbox/ui/features/email-review/decision-labels.ts`, `areas/inbox/ui/features/email-review/review.tsx`, `areas/inbox/ui/features/mail-setup/`, `areas/inbox/ui/pages/agent-mailbox.ts`, `areas/inbox/ui/whatsapp.ts`
 
 ## areas/integrations
 

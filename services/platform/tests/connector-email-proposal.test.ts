@@ -14,12 +14,15 @@ const accessMocks = vi.hoisted(() => ({
   resolveConnectorGmailAccess: vi.fn(),
 }));
 
-vi.mock("../src/actors/connector-email-evaluation", async (importOriginal) => ({
-  ...(await importOriginal<
-    typeof import("../src/actors/connector-email-evaluation")
-  >()),
-  resolveConnectorGmailAccess: accessMocks.resolveConnectorGmailAccess,
-}));
+vi.mock(
+  "@purin-labs/area-inbox/server/actors/connector-email-evaluation",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-inbox/server/actors/connector-email-evaluation")
+    >()),
+    resolveConnectorGmailAccess: accessMocks.resolveConnectorGmailAccess,
+  }),
+);
 
 import {
   digestEmailBody,
@@ -34,19 +37,19 @@ import {
   readEmailDraftOperation,
   recordEmailDraftOperation,
   type EmailIngressLimits,
-} from "../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
 import {
   dispatchEmailReply,
   disposeEmailProposal,
   previewEmailProposal,
   runEmailProposalMaintenance,
-} from "../src/actors/connector-email-proposal";
+} from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
 import {
   EMAIL_MAINTENANCE_INTERVAL_MS,
   EMAIL_RESOLVE_GRACE_MS,
   nextEmailMaintenanceAt,
-} from "../src/actors/connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";
 

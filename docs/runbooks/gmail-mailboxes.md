@@ -53,7 +53,7 @@ watch call fails outright.
 Mail goes only to a model route that Purin reviewed for Google's Limited Use
 rules: the provider trains on no prompt and keeps no prompt after the answer.
 The reviews are in
-`services/platform/src/mail-inbox/contract/gmail-model-reviews.ts`, and
+`areas/inbox/server/mail-inbox/contract/gmail-model-reviews.ts`, and
 [Plan 83](../history/plan-83-one-inbox.md#model-review-and-consent) gives the design.
 No operator writes a row by hand. An owner or admin accepts the reviewed
 model's terms with the checkbox above **Turn on**, and the Portal writes the

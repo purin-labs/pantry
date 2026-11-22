@@ -9,7 +9,7 @@ import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   evaluateMail,
   type MailEvaluationInput,
-} from "../../mail-inbox/evaluation";
+} from "@purin-labs/area-inbox/server/mail-inbox/evaluation";
 import { reconcileAdmittedOrganisationArchiveCleanup } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import { ARCHIVE_CLEANUP_PARTS } from "../../archive-cleanup-parts";
 import {

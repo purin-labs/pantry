@@ -17,7 +17,7 @@ import {
   registerWhatsAppPhoneNumberAccount,
   selectWhatsAppPhoneNumberAccount,
   whatsappConversationWindowCaseId,
-} from "../../src/data/whatsapp";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
 import {
   type IntegrationAccountId,
   type ProviderConnectionId,

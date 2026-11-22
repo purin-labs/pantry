@@ -10,7 +10,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
  */
 export const EMAIL_REPLY_PROPOSAL_MACHINE = {
   name: "email_reply_proposal",
-  owner: "services/platform/src/actors/case-inbox/email-proposals.ts",
+  owner: "areas/inbox/server/actors/case-inbox/email-proposals.ts",
   store: {
     table: "case_email_proposal",
     key: "proposal_id",

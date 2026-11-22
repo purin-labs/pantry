@@ -50,7 +50,7 @@ import {
   restoreOrganisationDataArchive,
 } from "@purin-labs/actor-runtime/data/organisation-regional-copy";
 import type { SessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
-import { type MailEvaluationInput } from "../mail-inbox/evaluation";
+import { type MailEvaluationInput } from "@purin-labs/area-inbox/server/mail-inbox/evaluation";
 import {
   canAdmitOrganisationArchiveCleanup,
   closeOrganisationArchiveCleanupAdmission,
@@ -73,18 +73,21 @@ import {
   type CollaborationSocketRooms,
 } from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
 import { commerceCollaborationRooms } from "./commerce-collaboration-rooms";
-import { inboxCollaborationRooms } from "./inbox-collaboration-rooms";
+import { inboxCollaborationRooms } from "@purin-labs/area-inbox/server/actors/inbox-collaboration-rooms";
 import { kitchenCollaborationRooms } from "./kitchen-collaboration-rooms";
 import {
   ProductDescriptionDraftRooms,
   type DraftAgentEdit,
   type DraftAgentReadRequest,
 } from "./product-description-draft";
-import { EmailDraftRooms, type EmailDraftAgentEdit } from "./email-draft";
+import {
+  EmailDraftRooms,
+  type EmailDraftAgentEdit,
+} from "@purin-labs/area-inbox/server/actors/email-draft";
 import {
   MailReplyDraftRooms,
   type MailReplyDraftAgentEdit,
-} from "./mail-reply-draft";
+} from "@purin-labs/area-inbox/server/actors/mail-reply-draft";
 import {
   MenuDraftRooms,
   type MenuDraftAgentEdit,
@@ -199,7 +202,7 @@ import {
 import {
   CASE_CONTEXT_SOURCE_FOR_POLICY,
   deliverCaseContextCollectionInvalidations,
-} from "./organisation/case-context-collection";
+} from "@purin-labs/area-inbox/server/actors/organisation/case-context-collection";
 import {
   createOrganisationSchema,
   schemaTransaction,
@@ -250,7 +253,7 @@ import {
   admittedValidateCaseContextCollectionEvidence,
   type OrganisationCaseContextCollectionRpc,
   type OrganisationCollectionHost,
-} from "./organisation/case-context-collection-commands";
+} from "@purin-labs/area-inbox/server/actors/organisation/case-context-collection-commands";
 import {
   JEV_FOR_POLICY,
   manageJevFeatureForOrganisation,

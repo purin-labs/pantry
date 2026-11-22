@@ -1,6 +1,6 @@
 import type { CollaborationMutationAuthority } from "@purin-labs/collaboration/worker/collaboration-room";
 import type { ProductDescriptionDraftRooms } from "../src/actors/product-description-draft";
-import type { EmailDraftRooms } from "../src/actors/email-draft";
+import type { EmailDraftRooms } from "@purin-labs/area-inbox/server/actors/email-draft";
 
 declare const authority: CollaborationMutationAuthority;
 const { scope, ...unscopedAuthority } = authority;

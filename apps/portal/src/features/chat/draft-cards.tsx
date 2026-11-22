@@ -18,8 +18,8 @@ import {
 import {
   EMAIL_REPLY_DECISION,
   SELF_TEST_SEND_LABEL,
-} from "../email-review/decision-labels";
-import type { EmailReviewActions } from "../email-review/api";
+} from "@purin-labs/area-inbox/ui/features/email-review/decision-labels";
+import type { EmailReviewActions } from "@purin-labs/area-inbox/ui/features/email-review/api";
 import type { EmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import {
   ClaimSummary,
@@ -28,11 +28,11 @@ import {
   focusNumber,
   relocateSources,
   type ClaimFocus,
-} from "../mail-inbox/claim-trace";
+} from "@purin-labs/area-inbox/ui/features/mail-inbox/claim-trace";
 import {
   DraftBodyMarks,
   type MailSourceLinks,
-} from "../mail-inbox/draft-sources";
+} from "@purin-labs/area-inbox/ui/features/mail-inbox/draft-sources";
 import type { ChatTimelineInsert } from "./activity";
 import type { SlackChannelView, SlackDraftView } from "@purin-labs/control-api/portal/slack-drafts";
 import type { SlackDraftActions } from "./slack-drafts";

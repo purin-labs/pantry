@@ -6,7 +6,7 @@ import {
   createContinueSerialQueue,
   createKeyedContinueSerialQueue,
 } from "@purin-labs/async-control/serial-queue";
-import { runMailOrganization } from "../../mail-inbox/connector-runtime";
+import { runMailOrganization } from "@purin-labs/area-inbox/server/mail-inbox/connector-runtime";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
@@ -17,19 +17,22 @@ import { GMAIL_MAILBOX } from "@purin-labs/connections/mail/gmail-mail-adapter";
 import {
   fetchSessionConnectorMail,
   isSessionMailExecutionActive,
-} from "../../mail-inbox/execution";
+} from "@purin-labs/area-inbox/server/mail-inbox/execution";
 import {
   readEmailProposalFlow,
   validateEmailCaseContextCollectionDependency,
-} from "../email-case-context-collection-evidence";
+} from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 import {
   runMailAssistant,
   readMailAssistantStatus,
   type MailAssistantActorInput,
-} from "../../mail-inbox/assistant";
-import { eraseMailClassificationRecords } from "../../mail-inbox/store";
+} from "@purin-labs/area-inbox/server/mail-inbox/assistant";
+import { eraseMailClassificationRecords } from "@purin-labs/area-inbox/server/mail-inbox/store";
 import { parseStoredRequestAuthority } from "@purin-labs/authority/request-authority/index";
-import { readClassifiedPage, readDecision } from "../../mail-inbox/reads";
+import {
+  readClassifiedPage,
+  readDecision,
+} from "@purin-labs/area-inbox/server/mail-inbox/reads";
 import {
   readOrganization,
   manageOrganization,
@@ -37,7 +40,7 @@ import {
   type MailOrganizationReadInput,
   type MailClassifiedPageInput,
   type MailDecisionInput,
-} from "../../mail-inbox/commands";
+} from "@purin-labs/area-inbox/server/mail-inbox/commands";
 import type { MailOrganizationCommand } from "@purin-labs/control-api";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
@@ -45,7 +48,7 @@ import {
   parseIntegrationAccountId,
   parseOrganisationId,
 } from "@purin-labs/kernel/ids";
-import { readAgentMailboxBinding } from "../../data/email-mailbox";
+import { readAgentMailboxBinding } from "@purin-labs/area-inbox/server/data/email-mailbox";
 import {
   connectionCredentialAuthority,
   resolveActiveProviderAccountContext,
@@ -85,13 +88,13 @@ import {
   type EmailHintAcceptance,
   type EmailReplyCorrection,
   type EmailRuntimeSnapshot,
-} from "../connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import type {
   ClaimedEvalTask,
   EvalTaskEnd,
   EvalTaskServices,
 } from "@purin-labs/area-brain/server/evals/contract/eval-task";
-import { runMailboxEvalTask } from "../eval-task-processing";
+import { runMailboxEvalTask } from "@purin-labs/area-inbox/server/actors/eval-task-processing";
 import {
   establishConnectorEmailWatch,
   readConnectorEmailHistoryId,
@@ -99,16 +102,16 @@ import {
   runConnectorEmailEvaluation,
   stopConnectorEmailWatch,
   resolveConnectorGmailAccess,
-} from "../connector-email-evaluation";
+} from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
 import {
   processEmailCorrectionLearning,
   processEmailThreadTurn,
-} from "../email-case-processing";
+} from "@purin-labs/area-inbox/server/actors/email-case-processing";
 import {
   readEmailProposalChatContext,
   readEmailProposalChatSources,
   recordChatEditProvenance,
-} from "../email-proposal-sources";
+} from "@purin-labs/area-inbox/server/actors/email-proposal-sources";
 import {
   authorizeEmailReplyReview,
   editEmailReplyBody,
@@ -126,7 +129,7 @@ import {
   type EmailDisposalOutcome,
   type EmailProposalPreviewOutcome,
   type EmailProposalResolution,
-} from "../connector-email-proposal";
+} from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
 import {
   createOperationalEmailProposal,
   dispatchOperationalEmail,
@@ -1307,8 +1310,8 @@ export class ConnectorEmail {
     input: ConnectorEmailIdentityRequest &
       Readonly<{
         proposalId: string;
-        chatSources: readonly import("../../mail-inbox/reply-sources").EmailChatSource[];
-        chatContext: import("../../mail-inbox/reply-sources").EmailChatContext;
+        chatSources: readonly import("@purin-labs/area-inbox/server/mail-inbox/reply-sources").EmailChatSource[];
+        chatContext: import("@purin-labs/area-inbox/server/mail-inbox/reply-sources").EmailChatContext;
       }>,
   ): Promise<ConnectorResult<null>> {
     return this.host.trackExecution(

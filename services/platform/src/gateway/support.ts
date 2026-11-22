@@ -40,7 +40,7 @@ import {
 import type { EmailChangeQueueMessage } from "../mail/queue-messages";
 import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
-import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";
+import { gmailConnectorIdValue } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import {
   parseConnectorId,
   type RequestId,

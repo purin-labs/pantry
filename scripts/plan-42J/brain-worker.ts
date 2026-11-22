@@ -18,9 +18,9 @@ import {
   latestEmailDraftOperation,
   readEmailRuntime,
   type EmailIngressLimits,
-} from "../../services/platform/src/actors/connector-email";
-import { runConnectorEmailEvaluation } from "../../services/platform/src/actors/connector-email-evaluation";
-import { emailTurnSessionId } from "../../services/platform/src/actors/email-case-processing";
+} from "../../areas/inbox/server/actors/connector-email";
+import { runConnectorEmailEvaluation } from "../../areas/inbox/server/actors/connector-email-evaluation";
+import { emailTurnSessionId } from "../../areas/inbox/server/actors/email-case-processing";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
 import { CAPABILITY_KEYS } from "../../foundation/authority/authorization/capability-catalogue";
 import { parseVaultHandle } from "../../foundation/authority/credential-vault/domain";
@@ -30,16 +30,16 @@ import {
   applyAgentOperation,
   type AgentOperationCommand,
 } from "../../foundation/agent/data/agent-operations";
-import { publishContactVerification } from "../../services/platform/src/data/contact-verification";
+import { publishContactVerification } from "../../areas/inbox/server/data/contact-verification";
 import {
   assignAgentMailbox,
   publishMailboxIngressPolicy,
   registerEmailMailboxAccount,
-} from "../../services/platform/src/data/email-mailbox";
+} from "../../areas/inbox/server/data/email-mailbox";
 import {
   gmailConnectorId,
-} from "../../services/platform/src/mail-inbox/contract/connector-ids";
-import { registerOperationalEmailContact } from "../../services/platform/src/data/email-operational";
+} from "../../areas/inbox/server/mail-inbox/contract/connector-ids";
+import { registerOperationalEmailContact } from "../../areas/inbox/server/data/email-operational";
 import { createActiveConnectedIntegration } from "../../foundation/connections/data/integration-account";
 import type { Env } from "../../foundation/kernel/env";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "../../foundation/connections/mail/gmail-authorization";

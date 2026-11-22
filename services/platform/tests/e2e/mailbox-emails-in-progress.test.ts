@@ -4,7 +4,7 @@ import { expect, it, type TestContext } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { setUpMailbox } from "../../../../apps/portal/src/features/mail-setup/turn-on";
+import { setUpMailbox } from "@purin-labs/area-inbox/ui/features/mail-setup/turn-on";
 import { modelToolResults } from "./chat-journey-support";
 import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";

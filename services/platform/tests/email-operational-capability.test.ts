@@ -3,7 +3,7 @@ import {
   integrationAccountReference,
   parseIntegrationAccountReference,
 } from "@purin-labs/authority/access-control/integration-discovery";
-import { resolveEmailOperationalCapability } from "../src/actors/email-operational-capability";
+import { resolveEmailOperationalCapability } from "@purin-labs/area-inbox/server/actors/email-operational-capability";
 import { encodeCapabilityKey } from "@purin-labs/authority/authorization/access-grants/capability-key";
 import {
   parseIntegrationAccountId,

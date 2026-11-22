@@ -8,7 +8,7 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   latestWhatsAppProposal,
   readWhatsAppRuntime,
-} from "../../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import { network } from "./network";
 import { fixtureDatabase } from "./organisation-database";
 import { ORGANISATION_ID } from "./slack-journey-support";

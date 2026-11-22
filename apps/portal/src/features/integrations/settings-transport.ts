@@ -5,7 +5,7 @@ import {
   controlSecretMutation,
 } from "@purin-labs/control/portal/control-client";
 import { accountInvitationHref } from "@purin-labs/area-organisation/ui/pages/account-invitation-link";
-import { setUpMailbox } from "../mail-setup/turn-on";
+import { setUpMailbox } from "@purin-labs/area-inbox/ui/features/mail-setup/turn-on";
 import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "./settings-types";
 import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
@@ -15,7 +15,7 @@ import {
   organisationRecordPath,
 } from "@purin-labs/control/portal/control-paths";
 import { parseWhatsAppSurface, type WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
-import { whatsappAccountActionPath, whatsappAccountsPath } from "../../whatsapp";
+import { whatsappAccountActionPath, whatsappAccountsPath } from "@purin-labs/area-inbox/ui/whatsapp";
 import { parseCredentialRotationReceiptResponse, parseCredentialRevocationReceiptResponse } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   assertNever,

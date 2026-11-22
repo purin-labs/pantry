@@ -39,7 +39,7 @@ import { evaluateFlowLabelSink } from "@purin-labs/authority/policy/index";
 import { supplierPayoutLabel } from "../../payouts/supplier-payout-access";
 import {
   mailControlAuthority,
-} from "../../mail-inbox/contract/control-authority";
+} from "@purin-labs/area-inbox/server/mail-inbox/contract/control-authority";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

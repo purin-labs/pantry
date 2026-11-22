@@ -85,7 +85,8 @@ function loadWorkflowSimulator() {
 }
 
 async function loadMailInboxRoute() {
-  const module = await import("./features/mail-inbox/route");
+  const module =
+    await import("@purin-labs/area-inbox/ui/features/mail-inbox/route");
   return { default: module.MailInboxRoute };
 }
 

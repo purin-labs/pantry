@@ -5,7 +5,7 @@ import { http, HttpResponse } from "msw";
 import { expect, it } from "vitest";
 import { parseInboxConversations } from "@purin-labs/control-api";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { readWhatsAppIngressPolicy } from "../../src/data/whatsapp";
+import { readWhatsAppIngressPolicy } from "@purin-labs/area-inbox/server/data/whatsapp";
 import { createGrant, enableCapability } from "./access-route-support";
 import { network } from "./network";
 import { ORGANISATION_ID } from "./slack-journey-support";

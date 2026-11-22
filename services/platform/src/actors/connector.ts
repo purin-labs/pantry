@@ -4,7 +4,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 import { ACTOR_MACHINES } from "./actor-machines";
 import { readWarmActorSlots } from "@purin-labs/actor-runtime/actors/warm-actor-slots";
-import { invalidateEmailCaseContextCollectionProposals } from "./email-case-context-collection-evidence";
+import { invalidateEmailCaseContextCollectionProposals } from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   actorExecutionAdmissionOpen,
@@ -26,7 +26,7 @@ import type {
   ActorFenceToken,
 } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
-import { readEmailRuntime } from "./connector-email";
+import { readEmailRuntime } from "@purin-labs/area-inbox/server/actors/connector-email";
 import {
   parseConnectorCaseWorkRecoveryRequest,
   parseConnectorCaseWorkRequest,

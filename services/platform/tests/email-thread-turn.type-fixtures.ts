@@ -1,5 +1,5 @@
-import type { EmailThreadTurnOutcome } from "../src/actors/email-case-processing";
-import type { EmailDispatchOutcome } from "../src/actors/connector-email-proposal";
+import type { EmailThreadTurnOutcome } from "@purin-labs/area-inbox/server/actors/email-case-processing";
+import type { EmailDispatchOutcome } from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
 
 // @ts-expect-error An uncertain send requires its exact dispatch version and digests.
 export const unidentifiedSend: EmailDispatchOutcome = {

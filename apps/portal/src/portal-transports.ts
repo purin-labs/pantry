@@ -5,7 +5,7 @@ import {
   controlMutation,
 } from "@purin-labs/control/portal/control-client";
 import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
-import { readMailboxSetup } from "./features/mail-setup/run";
+import { readMailboxSetup } from "@purin-labs/area-inbox/ui/features/mail-setup/run";
 import type { OrganisationActions } from "@purin-labs/area-organisation/ui/pages/workspaces";
 import type { ProductDescriptionActionTransport } from "./features/commerce/description-draft/editor";
 import type {

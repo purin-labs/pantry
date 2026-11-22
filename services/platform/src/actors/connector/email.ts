@@ -1,9 +1,9 @@
-import { isSessionMailExecutionActive } from "../../mail-inbox/execution";
-import { readEmailProposalEvidence } from "../email-case-context-collection-evidence";
+import { isSessionMailExecutionActive } from "@purin-labs/area-inbox/server/mail-inbox/execution";
+import { readEmailProposalEvidence } from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 import {
   acceptMailClassificationHint,
   eraseMailOrganization,
-} from "../../mail-inbox/store";
+} from "@purin-labs/area-inbox/server/mail-inbox/store";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -21,21 +21,21 @@ import {
   readEmailRuntime,
   type EmailHintAcceptance,
   type EmailRuntimeSnapshot,
-} from "../connector-email";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
 import { nextOperationalEmailMaintenanceAt } from "../connector-email-operational";
-import type { EmailDisposalOutcome } from "../connector-email-proposal";
+import type { EmailDisposalOutcome } from "@purin-labs/area-inbox/server/actors/connector-email-proposal";
 import {
   createConnectorEvalSchema,
   nextEvalWorkAt,
 } from "@purin-labs/area-brain/server/actors/connector-eval";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
-import { nextMailOrganizationAt } from "../../mail-inbox/store";
+import { nextMailOrganizationAt } from "@purin-labs/area-inbox/server/mail-inbox/store";
 import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { digestEmailBody } from "@purin-labs/connections/mail/reply-target";
 import {
   createEmailProposalDraft,
   type EmailProposalDraftRecord,
-} from "../email-case-processing";
+} from "@purin-labs/area-inbox/server/actors/email-case-processing";
 import {
   type EmailReplyProposalCreateRequest,
   parseEmailChangeRequest,

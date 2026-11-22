@@ -32,12 +32,12 @@ import {
   handleMailAssistantRoute,
   matchMailAssistantRoute,
   type MailAssistantRoute,
-} from "./control/routes/mail-assistant";
+} from "@purin-labs/area-inbox/server/control/routes/mail-assistant";
 import {
   handleMailOrganizationRoute,
   matchMailOrganizationRoute,
   type MailOrganizationRoute,
-} from "./control/routes/mail-organization";
+} from "@purin-labs/area-inbox/server/control/routes/mail-organization";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   handleProjectsRoute,
@@ -53,17 +53,17 @@ import {
   handleMailInboxRoute,
   matchMailInboxRoute,
   type MailInboxRoute,
-} from "./control/routes/mail-inbox";
+} from "@purin-labs/area-inbox/server/control/routes/mail-inbox";
 import {
   handleInboxConversationsRoute,
   matchInboxConversationsRoute,
   type InboxConversationsRoute,
-} from "./control/routes/inbox-conversations";
+} from "@purin-labs/area-inbox/server/control/routes/inbox-conversations";
 import {
   handleMailPersonReplyRoute,
   matchMailPersonReplyRoute,
   type MailPersonReplyRoute,
-} from "./control/routes/mail-person-reply";
+} from "@purin-labs/area-inbox/server/control/routes/mail-person-reply";
 import { handleBakeryWorkflowRoute } from "./control/routes/bakery-workflows";
 import {
   matchBakeryWorkflowRoute,
@@ -94,7 +94,7 @@ import {
   matchCaseContextDiscoveryRoute,
   type CaseContextDiscoveryRoute,
 } from "@purin-labs/conversation/control/routes/case-context-discovery";
-import { resolveCaseContextCollectionSelectionVerification } from "./case-context-discovery/source";
+import { resolveCaseContextCollectionSelectionVerification } from "@purin-labs/area-inbox/server/case-context-discovery/source";
 import { handleCaseScreenObservationsRoute } from "./control/routes/case-screen-observations";
 import {
   handleMemoryRoute,
@@ -126,11 +126,11 @@ import {
   matchProductDescriptionDraftRoute,
   type ProductDescriptionDraftRoute,
 } from "./control/admission/product-description-draft";
-import { handleMailReplyDraftRoute } from "./control/routes/mail-reply-draft";
+import { handleMailReplyDraftRoute } from "@purin-labs/area-inbox/server/control/routes/mail-reply-draft";
 import {
   matchMailReplyDraftRoute,
   type MailReplyDraftRoute,
-} from "./control/admission/mail-reply-draft";
+} from "@purin-labs/area-inbox/server/control/admission/mail-reply-draft";
 import { handleProductionPlanRoute } from "./control/routes/production-plan";
 import {
   matchProductionPlanRoute,
@@ -141,11 +141,11 @@ import {
   matchCostsSheetRoute,
   type CostsSheetRoute,
 } from "./control/admission/costs-sheet";
-import { handleEmailDraftRoute } from "./control/routes/email-draft";
+import { handleEmailDraftRoute } from "@purin-labs/area-inbox/server/control/routes/email-draft";
 import {
   matchEmailDraftRoute,
   type EmailDraftRoute,
-} from "./control/admission/email-draft";
+} from "@purin-labs/area-inbox/server/control/admission/email-draft";
 import {
   handleVoiceRoute,
   matchVoiceRoute,

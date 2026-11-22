@@ -13,7 +13,7 @@ import { describe, expect, it, vi } from "vitest";
  * Connector admission and the D1 projection. The Case trigger itself is
  * covered by the gateway test and by the contracts type model.
  */
-vi.mock("../src/actors/whatsapp-case-admission", () => ({
+vi.mock("@purin-labs/area-inbox/server/actors/whatsapp-case-admission", () => ({
   admitWhatsAppSupportCase: async () => ({
     ok: true,
     value: { kind: "accepted" },
@@ -37,7 +37,7 @@ import {
   requestWhatsAppHandoff,
   updateWhatsAppRuntimePolicy,
   type WhatsAppIngressLimits,
-} from "../src/actors/connector-whatsapp";
+} from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import {
   acceptWhatsAppEvent,
   closeWhatsAppSupportCase,
@@ -51,11 +51,11 @@ import {
 import { dispatchWhatsAppReply } from "../src/actors/connector-whatsapp-proposal";
 import { armConnectorAlarm } from "@purin-labs/conversation/actors/connector/alarm";
 import { emailAlarmDue } from "../src/actors/connector/email";
-import { whatsAppAlarmDue } from "../src/actors/connector-whatsapp";
+import { whatsAppAlarmDue } from "@purin-labs/area-inbox/server/actors/connector-whatsapp";
 import {
   createWhatsAppContentCipher,
   type WhatsAppContentCipher,
-} from "../src/actors/whatsapp-active-content";
+} from "@purin-labs/area-inbox/server/actors/whatsapp-active-content";
 import {
   listWhatsAppPhoneNumberAccounts,
   readWhatsAppCaseConversationWindowByCaseId,
@@ -65,8 +65,8 @@ import {
   requestWhatsAppCaseHandoff,
   revokeWhatsAppConnection,
   routeWhatsAppWebhookAccount,
-} from "../src/data/whatsapp";
-import { whatsappErasureStatements } from "../src/mail-inbox/contract/account-erasure";
+} from "@purin-labs/area-inbox/server/data/whatsapp";
+import { whatsappErasureStatements } from "@purin-labs/area-inbox/server/mail-inbox/contract/account-erasure";
 import { reconcileOrganisationOnboarding } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import type { SessionDO } from "../src/actors/agent-session";
 import {

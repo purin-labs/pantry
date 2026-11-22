@@ -8,8 +8,8 @@ import type { ConnectorDO } from "../../src/actors/connector";
 import {
   readEmailRuntime,
   type EmailProcessingState,
-} from "../../src/actors/connector-email";
-import { runConnectorEmailEvaluation } from "../../src/actors/connector-email-evaluation";
+} from "@purin-labs/area-inbox/server/actors/connector-email";
+import { runConnectorEmailEvaluation } from "@purin-labs/area-inbox/server/actors/connector-email-evaluation";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,
@@ -17,8 +17,8 @@ import {
 } from "@purin-labs/authority/authorization/capability-catalogue";
 import { storeVaultSecret } from "@purin-labs/authority/credential-vault/index";
 import { parseVaultHandle } from "@purin-labs/authority/credential-vault/domain";
-import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
-import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
+import { registerEmailMailboxAccount } from "@purin-labs/area-inbox/server/data/email-mailbox";
+import { gmailConnectorId } from "@purin-labs/area-inbox/server/mail-inbox/contract/connector-ids";
 import { createActiveConnectedIntegration } from "@purin-labs/connections/data/integration-account";
 import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import { GMAIL_FULL_MAILBOX_SCOPES } from "@purin-labs/connections/mail/gmail-authorization";
@@ -30,7 +30,7 @@ import {
 import {
   runMailboxSetup,
   type MailboxSetupTransport,
-} from "../../../../apps/portal/src/features/mail-setup/run";
+} from "@purin-labs/area-inbox/ui/features/mail-setup/run";
 import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";

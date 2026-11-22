@@ -1,8 +1,8 @@
 import type {
   EmailProposalTarget,
   OperationalEmailTarget,
-} from "../src/data/email-operational";
-import type { EmailSelfTestRequest } from "../src/data/email-self-test";
+} from "@purin-labs/area-inbox/server/data/email-operational";
+import type { EmailSelfTestRequest } from "@purin-labs/area-inbox/server/data/email-self-test";
 
 const selfTest: EmailProposalTarget = {
   kind: "self_test",

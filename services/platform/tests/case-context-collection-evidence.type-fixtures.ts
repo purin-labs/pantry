@@ -8,7 +8,7 @@ import type {
   CaseContextCollectionEvidenceSelection,
 } from "@purin-labs/agent/case-context-discovery/evidence";
 import type { FlowRecipient } from "@purin-labs/authority/policy/information-flow/index";
-import { EmailTurnInformationFlow } from "../src/actors/email-case-context-collection-evidence";
+import { EmailTurnInformationFlow } from "@purin-labs/area-inbox/server/actors/email-case-context-collection-evidence";
 
 declare const dependency: Extract<
   CaseEvidenceDependency,

@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   readGmailPilotBudget,
   registerEmailMailboxAccount,
-} from "../src/data/email-mailbox";
+} from "@purin-labs/area-inbox/server/data/email-mailbox";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   createConnectedIntegration,

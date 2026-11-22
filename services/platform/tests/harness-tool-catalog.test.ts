@@ -985,9 +985,9 @@ function listIntegrations(
 
 function recordWhatsAppSupportReplySend(
   sends: unknown[],
-  request: import("../src/agent-tools/channels/services").HarnessWhatsAppSupportReplySend,
+  request: import("@purin-labs/area-inbox/server/agent-tools/channels/services").HarnessWhatsAppSupportReplySend,
 ): Promise<
-  import("../src/agent-tools/channels/services").HarnessWhatsAppSupportReplyReceipt
+  import("@purin-labs/area-inbox/server/agent-tools/channels/services").HarnessWhatsAppSupportReplyReceipt
 > {
   sends.push(request);
   return Promise.resolve({

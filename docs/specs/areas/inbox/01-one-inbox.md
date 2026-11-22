@@ -190,7 +190,7 @@ An owner or admin opens the sheet "How should the agent help?" from the list hea
 - `packages/mail-reply-crdt` (protocol `mail_reply_sync.v1`) and
   `packages/inbox-control-api` (Portal frame parsers). `packages/email-draft-crdt` is
   the separate marketing email draft of a Slack thread.
-- The Portal: `apps/portal/src/features/mail-inbox/` (`route.tsx`, `conversation.tsx`,
+- The Portal: `areas/inbox/ui/features/mail-inbox/` (`route.tsx`, `conversation.tsx`,
   `whatsapp-conversation.tsx`, `reply-draft-editor.tsx`, `reply-composer.tsx`,
   `draft-sources.tsx`, `claim-trace.tsx`, `agent-sheet.tsx`, `turn-on-sheet.tsx`).
   `apps/portal/src/pages/whatsapp.tsx` keeps the number's connection, binding, policy
@@ -308,7 +308,7 @@ unconfirmed send is looked up by its Message-ID, and the result is
 `send_indeterminate` if Gmail does not show it. Nothing sends again.
 
 **Agent tools.** The Portal chat agent's tools are in
-`services/platform/src/agent-tools/channels/channels.ts` (family `channels`):
+`areas/inbox/server/agent-tools/channels/channels.ts` (family `channels`):
 
 | Tool                          | Capability                    | Effect                                                             |
 | ----------------------------- | ----------------------------- | ------------------------------------------------------------------ |

@@ -6,7 +6,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   consentToGmailModel,
   readGmailModelState,
-} from "../src/mail-inbox/gmail-model-consent";
+} from "@purin-labs/area-inbox/server/mail-inbox/gmail-model-consent";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**

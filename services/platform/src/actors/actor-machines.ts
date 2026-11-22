@@ -6,8 +6,8 @@ import { CASE_OUTPUT_MACHINE } from "@purin-labs/conversation/actors/case/output
 import { CUE_DELIVERY_MACHINE } from "@purin-labs/agent/actors/cue-delivery.machine";
 import { DEVICE_COMMAND_MACHINE } from "@purin-labs/area-devices/server/actors/device-command.machine";
 import { STEERING_INPUT_MACHINE } from "@purin-labs/agent/actors/steering-input.machine";
-import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "./whatsapp-reply-proposal.machine";
-import { EMAIL_REPLY_PROPOSAL_MACHINE } from "../data/email-reply-proposal.machine";
+import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "@purin-labs/area-inbox/server/actors/whatsapp-reply-proposal.machine";
+import { EMAIL_REPLY_PROPOSAL_MACHINE } from "@purin-labs/area-inbox/server/data/email-reply-proposal.machine";
 
 /**
  * The machines whose state lives in an Actor's SQLite (Refactor 15, S5).
