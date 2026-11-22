@@ -20,9 +20,13 @@
 //   Objects, R2, KV, D1, Queues, the Cache API and `cloudflare:` modules
 //   appear only in CLOUDFLARE_ADAPTERS.
 // - Platform actors, Slack code and chat code import no route file in
-//   services/platform/src/control/routes/ (Refactor 10 step 3). A route
-//   parses, authorizes and calls domain code; domain code does not call back.
-//   A route file runs no D1 query either: the query lives in a data/ module.
+//   services/platform/src/control/routes/ (Refactor 10 step 3), by a relative
+//   path or by a package name. A route parses, authorizes and calls domain
+//   code; domain code does not call back. A route file runs no D1 query
+//   either: the query lives in a data/ module. A foundation package keeps the
+//   folders of the Worker source (Refactor 17): its control/routes/ holds
+//   route files and its actors/, slack/ and chat/ hold no import of one. The
+//   Worker side of foundation/control keeps its route files in worker/routes/.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, normalize, relative, resolve } from "node:path";
@@ -72,9 +76,10 @@ const pluginDirectory = (path) => {
   return match === null ? null : `${COMMERCE_PLUGINS}/${match[1]}`;
 };
 
-// Platform directories whose code may not import a route file.
-const PLATFORM_ROUTES = "services/platform/src/control/routes";
-const PLATFORM_ROUTE_FREE = ["services/platform/src/actors", "services/platform/src/slack", "services/platform/src/chat"];
+// Platform route files, and the Platform directories whose code may not import
+// one: in the Worker source and in each foundation package.
+const PLATFORM_ROUTES = /^(?:services\/platform\/src|foundation\/[^/]+)\/control\/routes\/|^foundation\/control\/worker\/routes\//;
+const PLATFORM_ROUTE_FREE = /^(?:services\/platform\/src|foundation\/[^/]+)\/(?:actors|slack|chat)\//;
 
 const SOURCE = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
 const SKIPPED = /(^|\/)(node_modules|dist|public|wasm-pkg|generated|output|\.artifacts)\//;
@@ -84,6 +89,8 @@ const isCommerce = (path) => within(path, COMMERCE_DIRECTORIES);
 const isNeutral = (path) => within(path, NEUTRAL_DIRECTORIES);
 
 const packages = workspacePackages();
+/** package name -> its exports map, for packageFile. */
+const exportMaps = new Map();
 const commercePackages = new Set([...packages].filter(([, directory]) => isCommerce(directory)).map(([name]) => name));
 const neutralPackages = new Set([...packages].filter(([, directory]) => isNeutral(directory)).map(([name]) => name));
 const runtimePackages = new Set([...packages].filter(([, directory]) => within(directory, COMMERCE_RUNTIME_DIRECTORIES)).map(([name]) => name));
@@ -152,7 +159,7 @@ function checkSource(file) {
       const target = repositoryPath(file, specifier);
       if (target === null) continue;
       const plugin = pluginDirectory(target);
-      if (within(file, PLATFORM_ROUTE_FREE) && within(target, [PLATFORM_ROUTES]))
+      if (PLATFORM_ROUTE_FREE.test(file) && PLATFORM_ROUTES.test(target))
         report(file, line, specifier, `imports the route file ${target}; move the shared code out of control/routes/`);
       if (plugin !== null && !within(file, [plugin]) && target !== `${plugin}/index.ts`)
         report(file, line, specifier, `imports ${target}; take the plugin through ${plugin}/index.ts`);
@@ -166,13 +173,18 @@ function checkSource(file) {
     }
     const name = packageName(specifier);
     if (!packages.has(name)) continue; // an npm package or a runtime module
+    if (PLATFORM_ROUTE_FREE.test(file)) {
+      const target = packageFile(specifier);
+      if (target !== null && PLATFORM_ROUTES.test(target))
+        report(file, line, specifier, `imports the route file ${target}; move the shared code out of control/routes/`);
+    }
     if (commerceEngine && !commercePackages.has(name) && !neutralPackages.has(name))
       report(file, line, specifier, `imports ${name}, a package outside Commerce`);
     else if (neutral && !neutralPackages.has(name)) report(file, line, specifier, `imports ${name} from a neutral package`);
     else if (!commerceEngine && runtimePackages.has(name))
       report(file, line, specifier, `imports ${name}, Commerce's runtime source; use @purin-labs/commerce-client or the built Worker`);
   }
-  if (within(file, [PLATFORM_ROUTES]))
+  if (PLATFORM_ROUTES.test(file))
     for (const match of text.matchAll(/\.prepare\(/g))
       report(file, lineOf(match.index), "prepare", "runs a D1 query in a route file; move the query to a data/ module");
   if (within(file, [COMMERCE_CORE]) && !CLOUDFLARE_ADAPTERS.has(file)) checkCloudflareNames(file, text, lineOf, importedFiles);
@@ -257,6 +269,26 @@ function repositoryPath(file, specifier) {
 function packageName(specifier) {
   const parts = specifier.split("/");
   return specifier.startsWith("@") ? parts.slice(0, 2).join("/") : parts[0];
+}
+
+// The repository path of a file that a workspace package specifier names
+// through the exports map of the package, or null.
+function packageFile(specifier) {
+  const name = packageName(specifier);
+  const directory = packages.get(name);
+  if (!exportMaps.has(name)) exportMaps.set(name, JSON.parse(readFileSync(join(root, directory, "package.json"), "utf8")).exports ?? {});
+  const subpath = `.${specifier.slice(name.length)}`;
+  for (const [key, value] of Object.entries(exportMaps.get(name))) {
+    const target = typeof value === "string" ? value : value?.default;
+    if (typeof target !== "string") continue;
+    const [head, tail] = key.split("*");
+    if (tail === undefined) {
+      if (key === subpath) return normalize(join(directory, target));
+    } else if (subpath.startsWith(head) && subpath.endsWith(tail) && subpath.length >= key.length - 1) {
+      return normalize(join(directory, target.replace("*", subpath.slice(head.length, subpath.length - tail.length))));
+    }
+  }
+  return null;
 }
 
 function workspacePackages() {
