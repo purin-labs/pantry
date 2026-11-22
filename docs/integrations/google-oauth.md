@@ -26,23 +26,18 @@ secrets hold its one secret. `GDRIVE_PICKER_APP_ID` is the project number,
 and `GDRIVE_PICKER_API_KEY` is the key "Pantry Picker", limited to the
 Picker API and `https://pantry.purin.io/*`.
 
-## Local development: three clients until Plan 93 step 5
+## Local development: the same client
 
-| Purpose                  | Google Cloud project shown in Console | Client ID setting        | Client secret setting        |
-| ------------------------ | ------------------------------------- | ------------------------ | ---------------------------- |
-| Google SSO login         | `seams`                               | `GOOGLE_OIDC_CLIENT_ID`  | `GOOGLE_OIDC_CLIENT_SECRET`  |
-| Gmail integration        | `Pantry Gmail Development`             | `GMAIL_OAUTH_CLIENT_ID`  | `GMAIL_OAUTH_CLIENT_SECRET`  |
-| Google Drive integration | `pantry-drive-pilot`                   | `GDRIVE_OAUTH_CLIENT_ID` | `GDRIVE_OAUTH_CLIENT_SECRET` |
-
-```text
-971053349716-6307q8845efbiript6fbj86jo11mcfr4.apps.googleusercontent.com
-502066821359-gurke0m6ja02sv7t824lgei8f93vvn04.apps.googleusercontent.com
-791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com
-```
-
-These ids are in `env.local.vars` of `services/platform/wrangler.jsonc`, in
-the same order (SSO, Gmail, Drive). Plan 93 step 5 moves local development to
-`purin-pantry` before it deletes the old Gmail and Drive projects.
+Local development uses the production client "Purin Pantry web" of
+`purin-pantry` for sign-in, Gmail and Drive, with the local callbacks of the
+table below and the JavaScript origin `https://localhost:3003`. The
+`env.local` profile of `services/platform/wrangler.jsonc` holds the same
+client id; the git-ignored `services/platform/.dev.vars.local` holds its
+secret and the "Pantry Picker" key, which also allows
+`https://localhost:3003/*`. Local Gmail push uses the topic
+`projects/purin-pantry/topics/pantry-gmail-push-local`, which has no
+subscription. Plan 93 deleted the old projects `satyr-gmail-dev` and
+`satyr-drive-pilot` on 22 November 2026.
 
 ## Redirect allowlists
 
@@ -50,8 +45,8 @@ In each client's Google Cloud Console page, use **Authorized redirect URIs**.
 Keep the current production callback when maintaining a client that serves
 both local and production flows.
 
-| Client | Local redirect URI                                                  | Current production redirect URI                                                      |
-| ------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Client | Local redirect URI                                                  | Current production redirect URI                                      |
+| ------ | ------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | SSO    | `https://localhost:3003/v1/control/auth/google/callback`            | `https://pantry.purin.io/v1/control/auth/google/callback`            |
 | Gmail  | `https://localhost:3003/v1/control/providers/gmail/callback`        | `https://pantry.purin.io/v1/control/providers/gmail/callback`        |
 | Drive  | `https://localhost:3003/v1/control/providers/google_drive/callback` | `https://pantry.purin.io/v1/control/providers/google_drive/callback` |

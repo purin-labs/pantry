@@ -41,9 +41,8 @@ production", so refresh tokens do not end after seven days. The Portal shows
 no expiry date for a Gmail sign-in. Until Google verifies the
 restricted Gmail scopes, a connect shows Google's "unverified app" screen,
 and at most 100 people can connect. Because sign-in shares the project, a
-restriction on the project would also stop sign-in. Local development still
-uses the pilot project `satyr-gmail-dev` (External, Testing, so tokens end
-after seven days) until Plan 93 step 5.
+restriction on the project would also stop sign-in. Local development uses
+the same client, with the topic `pantry-gmail-push-local`.
 
 `GMAIL_PUBSUB_TOPIC` is passed verbatim to `users.watch`. The topic must grant
 `roles/pubsub.publisher` to `gmail-api-push@system.gserviceaccount.com` or the

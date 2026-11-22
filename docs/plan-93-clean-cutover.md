@@ -905,12 +905,51 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   Google Drive, Square and Slack connected on the new stack. The owner's own
   Gmail connects through the unverified Google app, so the verification of
   the Gmail scopes waits until outside users connect.
-- **Still open:** the shop Mac voice service and local development on
-  `purin-pantry` (they wait for the owner's DNS token for `purin.io`); the
-  Gmail model-approval gate (the owner's decision) and an email Case that
-  never closes, which stops a live mailbox at its fourth thread (Plan 83);
-  38 R2 objects in `pantry-repo-binaries-apac` that no commit names (the
-  owner's decision); a test order on `shop.purin.io` and an MCP call.
+- **Closed later the same day (owner's yes for each):**
+  - Shop voice: a DNS token limited to the zone `purin.io` (Cloudflare
+    token "Pantry voice DNS (purin.io)") is in `VOICE_DNS_*` on `pantry`.
+    The owner's Mac enrolled as `e329c8b19740.voice.purin.io`
+    (`io.purin.pantry.shop-voice`, folder `~/.pantry-voice`), got its
+    Let's Encrypt certificate, and the Portal shows "Ready with Whisper
+    large-v3-turbo". The old token "Satyr voice DNS" is deleted. No spoken
+    command was tested.
+  - Local development uses the client "Purin Pantry web" of `purin-pantry`
+    with the `https://localhost:3003` callbacks and origin, the Picker key
+    allows `https://localhost:3003/*`, and local Gmail push uses the topic
+    `pantry-gmail-push-local`. Google accepts the local sign-in callback
+    (its account chooser opened for `localhost:3003`); no full local
+    sign-in ran. The projects `satyr-gmail-dev` and `satyr-drive-pilot` are
+    deleted (Google can restore them until 22 December 2026), and the old
+    client "Satyr Portal" in `seams-501403` has no Pantry address left.
+  - The 38 R2 objects that no commit names (198 MB) are deleted; the
+    bucket holds 3,335 objects, each named by a commit.
+  - The MCP check passed with a read-only key that was then revoked:
+    `tools/list` offered only `list_storefronts` and `read_catalog`, the
+    shop had 1 storefront and 12 listings, and `read_order` was refused for
+    the missing scope.
+  - The old Seams stack in this account is deleted (the owner's yes after
+    the check that no outside caller used it since 21 November 08:00 UTC):
+    15 Workers (`router-ab-*`, `seams-sdk-d1-*`,
+    `seams-voice-intents-x-refresh`), 8 D1 databases, the buckets of
+    `router-ab` and `outlayer1`, the KV `seams-voice-intents-x-cache` and
+    the custom domain `api.wallet.seams.sh`. The wallet test groups of
+    step 7 were already gone.
+- **Still open:** a test order on `shop.purin.io` (the café menu was
+  closed at midnight); the Gmail model gate (a session builds owner consent)
+  and the email Case that never closes (Plan 83); the zone `seams.tech`,
+  which Cloudflare refuses to remove because this account holds its
+  Cloudflare Registrar registration, expired on 11 October 2026 and now in
+  the redemption period (restore: $66.00 plus $49.20 for one year); the
+  Cloudflare token "seams-monorepo GitHub Actions", which can edit Pages,
+  D1 and Workers scripts in the whole account and may be the purin.io
+  deploy token (`COMPANY_CLOUDFLARE_API_TOKEN` of `purin-monorepo`); and
+  the `speak-to-sign` project (Pages, KV `speak-to-sign-faucet-limits`)
+  with the domain `tatchi.xyz`, which still serves visitors from this
+  account. The stale zone record `seams.sh` (its name servers point to the
+  other account) and the token "Cloudflare Tunnel API Token for seams.sh"
+  (no tunnel exists) are deleted. Of step 7 only `hadimar` (the owner keeps
+  it) and the Pages project `outlayer-email-recovery-example` remain; the
+  other groups are gone.
 
 ### 7. Other projects (separate)
 

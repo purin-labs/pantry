@@ -254,16 +254,11 @@ them. If you read an old name there, use this table to find the new name.
 | Seams Pantry, Checkout, Vault, Gantry                  | Purin Pantry, Purin Checkout, Purin Vault, Purin Gantry                            |
 | `satyr-edge`, `underclerk`, `satyr-*` Workers          | `pantry`, `pantry-commerce`, `pantry-*` (Plan 93 tables)                           |
 
-Four things keep an old name on purpose, and `git grep` finds them:
+Three things keep an old name on purpose, and `git grep` finds them:
 
 - The wake phrase "Hey Satyr", its model `hey_satyr.onnx` and its training
   scripts, until a "Hey Sous Chef" wake model passes. The privacy text says
   "Purin keeps no audio."
-- The Google Cloud projects of local development: `satyr-gmail-dev`,
-  `satyr-drive-pilot` and the sign-in client of `seams-501403`, in
-  `env.local` of the Platform profile. Production uses the project
-  `purin-pantry` (Plan 93 step 4). Plan 93 step 5 moves local development
-  to it before it deletes the old projects.
 - The pinned Kitchen physics bundles in `apps/portal/public/bakery-physics`,
   the native source that they hash, the browser folder
   `satyr-physics-results` that the execution bundle holds, and the R2 file
