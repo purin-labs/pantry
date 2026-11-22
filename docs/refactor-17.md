@@ -6,9 +6,8 @@ and after a second review with the owner's request to prune
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
 S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
 final; 13 of the 33 specs are written, and the other 20 are in work. The Plan 93
-cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and five
-foundation modules are packages since 2026-11-23 (the kernel, `tenancy`,
-`actor-runtime`, `connections` and `authority`). On 2026-11-22 the owner asked to finish the
+cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and each
+foundation module is a package since 2026-11-23. On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
 and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
 lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
@@ -495,8 +494,14 @@ the old stack is deleted. Stage B starts with step 1. In this order:
    module merges into `Env`; the type check of the Worker checks their files. Two
    decisions made the group possible: the type `InstallModel` is in
    `@purin-labs/contracts`, and the entry of the 1Password store Worker belongs to
-   `workers/platform`. Next: `agent-tools`, `agent`, `conversation` and
-   `tool-handlers`; the runbook lists what each module that is left needs first.
+   `workers/platform`. Done on 2026-11-23, as the second group: `agent-tools`,
+   `control`, `agent`, `conversation`, `tool-handlers` and `ui` are packages in
+   `foundation/`, the file `boundary.ts` joined `@purin-labs/contracts`, and the
+   Durable Object files and the React files of `collaboration` joined
+   `@purin-labs/collaboration` (tags `refactor-17-foundation-2-before` and
+   `refactor-17-foundation-2-after`). 461 files moved. Each foundation module is now a
+   package. Next: the server code of each area goes into a folder of its own
+   (decision D1).
 2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
    journeys import the inside of the Worker.
 3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of

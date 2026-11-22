@@ -18,9 +18,12 @@ was cut before the move, the limits, and the plan of the next module.
 The move changes paths and import specifiers only. In the dry run of the
 kernel, the Worker bundle had the same bytes before and after the move.
 
-Five modules are packages: `kernel`, and since 2026-11-23 `tenancy`,
-`actor-runtime`, `connections` and `authority`, which moved as one group in one
-freeze ([The group of 2026-11-23](#the-group-of-2026-11-23)).
+Each foundation module is a package since 2026-11-23. The kernel moved first.
+`tenancy`, `actor-runtime`, `connections` and `authority` moved as one group
+([The group of 2026-11-23](#the-group-of-2026-11-23)). `agent-tools`,
+`contracts`, `control`, `agent`, `conversation`, `tool-handlers`, `ui` and
+`collaboration` moved as the second group
+([The second group](#the-second-group-of-2026-11-23)).
 
 ## Before the day
 
@@ -100,11 +103,22 @@ Rules for the day:
 - **A group of modules in one freeze.** Run the plans in the order of
   `foundationOrder`, with one move commit for each. Use one pair of tags for the
   group (`refactor-17-<group>-before` and `-after`). Run the checks of steps 6
-  to 8 one time, after the last move. Between two moves of a group, `pnpm
-lint:clones` can report a pair that got smaller: jscpd reads the files in a
-  new order and pairs the same lines in another way. No file changed. Do not
-  run `--update`; the count returns when the last module of the group moves. A
-  ratchet that still differs after the last move is a real difference.
+  to 8 one time, after the last move.
+- **The clone lint and the order of the scan.** jscpd reads the files in the
+  order of their paths and pairs each copy with the first file that holds it.
+  A moved file comes earlier or later in the scan, so jscpd can pair the same
+  copied lines in another way: a pair gets smaller, a new pair appears in a
+  group of copies, or a pair grows by a line. No file changed. Do not touch
+  the baseline between two moves of a group. After the last move:
+  - If the lint reports only smaller or moved pairs, run
+    `node scripts/check-clones.mjs --update`.
+  - If it reports a new pair or a pair that grew, prove for each file of each
+    such pair that the group changed nothing in it but import specifiers and
+    paths (`git diff -M <before>..HEAD`), and that the copied lines hold no
+    changed line. Then run `node scripts/check-clones.mjs --init`. The limit is
+    3 copies and 40 lines for one group. Above it, stop.
+  - Either way it is one commit of its own after the last move. Its message
+    gives the totals before and after, each changed pair and the proof.
 - **To go back** before step 9: `git reset --hard refactor-17-<module>-before`
   and `pnpm install`. After step 9: revert the one move commit.
 
@@ -130,9 +144,19 @@ pnpm --filter @purin-labs/platform check:types
 ```
 
 - For a group, do step 3 with each plan of the group, in the order of the
-  move, and then one commit. The group of 2026-11-23 has the tags
+  move, and then one commit. The first group has the tags
   `refactor-17-foundation-1-before` and `refactor-17-foundation-1-after` and
-  the plans `tenancy`, `actor-runtime`, `connections` and `authority`.
+  the plans `tenancy`, `actor-runtime`, `connections` and `authority`. The
+  second group has the tags `refactor-17-foundation-2-before` and
+  `refactor-17-foundation-2-after` and the plans `agent-tools`, `contracts`,
+  `control`, `agent`, `conversation`, `tool-handlers`, `ui` and
+  `collaboration`. A branch that was cut before both groups does the steps for
+  the first group, then for the second.
+- Between the two tags of the second group there are four small commits that
+  are not moves: the Portal lints read `PORTAL_SOURCE`, 17 `ui` names lose
+  `export`, the layer check reads `packages/collaboration`, and one script
+  correction. Where the branch changed the same lines, `-X theirs` keeps the
+  lines of the branch. Run `pnpm lint:static` after step 4 to find such a line.
 - Step 2 has only the move between the two tags. Where the branch and the move
   changed the same lines, `-X theirs` keeps the lines of the branch, with their
   old imports. The move changed nothing but imports there, so no work is lost.
@@ -218,18 +242,28 @@ Copy `scripts/refactor-17/plans/kernel.json` and change:
 - `package.typeCheck`: `false` if the module reads a key that another module
   merges into `Env`. Give the keys in `about`.
 
-The modules that are left, with what each needs first:
+No foundation module is left. The same script moves a module of another layer;
+these plan options exist for the cases that the foundation had:
 
-| Module                                   | What it needs                                                                                                                                                                         |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `agent-tools`                            | An ESLint edit for `context/**`, the dependencies `typebox` and `@earendil-works/pi-codemode`, and an edit of `scripts/check-tool-effects.mjs`, which names the folder `agent-tools/` |
-| `agent`, `conversation`, `tool-handlers` | The Worker entries of `model-exit`, `chatgpt-exit` and `code-mode-sandbox` in `workers/platform` first. `agent` has 206 files                                                         |
-| `contracts`                              | One Worker file (`boundary.ts`) beside the package `@purin-labs/contracts`. The script cannot move a file into a package that exists                                                  |
-| `control`                                | 21 Worker files and 5 Portal files. `scripts/check-runtime-boundary.mjs` must read an import of `control/routes/` by package name                                                     |
-| `ui`                                     | 64 Portal files: React and DOM code, so the package needs the `tsconfig` of the Portal                                                                                                |
-| `collaboration`                          | 8 Portal files and 4 Actor files beside `packages/collaboration`. The script moves a module into one target only                                                                      |
-
-Run the script with `--check` first: it changes nothing and prints each fault.
+- `package.existing: true` moves the files into a package that exists
+  (`contracts`, `collaboration`). The script changes no manifest field but the
+  dependencies.
+- A module with Worker files and Portal files gets one package with the
+  sub-folders `worker/` and `portal/` (`control`, `collaboration`). Add each
+  such folder to `PLATFORM_SOURCE` or `PORTAL_SOURCE` in
+  `scripts/lib/source-roots.mjs` with an edit of the plan: the Portal lints
+  (`lint:portal-fetch`, `lint:portal-select`, the portal requests lint) and
+  ESLint read these lists.
+- A Portal package (`ui`) takes the compiler settings of the Portal and
+  `vite/client`. Its exports map gives an entry to each file that another
+  module imports; a component behind `index.ts` stays behind it, so knip judges
+  it as before the move.
+- `scripts/check-runtime-boundary.mjs` reads a route file in
+  `foundation/*/control/routes/` and in `foundation/control/worker/routes/`,
+  and an import by package name.
+- A class that a Worker entry exports for a binding carries `@public` with the
+  entry and the binding, because knip judges each export of a foundation
+  package.
 
 ## The group of 2026-11-23
 
@@ -256,6 +290,45 @@ the four plans.
   The `owner` paths in `organisation-lifecycle.machine.ts` and
   `placement-move.machine.ts` are the whole difference: with the new paths in
   the bundle of before, the bytes are the same.
+- Not run: the full E2E suite, the Kitchen journeys and a release.
+
+## The second group of 2026-11-23
+
+Branch `refactor-17-foundation-group-2`, on `origin/dev` at `5c66062c`. Tags
+`refactor-17-foundation-2-before` and `refactor-17-foundation-2-after`.
+
+| Module          | Target                                                 | Files moved | Files changed | Imports changed (by name / relative) | Own type check                |
+| --------------- | ------------------------------------------------------ | ----------- | ------------- | ------------------------------------ | ----------------------------- |
+| `agent-tools`   | `foundation/agent-tools`                               | 16          | 103           | 180 (173 / 7)                        | No                            |
+| `contracts`     | `packages/contracts/src/boundary.ts`                   | 1           | 18            | 14 (14 / 0)                          | Yes                           |
+| `control`       | `foundation/control`, with `worker/` and `portal/`     | 26          | 356           | 605 (601 / 4)                        | No                            |
+| `agent`         | `foundation/agent`                                     | 204         | 439           | 942 (865 / 77)                       | No                            |
+| `conversation`  | `foundation/conversation`                              | 96          | 230           | 493 (479 / 14)                       | No                            |
+| `tool-handlers` | `foundation/tool-handlers`                             | 8           | 33            | 32 (30 / 2)                          | No                            |
+| `ui`            | `foundation/ui`                                        | 96          | 264           | 417 (412 / 5)                        | Yes, with the Portal settings |
+| `collaboration` | `packages/collaboration`, with `worker/` and `portal/` | 14          | 49            | 54 (54 / 0)                          | Yes, for the CRDT core `src/` |
+
+- Before the moves, in their own commits: the class `CodeModeSandbox` and its
+  `Env` merge left the entry of the sandbox Worker for `sandbox.ts` (the
+  sandbox bundle differs by one blank line); the entries of `model-exit`,
+  `chatgpt-exit` and `code-mode-sandbox` went to `workers/platform`; seven
+  corrections of the script; the `contracts` type check reads the Workers
+  types; the runtime boundary lint and the Portal lints read the new folders;
+  17 `ui` names that only their own file uses lost `export`; the layer check
+  reads `packages/collaboration`, and its core imports only `@purin-labs/std`
+  and `yjs`.
+- Each move commit is the output of the script, and `--check` prints "Nothing
+  to change." for each of the 13 plans.
+- After the last move, each quick check of the table passes, with the type
+  checks of `kernel`, `contracts`, `ui` and `collaboration`. The layer check
+  finds 0 crossings. The unused-code counts and the layer debts do not change.
+- The clone baseline changed one time, after the last move, by the rule above:
+  from 790 copies (14,190 lines) to 791 copies (14,202 lines). The scan order
+  is the whole cause: four of the five files of the new and grown pairs have
+  the same content as before the group, and the fifth changed one import line
+  outside its copied lines.
+- The Worker bundle has 10,411,723 bytes before and after. Seven `owner` paths
+  of state machine files are the whole difference.
 - Not run: the full E2E suite, the Kitchen journeys and a release.
 
 ## The dry run of the kernel
