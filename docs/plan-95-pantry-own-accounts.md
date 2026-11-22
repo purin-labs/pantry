@@ -1,8 +1,8 @@
 # Plan 95 — Pantry owns its accounts
 
-Status: in progress, 21 November 2026. The owner decided the five decisions
-on 20 November 2026 (see "Decisions"). Steps 1 to 4 are done (see their
-"results" sections). Step 5 needs the owner for its gate. Step 6 is open.
+Status: steps 1 to 5 done, 22 November 2026. The owner decided the five
+decisions on 20 November 2026 (see "Decisions"). Steps 1 to 5 are done and in
+production (see their "results" sections). Step 6 is open.
 
 - The owner decided on 20 November 2026: the Seams Wallet and its Console are
   one product, apart from Purin. Pantry and the Wallet stop sharing
@@ -678,6 +678,42 @@ list above:
   longer binds the Console.
 - The test organisations keep their native grants, so their members keep
   access. Their pending Console invitations are lost; they are test data.
+
+#### Step 5 results
+
+Done on 22 November 2026. What happened, and where it differs from the list
+above:
+
+- The release went out on 21 November 2026 at 08:00 UTC as `satyr-edge`
+  `55620b6e` (dev `40a71b48`, together with Plans 24 and 96). The invitations
+  patch was applied to `satyr-organisation-apac` before the upload.
+- The release had a fault. A Session with an old Console billing row in its
+  outbox did not start: the outbox schema step deleted the row, and the row
+  count check refused the loss (`schema_row_count_changed:actor_outbox:5:4`).
+  A migration step can now name a preserved table that may shrink or grow
+  (`rowCountChanges` in `actors/schema-migrations.ts`). The fix went out on
+  21 November 2026 as `satyr-edge` `b65f8509` (dev `eaa894fe` and
+  `79462c0f`).
+- The rollback in the list above stopped working with the release: the old
+  version cannot open the Sessions, because their schema is newer.
+- The gate ran on production on 22 November 2026:
+  - The owner made the organisation "Plan 95 gate test" in the Portal. It has
+    a native owner grant and no Console record.
+  - The owner has one Google account, so no second account accepted an
+    invitation. Instead, an invitation to a test address in "Satyr workspace"
+    was made (`pending`, its link on the production Portal) and revoked
+    (`revoked`). Journey J5 proves the accept step.
+  - One Portal chat turn and one Slack turn of the owner (a mention in
+    `#cafe-ops`) passed. The first chat turn failed: Claude had ended the
+    access of the workspace's Claude sign-in. The owner chose Seams AI for
+    "Satyr workspace", and the turns passed on it.
+  - No mailbox turn ran: Gmail needs a new sign-in.
+- The two D1 patches were applied at 09:43 UTC on 22 November 2026, after a
+  JSON backup of the dropped rows. The member grants are the same before and
+  after, the schema check passes, a Portal chat turn after the patch passed,
+  and the logs show no warning or error.
+- The session "Console Pantry service removal" (Refactor 260) knows that
+  Pantry binds no Console.
 
 ### 6. Stripe billing
 

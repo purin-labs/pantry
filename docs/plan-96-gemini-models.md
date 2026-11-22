@@ -2,9 +2,13 @@
 
 Status: accepted with the default decisions on 21 November 2026, when the
 owner asked to implement it. Steps A1, A2, B1, B2 and B3 and the journeys of
-B4 are built and on `dev` since 21 November 2026 (see "Steps done"). Nothing
-is released: the owner chose on 21 November 2026 not to release part A yet. The release of B1 still
-waits for D3: not before 27 November 2026, on the newest 1.6 patch.
+B4 are built and on `dev` since 21 November 2026 (see "Steps done"). All of
+them are released: on 21 November 2026 the owner chose to release all of `dev`
+with Plan 95 (`satyr-edge` `55620b6e`, sandbox `cabda285`), so the Hydrogen
+default and Pi 1.6.0 went live before D3. The Gemini key D1 patch was applied
+first. On 22 November 2026 one Portal chat turn and one Slack turn on Gemini 4
+Hydrogen passed in production, in the Plan 95 gate. No Gemini key turn has run
+in production.
 
 Owner: the model routes (spec FND-04, "Agent harness and model routes").
 Touches: [Plan 73 — model exit Worker](plan-73-model-exit-worker.md),

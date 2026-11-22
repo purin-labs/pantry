@@ -1,7 +1,10 @@
 # Plan 24 — Cobot bakes in the first café kitchen
 
 Status: Rewritten on 3 November 2026 after a review with the owner. S1 to S6 are built and on
-`dev` since 21 November 2026 (see "Steps done"), and not released. The owner kept the FR10 for the
+`dev` since 21 November 2026 (see "Steps done"). They are released since 21 November 2026 with Plan 95
+(`satyr-edge` `55620b6e`), after the four Plan 24 D1 patches and the capability backfill of
+`kitchen.bake.read`, `kitchen.bake.propose` and `kitchen.bake_run.pause`. No bake run has run in
+production. The owner kept the FR10 for the
 simulation on 21 November 2026. The checks of the exit
 gate passed on 21 November 2026 in the simulation: `bake-cafe-day` (the café day two times, the same
 outcomes), the S6 fault journeys `bake-faults`, `bake-pause` and `bake-approval-gate`, and
