@@ -4,14 +4,14 @@ import { requireConversationId } from "../test-ids";
 import {
   initialSimulatorState,
   applyBakeryWorkspaceAction,
-} from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/simulator-state";
 import {
   prepareBakerySurfaceCommand,
   validatePreparedBakerySurfaceRead,
   bakerySurfaceCommandSucceeded,
-} from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
-import { readScenario } from "../../../../apps/portal/src/features/workflow-simulator/scenario-api";
-import { readProductionScenario } from "../../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/bakery-surface";
+import { readScenario } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/scenario-api";
+import { readProductionScenario } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/production-scenario-api";
 import { sha256Hex } from "@purin-labs/std";
 import {
   editRehearsalWorkcells,
@@ -31,7 +31,7 @@ import {
   preparePersistentWorkspaceRun,
   readExactWorkspaceRun,
   verifyStoredWorkspaceRun,
-} from "../../../../apps/portal/src/features/workflow-simulator/workspace-runs-api";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/workspace-runs-api";
 import {
   compileFinancierRecipe,
   financierRecipeInput,
@@ -55,16 +55,16 @@ import {
 } from "./commerce-support";
 import { expect, it, vi } from "vitest";
 import { responseJson } from "@purin-labs/control/portal/control-client";
-import { savePreparedScenarioCopy } from "../../../../apps/portal/src/features/workflow-simulator/workspace-commands";
-import { savePreparedProductionScenario } from "../../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
+import { savePreparedScenarioCopy } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/workspace-commands";
+import { savePreparedProductionScenario } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/production-scenario-api";
 import { type IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { readLatestAgentRunSave } from "../../src/commerce/bakery/agent-run-save";
-import { listBakerySurfaceTimelineEvents } from "../../src/actors/bakery-surface-effect";
+import { readLatestAgentRunSave } from "@purin-labs/area-kitchen/server/bakery/agent-run-save";
+import { listBakerySurfaceTimelineEvents } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import { admitTurn } from "../../src/chat/turn/admission";
 import { reconcileStoredBakerySurfaceTimeline } from "../../src/chat/turn/timeline";
 import { readConversation, saveConversation } from "@purin-labs/conversation/chat/store";
 import { resolvePantryPlatformModelRoute } from "@purin-labs/agent/models/route";
-import { readLatestAgentScenarioSave } from "../../src/commerce/bakery/agent-scenario-save";
+import { readLatestAgentScenarioSave } from "@purin-labs/area-kitchen/server/bakery/agent-scenario-save";
 import {
   agentScenarioSaveManifest,
   type AgentScenarioSavePayload,
@@ -82,7 +82,7 @@ import {
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
-import { FINANCIER_SAMPLE_ID } from "../../src/commerce/bakery/sample";
+import { FINANCIER_SAMPLE_ID } from "@purin-labs/area-kitchen/server/bakery/sample";
 import { customEntityRef } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 import { parseScenarioCopy } from "@purin-labs/bakery-model/bakery-scenario";
 import {

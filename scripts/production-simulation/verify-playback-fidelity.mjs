@@ -20,7 +20,7 @@ import {
   PhysicsModel,
   disposePhysicsObject,
   samplePhysics,
-} from "../../apps/portal/src/features/workflow-simulator/spatial/physics-model.ts";
+} from "../../areas/kitchen/ui/features/workflow-simulator/spatial/physics-model.ts";
 import { BAKERY_BROWSER_BUNDLE } from "../../packages/production-simulation/src/simulator/browser-physics-asset.ts";
 import {
   OVEN_CELL,
@@ -498,7 +498,7 @@ for (const [name, definition, expectedOutcome] of [
 const sources = [];
 for (const file of [
   "scripts/production-simulation/verify-playback-fidelity.mjs",
-  "apps/portal/src/features/workflow-simulator/spatial/physics-model.ts",
+  "areas/kitchen/ui/features/workflow-simulator/spatial/physics-model.ts",
   "packages/bakery-model/src/bakery-physics.ts",
   "packages/bakery-model/src/bakery-robots.ts",
   "packages/production-simulation/src/recipes/bakery/physics-playback.ts",

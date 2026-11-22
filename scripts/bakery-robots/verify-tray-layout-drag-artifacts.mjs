@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { rackLayoutHash } from "../../packages/bakery-model/src/bakery-physics.ts";
 import { parseRehearsalWorkcells } from "../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
-import { rackPlacementFit } from "../../apps/portal/src/features/workflow-simulator/rack-layout.ts";
+import { rackPlacementFit } from "../../areas/kitchen/ui/features/workflow-simulator/rack-layout.ts";
 import { simulateProduction } from "../../packages/production-simulation/src/recipes/bakery/schedule.ts";
 
 // Verifies the runs saved by verify-tray-layout-drag-browser.js with WebGL

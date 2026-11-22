@@ -5,7 +5,7 @@ import type {
 import {
   listAppliedWorkflows,
   readAppliedWorkflowHead,
-} from "../../commerce/bakery/workflow-revisions";
+} from "@purin-labs/area-kitchen/server/bakery/workflow-revisions";
 import {
   findActiveDeviceWithCapability,
   listGateways,
@@ -14,19 +14,19 @@ import type { Env } from "@purin-labs/kernel/env";
 import type {
   BakeKitchenPorts,
   CounterStockChange,
-} from "../../kitchen/bakes/commands";
-import { listBakeAuthority } from "../../kitchen/bakes/authority";
-import type { BakeProposal } from "../../kitchen/bakes/records";
+} from "@purin-labs/area-kitchen/server/bakes/commands";
+import { listBakeAuthority } from "@purin-labs/area-kitchen/server/bakes/authority";
+import type { BakeProposal } from "@purin-labs/area-kitchen/server/bakes/records";
 import {
   listBakeProposals,
   listBakeStockLevels,
   readBakeProposal,
-} from "../../kitchen/bakes/records";
+} from "@purin-labs/area-kitchen/server/bakes/records";
 import {
   bakeRunIdOf,
   listBakeRuns,
   readBakeRun,
-} from "../../kitchen/bakes/run-records";
+} from "@purin-labs/area-kitchen/server/bakes/run-records";
 import { bakeRunKitchenPorts, bakeRunStub } from "../bake-run-ports";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { announceBakeProposal } from "../../slack/bake-proposal-announce";

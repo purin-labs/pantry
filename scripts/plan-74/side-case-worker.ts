@@ -7,8 +7,8 @@ import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/a
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants";
 import { parseWorkflowChanges } from "../../packages/bakery-workflow/src/changes";
-import { prepareWorkflowProposal } from "../../services/platform/src/commerce/bakery/workflow-proposals";
-import { readCurrentWorkflow } from "../../services/platform/src/commerce/bakery/workflow-revisions";
+import { prepareWorkflowProposal } from "../../areas/kitchen/server/bakery/workflow-proposals";
+import { readCurrentWorkflow } from "../../areas/kitchen/server/bakery/workflow-revisions";
 import { createOperatorConfigurationDraft } from "../../areas/organisation/server/data/operator-configuration-draft";
 import { OrganisationExecutionScope } from "../../foundation/tenancy/organisation-execution-scope";
 import type { Env } from "../../foundation/kernel/env";

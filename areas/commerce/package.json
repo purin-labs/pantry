@@ -66,6 +66,7 @@
     "@purin-labs/tool-handlers": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/ui": "workspace:*",
+    "@purin-labs/area-kitchen": "workspace:*",
     "lucide-react": "^0.542.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

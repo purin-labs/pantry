@@ -10,7 +10,7 @@ import {
 import {
   createSupplier,
   parseSupplierCreation,
-} from "../src/commerce/purchasing/supplier-creation";
+} from "@purin-labs/area-kitchen/server/purchasing/supplier-creation";
 import {
   startCommerceWorker,
   type CommerceWorker,

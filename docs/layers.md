@@ -333,41 +333,41 @@ import. A module with no line for one of these has none.
 ## areas/kitchen
 
 - Folders: 32
-  - `apps/portal/src/features/`
-  - `apps/portal/src/features/bakes/`
-  - `apps/portal/src/features/costs/`
-  - `apps/portal/src/features/production-run/`
-  - `apps/portal/src/features/production-run/black-sesame/`
-  - `apps/portal/src/features/production-run/cafe-shift/`
-  - `apps/portal/src/features/production-run/financier-bake/`
-  - `apps/portal/src/features/production-run/financier-batter/`
-  - `apps/portal/src/features/production-run/financier-pack/`
-  - `apps/portal/src/features/production-run/ginger-tea/`
-  - `apps/portal/src/features/production-run/latte/`
-  - `apps/portal/src/features/production-run/linea/`
-  - `apps/portal/src/features/production-run/pastry-bench/`
-  - `apps/portal/src/features/production-run/pour-over/`
-  - `apps/portal/src/features/production-run/shared/`
-  - `apps/portal/src/features/production-run/siphon/`
-  - `apps/portal/src/features/recipes/`
-  - `apps/portal/src/features/workflow-simulator/`
-  - `apps/portal/src/features/workflow-simulator/docks/`
-  - `apps/portal/src/features/workflow-simulator/spatial/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/agent-tools/bakery/`
-  - `services/platform/src/agent-tools/costs/`
-  - `services/platform/src/agent-tools/kitchen/`
-  - `services/platform/src/commerce/`
-  - `services/platform/src/commerce/bakery/`
-  - `services/platform/src/commerce/purchasing/`
-  - `services/platform/src/control/admission/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/data/`
-  - `services/platform/src/kitchen/bakes/`
-  - `services/platform/src/kitchen/contract/`
-- Packages: `packages/bakery-model`, `packages/bakery-workflow`, `packages/costs-sheet-crdt`, `packages/kitchen-control-api`, `packages/production-plan-crdt`, `packages/production-simulation`, `packages/workflow-canvas-crdt`
+  - `areas/kitchen/server/`
+  - `areas/kitchen/server/actors/`
+  - `areas/kitchen/server/agent-tools/bakery/`
+  - `areas/kitchen/server/agent-tools/costs/`
+  - `areas/kitchen/server/agent-tools/kitchen/`
+  - `areas/kitchen/server/bakery/`
+  - `areas/kitchen/server/bakes/`
+  - `areas/kitchen/server/contract/`
+  - `areas/kitchen/server/control/admission/`
+  - `areas/kitchen/server/control/routes/`
+  - `areas/kitchen/server/data/`
+  - `areas/kitchen/server/purchasing/`
+  - `areas/kitchen/ui/features/`
+  - `areas/kitchen/ui/features/bakes/`
+  - `areas/kitchen/ui/features/costs/`
+  - `areas/kitchen/ui/features/production-run/`
+  - `areas/kitchen/ui/features/production-run/black-sesame/`
+  - `areas/kitchen/ui/features/production-run/cafe-shift/`
+  - `areas/kitchen/ui/features/production-run/financier-bake/`
+  - `areas/kitchen/ui/features/production-run/financier-batter/`
+  - `areas/kitchen/ui/features/production-run/financier-pack/`
+  - `areas/kitchen/ui/features/production-run/ginger-tea/`
+  - `areas/kitchen/ui/features/production-run/latte/`
+  - `areas/kitchen/ui/features/production-run/linea/`
+  - `areas/kitchen/ui/features/production-run/pastry-bench/`
+  - `areas/kitchen/ui/features/production-run/pour-over/`
+  - `areas/kitchen/ui/features/production-run/shared/`
+  - `areas/kitchen/ui/features/production-run/siphon/`
+  - `areas/kitchen/ui/features/recipes/`
+  - `areas/kitchen/ui/features/workflow-simulator/`
+  - `areas/kitchen/ui/features/workflow-simulator/docks/`
+  - `areas/kitchen/ui/features/workflow-simulator/spatial/`
+- Packages: `areas/kitchen`, `packages/bakery-model`, `packages/bakery-workflow`, `packages/costs-sheet-crdt`, `packages/kitchen-control-api`, `packages/production-plan-crdt`, `packages/production-simulation`, `packages/workflow-canvas-crdt`
 - Tables (13): `bake_authority`, `bake_proposal`, `bake_run`, `bake_stock_level`, `bakery_agent_run_save`, `bakery_agent_scenario_save`, `bakery_cost_plan`, `bakery_cost_product_plan`, `bakery_lot_invoice_cost`, `bakery_surface_effect_delivery`, `bakery_surface_timeline_event`, `bakery_workflow`, `bakery_workflow_revision`
-- Public files: `apps/portal/src/features/bakery-browser-context.ts`, `services/platform/src/agent-tools/bakery/surface-result.ts`, `services/platform/src/agent-tools/kitchen/services.ts`, `services/platform/src/kitchen/contract/`
+- Public files: `areas/kitchen/server/agent-tools/bakery/surface-result.ts`, `areas/kitchen/server/agent-tools/kitchen/services.ts`, `areas/kitchen/server/contract/`, `areas/kitchen/ui/features/bakery-browser-context.ts`
 
 ## areas/organisation
 

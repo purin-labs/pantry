@@ -39,7 +39,7 @@ import {
   stockOperationResourceId,
   stockOperationVerb,
   type StockOperationAction,
-} from "../../../services/platform/src/kitchen/contract/stock-action";
+} from "@purin-labs/area-kitchen/server/contract/stock-action";
 import {
   CAFE_MENU_PUBLISH_VERB,
   cafeMenuActionPath,

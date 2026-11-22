@@ -64,7 +64,7 @@ import {
   type ConversationScope,
 } from "@purin-labs/conversation/chat/store";
 import { conversationPrompt, workspaceCanvasPrompt } from "../prompt";
-import { readLatestBakerySurfaceOfRequests } from "../../actors/bakery-surface-effect";
+import { readLatestBakerySurfaceOfRequests } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   type ConversationExecutionFailure,

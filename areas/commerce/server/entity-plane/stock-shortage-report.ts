@@ -1,7 +1,7 @@
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 import { normalizeUntrustedCommerceText } from "@purin-labs/agent-tools/context/untrusted-commerce-text";
-import { connectedStockOverview } from "../../../../services/platform/src/kitchen/contract/inventory-overview";
+import { connectedStockOverview } from "@purin-labs/area-kitchen/server/contract/inventory-overview";
 import {
   merchantReportDefinition,
   type MerchantReportRecord,

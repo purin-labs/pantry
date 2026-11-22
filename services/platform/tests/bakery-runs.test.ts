@@ -2,7 +2,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import {
   handleBakeryRunRoute,
   matchBakeryRunRoute,
-} from "../src/control/routes/bakery-runs";
+} from "@purin-labs/area-kitchen/server/control/routes/bakery-runs";
 import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { platformEnv } from "./worker-fakes";
 

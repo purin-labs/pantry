@@ -5,12 +5,12 @@ import { DEFAULT_FINANCIER_BAKE_RECIPE } from "@purin-labs/production-simulation
 import { DEFAULT_FINANCIER_BATTER_RECIPE } from "@purin-labs/production-simulation/recipes/financier-batter/model";
 import { DEFAULT_FINANCIER_PACK_RECIPE } from "@purin-labs/production-simulation/recipes/financier-pack/model";
 import { DEFAULT_GINGER_TEA_COBOT_RECIPE } from "@purin-labs/production-simulation/recipes/ginger-tea/model";
-import { BlackSesameWorkspace } from "../features/production-run/black-sesame/black-sesame-physics-view";
-import { FinancierBakeWorkspace } from "../features/production-run/financier-bake/financier-bake-physics-view";
-import { FinancierBatterWorkspace } from "../features/production-run/financier-batter/financier-batter-physics-view";
-import { FinancierPackWorkspace } from "../features/production-run/financier-pack/financier-pack-physics-view";
-import { GingerTeaWorkspace } from "../features/production-run/ginger-tea/ginger-tea-physics-view";
-import { LatteWorkspace } from "../features/production-run/latte/latte-physics-view";
+import { BlackSesameWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/black-sesame/black-sesame-physics-view";
+import { FinancierBakeWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/financier-bake/financier-bake-physics-view";
+import { FinancierBatterWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/financier-batter/financier-batter-physics-view";
+import { FinancierPackWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/financier-pack/financier-pack-physics-view";
+import { GingerTeaWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/ginger-tea/ginger-tea-physics-view";
+import { LatteWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/latte/latte-physics-view";
 import "../styles.css";
 
 // One recipe view with its default recipe and no workspace, as in the local

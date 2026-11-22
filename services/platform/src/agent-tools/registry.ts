@@ -1,6 +1,6 @@
 import { createToolRegistry } from "@purin-labs/agent-tools/catalog/tool-registry";
 import type { RegisteredTool } from "@purin-labs/agent-tools/define-tool";
-import { SURFACE_TOOL_LIST } from "./bakery/surface";
+import { SURFACE_TOOL_LIST } from "@purin-labs/area-kitchen/server/agent-tools/bakery/surface";
 import {
   emailMailboxSearch,
   emailOperationalProposal,
@@ -38,7 +38,7 @@ import {
 } from "@purin-labs/area-commerce/server/agent-tools/commerce/proposals";
 import { REGISTER_VIEW_TOOLS } from "@purin-labs/area-cafe/server/agent-tools/commerce/register-view";
 import { merchantReport } from "@purin-labs/area-commerce/server/agent-tools/commerce/reports";
-import { COSTS_VIEW_TOOLS } from "./costs/view";
+import { COSTS_VIEW_TOOLS } from "@purin-labs/area-kitchen/server/agent-tools/costs/view";
 import {
   devicePause,
   deviceProposal,
@@ -94,7 +94,7 @@ import {
   supplyCostSave,
   workflowCanvasMove,
   workflowCanvasRead,
-} from "./kitchen/tools";
+} from "@purin-labs/area-kitchen/server/agent-tools/kitchen/tools";
 import {
   messageAttachmentInspect,
   messageLinkRead,

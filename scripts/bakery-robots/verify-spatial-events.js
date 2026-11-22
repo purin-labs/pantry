@@ -89,7 +89,7 @@ async function verifySpatialEvents(page) {
   // A nominal recording clears the fit failure of the one before.
   await setup.click();
   await file.setInputFiles(
-    "apps/portal/src/features/workflow-simulator/fixtures/physics-recording-v2.json",
+    "areas/kitchen/ui/features/workflow-simulator/fixtures/physics-recording-v2.json",
   );
   await setup.click();
   if (!(await plan.isVisible()))

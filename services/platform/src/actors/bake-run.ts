@@ -7,7 +7,7 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { BakeRunAction } from "../kitchen/bakes/commands";
+import type { BakeRunAction } from "@purin-labs/area-kitchen/server/bakes/commands";
 import {
   pauseBakeRun,
   readBakeRunRecord,
@@ -21,11 +21,11 @@ import {
   type BakeRunError,
   type BakeRunStart,
   type RunActor,
-} from "../kitchen/bakes/run";
+} from "@purin-labs/area-kitchen/server/bakes/run";
 import {
   loadBakeRun,
   runBakeRunSchemaMigrations,
-} from "../kitchen/bakes/run-store";
+} from "@purin-labs/area-kitchen/server/bakes/run-store";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
 import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";

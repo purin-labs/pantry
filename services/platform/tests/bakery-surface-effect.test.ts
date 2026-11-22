@@ -57,7 +57,7 @@ import {
   listBakerySurfaceTimelineEvents,
   reconcileBakerySurfaceEffects,
   settleBakerySurfaceEffect,
-} from "../src/actors/bakery-surface-effect";
+} from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { SqliteD1Database, type SqliteD1Statement } from "./sqlite-d1";

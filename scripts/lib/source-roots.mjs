@@ -35,6 +35,8 @@ PLATFORM_SOURCE.push("areas/inbox/server");
 PLATFORM_SOURCE.push("areas/integrations/server");
 // The Worker side of the area commerce (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("areas/commerce/server");
+// The Worker side of the area kitchen (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("areas/kitchen/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
@@ -63,6 +65,8 @@ PORTAL_SOURCE.push("areas/inbox/ui");
 PORTAL_SOURCE.push("areas/integrations/ui");
 // The Portal side of the area commerce (Refactor 17, Stage B).
 PORTAL_SOURCE.push("areas/commerce/ui");
+// The Portal side of the area kitchen (Refactor 17, Stage B).
+PORTAL_SOURCE.push("areas/kitchen/ui");
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

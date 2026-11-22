@@ -4,7 +4,7 @@ import {
   presentConfigurationCommand,
   previewCode,
 } from "../slack/configuration-presentation";
-import { KITCHEN_PAGE_EFFECTS } from "./bakery/page-effects";
+import { KITCHEN_PAGE_EFFECTS } from "@purin-labs/area-kitchen/server/agent-tools/bakery/page-effects";
 import { channelToolServices } from "@purin-labs/area-inbox/server/agent-tools/channels/turn-services";
 import {
   bindAllowanceReference,
@@ -21,7 +21,7 @@ import { jevToolServices } from "@purin-labs/area-integrations/server/agent-tool
 import {
   kitchenToolServices,
   pageViewCommandExecutor,
-} from "./kitchen/turn-services";
+} from "@purin-labs/area-kitchen/server/agent-tools/kitchen/turn-services";
 import { stageConfigurationDraft } from "@purin-labs/area-organisation/server/agent-tools/organisation/configuration-draft";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
 import { slackThreadSideCase } from "../slack/side-cases";

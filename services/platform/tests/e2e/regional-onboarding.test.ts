@@ -19,7 +19,7 @@ import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   bakeryRunSnapshotPrefix,
   savedBakeryRunArchiveKeys,
-} from "../../src/commerce/bakery/saved-runs";
+} from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import { sha256Hex } from "@purin-labs/std";
 import {
   workspaceRevisionArchiveKeys,

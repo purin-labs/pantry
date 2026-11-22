@@ -15,7 +15,7 @@ import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
+import { bakeryRunSnapshotPrefix } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";
 

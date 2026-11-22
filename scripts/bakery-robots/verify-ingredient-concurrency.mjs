@@ -8,11 +8,11 @@ import {
 import {
   prepareRehearsalReview,
   prepareRehearsalEdit,
-} from "../../apps/portal/src/features/workflow-simulator/rehearsal-edits.ts";
+} from "../../areas/kitchen/ui/features/workflow-simulator/rehearsal-edits.ts";
 import {
   initialSimulatorState,
   applyBakeryWorkspaceAction,
-} from "../../apps/portal/src/features/workflow-simulator/simulator-state.ts";
+} from "../../areas/kitchen/ui/features/workflow-simulator/simulator-state.ts";
 
 assert.equal(
   process.argv.length,

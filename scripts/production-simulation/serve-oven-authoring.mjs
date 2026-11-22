@@ -20,12 +20,12 @@ import { parseProductionScenario } from "../../packages/bakery-model/src/bakery-
 import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,
-} from "../../services/platform/src/commerce/bakery/sample.ts";
+} from "../../areas/kitchen/server/bakery/sample.ts";
 import {
   parseOperationEdit,
   saveOperationDuration,
-} from "../../services/platform/src/commerce/bakery/operation.ts";
-import { saveProductionScenario } from "../../services/platform/src/commerce/bakery/production-scenario.ts";
+} from "../../areas/kitchen/server/bakery/operation.ts";
+import { saveProductionScenario } from "../../areas/kitchen/server/bakery/production-scenario.ts";
 import { canonicalJson } from "../../packages/std/src/index.ts";
 import { startCommerceWorker } from "../../services/platform/tests/commerce-fixture-worker.ts";
 

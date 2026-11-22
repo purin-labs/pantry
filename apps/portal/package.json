@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsrs --noEmit && vite build && node ../../services/shop-voice/pack.mjs dist/shop-voice/install.sh && node ../../services/shop-gateway/pack.mjs dist/shop-gateway && node ../../scripts/bakery-robots/check-asset-sizes.mjs dist",
     "dev": "vite",
-    "test": "node --test src/features/workflow-simulator/schedule.test.mjs src/features/workflow-simulator/task-events.test.mjs src/features/workflow-simulator/procedure.test.mjs src/features/workflow-simulator/equipment-timeline.test.mjs src/features/workflow-simulator/workcell-view.test.mjs"
+    "test": "node --test ../../areas/kitchen/ui/features/workflow-simulator/schedule.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/task-events.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/procedure.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/equipment-timeline.test.mjs ../../areas/kitchen/ui/features/workflow-simulator/workcell-view.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -41,6 +41,7 @@
     "@purin-labs/area-inbox": "workspace:*",
     "@purin-labs/area-integrations": "workspace:*",
     "@purin-labs/area-commerce": "workspace:*",
+    "@purin-labs/area-kitchen": "workspace:*",
     "lucide-react": "^0.542.0",
     "onnxruntime-web": "1.22.0",
     "qrcode-generator": "^2.0.4",

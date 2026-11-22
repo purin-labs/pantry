@@ -86,7 +86,7 @@ The commerce lab runs six deterministic scenarios with no provider credential.
 ### The inventory views
 
 The Portal shows one engine stock snapshot (`readStockSnapshot`) in two pages.
-`connectedStockOverview` (`services/platform/src/kitchen/contract/inventory-overview.ts`)
+`connectedStockOverview` (`areas/kitchen/server/contract/inventory-overview.ts`)
 builds the rows. The read has no page and no cursor.
 
 | Page                       | Path, group           | Rows                                                                   | Drawer actions                                                                                                                                              |

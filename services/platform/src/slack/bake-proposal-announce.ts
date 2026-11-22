@@ -9,7 +9,7 @@ import { newRequestId, parseCaseId, type CaseId } from "@purin-labs/kernel/ids";
 import {
   markBakeProposalAnnounced,
   type BakeProposal,
-} from "../kitchen/bakes/records";
+} from "@purin-labs/area-kitchen/server/bakes/records";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";

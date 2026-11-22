@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import type { BakeProposal } from "../kitchen/bakes/records";
+import type { BakeProposal } from "@purin-labs/area-kitchen/server/bakes/records";
 import { cardDeliveryIds } from "./card-delivery-ids";
 import {
   workspacePortalUrl,

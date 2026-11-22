@@ -10,7 +10,7 @@ import {
   connectedStockOverview,
   inventoryOverview,
   inventoryStockStatus,
-} from "../src/kitchen/contract/inventory-overview";
+} from "@purin-labs/area-kitchen/server/contract/inventory-overview";
 import type {
   CommerceOfferV1,
   CommerceSalesChannelV1,

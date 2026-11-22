@@ -3,8 +3,8 @@ import {
   controlMutation,
   type ControlMutationIntent,
 } from "@purin-labs/control/portal/control-client";
-import { LatteWorkspace } from "../features/production-run/latte/latte-physics-view";
-import { RecipeWorkspaceContext } from "../features/production-run/recipe-workspace";
+import { LatteWorkspace } from "@purin-labs/area-kitchen/ui/features/production-run/latte/latte-physics-view";
+import { RecipeWorkspaceContext } from "@purin-labs/area-kitchen/ui/features/production-run/recipe-workspace";
 import "../styles.css";
 
 // One recipe view against a Worker's control routes, for the Plan 84 browser

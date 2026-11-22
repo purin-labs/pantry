@@ -10,7 +10,7 @@ import { parsePantryCommerceReadAuthority } from "@purin-labs/commerce-contracts
 import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,
-} from "../src/commerce/bakery/sample";
+} from "@purin-labs/area-kitchen/server/bakery/sample";
 import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
 import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import {

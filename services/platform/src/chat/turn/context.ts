@@ -21,7 +21,7 @@ import {
   type ConversationScope,
   type StoredConversation,
 } from "@purin-labs/conversation/chat/store";
-import type { BakerySurfaceTimelineEvent } from "../../actors/bakery-surface-effect";
+import type { BakerySurfaceTimelineEvent } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import type { Variant } from "@purin-labs/type-utils";
 import { timelineEventHasId } from "./admission";
 import { nextTimelineSequence } from "./timeline";

@@ -14,7 +14,7 @@ import {
   noArguments,
   stringEnum,
 } from "@purin-labs/agent-tools/define-tool";
-import type { PageViewExecute } from "../../../../../services/platform/src/agent-tools/kitchen/services";
+import type { PageViewExecute } from "@purin-labs/area-kitchen/server/agent-tools/kitchen/services";
 import { ProposalArgumentError } from "@purin-labs/agent-tools/errors";
 import type { PreparedEffect } from "@purin-labs/agent-tools/tool-effect";
 

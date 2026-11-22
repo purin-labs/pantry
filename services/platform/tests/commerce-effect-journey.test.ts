@@ -14,7 +14,7 @@ import type {
 import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,
-} from "../src/commerce/bakery/sample";
+} from "@purin-labs/area-kitchen/server/bakery/sample";
 import {
   buildCommerceEntityPlaneEffect,
   parseCommerceEntityPlaneEffect,

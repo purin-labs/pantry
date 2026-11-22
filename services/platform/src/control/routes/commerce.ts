@@ -1,12 +1,12 @@
 import type { DecidePendingDecision } from "@purin-labs/control/worker/decide-pending-decision";
-import { handleRecipes } from "./recipes";
-import { handleCosts } from "./costs";
+import { handleRecipes } from "@purin-labs/area-kitchen/server/control/routes/recipes";
+import { handleCosts } from "@purin-labs/area-kitchen/server/control/routes/costs";
 import type { Env } from "@purin-labs/kernel/env";
-import { handleInventoryProduction } from "./inventory-production";
+import { handleInventoryProduction } from "@purin-labs/area-kitchen/server/control/routes/inventory-production";
 import {
   handleInventoryDeliveries,
   handleInventoryReceipt,
-} from "./inventory-receipts";
+} from "@purin-labs/area-kitchen/server/control/routes/inventory-receipts";
 import {
   handleProductCatalogAction,
   type ProductCatalogAction,
@@ -19,11 +19,11 @@ import {
 import {
   handlePurchasingControlRoute,
   type PurchasingControlAction,
-} from "./purchasing";
+} from "@purin-labs/area-kitchen/server/control/routes/purchasing";
 import {
   handleBakeryControl,
   type BakeryAction,
-} from "./bakery";
+} from "@purin-labs/area-kitchen/server/control/routes/bakery";
 import {
   handleCheckoutProfileControlRoute,
   matchCheckoutProfileControlRoute,

@@ -11,7 +11,7 @@ import {
   resolveInventoryAccess,
   resolveInventoryMutation,
   type InventoryControlMutation,
-} from "../../../../../services/platform/src/kitchen/contract/inventory-control";
+} from "@purin-labs/area-kitchen/server/contract/inventory-control";
 
 export type ProductCatalogAction = "edit" | "status" | "delete";
 

@@ -40,7 +40,7 @@ import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/
 import {
   bakeryRunSnapshotPrefix,
   bakeryRunSnapshotSummary,
-} from "./commerce/bakery/saved-runs";
+} from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import { bakeryRunSnapshots } from "@purin-labs/conversation/projects/references";
 import {
   readNamedCommerceQuery,
@@ -111,8 +111,8 @@ import {
   previewCode,
   readOperatorDraft,
 } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
-import { workflowChanges } from "./kitchen/contract/workflow-changes";
-import { applyApprovedWorkflowChange } from "./commerce/bakery/workflow-proposals";
+import { workflowChanges } from "@purin-labs/area-kitchen/server/contract/workflow-changes";
+import { applyApprovedWorkflowChange } from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
 import { deviceCommands } from "@purin-labs/area-devices/server/contract/device-commands";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";

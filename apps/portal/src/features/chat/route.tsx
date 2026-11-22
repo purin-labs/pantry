@@ -21,7 +21,7 @@ import {
   toQueuedInput,
   withoutOutgoing,
 } from "./submission";
-import { captureBakeryBrowserContext } from "../bakery-browser-context";
+import { captureBakeryBrowserContext } from "@purin-labs/area-kitchen/ui/features/bakery-browser-context";
 import { type BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import {
   QuestionCard,
@@ -127,7 +127,7 @@ import {
   bakerySurfaceForOrganisation,
   notifySurfaceListeners,
   subscribeBakerySurface,
-} from "../bakery-surface-registry";
+} from "@purin-labs/area-kitchen/ui/features/bakery-surface-registry";
 import { createEmailReviewActions } from "@purin-labs/area-inbox/ui/features/email-review/api";
 import { emailDraftInserts, slackDraftInserts } from "./draft-cards";
 import type { MailSourceLinks } from "@purin-labs/area-inbox/ui/features/mail-inbox/draft-sources";

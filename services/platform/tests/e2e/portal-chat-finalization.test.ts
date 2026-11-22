@@ -23,7 +23,7 @@ import { requireDefaultProjectId } from "../fixtures/default-project";
 import { parseContinuation } from "@purin-labs/agent/actors/agent-session-continuation";
 import { parsePersistedHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
 import { readProjectDirectory } from "@purin-labs/conversation/chat/projects";
-import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
+import { bakeryRunSnapshotPrefix } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { connectCommerceFixture } from "./commerce-support";
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
@@ -34,7 +34,7 @@ import {
   rehearsalSettings,
 } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import { isRecord, sha256Hex } from "@purin-labs/std";
-import { prepareRehearsalRunWorkspace } from "../../../../apps/portal/src/features/workflow-simulator/workspace-runs-api";
+import { prepareRehearsalRunWorkspace } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/workspace-runs-api";
 import { responseJson } from "@purin-labs/control/portal/control-client";
 import { timelineVisibleMessages } from "@purin-labs/conversation/chat/conversation";
 import {
@@ -42,15 +42,15 @@ import {
   prepareBakerySurfaceCommand,
   commitBakerySurfaceCommand,
   bakerySurfaceCommandSucceeded,
-} from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/bakery-surface";
 import {
   initialSimulatorState,
   simulatorPlaybackSnapshot,
   applyBakeryWorkspaceAction,
   applySimulatorReplayAction,
   applySimulatorViewAction,
-} from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";
-import { applyPlaybackAction } from "../../../../apps/portal/src/features/workflow-simulator/playback-actions";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/simulator-state";
+import { applyPlaybackAction } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/playback-actions";
 import ovenCycle from "../../../../assets/bakery-mujoco/fr10-workcell/recordings/oven-cycle.json";
 import { parsePhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import {

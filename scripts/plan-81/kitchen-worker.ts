@@ -8,7 +8,7 @@ import interrupted from "../../assets/bakery-mujoco/combined-bakery/rust-evidenc
 import gateway from "../../services/platform/src/integration-gateway";
 import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/actors/actor-router";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../foundation/authority/authorization/access-grants/turn-authority";
-import { bakeryRunSnapshotPrefix } from "../../services/platform/src/commerce/bakery/saved-runs";
+import { bakeryRunSnapshotPrefix } from "../../areas/kitchen/server/bakery/saved-runs";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants";
 import type { Env } from "../../foundation/kernel/env";
 import { compilePublishAndActivateOrganisationPolicy } from "../../foundation/authority/policy-snapshot";

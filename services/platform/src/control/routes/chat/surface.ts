@@ -14,7 +14,7 @@ import { parseBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surfa
 import {
   listPendingBakerySurfaceEffects,
   readBakerySurfaceDeliveryTarget,
-} from "../../../actors/bakery-surface-effect";
+} from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 
 export async function handlePortalChatSurfaceEffects(
   request: Request,

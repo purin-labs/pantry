@@ -268,7 +268,7 @@ needs new native requests and recordings; an old recording is never reinterprete
   `execution-bundle.ts`, `execution-entry.ts`, `execution-host.ts`,
   `simulator/browser-physics-asset.ts`, `simulator/browser-physics-task.ts`,
   `simulator/appliance-runtime.ts`).
-- **Portal:** `apps/portal/src/features/production-run/` (`engine-jobs.ts`,
+- **Portal:** `areas/kitchen/ui/features/production-run/` (`engine-jobs.ts`,
   `engine-programs.ts`, `execution-client.ts`, `execution-worker.ts`,
   `opfs-result-files.ts`, `retained-appliance-worker.ts`, `scene-host.ts`) and
   `features/workflow-simulator/` (`physics-replay.tsx`, `browser-production-run.ts`,

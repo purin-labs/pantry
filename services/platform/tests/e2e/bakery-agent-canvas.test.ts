@@ -23,7 +23,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
-import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
+import { bakeryRunSnapshotPrefix } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import { CONTEXT_CASE_READ_CAPABILITY } from "@purin-labs/authority/authorization/access-grants/turn-authority";
 import { encodeContextVisibility } from "@purin-labs/authority/authorization/access-grants/index";
 import { FlowLabel } from "@purin-labs/authority/policy/information-flow/index";

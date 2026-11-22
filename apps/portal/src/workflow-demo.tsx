@@ -11,7 +11,7 @@ import { CircleQuestionMark } from "lucide-react";
 import { PortalFrame } from "./shell";
 import { PageHeader } from "@purin-labs/ui/page-components";
 import { readPortalRoute, workspacePageDescriptor } from "@purin-labs/ui/route";
-import WorkflowSimulatorRoute from "./features/workflow-simulator/route";
+import WorkflowSimulatorRoute from "@purin-labs/area-kitchen/ui/features/workflow-simulator/route";
 import { ConnectedChatPage as ChatPage } from "./features/chat/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
 import { showPhysicsEvidence } from "@purin-labs/production-simulation/runs/physics-evidence";

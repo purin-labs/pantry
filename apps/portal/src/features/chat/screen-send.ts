@@ -5,7 +5,7 @@ import {
 } from "@purin-labs/control-api";
 import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-context";
 import { errorMessage } from "@purin-labs/std";
-import { bakerySurfaceForOrganisation } from "../bakery-surface-registry";
+import { bakerySurfaceForOrganisation } from "@purin-labs/area-kitchen/ui/features/bakery-surface-registry";
 import { captureSurfaceObservation } from "@purin-labs/ui/features/surface-observation";
 import { takeScreenChipDecision } from "./screen-chip";
 import { settleScreenSuggestion } from "./screen-relevance";

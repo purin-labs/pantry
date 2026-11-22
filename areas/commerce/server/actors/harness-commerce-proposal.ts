@@ -87,8 +87,8 @@ import {
 import {
   planStockOperation,
   type StockProposalRequest,
-} from "../../../../services/platform/src/kitchen/contract/stock-action-plan";
-import { stockOperationResourceId } from "../../../../services/platform/src/kitchen/contract/stock-action";
+} from "@purin-labs/area-kitchen/server/contract/stock-action-plan";
+import { stockOperationResourceId } from "@purin-labs/area-kitchen/server/contract/stock-action";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { resolveCommerceCancellationAuthority } from "../provider";
 import { commerceProviderResourceId } from "../contract/resource-ids";

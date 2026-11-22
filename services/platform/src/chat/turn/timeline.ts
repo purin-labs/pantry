@@ -41,7 +41,7 @@ import {
 import {
   listBakerySurfaceTimelineEvents,
   type BakerySurfaceTimelineEvent,
-} from "../../actors/bakery-surface-effect";
+} from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { timelineEventHasId } from "./admission";

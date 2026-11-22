@@ -19,7 +19,7 @@ import {
 import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import * as Y from "yjs";
-import { bakeryWorkflowPrefix } from "../../src/commerce/bakery/workflow-revisions";
+import { bakeryWorkflowPrefix } from "@purin-labs/area-kitchen/server/bakery/workflow-revisions";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import {
   parseOrganisationId,

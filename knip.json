@@ -55,8 +55,6 @@
         "src/tv/main.tsx",
         "src/dev/*.{ts,tsx}",
         "src/ui/index.ts",
-        "src/features/production-run/linea/espresso-rehearsal.ts",
-        "src/features/production-run/execution-worker.ts",
         "src/features/voice/wake-worker.ts",
         "src/**/*.typecheck.ts",
         "src/**/*.type-fixtures.ts",
@@ -75,6 +73,18 @@
         "scripts/*.mjs"
       ],
       "project": ["src/.vitepress/**/*.{ts,vue}", "scripts/*.mjs"]
+    },
+    "areas/kitchen": {
+      "entry": [
+        "server/**/*.fixtures.ts",
+        "server/**/*.type-fixtures.ts",
+        "ui/**/*.type-fixtures.ts",
+        "ui/**/*.typecheck.ts",
+        "ui/features/production-run/linea/espresso-rehearsal.ts",
+        "ui/features/production-run/execution-worker.ts"
+      ],
+      "project": ["**/*.{ts,tsx}"],
+      "includeEntryExports": true
     },
     "areas/*": {
       "entry": [

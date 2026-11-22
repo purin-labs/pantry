@@ -224,7 +224,7 @@ Every step can take and lose arrows. A new work step gets the first worker of th
 - **Engine** `packages/production-simulation`: `scenario.ts` (`TaskExecutor`,
   `DecisionGuard`, `DecisionRule`, `SCENARIO_SCHEMA_VERSION` 5), `admission.ts`
   (`admitScenario`), `inspections.ts` (`ruleOutcome`) and `src/recipes/bakery/`.
-- **Portal** `apps/portal/src/features/production-run/`: `recipe-workflow-graph.tsx`,
+- **Portal** `areas/kitchen/ui/features/production-run/`: `recipe-workflow-graph.tsx`,
   `recipe-graph.ts` (sources and stage bindings), `recipe-workflow.tsx` (surfaces),
   `recipe-clock.ts`, `recipe-draft-run.ts`, `recipe-workspace.ts` (requests),
   `workflow-draft-client.ts`, `draft-placement.ts` and the recipe folders.
@@ -240,7 +240,7 @@ Every step can take and lose arrows. A new work step gets the first worker of th
   bytes. A proposed document has no size check.
 - **Actor SQLite:** `workflow_draft` in the Organisation Actor
   (`actors/workflow-draft.ts`), one row for each workflow id.
-- **Domain code** `services/platform/src/commerce/bakery/workflow-revisions.ts` (store,
+- **Domain code** `areas/kitchen/server/bakery/workflow-revisions.ts` (store,
   apply, findings, `readAppliedWorkflowHead`) and `workflow-proposals.ts` (prepare,
   approve, open proposals). The port `kitchen/contract/workflow-changes.ts` gives the
   approval to the configuration draft.
@@ -266,7 +266,7 @@ The error codes are `bakery_workflow_invalid`, `bakery_workflow_refused`,
 `bakery_workflow_too_large` and `bakery_workflow_unavailable`. The draft room gives
 `bakery_workflow_too_large` (422) when the applied revision does not fit a draft.
 
-Agent tools in `services/platform/src/agent-tools/kitchen/recipe-workflow.ts`, with the
+Agent tools in `areas/kitchen/server/agent-tools/kitchen/recipe-workflow.ts`, with the
 handlers in `handlers.ts` and `turn-services.ts`:
 
 | Tool                      | Capability                         | Effect   | Rerun                                                           |

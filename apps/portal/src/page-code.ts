@@ -81,7 +81,7 @@ export function startWorkspacePageCode(page: WorkspaceDetailPage): void {
 function ignoreFailedPageCode(): void {}
 
 function loadWorkflowSimulator() {
-  return import("./features/workflow-simulator/route");
+  return import("@purin-labs/area-kitchen/ui/features/workflow-simulator/route");
 }
 
 async function loadMailInboxRoute() {
@@ -102,12 +102,14 @@ async function loadInventoryPage() {
 }
 
 async function loadRecipesPage() {
-  const module = await import("./features/recipes/route");
+  const module =
+    await import("@purin-labs/area-kitchen/ui/features/recipes/route");
   return { default: module.RecipesPage };
 }
 
 async function loadCostsPage() {
-  const module = await import("./features/costs/route");
+  const module =
+    await import("@purin-labs/area-kitchen/ui/features/costs/route");
   return { default: module.CostsPage };
 }
 
@@ -153,7 +155,8 @@ async function loadDevicesRoute() {
 }
 
 async function loadBakesRoute() {
-  const { BakesRoute } = await import("./features/bakes/route");
+  const { BakesRoute } =
+    await import("@purin-labs/area-kitchen/ui/features/bakes/route");
   return { default: BakesRoute };
 }
 

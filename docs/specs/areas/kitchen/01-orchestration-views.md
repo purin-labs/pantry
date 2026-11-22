@@ -249,7 +249,7 @@ The `workflow_canvas` room (FND-10) holds the card positions of one saved run of
 
 ## Contracts
 
-- **Portal feature:** `apps/portal/src/features/workflow-simulator/` (route, views,
+- **Portal feature:** `areas/kitchen/ui/features/workflow-simulator/` (route, views,
   docks, `spatial/`), with the page bridge `bakery-surface.ts`. The shared Portal files
   are `features/bakery-surface-effect-bridge.tsx`, `bakery-surface-registry.ts`,
   `bakery-browser-context.ts` and `bakery-workspace-reveal.tsx`.
@@ -265,7 +265,7 @@ The `workflow_canvas` room (FND-10) holds the card positions of one saved run of
   `bakery-persistent-surface.ts`, `bakery-agent-scenario-save.ts` and
   `bakery-canvas-source.ts`. The canvas document is `packages/workflow-canvas-crdt`
   (`workflow_canvas_crdt.v1`, protocol `workflow_canvas_sync.v2`).
-- **Entity plane** (COM-01, COM-02), written by `services/platform/src/commerce/bakery/`:
+- **Entity plane** (COM-01, COM-02), written by `areas/kitchen/server/bakery/`:
   the types `bakery_procedure`, `bakery_operation` (`operation`, `minutes`),
   `bakery_equipment` (`station`, `capacity_trays`), `bakery_scenario` (type revisions 1
   and 2), `bakery_production_scenario` (1 to 5) and `bakery_production_task` (1 and 2).
@@ -317,7 +317,7 @@ token:
 
 The page effect routes `GET /chat/surface-effects` and `POST
 /chat/surface-effects/:effectId/receipt` belong to FND-05 and FND-09. The agent tools are
-in `services/platform/src/agent-tools/bakery/` (`surface.ts`, `handlers.ts`,
+in `areas/kitchen/server/agent-tools/bakery/` (`surface.ts`, `handlers.ts`,
 `page-effects.ts`) and `agent-tools/kitchen/` (`saved-runs.ts`, `workflow-canvas.ts`).
 The capabilities are `workspace.query` (`bakery_saved_run_read`),
 `commerce.entity_plane.context` (`workflow_canvas_read`) and

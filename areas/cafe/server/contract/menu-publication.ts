@@ -8,7 +8,7 @@ import type {
 } from "@purin-labs/commerce-client";
 import type { MenuDraftSnapshot } from "@purin-labs/menu-draft-crdt";
 import { cafeMediaBaseFor } from "./media";
-import { productPhotos } from "../../../../services/platform/src/kitchen/contract/inventory-overview";
+import { productPhotos } from "@purin-labs/area-kitchen/server/contract/inventory-overview";
 
 export type CafeMenuDefinition = PublishMenuCommand["menu"];
 type MenuEntryInput = CafeMenuDefinition["entries"][number];

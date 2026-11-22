@@ -8,11 +8,11 @@ import {
   matchChatGoalRoute,
   type ChatGoalRoute,
 } from "@purin-labs/conversation/control/routes/chat-goal";
-import { handleWorkflowCanvasRoute } from "./control/routes/workflow-canvas";
+import { handleWorkflowCanvasRoute } from "@purin-labs/area-kitchen/server/control/routes/workflow-canvas";
 import {
   matchWorkflowCanvasRoute,
   type WorkflowCanvasRoute,
-} from "./control/admission/workflow-canvas";
+} from "@purin-labs/area-kitchen/server/control/admission/workflow-canvas";
 import {
   handleChatSharingRoute,
   matchChatSharingRoute,
@@ -64,21 +64,21 @@ import {
   matchMailPersonReplyRoute,
   type MailPersonReplyRoute,
 } from "@purin-labs/area-inbox/server/control/routes/mail-person-reply";
-import { handleBakeryWorkflowRoute } from "./control/routes/bakery-workflows";
+import { handleBakeryWorkflowRoute } from "@purin-labs/area-kitchen/server/control/routes/bakery-workflows";
 import {
   matchBakeryWorkflowRoute,
   type BakeryWorkflowRoute,
-} from "./control/admission/bakery-workflows";
+} from "@purin-labs/area-kitchen/server/control/admission/bakery-workflows";
 import {
   handleBakeryRunRoute,
   matchBakeryRunRoute,
   type BakeryRunRoute,
-} from "./control/routes/bakery-runs";
+} from "@purin-labs/area-kitchen/server/control/routes/bakery-runs";
 import {
   handleBakeryRunArtifactRoute,
   matchBakeryRunArtifactRoute,
   type BakeryRunArtifactRoute,
-} from "./control/routes/bakery-run-artifacts";
+} from "@purin-labs/area-kitchen/server/control/routes/bakery-run-artifacts";
 import {
   handleJevFeaturesRoute,
   matchJevFeaturesRoute,
@@ -131,16 +131,16 @@ import {
   matchMailReplyDraftRoute,
   type MailReplyDraftRoute,
 } from "@purin-labs/area-inbox/server/control/admission/mail-reply-draft";
-import { handleProductionPlanRoute } from "./control/routes/production-plan";
+import { handleProductionPlanRoute } from "@purin-labs/area-kitchen/server/control/routes/production-plan";
 import {
   matchProductionPlanRoute,
   type ProductionPlanRoute,
-} from "./control/admission/production-plan";
-import { handleCostsSheetRoute } from "./control/routes/costs-sheet";
+} from "@purin-labs/area-kitchen/server/control/admission/production-plan";
+import { handleCostsSheetRoute } from "@purin-labs/area-kitchen/server/control/routes/costs-sheet";
 import {
   matchCostsSheetRoute,
   type CostsSheetRoute,
-} from "./control/admission/costs-sheet";
+} from "@purin-labs/area-kitchen/server/control/admission/costs-sheet";
 import { handleEmailDraftRoute } from "@purin-labs/area-inbox/server/control/routes/email-draft";
 import {
   matchEmailDraftRoute,
@@ -175,7 +175,7 @@ import {
   handleBakeControlRoute,
   matchBakeControlRoute,
   type BakeControlRoute,
-} from "./control/routes/bakes";
+} from "@purin-labs/area-kitchen/server/control/routes/bakes";
 import { handleChatSignalRoute } from "@purin-labs/conversation/control/routes/chat-signals";
 import {
   matchChatSignalRoute,

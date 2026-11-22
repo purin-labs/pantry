@@ -190,8 +190,8 @@ The columns that take a formula are `COST_FORMULA_COLUMNS`: `units`, `spoil`, `p
 
 ### Agents
 
-The tools are in `services/platform/src/agent-tools/kitchen/costs.ts` and
-`services/platform/src/agent-tools/costs/view.ts`.
+The tools are in `areas/kitchen/server/agent-tools/kitchen/costs.ts` and
+`areas/kitchen/server/agent-tools/costs/view.ts`.
 
 | Tool                                                                             | Capability or selection         | Effect  | What it does                                                                                 |
 | -------------------------------------------------------------------------------- | ------------------------------- | ------- | -------------------------------------------------------------------------------------------- |
@@ -233,7 +233,7 @@ The tools are in `services/platform/src/agent-tools/kitchen/costs.ts` and
   (`services/commerce/src/plugins/purchasing/purchasing-preset.ts`). It is a
   `unique_entity` list over the system `inventory_item`.
 - `OrganisationDO` keeps the draft in Actor SQLite table `costs_sheet_draft`
-  (`services/platform/src/actors/costs-sheet-draft.ts`). It has one row
+  (`areas/kitchen/server/actors/costs-sheet-draft.ts`). It has one row
   (`singleton_id = 'costs-sheet'`), schema `costs_sheet_crdt.v1`, and a state of at
   most 262,144 bytes. `CostsSheetRooms` holds the `CollaborationRoom` of route kind
   `costs_sheet` (FND-10). The RPC methods are `readCostsSheetDraft`,
@@ -242,10 +242,10 @@ The tools are in `services/platform/src/agent-tools/kitchen/costs.ts` and
   the value checks and the sync protocol `costs_sheet_sync.v1`.
 - `@purin-labs/kitchen-control-api` holds the TypeBox contracts and the engines:
   `costs.ts`, `costs-formulas.ts`, `costs-actuals.ts` and `costs-forecast.ts`.
-- `services/platform/src/commerce/cost-commands.ts` reads the overview and saves the
+- `areas/kitchen/server/cost-commands.ts` reads the overview and saves the
   pack prices. `cost-plan-store.ts` reads and writes the three D1 tables and the offer
   prices.
-- The Portal code is in `apps/portal/src/features/costs/`.
+- The Portal code is in `areas/kitchen/ui/features/costs/`.
 
 | Cell key                                                        | Value                                               |
 | --------------------------------------------------------------- | --------------------------------------------------- |

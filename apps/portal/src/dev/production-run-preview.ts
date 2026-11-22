@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { ProductionActivityTrace } from "../features/production-run/production-activity-trace";
+import { ProductionActivityTrace } from "@purin-labs/area-kitchen/ui/features/production-run/production-activity-trace";
 import "../styles.css";
 import { Select } from "@purin-labs/ui/select";
 import {

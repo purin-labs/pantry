@@ -9,8 +9,8 @@ import {
   readAccountInvitationRoute,
 } from "@purin-labs/area-organisation/ui/pages/account-invitation";
 import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
-import { BakeryWorkspaceReveal } from "./features/bakery-workspace-reveal";
-import { revealBakeryWorkspace } from "./features/bakery-surface-registry";
+import { BakeryWorkspaceReveal } from "@purin-labs/area-kitchen/ui/features/bakery-workspace-reveal";
+import { revealBakeryWorkspace } from "@purin-labs/area-kitchen/ui/features/bakery-surface-registry";
 import React from "react";
 import {
   createBrowserRouter,
@@ -69,7 +69,7 @@ import {
   type MerchantPluginPreview,
   parseCommerceActionExecutionResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
-import { BakerySurfaceEffectBridge } from "./features/bakery-surface-effect-bridge";
+import { BakerySurfaceEffectBridge } from "@purin-labs/area-kitchen/ui/features/bakery-surface-effect-bridge";
 import { registerPortalBoardChat } from "./portal-board-chat";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

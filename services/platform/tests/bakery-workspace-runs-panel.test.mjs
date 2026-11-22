@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import recording from "../../../assets/bakery-mujoco/fr10-workcell/recordings/nominal.json";
 import { parsePhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import { sampleSettings } from "@purin-labs/bakery-model/bakery";
-import { WorkspaceRunsPanel } from "../../../apps/portal/src/features/workflow-simulator/workspace-runs-panel";
+import { WorkspaceRunsPanel } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/workspace-runs-panel";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { editRehearsalWorkcells } from "../../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
 import {
@@ -12,7 +12,7 @@ import {
 import {
   initialSimulatorState,
   applyBakeryWorkspaceAction,
-} from "../../../apps/portal/src/features/workflow-simulator/simulator-state";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/simulator-state";
 
 const transport = vi.hoisted(createTransport);
 function createTransport() {

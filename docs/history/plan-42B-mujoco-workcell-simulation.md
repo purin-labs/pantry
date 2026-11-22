@@ -77,16 +77,16 @@ MuJoCo engine and Rust controller into a Wasm module with a separate preloaded
 model-data file. It targets `wasm32-unknown-emscripten`. The JavaScript, Wasm and
 data files form one [retained native bundle](https://github.com/seams-tech/pantry-history/blob/2cf5676a714978ce2887a78523b1b0f6c87a53a8/docs/evidence/bakery-browser-asset-bundles.md).
 The
-[job owner](../../apps/portal/src/features/production-run/engine-jobs.ts)
+[job owner](../../areas/kitchen/ui/features/production-run/engine-jobs.ts)
 keeps one engine worker for the page, reports the step and stops a job at a
 step boundary. The
-[engine worker](../../apps/portal/src/features/production-run/execution-worker.ts)
+[engine worker](../../areas/kitchen/ui/features/production-run/execution-worker.ts)
 loads the module one time and runs each job as a
-[host program](../../apps/portal/src/features/production-run/engine-programs.ts)
+[host program](../../areas/kitchen/ui/features/production-run/engine-programs.ts)
 (Refactor 16, step 5). The
-[production runner](../../apps/portal/src/features/workflow-simulator/browser-production-run.ts)
+[production runner](../../areas/kitchen/ui/features/workflow-simulator/browser-production-run.ts)
 accepts results and advances the workflow. The
-[Three.js model](../../apps/portal/src/features/workflow-simulator/spatial/physics-model.ts)
+[Three.js model](../../areas/kitchen/ui/features/workflow-simulator/spatial/physics-model.ts)
 projects recorded motion into the scene.
 
 ### One workflow path

@@ -8,7 +8,7 @@ import type {
   BakeryRehearsalEdit,
   BakerySurfaceEditOperation,
 } from "@purin-labs/bakery-model/bakery-surface";
-import { type BakerySurfaceTimelineEvent } from "../actors/bakery-surface-effect";
+import { type BakerySurfaceTimelineEvent } from "@purin-labs/area-kitchen/server/actors/bakery-surface-effect";
 import { assertNever } from "@purin-labs/std";
 import type { ChatReceiptReference, ChatToolView } from "@purin-labs/control-api";
 import {

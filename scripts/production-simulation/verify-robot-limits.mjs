@@ -40,7 +40,7 @@ import {
 } from "../../packages/bakery-model/src/bakery-margins.ts";
 import { parsePhysicsReplay } from "../../packages/bakery-model/src/bakery-physics.ts";
 import { parseSimulationOutput } from "../../packages/bakery-model/src/bakery-simulation-output.ts";
-import { simulationResult } from "../../apps/portal/src/features/workflow-simulator/simulation-result.ts";
+import { simulationResult } from "../../areas/kitchen/ui/features/workflow-simulator/simulation-result.ts";
 
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const binary = join(root, "crates/bakery-native/target/release/bakery-native");

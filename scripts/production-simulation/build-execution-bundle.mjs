@@ -185,7 +185,7 @@ async function compile(runtimeDirectory, banner) {
   const compiled = await build({
     absWorkingDir: root,
     entryPoints: [
-      "apps/portal/src/features/production-run/execution-worker.ts",
+      "areas/kitchen/ui/features/production-run/execution-worker.ts",
     ],
     // The worker carries the loader of the runtime it is built against.
     alias: {

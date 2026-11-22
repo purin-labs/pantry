@@ -12,8 +12,8 @@ import {
   type ControlMutationIntent,
 } from "@purin-labs/control/portal/control-client";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
-import { BakerySurfaceEffectBridge } from "../features/bakery-surface-effect-bridge";
-import WorkflowSimulatorRoute from "../features/workflow-simulator/route";
+import { BakerySurfaceEffectBridge } from "@purin-labs/area-kitchen/ui/features/bakery-surface-effect-bridge";
+import WorkflowSimulatorRoute from "@purin-labs/area-kitchen/ui/features/workflow-simulator/route";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
 
 // Kitchen with the chat beside it, as the Portal shows them, for one

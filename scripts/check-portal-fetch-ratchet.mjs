@@ -24,12 +24,12 @@ const EXCLUDED = [
 // Files that fetch assets, models, bundles or another origin, not the control API.
 const NOT_CONTROL = new Set([
   "areas/organisation/ui/features/access/google-drive-picker.ts",
-  "apps/portal/src/features/production-run/execution-client.ts",
-  "apps/portal/src/features/production-run/execution-worker.ts",
-  "apps/portal/src/features/production-run/retained-appliance-worker.ts",
+  "areas/kitchen/ui/features/production-run/execution-client.ts",
+  "areas/kitchen/ui/features/production-run/execution-worker.ts",
+  "areas/kitchen/ui/features/production-run/retained-appliance-worker.ts",
   "apps/portal/src/features/voice/model-cache.ts",
-  "apps/portal/src/features/workflow-simulator/rehearsal-examples.ts",
-  "apps/portal/src/features/workflow-simulator/spatial/physics-asset-loader.ts",
+  "areas/kitchen/ui/features/workflow-simulator/rehearsal-examples.ts",
+  "areas/kitchen/ui/features/workflow-simulator/spatial/physics-asset-loader.ts",
   // The voice transport's other calls go to the shop Mac's own origin.
   "apps/portal/src/features/voice/transport.ts",
   // The identity link page calls /v1/identity-links, outside the control API.

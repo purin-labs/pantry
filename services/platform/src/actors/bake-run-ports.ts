@@ -2,10 +2,10 @@ import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
 } from "@purin-labs/area-commerce/server/contract/client";
-import { readWorkflowDocument } from "../commerce/bakery/workflow-revisions";
+import { readWorkflowDocument } from "@purin-labs/area-kitchen/server/bakery/workflow-revisions";
 import { commerceProviderResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
 import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
-import { executeStockOperation } from "../kitchen/contract/stock-action-execution";
+import { executeStockOperation } from "@purin-labs/area-kitchen/server/contract/stock-action-execution";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { listDevices, listGateways } from "@purin-labs/area-devices/server/store";
@@ -13,11 +13,11 @@ import { readKitchenDeviceViews } from "@purin-labs/area-devices/server/views";
 import { changeDeviceWork, reserveDeviceWork } from "@purin-labs/area-devices/server/work";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
-import type { BakeKitchenPorts } from "../kitchen/bakes/commands";
-import type { BakeProposal } from "../kitchen/bakes/records";
-import type { BakeRunDevicePorts, BakeRunNotices } from "../kitchen/bakes/run";
-import type { BakeRunLaunchPorts } from "../kitchen/bakes/run-start";
-import type { BakeRunDevice } from "../kitchen/bakes/run-store";
+import type { BakeKitchenPorts } from "@purin-labs/area-kitchen/server/bakes/commands";
+import type { BakeProposal } from "@purin-labs/area-kitchen/server/bakes/records";
+import type { BakeRunDevicePorts, BakeRunNotices } from "@purin-labs/area-kitchen/server/bakes/run";
+import type { BakeRunLaunchPorts } from "@purin-labs/area-kitchen/server/bakes/run-start";
+import type { BakeRunDevice } from "@purin-labs/area-kitchen/server/bakes/run-store";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   announceBakeRun,

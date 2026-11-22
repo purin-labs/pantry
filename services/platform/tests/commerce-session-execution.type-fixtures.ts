@@ -1,7 +1,7 @@
 import {
   readWorkflowCanvasForEmbeddedHarness,
   moveWorkflowCanvasForEmbeddedHarness,
-} from "../src/agent-tools/kitchen/workflow-canvas-handlers";
+} from "@purin-labs/area-kitchen/server/agent-tools/kitchen/workflow-canvas-handlers";
 import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,

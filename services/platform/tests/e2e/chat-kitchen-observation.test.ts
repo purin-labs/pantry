@@ -11,8 +11,8 @@ import {
 import { isRecord } from "@purin-labs/std";
 
 import { kitchenObservation } from "../kitchen-observation-fixture";
-import { captureBakerySurface } from "../../../../apps/portal/src/features/workflow-simulator/bakery-surface";
-import { initialSimulatorState } from "../../../../apps/portal/src/features/workflow-simulator/simulator-state";
+import { captureBakerySurface } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/bakery-surface";
+import { initialSimulatorState } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/simulator-state";
 import {
   createConversation,
   installMemoryFixture,

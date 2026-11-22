@@ -6,7 +6,7 @@ import { newRequestId } from "@purin-labs/kernel/ids";
 import {
   readBakeProposal,
   readBakeProposalCardTs,
-} from "../kitchen/bakes/records";
+} from "@purin-labs/area-kitchen/server/bakes/records";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {

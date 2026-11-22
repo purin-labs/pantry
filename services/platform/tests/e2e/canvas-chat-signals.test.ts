@@ -12,7 +12,7 @@ import { parseCanvasServerMessage } from "@purin-labs/workflow-canvas-crdt/proto
 
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
+import { bakeryRunSnapshotPrefix } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { createAccessGrant } from "@purin-labs/authority/data/access-grants";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";

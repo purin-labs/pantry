@@ -1,4 +1,4 @@
-import type { SavedBakeryRunQuery } from "../src/commerce/bakery/saved-runs";
+import type { SavedBakeryRunQuery } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 
 declare const exactRead: Readonly<{ kind: "read"; id: string }>;
 

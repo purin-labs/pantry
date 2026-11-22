@@ -2,7 +2,7 @@ import {
   openExecutionWorker as openWorker,
   openAuthoredCellWorker as openAuthoredWorker,
   type ExecutionWorker,
-} from "../features/production-run/execution-client";
+} from "@purin-labs/area-kitchen/ui/features/production-run/execution-client";
 import type { ExecutionBundle } from "@purin-labs/production-simulation";
 import type { PersistentCell } from "@purin-labs/bakery-model/bakery-physics";
 import { isRecord } from "@purin-labs/std";

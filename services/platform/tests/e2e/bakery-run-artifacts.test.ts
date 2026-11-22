@@ -6,7 +6,7 @@ import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { controlRequest } from "./organisation-fixture";
 import failed from "../fixtures/bakery-persistent-failure.json";
-import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
+import { bakeryRunSnapshotPrefix } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 
 it(
   "publishes a failed native factory only after complete private staging, then fences artifact access and survives lost replies",

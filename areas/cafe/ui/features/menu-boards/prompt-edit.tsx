@@ -6,7 +6,7 @@ import {
   type MenuBoardElement,
   type MenuBoardSnapshot,
 } from "@purin-labs/menu-board-crdt/board";
-import { captureBakeryBrowserContext } from "../../../../../apps/portal/src/features/bakery-browser-context";
+import { captureBakeryBrowserContext } from "@purin-labs/area-kitchen/ui/features/bakery-browser-context";
 import { boardChat } from "./board-chat";
 import { controlAnswer, controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
 import { controlPath } from "@purin-labs/control/portal/control-paths";

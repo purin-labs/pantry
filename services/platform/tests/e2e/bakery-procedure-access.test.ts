@@ -27,7 +27,7 @@ import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-pla
 import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce/server/contract/client";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
-import { createFinancierSample } from "../../src/commerce/bakery/sample";
+import { createFinancierSample } from "@purin-labs/area-kitchen/server/bakery/sample";
 
 it(
   "grants a custom procedure source through Access, preserves replay, and refuses reads after revocation",

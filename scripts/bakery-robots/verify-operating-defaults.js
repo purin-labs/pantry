@@ -59,7 +59,7 @@ async function verifyOperatingDefaults(page) {
     exact: true,
   });
   await importer.setInputFiles(
-    "apps/portal/src/features/workflow-simulator/fixtures/measured-shift-synthetic.json",
+    "areas/kitchen/ui/features/workflow-simulator/fixtures/measured-shift-synthetic.json",
   );
   await page
     .getByRole("rowheader", { name: "Cool before packing", exact: true })

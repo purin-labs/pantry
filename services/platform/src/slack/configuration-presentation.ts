@@ -1,5 +1,5 @@
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
-import type { WorkflowChangeCommand } from "../commerce/bakery/workflow-proposals";
+import type { WorkflowChangeCommand } from "@purin-labs/area-kitchen/server/bakery/workflow-proposals";
 import type {
   AgentOperationInput,
   AgentOperationsSnapshot,

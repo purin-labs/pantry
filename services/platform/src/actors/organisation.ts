@@ -36,7 +36,7 @@ import {
 } from "@purin-labs/control-api";
 import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas-source";
 import type { WorkflowCanvasSource } from "@purin-labs/bakery-model/bakery-canvas-source";
-import { savedBakeryRunArchiveKeys } from "../commerce/bakery/saved-runs";
+import { savedBakeryRunArchiveKeys } from "@purin-labs/area-kitchen/server/bakery/saved-runs";
 import {
   reconcileFrozenOrganisationReceipt,
   type RelocationReceiptRequest,
@@ -64,7 +64,7 @@ import {
   CostsSheetRooms,
   type CostsSheetAgentEdit,
   type CostsSheetSettleInput,
-} from "./costs-sheet-draft";
+} from "@purin-labs/area-kitchen/server/actors/costs-sheet-draft";
 import { cafeCollaborationRooms } from "@purin-labs/area-cafe/server/actors/cafe-collaboration-rooms";
 import {
   dispatchCollaborationFetch,
@@ -74,7 +74,7 @@ import {
 } from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
 import { commerceCollaborationRooms } from "@purin-labs/area-commerce/server/actors/commerce-collaboration-rooms";
 import { inboxCollaborationRooms } from "@purin-labs/area-inbox/server/actors/inbox-collaboration-rooms";
-import { kitchenCollaborationRooms } from "./kitchen-collaboration-rooms";
+import { kitchenCollaborationRooms } from "@purin-labs/area-kitchen/server/actors/kitchen-collaboration-rooms";
 import {
   ProductDescriptionDraftRooms,
   type DraftAgentEdit,
@@ -113,17 +113,17 @@ import {
 import {
   ProductionPlanRooms,
   type ProductionPlanAgentEdit,
-} from "./production-plan";
+} from "@purin-labs/area-kitchen/server/actors/production-plan";
 import {
   openCanvasPages,
   signalCanvasChat,
   WorkflowCanvasRooms,
-} from "./workflow-canvas-rooms";
+} from "@purin-labs/area-kitchen/server/actors/workflow-canvas-rooms";
 import type {
   DraftChangeSet,
   DraftSnapshot,
 } from "@purin-labs/workflow-canvas-crdt/draft-shape";
-import { WorkflowDraftRooms } from "./workflow-draft";
+import { WorkflowDraftRooms } from "@purin-labs/area-kitchen/server/actors/workflow-draft";
 import {
   collaborationSocketRoute,
   type CollaborationSocketRoom,
@@ -149,7 +149,7 @@ import {
 import {
   authorizeWorkflowCanvasRequest,
   matchWorkflowCanvasRoute,
-} from "../control/admission/workflow-canvas";
+} from "@purin-labs/area-kitchen/server/control/admission/workflow-canvas";
 import {
   authorizeMenuBoardSocketRequest,
   matchMenuBoardSocketRoute,
@@ -283,8 +283,8 @@ import {
   readApprovedBakeProposal,
   runBakeCommand,
   type BakeCommand,
-} from "../kitchen/bakes/commands";
-import { setBakeStockLevel } from "../kitchen/bakes/levels";
+} from "@purin-labs/area-kitchen/server/bakes/commands";
+import { setBakeStockLevel } from "@purin-labs/area-kitchen/server/bakes/levels";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
 import type { InventoryStockChange } from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
 export class OrganisationDO

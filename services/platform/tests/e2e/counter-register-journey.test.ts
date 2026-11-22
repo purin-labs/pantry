@@ -11,7 +11,7 @@ import { isRecord } from "@purin-labs/std";
 import { activateTerminalAssignment } from "@purin-labs/area-cafe/server/data/terminal-assignment-store";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { TOOLS } from "../../src/agent-tools/registry";
-import { authorizedBakerySurfaceCommands } from "../../src/agent-tools/bakery/page-effects";
+import { authorizedBakerySurfaceCommands } from "@purin-labs/area-kitchen/server/agent-tools/bakery/page-effects";
 import {
   COOKIE_ENTRY,
   DRINK_ENTRY,

@@ -16,11 +16,11 @@ import {
   createFinancierSample,
   entityType,
   FINANCIER_SAMPLE_ID,
-} from "../src/commerce/bakery/sample";
+} from "@purin-labs/area-kitchen/server/bakery/sample";
 import {
   parseOperationEdit,
   saveOperationDuration,
-} from "../src/commerce/bakery/operation";
+} from "@purin-labs/area-kitchen/server/bakery/operation";
 import { commerceGraphResponseBody } from "@purin-labs/area-commerce/server/entity-plane/routes";
 import {
   parseCommerceGraphQueryResult,
@@ -43,7 +43,7 @@ import {
   parseScenarioCopy,
   scenarioFromEntity,
 } from "@purin-labs/bakery-model/bakery-scenario";
-import { saveScenarioCopy } from "../src/commerce/bakery/scenario";
+import { saveScenarioCopy } from "@purin-labs/area-kitchen/server/bakery/scenario";
 import {
   parseProductionScenario,
   productionDefinitionFingerprint,
@@ -51,7 +51,7 @@ import {
   type ProductionAssignment,
   type ProductionScenario,
 } from "@purin-labs/bakery-model/bakery-production-scenario";
-import { saveProductionScenario } from "../src/commerce/bakery/production-scenario";
+import { saveProductionScenario } from "@purin-labs/area-kitchen/server/bakery/production-scenario";
 import {
   startCommerceWorker,
   type CommerceWorker,
@@ -59,8 +59,8 @@ import {
 import {
   saveProductionScenario as saveProductionScenarioFromPortal,
   type ProductionScenarioRead,
-} from "../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
-import { readScenarioPage } from "../../../apps/portal/src/features/workflow-simulator/scenario-api";
+} from "@purin-labs/area-kitchen/ui/features/workflow-simulator/production-scenario-api";
+import { readScenarioPage } from "@purin-labs/area-kitchen/ui/features/workflow-simulator/scenario-api";
 import type { CommerceGraphFetch } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 import { customEntityRef } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 

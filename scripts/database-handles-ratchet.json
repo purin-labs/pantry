@@ -1,6 +1,8 @@
 {
   "areas/cafe/server/data/screen-pairing.ts": 1,
   "areas/devices/server/alerts.ts": 1,
+  "areas/kitchen/server/control/routes/bakery-runs.ts": 2,
+  "areas/kitchen/server/data/bakery-agent-run-save.ts": 1,
   "foundation/actor-runtime/actors/actor-placement-admission.ts": 2,
   "foundation/actor-runtime/actors/actor-relocation.ts": 1,
   "foundation/actor-runtime/actors/organisation-archive-cleanup.ts": 1,
@@ -24,8 +26,6 @@
   "foundation/tenancy/data/shared-rows/placement-row.ts": 1,
   "foundation/tenancy/organisation-execution-scope.ts": 1,
   "services/platform/src/chat/thread-read-timing.ts": 2,
-  "services/platform/src/control/routes/bakery-runs.ts": 2,
-  "services/platform/src/data/bakery-agent-run-save.ts": 1,
   "services/platform/src/gateway/admin/actor-registry.ts": 1,
   "services/platform/src/slack/ingress-admission.ts": 1,
   "services/platform/src/slack/install-organisation.ts": 1
