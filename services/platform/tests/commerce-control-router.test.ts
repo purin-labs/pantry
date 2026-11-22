@@ -106,17 +106,17 @@ vi.mock("@purin-labs/area-organisation/server/data/onboarding-projection", async
   buildOnboardingProjection: onboardingMocks.buildOnboardingProjection,
 }));
 vi.mock(
-  "../src/data/commerce-capability-activation",
+  "@purin-labs/area-commerce/server/data/commerce-capability-activation",
   async (importOriginal) => ({
     ...(await importOriginal<
-      typeof import("../src/data/commerce-capability-activation")
+      typeof import("@purin-labs/area-commerce/server/data/commerce-capability-activation")
     >()),
     admitCommerceCapability: capabilityMocks.admitCommerceCapability,
   }),
 );
-vi.mock("../src/commerce/provider-execution", async (importOriginal) => ({
+vi.mock("@purin-labs/area-commerce/server/provider-execution", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/commerce/provider-execution")
+    typeof import("@purin-labs/area-commerce/server/provider-execution")
   >()),
   reconcileCommerceProviderAction:
     providerExecutionMocks.reconcileCommerceProviderAction,
@@ -151,7 +151,7 @@ vi.mock("@purin-labs/authority/slack/installation-store", async (importOriginal)
 }));
 
 import { handleControlRequest } from "../src/control-router";
-import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../src/commerce-lab/lab-metadata";
+import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { fixtureFlowBinding } from "./fixtures/plan25-turn";
 import { isRecord } from "@purin-labs/std";

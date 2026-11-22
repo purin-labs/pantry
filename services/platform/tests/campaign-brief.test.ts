@@ -7,7 +7,7 @@ import {
   proposeCampaignBrief,
   type CampaignMessageVariant,
   type ProposeCampaignBriefInput,
-} from "../src/data/campaign-brief";
+} from "@purin-labs/area-commerce/server/data/campaign-brief";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

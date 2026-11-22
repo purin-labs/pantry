@@ -18,7 +18,7 @@ import {
 } from "./services";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
 import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-catalogue";
-import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
+import { CommerceReadRequestError } from "@purin-labs/area-commerce/server/contract/read-errors";
 import { parseProductionRequestFields } from "@purin-labs/commerce-client";
 import {
   type DraftThreadLink,
@@ -30,7 +30,7 @@ import {
 import type {
   CommerceToolReads,
   PreparedCommerceRead,
-} from "../../commerce/contract/tool-reads";
+} from "@purin-labs/area-commerce/server/contract/tool-reads";
 import type { KitchenToolContext } from "./services";
 
 /**

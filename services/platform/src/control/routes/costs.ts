@@ -42,7 +42,7 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { createCommerceEntityPlaneClient } from "../../commerce/contract/client";
+import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce/server/contract/client";
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import {
   finishInventoryOperation,

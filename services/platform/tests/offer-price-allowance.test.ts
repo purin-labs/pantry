@@ -9,8 +9,8 @@ const bindingMocks = vi.hoisted(() => ({
   resolveOrganisationCommerceMerchantBinding: vi.fn(),
 }));
 const organisationMocks = vi.hoisted(() => ({ readOrganisationEnvironment: vi.fn() }));
-vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
+vi.mock("@purin-labs/area-commerce/server/contract/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-commerce/server/contract/client")>()),
   createCommerceClient: clientMocks.createCommerceClient,
 }));
 vi.mock("@purin-labs/connections/data/commerce-merchant-binding", async (importOriginal) => ({
@@ -28,7 +28,7 @@ vi.mock("@purin-labs/agent/control/organisation-runtime", async (importOriginal)
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,
-} from "../src/commerce/contract/offer-price-allowance";
+} from "@purin-labs/area-commerce/server/contract/offer-price-allowance";
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION = requireOrganisationId("organisation_allowance");

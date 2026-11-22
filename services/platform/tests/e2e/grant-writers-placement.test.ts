@@ -28,7 +28,7 @@ import {
   parseSetupSelection,
   selectSetupTemplates,
 } from "@purin-labs/area-organisation/server/data/onboarding";
-import { publishCommerceExportPreset } from "../../src/data/export-preset";
+import { publishCommerceExportPreset } from "@purin-labs/area-commerce/server/data/export-preset";
 import {
   assignWhatsAppSupportAgent,
   ensureWhatsAppSupportContextGrant,

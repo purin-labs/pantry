@@ -31,14 +31,14 @@ vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt:
     payoutControlMocks.recordCommerceMutationReceipt,
 }));
-vi.mock("../src/commerce/commerce-wasm", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/commerce-wasm")>()),
+vi.mock("@purin-labs/area-commerce/server/commerce-wasm", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-commerce/server/commerce-wasm")>()),
   applySupplierPayableCommandWithLexicon:
     payoutControlMocks.applySupplierPayableCommandWithLexicon,
 }));
 
 import { handleControlRequest } from "../src/control-router";
-import { readSupplierDestinationRevision } from "../src/data/supplier-payable-store";
+import { readSupplierDestinationRevision } from "@purin-labs/area-commerce/server/data/supplier-payable-store";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import { platformEnv, type UnitTestEnv } from "./worker-fakes";

@@ -234,7 +234,7 @@ kind. The action kinds are:
 | `packages/commerce-client` (`@purin-labs/commerce-client`)       | `CommerceAdminClient`, `CommerceStorefrontClient` and `CommerceEntityPlaneClient`                                                                                                                                                                                                                                                                |
 | `services/commerce`                                              | The engine Worker `pantry-commerce`. `docs/spec.md` is the contract of its API                                                                                                                                                                                                                                                                   |
 | `apps/storefront`, `scripts/punter`                              | The buyer application and the buyer acceptance client                                                                                                                                                                                                                                                                                            |
-| `services/platform/src/commerce/contract/`                       | The public files of the area in the Platform: the provider port, the delivery intake, the engine client, the queue messages                                                                                                                                                                                                                      |
+| `areas/commerce/server/contract/`                                | The public files of the area in the Platform: the provider port, the delivery intake, the engine client, the queue messages                                                                                                                                                                                                                      |
 
 - Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
   `organisation_commerce_system` has one row for each Organisation, with `system_kind`
@@ -268,7 +268,7 @@ kind. The action kinds are:
   `commerce/outbox-worker.ts`, `commerce/webhooks.ts` and
   `actors/commerce-projection.ts`.
 
-The control routes (`services/platform/src/control/routes/commerce/system.ts`) are under
+The control routes (`areas/commerce/server/control/routes/commerce/system.ts`) are under
 `/v1/control/organisations/:id`:
 
 | Route                                                                    | Role   | Purpose                                                                                                                                                    |
@@ -287,7 +287,7 @@ The control routes (`services/platform/src/control/routes/commerce/system.ts`) a
 - The action routes (`control/routes/commerce/actions.ts`) are `POST /commerce/actions`,
   `GET /commerce/actions/:nonce` (viewer), `POST /commerce/actions/:nonce/approval`,
   `/rejection` and `/execute`, and `GET /commerce/actions/:nonce/plugin-preview`.
-- Agent tools (`services/platform/src/agent-tools/commerce/`): `commerce_entity_context`
+- Agent tools (`areas/commerce/server/agent-tools/commerce/`): `commerce_entity_context`
   reads commerce records with the capability `commerce.entity_plane.context`.
   `commerce_propose_action` stages a governed action with `commerce.action.propose`. It
   writes to no provider. COM-03 and COM-05 give the other tools.

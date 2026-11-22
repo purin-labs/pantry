@@ -4,7 +4,7 @@ import { CandidateActor as RecoveryActor } from "./recovery-worker.mjs";
 import { registerSession, seedDraftAuthority } from "./draft-seed.mjs";
 import { OrganisationDO } from "../../services/platform/src/actors/organisation.ts";
 import { CaseDO } from "../../services/platform/src/actors/case.ts";
-import { proposeCommerceActionForHarness } from "../../services/platform/src/actors/harness-commerce-proposal.ts";
+import { proposeCommerceActionForHarness } from "../../areas/commerce/server/actors/harness-commerce-proposal.ts";
 import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
 import { createActorExecutionBarrierSchema } from "../../foundation/actor-runtime/actors/actor-execution-quiescence.ts";
 import {
@@ -32,7 +32,7 @@ import {
 } from "../../foundation/authority/data/access-grants.ts";
 import { parseOrganisationPolicySnapshot } from "../../foundation/authority/policy-snapshot.ts";
 import { parseOrganisationId } from "../../foundation/kernel/ids.ts";
-import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
+import { commerceCanonicalResourceId } from "../../areas/commerce/server/contract/resource-ids.ts";
 import { preflightHarnessTurnLease } from "../../foundation/agent/actors/agent-session-harness-authority.ts";
 import {
   admitSessionInformationFlowObservation,

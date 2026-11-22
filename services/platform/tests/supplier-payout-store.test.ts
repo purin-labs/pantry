@@ -14,7 +14,7 @@ import {
   readSupplierPayout,
   readSupplierPayoutByIdempotencyKey,
   type SupplierPayoutRow,
-} from "../src/data/supplier-payout-store";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_payout" as OrganisationId;

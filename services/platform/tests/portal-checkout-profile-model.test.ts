@@ -7,9 +7,9 @@ import { describe, expect, it, vi } from "vitest";
 import type {
   CheckoutProfileCollection,
   DraftCheckoutProfileSummary,
-} from "../../../apps/portal/src/features/checkout-profiles/api";
+} from "@purin-labs/area-commerce/ui/features/checkout-profiles/api";
 import type { CheckoutProfileSummary } from "@purin-labs/commerce-control-api/portal/checkout-profiles";
-import { handleSaveSubmit } from "../../../apps/portal/src/features/checkout-profiles/controller";
+import { handleSaveSubmit } from "@purin-labs/area-commerce/ui/features/checkout-profiles/controller";
 import {
   activeReview,
   busyAction,
@@ -23,7 +23,7 @@ import {
   selectedProfile,
   type CheckoutProfilesAction,
   type CheckoutProfilesState,
-} from "../../../apps/portal/src/features/checkout-profiles/model";
+} from "@purin-labs/area-commerce/ui/features/checkout-profiles/model";
 import type { Variant } from "@purin-labs/type-utils";
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
@@ -353,7 +353,7 @@ function loadCollection(
 function publishedSummary(
   checkoutProfileId: string,
   revision: number,
-): import("../../../apps/portal/src/features/checkout-profiles/model").PublishedCheckoutProfileSummary {
+): import("@purin-labs/area-commerce/ui/features/checkout-profiles/model").PublishedCheckoutProfileSummary {
   const value = summary(checkoutProfileId, revision, "published");
   if (!isPublishedProfileSummary(value)) {
     throw new Error("Expected a published checkout profile.");

@@ -9,7 +9,7 @@ import {
   type CheckoutProfileReadTransport,
   type DraftCheckoutProfileSummary,
   type PublishedCheckoutProfileSummary,
-} from "../../../apps/portal/src/features/checkout-profiles/api";
+} from "@purin-labs/area-commerce/ui/features/checkout-profiles/api";
 
 const CONFIGURATION: CheckoutProfileConfiguration = {
   currencyPolicy: { kind: "fixed", currency: "JPY" },

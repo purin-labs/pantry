@@ -8,14 +8,14 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
-import { commerceActionTitle } from "../../../../apps/portal/src/features/governed-actions/commerce";
+import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
 import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
 import {
   chat,
   preparePortalChatJourney,

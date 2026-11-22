@@ -4,7 +4,7 @@ import {
   createCommerceLabScenarioRun,
   parseCommerceLabIdempotencyKey,
   parseCommerceLabScenarioId,
-} from "../../src/commerce-lab/scenarios";
+} from "@purin-labs/area-commerce/server/commerce-lab/scenarios";
 
 describe("commerce lab scenario catalog", function commerceLabCatalogSuite() {
   it("creates the same run and provider event identities on replay", function deterministicRun() {

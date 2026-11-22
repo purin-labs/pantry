@@ -21,7 +21,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import {
   discoverShopifyIdentity,
   exchangeShopifyAuthorizationCode,

@@ -1,6 +1,6 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { prepareCueLogEntry } from "@purin-labs/agent/cues/cue-log";
-import { pantryCommerceAccess } from "../commerce/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   CommerceEntityRef,
@@ -43,9 +43,9 @@ import type { Result } from "@purin-labs/kernel/result";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
-import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
-import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";
-import { CommerceEngineSource } from "../commerce/entity-plane/commerce-source";
+import { buildSavedSelectorCommerceReadAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
+import { createCommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/selected-graph-reader";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import {

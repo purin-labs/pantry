@@ -5,7 +5,7 @@ import {
   parseCommerceSnapshotRevision,
 } from "@purin-labs/commerce-client";
 
-import { planSafeCommerceQuery } from "../src/commerce/entity-plane/planner";
+import { planSafeCommerceQuery } from "@purin-labs/area-commerce/server/entity-plane/planner";
 
 describe("commerce entity-plane planner surface", () => {
   it("lets Lexicon seal exact-definition relationship traversal", () => {

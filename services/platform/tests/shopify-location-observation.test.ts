@@ -14,7 +14,7 @@ import {
 import {
   createCommerceProjectionSchema,
   readCurrentCommerceProjection,
-} from "../src/actors/commerce-projection";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 

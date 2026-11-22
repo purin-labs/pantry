@@ -228,39 +228,39 @@ import. A module with no line for one of these has none.
 ## areas/commerce
 
 - Folders: 30
-  - `apps/portal/src/`
-  - `apps/portal/src/features/api-keys/`
-  - `apps/portal/src/features/bank-payouts/`
-  - `apps/portal/src/features/checkout-profiles/`
-  - `apps/portal/src/features/commerce/`
-  - `apps/portal/src/features/commerce/description-draft/`
-  - `apps/portal/src/features/commerce/entity-plane/`
-  - `apps/portal/src/features/ecommerce/`
-  - `apps/portal/src/features/governed-actions/`
-  - `apps/portal/src/features/orders/`
-  - `apps/portal/src/features/payment-accounts/`
-  - `apps/portal/src/features/payments/`
-  - `apps/portal/src/features/payouts/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/commerce-projection/`
-  - `services/platform/src/actors/organisation/`
-  - `services/platform/src/agent-tools/commerce/`
-  - `services/platform/src/commerce-lab/`
-  - `services/platform/src/commerce/`
-  - `services/platform/src/commerce/contract/`
-  - `services/platform/src/commerce/entity-plane/`
-  - `services/platform/src/control/`
-  - `services/platform/src/control/admission/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/control/routes/agents/`
-  - `services/platform/src/control/routes/commerce/`
-  - `services/platform/src/data/`
-  - `services/platform/src/payout-providers/`
-  - `services/platform/src/payouts/`
-  - `services/platform/src/stripe/`
-- Packages: `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
+  - `areas/commerce/server/`
+  - `areas/commerce/server/actors/`
+  - `areas/commerce/server/actors/commerce-projection/`
+  - `areas/commerce/server/actors/organisation/`
+  - `areas/commerce/server/agent-tools/commerce/`
+  - `areas/commerce/server/commerce-lab/`
+  - `areas/commerce/server/contract/`
+  - `areas/commerce/server/control/`
+  - `areas/commerce/server/control/admission/`
+  - `areas/commerce/server/control/routes/`
+  - `areas/commerce/server/control/routes/agents/`
+  - `areas/commerce/server/control/routes/commerce/`
+  - `areas/commerce/server/data/`
+  - `areas/commerce/server/entity-plane/`
+  - `areas/commerce/server/payout-providers/`
+  - `areas/commerce/server/payouts/`
+  - `areas/commerce/server/stripe/`
+  - `areas/commerce/ui/`
+  - `areas/commerce/ui/features/api-keys/`
+  - `areas/commerce/ui/features/bank-payouts/`
+  - `areas/commerce/ui/features/checkout-profiles/`
+  - `areas/commerce/ui/features/commerce/`
+  - `areas/commerce/ui/features/commerce/description-draft/`
+  - `areas/commerce/ui/features/commerce/entity-plane/`
+  - `areas/commerce/ui/features/ecommerce/`
+  - `areas/commerce/ui/features/governed-actions/`
+  - `areas/commerce/ui/features/orders/`
+  - `areas/commerce/ui/features/payment-accounts/`
+  - `areas/commerce/ui/features/payments/`
+  - `areas/commerce/ui/features/payouts/`
+- Packages: `areas/commerce`, `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
 - Tables (13): `campaign_brief`, `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
-- Public files: `apps/portal/src/features/commerce/description-draft/styles.css`, `apps/portal/src/features/commerce/entity-plane/api.ts`, `apps/portal/src/features/commerce/operations.ts`, `apps/portal/src/features/commerce/stock-status.ts`, `apps/portal/src/features/governed-actions/commerce.ts`, `apps/portal/src/features/governed-actions/decision-labels.ts`, `packages/commerce-contracts`, `services/platform/src/commerce/contract/`
+- Public files: `areas/commerce/server/contract/`, `areas/commerce/ui/features/commerce/description-draft/styles.css`, `areas/commerce/ui/features/commerce/entity-plane/api.ts`, `areas/commerce/ui/features/commerce/operations.ts`, `areas/commerce/ui/features/commerce/stock-status.ts`, `areas/commerce/ui/features/governed-actions/commerce.ts`, `areas/commerce/ui/features/governed-actions/decision-labels.ts`, `packages/commerce-contracts`
 
 ## areas/devices
 

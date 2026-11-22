@@ -17,7 +17,7 @@ import { handleEmailReply } from "@purin-labs/area-inbox/server/control/routes/a
 import {
   handleCommerceActionApproval,
   handleCommerceActionRejection,
-} from "./routes/commerce/actions";
+} from "@purin-labs/area-commerce/server/control/routes/commerce/actions";
 import {
   approveCustomConnectorWriteAction,
   rejectCustomConnectorWriteAction,

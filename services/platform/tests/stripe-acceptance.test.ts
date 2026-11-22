@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { triggerStripeFailedCharge } from "../src/stripe/acceptance";
+import { triggerStripeFailedCharge } from "@purin-labs/area-commerce/server/stripe/acceptance";
 
 let capturedFetcherReceiver: unknown = null;
 

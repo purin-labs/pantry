@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   composeCommerceActivity,
   readCommerceActivity,
-} from "../src/commerce/entity-plane/activity";
-import { parseCommerceEntityPlaneEffect } from "../src/commerce/entity-plane/proposals";
+} from "@purin-labs/area-commerce/server/entity-plane/activity";
+import { parseCommerceEntityPlaneEffect } from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import type { CommerceActivityResource } from "@purin-labs/commerce-control-api";
 import { requireOrganisationId } from "./test-ids";
 

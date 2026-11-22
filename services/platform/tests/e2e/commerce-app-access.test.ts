@@ -5,7 +5,7 @@ import {
   COMMERCE_API_SCOPES,
   parseListEntryReadRequest,
 } from "@purin-labs/commerce-client";
-import { createCommerceEntityPlaneClient } from "../../src/commerce/contract/client";
+import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce/server/contract/client";
 import {
   commerceClient,
   commerceWorkspace,

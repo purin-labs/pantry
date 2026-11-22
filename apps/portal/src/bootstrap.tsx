@@ -30,7 +30,8 @@ async function renderApplication(pathname: string): Promise<void> {
     return;
   }
   if (pathname === "/ecommerce" || pathname === "/ecommerce/") {
-    const { EcommercePage } = await import("./features/ecommerce/page");
+    const { EcommercePage } =
+      await import("@purin-labs/area-commerce/ui/features/ecommerce/page");
     document.title = "Ecommerce Agents · Seams";
     portalRoot.render(<EcommercePage />);
     return;

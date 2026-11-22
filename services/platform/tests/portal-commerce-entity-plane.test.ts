@@ -20,15 +20,15 @@ import {
   parseCommerceGraphQueryResult,
   patchCommerceListEntryStatus,
   readPublishedCommerceResources,
-} from "../../../apps/portal/src/features/commerce";
-import { updateCommerceBoardPresence } from "../../../apps/portal/src/features/commerce/entity-plane/api";
+} from "@purin-labs/area-commerce/ui/features/commerce/index";
+import { updateCommerceBoardPresence } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 import { parseCommerceListEntryPatchResponse } from "@purin-labs/commerce-control-api/portal/entity-plane";
 import {
   OrderCancellationControl,
   proposeOrderCancellation,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/features/commerce/entity-plane/route";
-import type { CommerceOperationsTransport } from "../../../apps/portal/src/features/commerce/operations";
+} from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/route";
+import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
 
 async function validCommercePresenceTransport(): Promise<unknown> {
   return commercePresenceResponse(false);

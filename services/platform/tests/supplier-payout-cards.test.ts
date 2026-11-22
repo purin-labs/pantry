@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { SupplierPayoutRow } from "../src/data/supplier-payout-store";
+import type { SupplierPayoutRow } from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 import {
   renderOutgoingPayouts,
   renderPayoutApprovalCard,

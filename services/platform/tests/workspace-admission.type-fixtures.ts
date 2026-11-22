@@ -65,7 +65,7 @@ const spreadAuthority: WorkspaceRevisionAuthority = {
 };
 void spreadAuthority;
 
-declare const campaignDraft: import("../src/data/campaign-brief").ProposeCampaignBriefInput;
+declare const campaignDraft: import("@purin-labs/area-commerce/server/data/campaign-brief").ProposeCampaignBriefInput;
 const { authorizeCommit: campaignAuthority, ...unboundCampaign } =
   campaignDraft;
 void campaignAuthority;

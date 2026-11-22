@@ -11,7 +11,7 @@ import {
 import {
   commerceDeliveryIntake,
   type CommerceWasmError,
-} from "../commerce/contract/delivery-intake";
+} from "@purin-labs/area-commerce/server/contract/delivery-intake";
 import type { Result } from "@purin-labs/kernel/result";
 
 export function normalizeShopifyCommerceOrderDelivery(

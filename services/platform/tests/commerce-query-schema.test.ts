@@ -21,14 +21,14 @@ import { OrganisationDO } from "../src/actors/organisation";
 import {
   materializeCommerceRelationText,
   rebuildCommerceRelationshipRelationsForOwner,
-} from "../src/actors/commerce-query-schema";
+} from "@purin-labs/area-commerce/server/actors/commerce-query-schema";
 import {
   buildCommerceGraphQueryPlanRequest,
   commerceGraphQueryProjection,
   planSafeCommerceQuery,
-} from "../src/commerce/entity-plane/planner";
-import { parseCommerceGraphQuery } from "../src/commerce/entity-plane/routes";
-import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/entity-plane/planner";
+import { parseCommerceGraphQuery } from "@purin-labs/area-commerce/server/entity-plane/routes";
+import { planCommerceGraphQuery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";

@@ -18,7 +18,7 @@ Each change names the exact record and the revision that it expects. A delivery
 (`receive_stock`) and a new production request expect revision 0
 (`kitchen/contract/stock-action.ts`). The action ledger of `OrganisationActor` holds
 the change (FND-06). The kinds are in `CommerceActionRequest`
-(`services/platform/src/commerce/action-model.ts`):
+(`areas/commerce/server/action-model.ts`):
 
 | Kind                                                       | Who proposes                                         | Runs at             | Slack approval |
 | ---------------------------------------------------------- | ---------------------------------------------------- | ------------------- | -------------- |
@@ -320,7 +320,7 @@ decision is the exception: it takes `expectedRevision` in the body, and a stale
 revision gives 409 `campaign_brief_conflict`. The 18 agent operation commands are in
 `packages/control-api/src/agent-operation-commands.ts`.
 
-The proposal tools are in `services/platform/src/agent-tools/commerce/proposals.ts`,
+The proposal tools are in `areas/commerce/server/agent-tools/commerce/proposals.ts`,
 except `menu_board_propose_price` (`agent-tools/drafts/`). `commerce_merchant_report` is
 in `agent-tools/commerce/reports.ts`. `supplier_read` and `supplier_create` are in
 `agent-tools/kitchen/suppliers.ts`. Each proposal tool needs `commerce.action.propose`

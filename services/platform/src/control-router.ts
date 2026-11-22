@@ -121,11 +121,11 @@ import {
   matchCaseExecutionRoute,
   type CaseExecutionRoute,
 } from "@purin-labs/area-brain/server/control/routes/case-execution";
-import { handleProductDescriptionDraftRoute } from "./control/routes/product-description-draft";
+import { handleProductDescriptionDraftRoute } from "@purin-labs/area-commerce/server/control/routes/product-description-draft";
 import {
   matchProductDescriptionDraftRoute,
   type ProductDescriptionDraftRoute,
-} from "./control/admission/product-description-draft";
+} from "@purin-labs/area-commerce/server/control/admission/product-description-draft";
 import { handleMailReplyDraftRoute } from "@purin-labs/area-inbox/server/control/routes/mail-reply-draft";
 import {
   matchMailReplyDraftRoute,

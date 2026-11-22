@@ -20,13 +20,13 @@ import type {
   HarnessCodeModeAuthority,
 } from "@purin-labs/agent-tools/catalog/types";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
-import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
-import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";
-import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
+import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
+import { runMerchantReport } from "@purin-labs/area-commerce/server/entity-plane/merchant-report-runner";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import {
   assembleCommerceContext,
   selectCommerceContextSourceGrant,
-} from "../src/commerce/entity-plane/context-read";
+} from "@purin-labs/area-commerce/server/entity-plane/context-read";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { isRecord } from "@purin-labs/std";
 import {
@@ -721,7 +721,7 @@ async function readContext(
 async function readReport(
   fixture: Fixture,
   request: {
-    name: import("../src/commerce/entity-plane/merchant-reports").MerchantReportName;
+    name: import("@purin-labs/area-commerce/server/entity-plane/merchant-reports").MerchantReportName;
   },
 ) {
   return required(

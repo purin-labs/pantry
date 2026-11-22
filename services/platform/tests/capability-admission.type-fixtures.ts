@@ -9,7 +9,7 @@ import {
   type CapabilityPolicyWrite,
 } from "@purin-labs/authority/data/capability-policy";
 import { selectSetupTemplates } from "@purin-labs/area-organisation/server/data/onboarding";
-import { publishCommerceExportPreset } from "../src/data/export-preset";
+import { publishCommerceExportPreset } from "@purin-labs/area-commerce/server/data/export-preset";
 import {
   assignWhatsAppSupportAgent,
   ensureWhatsAppSupportContextGrant,

@@ -19,7 +19,7 @@ import {
   buildCommerceEntityPlaneEffect,
   parseCommerceEntityPlaneEffect,
   proposalFromCommand,
-} from "../src/commerce/entity-plane/proposals";
+} from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import { startCommerceWorker } from "./commerce-fixture-worker";
 import { requireOrganisationId } from "./test-ids";
 

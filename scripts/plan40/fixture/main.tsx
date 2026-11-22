@@ -3,8 +3,8 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Link, RouterProvider, useLocation } from "react-router";
 import { validateCommerceEntityShape } from "@purin-labs/commerce-contracts/browser-validators";
 import type { CommerceEntity } from "@purin-labs/commerce-contracts";
-import { ProductDescriptionDraftControl } from "../../../apps/portal/src/features/commerce/description-draft/control";
-import DescriptionEditor from "../../../apps/portal/src/features/commerce/description-draft/editor";
+import { ProductDescriptionDraftControl } from "../../../areas/commerce/ui/features/commerce/description-draft/control";
+import DescriptionEditor from "../../../areas/commerce/ui/features/commerce/description-draft/editor";
 import "../../../apps/portal/src/styles.css";
 
 const root = document.getElementById("root");

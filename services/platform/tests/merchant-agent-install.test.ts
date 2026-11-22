@@ -11,10 +11,10 @@ import {
   installMerchantAgent,
   merchantAgentDefaultSkills,
   merchantAgentSkillId,
-} from "../src/data/merchant-agent-preset";
+} from "@purin-labs/area-commerce/server/data/merchant-agent-preset";
 import { merchantAgentAgentId } from "@purin-labs/agent/data/merchant-agent-ids";
-import { merchantAgentSkill } from "../src/data/merchant-agent-skills";
-import { merchantAgentAreaId } from "../src/data/merchant-agent-preset";
+import { merchantAgentSkill } from "@purin-labs/area-commerce/server/data/merchant-agent-skills";
+import { merchantAgentAreaId } from "@purin-labs/area-commerce/server/data/merchant-agent-preset";
 import { createAgentOperationsDatabase } from "./agent-operations-database";
 import { requireOrganisationId } from "./test-ids";
 

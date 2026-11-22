@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import { createFinancierSample } from "../../commerce/bakery/sample";
 import {
@@ -29,7 +29,7 @@ import {
   replayControlMutation,
   resolveMutationUser,
 } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "../../commerce/contract/merchant-control";
+import { resolveMerchantBinding } from "@purin-labs/area-commerce/server/contract/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

@@ -20,7 +20,7 @@ import { describe, expect, it } from "vitest";
 import {
   compileCommerceReadAuthorities,
   commerceCommandGrantMatches,
-} from "../src/commerce/entity-plane/grant-authorities";
+} from "@purin-labs/area-commerce/server/entity-plane/grant-authorities";
 import {
   compileEffectiveGrantSet,
   encodeProviderCapabilityKey,

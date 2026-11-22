@@ -223,7 +223,7 @@ to the spec of its area.
 - **Portal.** `apps/portal/src/features/collaboration/`: `document-client.ts`,
   `text-client.ts`, `socket-liveness.ts`, `draft-presence.tsx`, `agent-cursors.tsx`,
   `slack-thread-control.tsx` and `draft-leave-dialog.tsx`. The description editor is in
-  `apps/portal/src/features/commerce/description-draft/`.
+  `areas/commerce/ui/features/commerce/description-draft/`.
 - **Layers.** In `scripts/layers.json`, the module is `foundation/collaboration`:
   `packages/collaboration`, `collaboration-room.ts`, `collaboration-room-dispatch.ts`,
   `collaboration-agent.ts`, `collaboration-slack-thread.ts` and the Portal folder
@@ -317,7 +317,7 @@ Portal origin (`PANTRY_PUBLIC_ORIGIN`). The role "Admin" includes the owner.
 | `email_draft_read`               | `marketing.email_draft.edit`              | Read   | Returns the email draft and its revision                                                                                                                                                                                               |
 | `email_draft_edit`               | `marketing.email_draft.edit`              | Draft  | Replaces one exact passage of one field, at `expectedRevision`                                                                                                                                                                         |
 
-The tools are in `services/platform/src/agent-tools/commerce/description-draft.ts` and
+The tools are in `areas/commerce/server/agent-tools/commerce/description-draft.ts` and
 `agent-tools/channels/email-draft.ts`, and Code Mode can call them. The two edit
 capabilities are in `foundation/authority/authorization/capability-catalogue.ts`. A new
 Organisation has both switched off. An agent can ask for each one in the permission

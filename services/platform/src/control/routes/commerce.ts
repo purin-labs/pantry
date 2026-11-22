@@ -10,12 +10,12 @@ import {
 import {
   handleProductCatalogAction,
   type ProductCatalogAction,
-} from "./product-catalog";
+} from "@purin-labs/area-commerce/server/control/routes/product-catalog";
 import {
   handleLibraryImageContent,
   handleProductPhotoAction,
   type ProductPhotoAction,
-} from "./product-photos";
+} from "@purin-labs/area-commerce/server/control/routes/product-photos";
 import {
   handlePurchasingControlRoute,
   type PurchasingControlAction,
@@ -28,7 +28,7 @@ import {
   handleCheckoutProfileControlRoute,
   matchCheckoutProfileControlRoute,
   type CheckoutProfileControlRoute,
-} from "./checkout-profiles";
+} from "@purin-labs/area-commerce/server/control/routes/checkout-profiles";
 import {
   handleTerminalOperationsControlRoute,
   matchTerminalOperationsControlRoute,
@@ -43,12 +43,12 @@ import {
   handleCommerceApiKeyControlRoute,
   matchCommerceApiKeyControlRoute,
   type CommerceApiKeyControlRoute,
-} from "./commerce-api-keys";
+} from "@purin-labs/area-commerce/server/control/routes/commerce-api-keys";
 import {
   handleCommercePaymentAccountControlRoute,
   matchCommercePaymentAccountControlRoute,
   type CommercePaymentAccountControlRoute,
-} from "./commerce-payment-accounts";
+} from "@purin-labs/area-commerce/server/control/routes/commerce-payment-accounts";
 import {
   handleCommerceMenuPublicationControlRoute,
   matchCommerceMenuPublicationControlRoute,
@@ -63,17 +63,17 @@ import {
   handleFailedPaymentsControlRoute,
   matchFailedPaymentsControlRoute,
   type FailedPaymentsControlRoute,
-} from "./failed-payments";
+} from "@purin-labs/area-commerce/server/control/routes/failed-payments";
 import {
   handleCommercePaymentsControlRoute,
   matchCommercePaymentsControlRoute,
   type CommercePaymentsControlRoute,
-} from "./payments";
+} from "@purin-labs/area-commerce/server/control/routes/payments";
 import {
   handleBankPayoutsControlRoute,
   matchBankPayoutsControlRoute,
   type BankPayoutsControlRoute,
-} from "./bank-payouts";
+} from "@purin-labs/area-commerce/server/control/routes/bank-payouts";
 import {
   handleOrderTimesControlRoute,
   matchOrderTimesControlRoute,
@@ -93,13 +93,13 @@ import {
   handleSupplierPayoutControlRoute,
   matchSupplierPayoutControlRoute,
   type SupplierPayoutControlRoute,
-} from "./supplier-payouts";
+} from "@purin-labs/area-commerce/server/control/routes/supplier-payouts";
 import { assertNever } from "@purin-labs/std";
 import {
   handleCommerceActionExecution,
   handleCommerceActionPluginPreview,
   handleCommerceActions,
-} from "./commerce/actions";
+} from "@purin-labs/area-commerce/server/control/routes/commerce/actions";
 import {
   handleCommerceCueRefresh,
   handleCommerceInventory,
@@ -107,7 +107,7 @@ import {
   handleCommercePricedOffers,
   handleCommercePublishedResources,
   handleCommerceTrackingBatchPreview,
-} from "./commerce/catalog";
+} from "@purin-labs/area-commerce/server/control/routes/commerce/catalog";
 import {
   handleCommerceBoardPresence,
   handleCommerceExportPreset,
@@ -116,13 +116,13 @@ import {
   handleCommerceGraphChanges,
   handleCommerceListEntryPatch,
   handleCommerceSavedViewPresentationPatch,
-} from "./commerce/graph";
+} from "@purin-labs/area-commerce/server/control/routes/commerce/graph";
 import {
   handleCommerceCapabilities,
   handleCommerceSystem,
   handleCommerceSystemSync,
   handlePantryCommerceDemo,
-} from "./commerce/system";
+} from "@purin-labs/area-commerce/server/control/routes/commerce/system";
 
 export type CommerceControlRoute =
   | CheckoutProfileControlRoute

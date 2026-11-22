@@ -16,7 +16,7 @@ import type { CommerceCommandResult } from "@purin-labs/commerce-contracts";
 import {
   commerceListEntryPatchCommand,
   productionRequestCreateCommand,
-} from "../../commerce/contract/list-entry-commands";
+} from "@purin-labs/area-commerce/server/contract/list-entry-commands";
 import type {
   StockOperationAction,
   StockProductionAdvanceOperation,

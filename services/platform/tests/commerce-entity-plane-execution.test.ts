@@ -11,8 +11,8 @@ import { parseApprovalEvidence } from "@purin-labs/authority/approval-authentica
 import {
   executeCommerceEntityPlaneAction,
   type CommerceEntityPlaneExecutionEnv,
-} from "../src/commerce/entity-plane/execution";
-import { parseCommerceEntityPlaneProposal } from "../src/commerce/entity-plane/proposals";
+} from "@purin-labs/area-commerce/server/entity-plane/execution";
+import { parseCommerceEntityPlaneProposal } from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   realProviderActionAuthority,

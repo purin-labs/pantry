@@ -44,7 +44,7 @@ import {
   fixtureFlowBinding,
   fixtureProviderActionAuthority,
 } from "./fixtures/plan25-turn";
-import { parseCommerceEntityPlaneEffect } from "../src/commerce/entity-plane/proposals";
+import { parseCommerceEntityPlaneEffect } from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   requireCaseId,

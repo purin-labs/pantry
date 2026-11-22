@@ -19,21 +19,21 @@ import {
 import { proposeEvalFromCorrection } from "@purin-labs/area-brain/server/evals/access";
 import { commerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
 import { actionLedgerCommerce } from "@purin-labs/authority/actors/action-ledger";
-import { slackMayApproveAction } from "./commerce/action-model";
-import { parseCommerceEntityPlaneEffect } from "./commerce/entity-plane/proposals";
+import { slackMayApproveAction } from "@purin-labs/area-commerce/server/action-model";
+import { parseCommerceEntityPlaneEffect } from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import { commerceGrantSelection } from "@purin-labs/authority/authorization/access-grants/commerce-grant-selection";
-import { COMMERCE_ACCESS_TARGETS } from "./commerce/entity-plane/access-targets";
-import { RESPONSIBILITY_SCOPE_COMMERCE } from "./commerce/entity-plane/responsibility-scopes";
+import { COMMERCE_ACCESS_TARGETS } from "@purin-labs/area-commerce/server/entity-plane/access-targets";
+import { RESPONSIBILITY_SCOPE_COMMERCE } from "@purin-labs/area-commerce/server/entity-plane/responsibility-scopes";
 import { responsibilityScopeCommerce } from "@purin-labs/agent/data/agent-operations/scope-commerce";
 import { commerceGrantTargets } from "@purin-labs/authority/authorization/access-grants/commerce-grant-targets";
-import { COMMERCE_GRANT_TARGETS } from "./commerce/entity-plane/grant-targets";
-import { connectedCommerceProviders } from "./commerce/contract/commerce-provider";
-import { COMMERCE_GRANT_SELECTION } from "./commerce/entity-plane/grant-selection";
-import { commerceGraphReads } from "./commerce/contract/graph-reads";
+import { COMMERCE_GRANT_TARGETS } from "@purin-labs/area-commerce/server/entity-plane/grant-targets";
+import { connectedCommerceProviders } from "@purin-labs/area-commerce/server/contract/commerce-provider";
+import { COMMERCE_GRANT_SELECTION } from "@purin-labs/area-commerce/server/entity-plane/grant-selection";
+import { commerceGraphReads } from "@purin-labs/area-commerce/server/contract/graph-reads";
 import { parseEntityPlaneObservation } from "@purin-labs/commerce-client";
 import { entityPlaneObservationParser } from "@purin-labs/agent/cues/engine";
-import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
-import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
+import { readCommerceExceptionInbox } from "@purin-labs/area-commerce/server/operations-workbench";
 import { commerceExceptionInbox } from "@purin-labs/agent/control/agent-operation-activity";
 import { onboardingProjection } from "@purin-labs/control/worker/admission/control-mutation";
 import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/data/onboarding-projection";
@@ -45,16 +45,16 @@ import { bakeryRunSnapshots } from "@purin-labs/conversation/projects/references
 import {
   readNamedCommerceQuery,
   selectNamedCommerceQuerySourceGrant,
-} from "./commerce/entity-plane/context-read";
-import { createCommerceGraphReader } from "./commerce/entity-plane/selected-graph-reader";
+} from "@purin-labs/area-commerce/server/entity-plane/context-read";
+import { createCommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/selected-graph-reader";
 import {
   commerceGraphControlAuthority,
   controlCommerceSensitivityCeiling,
   openControlCommerceGraph,
-} from "./control/commerce-graph";
-import { commerceDeliveryIntake } from "./commerce/contract/delivery-intake";
-import { applyCommerceDelivery } from "./actors/commerce-projection";
-import { normalizeCommerceDelivery } from "./commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/control/commerce-graph";
+import { commerceDeliveryIntake } from "@purin-labs/area-commerce/server/contract/delivery-intake";
+import { applyCommerceDelivery } from "@purin-labs/area-commerce/server/actors/commerce-projection";
+import { normalizeCommerceDelivery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { connectionParts } from "@purin-labs/area-integrations/server/contract/connection-parts";
 import { providerModules } from "@purin-labs/area-integrations/server/contract/provider-modules";
 import { providerServices } from "@purin-labs/area-integrations/server/contract/provider-services";
@@ -87,7 +87,7 @@ import { releaseAgentPermissionDecision } from "./slack/permission-request-relea
 import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import { shopMacDevices } from "@purin-labs/area-devices/server/contract/shop-mac-devices";
 import { readShopMacDevices } from "./voice/mac-devices";
-import { commerceApprovalCardTexts } from "./commerce/contract/approval-card-texts";
+import { commerceApprovalCardTexts } from "@purin-labs/area-commerce/server/contract/approval-card-texts";
 import {
   commerceActionCardText,
   commerceActionPortalUrl,

@@ -21,7 +21,7 @@ import {
   parseOperationEdit,
   saveOperationDuration,
 } from "../src/commerce/bakery/operation";
-import { commerceGraphResponseBody } from "../src/commerce/entity-plane/routes";
+import { commerceGraphResponseBody } from "@purin-labs/area-commerce/server/entity-plane/routes";
 import {
   parseCommerceGraphQueryResult,
 } from "@purin-labs/commerce-control-api/portal/entity-plane-boundary";
@@ -61,8 +61,8 @@ import {
   type ProductionScenarioRead,
 } from "../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
 import { readScenarioPage } from "../../../apps/portal/src/features/workflow-simulator/scenario-api";
-import type { CommerceGraphFetch } from "../../../apps/portal/src/features/commerce/entity-plane/api";
-import { customEntityRef } from "../../../apps/portal/src/features/commerce/entity-plane/api";
+import type { CommerceGraphFetch } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import { customEntityRef } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 
 const NOW = "2026-09-08T00:00:00.000Z";
 const ORGANISATION = "organisation_bakery_sample",

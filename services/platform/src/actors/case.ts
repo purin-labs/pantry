@@ -1,4 +1,4 @@
-import { caseCommercePart } from "../commerce/case-proposals";
+import { caseCommercePart } from "@purin-labs/area-commerce/server/case-proposals";
 import type {
   CaseExecutionCaseRecords,
   CaseExecutionContentTarget,

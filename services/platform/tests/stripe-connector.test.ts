@@ -11,7 +11,7 @@ import {
   parseStripeCueEvent,
   registerStripeWebhook,
   verifyStripeWebhookSignature,
-} from "../src/stripe/connector";
+} from "@purin-labs/area-commerce/server/stripe/connector";
 
 type CapturedStripeRequest = {
   url: string;

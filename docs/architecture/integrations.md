@@ -232,7 +232,7 @@ see [Action ledger](./security.md#action-ledger) and
 `CommerceActionRequest`
 ([`commerce-actions.ts`](../../services/platform/src/commerce-actions.ts))
 lists the commerce actions, and each source supports a subset
-([`harness-commerce-proposal.ts`](../../services/platform/src/actors/harness-commerce-proposal.ts)):
+([`harness-commerce-proposal.ts`](../../areas/commerce/server/actors/harness-commerce-proposal.ts)):
 `commerce` supports `publish_catalog_listing`, `cancel_order`,
 `attach_tracking` and `adjust_offer_price`; `shopify` supports `cancel_order`.
 [`commerce-provider-execution.ts`](../../services/platform/src/commerce-provider-execution.ts)

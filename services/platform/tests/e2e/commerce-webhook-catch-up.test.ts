@@ -5,7 +5,7 @@ import { isRecord } from "@purin-labs/std";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import { newRequestId } from "@purin-labs/kernel/ids";
-import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
+import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-commerce/server/outbox-worker";
 import {
   commerceClient,
   commerceWorkspace,

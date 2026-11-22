@@ -44,6 +44,7 @@
     "@purin-labs/tool-handlers": "workspace:*",
     "@purin-labs/type-utils": "workspace:*",
     "@purin-labs/ui": "workspace:*",
+    "@purin-labs/area-commerce": "workspace:*",
     "lucide-react": "^0.542.0",
     "qrcode-generator": "^2.0.4",
     "react": "^19.1.1",

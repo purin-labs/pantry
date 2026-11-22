@@ -36,7 +36,7 @@ pantry/
 | Workspace executor | Bounded heavy execution                                                               | Immutable workspace revisions and validated changesets           |
 
 Sous Chef runs inside Platform; its instructions and skills live in
-`services/platform/src/data/merchant-agent-skills.ts`. Punter is a CLI package in
+`areas/commerce/server/data/merchant-agent-skills.ts`. Punter is a CLI package in
 `scripts/punter`, not a deployed service.
 
 The portal and docs apps are browser surfaces. They do not receive private

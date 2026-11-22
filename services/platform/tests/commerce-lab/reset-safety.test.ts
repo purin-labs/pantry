@@ -9,7 +9,7 @@ import {
   parseCanonicalCommerceDelivery,
   resetCommerceLab,
   seedCommerceLab,
-} from "../../src/actors/commerce-projection";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { createCueDeliverySchema } from "@purin-labs/agent/actors/cue-delivery";
 import { emptySqliteFixture, sqlStorage } from "../sqlite-storage";
 import {

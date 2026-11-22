@@ -2,7 +2,6 @@
   "limit": 3000,
   "files": {
     "apps/portal/src/features/chat/route.tsx": 4255,
-    "apps/portal/src/features/commerce/entity-plane/route.tsx": 4051,
     "apps/portal/src/features/production-run/morning-shift-appliances.ts": 3681,
     "apps/portal/src/features/production-run/recipe-workflow-graph.tsx": 3008,
     "apps/portal/src/features/workflow-simulator/bakery-surface.ts": 3893,
@@ -10,6 +9,7 @@
     "apps/portal/src/styles.css": 10385,
     "apps/storefront/src/storefront.tsx": 9334,
     "apps/storefront/src/styles.css": 3907,
+    "areas/commerce/ui/features/commerce/entity-plane/route.tsx": 4051,
     "packages/bakery-model/src/bakery-surface.ts": 4991,
     "packages/commerce-contracts/src/records/commerce-records.ts": 3253,
     "packages/production-simulation/src/recipes/bakery/appliance-execution.ts": 3819,

@@ -4,9 +4,9 @@ import {
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 
-import { publishSavedCommerceViewPresentation } from "../src/commerce/entity-plane/saved-view-mutations";
-import { parseSavedCommerceViewPresentationPatchRouteBody } from "../src/commerce/entity-plane/routes";
-import { buildSavedViewAdministrationAuthority } from "../src/commerce/entity-plane/authority";
+import { publishSavedCommerceViewPresentation } from "@purin-labs/area-commerce/server/entity-plane/saved-view-mutations";
+import { parseSavedCommerceViewPresentationPatchRouteBody } from "@purin-labs/area-commerce/server/entity-plane/routes";
+import { buildSavedViewAdministrationAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
 
 describe("saved Commerce view presentation mutations", () => {
   it("publishes the next exact view revision and retains integer filters across JSON", async () => {

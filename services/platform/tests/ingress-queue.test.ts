@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createCommerceDeliveryQueueMessage } from "../src/commerce/contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import { parseIngressQueueMessage } from "../src/ingress-queue";
 import { slackConversationAuthorityKind } from "../src/slack/case-command-message";
 import {

@@ -11,8 +11,8 @@ import {
   vi,
 } from "vitest";
 
-vi.mock("../../src/commerce/commerce-wasm", commerceWasmMock);
-vi.mock("../../src/commerce-lab/lab-metadata", labMetadataMock);
+vi.mock("@purin-labs/area-commerce/server/commerce-wasm", commerceWasmMock);
+vi.mock("@purin-labs/area-commerce/server/commerce-lab/lab-metadata", labMetadataMock);
 vi.mock("@purin-labs/actor-runtime/actors/actor-router", actorRouterMock);
 
 const queueMocks = vi.hoisted(function createQueueMocks() {
@@ -36,9 +36,9 @@ const labMetadataMocks = vi.hoisted(function createLabMetadataMocks() {
 
 import { cueLogIntegrationAccountId } from "../../src/gateway/cue-delivery";
 import { handleCommerceDeliveryQueueMessage } from "../../src/gateway/support";
-import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../../src/commerce-lab/lab-metadata";
+import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import type { NormalizedCueEvent } from "@purin-labs/agent/cues/engine";
-import { createCommerceDeliveryQueueMessage } from "../../src/commerce/contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import {
   parseIntegrationAccountId,
   parseRequestId,

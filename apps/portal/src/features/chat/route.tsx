@@ -135,7 +135,7 @@ import { createSlackDraftActions } from "./slack-drafts";
 import { createConfigurationDraftActions } from "./configuration-drafts";
 import { configurationDraftInserts } from "./configuration-draft-cards";
 import { createSideCaseActions } from "./side-cases";
-import { sideCaseInserts } from "./side-case-cards"; import { chatCommerceActionCards, withoutCommerceActionLinks } from "../governed-actions/chat-commerce-action-card";
+import { sideCaseInserts } from "./side-case-cards"; import { chatCommerceActionCards, withoutCommerceActionLinks } from "@purin-labs/area-commerce/ui/features/governed-actions/chat-commerce-action-card";
 import "./styles.css";
 import type { Variant } from "@purin-labs/type-utils";
 import type {

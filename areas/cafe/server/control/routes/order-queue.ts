@@ -10,7 +10,7 @@ import { admitUserMutation } from "@purin-labs/control/worker/admission/control-
 import {
   authorizeMerchantRead,
   resolveMerchantControlContext,
-} from "../../../../../services/platform/src/commerce/contract/merchant-control";
+} from "@purin-labs/area-commerce/server/contract/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,

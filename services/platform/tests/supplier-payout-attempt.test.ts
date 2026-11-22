@@ -10,12 +10,12 @@ import {
   createSupplierPayoutAttemptStore,
   listSupplierPayoutAttempts,
   readSupplierPayoutAttempt,
-} from "../src/data/supplier-payout-attempt";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-attempt";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   executeSupplierPayout,
   type SupplierPayoutProvider,
-} from "../src/payouts/executor";
+} from "@purin-labs/area-commerce/server/payouts/executor";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_1" as OrganisationId;
 /** Stands in for Lexicon; plan validation is exercised in the executor suite. */

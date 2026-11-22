@@ -8,7 +8,7 @@ import {
   readUnresolvedPayouts,
   supplierPayoutAuditPath,
   type PayoutReadTransport,
-} from "../../../apps/portal/src/features/payouts/api";
+} from "@purin-labs/area-commerce/ui/features/payouts/api";
 import type { SupplierPayout } from "@purin-labs/control-api/portal/payouts";
 
 const ORGANISATION = "organisation_1";

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   commerceActionExpectedRevision,
   parseCommerceActionRequest,
-} from "../src/commerce/action-model";
+} from "@purin-labs/area-commerce/server/action-model";
 
 const VALID = {
   kind: "adjust_offer_price",

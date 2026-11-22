@@ -22,7 +22,7 @@ import {
 } from "@purin-labs/commerce-client";
 import type { Env } from "@purin-labs/kernel/env";
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
-import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
+import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-commerce/server/outbox-worker";
 import { handleInventoryProduction } from "../../src/control/routes/inventory-production";
 import { handleInventoryReceipt } from "../../src/control/routes/inventory-receipts";
 import {

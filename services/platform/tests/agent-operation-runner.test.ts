@@ -29,7 +29,7 @@ import {
   installMerchantAgent,
   merchantAgentDefaultSkills,
   merchantAgentInstallationId,
-} from "../src/data/merchant-agent-preset";
+} from "@purin-labs/area-commerce/server/data/merchant-agent-preset";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

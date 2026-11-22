@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseCommerceEntityPlaneEffect,
   parseCommerceEntityPlaneProposal,
-} from "../src/commerce/entity-plane/proposals";
+} from "@purin-labs/area-commerce/server/entity-plane/proposals";
 import { assertNever } from "@purin-labs/std";
 
 type ProposalKind =

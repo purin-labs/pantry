@@ -5,7 +5,7 @@ import {
   createPublishedResourceClient,
   enumeratePublishedResources,
   resolvePublishedResponsibilityScope,
-} from "../src/commerce/entity-plane/published-resources";
+} from "@purin-labs/area-commerce/server/entity-plane/published-resources";
 
 const ORGANISATION = "organisation_published_resources";
 const MERCHANT = "merchant_published_resources";

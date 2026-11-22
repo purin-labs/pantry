@@ -73,6 +73,9 @@ importers:
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../../areas/devices
@@ -319,6 +322,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../commerce
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../devices
@@ -385,6 +391,124 @@ importers:
       qrcode-generator:
         specifier: ^2.0.4
         version: 2.0.4
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.1.1
+        version: 19.2.7(react@19.2.7)
+      react-router:
+        specifier: ^7.18.2
+        version: 7.18.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      typebox:
+        specifier: 1.3.27
+        version: 1.3.27
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260707.1
+        version: 5.20260707.1
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19.1.9
+        version: 19.2.3(@types/react@19.2.17)
+      tsrs:
+        specifier: 0.18.0-ts7.1.0-dev.20260929
+        version: 0.18.0-ts7.1.0-dev.20260929
+
+  areas/commerce:
+    dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/agent-tools':
+        specifier: workspace:*
+        version: link:../../foundation/agent-tools
+      '@purin-labs/area-cafe':
+        specifier: workspace:*
+        version: link:../cafe
+      '@purin-labs/area-inbox':
+        specifier: workspace:*
+        version: link:../inbox
+      '@purin-labs/area-integrations':
+        specifier: workspace:*
+        version: link:../integrations
+      '@purin-labs/area-organisation':
+        specifier: workspace:*
+        version: link:../organisation
+      '@purin-labs/authority':
+        specifier: workspace:*
+        version: link:../../foundation/authority
+      '@purin-labs/collaboration':
+        specifier: workspace:*
+        version: link:../../packages/collaboration
+      '@purin-labs/commerce-client':
+        specifier: workspace:*
+        version: link:../../packages/commerce-client
+      '@purin-labs/commerce-contracts':
+        specifier: workspace:*
+        version: link:../../packages/commerce-contracts
+      '@purin-labs/commerce-control-api':
+        specifier: workspace:*
+        version: link:../../packages/commerce-control-api
+      '@purin-labs/commerce-query-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/commerce-query-sqlite
+      '@purin-labs/connections':
+        specifier: workspace:*
+        version: link:../../foundation/connections
+      '@purin-labs/contract-schema':
+        specifier: workspace:*
+        version: link:../../packages/contract-schema
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../../packages/control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
+      '@purin-labs/kitchen-control-api':
+        specifier: workspace:*
+        version: link:../../packages/kitchen-control-api
+      '@purin-labs/product-description-crdt':
+        specifier: workspace:*
+        version: link:../../packages/product-description-crdt
+      '@purin-labs/production-plan-crdt':
+        specifier: workspace:*
+        version: link:../../packages/production-plan-crdt
+      '@purin-labs/std':
+        specifier: workspace:*
+        version: link:../../packages/std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/tool-handlers':
+        specifier: workspace:*
+        version: link:../../foundation/tool-handlers
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../../packages/type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../foundation/ui
+      lucide-react:
+        specifier: ^0.542.0
+        version: 0.542.0(react@19.2.7)
       react:
         specifier: ^19.1.1
         version: 19.2.7
@@ -492,6 +616,9 @@ importers:
       '@purin-labs/area-brain':
         specifier: workspace:*
         version: link:../brain
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../commerce
       '@purin-labs/area-integrations':
         specifier: workspace:*
         version: link:../integrations
@@ -595,6 +722,9 @@ importers:
       '@purin-labs/agent-tools':
         specifier: workspace:*
         version: link:../../foundation/agent-tools
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../commerce
       '@purin-labs/area-inbox':
         specifier: workspace:*
         version: link:../inbox
@@ -680,6 +810,9 @@ importers:
       '@purin-labs/area-brain':
         specifier: workspace:*
         version: link:../brain
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../commerce
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../devices
@@ -1781,6 +1914,9 @@ importers:
       '@purin-labs/area-cafe':
         specifier: workspace:*
         version: link:../../areas/cafe
+      '@purin-labs/area-commerce':
+        specifier: workspace:*
+        version: link:../../areas/commerce
       '@purin-labs/area-devices':
         specifier: workspace:*
         version: link:../../areas/devices

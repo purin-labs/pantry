@@ -10,10 +10,10 @@ import {
 import {
   commerceGraphResponseBody,
   parseCommerceGraphRouteBody,
-} from "../../services/platform/src/commerce/entity-plane/routes.ts";
-import { buildSavedSelectorCommerceReadAuthority } from "../../services/platform/src/commerce/entity-plane/authority.ts";
-import { CommerceGraphReader } from "../../services/platform/src/commerce/entity-plane/graph-reader.ts";
-import { CommerceEngineSource } from "../../services/platform/src/commerce/entity-plane/commerce-source.ts";
+} from "../../areas/commerce/server/entity-plane/routes.ts";
+import { buildSavedSelectorCommerceReadAuthority } from "../../areas/commerce/server/entity-plane/authority.ts";
+import { CommerceGraphReader } from "../../areas/commerce/server/entity-plane/graph-reader.ts";
+import { CommerceEngineSource } from "../../areas/commerce/server/entity-plane/commerce-source.ts";
 import { sampleSettings } from "../../packages/bakery-model/src/bakery.ts";
 import { readBakeryProcedure } from "../../packages/bakery-model/src/bakery-procedure.ts";
 import { parseProductionScenario } from "../../packages/bakery-model/src/bakery-production-scenario.ts";

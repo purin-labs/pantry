@@ -448,9 +448,9 @@ async function sourceEvidence() {
     files.push(
       "scripts/plan-50/draft-worker.mjs",
       "scripts/plan-50/draft-seed.mjs",
-      "services/platform/src/actors/product-description-draft.ts",
+      "areas/commerce/server/actors/product-description-draft.ts",
       "packages/collaboration/worker/collaboration-room.ts",
-      "services/platform/src/actors/commerce-projection.ts",
+      "areas/commerce/server/actors/commerce-projection.ts",
       "foundation/agent/actors/session-execution-admission.ts",
       "foundation/actor-runtime/actors/actor-activation.ts",
       "foundation/tenancy/organisation-execution-scope.ts",
@@ -463,7 +463,7 @@ async function sourceEvidence() {
   if (proposal || providerTrial)
     files.push(
       "scripts/plan-50/proposal-worker.mjs",
-      "services/platform/src/actors/harness-commerce-proposal.ts",
+      "areas/commerce/server/actors/harness-commerce-proposal.ts",
       "services/platform/src/actors/case.ts",
       "foundation/authority/actors/action-ledger.ts",
       "services/platform/src/actors/organisation.ts",

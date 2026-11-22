@@ -25,7 +25,7 @@ layout:
 | ------------------- | ------------------------------------------------------------------------------------ |
 | Commerce          | `services/commerce`                                                                |
 | Contracts           | `packages/contracts`                                                                 |
-| Urk                 | `services/platform/src/data/merchant-agent-skills.ts` and the Pantry agent runtime               |
+| Urk                 | `areas/commerce/server/data/merchant-agent-skills.ts` and the Pantry agent runtime               |
 | Commerce Read Layer | OrganisationActor projections and CommerceGraphReader sources in `services/platform` |
 | Punter              | `scripts/punter`                                                                     |
 

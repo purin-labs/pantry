@@ -96,7 +96,8 @@ async function loadChatPage() {
 }
 
 async function loadInventoryPage() {
-  const module = await import("./features/commerce/inventory");
+  const module =
+    await import("@purin-labs/area-commerce/ui/features/commerce/inventory");
   return { default: module.InventoryPage };
 }
 
@@ -111,7 +112,8 @@ async function loadCostsPage() {
 }
 
 async function loadInventoryProductionRequestsPage() {
-  const module = await import("./features/commerce/inventory-production");
+  const module =
+    await import("@purin-labs/area-commerce/ui/features/commerce/inventory-production");
   return { default: module.InventoryProductionRequestsPage };
 }
 
@@ -121,22 +123,26 @@ async function loadHomePage() {
 }
 
 async function loadCommerceEntityPlaneRoute() {
-  const module = await import("./features/commerce/entity-plane/route");
+  const module =
+    await import("@purin-labs/area-commerce/ui/features/commerce/entity-plane/route");
   return { default: module.CommerceEntityPlaneRoute };
 }
 
 async function loadCheckoutProfilesRoute() {
-  const module = await import("./features/checkout-profiles/route");
+  const module =
+    await import("@purin-labs/area-commerce/ui/features/checkout-profiles/route");
   return { default: module.CheckoutProfilesRoute };
 }
 
 async function loadBankPayoutsRoute() {
-  const { BankPayoutsRoute } = await import("./features/bank-payouts/route");
+  const { BankPayoutsRoute } =
+    await import("@purin-labs/area-commerce/ui/features/bank-payouts/route");
   return { default: BankPayoutsRoute };
 }
 
 async function loadPaymentsRoute() {
-  const { PaymentsRoute } = await import("./features/payments/route");
+  const { PaymentsRoute } =
+    await import("@purin-labs/area-commerce/ui/features/payments/route");
   return { default: PaymentsRoute };
 }
 
@@ -176,12 +182,14 @@ async function loadTerminalOperationsPanel() {
 }
 
 async function loadSupplierPayoutsPanel() {
-  const module = await import("./features/payouts/route");
+  const module =
+    await import("@purin-labs/area-commerce/ui/features/payouts/route");
   return { default: module.SupplierPayoutsPanel };
 }
 
 async function loadCommerceApiKeysRoute() {
-  const module = await import("./features/api-keys/route");
+  const module =
+    await import("@purin-labs/area-commerce/ui/features/api-keys/route");
   return { default: module.CommerceApiKeysRoute };
 }
 

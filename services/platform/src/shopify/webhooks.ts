@@ -9,7 +9,7 @@ import {
   methodNotAllowed,
   notFound,
 } from "@purin-labs/kernel/http";
-import { createCommerceDeliveryQueueMessage } from "../commerce/contract/queue-messages";
+import { createCommerceDeliveryQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import { createShopifyCommerceRefreshQueueMessage } from "./queue-messages";
 import {
   newRequestId,
@@ -37,7 +37,7 @@ import {
 } from "./delivery-normalizers";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { commerceObservationIdentity } from "../commerce/contract/observation-identity";
+import { commerceObservationIdentity } from "@purin-labs/area-commerce/server/contract/observation-identity";
 import { decodePathSegmentValue } from "@purin-labs/control/worker/gateway/request-helpers";
 
 function isShopifyWebhookShopDomain(raw: string | null): raw is string {

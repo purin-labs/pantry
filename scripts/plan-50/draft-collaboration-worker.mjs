@@ -8,11 +8,11 @@ import { organisationId, userId, accountId } from "./proposal-worker.mjs";
 import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,
-} from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
+} from "../../areas/commerce/server/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../foundation/tool-handlers/agent-tools/session-support.ts";
 import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
-import { createCommerceClient } from "../../services/platform/src/commerce/contract/client.ts";
-import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
+import { createCommerceClient } from "../../areas/commerce/server/contract/client.ts";
+import { commerceCanonicalResourceId } from "../../areas/commerce/server/contract/resource-ids.ts";
 import { createAccessGrant } from "../../foundation/authority/data/access-grants.ts";
 import { SessionExecutionAdmission } from "../../foundation/agent/actors/session-execution-admission.ts";
 import { createOrganisationInstall } from "../../foundation/tenancy/data/organisation.ts";
@@ -24,8 +24,8 @@ import { parseWorkspaceId } from "../../foundation/kernel/ids.ts";
 import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement.ts";
 import { browserFixture } from "./browser-fixture.mjs";
 import { authorizeOrganisationRequest } from "../../foundation/control/worker/authorization.ts";
-import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
-import { handleProductDescriptionDraftRoute } from "../../services/platform/src/control/routes/product-description-draft.ts";
+import { matchProductDescriptionDraftRoute } from "../../areas/commerce/server/control/admission/product-description-draft.ts";
+import { handleProductDescriptionDraftRoute } from "../../areas/commerce/server/control/routes/product-description-draft.ts";
 
 const productId = "product_financier";
 const merchantId = "merchant_plan50_draft";

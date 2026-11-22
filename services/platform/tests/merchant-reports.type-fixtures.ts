@@ -1,4 +1,4 @@
-import type { MerchantReportName } from "../src/commerce/entity-plane/merchant-reports";
+import type { MerchantReportName } from "@purin-labs/area-commerce/server/entity-plane/merchant-reports";
 
 // Exhaustiveness: adding a report name without a definition fails to compile.
 const _coverage: Record<MerchantReportName, true> = {

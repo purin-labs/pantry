@@ -17,8 +17,8 @@ import {
 import {
   productDescriptionDraftEdit,
   productDescriptionDraftRead,
-} from "./commerce/description-draft";
-import { commerceEntityContext } from "./commerce/entity-context";
+} from "@purin-labs/area-commerce/server/agent-tools/commerce/description-draft";
+import { commerceEntityContext } from "@purin-labs/area-commerce/server/agent-tools/commerce/entity-context";
 import {
   counterSaleRead,
   orderQueueAdvance,
@@ -26,7 +26,7 @@ import {
   soldOutMark,
   soldOutRead,
 } from "@purin-labs/area-cafe/server/agent-tools/commerce/order-queue";
-import { paymentsRead } from "./commerce/payments";
+import { paymentsRead } from "@purin-labs/area-commerce/server/agent-tools/commerce/payments";
 import {
   campaignBriefProposal,
   commerceActionProposal,
@@ -35,9 +35,9 @@ import {
   merchantPluginProposal,
   orderRefundProposal,
   stockActionProposal,
-} from "./commerce/proposals";
+} from "@purin-labs/area-commerce/server/agent-tools/commerce/proposals";
 import { REGISTER_VIEW_TOOLS } from "@purin-labs/area-cafe/server/agent-tools/commerce/register-view";
-import { merchantReport } from "./commerce/reports";
+import { merchantReport } from "@purin-labs/area-commerce/server/agent-tools/commerce/reports";
 import { COSTS_VIEW_TOOLS } from "./costs/view";
 import {
   devicePause,

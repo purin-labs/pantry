@@ -11,13 +11,13 @@ import {
   readCurrentCommerceProjection,
   readRecoverableCommerceCues,
   type PendingCommerceCue,
-} from "../src/actors/commerce-projection";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import {
   claimCueDelivery,
   completeClaimedCueDelivery,
   createCueDeliverySchema,
 } from "@purin-labs/agent/actors/cue-delivery";
-import { normalizeCommerceEngineDelivery } from "../src/commerce/provider";
+import { normalizeCommerceEngineDelivery } from "@purin-labs/area-commerce/server/provider";
 import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { sqlStorage, emptySqliteFixture } from "./sqlite-storage";
 

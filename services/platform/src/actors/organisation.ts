@@ -40,7 +40,7 @@ import { savedBakeryRunArchiveKeys } from "../commerce/bakery/saved-runs";
 import {
   reconcileFrozenOrganisationReceipt,
   type RelocationReceiptRequest,
-} from "./organisation-relocation-receipt";
+} from "@purin-labs/area-commerce/server/actors/organisation-relocation-receipt";
 import { workspaceRevisionArchiveKeys } from "@purin-labs/agent/workspace-revision-store";
 import { readPortalChatAttachmentKeys } from "@purin-labs/conversation/chat/attachments";
 import { readChatForkAttachmentKeys } from "@purin-labs/agent/chat/fork-history";
@@ -72,14 +72,14 @@ import {
   type CollaborationRoomRoute,
   type CollaborationSocketRooms,
 } from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
-import { commerceCollaborationRooms } from "./commerce-collaboration-rooms";
+import { commerceCollaborationRooms } from "@purin-labs/area-commerce/server/actors/commerce-collaboration-rooms";
 import { inboxCollaborationRooms } from "@purin-labs/area-inbox/server/actors/inbox-collaboration-rooms";
 import { kitchenCollaborationRooms } from "./kitchen-collaboration-rooms";
 import {
   ProductDescriptionDraftRooms,
   type DraftAgentEdit,
   type DraftAgentReadRequest,
-} from "./product-description-draft";
+} from "@purin-labs/area-commerce/server/actors/product-description-draft";
 import {
   EmailDraftRooms,
   type EmailDraftAgentEdit,
@@ -219,7 +219,7 @@ import {
 import type {
   CommerceBoardPresenceRead,
   CommerceBoardPresenceUpdate,
-} from "./organisation/commerce-types";
+} from "@purin-labs/area-commerce/server/actors/organisation/commerce-types";
 import type {
   OrganisationMeta,
   OrganisationMetaRequest,
@@ -229,7 +229,7 @@ import type {
 import {
   OrganisationCommerce,
   type OrganisationCommerceRpc,
-} from "./organisation/organisation-commerce";
+} from "@purin-labs/area-commerce/server/actors/organisation/organisation-commerce";
 import { OrganisationActorBase } from "./organisation/organisation-actor-base";
 import {
   activateOrganisationPolicy,
@@ -286,7 +286,7 @@ import {
 } from "../kitchen/bakes/commands";
 import { setBakeStockLevel } from "../kitchen/bakes/levels";
 import type { BakeStockLevelInput } from "@purin-labs/kitchen-control-api";
-import type { InventoryStockChange } from "./commerce-projection/stock-changes";
+import type { InventoryStockChange } from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
 export class OrganisationDO
   extends OrganisationActorBase
   implements

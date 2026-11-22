@@ -11,12 +11,12 @@ import type {
   CommerceEntityRef,
   CommerceReadWatermark,
 } from "@purin-labs/commerce-contracts";
-import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import {
   buildCommerceGraphQueryPlanRequest,
   commerceGraphQueryProjection,
-} from "../src/commerce/entity-plane/planner";
-import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/entity-plane/planner";
+import { planCommerceGraphQuery } from "@purin-labs/area-commerce/server/commerce-wasm";
 
 describe("commerce entity-plane Commerce source", () => {
   it.each([

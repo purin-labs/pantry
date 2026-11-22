@@ -33,7 +33,7 @@ import {
 
 import { ensureCreatedOrganisationActor } from "@purin-labs/agent/control/organisation-runtime";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
+import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-commerce/server/outbox-worker";
 import {
   commerceClient,
   commerceHeaders,

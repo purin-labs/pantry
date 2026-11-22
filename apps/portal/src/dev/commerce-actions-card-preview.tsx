@@ -3,9 +3,9 @@ import { createRoot } from "react-dom/client";
 import "../styles.css";
 import { configurationDraftInserts } from "../features/chat/configuration-draft-cards";
 import type { ConfigurationDraftView } from "@purin-labs/control-api/portal/configuration-drafts";
-import { commerceActionTitle } from "../features/governed-actions/commerce";
-import { OrderRefundDetails } from "../features/governed-actions/order-refund-details";
-import { StockOperationCard } from "../features/governed-actions/stock-operation-details";
+import { commerceActionTitle } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce";
+import { OrderRefundDetails } from "@purin-labs/area-commerce/ui/features/governed-actions/order-refund-details";
+import { StockOperationCard } from "@purin-labs/area-commerce/ui/features/governed-actions/stock-operation-details";
 import type { StockOperationView } from "@purin-labs/control-api/portal/stock-operation";
 
 // The refund and stock approval cards and the chat's setup card, with sample

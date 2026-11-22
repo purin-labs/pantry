@@ -11,8 +11,8 @@ import {
   createFinancierSample,
   FINANCIER_SAMPLE_ID,
 } from "../src/commerce/bakery/sample";
-import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
-import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
+import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import {
   startCommerceWorker,
   type CommerceWorker,

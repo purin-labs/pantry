@@ -222,7 +222,7 @@ assignment. No agent tool starts a collection.
 - Regional D1 (`services/platform/migrations-regional/0001_current_schema.sql`):
   `cafe_terminal_assignment` (module `areas/cafe` in `scripts/layers.json`) and
   `paid_receipt`.
-- Agent tools: `services/platform/src/agent-tools/commerce/payments.ts` and
+- Agent tools: `areas/commerce/server/agent-tools/commerce/payments.ts` and
   `proposals.ts`.
 
 The control routes are under `/v1/control/organisations/:id/commerce`:

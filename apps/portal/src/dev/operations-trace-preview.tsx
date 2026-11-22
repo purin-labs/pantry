@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Package, RotateCcw, Workflow } from "lucide-react";
-import { CommerceActionTrace } from "../features/governed-actions/commerce-trace";
+import { CommerceActionTrace } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce-trace";
 import {
   parseCommerceActionExecutionResponse,
   type CommerceActionRecord,

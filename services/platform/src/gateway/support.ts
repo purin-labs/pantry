@@ -36,7 +36,7 @@ import {
   createCommerceDeliveryQueueMessage,
   type CommerceDeliveryQueueMessage,
   type CommerceOutboxReconcileQueueMessage,
-} from "../commerce/contract/queue-messages";
+} from "@purin-labs/area-commerce/server/contract/queue-messages";
 import type { EmailChangeQueueMessage } from "../mail/queue-messages";
 import type { IngressQueueMessageError } from "@purin-labs/kernel/queue-fields";
 import type { ShopifyCommerceRefreshQueueMessage } from "../shopify/queue-messages";
@@ -68,13 +68,13 @@ import {
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
-} from "../actors/commerce-projection";
-import { commerceObservationIdentity } from "../commerce/contract/observation-identity";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
+import { commerceObservationIdentity } from "@purin-labs/area-commerce/server/contract/observation-identity";
 import {
   failCommerceLabRun,
   listCommerceLabRuns,
-} from "../commerce-lab/lab-metadata";
-import { reconcileCommerceOutbox } from "../commerce/outbox-worker";
+} from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
+import { reconcileCommerceOutbox } from "@purin-labs/area-commerce/server/outbox-worker";
 import type {
   Variant,
   VariantBy,
@@ -449,7 +449,7 @@ export async function handleCommerceDeliveryQueueMessage(
     });
     return;
   }
-  let commerceSystem: import("../actors/commerce-projection").CommerceSystemStorageAuthority =
+  let commerceSystem: import("@purin-labs/area-commerce/server/actors/commerce-projection").CommerceSystemStorageAuthority =
     {
       kind: "lab",
       revision: null,

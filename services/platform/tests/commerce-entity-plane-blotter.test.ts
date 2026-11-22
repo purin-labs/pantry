@@ -14,20 +14,20 @@ import {
   parseCommerceSnapshotRevision,
   parseSystemSchemaRevision,
 } from "@purin-labs/commerce-client";
-import { BlotterSource } from "../src/commerce/entity-plane/blotter-source";
+import { BlotterSource } from "@purin-labs/area-commerce/server/entity-plane/blotter-source";
 import {
   buildCommerceGraphQueryPlanRequest,
   commerceGraphQueryProjection,
   planSafeCommerceQuery,
-} from "../src/commerce/entity-plane/planner";
-import { decodeCommerceCursor } from "../src/commerce/commerce-wasm";
-import { parseCommerceGraphQuery } from "../src/commerce/entity-plane/routes";
+} from "@purin-labs/area-commerce/server/entity-plane/planner";
+import { decodeCommerceCursor } from "@purin-labs/area-commerce/server/commerce-wasm";
+import { parseCommerceGraphQuery } from "@purin-labs/area-commerce/server/entity-plane/routes";
 import type {
   CommerceProjectionKind,
   CommerceProjectionRecord,
-} from "../src/actors/commerce-projection";
-import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
-import type { CommerceRelationshipRelationRow } from "../src/actors/commerce-query-schema";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
+import { planCommerceGraphQuery } from "@purin-labs/area-commerce/server/commerce-wasm";
+import type { CommerceRelationshipRelationRow } from "@purin-labs/area-commerce/server/actors/commerce-query-schema";
 import type { Variant } from "@purin-labs/type-utils";
 import { requireIntegrationAccountId, requireOrganisationId } from "./test-ids";
 

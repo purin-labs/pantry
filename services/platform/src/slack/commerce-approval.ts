@@ -12,12 +12,12 @@ import {
   type ApprovalEvidence,
   type MerchantActionRejectionEvidence,
 } from "@purin-labs/authority/approval-authentication";
-import { slackMayApproveAction } from "../commerce/action-model";
-import { syncCaseApprovalWait } from "../commerce/case-approval-sync";
+import { slackMayApproveAction } from "@purin-labs/area-commerce/server/action-model";
+import { syncCaseApprovalWait } from "@purin-labs/area-commerce/server/case-approval-sync";
 import {
   acceptAndDeliverCommerceOutcome,
   executeCommerceAction,
-} from "../commerce/actions";
+} from "@purin-labs/area-commerce/server/actions";
 import { readOrganisationDefaultWorkspacePortalAddress } from "@purin-labs/agent/data/organisation-workspace";
 import { parsePersonId } from "@purin-labs/authority/data/person-authz";
 import type { Env } from "@purin-labs/kernel/env";

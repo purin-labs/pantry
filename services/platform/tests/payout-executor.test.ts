@@ -8,7 +8,7 @@ import {
   type SupplierPayoutPlanValidator,
   type PayoutProviderOutcome,
   type SupplierPayoutProvider,
-} from "../src/payouts/executor";
+} from "@purin-labs/area-commerce/server/payouts/executor";
 
 const PLAN = wisePayoutPlan("organisation_1");
 const DIGEST = PLAN.seal.approvalDigest;

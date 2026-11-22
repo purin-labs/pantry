@@ -210,7 +210,7 @@ Main files of `packages/contracts/src/`:
   `OrganisationId`.
 
 Other files: `foundation/agent/actor-wasm.ts` calls the Session reducer,
-`services/platform/src/commerce/commerce-wasm.ts` calls the commerce functions, and
+`areas/commerce/server/commerce-wasm.ts` calls the commerce functions, and
 `foundation/agent/messages/message-wasm.ts` calls the message and attachment
 parsers. The three run TypeScript only.
 `foundation/agent/actors/pi-tool-arguments.ts` holds the tool argument check.

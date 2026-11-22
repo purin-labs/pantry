@@ -30,7 +30,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { createCommerceClient } from "../../../../../services/platform/src/commerce/contract/client";
+import { createCommerceClient } from "@purin-labs/area-commerce/server/contract/client";
 import {
   countOpenScreenPairings,
   deleteExpiredScreenPairings,

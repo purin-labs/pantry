@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   markCommerceLabOrganisation,
   requireCommerceLabOrganisationMarker,
-} from "../../src/commerce-lab/lab-metadata";
+} from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import { createMigratedDatabase } from "../sqlite-d1";
 import { requireOrganisationId } from "../test-ids";
 

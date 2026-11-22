@@ -35,8 +35,8 @@ vi.mock("@purin-labs/authority/policy-snapshot", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@purin-labs/authority/policy-snapshot")>()),
   readCurrentOrganisationPolicySnapshot: policyMocks.readCurrentOrganisationPolicySnapshot,
 }));
-vi.mock("../src/data/merchant-agent-preset", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/data/merchant-agent-preset")>()),
+vi.mock("@purin-labs/area-commerce/server/data/merchant-agent-preset", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-commerce/server/data/merchant-agent-preset")>()),
   installMerchantAgent: presetMocks.installMerchantAgent,
 }));
 

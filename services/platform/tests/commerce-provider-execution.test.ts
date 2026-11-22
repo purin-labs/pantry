@@ -50,19 +50,29 @@ vi.mock("@purin-labs/connections/data/commerce-merchant-binding", () => ({
   resolveCommerceMerchantBinding:
     commerceEngineMocks.resolveCommerceMerchantBinding,
 }));
-vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
-  createCommerceClient: commerceEngineMocks.createCommerceClient,
-}));
-vi.mock("../src/commerce/provider", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/provider")>()),
-  reconcileCommerceCatalogPublication:
-    commerceEngineMocks.reconcileCommerceCatalogPublication,
-  publishCatalogListingThroughCommerce:
-    commerceEngineMocks.publishCatalogListingThroughCommerce,
-  adjustOfferPriceThroughCommerce:
-    commerceEngineMocks.adjustOfferPriceThroughCommerce,
-}));
+vi.mock(
+  "@purin-labs/area-commerce/server/contract/client",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-commerce/server/contract/client")
+    >()),
+    createCommerceClient: commerceEngineMocks.createCommerceClient,
+  }),
+);
+vi.mock(
+  "@purin-labs/area-commerce/server/provider",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/area-commerce/server/provider")
+    >()),
+    reconcileCommerceCatalogPublication:
+      commerceEngineMocks.reconcileCommerceCatalogPublication,
+    publishCatalogListingThroughCommerce:
+      commerceEngineMocks.publishCatalogListingThroughCommerce,
+    adjustOfferPriceThroughCommerce:
+      commerceEngineMocks.adjustOfferPriceThroughCommerce,
+  }),
+);
 vi.mock(
   "@purin-labs/connections/data/organisation-commerce-system",
   async (importOriginal) => ({
@@ -77,7 +87,7 @@ vi.mock(
 import {
   executeCommerceProviderAction,
   reconcileCommerceProviderAction,
-} from "../src/commerce/provider-execution";
+} from "@purin-labs/area-commerce/server/provider-execution";
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,

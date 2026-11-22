@@ -100,7 +100,7 @@ the Register. The commerce engine in `services/commerce` runs it.
 
 The merchant-principal agent behavior: operating work through the Cases,
 tools, policies, and approvals of Pantry. Its instructions and skills live in
-`services/platform/src/data/merchant-agent-skills.ts`. Older plans call it Urk.
+`areas/commerce/server/data/merchant-agent-skills.ts`. Older plans call it Urk.
 
 ### Workspace executor
 

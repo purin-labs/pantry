@@ -72,7 +72,7 @@ import {
   type CostPlanSaveResult,
   type LotCostSaveResult,
 } from "../../commerce/cost-plan-store";
-import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
+import { CommerceReadRequestError } from "@purin-labs/area-commerce/server/contract/read-errors";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
@@ -84,7 +84,7 @@ import {
 import type {
   CommerceToolReads,
   PreparedCommerceRead,
-} from "../../commerce/contract/tool-reads";
+} from "@purin-labs/area-commerce/server/contract/tool-reads";
 
 const SUPPLY_COST_TERMS_SCOPE = "supply-cost-terms:shop";
 const LOT_INVOICE_COST_SCOPE = "bakery-lot-invoice-cost:shop";

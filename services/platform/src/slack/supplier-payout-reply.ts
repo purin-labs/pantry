@@ -12,7 +12,7 @@ import {
   listSupplierPayoutsForSupplier,
   listUnresolvedSupplierPayouts,
   type SupplierPayoutRow,
-} from "../data/supplier-payout-store";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 import type { OrganisationId, SessionId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -25,7 +25,7 @@ import {
   type FlowLabel,
 } from "@purin-labs/authority/policy/index";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
-import { supplierPayoutLabel } from "../payouts/supplier-payout-access";
+import { supplierPayoutLabel } from "@purin-labs/area-commerce/server/payouts/supplier-payout-access";
 import {
   renderOutgoingPayouts,
   renderPayoutOutcome,

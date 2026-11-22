@@ -38,8 +38,8 @@ import {
   offerPriceAllowanceAlreadyApplied,
   parseOfferPriceAllowanceCommand,
   type OfferPriceAllowanceCommand,
-} from "../../../../services/platform/src/commerce/contract/offer-price-allowance";
-import type { PublishedResourceBoundaryError } from "../../../../services/platform/src/commerce/contract/types";
+} from "@purin-labs/area-commerce/server/contract/offer-price-allowance";
+import type { PublishedResourceBoundaryError } from "@purin-labs/area-commerce/server/contract/types";
 import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import {

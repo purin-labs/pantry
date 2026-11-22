@@ -10,13 +10,13 @@ export { ProposalCase } from "./provider-worker.mjs";
 export { CodeModePlatformGovernorActor } from "./codemode-worker.mjs";
 import { organisationId, userId } from "./proposal-worker.mjs";
 import { humanUser } from "./draft-seed.mjs";
-import { editProductDescriptionDraftForEmbeddedHarness } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
+import { editProductDescriptionDraftForEmbeddedHarness } from "../../areas/commerce/server/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../foundation/tool-handlers/agent-tools/session-support.ts";
 import { uncheckedEffect } from "../../foundation/agent-tools/tool-effect.ts";
 import { SessionExecutionAdmission } from "../../foundation/agent/actors/session-execution-admission.ts";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
-import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
-import { handleProductDescriptionDraftRoute } from "../../services/platform/src/control/routes/product-description-draft.ts";
+import { matchProductDescriptionDraftRoute } from "../../areas/commerce/server/control/admission/product-description-draft.ts";
+import { handleProductDescriptionDraftRoute } from "../../areas/commerce/server/control/routes/product-description-draft.ts";
 import {
   ProductDescriptionDoc,
   parseProductDescriptionState,

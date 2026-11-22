@@ -1,10 +1,10 @@
 import {
   createCommerceClient,
   createCommerceEntityPlaneClient,
-} from "../commerce/contract/client";
+} from "@purin-labs/area-commerce/server/contract/client";
 import { readWorkflowDocument } from "../commerce/bakery/workflow-revisions";
-import { commerceProviderResourceId } from "../commerce/contract/resource-ids";
-import { createCommerceOutboxReconcileQueueMessage } from "../commerce/contract/queue-messages";
+import { commerceProviderResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import { executeStockOperation } from "../kitchen/contract/stock-action-execution";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";

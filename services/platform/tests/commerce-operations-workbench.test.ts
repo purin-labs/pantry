@@ -9,7 +9,7 @@ import {
   deriveMissingTrackingExceptions,
   parseTrackingBatchPreviewRequest,
   previewTrackingBatch,
-} from "../src/commerce/operations-workbench";
+} from "@purin-labs/area-commerce/server/operations-workbench";
 import type { CommerceExceptionInbox } from "@purin-labs/control-api";
 
 const OBSERVED_AT = "2026-08-29T00:00:00.000Z";

@@ -2,7 +2,7 @@ import type { SupplierPayoutExecutionPlan } from "@purin-labs/commerce-contracts
 import {
   assertSupplierPayoutPlanWithLexicon,
   validateSupplierPayoutPlanWithLexicon,
-} from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/commerce-wasm";
 
 export function payoutPlan(
   organisationId: string,

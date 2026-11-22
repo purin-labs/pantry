@@ -257,7 +257,7 @@ projection and applies it at once, as the delivery `commerce_action_<nonce>`.
 
 ### Agents
 
-The tools are in `services/platform/src/agent-tools/commerce/`. A turn offers a tool when
+The tools are in `areas/commerce/server/agent-tools/commerce/`. A turn offers a tool when
 it holds the capability.
 
 | Tool                            | Capability                      | Effect   | What it does                                                                                                                                                                            |
@@ -300,7 +300,7 @@ COM-04 and COM-05 own the other commerce read tools (`order_queue_read`,
   `actors/organisation/commerce-query.ts` and `organisation-commerce.ts`,
   `commerce/entity-plane/graph-reader.ts` and `blotter-source.ts`,
   `commerce/outbox-worker.ts`, `commerce-lab/`, `scripts/lab/run-commerce-lab.mjs` and
-  `apps/portal/src/features/commerce/inventory*.tsx`.
+  `areas/commerce/ui/features/commerce/inventory*.tsx`.
 
 The control routes are under `/v1/control/organisations/:id/`:
 

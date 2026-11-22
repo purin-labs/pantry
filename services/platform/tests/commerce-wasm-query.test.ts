@@ -4,7 +4,7 @@ import {
   decodeCommerceCursor,
   encodeCommerceCursor,
   planCommerceGraphQuery,
-} from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/commerce-wasm";
 
 describe("commerce query WASM boundary", function commerceQueryWasmSuite() {
   it("returns the Rust planner outcome and round-trips its cursor codec", function validPlannerOutput() {

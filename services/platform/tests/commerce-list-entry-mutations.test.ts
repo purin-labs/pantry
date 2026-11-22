@@ -4,9 +4,9 @@ import {
   CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
 
-import { patchPublishedCommerceListEntry } from "../src/commerce/entity-plane/list-entry-mutations";
-import { parseCommerceListEntryPatchRouteBody } from "../src/commerce/entity-plane/routes";
-import { buildCommerceListEntryCommandAuthority } from "../src/commerce/entity-plane/authority";
+import { patchPublishedCommerceListEntry } from "@purin-labs/area-commerce/server/entity-plane/list-entry-mutations";
+import { parseCommerceListEntryPatchRouteBody } from "@purin-labs/area-commerce/server/entity-plane/routes";
+import { buildCommerceListEntryCommandAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
 
 describe("human Commerce List entry mutations", () => {
   it("does not issue a command when the exact entry is unpublished", async () => {

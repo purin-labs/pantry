@@ -13,12 +13,12 @@ import {
   deleteCommerceCueEvidence,
   handleCommerceLabRoute,
   parseCommerceProposalCue,
-} from "../../src/commerce-lab/router";
-import { markCommerceLabOrganisation } from "../../src/commerce-lab/lab-metadata";
+} from "@purin-labs/area-commerce/server/commerce-lab/router";
+import { markCommerceLabOrganisation } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import {
   parseCanonicalCommerceDelivery,
   parseCommerceCueFacts,
-} from "../../src/actors/commerce-projection";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { d1Database } from "../sqlite-d1";
 import { bytesToHex } from "@purin-labs/std";
 import { requireOrganisationId } from "../test-ids";

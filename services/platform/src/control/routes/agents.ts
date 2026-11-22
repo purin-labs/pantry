@@ -22,7 +22,7 @@ import { assertNever } from "@purin-labs/std";
 import {
   handleCampaignBriefDecision,
   handleCampaignBriefQueue,
-} from "./agents/campaign-briefs";
+} from "@purin-labs/area-commerce/server/control/routes/agents/campaign-briefs";
 import { handleCaseCommand } from "@purin-labs/conversation/control/routes/agents/case-command";
 import {
   handleCancelOrganisationCodexAuthorization,
@@ -46,7 +46,7 @@ import {
   handleAgentOperationRevisions,
   handleAgentOperations,
 } from "@purin-labs/conversation/control/routes/agents/operations";
-import { handleMerchantAgentInstallation } from "./agents/merchant-agent";
+import { handleMerchantAgentInstallation } from "@purin-labs/area-commerce/server/control/routes/agents/merchant-agent";
 
 export type AgentControlRoute =
   | Readonly<{ kind: "organisationCodex"; organisationIdRaw: string }>

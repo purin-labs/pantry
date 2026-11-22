@@ -1,7 +1,7 @@
 import {
   CommerceContextToolResult,
   type CommerceContextValue,
-} from "../src/actors/commerce-context-tool-result";
+} from "@purin-labs/area-commerce/server/actors/commerce-context-tool-result";
 
 declare function accept(value: CommerceContextValue): void;
 const emptyGraph = {

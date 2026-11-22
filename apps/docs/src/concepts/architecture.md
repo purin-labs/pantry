@@ -75,7 +75,7 @@ budgets, cancellation, and output receipts for all active routes.
 | Portal             | Merchant and agent operations UI                                    | `apps/portal`                                                  |
 | Commerce contracts | Provider-neutral TypeScript contract schemas                        | `packages/contracts`                                           |
 | Commerce authority | Private catalog, inventory, checkout, order, and fulfillment state  | `services/commerce` or the selected provider                 |
-| Agent behavior     | Sous Chef's instructions, skills, and installation                  | `services/platform/src/data/merchant-agent-skills.ts` and `merchant-agent-preset.ts` |
+| Agent behavior     | Sous Chef's instructions, skills, and installation                  | `areas/commerce/server/data/merchant-agent-skills.ts` and `merchant-agent-preset.ts` |
 | Acceptance         | Buyer and cross-service acceptance scenarios                        | `scripts/punter`                                               |
 | Heavy execution    | On-demand isolated workspace work                                   | `crates/workspace-executor` and `services/workspace-executor`  |
 

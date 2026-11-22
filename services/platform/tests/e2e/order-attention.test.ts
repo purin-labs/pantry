@@ -23,7 +23,7 @@ import {
   installMerchantAgent,
   merchantAgentDefaultSkills,
   MERCHANT_AGENT_READ_CAPABILITY,
-} from "../../src/data/merchant-agent-preset";
+} from "@purin-labs/area-commerce/server/data/merchant-agent-preset";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "@purin-labs/authority/policy-snapshot";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";

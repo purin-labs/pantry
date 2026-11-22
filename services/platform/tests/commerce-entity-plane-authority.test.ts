@@ -10,20 +10,20 @@ import {
   buildSavedSelectorCommerceReadAuthority,
   filterCommerceGraphSensitivity,
   type CommerceGraphReadAuthority,
-} from "../src/commerce/entity-plane/authority";
+} from "@purin-labs/area-commerce/server/entity-plane/authority";
 import {
   CommerceGraphReader,
   type CommerceGraphBlotterSource,
   type CommerceGraphHydratingSource,
   type CommerceGraphSource,
   type CommerceGraphCommerceSource,
-} from "../src/commerce/entity-plane/graph-reader";
+} from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
 import type {
   CommerceGraphPlannedSourceResult,
   CommerceGraphSourceResult,
-} from "../src/commerce/entity-plane/commerce-source";
-import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
-import { commerceGraphQueryProjection } from "../src/commerce/entity-plane/planner";
+} from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
+import { planCommerceGraphQuery } from "@purin-labs/area-commerce/server/commerce-wasm";
+import { commerceGraphQueryProjection } from "@purin-labs/area-commerce/server/entity-plane/planner";
 import type {
   AttributeDefinitionId,
   AttributeDefinitionRevision,

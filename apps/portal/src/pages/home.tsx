@@ -22,7 +22,7 @@ import { workspacePagePath, workspaceResourcePath } from "@purin-labs/ui/route";
 import {
   readCommerceHomeAggregations,
   type CommerceHomeAggregation,
-} from "../features/commerce";
+} from "@purin-labs/area-commerce/ui/features/commerce/index";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type {

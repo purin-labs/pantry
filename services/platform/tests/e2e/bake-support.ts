@@ -15,7 +15,7 @@ import {
   financierRecipeInput,
 } from "../../../../packages/production-simulation/src/recipes/bakery/financier-production";
 import counterDay from "../../../../scripts/plan-24/counter-day.json";
-import { runScheduledCommerceOutboxReconciliation } from "../../src/commerce/outbox-worker";
+import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-commerce/server/outbox-worker";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { placePickupOrder, required } from "./cafe-order-support";
 import { finished, messageWord, startChat } from "./chat-journey-support";

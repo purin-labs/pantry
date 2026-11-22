@@ -9,7 +9,7 @@ import { channelToolServices } from "@purin-labs/area-inbox/server/agent-tools/c
 import {
   bindAllowanceReference,
   commerceToolServices,
-} from "./commerce/turn-services";
+} from "@purin-labs/area-commerce/server/agent-tools/commerce/turn-services";
 import { deviceToolServices } from "@purin-labs/area-devices/server/agent-tools/devices/turn-services";
 import { createMenuBoardDraftPreview } from "@purin-labs/area-cafe/server/agent-tools/drafts/board-draft-preview";
 import { menuToolServices } from "@purin-labs/area-cafe/server/agent-tools/drafts/turn-services";

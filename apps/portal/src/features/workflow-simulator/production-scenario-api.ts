@@ -13,8 +13,8 @@ import { parseCommerceGraphQuery } from "@purin-labs/commerce-client";
 import {
   customEntityRef,
   readCommerceGraph,
-} from "../commerce/entity-plane/api.ts";
-import type { CommerceMutationTransport } from "../commerce/entity-plane/api.ts";
+} from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
+import type { CommerceMutationTransport } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 import { readProcedure } from "./procedure-api.ts";
 import { scenarioSaveRejection } from "./workspace-commands.ts";
 import { isRecord, sameJson } from "@purin-labs/std";

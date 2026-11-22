@@ -5,7 +5,7 @@ import {
 import {
   readProductDescriptionDraftForEmbeddedHarness,
   editProductDescriptionDraftForEmbeddedHarness,
-} from "../src/agent-tools/commerce/description-draft-handlers";
+} from "@purin-labs/area-commerce/server/agent-tools/commerce/description-draft-handlers";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 type WorkflowReadAdmission = Parameters<

@@ -22,10 +22,10 @@ import {
   readActiveOrganisationMembership,
 } from "@purin-labs/tenancy/data/control-plane";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import { readNamedCommerceQuery } from "../../src/commerce/entity-plane/context-read";
-import { CommerceGraphReader } from "../../src/commerce/entity-plane/graph-reader";
-import { CommerceEngineSource } from "../../src/commerce/entity-plane/commerce-source";
-import { createCommerceEntityPlaneClient } from "../../src/commerce/contract/client";
+import { readNamedCommerceQuery } from "@purin-labs/area-commerce/server/entity-plane/context-read";
+import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
+import { createCommerceEntityPlaneClient } from "@purin-labs/area-commerce/server/contract/client";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
 import { createFinancierSample } from "../../src/commerce/bakery/sample";
 

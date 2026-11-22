@@ -3,8 +3,8 @@
 // source and the control API shape of the selected shop. Today the one action
 // is the cancellation of an order.
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
-import type { CommerceActionPath } from "../commerce/contract/types";
-import { commerceProjectionRevision } from "../commerce/contract/commerce-provider";
+import type { CommerceActionPath } from "@purin-labs/area-commerce/server/contract/types";
+import { commerceProjectionRevision } from "@purin-labs/area-commerce/server/contract/commerce-provider";
 import type {
   ActionLedgerEntry,
   ExecutingActionLedgerEntry,
@@ -33,7 +33,7 @@ import {
   type CommerceProviderExecutionError,
   type CommerceProviderOperation,
   type CommerceProviderReconciliation,
-} from "../commerce/contract/commerce-provider";
+} from "@purin-labs/area-commerce/server/contract/commerce-provider";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 

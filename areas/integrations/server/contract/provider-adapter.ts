@@ -1,4 +1,4 @@
-import type { SquareDelegation } from "../../../../services/platform/src/commerce/contract/square-link";
+import type { SquareDelegation } from "@purin-labs/area-commerce/server/contract/square-link";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   VaultHandle,

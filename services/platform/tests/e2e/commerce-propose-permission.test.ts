@@ -1,6 +1,6 @@
 import { expect, it, type TestContext } from "vitest";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
 import {
   PROPOSE,
   accessCapability,

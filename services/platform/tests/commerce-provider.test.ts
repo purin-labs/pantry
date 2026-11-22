@@ -24,7 +24,7 @@ import {
   resolveCommerceCancellationAuthority,
   createCommerceEd25519Verifier,
   type CommerceDeliveryVerifier,
-} from "../src/commerce/provider.ts";
+} from "@purin-labs/area-commerce/server/provider";
 
 const NOW = "2026-08-09T09:00:00Z";
 

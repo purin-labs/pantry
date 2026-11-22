@@ -18,12 +18,12 @@ import {
   parseCommerceActionPath,
   type CommerceActionPath,
   type CommerceActionRequest,
-} from "../commerce/action-model";
+} from "@purin-labs/area-commerce/server/action-model";
 import {
   menuPriceChangeKind,
   type MenuPriceSide,
-} from "../commerce/menu-price-action";
-import type { CommerceChangeFacts } from "../commerce/contract/approval-card-texts";
+} from "@purin-labs/area-commerce/server/menu-price-action";
+import type { CommerceChangeFacts } from "@purin-labs/area-commerce/server/contract/approval-card-texts";
 import type { Env } from "@purin-labs/kernel/env";
 import { decisionCardBlocks, type DecisionCardButton } from "./decision-card";
 import { assertNever } from "@purin-labs/std";

@@ -66,7 +66,7 @@ import {
   deviceAlertNoticeOfUpdate,
   isDeviceAlertDelivery,
 } from "@purin-labs/area-devices/server/contract/alert-delivery";
-import { slackMayApproveAction } from "../../commerce/action-model";
+import { slackMayApproveAction } from "@purin-labs/area-commerce/server/action-model";
 import { resolveActiveSlackDestinationConnection } from "@purin-labs/authority/slack/installation-store";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { checkPreparedConnectorDelivery } from "../connector-slack-stream";

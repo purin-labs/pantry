@@ -35,7 +35,7 @@ import {
   pieceCount,
   readInventoryItemStock,
   type InventoryStockChange,
-} from "../commerce-projection/stock-changes";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection/stock-changes";
 
 /**
  * The Organisation Actor's side of the bake proposals (Plan 24 S1). Kitchen

@@ -30,8 +30,8 @@ import {
   organisationRecordPath,
 } from "@purin-labs/control/portal/control-paths";
 import { rememberOrganisationId } from "./early-reads";
-import { offerPriceAllowanceTransport } from "./features/commerce/price-allowance";
-import type { OfferPriceAllowanceInteraction } from "./features/commerce/entity-plane/route";
+import { offerPriceAllowanceTransport } from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
+import type { OfferPriceAllowanceInteraction } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/route";
 import { isRecord } from "@purin-labs/std";
 import { parseMemberships, parseOrganisationInvitation, parseOrganisationMember, parseReadiness, parseUser } from "@purin-labs/control-api/portal/portal-projection";
 import { readApiError } from "@purin-labs/control-api/portal/api-error";

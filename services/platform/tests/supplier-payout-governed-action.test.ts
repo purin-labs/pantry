@@ -15,12 +15,12 @@ vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt: vi.fn(async () => ({ ok: true, value: null })),
 }));
 
-import { executeApprovedSupplierPayout } from "../src/control/routes/supplier-payout-execution";
-import { readSupplierPayout } from "../src/data/supplier-payout-store";
+import { executeApprovedSupplierPayout } from "@purin-labs/area-commerce/server/control/routes/supplier-payout-execution";
+import { readSupplierPayout } from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 import {
   PAYOUT_CERTIFICATION_CHECKS,
   SUPPLIER_PAYOUT_ADAPTER_VERSIONS,
-} from "../src/data/supplier-payout-certification";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-certification";
 import {
   parseOrganisationId,
   parseControlSessionId,

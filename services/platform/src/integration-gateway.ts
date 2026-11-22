@@ -1,4 +1,4 @@
-import { runScheduledPayoutReconciliation } from "./payouts/recovery";
+import { runScheduledPayoutReconciliation } from "@purin-labs/area-commerce/server/payouts/recovery";
 import type { Track } from "@purin-labs/contracts";
 import { handleControlRequest } from "./control-router";
 import type { GatewayRoute } from "./gateway-routing/domain";
@@ -8,7 +8,7 @@ import { runScheduledOnboardingReconciliation } from "./onboarding-reconciliatio
 import {
   handleCommerceLabRoute,
   matchCommerceLabRoute,
-} from "./commerce-lab/router";
+} from "@purin-labs/area-commerce/server/commerce-lab/router";
 import { processCueQueueBatch } from "@purin-labs/agent/cues/queue-consumer";
 import { runScheduleDispatch } from "@purin-labs/agent/schedules/dispatch";
 import type { Env } from "@purin-labs/kernel/env";
@@ -21,13 +21,13 @@ import {
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { startIsolateLocationRead } from "@purin-labs/kernel/isolate-location";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { runScheduledCommerceOutboxReconciliation } from "./commerce/outbox-worker";
-import { runScheduledPaidReceiptDelivery } from "./commerce/paid-receipt";
+import { runScheduledCommerceOutboxReconciliation } from "@purin-labs/area-commerce/server/outbox-worker";
+import { runScheduledPaidReceiptDelivery } from "@purin-labs/area-commerce/server/paid-receipt";
 import { runFileContextReconciliation } from "@purin-labs/agent/context/files/index";
 import { runAttachmentCollection } from "@purin-labs/conversation/messages/attachment-collection";
 import { runWeeklyChatGptLoginRefresh } from "@purin-labs/agent/models/codex-connection";
 import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runtime/actors/actor-registry-sweep";
-import { handleCommerceWebhook } from "./commerce/webhooks";
+import { handleCommerceWebhook } from "@purin-labs/area-commerce/server/webhooks";
 import { handleMenuScreenRequest } from "@purin-labs/area-cafe/server/control/routes/menu-screens";
 import { handleVoiceMacRequest } from "./voice/mac-routes";
 import { handleDeviceGatewayRequest } from "@purin-labs/area-devices/server/gateway-routes";
@@ -94,15 +94,15 @@ import {
 import {
   handleConfigureStripeConnector,
   handleConfigureStripeFailureCues,
-} from "./stripe/admin";
+} from "@purin-labs/area-commerce/server/stripe/admin";
 import {
   handleConfigureStripeTestCredential,
   handleTriggerStripeTestFailure,
-} from "./stripe/test-admin";
+} from "@purin-labs/area-commerce/server/stripe/test-admin";
 import {
   handleStripeConnectWebhook,
   handleStripeWebhook,
-} from "./stripe/webhooks";
+} from "@purin-labs/area-commerce/server/stripe/webhooks";
 import { handleWhatsAppWebhook } from "./whatsapp/webhook-route";
 // The Worker registers the ports of the lower modules (`worker-ports.ts`)
 // before it serves a request or starts an Actor.

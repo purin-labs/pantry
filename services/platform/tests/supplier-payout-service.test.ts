@@ -7,32 +7,32 @@ import { DatabaseSync } from "node:sqlite";
 import {
   applySupplierPayableCommandWithLexicon,
   validateSupplierPayoutPlanWithLexicon,
-} from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/commerce-wasm";
 import { payoutPlan, wisePayoutPlan } from "./supplier-payout-fixtures";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readSupplierPayable } from "../src/data/supplier-payable-store";
+import { readSupplierPayable } from "@purin-labs/area-commerce/server/data/supplier-payable-store";
 import {
   PAYOUT_CERTIFICATION_CHECKS,
   SUPPLIER_PAYOUT_ADAPTER_VERSIONS,
-} from "../src/data/supplier-payout-certification";
-import { readSupplierPayout } from "../src/data/supplier-payout-store";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-certification";
+import { readSupplierPayout } from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 import {
   createSupplierPayoutAttemptStore,
   readSupplierPayoutAttempt,
-} from "../src/data/supplier-payout-attempt";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-attempt";
 import type {
   PayoutAttemptStore,
   SupplierPayoutPlanValidator,
   SupplierPayoutProvider,
-} from "../src/payouts/executor";
+} from "@purin-labs/area-commerce/server/payouts/executor";
 import {
   approveSupplierPayout,
   proposeSupplierPayout,
   resumeSupplierPayoutFunding,
   submitSupplierPayout,
   type PayableCommandRunner,
-} from "../src/payouts/supplier-payout-service";
+} from "@purin-labs/area-commerce/server/payouts/supplier-payout-service";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_service" as OrganisationId;

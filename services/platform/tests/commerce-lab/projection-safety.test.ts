@@ -4,9 +4,9 @@ import { describe, expect, it } from "vitest";
 import {
   createCommerceLabScenarioRun,
   parseCommerceLabIdempotencyKey,
-} from "../../src/commerce-lab/scenarios";
-import type { CommerceLabRunEvidence } from "../../src/commerce-lab/lab-metadata";
-import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../../src/commerce-lab/lab-metadata";
+} from "@purin-labs/area-commerce/server/commerce-lab/scenarios";
+import type { CommerceLabRunEvidence } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
+import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import { createActionLedgerSchema } from "@purin-labs/authority/actors/action-ledger";
 import {
   applyCommerceDelivery as applyCommerceDeliveryWithAuthority,
@@ -18,7 +18,7 @@ import {
   readRecoverableCommerceCues,
   verifyCommerceLab,
   type ApplyCommerceDeliveryInput,
-} from "../../src/actors/commerce-projection";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { emptySqliteFixture, sqlStorage } from "../sqlite-storage";
 import { requireOrganisationId } from "../test-ids";
 

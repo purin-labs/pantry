@@ -2,7 +2,7 @@ import type { OrganisationDatabaseSession } from "@purin-labs/kernel/database-ha
 import {
   readSquareDelegation,
   type SquareDelegation,
-} from "../../../../services/platform/src/commerce/contract/square-link";
+} from "@purin-labs/area-commerce/server/contract/square-link";
 import {
   OrganisationExecutionScope,
   dispatchWithOrganisationPlacement,

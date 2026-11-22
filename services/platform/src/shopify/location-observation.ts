@@ -24,7 +24,7 @@ import {
   type CommerceProjectionError,
   type CommerceSystemStorageAuthority,
   type CommerceWasmError,
-} from "../commerce/contract/delivery-intake";
+} from "@purin-labs/area-commerce/server/contract/delivery-intake";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { exhaustiveList, isRecord } from "@purin-labs/std";
 

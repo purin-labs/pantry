@@ -13,7 +13,7 @@ import {
   PAYOUT_CERTIFICATION_CHECKS,
   SUPPLIER_PAYOUT_ADAPTER_VERSIONS,
   type SupplierPayoutCertification,
-} from "../src/data/supplier-payout-certification";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-certification";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_cert" as OrganisationId;

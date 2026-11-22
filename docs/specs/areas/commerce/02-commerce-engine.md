@@ -142,7 +142,7 @@ installation with settings. It needs at least one function, handler or action.
 - Secrets: `COMMERCE_SERVICE_TOKEN`, `COMMERCE_BUYER_SESSION_SECRET`,
   `COMMERCE_SIGNING_PRIVATE_KEY_PKCS8_B64` (one Ed25519 key, `key_commerce_v1`, for all
   merchants) and `JAPAN_CARRIER_SIGNING_KEY`. Pantry's key routes are in
-  `services/platform/src/control/routes/commerce-api-keys.ts`.
+  `areas/commerce/server/control/routes/commerce-api-keys.ts`.
 
 ## Rules and limits
 

@@ -10,7 +10,7 @@ import {
   parseCapabilityContractRevision,
   parseCommerceLocationId,
   requireActiveCommerceCapability,
-} from "../src/data/commerce-capability-activation";
+} from "@purin-labs/area-commerce/server/data/commerce-capability-activation";
 import { requireUserId, requireOrganisationId } from "./test-ids";
 import { createMigratedDatabase } from "./sqlite-d1";
 

@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 import type { RequestAuthority } from "@purin-labs/contracts";
 
-import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
-import { runMerchantReport } from "../src/commerce/entity-plane/merchant-report-runner";
-import type { MerchantReportName } from "../src/commerce/entity-plane/merchant-reports";
-import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
+import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
+import { runMerchantReport } from "@purin-labs/area-commerce/server/entity-plane/merchant-report-runner";
+import type { MerchantReportName } from "@purin-labs/area-commerce/server/entity-plane/merchant-reports";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 
 const ORGANISATION_ID = "organisation_urk_brief";

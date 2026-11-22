@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { pantryCommerceAccess } from "../../../../services/platform/src/commerce/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
@@ -21,7 +21,7 @@ import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import { selectActiveGrants } from "@purin-labs/authority/authorization/access-grants/compiler";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
-import { commerceGraphReads } from "../../../../services/platform/src/commerce/contract/graph-reads";
+import { commerceGraphReads } from "@purin-labs/area-commerce/server/contract/graph-reads";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   validateLiveRequestAuthority,

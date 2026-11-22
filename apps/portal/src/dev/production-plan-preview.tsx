@@ -16,7 +16,7 @@ import {
   type PlanServerMessage,
 } from "@purin-labs/production-plan-crdt/protocol";
 import { isRecord } from "@purin-labs/std";
-import { ProductionPlanPanel } from "../features/commerce/production-plan";
+import { ProductionPlanPanel } from "@purin-labs/area-commerce/ui/features/commerce/production-plan";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
 import "../styles.css";
 

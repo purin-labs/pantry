@@ -20,9 +20,9 @@ import {
   parseCommerceSnapshotRevision,
 } from "@purin-labs/commerce-client";
 
-import { createCommerceProjectionSchema } from "../src/actors/commerce-projection";
+import { createCommerceProjectionSchema } from "@purin-labs/area-commerce/server/actors/commerce-projection";
 import { OrganisationDO } from "../src/actors/organisation";
-import { materializeCommerceRelationText } from "../src/actors/commerce-query-schema";
+import { materializeCommerceRelationText } from "@purin-labs/area-commerce/server/actors/commerce-query-schema";
 import { compileCommerceQuerySql } from "@purin-labs/commerce-query-sqlite";
 import {
   NORMALIZED_CONFORMANCE_CASES,
@@ -33,21 +33,21 @@ import {
   normalizedConformancePlanInput,
   type NormalizedConformanceRow,
 } from "@purin-labs/commerce-query-sqlite/normalized-conformance";
-import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";
+import { buildSavedSelectorCommerceReadAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
 import {
   BlotterSource,
   type BlotterOrganisationReader,
-} from "../src/commerce/entity-plane/blotter-source";
+} from "@purin-labs/area-commerce/server/entity-plane/blotter-source";
 import {
   CommerceGraphReader,
   type CommerceGraphBlotterSource,
-} from "../src/commerce/entity-plane/graph-reader";
-import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
+} from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import {
   decodeCommerceCursor,
   encodeCommerceCursor,
   planCommerceGraphQuery,
-} from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/commerce-wasm";
 import { parseIntegrationAccountId, parseOrganisationId } from "@purin-labs/kernel/ids";
 
 const ORGANISATION_ID = "organisation_entity_plane_parity";

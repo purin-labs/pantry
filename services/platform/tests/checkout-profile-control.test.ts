@@ -53,8 +53,8 @@ vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt:
     checkoutControlMocks.recordCommerceMutationReceipt,
 }));
-vi.mock("../src/commerce/contract/client", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/commerce/contract/client")>()),
+vi.mock("@purin-labs/area-commerce/server/contract/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/area-commerce/server/contract/client")>()),
   createCommerceClient: vi.fn(() => ({
     listCheckoutProfiles: checkoutControlMocks.listCheckoutProfiles,
     listCheckoutProfileActivations:

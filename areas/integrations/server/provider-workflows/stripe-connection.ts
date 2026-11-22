@@ -33,8 +33,8 @@ import {
 } from "../contract/provisioning";
 import { scopesAreComplete } from "@purin-labs/connections/provider-adapters/authorization";
 import type { Result } from "@purin-labs/kernel/result";
-import { linkStripePaymentAccount } from "../../../../services/platform/src/commerce/contract/stripe-link";
-import { resolveCommerceMerchant } from "../../../../services/platform/src/commerce/contract/square-link";
+import { linkStripePaymentAccount } from "@purin-labs/area-commerce/server/contract/stripe-link";
+import { resolveCommerceMerchant } from "@purin-labs/area-commerce/server/contract/square-link";
 
 export async function connectStripe(
   input: CompleteProviderInput,

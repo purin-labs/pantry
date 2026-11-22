@@ -6,7 +6,7 @@ import {
   parseCommerceGraphQuery,
   parseCommerceGraphRouteBody,
   parseCommerceListEntryPatchRouteBody,
-} from "../src/commerce/entity-plane/routes";
+} from "@purin-labs/area-commerce/server/entity-plane/routes";
 
 describe("commerce entity-plane route boundary", () => {
   it("accepts only the exact path-bound list-entry patch branch", () => {

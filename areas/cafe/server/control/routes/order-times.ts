@@ -1,7 +1,7 @@
 import type { OrderTimesWindow } from "@purin-labs/control-api";
 
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveMerchantControlContext } from "../../../../../services/platform/src/commerce/contract/merchant-control";
+import { resolveMerchantControlContext } from "@purin-labs/area-commerce/server/contract/merchant-control";
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { controlError, controlJson } from "@purin-labs/control/worker/http";
 

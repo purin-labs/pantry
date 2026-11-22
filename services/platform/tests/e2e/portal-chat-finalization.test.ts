@@ -27,7 +27,7 @@ import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { writeOrganisationCapabilityPolicy } from "@purin-labs/authority/data/capability-policy";
 import { connectCommerceFixture } from "./commerce-support";
 import { CommerceAdminClient } from "@purin-labs/commerce-client";
-import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
+import { commerceCanonicalResourceId } from "@purin-labs/area-commerce/server/contract/resource-ids";
 import { sampleSettings } from "@purin-labs/bakery-model/bakery";
 import {
   rehearsalFromRecording,
@@ -117,7 +117,7 @@ import {
   installMerchantAgent,
   merchantAgentDefaultSkills,
   merchantAgentInstallationId,
-} from "../../src/data/merchant-agent-preset";
+} from "@purin-labs/area-commerce/server/data/merchant-agent-preset";
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
 import { readPortalOutput } from "./full-worker";
 import { PLATFORM_DEFAULT_PI_MODEL } from "@purin-labs/agent/actors/pi-model-transport";

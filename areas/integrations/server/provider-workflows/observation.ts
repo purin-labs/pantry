@@ -14,8 +14,8 @@ import {
 import type { ProviderObservationRequest } from "../contract/provider-adapter";
 import { blockedEvidence } from "../contract/observation-evidence";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
-import { linkStripePaymentAccount } from "../../../../services/platform/src/commerce/contract/stripe-link";
-import { resolveCommerceMerchant } from "../../../../services/platform/src/commerce/contract/square-link";
+import { linkStripePaymentAccount } from "@purin-labs/area-commerce/server/contract/stripe-link";
+import { resolveCommerceMerchant } from "@purin-labs/area-commerce/server/contract/square-link";
 
 export type { ProviderObservationRequest } from "../contract/provider-adapter";
 

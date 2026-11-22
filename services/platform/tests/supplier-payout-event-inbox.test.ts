@@ -6,7 +6,7 @@ import {
   admitSupplierPayoutEvent,
   listUnappliedEvents,
   type SupplierPayoutEvidence,
-} from "../src/data/supplier-payout-event-inbox";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-event-inbox";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 import type { VariantBy } from "@purin-labs/type-utils";

@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
 import type { CommerceListEntry } from "@purin-labs/commerce-contracts";
 import {
   parseInventoryProductionCreation,
@@ -21,7 +21,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   commerceListEntryPatchCommand,
   productionRequestCreateCommand,
-} from "../../commerce/contract/list-entry-commands";
+} from "@purin-labs/area-commerce/server/contract/list-entry-commands";
 import {
   controlError,
   controlJson,

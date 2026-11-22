@@ -14,13 +14,13 @@ import type { VariantBy } from "@purin-labs/type-utils";
 const money = { amountMinor: 10_000, currency: "JPY" };
 
 type PayoutCase = VariantBy<
-  import("../src/commerce/case-proposals").CommerceCaseProposal,
+  import("@purin-labs/area-commerce/server/case-proposals").CommerceCaseProposal,
   "provenance",
   null
 >;
 declare const payoutCase: PayoutCase;
 // @ts-expect-error Payout proposals cannot borrow commerce-system authority through a spread.
-const payoutWithCommerceAuthority: import("../src/commerce/case-proposals").CommerceCaseProposal =
+const payoutWithCommerceAuthority: import("@purin-labs/area-commerce/server/case-proposals").CommerceCaseProposal =
   { ...payoutCase, authority: { kind: "lab" } };
 void payoutWithCommerceAuthority;
 
@@ -233,7 +233,7 @@ void gmoPlanWithQuote;
 void wisePlanWithoutPaymentOption;
 void sealWithoutDeadline;
 
-const fundingAsSettlement: import("../src/payouts/executor").PayoutExecutionResult =
+const fundingAsSettlement: import("@purin-labs/area-commerce/server/payouts/executor").PayoutExecutionResult =
   {
     // @ts-expect-error Funding acknowledgement cannot produce a settled execution result.
     kind: "settled",
@@ -243,11 +243,11 @@ const fundingAsSettlement: import("../src/payouts/executor").PayoutExecutionResu
 void fundingAsSettlement;
 
 declare const rejectedRequestEvidence: VariantBy<
-  import("../src/data/supplier-payout-event-inbox").SupplierPayoutEvidence,
+  import("@purin-labs/area-commerce/server/data/supplier-payout-event-inbox").SupplierPayoutEvidence,
   "targetKind",
   "request"
 >;
-const requestAsSettlement: import("../src/data/supplier-payout-event-inbox").SupplierPayoutEvidence =
+const requestAsSettlement: import("@purin-labs/area-commerce/server/data/supplier-payout-event-inbox").SupplierPayoutEvidence =
   {
     ...rejectedRequestEvidence,
     observation: {
@@ -261,7 +261,7 @@ const requestAsSettlement: import("../src/data/supplier-payout-event-inbox").Sup
 void requestAsSettlement;
 
 // @ts-expect-error A funding approval cannot omit the provider transfer it authorizes.
-const fundingResumeWithoutTransfer: import("../src/commerce/action-model").CommerceActionRequest =
+const fundingResumeWithoutTransfer: import("@purin-labs/area-commerce/server/action-model").CommerceActionRequest =
   {
     kind: "resume_supplier_payout_funding",
     payoutId: "supplier_payout_1",

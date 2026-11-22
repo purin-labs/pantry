@@ -15,7 +15,7 @@ import {
   withdrawAllowance,
   allowanceSummary,
   // @ts-expect-error The portal build checks this JSX module with its app-local configuration.
-} from "../../../apps/portal/src/features/commerce/price-allowance";
+} from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
 import {
   parseOfferPriceAllowanceView,
   parsePricedOffers,

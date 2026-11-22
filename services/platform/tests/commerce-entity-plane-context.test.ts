@@ -16,16 +16,16 @@ import type {
   CommerceRelationship,
 } from "@purin-labs/commerce-contracts";
 
-import { assembleCommerceContext } from "../src/commerce/entity-plane/context-read";
-import { buildSavedSelectorCommerceReadAuthority } from "../src/commerce/entity-plane/authority";
+import { assembleCommerceContext } from "@purin-labs/area-commerce/server/entity-plane/context-read";
+import { buildSavedSelectorCommerceReadAuthority } from "@purin-labs/area-commerce/server/entity-plane/authority";
 import {
   handleCommerceGraphRoute,
   parseCommerceGraphRouteBody,
-} from "../src/commerce/entity-plane/routes";
-import { CommerceGraphReader } from "../src/commerce/entity-plane/graph-reader";
-import { CommerceEngineSource } from "../src/commerce/entity-plane/commerce-source";
+} from "@purin-labs/area-commerce/server/entity-plane/routes";
+import { CommerceGraphReader } from "@purin-labs/area-commerce/server/entity-plane/graph-reader";
+import { CommerceEngineSource } from "@purin-labs/area-commerce/server/entity-plane/commerce-source";
 import { parseOrganisationId as parsePlatformOrganisationId } from "@purin-labs/kernel/ids";
-import { planCommerceGraphQuery } from "../src/commerce/commerce-wasm";
+import { planCommerceGraphQuery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { isRecord } from "@purin-labs/std";
 
 const ORGANISATION_ID = "organisation_phase4_context";

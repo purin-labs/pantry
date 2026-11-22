@@ -6,7 +6,7 @@ import type { Settings } from "@purin-labs/bakery-model/bakery";
 import {
   customEntityRef,
   readCommerceGraph,
-} from "../commerce/entity-plane/api.ts";
+} from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/api";
 
 export async function readProcedure(
   organisationId: string,

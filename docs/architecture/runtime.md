@@ -216,7 +216,7 @@ system updates projections; a mismatch fails with
 `commerce_system_authority_mismatch` before the reducer runs.
 
 `OrganisationActor.applyCommerceDelivery`
-([`commerce-projection.ts`](../../services/platform/src/actors/commerce-projection.ts))
+([`commerce-projection.ts`](../../areas/commerce/server/actors/commerce-projection.ts))
 is the only acceptance point for a `CanonicalCommerceDelivery`. One
 transaction records the receipt, all child observations, all projection
 transitions and the pending cues. An exact replay is a `duplicate`. A
@@ -228,7 +228,7 @@ until a `LocationKind` is assigned
 ([`location-observation.ts`](../../services/platform/src/shopify/location-observation.ts));
 code never infers it from a name or address. Merchant reads use the
 Commerce Read Layer
-([`entity-plane/`](../../services/platform/src/commerce/entity-plane/)).
+([`entity-plane/`](../../areas/commerce/server/entity-plane/)).
 
 ### Objects, reachability and erasure
 

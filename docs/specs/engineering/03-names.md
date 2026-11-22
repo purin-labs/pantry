@@ -172,7 +172,7 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
 | Gateway identity              | `x-pantry-device-gateway`, `-organisation`, `-location`                                                                                                             | `areas/devices/server/gateway-routes.ts`                                                  |
 | Voice device                  | `x-pantry-voice-device`                                                                                                                                             | `VOICE_DEVICE_HEADER`, `packages/control-api/src/voice.ts`                                |
 | Exit Workers                  | `x-pantry-upstream-url`, `x-pantry-exit-colo`                                                                                                                       | `chatgpt-exit/forward.ts`, `model-exit/protocol.ts` in `services/platform/src/`           |
-| Commerce lab                  | `x-pantry-lab-timestamp`, `x-pantry-lab-signature`                                                                                                                  | `services/platform/src/commerce-lab/ingress.ts`                                           |
+| Commerce lab                  | `x-pantry-lab-timestamp`, `x-pantry-lab-signature`                                                                                                                  | `areas/commerce/server/commerce-lab/ingress.ts`                                           |
 | Connector probe               | `x-pantry-probe-key`                                                                                                                                                | `crates/custom-connector-fetch/src/lib.rs`                                                |
 | Commerce webhook              | `x-commerce-event-id`, `-event-kind`, `-timestamp`, `-signature`                                                                                                    | `services/commerce/src/webhooks.ts`                                                       |
 | Catalog snapshot              | `x-commerce-public-origin`, `x-commerce-snapshot-fetched-at`                                                                                                        | `services/commerce/src/catalog-snapshots.ts`                                              |
@@ -192,7 +192,7 @@ The Durable Object classes of the commerce engine are `CommerceMerchantDO` and
 - `SLACK_APP_NAME` ("Purin Pantry") and `SLACK_BOT_NAME` ("Sous Chef") are in
   `packages/control-api/src/slack-names.ts`.
 - `MERCHANT_AGENT_DISPLAY_NAME` ("Sous Chef") is in
-  `services/platform/src/data/merchant-agent-skills.ts`. `AGENT_NAME` ("Purin Sous Chef")
+  `areas/commerce/server/data/merchant-agent-skills.ts`. `AGENT_NAME` ("Purin Sous Chef")
   is in `foundation/agent/models/chatgpt-agent-oauth.ts`.
 - `scripts/slack/pantry-dev-manifest.json` holds the app name "Purin Pantry Dev" and the
   bot name `sous-chef-dev`. `pnpm slack:app:update` sends this file to the production app
@@ -309,7 +309,7 @@ exported `PurinMark` and `PurinIcon`.
 - The docstring of `scripts/shop-voice/phrase-bench.py` names Satyr.
 
 **The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
-`apps/portal/src/features/commerce/production-plan.tsx` show these words to people.
+`areas/commerce/ui/features/commerce/production-plan.tsx` show these words to people.
 
 **Seams text in the Portal:**
 

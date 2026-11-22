@@ -73,7 +73,7 @@ import { BakerySurfaceEffectBridge } from "./features/bakery-surface-effect-brid
 import { registerPortalBoardChat } from "./portal-board-chat";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { CommerceActionStatus } from "./features/governed-actions/commerce-action-status";
+import { CommerceActionStatus } from "@purin-labs/area-commerce/ui/features/governed-actions/commerce-action-status";
 import { fetchCodexUsagePercent } from "@purin-labs/area-integrations/ui/features/integrations/codex-transport";
 import { signInForApproval } from "@purin-labs/control/portal/approval-sign-in-popup";
 import {
@@ -81,7 +81,7 @@ import {
   currentPortalPath,
   readPendingCommerceApproval,
   writePendingCommerceApproval,
-} from "./portal-commerce-approval";
+} from "@purin-labs/area-commerce/ui/portal-commerce-approval";
 import {
   commerceEntityPlaneControlMutation,
 } from "./portal-mutations";

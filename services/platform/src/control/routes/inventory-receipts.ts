@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
 import type {
   InventoryDeliveries,
   InventoryDelivery,

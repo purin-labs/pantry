@@ -14,11 +14,11 @@ import {
   parseCommerceActionPath,
   parseCommerceEntityPlaneActionPath,
   parseCommerceActionRequest,
-} from "../src/commerce/action-model";
+} from "@purin-labs/area-commerce/server/action-model";
 import type {
   CommerceActionPath,
   CommerceCancellationAuthority,
-} from "../src/commerce/action-model";
+} from "@purin-labs/area-commerce/server/action-model";
 import {
   beginActionExecution,
   createActionLedgerSchema,
@@ -27,7 +27,7 @@ import {
   signAction,
   type LedgerCanonicalAction,
 } from "@purin-labs/authority/actors/action-ledger";
-import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../src/commerce-lab/lab-metadata";
+import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import {
   parseApprovalProofDigest,
   type ApprovalEvidence,

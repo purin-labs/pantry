@@ -4,12 +4,12 @@ import {
   type ProductSalesReport,
 } from "@purin-labs/commerce-client";
 import type { AccessGrant } from "@purin-labs/authority/authorization/access-grants/types";
-import { selectNamedCommerceQuerySourceGrant } from "../src/commerce/entity-plane/context-read";
+import { selectNamedCommerceQuerySourceGrant } from "@purin-labs/area-commerce/server/entity-plane/context-read";
 import {
   PRODUCT_SALES_SOURCE_TYPES,
   productSalesGrantProbe,
   readBoundProductSales,
-} from "../src/commerce/entity-plane/product-sales-report";
+} from "@purin-labs/area-commerce/server/entity-plane/product-sales-report";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { fixtureRequestAuthority } from "./fixtures/plan25-turn";
 

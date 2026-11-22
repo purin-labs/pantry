@@ -17,7 +17,7 @@ import {
 import {
   parseCommerceExportPresetPublishRequest,
   publishCommerceExportPreset,
-} from "../src/data/export-preset";
+} from "@purin-labs/area-commerce/server/data/export-preset";
 import { SqliteD1Database } from "./sqlite-d1";
 import { startCommerceWorker } from "./commerce-fixture-worker";
 import { requireUserId, requireOrganisationId } from "./test-ids";

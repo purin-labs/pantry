@@ -25,16 +25,16 @@ import type {
 } from "@purin-labs/commerce-contracts";
 
 import "../styles.css";
-import { CheckoutProfilesRoute } from "../features/checkout-profiles/route";
-import { CommerceEntityPlaneRoute } from "../features/commerce/entity-plane/route";
-import { SupplierPayoutsPanel } from "../features/payouts/route";
+import { CheckoutProfilesRoute } from "@purin-labs/area-commerce/ui/features/checkout-profiles/route";
+import { CommerceEntityPlaneRoute } from "@purin-labs/area-commerce/ui/features/commerce/entity-plane/route";
+import { SupplierPayoutsPanel } from "@purin-labs/area-commerce/ui/features/payouts/route";
 import { CounterSaleRoute } from "@purin-labs/area-cafe/ui/features/terminals/counter-sale-route";
 import type { CounterSale } from "@purin-labs/control-api/portal/counter-sale";
 import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
-import type { PayoutReadAccess } from "../features/payouts/read-permission";
+import type { PayoutReadAccess } from "@purin-labs/area-commerce/ui/features/payouts/read-permission";
 import type { SupplierPayout } from "@purin-labs/control-api/portal/payouts";
-import type { OfferPriceAllowanceTransport } from "../features/commerce/price-allowance";
-import type { CommerceOperationsTransport } from "../features/commerce/operations";
+import type { OfferPriceAllowanceTransport } from "@purin-labs/area-commerce/ui/features/commerce/price-allowance";
+import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
 
 const PREVIEW_COMMERCE_OPERATIONS: CommerceOperationsTransport = {
   previewTrackingBatch: refusePreviewOrderProposal,

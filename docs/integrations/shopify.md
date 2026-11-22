@@ -273,6 +273,6 @@ the same maintenance window.
   [`shopify-connector.ts`](../../services/platform/src/shopify-connector.ts)
 - Provider health projection:
   [`onboarding-projection.ts`](../../areas/organisation/server/data/onboarding-projection.ts)
-- Merchant presentation: [commerce feature](../../apps/portal/src/features/commerce/index.ts)
+- Merchant presentation: [commerce feature](../../areas/commerce/ui/features/commerce/index.ts)
 - Operational failure codes:
   [`onboarding-operations.md`](../runbooks/onboarding-operations.md)

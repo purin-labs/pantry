@@ -18,17 +18,17 @@ import {
   readCurrentCommerceProjection,
   validateCommerceSystemProjections,
   type ApplyCommerceDeliveryInput,
-} from "../src/actors/commerce-projection";
-import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "../src/commerce-lab/lab-metadata";
+} from "@purin-labs/area-commerce/server/actors/commerce-projection";
+import { COMMERCE_LAB_INTEGRATION_ACCOUNT_ID } from "@purin-labs/area-commerce/server/commerce-lab/lab-metadata";
 import {
   createCommerceLabScenarioRun,
   parseCommerceLabIdempotencyKey,
-} from "../src/commerce-lab/scenarios";
+} from "@purin-labs/area-commerce/server/commerce-lab/scenarios";
 import {
   buildCommerceActionDraft,
   buildCommerceLabDelivery,
-} from "../src/commerce/action-model";
-import { normalizeLabCommerceDelivery } from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/action-model";
+import { normalizeLabCommerceDelivery } from "@purin-labs/area-commerce/server/commerce-wasm";
 import { parseCommerceSystemRevision } from "@purin-labs/connections/data/organisation-commerce-system";
 import {
   parseApprovalProofDigest,

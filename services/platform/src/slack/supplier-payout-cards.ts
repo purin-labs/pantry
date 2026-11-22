@@ -1,4 +1,4 @@
-import type { SupplierPayoutRow } from "../data/supplier-payout-store";
+import type { SupplierPayoutRow } from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 
 /**
  * What a supplier payout looks like in Slack.

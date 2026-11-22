@@ -11,13 +11,13 @@ import {
   parseSlackInstallationId,
   parseSlackOrganisationConnectionId,
 } from "@purin-labs/kernel/ids";
-import { createCommerceOutboxReconcileQueueMessage } from "../../src/commerce/contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import {
   createSlackOrganisationConnection,
   disableSlackOrganisationConnection,
 } from "@purin-labs/authority/slack/installation-store";
-import { reconcileCommerceOutbox } from "../../src/commerce/outbox-worker";
-import { runScheduledPaidReceiptDelivery } from "../../src/commerce/paid-receipt";
+import { reconcileCommerceOutbox } from "@purin-labs/area-commerce/server/outbox-worker";
+import { runScheduledPaidReceiptDelivery } from "@purin-labs/area-commerce/server/paid-receipt";
 import { placeCafeOrder, publishCafeMenu } from "./cafe-order-support";
 import { connectCommerceFixture } from "./commerce-support";
 import {

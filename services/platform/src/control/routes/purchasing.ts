@@ -1,4 +1,4 @@
-import { pantryCommerceAccess } from "../../commerce/contract/client";
+import { pantryCommerceAccess } from "@purin-labs/area-commerce/server/contract/client";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
 import {
@@ -11,14 +11,14 @@ import type {
   ControlMutationReceiptScope,
 } from "@purin-labs/tenancy/data/control-mutation";
 import type { Env } from "@purin-labs/kernel/env";
-import { createCommerceOutboxReconcileQueueMessage } from "../../commerce/contract/queue-messages";
+import { createCommerceOutboxReconcileQueueMessage } from "@purin-labs/area-commerce/server/contract/queue-messages";
 import {
   newRequestId,
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
-import { resolveMerchantBinding } from "../../commerce/contract/merchant-control";
+import { resolveMerchantBinding } from "@purin-labs/area-commerce/server/contract/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,

@@ -14,7 +14,7 @@ import {
   writeSupplierPayable,
   type SupplierDestinationRow,
   type SupplierPayableRow,
-} from "../src/data/supplier-payable-store";
+} from "@purin-labs/area-commerce/server/data/supplier-payable-store";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { d1Database } from "./sqlite-d1";
 const ORGANISATION = "organisation_1" as OrganisationId;

@@ -423,6 +423,7 @@ export default [
       "services/platform/src/actors/organisation/organisation-*.ts",
       "foundation/tenancy/actors/organisation/organisation-record.ts",
       "foundation/agent/actors/organisation/organisation-policy.ts",
+      "areas/commerce/server/actors/organisation/organisation-commerce.ts",
       "areas/brain/server/memory/access.ts",
       "areas/brain/server/evals/access.ts",
     ],

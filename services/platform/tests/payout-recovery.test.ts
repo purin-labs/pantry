@@ -6,26 +6,26 @@ import type { SupplierPayable } from "@purin-labs/commerce-contracts";
 import { d1Database } from "./sqlite-d1";
 import { payoutPlan } from "./supplier-payout-fixtures";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { createSupplierPayout } from "../src/data/supplier-payout-store";
-import { createSupplierPayoutAttemptStore } from "../src/data/supplier-payout-attempt";
+import { createSupplierPayout } from "@purin-labs/area-commerce/server/data/supplier-payout-store";
+import { createSupplierPayoutAttemptStore } from "@purin-labs/area-commerce/server/data/supplier-payout-attempt";
 import {
   admitSupplierPayoutEvent,
   readSupplierPayoutAuditEvents,
   listSupplierPayoutExceptions,
   type SupplierPayoutEvidence,
-} from "../src/data/supplier-payout-event-inbox";
+} from "@purin-labs/area-commerce/server/data/supplier-payout-event-inbox";
 import {
   writeSupplierPayable,
   readSupplierPayable,
-} from "../src/data/supplier-payable-store";
-import { proposeSupplierPayout } from "../src/payouts/supplier-payout-service";
-import { applySupplierPayableCommandWithLexicon } from "../src/commerce/commerce-wasm";
+} from "@purin-labs/area-commerce/server/data/supplier-payable-store";
+import { proposeSupplierPayout } from "@purin-labs/area-commerce/server/payouts/supplier-payout-service";
+import { applySupplierPayableCommandWithLexicon } from "@purin-labs/area-commerce/server/commerce-wasm";
 import {
   recoverUnresolvedPayouts,
   type PayoutRecoveryProvider,
-} from "../src/payouts/recovery";
-import { reconcilePayoutInbox } from "../src/payouts/reconciliation";
-import { readSupplierPayout } from "../src/data/supplier-payout-store";
+} from "@purin-labs/area-commerce/server/payouts/recovery";
+import { reconcilePayoutInbox } from "@purin-labs/area-commerce/server/payouts/reconciliation";
+import { readSupplierPayout } from "@purin-labs/area-commerce/server/data/supplier-payout-store";
 import type { VariantBy } from "@purin-labs/type-utils";
 
 const parsedOrganisation = parseOrganisationId("organisation_recovery");

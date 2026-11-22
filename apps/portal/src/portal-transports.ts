@@ -7,7 +7,7 @@ import {
 import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import { readMailboxSetup } from "@purin-labs/area-inbox/ui/features/mail-setup/run";
 import type { OrganisationActions } from "@purin-labs/area-organisation/ui/pages/workspaces";
-import type { ProductDescriptionActionTransport } from "./features/commerce/description-draft/editor";
+import type { ProductDescriptionActionTransport } from "@purin-labs/area-commerce/ui/features/commerce/description-draft/editor";
 import type {
   IntegrationsRouteTransport,
   WhatsAppRouteTransport,
@@ -17,7 +17,7 @@ import {
   type CommerceActionRecord,
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
-import type { CommerceOperationsTransport } from "./features/commerce/operations";
+import type { CommerceOperationsTransport } from "@purin-labs/area-commerce/ui/features/commerce/operations";
 import type { AgentOperationsTransport } from "@purin-labs/area-organisation/ui/pages/automation";
 import { createAccessRouteTransport } from "@purin-labs/area-organisation/ui/features/access/api";
 import { pickGoogleDriveFile } from "@purin-labs/area-organisation/ui/features/access/google-drive-picker";
@@ -42,7 +42,7 @@ import {
   restoreControlOrganisation,
 } from "./portal-reads";
 import { MAILBOX_SETUP_TRANSPORT } from "./portal-support";
-import { StripePaymentAccountSetup } from "./features/payment-accounts/stripe-account";
+import { StripePaymentAccountSetup } from "@purin-labs/area-commerce/ui/features/payment-accounts/stripe-account";
 
 export const AGENT_OPERATIONS_TRANSPORT: AgentOperationsTransport = {
   read: readAgentOperationsTransport,
