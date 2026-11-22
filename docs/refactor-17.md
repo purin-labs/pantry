@@ -344,9 +344,32 @@ physical bake. This refactor does not remove `schedule.ts`.
 
 ## What is left
 
-Updated on 2026-11-22, after the owner asked to finish the tail. The handoff
+State on 2026-11-23, on `dev` at `7de9d964`. The three stages have their main result:
+
+- Stage A: the layers are in place, and `pnpm lint:layers` finds 0 crossings.
+- Stage S: the 33 specs are written, 56 plans are in `docs/history/`, and `AGENTS.md`
+  has 249 lines.
+- Stage B: each foundation module is a package in `foundation/`, and each product
+  area is a package in `areas/<area>/` with `server/` and `ui/`.
+
+The open work, each item with its own decision:
+
+| Item                                                                                                              | Cost                                                                                      | Default                      |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------- |
+| The surfaces (`slack`, `chat`, `voice`, `whatsapp`, Shopify, the Portal shell) move to `surfaces/`                | One more group with the move script: about 370 files, one freeze of `dev` of 30 minutes   | They stay where they are     |
+| `services/platform` becomes `workers/platform`                                                                    | The Wrangler files, the deploy scripts and the CI paths change; a release of its own      | The folder keeps its name    |
+| A `contract` package for each area                                                                                | The public files of `contracts` in `scripts/layers.json` move; it ends 3 package cycles   | One package for each area    |
+| The nine kinds of layer debt that `pnpm lint:layer-debts` counts                                                  | Each kind is its own change; the largest are 249 imports of files that are not public     | The counts may not grow      |
+| The 216 code faults that the second read of the specs confirmed, 8 of high severity                               | One change for each fault, with a journey; the list is with the owner                     | No fault is corrected        |
+| One outbox table shape for the 5 outboxes, new names for classes and tables, the deletion of each old-row adapter | Each needs a D1 patch or an Actor schema step                                             | Nothing changes              |
+| Plan 91 moves to `docs/history/`; the 15 other source documents of the specs                                      | One run of `scripts/move-plan-to-history.mjs` after phase 6 of Plan 91                    | They stay in `docs/`         |
+| A short `AGENTS.md` for each area                                                                                 | 8 short files                                                                             | The root `AGENTS.md` only    |
+| A CI run with no failure                                                                                          | The first full E2E run in CI passed 486 of 488 tests; three fixes are on `dev` since then | Read the next runs           |
+| 42 test files call `runDurableObjectAlarm` and most ignore its result                                             | The same race as in the mail journeys can fail them on a slow runner                      | Correct a file when it fails |
+
+The handoff
 [`docs/handoffs/2026-11-21-refactor-17.md`](handoffs/2026-11-21-refactor-17.md) gives
-the state of the branches and the way to continue.
+the state of Stage A. Its branches are gone; the work is on `dev`.
 
 ### The end of Stage A: the state of the exit list
 
