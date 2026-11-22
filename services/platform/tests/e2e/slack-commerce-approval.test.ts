@@ -1,7 +1,7 @@
 import { env, exports } from "cloudflare:workers";
 import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse } from "msw";
-import { expect, it, type TestContext } from "vitest";
+import { expect, it, vi, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
 import {
@@ -180,6 +180,11 @@ async function proposeInSlack(eventId: string, reply?: string) {
     .toBe(reply === undefined ? 2 : 1);
   const notice = slack.messages.find(isApprovalCard);
   if (notice === undefined) throw new Error("Approval card missing");
+  // The card is in the thread while the proposal tool still runs. The nonce
+  // is in the tool result, which the model reads in its next request.
+  const nonce = await vi.waitFor(() => listingNonce(provider.requests), {
+    timeout: 30_000,
+  });
   return {
     connectorId: fixture.connectorId,
     integrationAccountId: fixture.selectedIntegrationAccountId,
@@ -188,7 +193,7 @@ async function proposeInSlack(eventId: string, reply?: string) {
     answers,
     notice,
     noticeTs: notice.ts ?? "",
-    nonce: listingNonce(provider.requests),
+    nonce,
   };
 }
 
