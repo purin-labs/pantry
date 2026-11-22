@@ -10,7 +10,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createCommerceClient } from "../../commerce/contract/client";
 import { commerceCommandInput, type CommerceAdminClient } from "@purin-labs/commerce-client";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
 import type { MenuBoardCommand, MenuBoardCommandReply } from "../../actors/menu-board-commands";
 import { CAFE_STOREFRONT_ID } from "./menu-publication";

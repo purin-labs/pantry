@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { type SchemaTransaction } from "../../actors/schema-migrations";
+import { type SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   parseVaultHandle,
   type VaultHandle,
@@ -10,7 +10,7 @@ import {
   storeOrganisationExecutionVaultSecret,
 } from "../../credential-vault/service";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../../actors/actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { CredentialVaultBindings } from "../../credential-vault/keyring";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

@@ -1,8 +1,8 @@
 import { admitNamedConnector } from "./module-admission";
 import type { ConnectorModuleHost } from "./channel-adapter";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { isActorExecutionActive } from "../actor-execution-quiescence";
-import { admitActorRecovery } from "../actor-activation";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import { readWhatsAppIngressPolicy } from "../../data/whatsapp";
 import {
   newRequestId,

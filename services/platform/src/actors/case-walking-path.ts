@@ -33,7 +33,7 @@ import {
 import type { PinnedSessionPolicy } from "../policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   decideCaseConversationSink,
   type AllowFlowDecision,
@@ -61,8 +61,8 @@ import type { SessionActor } from "./session/session-actor";
 import type { CaseActor } from "./case/case-actor";
 import type { CaseOutput, CaseSnapshot } from "./case/types";
 import type { CaseConnectorRpc } from "./case/connector-rpc";
-import type { SessionActorRoute } from "./actor-router";
-import type { ConnectorWarmActorSlots } from "./warm-actor-slots";
+import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { ConnectorWarmActorSlots } from "@purin-labs/actor-runtime/actors/warm-actor-slots";
 import { selectEmbeddedHarnessAdapterForModelRoute } from "./embedded-harness-adapter";
 import type {
   EmbeddedHarnessModelUsage,

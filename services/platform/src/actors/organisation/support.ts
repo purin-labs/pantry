@@ -4,13 +4,13 @@ import {
   OrganisationExecutionScope,
   selectOrganisationPlacementDatabase,
 } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { collaborationSocketRoute } from "../collaboration-room";
 import {
   SOCKET_SILENCE_LIMIT_MS,
   SOCKET_SWEEP_INTERVAL_MS,
   openSockets,
-} from "../hibernatable-sockets";
+} from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,
@@ -23,11 +23,11 @@ import {
   expireDueActionExecutions,
   readNextActionExecutionLeaseDeadline,
 } from "../action-ledger";
-import { admitActorRecovery } from "../actor-activation";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   readActivationExportSource,
   type ActorExportError,
-} from "../actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   expireCodeModeOrganisationReservations,
   readNextCodeModeOrganisationAlarmAt,

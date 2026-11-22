@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
-import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import { assertNever } from "@purin-labs/std";
 import type { MailDecision } from "@purin-labs/control-api";

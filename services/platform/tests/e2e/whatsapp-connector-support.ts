@@ -4,7 +4,7 @@ import type { ConnectorIdentity } from "@purin-labs/contracts";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   beginWhatsAppAdmission,

@@ -1,9 +1,9 @@
-import type { AlarmReconciler } from "./lifecycle/actor-alarm";
+import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { SqlStorage } from "@cloudflare/workers-types";
 
 import type { Result } from "@purin-labs/kernel/result";
 import { backoffDelay, isRecord } from "@purin-labs/std";
-import type { SchemaTransaction } from "./schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   advanceWhatsAppProposal,
   createConnectorWhatsAppProposalSchema,

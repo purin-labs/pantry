@@ -10,7 +10,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect, it } from "vitest";
 
 import { bytesToHex, encodeBase64 } from "@purin-labs/std";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { storeVaultSecret, type VaultHandle } from "../../src/credential-vault";
 import { upsertUser, type User } from "@purin-labs/tenancy/data/control-plane";
 import {

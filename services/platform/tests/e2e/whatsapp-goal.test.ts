@@ -7,7 +7,7 @@ import {
 } from "cloudflare:test";
 import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readCaseSessionAssignment } from "../../src/actors/actor-journal/transactions";
 import { parsePersistedHarnessTurnLease } from "../../src/actors/agent-session-harness-authority";
 import { SessionDO } from "../../src/actors/agent-session";
@@ -16,7 +16,7 @@ import { SessionExecutionAdmission } from "../../src/actors/session-execution-ad
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   readOrganisationPlacementMove,
   parseOrganisationPlacementMoveTarget,

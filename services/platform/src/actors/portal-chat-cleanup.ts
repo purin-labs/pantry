@@ -7,8 +7,8 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
-import type { ActorFenceToken } from "./actor-registry";
-import type { ActorExportError } from "./actor-export";
+import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
+import type { ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 
 export type PortalChatCleanupRequest = Readonly<{
   requestingOrganisationId: OrganisationId;

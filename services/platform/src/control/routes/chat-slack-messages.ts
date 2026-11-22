@@ -13,7 +13,7 @@ import { assertNever, hasExactKeys } from "@purin-labs/std";
 import {
   resolveActiveConnectorActorAtPlacement,
   type ActorResolutionError,
-} from "../../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
 import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing";
 import { conversationCaseIdentity } from "../../chat/conversation-access";
@@ -33,7 +33,7 @@ import {
   type SlackMessageProposal,
 } from "../../data/slack-message-proposal";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ConnectorActorStub } from "../../actors/actor-stubs";
+import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { authorizeOrganisationRequest } from "../authorization";

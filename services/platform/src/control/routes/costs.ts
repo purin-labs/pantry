@@ -28,7 +28,7 @@ import {
   type CostsSheetWriteResult,
 } from "@purin-labs/kitchen-control-api";
 import type { CommerceStockSnapshot } from "@purin-labs/commerce-client";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   readCostsOverview,
   saveSupplyCostTerms,

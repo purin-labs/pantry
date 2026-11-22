@@ -4,7 +4,7 @@ import {
   baseProjectId,
   prepareBaseProject,
 } from "../../services/platform/src/projects/default-project.ts";
-import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../../services/platform/src/actors/actor-schema-versions.ts";
+import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../../foundation/actor-runtime/actors/actor-schema-versions.ts";
 import { parseOrganisationId } from "../../foundation/kernel/ids.ts";
 import { parseUserId } from "../../packages/control-api/src/ids.ts";
 import { ownerUser } from "./account-authority.mjs";

@@ -3,7 +3,7 @@ import { assertNever } from "@purin-labs/std";
 import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { SessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { resolveActorRecoveryAdmission } from "./actor-activation";
+import { resolveActorRecoveryAdmission } from "@purin-labs/actor-runtime/actors/actor-activation";
 import type {
   EmbeddedHarnessModelRouteLease,
   HarnessNativeCodeMode,

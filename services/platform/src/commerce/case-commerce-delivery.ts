@@ -8,7 +8,7 @@ import type { CaseOutput } from "../actors/case/types";
 import { sinkRefusalAsksPerson } from "../policy";
 import { holdCaseOutput } from "../actors/case-output-hold";
 import { authorizeCaseConversationOutput } from "../actors/case-walking-path";
-import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
+import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { prepareTurnAuthority } from "../context/turn-context";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId, type OrganisationId } from "@purin-labs/kernel/ids";

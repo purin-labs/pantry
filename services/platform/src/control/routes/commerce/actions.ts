@@ -3,7 +3,7 @@ import { ensureCaseProject } from "../../../projects/case-project";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub, OrganisationActorStub } from "../../../actors/actor-stubs";
+import type { CaseActorStub, OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   isCommerceLedgerAction,
@@ -14,7 +14,7 @@ import type { CommerceSource } from "@purin-labs/commerce-contracts";
 import {
   resolveActiveCaseActor,
   requireActiveOrganisationActor,
-} from "../../../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   approvalActionBindingMatches,
   digestApprovalAction,

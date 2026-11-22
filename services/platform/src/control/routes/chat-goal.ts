@@ -5,7 +5,7 @@ import {
   type ChatGoalView,
 } from "@purin-labs/control-api";
 import { hasExactKeys, isRecord } from "@purin-labs/std";
-import { resolveActiveCaseActor } from "../../actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseGoalCommandRequest } from "../../actors/case-goals";
 import {
   authorizeConversation,

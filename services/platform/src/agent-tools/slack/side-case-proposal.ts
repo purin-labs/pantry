@@ -1,7 +1,7 @@
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import { assertNever } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import { resolveActiveConnectorActorAtPlacement } from "../../actors/actor-router";
+import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import { decideCaseConversationSink } from "../../actors/case-conversation-sink";
 import {

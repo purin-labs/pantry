@@ -14,8 +14,8 @@ import {
 import type { HarnessTurnLease } from "@purin-labs/contracts";
 import type { SessionDO } from "../../src/actors/agent-session";
 import { preflightHarnessTurnLeaseInTransaction } from "../../src/actors/agent-session-harness-authority";
-import { closeActorExecutionAdmission } from "../../src/actors/actor-execution-quiescence";
-import { readActivationExportSource } from "../../src/actors/actor-export";
+import { closeActorExecutionAdmission } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { readActivationExportSource } from "@purin-labs/actor-runtime/actors/actor-export";
 import { ORGANISATION_ID } from "./slack-journey-support";
 import {
   chat,

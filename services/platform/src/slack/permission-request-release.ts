@@ -1,4 +1,4 @@
-import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
+import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   listHeldAgentPermissionDecisions,
   markAgentPermissionRequestReleased,

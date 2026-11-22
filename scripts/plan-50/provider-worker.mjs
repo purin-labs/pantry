@@ -1,5 +1,5 @@
 import { failNativeStream } from "../../services/platform/src/actors/pi-durable-stream.ts";
-import { armAlarmBy } from "../../services/platform/src/actors/lifecycle/actor-alarm.ts";
+import { armAlarmBy } from "../../foundation/actor-runtime/actors/lifecycle/actor-alarm.ts";
 import proposalTrial, {
   CandidateActor as ProposalActor,
   ProposalOrganisation as ProposalOrganisationOwner,

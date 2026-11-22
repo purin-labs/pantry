@@ -17,7 +17,7 @@ import {
   type ProductionRequestFields,
   type CommerceEntityPlaneClient,
 } from "@purin-labs/commerce-client";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";

@@ -61,12 +61,12 @@ import {
 } from "../policy/information-flow";
 import { ensureCaseProject } from "../projects/case-project";
 import { buildAgentMailboxAuthority } from "../request-authority";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { serializeContextBundle } from "./actor-journal/parsers";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,

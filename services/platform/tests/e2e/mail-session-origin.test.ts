@@ -59,7 +59,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
   resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,

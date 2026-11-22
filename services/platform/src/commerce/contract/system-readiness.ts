@@ -1,5 +1,5 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CommerceSystemSyncStatus } from "../../actors/commerce-projection";
 import { ensureCreatedOrganisationActor } from "../../control/organisation-runtime";
 import { resolveOrganisationCommerceSystemAuthority } from "../../data/organisation-commerce-system";

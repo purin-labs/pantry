@@ -6,7 +6,7 @@ import type { BakeryBrowserContext } from "@purin-labs/bakery-model/bakery-conte
 import type { BakerySurfaceAttachmentV1 } from "@purin-labs/bakery-model/bakery-surface";
 import type { Env } from "@purin-labs/kernel/env";
 import { kitchenState } from "../kitchen-observation";
-import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
+import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   conversationTimeline,
   timelineVisibleMessages,

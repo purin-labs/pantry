@@ -4,7 +4,7 @@ import type { OrganisationPlacementBindings } from "@purin-labs/tenancy/organisa
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "../../../actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { CommerceGraphQuery } from "@purin-labs/commerce-contracts";
@@ -16,7 +16,7 @@ import {
   resolveActiveCaseActor,
   resolveActiveCaseActorAtPlacement,
   requireActiveOrganisationActor,
-} from "../../../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ActionLedgerEntry } from "../../../actors/action-ledger";
 import type { CaseSnapshot } from "../../../actors/case/types";
 import { authorizeCapabilityUse } from "../../../authorization/access-grants/turn-authority";

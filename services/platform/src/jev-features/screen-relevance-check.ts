@@ -1,7 +1,7 @@
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type { ScreenRelevanceBand } from "@purin-labs/control-api";
 import type { Variant } from "@purin-labs/type-utils";
-import type { SchemaTransaction } from "../actors/schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import {

@@ -20,14 +20,14 @@ import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation
 import type {
   ActorIdentity,
   ActorRegistryEntry,
-} from "../actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
   type ActorResolutionError,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   errorResponse,
   jsonResponse,

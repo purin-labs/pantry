@@ -4,7 +4,7 @@ import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   CAPABILITY_KEYS,
   SLACK_MESSAGE_RESOURCE_SCOPE,

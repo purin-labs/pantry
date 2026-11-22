@@ -1,7 +1,7 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { resolveCaseContextCollectionSelectionVerification } from "../../case-context-discovery/source";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseIntegrationAccountId,
@@ -14,7 +14,7 @@ import {
 import type { Result } from "@purin-labs/kernel/result";
 import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
-import { resolveActiveConnectorActor } from "../actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   decideCaseContextCollectionRelationship,
   listMemberCaseContextCollectionIdsForCase,

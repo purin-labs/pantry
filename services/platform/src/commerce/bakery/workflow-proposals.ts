@@ -9,7 +9,7 @@ import {
   type WorkflowChange,
 } from "@purin-labs/bakery-workflow/changes";
 import type { RunFinding } from "@purin-labs/bakery-workflow/findings";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";

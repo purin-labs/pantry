@@ -25,7 +25,7 @@ import {
   openSockets,
   socketLastSeenAt,
   socketRouteTag,
-} from "./hibernatable-sockets";
+} from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import { socketSessionAccess } from "./socket-session-access";
 
 /** An open canvas page: a socket of a canvas room, with its canvas and user. */

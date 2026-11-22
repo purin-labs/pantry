@@ -9,8 +9,8 @@ import type {
 import {
   listRecentActiveCaseRegistryEntries,
   type ActiveActorRegistryEntry,
-} from "./actor-registry";
-import { resolveActiveCaseActor } from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

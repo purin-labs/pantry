@@ -10,7 +10,7 @@ import {
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveActiveSessionActorAtPlacement } from "../actor-router";
+import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CaseActor } from "./case-actor";
 import { logAbandonSkipped } from "./assignment-census";
 

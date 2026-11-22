@@ -5,7 +5,7 @@ import {
   resumeActorRelocation,
   startActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { reconcileProviderAccountCleanup } from "../../src/provider-lifecycle/cleanup-reconciliation";
 import { readProviderCleanupContext } from "../../src/provider-adapters/catalogue";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";

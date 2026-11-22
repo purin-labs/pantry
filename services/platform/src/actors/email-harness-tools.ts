@@ -11,7 +11,7 @@ import {
   validateCaseContextCollectionEmailMessage,
 } from "./email-case-context-collection-evidence";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { requireActiveOrganisationActor } from "./actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { SerializedFlowBinding } from "../policy/information-flow";
 import type {
   GmailAttachmentRef,

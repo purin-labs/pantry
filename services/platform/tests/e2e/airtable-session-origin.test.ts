@@ -30,7 +30,7 @@ import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-sn
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 
 const TOKEN = "airtable-session-origin-fixture-token";

@@ -1,4 +1,4 @@
-import type { MachineCensus } from "../lifecycle/machine-census";
+import type { MachineCensus } from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 
 const DAY_MS = 24 * 60 * 60_000;
 /** A kind or a reason is a code, never free text. Anything else is `other`. */

@@ -12,13 +12,13 @@ import {
   type ActorFenceToken,
   type ActorIdentity,
   type ActorRegistryId,
-} from "../src/actors/actor-registry";
-import type { ActorActivationInspection } from "../src/actors/actor-activation";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import type { ActorActivationInspection } from "@purin-labs/actor-runtime/actors/actor-activation";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,
-} from "../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import gateway from "../src/integration-gateway";
 import {
   type CaseId,

@@ -15,7 +15,7 @@ import { parseSessionModelRoute } from "../policy-snapshot";
 import type { Result } from "@purin-labs/kernel/result";
 import { parseWorkspaceReceipt } from "../workspace-revision-store";
 import { type AgentSessionPersistence } from "./agent-session-schema";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   isNonNegativeInteger,

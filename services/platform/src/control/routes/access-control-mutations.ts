@@ -30,7 +30,7 @@ import {
   resolveGrantSubjectReference,
   resolveGrantTargetReference,
 } from "../../access-control/decision-explanation";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type {
   AccessGrantTarget,
   FileResourceAccessGrantTarget,

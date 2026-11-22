@@ -1,4 +1,4 @@
-import { armAlarmBy } from "../lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { readGoalTurnUsage } from "../session-goal-usage";
 import type {
   HarnessTurnLease,

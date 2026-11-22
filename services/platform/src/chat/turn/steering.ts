@@ -19,9 +19,9 @@ import {
   type ChatCommand,
 } from "../conversation";
 import type { Env } from "@purin-labs/kernel/env";
-import type { SessionActorStub } from "../../actors/actor-stubs";
+import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseRequestId } from "@purin-labs/kernel/ids";
-import { resolveActiveSessionActorAtPlacement } from "../../actors/actor-router";
+import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationModelRoute } from "../../models/route";
 import {
   readConversation,

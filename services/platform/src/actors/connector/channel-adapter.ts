@@ -4,11 +4,11 @@ import type {
   ConnectorIdentity,
 } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
-import type { SessionActorStub } from "../actor-stubs";
+import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { SessionId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { AlarmReconciler } from "../lifecycle/actor-alarm";
-import type { SessionActorRoute } from "../actor-router";
+import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
+import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
 import type {
   CaseWorkCodec,
   CaseWorkCommand,

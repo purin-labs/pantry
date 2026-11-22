@@ -16,7 +16,7 @@ import {
 import { listMessagePreparationObjectKeys } from "../message-preparation-store";
 import type { EmbeddedHarnessActiveTurn } from "../embedded-harness";
 import type { CanonicalTextTurnCompletionIdentity } from "../agent-session-text-turn";
-import type { ActorExportError } from "../actor-export";
+import type { ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   beginSessionTurnStream,
   failSessionTurnStream,

@@ -19,7 +19,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { SessionDO } from "../../src/actors/agent-session";
 import type { Conversation } from "../../src/chat/conversation";
 import {

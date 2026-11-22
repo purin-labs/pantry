@@ -3,7 +3,7 @@ import type {
   PendingGovernedAction,
 } from "@purin-labs/control-api";
 import { isCommerceLedgerAction } from "../actors/action-ledger";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { listEmailReviewProjections } from "../data/email-review";
 import type { Env } from "@purin-labs/kernel/env";
 import {

@@ -40,8 +40,8 @@ vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
   resolveControlSession: controlMocks.resolveControlSession,
   validateControlCsrf: controlMocks.validateControlCsrf,
 }));
-vi.mock("../src/actors/actor-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/actors/actor-router")>()),
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/actor-runtime/actors/actor-router")>()),
   requireActiveOrganisationActorAtPlacement: actorMocks.requireActiveOrganisationActor,
   requireActiveOrganisationActor: actorMocks.requireActiveOrganisationActor,
 }));

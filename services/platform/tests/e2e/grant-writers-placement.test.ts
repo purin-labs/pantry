@@ -40,8 +40,8 @@ import {
   parseWhatsAppBusinessAccountId,
   parseWhatsAppPhoneNumberId,
 } from "../../src/whatsapp/identifiers";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
-import { resumeActorRelocation } from "../../src/actors/actor-relocation";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
+import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

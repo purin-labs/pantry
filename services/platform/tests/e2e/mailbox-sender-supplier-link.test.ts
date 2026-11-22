@@ -4,7 +4,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { expect, it, type TestContext } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
-import { resolveActiveCaseActor } from "../../src/actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { nextEmailCorrectionLearningAt } from "../../src/actors/connector-email";
 import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readVerifiedMessageSender } from "../../src/mail-inbox/verified-sender";

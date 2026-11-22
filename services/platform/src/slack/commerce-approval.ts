@@ -4,7 +4,7 @@ import { errorMessage } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ActionLedgerEntry } from "../actors/action-ledger";
 import { resolveSlackApprover } from "../actors/action-mutation-execution";
 import {

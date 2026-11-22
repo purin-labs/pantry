@@ -8,7 +8,7 @@ import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
-import { resolveActiveConnectorActor } from "../../actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import {
   parseIntegrationAccountId,

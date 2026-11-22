@@ -1,7 +1,7 @@
 import type { Env } from "@purin-labs/kernel/env";
-import type { ConnectorActorStub } from "../actors/actor-stubs";
+import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveActiveConnectorActor } from "../actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { type MailboxIngressPolicy } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";
 import { whatsappConnectorIdValue } from "../data/whatsapp";

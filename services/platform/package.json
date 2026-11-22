@@ -69,6 +69,7 @@
     "@purin-labs/contract-schema": "workspace:*",
     "@purin-labs/kernel": "workspace:*",
     "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/actor-runtime": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

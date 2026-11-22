@@ -19,7 +19,7 @@ import { expect, it } from "vitest";
 import { http, type HttpResponseResolver } from "msw";
 import { isRecord } from "@purin-labs/std";
 import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";

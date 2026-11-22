@@ -6,7 +6,7 @@ import {
   digestApprovalAction,
   isCommerceActionNonce,
 } from "../../approval-authentication";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   beginGoogleOidc,
   completeGoogleOidc,

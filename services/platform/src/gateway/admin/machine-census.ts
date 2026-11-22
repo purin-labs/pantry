@@ -8,7 +8,7 @@ import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisatio
 import type {
   MachineCensus,
   MachineStateAge,
-} from "../../actors/lifecycle/machine-census";
+} from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 import { isAuthorizedOrganisationAdminRequest } from "../request-helpers";
 
 /** The most Actors that one census request reads. */

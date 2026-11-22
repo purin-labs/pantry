@@ -5,13 +5,13 @@ import { expect, it, type TestContext } from "vitest";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
-import { listOrganisationActorRegistryEntries } from "../../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-router";
+import { listOrganisationActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   conversationResidencyStub,
   type ConversationResidencyActor,
-} from "../../src/actors/conversation-residency";
+} from "@purin-labs/actor-runtime/actors/conversation-residency";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import {
   ORGANISATION_ID,

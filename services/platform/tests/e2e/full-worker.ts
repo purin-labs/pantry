@@ -10,7 +10,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import { CaseDO } from "../../src/actors/case";
 import { SessionDO } from "../../src/actors/agent-session";
 import { OrganisationDO } from "../../src/actors/organisation";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";

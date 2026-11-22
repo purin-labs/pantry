@@ -3,7 +3,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   latestWhatsAppProposal,

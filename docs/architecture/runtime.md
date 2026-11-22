@@ -84,7 +84,7 @@ ConnectorActor -> CaseActor -> AgentSessionActor -> executor
 
 Every Actor is one Organisation-scoped coordination unit, resolved through
 the registry by its exact logical identity
-([`actor-router.ts`](../../services/platform/src/actors/actor-router.ts)).
+([`actor-router.ts`](../../foundation/actor-runtime/actors/actor-router.ts)).
 One Connector serializes one provider-account delivery domain. One Case
 serializes one body of related work. One Agent Session serializes one
 agent's private lifecycle. An executor owns no durable state. Actors call
@@ -153,7 +153,7 @@ fence. `OrganisationExecutionScope.resolve`
 gives the regional database and placement of an Organisation.
 
 A regional `durable_object_registry` row
-([`actor-registry.ts`](../../services/platform/src/actors/actor-registry.ts))
+([`actor-registry.ts`](../../foundation/actor-runtime/actors/actor-registry.ts))
 binds the Organisation, Actor kind and logical identity, the physical name,
 the schema and state versions, the placement epoch and cell, and an
 activation token and fence token. Its lifecycle is `reserved`, `active`,
@@ -182,7 +182,7 @@ recovery work only at its active placement.
   collaborative drafts.
 
 Each Actor owns its schema upgrades
-([`schema-migrations.ts`](../../services/platform/src/actors/schema-migrations.ts)).
+([`schema-migrations.ts`](../../foundation/actor-runtime/actors/schema-migrations.ts)).
 A chat trigger carries a `UserMessage`: one ordered, non-empty list of text,
 link and attachment parts. Attachments belong to the parts; no separate
 attachment list exists.

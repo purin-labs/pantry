@@ -30,7 +30,7 @@ import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-sn
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 
 const LINK = "https://supplier.example.net/schedule?private=fixture";
 const FINAL_LINK = "https://docs.example.net/delivery";

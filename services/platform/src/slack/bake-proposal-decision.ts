@@ -1,5 +1,5 @@
 import { resolveSlackLinkedMember } from "../actors/action-mutation-execution";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   ChannelId,

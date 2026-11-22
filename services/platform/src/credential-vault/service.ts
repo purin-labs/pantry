@@ -3,7 +3,7 @@ import type {
   OrganisationDatabaseSession,
 } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   organisationPlacementPredicate,
   type OrganisationExecutionScope,

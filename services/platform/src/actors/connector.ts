@@ -1,15 +1,15 @@
 import {
   actorMachineCensus,
   type MachineCensus,
-} from "./lifecycle/machine-census";
+} from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 import { ACTOR_MACHINES } from "./actor-machines";
-import { readWarmActorSlots } from "./warm-actor-slots";
+import { readWarmActorSlots } from "@purin-labs/actor-runtime/actors/warm-actor-slots";
 import { invalidateEmailCaseContextCollectionProposals } from "./email-case-context-collection-evidence";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   actorExecutionAdmissionOpen,
   closeActorExecutionAdmission,
-} from "./actor-execution-quiescence";
+} from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   permissionDecisionDeliveryId,
   permissionNoticeDeliveryId,
@@ -19,10 +19,13 @@ import {
   pinnedActorDatabase,
   type ActorActivationSchemaAdvance,
   type ActorActivationSchemaAdvanceError,
-} from "./actor-activation";
-import { type ActorExportError } from "./actor-export";
-import type { ActorActivationRequest, ActorFenceToken } from "./actor-registry";
-import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "./actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
+import { type ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
+import type {
+  ActorActivationRequest,
+  ActorFenceToken,
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { readEmailRuntime } from "./connector-email";
 import {
   parseConnectorCaseWorkRecoveryRequest,
@@ -63,8 +66,8 @@ import {
 import { reopenWithheldConnectorSlackDelivery } from "./connector-slack-stream";
 import { deliverSlackPermissionNotice } from "../slack/case-processing";
 import type { Result } from "@purin-labs/kernel/result";
-import { type PlacedActorExportSource } from "./lifecycle/placed-actor";
-import { armAlarmBy } from "./lifecycle/actor-alarm";
+import { type PlacedActorExportSource } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { inspectConnector } from "./connector/delivery";
 import type { ConnectorChannels } from "./connector/channel-adapter";
 import { SlackConnectorChannel } from "./connector/slack-channel";

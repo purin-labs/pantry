@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
-import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import type {
   MailOrganizationCommand,
@@ -14,7 +14,7 @@ import type {
   ConnectorId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { establishConnectorEmailWatch } from "../actors/connector-email-evaluation";
 import { readEmailMailboxAccount } from "../data/email-mailbox";
 import { gmailConnectorIdValue } from "./contract/connector-ids";

@@ -3,7 +3,7 @@ import {
   assertTableExists,
   runSchemaMigrations,
   type SchemaMigrationPlan,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 
 /**
  * The Case's own tables, version 1. A schema change adds a step after the

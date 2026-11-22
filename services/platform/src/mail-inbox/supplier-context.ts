@@ -22,7 +22,7 @@ import { selectActiveGrants } from "../authorization/access-grants/compiler";
 import { resolveCurrentOrganisationCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import { resolveOrganisationCommerceSystemAuthority } from "../data/organisation-commerce-system";
 import { commerceGraphReads } from "../commerce/contract/graph-reads";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   validateLiveRequestAuthority,
   validateLiveAutomationAuthority,

@@ -7,9 +7,9 @@ import {
 } from "@purin-labs/kernel/database-handles";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationPlacement } from "@purin-labs/tenancy/placement";
-import type { ActorRegistryId } from "../src/actors/actor-registry";
-import { readRegistryEntryById } from "../src/actors/actor-registry";
-import { resolveActorExecutionAdmission } from "../src/actors/actor-placement-admission";
+import type { ActorRegistryId } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { readRegistryEntryById } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { resolveActorExecutionAdmission } from "@purin-labs/actor-runtime/actors/actor-placement-admission";
 
 /**
  * The SQL of the one-database schema that holds both deployed baselines.

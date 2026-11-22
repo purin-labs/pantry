@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import { requireActiveOrganisationActor } from "../../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseVaultHandle,
   revokeCredential,

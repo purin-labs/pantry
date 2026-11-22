@@ -1,4 +1,4 @@
-import { armAlarmBy } from "../../services/platform/src/actors/lifecycle/actor-alarm.ts";
+import { armAlarmBy } from "../../foundation/actor-runtime/actors/lifecycle/actor-alarm.ts";
 import {
   CandidateActor as ProviderActor,
   ProposalOrganisation as ProviderOrganisation,

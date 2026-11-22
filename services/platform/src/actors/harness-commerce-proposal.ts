@@ -17,7 +17,7 @@ import {
 import type { CommerceOrderV1 } from "@purin-labs/commerce-client";
 import type { Variant } from "@purin-labs/type-utils";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "./actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   newRequestId,
@@ -31,7 +31,7 @@ import type { CanonicalActionDraft } from "./action-ledger";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CommerceActionProposalOrigin } from "../agent-tools/catalog/types";
 import {
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,

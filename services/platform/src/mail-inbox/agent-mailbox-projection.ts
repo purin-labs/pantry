@@ -1,6 +1,6 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveActiveConnectorActorAtScope } from "../actors/actor-router";
+import { resolveActiveConnectorActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   readAgentMailboxBinding,
   readEmailMailboxAccount,

@@ -1,9 +1,9 @@
-import type { ActorRestoreManifest } from "../src/actors/actor-restore-manifest";
-import type { ActorPlacementAdmission } from "../src/actors/actor-placement-admission";
+import type { ActorRestoreManifest } from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
+import type { ActorPlacementAdmission } from "@purin-labs/actor-runtime/actors/actor-placement-admission";
 import type {
   ActorActivationIdentity,
   ActorActivationRequest,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 
 declare const identity: ActorActivationIdentity;
 declare const execution: Extract<

@@ -7,7 +7,7 @@ import {
   assertTableExists,
   runSchemaMigrations,
   type SchemaMigrationPlan,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 
 /**
  * The DeviceFleetActor's tables (Plan 85). Version 1 is the shape that the

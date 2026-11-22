@@ -16,7 +16,7 @@ import {
 } from "@purin-labs/control-api";
 import { listIntegrationAccounts } from "../../data/integration-account";
 import { resolveConnectorGmailAccess } from "../../actors/connector-email-evaluation";
-import { resolveActiveConnectorActor } from "../../actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
 import {

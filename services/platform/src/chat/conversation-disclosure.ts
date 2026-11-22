@@ -13,7 +13,7 @@ import {
   decideChatFlowDelivery,
   evaluateChatFlowLabelSink,
 } from "./information-flow";
-import { resolveActiveSessionActor } from "../actors/actor-router";
+import { resolveActiveSessionActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   FlowBinding,
   labelAllowsAudiences,

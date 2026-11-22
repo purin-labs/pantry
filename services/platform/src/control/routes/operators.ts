@@ -1,7 +1,7 @@
 import { configuredOrganisationDatabases } from "@purin-labs/tenancy/organisation-execution-scope";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseVaultRootRotationId,
   parseVaultRotationBatchLimit,

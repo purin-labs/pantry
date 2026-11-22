@@ -10,9 +10,9 @@ import { describe, expect, it } from "vitest";
 import {
   activateActorRegistryEntry,
   reserveActor,
-} from "../src/actors/actor-registry";
-import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { CASE_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import {
   parseCaseId,
   parseSessionId,

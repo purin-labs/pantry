@@ -6,7 +6,7 @@ import {
   type ActorIdentity,
   type ActorActivationRequest,
   type ActorActivationResult,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import { requireActorExecutionAdmission } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {

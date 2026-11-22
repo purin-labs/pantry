@@ -4,12 +4,12 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { actorStub } from "../../src/actors/actor-stubs";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { CaseDO } from "../../src/actors/case";
 import {
   conversationResidencyStub,
   type WarmSlotName,
-} from "../../src/actors/conversation-residency";
+} from "@purin-labs/actor-runtime/actors/conversation-residency";
 import { network } from "./network";
 import { registryEntries } from "./slack-follow-up-support";
 import {

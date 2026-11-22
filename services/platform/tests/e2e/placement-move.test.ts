@@ -20,17 +20,17 @@ import { requireOrganisationExecutionScope } from "../organisation-execution-fix
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
-import { startActorRestore } from "../../src/actors/actor-restore";
-import { prepareActorRestoreManifest } from "../../src/actors/actor-restore-manifest";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
+import { startActorRestore } from "@purin-labs/actor-runtime/actors/actor-restore";
+import { prepareActorRestoreManifest } from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { requireActiveSessionActor } from "../../src/actors/actor-router";
+import { requireActiveSessionActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   quarantineActorRegistryEntry,
   reserveActor,
-} from "../../src/actors/actor-registry";
-import { resolveActorExecutionAdmission } from "../../src/actors/actor-placement-admission";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { resolveActorExecutionAdmission } from "@purin-labs/actor-runtime/actors/actor-placement-admission";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { parseSessionId, type SessionId } from "@purin-labs/kernel/ids";
 import { moveTarget, placementEntries } from "./placement-move-support";
 

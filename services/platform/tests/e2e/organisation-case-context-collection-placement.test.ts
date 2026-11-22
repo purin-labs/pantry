@@ -16,7 +16,7 @@ import { expect, it, vi, type TestContext } from "vitest";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   activateEmailRuntime,
@@ -27,7 +27,7 @@ import {
   startActorRelocation,
   resumeActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";

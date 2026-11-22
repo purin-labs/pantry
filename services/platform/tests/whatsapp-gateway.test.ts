@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("cloudflare:workers", cloudflareWorkersMock);
 vi.mock("../src/data/whatsapp", whatsappDataMockFactory);
-vi.mock("../src/actors/actor-router", actorRouterMockFactory);
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", actorRouterMockFactory);
 
 const gatewayMocks = vi.hoisted(createGatewayMocks);
 
@@ -187,7 +187,7 @@ function whatsappDataMockFactory(): Record<string, unknown> {
 
 async function actorRouterMockFactory(): Promise<Record<string, unknown>> {
   const actual = await vi.importActual<Record<string, unknown>>(
-    "../src/actors/actor-router",
+    "@purin-labs/actor-runtime/actors/actor-router",
   );
   return {
     ...actual,

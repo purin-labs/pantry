@@ -19,14 +19,14 @@ import {
 } from "@purin-labs/std/state-machine";
 
 import type { Result } from "@purin-labs/kernel/result";
-import { writeActorTransition } from "./lifecycle/state-transition";
+import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
 import {
   assertRequiredColumns,
   assertTableExists,
   runSchemaMigrations,
   type SchemaMigrationPlan,
   type SchemaTransaction,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { WHATSAPP_REPLY_PROPOSAL_MACHINE } from "./whatsapp-reply-proposal.machine";
 
 type ProposalMachine = typeof WHATSAPP_REPLY_PROPOSAL_MACHINE;

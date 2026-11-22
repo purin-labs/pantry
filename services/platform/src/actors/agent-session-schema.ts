@@ -3,7 +3,7 @@ import {
   assertRequiredColumns,
   runSchemaMigrations,
   type SchemaMigrationPlan,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   createSessionHarnessAuthoritySchema,
   SESSION_HARNESS_CHECKPOINT_COLUMNS,
@@ -13,7 +13,7 @@ import {
   TURN_DELIVERY_SEGMENT_COLUMNS,
 } from "./agent-session-harness-authority";
 import { createSessionTurnContextSchema } from "./actor-journal";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "./actor-schema-versions";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { createSessionInformationFlowSchema } from "./agent-session-information-flow";
 import { createMessagePreparationSchema } from "./message-preparation-store";
 import { runSessionOutboxSchemaMigrations } from "./agent-session-outbox-schema";

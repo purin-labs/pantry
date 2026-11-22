@@ -30,7 +30,7 @@ import {
   triggerAuthorityMatchesSource,
 } from "./context-source";
 import { machineTransition } from "@purin-labs/std/state-machine";
-import { writeActorTransition } from "../lifecycle/state-transition";
+import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
 import { CASE_ASSIGNMENT_MACHINE } from "./assignment.machine";
 import {
   appendJournal,

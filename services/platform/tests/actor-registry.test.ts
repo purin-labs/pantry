@@ -21,7 +21,7 @@ import {
   type ActorActivationResult,
   type ActorRegistryEntry,
   type ActorIdentity,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   parseCaseId,
   parseConnectorId,
@@ -30,17 +30,17 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
-import { reconcileOrganisationActorRegistry } from "../src/actors/actor-registry-reconciliation";
+import { CASE_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
+import { reconcileOrganisationActorRegistry } from "@purin-labs/actor-runtime/actors/actor-registry-reconciliation";
 import {
   resolveActiveCaseSessionActorsAtPlacement,
   publishActorRegistryActivation,
   resolveActiveSessionActor,
   type ActorNamespaces,
-} from "../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { CaseDO } from "../src/actors/case";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import {
   d1Database,
   readMigration,

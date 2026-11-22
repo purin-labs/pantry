@@ -9,8 +9,8 @@ import {
 } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
-import type { SessionActorRoute } from "./actor-router";
-import type { CountRow } from "./sql-rows";
+import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
+import type { CountRow } from "@purin-labs/actor-runtime/actors/sql-rows";
 import {
   isNonBlankString,
   isNonNegativeInteger,

@@ -4,7 +4,7 @@ import {
   type JevFeaturesView,
 } from "@purin-labs/control-api/portal/jev-features";
 import { assertNever } from "@purin-labs/std";
-import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { readCaseContextDiscoveryPolicy } from "../case-context-discovery/evaluation-store";
 import {
   caseContextDiscoveryRoute,

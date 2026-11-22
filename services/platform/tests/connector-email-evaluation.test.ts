@@ -1,7 +1,7 @@
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
-import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
+import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 import { describe, expect, it, vi } from "vitest";
 

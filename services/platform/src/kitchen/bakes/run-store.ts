@@ -12,7 +12,7 @@ import {
   assertRequiredColumns,
   runSchemaMigrations,
   type SchemaMigrationPlan,
-} from "../../actors/schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 import type { BakeDecidedVia, BakeDeciderRole } from "./records";
 
 /**

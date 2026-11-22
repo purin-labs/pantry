@@ -21,14 +21,14 @@ import {
   type ActorRelocationError,
   type ActorRelocationId,
   type RelocationBindings,
-} from "./actor-relocation";
-import { actorStub } from "./actor-stubs";
-import type { ActorFenceToken } from "./actor-registry";
-import { readActivationExportSource } from "./actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { readActivationExportSource } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   frozenRelocationReceiptGate,
   type RelocationReceiptError,
-} from "./actor-relocation-state";
+} from "@purin-labs/actor-runtime/actors/actor-relocation-state";
 import {
   latestEmailDraftOperation,
   readEmailRuntime,

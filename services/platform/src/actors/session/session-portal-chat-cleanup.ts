@@ -11,8 +11,8 @@ import {
   type PortalChatCleanupRequest,
   type PortalChatErasure,
 } from "../portal-chat-cleanup";
-import { eraseActorContentSql } from "../placement-execution-quiescence";
-import type { ActorExportError } from "../actor-export";
+import { eraseActorContentSql } from "@purin-labs/actor-runtime/actors/placement-execution-quiescence";
+import type { ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import type { Variant } from "@purin-labs/type-utils";
 import { errorMessage } from "@purin-labs/std";
 import { sessionPlacementR2Keys } from "./support";

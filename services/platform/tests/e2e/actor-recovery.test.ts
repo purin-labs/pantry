@@ -15,14 +15,14 @@ import { expect, it, type TestContext } from "vitest";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
 import type { SessionCheckpointInspection } from "../../src/actors/session/types";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CaseDO } from "../../src/actors/case";
 import type { ConnectorDO } from "../../src/actors/connector";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import {
   resumeActorRelocation,
   startActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { freezePlacement, type PlacementRace } from "./placement-race-support";
 import { storeVaultSecret } from "../../src/credential-vault";

@@ -9,11 +9,11 @@ import {
   actorActivationIdentity,
   type ActorRegistryEntry,
   type ActorIdentity,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   activateActor,
   createActorActivationSchema,
-} from "../src/actors/actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   captureActorExport,
   createActorExportEnvelope,
@@ -22,7 +22,7 @@ import {
   newActorExportId,
   parseActorExportEnvelope,
   type ActorExportEnvelopeV1,
-} from "../src/actors/actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import {
@@ -31,7 +31,7 @@ import {
   type TestSqlStorage,
 } from "./sqlite-storage";
 import type { VariantBy } from "@purin-labs/type-utils";
-import type { CountRow } from "../src/actors/sql-rows";
+import type { CountRow } from "@purin-labs/actor-runtime/actors/sql-rows";
 
 describe("actor export", function actorExportSuite() {
   it(

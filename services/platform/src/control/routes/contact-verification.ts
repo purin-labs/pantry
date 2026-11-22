@@ -5,7 +5,7 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import { authorizeOrganisationRequest } from "../authorization";
 import { controlError, controlJson, readBoundedJsonRecord } from "../http";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 
 export async function handleContactVerification(
   request: Request,

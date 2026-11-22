@@ -1,11 +1,11 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readPortalChatAttachmentKeys } from "../chat/attachments";
 import { readChatForkAttachmentKeys } from "../chat/fork-history";
-import { actorStub } from "../actors/actor-stubs";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   listOrganisationActorRegistryEntries,
   type ActorRegistryEntry,
-} from "../actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

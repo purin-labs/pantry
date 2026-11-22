@@ -5,7 +5,7 @@ import {
   type MemoryReadScope,
 } from "../memory/contract/memory-service";
 import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
-import { resolveActiveCaseActor } from "../actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   projectEmailReplyProposal,
   type EmailReplyProposalProjection,

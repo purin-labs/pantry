@@ -3,7 +3,7 @@ import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import { http, HttpResponse } from "msw";
 import { expect } from "vitest";
 import { decodeBase64, encodeBase64Url, isRecord } from "@purin-labs/std";
-import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   readEmailRuntime,

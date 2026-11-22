@@ -22,7 +22,7 @@ import { publishStoppedInitialPlacement } from "@purin-labs/tenancy/data/shared-
 import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { requireActiveOrganisationActorAtPlacement } from "./actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { reconcileProviderManifestObservations } from "./provider-lifecycle/observation";
 import { reconcileInterruptedProviderCredentialCutovers } from "./integrations/contract/credential-cutover";
 import {

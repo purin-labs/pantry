@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CommerceLabRunEvidence } from "../../commerce-lab/lab-metadata";
-import type { CountRow } from "../sql-rows";
+import type { CountRow } from "@purin-labs/actor-runtime/actors/sql-rows";
 import {
   canonicalJson,
   isNonNegativeInteger,

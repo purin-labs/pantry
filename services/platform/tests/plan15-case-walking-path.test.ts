@@ -1,7 +1,7 @@
 import { createMigratedDatabase } from "./sqlite-d1";
 import { activateActorFixture } from "./organisation-execution-fixture";
 import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-placement";
-import { CASE_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+import { CASE_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import {
   withCaseMutationExecution,
@@ -57,7 +57,7 @@ import {
   caseContentAttachments,
   caseContentInstruction,
 } from "../src/actors/case-content";
-import { actorPhysicalName } from "../src/actors/actor-registry";
+import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { slackCaseTurnId } from "../src/actors/case-turn-stream";
 import {
   authorizeCaseConversationOutput,
@@ -2355,10 +2355,12 @@ function requiredSessionId(value = "session_plan15_1") {
 }
 
 vi.mock(
-  "../src/actors/actor-activation",
+  "@purin-labs/actor-runtime/actors/actor-activation",
   async function caseRecoveryMock(importOriginal) {
     const original =
-      await importOriginal<typeof import("../src/actors/actor-activation")>();
+      await importOriginal<
+        typeof import("@purin-labs/actor-runtime/actors/actor-activation")
+      >();
     return { ...original, admitActorRecovery: caseFixtureRecovery };
   },
 );

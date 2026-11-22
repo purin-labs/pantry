@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/control-api";
 
 import { authenticatedConversationScope } from "@purin-labs/tenancy/organisation-access/access";
-import { resolveActiveCaseActorAtPlacement } from "../../actors/actor-router";
+import { resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { capabilityDefinitionById } from "../../authorization/capability-catalogue";
 import { readChatControlAuthority } from "../../chat/information-flow";
 import {

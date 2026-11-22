@@ -35,7 +35,7 @@ import {
 } from "./collaboration-room";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 
 const MENU_DRAFT_ID = "cafe-menu";
 type StoredMenuDraft = Readonly<{ document: MenuDraftDoc; revision: number }>;

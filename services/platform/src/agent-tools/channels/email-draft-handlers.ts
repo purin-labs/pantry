@@ -6,7 +6,7 @@ import type {
 } from "../../actors/email-draft";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

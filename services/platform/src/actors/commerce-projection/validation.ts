@@ -8,7 +8,7 @@ import type {
   OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { assertRequiredColumns } from "../schema-migrations";
+import { assertRequiredColumns } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   canonicalJson,
   hasExactKeys,

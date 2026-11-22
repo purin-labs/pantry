@@ -10,7 +10,7 @@ import {
   type DraftServerMessage,
 } from "@purin-labs/product-description-crdt/protocol";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { opaqueSubjectReference } from "../../src/access-control/references";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

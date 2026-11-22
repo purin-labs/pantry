@@ -1,7 +1,7 @@
 import { isRecord, isSha256Hex, parseJsonOrNull } from "@purin-labs/std";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { SchemaTransaction } from "../actors/schema-migrations";
-import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { digestCanonical } from "../policy/information-flow/digest";
 import { parseFlowRecipient } from "../policy/information-flow/labels";

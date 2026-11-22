@@ -24,7 +24,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,
-} from "../../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   errorResponse,
   jsonResponse,

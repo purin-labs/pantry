@@ -34,7 +34,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   actorExecutionAdmissionOpen,
   isActorExecutionActive,
-} from "./actor-execution-quiescence";
+} from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { Result } from "@purin-labs/kernel/result";
 import type { EmbeddedHarnessTurnError } from "./embedded-harness";
 import {
@@ -52,7 +52,7 @@ import {
   parseSessionTurnStreamRecord,
   type SessionTurnStreamRecord,
 } from "./agent-session-turn-stream";
-import { isRegisteredActorName } from "./actor-registry";
+import { isRegisteredActorName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type {
   ConnectorCaseStreamRelease,
   ConnectorCaseTurnStreamError,

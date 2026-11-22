@@ -7,15 +7,15 @@ import { isRecord } from "@purin-labs/std";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { SessionDO } from "../../src/actors/agent-session";
 import { SessionExecutionAdmission } from "../../src/actors/session-execution-admission";
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
+import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   requireActiveOrganisationActor,
-} from "../../src/actors/actor-router";
-import { actorStub } from "../../src/actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-router";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   resumeActorRelocation,
   startActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   freezeOrganisationPlacementMove,
   freezeRegionalOrganisationPlacement,

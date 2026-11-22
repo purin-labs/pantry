@@ -22,16 +22,16 @@ import {
   type ActorPairResolutionTiming,
   type ActorRegistryPublication,
   type SessionActorRoute,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   keepConversationResident,
   startSessionBeforeItsTurn,
-} from "../actors/conversation-residency";
+} from "@purin-labs/actor-runtime/actors/conversation-residency";
 import {
   eraseWarmActorSlots,
   type ConnectorWarmActorSlots,
   type WarmActorSlot,
-} from "../actors/warm-actor-slots";
+} from "@purin-labs/actor-runtime/actors/warm-actor-slots";
 import {
   runOngoingCaseTurn,
   admitOngoingCaseTurn,
@@ -44,7 +44,7 @@ import {
   readOrganisationDefaultWorkspacePortalAddress,
 } from "../data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub, SessionActorStub } from "../actors/actor-stubs";
+import type { CaseActorStub, SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { SessionBudgetDimension } from "@purin-labs/contracts";
 import { budgetNoticeDeliveryId, budgetStopNoticeText } from "./budget-notice";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

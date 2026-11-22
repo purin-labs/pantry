@@ -2,12 +2,12 @@ import {
   armAlarmAfterFailedSteps,
   runAlarmSteps,
   runAlarmStepsTogether,
-} from "../lifecycle/actor-alarm";
+} from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import {
   createWarmActorSlotSchema,
   eraseWarmActorSlots,
   type WarmActorSlot,
-} from "../warm-actor-slots";
+} from "@purin-labs/actor-runtime/actors/warm-actor-slots";
 import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
@@ -15,22 +15,22 @@ import {
   createActorExecutionBarrierSchema,
   isActorExecutionActive,
   settleActorExecution,
-} from "../actor-execution-quiescence";
+} from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   createActorActivationSchema,
   admitActorRecovery,
-} from "../actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   createActorImportSchema,
   readActivationExportSource,
   type ActorExportError,
-} from "../actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   createConnectorCaseWorkSchema,
   renewRunningConnectorCaseWorkLeases,
 } from "../connector-case-work";
 import type { Result } from "@purin-labs/kernel/result";
-import { PlacedActor } from "../lifecycle/placed-actor";
+import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { armConnectorAlarm } from "./alarm";
 import {
   acceptIngress,

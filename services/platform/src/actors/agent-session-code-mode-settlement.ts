@@ -50,29 +50,29 @@ import {
 import { codeModePlatformGovernor } from "./code-mode-platform-governor-stub";
 import {
   requireActiveOrganisationActorAtPlacement,
-} from "./actor-router";
-import { actorStub } from "./actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-router";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { SessionExecutionAdmission } from "./session-execution-admission";
-import { readActivationExportSource } from "./actor-export";
+import { readActivationExportSource } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   listPlacementActorRegistryEntries,
   type ActorFenceToken,
   type ActorRegistryEntry,
-} from "./actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import { readPlacementByEpoch } from "@purin-labs/tenancy/data/organisation-placement";
 import { selectOrganisationPlacementDatabase } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { ActorRelocationId } from "./actor-relocation";
+import type { ActorRelocationId } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   frozenRelocationReceiptGate,
   type RelocationReceiptError,
-} from "./actor-relocation-state";
+} from "@purin-labs/actor-runtime/actors/actor-relocation-state";
 import type { Variant } from "@purin-labs/type-utils";
 import { canonicalJson, isRecord, nonNegativeIntegerOrNull } from "@purin-labs/std";
 import type {
   HarnessCodeModeExecutionLease,
   HarnessCodeModeExecutionOutcome,
 } from "../agent-tools/catalog/types";
-import { armAlarmBy } from "./lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 
 const SETTLEMENT_KIND = "code_mode_execution_settlement.v1";
 const SETTLEMENT_RECOVERY_DELAY_MS = 1_000;

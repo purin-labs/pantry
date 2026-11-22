@@ -43,7 +43,7 @@ import {
   sameJson,
   sha256Hex,
 } from "@purin-labs/std";
-import { armAlarmBy } from "./lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { traceWarn } from "@purin-labs/kernel/observability";
 
 export const SURFACE_EFFECT_TTL_MS = 20_000;

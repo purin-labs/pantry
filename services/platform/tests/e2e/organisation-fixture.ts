@@ -4,7 +4,7 @@
 import { env, exports } from "cloudflare:workers";
 import { isRecord } from "@purin-labs/std";
 import type { ModelRoute } from "@purin-labs/contracts";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseModelApiKey,
   storeOrganisationModelCredential,

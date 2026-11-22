@@ -2,7 +2,7 @@ import type { ConnectorIdentity } from "@purin-labs/contracts";
 import type { RequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import type { CountRow } from "../sql-rows";
+import type { CountRow } from "@purin-labs/actor-runtime/actors/sql-rows";
 import { scheduleCaseWorkAlarm } from "./alarm";
 import type { ChannelAlarmDue } from "./channel-adapter";
 // The pure parsers live in a module with no Actor imports, so that a module

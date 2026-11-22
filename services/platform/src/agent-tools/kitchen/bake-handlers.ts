@@ -1,4 +1,4 @@
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { requireSessionExecution } from "../../actors/session-execution-admission";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";
 import { digestCanonical } from "../../policy";

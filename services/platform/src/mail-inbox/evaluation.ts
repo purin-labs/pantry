@@ -1,5 +1,5 @@
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import {
@@ -24,7 +24,7 @@ import { authorizeMailSource } from "./contract/mail-source-authorization";
 import { mailInferenceEligible } from "./contract/mail-inference-eligibility";
 import { JevMailRequest } from "./jev";
 import { mailClassificationEvidence } from "./evidence";
-import type { SchemaTransaction } from "../actors/schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import type { Result } from "@purin-labs/kernel/result";
 import type { Variant } from "@purin-labs/type-utils";
 

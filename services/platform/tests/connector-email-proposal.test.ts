@@ -7,7 +7,7 @@ import {
   TEST_INITIAL_ORGANISATION_PLACEMENT,
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
-import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
+import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { describe, expect, it, vi } from "vitest";
 
 const accessMocks = vi.hoisted(() => ({

@@ -63,7 +63,7 @@ import {
   resolveActiveSessionActorAtScope,
   resolveActiveCaseSessionActorsAtScope,
   publishActorRegistryActivation,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   finalizeAssignedCaseSession,
   runDirectCasePath,

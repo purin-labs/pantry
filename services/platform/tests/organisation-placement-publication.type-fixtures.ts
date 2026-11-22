@@ -1,5 +1,5 @@
-import type { ActorRelocationId } from "../src/actors/actor-relocation";
-import type { ActorRestoreId } from "../src/actors/actor-restore";
+import type { ActorRelocationId } from "@purin-labs/actor-runtime/actors/actor-relocation";
+import type { ActorRestoreId } from "@purin-labs/actor-runtime/actors/actor-restore";
 import type { OrganisationPlacementPublication } from "@purin-labs/tenancy/data/organisation-placement";
 
 declare const relocationId: ActorRelocationId;

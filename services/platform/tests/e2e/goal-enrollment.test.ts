@@ -5,7 +5,7 @@ import { env, exports } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
 import { http } from "msw";
 import { expect, it, type TestContext } from "vitest";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { network } from "./network";
 import {

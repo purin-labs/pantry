@@ -27,8 +27,8 @@ import {
 } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
 
-import type { SchemaTransaction } from "../actors/schema-migrations";
-import type { CountRow } from "../actors/sql-rows";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
+import type { CountRow } from "@purin-labs/actor-runtime/actors/sql-rows";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import {
   canonicalFlowLabel,

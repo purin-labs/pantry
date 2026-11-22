@@ -29,7 +29,7 @@ import {
   activateProviderCredentialCutover,
   type ProviderCredentialCutoverError,
 } from "./credential-cutover";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseVaultHandle,
   type VaultHandle,

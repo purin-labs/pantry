@@ -30,7 +30,7 @@ import {
   type MenuDraftServerMessage,
 } from "@purin-labs/menu-draft-crdt/protocol";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
 import {

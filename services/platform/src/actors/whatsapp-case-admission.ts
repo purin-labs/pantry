@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { buildWhatsAppSupportAuthority } from "../request-authority";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveActiveCaseActorAtPlacement } from "./actor-router";
+import { resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { sha256Hex } from "@purin-labs/std";
 
 /**

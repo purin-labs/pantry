@@ -23,7 +23,7 @@ import {
 } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   ORGANISATION_ID,
   OTHER_WORKSPACE_ID,

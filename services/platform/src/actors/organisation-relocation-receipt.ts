@@ -5,13 +5,13 @@ import { FlowBinding, digestFlowBinding } from "../policy/information-flow";
 import type { Result } from "@purin-labs/kernel/result";
 import { reconcileCommerceProviderReceipt } from "../commerce/action-model";
 import { readActionResult } from "./action-ledger";
-import { readActivationExportSource } from "./actor-export";
-import type { ActorFenceToken } from "./actor-registry";
-import type { ActorRelocationId } from "./actor-relocation";
+import { readActivationExportSource } from "@purin-labs/actor-runtime/actors/actor-export";
+import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
+import type { ActorRelocationId } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   frozenRelocationReceiptGate,
   type RelocationReceiptError,
-} from "./actor-relocation-state";
+} from "@purin-labs/actor-runtime/actors/actor-relocation-state";
 
 /**
  * The commerce receipt that an Organisation Actor settles while its

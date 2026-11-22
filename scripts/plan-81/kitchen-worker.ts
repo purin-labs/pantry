@@ -6,7 +6,7 @@ import { sha256Hex } from "../../packages/std/src/index";
 import { parseRunSnapshot } from "../../packages/bakery-model/src/bakery-run-snapshot";
 import interrupted from "../../assets/bakery-mujoco/combined-bakery/rust-evidence/shared-run-interrupted.json";
 import gateway from "../../services/platform/src/integration-gateway";
-import { requireActiveOrganisationActor } from "../../services/platform/src/actors/actor-router";
+import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/actors/actor-router";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../services/platform/src/authorization/access-grants/turn-authority";
 import { bakeryRunSnapshotPrefix } from "../../services/platform/src/commerce/bakery/saved-runs";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants";

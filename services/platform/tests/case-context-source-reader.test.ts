@@ -633,10 +633,10 @@ async function digestAuthorityPartition(value: unknown): Promise<string> {
 }
 
 vi.mock(
-  "../src/actors/actor-activation",
+  "@purin-labs/actor-runtime/actors/actor-activation",
   async function caseRecoveryMock(importOriginal) {
     const original =
-      await importOriginal<typeof import("../src/actors/actor-activation")>();
+      await importOriginal<typeof import("@purin-labs/actor-runtime/actors/actor-activation")>();
     return { ...original, admitActorRecovery: caseFixtureRecovery };
   },
 );

@@ -3,12 +3,12 @@ import { sealJevUsageHours } from "../jev-features/usage-records";
 import {
   actorMachineCensus,
   type MachineCensus,
-} from "./lifecycle/machine-census";
+} from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 import { ACTOR_MACHINES } from "./actor-machines";
 import {
   armAlarmAfterFailedSteps,
   runAlarmSteps,
-} from "./lifecycle/actor-alarm";
+} from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { screenMediaBase } from "../cafe/contract/media";
 import {
@@ -48,7 +48,7 @@ import {
   captureOrganisationDataArchive,
   deleteOrganisationDataArchivePages,
   restoreOrganisationDataArchive,
-} from "../data/organisation-regional-copy";
+} from "@purin-labs/actor-runtime/data/organisation-regional-copy";
 import type { SessionTurnExecution } from "../chat/turn-access";
 import { type MailEvaluationInput } from "../mail-inbox/evaluation";
 import {
@@ -56,10 +56,10 @@ import {
   closeOrganisationArchiveCleanupAdmission,
   type OrganisationArchiveCleanupError,
   type OrganisationArchiveCleanupRequest,
-} from "./organisation-archive-cleanup";
-import type { ActorFenceToken } from "./actor-registry";
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
+import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   CostsSheetRooms,
   type CostsSheetAgentEdit,
@@ -133,7 +133,7 @@ import {
   openSockets,
   readSocketSweepDueAt,
   scheduleSocketSweep,
-} from "./hibernatable-sockets";
+} from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import type { ControlSessionId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
@@ -163,7 +163,7 @@ import {
   pinnedActorDatabase,
   type ActorActivationSchemaAdvance,
   type ActorActivationSchemaAdvanceError,
-} from "./actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   exportActorPlacement,
   importActorExport,
@@ -174,7 +174,7 @@ import {
   type ActorExportRequest,
   type ActorImportRequest,
   type ActorImportedState,
-} from "./actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import { createCodeModeBudgetSchema } from "./code-mode-budget";
 import {
   type AssignShopifyLocationClassificationInput,

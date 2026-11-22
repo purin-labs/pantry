@@ -11,37 +11,37 @@ import {
   reserveActor,
   reserveActorPair,
   type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   actorStubForRegistryEntry,
   publishActorRegistryActivation,
   resolveActiveCaseSessionActorsAtPlacement,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   actorRelocationAdmission,
   actorPlacementDirectoryAdmits,
   resolveActorExecutionAdmission,
   type ActorPlacementAdmission,
-} from "../../src/actors/actor-placement-admission";
+} from "@purin-labs/actor-runtime/actors/actor-placement-admission";
 import {
   startActorRelocation,
   resumeActorRelocation,
   ACTOR_RELOCATION_RETENTION_MS,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   startActorRestore,
   resumeActorRestore,
-} from "../../src/actors/actor-restore";
+} from "@purin-labs/actor-runtime/actors/actor-restore";
 import {
   prepareActorRestoreManifest,
   parseActorRestoreManifest,
   canonicalActorRestoreManifestJson,
-} from "../../src/actors/actor-restore-manifest";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import {
   CASE_ACTOR_SCHEMA_VERSION,
   CONNECTOR_ACTOR_SCHEMA_VERSION,
-} from "../../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import {
   parseCaseId,
   parseConnectorId,

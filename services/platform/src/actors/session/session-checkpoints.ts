@@ -1,6 +1,6 @@
 import type { SessionShared } from "./session-shared";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { armAlarmBy } from "../lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { Outcome } from "@purin-labs/contracts";
 import { validateLiveRequestAuthority } from "../../request-authority";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";

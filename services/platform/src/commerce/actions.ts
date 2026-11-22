@@ -1,8 +1,8 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "../actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "../actors/actor-router";
+import { resolveActiveCaseActor, resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ActionLedgerEntry } from "../actors/action-ledger";
 import type { OrganisationCommerce } from "../actors/organisation/organisation-commerce";
 import type { MerchantActionRejectionEvidence } from "../approval-authentication";

@@ -42,8 +42,8 @@ import { authorizeMailSource } from "../mail-inbox/contract/mail-source-authoriz
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { buildControlAuthority } from "../request-authority";
 import type { Result } from "@purin-labs/kernel/result";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
-import { resolveActiveConnectorActorAtPlacement } from "./actor-router";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   CollaborationRoom,
   type CollaborationParticipantAccess,

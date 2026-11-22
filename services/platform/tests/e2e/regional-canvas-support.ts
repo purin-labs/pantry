@@ -13,7 +13,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

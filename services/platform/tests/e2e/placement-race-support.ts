@@ -10,7 +10,7 @@ import {
   startActorRelocation,
   resumeActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 
 export type PlacementRace = {
   readonly organisationId: OrganisationId;

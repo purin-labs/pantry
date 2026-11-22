@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../src/control/authorization", () => ({
   authorizeOrganisationRequest: mocks.authorize,
 }));
-vi.mock("../src/actors/actor-router", () => ({
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", () => ({
   requireActiveOrganisationActor: mocks.actor,
 }));
 

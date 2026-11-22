@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveActiveCaseActor } from "../actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { EmailReplyProposalLifecycle } from "../data/email-mailbox";
 import type { EmailOperationalProposalProjection } from "../data/email-operational";
 import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";

@@ -5,7 +5,7 @@ import {
   TEST_ORGANISATION_PLACEMENT_PROFILE,
 } from "./fixtures/organisation-placement";
 import { requireOrganisationId } from "./test-ids";
-import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
+import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 import { describe, expect, it, vi } from "vitest";
@@ -27,8 +27,8 @@ const orchestratorMocks = vi.hoisted(() => ({
   resolveWhatsAppOrganisationCredential: vi.fn(),
 }));
 
-vi.mock("../src/actors/actor-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/actors/actor-router")>()),
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/actor-runtime/actors/actor-router")>()),
   resolveActiveCaseActorAtPlacement: orchestratorMocks.resolveActiveCaseActorAtPlacement,
   resolveActiveSessionActorAtPlacement: orchestratorMocks.resolveActiveSessionActorAtPlacement,
 }));

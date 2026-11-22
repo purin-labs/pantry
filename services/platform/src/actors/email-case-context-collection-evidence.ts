@@ -14,7 +14,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseCaseContextCollectionEvidenceDependency,
   type CaseContextCollectionEvidenceDependency,

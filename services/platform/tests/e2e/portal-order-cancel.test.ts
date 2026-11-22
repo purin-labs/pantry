@@ -5,7 +5,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { advanceOrderQueueEntry } from "../../src/cafe/contract/order-queue-commands";
 import { googleConfig } from "../../src/control/google-oidc-config";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";

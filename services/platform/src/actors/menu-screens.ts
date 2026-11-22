@@ -13,7 +13,7 @@ import {
   closeSocket,
   openSockets,
   socketLastSeenAt,
-} from "./hibernatable-sockets";
+} from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 
 /**
  * The paired screens of an Organisation (Plan 40B phase 1). A screen holds a

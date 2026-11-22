@@ -11,11 +11,11 @@ import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeOrganisationRequest } from "../../src/control/authorization";
 import { recordCommerceMutationReceipt } from "../../src/control/mutation-receipt";
 import { readControlMutationReplay } from "@purin-labs/tenancy/data/control-mutation";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 
 type DigestPause = {

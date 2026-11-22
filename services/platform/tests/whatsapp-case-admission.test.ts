@@ -16,7 +16,7 @@ vi.mock("../src/data/organisation-workspace", () => ({
   ensureOrganisationDefaultWorkspace: mocks.ensureOrganisationDefaultWorkspace,
 }));
 
-vi.mock("../src/actors/actor-router", () => ({
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", () => ({
   resolveActiveCaseActorAtPlacement: mocks.resolveActiveCaseActorAtPlacement,
 }));
 

@@ -3,7 +3,7 @@
 // person in and read the simulated model's record, which a browser cannot do
 // on its own.
 import gateway from "../../services/platform/src/integration-gateway";
-import { requireActiveOrganisationActor } from "../../services/platform/src/actors/actor-router";
+import { requireActiveOrganisationActor } from "../../foundation/actor-runtime/actors/actor-router";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../services/platform/src/authorization/access-grants/turn-authority";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants";
 import { parseWorkflowChanges } from "../../packages/bakery-workflow/src/changes";

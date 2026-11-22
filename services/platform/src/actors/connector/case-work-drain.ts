@@ -1,11 +1,11 @@
 import type { Env } from "@purin-labs/kernel/env";
-import type { SessionActorStub } from "../actor-stubs";
+import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { newRequestId, parseSessionId } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { actorExecutionAdmissionOpen } from "../actor-execution-quiescence";
-import { admitActorRecovery } from "../actor-activation";
-import { actorStub } from "../actor-stubs";
+import { actorExecutionAdmissionOpen } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   claimConnectorCaseWork,
   parkSteeredCaseWork,

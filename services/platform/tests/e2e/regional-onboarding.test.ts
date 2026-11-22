@@ -13,8 +13,8 @@ import {
 import {
   startActorRestore,
   resumeActorRestore,
-} from "../../src/actors/actor-restore";
-import { prepareActorRestoreManifest } from "../../src/actors/actor-restore-manifest";
+} from "@purin-labs/actor-runtime/actors/actor-restore";
+import { prepareActorRestoreManifest } from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
 import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import {
   bakeryRunSnapshotPrefix,
@@ -61,12 +61,12 @@ import {
   readRetainedActorRelocationExports,
   type ActorRelocationId,
   type RetainedActorRelocationExport,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   loadActorExport,
   restoreReferencedR2Objects,
   type ActorExportR2Object,
-} from "../../src/actors/actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import { publishOrganisationPlacementMove } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import {
   readOrganisationPlacementMove,
@@ -80,21 +80,21 @@ import {
   actorStubForRegistryEntry,
   requireActiveSessionActor,
   requireActiveOrganisationActorAtPlacement,
-} from "../../src/actors/actor-router";
-import { actorStub } from "../../src/actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-router";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   listPlacementActorRegistryEntries,
   beginActorExport,
   retireActorRegistryEntry,
   type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import { OrganisationDO } from "../../src/actors/organisation";
 import {
   regionalCopyTables,
   countRegionalOrganisationRows,
-} from "../../src/data/organisation-regional-copy";
-import type { ActorImportRequest } from "../../src/actors/actor-export";
+} from "@purin-labs/actor-runtime/data/organisation-regional-copy";
+import type { ActorImportRequest } from "@purin-labs/actor-runtime/actors/actor-export";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 it(

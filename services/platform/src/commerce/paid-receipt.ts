@@ -20,12 +20,12 @@ import type { ConnectorDelivery } from "@purin-labs/contracts";
 import type { CanonicalCommerceDelivery } from "@purin-labs/commerce-contracts";
 import { assertNever } from "@purin-labs/std";
 
-import { resolveActiveConnectorActorAtPlacement } from "../actors/actor-router";
+import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseDelivery } from "../actors/connector/ingress-parsers";
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ConnectorActorStub } from "../actors/actor-stubs";
+import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   newRequestId,
   parseConnectorId,

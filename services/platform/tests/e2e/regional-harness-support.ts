@@ -11,7 +11,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { requireActiveOrganisationActorAtPlacement } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";

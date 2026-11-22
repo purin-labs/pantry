@@ -8,12 +8,12 @@ import { isRecord } from "@purin-labs/std";
 import {
   listPlacementActorRegistryEntries,
   type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
-import { actorStub } from "../../src/actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   resumeActorRelocation,
   startActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { SessionDO } from "../../src/actors/agent-session";
 import { listHarnessCheckpointObjectKeys } from "../../src/actors/agent-session-harness-authority";
 import { freezeOrganisationPlacementMove } from "@purin-labs/tenancy/data/shared-rows/placement-row";

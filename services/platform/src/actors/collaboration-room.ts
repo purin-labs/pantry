@@ -32,8 +32,8 @@ import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { admitActorRecovery } from "./actor-activation";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   SOCKET_MOVED,
   SOCKET_SILENCE_LIMIT_MS,
@@ -42,7 +42,7 @@ import {
   openSockets,
   socketLastSeenAt,
   socketRouteTag,
-} from "./hibernatable-sockets";
+} from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
 import {
   socketSessionAccess,
   socketSessionMembership,

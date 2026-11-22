@@ -19,7 +19,7 @@ import { codeModePlatformGovernor } from "../../src/actors/code-mode-platform-go
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { revokeAccessGrant } from "../../src/data/access-grants";
 import { network } from "./network";

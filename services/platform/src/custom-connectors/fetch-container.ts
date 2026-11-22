@@ -1,6 +1,6 @@
 import { Container } from "@cloudflare/containers";
 
-import { eraseIdleContainerState } from "../actors/unregistered-actor-erasure";
+import { eraseIdleContainerState } from "@purin-labs/actor-runtime/actors/unregistered-actor-erasure";
 import type { Env } from "@purin-labs/kernel/env";
 
 const CUSTOM_CONNECTOR_FETCH_PORT = 8080;

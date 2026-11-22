@@ -16,7 +16,7 @@ import { MenuBoardRequestError } from "../../cafe/contract/request-errors";
 import { readCafeImages } from "../../cafe/contract/media";
 import { readPublishedCafeMenu } from "../../control/routes/menu-screens";
 import type { HarnessTurnLease } from "@purin-labs/contracts";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

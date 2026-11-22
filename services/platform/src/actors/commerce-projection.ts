@@ -16,7 +16,7 @@ import {
   assertRequiredColumns,
   runSchemaMigrations,
   type SchemaTransaction,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   COMMERCE_PROJECTION_SCHEMA_V16,
   execSchemaStatements,

@@ -5,7 +5,7 @@ import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import { mutationHeaders } from "./access-route-support";

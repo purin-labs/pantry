@@ -5,8 +5,8 @@ import { isRecord } from "@purin-labs/std";
 import {
   listPlacementActorRegistryEntries,
   type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
-import { actorStub } from "../../src/actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { ORGANISATION_ID } from "./slack-journey-support";
 
 /** Each follow-up of the Connector: when it is due, or how it settled. */

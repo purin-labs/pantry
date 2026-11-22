@@ -23,7 +23,7 @@ import {
   type Conversation,
 } from "./conversation";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub } from "../actors/actor-stubs";
+import type { CaseActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   deriveDirectCaseIdentities,
   type ConversationCaseActor,
@@ -32,7 +32,7 @@ import {
   resolveActiveCaseActorAtScope,
   resolveActiveSessionActorAtPlacement,
   resolveActiveSessionActorAtScope,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConversationExecution } from "./execution";
 import {
   resolveControlSessionById,

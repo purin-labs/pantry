@@ -1,4 +1,4 @@
-import { assertRequiredColumns } from "../../actors/schema-migrations";
+import { assertRequiredColumns } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 
 export type TypeSafePurpose =

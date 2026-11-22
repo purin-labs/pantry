@@ -6,7 +6,7 @@ import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-acc
 import type { Env } from "@purin-labs/kernel/env";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import { validateLiveRequestAuthority } from "../request-authority";
-import { resolveActiveConnectorActorAtPlacement } from "./actor-router";
+import { resolveActiveConnectorActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type {
   HarnessFollowUpRequest,
   HarnessFollowUpResult,

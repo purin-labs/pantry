@@ -6,8 +6,8 @@ import { runInDurableObject } from "cloudflare:test";
 import {
   startActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
+import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { ConnectorDO } from "../../src/actors/connector";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { fixtureDatabase } from "./organisation-database";

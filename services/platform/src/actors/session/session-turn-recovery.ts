@@ -9,7 +9,7 @@ import {
   resumePiDurableRecovery,
   type SavedRecovery,
 } from "../pi-durable-recovery";
-import { armAlarmBy } from "../lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import {
   finishHarnessTurnContinuation,
   discardHarnessTurnContinuation,
@@ -31,7 +31,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { SessionExecutionAdmission } from "../session-execution-admission";
-import { settleActorExecution } from "../actor-execution-quiescence";
+import { settleActorExecution } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { readCanonicalSessionForPersistence } from "../agent-session-canonical";
 import {
   appendHarnessHistory,

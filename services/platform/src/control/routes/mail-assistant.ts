@@ -14,7 +14,7 @@ import {
 } from "../../mail-inbox/contract/control-authority";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
 import { gmailConnectorId } from "../../mail-inbox/contract/connector-ids";
-import { resolveActiveConnectorActor } from "../../actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 
 export type MailAssistantRoute = Readonly<{
   kind: "mailAssistant";

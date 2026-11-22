@@ -10,7 +10,7 @@ import { isRecord, sha256Hex } from "@purin-labs/std";
 import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import { parseCanvasServerMessage } from "@purin-labs/workflow-canvas-crdt/protocol";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { bakeryRunSnapshotPrefix } from "../../src/commerce/bakery/saved-runs";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";

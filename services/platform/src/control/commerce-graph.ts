@@ -5,7 +5,7 @@ import type {
 } from "@purin-labs/commerce-contracts";
 import { CommerceEntityPlaneClient } from "@purin-labs/commerce-client";
 
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { buildSavedSelectorCommerceReadAuthority } from "../commerce/entity-plane/authority";
 import type { CommerceGraphReader } from "../commerce/entity-plane/graph-reader";
 import { createCommerceGraphReader } from "../commerce/entity-plane/selected-graph-reader";

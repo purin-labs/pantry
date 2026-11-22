@@ -4,8 +4,8 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import { actorStub } from "../../src/actors/actor-stubs";
+import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { STEER_ANSWER_LOST_FAULT_KEY } from "../../src/actors/connector/steer-fault";
 import { fixtureDatabase } from "./organisation-database";
 import { network } from "./network";

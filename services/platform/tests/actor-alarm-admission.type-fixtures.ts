@@ -1,4 +1,4 @@
-import type { ActorRecoveryAdmission } from "../src/actors/actor-activation";
+import type { ActorRecoveryAdmission } from "@purin-labs/actor-runtime/actors/actor-activation";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 declare const scope: OrganisationExecutionScope;

@@ -1,7 +1,7 @@
 import { readConversationExecution } from "../chat/execution";
 import { readCommerceApproval, readMeta } from "./case/context-source";
 import { parseLifecycle } from "./case/record-parsers";
-import type { AlarmReconciler } from "./lifecycle/actor-alarm";
+import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { nextUndeliveredOutputAt } from "./case/outputs";
 import { ASSIGNMENT_ABANDON_AFTER_MS } from "./case/assignment.machine";
 import { activeAssignmentTimes } from "./case/lifecycle";

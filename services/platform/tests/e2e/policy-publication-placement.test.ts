@@ -9,8 +9,8 @@ import {
   startActorRelocation,
   resumeActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import {
   installSlackActorFixture,

@@ -58,7 +58,7 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { ensureCreatedOrganisationActor } from "../control/organisation-runtime";
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord } from "@purin-labs/std";

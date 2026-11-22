@@ -4,7 +4,7 @@ import { env, exports } from "cloudflare:workers";
 import { expect } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";

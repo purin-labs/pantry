@@ -5,7 +5,7 @@
  * Slack reply uses, so one draft applies one time on either surface.
  */
 import { isConversationId } from "@purin-labs/control-api";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConversationScope } from "../../chat/store";
 import {
   cancelOperatorConfigurationDraft,

@@ -36,14 +36,14 @@ import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mut
 import {
   listOrganisationActorRegistryEntries,
   type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { actorStub } from "../../src/actors/actor-stubs";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { readOrganisationHarnessErasureReceipts } from "../../src/data/onboarding-reconciliation";
 import {
   readOrganisationArchiveCleanup,
   type OrganisationArchiveCleanupRequest,
-} from "../../src/actors/organisation-archive-cleanup";
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import type { SessionId } from "@purin-labs/kernel/ids";
 import { readPortalChatErasure } from "../../src/actors/portal-chat-cleanup";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
@@ -51,7 +51,7 @@ import {
   startActorRelocation,
   resumeActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { http, type HttpResponseResolver } from "msw";
 import {
   isConversationId,
@@ -68,7 +68,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { readConversation, saveConversation } from "../../src/chat/store";
 import { readProjectDirectory } from "../../src/chat/projects";

@@ -4,8 +4,8 @@ import { env } from "cloudflare:workers";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { listPlacementActorRegistryEntries } from "../../src/actors/actor-registry";
-import { actorStub } from "../../src/actors/actor-stubs";
+import { listPlacementActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   DISCOVER_INTEGRATION_LIST,
   countCalls,

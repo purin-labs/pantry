@@ -9,7 +9,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { processTwoSessionDirectCaseCommand } from "../../src/actors/case-direct-processing";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import {

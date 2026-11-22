@@ -7,7 +7,7 @@ import { resolveEmailOperationalCapability } from "../../actors/email-operationa
 import type { EmailProposalTarget } from "../../data/email-operational";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
-import type { ConnectorActorStub } from "../../actors/actor-stubs";
+import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   parseCaseId,
   parseIntegrationAccountId,
@@ -21,7 +21,7 @@ import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
-} from "../../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   SessionExecutionAdmission,
   requireSessionExecution,

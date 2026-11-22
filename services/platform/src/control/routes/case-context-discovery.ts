@@ -1,4 +1,4 @@
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { resolveCaseReference } from "../../access-control/references";
 import type { ConversationScope } from "../../chat/store";
 import {
@@ -12,7 +12,7 @@ import type {
 } from "@purin-labs/control-api";
 import { identifier } from "../../case-context-discovery/policy";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "../../actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { authorizeConfiguredBearer } from "@purin-labs/kernel/fault-injection-auth";
 import {
   parseCaseId,

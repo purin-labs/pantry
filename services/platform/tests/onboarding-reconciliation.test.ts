@@ -28,23 +28,23 @@ import type { OrganisationDO } from "../src/actors/organisation";
 import type {
   ActorActivationRequest,
   ActorActivationResult,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import type {
   HarnessHistoryErasureRequest,
   OrganisationArchiveCleanupRequest,
-} from "../src/actors/organisation-archive-cleanup";
-import { AdmittedOrganisationArchiveCleanup } from "../src/actors/organisation-archive-cleanup";
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
+import { AdmittedOrganisationArchiveCleanup } from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import type { ConnectorDO } from "../src/actors/connector";
 import {
   activateActorRegistryEntry,
   reserveActor,
   listOrganisationActorRegistryEntries,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import type { HarnessHistoryErasure } from "../src/actors/agent-session-harness-authority";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { ActorRegistryEntry } from "../src/actors/actor-registry";
+import type { ActorRegistryEntry } from "@purin-labs/actor-runtime/actors/actor-registry";
 import { createAuthorizingProviderAttempt } from "../src/data/provider-attempt";
 import {
   archiveOrganisation,

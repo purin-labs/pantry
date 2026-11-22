@@ -11,7 +11,7 @@ import {
   revokeInvitation,
 } from "@purin-labs/tenancy/organisation-access/invitations";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { commerceSystemReadiness } from "../../commerce/contract/system-readiness";
 import {
   ensureCurrentReadiness,

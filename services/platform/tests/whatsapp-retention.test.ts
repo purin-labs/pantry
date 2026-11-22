@@ -1,7 +1,7 @@
 // The ports that the Worker registers (worker-ports.ts).
 import "../src/worker-ports";
 import type { SingleDatabase } from "@purin-labs/kernel/database-handles";
-import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
+import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";
 

@@ -18,12 +18,12 @@ import type { Variant } from "@purin-labs/type-utils";
 import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { AuthorizedConversationScope as ConversationScope } from "@purin-labs/tenancy/organisation-access/access";
 import { verifiedContacts } from "../mail-inbox/contract/verified-contacts";
 import { gmailConnectorId } from "../mail-inbox/contract/connector-ids";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "../actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   parseIntegrationAccountId,
   type OrganisationId,

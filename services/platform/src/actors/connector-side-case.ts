@@ -38,7 +38,7 @@ import {
   slackSideCaseThreadMessage,
   type SlackSideCaseProposal,
 } from "../slack/side-cases";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { decideStoredFlowConversationSink } from "./case-conversation-sink";
 import { parseIdentityRecord } from "./connector-case-work";
 import {

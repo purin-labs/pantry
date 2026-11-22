@@ -1,6 +1,6 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
@@ -48,7 +48,7 @@ import type {
   OperationalCaseContextDiscoveryRequest,
   OperationalCaseContextDiscoverySourceRequest,
 } from "../../case-context-discovery/operational-evaluation";
-import type { SchemaTransaction } from "../schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   organisationPlacementConflict,
   readOrganisationMetaRow,

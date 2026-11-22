@@ -7,7 +7,7 @@ import {
   runSchemaMigrations,
   type SchemaMigrationPlan,
   type SchemaTransaction,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 
 export type CueClaimInput = {
   organisationId: OrganisationId;

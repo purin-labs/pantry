@@ -1,5 +1,5 @@
-import { resolveActiveCaseActorAtScope } from "../actors/actor-router";
-import { deliverOperationsCard } from "../actors/operations-channel";
+import { resolveActiveCaseActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
+import { deliverOperationsCard } from "@purin-labs/actor-runtime/actors/operations-channel";
 import {
   readOperationsDestination,
   type OperationsDestination,

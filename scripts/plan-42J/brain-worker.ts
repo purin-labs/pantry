@@ -10,7 +10,7 @@ import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
   resolveActiveSessionActor,
-} from "../../services/platform/src/actors/actor-router";
+} from "../../foundation/actor-runtime/actors/actor-router";
 import { readSessionTurnMemoryRecords } from "../../services/platform/src/actors/actor-journal/transactions";
 import {
   acceptEmailHint,

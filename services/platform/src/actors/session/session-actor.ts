@@ -1,4 +1,4 @@
-import { PlacedActor } from "../lifecycle/placed-actor";
+import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { SessionShared } from "./session-shared";
 import {
   type TrackedTransientSessionExecution,
@@ -21,11 +21,11 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
 import {
   actorMachineCensus,
   type MachineCensus,
-} from "../lifecycle/machine-census";
+} from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 import {
   armAlarmAfterFailedSteps,
   runAlarmSteps,
-} from "../lifecycle/actor-alarm";
+} from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import {
   MAX_STEERING_TEXT_CHARS,
   admitSteeringInput,
@@ -58,14 +58,14 @@ import {
   canEraseArchivedHarnessHistory,
   type HarnessHistoryErasureRequest,
   type OrganisationArchiveCleanupError,
-} from "../organisation-archive-cleanup";
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import { readAcceptedCheckpointFinalization } from "../agent-session-finalization";
 import type {
   AcceptedInputRef,
   HarnessCheckpointRecord,
   HarnessTurnLease,
 } from "@purin-labs/contracts";
-import type { ActorActivationRequest } from "../actor-registry";
+import type { ActorActivationRequest } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseRequestId,
@@ -79,14 +79,14 @@ import { traceLog } from "@purin-labs/kernel/observability";
 import { verifyWorkspaceRevisionReceipt } from "../../workspace-revision-store";
 import type { Result } from "@purin-labs/kernel/result";
 import { initializeAgentSessionPersistence } from "../agent-session-schema";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../actor-schema-versions";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import {
   inspectAgentSessionCutoverQuiescence,
   type SessionCutoverInspectionError,
   type SessionCutoverQuiescence,
 } from "../agent-session-cutover-quiescence";
 import { SessionExecutionAdmission } from "../session-execution-admission";
-import { settleActorExecution } from "../actor-execution-quiescence";
+import { settleActorExecution } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   readCanonicalSessionForPersistence,
   readCanonicalSessionProjection,
@@ -140,7 +140,7 @@ import {
   type CanonicalTextTurnTransitionError,
 } from "../agent-session-text-turn";
 import { readSessionBudgetAccount } from "../agent-session-budget";
-import { admitActorRecovery } from "../actor-activation";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   canAdmitSessionWork,
   closePortalChatCleanupAdmission,
@@ -148,8 +148,8 @@ import {
   type PortalChatCleanupError,
   type PortalChatCleanupRequest,
 } from "../portal-chat-cleanup";
-import type { ActorFenceToken } from "../actor-registry";
-import type { ActorExportError } from "../actor-export";
+import type { ActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
+import type { ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   failSessionTurnStream,
   readSessionTurnStream,
@@ -161,8 +161,8 @@ import {
   readSessionTurnFlowBinding as readPersistedSessionTurnFlowBinding,
 } from "../agent-session-information-flow";
 import { sameJson, sha256Hex } from "@purin-labs/std";
-import type { ActorImportSqlMigration } from "../actor-export";
-import { type PlacedActorExportSource } from "../lifecycle/placed-actor";
+import type { ActorImportSqlMigration } from "@purin-labs/actor-runtime/actors/actor-export";
+import { type PlacedActorExportSource } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import { sessionReachableAttachmentObjectKeys } from "./attachments";
 import { indeterminateEffectCensus } from "./indeterminate-effect-census";
 import {

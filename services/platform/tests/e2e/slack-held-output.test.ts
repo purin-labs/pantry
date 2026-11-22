@@ -3,7 +3,7 @@ import { fixtureDatabase } from "./organisation-database";
 import { http, HttpResponse } from "msw";
 import { expect, it, type TestContext } from "vitest";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { FlowPolicyInput } from "../../src/policy/information-flow";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";

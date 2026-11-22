@@ -16,7 +16,7 @@ import { http, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import { parseRunSnapshot } from "@purin-labs/bakery-model/bakery-run-snapshot";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   issueControlSession,
   type IssuedControlSession,

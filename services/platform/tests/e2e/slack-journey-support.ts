@@ -11,7 +11,7 @@ import { expect } from "vitest";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";
 import { encodeContextVisibility } from "../../src/authorization/access-grants/visibility";
 import { CAPABILITY_KEYS } from "../../src/authorization/capability-catalogue";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { CaseSnapshot } from "../../src/actors/case/types";
 import {
   applyFileProjectionCommand,

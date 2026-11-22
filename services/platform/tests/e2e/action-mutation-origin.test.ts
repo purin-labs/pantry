@@ -18,7 +18,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseCaseId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { authorityPartitionKey } from "../../src/authorization/access-grants/turn-authority";
 import { fixtureFlowBinding } from "../fixtures/plan25-turn";
 import { FlowLabel } from "../../src/policy/information-flow";

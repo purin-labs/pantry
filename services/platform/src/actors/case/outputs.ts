@@ -26,7 +26,7 @@ import {
   machineTransition,
   type MachineEvent,
 } from "@purin-labs/std/state-machine";
-import { writeActorTransition } from "../lifecycle/state-transition";
+import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
 import { retainContextProjection } from "./lifecycle";
 import { CASE_OUTPUT_MACHINE } from "./output.machine";
 import { equal, invalid, isOpen } from "./record-parsers";

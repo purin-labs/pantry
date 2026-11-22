@@ -15,13 +15,13 @@ import {
   startActorRelocation,
   resumeActorRelocation,
   type ActorRelocationId,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { admitTurn } from "../../src/chat/turn/admission";
 import { resumeConversationExecution } from "../../src/chat/application";
 import * as modelRoutes from "../../src/models/route";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
-import { resolveActiveCaseActor } from "../../src/actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseChatCommand } from "../../src/chat/conversation";
 import {
   bindConversationProjectSnapshot,

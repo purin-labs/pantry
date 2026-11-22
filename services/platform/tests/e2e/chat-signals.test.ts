@@ -16,13 +16,13 @@ import {
   type ConversationId,
 } from "@purin-labs/control-api";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { saveConversation } from "../../src/chat/store";
 import { ensureCreatedOrganisationActor } from "../../src/control/organisation-runtime";
-import { parseActorFenceToken } from "../../src/actors/actor-registry";
+import { parseActorFenceToken } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
-import { newActorExportId } from "../../src/actors/actor-export";
+import { newActorExportId } from "@purin-labs/actor-runtime/actors/actor-export";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { organisationBootstrapMutation } from "../control-mutation-fixture";
 import {

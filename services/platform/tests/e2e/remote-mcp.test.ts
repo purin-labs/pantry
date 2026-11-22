@@ -46,7 +46,7 @@ import {
   digestApprovalAction,
   parseApprovalEvidence,
 } from "../../src/approval-authentication";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { changeVersionedCapabilityPolicy } from "../../src/access-control/capability-mutations";
 import { readOrganisationCapabilityPolicies } from "../../src/data/capability-policy";

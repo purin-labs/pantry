@@ -4,7 +4,7 @@ import {
   defineExtension,
   defineTool,
 } from "@earendil-works/pi-durable";
-import { createActorActivationSchema } from "../../services/platform/src/actors/actor-activation.ts";
+import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
 import { createSessionSchema } from "../../services/platform/src/actors/agent-session-schema.ts";
 import {
   buildSessionExecutionRecovery,

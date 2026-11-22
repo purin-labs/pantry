@@ -86,7 +86,7 @@ import {
   reconcileStockOperation,
   type StockExecution,
 } from "../kitchen/contract/stock-action-execution";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";

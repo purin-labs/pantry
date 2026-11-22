@@ -10,8 +10,8 @@ import {
 import { recordEmailMessageReceipt } from "../../data/email-mailbox";
 import { projectEmailOperationalProposal } from "../../data/email-operational";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isActorExecutionActive } from "../actor-execution-quiescence";
-import { requireActiveOrganisationActor } from "../actor-router";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   completeEmailCaseContextDiscovery,
   retryEmailCaseContextDiscovery,

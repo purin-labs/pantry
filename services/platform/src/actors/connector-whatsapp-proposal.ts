@@ -14,7 +14,7 @@ import {
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { resolveWhatsAppOrganisationCredential } from "../whatsapp/credential";
 import { sendWhatsAppText } from "../whatsapp/graph";
 import {

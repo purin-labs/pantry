@@ -9,7 +9,7 @@ import { type MenuScreenPickup } from "@purin-labs/control-api";
 import { encodeBase64Url, sha256Hex } from "@purin-labs/std";
 import { CommerceStorefrontClient } from "@purin-labs/commerce-client";
 
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { MenuBoardCommandReply } from "../../actors/menu-board-commands";
 import {
   menuScreenSocketToken,

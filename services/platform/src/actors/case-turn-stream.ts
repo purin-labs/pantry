@@ -8,7 +8,7 @@ import type {
   WorkspaceId,
 } from "@purin-labs/kernel/ids";
 import type { SerializedFlowBinding } from "../policy/information-flow";
-import type { SessionActorRoute } from "./actor-router";
+import type { SessionActorRoute } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { EmbeddedHarnessTurnError } from "./embedded-harness";
 
 // The stream of an ongoing Case turn into its thread: what the Case walk

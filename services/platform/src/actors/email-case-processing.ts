@@ -36,7 +36,7 @@ import {
 } from "../mail/reply-target";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   fetchConnectorMail,
   fetchSessionConnectorMail,
@@ -113,7 +113,7 @@ import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,

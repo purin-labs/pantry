@@ -22,7 +22,7 @@ import { serializeContextBundle } from "../../src/actors/actor-journal/parsers";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   canonicalFlowLabel,
   FlowLabel,

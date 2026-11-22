@@ -14,7 +14,7 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActorAtPlacement,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseIngressQueueMessage } from "../ingress-queue";
 import type { AgentScheduleDispatchQueueMessage } from "../schedules/queue-messages";
 import {

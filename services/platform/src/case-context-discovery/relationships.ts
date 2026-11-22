@@ -3,7 +3,7 @@ import type {
   CaseContextCollectionReviewCommand,
 } from "@purin-labs/control-api";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import type { SchemaTransaction } from "../actors/schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import type { Result } from "@purin-labs/kernel/result";
 import type { CaseContextCollectionRelationshipOutcome } from "./jev";
 import { identifier, integerIn } from "./policy";

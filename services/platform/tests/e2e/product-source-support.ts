@@ -2,7 +2,7 @@ import { runInDurableObject } from "cloudflare:test";
 import { fixtureDatabase } from "./organisation-database";
 import { env } from "cloudflare:workers";
 
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { commerceCanonicalResourceId } from "../../src/commerce/contract/resource-ids";
 import { connectCommerceFixture } from "./commerce-support";

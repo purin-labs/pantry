@@ -2,7 +2,7 @@ import type {
   AdmittedOrganisationArchiveCleanup,
   HarnessHistoryErasureRequest,
   OrganisationArchiveCleanupRequest,
-} from "../src/actors/organisation-archive-cleanup";
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import type { OrganisationDO } from "../src/actors/organisation";
 import type { SessionDO } from "../src/actors/agent-session";
 

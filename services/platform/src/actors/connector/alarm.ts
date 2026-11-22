@@ -1,6 +1,9 @@
 import type { RequestId } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
-import { nextAlarmAt, setActorAlarm } from "../lifecycle/actor-alarm";
+import {
+  nextAlarmAt,
+  setActorAlarm,
+} from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { connectorAlarmReconcilers } from "../connector-alarm";
 import type { ChannelAlarmDue } from "./channel-adapter";
 import { invalid } from "./support";

@@ -1,7 +1,7 @@
 import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { restoreFlowBinding } from "../actors/case-walking-path";
 import {
   decideHeldOutputRequest,

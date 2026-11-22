@@ -10,7 +10,7 @@ import {
   type MemoryCommand,
 } from "@purin-labs/control-api";
 import { assertNever, encodeBase64Url, isRecord } from "@purin-labs/std";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   readEmailProposalChatContext,
   readEmailProposalChatSources,

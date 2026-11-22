@@ -1,5 +1,5 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import {
   fetchConnectorMail,
   isSessionMailExecutionActive,

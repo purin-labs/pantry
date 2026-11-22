@@ -1,4 +1,4 @@
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";

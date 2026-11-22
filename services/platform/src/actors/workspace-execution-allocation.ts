@@ -7,7 +7,7 @@ import {
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { requireActiveOrganisationActor } from "./actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   CODE_MODE_PRICE_BOOK_REVISION_V2,
   WORKSPACE_EXECUTOR_ALLOCATION_PROFILE,

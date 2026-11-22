@@ -3,7 +3,7 @@
 import { describe, expect, test } from "vitest";
 
 import { createSessionSchema, initializeAgentSessionPersistence } from "../src/actors/agent-session-schema";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 describe("AgentSession persistence mode", function agentSessionPersistenceSuite() {

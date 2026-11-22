@@ -10,11 +10,11 @@ import {
   BindingObservation,
   type BindingObservationSnapshot,
 } from "./binding-observation";
-import { resolveActiveCaseActor } from "../../src/actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import { CaseDO } from "../../src/actors/case";
 import { parseCaseId } from "@purin-labs/kernel/ids";

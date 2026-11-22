@@ -27,8 +27,8 @@ import {
   reserveActor,
   actorActivationRequest,
   activateActorRegistryEntry,
-} from "../src/actors/actor-registry";
-import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 
 describe("OrganisationActor cutover quiescence", function organisationCutoverQuiescenceSuite() {
   it(

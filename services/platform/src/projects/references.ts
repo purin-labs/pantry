@@ -37,7 +37,7 @@ import {
 } from "@purin-labs/control-api";
 import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
-import { resolveActiveCaseActor } from "../actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { definePort } from "@purin-labs/kernel/port";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ConversationScope } from "../chat/store";

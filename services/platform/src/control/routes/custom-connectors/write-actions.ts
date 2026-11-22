@@ -5,8 +5,8 @@ import { controlActionMutationExecution } from "../../../actors/action-mutation-
 import { decideCurrentAuthorityFlowSink } from "../../../chat/information-flow";
 import { customConnectorFetchOf } from "../../../custom-connectors/egress";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "../../../actors/actor-stubs";
-import { requireActiveOrganisationActor } from "../../../actors/actor-router";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   approvalActionBindingMatches,
   digestApprovalAction,

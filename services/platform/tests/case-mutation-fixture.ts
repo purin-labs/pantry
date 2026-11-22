@@ -1,6 +1,6 @@
 import type { UnitTestEnv } from "./worker-fakes";
 import { isRecord } from "@purin-labs/std";
-import type { ActorRecoveryAdmission } from "../src/actors/actor-activation";
+import type { ActorRecoveryAdmission } from "@purin-labs/actor-runtime/actors/actor-activation";
 import { createAgentOperationsDatabase } from "./agent-operations-database";
 import { requireOrganisationId } from "./test-ids";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";

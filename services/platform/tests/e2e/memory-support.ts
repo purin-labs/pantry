@@ -17,7 +17,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Conversation } from "../../src/chat/conversation";
 import {
   conversationCaseId,
@@ -38,7 +38,7 @@ import {
   type OrganisationClient,
 } from "./organisation-fixture";
 import { openRouterText } from "./slack-journey-support";
-import type { OrganisationActorStub } from "../../src/actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 
 const CUTOFF_INSTRUCTION =
   "Remember that our primary supplier closes next-day orders at noon Sydney time.";

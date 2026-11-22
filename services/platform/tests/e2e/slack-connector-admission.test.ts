@@ -8,9 +8,9 @@ import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import {
   listPlacementActorRegistryEntries,
   type ActorRegistryEntry,
-} from "../../src/actors/actor-registry";
-import { resumeActorRelocation } from "../../src/actors/actor-relocation";
-import { actorStub } from "../../src/actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { network } from "./network";
 import { freezePlacement, type PlacementRace } from "./placement-race-support";
 import {

@@ -103,7 +103,7 @@ import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
   requireActiveOrganisationActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { deriveDirectCaseIdentities } from "../../src/actors/case-direct-processing";
 import { createAccessGrant } from "../../src/data/access-grants";
 import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-grants/turn-authority";

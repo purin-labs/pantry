@@ -31,7 +31,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { admitActorRecovery } from "./actor-activation";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   CollaborationRoom,
   accessRevoked,

@@ -44,7 +44,7 @@ import { flowBindingMatchesIdentity } from "../policy";
 import { definePort } from "@purin-labs/kernel/port";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { isNonNegativeInteger, isRecord, isSha256Hex } from "@purin-labs/std";
-import { armAlarmBy } from "./lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 
 export type CanonicalActionDraft = {
   host: string;

@@ -18,7 +18,7 @@ vi.mock("cloudflare:workers", function cloudflareWorkersMock() {
   };
 });
 
-import { activateActor } from "../src/actors/actor-activation";
+import { activateActor } from "@purin-labs/actor-runtime/actors/actor-activation";
 import { CaseDO } from "../src/actors/case";
 import {
   actorPhysicalName,
@@ -26,7 +26,7 @@ import {
   parseActorFenceToken,
   parseActorRegistryId,
   type ActorActivationIdentity,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import { parseCaseId, parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";

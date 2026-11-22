@@ -1,6 +1,6 @@
 import type { ChannelAlarmDue } from "./connector/channel-adapter";
 import { nextConnectorCaseWorkAlarm } from "./connector-case-work";
-import type { AlarmReconciler } from "./lifecycle/actor-alarm";
+import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 
 /**
  * The Connector's alarm reconcilers: its Case work and the work of each

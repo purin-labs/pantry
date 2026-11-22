@@ -3,7 +3,10 @@ import {
   CURRENT_SQLITE_SCHEMA_VERSION,
   SQLITE_MIGRATIONS,
 } from "@earendil-works/pi-durable/storage/sqlite";
-import type { ActorExportTable, ActorImportSqlMigration } from "./actor-export";
+import type {
+  ActorExportTable,
+  ActorImportSqlMigration,
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import { createPiUsageSchema } from "./pi-durable-usage";
 import type {
   EmbeddedHarnessConstructionInput,

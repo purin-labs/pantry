@@ -7,8 +7,8 @@ import {
   type OrganisationPlacementBindings,
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { OrganisationUserAuthority } from "@purin-labs/tenancy/organisation-access/access";
-import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "../actors/actor-schema-versions";
-import { actorPhysicalName } from "../actors/actor-registry";
+import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
+import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { CredentialVaultBindings } from "../credential-vault/keyring";
 import {
   resolveVaultSecretRow,

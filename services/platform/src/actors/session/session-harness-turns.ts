@@ -5,7 +5,7 @@ import {
   acceptedExecutionAuthority,
   organisationAccessOfOneRead,
 } from "@purin-labs/tenancy/organisation-access/access";
-import { armAlarmBy } from "../lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import {
   createSessionGoalExecution,
   findServedGoalCase,

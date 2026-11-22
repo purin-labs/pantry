@@ -13,7 +13,7 @@ import {
 
 vi.mock("../../src/commerce/commerce-wasm", commerceWasmMock);
 vi.mock("../../src/commerce-lab/lab-metadata", labMetadataMock);
-vi.mock("../../src/actors/actor-router", actorRouterMock);
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", actorRouterMock);
 
 const queueMocks = vi.hoisted(function createQueueMocks() {
   const organisation = {

@@ -3,7 +3,7 @@ import {
   fetchConnectorMail,
   type MailConnectorContext,
 } from "../mail-inbox/execution";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 

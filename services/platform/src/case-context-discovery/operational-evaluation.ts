@@ -1,11 +1,11 @@
 import type { TypeSafeEvaluationReceipt } from "../integrations/typesafe/evaluation-ledger";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actors/actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { TypeSafeCredential } from "../integrations/typesafe/credential";
 import { digestCanonical } from "../policy/information-flow/digest";
 import type { Result } from "@purin-labs/kernel/result";
-import type { SchemaTransaction } from "../actors/schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   JevRelationshipRequest,
   CASE_CONTEXT_DISCOVERY_JEV_MODEL,

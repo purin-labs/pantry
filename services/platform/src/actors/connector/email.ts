@@ -27,7 +27,7 @@ import type { EmailDisposalOutcome } from "../connector-email-proposal";
 import { createConnectorEvalSchema, nextEvalWorkAt } from "../connector-eval";
 import type { GmailMessageContent } from "../../mail/gmail-adapter";
 import { nextMailOrganizationAt } from "../../mail-inbox/store";
-import type { AlarmReconciler } from "../lifecycle/actor-alarm";
+import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { digestEmailBody } from "../../mail/reply-target";
 import {
   createEmailProposalDraft,

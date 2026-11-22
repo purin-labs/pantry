@@ -4,7 +4,7 @@ import {
   type ActionMutationExecution,
 } from "../action-mutation-execution";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 import {
   compileCommerceRelationshipTraversalStepSql,
@@ -93,7 +93,7 @@ import {
   type CommerceEntityRelationRow,
   type CommerceRelationshipRelationRow,
 } from "../commerce-query-schema";
-import { admitActorRecovery } from "../actor-activation";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   abandonCodeModeCapabilityCalls,
   claimCodeModeCapabilityCall,

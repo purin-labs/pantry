@@ -7,7 +7,7 @@ import type {
 import { surfaceAreaTitle } from "@purin-labs/control-api";
 import { bytesToHex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import { requireActiveOrganisationActorAtScope } from "../actors/actor-router";
+import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ScreenRelevanceState } from "../jev-features/screen-relevance-jev";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

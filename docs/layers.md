@@ -48,9 +48,10 @@ import. A module with no line for one of these has none.
 ## foundation/actor-runtime
 
 - Folders: 3
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/lifecycle/`
-  - `services/platform/src/data/`
+  - `foundation/actor-runtime/actors/`
+  - `foundation/actor-runtime/actors/lifecycle/`
+  - `foundation/actor-runtime/data/`
+- Packages: `foundation/actor-runtime`
 - Tables (5): `durable_object_registry`, `state_object_relocation_copy`, `state_object_relocation_exclusion`, `state_object_relocation_item`, `state_object_restore_item`
 
 ## foundation/connections

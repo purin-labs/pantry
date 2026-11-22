@@ -12,7 +12,7 @@ import {
 } from "../data/whatsapp";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub, SessionActorStub } from "./actor-stubs";
+import type { CaseActorStub, SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   newRequestId,
@@ -43,7 +43,7 @@ import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveSessionActorAtPlacement,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,

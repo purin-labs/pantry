@@ -29,7 +29,7 @@ import {
 import type { UserId } from "@purin-labs/control-api/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import type {
   CollaborationRoomBacking,
   CollaborationRoomProtocol,

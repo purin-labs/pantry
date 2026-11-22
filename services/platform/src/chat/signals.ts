@@ -7,8 +7,8 @@ import {
 import { errorMessage } from "@purin-labs/std";
 import { waitUntil } from "cloudflare:workers";
 
-import { actorPhysicalName } from "../actors/actor-registry";
-import { actorStub } from "../actors/actor-stubs";
+import { actorPhysicalName } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

@@ -2,7 +2,7 @@ import { expect, it, vi, type TestContext } from "vitest";
 import { fixtureDatabase } from "./organisation-database";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject, runInDurableObject } from "cloudflare:test";
-import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
+import { resolveActiveConnectorActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { requireConnectorId } from "../test-ids";
 import type { ConnectorDelivery } from "@purin-labs/contracts";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";

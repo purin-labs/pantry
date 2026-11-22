@@ -1,4 +1,4 @@
-import { armAlarmBy } from "../../services/platform/src/actors/lifecycle/actor-alarm.ts";
+import { armAlarmBy } from "../../foundation/actor-runtime/actors/lifecycle/actor-alarm.ts";
 import { CandidateActor as SeamActor, readRecords } from "./seam-worker.mjs";
 import {
   CURRENT_SQLITE_SCHEMA_VERSION,
@@ -8,11 +8,11 @@ import { ActorSqliteDatabase } from "../../services/platform/src/actors/pi-durab
 import { sha256Hex } from "../../packages/std/src/index.ts";
 import { resolvePantryPlatformModelRoute } from "../../services/platform/src/models/route.ts";
 export { default } from "./seam-worker.mjs";
-import { createActorActivationSchema } from "../../services/platform/src/actors/actor-activation.ts";
+import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
 import { canonicalStopNotice } from "../../services/platform/src/actors/pi-durable-history.ts";
-import { eraseActorContentSql } from "../../services/platform/src/actors/placement-execution-quiescence.ts";
+import { eraseActorContentSql } from "../../foundation/actor-runtime/actors/placement-execution-quiescence.ts";
 import { createSessionSchema } from "../../services/platform/src/actors/agent-session-schema.ts";
-import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../services/platform/src/actors/actor-schema-versions.ts";
+import { CANONICAL_SESSION_SCHEMA_VERSION } from "../../foundation/actor-runtime/actors/actor-schema-versions.ts";
 import {
   commitInitializedSession,
   commitAcceptedSessionInput,
@@ -73,8 +73,8 @@ import {
   newActorExportId,
   parseActorExportRef,
   readActivationExportSource,
-} from "../../services/platform/src/actors/actor-export.ts";
-import { parseActorFenceToken } from "../../services/platform/src/actors/actor-registry.ts";
+} from "../../foundation/actor-runtime/actors/actor-export.ts";
+import { parseActorFenceToken } from "../../foundation/actor-runtime/actors/actor-registry.ts";
 
 const identity = {
   organisationId: "organisation_plan50_seams",

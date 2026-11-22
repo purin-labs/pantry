@@ -10,7 +10,7 @@ import { commerceHeaders } from "./commerce-support";
 import {
   requireActiveOrganisationActor,
   requireActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import {
   issueControlSession,

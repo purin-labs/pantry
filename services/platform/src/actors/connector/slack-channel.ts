@@ -25,8 +25,8 @@ import { slackAuthoredText } from "../../slack/events";
 import { resolveConfiguredSlackInstallationIdentity } from "../../slack/installation-identity";
 import { setSlackThreadStatus } from "../../slack/messages";
 import { buildSlackUserMessage } from "../../slack/user-message";
-import { actorExecutionAdmissionOpen } from "../actor-execution-quiescence";
-import { actorStub } from "../actor-stubs";
+import { actorExecutionAdmissionOpen } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { OngoingCaseWalkingConnector } from "../case-walking-path";
 import {
   CASE_WORK_ATTEMPTS_EXHAUSTED,
@@ -56,7 +56,7 @@ import {
   type ConnectorCaseStreamRelease,
   type ConnectorCaseTurnStreamError,
 } from "../case-turn-stream";
-import { connectorWarmActorSlots } from "../warm-actor-slots";
+import { connectorWarmActorSlots } from "@purin-labs/actor-runtime/actors/warm-actor-slots";
 import type {
   CaseWorkChannel,
   CaseWorkSteer,

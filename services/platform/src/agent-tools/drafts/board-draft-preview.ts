@@ -2,7 +2,7 @@ import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { resolveCanvasCollaborationAgent } from "../../actors/collaboration-agent";
 import type { HarnessToolArgumentObserver } from "../../actors/embedded-harness";
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readSessionTurnFlowBinding } from "../../actors/agent-session-information-flow";
 import { sessionTurnExecution } from "../../chat/turn-access";
 import { CAPABILITY_KEYS } from "../../authorization/capability-catalogue";

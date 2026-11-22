@@ -1,6 +1,6 @@
 import { resolveCaseContextCollectionSelectionVerification } from "../../case-context-discovery/source";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "../actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { parseCaseId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { readCaseContextDiscoveryPolicy } from "../../case-context-discovery/evaluation-store";
 import {
@@ -38,7 +38,7 @@ import {
   caseContextCollectionSourceAccess,
 } from "./case-context-collection";
 import type { Env } from "@purin-labs/kernel/env";
-import type { SchemaTransaction } from "../schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import type { OrganisationStateError } from "@purin-labs/tenancy/actors/organisation/types";
 import type { Result } from "@purin-labs/kernel/result";
 import { organisationPlacementConflict } from "@purin-labs/tenancy/actors/organisation/organisation-record";

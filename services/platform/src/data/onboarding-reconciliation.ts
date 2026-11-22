@@ -28,15 +28,15 @@ import {
   parseActorRegistryId,
   type ActorRegistryEntry,
   type ActorRegistryId,
-} from "../actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   resolveActiveOrganisationActor,
-} from "../actors/actor-router";
-import { actorStub } from "../actors/actor-stubs";
-import type { AdmittedOrganisationArchiveCleanup } from "../actors/organisation-archive-cleanup";
+} from "@purin-labs/actor-runtime/actors/actor-router";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
+import type { AdmittedOrganisationArchiveCleanup } from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import { resolveActiveOrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
-import type { SessionActorStub } from "../actors/actor-stubs";
+import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";

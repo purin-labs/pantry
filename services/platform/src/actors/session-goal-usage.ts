@@ -17,11 +17,11 @@ import {
 } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
 import type { Env } from "@purin-labs/kernel/env";
-import type { CaseActorStub } from "./actor-stubs";
+import type { CaseActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   findActiveCaseActorAtScope,
   resolveActiveCaseActor,
-} from "./actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   preflightHarnessTurnLease,
@@ -40,7 +40,7 @@ import type {
   GoalModelCallTicket,
   GoalModelStop,
 } from "./goal-model-calls";
-import { armAlarmBy } from "./lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { Variant } from "@purin-labs/type-utils";
 
 export type GoalUsageContext = {

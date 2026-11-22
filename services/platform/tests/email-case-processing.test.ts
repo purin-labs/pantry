@@ -6,7 +6,7 @@ import {
   publishMailboxIngressPolicy,
 } from "../src/data/email-mailbox";
 import { requireIntegrationAccountId } from "./test-ids";
-import { createActorExecutionBarrierSchema } from "../src/actors/actor-execution-quiescence";
+import { createActorExecutionBarrierSchema } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { CAPABILITY_KEYS } from "../src/authorization/capability-catalogue";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { defaultDenyPolicy } from "../src/policy-snapshot";
@@ -44,13 +44,18 @@ vi.mock("../src/mail-inbox/contract/gmail-inference-eligibility", () => ({
     orchestratorMocks.readGmailInferenceEligibility,
 }));
 
-vi.mock("../src/actors/actor-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/actors/actor-router")>()),
-  resolveActiveCaseActor: orchestratorMocks.resolveActiveCaseActor,
-  resolveActiveSessionActor: orchestratorMocks.resolveActiveSessionActor,
-  requireActiveOrganisationActor:
-    orchestratorMocks.requireActiveOrganisationActor,
-}));
+vi.mock(
+  "@purin-labs/actor-runtime/actors/actor-router",
+  async (importOriginal) => ({
+    ...(await importOriginal<
+      typeof import("@purin-labs/actor-runtime/actors/actor-router")
+    >()),
+    resolveActiveCaseActor: orchestratorMocks.resolveActiveCaseActor,
+    resolveActiveSessionActor: orchestratorMocks.resolveActiveSessionActor,
+    requireActiveOrganisationActor:
+      orchestratorMocks.requireActiveOrganisationActor,
+  }),
+);
 vi.mock("../src/actors/case-walking-path", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../src/actors/case-walking-path")>()),
   prepareTransientEmailAssignment:

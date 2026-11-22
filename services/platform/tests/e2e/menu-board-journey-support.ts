@@ -34,7 +34,7 @@ import { enableCapability } from "./access-route-support";
 import { commerceClient } from "./commerce-support";
 import { network } from "./network";
 import { givePortalHandles } from "./permission-request-support";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { closeSocket, openSocket } from "./hibernatable-socket-support";
 import {

@@ -5,7 +5,7 @@ import { http, HttpResponse, type HttpResponseResolver } from "msw";
 import { expect, it, type TestContext } from "vitest";
 import { isRecord } from "@purin-labs/std";
 
-import { actorStub } from "../../src/actors/actor-stubs";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   applyAgentOperation,
   type AgentOperationCommand,

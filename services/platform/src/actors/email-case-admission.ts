@@ -9,7 +9,7 @@ import {
 import { buildAgentMailboxAuthority } from "../request-authority";
 import type { Result } from "@purin-labs/kernel/result";
 import { ensureOrganisationDefaultWorkspace } from "../data/organisation-workspace";
-import { resolveActiveCaseActor } from "./actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 
 /**

@@ -7,7 +7,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   digestApprovalAction,
   type MerchantActionRejectionEvidence,

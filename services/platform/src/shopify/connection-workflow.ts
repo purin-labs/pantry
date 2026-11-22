@@ -1,4 +1,4 @@
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { parseShopifyLocationObservationEnvelope } from "./location-observation";
 import {
   normalizeShopifyCommerceCatalogDelivery,

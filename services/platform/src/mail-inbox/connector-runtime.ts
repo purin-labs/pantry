@@ -2,7 +2,7 @@ import { typeSafeMonth } from "../integrations/typesafe/usage-store";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { fetchConnectorMail, type MailConnectorContext } from "./execution";
-import { isActorExecutionActive } from "../actors/actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type {
   MailOrganizationView,
@@ -11,7 +11,7 @@ import type {
 import {
   requireActiveOrganisationActor,
   requireActiveOrganisationActorAtPlacement,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   resolveConnectorGmailAccess,
   establishConnectorEmailWatch,

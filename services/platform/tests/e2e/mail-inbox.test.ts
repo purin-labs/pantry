@@ -44,7 +44,7 @@ import {
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import type { MailEvaluationInput } from "../../src/mail-inbox/evaluation";
@@ -209,7 +209,7 @@ import {
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { registerEmailMailboxAccount } from "../../src/data/email-mailbox";
 import { gmailConnectorId } from "../../src/mail-inbox/contract/connector-ids";
 import { resolveActiveProviderAccountContext } from "../../src/data/integration-account";
@@ -230,7 +230,7 @@ import type { InboxResponseOwner } from "../../src/mail-inbox/response-store";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseCaseId,
   parseOrganisationId,
@@ -271,7 +271,7 @@ import type { CaseAssignment } from "@purin-labs/contracts";
 import type { CaseGmailReplyProposal } from "../../src/actors/case-inbox/email-proposals";
 import { decodeRaw } from "./gmail-mailbox-support";
 import { controlFetch, modelToolResults } from "./chat-journey-support";
-import type { OrganisationActorStub } from "../../src/actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { PLATFORM_DEFAULT_PI_MODEL } from "../../src/actors/pi-model-transport";
 
 async function prepareMailBudgetJourney() {

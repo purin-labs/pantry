@@ -7,7 +7,7 @@ import {
 import {
   resolveActiveCaseActorAtPlacement,
   resolveActiveConnectorActorAtPlacement,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   readEmailThreadCase,
   readEmailReplyProposalProjection,

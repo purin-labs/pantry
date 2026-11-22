@@ -15,7 +15,7 @@ import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   parseSessionId,
   type OrganisationId,

@@ -19,12 +19,12 @@ import type { HarnessTurnLease } from "@purin-labs/contracts";
 import {
   resolveActiveSessionActor,
   type ActorResolutionError,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Result } from "@purin-labs/kernel/result";
 import { deriveDirectCaseIdentities } from "../actors/case-direct-processing";
 import { admitSessionInformationFlowObservation } from "../actors/agent-session-information-flow";
 import type { Env } from "@purin-labs/kernel/env";
-import type { SessionActorStub } from "../actors/actor-stubs";
+import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseSessionId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import { FlowBinding, ObservationEvidence } from "../policy/information-flow";

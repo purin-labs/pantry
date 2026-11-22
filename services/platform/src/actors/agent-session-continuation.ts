@@ -3,7 +3,7 @@ import {
   assertTableExists,
   runSchemaMigrations,
   type SchemaMigrationPlan,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   parsePageBrowserContext,
   type PageBrowserContext,

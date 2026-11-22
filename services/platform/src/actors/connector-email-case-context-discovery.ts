@@ -2,7 +2,7 @@ import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
 import { GMAIL_MAILBOX } from "../mail/gmail-mail-adapter";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isActorExecutionActive } from "./actor-execution-quiescence";
+import { isActorExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { fetchConnectorMail } from "../mail-inbox/execution";
 import { extractMailbox } from "../mail/gmail-adapter";
 import {
@@ -14,7 +14,7 @@ import {
 import { resolveVerifiedContactEndpointByEndpoint } from "../data/contact-verification";
 import { bindEmailMessageReceiptContact } from "../data/email-mailbox";
 import type { CaseContextCollectionSelection } from "../case-context-discovery/relationships";
-import { requireActiveOrganisationActor } from "./actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 
 type EmailCaseContextCollectionReceipt = Readonly<{
   messageId: string;

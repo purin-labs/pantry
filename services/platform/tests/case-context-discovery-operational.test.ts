@@ -21,7 +21,7 @@ import {
 import { parseOrganisationId, parseIntegrationAccountId } from "@purin-labs/kernel/ids";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { createTypeSafeConnectionSchema } from "../src/integrations/typesafe/connection";
-import type { SchemaTransaction } from "../src/actors/schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { ensureInitialOrganisationPlacement } from "@purin-labs/tenancy/data/shared-rows/placement-row";
 import { requireOrganisationExecutionScope } from "./organisation-execution-fixture";

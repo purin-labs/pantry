@@ -3,7 +3,7 @@ import {
   steeringInputsToJournal,
   turnTriggerEntryId,
 } from "../harness-steering";
-import { armAlarmBy } from "../lifecycle/actor-alarm";
+import { armAlarmBy } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import type { AcceptedInputRef, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceLog, traceWarn } from "@purin-labs/kernel/observability";
 import type { Result } from "@purin-labs/kernel/result";
-import { resolveActiveCaseActorAtPlacement } from "../actor-router";
+import { resolveActiveCaseActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { type AgentSessionPersistence } from "../agent-session-schema";
 import { SessionExecutionAdmission } from "../session-execution-admission";
 import { type CanonicalHarnessCheckpointPayload } from "../agent-session-harness-checkpoint";
@@ -22,7 +22,7 @@ import { ActiveAttachmentPreparationControl } from "../message-attachment-prepar
 import { releaseEndedCodeModeExecutions } from "../agent-session-code-mode-settlement";
 import type { EmbeddedHarnessActiveTurn } from "../embedded-harness";
 import { type PortalChatCleanupError } from "../portal-chat-cleanup";
-import type { ActorExportError } from "../actor-export";
+import type { ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import { errorMessage } from "@purin-labs/std";
 import { deferredExecutionRelease } from "./replay";
 import {

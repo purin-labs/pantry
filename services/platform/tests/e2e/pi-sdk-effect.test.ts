@@ -8,7 +8,7 @@ import { isRecord } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveCaseActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import type { ActionLedgerEntry } from "../../src/actors/action-ledger";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";

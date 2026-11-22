@@ -23,7 +23,7 @@ import {
   type OrganisationId,
   type RequestId,
 } from "@purin-labs/kernel/ids";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { createCommerceOutboxReconcileQueueMessage } from "./contract/queue-messages";
 import { traceWarn } from "@purin-labs/kernel/observability";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

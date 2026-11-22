@@ -1,7 +1,7 @@
 import {
   isUnregisteredActorKind,
   type UnregisteredActorKind,
-} from "../../actors/unregistered-actor-erasure";
+} from "@purin-labs/actor-runtime/actors/unregistered-actor-erasure";
 import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
@@ -22,23 +22,23 @@ import {
   type ActorRegistryEntry,
   type ActorRegistryId,
   type ActorRegistrySchemaAdvanceError,
-} from "../../actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import type {
   ActorActivationInspection,
   ActorActivationSchemaAdvanceError,
-} from "../../actors/actor-activation";
-import { currentActorSchemaVersion } from "../../actors/current-actor-schema-version";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
+import { currentActorSchemaVersion } from "@purin-labs/actor-runtime/actors/current-actor-schema-version";
 import type { Env } from "@purin-labs/kernel/env";
 import type {
   OrganisationActorStub,
   SessionActorStub,
-} from "../../actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   inspectOrganisationActorRegistry,
   reconcileOrganisationActorRegistry,
   type ActorRegistryInventoryEntry,
   type ActorRegistryReconciliationError,
-} from "../../actors/actor-registry-reconciliation";
+} from "@purin-labs/actor-runtime/actors/actor-registry-reconciliation";
 import type { CaseSnapshot } from "../../actors/case/types";
 import {
   requireActiveOrganisationActorAtPlacement,
@@ -46,8 +46,8 @@ import {
   resolveImportedCanonicalSessionActor,
   type ActorNamespaces,
   type ActorResolutionError,
-} from "../../actors/actor-router";
-import { actorStub } from "../../actors/actor-stubs";
+} from "@purin-labs/actor-runtime/actors/actor-router";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   errorResponse,
   jsonResponse,
@@ -76,7 +76,7 @@ import {
 import { customConnectorFetchObjectName } from "../../custom-connectors/egress";
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
-import { conversationResidencyStub } from "../../actors/conversation-residency";
+import { conversationResidencyStub } from "@purin-labs/actor-runtime/actors/conversation-residency";
 import { type QuarantinedCaseActorRegistryEntry, actorResolutionErrorResponse } from "../support";
 import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readPositiveSafeIntegerField } from "../request-helpers";
 

@@ -54,8 +54,8 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   actorExecutionAdmissionOpen,
   isActorExecutionActive,
-} from "../actor-execution-quiescence";
-import { admitActorRecovery } from "../actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   activateEmailRuntime,
   claimDueEmailCorrectionLearning,

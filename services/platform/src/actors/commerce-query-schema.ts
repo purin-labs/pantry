@@ -8,7 +8,7 @@ import type {
 import {
   runSchemaMigrations,
   type SchemaTransaction,
-} from "./schema-migrations";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
 import {
   COMMERCE_QUERY_SCHEMA_V5,
   execSchemaStatements,

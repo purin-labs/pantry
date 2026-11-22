@@ -4,7 +4,7 @@ import type {
   DeviceConnection,
 } from "@purin-labs/control-api";
 
-import { deliverOperationsCard } from "../actors/operations-channel";
+import { deliverOperationsCard } from "@purin-labs/actor-runtime/actors/operations-channel";
 import {
   readOperationsDestination,
   type OperationsDestination,

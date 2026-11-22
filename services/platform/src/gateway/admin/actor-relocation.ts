@@ -24,12 +24,12 @@ import {
   startActorRelocation,
   type ActorRelocationError,
   type ActorRelocationId,
-} from "../../actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   parseActorRestoreManifest,
   prepareActorRestoreManifest,
   type ActorRestoreManifest,
-} from "../../actors/actor-restore-manifest";
+} from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
 import {
   abandonActorRestore,
   inspectActorRestore,
@@ -38,7 +38,7 @@ import {
   startActorRestore,
   type ActorRestoreError,
   type ActorRestoreId,
-} from "../../actors/actor-restore";
+} from "@purin-labs/actor-runtime/actors/actor-restore";
 import {
   errorResponse,
   jsonResponse,

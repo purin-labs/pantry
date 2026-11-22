@@ -129,35 +129,40 @@ vi.mock(
     };
   },
 );
-vi.mock("../src/actors/actor-router", function actorRouterModule() {
-  return {
-    resolveActiveSessionActor: async function resolveSession() {
-      return {
-        ok: true,
-        value: {
-          interruptCanonicalEmbeddedHarnessTurn: mocks.interrupt,
-        },
-      };
-    },
-    resolveActiveCaseActorAtScope: async function resolveCase() {
-      return { ok: true, value: { scheduleConversation: mocks.schedule } };
-    },
-    resolveActiveSessionActorAtScope: async function prepareSession() {
-      return { ok: true, value: {} };
-    },
-    resolveActiveSessionActorAtPlacement: vi.fn(async function resolveActor() {
-      return {
-        ok: true,
-        value: {
-          interruptCanonicalEmbeddedHarnessTurn: mocks.interrupt,
-          readConfirmedContextObservations: async function observations() {
-            return [];
+vi.mock(
+  "@purin-labs/actor-runtime/actors/actor-router",
+  function actorRouterModule() {
+    return {
+      resolveActiveSessionActor: async function resolveSession() {
+        return {
+          ok: true,
+          value: {
+            interruptCanonicalEmbeddedHarnessTurn: mocks.interrupt,
           },
+        };
+      },
+      resolveActiveCaseActorAtScope: async function resolveCase() {
+        return { ok: true, value: { scheduleConversation: mocks.schedule } };
+      },
+      resolveActiveSessionActorAtScope: async function prepareSession() {
+        return { ok: true, value: {} };
+      },
+      resolveActiveSessionActorAtPlacement: vi.fn(
+        async function resolveActor() {
+          return {
+            ok: true,
+            value: {
+              interruptCanonicalEmbeddedHarnessTurn: mocks.interrupt,
+              readConfirmedContextObservations: async function observations() {
+                return [];
+              },
+            },
+          };
         },
-      };
-    }),
-  };
-});
+      ),
+    };
+  },
+);
 vi.mock(
   "../src/custom-connectors/authoring",
   async function authoringModule(importOriginal) {

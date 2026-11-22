@@ -9,7 +9,7 @@ import {
   menuBoardStartFits,
 } from "@purin-labs/menu-board-crdt/board";
 import { encodeBase64Url } from "@purin-labs/std";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type {
   MenuBoardCommand,
   MenuBoardCommandReply,

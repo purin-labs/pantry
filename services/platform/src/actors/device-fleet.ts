@@ -102,8 +102,12 @@ import {
   type StartTerminalCollectionResult,
   type TerminalCollectionRecord,
 } from "./device-fleet-terminal";
-import { acceptSocket, closeSocket, openSockets } from "./hibernatable-sockets";
-import { eraseUnregisteredActorState } from "./unregistered-actor-erasure";
+import {
+  acceptSocket,
+  closeSocket,
+  openSockets,
+} from "@purin-labs/actor-runtime/actors/hibernatable-sockets";
+import { eraseUnregisteredActorState } from "@purin-labs/actor-runtime/actors/unregistered-actor-erasure";
 
 /**
  * The connections of one shop location's gateways (Plan 85 D3). A gateway holds

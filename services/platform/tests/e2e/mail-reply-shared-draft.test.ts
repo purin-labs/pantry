@@ -12,7 +12,7 @@ import {
   parseDraftServerMessage,
   type DraftServerMessage,
 } from "@purin-labs/mail-reply-crdt/protocol";
-import { requireActiveOrganisationActor } from "../../src/actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   CAPABILITY_KEYS,
   EMAIL_MAILBOX_RESOURCE_SCOPE,

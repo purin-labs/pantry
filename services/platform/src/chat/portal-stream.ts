@@ -4,7 +4,7 @@ import { decideChatFlowDelivery } from "./information-flow";
 import { authorizeConversation } from "./conversation-access";
 import type { ConversationId } from "@purin-labs/control-api";
 import { applyAgentMessageAssemblyEvent } from "../actors/agent-message-assembly";
-import { resolveActiveSessionActorAtPlacement } from "../actors/actor-router";
+import { resolveActiveSessionActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { SessionActor } from "../actors/session/session-actor";
 import {
   parseSessionTurnStreamRecord,

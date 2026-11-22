@@ -25,7 +25,7 @@ import {
   parseBakeStockLevelInput,
   type BakeStockLevelInput,
 } from "@purin-labs/kitchen-control-api";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   applyJevDraftCommand,
   jevDraftOperation,

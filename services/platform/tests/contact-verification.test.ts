@@ -5,8 +5,8 @@ import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("../src/actors/actor-router", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/actors/actor-router")>()),
+vi.mock("@purin-labs/actor-runtime/actors/actor-router", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/actor-runtime/actors/actor-router")>()),
   requireActiveOrganisationActorAtPlacement: vi.fn().mockResolvedValue({
     invalidateCaseContextCollectionVerification: vi
       .fn()

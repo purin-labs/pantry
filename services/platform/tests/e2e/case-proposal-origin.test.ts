@@ -18,7 +18,7 @@ import {
 } from "@purin-labs/tenancy/data/control-plane";
 import { parseCaseId } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { resolveActiveCaseActor } from "../../src/actors/actor-router";
+import { resolveActiveCaseActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { authorityPartitionKey } from "../../src/authorization/access-grants/turn-authority";
 import { fixtureFlowBinding } from "../fixtures/plan25-turn";
 import {
@@ -28,7 +28,7 @@ import {
 import {
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationPlacementMoveTarget } from "@purin-labs/tenancy/data/organisation-placement";
 
 type Boundary = "session_origin" | "placement" | "approval_wait";

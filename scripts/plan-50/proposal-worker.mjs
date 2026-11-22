@@ -5,12 +5,12 @@ import { registerSession, seedDraftAuthority } from "./draft-seed.mjs";
 import { OrganisationDO } from "../../services/platform/src/actors/organisation.ts";
 import { CaseDO } from "../../services/platform/src/actors/case.ts";
 import { proposeCommerceActionForHarness } from "../../services/platform/src/actors/harness-commerce-proposal.ts";
-import { createActorActivationSchema } from "../../services/platform/src/actors/actor-activation.ts";
-import { createActorExecutionBarrierSchema } from "../../services/platform/src/actors/actor-execution-quiescence.ts";
+import { createActorActivationSchema } from "../../foundation/actor-runtime/actors/actor-activation.ts";
+import { createActorExecutionBarrierSchema } from "../../foundation/actor-runtime/actors/actor-execution-quiescence.ts";
 import {
   CASE_ACTOR_SCHEMA_VERSION,
   ORGANISATION_ACTOR_SCHEMA_VERSION,
-} from "../../services/platform/src/actors/actor-schema-versions.ts";
+} from "../../foundation/actor-runtime/actors/actor-schema-versions.ts";
 import {
   SessionExecutionAdmission,
   admittedSessionToolHost,

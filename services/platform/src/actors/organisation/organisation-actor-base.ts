@@ -18,7 +18,7 @@ import {
   ORGANISATION_ARCHIVE_CLEANUP_KEY,
   type OrganisationArchiveCleanupError,
   type OrganisationArchiveCleanupRequest,
-} from "../organisation-archive-cleanup";
+} from "@purin-labs/actor-runtime/actors/organisation-archive-cleanup";
 import {
   OrganisationExecutionScope,
   selectOrganisationPlacementDatabase,
@@ -26,11 +26,11 @@ import {
 import {
   settleActorExecution,
   isOrganisationExecutionActive,
-} from "../actor-execution-quiescence";
+} from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 import { type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import { admitActorRecovery } from "../actor-activation";
-import { type ActorExportError } from "../actor-export";
+import { admitActorRecovery } from "@purin-labs/actor-runtime/actors/actor-activation";
+import { type ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   acceptShopifyLocationObservation,
   assignShopifyLocationClassification,
@@ -71,8 +71,8 @@ import { cleanupTypeSafeCredentials } from "../../integrations/typesafe/connecti
 import { resolveTypeSafeCredential } from "../../integrations/typesafe/authority";
 import { identifier, integerIn } from "../../case-context-discovery/policy";
 import { errorMessage, isRecord } from "@purin-labs/std";
-import { PlacedActor } from "../lifecycle/placed-actor";
-import { rearmActorAlarm } from "../lifecycle/actor-alarm";
+import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
+import { rearmActorAlarm } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import { organisationAlarmReconcilers } from "../organisation-alarm";
 import { schemaTransaction } from "./schema";
 import {

@@ -15,13 +15,13 @@ import { isRecord, assertNever } from "@purin-labs/std";
 import {
   requireActiveOrganisationActor,
   resolveActiveConnectorActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
   latestOperationalEmailProposal,
   readOperationalEmailDispatchId,
 } from "../../src/actors/connector-email-operational";
-import { resumeActorRelocation } from "../../src/actors/actor-relocation";
+import { resumeActorRelocation } from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { reconcileActorRelocationMailReceipt } from "../../src/actors/actor-relocation-mail";
 import { parseVaultHandle, storeVaultSecret } from "../../src/credential-vault";
 import { createActiveConnectedIntegration } from "../../src/data/integration-account";

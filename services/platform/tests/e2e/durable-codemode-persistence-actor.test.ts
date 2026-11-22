@@ -6,7 +6,7 @@ import { readLatestHarnessCheckpoint } from "../../src/actors/agent-session-harn
 import {
   resumeActorRelocation,
   startActorRelocation,
-} from "../../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import { parseOrganisationId, parseSessionId } from "@purin-labs/kernel/ids";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

@@ -40,7 +40,7 @@ import {
   type ExecutionRequestedSessionCommit,
 } from "./actor-journal";
 import { readCanonicalSessionProjection } from "./agent-session-canonical";
-import { requireActiveOrganisationActorAtPlacement } from "./actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { CodeModeAdmissionFrozenError, type HarnessCodeModeAdmission, type HarnessCodeModeAdmittedExecution, type HarnessCodeModeExecutionLease, type HarnessCodeModeExecutionOutcome } from "../agent-tools/catalog/types";
 import {
   parseCodeModeExecutionProjection,

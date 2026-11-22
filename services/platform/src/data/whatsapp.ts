@@ -6,8 +6,8 @@ import {
   WHATSAPP_DEFAULT_ALWAYS_WAIT_TOPICS,
   type WhatsAppAgentMode,
 } from "@purin-labs/control-api";
-import { listOrganisationActorRegistryEntries } from "../actors/actor-registry";
-import { actorStub } from "../actors/actor-stubs";
+import { listOrganisationActorRegistryEntries } from "@purin-labs/actor-runtime/actors/actor-registry";
+import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type {
   D1PreparedStatement,

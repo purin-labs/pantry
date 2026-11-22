@@ -31,7 +31,7 @@ import { gmailConnectorIdValue } from "./contract/connector-ids";
 import {
   resolveActiveCaseActor,
   resolveActiveSessionActor,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   prepareTransientEmailAssignment,
   settleTransientEmailAssignment,

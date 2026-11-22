@@ -7,7 +7,7 @@ import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import type { RequestAuthority } from "@purin-labs/contracts";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { requireActiveOrganisationActor } from "../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { AgentMailboxConnectorHandle } from "./agent-mailbox-connector";
 import { emailApprovalChallenge } from "./email-approval-challenge";
 import { recordEmailReplyRevision } from "./email-reply-lifecycle";

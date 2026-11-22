@@ -1,5 +1,5 @@
 import { canonicalFact } from "../../services/platform/src/actors/pi-durable-history.ts";
-import { armAlarmBy } from "../../services/platform/src/actors/lifecycle/actor-alarm.ts";
+import { armAlarmBy } from "../../foundation/actor-runtime/actors/lifecycle/actor-alarm.ts";
 import { DurableObject } from "cloudflare:workers";
 import { BACKGROUND_CONTEXT } from "@earendil-works/chord/context";
 import { createModels } from "@earendil-works/pi-ai/models";

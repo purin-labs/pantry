@@ -14,7 +14,7 @@ import {
   type ActorActivationRequest,
   type ActorRegistryEntry,
   type ActorIdentity,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   resolveActiveOrganisationPlacement,
   parseOrganisationPlacementMoveTarget,
@@ -22,28 +22,28 @@ import {
 import {
   activateActor,
   createActorActivationSchema,
-} from "../src/actors/actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   captureActorExport,
   newActorExportId,
   type ActorExportRef,
-} from "../src/actors/actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   parseCaseId,
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
-import { prepareActorRestoreManifest } from "../src/actors/actor-restore-manifest";
+import { prepareActorRestoreManifest } from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
 import {
   inspectActorRestore,
   resumeActorRestore,
   startActorRestore,
-} from "../src/actors/actor-restore";
+} from "@purin-labs/actor-runtime/actors/actor-restore";
 import {
   parseActorRelocationId,
   type ActorRelocationId,
-} from "../src/actors/actor-relocation";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
 import {
   emptySqliteFixture,
   sqlStorage,

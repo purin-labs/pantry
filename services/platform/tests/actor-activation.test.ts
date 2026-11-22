@@ -8,12 +8,12 @@ import {
   parseActorRegistryId,
   actorPhysicalName,
   type ActorActivationIdentity,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import {
   activateActor,
   createActorActivationSchema,
   inspectActorActivation,
-} from "../src/actors/actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import { emptySqliteFixture } from "./sqlite-storage";

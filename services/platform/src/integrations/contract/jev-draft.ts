@@ -2,7 +2,7 @@ import {
   parseJevFeatureCommand,
   type JevFeatureCommand,
 } from "@purin-labs/control-api/portal/jev-features";
-import { requireActiveOrganisationActor } from "../../actors/actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";

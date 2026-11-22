@@ -2,7 +2,7 @@ import type { MachineDefinition } from "@purin-labs/std/state-machine";
 import {
   censusOfActorMachines,
   type MachineCensus,
-} from "../lifecycle/machine-census";
+} from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
 import {
   authorizeActionMutationExecution,
   parseActionMutationExecution,
@@ -37,7 +37,7 @@ import type {
   CaseAssignmentLifecycle,
 } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";
-import { requireActiveOrganisationActor } from "../actor-router";
+import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   newRequestId,
   parseOrganisationId,
@@ -51,20 +51,20 @@ import {
   pinnedActorDatabase,
   inspectActorActivation,
   type ActorActivationInspection,
-} from "../actor-activation";
+} from "@purin-labs/actor-runtime/actors/actor-activation";
 import {
   actorExecutionAdmissionOpen,
   closeActorExecutionAdmission,
   createActorExecutionBarrierSchema,
   settleActorExecution,
-} from "../actor-execution-quiescence";
-import { createActorImportSchema, type ActorExportError } from "../actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
+import { createActorImportSchema, type ActorExportError } from "@purin-labs/actor-runtime/actors/actor-export";
 import type {
   ActorActivationRequest,
   ActorActivationIdentity,
   ActorFenceToken,
-} from "../actor-registry";
-import { CASE_ACTOR_SCHEMA_VERSION } from "../actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { CASE_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import type {
   CaseContextSource,
   CaseContextSourceReader,
@@ -87,11 +87,11 @@ import {
 import type { SerializedFlowBinding } from "../../policy";
 import { sourceReaderForAuthority } from "../../policy/information-flow/source-readers";
 import { errorMessage, isRecord, parseJsonOrNull, sha256Hex } from "@purin-labs/std";
-import { PlacedActor } from "../lifecycle/placed-actor";
+import { PlacedActor } from "@purin-labs/actor-runtime/actors/lifecycle/placed-actor";
 import {
   rearmActorAlarm,
   runAlarmStepsTogether,
-} from "../lifecycle/actor-alarm";
+} from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";
 import {
   caseAlarmReconcilers,
   commerceApprovalsToRead,

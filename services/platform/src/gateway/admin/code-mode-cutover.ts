@@ -9,7 +9,7 @@ import type {
 } from "../../actors/code-mode-platform-governor";
 import { codeModePlatformGovernor } from "../../actors/code-mode-platform-governor-stub";
 import type { Env } from "@purin-labs/kernel/env";
-import { resolveActiveOrganisationActor } from "../../actors/actor-router";
+import { resolveActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {
   errorResponse,
   jsonResponse,

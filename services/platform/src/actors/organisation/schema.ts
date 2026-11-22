@@ -3,7 +3,7 @@ import { createActionLedgerSchema } from "../action-ledger";
 import { createCueDeliverySchema } from "../cue-delivery";
 import { createCommerceProjectionSchema } from "../commerce-projection";
 import { createShopifyLocationObservationSchema } from "../../shopify/location-observation";
-import type { SchemaTransaction } from "../schema-migrations";
+import type { SchemaTransaction } from "@purin-labs/actor-runtime/actors/schema-migrations";
 import { createCaseContextDiscoveryEvaluationSchema } from "../../case-context-discovery/evaluation-store";
 import { createEvalSchema } from "../../evals/store";
 import { createMemorySchema } from "../../memory/store";

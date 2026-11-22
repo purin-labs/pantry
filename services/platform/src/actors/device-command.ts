@@ -1,7 +1,7 @@
 import { machineTransition } from "@purin-labs/std/state-machine";
 
 import { DEVICE_COMMAND_MACHINE } from "./device-command.machine";
-import { writeActorTransition } from "./lifecycle/state-transition";
+import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
 
 /**
  * The pauses and resumes that a DeviceFleetActor sends to its gateways

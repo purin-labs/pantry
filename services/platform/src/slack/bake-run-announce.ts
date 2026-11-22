@@ -1,5 +1,5 @@
 import type { BakeRunRecord } from "@purin-labs/kitchen-control-api";
-import { deliverOperationsCard } from "../actors/operations-channel";
+import { deliverOperationsCard } from "@purin-labs/actor-runtime/actors/operations-channel";
 import { readOperationsDestination } from "@purin-labs/tenancy/data/operations-destination";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";

@@ -50,7 +50,7 @@ import {
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 
 export type DraftSharedThread = Readonly<{
   caseId: CaseId;

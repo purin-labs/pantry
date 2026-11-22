@@ -26,7 +26,7 @@ import { runScheduledPaidReceiptDelivery } from "./commerce/paid-receipt";
 import { runFileContextReconciliation } from "./context/files";
 import { runAttachmentCollection } from "./messages/attachment-collection";
 import { runWeeklyChatGptLoginRefresh } from "./models/codex-connection";
-import { runScheduledActorRegistryReconciliation } from "./actors/actor-registry-sweep";
+import { runScheduledActorRegistryReconciliation } from "@purin-labs/actor-runtime/actors/actor-registry-sweep";
 import { handleCommerceWebhook } from "./commerce/webhooks";
 import { handleMenuScreenRequest } from "./control/routes/menu-screens";
 import { handleVoiceMacRequest } from "./voice/mac-routes";
@@ -110,7 +110,7 @@ import "./worker-ports";
 
 export { CodeModePlatformGovernorActor } from "./actors/code-mode-platform-governor";
 
-export { ConversationResidencyActor } from "./actors/conversation-residency";
+export { ConversationResidencyActor } from "@purin-labs/actor-runtime/actors/conversation-residency";
 
 export { DeviceFleetActor } from "./actors/device-fleet";
 export { BakeRunActor } from "./actors/bake-run";

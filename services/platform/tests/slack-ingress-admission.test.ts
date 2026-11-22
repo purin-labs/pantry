@@ -5,11 +5,11 @@ import { describe, expect, it, vi, type TestContext } from "vitest";
 
 import { parseVaultHandle, storeVaultSecret } from "../src/credential-vault";
 import { testRoot } from "./secrets-store";
-import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "../src/actors/actor-schema-versions";
+import { CONNECTOR_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import type {
   ActorActivationRequest,
   ActorActivationResult,
-} from "../src/actors/actor-registry";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
 import { issueControlSession, upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { createOrganisationInstall } from "@purin-labs/tenancy/data/organisation";
 import { parseSlackAppId, type OrganisationId } from "@purin-labs/kernel/ids";

@@ -2,7 +2,7 @@ import {
   isCommerceLedgerAction,
   type ActionLedgerActivity,
 } from "../../actors/action-ledger";
-import { requireActiveOrganisationActorAtScope } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtScope } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { ActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
 import {
   buildOnboardingProjection,

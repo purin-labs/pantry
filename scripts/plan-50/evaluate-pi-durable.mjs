@@ -428,8 +428,8 @@ async function sourceEvidence() {
       "services/platform/src/actors/agent-session-turn-stream.ts",
       "services/platform/src/actors/agent-session-information-flow.ts",
       "services/platform/src/harness-checkpoint.ts",
-      "services/platform/src/actors/actor-export.ts",
-      "services/platform/src/actors/actor-registry.ts",
+      "foundation/actor-runtime/actors/actor-export.ts",
+      "foundation/actor-runtime/actors/actor-registry.ts",
     );
   if (recovery)
     files.push(
@@ -452,7 +452,7 @@ async function sourceEvidence() {
       "services/platform/src/actors/collaboration-room.ts",
       "services/platform/src/actors/commerce-projection.ts",
       "services/platform/src/actors/session-execution-admission.ts",
-      "services/platform/src/actors/actor-activation.ts",
+      "foundation/actor-runtime/actors/actor-activation.ts",
       "foundation/tenancy/organisation-execution-scope.ts",
       "services/platform/migrations-global/0001_current_schema.sql",
       "services/platform/migrations-regional/0001_current_schema.sql",

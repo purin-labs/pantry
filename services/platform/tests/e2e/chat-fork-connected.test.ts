@@ -21,13 +21,13 @@ import {
   type ActorRelocationId,
   startActorRelocation,
   resumeActorRelocation,
-} from "../../src/actors/actor-relocation";
-import { prepareActorRestoreManifest } from "../../src/actors/actor-restore-manifest";
-import { loadActorExport } from "../../src/actors/actor-export";
+} from "@purin-labs/actor-runtime/actors/actor-relocation";
+import { prepareActorRestoreManifest } from "@purin-labs/actor-runtime/actors/actor-restore-manifest";
+import { loadActorExport } from "@purin-labs/actor-runtime/actors/actor-export";
 import {
   startActorRestore,
   resumeActorRestore,
-} from "../../src/actors/actor-restore";
+} from "@purin-labs/actor-runtime/actors/actor-restore";
 import { sha256Hex } from "@purin-labs/std";
 import { env, exports } from "cloudflare:workers";
 import { evictDurableObject } from "cloudflare:test";
@@ -58,7 +58,7 @@ import { CONTEXT_CASE_READ_CAPABILITY } from "../../src/authorization/access-gra
 import {
   requireActiveOrganisationActor,
   resolveActiveSessionActor,
-} from "../../src/actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { readConversation, type ConversationScope } from "../../src/chat/store";
 import {
   chatForkAttachments,

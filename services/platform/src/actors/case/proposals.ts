@@ -3,7 +3,7 @@ import { assertNever } from "@purin-labs/std";
 import { machineTransition } from "@purin-labs/std/state-machine";
 import type { MerchantActionDecision } from "../../approval-authentication";
 import type { ActionLedgerEntry } from "../action-ledger";
-import { writeActorTransition } from "../lifecycle/state-transition";
+import { writeActorTransition } from "@purin-labs/actor-runtime/actors/lifecycle/state-transition";
 import { CASE_APPROVAL_WAIT_MACHINE } from "./approval-wait.machine";
 import { authorityPartitionKeyMatchesRequest } from "../../authorization/access-grants/turn-authority";
 import { FlowBinding } from "../../policy";

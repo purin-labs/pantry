@@ -14,7 +14,7 @@ import type {
   CommerceReceivedDeliveryV1,
 } from "@purin-labs/commerce-client";
 
-import { requireActiveOrganisationActorAtPlacement } from "../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { PendingCommerceCue } from "../actors/commerce-projection";
 import { resolveCommerceMerchantBinding } from "../data/commerce-merchant-binding";
 import {
@@ -28,7 +28,7 @@ import {
   ensureCommerceLowStockCueSnapshot,
 } from "../cues/engine";
 import type { Env } from "@purin-labs/kernel/env";
-import type { OrganisationActorStub } from "../actors/actor-stubs";
+import type { OrganisationActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import {
   createCommerceOutboxReconcileQueueMessage,
   type CommerceOutboxReconcileQueueMessage,

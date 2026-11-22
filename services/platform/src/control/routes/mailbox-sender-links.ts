@@ -8,7 +8,7 @@ import {
   SUPPLIER_ENTITY_TYPE_ID,
 } from "@purin-labs/commerce-client";
 
-import { requireActiveOrganisationActorAtPlacement } from "../../actors/actor-router";
+import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readEmailMailboxAccount } from "../../data/email-mailbox";
 import { resolveActiveProviderAccountContext } from "../../data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";

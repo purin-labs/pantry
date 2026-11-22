@@ -10,8 +10,8 @@ import {
   activateActorRegistryEntry,
   actorActivationRequest,
   reserveActor,
-} from "../../src/actors/actor-registry";
-import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../../src/actors/actor-schema-versions";
+} from "@purin-labs/actor-runtime/actors/actor-registry";
+import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "@purin-labs/actor-runtime/actors/actor-schema-versions";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActorExecutionAdmission } from "../sqlite-d1";

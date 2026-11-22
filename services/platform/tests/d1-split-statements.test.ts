@@ -38,16 +38,16 @@ const REGIONAL_RECEIVER = /(?:scope|execution)(?:\.value)?\.database$/iu;
 // function that names a global-only table prepares it on a receiver matching
 // GLOBAL_RECEIVER, or is traced the same way and listed here.
 const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
-  "services/platform/src/actors/actor-placement-admission.ts": [
+  "foundation/actor-runtime/actors/actor-placement-admission.ts": [
     "actorPlacementDirectoryAdmissionPredicate",
   ],
-  "services/platform/src/actors/actor-relocation.ts": [
+  "foundation/actor-runtime/actors/actor-relocation.ts": [
     "ensureItemExported",
     "markRelocationItemImported",
     "readRelocationItems",
     "relocationSelect",
   ],
-  "services/platform/src/actors/actor-restore.ts": [
+  "foundation/actor-runtime/actors/actor-restore.ts": [
     "markRestoreItemImported",
     "prepareRestoreItemInsert",
     "readRestoreItems",

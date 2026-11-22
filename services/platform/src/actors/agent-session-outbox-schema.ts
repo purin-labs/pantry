@@ -3,8 +3,8 @@ import {
   assertTableExists,
   runSchemaMigrations,
   type SchemaMigrationPlan,
-} from "./schema-migrations";
-import type { CountRow } from "./sql-rows";
+} from "@purin-labs/actor-runtime/actors/schema-migrations";
+import type { CountRow } from "@purin-labs/actor-runtime/actors/sql-rows";
 
 /**
  * The Session's `actor_outbox` after Refactor 15: a terminal `quarantined`

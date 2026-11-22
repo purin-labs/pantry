@@ -3,7 +3,7 @@ import type { CaseContextCollectionMetadataView } from "@purin-labs/control-api"
 import {
   requireActiveOrganisationActorAtPlacement,
   resolveActiveCaseActorAtPlacement,
-} from "../actors/actor-router";
+} from "@purin-labs/actor-runtime/actors/actor-router";
 import { CAPABILITY_KEYS } from "../authorization/capability-catalogue";
 import {
   authorizeCapabilityUse,

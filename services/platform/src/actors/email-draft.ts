@@ -44,7 +44,7 @@ import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { isOrganisationExecutionActive } from "./actor-execution-quiescence";
+import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
 
 const EMAIL_DRAFT_ID = "active";
 
