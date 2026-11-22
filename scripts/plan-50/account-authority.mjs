@@ -3,7 +3,7 @@
 // outside account authority.
 import { acceptedExecutionAuthority } from "../../services/platform/src/organisation-access/access.ts";
 import { compileTurnAuthority } from "../../services/platform/src/authorization/access-grants/turn-authority.ts";
-import { parseUserId } from "../../services/platform/src/ids.ts";
+import { parseUserId } from "../../packages/control-api/src/ids.ts";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope.ts";
 
 // The trial Organisation has one Pantry owner. The trial people keep their

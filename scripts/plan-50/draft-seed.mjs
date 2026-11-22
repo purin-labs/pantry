@@ -5,10 +5,8 @@ import {
   prepareBaseProject,
 } from "../../services/platform/src/projects/default-project.ts";
 import { ORGANISATION_ACTOR_SCHEMA_VERSION } from "../../services/platform/src/actors/actor-schema-versions.ts";
-import {
-  parseOrganisationId,
-  parseUserId,
-} from "../../services/platform/src/ids.ts";
+import { parseOrganisationId } from "../../services/platform/src/ids.ts";
+import { parseUserId } from "../../packages/control-api/src/ids.ts";
 import { ownerUser } from "./account-authority.mjs";
 
 const organisationId = required(

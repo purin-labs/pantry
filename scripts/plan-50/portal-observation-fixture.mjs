@@ -27,7 +27,7 @@ import {
 import { buildAssistantTimelineEvent } from "../../services/platform/src/chat/timeline.ts";
 import { organisationId, userId } from "./proposal-worker.mjs";
 import { authorizeConversation } from "../../services/platform/src/chat/conversation-access.ts";
-import { parseUserId } from "../../services/platform/src/ids.ts";
+import { parseUserId } from "../../packages/control-api/src/ids.ts";
 import { mutateProject } from "../../services/platform/src/projects/commands.ts";
 import { mutateProjectAccess } from "../../services/platform/src/projects/membership.ts";
 import { shareConversation } from "../../services/platform/src/chat/conversation-sharing.ts";

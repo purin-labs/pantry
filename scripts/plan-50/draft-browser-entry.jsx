@@ -2,10 +2,10 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { TaskList } from "../../apps/portal/src/ui/task-list.tsx";
-import { parsePendingInputs } from "../../apps/portal/src/features/chat/api.ts";
+import { parsePendingInputs } from "../../packages/control-api/src/portal/chat.ts";
 import DescriptionEditor from "../../apps/portal/src/features/commerce/description-draft/editor.tsx";
 import { responseJson } from "../../apps/portal/src/control-client.ts";
-import { parseCommerceActionRecordResponse } from "../../apps/portal/src/features/governed-actions/commerce.ts";
+import { parseCommerceActionRecordResponse } from "../../packages/commerce-control-api/src/portal/commerce-actions.ts";
 import "../../apps/portal/src/features/commerce/description-draft/styles.css";
 
 const organisationId = "organisation_plan50_seams";

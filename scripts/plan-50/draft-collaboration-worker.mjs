@@ -11,8 +11,8 @@ import {
 } from "../../services/platform/src/agent-tools/commerce/description-draft-handlers.ts";
 import { settleToolEffect } from "../../services/platform/src/agent-tools/session-support.ts";
 import { uncheckedEffect } from "../../services/platform/src/agent-tools/tool-effect.ts";
-import { createCommerceClient } from "../../services/platform/src/commerce/outbox-worker.ts";
-import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/provider.ts";
+import { createCommerceClient } from "../../services/platform/src/commerce/contract/client.ts";
+import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { createAccessGrant } from "../../services/platform/src/data/access-grants.ts";
 import { SessionExecutionAdmission } from "../../services/platform/src/actors/session-execution-admission.ts";
 import { createOrganisationInstall } from "../../services/platform/src/data/organisation.ts";

@@ -1,3 +1,5 @@
+// Every trial Worker from this one up runs Session turns and grant reads.
+import "./trial-ports.mjs";
 import { CandidateActor as RecoveryActor } from "./recovery-worker.mjs";
 import { registerSession, seedDraftAuthority } from "./draft-seed.mjs";
 import { OrganisationDO } from "../../services/platform/src/actors/organisation.ts";
@@ -30,7 +32,7 @@ import {
 } from "../../services/platform/src/data/access-grants.ts";
 import { parseOrganisationPolicySnapshot } from "../../services/platform/src/policy-snapshot.ts";
 import { parseOrganisationId } from "../../services/platform/src/ids.ts";
-import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/provider.ts";
+import { commerceCanonicalResourceId } from "../../services/platform/src/commerce/contract/resource-ids.ts";
 import { preflightHarnessTurnLease } from "../../services/platform/src/actors/agent-session-harness-authority.ts";
 import {
   admitSessionInformationFlowObservation,
