@@ -377,7 +377,7 @@ Each URL change has one of four times:
 | Square, production app | Point of Sale API web callback `https://pantry.purin.io/portal/square-pos-return` | Early | The owner |
 | | OAuth redirect URL `https://pantry.purin.io/v1/control/providers/square/callback`. Square keeps one redirect URL for each environment | Switch | The owner |
 | Stripe, platform account | Connect OAuth redirect `https://pantry.purin.io/v1/control/providers/stripe/callback` | Early | The owner |
-| | A new Connect webhook endpoint (events of connected accounts) `https://pantry.purin.io/hook/stripe/connect`; its id and signing secret go to `STRIPE_CONNECT_WEBHOOK_ID` and `STRIPE_CONNECT_WEBHOOK_SECRET`. If the commerce engine has `STRIPE_WEBHOOK_SECRET`, a second endpoint `https://commerce.pantry.purin.io/v1/providers/stripe/webhooks` | Live | The owner |
+| | A new Connect webhook endpoint (events of connected accounts) `https://pantry.purin.io/hook/stripe/connect`; its id and signing secret go to `STRIPE_CONNECT_WEBHOOK_ID` and `STRIPE_CONNECT_WEBHOOK_SECRET`. The commerce engine has its own endpoint (the old `underclerk` Worker has `STRIPE_WEBHOOK_SECRET`): a second new endpoint `https://commerce.pantry.purin.io/v1/providers/stripe/webhooks`, whose signing secret goes to `STRIPE_WEBHOOK_SECRET` of `pantry-commerce` | Live | The owner |
 | Shopify, app "Nuki" (`integrations/shopify/shopify.app.toml`) | `redirect_urls` gets `https://pantry.purin.io/v1/control/providers/shopify/callback` beside the old URL | Early | I, with `shopify app deploy`, after the owner's yes |
 | | `application_url` `https://pantry.purin.io/portal` (one value) | Switch | I, as above |
 | | The "Order creation" webhook in the development store's admin (Settings › Notifications › Webhooks, API version `2026-07`) to `https://pantry.purin.io/hook/shopify/<new organisation id>`, when Shopify's protected-customer-data gate refuses the app's own `orders/create` subscription (`integrations/shopify/README.md`). Its signing secret goes in with `pnpm shopify:m8:credentials` | Switch | The owner, after the Shopify connect in the new organisation |
@@ -632,10 +632,17 @@ State on 22 November 2026:
     callbacks, with the old `application_url`.
   - The Google `gcloud` steps wait for the owner's new project. The console
     steps wait for the owner.
-- **Secrets.** Decided by the owner on 22 November 2026: each provider
-  client secret is rotated on the switch day. At most providers the old
-  secret then stops at once, so the old stack loses its provider connects,
-  and a rollback needs another rotation.
+- **Secrets.** Decided by the owner on 22 November 2026: the new stack
+  reuses the current provider client secrets, with no rotation. The owner
+  first answered "rotate on the switch day", then chose reuse in the Plan 93
+  session and confirmed it here. The Plan 93 session set the current Slack,
+  Square, Shopify, Stripe Connect, Airtable, Notion, Dropbox and WhatsApp
+  values on the new Workers. So the old stack keeps working until Plan 93
+  step 5. New values come only from the new Google project and the two new
+  Stripe webhook endpoints.
+- **Live.** Since 22 November 2026, 12:30 JST, `pantry.purin.io` serves the
+  Purin text (Plan 93 redeploy from dev `f6993814`); the privacy and terms
+  pages show "Purin Pantry", so Google brand verification can read them.
 - **4C** and **4D** wait for Plan 93 steps 4 and 5.
 
 ## Built
