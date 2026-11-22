@@ -30,9 +30,10 @@
 //       package of its own (scripts/) keeps a relative path.
 //    5. Each path of a moved file in a lint, a ratchet, a config, a Dockerfile,
 //       a CI file and a document, and the path of each folder that moves
-//       whole. Plans and evidence keep the old paths. A glob of the Worker
-//       source that selects a moved file of a folder that does not move whole
-//       is a fault: the plan adds the new path with an edit.
+//       whole. Plans and evidence keep the old paths in their text; only
+//       the target of a Markdown link to a moved file changes. A glob of the
+//       Worker source that selects a moved file of a folder that does not
+//       move whole is a fault: the plan adds the new path with an edit.
 //    6. scripts/layers.json: one rule for the folder, the package and the
 //       cover. The rule of a folder that moved whole goes.
 //    7. The ratchet files in their own order. No count changes.
@@ -707,6 +708,32 @@ for (const path of tree) {
       );
     });
   }
+  if (changed === 0) continue;
+  counts.paths += changed;
+  put(path, next, "path");
+}
+
+// A frozen document keeps the old paths in its text. A Markdown link is the
+// exception: `pnpm lint:doc-links` refuses a link to a file that is gone, so
+// the target of a link to a moved file follows the file.
+const MARKDOWN_LINK = /(\]\()([^)\s#]+)(?=[)#\s])/g;
+for (const path of tree) {
+  if (!path.endsWith(".md")) continue;
+  if (!FROZEN.some((pattern) => pattern.test(path))) continue;
+  const text = textOf(path);
+  if (text === null) continue;
+  let changed = 0;
+  const next = text.replace(MARKDOWN_LINK, (whole, lead, target) => {
+    if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith("/")) {
+      return whole;
+    }
+    const moved = planFiles.get(
+      posix.normalize(posix.join(posix.dirname(path), target)),
+    );
+    if (moved === undefined) return whole;
+    changed += 1;
+    return lead + relativeSpecifier(posix.dirname(path), moved, "exact");
+  });
   if (changed === 0) continue;
   counts.paths += changed;
   put(path, next, "path");
