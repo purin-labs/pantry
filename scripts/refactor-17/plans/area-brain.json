@@ -1,0 +1,150 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the area brain join one workspace package @purin-labs/area-brain in areas/brain. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is brain/ or commerce/ (the longer lines of sourcePrefixes give this rule, one time for each file, and no two files then share a place), a Portal file goes to ui/ and keeps its sub-path below apps/portal/src/. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker and the Portal manifests. The exports map gives each .ts file of server/ and of ui/ and each style sheet of ui/ as an entry; a .tsx file that another module imports has an entry of its own. The tsconfig of the package reads server/ only. The Worker tsconfigs include areas/*/server and the Portal tsconfig includes areas/*/ui (the preparation commit \"Type checks: the Worker and the Portal programs read the area packages\"), so each file stays in the program that checked it before the move. edits: text edits of the files that name a root folder or a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Its own files (server/case-execution/access.ts, server/evals/access.ts, server/memory/access.ts) read the Env keys CASE, CONNECTOR, ORGANISATION, SESSION, which the Actor files of the Worker and the commerce area merge with declare module. Through the foundation packages that it imports the program also lacks CODE_MODE_SANDBOX, EVENT_Q, MESSAGE_LINK_FETCH, entityPlaneEffect, entityPlaneObservation, entityTypeId, graphQuery, listEntryRef, listId, publishedResourceMetadata, publishedSelector, relationshipRef. The package alone gives 169 errors, 39 of them in its own files. The Worker program checks each file of server/. ",
+  "module": "areas/brain",
+  "target": "areas/brain",
+  "workspaceEntry": "areas/*",
+  "sourcePrefixes": {
+    "services/platform/src/brain/": "server/",
+    "services/platform/src/commerce/": "server/",
+    "services/platform/src/": "server/",
+    "apps/portal/src/": "ui/"
+  },
+  "package": {
+    "name": "@purin-labs/area-brain",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/brain/route": "./ui/features/brain/route.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/commerce-client": "workspace:*",
+      "@purin-labs/commerce-contracts": "workspace:*",
+      "@purin-labs/commerce-control-api": "workspace:*",
+      "@purin-labs/contracts": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/conversation": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "lucide-react": "^0.542.0",
+      "react": "^19.1.1",
+      "react-router": "^7.18.2"
+    },
+    "devDependencies": [
+      "@cloudflare/workers-types",
+      "@types/react",
+      "tsrs"
+    ],
+    "versionsFrom": [
+      "services/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": [
+          "ESNext"
+        ],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": [
+          "@cloudflare/workers-types"
+        ],
+        "allowImportingTsExtensions": true
+      },
+      "include": [
+        "server/**/*.ts"
+      ]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"areas/devices/server\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"areas/devices/server\");\n// The Worker side of the area brain (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/brain/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the package",
+      "find": "PORTAL_SOURCE.push(\"areas/devices/ui\");\n",
+      "replace": "PORTAL_SOURCE.push(\"areas/devices/ui\");\n// The Portal side of the area brain (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/brain/ui\");\n"
+    }
+  ],
+  "keepForm": [],
+  "regenerate": [
+    {
+      "run": [
+        "node",
+        "scripts/check-layers.mjs",
+        "--areas",
+        "--write"
+      ],
+      "writes": [
+        "docs/layers.md"
+      ]
+    }
+  ],
+  "files": {
+    "apps/portal/src/brain-summary.ts": "ui/brain-summary.ts",
+    "apps/portal/src/execution-client.ts": "ui/execution-client.ts",
+    "apps/portal/src/features/brain/address.ts": "ui/features/brain/address.ts",
+    "apps/portal/src/features/brain/api.ts": "ui/features/brain/api.ts",
+    "apps/portal/src/features/brain/case-timeline.tsx": "ui/features/brain/case-timeline.tsx",
+    "apps/portal/src/features/brain/context.tsx": "ui/features/brain/context.tsx",
+    "apps/portal/src/features/brain/eval-editor-model.ts": "ui/features/brain/eval-editor-model.ts",
+    "apps/portal/src/features/brain/eval-editor.tsx": "ui/features/brain/eval-editor.tsx",
+    "apps/portal/src/features/brain/evals-model.ts": "ui/features/brain/evals-model.ts",
+    "apps/portal/src/features/brain/evals.tsx": "ui/features/brain/evals.tsx",
+    "apps/portal/src/features/brain/execution-canvas.tsx": "ui/features/brain/execution-canvas.tsx",
+    "apps/portal/src/features/brain/execution-layout.ts": "ui/features/brain/execution-layout.ts",
+    "apps/portal/src/features/brain/execution-model.ts": "ui/features/brain/execution-model.ts",
+    "apps/portal/src/features/brain/execution.tsx": "ui/features/brain/execution.tsx",
+    "apps/portal/src/features/brain/knowledge-model.ts": "ui/features/brain/knowledge-model.ts",
+    "apps/portal/src/features/brain/knowledge.tsx": "ui/features/brain/knowledge.tsx",
+    "apps/portal/src/features/brain/learning-model.ts": "ui/features/brain/learning-model.ts",
+    "apps/portal/src/features/brain/learning.tsx": "ui/features/brain/learning.tsx",
+    "apps/portal/src/features/brain/model.ts": "ui/features/brain/model.ts",
+    "apps/portal/src/features/brain/overview.tsx": "ui/features/brain/overview.tsx",
+    "apps/portal/src/features/brain/route.tsx": "ui/features/brain/route.tsx",
+    "apps/portal/src/features/brain/seen.ts": "ui/features/brain/seen.ts",
+    "apps/portal/src/features/brain/styles.css": "ui/features/brain/styles.css",
+    "services/platform/src/actors/case-execution-records.ts": "server/actors/case-execution-records.ts",
+    "services/platform/src/actors/connector-eval.ts": "server/actors/connector-eval.ts",
+    "services/platform/src/actors/connector/connector-evals.ts": "server/actors/connector/connector-evals.ts",
+    "services/platform/src/actors/organisation-execution-records.ts": "server/actors/organisation-execution-records.ts",
+    "services/platform/src/case-execution/access.ts": "server/case-execution/access.ts",
+    "services/platform/src/case-execution/projection.ts": "server/case-execution/projection.ts",
+    "services/platform/src/case-execution/timeline.ts": "server/case-execution/timeline.ts",
+    "services/platform/src/control/routes/brain.ts": "server/control/routes/brain.ts",
+    "services/platform/src/control/routes/case-execution.ts": "server/control/routes/case-execution.ts",
+    "services/platform/src/control/routes/evals.ts": "server/control/routes/evals.ts",
+    "services/platform/src/control/routes/memories.ts": "server/control/routes/memories.ts",
+    "services/platform/src/evals/access.ts": "server/evals/access.ts",
+    "services/platform/src/evals/contract/eval-task.ts": "server/evals/contract/eval-task.ts",
+    "services/platform/src/evals/scorer.ts": "server/evals/scorer.ts",
+    "services/platform/src/evals/store.ts": "server/evals/store.ts",
+    "services/platform/src/evals/store.type-fixtures.ts": "server/evals/store.type-fixtures.ts",
+    "services/platform/src/memory/access.ts": "server/memory/access.ts",
+    "services/platform/src/memory/contract/memory-service.ts": "server/memory/contract/memory-service.ts",
+    "services/platform/src/memory/contract/turn-memory.ts": "server/memory/contract/turn-memory.ts",
+    "services/platform/src/memory/store.ts": "server/memory/store.ts",
+    "services/platform/src/memory/store.type-fixtures.ts": "server/memory/store.type-fixtures.ts"
+  }
+}
