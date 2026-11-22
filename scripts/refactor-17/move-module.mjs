@@ -50,6 +50,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   renameSync,
   statSync,
@@ -205,6 +206,26 @@ async function pretty(path, text) {
 }
 async function putJson(path, value, kind) {
   put(path, await pretty(path, `${JSON.stringify(value, null, 2)}\n`), kind);
+}
+
+// A plan names each file at its place on the day of its move. A later move of
+// another module can take a file of keepForm or of an edit: the plans beside
+// this one give its place now.
+const laterMoves = new Map();
+for (const name of readdirSync(dirname(planPath))) {
+  const other = join(dirname(planPath), name);
+  if (!name.endsWith(".json") || other === planPath) continue;
+  const otherPlan = JSON.parse(readFileSync(other, "utf8"));
+  for (const [from, inside] of Object.entries(otherPlan.files ?? {})) {
+    laterMoves.set(from, `${otherPlan.target}/${inside}`);
+  }
+}
+function laterPath(path) {
+  let current = path;
+  while (!known.has(current) && laterMoves.has(current)) {
+    current = laterMoves.get(current);
+  }
+  return known.has(current) ? current : path;
 }
 
 // ---------------------------------------------------------------------------
@@ -561,6 +582,9 @@ const FROM_ROOT = new RegExp(
   "g",
 );
 const RELATIVE_PATH = /(?<![\w/@.-])(\.{1,2}\/[\w@./-]+)/g;
+/** True for a file or a folder of the tree, at its path after the move. */
+const exists = (path) =>
+  known.has(path) || existsSync(join(root, diskPath(path)));
 
 // A folder moves whole when each tracked file in it is in the plan and keeps
 // its place below the folder. A lint, a config or a document can name such a
@@ -662,6 +686,23 @@ for (const path of tree) {
       changed += 1;
       return (
         relativeSpecifier(posix.dirname(path), planFiles.get(target), "exact") +
+        whole.slice(trimmed.length)
+      );
+    });
+  }
+  // A moved document or config: its paths were written for its old folder.
+  if (!SOURCE.test(path) && oldPathOf.has(path)) {
+    const oldFolder = posix.dirname(oldPathOf.get(path));
+    next = next.replace(RELATIVE_PATH, (whole) => {
+      const trimmed = whole.replace(/[.,;:]+$/, "");
+      const here = posix.normalize(posix.join(posix.dirname(path), trimmed));
+      if (exists(here)) return whole;
+      const before = posix.normalize(posix.join(oldFolder, trimmed));
+      const target = planFiles.get(before) ?? (exists(before) ? before : null);
+      if (target === null) return whole;
+      changed += 1;
+      return (
+        relativeSpecifier(posix.dirname(path), target, "exact") +
         whole.slice(trimmed.length)
       );
     });
@@ -776,7 +817,8 @@ for (const path of [...pending.keys()]) {
 // 8. The text edits of the plan: the configs that find files by a root name
 // and that cannot read scripts/lib/source-roots.mjs.
 
-for (const edit of plan.edits ?? []) {
+for (const plannedEdit of plan.edits ?? []) {
+  const edit = { ...plannedEdit, file: laterPath(plannedEdit.file) };
   const text = textOf(edit.file);
   if (text === null) {
     faults.push(`${edit.file}: the plan edits it, and it does not exist`);
@@ -845,7 +887,7 @@ stopOnFaults();
 // does not run. The plan gives the reason for each file.
 
 const keepForm = new Map(
-  (plan.keepForm ?? []).map((entry) => [entry.file, entry.why]),
+  (plan.keepForm ?? []).map((entry) => [laterPath(entry.file), entry.why]),
 );
 for (const file of keepForm.keys()) {
   if (!known.has(file)) {
