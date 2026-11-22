@@ -787,9 +787,12 @@ State on 22 November 2026:
   ID, and both connects returned "You're connected" and show under
   Connected. The test grants are narrow: one Airtable example base
   ("Restaurant Field Guide") and one Notion page ("Demo Satyr Page"); the
-  owner widens them at the provider. The old integrations stay: the local
-  profile still uses the old Airtable client, and the old Notion connection
-  "Satyr" is unused (the owner may delete it).
+  owner widens them at the provider. The old Airtable integration stays,
+  because the local profile still uses its client. The old Notion
+  connection "Satyr" is deleted (23 November 2026, on the owner's
+  request): "Purin Pantry" took its two local redirects
+  (`https://portal.localhost/…` and `https://localhost:3003/…`), and the
+  local `.env.local` now names the new client.
 
 Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 
