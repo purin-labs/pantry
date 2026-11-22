@@ -7,6 +7,7 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "types": ["@cloudflare/workers-types"],
     "allowImportingTsExtensions": true,
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true
