@@ -72,9 +72,9 @@
     },
     {
       "file": "knip.json",
-      "why": "knip reads each package of the new root folder",
+      "why": "knip reads each package of the new root folder and judges each export of it (includeEntryExports, since c8e50933)",
       "find": "    \"packages/*\": {\n      \"entry\": [",
-      "replace": "    \"foundation/*\": {\n      \"project\": [\"**/*.ts\"]\n    },\n    \"packages/*\": {\n      \"entry\": ["
+      "replace": "    \"foundation/*\": {\n      \"project\": [\"**/*.ts\"],\n      \"includeEntryExports\": true\n    },\n    \"packages/*\": {\n      \"entry\": ["
     },
     {
       "file": "package.json",
