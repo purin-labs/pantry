@@ -5,8 +5,9 @@ and after a second review with the owner's request to prune
 ([What the reviews changed](#what-the-reviews-changed)).
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
 S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
-final. The Plan 93 cutover ended on 2026-11-22, so Stage B is open; its first step is
-the trial of D1. On 2026-11-22 the owner asked to finish the
+final; 13 of the 33 specs are written, and the other 20 are in work. The Plan 93
+cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and the kernel
+is the first package since 2026-11-23 (`82d52faa`). On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
 and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
 lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
@@ -399,6 +400,12 @@ the state of the branches and the way to continue.
 
 ### Stage S: started 2026-11-22
 
+State on 2026-11-23: 13 specs are written, each with a second reader and a correction:
+`DEV-01`, `FND-01` to `FND-11` and `COM-01`. The second readers found 3 to 8 false
+statements in each first version, and each spec lists the places where its source
+plans differ from the code. The other 20 specs are in work. A source plan moves to
+`docs/history/` when each spec that it feeds is written.
+
 The condition of step S2 was final brand names (D2: "The spec text waits for the
 brand names"). The Purin names are on `dev` since Plan 91 phase 4A, so S2 started on
 2026-11-22 with one pilot spec, `DEV-01` (Devices, from Plan 85):
@@ -471,9 +478,14 @@ the old stack is deleted. Stage B starts with step 1. In this order:
 1. Done: the trial of D1 ([report](evidence/refactor-17-d1-trial.md)) and its
    decision, a mix ([D1](#decisions)). Done with it: the four Actor stub types left
    `env.ts` for `actors/actor-stubs.ts`, so the kernel reads no key that an Actor
-   file merges into `Env`. Next: the kernel as the first package. That move changes
-   about 1,230 files by script (917 Worker files, 172 unit tests, 101 journeys), so
-   it needs a move date that the other sessions know.
+   file merges into `Env`. Done on 2026-11-23: the kernel is the package
+   `@purin-labs/kernel` in `foundation/kernel/` (`82d52faa`, tags
+   `refactor-17-kernel-before` and `refactor-17-kernel-after`). One run of
+   `scripts/refactor-17/move-module.mjs` changed 1,247 files in a freeze of `dev` of
+   about 7 minutes. The Worker bundle has the same bytes before and after. The
+   [runbook](runbooks/refactor-17-module-move.md) gives the steps of the day and of an
+   open branch. Next: a plan and a dry run for each other foundation module, from the
+   bottom of the order, and one freeze for a group of them.
 2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
    journeys import the inside of the Worker.
 3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of

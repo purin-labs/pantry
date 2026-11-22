@@ -38,18 +38,18 @@ each source file its module.
 
 | Id | Spec | Folder | Written from | State |
 | --- | --- | --- | --- | --- |
-| FND-01 | Tenancy and placement | `foundation/` | `architecture/runtime.md` (data model, placement), Refactor 12, `economics-costs.md` | Not written |
-| FND-02 | Actor runtime | `foundation/` | Plan 14, `architecture/runtime.md` (platform layout, actors) | Not written |
-| FND-03 | Cases, Sessions and conversations | `foundation/` | Plans 15, 42H and 74, Refactor 9, `architecture/runtime.md` (Case coordination, cues) | Not written |
-| FND-04 | Agent harness and model routes | `foundation/` | Plans 28, 73 and 75, `architecture/runtime.md` (harness adapter) | Not written |
-| FND-05 | Messages, attachments and context | `foundation/` | Plans 37 and 42G | Not written |
-| FND-06 | Identity, policy and approval | `foundation/` | `architecture/security.md` | Not written |
-| FND-07 | Information flow | `foundation/` | Plans 27, 27C and 89 | Not written |
-| FND-08 | Vault | `foundation/` | Plans 12 and 79 | Not written |
-| FND-09 | Agent tools and screen context | `foundation/` | Plans 81 and 87 | Not written |
-| FND-10 | Shared drafts | `foundation/` | Plans 40 and 40C | Not written |
-| FND-11 | Contracts | `foundation/` | Plan 78 | Not written |
-| COM-01 | Commerce domain | `areas/commerce/` | `commerce-domain-architecture.md`, `commerce-monorepo.md`, Plan 22 | Not written |
+| FND-01 | [Tenancy and placement](foundation/01-tenancy-and-placement.md) | `foundation/` | `architecture/runtime.md` (data model, placement), Refactor 12, `economics-costs.md` | Written 2026-11-23 |
+| FND-02 | [Actor runtime](foundation/02-actor-runtime.md) | `foundation/` | Plan 14, `architecture/runtime.md` (platform layout, actors) | Written 2026-11-23 |
+| FND-03 | [Cases, Sessions and conversations](foundation/03-cases-sessions-and-conversations.md) | `foundation/` | Plans 15, 42H and 74, Refactor 9, `architecture/runtime.md` (Case coordination, cues) | Written 2026-11-23 |
+| FND-04 | [Agent harness and model routes](foundation/04-agent-harness-and-model-routes.md) | `foundation/` | Plans 28, 73 and 75, `architecture/runtime.md` (harness adapter) | Written 2026-11-23 |
+| FND-05 | [Messages, attachments and context](foundation/05-messages-attachments-and-context.md) | `foundation/` | Plans 37 and 42G | Written 2026-11-23 |
+| FND-06 | [Identity, policy and approval](foundation/06-identity-policy-and-approval.md) | `foundation/` | `architecture/security.md` | Written 2026-11-23 |
+| FND-07 | [Information flow](foundation/07-information-flow.md) | `foundation/` | Plans 27, 27C and 89 | Written 2026-11-23 |
+| FND-08 | [Vault](foundation/08-vault.md) | `foundation/` | Plans 12 and 79 | Written 2026-11-23 |
+| FND-09 | [Agent tools and screen context](foundation/09-agent-tools-and-screen-context.md) | `foundation/` | Plans 81 and 87 | Written 2026-11-23 |
+| FND-10 | [Shared drafts](foundation/10-shared-drafts.md) | `foundation/` | Plans 40 and 40C | Written 2026-11-23 |
+| FND-11 | [Contracts](foundation/11-contracts.md) | `foundation/` | Plan 78 | Written 2026-11-23 |
+| COM-01 | [Commerce domain](areas/commerce/01-commerce-domain.md) | `areas/commerce/` | `commerce-domain-architecture.md`, `commerce-monorepo.md`, Plan 22 | Written 2026-11-23 |
 | COM-02 | Commerce engine | `areas/commerce/` | Plans 76, 76A, 77 and 80 | Not written |
 | COM-03 | Providers and the read layer | `areas/commerce/` | Plans 9 and 47, `integrations/shopify.md` | Not written |
 | COM-04 | Checkout and payments | `areas/commerce/` | Plans 33, 33C and 33D | Not written |
