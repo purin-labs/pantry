@@ -24,7 +24,10 @@ import {
 } from "../connector-email";
 import { nextOperationalEmailMaintenanceAt } from "../connector-email-operational";
 import type { EmailDisposalOutcome } from "../connector-email-proposal";
-import { createConnectorEvalSchema, nextEvalWorkAt } from "../connector-eval";
+import {
+  createConnectorEvalSchema,
+  nextEvalWorkAt,
+} from "@purin-labs/area-brain/server/actors/connector-eval";
 import type { GmailMessageContent } from "@purin-labs/connections/mail/gmail-adapter";
 import { nextMailOrganizationAt } from "../../mail-inbox/store";
 import type { AlarmReconciler } from "@purin-labs/actor-runtime/actors/lifecycle/actor-alarm";

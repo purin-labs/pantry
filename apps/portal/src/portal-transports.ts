@@ -4,7 +4,7 @@ import {
   controlSignal,
   controlMutation,
 } from "@purin-labs/control/portal/control-client";
-import type { BrainTransport } from "./features/brain/api";
+import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import { readMailboxSetup } from "./features/mail-setup/run";
 import type { OrganisationActions } from "./pages/workspaces";
 import type { ProductDescriptionActionTransport } from "./features/commerce/description-draft/editor";

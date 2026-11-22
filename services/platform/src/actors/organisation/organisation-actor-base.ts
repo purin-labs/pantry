@@ -54,7 +54,7 @@ import {
   readEvalCommandReceipt,
   serializeEval,
   settleEvalRunResult,
-} from "../../evals/store";
+} from "@purin-labs/area-brain/server/evals/store";
 import {
   applyMemoryCommand,
   checkSharedReviewLabel,
@@ -66,7 +66,7 @@ import {
   readMemoryCommandReceipt,
   serializeMemory,
   type AcceptedMemoryCursor,
-} from "../../memory/store";
+} from "@purin-labs/area-brain/server/memory/store";
 import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
 import { resolveTypeSafeCredential } from "@purin-labs/agent/integrations/typesafe/authority";
 import {

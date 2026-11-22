@@ -96,7 +96,7 @@ import {
 import {
   ConnectorEvals,
   type ConnectorEvalsRpc,
-} from "./connector/connector-evals";
+} from "@purin-labs/area-brain/server/actors/connector/connector-evals";
 
 export class ConnectorDO
   extends ConnectorActorBase

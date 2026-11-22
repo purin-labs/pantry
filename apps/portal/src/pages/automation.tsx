@@ -54,7 +54,7 @@ import {
 import { useLocation, useNavigate } from "react-router";
 import { pageAddress, pageLink } from "@purin-labs/ui/page-address";
 import { AgentSchedulesPanel } from "../features/agent-schedules/route";
-import type { BrainTransport } from "../features/brain/api";
+import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import {
   runAsync,
   type AgentOperationMutationState,

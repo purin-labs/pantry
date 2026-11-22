@@ -55,7 +55,7 @@ import {
   type WorkspaceNavigationGroup,
   type WorkspaceSystem,
 } from "@purin-labs/ui/route";
-import { useBrainItemsToReview } from "./brain-summary";
+import { useBrainItemsToReview } from "@purin-labs/area-brain/ui/brain-summary";
 import { useRequestsToDecide } from "./features/access/permission-requests-summary";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import "./features/access/permission-requests-drawer.css";

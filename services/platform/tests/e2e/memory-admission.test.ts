@@ -44,17 +44,17 @@ import {
   createTurnMemoryReader,
   TURN_MEMORY_PAGE,
   type TurnMemoryDestination,
-} from "../../src/memory/access";
+} from "@purin-labs/area-brain/server/memory/access";
 import {
   turnMemoryReaderWithoutSubjects,
-} from "../../src/memory/contract/turn-memory";
+} from "@purin-labs/area-brain/server/memory/contract/turn-memory";
 import {
   parseAssignmentId,
   parseSessionId,
   type AssignmentId,
   type SessionId,
 } from "@purin-labs/kernel/ids";
-import { memoryApplicabilityKey } from "../../src/memory/store";
+import { memoryApplicabilityKey } from "@purin-labs/area-brain/server/memory/store";
 import { readCurrentOrganisationPolicySnapshot } from "@purin-labs/authority/policy-snapshot";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import {

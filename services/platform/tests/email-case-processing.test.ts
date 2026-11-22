@@ -138,7 +138,7 @@ import {
   utcDayKey,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
-import { createConnectorEvalSchema } from "../src/actors/connector-eval";
+import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
 import { processEmailThreadTurn } from "../src/actors/email-case-processing";
 import { claimMailResponseOwner } from "../src/mail-inbox/response-store";
 import { platformEnv } from "./worker-fakes";

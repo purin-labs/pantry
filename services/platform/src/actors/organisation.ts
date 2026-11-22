@@ -184,8 +184,8 @@ import {
   type ShopifyLocationObservationInput,
 } from "../shopify/location-observation";
 import type { CaseExecutionEffectRecords } from "@purin-labs/agent/case-execution/records";
-import { readCaseEffectRecords } from "./organisation-execution-records";
-import { type AcceptedMemoryCursor } from "../memory/store";
+import { readCaseEffectRecords } from "@purin-labs/area-brain/server/actors/organisation-execution-records";
+import { type AcceptedMemoryCursor } from "@purin-labs/area-brain/server/memory/store";
 import { cleanupTypeSafeCredentials } from "@purin-labs/agent/integrations/typesafe/connection";
 import { assertNever, errorMessage } from "@purin-labs/std";
 import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-api";

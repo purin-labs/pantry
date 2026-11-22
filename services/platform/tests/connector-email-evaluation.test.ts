@@ -62,7 +62,7 @@ import {
   readEmailRuntime,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
-import { createConnectorEvalSchema } from "../src/actors/connector-eval";
+import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
 import { runConnectorEmailEvaluation } from "../src/actors/connector-email-evaluation";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {

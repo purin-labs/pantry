@@ -373,7 +373,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/memory/**/*.ts"],
+    files: ["areas/brain/server/memory/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -394,7 +394,7 @@ export default [
     },
   },
   {
-    files: ["services/platform/src/evals/**/*.ts"],
+    files: ["areas/brain/server/evals/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -423,8 +423,8 @@ export default [
       "services/platform/src/actors/organisation/organisation-*.ts",
       "foundation/tenancy/actors/organisation/organisation-record.ts",
       "foundation/agent/actors/organisation/organisation-policy.ts",
-      "services/platform/src/memory/access.ts",
-      "services/platform/src/evals/access.ts",
+      "areas/brain/server/memory/access.ts",
+      "areas/brain/server/evals/access.ts",
     ],
     rules: {
       "no-restricted-imports": [

@@ -20,7 +20,7 @@ import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisatio
 import {
   memoryService,
   type TurnMemoryDestination,
-} from "../memory/contract/memory-service";
+} from "@purin-labs/area-brain/server/memory/contract/memory-service";
 
 /**
  * The Memory reader for one mailbox turn.

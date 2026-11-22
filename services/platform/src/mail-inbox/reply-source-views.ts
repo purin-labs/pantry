@@ -12,8 +12,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   memoryService,
   type MemoryReadScope,
-} from "../memory/contract/memory-service";
-import { type ShownMemoryRevision } from "../memory/contract/turn-memory";
+} from "@purin-labs/area-brain/server/memory/contract/memory-service";
+import { type ShownMemoryRevision } from "@purin-labs/area-brain/server/memory/contract/turn-memory";
 import type { Result } from "@purin-labs/kernel/result";
 import { authorizeEmailChatSourceDelivery } from "./chat-source-access";
 import { isOrder, orderQuery, orderSummary } from "./order-context";

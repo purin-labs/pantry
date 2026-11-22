@@ -16,7 +16,7 @@ import {
   registerWhatsAppPhoneNumberAccount,
   setWhatsAppProviderHealth,
 } from "./data/whatsapp";
-import { proposeEvalFromCorrection } from "./evals/access";
+import { proposeEvalFromCorrection } from "@purin-labs/area-brain/server/evals/access";
 import { commerceAccessTargets } from "@purin-labs/authority/access-control/commerce-access-targets";
 import { actionLedgerCommerce } from "@purin-labs/authority/actors/action-ledger";
 import { slackMayApproveAction } from "./commerce/action-model";
@@ -69,8 +69,8 @@ import {
   proposeMemoryFromCorrection,
   readMemoryViews,
   readShownMemoryStanding,
-} from "./memory/access";
-import { memoryService } from "./memory/contract/memory-service";
+} from "@purin-labs/area-brain/server/memory/access";
+import { memoryService } from "@purin-labs/area-brain/server/memory/contract/memory-service";
 import { CARD_ONLY_REPLY_INSTRUCTION } from "@purin-labs/tool-handlers/slack/card-only-reply";
 import {
   readSlackConversationFact,

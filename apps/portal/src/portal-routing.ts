@@ -4,7 +4,7 @@ import {
   brainViewSection,
   readBrainAddress,
   type BrainView,
-} from "./features/brain/address";
+} from "@purin-labs/area-brain/ui/features/brain/address";
 import {
   workspaceResourcePath,
   type AccessSubview,

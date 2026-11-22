@@ -192,17 +192,18 @@ import. A module with no line for one of these has none.
 ## areas/brain
 
 - Folders: 10
-  - `apps/portal/src/`
-  - `apps/portal/src/features/brain/`
-  - `services/platform/src/actors/`
-  - `services/platform/src/actors/connector/`
-  - `services/platform/src/case-execution/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/evals/`
-  - `services/platform/src/evals/contract/`
-  - `services/platform/src/memory/`
-  - `services/platform/src/memory/contract/`
-- Public files: `apps/portal/src/execution-client.ts`, `apps/portal/src/features/brain/address.ts`, `apps/portal/src/features/brain/api.ts`, `services/platform/src/evals/contract/`, `services/platform/src/evals/scorer.ts`, `services/platform/src/memory/contract/`
+  - `areas/brain/server/actors/`
+  - `areas/brain/server/actors/connector/`
+  - `areas/brain/server/case-execution/`
+  - `areas/brain/server/control/routes/`
+  - `areas/brain/server/evals/`
+  - `areas/brain/server/evals/contract/`
+  - `areas/brain/server/memory/`
+  - `areas/brain/server/memory/contract/`
+  - `areas/brain/ui/`
+  - `areas/brain/ui/features/brain/`
+- Packages: `areas/brain`
+- Public files: `areas/brain/server/evals/contract/`, `areas/brain/server/evals/scorer.ts`, `areas/brain/server/memory/contract/`, `areas/brain/ui/execution-client.ts`, `areas/brain/ui/features/brain/address.ts`, `areas/brain/ui/features/brain/api.ts`
 
 ## areas/cafe
 

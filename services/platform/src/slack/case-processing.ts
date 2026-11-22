@@ -2,7 +2,7 @@ import { workspacePortalUrl } from "./portal-links";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
-} from "../memory/contract/turn-memory";
+} from "@purin-labs/area-brain/server/memory/contract/turn-memory";
 import { ensureCaseProject } from "@purin-labs/conversation/projects/case-project";
 import { isSlackGoalMessage } from "@purin-labs/conversation/slack/goal-command";
 import { deliverAndSettleCaseOutput } from "@purin-labs/conversation/actors/case-walking-path";

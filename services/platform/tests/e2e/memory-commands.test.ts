@@ -15,7 +15,7 @@ import {
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import { readChatControlAuthority } from "@purin-labs/conversation/chat/information-flow";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { restoreSerializedMemory } from "../../src/memory/store";
+import { restoreSerializedMemory } from "@purin-labs/area-brain/server/memory/store";
 import {
   canonicalFlowLabel,
   createCurrentSourceFlowLabel,

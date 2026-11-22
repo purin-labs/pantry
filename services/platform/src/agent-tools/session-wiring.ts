@@ -27,7 +27,7 @@ import { TOOL_REGISTRY, type ToolServices } from "./registry";
 import { slackThreadSideCase } from "../slack/side-cases";
 import { sessionConversation } from "@purin-labs/conversation/chat/session-conversation";
 import { proposeSlackSideCaseForHarness } from "./slack/side-case-proposal";
-import { proposeMemoryFromInstruction } from "../memory/access";
+import { proposeMemoryFromInstruction } from "@purin-labs/area-brain/server/memory/access";
 import { slackToolServices } from "./slack/turn-services";
 import { sessionOwnToolServices } from "@purin-labs/tool-handlers/actors/session/own-tool-services";
 import {

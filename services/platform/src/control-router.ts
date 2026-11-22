@@ -100,7 +100,7 @@ import {
   handleMemoryRoute,
   matchMemoryRoute,
   type MemoryRoute,
-} from "./control/routes/memories";
+} from "@purin-labs/area-brain/server/control/routes/memories";
 import {
   handleVaultRoute,
   matchVaultRoute,
@@ -110,17 +110,17 @@ import {
   handleEvalRoute,
   matchEvalRoute,
   type EvalRoute,
-} from "./control/routes/evals";
+} from "@purin-labs/area-brain/server/control/routes/evals";
 import {
   handleBrainRoute,
   matchBrainRoute,
   type BrainRoute,
-} from "./control/routes/brain";
+} from "@purin-labs/area-brain/server/control/routes/brain";
 import {
   handleCaseExecutionRoute,
   matchCaseExecutionRoute,
   type CaseExecutionRoute,
-} from "./control/routes/case-execution";
+} from "@purin-labs/area-brain/server/control/routes/case-execution";
 import { handleProductDescriptionDraftRoute } from "./control/routes/product-description-draft";
 import {
   matchProductDescriptionDraftRoute,

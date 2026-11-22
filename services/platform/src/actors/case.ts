@@ -7,7 +7,7 @@ import type {
 import {
   readCaseExecutionContent,
   readCaseExecutionRecords,
-} from "./case-execution-records";
+} from "@purin-labs/area-brain/server/actors/case-execution-records";
 import {
   acceptCaseEmailProposal,
   readCaseEmailProposals,

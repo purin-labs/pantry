@@ -26,7 +26,7 @@ import {
 import { readConversation, saveConversation } from "@purin-labs/conversation/chat/store";
 import { readActiveOrganisationMembership } from "@purin-labs/tenancy/data/control-plane";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { entityRefOrNull } from "../../src/memory/store";
+import { entityRefOrNull } from "@purin-labs/area-brain/server/memory/store";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceClient, commerceWorkspace } from "./commerce-support";
 import { network } from "./network";

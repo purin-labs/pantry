@@ -21,14 +21,14 @@ import {
   readExecutionNode,
   executionErrorMessage,
   type ReadCaseExecution,
-} from "../../execution-client";
+} from "@purin-labs/area-brain/ui/execution-client";
 import {
   nodeTitle,
   nodeStatus,
   nodeFacts,
   contentRoleLabel,
   limitationSentence,
-} from "../brain/execution-model";
+} from "@purin-labs/area-brain/ui/features/brain/execution-model";
 import {
   Trace,
   TraceCollapsible,

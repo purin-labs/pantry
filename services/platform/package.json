@@ -79,6 +79,7 @@
     "@purin-labs/tool-handlers": "workspace:*",
     "@purin-labs/ui": "workspace:*",
     "@purin-labs/area-devices": "workspace:*",
+    "@purin-labs/area-brain": "workspace:*",
     "typebox": "1.3.27"
   },
   "devDependencies": {

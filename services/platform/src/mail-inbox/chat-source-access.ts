@@ -4,7 +4,7 @@ import { selectActiveGrants } from "@purin-labs/authority/authorization/access-g
 import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
-import { memoryService } from "../memory/contract/memory-service";
+import { memoryService } from "@purin-labs/area-brain/server/memory/contract/memory-service";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {
   createCurrentObservedSourceFlowLabel,

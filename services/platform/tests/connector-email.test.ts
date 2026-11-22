@@ -26,7 +26,7 @@ import {
   utcDayKey,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
-import { createConnectorEvalSchema } from "../src/actors/connector-eval";
+import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 
 const NOW = 1_784_016_325_277;

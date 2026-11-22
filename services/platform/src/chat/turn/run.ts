@@ -11,7 +11,7 @@ import {
   checkConversationDisclosure,
   conversationAudienceMayReceive,
 } from "@purin-labs/conversation/chat/conversation-disclosure";
-import { createTurnMemoryReader } from "../../memory/access";
+import { createTurnMemoryReader } from "@purin-labs/area-brain/server/memory/access";
 import { listProjectMembers } from "@purin-labs/conversation/projects/access";
 import { bindConversationTurnAccess } from "@purin-labs/conversation/chat/turn-access";
 import { authorizeConversation } from "@purin-labs/conversation/chat/conversation-access";

@@ -28,15 +28,15 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
 import type { AgentOperationsSnapshot } from "@purin-labs/commerce-control-api/portal/agent-operations";
-import { useBrainSummary } from "../brain-summary";
-import type { BrainTransport } from "../features/brain/api";
+import { useBrainSummary } from "@purin-labs/area-brain/ui/brain-summary";
+import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import {
   SAMPLE_EXECUTION_CASES,
   sampleCaseTimeline,
   sampleExecutionDetail,
   sampleExecutionPage,
 } from "./brain-execution-sample";
-import { BrainRoute } from "../features/brain/route";
+import { BrainRoute } from "@purin-labs/area-brain/ui/features/brain/route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { installChatPreviewFetch } from "./chat-preview-data";

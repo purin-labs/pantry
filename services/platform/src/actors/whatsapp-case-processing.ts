@@ -1,7 +1,7 @@
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import {
   turnMemoryReaderWithoutSubjects,
-} from "../memory/contract/turn-memory";
+} from "@purin-labs/area-brain/server/memory/contract/turn-memory";
 import type { SqlStorage } from "@cloudflare/workers-types";
 import type { WhatsAppAgentMode } from "@purin-labs/control-api";
 

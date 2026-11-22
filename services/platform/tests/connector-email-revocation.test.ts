@@ -19,7 +19,7 @@ import {
   type EmailDraftState,
   type EmailIngressLimits,
 } from "../src/actors/connector-email";
-import { createConnectorEvalSchema } from "../src/actors/connector-eval";
+import { createConnectorEvalSchema } from "@purin-labs/area-brain/server/actors/connector-eval";
 import { dispatchEmailReply } from "../src/actors/connector-email-proposal";
 import { emptySqliteFixture, sqlStorage } from "./sqlite-storage";
 import { platformEnv } from "./worker-fakes";

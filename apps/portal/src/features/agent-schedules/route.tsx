@@ -21,7 +21,7 @@ import {
   executionErrorMessage,
   readScheduleRuns,
   type BrainTransport,
-} from "../brain/api";
+} from "@purin-labs/area-brain/ui/features/brain/api";
 import {
   ScheduleLanes,
   type ScheduledAgent,

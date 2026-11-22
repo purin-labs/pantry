@@ -17,7 +17,7 @@ import type {
   AgentOperationsSnapshot,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { AgentSchedulesPanel } from "../features/agent-schedules/route";
-import type { BrainTransport } from "../features/brain/api";
+import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 
 // Two timelines that reuse TimeLanes, with the sample café's Friday:
 // `?view=schedules` (Agents › Schedules) and `?view=payments` (Payments).

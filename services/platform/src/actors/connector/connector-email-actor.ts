@@ -1,6 +1,6 @@
 import { admitNamedConnector } from "@purin-labs/conversation/actors/connector/module-admission";
 import type { ConnectorModuleHost } from "@purin-labs/conversation/actors/connector/channel-adapter";
-import type { ConnectorEvals } from "./connector-evals";
+import type { ConnectorEvals } from "@purin-labs/area-brain/server/actors/connector/connector-evals";
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   createContinueSerialQueue,
@@ -90,7 +90,7 @@ import type {
   ClaimedEvalTask,
   EvalTaskEnd,
   EvalTaskServices,
-} from "../../evals/contract/eval-task";
+} from "@purin-labs/area-brain/server/evals/contract/eval-task";
 import { runMailboxEvalTask } from "../eval-task-processing";
 import {
   establishConnectorEmailWatch,

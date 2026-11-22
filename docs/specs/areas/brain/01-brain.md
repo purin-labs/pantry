@@ -262,7 +262,7 @@ records one Memory outcome.
   TypeScript types with hand-written parsers on the `@purin-labs/std` guards, not
   TypeBox schemas.
 - Public files of the area (`scripts/layers.json`): `memory/contract/`,
-  `evals/contract/`, `evals/scorer.ts`, `apps/portal/src/execution-client.ts`,
+  `evals/contract/`, `evals/scorer.ts`, `areas/brain/ui/execution-client.ts`,
   `features/brain/api.ts` and `features/brain/address.ts`.
 - Entry points: `memory/access.ts` (`readMemoryViews`, `commandMemoryAsOperator`,
   `countMemoriesToReview`, the turn readers), `evals/access.ts` (`readEvalViews`,

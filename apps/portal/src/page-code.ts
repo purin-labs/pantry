@@ -196,7 +196,7 @@ async function loadVaultRoute() {
 }
 
 async function loadBrainRoute() {
-  const module = await import("./features/brain/route");
+  const module = await import("@purin-labs/area-brain/ui/features/brain/route");
   return { default: module.BrainRoute };
 }
 
