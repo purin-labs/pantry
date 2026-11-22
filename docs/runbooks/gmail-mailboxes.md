@@ -35,15 +35,16 @@ ${PANTRY_OAUTH_CALLBACK_ORIGIN}/v1/control/providers/gmail/callback
 ${PANTRY_OAUTH_CALLBACK_ORIGIN}/hook/email/google
 ```
 
-Gmail runs in its own Google Cloud project, `satyr-gmail-dev`, separate from
-`seams-501403`, which serves portal sign-in and must never receive Gmail
-scopes or credentials — a consent screen is per-project, so restricting one
-restricts every flow that shares it. The pilot project is External with
-Testing status, so refresh tokens expire after seven days and every mailbox
-needs weekly reconnection; `GMAIL_OAUTH_PILOT_EXPIRY_DAYS` makes the console
-project each expiry and warn before it lapses. Production will be a third,
-separate project, created later and published together with restricted-scope
-verification.
+Production Gmail runs in the Google Cloud project `purin-pantry` (Plan 93
+step 4), with one web client for sign-in, Gmail and Drive (the owner's
+decision in Plan 91 phase 4). Its consent screen is External and "In
+production", so refresh tokens do not end after seven days, and
+`GMAIL_OAUTH_PILOT_EXPIRY_DAYS` is not set. Until Google verifies the
+restricted Gmail scopes, a connect shows Google's "unverified app" screen,
+and at most 100 people can connect. Because sign-in shares the project, a
+restriction on the project would also stop sign-in. Local development still
+uses the pilot project `satyr-gmail-dev` (External, Testing, so tokens end
+after seven days) until Plan 93 step 5.
 
 `GMAIL_PUBSUB_TOPIC` is passed verbatim to `users.watch`. The topic must grant
 `roles/pubsub.publisher` to `gmail-api-push@system.gserviceaccount.com` or the

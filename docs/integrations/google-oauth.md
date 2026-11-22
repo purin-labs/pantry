@@ -4,11 +4,29 @@ Inventory recorded 2026-09-08 from the local Worker configuration and the
 owner's Google Cloud Console screenshots. Client IDs are public identifiers.
 Secret values must never be added to this document.
 
-Pantry uses three separate web application OAuth clients. Google SSO signs a
-person into Pantry; Gmail and Drive connect that person's provider accounts.
-Each flow has its own credentials and callback path.
+Google SSO signs a person into Pantry; Gmail and Drive connect that person's
+provider accounts. Each flow has its own callback path.
 
-## Client inventory
+## Production: one client in project `purin-pantry`
+
+Since Plan 93 step 4 (22 November 2026), production uses one web client,
+"Purin Pantry web", in the Google Cloud project `purin-pantry` (number
+`136715459438`), for all three flows. The consent screen is External and
+"In production"; Google verification of the Gmail scopes is still open, so
+Gmail and Drive connects show Google's "unverified app" screen and count
+against the 100-user cap. Sign-in asks only `openid`, `email` and `profile`.
+
+```text
+136715459438-i2qutsi27kb4ka9c3qkhvu1v42jvuhdq.apps.googleusercontent.com
+```
+
+`GOOGLE_OIDC_CLIENT_ID`, `GMAIL_OAUTH_CLIENT_ID` and `GDRIVE_OAUTH_CLIENT_ID`
+in `env.production.vars` name it, and the three `*_CLIENT_SECRET` Worker
+secrets hold its one secret. `GDRIVE_PICKER_APP_ID` is the project number,
+and `GDRIVE_PICKER_API_KEY` is the key "Pantry Picker", limited to the
+Picker API and `https://pantry.purin.io/*`.
+
+## Local development: three clients until Plan 93 step 5
 
 | Purpose                  | Google Cloud project shown in Console | Client ID setting        | Client secret setting        |
 | ------------------------ | ------------------------------------- | ------------------------ | ---------------------------- |
@@ -16,33 +34,15 @@ Each flow has its own credentials and callback path.
 | Gmail integration        | `Pantry Gmail Development`             | `GMAIL_OAUTH_CLIENT_ID`  | `GMAIL_OAUTH_CLIENT_SECRET`  |
 | Google Drive integration | `pantry-drive-pilot`                   | `GDRIVE_OAUTH_CLIENT_ID` | `GDRIVE_OAUTH_CLIENT_SECRET` |
 
-Project labels above identify the observed Console projects; they are not a
-verified inventory of Google Cloud project IDs. The Drive client display name
-is `Pantry Google Drive (dev)`.
-
-### Google SSO login
-
 ```text
 971053349716-6307q8845efbiript6fbj86jo11mcfr4.apps.googleusercontent.com
-```
-
-### Gmail integration
-
-```text
 502066821359-gurke0m6ja02sv7t824lgei8f93vvn04.apps.googleusercontent.com
-```
-
-### Google Drive integration
-
-```text
 791319521481-4ebf0qsifdtqddm66ev837ouem2kffc1.apps.googleusercontent.com
 ```
 
-These IDs match `services/platform/wrangler.jsonc` → `env.local.vars`.
-Production Gmail also declares the listed Gmail ID in `env.production.vars`.
-Production SSO and Drive IDs remain configured through Cloudflare secrets;
-their deployed values have not been inventoried here. Do not overwrite them
-with local values without checking the selected production client.
+These ids are in `env.local.vars` of `services/platform/wrangler.jsonc`, in
+the same order (SSO, Gmail, Drive). Plan 93 step 5 moves local development to
+`purin-pantry` before it deletes the old Gmail and Drive projects.
 
 ## Redirect allowlists
 

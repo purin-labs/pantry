@@ -9,15 +9,16 @@ lives in [Gmail mailboxes](gmail-mailboxes.md).
 
 ## Provisioned infrastructure
 
-The Pub/Sub half is built in Google Cloud project `satyr-gmail-dev`:
+The production Pub/Sub half is built in Google Cloud project `purin-pantry`
+(Plan 93 step 4):
 
 | Resource        | Value                                                                        |
 | --------------- | ---------------------------------------------------------------------------- |
-| Topic           | `projects/satyr-gmail-dev/topics/satyr-gmail-push`                           |
+| Topic           | `projects/purin-pantry/topics/pantry-gmail-push`                             |
 | Gmail publisher | `gmail-api-push@system.gserviceaccount.com` granted `roles/pubsub.publisher` |
-| Push identity   | `satyr-gmail-push@satyr-gmail-dev.iam.gserviceaccount.com` (no key issued)   |
+| Push identity   | `pantry-gmail-push@purin-pantry.iam.gserviceaccount.com` (no key issued)     |
 | Token minting   | Pub/Sub service agent granted `roles/iam.serviceAccountTokenCreator`         |
-| Subscription    | `satyr-gmail-push-sub`, OIDC, 30s ack, 1d retention                          |
+| Subscription    | `pantry-gmail-push-sub`, OIDC, audience = push endpoint, no expiry           |
 | Push endpoint   | `https://pantry.purin.io/hook/email/google`                  |
 
 Gmail API and Pub/Sub API are enabled on that project.
@@ -75,34 +76,17 @@ data worth keeping, it needs a hand-written delta instead. This has not been
 verified against production here — the available API token lacks D1 query
 permission.
 
-## Finishing the setup in the Console
+## The setup in the Console (done for production)
 
-1. Open the OAuth consent screen for `satyr-gmail-dev` and choose **External**
-   with **Testing** status. Add the development team and each canary mailbox as
-   test users. Accept weekly reconnection as the pilot cost. Do not touch
-   `seams-501403`: its consent screen serves portal sign-in, and adding Gmail
-   scopes there would restrict login for everyone.
-2. Add exactly these scopes: `openid`, `email`,
-   `https://www.googleapis.com/auth/gmail.readonly`,
-   `https://www.googleapis.com/auth/gmail.compose`.
-3. Create an OAuth client of type **Web application**. Set one authorized
-   redirect URI, byte for byte:
-   `https://pantry.purin.io/v1/control/providers/gmail/callback`
-4. Put the client ID in `wrangler.jsonc` as `GMAIL_OAUTH_CLIENT_ID`, and set the
-   secret yourself so it never lands in the repo:
-
-```text
-pnpm --filter @purin-labs/platform exec wrangler secret put GMAIL_OAUTH_CLIENT_SECRET
-```
-
-5. `GMAIL_OAUTH_PILOT_EXPIRY_DAYS` is already set to `7` so the console
-   projects each mailbox's expiry. Remove it once the project is verified and
-   refresh tokens stop expiring.
-6. Deploy, then run the canary sequence below.
-
-Use a dedicated canary mailbox, never a real support address. In a Testing
-project the refresh token expires after seven days, so plan to either finish
-inside that window or reconnect.
+Plan 93 step 4 set up project `purin-pantry` on 22 November 2026: an External
+consent screen "In production" with the scopes `openid`, `userinfo.email`,
+`userinfo.profile`, `gmail.readonly`, `gmail.compose`, `gmail.send` and
+`drive.file`, and one web client, "Purin Pantry web", whose redirect URIs are
+the sign-in, Gmail and Drive callbacks on `https://pantry.purin.io`. The
+client id is in `env.production.vars` as `GOOGLE_OIDC_CLIENT_ID`,
+`GMAIL_OAUTH_CLIENT_ID` and `GDRIVE_OAUTH_CLIENT_ID`, and its secret is the
+Worker secret of each. Open: Google verification of the restricted Gmail
+scopes (the logo upload and the submission are the owner's).
 
 ## Canary sequence
 

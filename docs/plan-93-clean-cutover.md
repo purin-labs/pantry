@@ -604,6 +604,40 @@ A signed Slack `url_verification` to
 `https://slack.pantry.purin.io/slack/events` returns its challenge, so the
 Slack request URLs can switch.
 
+**Stripe webhooks.** With the owner's yes, two new test-mode endpoints were
+made by API, with the events and API version of the old ones:
+`https://pantry.purin.io/hook/stripe/connect` (Connect, 5 events) and
+`https://commerce.pantry.purin.io/v1/providers/stripe/webhooks` (Connect, 8
+events). Their ids and signing secrets are in the `PANTRY_STACK_` block and
+on `pantry` and `pantry-commerce`, with the commerce engine's Stripe keys. A
+wrong signature gets 401 (Platform) and 400 (commerce engine); a correctly
+signed event of an ignored type gets 200.
+
+**Google: the new project `purin-pantry`** (Plan 91 phase 4, decision 2:
+one project for sign-in, Gmail and Drive). The Plan 91 phase 4 session made
+the project with `gcloud`: the Gmail, Drive, Picker and Pub/Sub APIs, the
+topic `pantry-gmail-push` (publisher: `gmail-api-push@system`), the push
+service account `pantry-gmail-push`, the push subscription to
+`https://pantry.purin.io/hook/email/google` (OIDC, audience the same URL)
+and the Picker key. In the owner's Chrome, with the owner's yes (including
+the agreement to Google's API Services User Data Policy), I made the consent
+screen (External, "In production", home page `https://purin.io`, the
+privacy and terms pages, domain `purin.io`, the seven scopes) and the web
+client "Purin Pantry web" with the three callbacks. The production profile
+names the client, the project number, the topic and the service account, and
+`GMAIL_OAUTH_PILOT_EXPIRY_DAYS` is gone ("In production" tokens do not end
+after seven days). The secrets are set on `pantry`. Open: Google verification
+of the restricted Gmail scopes and the logo (the owner's), and the move of
+local development, which still uses `satyr-gmail-dev`, `satyr-drive-pilot`
+and the `seams-501403` sign-in client, before step 5 deletes them.
+
+A fault on the way: a `find` call on the "client created" dialog returned the
+label of its copy button, which holds the full client secret, so that secret
+entered the session transcript. It was replaced at once: a second secret was
+made and saved through a local file, and the first one was disabled and
+deleted before any Worker used it. Never read the page of a Google client
+secret dialog with a tool that returns element labels.
+
 ### 4. Switch the outside parties
 
 The owner does the provider consoles. I do the rest.
