@@ -259,7 +259,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/stripe/`
 - Packages: `packages/commerce-client`, `packages/commerce-contracts`, `packages/commerce-control-api`, `packages/commerce-query-sqlite`, `packages/product-description-crdt`, `services/commerce`
 - Tables (13): `campaign_brief`, `commerce_capability_activation`, `commerce_export_preset_publication`, `commerce_lab_organisation`, `commerce_lab_run`, `commerce_webhook_subscription`, `paid_receipt`, `supplier_destination_revision`, `supplier_payable`, `supplier_payout`, `supplier_payout_attempt`, `supplier_payout_certification`, `supplier_payout_event`
-- Public files: `apps/portal/src/features/commerce/entity-plane/api.ts`, `apps/portal/src/features/commerce/operations.ts`, `apps/portal/src/features/commerce/stock-status.ts`, `apps/portal/src/features/governed-actions/commerce.ts`, `apps/portal/src/features/governed-actions/decision-labels.ts`, `packages/commerce-contracts`, `services/platform/src/commerce/contract/`
+- Public files: `apps/portal/src/features/commerce/description-draft/styles.css`, `apps/portal/src/features/commerce/entity-plane/api.ts`, `apps/portal/src/features/commerce/operations.ts`, `apps/portal/src/features/commerce/stock-status.ts`, `apps/portal/src/features/governed-actions/commerce.ts`, `apps/portal/src/features/governed-actions/decision-labels.ts`, `packages/commerce-contracts`, `services/platform/src/commerce/contract/`
 
 ## areas/devices
 
@@ -325,7 +325,7 @@ import. A module with no line for one of these has none.
   - `services/platform/src/provider-lifecycle/`
   - `services/platform/src/provider-workflows/`
 - Tables (8): `credential_rotation`, `custom_connector`, `custom_connector_account_binding`, `custom_connector_revision`, `custom_connector_setup_attempt`, `discord_interaction_install`, `mail_classification_eligibility`, `provider_account_cleanup`
-- Public files: `apps/portal/src/features/integrations/archive-confirm.tsx`, `apps/portal/src/features/integrations/connect-consent-dialog.tsx`, `apps/portal/src/features/integrations/connection-dialog.tsx`, `apps/portal/src/features/integrations/custom-connector-api.ts`, `apps/portal/src/features/jev-features/api.ts`, `apps/portal/src/features/jev-features/paid-use.tsx`, `apps/portal/src/integration-catalogue.ts`, `apps/portal/src/provider-onboarding.tsx`, `services/platform/src/integrations/contract/`, `services/platform/src/mail/gmail-oauth.ts`
+- Public files: `apps/portal/src/features/integrations/archive-confirm.tsx`, `apps/portal/src/features/integrations/connect-consent-dialog.tsx`, `apps/portal/src/features/integrations/connection-dialog.tsx`, `apps/portal/src/features/integrations/custom-connector-api.ts`, `apps/portal/src/features/jev-features/api.ts`, `apps/portal/src/features/jev-features/paid-use.tsx`, `apps/portal/src/features/jev-features/styles.css`, `apps/portal/src/features/vault/styles.css`, `apps/portal/src/integration-catalogue.ts`, `apps/portal/src/provider-onboarding.tsx`, `services/platform/src/integrations/contract/`, `services/platform/src/mail/gmail-oauth.ts`
 
 ## areas/kitchen
 
