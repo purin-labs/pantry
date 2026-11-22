@@ -745,6 +745,45 @@ possible after this step.
   `pnpm lint:physics-bundle` and `scripts/check-physics-dist.mjs` must pass.
   The files stay in the git history of the import commit.
 
+#### Step 5 results (22 November 2026)
+
+The owner said "Yes, delete the old stack" after the switch checks, with the
+full list: the nine Workers and their Durable Objects, the container
+applications, both databases (the organisations "Satyr workspace" and "Plan
+95 gate test" with all their records), the three buckets, `POLICY_KV`, the
+four queues, the five old Secrets Store roots, the three old Stripe test
+webhooks and the shop voice service on this Mac. The script
+(`rel93-delete-old.mjs`, in the session scratchpad) holds fixed lists of old
+names, refuses any `pantry*` or `purin*` name, and runs Wrangler from a folder
+with no Wrangler profile, so `--name` is the only target.
+
+- The shop voice service: its own `launchd.remove()` took the job
+  `sh.seams.satyr.shop-voice` out, and `~/.satyr-voice` (2.5 GB) went to the
+  Trash, so its models can still serve a later enrollment.
+- The queue consumers of `satyr-events` and `satyr-cues`, then the nine
+  Workers, in the plan's order. Right after: `pantry.purin.io` (Portal,
+  `/health`, the Google sign-in start), `commerce.pantry.purin.io`,
+  `docs.pantry.purin.io` and `shop.purin.io` answered; the workers.dev
+  addresses of `satyr-edge` and `underclerk` answered 404, and
+  `shop.seams.tokyo` did not answer.
+- The four container applications and the two databases.
+- The buckets `satyr-archive-apac` (441 objects) and `underclerk-apac`
+  (24), emptied through the R2 API and deleted. The API throttles at about
+  1,200 requests in five minutes, so the 3,574 objects of
+  `satyr-repo-binaries-apac` go at about three a second.
+
+Kept on purpose: the Google projects `satyr-gmail-dev` and
+`satyr-drive-pilot`, which local development still uses; the old R2 token of
+CI (the owner's, in the dashboard of the Pantry account: add
+`pantry-repo-binaries-apac` to it, or make a new one, and remove the old
+bucket from it); the old provider URLs, which the Plan 91 phase 4 session
+removes in the consoles.
+
+Moved to its own task: the old Kitchen physics bundles. It is a change in
+the Kitchen area (the pins, the 45 `BAKERY_APPLIANCE_BUILDS` entries, the R2
+manifest and the physics lints), not part of the cutover; no saved run can
+name an old bundle now.
+
 ### 6. Clean the records
 
 - Update AGENTS.md ("Old and new names", "Active runtime", "Deployment"),
