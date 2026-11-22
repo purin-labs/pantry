@@ -338,7 +338,7 @@ const WORKSPACE_PAGE_DESCRIPTORS: Record<
     navigationLabel: "Jev",
     title: "Jev",
     description:
-      "Choose which Seams Pantry features may send data to TypeSafe Jev.",
+      "Choose which Purin Pantry features may send data to TypeSafe Jev.",
     group: "Settings",
     resource: { kind: "none" },
   },
@@ -527,7 +527,7 @@ export function workspacePageDocumentTitle(
   workspaceName: string,
   resourceId: string | null,
 ): string {
-  return `${workspacePageHeader(descriptor, resourceId).title} · ${workspaceName} · Seams Pantry`;
+  return `${workspacePageHeader(descriptor, resourceId).title} · ${workspaceName} · Purin Pantry`;
 }
 
 export function organisationPath(organisationHandle: string): string {

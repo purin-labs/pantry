@@ -1,6 +1,6 @@
 ---
 name: auth-failure-log-triage
-description: "Investigate Seams Pantry authentication, OAuth, credential, permission, and provider failures using scoped Cloudflare runtime evidence and current connection state. Use for reported 401, 403, 503, or failed credential resolution."
+description: "Investigate Purin Pantry authentication, OAuth, credential, permission, and provider failures using scoped Cloudflare runtime evidence and current connection state. Use for reported 401, 403, 503, or failed credential resolution."
 ---
 
 # Auth failure log triage

@@ -1,6 +1,6 @@
 ---
 title: Commerce domain
-description: The merchant-native Seams Pantry model for catalog, inventory, selling, orders, and fulfillment.
+description: The merchant-native Purin Pantry model for catalog, inventory, selling, orders, and fulfillment.
 ---
 
 # Commerce domain

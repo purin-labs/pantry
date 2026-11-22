@@ -32,8 +32,8 @@ export function renderCodexConnection(
           )}
           <p>
             {inUse
-              ? "Sign in with the ChatGPT account that pays for Seams Pantry. Agents can start after OpenAI confirms the sign-in."
-              : "Sign in with the ChatGPT account that pays for Seams Pantry, then use this source."}
+              ? "Sign in with the ChatGPT account that pays for Purin Pantry. Agents can start after OpenAI confirms the sign-in."
+              : "Sign in with the ChatGPT account that pays for Purin Pantry, then use this source."}
           </p>
           {props.canConnect ? (
             <div className="connection-actions">
@@ -91,7 +91,7 @@ export function renderCodexConnection(
           {props.connection.signIn === "codex_device" ? (
             <p className="field-hint">
               This connection uses the old ChatGPT sign-in, which OpenAI now
-              refuses for Seams Pantry. Select Reconnect to sign in with
+              refuses for Purin Pantry. Select Reconnect to sign in with
               ChatGPT again.
             </p>
           ) : null}
@@ -193,7 +193,7 @@ function CodexSignIn(props: {
             {code === null ? "Open OpenAI" : "Open OpenAI and enter the code"}
           </span>
           <small>
-            Sign in with the ChatGPT account that pays for Seams Pantry
+            Sign in with the ChatGPT account that pays for Purin Pantry
             {code === null ? ", then approve the access." : "."}
           </small>
         </li>
@@ -263,10 +263,10 @@ function ChatGptPastedSignIn(props: {
       <ol className="codex-sign-in-steps">
         <li>
           <span className="codex-sign-in-step-title">
-            Allow Seams Pantry in ChatGPT
+            Allow Purin Pantry in ChatGPT
           </span>
           <small>
-            Sign in with the ChatGPT account that pays for Seams Pantry, then
+            Sign in with the ChatGPT account that pays for Purin Pantry, then
             allow the access.
           </small>
         </li>

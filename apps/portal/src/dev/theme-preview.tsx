@@ -206,7 +206,7 @@ function ThemePreview(): React.ReactNode {
     <main className="theme-preview">
       <header className="theme-preview-heading">
         <div>
-          <p className="theme-eyebrow">Seams Pantry / Design system</p>
+          <p className="theme-eyebrow">Purin Pantry / Design system</p>
           <h1>{spec.title}</h1>
           <p>{spec.summary}</p>
         </div>
@@ -230,7 +230,7 @@ function ThemePreview(): React.ReactNode {
 
       <section className="theme-specimen" aria-label="Component examples">
         <div className="theme-sample-sidebar">
-          <strong>Seams Pantry</strong>
+          <strong>Purin Pantry</strong>
           <span className="theme-sample-selected">Menu draft</span>
           <span>Products</span>
           <span>Orders</span>

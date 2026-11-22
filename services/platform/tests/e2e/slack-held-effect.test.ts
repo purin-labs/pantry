@@ -69,7 +69,7 @@ const OWNER = {
 const SECOND_ROOT_TS = "1787500200.000001";
 const THIRD_ROOT_TS = "1787500300.000001";
 const DRAFT_TEXT = "The flour supplier raises the price on Monday.";
-const STOPPED = "Seams Pantry stopped this step";
+const STOPPED = "Purin Pantry stopped this step";
 
 type Step = (body: Record<string, unknown>) => Promise<Response> | Response;
 

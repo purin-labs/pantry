@@ -597,10 +597,10 @@ function replySelectionText(
   policy: EmailResponsePolicy,
 ): string {
   if (kind === "reply_now")
-    return "Immediate reply selected. Seams Pantry will revalidate policy and delivery authority.";
+    return "Immediate reply selected. Purin Pantry will revalidate policy and delivery authority.";
   if (policy === "draft_only")
-    return "Review draft selected. Seams Pantry will save it without sending mail.";
-  return "Human approval selected. Seams Pantry will acknowledge receipt and queue the draft for review.";
+    return "Review draft selected. Purin Pantry will save it without sending mail.";
+  return "Human approval selected. Purin Pantry will acknowledge receipt and queue the draft for review.";
 }
 
 function readMemoryStatement(inputJson: string): string | null {

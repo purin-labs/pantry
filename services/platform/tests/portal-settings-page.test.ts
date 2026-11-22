@@ -368,7 +368,7 @@ describe("Café settings page ownership", () => {
     // the stale blocker code and the step stays visibly done, with its label.
     expect(markup).toContain("1 of 5 done");
     expect(markup).toContain("Choose your commerce system");
-    expect(markup).toContain("Seams Checkout");
+    expect(markup).toContain("Purin Checkout");
     // Slack is the first open step and carries the only enabled action.
     expect(markup).toContain(">Connect Slack</button>");
     // Steps behind an unmet dependency wait instead of competing for a click.
@@ -566,7 +566,7 @@ describe("Café settings page ownership", () => {
 
     expect(markup).toContain(">Connect Slack</button>");
     expect(markup).toContain(
-      "Connect Slack first, then choose the channel Seams Pantry should post to.",
+      "Connect Slack first, then choose the channel Purin Pantry should post to.",
     );
     expect(markup).not.toContain('name="channelId"');
     expect(markup).toContain("Close slack");

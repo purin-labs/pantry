@@ -803,7 +803,7 @@ async function readProductSalesForEmbeddedHarness(
     name: "product_sales" as const,
     metric: "Seven-day booked merchandise before refunds by product.",
     reason:
-      "This report requires a Seams Checkout merchant and restricted reads of orders, variants, and products in an authorized operator conversation.",
+      "This report requires a Purin Checkout merchant and restricted reads of orders, variants, and products in an authorized operator conversation.",
     dependency: "authorized_product_sales_read",
   };
   const authority = await resolveOrganisationCommerceSystemAuthority({
@@ -900,7 +900,7 @@ async function readStockShortagesForEmbeddedHarness(
     name: "low_stock_exposure" as const,
     metric: merchantReportDefinition("low_stock_exposure").metric,
     reason:
-      "Stock shortages need a Seams Checkout shop and a read of its stock positions.",
+      "Stock shortages need a Purin Checkout shop and a read of its stock positions.",
     dependency: "authorized_stock_snapshot_read",
   };
   const authority = await resolveOrganisationCommerceSystemAuthority({

@@ -682,7 +682,7 @@ async (page) => {
       );
       await this.owner.getByText("Finished", { exact: true }).waitFor();
       await this.owner
-        .getByText("Seams AI. Proposed memory: passed all 1 scenarios.", {
+        .getByText("Purin AI. Proposed memory: passed all 1 scenarios.", {
           exact: true,
         })
         .waitFor();
@@ -729,7 +729,7 @@ async (page) => {
           JSON.stringify(compared.columns) ===
             JSON.stringify([
               "Scenario",
-              "Seams AI",
+              "Purin AI",
               "Your OpenAI key",
               "Memory in use",
               "Proposed memory",

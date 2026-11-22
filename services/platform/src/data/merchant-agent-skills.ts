@@ -138,7 +138,7 @@ export function merchantAgentSkill(name: MerchantAgentSkillName): MerchantAgentS
           "- `low_stock_exposure` — stock items that are low or out, the same rows as the Products and Ingredients pages.",
           "- `payment_failures` — payments whose lifecycle is failed.",
           "- `fulfillment_exceptions` — shipments with a delivery exception.",
-          "- `product_sales` — the trailing seven-day UTC window of booked merchandise before refunds by product, for an authorized Seams Checkout operator. State the exact window, currency, unmatched attribution, and adjustment disclosures. This is not net sales or captured revenue. A refused read means evidence is unavailable; never substitute order counts or invent demand.",
+          "- `product_sales` — the trailing seven-day UTC window of booked merchandise before refunds by product, for an authorized Purin Checkout operator. State the exact window, currency, unmatched attribution, and adjustment disclosures. This is not net sales or captured revenue. A refused read means evidence is unavailable; never substitute order counts or invent demand.",
           "",
           "## Daily brief",
           "",

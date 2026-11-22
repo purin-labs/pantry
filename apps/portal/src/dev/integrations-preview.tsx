@@ -678,7 +678,7 @@ function scenarioFeedback(
     message:
       provider === "whatsapp"
         ? "Meta sent you back without finishing the connection. Nothing was changed. Try again, and contact support if it keeps happening."
-        : "This integration is unavailable. Ask your Seams Pantry administrator to configure it, then try again.",
+        : "This integration is unavailable. Ask your Purin Pantry administrator to configure it, then try again.",
   };
 }
 
@@ -1418,7 +1418,7 @@ function ProviderWindow(props: { readonly provider: string }): React.ReactNode {
         Approve
       </button>
       <button type="button" onClick={returnThroughPortalPath}>
-        Back to Seams Pantry
+        Back to Purin Pantry
       </button>
       <button type="button" onClick={closeProviderWindow}>
         Close this window

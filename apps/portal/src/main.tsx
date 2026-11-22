@@ -147,12 +147,12 @@ class IdentityLinkController extends React.Component<
     return (
       <PageFrame>
         <section className="identity-panel" aria-labelledby="identity-title">
-          <p className="brand">Seams Pantry</p>
+          <p className="brand">Purin Pantry</p>
           <h1 id="identity-title" tabIndex={-1}>
             Connect your Slack account
           </h1>
           <p className="summary">
-            Sign in with the Google account you use for Seams Pantry, then
+            Sign in with the Google account you use for Purin Pantry, then
             confirm the connection.
           </p>
           <dl className="invitation-facts">
@@ -217,7 +217,7 @@ function StatusPanel(props: {
 }): React.ReactNode {
   return (
     <section className="status-panel">
-      <p className="brand">Seams Pantry</p>
+      <p className="brand">Purin Pantry</p>
       <h1 tabIndex={-1}>{props.title}</h1>
       <p>{props.detail}</p>
     </section>

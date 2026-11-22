@@ -177,7 +177,7 @@ function raisesFor(view: AiBudgetView): readonly Raise[] {
     raises.push({
       id: "maxWallMs",
       label: `Time for one request: ${duration(view.limits.maxWallMs)} to ${duration(next("maxWallMs"))}`,
-      description: "Each request may run this long before Seams Pantry stops it.",
+      description: "Each request may run this long before Purin Pantry stops it.",
       value: Math.floor(next("maxWallMs") / 1000) * 1000,
     });
   if (view.limits.maxToolCalls < view.maximum.maxToolCalls)

@@ -358,7 +358,7 @@ export class ControlPortalApp extends React.Component<
       if (routeRevision !== this.routeRevision) return;
       if (session === null) {
         forgetControlReads();
-        document.title = "Sign in · Seams Pantry";
+        document.title = "Sign in · Purin Pantry";
         this.setState({ kind: "signed_out" }, focusPortalPage);
         return;
       }
@@ -377,7 +377,7 @@ export class ControlPortalApp extends React.Component<
           findMembershipByOrganisationHandle(route.organisationHandle),
         );
         if (membership === undefined) {
-          document.title = "Organisation unavailable · Seams Pantry";
+          document.title = "Organisation unavailable · Purin Pantry";
           this.setState(
             {
               kind: "route_not_found",
@@ -417,7 +417,7 @@ export class ControlPortalApp extends React.Component<
               ? null
               : await loadPortalOrganisation(membership);
           if (routeRevision !== this.routeRevision) return;
-          document.title = "Workspace unavailable · Seams Pantry";
+          document.title = "Workspace unavailable · Purin Pantry";
           this.setState(
             {
               kind: "route_not_found",
@@ -461,7 +461,7 @@ export class ControlPortalApp extends React.Component<
         );
         return;
       }
-      document.title = "Organisations · Seams Pantry";
+      document.title = "Organisations · Purin Pantry";
       this.setState(
         {
           kind: "organisation_list",
@@ -477,7 +477,7 @@ export class ControlPortalApp extends React.Component<
       );
     } catch (error) {
       if (routeRevision !== this.routeRevision) return;
-      document.title = "Seams Pantry";
+      document.title = "Purin Pantry";
       this.setState({ kind: "load_failed", message: portalError(error) });
     }
   }
@@ -544,7 +544,7 @@ export class ControlPortalApp extends React.Component<
       workspaceHandle === null ||
       membership?.workspaces.some(findWorkspaceByHandle(workspaceHandle)) ===
         true;
-    document.title = `Page not found · ${organisation?.organisation.name ?? "Seams Pantry"}`;
+    document.title = `Page not found · ${organisation?.organisation.name ?? "Purin Pantry"}`;
     this.setState(
       {
         kind: "route_not_found",

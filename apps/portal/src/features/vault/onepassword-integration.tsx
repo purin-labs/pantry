@@ -121,8 +121,8 @@ export function OnePasswordIntegrationPanel(props: {
   return (
     <section className="vault-integration" aria-label="1Password">
       <p className="vault-integration-lead">
-        Agents use the items through Seams Pantry and never see a password. You
-        can move items between Seams Vault and 1Password at any time.
+        Agents use the items through Purin Pantry and never see a password. You
+        can move items between Purin Vault and 1Password at any time.
       </p>
       <p className="vault-notice" role="status">
         {notice}

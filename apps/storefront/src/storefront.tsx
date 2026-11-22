@@ -1238,12 +1238,12 @@ export class StorefrontApp extends React.Component<
     this.#cafeLanguage = languageFromLocale(presentation.locale);
     if (typeof document !== "undefined") {
       document.documentElement.lang = presentation.locale;
-      document.title = `${presentation.merchantDisplayName} · Seams Checkout`;
+      document.title = `${presentation.merchantDisplayName} · Purin Checkout`;
     }
   };
 
   componentDidMount(): void {
-    document.title = `${this.props.config.name} · Seams Checkout`;
+    document.title = `${this.props.config.name} · Purin Checkout`;
     document.documentElement.lang =
       this.props.config.kind === "cafe"
         ? cafeInterfaceCopy(this.#cafeLanguage).htmlLanguage

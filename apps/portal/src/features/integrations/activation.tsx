@@ -171,7 +171,7 @@ const SETUP_STEPS: readonly SetupStep[] = [
   {
     id: "inference",
     title: "Choose your AI account",
-    detail: "Your Claude or ChatGPT plan, an API key, or Seams AI.",
+    detail: "Your Claude or ChatGPT plan, an API key, or Purin AI.",
     codes: ["runtime_admission_unavailable"],
     live: "inferenceChosen",
     /* A selection is not proof the credential resolves server-side, so the
@@ -195,7 +195,7 @@ const SETUP_STEPS: readonly SetupStep[] = [
   {
     id: "slack",
     title: "Connect Slack",
-    detail: "Seams Pantry sends approval requests and team updates through Slack.",
+    detail: "Purin Pantry sends approval requests and team updates through Slack.",
     codes: ["communication_connection_missing"],
     live: "slackConnected",
     liveSufficient: true,
@@ -217,7 +217,7 @@ const SETUP_STEPS: readonly SetupStep[] = [
   {
     id: "updates",
     title: "Save your Slack update settings",
-    detail: "Confirms what Seams Pantry posts, and where.",
+    detail: "Confirms what Purin Pantry posts, and where.",
     codes: ["policy_snapshot_missing", "cue_snapshot_missing"],
     live: null,
     liveSufficient: false,
@@ -268,7 +268,7 @@ function SetupChecklist(props: {
         <div>
           <h2 id="activation-title">Set up your workspace</h2>
           <p>
-            Seams Pantry checks that an owner is assigned, connected services
+            Purin Pantry checks that an owner is assigned, connected services
             work, and a Slack channel is ready for team updates.
           </p>
         </div>
@@ -445,7 +445,7 @@ function renderSetupVerifyRow(checking: boolean): React.ReactNode {
         ·
       </span>
       <div className="setup-step-main">
-        <span className="setup-step-title">Seams Pantry checks everything</span>
+        <span className="setup-step-title">Purin Pantry checks everything</span>
         <span className="setup-step-detail">
           {checking
             ? "Checking now…"
@@ -492,7 +492,7 @@ function announceUnknownBlockers(codes: string): void {
   if (codes.length === 0) return;
   console.warn(`[readiness] Unmapped blocker code(s): ${codes}`);
   toast.warning(
-    "A readiness check reported a problem Seams Pantry cannot name. It usually clears on the next recheck — contact support if it persists.",
+    "A readiness check reported a problem Purin Pantry cannot name. It usually clears on the next recheck — contact support if it persists.",
   );
 }
 
@@ -557,14 +557,14 @@ export function setupLiveState(
               ? "Gemini API key"
               : inferenceSelection.kind === "claude_oauth"
               ? "Claude"
-              : "Seams AI",
+              : "Purin AI",
     commerceChosen: commerceSystem !== null,
     commerceLabel:
       commerceSystem === null
         ? null
         : commerceSystem.kind === "shopify"
           ? "Shopify"
-          : "Seams Checkout",
+          : "Purin Checkout",
     slackConnected: slack.length > 0,
     slackLabel: selectedSlack?.displayName ?? slack[0]?.displayName ?? null,
     channelChosen:

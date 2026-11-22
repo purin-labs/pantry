@@ -296,7 +296,7 @@ function PlaceStep(
       <h2 id="add-gateway-title">Where is this gateway?</h2>
       <p className="devices-add-lead">
         A gateway is a small computer in the shop. It connects your devices to
-        Seams Pantry, and it dials out, so the shop opens no port.
+        Purin Pantry, and it dials out, so the shop opens no port.
       </p>
       <label className="devices-field">
         Gateway name

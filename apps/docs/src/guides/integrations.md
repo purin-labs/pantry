@@ -1,6 +1,6 @@
 ---
 title: Integrations
-description: How Seams Pantry connects Slack, commerce authorities, payment providers, and model execution.
+description: How Purin Pantry connects Slack, commerce authorities, payment providers, and model execution.
 ---
 
 # Integrations
@@ -32,11 +32,11 @@ plaintext while preserving content-free receipts and lifecycle metadata.
 Follow the [WhatsApp customer support guide](/guides/whatsapp-customer-support)
 to run the complete manual test.
 
-## Commerce: Seams Checkout or Shopify
+## Commerce: Purin Checkout or Shopify
 
 The organisation selects one commerce system:
 
-- **Seams Checkout** runs on the built-in commerce engine and owns private
+- **Purin Checkout** runs on the built-in commerce engine and owns private
   catalog, inventory, checkout, order, payment, fulfillment, and shipment
   facts.
 - **Shopify** remains authoritative for a Shopify-backed organisation while selected.
@@ -55,7 +55,7 @@ typed receipts and provider observations.
 `AgentSessionActor` uses the route pinned in the session contract. The
 `organisation_subscription` + `openai` route runs Pi with the organisation's ChatGPT
 sign-in. The `platform` +
-`openai-compatible` route runs Pi with the Seams `OPENROUTER_API_KEY`. Missing or
+`openai-compatible` route runs Pi with the Purin `OPENROUTER_API_KEY`. Missing or
 exhausted authority fails that route; no automatic fallback occurs. The Actor
 retains authority over history, budgets, bounded tools, checkpoints, and
 delivery. Linux-heavy work materializes an immutable workspace revision in the

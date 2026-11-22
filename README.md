@@ -1,8 +1,8 @@
-# Seams Pantry
+# Purin Pantry
 
-Seams Pantry: the operating system for modern bakeries & cafés.
+Purin Pantry: the operating system for modern bakeries & cafés.
 
-People and Sous Chef agents operate Seams Pantry through the Portal and Slack.
+People and Sous Chef agents operate Purin Pantry through the Portal and Slack.
 The product direction covers the full bakery and café business: demand,
 purchasing, recipes, production, quality checks, packaging, inventory, sales,
 distribution, and customer service.
@@ -14,7 +14,7 @@ with policy checks, approvals, and durable receipts.
 
 The business reference is a pâtisserie selling fresh products and packaged gifts
 through shops and online channels, such as Noix de Beurre or Lenôtre. These are
-product and distribution references. Seams makes no claim about their use of
+product and distribution references. Purin makes no claim about their use of
 robotic production.
 
 Commerce paths from Plans 22 and 23 are accepted. The bounded Plan 42 Kitchen
@@ -56,7 +56,7 @@ OAuth callbacks ──────────────┘        │
                                       ├── provider integrations and organisation OAuth
                                       ├── explicit inference route
                                       │   └── Pi via the organisation ChatGPT subscription,
-                                      │       an organisation OpenAI key or Seams OpenRouter funding
+                                      │       an organisation OpenAI key or Purin OpenRouter funding
                                       └── on-demand workspace executor
 ```
 
@@ -70,7 +70,7 @@ names of their time; the glossary in AGENTS.md maps them.
   through pi-ai's legacy `openai-codex` provider (Plan 72).
 - `organisation_byo` + `openai`: Pi using the organisation's purpose-bound, Vault-encrypted
   OpenAI API key.
-- `platform` + `openai-compatible`: Pi using the Seams `OPENROUTER_API_KEY`.
+- `platform` + `openai-compatible`: Pi using the Purin `OPENROUTER_API_KEY`.
 
 Missing or exhausted authority fails the selected route. The Actor owns accepted
 history, tools, checkpoints, budgets, cancellation, and delivery for every route.
@@ -182,7 +182,7 @@ The local HTTP addresses are:
 - `http://store.localhost:3002/store/shipping` → shipping storefront
 - `https://localhost:3003` → Pantry operator Portal and OAuth-compatible loopback origin
 - `http://commerce.localhost:3004` → Commerce API and health boundary
-- `http://docs.localhost:3005` → Seams Pantry documentation
+- `http://docs.localhost:3005` → Purin Pantry documentation
 
 Platform and Commerce remain separate Worker processes. Caddy only owns local
 host routing. The `example.cafe`, `example.store`, and `example.portal` names
@@ -225,14 +225,14 @@ Slack ingress Worker, in that order. See
 [the sandbox release runbook](docs/runbooks/code-mode-sandbox-release.md) and
 [Plan 73](docs/plan-73-model-exit-worker.md).
 
-## Seams Vault
+## Purin Vault
 
-Seams Vault stores organisation provider credentials and opaque, organisation-scoped
+Purin Vault stores organisation provider credentials and opaque, organisation-scoped
 ChatGPT sign-in profiles (a Codex `auth.json`). Ciphertext and lifecycle metadata live in D1, while versioned
 encryption roots live in Cloudflare Secrets Store. Runtime consumers authorize
 an exact purpose before resolving a credential for one trusted operation.
 `OPENROUTER_API_KEY` is a platform deployment secret used only by the explicit
-Seams-funded Pi route. That route runs `google/gemini-4-hydrogen` (Plan 96);
+Purin-funded Pi route. That route runs `google/gemini-4-hydrogen` (Plan 96);
 open Slack threads that started on `moonshotai/kimi-k3` stay on it. Tests that
 call OpenRouter set the Worker variable `PANTRY_PLATFORM_PI_MODEL` to the cheaper
 `qwen/qwen3.7-flash`.

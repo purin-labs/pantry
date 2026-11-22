@@ -335,7 +335,7 @@ it("restores a Pi listing proposal and one approved effect after response loss a
   // The outcome updates the one card; the thread gets no new message.
   await expect
     .poll(() => slack.messages[0]?.text, { timeout: 15_000 })
-    .toContain("Seams Pantry made the change.");
+    .toContain("Purin Pantry made the change.");
   expect(slack.visibleMessageCount()).toBe(2);
   const sessionRow = await fixtureDatabase()
     .prepare(

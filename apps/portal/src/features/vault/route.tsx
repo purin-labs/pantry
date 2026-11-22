@@ -930,7 +930,7 @@ function KeyDetails(props: {
         </div>
       </dl>
       <p className="vault-secret-note">
-        Never shown to agents or people. Seams Pantry uses it only for actions
+        Never shown to agents or people. Purin Pantry uses it only for actions
         on {item.service}. Add, replace or revoke it in Integrations.
       </p>
       {href === null ? null : (

@@ -16,7 +16,7 @@ export function PublicDocumentsApp(props: {
 }): React.ReactNode {
   const descriptor = publicDocumentFromPath(props.pathname);
   if (descriptor === null) throw new Error("Public document route is invalid");
-  document.title = `${descriptor.title} · Seams Pantry`;
+  document.title = `${descriptor.title} · Purin Pantry`;
 
   return (
     <div className="public-doc-shell">
@@ -26,7 +26,7 @@ export function PublicDocumentsApp(props: {
       <PublicDocumentHeader document={descriptor.document} />
       <main id="document-content" className="public-doc-main">
         <header className="public-doc-heading">
-          <p className="public-doc-eyebrow">Seams Pantry policies</p>
+          <p className="public-doc-eyebrow">Purin Pantry policies</p>
           <h1>{descriptor.title}</h1>
           <p className="public-doc-summary">{descriptor.description}</p>
           <p className="public-doc-updated">Last updated {LAST_UPDATED}</p>
@@ -49,28 +49,28 @@ function publicDocumentFromPath(
         document: "privacy",
         title: "Privacy policy",
         description:
-          "How Seams handles account, integration, and customer-support data.",
+          "How Purin handles account, integration, and customer-support data.",
       };
     case "/docs/terms":
       return {
         document: "terms",
         title: "Terms of service",
         description:
-          "The terms that apply when you access or use Seams Pantry.",
+          "The terms that apply when you access or use Purin Pantry.",
       };
     case "/docs/deletion":
       return {
         document: "deletion",
         title: "User-data deletion",
         description:
-          "How to disconnect a service or ask us to delete your Seams Pantry data.",
+          "How to disconnect a service or ask us to delete your Purin Pantry data.",
       };
     case "/docs/contact":
       return {
         document: "contact",
         title: "Support and contact",
         description:
-          "How to reach Seams about support, privacy, deletion, or security.",
+          "How to reach Purin about support, privacy, deletion, or security.",
       };
     default:
       return null;
@@ -85,7 +85,7 @@ function PublicDocumentHeader(props: {
       <a
         className="public-doc-brand"
         href="/docs/privacy"
-        aria-label="Seams Pantry policies home"
+        aria-label="Purin Pantry policies home"
       >
         <img
           src="/brand/pantry-mark-dark-32.png"
@@ -93,7 +93,7 @@ function PublicDocumentHeader(props: {
           height="28"
           alt=""
         />
-        <span>Seams Pantry</span>
+        <span>Purin Pantry</span>
       </a>
       <nav className="public-doc-nav" aria-label="Policies">
         <PublicDocumentLink
@@ -136,7 +136,7 @@ function PublicDocumentLink(props: {
 function PublicDocumentFooter(): React.ReactNode {
   return (
     <footer className="public-doc-footer">
-      <p>Seams Pantry is a software service that Seams operates from Japan.</p>
+      <p>Purin Pantry is a software service that Purin operates from Japan.</p>
       <nav aria-label="Policy links">
         <a href="/docs/privacy">Privacy</a>
         <a href="/docs/terms">Terms</a>
@@ -166,16 +166,16 @@ function PrivacyPolicy(): React.ReactNode {
       <section>
         <h2>1. About this policy</h2>
         <p>
-          This policy explains how Seams collects, uses, shares, retains, and
-          deletes personal information when you visit the Seams Pantry portal,
+          This policy explains how Purin collects, uses, shares, retains, and
+          deletes personal information when you visit the Purin Pantry portal,
           create a workspace, connect another service, or communicate with a
-          business that uses Seams Pantry.
+          business that uses Purin Pantry.
         </p>
         <p>
-          A business using Seams Pantry controls the customer information it
-          sends to the service. Seams processes that information for the
+          A business using Purin Pantry controls the customer information it
+          sends to the service. Purin processes that information for the
           business under its instructions. This policy also covers information
-          Seams handles directly for portal users, support contacts, and website
+          Purin handles directly for portal users, support contacts, and website
           visitors.
         </p>
       </section>
@@ -196,7 +196,7 @@ function PrivacyPolicy(): React.ReactNode {
           <li>
             <strong>Business and customer content:</strong> messages, orders,
             products, files, and other records that a workspace admits for an
-            enabled Seams Pantry workflow.
+            enabled Purin Pantry workflow.
           </li>
           <li>
             <strong>Usage and technical information:</strong> IP address,
@@ -211,7 +211,7 @@ function PrivacyPolicy(): React.ReactNode {
         </ul>
         <p>
           We receive this information from you, your workspace administrator,
-          connected services, and the devices or browsers used to access Seams
+          connected services, and the devices or browsers used to access Purin
           Pantry.
         </p>
       </section>
@@ -219,13 +219,13 @@ function PrivacyPolicy(): React.ReactNode {
       <section>
         <h2>3. WhatsApp customer-support data</h2>
         <p>
-          When a business enables the WhatsApp integration, Seams receives new
+          When a business enables the WhatsApp integration, Purin receives new
           webhook-delivered text messages for the connected WhatsApp Business
-          Platform number. Seams does not import earlier chats or browse the
+          Platform number. Purin does not import earlier chats or browse the
           business&apos;s WhatsApp inbox.
         </p>
         <p>
-          Seams temporarily stores the text needed for an open support Case for
+          Purin temporarily stores the text needed for an open support Case for
           up to 24 hours after the customer&apos;s latest message. A proposed
           reply is deleted sooner after it is sent, rejected, replaced, or
           expires. WhatsApp continues to hold messages under Meta&apos;s own
@@ -236,7 +236,7 @@ function PrivacyPolicy(): React.ReactNode {
       <section>
         <h2>4. How we use information</h2>
         <ul>
-          <li>Provide, secure, maintain, and troubleshoot Seams Pantry.</li>
+          <li>Provide, secure, maintain, and troubleshoot Purin Pantry.</li>
           <li>Authenticate users and enforce workspace permissions.</li>
           <li>Connect services and run the workflows a workspace enables.</li>
           <li>
@@ -252,7 +252,7 @@ function PrivacyPolicy(): React.ReactNode {
             establish or defend legal claims.
           </li>
           <li>
-            Understand reliability and improve Seams Pantry using aggregate or
+            Understand reliability and improve Purin Pantry using aggregate or
             de-identified information where practical.
           </li>
         </ul>
@@ -267,10 +267,10 @@ function PrivacyPolicy(): React.ReactNode {
         <h2>5. Agent and inference processing</h2>
         <p>
           A workspace can assign an agent and an inference provider to an
-          enabled workflow. Seams sends the minimum admitted content needed to
+          enabled workflow. Purin sends the minimum admitted content needed to
           that selected provider to produce a result. The provider may process
           information in other countries and under the workspace&apos;s
-          agreement with that provider. Where Seams Pantry requires human
+          agreement with that provider. Where Purin Pantry requires human
           approval, an agent proposal is not sent to a customer until an
           authorised person approves it.
         </p>
@@ -326,7 +326,7 @@ function PrivacyPolicy(): React.ReactNode {
       <section>
         <h2>8. Security</h2>
         <p>
-          Seams uses technical and organisational safeguards designed to protect
+          Purin uses technical and organisational safeguards designed to protect
           information, including encrypted transport, encrypted credentials and
           sensitive application data, access controls, organisation isolation,
           and audit records. No online service can guarantee absolute security.
@@ -338,7 +338,7 @@ function PrivacyPolicy(): React.ReactNode {
       <section>
         <h2>9. International processing</h2>
         <p>
-          Seams and its service providers may process information in Japan, the
+          Purin and its service providers may process information in Japan, the
           United States, and other countries where they operate. Those countries
           may have different data-protection laws. We use contractual and
           technical safeguards where applicable.
@@ -356,14 +356,14 @@ function PrivacyPolicy(): React.ReactNode {
           below.
         </p>
         <p>
-          We do not knowingly offer Seams Pantry directly to children under 18.
+          We do not knowingly offer Purin Pantry directly to children under 18.
         </p>
       </section>
 
       <section>
         <h2>11. Changes and contact</h2>
         <p>
-          We may update this policy as Seams Pantry changes. We will change the
+          We may update this policy as Purin Pantry changes. We will change the
           date above and provide additional notice when required by law.
           Questions and requests can be sent to{" "}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
@@ -379,10 +379,10 @@ function TermsOfService(): React.ReactNode {
       <section>
         <h2>1. Agreement</h2>
         <p>
-          These terms govern access to and use of Seams Pantry. By creating an
-          account, accepting an invitation, connecting a service, or using Seams
+          These terms govern access to and use of Purin Pantry. By creating an
+          account, accepting an invitation, connecting a service, or using Purin
           Pantry, you agree to these terms and the{" "}
-          <a href="/docs/privacy">privacy policy</a>. If you use Seams Pantry
+          <a href="/docs/privacy">privacy policy</a>. If you use Purin Pantry
           for an organisation, you confirm that you have authority to bind that
           organisation.
         </p>
@@ -395,7 +395,7 @@ function TermsOfService(): React.ReactNode {
       <section>
         <h2>2. The service</h2>
         <p>
-          Seams Pantry helps businesses coordinate connected services, business
+          Purin Pantry helps businesses coordinate connected services, business
           records, agents, approvals, and customer-support workflows. Features
           may be experimental, limited, or changed as the service develops. The
           portal identifies controls and approval steps that apply to each
@@ -411,22 +411,22 @@ function TermsOfService(): React.ReactNode {
           owners and administrators control member access, connected services,
           agents, and workflow settings. You are responsible for actions taken
           through your account unless caused by a breach of these terms by
-          $1Seams.
+          Purin.
         </p>
       </section>
 
       <section>
         <h2>4. Connected services</h2>
         <p>
-          Seams Pantry can interact with services you choose to connect. Your
+          Purin Pantry can interact with services you choose to connect. Your
           use of those services remains subject to their own terms, policies,
-          availability, permissions, and charges. You authorise Seams to access
+          availability, permissions, and charges. You authorise Purin to access
           and act on connected-service data only as needed to provide the
           workflows you enable. You can revoke that authority by disconnecting
           the service.
         </p>
         <p>
-          Seams is not responsible for a connected service&apos;s content,
+          Purin is not responsible for a connected service&apos;s content,
           decisions, outages, account restrictions, or changes to its APIs.
         </p>
       </section>
@@ -442,14 +442,14 @@ function TermsOfService(): React.ReactNode {
         </p>
         <p>
           You remain responsible for instructions, connected data, approved
-          actions, customer communications, and decisions made using Seams
+          actions, customer communications, and decisions made using Purin
           Pantry.
         </p>
       </section>
 
       <section>
         <h2>6. Acceptable use</h2>
-        <p>You may not use Seams Pantry to:</p>
+        <p>You may not use Purin Pantry to:</p>
         <ul>
           <li>
             Break the law, infringe rights, deceive people, or facilitate fraud
@@ -468,29 +468,29 @@ function TermsOfService(): React.ReactNode {
             or expose credentials.
           </li>
           <li>
-            Use Seams Pantry for high-risk decisions where errors could cause
+            Use Purin Pantry for high-risk decisions where errors could cause
             death, serious injury, or denial of essential rights without
             qualified human oversight.
           </li>
         </ul>
         <p>
           You must have all notices, consents, and lawful authority needed for
-          data you provide to Seams Pantry.
+          data you provide to Purin Pantry.
         </p>
       </section>
 
       <section>
         <h2>7. Content and intellectual property</h2>
         <p>
-          You retain ownership of content you submit. You grant Seams a limited
+          You retain ownership of content you submit. You grant Purin a limited
           right to host, process, transmit, and display that content only to
           operate, secure, and support the service. You are responsible for
           ensuring that you have the rights needed to provide it.
         </p>
         <p>
-          Seams Pantry and its software, branding, and documentation remain
+          Purin Pantry and its software, branding, and documentation remain
           protected by applicable intellectual-property laws. These terms do not
-          transfer ownership of Seams Pantry to you.
+          transfer ownership of Purin Pantry to you.
         </p>
       </section>
 
@@ -507,7 +507,7 @@ function TermsOfService(): React.ReactNode {
       <section>
         <h2>9. Availability and changes</h2>
         <p>
-          We work to keep Seams Pantry available and secure, but the service may
+          We work to keep Purin Pantry available and secure, but the service may
           be interrupted. We may add, remove, or change features and limits.
           When a change materially reduces a paid service, we will provide
           reasonable notice where practical.
@@ -517,8 +517,8 @@ function TermsOfService(): React.ReactNode {
       <section>
         <h2>10. Suspension and termination</h2>
         <p>
-          You may stop using Seams Pantry and request account deletion. We may
-          restrict or suspend access when reasonably needed to protect Seams
+          You may stop using Purin Pantry and request account deletion. We may
+          restrict or suspend access when reasonably needed to protect Purin
           Pantry or others, respond to unlawful conduct, prevent abuse, address
           non-payment, or enforce these terms. We may terminate the service with
           reasonable notice unless urgent action is required.
@@ -533,7 +533,7 @@ function TermsOfService(): React.ReactNode {
       <section>
         <h2>11. Disclaimers</h2>
         <p>
-          To the extent permitted by law, Seams Pantry is provided “as is” and
+          To the extent permitted by law, Purin Pantry is provided “as is” and
           “as available.” We disclaim implied warranties of merchantability,
           fitness for a particular purpose, non-infringement, and uninterrupted
           or error-free operation. Nothing in these terms excludes a warranty or
@@ -544,10 +544,10 @@ function TermsOfService(): React.ReactNode {
       <section>
         <h2>12. Limitation of liability</h2>
         <p>
-          To the extent permitted by law, Seams will not be liable for indirect,
+          To the extent permitted by law, Purin will not be liable for indirect,
           incidental, special, exemplary, or consequential loss, or for lost
-          profits, revenue, goodwill, or data. The total liability of Seams
-          arising from the service will not exceed the amount you paid for Seams
+          profits, revenue, goodwill, or data. The total liability of Purin
+          arising from the service will not exceed the amount you paid for Purin
           Pantry in the 12 months before the event giving rise to the claim.
           These limits do not apply where liability cannot lawfully be limited.
         </p>
@@ -583,20 +583,20 @@ function DeletionInstructions(): React.ReactNode {
       <section>
         <h2>Request deletion</h2>
         <p>
-          A Seams Pantry workspace owner or authorised administrator can request
+          A Purin Pantry workspace owner or authorised administrator can request
           deletion of a workspace, connected-service data, or a specific
           integration. An individual can also ask about personal information
-          Seams handles about them.
+          Purin handles about them.
         </p>
         <ol>
           <li>
             Email{" "}
             <a
-              href={`mailto:${SUPPORT_EMAIL}?subject=Seams%20data%20deletion%20request`}
+              href={`mailto:${SUPPORT_EMAIL}?subject=Purin%20data%20deletion%20request`}
             >
               {SUPPORT_EMAIL}
             </a>{" "}
-            with the subject <strong>Seams data deletion request</strong>.
+            with the subject <strong>Purin data deletion request</strong>.
           </li>
           <li>
             Include your name, sign-in email, organisation and workspace name,
@@ -614,7 +614,7 @@ function DeletionInstructions(): React.ReactNode {
         </ol>
         <p>
           We will acknowledge the request, explain its scope, and provide the
-          expected completion timeline. If Seams processes the information for a
+          expected completion timeline. If Purin processes the information for a
           business, we may direct the request to that business or confirm its
           instructions before deleting it.
         </p>
@@ -623,9 +623,9 @@ function DeletionInstructions(): React.ReactNode {
       <section>
         <h2>Disconnect first when appropriate</h2>
         <p>
-          A workspace administrator can use the Seams Pantry portal to disable
+          A workspace administrator can use the Purin Pantry portal to disable
           or disconnect an integration. This stops new workflow processing and
-          begins credential revocation or cleanup. Deleting a Seams Pantry
+          begins credential revocation or cleanup. Deleting a Purin Pantry
           connection does not delete the account or content held by the
           connected service.
         </p>
@@ -635,12 +635,12 @@ function DeletionInstructions(): React.ReactNode {
         <h2>What deletion covers</h2>
         <p>Depending on the verified request, deletion may include:</p>
         <ul>
-          <li>Seams Pantry account and workspace profile information.</li>
+          <li>Purin Pantry account and workspace profile information.</li>
           <li>
             Connected-service credentials, grants, identifiers, and
             configuration.
           </li>
-          <li>Temporary Case content and agent proposals held by Seams.</li>
+          <li>Temporary Case content and agent proposals held by Purin.</li>
           <li>
             Workspace projections and other customer content held for the
             deleted service.
@@ -650,7 +650,7 @@ function DeletionInstructions(): React.ReactNode {
           </li>
         </ul>
         <p>
-          Seams may retain narrowly limited security, transaction, audit, or
+          Purin may retain narrowly limited security, transaction, audit, or
           legal records when required by law, needed to prevent abuse, or
           necessary to document that a deletion was completed. Those records are
           restricted to their remaining purpose.
@@ -660,14 +660,14 @@ function DeletionInstructions(): React.ReactNode {
       <section>
         <h2>WhatsApp message data</h2>
         <p>
-          Seams holds text for an open WhatsApp support Case for no longer than
+          Purin holds text for an open WhatsApp support Case for no longer than
           24 hours after the customer&apos;s latest message. A proposal is
           removed sooner after it is sent, rejected, replaced, or expires. A
           verified deletion request can trigger earlier cleanup when no security
           or legal obligation requires retention.
         </p>
         <p>
-          This process removes data held by Seams. Messages and account
+          This process removes data held by Purin. Messages and account
           information retained by Meta, WhatsApp, or another connected service
           remain subject to that provider&apos;s deletion tools and policies.
         </p>
@@ -689,14 +689,14 @@ function ContactPage(): React.ReactNode {
   return (
     <>
       <section>
-        <h2>Contact Seams</h2>
+        <h2>Contact Purin</h2>
         <p>
           Email{" "}
           <a className="public-doc-contact" href={`mailto:${SUPPORT_EMAIL}`}>
             {SUPPORT_EMAIL}
           </a>{" "}
           for product support, privacy questions, data-deletion requests, legal
-          notices, or security reports. Seams operates from Japan, and messages
+          notices, or security reports. Purin operates from Japan, and messages
           are handled in Japan Standard Time.
         </p>
       </section>
@@ -705,7 +705,7 @@ function ContactPage(): React.ReactNode {
         <h2>Help us respond</h2>
         <p>Please include:</p>
         <ul>
-          <li>Your name and the email used with Seams Pantry.</li>
+          <li>Your name and the email used with Purin Pantry.</li>
           <li>Your organisation and workspace name.</li>
           <li>A concise description of the issue and when it occurred.</li>
           <li>Any support reference shown in the portal.</li>
@@ -721,7 +721,7 @@ function ContactPage(): React.ReactNode {
         <h2>Privacy and deletion</h2>
         <p>
           Put <strong>Privacy request</strong> or{" "}
-          <strong>Seams data deletion request</strong> in the subject line. Read
+          <strong>Purin data deletion request</strong> in the subject line. Read
           the <a href="/docs/privacy">privacy policy</a> and{" "}
           <a href="/docs/deletion">deletion instructions</a> for the information
           we need to verify and complete a request.
@@ -732,7 +732,7 @@ function ContactPage(): React.ReactNode {
         <h2>Security reports</h2>
         <p>
           Put <strong>Security report</strong> in the subject line. Describe the
-          affected Seams Pantry URL or feature, the observed behaviour, and safe
+          affected Purin Pantry URL or feature, the observed behaviour, and safe
           reproduction steps. Do not access another person&apos;s data, disrupt
           the service, or include live credentials in your report.
         </p>

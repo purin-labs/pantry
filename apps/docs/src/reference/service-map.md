@@ -1,6 +1,6 @@
 ---
 title: Service map
-description: The concrete repository layout for the current Seams Pantry runtime and commerce modules.
+description: The concrete repository layout for the current Purin Pantry runtime and commerce modules.
 ---
 
 # Service map

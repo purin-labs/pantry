@@ -215,7 +215,7 @@ export async function requestPermissionForHarness(
     return {
       kind: "permission_not_requested",
       reason:
-        "Seams Pantry does not open orders, payments, shipments or stock policies to a shared channel. Tell the person to ask in a Portal chat or a direct message. Do not retry this denied read.",
+        "Purin Pantry does not open orders, payments, shipments or stock policies to a shared channel. Tell the person to ask in a Portal chat or a direct message. Do not retry this denied read.",
     };
   const live = await validateLiveRequestAuthority({
     db: scope.database,
@@ -305,7 +305,7 @@ export async function requestPermissionForHarness(
       : {
           kind: "permission_requested",
           detail:
-            "Seams Pantry shows the person an Allow prompt in this chat. Tell them in one sentence that you asked, and that the request continues here after it is allowed. Do not do the work now.",
+            "Purin Pantry shows the person an Allow prompt in this chat. Tell them in one sentence that you asked, and that the request continues here after it is allowed. Do not do the work now.",
         };
   }
   const connectorId = parseConnectorId(String(authority.connectorId));
@@ -366,8 +366,8 @@ export async function requestPermissionForHarness(
     kind: "permission_requested",
     detail:
       notice.ok && notice.value.notice === "posted"
-        ? `Seams Pantry posted a card with this request and its buttons in this thread. Do not give a link. Do not do the work now. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`
-        : "Seams Pantry stored the request, but the thread does not hold its link. Tell the person that you asked an owner or admin, who can allow it under Access in the Portal. Do not do the work now.",
+        ? `Purin Pantry posted a card with this request and its buttons in this thread. Do not give a link. Do not do the work now. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`
+        : "Purin Pantry stored the request, but the thread does not hold its link. Tell the person that you asked an owner or admin, who can allow it under Access in the Portal. Do not do the work now.",
   };
 }
 
@@ -567,8 +567,8 @@ export async function passOrAskForExitApproval(
     if (!stored.ok) throw new Error("exit approval not stored");
     throw new ExitApprovalRequestedError(
       input.reason === "outside_written"
-        ? "Seams Pantry stopped this step, because this conversation read text that a person outside the Organisation wrote, and this step changes something. It shows the person the exact step in a permission request in this chat; the request also waits under Permission requests in the account menu. Tell the person in one or two sentences what the step is. They can ask you again after they allow it, and the step must then be the same. Do not try this step again in this turn."
-        : "Seams Pantry stopped this step, because it uses content that this destination may not receive. It shows the person a permission request in this chat; the request also waits under Permission requests in the account menu. Tell the person in one or two sentences. They can ask you again after they allow it. Do not try this step again in this turn.",
+        ? "Purin Pantry stopped this step, because this conversation read text that a person outside the Organisation wrote, and this step changes something. It shows the person the exact step in a permission request in this chat; the request also waits under Permission requests in the account menu. Tell the person in one or two sentences what the step is. They can ask you again after they allow it, and the step must then be the same. Do not try this step again in this turn."
+        : "Purin Pantry stopped this step, because it uses content that this destination may not receive. It shows the person a permission request in this chat; the request also waits under Permission requests in the account menu. Tell the person in one or two sentences. They can ask you again after they allow it. Do not try this step again in this turn.",
     );
   }
   const connectorId = parseConnectorId(String(authority.connectorId));
@@ -608,8 +608,8 @@ export async function passOrAskForExitApproval(
   });
   throw new ExitApprovalRequestedError(
     input.reason === "outside_written"
-      ? `Seams Pantry stopped this step, because this conversation read text that a person outside the Organisation wrote, and this step changes something. It posted a card with this request in this thread, and the request continues here after it is allowed. The step must then be the same. Do not give a link. Do not try this step again in this turn. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`
-      : `Seams Pantry stopped this step, because it uses content that this destination may not receive. It posted a card with this request in this thread, and the step continues here after it is allowed. Do not give a link. Do not try this step again in this turn. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`,
+      ? `Purin Pantry stopped this step, because this conversation read text that a person outside the Organisation wrote, and this step changes something. It posted a card with this request in this thread, and the request continues here after it is allowed. The step must then be the same. Do not give a link. Do not try this step again in this turn. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`
+      : `Purin Pantry stopped this step, because it uses content that this destination may not receive. It posted a card with this request in this thread, and the step continues here after it is allowed. Do not give a link. Do not try this step again in this turn. ${slackSurfaceParts.use().cardOnlyReplyInstruction}`,
   );
 }
 

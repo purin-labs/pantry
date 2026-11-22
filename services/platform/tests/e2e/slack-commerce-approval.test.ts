@@ -235,7 +235,7 @@ async function slackCommerceApprovalJourney({
   await expect.poll(() => answers.length, { timeout: 30_000 }).toBe(3);
   expect(answers[2]).toMatchObject({ replaceOriginal: true });
   expect(answers[2]?.text).toContain(`Approved by <@${USER_ID}>`);
-  expect(answers[2]?.text).toContain("Seams Pantry made the change.");
+  expect(answers[2]?.text).toContain("Purin Pantry made the change.");
   expect(answers[2]?.buttons).not.toContain("commerce_action_approve");
   await expect
     .poll(() => slack.messages[0]?.text, { timeout: 30_000 })

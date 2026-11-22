@@ -3,7 +3,7 @@ import {
   type ProviderCleanupResult,
 } from "./provider-adapter";
 
-/** What a person does when Seams cannot revoke the Gmail access. */
+/** What a person does when Purin cannot revoke the Gmail access. */
 export const GMAIL_MANUAL_INSTRUCTION =
   "revoke_gmail_access_in_google" as const;
 

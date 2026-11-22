@@ -22,7 +22,7 @@ describe("portal control error boundary", () => {
     expect(problem).toEqual({
       kind: "provider_configuration_missing",
       message:
-        "This integration is unavailable. Ask your Seams Pantry administrator to configure it, then try again.",
+        "This integration is unavailable. Ask your Purin Pantry administrator to configure it, then try again.",
       supportReference: "support_123",
     });
   });

@@ -144,7 +144,7 @@ class OperationsPreview extends React.Component<object, State> {
       <main className="ops-preview">
         <header className="ops-header">
           <div>
-            <div className="ops-eyebrow">SEAMS PANTRY / OPERATIONS</div>
+            <div className="ops-eyebrow">PURIN PANTRY / OPERATIONS</div>
             <h1>From request to receipt.</h1>
             <p>The production components, with local example data.</p>
           </div>

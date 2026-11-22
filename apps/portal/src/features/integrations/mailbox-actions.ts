@@ -179,7 +179,7 @@ export async function reconnectAgentMailbox(
     context,
     { kind: "reconnect_mailbox", integrationAccountId },
     { kind: "agent_mailbox", integrationAccountId },
-    "Mail sync restarted. Seams Pantry starts again from now.",
+    "Mail sync restarted. Purin Pantry starts again from now.",
   );
 }
 
@@ -266,7 +266,7 @@ export async function rejectEmailReply(
     context,
     { kind: "reject_email_reply", proposalId },
     { kind: "email_reply", proposalId, operation: "reject" },
-    "Reply rejected. Seams Pantry is removing its draft from Gmail.",
+    "Reply rejected. Purin Pantry is removing its draft from Gmail.",
   );
 }
 

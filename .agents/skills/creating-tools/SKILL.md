@@ -1,6 +1,6 @@
 ---
 name: creating-tools
-description: "Build Seams Pantry provider integrations and agent capabilities through the Platform adapter, authorization, and Tool Host boundaries. Use for a new API integration or production agent tool."
+description: "Build Purin Pantry provider integrations and agent capabilities through the Platform adapter, authorization, and Tool Host boundaries. Use for a new API integration or production agent tool."
 ---
 
 # Creating tools

@@ -18,7 +18,7 @@ const TERM_CHARACTER_LIMIT = 80;
 /**
  * The names that a person says to the agent, first in the list. "Pantry" is
  * the wake phrase's name: Whisper once wrote it as "Seder" (Plan 82 Phase 4).
- * "Sous Chef" is the agent and "Pantry" the short name of Seams Pantry.
+ * "Sous Chef" is the agent and "Pantry" the short name of Purin Pantry.
  */
 const ASSISTANT_NAMES = ["Satyr", "Sous Chef", "Pantry"] as const;
 

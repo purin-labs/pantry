@@ -1,6 +1,6 @@
 ---
 title: Runtime request flow
-description: How Seams Pantry admits, runs, delivers, and recovers one piece of work.
+description: How Purin Pantry admits, runs, delivers, and recovers one piece of work.
 ---
 
 # Runtime request flow

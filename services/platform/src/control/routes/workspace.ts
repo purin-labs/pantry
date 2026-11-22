@@ -248,7 +248,7 @@ function buildHomeBlockers(input: HomeViewBuildInput): readonly HomeBlocker[] {
     blockers.push({
       kind: "synchronization",
       title: "Workspace activation is in progress",
-      reason: "Seams Pantry is still preparing this workspace.",
+      reason: "Purin Pantry is still preparing this workspace.",
       consequence:
         "Daily operations will be available when activation completes.",
       observedAt: new Date(input.projection.updated_at).toISOString(),
@@ -287,7 +287,7 @@ function buildHomeBlockers(input: HomeViewBuildInput): readonly HomeBlocker[] {
     blockers.push({
       kind: "synchronization",
       title: "Operations are unavailable",
-      reason: "Seams Pantry cannot load changes that need approval right now.",
+      reason: "Purin Pantry cannot load changes that need approval right now.",
       consequence: "Pending decisions may not be visible.",
       observedAt: null,
       nextAction: {
@@ -337,7 +337,7 @@ function homeReadinessBlockerDetail(
     case "readiness_not_evaluated":
       return {
         kind: "workspace",
-        title: "Seams Pantry is checking this workspace",
+        title: "Purin Pantry is checking this workspace",
         reason: "The latest setup check has not finished.",
         consequence: "Actions that require approval are unavailable.",
         actionKind: "manage_workspace",
@@ -358,7 +358,7 @@ function homeReadinessBlockerDetail(
       return {
         kind: "workspace",
         title: "Workspace setup needs repair",
-        reason: "Seams Pantry cannot start this workspace right now.",
+        reason: "Purin Pantry cannot start this workspace right now.",
         consequence: "Actions that require approval are unavailable.",
         actionKind: "manage_workspace",
         actionLabel: "Open workspace settings",
@@ -369,7 +369,7 @@ function homeReadinessBlockerDetail(
         kind: "authentication",
         title: "Slack is not connected",
         reason: "Connect Slack to receive requests and team updates.",
-        consequence: "Seams Pantry cannot send updates to your team.",
+        consequence: "Purin Pantry cannot send updates to your team.",
         actionKind: "manage_workspace",
         actionLabel: "Connect Slack",
         destination: { kind: "integrations" },
@@ -378,8 +378,8 @@ function homeReadinessBlockerDetail(
       return {
         kind: "workspace",
         title: "Choose a Slack channel",
-        reason: "Choose where Seams Pantry should send team updates.",
-        consequence: "Seams Pantry cannot send updates to your team.",
+        reason: "Choose where Purin Pantry should send team updates.",
+        consequence: "Purin Pantry cannot send updates to your team.",
         actionKind: "manage_workspace",
         actionLabel: "Choose a channel",
         destination: { kind: "integrations" },
@@ -447,7 +447,7 @@ function homeReadinessBlockerDetail(
     case "runtime_admission_unavailable":
       return {
         kind: "synchronization",
-        title: "Seams Pantry is temporarily unavailable",
+        title: "Purin Pantry is temporarily unavailable",
         reason: "Pantry cannot accept new work right now.",
         consequence: "Pending work will wait until service resumes.",
         actionKind: "review_operations",

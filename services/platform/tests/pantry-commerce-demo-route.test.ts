@@ -88,7 +88,7 @@ const ORGANISATION_ID = "organisation_demo_profiles";
 const INTEGRATION_ACCOUNT_ID = "integration_commerce_demo_profiles";
 const MERCHANT_ID = "merchant_pantry_demo_profiles";
 
-describe("Seams Checkout demo profile route", () => {
+describe("Purin Checkout demo profile route", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     prepareAuthorizedControlMocks();

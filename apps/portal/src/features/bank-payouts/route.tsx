@@ -185,7 +185,7 @@ function SourceNotice(props: {
     case "unavailable":
       return (
         <TimeLanesNote>
-          {name} did not answer. This view shows the payouts that Seams Pantry
+          {name} did not answer. This view shows the payouts that Purin Pantry
           read last.
         </TimeLanesNote>
       );
@@ -193,7 +193,7 @@ function SourceNotice(props: {
     case "scope_missing":
       return (
         <TimeLanesNote>
-          {name} does not let Seams Pantry read payouts yet.{" "}
+          {name} does not let Purin Pantry read payouts yet.{" "}
           <a href={props.integrationsPath}>
             Connect {name} again in Integrations
           </a>{" "}
@@ -203,7 +203,7 @@ function SourceNotice(props: {
     case "refresh_failed":
       return (
         <TimeLanesNote>
-          {name} did not renew the Seams Pantry sign-in.{" "}
+          {name} did not renew the Purin Pantry sign-in.{" "}
           <a href={props.integrationsPath}>
             Connect {name} again in Integrations
           </a>{" "}
@@ -213,7 +213,7 @@ function SourceNotice(props: {
     case "revoked":
       return (
         <TimeLanesNote>
-          Seams Pantry was removed from your {name} account.{" "}
+          Purin Pantry was removed from your {name} account.{" "}
           <a href={props.integrationsPath}>
             Connect {name} again in Integrations
           </a>{" "}

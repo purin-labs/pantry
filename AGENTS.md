@@ -1,4 +1,4 @@
-# Seams Pantry — Developer Guide
+# Purin Pantry — Developer Guide
 
 ## This codebase is yours
 
@@ -84,38 +84,39 @@ Read <brief file> and follow it." < /dev/null`. The whole `/goal` text must
 
 ## Product direction
 
-Seams Pantry is the bakery operating system. People and Sous Chef agents
+Purin Pantry is the bakery operating system. People and Sous Chef agents
 operate it through the Portal and Slack.
 The product direction covers the full bakery and café business: demand,
 purchasing, recipes, production, quality checks, packaging, inventory, sales,
 distribution, and customer service.
 
-Kitchen is the production orchestration area within Seams Pantry. Pantry
+Kitchen is the production orchestration area within Purin Pantry. Pantry
 connects that work to commerce and daily operations. Agentic ecommerce means
 agents can investigate records, prepare changes, and execute authorized
 commerce actions with policy checks, approvals, and durable receipts.
 
-Seams is the company. These are its public names:
+Purin is the company. These are its public names:
 
-- Seams Pantry: the operator product, "the bakery operating system". The
+- Purin Pantry: the operator product, "the bakery operating system". The
   short form is Pantry.
-- Sous Chef: the agents in Pantry. The full form is Seams Sous Chef.
-- Seams Checkout: the built-in commerce that people see, beside Shopify. It
+- Sous Chef: the agents in Pantry. The full form is Purin Sous Chef.
+- Purin Checkout: the built-in commerce that people see, beside Shopify. It
   includes the checkout pages, the QR order page and the Register.
-- Seams Gantry: robot orchestration, for the ceiling cobots, the smart ovens
+- Purin Gantry: robot orchestration, for the ceiling cobots, the smart ovens
   and the MuJoCo simulation of Plan 24. The name is reserved; the Devices page
   stays "Devices".
-- Seams Pay: signed payment approvals.
-- Seams Vault: the Vault store that Seams runs.
+- Seams Pay: signed payment approvals. It is a product of the Seams wallet,
+  so it keeps the Seams name.
+- Purin Vault: the Vault store that Purin runs.
 
-Use "Seams Pantry" in the Portal, the site, the docs and agent text, and
+Use "Purin Pantry" in the Portal, the site, the docs and agent text, and
 "Pantry" after the first use on a page. Kitchen is the area name. Code,
 Worker names and wire values use the new names (Plan 93); plans keep the old
 names. The section "Old and new names" maps each old name.
 
 The business reference is a pâtisserie selling fresh products and packaged gifts
 through shops and online channels, such as Noix de Beurre or Lenôtre. These are
-product and distribution references. Seams makes no claim about their use of
+product and distribution references. Purin makes no claim about their use of
 robotic production.
 
 Plans 22 and 23 record accepted commerce paths. Plan 24 owns the cobot bake
@@ -127,7 +128,7 @@ Collaborative authoring is scoped by
 [Plan 40](docs/plan-40-product-description-drafting.md) and
 [Plan 40B](docs/plan-40B-collaborative-menu-editor.md), the collaborative
 menu editor: one live menu on every screen in the shop and on the QR order
-page. Seams builds no merchant websites; operators build their own sites with
+page. Purin builds no merchant websites; operators build their own sites with
 Claude or Codex on the commerce engine. They replace the retired file-native plans. General desktop filesystem synchronization
 remains deferred. Cloud agent profiles and Markdown playbooks belong to Plan 16.
 
@@ -154,7 +155,7 @@ execution inspection: [Plan 42J](docs/plan-42J-brain.md) owns its records and
 [Plan 79](docs/plan-79-agent-vault.md) owns the agent Vault: website logins,
 secure notes, contact profiles and payment cards that agents use without
 seeing a secret, an agent browser that fills them, and a store that each
-Organisation chooses: Seams Vault or 1Password. Cards stay off in production
+Organisation chooses: Purin Vault or 1Password. Cards stay off in production
 until the PCI DSS verification passes.
 [Plan 74](docs/plan-74-side-cases.md) owns side Cases: an agent proposes
 separate work from a Portal chat or a Slack thread, and a person starts it as
@@ -193,8 +194,8 @@ Workflow labor and energy costs remain a future Plan 86 feature.
 [Plan 87](docs/plan-87-screen-context.md) owns screen context: where a chat
 started, which page each message carries, and one surface protocol for what a
 person sees and what the agent does on it.
-[Plan 88](docs/plan-88-satyr-funded-jev.md) owns Jev from Seams: the TypeSafe key of
-Seams, an on/off switch for each Jev feature, and a monthly allowance in the
+[Plan 88](docs/plan-88-satyr-funded-jev.md) owns Jev from Purin: the TypeSafe key of
+Purin, an on/off switch for each Jev feature, and a monthly allowance in the
 subscription.
 [Plan 89](docs/plan-89-outside-written-content.md) owns the defence against
 prompt injection: a label says that a person outside the Organisation wrote
@@ -206,14 +207,15 @@ and its POS payment adapters: menu items and modifiers at the counter, cash
 with change, Square Terminal Japan cashless (`CARD_PRESENT`, `FELICA_ALL`,
 `QR_CODE`) with manual cash refunds for FeliCa, and GMO `stera` over
 `shop-gateway` LAN (proposed).
-[Plan 91](docs/plan-91-seams-atelier-rename.md) owns the Seams Pantry rename:
-the display names, the code names, the repository name and the public address.
+[Plan 91](docs/plan-91-seams-atelier-rename.md) owns the Purin Pantry rename:
+the display names, the code names, the repository name and the provider
+registrations (names, icons and callback URLs at each provider).
 [Plan 92](docs/plan-92-new-pantry-repository.md) owns the new repository and
 the cleanup of unused, duplicate and legacy code and weak tests.
 [Plan 93](docs/plan-93-clean-cutover.md) owns the clean cutover to the new
 `pantry-*` stack on `purin.io` domains, with no data move and no old name.
 [Plan 96](docs/plan-96-gemini-models.md) owns the Gemini models: Gemini 4
-Hydrogen on the route that Seams pays for, and an Organisation's own Gemini
+Hydrogen on the route that Purin pays for, and an Organisation's own Gemini
 API key for Hydrogen, Carbon, Argon and Neon, through the model exit Worker.
 Plan 60A owns
 equipment models. Its simulation phase is complete, with reference gaps accepted
@@ -237,25 +239,26 @@ them. If you read an old name there, use this table to find the new name.
 
 | Old name                                               | New name                                                                           |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| Satyr, the product; Atelier (16 to 18 November 2026)   | Seams Pantry, then Pantry. Code: `pantry`, `Pantry*`, `PANTRY_*`                   |
-| Satyr, the company, the maker or the party that keeps data | Seams                                                                          |
+| Satyr, the product; Atelier (16 to 18 November 2026)   | Purin Pantry, then Pantry. Code: `pantry`, `Pantry*`, `PANTRY_*`                   |
+| Satyr, the company, the maker or the party that keeps data | Purin                                                                          |
 | Satyr, the agent; Urk                                  | Sous Chef                                                                          |
-| Satyr Agents                                           | Seams Pantry                                                                       |
-| CafeOS                                                 | Seams Pantry for the product; Café for the switcher area. Wire value `"cafe"`      |
+| Satyr Agents                                           | Purin Pantry                                                                       |
+| CafeOS                                                 | Purin Pantry for the product; Café for the switcher area. Wire value `"cafe"`      |
 | Satyr Kitchen, BakeryOS                                | Kitchen. Wire value `"kitchen"`                                                    |
 | AgentCommerce                                          | Commerce, the switcher area. Wire value `"commerce"`                               |
-| Satyr Commerce                                         | Seams Checkout. Provider id `builtin_commerce`, code name `builtInCommerce`        |
+| Satyr Commerce                                         | Purin Checkout. Provider id `builtin_commerce`, code name `builtInCommerce`        |
 | Underclerk                                             | The commerce engine. Code `commerce`, `Commerce*`, `COMMERCE_*`; events `commerce.*.v1` |
-| Satyr Vault                                            | Seams Vault                                                                        |
-| Satyr identity, Satyr's AI, Jev from Satyr             | Seams Pay (payment approvals only), Seams AI, Jev from Seams                       |
-| Seams Commis                                           | Seams Gantry                                                                       |
+| Satyr Vault                                            | Purin Vault                                                                        |
+| Satyr identity, Satyr's AI, Jev from Satyr             | Seams Pay (payment approvals only), Purin AI, Jev from Purin                       |
+| Seams Commis                                           | Purin Gantry                                                                       |
+| Seams Pantry, Checkout, Vault, Gantry                  | Purin Pantry, Purin Checkout, Purin Vault, Purin Gantry                            |
 | `satyr-edge`, `underclerk`, `satyr-*` Workers          | `pantry`, `pantry-commerce`, `pantry-*` (Plan 93 tables)                           |
 
 Four things keep an old name on purpose, and `git grep` finds them:
 
 - The wake phrase "Hey Satyr", its model `hey_satyr.onnx` and its training
   scripts, until a "Hey Sous Chef" wake model passes. The privacy text says
-  "Seams keeps no audio."
+  "Purin keeps no audio."
 - The Google Cloud project `satyr-gmail-dev` and its Pub/Sub topic of the
   Gmail push channel: a project id cannot change.
 - The pinned Kitchen physics bundles in `apps/portal/public/bakery-physics`,
@@ -332,7 +335,7 @@ Pantry’s production runtime is Cloudflare-native:
   sign-in (Plan 72). `organisation_byo` + `openai`, `anthropic` or
   `google` runs Pi with the organisation's purpose-bound, Vault-encrypted
   API key of that provider (Gemini 4 for `google`, Plan 96). `platform` +
-  `openai-compatible` runs Pi with the Seams `OPENROUTER_API_KEY`; its default
+  `openai-compatible` runs Pi with the Purin `OPENROUTER_API_KEY`; its default
   model is Gemini 4 Hydrogen. Missing or exhausted authority fails the
   selected route.
 - The model exit Worker `pantry-model-exit` sends every direct model-provider
@@ -705,7 +708,7 @@ and every route runs Pi. Organisation-funded `organisation_subscription` +
 sign-in, through the ChatGPT exit container. The Worker signs in with a device code, and the Session refreshes the
 token under a lease on `organisation_codex_connection`, because OpenAI rotates
 refresh tokens. Organisation-funded `organisation_byo` turns use a
-purpose-bound, Vault-encrypted API key of OpenAI, Anthropic or Google. Seams-funded `platform` +
+purpose-bound, Vault-encrypted API key of OpenAI, Anthropic or Google. Purin-funded `platform` +
 `openai-compatible` turns use `OPENROUTER_API_KEY`. The Actor owns accepted
 history, Tool Host authority, checkpoints, budgets, cancellation, and delivery.
 Pi Durable owns Pi tasks in Actor SQLite and restores from the Actor-owned

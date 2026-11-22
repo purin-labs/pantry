@@ -1,6 +1,6 @@
 ---
 title: Contracts
-description: How Seams Pantry keeps provider-neutral commerce and actor protocols precise with TypeScript schemas.
+description: How Purin Pantry keeps provider-neutral commerce and actor protocols precise with TypeScript schemas.
 ---
 
 # Contracts

@@ -443,15 +443,15 @@ function providerCompletionFailureMessage(
   if (completion.provider === "whatsapp") {
     switch (completion.failure_reason_code) {
       case "provider_account_ineligible":
-        return "WhatsApp wasn’t connected. Reopen Meta and choose Edit settings. If Meta says it can’t onboard customers, Meta has not approved Seams yet.";
+        return "WhatsApp wasn’t connected. Reopen Meta and choose Edit settings. If Meta says it can’t onboard customers, Meta has not approved Purin yet.";
       case "provider_scope_missing":
         return "WhatsApp wasn’t connected. Reopen Meta, choose Edit settings, and approve all requested access.";
       case "provider_distribution_disabled":
-        return "WhatsApp setup is waiting for Meta to approve Seams.";
+        return "WhatsApp setup is waiting for Meta to approve Purin.";
     }
   }
   if (completion.failure_reason_code === "provider_account_already_claimed") {
-    return `${providerCompletionProviderLabel(completion.provider, "Connection")} wasn’t connected. That account is already connected to another Seams Pantry organisation.`;
+    return `${providerCompletionProviderLabel(completion.provider, "Connection")} wasn’t connected. That account is already connected to another Purin Pantry organisation.`;
   }
   return `${providerCompletionProviderLabel(completion.provider, "Connection")} wasn’t connected. Review the provider window and try again.`;
 }

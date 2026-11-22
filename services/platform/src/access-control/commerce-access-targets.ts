@@ -28,7 +28,7 @@ export type PublishedCommerceTarget =
       providerTarget: CommerceProviderTarget;
       targetRef: AccessTargetRef;
       label: string;
-      detail: "Seams Checkout product";
+      detail: "Purin Checkout product";
     }>;
 
 /** The record type of a commerce read grant. */

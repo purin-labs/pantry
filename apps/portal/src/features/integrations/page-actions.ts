@@ -83,7 +83,7 @@ export function createIntegrationsPageActions(
       context,
       { kind: "provision_commerce" },
       { kind: "provision_commerce" },
-      "Seams Checkout is ready.",
+      "Purin Checkout is ready.",
     ),
     publishExportCoordination: runIntegrationsCommand.bind(
       null,

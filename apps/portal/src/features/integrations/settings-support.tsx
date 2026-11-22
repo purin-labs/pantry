@@ -146,17 +146,17 @@ export const BLOCKER_COPY: Readonly<Record<string, string>> = {
   owner_missing: "Assign an active workspace owner.",
   communication_connection_missing: "Connect Slack.",
   communication_destination_missing: "Choose a Slack channel.",
-  commerce_system_missing: "Choose Seams Checkout or Shopify.",
+  commerce_system_missing: "Choose Purin Checkout or Shopify.",
   credential_unresolved: "Reconnect the affected service.",
   webhook_unhealthy: "Reconnect the affected service so updates can resume.",
   policy_snapshot_missing: "Save your Slack update settings.",
   cue_snapshot_missing: "Save your Slack update settings.",
   readiness_not_evaluated:
-    "Seams Pantry has not finished checking this workspace yet.",
+    "Purin Pantry has not finished checking this workspace yet.",
   environment_conflict:
     "A connected service is a test account while this workspace runs live, or the reverse. Disconnect it, then reconnect with the matching account.",
   placement_missing:
-    "Seams Pantry needs to repair this workspace before it can start. Contact support if this persists.",
+    "Purin Pantry needs to repair this workspace before it can start. Contact support if this persists.",
 };
 
 /**

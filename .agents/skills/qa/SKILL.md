@@ -1,9 +1,9 @@
 ---
 name: qa
-description: "Verify Seams Pantry operator journeys in Kitchen, Café and Commerce through Portal or Slack, durable actors, and commerce boundaries. Use for stack QA, smoke tests, or deployment acceptance."
+description: "Verify Purin Pantry operator journeys in Kitchen, Café and Commerce through Portal or Slack, durable actors, and commerce boundaries. Use for stack QA, smoke tests, or deployment acceptance."
 ---
 
-# Seams Pantry QA
+# Purin Pantry QA
 
 Prove the requested operator journey in the selected environment. Report local,
 provider Sandbox, production, and simulated-machine evidence separately.

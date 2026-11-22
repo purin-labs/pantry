@@ -104,7 +104,7 @@ export function gmailMailboxSummary(
   agentName: string | null,
 ): string {
   if (mailbox.connectionLifecycle !== "active") {
-    return "Gmail is not connected. Seams Pantry reads no mail until you reconnect this mailbox.";
+    return "Gmail is not connected. Purin Pantry reads no mail until you reconnect this mailbox.";
   }
   switch (mailbox.policy.kind) {
     case "disabled_by_default":
@@ -113,7 +113,7 @@ export function gmailMailboxSummary(
     case "enabled": {
       const processing = mailbox.runtime?.processing ?? null;
       if (processing === null) {
-        return "On. Seams Pantry is starting to watch this mailbox.";
+        return "On. Purin Pantry is starting to watch this mailbox.";
       }
       if (processing.kind === "paused") {
         return "Paused. New mail stays in Gmail until processing resumes.";
@@ -314,7 +314,7 @@ export function mailboxAuthorizationNotice(
       headline: "Gmail authorization has lapsed",
       detail:
         `This authorization was due to expire ${formatAbsoluteTime(authorization.expiresAt)}. ` +
-        "Reconnect to resume processing from the last message Seams Pantry accepted.",
+        "Reconnect to resume processing from the last message Purin Pantry accepted.",
     };
   }
   if (remaining <= AUTHORIZATION_WARNING_MS) {

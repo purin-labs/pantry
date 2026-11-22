@@ -1465,7 +1465,7 @@ export class MailInboxRoute extends React.Component<InboxProps, InboxState> {
           <div className="mail-inbox-connect">
             <h2>Connect your mailbox</h2>
             <p>
-              Connect a Gmail mailbox that Seams Pantry may read. Send-only
+              Connect a Gmail mailbox that Purin Pantry may read. Send-only
               accounts stay available for operational email.
             </p>
             <a href={`${this.props.integrationsPath}?integration=gmail`}>
@@ -2337,7 +2337,7 @@ function MailboxReconnect(
   return (
     <div className="mail-agent-strip" data-tone="danger">
       <p role="alert">
-        Google refused the Gmail sign-in for {props.address}. Seams Pantry
+        Google refused the Gmail sign-in for {props.address}. Purin Pantry
         cannot read this mailbox until it is connected again. Your mail stays in
         Gmail.
       </p>

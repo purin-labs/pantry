@@ -55,7 +55,7 @@ declare module "vitest" {
 
 const MERCHANT_ID = "merchant_chat_recipes";
 /** The sentence of the exit check: the step stopped, and a person was asked. */
-const STOPPED = "Seams Pantry stopped this step";
+const STOPPED = "Purin Pantry stopped this step";
 
 /** What the model does for one chat message, found by a word in the message. */
 type Script = Readonly<{

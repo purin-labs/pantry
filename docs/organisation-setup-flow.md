@@ -1,7 +1,7 @@
 # Organisation setup flow
 
-This spec covers the Organisations page when a person has no Seams Pantry
-organisation, and the **Set up Seams Pantry** dialog. Pantry makes the
+This spec covers the Organisations page when a person has no Purin Pantry
+organisation, and the **Set up Purin Pantry** dialog. Pantry makes the
 organisation itself ([Plan 95](plan-95-pantry-own-accounts.md) step 2); no
 outside account takes part.
 
@@ -18,7 +18,7 @@ idempotency key of the route. Pantry does not make a second organisation.
 
 ## Shape
 
-One dialog with the constant title **Set up Seams Pantry** and a counter,
+One dialog with the constant title **Set up Purin Pantry** and a counter,
 "Step 2 of 4". A thin segmented bar under the title shows the four steps with
 a short label under each segment. The body below the bar changes for each
 step. The page behind the dialog does not change.
@@ -26,9 +26,9 @@ step. The page behind the dialog does not change.
 | #   | Step bar label | Body heading                            | Primary action    |
 | --- | -------------- | --------------------------------------- | ----------------- |
 | 1   | Organisation   | Name your organisation                  | Create            |
-| 2   | Prepare        | Seams Pantry prepares your organisation | (none)            |
+| 2   | Prepare        | Purin Pantry prepares your organisation | (none)            |
 | 3   | Jev            | Jev (optional)                          | Turn on · Skip    |
-| 4   | Done           | Seams Pantry is ready                   | Open organisation |
+| 4   | Done           | Purin Pantry is ready                   | Open organisation |
 
 A segment is filled when its step is done or current, empty when it is next,
 red when its step failed, and amber when it needs attention. The current step

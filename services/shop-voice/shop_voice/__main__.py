@@ -65,7 +65,7 @@ def run_service() -> int:
     speech_files.start()
     tls.start()
     threading.Thread(target=serve, args=(shop, tls), name="server", daemon=True).start()
-    print(f"Seams Pantry shop voice {VERSION} runs as {config.hostname}.", flush=True)
+    print(f"Purin Pantry shop voice {VERSION} runs as {config.hostname}.", flush=True)
 
     refusals = 0
     next_vocabulary = 0.0

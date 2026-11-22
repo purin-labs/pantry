@@ -299,7 +299,7 @@ function discordInteractionErrorResponse(
         400,
       );
     case "discord_command_unsupported":
-      return discordEphemeralResponse("This Seams Pantry command is unsupported.");
+      return discordEphemeralResponse("This Purin Pantry command is unsupported.");
     default:
       return assertNever(error);
   }

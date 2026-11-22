@@ -46,9 +46,9 @@ export function agentSentence(agent: MailboxSetupAgent): string {
     case "ready":
       return `${agent.name} will answer this mailbox.`;
     case "inactive":
-      return `${agent.name} will answer this mailbox. Seams Pantry makes it active first.`;
+      return `${agent.name} will answer this mailbox. Purin Pantry makes it active first.`;
     case "absent":
-      return `Seams Pantry creates the agent ${agent.name} for this mailbox. You can change its instructions later on Agents.`;
+      return `Purin Pantry creates the agent ${agent.name} for this mailbox. You can change its instructions later on Agents.`;
   }
 }
 
@@ -77,9 +77,9 @@ export function modelSentence(plan: MailboxSetupPlan): string {
     case "approved":
       return "Approved for email content.";
     case "not_approved":
-      return "Not approved for email content yet. Seams support records your consent, then approves it. Until then this mailbox stays off.";
+      return "Not approved for email content yet. Purin support records your consent, then approves it. Until then this mailbox stays off.";
     case "unavailable":
-      return "No AI model is connected. Connect one under AI account, then ask Seams support to approve it for email content.";
+      return "No AI model is connected. Connect one under AI account, then ask Purin support to approve it for email content.";
   }
 }
 
@@ -91,12 +91,12 @@ export function actionHint(
   const name = plan.agent.name;
   switch (action) {
     case "set_up_and_turn_on":
-      return `Seams Pantry makes the changes under Setup. Then ${name} reads new mail. Sensitive or uncertain replies wait as drafts for your approval.`;
+      return `Purin Pantry makes the changes under Setup. Then ${name} reads new mail. Sensitive or uncertain replies wait as drafts for your approval.`;
     case "set_up":
-      return "Seams Pantry makes the changes under Setup. The mailbox stays off until Seams approves your AI model for email content.";
+      return "Purin Pantry makes the changes under Setup. The mailbox stays off until Purin approves your AI model for email content.";
     case "turn_on":
       return `When on, ${name} sends routine replies at once. Sensitive or uncertain replies wait as drafts for your approval.`;
     case "wait_for_model":
-      return "This mailbox is set up. It turns on after Seams approves your AI model for email content.";
+      return "This mailbox is set up. It turns on after Purin approves your AI model for email content.";
   }
 }

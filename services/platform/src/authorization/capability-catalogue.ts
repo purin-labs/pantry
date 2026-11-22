@@ -555,7 +555,7 @@ const CAPABILITY_SEEDS = {
   [CAPABILITY_KEYS.commerceCatalogUpdateDescription]: {
     label: "Update a product description",
     description:
-      "Apply one approved reviewed description to an exact Seams Checkout product.",
+      "Apply one approved reviewed description to an exact Purin Checkout product.",
     category: "commerce",
     risk: "external_effect",
     target: "commerce_command",

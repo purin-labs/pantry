@@ -1,6 +1,6 @@
 ---
 title: Module vocabulary
-description: The Lowerarchy names for the commerce responsibilities of Seams Pantry and their current homes.
+description: The Lowerarchy names for the commerce responsibilities of Purin Pantry and their current homes.
 ---
 
 # Module vocabulary

@@ -290,7 +290,7 @@ export function gmailMailboxEntrySummary(
     );
   }
   return isSendOnlyGmailAccount(entry.account)
-    ? "Send only. Seams Pantry sends email from this address after you approve it. It reads no mail."
+    ? "Send only. Purin Pantry sends email from this address after you approve it. It reads no mail."
     : "Connected. Mailbox settings are not available for this account yet.";
 }
 

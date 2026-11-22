@@ -156,7 +156,7 @@ function buildPantryEcommerceResources(): CommerceResourcesV1 {
       {
         id: "location_pantry_ecommerce_fulfillment",
         revision: 1,
-        name: "Seams Pantry Demo Fulfillment",
+        name: "Purin Pantry Demo Fulfillment",
         kind: "fulfillment_center",
         lifecycle: {
           state: "active",
@@ -169,7 +169,7 @@ function buildPantryEcommerceResources(): CommerceResourcesV1 {
       {
         id: "channel_pantry_ecommerce_online",
         revision: 1,
-        name: "Seams Checkout Demo Storefront",
+        name: "Purin Checkout Demo Storefront",
         kind: "online",
         lifecycle: {
           state: "active",

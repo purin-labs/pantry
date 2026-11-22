@@ -82,7 +82,7 @@ export async function collectCounterSale(
 }
 
 /**
- * Send the Square Point of Sale app's answer for the sale. Seams Pantry reads
+ * Send the Square Point of Sale app's answer for the sale. Purin Pantry reads
  * the payment from Square before it places the order.
  */
 export async function recordCounterSaleHandoffResult(
@@ -377,7 +377,7 @@ export function counterSaleGuidance(sale: CounterSale): string {
       return "The terminal is waiting for the card. Do not start another payment.";
     case "submission_unknown":
       return (
-        "Seams Checkout does not yet know whether this payment went through. " +
+        "Purin Checkout does not yet know whether this payment went through. " +
         "Reconcile it before taking payment again."
       );
     case "declined":

@@ -179,7 +179,7 @@ function actionGuidance(state: CommerceActionRecord["state"]): string {
   switch (state) {
     case "proposed":
     case "approval_requested":
-      return "Review the exact change above. Approval authorizes Seams Pantry to apply it to the connected commerce system.";
+      return "Review the exact change above. Approval authorizes Purin Pantry to apply it to the connected commerce system.";
     case "signed":
       return "This change is approved and ready to run.";
     case "executing":

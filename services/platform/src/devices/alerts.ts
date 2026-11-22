@@ -157,7 +157,7 @@ export async function syncGatewayAlerts(
         organisationId,
         subjectId: gateway.gatewayId,
         kind: "task_connection_lost",
-        text: `Seams Pantry cannot hear ${gateway.name}, and ${taskCountText(tasks.length)} on it. New work on it has stopped. Check the machines in the shop.`,
+        text: `Purin Pantry cannot hear ${gateway.name}, and ${taskCountText(tasks.length)} on it. New work on it has stopped. Check the machines in the shop.`,
         closedText: `${gateway.name} is connected again. Check the task result in the run.`,
         now,
       });
@@ -226,7 +226,7 @@ export async function openResultUnknownAlert(
     organisationId: scope.organisationId,
     subjectId: device.deviceId,
     kind: "task_result_unknown",
-    text: `Seams Pantry does not know if the last task of ${device.name} finished. Do not repeat it until a person checks the machine.`,
+    text: `Purin Pantry does not know if the last task of ${device.name} finished. Do not repeat it until a person checks the machine.`,
     closedText: `The last task of ${device.name} is settled.`,
     now,
   });

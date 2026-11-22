@@ -63,7 +63,7 @@ export function installVaultIntegrationPreview(organisationId: string): void {
           vaults: [
             {
               vaultId: "previewvaultpantry00000000",
-              title: "Seams",
+              title: "Purin",
               itemCount: 0,
             },
             {
@@ -78,7 +78,7 @@ export function installVaultIntegrationPreview(organisationId: string): void {
         vaultTitle:
           command.vaultId === "previewvaultprivate0000000"
             ? "Private"
-            : "Seams",
+            : "Purin",
         connectedAt: Date.now(),
         reachable: true,
       };

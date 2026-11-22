@@ -275,7 +275,7 @@ export function commerceRelationshipLabel(definitionId: string): string {
 export function commerceSourceLabel(source: string): string {
   switch (source) {
     case "commerce":
-      return "Seams Checkout";
+      return "Purin Checkout";
     case "shopify":
       return "Shopify";
     case "stripe":

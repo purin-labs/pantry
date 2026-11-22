@@ -1,6 +1,6 @@
 ---
 title: Guides
-description: Task-focused paths for building, operating, and extending Seams Pantry.
+description: Task-focused paths for building, operating, and extending Purin Pantry.
 ---
 
 # Guides

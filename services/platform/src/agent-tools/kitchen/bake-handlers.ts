@@ -84,7 +84,7 @@ export async function proposeBakeForEmbeddedHarness(
     throw new BakeRequestError(
       "message" in proposed.error && typeof proposed.error.message === "string"
         ? proposed.error.message
-        : "Seams Pantry could not store the proposal now. Nothing was stored.",
+        : "Purin Pantry could not store the proposal now. Nothing was stored.",
     );
   if (proposed.value.kind !== "proposed")
     throw new Error("A bake proposal returned another outcome.");
@@ -196,7 +196,7 @@ export async function pauseBakeRunForEmbeddedHarness(
         throw new BakeRequestError(
           "message" in paused.error && typeof paused.error.message === "string"
             ? `${paused.error.message} Nothing changed. Tell the person; do not retry.`
-            : "Seams Pantry could not pause the run now. Nothing changed.",
+            : "Purin Pantry could not pause the run now. Nothing changed.",
         );
       const digest = await digestCanonical({
         sessionId: lease.session.sessionId,

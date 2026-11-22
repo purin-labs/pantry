@@ -232,11 +232,11 @@ function FundingLine(props: {
     return (
       <>
         <p className="jev-funding-line">
-          <strong>The Seams TypeSafe key</strong> pays for Jev calls.
+          <strong>The Purin TypeSafe key</strong> pays for Jev calls.
         </p>
         {view.keyAvailable ? null : (
           <p className="jev-warning" role="status">
-            The Seams key is not set. Jev calls stop until the key is set.
+            The Purin key is not set. Jev calls stop until the key is set.
           </p>
         )}
         {view.allowance === null ? null : (

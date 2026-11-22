@@ -1,6 +1,6 @@
 # Reference: a checkout with several payment options
 
-This file is a design reference for the Seams Checkout pages.
+This file is a design reference for the Purin Checkout pages.
 [Plan 77](../../plan-77-underclerk-modular-core.md) owns the payments module
 and the checkout pipeline. The operator supplied the file on 20 November 2026.
 

@@ -92,7 +92,7 @@ export function ReceiptPrintControl(
       }
     } catch {
       setNotice({
-        text: "Seams Pantry could not reach the printer. You can print in the browser.",
+        text: "Purin Pantry could not reach the printer. You can print in the browser.",
         fallback: true,
         error: true,
       });

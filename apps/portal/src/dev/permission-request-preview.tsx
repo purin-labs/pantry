@@ -321,7 +321,7 @@ function PermissionRequestPreview(): React.ReactNode {
       <header>
         <div>
           <p className="agent-preview-eyebrow">
-            Seams Pantry · Component preview
+            Purin Pantry · Component preview
           </p>
           <h1>Permission requests</h1>
         </div>

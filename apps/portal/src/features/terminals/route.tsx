@@ -102,7 +102,7 @@ export function TerminalOperationsPanel(
         <p className="terminal-panel-warning">
           {operations.unreadableAssignments} assignment
           {operations.unreadableAssignments === 1 ? "" : "s"} could not be read.
-          Those counters exist but Seams Pantry cannot describe them.
+          Those counters exist but Purin Pantry cannot describe them.
         </p>
       ) : null}
       <ul className="terminal-list">
@@ -418,7 +418,7 @@ function TerminalSetup(
   if (props.configuration.kind === "blocked") {
     return (
       <div className="terminal-setup terminal-panel-quiet">
-        Set up Seams Checkout before assigning a Square terminal.
+        Set up Purin Checkout before assigning a Square terminal.
       </div>
     );
   }
@@ -458,13 +458,13 @@ function TerminalSetup(
             : "Set up Sandbox terminal"}
         </h3>
         <p>
-          Choose the Seams Checkout counter, Square payment location, and
+          Choose the Purin Checkout counter, Square payment location, and
           documented test scenario.
         </p>
       </div>
       <div className="terminal-setup-fields">
         <label>
-          <span>Seams Checkout location</span>
+          <span>Purin Checkout location</span>
           <TerminalSelect
             name="pantryLocationId"
             items={props.configuration.pantryLocations.map(pantryLocationItem)}
@@ -580,13 +580,13 @@ function TerminalPairingSetup(
           {props.replace ? "Replace Square Terminal" : "Pair a Square Terminal"}
         </h3>
         <p>
-          Choose the Seams Checkout counter and the Square location of the
-          Terminal. Seams Pantry then shows a code to type on the Terminal.
+          Choose the Purin Checkout counter and the Square location of the
+          Terminal. Purin Pantry then shows a code to type on the Terminal.
         </p>
       </div>
       <div className="terminal-setup-fields">
         <label>
-          <span>Seams Checkout location</span>
+          <span>Purin Checkout location</span>
           <TerminalSelect
             name="pantryLocationId"
             items={props.configuration.pantryLocations.map(pantryLocationItem)}
@@ -656,14 +656,14 @@ function SquarePosAppSetup(
         <p>
           For a counter with a Square Reader and no Square Terminal. The
           Register opens the Square Point of Sale app on the same iPad, and
-          Seams Pantry checks each payment with Square. In the Square Developer
+          Purin Pantry checks each payment with Square. In the Square Developer
           Console, add this web callback URL to the Point of Sale API:{" "}
           <code>{`${window.location.origin}${SQUARE_POS_CALLBACK_PATH}`}</code>
         </p>
       </div>
       <div className="terminal-setup-fields">
         <label>
-          <span>Seams Checkout location</span>
+          <span>Purin Checkout location</span>
           <TerminalSelect
             name="pantryLocationId"
             items={props.configuration.pantryLocations.map(pantryLocationItem)}
@@ -702,7 +702,7 @@ async function submitSquarePosApp(
     withSandboxPlaceholder(new FormData(event.currentTarget)),
   );
   if (selection === null) {
-    toast.error("Choose a Seams Checkout location and a Square location.");
+    toast.error("Choose a Purin Checkout location and a Square location.");
     return;
   }
   setBusy(true);
@@ -742,7 +742,7 @@ async function submitTerminalPairing(
   const deviceName = form.get("deviceName");
   const selection = parseTerminalSelection(withSandboxPlaceholder(form));
   if (selection === null || typeof deviceName !== "string") {
-    toast.error("Choose a Seams Checkout location and a Square location.");
+    toast.error("Choose a Purin Checkout location and a Square location.");
     return;
   }
   setBusy(true);
@@ -929,7 +929,7 @@ async function submitTerminalConfiguration(
   const selection = parseTerminalSelection(new FormData(event.currentTarget));
   if (selection === null) {
     toast.error(
-      "Choose a Seams Checkout location, Square location, and Sandbox test device.",
+      "Choose a Purin Checkout location, Square location, and Sandbox test device.",
     );
     return;
   }

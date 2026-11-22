@@ -345,7 +345,7 @@ async function replyToModel(
     case 8: {
       // The denied read asked for the grant; it does not report missing data.
       const output = requireLastToolOutput(body);
-      expect(output).toContain("Seams Pantry posted a card");
+      expect(output).toContain("Purin Pantry posted a card");
       expect(output).not.toContain("Commerce read denied");
       return openRouterText(ANSWERS.askedRead, "read_permission_asked");
     }

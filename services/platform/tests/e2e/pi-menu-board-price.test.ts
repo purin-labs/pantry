@@ -194,7 +194,7 @@ it(
     await click(nonce, card.ts ?? "");
     await expect.poll(() => answers.length, { timeout: 30_000 }).toBe(2);
     expect(answers[1]).toMatchObject({ replaceOriginal: true });
-    expect(answers[1]?.text).toContain("Seams Pantry made the change.");
+    expect(answers[1]?.text).toContain("Purin Pantry made the change.");
     expect(await actionState(nonce)).toBe("confirmed");
     expect(await offer(script.itemId)).toMatchObject({
       price: { amountMinor: 600, currency: "JPY" },

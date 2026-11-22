@@ -188,7 +188,7 @@ function FileStorageSetup(props: {
     >
       <ul
         className="connect-consent-points"
-        aria-label={`What Seams Pantry can access in ${service}`}
+        aria-label={`What Purin Pantry can access in ${service}`}
       >
         <ConsentPoint
           title="You choose what to share"
@@ -200,7 +200,7 @@ function FileStorageSetup(props: {
         />
         <ConsentPoint
           title="Read only"
-          detail="Seams Pantry never edits, moves or shares your files."
+          detail="Purin Pantry never edits, moves or shares your files."
         />
         <ConsentPoint
           title="You stay in control"

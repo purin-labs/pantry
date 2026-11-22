@@ -100,7 +100,7 @@ export function GmailConnectionSetup(props: {
         />
         <ConsentPoint
           title="Use a support address"
-          detail="Not a personal inbox. Seams Pantry can read all mail in the account."
+          detail="Not a personal inbox. Purin Pantry can read all mail in the account."
           mark="caution"
         />
         <ConsentPoint
@@ -142,13 +142,13 @@ export function GmailConnectionSetup(props: {
             : "Connect send-only Gmail"}
         </button>
         <p id="gmail-send-only-help" className="notice-text">
-          For sending only: Seams Pantry sends the messages you approve and
+          For sending only: Purin Pantry sends the messages you approve and
           cannot read your mail.
         </p>
       </div>
       <div className="connection-fine-print">
         <p>
-          Until the mailbox is on, new mail stays in Gmail untouched. Seams
+          Until the mailbox is on, new mail stays in Gmail untouched. Purin
           Pantry then reads only the mail that your mailbox rules or an access
           grant allow.
         </p>
@@ -161,9 +161,9 @@ export function GmailConnectionSetup(props: {
 function GmailRetentionDisclosure(): React.ReactNode {
   return (
     <p>
-      Seams does not keep message text, attachments or reply text. Gmail keeps
+      Purin does not keep message text, attachments or reply text. Gmail keeps
       your mail, drafts and sent mail under your Google Workspace rules. Your AI
-      account processes the mail that Seams Pantry reads under its own data
+      account processes the mail that Purin Pantry reads under its own data
       terms. This processing does not use dedicated secure hardware.
     </p>
   );
@@ -427,8 +427,8 @@ function GmailProcessingSwitch(props: {
           {setup.kind === "failed"
             ? "Pantry could not check what this mailbox needs. Try again under Setup."
             : setup.kind === "absent"
-              ? "Reconnect this mailbox first. Seams Pantry reads no mail while Gmail refuses it."
-              : "Seams Pantry checks what this mailbox needs."}
+              ? "Reconnect this mailbox first. Purin Pantry reads no mail while Gmail refuses it."
+              : "Purin Pantry checks what this mailbox needs."}
         </p>
       </div>
     );
@@ -831,7 +831,7 @@ function GmailLimitsSection(props: {
       <h4>Limits</h4>
       <div className="mailbox-section-body">
         <p className="notice-text">
-          Seams Pantry pauses this mailbox when it reaches a limit. Most shops
+          Purin Pantry pauses this mailbox when it reaches a limit. Most shops
           can keep these numbers.
         </p>
         <form
@@ -919,7 +919,7 @@ function GmailLimitsSection(props: {
           <div className="setup-form-actions">
             {current === null ? (
               <p className="notice-text">
-                Seams Pantry saves these limits when you turn on{" "}
+                Purin Pantry saves these limits when you turn on{" "}
                 {props.mailbox.observedAddress}.
               </p>
             ) : (
@@ -1038,7 +1038,7 @@ function GmailConnectionSection(props: {
         )}
         {canRestartSync ? (
           <p className="notice-text">
-            Restart mail sync if new mail stops arriving. Seams Pantry starts
+            Restart mail sync if new mail stops arriving. Purin Pantry starts
             again from now.
           </p>
         ) : null}
@@ -1094,7 +1094,7 @@ function GmailDangerSection(props: {
         <p className="notice-text">
           {mailbox === null
             ? "Disconnect turns off this connection until you reconnect it."
-            : "Disconnect turns off this connection until you reconnect it. Remove access takes away Seams Pantry's access to this mailbox."}
+            : "Disconnect turns off this connection until you reconnect it. Remove access takes away Purin Pantry's access to this mailbox."}
         </p>
         {mailbox !== null && confirmingRevoke ? (
           <div
@@ -1107,7 +1107,7 @@ function GmailDangerSection(props: {
                 <strong>Remove access to {props.address}?</strong>
               </p>
               <p className="notice-text">
-                Seams Pantry stops reading new email, cancels emails waiting
+                Purin Pantry stops reading new email, cancels emails waiting
                 to send, tries to delete the drafts it made, and deletes its
                 sign-in for this mailbox. A draft that Pantry cannot delete
                 stays in Gmail and shows as Cleanup needed. A short record of

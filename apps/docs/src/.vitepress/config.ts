@@ -89,10 +89,10 @@ export default defineConfig({
   cleanUrls: true,
   appearance: true,
   lastUpdated: true,
-  title: "Seams Pantry",
-  titleTemplate: ":title · Seams Pantry",
+  title: "Purin Pantry",
+  titleTemplate: ":title · Purin Pantry",
   description:
-    "Seams Pantry: the operating system for modern bakeries & cafés.",
+    "Purin Pantry: the operating system for modern bakeries & cafés.",
   sitemap: {
     hostname: docsOrigin,
     transformItems: (items) =>
@@ -103,7 +103,7 @@ export default defineConfig({
       "link",
       { rel: "icon", href: "/brand/pantry-mark-dark-64.png", type: "image/png" },
     ],
-    ["meta", { property: "og:site_name", content: "Seams Pantry docs" }],
+    ["meta", { property: "og:site_name", content: "Purin Pantry docs" }],
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { name: "twitter:card", content: "summary" }],
   ],
@@ -128,11 +128,11 @@ export default defineConfig({
     },
   },
   themeConfig: {
-    siteTitle: "Seams Pantry docs",
+    siteTitle: "Purin Pantry docs",
     logo: {
       light: "/brand/pantry-mark-dark-64.png",
       dark: "/brand/pantry-mark-light-64.png",
-      alt: "Seams Pantry",
+      alt: "Purin Pantry",
     },
     logoLink: siteOrigin,
     lastUpdated: { text: "Last updated" },

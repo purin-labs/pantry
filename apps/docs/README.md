@@ -1,6 +1,6 @@
-# Seams Pantry documentation app
+# Purin Pantry documentation app
 
-The docs are a VitePress application for the Seams Pantry runtime, commerce
+The docs are a VitePress application for the Purin Pantry runtime, commerce
 boundaries, governed agent work, and operator workflows. The repository's
 authoritative design records remain under the top-level `docs/` directory;
 this app turns the stable parts of that corpus into a navigable public-facing

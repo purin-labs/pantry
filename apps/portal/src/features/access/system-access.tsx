@@ -425,7 +425,7 @@ function renderSystemTile(system: AccessSystem): React.ReactNode {
         />
       );
     case "commerce":
-      return <ProviderTile provider="builtin_commerce" label="Seams Checkout" />;
+      return <ProviderTile provider="builtin_commerce" label="Purin Checkout" />;
     case "workspace":
       return (
         <span className="access35-system-tile" aria-hidden="true">

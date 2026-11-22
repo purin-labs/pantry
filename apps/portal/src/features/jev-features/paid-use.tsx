@@ -101,7 +101,7 @@ export function JevUsePrompt(props: {
 export function pricedNote(priced: boolean): string | null {
   return priced
     ? null
-    : "Paid Jev use is not open yet. It opens when Seams Pantry billing starts.";
+    : "Paid Jev use is not open yet. It opens when Purin Pantry billing starts.";
 }
 
 /** "This month: $1.20 of $5.00", and the stop at the spending limit. */

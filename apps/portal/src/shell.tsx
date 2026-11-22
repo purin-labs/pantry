@@ -1328,7 +1328,7 @@ function PortalBrand(props: {
     <Link
       to="/portal"
       className={props.className}
-      aria-label="Seams Pantry organisations"
+      aria-label="Purin Pantry organisations"
       inert={props.inert}
     >
       <img
@@ -1337,7 +1337,7 @@ function PortalBrand(props: {
         alt=""
       />
       <span className="portal-brand-copy">
-        Seams Pantry
+        Purin Pantry
         <span className="portal-brand-subtitle">Bakery operating system</span>
       </span>
     </Link>

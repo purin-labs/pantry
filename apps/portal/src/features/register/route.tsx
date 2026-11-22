@@ -237,7 +237,7 @@ export function RegisterRoute(
     return (
       <EmptyState
         title="Register is unavailable"
-        description="Seams Pantry could not load the published café menu and counter policy."
+        description="Purin Pantry could not load the published café menu and counter policy."
       />
     );
   }

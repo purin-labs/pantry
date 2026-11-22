@@ -5,7 +5,7 @@ description: The accepted café, patisserie, packaged-goods, and flavored export
 
 # Commerce operations
 
-Seams Pantry supports two connected configurations: a café and patisserie operation,
+Purin Pantry supports two connected configurations: a café and patisserie operation,
 and an online packaged-goods storefront. Plan 23 extends the storefront with
 flavored products and Japan-to-Singapore export facts.
 

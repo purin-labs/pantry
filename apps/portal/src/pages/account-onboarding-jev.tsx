@@ -93,7 +93,7 @@ export function JevSetupBody(props: {
         </h4>
         <p className="account-setup-lead">
           Jev is a small AI model. TypeSafe runs it and processes the data for
-          Seams. This step is optional.
+          Purin. This step is optional.
         </p>
       </div>
       {state.kind === "result" ? (

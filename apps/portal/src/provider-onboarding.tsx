@@ -193,24 +193,24 @@ export function providerAttemptFailureCopy(
       };
     case "provider_scope_missing":
       return {
-        summary: `${service} didn't grant every permission that Seams Pantry asked for.`,
+        summary: `${service} didn't grant every permission that Purin Pantry asked for.`,
         nextStep:
           "Try again. On the consent screen, tick every box before you continue.",
       };
     case "provider_account_already_claimed":
       return {
-        summary: `This ${service} account is already connected to another Seams Pantry organisation.`,
+        summary: `This ${service} account is already connected to another Purin Pantry organisation.`,
         nextStep:
           "Use a different account, or delete the other organisation first.",
       };
     case "provider_account_ineligible":
       return {
-        summary: `${service} finished the sign-in without an account that Seams Pantry can use.`,
+        summary: `${service} finished the sign-in without an account that Purin Pantry can use.`,
         nextStep: "Try again with a different account.",
       };
     case "provider_asset_missing":
       return {
-        summary: `${service} finished the sign-in without sharing the business account that Seams Pantry needs.`,
+        summary: `${service} finished the sign-in without sharing the business account that Purin Pantry needs.`,
         nextStep: "Try again and choose the account before finishing.",
       };
     case "provider_environment_mismatch":
@@ -220,7 +220,7 @@ export function providerAttemptFailureCopy(
       };
     case "provider_distribution_disabled":
       return {
-        summary: `This Seams Pantry deployment isn't set up for ${service} connections yet.`,
+        summary: `This Purin Pantry deployment isn't set up for ${service} connections yet.`,
         nextStep:
           "Nothing for you to fix. Contact support and quote the reference below.",
       };

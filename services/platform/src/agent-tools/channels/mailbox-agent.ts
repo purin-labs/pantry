@@ -142,7 +142,7 @@ export const mailboxReplyForApproval = defineMailboxAgentTool({
   ...hostTool(MAILBOX_AGENT_HOST),
   name: "email_reply_for_approval",
   description:
-    "Choose human review for ambiguous, sensitive, consequential, incomplete, or policy-dependent replies. Seams Pantry acknowledges receipt and saves this body as a Gmail draft for approval.",
+    "Choose human review for ambiguous, sensitive, consequential, incomplete, or policy-dependent replies. Purin Pantry acknowledges receipt and saves this body as a Gmail draft for approval.",
   input: jsonSchema(REQUIRE_APPROVAL_PARAMETERS),
   parameters: REQUIRE_APPROVAL_PARAMETERS,
   effect: "proposal",
@@ -155,7 +155,7 @@ export const mailboxReviewDraftSave = defineMailboxAgentTool({
   ...hostTool(MAILBOX_AGENT_HOST),
   name: "email_reply_for_approval",
   description:
-    "Prepare one plain-text Gmail draft for operator review. Seams Pantry saves the draft without sending a reply or acknowledgement.",
+    "Prepare one plain-text Gmail draft for operator review. Purin Pantry saves the draft without sending a reply or acknowledgement.",
   input: jsonSchema(REQUIRE_APPROVAL_PARAMETERS),
   parameters: REQUIRE_APPROVAL_PARAMETERS,
   effect: "proposal",
@@ -173,7 +173,7 @@ const PROPOSE_MEMORY_PARAMETERS = {
     check: {
       type: ["object", "null"],
       description:
-        "One short email this sender could send later, to which the fact applies, written in your own words. Seams Pantry keeps it as a test of the fact for a person to review. Use null when you cannot write one without copying the email.",
+        "One short email this sender could send later, to which the fact applies, written in your own words. Purin Pantry keeps it as a test of the fact for a person to review. Use null when you cannot write one without copying the email.",
       properties: {
         subject: { type: "string", description: "The subject line." },
         body: {
@@ -286,7 +286,7 @@ export const mailboxSupplierContextRead = defineMailboxAgentTool({
   ...hostTool(MAILBOX_AGENT_HOST),
   name: "read_supplier_delay_context",
   description:
-    "Read canonical purchasing facts for a purchase request mentioned in the triggering email. Requires mailbox-agent commerce grants. Seams Pantry matches the sender address to Supplier Directory and the request to that supplier's Replenishment Queue entries. Unavailable or ambiguous evidence requires a clarification reply.",
+    "Read canonical purchasing facts for a purchase request mentioned in the triggering email. Requires mailbox-agent commerce grants. Purin Pantry matches the sender address to Supplier Directory and the request to that supplier's Replenishment Queue entries. Unavailable or ambiguous evidence requires a clarification reply.",
   input: jsonSchema(SUPPLIER_CONTEXT_PARAMETERS),
   parameters: SUPPLIER_CONTEXT_PARAMETERS,
   effect: "read",

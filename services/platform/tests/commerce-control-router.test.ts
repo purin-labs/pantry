@@ -552,7 +552,7 @@ describe("Google OIDC callback state binding", () => {
 });
 
 describe("commerce control query routes", () => {
-  it("queues one Seams Checkout sync and replays the accepted mutation", async () => {
+  it("queues one Purin Checkout sync and replays the accepted mutation", async () => {
     const organisationId = parseOrganisationId(ORGANISATION_ID);
     if (!organisationId.ok) throw new Error("organisation fixture is invalid");
     const queueSend = vi.fn(

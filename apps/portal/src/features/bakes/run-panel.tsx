@@ -117,7 +117,7 @@ export function BakeRunPanel(
       </div>
       {shadow ? (
         <p className="bake-run-note">
-          Shadow mode: Seams Pantry sends nothing to the devices and changes no
+          Shadow mode: Purin Pantry sends nothing to the devices and changes no
           stock. It matches each move of the cobots to the plan.
         </p>
       ) : null}

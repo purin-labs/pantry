@@ -126,7 +126,7 @@ async function main() {
   const desktopSignIn = checkPage();
   assertCommonPage(desktopSignIn, "/portal");
   assertCheck(
-    desktopSignIn.heading === "Sign in to Seams Pantry",
+    desktopSignIn.heading === "Sign in to Purin Pantry",
     "signed-out page uses the Café sign-in heading",
   );
   assertCheck(
@@ -203,7 +203,7 @@ async function main() {
   const direct = checkPage();
   assertCommonPage(direct, directPath);
   assertCheck(
-    direct.heading === "Sign in to Seams Pantry",
+    direct.heading === "Sign in to Purin Pantry",
     "direct SPA fallback still resolves the signed-out app",
   );
   runCli("go-back");

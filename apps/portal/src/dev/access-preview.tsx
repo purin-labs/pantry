@@ -678,7 +678,7 @@ function sourcePolicies(scenario: Scenario): AccessControlSourcePolicyView[] {
       },
       owner: {
         integrationAccountId: "intacc_commerce",
-        label: "Seams Checkout",
+        label: "Purin Checkout",
       },
       resourceLabel: "Nuki Cafe commerce records",
       readers: [SUBJECTS.cafeOps, SUBJECTS.ownerRole],

@@ -124,7 +124,7 @@ export function PermissionRequiredPrompt(props: Props): React.ReactNode {
       open={true}
       onClose={props.onClose}
       requester={{ name: "You", icon: <UserRound aria-hidden="true" /> }}
-      target={{ name: "Seams Pantry", icon: <PantryMark /> }}
+      target={{ name: "Purin Pantry", icon: <PantryMark /> }}
       title={`${props.action} needs permission to ${label}`}
       subtitle={subtitle(permission, props.grantScope)}
       scope={null}

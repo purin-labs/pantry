@@ -66,7 +66,7 @@ export function ContextView(props: {
       </h2>
       <p className="brain-muted brain-evals-intro">
         Context is the set of related records that an agent may load for a Case.
-        Seams Pantry finds a related record, keeps the reason with it, and a
+        Purin Pantry finds a related record, keeps the reason with it, and a
         person reviews it. A relationship gives no access: each reader sees only
         the records that they may read.
       </p>

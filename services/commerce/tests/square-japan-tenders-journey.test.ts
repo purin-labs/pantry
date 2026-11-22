@@ -486,7 +486,7 @@ class JapanTerminalDesk extends StaffDesk {
           },
           presentationPolicy: {
             locale: "ja-JP",
-            merchantDisplayName: "Seams Patisserie",
+            merchantDisplayName: "Purin Patisserie",
             termsPolicyId: "terms_counter",
             privacyPolicyId: "privacy_counter",
             supportContact: "support@example.test",
@@ -771,7 +771,7 @@ class FakeJapanSquare {
       return json({
         merchant: {
           id: SELLER,
-          business_name: "Seams Patisserie Tokyo",
+          business_name: "Purin Patisserie Tokyo",
           country: "JP",
           currency: "JPY",
         },

@@ -1,6 +1,6 @@
 ---
 title: Architecture
-description: The runtime, service, and data boundaries that make up Seams Pantry.
+description: The runtime, service, and data boundaries that make up Purin Pantry.
 ---
 
 # Architecture
@@ -60,7 +60,7 @@ ownership hierarchy. A Case may have several connectors and several
 independent sessions. A session may have multiple execution attempts; an
 executor is replaceable compute and owns no durable Case or session state.
 Pi runs every route. It uses the organisation's ChatGPT sign-in, the
-organisation's Vault-encrypted OpenAI API key, or the Seams `OPENROUTER_API_KEY`,
+organisation's Vault-encrypted OpenAI API key, or the Purin `OPENROUTER_API_KEY`,
 according to the pinned route.
 The session contract pins one route; an
 authority failure never switches harnesses. Picocodex is retired.

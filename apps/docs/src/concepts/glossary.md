@@ -1,6 +1,6 @@
 ---
 title: Glossary
-description: Terms used across Seams Pantry and the Lowerarchy commerce modules.
+description: Terms used across Purin Pantry and the Lowerarchy commerce modules.
 ---
 
 # Glossary
@@ -48,7 +48,7 @@ bounds when a reply may be sent. It is not a CaseContextCollection.
 ### Commerce authority
 
 The selected transactional system of record for an organisation's commerce facts,
-such as Seams Checkout or Shopify.
+such as Purin Checkout or Shopify.
 
 ### Commerce Read Layer
 
@@ -66,7 +66,7 @@ The route-selected agent runtime behind `AgentSessionActor`'s common adapter.
 `organisation_subscription` + `openai` uses Pi with the organisation's ChatGPT
 sign-in. `organisation_byo` + `openai` uses Pi with the organisation's
 Vault-encrypted OpenAI API key. `platform` + `openai-compatible` uses Pi with
-Seams-funded OpenRouter access. A route stays fixed for its session and never
+Purin-funded OpenRouter access. A route stays fixed for its session and never
 falls back to another funding authority. Picocodex is retired.
 
 ### HarnessTask
@@ -86,12 +86,12 @@ accounts, and Cases are separate concepts within it.
 The independent buyer and acceptance harness in `scripts/punter` that exercises
 the system through supported storefront and commerce journeys.
 
-### Seams Pantry
+### Purin Pantry
 
 The bakery operating system: governed operations for café and bakery
 production and commerce. Its product areas include Kitchen, Café, and Commerce.
 
-### Seams Checkout
+### Purin Checkout
 
 The built-in commerce that people see: checkout pages, the QR order page, and
 the Register. The commerce engine in `services/commerce` runs it.

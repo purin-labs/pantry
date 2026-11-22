@@ -187,7 +187,7 @@ export function systemActionSearch(
     case "commerce":
       return "commerce";
     case "workspace":
-      return "Seams Pantry";
+      return "Purin Pantry";
   }
 }
 
@@ -243,7 +243,7 @@ function draftForGrant(
                 : "integration",
           label:
             key === WORKSPACE_KEY
-              ? "Seams Pantry workspace"
+              ? "Purin Pantry workspace"
               : key === COMMERCE_KEY
                 ? "Commerce records"
                 : grant.resource.label,

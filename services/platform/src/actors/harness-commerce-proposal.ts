@@ -520,7 +520,7 @@ async function agentTrackingRequest(
     organisationId,
   });
   if (!authority.ok || authority.value.provider !== "commerce")
-    throw new Error("tracking proposal needs Seams Checkout");
+    throw new Error("tracking proposal needs Purin Checkout");
   const binding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -584,7 +584,7 @@ export async function proposeMerchantPluginForHarness(
     !commerceAuthority.ok ||
     commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("merchant plugin proposal needs Seams Checkout");
+    throw new Error("merchant plugin proposal needs Purin Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -681,7 +681,7 @@ export async function proposeCafeMenuPublicationForHarness(
     !commerceAuthority.ok ||
     commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("menu publication proposal needs Seams Checkout");
+    throw new Error("menu publication proposal needs Purin Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -782,7 +782,7 @@ export async function proposeMenuPriceForHarness(
     !commerceAuthority.ok ||
     commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("menu price proposal needs Seams Checkout");
+    throw new Error("menu price proposal needs Purin Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -931,7 +931,7 @@ export async function proposeOrderRefundForHarness(
     !commerceAuthority.ok ||
     commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("order refund proposal needs Seams Checkout");
+    throw new Error("order refund proposal needs Purin Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -1018,7 +1018,7 @@ export async function proposeStockActionForHarness(
     !commerceAuthority.ok ||
     commerceAuthority.value.provider !== "commerce"
   )
-    throw new Error("stock proposal needs Seams Checkout");
+    throw new Error("stock proposal needs Purin Checkout");
   const merchantBinding = await resolveCommerceMerchantBinding({
     db: input.execution.scope.database,
     organisationId,
@@ -1104,7 +1104,7 @@ async function orderRefundPolicyId(
     return configuration.value.afterSalePolicy.refundPolicyId;
   }
   throw new OrderRefundRequestError(
-    "This order has no refund policy that Seams Pantry can read. A person must refund it from the order in the Portal.",
+    "This order has no refund policy that Purin Pantry can read. A person must refund it from the order in the Portal.",
   );
 }
 

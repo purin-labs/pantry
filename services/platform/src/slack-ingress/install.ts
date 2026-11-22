@@ -373,7 +373,7 @@ function slackInstallAdmissionErrorResponse(
     case "slack_install_existing_workspace_requires_organisation_flow":
       return errorResponse(
         error.code,
-        "Reconnect this Slack workspace from its Seams Pantry organisation portal.",
+        "Reconnect this Slack workspace from its Purin Pantry organisation portal.",
         409,
       );
     case "slack_install_bootstrap_state_invalid":

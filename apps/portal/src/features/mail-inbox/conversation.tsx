@@ -588,7 +588,7 @@ export class MailConversation extends React.Component<Props, State> {
           Send not confirmed
         </h3>
         <p>
-          Gmail did not confirm this send. Seams Pantry does not retry it.
+          Gmail did not confirm this send. Purin Pantry does not retry it.
           Check the exact message in Gmail first.
         </p>
         {settled?.proposalId === reply.proposalId &&
@@ -745,7 +745,7 @@ export class MailConversation extends React.Component<Props, State> {
     const problem =
       personSend === "unconfirmed" ? (
         <p role="alert" className="mail-reply-problem">
-          Gmail did not confirm this send. Seams Pantry does not retry it.
+          Gmail did not confirm this send. Purin Pantry does not retry it.
           Check the thread in Gmail.
         </p>
       ) : personSend === "failed" ? (

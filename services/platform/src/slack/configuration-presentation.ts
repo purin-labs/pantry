@@ -64,7 +64,7 @@ function presentBakeStockLevel(
     summary: `Set the counter stock level of ${level.productName} to ${level.levelPieces} pieces, with ${level.piecesPerGroup} pieces in each mould group. Recipe workflow: ${level.workflowId}. Kitchen: ${level.kitchenLocation}.`,
     actionLabel: "Set stock level",
     consequence:
-      "When the counter stock falls below this level, Seams Pantry opens one bake proposal. Nothing is baked until an operator, an admin or the owner approves a proposal.",
+      "When the counter stock falls below this level, Purin Pantry opens one bake proposal. Nothing is baked until an operator, an admin or the owner approves a proposal.",
     portalSection: "overview",
   };
 }
@@ -83,7 +83,7 @@ function presentWorkflowChange(
     summary: `${command.title}: ${parts.join("; ")}. Reason: ${command.reason}.`,
     actionLabel: "Approve workflow change",
     consequence:
-      "Seams Pantry writes a new revision of this recipe, and new runs use it. Every member can then read its step names. A run that started keeps its revision.",
+      "Purin Pantry writes a new revision of this recipe, and new runs use it. Every member can then read its step names. A run that started keeps its revision.",
     portalSection: "overview",
   };
 }
@@ -97,14 +97,14 @@ function presentDeviceCommand(
         summary: `Restrict ${command.deviceName}. Reason: ${command.reason}.`,
         actionLabel: "Restrict device",
         consequence:
-          "Seams Pantry sends it no new task until an admin lifts this. A task that runs now continues.",
+          "Purin Pantry sends it no new task until an admin lifts this. A task that runs now continues.",
         portalSection: "overview",
       }
     : {
         summary: `Resume ${command.deviceName}.`,
         actionLabel: "Resume device",
         consequence:
-          "Check that the area around it is clear. Seams Pantry can send it new tasks after this.",
+          "Check that the area around it is clear. Purin Pantry can send it new tasks after this.",
         portalSection: "overview",
       };
 }

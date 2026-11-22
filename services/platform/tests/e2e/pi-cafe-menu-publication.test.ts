@@ -312,7 +312,7 @@ it("asks a person before content of a private channel enters the shared menu", a
   await expect
     .poll(delivered.bind(null, slack), { timeout: 20_000 })
     .toContain("PI_MENU_ASKED");
-  expect(outputs.join("\n")).toContain("Seams Pantry stopped this step");
+  expect(outputs.join("\n")).toContain("Purin Pantry stopped this step");
   const response = await exports.default.fetch(
     `${BASE}/collaboration/menu-draft`,
     { headers: mutationHeaders(session) },

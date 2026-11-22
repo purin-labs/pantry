@@ -169,7 +169,7 @@ async function offerPriceChangeJourney({ task }: TestContext): Promise<void> {
   // The decision updates the one card: no new message, and no internal ids.
   await expect
     .poll(() => slack.messages[0]?.text, { timeout: 30_000 })
-    .toContain("Seams Pantry made the change.");
+    .toContain("Purin Pantry made the change.");
   expect(slack.messages[0]?.text).toContain("2,400 JPY → 2,600 JPY");
   expect(slack.messages[0]?.text).not.toMatch(/receipt_|commerce:/u);
   expect(cardButtons(slack.messages[0])).toEqual(["commerce_action_details"]);

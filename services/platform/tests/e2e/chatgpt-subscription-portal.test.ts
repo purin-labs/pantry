@@ -60,7 +60,7 @@ async function portalSignInJourney(test: TestContext): Promise<void> {
   );
   expect(Object.fromEntries(authorize.searchParams.entries())).toMatchObject({
     client_id: "dynamic_agent_client",
-    agent_name_hint: "Seams Sous Chef",
+    agent_name_hint: "Purin Sous Chef",
     redirect_uri: "http://127.0.0.1:1455/auth/callback",
     resource: "https://api.openai.com/v1",
     code_challenge_method: "S256",

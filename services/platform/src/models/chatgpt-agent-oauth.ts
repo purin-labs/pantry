@@ -14,7 +14,7 @@ const TOKEN_URL = "https://auth.openai.com/api/accounts/oauth/token";
 const RESOURCE = "https://api.openai.com/v1";
 /** The first sign-in registers a client; OpenAI returns its issued id. */
 const DYNAMIC_CLIENT_ID = "dynamic_agent_client";
-const AGENT_NAME = "Seams Sous Chef";
+const AGENT_NAME = "Purin Sous Chef";
 const DIRECT_TOKEN_SCOPE = "chatgpt.tokens.use.direct";
 const SCOPE = `openid profile email offline_access resource.invoke ${DIRECT_TOKEN_SCOPE}`;
 /**

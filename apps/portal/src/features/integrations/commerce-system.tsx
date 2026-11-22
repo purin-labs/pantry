@@ -31,7 +31,7 @@ export function renderCommerceSystemCard(
     // A manager gets the choice itself under this card instead.
     return canManage ? null : (
       <p className="empty-state">
-        Choose Seams Checkout or connect a Shopify store.
+        Choose Purin Checkout or connect a Shopify store.
       </p>
     );
   }

@@ -2032,7 +2032,7 @@ function connectorCredentialGuidance(
   if (!isRecord(authentication))
     return "Use the key for the account you want to connect.";
   if (authentication.kind === "basic_api_key")
-    return "Paste the API key only. Seams Pantry supplies Basic authentication with an empty password.";
+    return "Paste the API key only. Purin Pantry supplies Basic authentication with an empty password.";
   if (
     authentication.kind === "header" &&
     typeof authentication.name === "string" &&

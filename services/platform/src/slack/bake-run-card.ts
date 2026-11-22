@@ -107,7 +107,7 @@ function taskLine(record: RunRecord, task: BakeRunTaskView): string {
 export function bakeRunCardText(record: RunRecord): string {
   const lines = [
     record.mode === "shadow"
-      ? `Shadow run of ${record.productName}: ${STATE[record.state]}. Seams Pantry only watches the cobots and sends them nothing.`
+      ? `Shadow run of ${record.productName}: ${STATE[record.state]}. Purin Pantry only watches the cobots and sends them nothing.`
       : `Bake run of ${record.productName}: ${STATE[record.state]}.`,
   ];
   for (const task of record.view?.tasks ?? [])

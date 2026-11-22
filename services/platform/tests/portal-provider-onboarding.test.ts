@@ -43,7 +43,7 @@ const SQUARE_ACCOUNT = {
   environment: "development",
   providerAccountId: "MLJRX6QNWVMY2",
   accountKind: "merchant",
-  displayName: "Seams KK",
+  displayName: "Purin Heavy Industries",
   lifecycle: { kind: "active" },
   isDefaultForProvider: true,
   capabilities: ["payment_terminal"],
@@ -215,7 +215,7 @@ describe("file storage onboarding", () => {
       accounts: [DROPBOX_ACCOUNT],
     });
     expect(markup).toContain("Reconnect Dropbox");
-    expect(markup).toContain("Dropbox removed a permission Seams Pantry was given.");
+    expect(markup).toContain("Dropbox removed a permission Purin Pantry was given.");
     expect(markup).not.toContain("oauth_scope_revoked");
     expect(markup).not.toContain("files.metadata.read");
     expect(markup).toContain("Read the folders and files you share.");
@@ -298,7 +298,7 @@ describe("Square onboarding", () => {
       initialIntegrationId: "square",
       accounts: [SQUARE_ACCOUNT],
     });
-    expect(connected).toContain("Seams KK");
+    expect(connected).toContain("Purin Heavy Industries");
     expect(connected).toContain("Connect another Square account");
     expect(connected).toContain('aria-label="Reconnect Square in a popup"');
     expect(connected).toContain(">Refresh locations and devices</button>");
@@ -353,7 +353,7 @@ describe("WhatsApp onboarding", () => {
     expect(markup).toContain(
       "without sharing a Business Portfolio and WhatsApp Business Account",
     );
-    expect(markup).toContain("pending approval on the Seams side");
+    expect(markup).toContain("pending approval on the Purin side");
     expect(markup).not.toContain("provider_asset_missing");
     expect(
       whatsappAttemptFailureCopy("provider_account_ineligible").summary,

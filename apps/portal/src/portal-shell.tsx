@@ -87,7 +87,7 @@ export function SignIn(): React.ReactNode {
   return (
     <main id="portal-content" className="signin-shell" tabIndex={-1}>
       <section className="signin-access" aria-labelledby="signin-title">
-        <div className="signin-brand" aria-label="Seams Pantry">
+        <div className="signin-brand" aria-label="Purin Pantry">
           <img
             className="signin-brand-mark"
             src="/brand/pantry-mark-dark-32.png"
@@ -96,7 +96,7 @@ export function SignIn(): React.ReactNode {
             height={28}
           />
           <div className="signin-brand-copy">
-            <strong>Seams Pantry</strong>
+            <strong>Purin Pantry</strong>
             <span className="portal-brand-subtitle">
               Bakery operating system
             </span>
@@ -104,7 +104,7 @@ export function SignIn(): React.ReactNode {
         </div>
         <div className="signin-access-body">
           <h1 id="signin-title" tabIndex={-1}>
-            Sign in to Seams Pantry
+            Sign in to Purin Pantry
           </h1>
           <p className="signin-intro">
             Open your workspace and continue operating.
@@ -221,7 +221,7 @@ export function PortalLoadFailure(props: {
   return (
     <main className="auth-status-shell">
       <section className="auth-status-panel">
-        <p className="brand">Seams Pantry</p>
+        <p className="brand">Purin Pantry</p>
         <h1>Something went wrong</h1>
         <p>{props.message}</p>
         <div className="load-failure-actions">
@@ -272,7 +272,7 @@ export function renderRouteNotFound(
       ? "This organisation does not exist or your account no longer has access to it."
       : state.reason === "workspace"
         ? "This workspace does not exist or your account no longer has access to it."
-        : "This address does not match a page in Seams Pantry.";
+        : "This address does not match a page in Purin Pantry.";
   const content = (
     <>
       <PageHeader title={title} description={description} />

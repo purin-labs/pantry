@@ -84,7 +84,7 @@ export async function proposeSlackSideCaseForHarness(
   );
   if (!sink.ok)
     return notProposed(
-      "What this turn read may not be shown in this channel, so Seams Pantry did not post a proposal. Tell the person in plain words what you found instead.",
+      "What this turn read may not be shown in this channel, so Purin Pantry did not post a proposal. Tell the person in plain words what you found instead.",
     );
   const connectorId = parseConnectorId(String(authority.connectorId));
   if (!connectorId.ok)
@@ -156,10 +156,10 @@ export async function proposeSlackSideCaseForHarness(
         ? {
             kind: "side_case_proposed",
             detail:
-              "Seams Pantry posted the proposal with a Start button in this thread. A person who starts it gets a new thread for it. Tell them in one sentence what you proposed. Do not do that work in this turn.",
+              "Purin Pantry posted the proposal with a Start button in this thread. A person who starts it gets a new thread for it. Tell them in one sentence what you proposed. Do not do that work in this turn.",
           }
         : notProposed(
-            "Seams Pantry kept the proposal, but this thread does not show it now. Tell the person in plain words what you found instead.",
+            "Purin Pantry kept the proposal, but this thread does not show it now. Tell the person in plain words what you found instead.",
           );
     }
     case "limit_reached":

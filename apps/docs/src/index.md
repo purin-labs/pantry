@@ -1,13 +1,13 @@
 ---
-title: Seams Pantry
+title: Purin Pantry
 titleTemplate: ":title docs"
 subtitle: Bakery operating system
-description: "Seams Pantry: the operating system for modern bakeries & cafés."
+description: "Purin Pantry: the operating system for modern bakeries & cafés."
 ---
 
-# Seams Pantry
+# Purin Pantry
 
-People and Sous Chef agents operate Seams Pantry through the Portal and Slack.
+People and Sous Chef agents operate Purin Pantry through the Portal and Slack.
 The product direction covers the full bakery and café business: demand,
 purchasing, recipes, production, quality checks, packaging, inventory, sales,
 distribution, and customer service.
@@ -19,7 +19,7 @@ with policy checks, approvals, and durable receipts.
 
 The business reference is a pâtisserie selling fresh products and packaged gifts
 through shops and online channels, such as Noix de Beurre or Lenôtre. These are
-product and distribution references. Seams makes no claim about their use of
+product and distribution references. Purin makes no claim about their use of
 robotic production.
 
 People, agents, and future machines use the same authorization, approval,
@@ -85,7 +85,7 @@ full local surface is described in [Local development](/operate/local-developmen
 - Plan 24 owns planned physical robot integration. The runtime has no physical
   robot controller or fleet service.
 - Inference has three pinned routes, all on Pi: the organisation's ChatGPT
-  subscription, organisation OpenAI API keys, and Seams-funded OpenRouter. Failure preserves the selected funding authority.
+  subscription, organisation OpenAI API keys, and Purin-funded OpenRouter. Failure preserves the selected funding authority.
 - Plan 40 product drafting is accepted. Plan 40B, the collaborative menu
   editor, is proposed. General desktop filesystem synchronization remains deferred.
 

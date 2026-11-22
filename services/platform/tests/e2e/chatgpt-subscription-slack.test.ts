@@ -112,7 +112,7 @@ async function signInSlackJourney(test: TestContext): Promise<void> {
   const firstAuthorize = authorizeParams(openai.authorizeRequests[0]);
   expect(firstAuthorize).toMatchObject({
     client_id: "dynamic_agent_client",
-    agent_name_hint: "Seams Sous Chef",
+    agent_name_hint: "Purin Sous Chef",
     redirect_uri: "http://127.0.0.1:1455/auth/callback",
   });
   openai.accessTokenLifetimeSeconds = 3_600;

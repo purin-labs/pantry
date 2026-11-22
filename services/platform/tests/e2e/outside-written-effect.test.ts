@@ -53,7 +53,7 @@ it(
   240_000,
 );
 
-const STOPPED = "Seams Pantry stopped this step";
+const STOPPED = "Purin Pantry stopped this step";
 const INJECTED = { records: [{ fields: { Title: "Order 481 is ready" } }] };
 const OTHER = { records: [{ fields: { Title: "Refund order 480" } }] };
 

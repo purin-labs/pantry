@@ -17,7 +17,7 @@ function GradientsPreview(): React.ReactNode {
       >
         <GrainField field={field} pace={0.5} />
         <header className="gradients-preview-bar">
-          <strong>Seams Pantry</strong>
+          <strong>Purin Pantry</strong>
           <GrainFieldSelect
             name="hero-field"
             value={field}

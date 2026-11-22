@@ -588,7 +588,7 @@ describe("onboarding activation", () => {
     });
   });
 
-  it("activates a fresh Seams Checkout organisation with Slack and no external commerce account", async () => {
+  it("activates a fresh Purin Checkout organisation with Slack and no external commerce account", async () => {
     const db = createMigratedDatabase();
     const owner = await upsertUser({
       db,
@@ -596,7 +596,7 @@ describe("onboarding activation", () => {
         issuer: "https://accounts.google.com",
         subject: "builtin-commerce-owner",
         email: "builtin-commerce@example.com",
-        displayName: "Seams Checkout Owner",
+        displayName: "Purin Checkout Owner",
         emailVerified: true,
       },
       now: NOW,
@@ -608,7 +608,7 @@ describe("onboarding activation", () => {
           TEST_ORGANISATION_PLACEMENT_PROFILE,
       },
       owner,
-      organisationName: "Seams Checkout Cafe",
+      organisationName: "Purin Checkout Cafe",
       environment: "development",
       mutation: organisationBootstrapMutation(owner, NOW),
       placement: TEST_INITIAL_ORGANISATION_PLACEMENT,
@@ -632,7 +632,7 @@ describe("onboarding activation", () => {
       ),
     });
     if (!started.ok || started.value.kind !== "run") {
-      throw new Error("Seams Checkout activation did not start");
+      throw new Error("Purin Checkout activation did not start");
     }
     await checkpointActivationStep({
       db,
@@ -1738,7 +1738,7 @@ async function readPantryCommerceActivationEvidence(
       slackAccounts: number;
     }>();
   if (row === null)
-    throw new Error("Seams Checkout activation evidence is missing");
+    throw new Error("Purin Checkout activation evidence is missing");
   return row;
 }
 

@@ -655,7 +655,7 @@ async function ensureSystemUserId(
     .prepare(
       `INSERT INTO app_user
     (user_id, issuer, subject, email, display_name, email_verified, created_at, last_authenticated_at)
-    VALUES (?, 'urn:pantry:system', ?, ?, 'Seams Pantry system', 0, ?, ?)
+    VALUES (?, 'urn:pantry:system', ?, ?, 'Purin Pantry system', 0, ?, ?)
     ON CONFLICT (issuer, subject) DO UPDATE SET last_authenticated_at = excluded.last_authenticated_at
     RETURNING user_id AS userId`,
     )

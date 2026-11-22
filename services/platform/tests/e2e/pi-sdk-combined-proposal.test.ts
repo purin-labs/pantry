@@ -367,7 +367,7 @@ it("joins two assignments that ran side by side into one proposal, one approval 
   // The outcome updates the one card; the thread gets no new message.
   await expect
     .poll(() => JSON.stringify(slack.messages), { timeout: 15_000 })
-    .toContain("Seams Pantry made the change.");
+    .toContain("Purin Pantry made the change.");
   expect(slack.visibleMessageCount()).toBe(4);
 
   // The Case's execution, read on the control plane by the owner. The Case

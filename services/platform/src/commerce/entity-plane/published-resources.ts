@@ -106,8 +106,8 @@ export async function listPublishedCommerceTargets(
           targetRefId: await opaqueAccessTargetReference(input.organisationId, providerTarget),
           revision: product.revision,
         },
-        label: `Seams Checkout · ${product.title}`,
-        detail: "Seams Checkout product",
+        label: `Purin Checkout · ${product.title}`,
+        detail: "Purin Checkout product",
       });
     }
     const metadata = await enumeratePublishedResources({

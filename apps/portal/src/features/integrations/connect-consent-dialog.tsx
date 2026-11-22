@@ -28,8 +28,8 @@ export function ConnectConsentDialog(
       onClose={props.close}
       className="connect-consent"
       requester={{
-        name: "Seams Pantry",
-        icon: <ProviderTile provider="builtin_commerce" label="Seams Pantry" />,
+        name: "Purin Pantry",
+        icon: <ProviderTile provider="builtin_commerce" label="Purin Pantry" />,
       }}
       target={{
         name: label,
@@ -41,7 +41,7 @@ export function ConnectConsentDialog(
         ),
       }}
       title={`Connect to ${label}`}
-      subtitle="Let Seams Pantry use this account for your workspace."
+      subtitle="Let Purin Pantry use this account for your workspace."
       asideHeading={`What happens when you continue`}
       aside={
         <ul className="connect-consent-points">

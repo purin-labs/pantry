@@ -1,4 +1,4 @@
-# Seams Pantry shop voice
+# Purin Pantry shop voice
 
 The Mac end of Portal voice control ([Plan 82](../../docs/plan-82-portal-voice-control.md)).
 It transcribes a spoken command with a speech engine in the shop: Whisper large-v3-turbo with MLX, or

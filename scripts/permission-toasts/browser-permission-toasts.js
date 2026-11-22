@@ -378,7 +378,7 @@ async (page) => {
     const held = await toolResults("menu-permission");
     check(
       "The exit check held the edit before the IFC decision",
-      held.some((result) => result.includes("Seams Pantry stopped this step")),
+      held.some((result) => result.includes("Purin Pantry stopped this step")),
       held,
     );
     await capture("ifc-01-prompt");
@@ -404,7 +404,7 @@ async (page) => {
     check(
       "The allowed edit ran, and Pantry did not hold it again",
       ran.length > 0 &&
-        !ran.some((result) => result.includes("Seams Pantry stopped")),
+        !ran.some((result) => result.includes("Purin Pantry stopped")),
       ran,
     );
     await capture("06-section-added");

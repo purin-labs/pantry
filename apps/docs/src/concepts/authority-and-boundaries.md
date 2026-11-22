@@ -1,6 +1,6 @@
 ---
 title: Authority and boundaries
-description: How Seams Pantry keeps provider authority, agent power, credentials, and safety responsibilities separate.
+description: How Purin Pantry keeps provider authority, agent power, credentials, and safety responsibilities separate.
 ---
 
 # Authority and boundaries
@@ -15,7 +15,7 @@ commerce resource:
 
 | State                                                         | System of record                                  |
 | ------------------------------------------------------------- | ------------------------------------------------- |
-| Products, inventory, orders, and fulfillment                  | The selected Seams Checkout or Shopify system     |
+| Products, inventory, orders, and fulfillment                  | The selected Purin Checkout or Shopify system     |
 | Normalized provider observations                              | Pantry projections, rebuildable from observations |
 | Cases, sessions, proposals, approvals, policies, and receipts | Pantry                                            |
 | Payment execution                                             | Stripe or the selected payment provider           |
@@ -60,7 +60,7 @@ closed.
 ## Seams SDK boundary
 
 The Seams SDK provides wallet identity, authentication, and signed action approval at
-the action boundary. Seams Vault owns provider credentials and organisation ChatGPT
+the action boundary. Purin Vault owns provider credentials and organisation ChatGPT
 OAuth profiles. Platform-funded Pi access remains deployment-secret-backed
 through `OPENROUTER_API_KEY`.
 

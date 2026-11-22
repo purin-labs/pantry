@@ -36,9 +36,9 @@ export type BakeDecisionClick = Readonly<{
 }>;
 
 const UNLINKED =
-  "Only an operator, an admin or the owner whose Slack account is linked to Seams Pantry can decide or pause this bake.";
+  "Only an operator, an admin or the owner whose Slack account is linked to Purin Pantry can decide or pause this bake.";
 const FAILED =
-  "Seams Pantry could not do this now. Try again, or use the Bakes page.";
+  "Purin Pantry could not do this now. Try again, or use the Bakes page.";
 
 export async function decideBakeProposalFromSlack(
   env: Env,

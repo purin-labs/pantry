@@ -582,7 +582,7 @@ function TracePreview(): React.ReactNode {
     <main className="trace-preview">
       <header className="trace-preview-header">
         <div>
-          <p className="trace-preview-eyebrow">SEAMS PANTRY / COMPONENTS</p>
+          <p className="trace-preview-eyebrow">PURIN PANTRY / COMPONENTS</p>
           <h1>Trace</h1>
           <p>One composition for the work an agent does.</p>
         </div>

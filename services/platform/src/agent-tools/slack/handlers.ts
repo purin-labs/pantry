@@ -79,7 +79,7 @@ export async function proposeSlackMessageForEmbeddedHarness(
       });
       if (options === null || options.channels.length === 0) {
         throw new SlackDraftRequestError(
-          "No Slack channel is connected to Seams Pantry in this workspace. Ask an owner or admin to connect a channel in Integrations.",
+          "No Slack channel is connected to Purin Pantry in this workspace. Ask an owner or admin to connect a channel in Integrations.",
         );
       }
       // An unknown channel is refused without naming the connected ones: their
@@ -90,7 +90,7 @@ export async function proposeSlackMessageForEmbeddedHarness(
           : matchSlackChannel(options, request.channel);
       if (request.channel !== null && matched === null) {
         throw new SlackDraftRequestError(
-          "That channel is not connected to Seams Pantry. Set channel to null so the person chooses on the card.",
+          "That channel is not connected to Purin Pantry. Set channel to null so the person chooses on the card.",
         );
       }
       const bodyDigest = await slackMessageBodyDigest(request.text);

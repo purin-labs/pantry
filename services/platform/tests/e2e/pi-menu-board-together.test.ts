@@ -259,7 +259,7 @@ it(
       // Only the owner's approval moves the price; the TV reads it live.
       await click(nonce, card.ts ?? "");
       await expect.poll(() => answers.length, { timeout: 30_000 }).toBe(1);
-      expect(answers[0]?.text).toContain("Seams Pantry made the change.");
+      expect(answers[0]?.text).toContain("Purin Pantry made the change.");
       expect(await actionState(nonce)).toBe("confirmed");
       expect((await offer(matchaId)).price.amountMinor).toBe(550);
       await expect

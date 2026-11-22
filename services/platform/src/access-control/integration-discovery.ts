@@ -406,7 +406,7 @@ async function readDiscoveryCandidates(
         kind: "builtin_commerce",
         sourceIntegrationAccountId: binding.value.integrationAccountId,
         provider: "builtin_commerce",
-        displayName: "Seams Checkout",
+        displayName: "Purin Checkout",
         connection: "available",
         configuredDataClasses: ["commerce"],
       });

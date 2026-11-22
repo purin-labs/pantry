@@ -231,7 +231,7 @@ function integrationEntries(
     },
     {
       id: "commerce",
-      label: "Seams Checkout",
+      label: "Purin Checkout",
       description: "Your built-in products, stock and orders.",
       tile: "builtin_commerce",
       accounts: [],
@@ -271,7 +271,7 @@ function integrationEntries(
           {props.canManage && props.commerceSystem === null ? (
             <IntegrationSetup title="Choose a commerce system">
               <p className="notice-text">
-                Seams Checkout starts with a demo café and patisserie catalogue.
+                Purin Checkout starts with a demo café and patisserie catalogue.
                 You can edit or replace its sample products and orders.
               </p>
               <div className="connection-actions">
@@ -283,7 +283,7 @@ function integrationEntries(
                     kind: "provision_commerce",
                   })}
                 >
-                  Set up Seams Checkout
+                  Set up Purin Checkout
                 </button>
                 {activeShopify.map(
                   renderShopifyCommerceChoice.bind(

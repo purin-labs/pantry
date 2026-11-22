@@ -677,7 +677,7 @@ export function AccountSetupDialog(props: {
   return (
     <AgentModal
       className="account-setup-modal"
-      title="Set up Seams Pantry"
+      title="Set up Purin Pantry"
       description={`Step ${stepIndex(viewStep(props.view)) + 1} of ${STEPS.length}`}
       close={props.actions.close}
       footer={setupFooter(props.view, props.actions)}
@@ -748,7 +748,7 @@ function setupBody(
           </span>
           <SetupIntro
             heading={heading}
-            title="Seams Pantry is ready"
+            title="Purin Pantry is ready"
             lead={`${view.name} is in your organisation list. Open it to start.`}
           />
         </div>
@@ -805,7 +805,7 @@ function OrganisationName(props: {
       <SetupIntro
         heading={props.heading}
         title="Name your organisation"
-        lead="Seams Pantry makes a new organisation for your shop. You become its owner."
+        lead="Purin Pantry makes a new organisation for your shop. You become its owner."
       />
       <div className="account-setup-name">
         <label>
@@ -843,7 +843,7 @@ function SetupProgress(props: {
     <>
       <SetupIntro
         heading={props.heading}
-        title="Seams Pantry prepares your organisation"
+        title="Purin Pantry prepares your organisation"
         lead="This takes a few seconds. Keep this window open to see the result."
       />
       <dl className="account-setup-summary">

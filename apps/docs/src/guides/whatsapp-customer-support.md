@@ -1,6 +1,6 @@
 ---
 title: WhatsApp customer support
-description: Route a customer message through Seams Pantry, send a governed reply, summarize active work in Slack, and verify cleanup.
+description: Route a customer message through Purin Pantry, send a governed reply, summarize active work in Slack, and verify cleanup.
 ---
 
 # WhatsApp customer support

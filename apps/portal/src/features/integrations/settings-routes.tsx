@@ -452,7 +452,7 @@ function mailboxSettingsBody(
     return (
       <EmptyState
         title="This mailbox is not connected"
-        detail="Seams Pantry has no Gmail connection for this mailbox now. Connect it again on the Integrations page."
+        detail="Purin Pantry has no Gmail connection for this mailbox now. Connect it again on the Integrations page."
       />
     );
   return (

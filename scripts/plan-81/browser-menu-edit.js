@@ -16,7 +16,7 @@ async (page) => {
   const MENU = "Add a Coffee section to the menu.";
   const AGAIN = "Please add the Coffee section again.";
   const ASKED =
-    "Seams Pantry asked you for approval in this chat. Ask me again after you allow it.";
+    "Purin Pantry asked you for approval in this chat. Ask me again after you allow it.";
   const ANSWER = "I added a Coffee section to the menu.";
   const fixtures = JOURNEY_FIXTURES;
   const artifacts = JOURNEY_ARTIFACTS;

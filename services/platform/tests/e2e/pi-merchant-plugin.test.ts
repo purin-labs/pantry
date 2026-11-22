@@ -202,7 +202,7 @@ it("installs an agent-written merchant plugin only after an owner approves each 
   ]);
   await expect
     .poll(() => slack.messages[0]?.text, { timeout: 15_000 })
-    .toContain("Seams Pantry made the change.");
+    .toContain("Purin Pantry made the change.");
 
   // A later turn of the same thread proposes too; its own turn binds it.
   await sendListingMessage(
@@ -238,7 +238,7 @@ it("installs an agent-written merchant plugin only after an owner approves each 
   );
   await expect
     .poll(() => slack.messages[2]?.text, { timeout: 15_000 })
-    .toContain("Seams Pantry made the change.");
+    .toContain("Purin Pantry made the change.");
 
   // A plugin with an event handler and no checkout rule.
   await sendListingMessage(
@@ -278,7 +278,7 @@ it("installs an agent-written merchant plugin only after an owner approves each 
   expect(third.plugin.contributions.functions).toEqual([]);
   await expect
     .poll(() => slack.messages[4]?.text, { timeout: 15_000 })
-    .toContain("Seams Pantry made the change.");
+    .toContain("Purin Pantry made the change.");
 });
 
 /** Each approval notice in the thread: the change and the linked action. */

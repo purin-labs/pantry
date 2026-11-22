@@ -113,7 +113,7 @@ async function decide(
   if (approver === null || personId === null)
     return {
       kind: "refused",
-      text: "Only an owner or admin whose Slack account is linked to Seams Pantry can decide this change.",
+      text: "Only an owner or admin whose Slack account is linked to Purin Pantry can decide this change.",
     };
   const now = Date.now();
   const organisation = await requireActiveOrganisationActor({

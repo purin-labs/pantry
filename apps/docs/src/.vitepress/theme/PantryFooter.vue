@@ -3,13 +3,13 @@ const year = new Date().getFullYear();
 </script>
 
 <template>
-  <footer class="pantry-docs-footer" aria-label="Seams Pantry footer">
+  <footer class="pantry-docs-footer" aria-label="Purin Pantry footer">
     <div class="pantry-docs-footer__inner">
       <div class="pantry-docs-footer__brand">
         <a
           class="pantry-docs-footer__brand-link"
           href="/"
-          aria-label="Seams Pantry documentation home"
+          aria-label="Purin Pantry documentation home"
         >
           <img
             class="pantry-docs-footer__mark pantry-docs-footer__mark--light"
@@ -23,9 +23,9 @@ const year = new Date().getFullYear();
             alt=""
             aria-hidden="true"
           />
-          <span>Seams Pantry</span>
+          <span>Purin Pantry</span>
         </a>
-        <p class="pantry-docs-footer__legal">© {{ year }} Seams</p>
+        <p class="pantry-docs-footer__legal">© {{ year }} Purin Heavy Industries</p>
       </div>
 
       <nav class="pantry-docs-footer__links" aria-label="Footer navigation">

@@ -60,7 +60,7 @@ export function presentJevDraftCommand(command: JevDraftCommand): Readonly<{
         summary: `Turn off ${name} in Settings › Jev.`,
         actionLabel: `Turn off ${name}`,
         consequence:
-          "Seams Pantry stops new Jev calls for this feature at once. Calls that started finish.",
+          "Purin Pantry stops new Jev calls for this feature at once. Calls that started finish.",
       };
 }
 

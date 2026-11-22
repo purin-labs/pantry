@@ -113,7 +113,7 @@ export const EVAL_ROUTES: readonly EvalRoute[] = [
 export function routeLabel(route: EvalRoute): string {
   switch (route) {
     case "pantry_platform":
-      return "Seams AI";
+      return "Purin AI";
     case "claude_oauth":
       return "Claude OAuth";
     case "codex_subscription":
@@ -184,7 +184,7 @@ export function taskNote(task: EvalTaskResult | null): string | null {
     case "failed":
       return "The turn stopped with an error before it gave a result. This is not a fail.";
     case "indeterminate":
-      return "The turn was interrupted and its result is not known. Seams Pantry does not run it again in the same run.";
+      return "The turn was interrupted and its result is not known. Purin Pantry does not run it again in the same run.";
     case "cancelled":
       return "The run was cancelled before this scenario started.";
     default:

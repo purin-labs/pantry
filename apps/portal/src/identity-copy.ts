@@ -13,9 +13,9 @@ export function identityServiceErrorMessage(
     case "control_session_expired":
       return "Sign in with Google before you connect Slack.";
     case "organisation_membership_missing":
-      return "This Google account does not have access to this Seams Pantry workspace. Sign in with the account you use for Pantry, or ask a workspace owner for access.";
+      return "This Google account does not have access to this Purin Pantry workspace. Sign in with the account you use for Pantry, or ask a workspace owner for access.";
     case "identity_conflict":
-      return "This Slack account is connected to another Seams Pantry account. Ask a workspace owner for help.";
+      return "This Slack account is connected to another Purin Pantry account. Ask a workspace owner for help.";
     case "identity_provider_unsupported":
       return "Use Google to connect this Slack account.";
     case "link_not_found":

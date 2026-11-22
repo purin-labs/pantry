@@ -229,7 +229,7 @@ export function describeDeviceEvent(event: DeviceEventRecord): string {
         ? "an agent"
         : event.actorKind === "gateway"
           ? "the gateway"
-          : "Seams Pantry";
+          : "Purin Pantry";
   const detail = (key: string): string =>
     typeof event.detail[key] === "string" ? event.detail[key] : "";
   switch (event.kind) {

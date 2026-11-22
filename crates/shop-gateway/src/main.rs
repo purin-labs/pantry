@@ -310,7 +310,7 @@ fn enroll(args: &[String]) -> Result<(), String> {
     }))
     .map_err(|error| match error {
         ureq::Error::Status(401, _) => {
-            "Seams Pantry refused this code. It works one time and ends in 15 minutes.".to_string()
+            "Purin Pantry refused this code. It works one time and ends in 15 minutes.".to_string()
         }
         other => format!("The enrollment failed: {other}"),
     })?;
@@ -413,7 +413,7 @@ fn run(args: &[String]) -> Result<(), String> {
         let started = Instant::now();
         match connect_and_serve(url.trim(), credential.trim(), &simulation, &mut adapters) {
             RunEnd::Revoked => {
-                println!("Seams Pantry ended this gateway's access. It will not connect again.");
+                println!("Purin Pantry ended this gateway's access. It will not connect again.");
                 return Ok(());
             }
             RunEnd::Dropped(reason) => eprintln!("The connection ended: {reason}"),
@@ -490,7 +490,7 @@ fn connect_and_serve(
     if let Err(error) = set_read_tick(&socket) {
         return RunEnd::Dropped(error);
     }
-    println!("Connected to Seams Pantry.");
+    println!("Connected to Purin Pantry.");
     let mut platform = Socket {
         socket,
         url,
@@ -633,7 +633,7 @@ fn answer(
         Some("welcome") => Ok(true),
         Some("pause" | "resume" | "stop") => {
             let request = message.get("requestId").cloned().unwrap_or(Value::Null);
-            eprintln!("Seams Pantry sent {text}");
+            eprintln!("Purin Pantry sent {text}");
             platform.send(&json!({ "type": "ack", "requestId": request, "outcome": "done" }))?;
             Ok(false)
         }
@@ -653,7 +653,7 @@ fn answer(
             Ok(false)
         }
         Some("refused") => {
-            eprintln!("Seams Pantry refused a report: {text}");
+            eprintln!("Purin Pantry refused a report: {text}");
             Ok(false)
         }
         _ => Ok(false),

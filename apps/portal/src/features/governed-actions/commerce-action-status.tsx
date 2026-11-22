@@ -158,7 +158,7 @@ function ActionDecisionControls(props: {
 function commerceSystemName(system: CommerceSystemKind): string {
   switch (system) {
     case "builtin_commerce":
-      return "Seams Checkout";
+      return "Purin Checkout";
     case "shopify":
       return "Shopify";
     default:

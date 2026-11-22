@@ -29,9 +29,9 @@ export async function runAccountSetupJourney(page, options) {
   await page.evaluate(setFixtureCsrf);
   await page.getByText("No organisations yet", { exact: true }).waitFor();
   await page
-    .getByRole("button", { name: "Set up Seams Pantry", exact: true })
+    .getByRole("button", { name: "Set up Purin Pantry", exact: true })
     .click();
-  const dialog = page.getByRole("dialog", { name: "Set up Seams Pantry" });
+  const dialog = page.getByRole("dialog", { name: "Set up Purin Pantry" });
   await dialog
     .getByRole("heading", { name: "Name your organisation", exact: true })
     .waitFor();
@@ -193,7 +193,7 @@ export async function runAccountSetupJourney(page, options) {
 
 async function waitForDone(dialog, name) {
   await dialog
-    .getByRole("heading", { name: "Seams Pantry is ready", exact: true })
+    .getByRole("heading", { name: "Purin Pantry is ready", exact: true })
     .waitFor();
   await dialog
     .getByText(`${name} is in your organisation list.`, { exact: false })
@@ -213,9 +213,9 @@ async function verifyUnlistedOrganisation(page, fixture, storageKey, options) {
     .locator('a.organisation-row-link[href="/portal/cafe-browser-lab"]')
     .waitFor();
   await page
-    .getByRole("button", { name: "Set up Seams Pantry", exact: true })
+    .getByRole("button", { name: "Set up Purin Pantry", exact: true })
     .click();
-  const dialog = page.getByRole("dialog", { name: "Set up Seams Pantry" });
+  const dialog = page.getByRole("dialog", { name: "Set up Purin Pantry" });
   await dialog.getByLabel("Organisation name").fill("Riverside cafe");
   await dialog
     .getByRole("button", { name: "Create organisation", exact: true })
@@ -292,14 +292,14 @@ async function verifyCreateRefusals(page, fixture, storageKey, options) {
   await page
     .locator('a.organisation-row-link[href="/portal/cafe-browser-lab"]')
     .waitFor();
-  const dialog = page.getByRole("dialog", { name: "Set up Seams Pantry" });
+  const dialog = page.getByRole("dialog", { name: "Set up Purin Pantry" });
   const footer = dialog.locator(".agent-modal-footer");
   const made = fixture.made;
   const outcomes = [];
   for (const refusal of CREATE_REFUSALS) {
     fixture.refusal = refusal;
     await page
-      .getByRole("button", { name: "Set up Seams Pantry", exact: true })
+      .getByRole("button", { name: "Set up Purin Pantry", exact: true })
       .click();
     await dialog.getByLabel("Organisation name").fill("Sixth shop");
     await dialog
@@ -394,7 +394,7 @@ async function verifyInvitationPage(page, options) {
     answerInvitation.bind(null, invitation),
   );
   const heading = page.getByRole("heading", {
-    name: "Seams Pantry invitation",
+    name: "Purin Pantry invitation",
     exact: true,
   });
   const accept = page.getByRole("button", {

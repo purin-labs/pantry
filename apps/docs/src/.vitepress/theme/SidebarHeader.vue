@@ -38,7 +38,7 @@ watchPostEffect(() => {
           alt=""
         />
         <span class="pantry-sidebar-header__wordmark" aria-hidden="true">
-          <span>Seams Pantry</span>
+          <span>Purin Pantry</span>
           <small>Bakery operating system</small>
         </span>
       </a>

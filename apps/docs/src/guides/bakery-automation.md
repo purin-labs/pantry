@@ -1,6 +1,6 @@
 ---
 title: Bakery automation
-description: Kitchen orchestration in Seams Pantry, recipe simulation, and the planned physical production boundary.
+description: Kitchen orchestration in Purin Pantry, recipe simulation, and the planned physical production boundary.
 ---
 
 # Bakery automation

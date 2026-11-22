@@ -76,7 +76,7 @@ async function createClient(token: string): Promise<OnePasswordClient> {
   const sdk = await import("@1password/sdk");
   const client = await sdk.createClient({
     auth: token,
-    integrationName: "Seams Vault",
+    integrationName: "Purin Vault",
     integrationVersion: "1",
   });
   // The SDK's enums are strings with the same values as the store's.

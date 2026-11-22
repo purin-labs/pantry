@@ -73,7 +73,7 @@ export function deviceStatus(device: DeviceView): DeviceStatus {
         label: "Managed by Square",
         reason: device.simulated
           ? "A simulated terminal for tests"
-          : "Seams Pantry has no heartbeat for this device",
+          : "Purin Pantry has no heartbeat for this device",
         tone: "muted",
       };
     case "gateway":
@@ -216,17 +216,17 @@ export function kitchenAnswer(device: KitchenDeviceView): string {
         case "pending":
           return "The gateway found this device. It takes no work until a person confirms it.";
         case "restricted":
-          return "A person restricted this device. Seams Pantry sends it no new task until an admin lifts this.";
+          return "A person restricted this device. Purin Pantry sends it no new task until an admin lifts this.";
         case "revoked":
-          return "This device has no access, and Seams Pantry sends it no task.";
+          return "This device has no access, and Purin Pantry sends it no task.";
         case "fault":
-          return "This device reports a fault, so Seams Pantry sends it no new task. Check the machine in the shop.";
+          return "This device reports a fault, so Purin Pantry sends it no new task. Check the machine in the shop.";
         case "paused":
-          return "Seams Pantry stopped new work on this device until a person resumes it.";
+          return "Purin Pantry stopped new work on this device until a person resumes it.";
         case "connection_lost":
-          return "Seams Pantry cannot hear this device, so it sends no new task. The device may still be on.";
+          return "Purin Pantry cannot hear this device, so it sends no new task. The device may still be on.";
         case "result_unknown":
-          return "Seams Pantry does not know if the last task finished. Check the machine, then mark the result as checked.";
+          return "Purin Pantry does not know if the last task finished. Check the machine, then mark the result as checked.";
         default:
           return assertNever(readiness.reason, "Unexpected value");
       }
@@ -258,7 +258,7 @@ export function credentialLabel(
     case "revoked":
       return "Square access is removed";
     case "unavailable":
-      return "Seams Pantry cannot read the connection";
+      return "Purin Pantry cannot read the connection";
     default:
       return assertNever(health, "Unexpected value");
   }

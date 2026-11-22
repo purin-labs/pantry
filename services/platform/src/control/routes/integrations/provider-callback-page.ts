@@ -26,13 +26,13 @@ export function providerCompletionPage(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${connected ? "Connected" : failed ? "Connection not finished" : "Authorization received"} · Seams Pantry</title>
+  <title>${connected ? "Connected" : failed ? "Connection not finished" : "Authorization received"} · Purin Pantry</title>
   <style>${PROVIDER_CALLBACK_PAGE_STYLES}</style>
 </head>
 <body>
   <main class="callback-shell">
     <section class="callback-panel" aria-labelledby="callback-title">
-      <p class="callback-brand">SEAMS PANTRY</p>
+      <p class="callback-brand">PURIN PANTRY</p>
       <span class="callback-mark ${connected ? "is-ok" : "is-neutral"}" aria-hidden="true">${connected ? CALLBACK_CHECK_ICON : CALLBACK_LINK_ICON}</span>
       <h1 id="callback-title">${connected ? "You&rsquo;re connected" : failed ? "Connection not finished" : "Authorization received"}</h1>
       <p class="callback-copy" id="status">${
@@ -134,13 +134,13 @@ export function providerCallbackFailurePage(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Connection not finished · Seams Pantry</title>
+  <title>Connection not finished · Purin Pantry</title>
   <style>${PROVIDER_CALLBACK_PAGE_STYLES}</style>
 </head>
 <body>
   <main class="callback-shell">
     <section class="callback-panel" aria-labelledby="callback-title">
-      <p class="callback-brand">SEAMS PANTRY</p>
+      <p class="callback-brand">PURIN PANTRY</p>
       <span class="callback-mark is-warn" aria-hidden="true">${CALLBACK_ALERT_ICON}</span>
       <h1 id="callback-title">We couldn&rsquo;t finish that connection</h1>
       <p class="callback-copy">${detail}</p>

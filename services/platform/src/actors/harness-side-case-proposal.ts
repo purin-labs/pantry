@@ -104,7 +104,7 @@ export async function proposeSideCaseForHarness(
       return {
         kind: "side_case_proposed",
         detail:
-          "Seams Pantry shows the person a card for this side Case in the chat. Tell them in one sentence what you proposed. Do not do that work in this turn.",
+          "Purin Pantry shows the person a card for this side Case in the chat. Tell them in one sentence what you proposed. Do not do that work in this turn.",
       };
     case "limit_reached":
       return notProposed(

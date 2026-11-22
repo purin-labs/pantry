@@ -242,7 +242,7 @@ async function verifyOneInbox(page) {
     .getByText("Can I move my Saturday pickup to 4 pm?", { exact: true })
     .waitFor();
   await conversation
-    .getByText(/Seams keeps WhatsApp text for up to 24 hours/)
+    .getByText(/Purin keeps WhatsApp text for up to 24 hours/)
     .waitFor();
   if ((await page.evaluate("location.search")) !== "?case=case-pickup")
     throw new Error("The address does not name the open Case");
@@ -320,7 +320,7 @@ async function verifyOneInbox(page) {
     .getByRole("button", { name: "Conversation options", exact: true })
     .click();
   await page
-    .getByRole("menuitem", { name: /^Close Case.*Seams deletes its text/ })
+    .getByRole("menuitem", { name: /^Close Case.*Purin deletes its text/ })
     .waitFor();
   await page.getByRole("menuitem", { name: /^Take over/ }).click();
   await page.waitForFunction(function tookOver() {
@@ -346,7 +346,7 @@ async function verifyOneInbox(page) {
   });
   await handled.getByRole("button", { name: /\+819000007720/ }).click();
   await conversation
-    .getByText(/This conversation is closed\. Seams deleted its text\./)
+    .getByText(/This conversation is closed\. Purin deleted its text\./)
     .waitFor();
 
   // A failed source names itself, and the other source stays.

@@ -12,7 +12,7 @@ inventory facts. Japan-to-Singapore export boxes remain an accepted commerce exa
 ## Accepted foundations
 
 Use the existing café, pâtisserie, pickup, packaged-goods checkout, and export
-commerce paths. Kitchen in Seams Pantry separately provides accepted bounded simulation,
+commerce paths. Kitchen in Purin Pantry separately provides accepted bounded simulation,
 saved scenarios, native handling evidence, and governed chat control.
 
 These foundations do not establish a fully automated physical factory. Recipe

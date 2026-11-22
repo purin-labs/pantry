@@ -79,7 +79,7 @@ export function CheckoutProfilesRoute(props: {
         <h2>Set up how customers buy</h2>
         <p>
           Connect your commerce system to configure customer details, payment,
-          pickup, and shipping. Seams support helps activate your storefront and
+          pickup, and shipping. Purin support helps activate your storefront and
           installs the starting checkout settings for you to review.
         </p>
         {props.integrationsPath == null ? null : (

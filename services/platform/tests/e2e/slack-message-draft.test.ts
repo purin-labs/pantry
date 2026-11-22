@@ -198,7 +198,7 @@ async function slackDraftJourney({ task }: TestContext): Promise<void> {
       text: DRAFT_TEXT,
     },
   );
-  expect(JSON.stringify(refusedOutputs)).toContain("not connected to Seams Pantry");
+  expect(JSON.stringify(refusedOutputs)).toContain("not connected to Purin Pantry");
   expect(JSON.stringify(refusedOutputs)).not.toContain(FINANCE);
   expect(await drafts(author, paths.chat, refused)).toEqual([]);
 

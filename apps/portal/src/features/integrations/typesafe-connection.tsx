@@ -116,7 +116,7 @@ export function TypeSafeConnectionPanel(props: {
                     aria-describedby="typesafe-key-help"
                   />
                   <p id="typesafe-key-help" className="field-hint">
-                    Seams Pantry encrypts your key and never shows it again.
+                    Purin Pantry encrypts your key and never shows it again.
                     Saving runs a small test that TypeSafe bills to you. After
                     you replace a key, turn on each feature again.
                   </p>

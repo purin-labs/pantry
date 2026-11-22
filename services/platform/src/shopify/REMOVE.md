@@ -1,6 +1,6 @@
 # How to remove Shopify
 
-Shopify is a connection of Seams Pantry. All its Platform code is in this folder
+Shopify is a connection of Purin Pantry. All its Platform code is in this folder
 (Refactor 17, step A2.5). This file lists what to delete with the folder, so that a
 removal is one piece of work with a known end.
 

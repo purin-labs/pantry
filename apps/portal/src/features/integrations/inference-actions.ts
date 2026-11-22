@@ -46,7 +46,7 @@ function inferenceSelectionSuccessMessage(
     case "codex_subscription":
       return "New agent conversations will use your ChatGPT subscription.";
     case "pantry_platform":
-      return "New agent conversations will use Seams AI.";
+      return "New agent conversations will use Purin AI.";
     case "organisation_openai_api_key":
       return "New agent conversations will use Pi with your OpenAI API key.";
     case "organisation_anthropic_api_key":

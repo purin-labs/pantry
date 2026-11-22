@@ -60,7 +60,7 @@ export function riskLabel(
     case "propose":
       return "Prepares changes";
     case "external_effect":
-      return "Acts outside Seams Pantry";
+      return "Acts outside Purin Pantry";
   }
 }
 
@@ -94,7 +94,7 @@ export function providerDependencyLabel(
 ): string {
   switch (dependency.kind) {
     case "none":
-      return "Seams Pantry";
+      return "Purin Pantry";
     case "provider":
       return dependency.providers.map(providerLabel).join(" or ");
     case "commerce_system":
@@ -105,7 +105,7 @@ export function providerDependencyLabel(
 function commerceSystemLabel(system: string): string {
   switch (system) {
     case "builtin_commerce":
-      return "Seams Checkout";
+      return "Purin Checkout";
     case "shopify":
       return "Shopify";
     default:

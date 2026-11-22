@@ -482,7 +482,7 @@ async function startSideCaseFromClick(
 const REFUSALS: Readonly<Record<SlackSideCaseStartRefusal, string>> = {
   side_case_unavailable: "The server cannot find this proposal.",
   side_case_starter_not_permitted:
-    "You cannot start this side Case. Only a member whose Slack account is linked to Seams Pantry, and who may give Sous Chef work here, can start it.",
+    "You cannot start this side Case. Only a member whose Slack account is linked to Purin Pantry, and who may give Sous Chef work here, can start it.",
   side_case_not_permitted:
     "This side Case cannot start here. It holds information that this conversation may not receive.",
   side_case_expired:

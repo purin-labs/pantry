@@ -146,7 +146,7 @@ export function CounterSaleRoute(
         <div className="counter-sale-recovery">
           <p>
             Payment {sale.recoverable.paymentAttemptId} is unresolved (
-            {sale.recoverable.reasonCode}). Seams Checkout will reconcile it
+            {sale.recoverable.reasonCode}). Purin Checkout will reconcile it
             from{" "}
             {new Date(sale.recoverable.reconcileAfter).toLocaleTimeString()}.
             Recover this attempt rather than starting a new one.

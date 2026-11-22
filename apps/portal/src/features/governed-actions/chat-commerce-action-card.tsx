@@ -156,7 +156,7 @@ function ChatCommerceActionCard(props: Readonly<{
   if (state.kind === "loading") return <section className="chat-commerce-action" aria-busy="true" aria-label="Proposed change">Loading the proposed change…</section>;
   if (state.kind === "missing") return null;
   if (state.kind === "unavailable") return <section className="chat-commerce-action" aria-label="Proposed change">
-    <p className="chat-commerce-action-summary">Seams Pantry cannot read this proposed change now, so it cannot be approved yet.</p>
+    <p className="chat-commerce-action-summary">Purin Pantry cannot read this proposed change now, so it cannot be approved yet.</p>
     <div className="chat-commerce-action-buttons">
       <button type="button" className="secondary-button" onClick={() => { setState({ kind: "loading" }); void read(); }}>Try again</button>
     </div>

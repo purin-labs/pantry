@@ -1,11 +1,11 @@
 ---
 title: Vault operations
-description: Operate Seams Vault without exposing organisation credentials to harnesses or executors.
+description: Operate Purin Vault without exposing organisation credentials to harnesses or executors.
 ---
 
 # Vault operations
 
-Seams Vault is the organisation-scoped source for provider and model credentials.
+Purin Vault is the organisation-scoped source for provider and model credentials.
 Ciphertext and lifecycle metadata live in D1. Versioned encryption roots live
 in Cloudflare Secrets Store. A trusted platform operation resolves an opaque
 reference only after it has authenticated the request and rechecked policy.
@@ -54,8 +54,8 @@ surface is documented in [Vault API reference](/reference/vault-api).
 Platform signing roots, OAuth application secrets, and the platform-funded
 `OPENROUTER_API_KEY` remain Cloudflare deployment secrets. Organisation provider
 tokens, the organisation ChatGPT sign-in profile for the subscription route, organisation-owned
-OAuth client credentials, and organisation webhook secrets belong in Seams Vault.
+OAuth client credentials, and organisation webhook secrets belong in Purin Vault.
 
 OAuth authorization codes are transient. After an OAuth exchange, validate the
-merchant identity and scopes, store the resulting organisation token in Seams Vault,
+merchant identity and scopes, store the resulting organisation token in Purin Vault,
 and persist only its handle in the provider connection.

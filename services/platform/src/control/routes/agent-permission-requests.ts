@@ -513,7 +513,7 @@ function slackThreadUrl(stored: AgentPermissionRequest): string | null {
 }
 
 const SHOP_PROPOSAL_DESCRIPTION =
-  "Prepare a change to a price, a listing, a product description, fulfilment tracking or a merchant plugin in this shop. Seams Pantry makes no change until an owner or admin approves it, each time.";
+  "Prepare a change to a price, a listing, a product description, fulfilment tracking or a merchant plugin in this shop. Purin Pantry makes no change until an owner or admin approves it, each time.";
 
 /**
  * A proposal grant covers every record of the Organisation's shop. A proposal

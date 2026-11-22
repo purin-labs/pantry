@@ -18,7 +18,7 @@ import { createAgentOperationsDatabase } from "./agent-operations-database";
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION = requireOrganisationId("organisation_urk");
-const HARNESS = "You are Sous Chef, a governed commerce agent in Seams Pantry.";
+const HARNESS = "You are Sous Chef, a governed commerce agent in Purin Pantry.";
 
 describe("pinned agent profile", () => {
   it("composes the harness rules, published instructions, and pinned skills", async () => {

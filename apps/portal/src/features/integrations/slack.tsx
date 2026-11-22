@@ -35,7 +35,7 @@ export function inferenceRouteName(selection: OrganisationInferenceSelection): s
     case "codex_subscription":
       return "your ChatGPT subscription";
     case "pantry_platform":
-      return "Seams AI";
+      return "Purin AI";
     case "organisation_openai_api_key":
       return "your OpenAI API key";
     case "organisation_anthropic_api_key":
@@ -93,7 +93,7 @@ export function SlackSetup(props: {
       <>
         {props.connecting ? null : (
           <p className="notice-text">
-            Connect Slack first, then choose the channel Seams Pantry should post to.
+            Connect Slack first, then choose the channel Purin Pantry should post to.
           </p>
         )}
         {renderSetupFeedback(props.setupFeedback)}

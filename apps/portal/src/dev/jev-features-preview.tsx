@@ -176,7 +176,7 @@ createRoot(root).render(
           element={
             <Page
               title="Jev"
-              description="Choose which Seams Pantry features may send data to TypeSafe Jev."
+              description="Choose which Purin Pantry features may send data to TypeSafe Jev."
             >
               <JevFeaturesRoute
                 organisationId="organisation_jev_preview"

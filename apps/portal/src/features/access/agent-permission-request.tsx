@@ -265,7 +265,7 @@ function decisionFor(
       tone: "denied",
       title: "Request denied",
       message: view.waitingForSlack
-        ? "The agent stopped the request. Seams Pantry tells the Slack thread when the Slack connection works again."
+        ? "The agent stopped the request. Purin Pantry tells the Slack thread when the Slack connection works again."
         : "The agent stopped the request.",
       pending: null,
       error: null,

@@ -274,7 +274,7 @@ export function WhatsAppConversation(props: Props): React.ReactNode {
                               <span className="action-menu-copy">
                                 <span>Close Case</span>
                                 <small>
-                                  Seams deletes its text. WhatsApp keeps the
+                                  Purin deletes its text. WhatsApp keeps the
                                   history.
                                 </small>
                               </span>
@@ -295,7 +295,7 @@ export function WhatsAppConversation(props: Props): React.ReactNode {
           <div className="mail-conversation-scroll">
             {closed ? (
               <p className="mail-conversation-notice">
-                This conversation is closed. Seams deleted its text. WhatsApp
+                This conversation is closed. Purin deleted its text. WhatsApp
                 keeps the full history.
               </p>
             ) : null}
@@ -327,7 +327,7 @@ export function WhatsAppConversation(props: Props): React.ReactNode {
             )}
             {closed ? null : (
               <p className="mail-inbox-note">
-                Seams keeps WhatsApp text for up to 24 hours. WhatsApp keeps the
+                Purin keeps WhatsApp text for up to 24 hours. WhatsApp keeps the
                 full history.
               </p>
             )}
@@ -367,7 +367,7 @@ export function WhatsAppConversation(props: Props): React.ReactNode {
                 <section className="mail-draft" data-draft="unconfirmed">
                   <h3 className="mail-draft-chip">Send not confirmed</h3>
                   <p>
-                    Meta did not confirm this send. Seams Pantry does not retry
+                    Meta did not confirm this send. Purin Pantry does not retry
                     it. Check WhatsApp, then record what you found.
                   </p>
                   {props.canManage && replyPath !== null ? (
@@ -560,7 +560,7 @@ function wasSent(answer: unknown): boolean {
 function notSentText(answer: unknown): string {
   switch (resultKind(answer)) {
     case "send_indeterminate":
-      return "Meta did not confirm this send. Seams Pantry does not retry it. Check WhatsApp.";
+      return "Meta did not confirm this send. Purin Pantry does not retry it. Check WhatsApp.";
     case "stale_approval":
       return "This draft changed. Read the new text, then approve it.";
     case "expired":

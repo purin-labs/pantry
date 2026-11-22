@@ -5,7 +5,7 @@ description: The verification sequence for platform, commerce, onboarding, and d
 
 # Testing and evidence
 
-Seams Pantry uses focused tests to prove the changed boundary and scenario runs to
+Purin Pantry uses focused tests to prove the changed boundary and scenario runs to
 prove the operating path. Evidence should identify the exact revision,
 receipt, provider observation, and terminal disposition that were checked.
 

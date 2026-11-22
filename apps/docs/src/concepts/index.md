@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: The ownership, authority, commerce, and execution ideas that shape Seams Pantry.
+description: The ownership, authority, commerce, and execution ideas that shape Purin Pantry.
 ---
 
 # Concepts

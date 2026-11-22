@@ -174,7 +174,7 @@ type PreparedDelivery = StrictUnion<
   | { readonly kind: "rejected"; readonly reason: string }
 >;
 
-const OUTPUT_HELD_TEXT = "Message held by the Seams Pantry output guardrail.";
+const OUTPUT_HELD_TEXT = "Message held by the Purin Pantry output guardrail.";
 const STREAM_FAILED_TEXT =
   "Sous Chef couldn’t complete this request. Please try again.";
 const STREAM_INTERRUPTED_TEXT =

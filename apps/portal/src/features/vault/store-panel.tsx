@@ -29,14 +29,14 @@ export function StoreLine(props: {
     <div className="vault-store-line">
       <p>
         {store.kind === "pantry" ? (
-          <>Storage: Seams Vault</>
+          <>Storage: Purin Vault</>
         ) : (
           <>
             Storage: 1Password · <strong>{store.vaultTitle}</strong>
             {store.reachable ? null : (
               <span className="vault-store-warning">
                 {" "}
-                1Password did not answer, so only Seams Vault items show.
+                1Password did not answer, so only Purin Vault items show.
               </span>
             )}
           </>
@@ -81,7 +81,7 @@ export function ConnectForm(props: {
       <ol className="vault-steps">
         <li>
           In 1Password, create a service account with read and write access to
-          one shared vault, for example “Seams”.
+          one shared vault, for example “Purin”.
         </li>
         <li>Paste its token here.</li>
       </ol>
@@ -139,8 +139,8 @@ export function ConnectForm(props: {
         </fieldset>
       )}
       <p className="vault-secret-note">
-        Seams keeps the token encrypted and never shows it. New items then go to
-        1Password, and you can move your Seams Vault items there.
+        Purin keeps the token encrypted and never shows it. New items then go to
+        1Password, and you can move your Purin Vault items there.
       </p>
       {props.failure === null ? null : (
         <p className="vault-failure" role="alert">
@@ -202,7 +202,7 @@ export function StoreDetails(props: {
         <div>
           <dt>Items</dt>
           <dd>
-            {onePasswordCount} in 1Password · {pantryCount} in Seams Vault
+            {onePasswordCount} in 1Password · {pantryCount} in Purin Vault
           </dd>
         </div>
       </dl>
@@ -219,7 +219,7 @@ export function StoreDetails(props: {
         >
           <p>
             Disconnect 1Password? Its items stay in 1Password, and agents can no
-            longer use them. New items go to Seams Vault again.
+            longer use them. New items go to Purin Vault again.
           </p>
           <div className="vault-actions">
             <button
@@ -260,7 +260,7 @@ export function StoreDetails(props: {
               disabled={props.busy}
               onClick={() => props.move("pantry")}
             >
-              Move items to Seams Vault
+              Move items to Purin Vault
             </button>
           ) : null}
           <button
@@ -350,7 +350,7 @@ function eventText(kind: VaultEventKind, store: VaultEvent["store"]): string {
     case "item_moved":
       return store === "onepassword"
         ? "Moved to 1Password"
-        : "Moved to Seams Vault";
+        : "Moved to Purin Vault";
     case "store_connected":
       return "1Password connected";
     case "store_disconnected":

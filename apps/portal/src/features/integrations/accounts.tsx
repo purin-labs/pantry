@@ -268,34 +268,34 @@ function connectionProblem(
 function connectionCause(service: string, reasonCode: string): string {
   switch (reasonCode) {
     case "oauth_scope_revoked":
-      return `${service} removed a permission Seams Pantry was given.`;
+      return `${service} removed a permission Purin Pantry was given.`;
     case "provider_credential_revoked":
     case "credential_revoked":
-      return `The key Seams Pantry uses for ${service} was revoked.`;
+      return `The key Purin Pantry uses for ${service} was revoked.`;
     case "provider_credential_rotated":
     case "credential_rotated":
-      return `The key Seams Pantry uses for ${service} was replaced.`;
+      return `The key Purin Pantry uses for ${service} was replaced.`;
     case "authorization_expired":
       return `The ${service} authorization expired.`;
     case "provider_grant_refused":
-      return `${service} refused the sign-in that Seams Pantry uses. It expired, or someone removed the access.`;
+      return `${service} refused the sign-in that Purin Pantry uses. It expired, or someone removed the access.`;
     case "authorization_cancelled":
       return `The ${service} authorization was closed before it finished.`;
     case "provider_manifest_unhealthy":
-      return `${service} stopped answering the checks Seams Pantry runs against it.`;
+      return `${service} stopped answering the checks Purin Pantry runs against it.`;
     case "provider_webhook_unhealthy":
-      return `${service} stopped delivering updates to Seams Pantry.`;
+      return `${service} stopped delivering updates to Purin Pantry.`;
     case "provider_rejected":
-      return `${service} rejected the last request Seams Pantry made.`;
+      return `${service} rejected the last request Purin Pantry made.`;
     case "provider_configuration_missing":
-      return `Seams Pantry is missing the settings it needs to reach ${service}.`;
+      return `Purin Pantry is missing the settings it needs to reach ${service}.`;
     case "provider_account_disabled":
     case "merchant_disabled":
-      return `The ${service} account Seams Pantry connects to is disabled.`;
+      return `The ${service} account Purin Pantry connects to is disabled.`;
     case "provider_account_removed":
-      return `The ${service} account Seams Pantry connects to was removed.`;
+      return `The ${service} account Purin Pantry connects to was removed.`;
     case "automatic_inactivity":
-      return `${service} went quiet for long enough that Seams Pantry paused it.`;
+      return `${service} went quiet for long enough that Purin Pantry paused it.`;
     default:
       return `${service} needs to be reconnected.`;
   }
@@ -317,7 +317,7 @@ export function renderIntegrationAccountDetails(
   return (
     <dl className="integration-account-details">
       <div>
-        <dt>What Seams Pantry can do</dt>
+        <dt>What Purin Pantry can do</dt>
         <dd>{describeAccountAccess(account)}</dd>
       </div>
       {account.selectedResources.length === 0 ||

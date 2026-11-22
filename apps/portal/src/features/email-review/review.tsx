@@ -238,7 +238,7 @@ function renderReply(
       {reply.lifecycleKind === "send_indeterminate" && props.canManage ? (
         <div className="connection-actions">
           <p className="notice-text">
-            Gmail did not confirm this send. Seams Pantry will not retry it.
+            Gmail did not confirm this send. Purin Pantry will not retry it.
             Check the exact message in Gmail before reconciling.
           </p>
           <button
@@ -567,7 +567,7 @@ function renderOperational(
       {proposal.lifecycleKind === "send_indeterminate" ? (
         <>
           <p className="notice-text">
-            Gmail did not confirm this send. Seams Pantry will not retry it.
+            Gmail did not confirm this send. Purin Pantry will not retry it.
             Check Sent Mail for Message-ID{" "}
             {proposal.indeterminateRfcMessageId ?? "(unavailable)"}.
           </p>

@@ -68,7 +68,7 @@ const PRIVATE_WORDS = "the private words of the operator";
 const SUBJECT_QUESTION = `set the email draft subject to "${SUBJECT}"`;
 const BODY_QUESTION = `put the praline description (${PRODUCT_ID}) into the email draft body`;
 const PRIVATE_QUESTION = "add what I told you in private to the email draft";
-const STOPPED = "Seams Pantry stopped this step";
+const STOPPED = "Purin Pantry stopped this step";
 const ANSWERS = {
   asked: "I asked an owner for permission to edit the email draft.",
   edited: "I changed the email draft.",

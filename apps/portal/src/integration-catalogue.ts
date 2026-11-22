@@ -46,7 +46,7 @@ export const PROVIDER_PRESENTATION = {
     searchAliases: ["email", "mail", "mailbox", "support", "google"],
     tile: "gmail",
     disconnectedConsequence:
-      "Seams Pantry has stopped reading new mail and preparing replies.",
+      "Purin Pantry has stopped reading new mail and preparing replies.",
   },
   google_drive: {
     label: "Google Drive",
@@ -62,7 +62,7 @@ export const PROVIDER_PRESENTATION = {
     searchAliases: ["wiki", "documents", "docs", "knowledge"],
     tile: "notion",
     disconnectedConsequence:
-      "Seams Pantry can no longer search this source for operational context.",
+      "Purin Pantry can no longer search this source for operational context.",
   },
   shopify: {
     label: "Shopify",
@@ -78,7 +78,7 @@ export const PROVIDER_PRESENTATION = {
     searchAliases: ["messages", "communication", "alerts", "approvals"],
     tile: "slack",
     disconnectedConsequence:
-      "Seams Pantry cannot post inventory alerts, action requests, or completion updates until it is reconnected.",
+      "Purin Pantry cannot post inventory alerts, action requests, or completion updates until it is reconnected.",
   },
   square: {
     label: "Square",
@@ -101,7 +101,7 @@ export const PROVIDER_PRESENTATION = {
     searchAliases: ["messages", "messaging", "support", "phone", "meta"],
     tile: "whatsapp",
     disconnectedConsequence:
-      "Seams Pantry has stopped receiving customer messages and preparing replies.",
+      "Purin Pantry has stopped receiving customer messages and preparing replies.",
   },
 } as const satisfies Record<Provider, ProviderPresentation>;
 
@@ -126,7 +126,7 @@ export function providerSearchAliases(provider: string): readonly string[] {
 export function providerDisconnectedConsequence(provider: string): string {
   return (
     providerPresentation(provider)?.disconnectedConsequence ??
-    "Seams Pantry has stopped exchanging data with this connection."
+    "Purin Pantry has stopped exchanging data with this connection."
   );
 }
 

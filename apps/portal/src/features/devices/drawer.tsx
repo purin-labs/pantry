@@ -451,12 +451,12 @@ function ActionPanel(
             void run(
               "restrict",
               { reason: panel.reason.trim() },
-              `${device.name} is restricted. Seams Pantry sends it no new task.`,
+              `${device.name} is restricted. Purin Pantry sends it no new task.`,
             );
           }}
         >
           <p>
-            Restrict {device.name}? Seams Pantry sends it no new task. A task
+            Restrict {device.name}? Purin Pantry sends it no new task. A task
             that runs now continues.
           </p>
           <label className="devices-field">
@@ -598,8 +598,8 @@ function ActionPanel(
         <div className="devices-panel">
           <p>
             {device.kind === "gateway"
-              ? `Revoke ${device.name}? Its connection closes and Seams Pantry refuses its credential within 5 seconds. Its devices lose access too.`
-              : `Revoke ${device.name}? Seams Pantry sends it no more work. A task that runs now becomes result unknown.`}
+              ? `Revoke ${device.name}? Its connection closes and Purin Pantry refuses its credential within 5 seconds. Its devices lose access too.`
+              : `Revoke ${device.name}? Purin Pantry sends it no more work. A task that runs now becomes result unknown.`}
           </p>
           <div className="devices-panel-actions">
             {cancel}
@@ -619,7 +619,7 @@ function ActionPanel(
       return (
         <div className="devices-panel">
           <p>
-            Resume {device.name}? Check that the area around it is clear. Seams
+            Resume {device.name}? Check that the area around it is clear. Purin
             Pantry can send it new tasks after this.
           </p>
           <div className="devices-panel-actions">
@@ -641,7 +641,7 @@ function ActionPanel(
       return (
         <div className="devices-panel">
           <p>
-            Did a person check {device.name} in the shop? Seams Pantry then
+            Did a person check {device.name} in the shop? Purin Pantry then
             treats its last task as closed. Pantry repeats nothing.
           </p>
           <div className="devices-panel-actions">
@@ -734,7 +734,7 @@ function CameraSnapshots(
     return (
       <div className="devices-fold">
         <p className="devices-fold-title">Snapshots</p>
-        <p>Snapshots are off. This camera sends no image to Seams.</p>
+        <p>Snapshots are off. This camera sends no image to Purin.</p>
         {confirming ? (
           <div className="devices-panel devices-snapshot-confirm">
             <p>
@@ -744,7 +744,7 @@ function CameraSnapshots(
             </p>
             <p>
               A camera sends one still image on a fault or when a person asks.
-              Seams deletes each image after seven days and keeps no video.
+              Purin deletes each image after seven days and keeps no video.
             </p>
             <div className="devices-panel-actions">
               <Button variant="link" onClick={() => setConfirming(false)}>
@@ -791,7 +791,7 @@ function CameraSnapshots(
   return (
     <div className="devices-fold">
       <p className="devices-fold-title">Snapshots</p>
-      <p>Seams deletes each image after seven days and keeps no video.</p>
+      <p>Purin deletes each image after seven days and keeps no video.</p>
       <div className="devices-snapshot-actions">
         <Button
           disabled={busy}

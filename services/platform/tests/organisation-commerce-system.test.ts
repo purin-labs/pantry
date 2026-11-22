@@ -17,7 +17,7 @@ import {
 } from "./test-ids";
 
 describe("organisation commerce system", () => {
-  it("selects one Seams Checkout binding and replays the same selection", async () => {
+  it("selects one Purin Checkout binding and replays the same selection", async () => {
     const db = createDatabase();
     const organisationId = requireOrganisationId("organisation_commerce_system");
     const userId = requireUserId(

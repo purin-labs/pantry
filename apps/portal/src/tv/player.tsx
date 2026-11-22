@@ -82,7 +82,7 @@ export function TvPlayer(): React.ReactNode {
           <div className="tv-message">
             <h1>{state.feed?.screen.name ?? "Paired"}</h1>
             <p>
-              This screen is paired. Publish its board in Seams Pantry, under
+              This screen is paired. Publish its board in Purin Pantry, under
               Menus › Boards.
             </p>
           </div>
@@ -117,7 +117,7 @@ function PairingScreen(
 ): React.ReactNode {
   return (
     <div className="tv-message tv-pairing">
-      <p className="tv-eyebrow">Seams screen</p>
+      <p className="tv-eyebrow">Purin screen</p>
       {props.pairing === null ? (
         <p>
           {props.failure === "limit"
@@ -129,7 +129,7 @@ function PairingScreen(
       ) : (
         <>
           <p>
-            In Seams Pantry, open Menus › Screens, choose “Add a screen”, and
+            In Purin Pantry, open Menus › Screens, choose “Add a screen”, and
             enter this code:
           </p>
           <p

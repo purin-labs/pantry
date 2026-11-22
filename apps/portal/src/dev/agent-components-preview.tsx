@@ -198,7 +198,7 @@ class AgentComponentsScenario extends React.Component<object, State> {
         <header>
           <div>
             <p className="agent-preview-eyebrow">
-              Seams Pantry · Component preview
+              Purin Pantry · Component preview
             </p>
             <h1>A bakery export, from request to handoff</h1>
           </div>

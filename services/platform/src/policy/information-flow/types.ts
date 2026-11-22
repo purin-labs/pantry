@@ -4,7 +4,7 @@ import type { ContextVisibility } from "../../authorization/access-grants/types"
 import type { Variant } from "@purin-labs/type-utils";
 
 /**
- * Who pays a Jev call: Seams, or the Organisation with its own TypeSafe key
+ * Who pays a Jev call: Purin, or the Organisation with its own TypeSafe key
  * (Plan 88). A Jev processing label names it.
  */
 export type TypeSafeAuthority =

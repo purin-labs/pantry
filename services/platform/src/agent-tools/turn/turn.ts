@@ -87,7 +87,7 @@ export const memoryProposal = defineTurnTool({
 export const followUp = defineTurnTool({
   name: "schedule_follow_up",
   description:
-    "Come back to this Slack thread later. After afterMinutes, Seams Pantry starts a new turn in this thread for the same person; in that turn you read your note in this call and answer in the thread. Use it when the person asks you to check back, to remind them, or when work must wait for something. Tell the person when you will come back. Call it directly, outside Code Mode. A thread holds at most three follow-ups that wait.",
+    "Come back to this Slack thread later. After afterMinutes, Purin Pantry starts a new turn in this thread for the same person; in that turn you read your note in this call and answer in the thread. Use it when the person asks you to check back, to remind them, or when work must wait for something. Tell the person when you will come back. Call it directly, outside Code Mode. A thread holds at most three follow-ups that wait.",
   input: jsonSchema({
     type: "object",
     properties: {
@@ -135,7 +135,7 @@ export const followUp = defineTurnTool({
 export const sideCaseProposal = defineTurnTool({
   name: "propose_side_case",
   description:
-    "Propose separate work that you found while you work on the person's request, such as a fault, wrong data or a missing setup step. Seams Pantry shows the proposal in this chat or Slack thread, and a person may start it as a new chat or a new Slack thread whose first message is your brief. The new conversation does not hold this one's history, so write the brief to stand alone. Do not do that work in this turn, and do not propose the work that the person asked for now. Tell the person in one sentence that you proposed it. Call it directly, outside Code Mode. A conversation holds at most three proposals that wait.",
+    "Propose separate work that you found while you work on the person's request, such as a fault, wrong data or a missing setup step. Purin Pantry shows the proposal in this chat or Slack thread, and a person may start it as a new chat or a new Slack thread whose first message is your brief. The new conversation does not hold this one's history, so write the brief to stand alone. Do not do that work in this turn, and do not propose the work that the person asked for now. Tell the person in one sentence that you proposed it. Call it directly, outside Code Mode. A conversation holds at most three proposals that wait.",
   input: jsonSchema({
     type: "object",
     properties: {

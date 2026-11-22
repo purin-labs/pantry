@@ -132,9 +132,9 @@ const INFERENCE_SOURCES: readonly InferenceSource[] = [
   },
   {
     kind: "pantry_platform",
-    label: "Seams AI",
-    detail: "Seams provides the AI. You need no other account.",
-    use: "Use Seams AI",
+    label: "Purin AI",
+    detail: "Purin provides the AI. You need no other account.",
+    use: "Use Purin AI",
   },
   {
     kind: "organisation_openai_api_key",
@@ -279,7 +279,7 @@ function InferenceSourceChoice(props: {
             </label>
             <p id="inference-api-key-help" className="field-hint">
               {changed
-                ? `Seams Pantry does not show the key again after you save it. ${apiKey.provider} bills usage to your account.`
+                ? `Purin Pantry does not show the key again after you save it. ${apiKey.provider} bills usage to your account.`
                 : `A key is saved. Enter a new key only to replace it. ${apiKey.provider} bills usage to your account.`}
             </p>
           </>
@@ -365,7 +365,7 @@ function inferenceSelectionSummary(
     case "codex_subscription":
       return "This workspace uses its ChatGPT plan.";
     case "pantry_platform":
-      return "This workspace uses Seams AI.";
+      return "This workspace uses Purin AI.";
     case "organisation_openai_api_key":
       return "This workspace runs Pi with its OpenAI API key. OpenAI bills usage to the workspace account.";
     case "organisation_anthropic_api_key":

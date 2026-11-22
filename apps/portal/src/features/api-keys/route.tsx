@@ -302,14 +302,14 @@ export function CommerceApiKeysRoute(props: {
               <div className="side-drawer-body">
                 {drawer.key === null ? (
                   <p className="vault-secret-note">
-                    Seams Pantry created this key earlier and cannot show it
+                    Purin Pantry created this key earlier and cannot show it
                     again. If you did not copy it, revoke it and create a new
                     key.
                   </p>
                 ) : (
                   <>
                     <p className="vault-secret-note">
-                      Copy this key now. Seams Pantry does not show it again.
+                      Copy this key now. Purin Pantry does not show it again.
                     </p>
                     <div className="api-keys-secret">
                       <code aria-label="API key">{drawer.key}</code>

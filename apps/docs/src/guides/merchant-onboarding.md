@@ -1,6 +1,6 @@
 ---
 title: Merchant onboarding
-description: Connect an organisation, establish authority, and activate Seams Pantry operations safely.
+description: Connect an organisation, establish authority, and activate Purin Pantry operations safely.
 ---
 
 # Merchant onboarding
@@ -14,7 +14,7 @@ archive, and restore operations.
 ```text
 Organisation
 ├── Commerce system
-│   ├── Seams Checkout
+│   ├── Purin Checkout
 │   └── Shopify
 ├── Payment connection
 │   └── Stripe
@@ -34,9 +34,9 @@ The portal's setup checklist walks these steps in order:
 1. Sign in with Google and create the workspace. The creator becomes the
    verified owner.
 2. Choose the AI inference source: the owner's ChatGPT subscription, an organisation
-   OpenAI API key, or inference provided by Seams. Only an owner can connect the
+   OpenAI API key, or inference provided by Purin. Only an owner can connect the
    ChatGPT subscription.
-3. Choose a commerce authority — set up Seams Checkout (which seeds a demo
+3. Choose a commerce authority — set up Purin Checkout (which seeds a demo
    café and patisserie catalogue you can replace) or connect a Shopify store.
 4. Connect Slack, invite the Slack app to each channel it should operate in,
    then refresh and choose the channel where updates go.
@@ -58,9 +58,9 @@ does not erase evidence required for the configured retention policy.
 
 - Slack workspace ownership, destination routing, membership, and delivery
   state remain organisation-scoped.
-- Shopify and Seams Checkout are never dual-written for the same organisation and
+- Shopify and Purin Checkout are never dual-written for the same organisation and
   environment.
-- Raw credentials stay in Seams Vault. The portal receives lifecycle state and
+- Raw credentials stay in Purin Vault. The portal receives lifecycle state and
   reason codes rather than plaintext.
 - Activation fails closed when authority, identity, policy, or required
   readiness facts are missing.

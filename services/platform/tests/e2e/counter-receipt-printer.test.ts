@@ -197,7 +197,7 @@ async function receiptPrinterJourney(): Promise<void> {
   expect(count(receipt, RECEIPT_END)).toBe(1);
   const total = quote.amount.amountMinor;
   for (const expected of [
-    "Seams Patisserie",
+    "Purin Patisserie",
     `登録番号 ${REGISTRATION}`,
     spaced(sale.pickupCode!),
     "Taro Cookie x2",

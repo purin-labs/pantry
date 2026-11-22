@@ -229,7 +229,7 @@ async function proposalPermissionJourney({ task }: TestContext): Promise<void> {
         capabilityId: "commerce.action.propose",
         granted: false,
         description: expect.stringContaining(
-          "Seams Pantry makes no change until an owner or admin approves it",
+          "Purin Pantry makes no change until an owner or admin approves it",
         ),
         grant: {
           subjectLabel: "Owners",

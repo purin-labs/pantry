@@ -948,7 +948,7 @@ function RunForm(
       </div>
       <p className="brain-muted">
         A run uses the token budget of the mailbox. A model that is not set up
-        shows as “Could not run”. Seams Pantry never moves a scenario to another
+        shows as “Could not run”. Purin Pantry never moves a scenario to another
         model.
       </p>
       <div className="proposal-decision">

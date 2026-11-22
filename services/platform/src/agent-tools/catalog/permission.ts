@@ -69,7 +69,7 @@ export function permissionRequestDefinition(
     type: "function",
     name: PERMISSION_REQUEST_TOOL_NAME,
     description:
-      "Ask an owner or admin of this workspace to allow work that this turn cannot do yet. In a Slack thread Seams Pantry posts one request with a link; in a Portal chat it shows the person an Allow prompt. When a person allows it, the request continues with the new permission. Ask for everything that the work needs in one call, then tell the person that you asked and stop. Call it directly, outside Code Mode, before you write your answer. Capabilities that you can ask for: " +
+      "Ask an owner or admin of this workspace to allow work that this turn cannot do yet. In a Slack thread Purin Pantry posts one request with a link; in a Portal chat it shows the person an Allow prompt. When a person allows it, the request continues with the new permission. Ask for everything that the work needs in one call, then tell the person that you asked and stop. Call it directly, outside Code Mode, before you write your answer. Capabilities that you can ask for: " +
       missing.map(requestableCapabilityLine).join("; ") +
       (missing.includes(CAPABILITY_KEYS.commerceActionPropose)
         ? `. When the work changes a price, a listing, a product description, fulfilment tracking, stock, a production request, a purchase request or a merchant plugin, ask for ${CAPABILITY_KEYS.commerceActionPropose} instead of answering that you have no tool; an owner or admin still approves each change`

@@ -156,18 +156,18 @@ function parseTerminalConfiguration(raw: unknown): TerminalConfiguration {
 function parsePantryLocation(
   raw: unknown,
 ): ReadyTerminalConfiguration["pantryLocations"][number] {
-  const object = requireObject(raw, "Seams Checkout location");
+  const object = requireObject(raw, "Purin Checkout location");
   requireExactKeys(
     object,
     ["pantryLocationId", "currency", "supportedItems"],
-    "Seams Checkout location",
+    "Purin Checkout location",
   );
   if (
     typeof object.pantryLocationId !== "string" ||
     typeof object.currency !== "string" ||
     !Array.isArray(object.supportedItems)
   ) {
-    throw new Error("Seams Checkout location is invalid.");
+    throw new Error("Purin Checkout location is invalid.");
   }
   return {
     pantryLocationId: object.pantryLocationId,

@@ -99,7 +99,7 @@ export function AccountInvitationPage(
         className="portal-band"
         aria-labelledby="account-invitation-title"
       >
-        <h1 id="account-invitation-title">Seams Pantry invitation</h1>
+        <h1 id="account-invitation-title">Purin Pantry invitation</h1>
         {props.route.kind === "invalid" ? (
           <p role="alert">
             This invitation link is incomplete. Ask the sender for a new link.

@@ -28,7 +28,7 @@ reuse an old grant.
 ## Credential and lifecycle incidents
 
 Disable or revoke a connection when the provider credential is suspected to be
-compromised. Use the Seams Vault lifecycle operation, then verify that an old
+compromised. Use the Purin Vault lifecycle operation, then verify that an old
 pinned session cannot resolve the revoked generation.
 
 Archive and restore preserve the explicit data-retention and erasure policy.

@@ -98,15 +98,15 @@ export function WhatsAppIntegrationPanel(
     <>
       {surface.applicationConfigured ? null : (
         <Notice tone="warning" announcement="none">
-          WhatsApp connections aren&rsquo;t available on this Seams Pantry
-          deployment yet. That is a setup step on the Seams side, not something
+          WhatsApp connections aren&rsquo;t available on this Purin Pantry
+          deployment yet. That is a setup step on the Purin side, not something
           to fix in your account. Numbers already connected keep working.
         </Notice>
       )}
       {discovered > 0 && props.canManage ? (
         <Notice tone="success" announcement="polite">
           Meta shared {discovered === 1 ? "a number" : `${discovered} numbers`}{" "}
-          with Seams Pantry. Choose which to use. Message handling stays off
+          with Purin Pantry. Choose which to use. Message handling stays off
           until you enable it.
         </Notice>
       ) : null}
@@ -225,8 +225,8 @@ function WhatsAppConnectionSetup(
       </ul>
       {firstConnection ? (
         <Notice tone="warning" announcement="none">
-          Meta limits this to the test businesses of Seams for now. It opens to
-          everyone after Meta approves Seams.
+          Meta limits this to the test businesses of Purin for now. It opens to
+          everyone after Meta approves Purin.
         </Notice>
       ) : null}
       <ProviderConnectAction
@@ -239,8 +239,8 @@ function WhatsAppConnectionSetup(
         cancel={props.actions.cancelConnection}
         help={
           props.applicationConfigured
-            ? "Opens Meta in a new window. Seams Pantry never sees your Facebook password."
-            : "Connections open when Seams finishes its Meta setup. You do not need to do anything yet."
+            ? "Opens Meta in a new window. Purin Pantry never sees your Facebook password."
+            : "Connections open when Purin finishes its Meta setup. You do not need to do anything yet."
         }
         waitingHint="Finish in the Meta window: sign in, choose the business and phone number, and approve access. This page updates as soon as Meta responds."
       />
@@ -252,7 +252,7 @@ function WhatsAppConnectionSetup(
       )}
       <div className="connection-fine-print">
         <p>
-          Meta gives access only to the business and number you approve. Seams
+          Meta gives access only to the business and number you approve. Purin
           keeps that access encrypted, and it never appears in the browser.
         </p>
         <WhatsAppProcessingDisclosure
@@ -278,21 +278,21 @@ export function whatsappAttemptFailureCopy(
     case "provider_asset_missing":
       return {
         summary:
-          "Meta finished the sign-in without sharing a Business Portfolio and WhatsApp Business Account that Seams Pantry can use.",
+          "Meta finished the sign-in without sharing a Business Portfolio and WhatsApp Business Account that Purin Pantry can use.",
         nextStep:
-          "Try again and choose a Business Portfolio, WhatsApp Business Account, and phone number before finishing. If Meta says Seams can't onboard customers right now, that is a pending approval on the Seams side, not a problem with your account; contact support and quote the reference below.",
+          "Try again and choose a Business Portfolio, WhatsApp Business Account, and phone number before finishing. If Meta says Purin can't onboard customers right now, that is a pending approval on the Purin side, not a problem with your account; contact support and quote the reference below.",
       };
     case "provider_account_ineligible":
       return {
         summary:
-          "The WhatsApp Business Account Meta shared has no phone number that Seams Pantry can use.",
+          "The WhatsApp Business Account Meta shared has no phone number that Purin Pantry can use.",
         nextStep:
           "Add a phone number to that account in WhatsApp Manager, then try again.",
       };
     case "provider_scope_missing":
       return {
         summary:
-          "Meta didn't grant every WhatsApp permission that Seams Pantry needs.",
+          "Meta didn't grant every WhatsApp permission that Purin Pantry needs.",
         nextStep: "Try again and approve all the requested permissions.",
       };
     default:
@@ -311,10 +311,10 @@ function WhatsAppProcessingDisclosure(props: {
   return (
     <>
       <p>
-        Seams Pantry receives new text messages after you turn on this number.
+        Purin Pantry receives new text messages after you turn on this number.
         It does not import earlier chats or browse your WhatsApp inbox. While a
-        support Case is open, Seams stores its text messages for up to 24 hours
-        after the customer's latest message. Seams deletes a proposed reply
+        support Case is open, Purin stores its text messages for up to 24 hours
+        after the customer's latest message. Purin deletes a proposed reply
         sooner when it is sent, rejected, replaced or expired. WhatsApp keeps
         messages under Meta's terms. Pantry can send replies only in the same
         24-hour window.
@@ -355,7 +355,7 @@ function WhatsAppAccountCard(props: {
         </div>
         {account.selectedAt === null ? (
           <p className="notice-text">
-            Meta shared this number with Seams Pantry. Select it to continue
+            Meta shared this number with Purin Pantry. Select it to continue
             setup. Pantry does not route messages here until you enable message
             handling.
           </p>
@@ -440,7 +440,7 @@ function WhatsAppAccountCard(props: {
               </button>
             </div>
             <p className="notice-text">
-              Revoking removes Seams Pantry's access to this WhatsApp Business
+              Revoking removes Purin Pantry's access to this WhatsApp Business
               Account in Meta and revokes every phone number connected through
               it. Open Cases are closed and their stored text is deleted.
               Reconnecting afterwards needs a fresh Embedded Signup.
@@ -675,7 +675,7 @@ function confirmRevoke(
   account: WhatsAppAccountView,
 ): void {
   const confirmed = globalThis.confirm(
-    `Revoke Seams Pantry's access to WhatsApp Business Account ${account.wabaId}? Every phone number connected through it stops working and open Cases are deleted.`,
+    `Revoke Purin Pantry's access to WhatsApp Business Account ${account.wabaId}? Every phone number connected through it stops working and open Cases are deleted.`,
   );
   if (!confirmed) return;
   void actions.revoke(account.integrationAccountId);
@@ -742,6 +742,6 @@ function inferenceProviderLabel(selection: WhatsAppInferenceSelection): string {
     case "organisation_google_api_key":
       return "Google Gemini (your API key)";
     case "pantry_platform":
-      return "Seams AI";
+      return "Purin AI";
   }
 }

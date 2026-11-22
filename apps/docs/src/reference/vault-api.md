@@ -1,11 +1,11 @@
 ---
 title: Vault API reference
-description: The Seams Vault public API, handle format, external import boundary, and credential migration procedure.
+description: The Purin Vault public API, handle format, external import boundary, and credential migration procedure.
 ---
 
 # Vault API reference
 
-Seams Vault is the organisation credential store for the Cloudflare runtime. It
+Purin Vault is the organisation credential store for the Cloudflare runtime. It
 encrypts credential values with AES-256-GCM, stores ciphertext and lifecycle
 metadata in D1, and loads versioned root keys from Cloudflare Secrets Store.
 Ciphertext is bound to the organisation, the handle, and the key version.
@@ -145,7 +145,7 @@ The full rotation, revocation, and root-key rotation procedures are in
 ## 1Password as the item store
 
 An Organisation can keep its Vault items in one 1Password vault instead of
-Seams Vault (Plan 79). An owner or admin connects a 1Password service account
+Purin Vault (Plan 79). An owner or admin connects a 1Password service account
 on Settings → Vault; Pantry stores the token as a `bearer` row and nothing else
 from 1Password. The Platform sends each item operation to the 1Password store
 Worker through the `VAULT_ONEPASSWORD` binding, and the Worker runs it with the
@@ -156,7 +156,7 @@ Worker through the `VAULT_ONEPASSWORD` binding, and the Worker runs it with the
 ## Import from 1Password
 
 1Password Connect is a trusted import boundary. The adapter reads one field,
-validates it, stores it in Seams Vault, and records a metadata receipt.
+validates it, stores it in Purin Vault, and records a metadata receipt.
 
 ```ts [Partial example]
 const adapter = createOnePasswordAdapter({
@@ -185,7 +185,7 @@ const imported = await importExternalVaultSecret({
 
 The same source revision is idempotent. A changed revision requires a new
 generation handle. An authenticated archived item revokes its imported Vault
-row. Provider requests continue to use Seams Vault after import. An
+row. Provider requests continue to use Purin Vault after import. An
 interrupted import is recovered by retrying the same source revision.
 
 Other vault products can implement the small `ExternalVaultAdapter` interface:
@@ -206,7 +206,7 @@ For each active organisation credential:
 2. Allocate a unique generation handle.
 3. Read the source once inside the trusted import boundary.
 4. Normalize and validate the credential.
-5. Store and verify it in Seams Vault.
+5. Store and verify it in Purin Vault.
 6. Activate the new provider generation and policy.
 7. Perform one safe provider read through its purpose resolver.
 8. Revoke the old Vault generation and source credential.

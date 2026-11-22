@@ -1,7 +1,7 @@
 import type { WhatsAppPolicyDraft } from "@purin-labs/control-api/portal/whatsapp";
 
 const WHATSAPP_DEFAULT_RELEVANT_MESSAGE_TOPICS =
-  "Seams Pantry, café automation, café and bakery operations, orders, menus, opening hours, and integrations.";
+  "Purin Pantry, café automation, café and bakery operations, orders, menus, opening hours, and integrations.";
 
 const WHATSAPP_DEFAULT_AUTOMATIC_ACKNOWLEDGEMENT_TEXT =
   "Thanks for your message. We’ve received it and will get back to you shortly.";

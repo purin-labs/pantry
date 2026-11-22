@@ -754,7 +754,7 @@ async function showSlackRoutingSetupPrompt(
   if (!credential.ok || credential.value.kind !== "bearer") return;
   const directMessage = event.channelId.startsWith("D");
   const text = directMessage
-    ? "Choose an organisation in Seams Pantry before starting a Case in this DM."
+    ? "Choose an organisation in Purin Pantry before starting a Case in this DM."
     : "This channel is not assigned to an organisation. Ask an organisation admin to add it in Slack settings.";
   const posted = await postSlackThreadMessage({
     token: credential.value.value,
@@ -854,7 +854,7 @@ async function showSlackIdentityLinkPrompt(
     channelId: event.channelId,
     externalUserId: event.author,
     threadTs: null,
-    text: `Link your Slack identity to Seams Pantry: ${browserUrl}`,
+    text: `Link your Slack identity to Purin Pantry: ${browserUrl}`,
   });
   if (!posted.ok) {
     traceWarn("integration_gateway.slack_identity_link_unavailable", {

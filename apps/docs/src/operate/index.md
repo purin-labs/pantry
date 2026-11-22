@@ -5,7 +5,7 @@ description: Local development, verification, recovery, and production operating
 
 # Operate
 
-The Seams Pantry operating workflow keeps the narrowest relevant check close to each
+The Purin Pantry operating workflow keeps the narrowest relevant check close to each
 change, then proves the full path with durable evidence.
 
 ## Start locally

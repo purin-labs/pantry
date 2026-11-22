@@ -372,7 +372,7 @@ export function OrganisationListPage(props: {
       className="organisation-create-button"
       onClick={props.openSetup}
     >
-      Set up Seams Pantry
+      Set up Purin Pantry
     </button>
   );
   return (
@@ -431,7 +431,7 @@ function renderOrganisationList(
       <div className="empty-state organisation-setup-invitation">
         <strong>No organisations yet</strong>
         <span>
-          Seams Pantry runs in an organisation that you own. Set it up in three
+          Purin Pantry runs in an organisation that you own. Set it up in three
           steps:
         </span>
         <ol className="organisation-setup-preview">
@@ -645,7 +645,7 @@ function RenameOrganisationDialog(props: {
   return (
     <AgentModal
       title="Rename organisation"
-      description="Update the name shown across Seams Pantry. Workspace URLs stay the same."
+      description="Update the name shown across Purin Pantry. Workspace URLs stay the same."
       close={resetOrganisationRow.bind(null, props.setState)}
       footer={
         <>

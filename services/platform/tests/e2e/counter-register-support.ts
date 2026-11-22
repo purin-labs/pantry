@@ -199,7 +199,7 @@ export async function setupRegisterShop(tag: string) {
         },
         presentationPolicy: {
           locale: "ja-JP",
-          merchantDisplayName: "Seams Patisserie",
+          merchantDisplayName: "Purin Patisserie",
           termsPolicyId: "terms_counter",
           privacyPolicyId: "privacy_counter",
           supportContact: "support@example.test",

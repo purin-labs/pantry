@@ -539,8 +539,8 @@ function settledEmailStatus(draft: EmailDraft): DraftMessageStatus | null {
         message:
           draft.kind === "operational" &&
           draft.item.indeterminateRfcMessageId !== null
-            ? `Gmail did not confirm this send, and Seams Pantry will not try again. Look in Sent Mail for Message-ID ${draft.item.indeterminateRfcMessageId}.`
-            : "Gmail did not confirm this send, and Seams Pantry will not try again. Look in Sent Mail before you act.",
+            ? `Gmail did not confirm this send, and Purin Pantry will not try again. Look in Sent Mail for Message-ID ${draft.item.indeterminateRfcMessageId}.`
+            : "Gmail did not confirm this send, and Purin Pantry will not try again. Look in Sent Mail before you act.",
       };
     case "operator_attested_absent":
       return {

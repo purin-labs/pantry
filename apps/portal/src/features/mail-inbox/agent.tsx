@@ -393,7 +393,7 @@ function WhatsAppRow(
             {conversation.customerWaId}
           </span>
           <span className="mail-case-row-line">
-            {conversation.preview ?? "No text. Seams deleted it."}
+            {conversation.preview ?? "No text. Purin deleted it."}
           </span>
         </span>
         <span className="mail-case-row-side">

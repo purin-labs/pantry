@@ -198,7 +198,7 @@ export function GrantAccessDialog(
           id="access35-grant-dialog-title"
           title={
             initialFileFlow
-              ? "Choose files for Seams Pantry"
+              ? "Choose files for Purin Pantry"
               : props.scopeLabel === null
                 ? "Grant access"
                 : `Share ${props.scopeLabel}`

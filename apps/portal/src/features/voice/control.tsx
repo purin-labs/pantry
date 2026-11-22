@@ -518,7 +518,7 @@ function VoiceTerms(): React.ReactNode {
       <li>
         <Trash2 aria-hidden="true" size={16} />
         <span>
-          Seams keeps no audio. The chat shows the text that the agent received.
+          Purin keeps no audio. The chat shows the text that the agent received.
         </span>
       </li>
       <li>

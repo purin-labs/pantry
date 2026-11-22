@@ -1,8 +1,8 @@
 # Mark assets
 
-The product is now Seams Pantry (Plan 91,
+The product is now Purin Pantry (Plan 91,
 `docs/plan-91-seams-atelier-rename.md`), but the goat mark stays until a
-better Seams Pantry mark is drawn. The owner rejected a first replacement
+better Purin Pantry mark is drawn. The owner rejected a first replacement
 (an arch with a stitched score line) on 17 November 2026. Its files are
 `pantry-mark-*`.
 

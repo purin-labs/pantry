@@ -130,7 +130,7 @@ function previewTransport(): VaultTransport {
     scenario === "onepassword"
       ? {
           kind: "onepassword",
-          vaultTitle: "Seams",
+          vaultTitle: "Purin",
           connectedAt: NOW - 2 * DAY,
           reachable: true,
         }
@@ -182,7 +182,7 @@ function previewTransport(): VaultTransport {
               vaults: [
                 {
                   vaultId: "previewvaultpantry00000000",
-                  title: "Seams",
+                  title: "Purin",
                   itemCount: 0,
                 },
                 {
@@ -197,7 +197,7 @@ function previewTransport(): VaultTransport {
             vaultTitle:
               command.vaultId === "previewvaultprivate0000000"
                 ? "Private"
-                : "Seams",
+                : "Purin",
             connectedAt: Date.now(),
             reachable: true,
           };

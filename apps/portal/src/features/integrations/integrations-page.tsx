@@ -821,7 +821,7 @@ export function inferenceIntegrationStatus(
     case "codex_subscription":
       return codexIntegrationStatus(connection);
     case "pantry_platform":
-      return { kind: "connected", label: "Provided by Seams" };
+      return { kind: "connected", label: "Provided by Purin" };
     case "organisation_openai_api_key":
       return { kind: "connected", label: "OpenAI key" };
     case "organisation_anthropic_api_key":

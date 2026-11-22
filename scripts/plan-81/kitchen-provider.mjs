@@ -59,7 +59,7 @@ const RUN_ANSWER =
 const MENU = "Add a Coffee section to the menu.";
 const MENU_AGAIN = "Please add the Coffee section again.";
 const MENU_ASKED =
-  "Seams Pantry asked you for approval in this chat. Ask me again after you allow it.";
+  "Purin Pantry asked you for approval in this chat. Ask me again after you allow it.";
 const MENU_ANSWER = "I added a Coffee section to the menu.";
 // The permission toast journey: menu editing is off, so the agent asks.
 const MENU_PERMISSION = "Turn on menu editing, then add a Coffee section.";
@@ -481,7 +481,7 @@ function boardScript(request, turn, edit) {
     endWhenStopped: true,
     answer: (calls) =>
       calls.some((call) =>
-        String(call.result).includes("Seams Pantry stopped this step"),
+        String(call.result).includes("Purin Pantry stopped this step"),
       )
         ? MENU_ASKED
         : BOARD_DONE,
@@ -567,7 +567,7 @@ const SCRIPTS = [
       "I asked for menu editing. The request continues here after you allow it.",
     answer: (calls) =>
       calls.some((call) =>
-        String(call.result).includes("Seams Pantry stopped this step"),
+        String(call.result).includes("Purin Pantry stopped this step"),
       )
         ? MENU_ASKED
         : MENU_ANSWER,
@@ -592,7 +592,7 @@ const SCRIPTS = [
     request: MENU,
     turn: "menu-asks",
     answer: (calls) =>
-      String(calls[0]?.result).includes("Seams Pantry stopped this step")
+      String(calls[0]?.result).includes("Purin Pantry stopped this step")
         ? MENU_ASKED
         : MENU_ANSWER,
     steps: [
@@ -606,7 +606,7 @@ const SCRIPTS = [
     request: MENU_AGAIN,
     turn: "menu-allowed",
     answer: (calls) =>
-      String(calls[0]?.result).includes("Seams Pantry stopped this step")
+      String(calls[0]?.result).includes("Purin Pantry stopped this step")
         ? MENU_ASKED
         : MENU_ANSWER,
     steps: [
@@ -902,7 +902,7 @@ async function model(request) {
   const stopped =
     script.endWhenStopped === true &&
     calls.some((call) =>
-      String(call.result).includes("Seams Pantry stopped this step"),
+      String(call.result).includes("Purin Pantry stopped this step"),
     );
   const step = stopped ? undefined : script.steps[calls.length];
   if (script.pauseAfter === calls.length && !state.paused.has(script.turn)) {

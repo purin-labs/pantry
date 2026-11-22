@@ -136,7 +136,7 @@ export function payoutGuidance(payout: SupplierPayout): string {
       return "The provider refused it. The held money has been freed.";
     case "indeterminate":
       return (
-        "Seams Pantry does not know whether this was sent. It is being reconciled — " +
+        "Purin Pantry does not know whether this was sent. It is being reconciled — " +
         "do not send it again."
       );
     case "cancelled":

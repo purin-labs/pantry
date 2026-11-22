@@ -210,7 +210,7 @@ function commerceActionStatus(entry: ActionLedgerEntry): string {
     case "indeterminate":
       return `${approvedBy(entry)}. The provider has not confirmed the change yet. If this stays, click Check again.`;
     case "confirmed":
-      return `${approvedBy(entry)}. Seams Pantry made the change.`;
+      return `${approvedBy(entry)}. Purin Pantry made the change.`;
     case "failed":
       return `${approvedBy(entry)}, but the change failed. Nothing changed. See Operations in the Portal.`;
     case "rejected":
@@ -301,7 +301,7 @@ function decisionButtons(
           primary: true,
           confirm: {
             title: "Approve this change?",
-            text: "Seams Pantry makes the change at once. Only an owner or admin can approve.",
+            text: "Purin Pantry makes the change at once. Only an owner or admin can approve.",
             confirm: "Approve",
             deny: "Cancel",
           },
@@ -314,7 +314,7 @@ function decisionButtons(
           primary: false,
           confirm: {
             title: "Decline this change?",
-            text: "Seams Pantry does not make the change. Only an owner or admin can decline.",
+            text: "Purin Pantry does not make the change. Only an owner or admin can decline.",
             confirm: "Decline",
             deny: "Cancel",
           },

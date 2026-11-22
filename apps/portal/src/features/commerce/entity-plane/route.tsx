@@ -3122,7 +3122,7 @@ function DossierFreshnessNotice(props: {
     case "unavailable":
       return (
         <Notice tone="warning" announcement="none">
-          Seams Pantry cannot confirm that this record is current.
+          Purin Pantry cannot confirm that this record is current.
         </Notice>
       );
     default:

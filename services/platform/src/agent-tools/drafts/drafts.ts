@@ -201,7 +201,7 @@ export const menuDraftEdit = defineMenuTool({
 export const menuBoardRead = defineMenuTool({
   name: "menu_board_read",
   description:
-    "Read the shop's menu boards, the Seams Pantry screens on TVs and tablets: each board's draft (title, layout, elements and their frames), its documentRevision, its newest release and its screen count. " +
+    "Read the shop's menu boards, the Purin Pantry screens on TVs and tablets: each board's draft (title, layout, elements and their frames), its documentRevision, its newest release and its screen count. " +
     "Give boardId null for every board; then archivedBoards lists the archived boards (boardId, title, archivedAt), which menu_board_archive can restore. The result lists the shop's images (mediaId and altText) for menu_board_edit add_image. It also lists the menu items: the items of the menu draft and every item on the published menu, also when the shop has no board, with each item's live price, wasPrice (the earlier price of a deal, or null) and availability, as the screens show them now. Use an item's itemId for menu_board_propose_price. " +
     "A board holds no price. Prices come from the shop's offers.",
   input: jsonSchema({

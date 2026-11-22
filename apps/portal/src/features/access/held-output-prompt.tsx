@@ -169,12 +169,12 @@ export function HeldOutputPrompt(props: Props): React.ReactNode {
       }
       footnote={
         view.answer !== null
-          ? "This decision is for this one answer. Seams Pantry asks again for each later answer."
+          ? "This decision is for this one answer. Purin Pantry asks again for each later answer."
           : view.reason === "outside_written"
-            ? "This decision is for this exact step. Seams Pantry asks again if a value changes."
+            ? "This decision is for this exact step. Purin Pantry asks again if a value changes."
             : view.covers === "request"
-              ? "This decision is for one request. Seams Pantry asks again for each later request."
-              : "This decision is for this one step. Seams Pantry asks again for each later step."
+              ? "This decision is for one request. Purin Pantry asks again for each later request."
+              : "This decision is for this one step. Purin Pantry asks again for each later step."
       }
       signedInAs={null}
     />

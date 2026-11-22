@@ -281,7 +281,7 @@ async function includeCommerceIntegration(
         organisationId: input.organisationId,
         integrationAccountId: binding.value.integrationAccountId,
         provider: "builtin_commerce",
-        displayName: "Seams Checkout",
+        displayName: "Purin Checkout",
         availability: "available",
         updatedAt: binding.value.updatedAt,
       },
@@ -524,7 +524,7 @@ async function resourceProjections(
             grantId: grant.grantId,
             targetRefId,
             revision: grant.lifecycle.revision,
-            label: `Seams Checkout · ${definition.label}`,
+            label: `Purin Checkout · ${definition.label}`,
             integrationAccountId: commerceIntegrationAccountId,
           });
           break;

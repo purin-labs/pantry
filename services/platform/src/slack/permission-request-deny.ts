@@ -66,7 +66,7 @@ async function deny(
     slackUserId: click.slackUserId,
   });
   if (approver === null)
-    return "Only an owner or admin whose Slack account is linked to Seams Pantry can deny this request.";
+    return "Only an owner or admin whose Slack account is linked to Purin Pantry can deny this request.";
   const stored = await readAgentPermissionRequest(
     scope.value.database,
     click.organisationId,

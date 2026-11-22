@@ -47,7 +47,7 @@ declare module "vitest" {
  */
 it("asks a person before internal content reaches Airtable", airtableExit, 240_000);
 
-const STOPPED = "Seams Pantry stopped this step";
+const STOPPED = "Purin Pantry stopped this step";
 const NEW_ORDER = { records: [{ fields: { Title: "Order 481 is ready" } }] };
 
 type Step = (body: Record<string, unknown>) => Response;

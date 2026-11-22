@@ -98,7 +98,7 @@ declare module "vitest" {
 }
 
 const MERCHANT_ID = "merchant_costs_margins";
-const STOPPED = "Seams Pantry stopped this step";
+const STOPPED = "Purin Pantry stopped this step";
 
 type SupplyCostArgs = Readonly<{
   inventoryItemId: string;

@@ -355,7 +355,7 @@ function controlErrorMessage(kind: ControlErrorKind): string {
     case "provider_attempt_open":
       return "An earlier connection to this service is still open. Finish it in its window, or wait 10 minutes and try again.";
     case "provider_configuration_missing":
-      return "This integration is unavailable. Ask your Seams Pantry administrator to configure it, then try again.";
+      return "This integration is unavailable. Ask your Purin Pantry administrator to configure it, then try again.";
     case "codex_device_authorization_unavailable":
       return "Enable device code login in ChatGPT security settings or ask your OpenAI workspace admin to allow it, then try again.";
     case "codex_sign_in_address_invalid":
@@ -363,7 +363,7 @@ function controlErrorMessage(kind: ControlErrorKind): string {
     case "codex_authorization_failed":
       return "ChatGPT did not complete the sign-in. Select Connect ChatGPT to start again.";
     case "codex_plan_usage_not_allowed":
-      return "ChatGPT did not allow Seams Pantry to use your plan. Select Connect ChatGPT and allow plan usage.";
+      return "ChatGPT did not allow Purin Pantry to use your plan. Select Connect ChatGPT and allow plan usage.";
     case "codex_sign_in_unavailable":
       return "OpenAI did not answer. Paste the same address again in a moment.";
     case "agent_mailbox_not_processing":
@@ -397,7 +397,7 @@ function controlErrorMessage(kind: ControlErrorKind): string {
     case "supplier_payout_read_unavailable":
       return "You do not have permission to read supplier payouts.";
     case "slack_channel_taken":
-      return "Another Seams Pantry workspace already posts in this channel. Choose another channel, or remove it from that workspace first.";
+      return "Another Purin Pantry workspace already posts in this channel. Choose another channel, or remove it from that workspace first.";
     case "slack_channel_connection_inactive":
       return "This Slack workspace is not connected. Connect it again, then add the channel.";
     case "unknown":

@@ -1,6 +1,6 @@
 ---
 name: tool-health-smoke
-description: "Check Seams Pantry production capability discovery, provider connection readiness, and authorized read execution. Use for tool health or integration connectivity checks; use qa for a complete operator journey."
+description: "Check Purin Pantry production capability discovery, provider connection readiness, and authorized read execution. Use for tool health or integration connectivity checks; use qa for a complete operator journey."
 ---
 
 # Tool health smoke

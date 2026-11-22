@@ -97,9 +97,9 @@ export type OnePasswordItemCreate = Readonly<{
 
 const LOGIN = "Login";
 const IDENTITY = "Identity";
-const CONTACT_SECTION = { id: "pantry_contact", title: "Seams Pantry contact" };
+const CONTACT_SECTION = { id: "pantry_contact", title: "Purin Pantry contact" };
 /** Items that Pantry writes carry this tag, so people see where they came from. */
-const PANTRY_TAG = "Seams Pantry";
+const PANTRY_TAG = "Purin Pantry";
 
 export async function handleOnePasswordOperation(
   operation: OnePasswordOperation,

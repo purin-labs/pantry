@@ -400,7 +400,7 @@ class RegisterCashDesk extends StaffDesk {
           },
           presentationPolicy: {
             locale: "ja-JP",
-            merchantDisplayName: "Seams Patisserie",
+            merchantDisplayName: "Purin Patisserie",
             termsPolicyId: "terms_counter",
             privacyPolicyId: "privacy_counter",
             supportContact: "support@example.test",
