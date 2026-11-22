@@ -772,12 +772,28 @@ State on 22 November 2026:
   Chrome session could not open that account; it is unused, because Pantry
   no longer sends that client ID. Its `localhost` redirects stay for local
   development, which still uses that account's keys.
+- **Airtable and Notion**, the same evening, on the owner's "make new ones":
+  two new OAuth integrations named "Purin Pantry", under the owner's
+  Airtable and Notion logins, with the Purin icon, `https://purin.io` as the
+  home page and the Portal privacy and terms pages. Airtable client
+  `7abda7cf-…`, with the seven scopes of `provider-adapters/airtable.ts`.
+  Notion public connection `420d872b-…`, with "Read content" and "Read user
+  information without email addresses" only: Pantry only searches the
+  shared pages and reads its bot user. Each has only the
+  `pantry.purin.io` callback. The client IDs are in the production vars
+  (dev `dd9c0bca`); the secrets went to `pantry` with `wrangler secret
+  bulk`; `pantry` version `9591e2c8` runs them. Live check in "Purin
+  workspace": both consent pages showed "Purin Pantry" with the new client
+  ID, and both connects returned "You're connected" and show under
+  Connected. The test grants are narrow: one Airtable example base
+  ("Restaurant Field Guide") and one Notion page ("Demo Satyr Page"); the
+  owner widens them at the provider. The old integrations stay: the local
+  profile still uses the old Airtable client, and the old Notion connection
+  "Satyr" is unused (the owner may delete it).
 
 Phase 4 is done, on 22 November 2026. Open items, each outside the switch:
 
-- Airtable, Notion and Meta keep their old names and URLs: Airtable and
-  Notion until they are used on the new stack, Meta until its business
-  verification passes.
+- Meta keeps its old name and URLs until its business verification passes.
 - `satyr-gmail-dev` and `satyr-drive-pilot` go when local development moves
   to `purin-pantry` (Plan 93 follow-ups).
 - The Dropbox icons (the console needs a native file picker).
