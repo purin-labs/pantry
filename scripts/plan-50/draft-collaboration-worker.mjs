@@ -23,7 +23,7 @@ import {
 import { parseWorkspaceId } from "../../foundation/kernel/ids.ts";
 import { parseInitialOrganisationPlacement } from "../../foundation/tenancy/placement.ts";
 import { browserFixture } from "./browser-fixture.mjs";
-import { authorizeOrganisationRequest } from "../../services/platform/src/control/authorization.ts";
+import { authorizeOrganisationRequest } from "../../foundation/control/worker/authorization.ts";
 import { matchProductDescriptionDraftRoute } from "../../services/platform/src/control/admission/product-description-draft.ts";
 import { handleProductDescriptionDraftRoute } from "../../services/platform/src/control/routes/product-description-draft.ts";
 

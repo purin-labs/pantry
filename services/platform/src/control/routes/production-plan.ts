@@ -21,7 +21,7 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { controlError, readJsonRecord } from "../http";
+import { controlError, readJsonRecord } from "@purin-labs/control/worker/http";
 import {
   finishInventoryOperation,
   resolveInventoryAccess,

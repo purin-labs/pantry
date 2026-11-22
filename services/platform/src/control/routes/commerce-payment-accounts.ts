@@ -2,11 +2,11 @@ import type { CommerceClientError } from "@purin-labs/commerce-client";
 
 import type { Env } from "@purin-labs/kernel/env";
 import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
-import { authorizeOrganisationRequest } from "../authorization";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   resolveOpenProviderSupportReferences,
 } from "../../organisation/contract/provider-support-references";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import { PRIMARY_ONLINE_PAYMENT_BINDING_ID } from "../../commerce/contract/stripe-link";
 
 /**

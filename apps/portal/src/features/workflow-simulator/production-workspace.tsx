@@ -192,7 +192,7 @@ import { saveProductionScenario } from "./production-scenario-api";
 import { readProductionScenario } from "./production-scenario-api";
 import { WorkspaceRunsPanel } from "./workspace-runs-panel";
 import { openPersistentWorkspaceRun } from "./shared-production-run";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { RecordingCandidatePreview } from "./recording-candidate-preview";
 import {
   handlingChoice,

@@ -22,8 +22,8 @@ import {
   type MailReplyRoomMetadata,
 } from "@purin-labs/mail-reply-crdt/protocol";
 import type { SessionTurnExecution } from "../chat/turn-access";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import {
   readActiveOrganisationMembershipRevision,
   resolveUser,

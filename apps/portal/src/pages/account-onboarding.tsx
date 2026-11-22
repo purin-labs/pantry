@@ -8,8 +8,8 @@ import {
   type OrganisationCreationRequest,
 } from "@purin-labs/control-api";
 import { assertNever, errorMessage, isRecord } from "@purin-labs/std";
-import { ControlApiError } from "../control-client";
-import { signInPath } from "../control-paths";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
+import { signInPath } from "@purin-labs/control/portal/control-paths";
 import { createOrganisation } from "../features/access/organisation-requests";
 import { organisationPath } from "../route";
 import { AgentModal } from "./agent-modal";

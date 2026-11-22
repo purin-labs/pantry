@@ -5,7 +5,7 @@ import {
   controlRead,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { isRecord } from "@purin-labs/std";
 import {
   parseEmailOperationalPreviewResponse,

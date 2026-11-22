@@ -7,7 +7,7 @@ import {
   type MailSupplierCandidate,
 } from "@purin-labs/control-api";
 import { isRecord, assertNever } from "@purin-labs/std";
-import { controlWrite } from "../../control-client";
+import { controlWrite } from "@purin-labs/control/portal/control-client";
 import { mailAnswer } from "./api";
 import {
   parseRelationshipPreview,

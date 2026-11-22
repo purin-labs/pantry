@@ -1,5 +1,5 @@
 import { parseCaseScreenObservationsResponse } from "@purin-labs/control-api";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   parseAiBudgetView,
   type AiBudgetLimits,

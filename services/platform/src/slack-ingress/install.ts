@@ -3,7 +3,7 @@ import {
   configuredOrganisationDatabases,
   OrganisationExecutionScope,
 } from "@purin-labs/tenancy/organisation-execution-scope";
-import { selectOrganisationHomePlacement } from "../control/home-region";
+import { selectOrganisationHomePlacement } from "@purin-labs/control/worker/home-region";
 import { SLACK_INSTALL_REDIRECT_PATH } from "../gateway-routing/slack";
 import {
   createOrganisationInstallPreservingExistingInstallModel,
@@ -53,7 +53,7 @@ import {
   isLocalDebugRequest,
   parsePublicServiceUrl,
   readRuntimeSecret,
-} from "../gateway/request-helpers";
+} from "@purin-labs/control/worker/gateway/request-helpers";
 
 export const SLACK_INSTALL_SCOPES = [
   "app_mentions:read",

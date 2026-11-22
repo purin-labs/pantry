@@ -1,6 +1,6 @@
 import React from "react";
 import type { CommerceEntity } from "@purin-labs/commerce-contracts";
-import { ControlApiError, controlRead } from "../../../control-client";
+import { ControlApiError, controlRead } from "@purin-labs/control/portal/control-client";
 import type {
   CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";

@@ -10,7 +10,7 @@ import {
   type CommerceInventoryLotInputV1,
 } from "@purin-labs/commerce-client";
 import { errorMessage, isRecord } from "@purin-labs/std";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 import {

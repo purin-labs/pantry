@@ -20,7 +20,7 @@ import {
   runCounterAfterSaleWithDrawer,
 } from "../../commerce/counter-printing";
 import type { Env } from "@purin-labs/kernel/env";
-import { controlError, controlJson, type JsonRecord } from "../http";
+import { controlError, controlJson, type JsonRecord } from "@purin-labs/control/worker/http";
 import {
   beginMutation,
   beginRead,

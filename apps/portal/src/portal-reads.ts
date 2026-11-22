@@ -8,7 +8,7 @@ import {
   controlReadIfChanged,
   controlSignal,
   readCookie,
-} from "./control-client";
+} from "@purin-labs/control/portal/control-client";
 import type {
   OnboardingNextAction,
   OnboardingStepProjection,
@@ -28,7 +28,7 @@ import type { SlackWorkspaceCatalog } from "./features/integrations/settings-typ
 import {
   commerceSystemPath,
   organisationRecordPath,
-} from "./control-paths";
+} from "@purin-labs/control/portal/control-paths";
 import { rememberOrganisationId } from "./early-reads";
 import { offerPriceAllowanceTransport } from "./features/commerce/price-allowance";
 import type { OfferPriceAllowanceInteraction } from "./features/commerce/entity-plane/route";

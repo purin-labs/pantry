@@ -23,8 +23,8 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 
 export type CaseExecutionRoute = Readonly<{
   kind: "case_execution";

@@ -10,9 +10,13 @@ import {
   controlMutationIdentity,
   projectionReplay,
   projectionResponse,
-} from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import { connectionParts } from "../../../integrations/contract/connection-parts";
 import {
   authorizeAccountRequest,

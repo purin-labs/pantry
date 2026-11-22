@@ -11,8 +11,8 @@ import {
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { readCommerceActionLedger } from "../agent-operation-activity";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import type {

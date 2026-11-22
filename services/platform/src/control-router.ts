@@ -105,7 +105,7 @@ import {
   handleVaultRoute,
   matchVaultRoute,
   type VaultRoute,
-} from "./control/routes/vault";
+} from "@purin-labs/control/worker/routes/vault";
 import {
   handleEvalRoute,
   matchEvalRoute,
@@ -181,12 +181,12 @@ import {
   matchChatSignalRoute,
   type ChatSignalRoute,
 } from "./control/admission/chat-signals";
-import { controlError } from "./control/http";
+import { controlError } from "@purin-labs/control/worker/http";
 import {
   handleAccessControlRoute,
   matchAccessControlRoute,
   type AccessControlRoute,
-} from "./control/routes/access-control";
+} from "@purin-labs/control/worker/routes/access-control";
 import {
   handleHeldOutputRequestRoute,
   matchHeldOutputRequestRoute,
@@ -253,7 +253,7 @@ import {
   handlePendingDecisionsRoute,
   matchPendingDecisionsRoute,
   type PendingDecisionsRoute,
-} from "./control/routes/pending-decisions";
+} from "@purin-labs/control/worker/routes/pending-decisions";
 
 type ControlRoute =
   | ChatGoalRoute

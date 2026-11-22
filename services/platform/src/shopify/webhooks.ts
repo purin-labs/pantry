@@ -38,7 +38,7 @@ import {
 import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { commerceObservationIdentity } from "../commerce/contract/observation-identity";
-import { decodePathSegmentValue } from "../gateway/request-helpers";
+import { decodePathSegmentValue } from "@purin-labs/control/worker/gateway/request-helpers";
 
 function isShopifyWebhookShopDomain(raw: string | null): raw is string {
   return raw !== null && /^[a-z0-9][a-z0-9-]*\.myshopify\.com$/i.test(raw);

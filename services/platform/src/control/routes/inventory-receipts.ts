@@ -16,7 +16,11 @@ import {
 } from "@purin-labs/commerce-client";
 import { inventoryQuantity } from "../../kitchen/contract/inventory-overview";
 import type { Env } from "@purin-labs/kernel/env";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   resolveInventoryAccess,
   resolveInventoryMutation,

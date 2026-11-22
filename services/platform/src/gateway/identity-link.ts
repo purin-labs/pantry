@@ -37,7 +37,7 @@ import {
   isLocalDebugRequest,
   jsonBodyErrorResponse,
   parsePublicServiceUrl,
-} from "./request-helpers";
+} from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleIssueIdentityLink(
   request: Request,

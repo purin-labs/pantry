@@ -112,11 +112,11 @@ function requireParsed<TValue>(
 
 // Control admission must retain its captured placement through continuations.
 function rejectMissingExecutionScope(
-  admitted: import("../src/control/authorization").AuthorizedOrganisationRequest,
+  admitted: import("@purin-labs/control/worker/authorization").AuthorizedOrganisationRequest,
 ) {
   const { executionScope, ...missingScope } = admitted;
   // @ts-expect-error A spread cannot omit the captured execution scope.
-  const invalid: import("../src/control/authorization").AuthorizedOrganisationRequest =
+  const invalid: import("@purin-labs/control/worker/authorization").AuthorizedOrganisationRequest =
     missingScope;
   void executionScope;
   void invalid;

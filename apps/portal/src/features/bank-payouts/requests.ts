@@ -3,8 +3,8 @@ import {
   type BankPayoutsWindow,
 } from "@purin-labs/control-api";
 
-import { controlRead } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlRead } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 
 /** The Payouts page's reads of the Platform. */
 

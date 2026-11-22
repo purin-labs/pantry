@@ -14,7 +14,7 @@ import {
 import { assertNever, isRecord } from "@purin-labs/std";
 import { StatusChip, type StatusChipStatus } from "../../page-components";
 import type { Quantity } from "@purin-labs/commerce-contracts";
-import { ControlApiError, controlRead } from "../../control-client";
+import { ControlApiError, controlRead } from "@purin-labs/control/portal/control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import {
   readProductionSubmission,

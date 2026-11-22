@@ -13,7 +13,7 @@ import {
   basicApiKeyFromVault,
 } from "../src/custom-connectors/basic-authentication";
 import type { MessageLinkEgress } from "../src/messages/link-reader";
-import type { JsonRecord } from "../src/control/http";
+import type { JsonRecord } from "@purin-labs/control/worker/http";
 import { isRecord } from "@purin-labs/std";
 const documents: readonly ConnectorDocumentation[] = [
   {

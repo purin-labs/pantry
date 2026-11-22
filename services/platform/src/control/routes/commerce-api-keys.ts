@@ -5,7 +5,7 @@ import {
 } from "@purin-labs/commerce-client";
 
 import type { Env } from "@purin-labs/kernel/env";
-import { admitUserMutation } from "../admission/control-mutation";
+import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import {
   resolveMerchantControlContext,
   type MerchantControlContext,
@@ -13,9 +13,13 @@ import {
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+} from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import type { Variant } from "@purin-labs/type-utils";
 
 /**

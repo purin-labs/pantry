@@ -4,8 +4,8 @@ import {
   type MenuBoardVersionSummary,
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlAnswer, controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 import "./board-history.css";
 
 /**

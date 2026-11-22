@@ -8,7 +8,7 @@ import {
   controlUpload,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { isConversationId } from "@purin-labs/control-api";
 import type { ConversationId, ProjectId } from "@purin-labs/control-api";
 import {

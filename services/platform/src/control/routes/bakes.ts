@@ -19,9 +19,13 @@ import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import {
   admitControlMutation,
   recordSessionMutationReceipt,
-} from "../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 /**
  * The Bakes page of Kitchen (Plan 24 S1): the stock level of each fresh

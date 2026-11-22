@@ -1,4 +1,4 @@
-import type { DecidePendingDecision } from "../../decide-pending-decision";
+import type { DecidePendingDecision } from "@purin-labs/control/worker/decide-pending-decision";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { controlActionMutationExecution } from "../../../actors/action-mutation-execution";
@@ -17,7 +17,7 @@ import { authorizeCapabilityUse } from "@purin-labs/authority/authorization/acce
 import {
   consumeGoogleApprovalCeremony,
   verifyGoogleApprovalGrant,
-} from "../../oidc";
+} from "@purin-labs/control/worker/oidc";
 import {
   executeApprovedCustomConnectorWrite,
   resolveApprovedCustomConnectorWrite,
@@ -37,22 +37,22 @@ import {
   parseMutationBoundary,
   replayControlMutation,
   resolveMutationUser,
-} from "../../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   authenticateControlMutation,
   APPROVAL_GRANT_COOKIE,
   parseCookies,
   type AuthorizedOrganisationRequest,
-} from "../../authorization";
-import { googleConfig } from "../../google-oidc-config";
+} from "@purin-labs/control/worker/authorization";
+import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../../http";
-import { recordCommerceMutationReceipt } from "../../mutation-receipt";
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import type { Variant } from "@purin-labs/type-utils";
 import { hasExactKeys } from "@purin-labs/std";
 import type { CustomConnectorControlRoute } from "../custom-connectors";

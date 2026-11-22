@@ -26,8 +26,11 @@ import {
 } from "../chat-side-cases";
 import { handlePortalChatScreenRelevance } from "../chat-screen-relevance";
 import { assertNever } from "@purin-labs/std";
-import { controlError } from "../../http";
-import { decodeSegment as decode, matchPath as match } from "../../path-match";
+import { controlError } from "@purin-labs/control/worker/http";
+import {
+  decodeSegment as decode,
+  matchPath as match,
+} from "@purin-labs/control/worker/path-match";
 
 /**
  * The routes of the Portal chat (Refactor 17). They were in the route file of

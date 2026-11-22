@@ -5,7 +5,7 @@ import {
 } from "@purin-labs/cafe-control-api";
 import { isNonNegativeInteger, isRecord, sha256Hex } from "@purin-labs/std";
 
-import { controlError } from "../control/http";
+import { controlError } from "@purin-labs/control/worker/http";
 import type { UserId } from "@purin-labs/control-api/ids";
 import {
   SOCKET_SILENCE_LIMIT_MS,

@@ -1,6 +1,6 @@
 import React from "react";
-import { ControlApiError } from "../control-client";
-import { signInPath } from "../control-paths";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
+import { signInPath } from "@purin-labs/control/portal/control-paths";
 import {
   acceptOrganisationInvitation,
   type OrganisationInvitation,

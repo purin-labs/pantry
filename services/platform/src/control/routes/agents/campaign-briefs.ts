@@ -5,14 +5,14 @@ import {
   listCaseCampaignBriefs,
   type CampaignMessageVariant,
 } from "../../../data/campaign-brief";
-import { resolveMutationUser } from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
+import { resolveMutationUser } from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   noStoreJson,
   readJsonRecord,
-} from "../../http";
+} from "@purin-labs/control/worker/http";
 
 /**
  * Lists the campaign briefs an agent staged in one Case.

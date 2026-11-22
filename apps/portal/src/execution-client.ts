@@ -8,7 +8,7 @@ import {
   type CaseExecutionNodeDetail,
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
-import { ControlApiError } from "./control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 
 type ExecutionTransport = Readonly<{
   read: (path: string) => Promise<unknown>;

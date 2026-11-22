@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import { TaskList } from "../../apps/portal/src/ui/task-list.tsx";
 import { parsePendingInputs } from "../../packages/control-api/src/portal/chat.ts";
 import DescriptionEditor from "../../apps/portal/src/features/commerce/description-draft/editor.tsx";
-import { responseJson } from "../../apps/portal/src/control-client.ts";
+import { responseJson } from "../../foundation/control/portal/control-client.ts";
 import { parseCommerceActionRecordResponse } from "../../packages/commerce-control-api/src/portal/commerce-actions.ts";
 import "../../apps/portal/src/features/commerce/description-draft/styles.css";
 

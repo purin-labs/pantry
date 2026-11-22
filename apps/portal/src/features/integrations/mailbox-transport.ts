@@ -1,4 +1,4 @@
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import {
   parseAgentOperationsResponse,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";

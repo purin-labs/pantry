@@ -19,7 +19,7 @@ import {
   ControlApiError,
   controlMutation,
   controlRead,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequestDialog,
   PantryMark,

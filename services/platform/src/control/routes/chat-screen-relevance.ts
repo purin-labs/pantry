@@ -22,8 +22,12 @@ import { readConversation, type ConversationScope } from "../../chat/store";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 const MAX_BODY_BYTES = 32_768;
 

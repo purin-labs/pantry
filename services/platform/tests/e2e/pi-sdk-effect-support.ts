@@ -9,7 +9,7 @@ import { CommerceAdminClient } from "@purin-labs/commerce-client";
 import type { CommerceProjection } from "@purin-labs/commerce-contracts";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { OrganisationDO } from "../../src/actors/organisation";
-import { APPROVAL_GRANT_COOKIE } from "../../src/control/authorization";
+import { APPROVAL_GRANT_COOKIE } from "@purin-labs/control/worker/authorization";
 import {
   issueControlSession,
   type IssuedControlSession,

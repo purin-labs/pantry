@@ -126,7 +126,7 @@ OIDC proves identity but grants no Organisation authority. The session cookie
 `pantry_session` lasts seven days. An Organisation route checks the session, reads the membership
 under the regional placement fence, then checks the role rank and the Account
 Platform access
-([`control/authorization.ts`](../../services/platform/src/control/authorization.ts)).
+([`control/authorization.ts`](../../foundation/control/worker/authorization.ts)).
 A missing membership or a low role returns `404`, so a person cannot probe
 other Organisations.
 

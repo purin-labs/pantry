@@ -7,7 +7,10 @@ import "../styles.css";
 import { PortalFrame } from "../shell";
 import { PageHeader } from "../page-components";
 import { workspacePageDescriptor } from "../route";
-import { controlMutation, type ControlMutationIntent } from "../control-client";
+import {
+  controlMutation,
+  type ControlMutationIntent,
+} from "@purin-labs/control/portal/control-client";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { BakerySurfaceEffectBridge } from "../features/bakery-surface-effect-bridge";
 import WorkflowSimulatorRoute from "../features/workflow-simulator/route";

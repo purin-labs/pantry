@@ -33,8 +33,8 @@ import {
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { isChatId, type Conversation } from "../../chat/conversation";
 import {
   listConversationDirectory,

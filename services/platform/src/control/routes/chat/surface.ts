@@ -4,8 +4,12 @@ import { parseBakeryBrowserBinding } from "@purin-labs/bakery-model/bakery-conte
 import type { Env } from "@purin-labs/kernel/env";
 import { parseSessionId } from "@purin-labs/kernel/ids";
 import { resolveActiveSessionActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import { parseBakerySurfaceReceipt } from "@purin-labs/bakery-model/bakery-surface";
 import {
   listPendingBakerySurfaceEffects,

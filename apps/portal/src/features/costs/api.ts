@@ -1,5 +1,5 @@
 import type { CostUnit } from "@purin-labs/kitchen-control-api";
-import type { ControlMutationIntent } from "../../control-client";
+import type { ControlMutationIntent } from "@purin-labs/control/portal/control-client";
 
 export type CostsMutation = (
   path: string,

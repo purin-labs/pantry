@@ -46,7 +46,7 @@ import "../styles.css";
 import { installClaudeConnectionPreview } from "./claude-connection-preview";
 import { installVaultIntegrationPreview } from "./vault-integration-preview";
 import { installCustomConnectorPreview } from "./custom-connector-preview";
-import { MutationLedger, type MutationProvider } from "../mutation-state";
+import { MutationLedger, type MutationProvider } from "@purin-labs/control/portal/mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import { IntegrationsPage } from "../features/integrations/integrations-page";
 import { StripePaymentAccountSetup } from "../features/payment-accounts/stripe-account";

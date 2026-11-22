@@ -23,7 +23,7 @@ import {
   controlSend,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 
 /** The Portal checks the Mac this often while voice control is on (Plan 82 D1b). */
 const CHECK_MS = 30_000;

@@ -8,8 +8,8 @@ import {
 } from "./slack-journey-support";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { authorizeOrganisationRequest } from "../../src/control/authorization";
-import { recordCommerceMutationReceipt } from "../../src/control/mutation-receipt";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { readControlMutationReplay } from "@purin-labs/tenancy/data/control-mutation";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import {

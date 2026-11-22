@@ -5,7 +5,7 @@ import {
   parseMutationResult,
   type ReconcileCommerceInventoryV1,
 } from "@purin-labs/commerce-client";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 
 export type ReconciliationScope = Readonly<{
   userId: string;

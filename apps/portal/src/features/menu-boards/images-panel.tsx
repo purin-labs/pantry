@@ -10,8 +10,8 @@ import {
   type MenuBoardRect,
 } from "@purin-labs/menu-board-crdt/board";
 import { isRecord } from "@purin-labs/std";
-import { controlAnswer, controlRead, controlUpload, controlWrite } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlAnswer, controlRead, controlUpload, controlWrite } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 import "./images-panel.css";
 
 /**

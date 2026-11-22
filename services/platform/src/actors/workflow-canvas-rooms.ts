@@ -20,8 +20,8 @@ import {
   type CanvasRoomMetadata,
   type CanvasSelection,
 } from "@purin-labs/workflow-canvas-crdt/protocol";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import {
   listOrganisationMembers,
   resolveUser,

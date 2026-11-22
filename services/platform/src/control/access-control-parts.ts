@@ -1,7 +1,7 @@
 import { resolveActiveCustomConnectorAccount } from "../custom-connectors/accounts";
 import { resolveCustomConnectorRevision } from "../custom-connectors/revisions";
 import { resolveAirtableAccountToken } from "../external-records/oauth";
-import type { AccessControlParts } from "./routes/access-control-explain";
+import type { AccessControlParts } from "@purin-labs/control/worker/routes/access-control-explain";
 
 /**
  * The parts of the integrations area that the access control routes read.

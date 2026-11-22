@@ -9,8 +9,12 @@ import {
   type OrganisationCodexConnection,
 } from "../../../models/codex-connection";
 import { parseCodexAuthorizationAttemptId } from "@purin-labs/kernel/ids";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 
 export async function handleOrganisationCodex(

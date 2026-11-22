@@ -1,4 +1,4 @@
-import type { ControlMutationIntent } from "../../../control-client";
+import type { ControlMutationIntent } from "@purin-labs/control/portal/control-client";
 import { parseCommerceGraphQuery, parseCommerceViewPresentation, parseEntityPlaneCommandResult, parseEntityPlaneChanges, parseEntityPlanePublishedResourceMetadataResponse, parsePurchasingPresetPublishResponse, parsePurchasingReconcileResponse, purchaseRequestAttributeValues, REPLENISHMENT_QUEUE_LIST_ID, type PurchaseRequestUpdate, type CommerceEntityPlaneChanges, type CommerceEntityPlanePublishedResourceMetadataResponse } from "@purin-labs/commerce-client";
 import type {
   AttributeDefinitionId,
@@ -26,7 +26,7 @@ import type {
   CommerceMutationReceiptV1,
 } from "@purin-labs/commerce-contracts";
 import { parseInventory } from "@purin-labs/commerce-contracts";
-import { responseJson } from "../../../control-client";
+import { responseJson } from "@purin-labs/control/portal/control-client";
 import { needsReorder } from "../stock-status";
 import {
   parseCommerceGraphQueryResult,

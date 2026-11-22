@@ -9,7 +9,7 @@ import {
   completeGoogleOidc,
   issueGoogleApprovalGrant,
   type GoogleOidcConfig,
-} from "../../src/control/oidc";
+} from "@purin-labs/control/worker/oidc";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 

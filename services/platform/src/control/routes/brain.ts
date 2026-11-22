@@ -11,8 +11,8 @@ import {
   organisationActor,
   resolveMemoryViewer,
 } from "../../memory/access";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 
 export type BrainRoute = Readonly<{
   kind: "brain";

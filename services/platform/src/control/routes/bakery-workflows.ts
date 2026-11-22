@@ -14,8 +14,12 @@ import { organisationServices } from "../../organisation/contract/organisation-s
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   type BakeryWorkflowRoute,
   authorizeBakeryWorkflowSocket,

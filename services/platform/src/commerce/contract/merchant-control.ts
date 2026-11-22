@@ -9,8 +9,8 @@ import type { IntegrationAccountId } from "@purin-labs/kernel/ids";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../../control/authorization";
-import { controlError } from "../../control/http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import { readOrganisationEnvironment } from "../../control/organisation-runtime";
 
 export type MerchantControlContext = Readonly<{

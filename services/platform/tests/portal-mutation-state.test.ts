@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   MutationLedger,
   type OrganisationMutation,
-} from "../../../apps/portal/src/mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 
 describe("Café scoped mutation ledger", () => {
   it("allows independent scopes while rejecting duplicate and conflicting work", () => {

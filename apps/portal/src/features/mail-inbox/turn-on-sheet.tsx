@@ -1,6 +1,9 @@
 import React from "react";
 
-import { controlMutation, controlRead } from "../../control-client";
+import {
+  controlMutation,
+  controlRead,
+} from "@purin-labs/control/portal/control-client";
 import { ProviderTile } from "../../page-components";
 import { ConnectionDialog } from "../integrations/connection-dialog";
 import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";

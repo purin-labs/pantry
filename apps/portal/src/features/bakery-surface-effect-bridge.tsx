@@ -28,7 +28,7 @@ import {
   controlRead,
   controlWrite,
   readCookie,
-} from "../control-client";
+} from "@purin-labs/control/portal/control-client";
 
 type BakerySurfaceEffectBridgeProps = Readonly<{
   organisationId: string;

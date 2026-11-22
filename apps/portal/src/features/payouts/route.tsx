@@ -1,7 +1,7 @@
 import React from "react";
 import { toast } from "sonner";
 
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { RecoverableError } from "../../page-components";
 import { ViewSwitch } from "../../ui";

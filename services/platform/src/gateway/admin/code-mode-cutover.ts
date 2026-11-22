@@ -19,7 +19,7 @@ import {
 } from "@purin-labs/kernel/http";
 import { newRequestId } from "@purin-labs/kernel/ids";
 import { actorResolutionErrorResponse } from "../support";
-import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
+import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleAdministerCodeModePlatformCutover(
   request: Request,

@@ -14,8 +14,12 @@ import {
 import { resolveOrganisationModelRoute } from "../../models/route";
 import { readProject } from "../../projects/records";
 import type { Env } from "@purin-labs/kernel/env";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 // A member's sidebar: their ordering of Projects and chats, and a chat started
 // inside a Project. Project content and Case moves are general routes.

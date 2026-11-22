@@ -13,7 +13,7 @@ import proposalTrial, {
 export { ProposalCase } from "./proposal-worker.mjs";
 import { CommerceAdminClient } from "../../packages/commerce-client/src/index.ts";
 import { issueControlSession } from "../../foundation/tenancy/data/control-plane.ts";
-import { googleConfig } from "../../services/platform/src/control/google-oidc-config.ts";
+import { googleConfig } from "../../foundation/control/worker/google-oidc-config.ts";
 import { completeCommerceApprovalFixture } from "../../services/platform/tests/e2e/commerce-approval-fixture.ts";
 import {
   handleCommerceControlRoute,

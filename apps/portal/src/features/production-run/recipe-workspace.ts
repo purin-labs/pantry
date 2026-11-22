@@ -10,7 +10,10 @@ import {
 import { canonicalJson, isRecord, sha256Hex } from "@purin-labs/std";
 import type { CompiledScenario } from "@purin-labs/production-simulation";
 import React from "react";
-import { controlRead, ControlApiError } from "../../control-client";
+import {
+  controlRead,
+  ControlApiError,
+} from "@purin-labs/control/portal/control-client";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";
 import type { RecipeGraphSource } from "./recipe-graph";
 

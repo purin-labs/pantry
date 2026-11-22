@@ -35,7 +35,7 @@ import {
 } from "@purin-labs/production-simulation/simulator/rehearsal-presets";
 import { isRecord, sha256Hex } from "@purin-labs/std";
 import { prepareRehearsalRunWorkspace } from "../../../../apps/portal/src/features/workflow-simulator/workspace-runs-api";
-import { responseJson } from "../../../../apps/portal/src/control-client";
+import { responseJson } from "@purin-labs/control/portal/control-client";
 import { timelineVisibleMessages } from "../../src/chat/conversation";
 import {
   captureBakerySurface,

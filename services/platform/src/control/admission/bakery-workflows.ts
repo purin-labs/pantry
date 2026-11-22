@@ -4,8 +4,8 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import type { AuthorizedOrganisationRequest } from "../authorization";
-import { authorizeOrganisationSocket } from "./organisation-socket";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { authorizeOrganisationSocket } from "@purin-labs/control/worker/admission/organisation-socket";
 
 /**
  * Plan 84: one recipe's applied workflow and the socket of its shared draft. A

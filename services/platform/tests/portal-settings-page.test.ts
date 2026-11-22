@@ -2,8 +2,8 @@
 // @ts-expect-error React runtime declarations are scoped to apps/portal.
 import React from "../../../apps/portal/node_modules/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MutationLedger } from "../../../apps/portal/src/mutation-state";
-import { ControlApiError } from "../../../apps/portal/src/control-client";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { parseIntegrationRouteSelection } from "../../../apps/portal/src/features/integrations/model";
 import {
   executeIntegrationsRoute,

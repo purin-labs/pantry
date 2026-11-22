@@ -3,7 +3,7 @@ import {
   lastControlRead,
   controlMutation,
   controlSecretMutation,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { accountInvitationHref } from "../../pages/account-invitation-link";
 import { setUpMailbox } from "../mail-setup/turn-on";
 import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "./settings-types";
@@ -13,7 +13,7 @@ import {
   commerceSystemPath,
   inferencePath,
   organisationRecordPath,
-} from "../../control-paths";
+} from "@purin-labs/control/portal/control-paths";
 import { parseWhatsAppSurface, type WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import { whatsappAccountActionPath, whatsappAccountsPath } from "../../whatsapp";
 import { parseCredentialRotationReceiptResponse, parseCredentialRevocationReceiptResponse } from "@purin-labs/control-api/portal/credential-inventory";

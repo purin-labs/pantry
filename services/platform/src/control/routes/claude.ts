@@ -12,8 +12,12 @@ import {
   startClaudeAuthorization,
 } from "../../models/claude-connection";
 import { parseClaudeAuthorizationCode } from "../../models/claude-oauth";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 
 export type ClaudeConnectionRoute = Readonly<{

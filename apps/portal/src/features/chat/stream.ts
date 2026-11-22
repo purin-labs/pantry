@@ -3,7 +3,7 @@ import type { PortalChatStreamRecord as ChatStreamRecord } from "@purin-labs/con
 import type { Variant } from "@purin-labs/type-utils";
 import { isRecord, parseJsonOrNull } from "@purin-labs/std";
 import { parseChatStreamRecord } from "@purin-labs/control-api/portal/chat-stream";
-import { controlStream } from "../../control-client";
+import { controlStream } from "@purin-labs/control/portal/control-client";
 
 export type { PortalChatStreamRecord as ChatStreamRecord } from "@purin-labs/contracts";
 

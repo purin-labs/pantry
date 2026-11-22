@@ -32,7 +32,7 @@ import {
   type PageBrowserContext,
 } from "@purin-labs/contracts";
 import { parseSessionModelRoute } from "@purin-labs/authority/policy-snapshot";
-import type { JsonRecord } from "../control/http";
+import type { JsonRecord } from "@purin-labs/control/worker/http";
 import {
   parseCustomConnectorId,
   type CustomConnectorId,

@@ -4,7 +4,7 @@ import {
   controlRead,
   controlSecretMutation,
   refusedBody,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import {
   type Configuration,
   parseConfiguration,

@@ -9,16 +9,16 @@ import {
   parseIntegrationAccountId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { admitUserMutation } from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
+import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   noStoreJson,
   readJsonRecord,
   type JsonRecord,
-} from "../../http";
-import { recordCommerceMutationReceipt } from "../../mutation-receipt";
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { hasExactKeys, isPositiveInteger } from "@purin-labs/std";
 import { agentMailboxConnector } from "../../../mail-inbox/agent-mailbox-connector";
 import {

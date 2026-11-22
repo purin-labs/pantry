@@ -1,4 +1,4 @@
-import type { DecidePendingDecision } from "../decide-pending-decision";
+import type { DecidePendingDecision } from "@purin-labs/control/worker/decide-pending-decision";
 import { handleRecipes } from "./recipes";
 import { handleCosts } from "./costs";
 import type { Env } from "@purin-labs/kernel/env";

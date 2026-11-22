@@ -9,7 +9,7 @@ import {
 import {
   MutationLedger,
   type OrganisationMutation,
-} from "../../mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import type { ProviderAttemptDiagnostics } from "../../provider-onboarding";
 import { emailReplyIsOpenable, gmailMailboxStatus, gmailMailboxSummary, type MailboxInstallationOption } from "../../pages/agent-mailbox";
 import type { AgentMailboxView, EmailReplyQueueItem, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";

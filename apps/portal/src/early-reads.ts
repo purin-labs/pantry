@@ -1,4 +1,7 @@
-import { startControlRead, startControlSessionRead } from "./control-client";
+import {
+  startControlRead,
+  startControlSessionRead,
+} from "@purin-labs/control/portal/control-client";
 import {
   codexConnectionPath,
   commerceSystemPath,
@@ -7,7 +10,7 @@ import {
   inferencePath,
   memoriesPath,
   organisationRecordPath,
-} from "./control-paths";
+} from "@purin-labs/control/portal/control-paths";
 import { readPortalRoute, type WorkspaceDetailPage } from "./route";
 
 const ORGANISATION_ID_STORAGE_PREFIX = "pantry:organisation-id:";

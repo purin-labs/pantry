@@ -33,13 +33,17 @@ import {
 import {
   admitControlMutation,
   recordSessionMutationReceipt,
-} from "../../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   resolveMerchantBinding,
   resolveMerchantControlContext,
 } from "../../../commerce/contract/merchant-control";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 // Stock quantities and thresholds are absent from the entity graph attributes.
 export async function handleCommerceInventory(

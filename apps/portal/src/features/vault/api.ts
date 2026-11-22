@@ -18,13 +18,13 @@ import {
   controlMutation,
   controlRead,
   controlSecretMutation,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import {
   inferencePath,
   vaultEventsPath,
   vaultItemsPath,
   vaultStorePath,
-} from "../../control-paths";
+} from "@purin-labs/control/portal/control-paths";
 import { parseCredentialInventoryResponse } from "@purin-labs/control-api/portal/credential-inventory";
 import {
   keysOfInferenceSelection,

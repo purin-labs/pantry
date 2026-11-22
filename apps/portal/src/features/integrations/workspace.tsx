@@ -1,6 +1,6 @@
 import { Select } from "../../ui/select";
 import React from "react";
-import { MutationLedger } from "../../mutation-state";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import { ArchiveConfirm } from "./archive-confirm";
 import type { Variant } from "@purin-labs/type-utils";
 import {

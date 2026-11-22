@@ -6,8 +6,8 @@ import {
 import {
   PENDING_APPROVAL_MAX_AGE_MS,
   signInForApproval,
-} from "../../approval-sign-in-popup";
-import { ControlApiError } from "../../control-client";
+} from "@purin-labs/control/portal/approval-sign-in-popup";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { Select } from "../../ui/select";
 import React from "react";
 import { MessageCircle, FileCode2 } from "lucide-react";

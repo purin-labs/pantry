@@ -5,7 +5,10 @@ import {
   type VoiceHeard,
 } from "@purin-labs/control-api";
 
-import { controlAnswer, controlWrite } from "../../control-client";
+import {
+  controlAnswer,
+  controlWrite,
+} from "@purin-labs/control/portal/control-client";
 import {
   encodeVoiceWav,
   isVoiceConfirmationAttempt,

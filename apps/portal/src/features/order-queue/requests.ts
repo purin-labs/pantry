@@ -7,8 +7,11 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { controlMutation, controlRead } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import {
+  controlMutation,
+  controlRead,
+} from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 
 /** The order queue's calls to the Platform. */
 

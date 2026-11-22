@@ -3,7 +3,7 @@ import { readCaseScreenObservations } from "../../chat/case-screen-observations"
 import type { ConversationScope } from "../../chat/store";
 import type { Env } from "@purin-labs/kernel/env";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { controlError, controlJson } from "../http";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 
 /**
  * Knowledge › Context › On screen for one Case (Plan 87 phase 5): the pages

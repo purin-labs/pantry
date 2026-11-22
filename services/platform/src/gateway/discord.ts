@@ -34,7 +34,7 @@ import {
   storeVaultSecret,
 } from "@purin-labs/authority/credential-vault/index";
 import { assertNever } from "@purin-labs/std";
-import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath } from "./request-helpers";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleConfigureDiscordInteraction(
   request: Request,

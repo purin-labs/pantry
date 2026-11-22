@@ -21,14 +21,14 @@ import {
   admitControlMutation,
   controlMutationIdentity,
   resolveMutationUser,
-} from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../../http";
+} from "@purin-labs/control/worker/http";
 import { assertNever, hasExactKeys } from "@purin-labs/std";
 import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 

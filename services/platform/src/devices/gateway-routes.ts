@@ -4,7 +4,7 @@ import {
 } from "@purin-labs/control-api";
 
 import { deviceFleetStub } from "./contract/fleet-stub";
-import { controlError, controlJson } from "../control/http";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseOrganisationId } from "@purin-labs/kernel/ids";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

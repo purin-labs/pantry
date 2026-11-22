@@ -53,7 +53,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "readRestoreItems",
     "restoreSelect",
   ],
-  "services/platform/src/control/oidc.ts": [
+  "foundation/control/worker/oidc.ts": [
     "beginGoogleOidc",
     "completeGoogleOidc",
     "consumeGoogleApprovalCeremony",

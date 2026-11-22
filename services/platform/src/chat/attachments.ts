@@ -4,7 +4,7 @@ import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { StoredMessageAttachment, UserMessage } from "@purin-labs/contracts";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { Variant } from "@purin-labs/type-utils";
-import { readJsonRecord } from "../control/http";
+import { readJsonRecord } from "@purin-labs/control/worker/http";
 import { MESSAGE_ATTACHMENT_POLICY } from "@purin-labs/control-api";
 import {
   buildStoredMessageAttachment,

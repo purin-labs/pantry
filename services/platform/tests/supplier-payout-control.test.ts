@@ -15,8 +15,8 @@ const payoutControlMocks = vi.hoisted(() => ({
   applySupplierPayableCommandWithLexicon: vi.fn(),
 }));
 
-vi.mock("../src/control/authorization", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/control/authorization")>()),
+vi.mock("@purin-labs/control/worker/authorization", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/control/worker/authorization")>()),
   authorizeOrganisationRequest: payoutControlMocks.authorizeOrganisationRequest,
 }));
 vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
@@ -27,7 +27,7 @@ vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => (
   ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-mutation")>()),
   readControlMutationReplay: payoutControlMocks.readControlMutationReplay,
 }));
-vi.mock("../src/control/mutation-receipt", () => ({
+vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt:
     payoutControlMocks.recordCommerceMutationReceipt,
 }));

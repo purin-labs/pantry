@@ -15,8 +15,8 @@ import type {
   OnboardingEnvironment,
   OrganisationOnboardingLifecycle,
 } from "@purin-labs/contracts";
-import { ControlApiError } from "../control-client";
-import { signInPath } from "../control-paths";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
+import { signInPath } from "@purin-labs/control/portal/control-paths";
 import { ArchiveConfirm } from "../features/integrations/archive-confirm";
 import {
   EmptyState,
@@ -25,7 +25,7 @@ import {
   PageSkeleton,
   RecoverableError,
 } from "../page-components";
-import type { PageContent } from "../page-content";
+import type { PageContent } from "@purin-labs/control/portal/page-content";
 import { organisationPath, workspacePagePath } from "../route";
 import { AgentModal } from "./agent-modal";
 import { AccountSetup, type AccountSetupListing } from "./account-onboarding";

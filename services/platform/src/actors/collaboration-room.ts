@@ -16,7 +16,7 @@ import {
   type EncodedValue,
 } from "@purin-labs/collaboration";
 import { isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   listOrganisationMembers,
   type ActiveOrganisationMembership,

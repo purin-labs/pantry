@@ -10,7 +10,7 @@ import {
   type RunSnapshotSummary,
 } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";
-import { ControlApiError } from "../../control-client.ts";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   exportProductionWorkcells,
   exportRehearsalWorkcells,

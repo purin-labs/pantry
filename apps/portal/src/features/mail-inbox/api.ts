@@ -24,7 +24,7 @@ import {
   controlRead,
   controlSignal,
   controlWrite,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { parseEmailReviewQueue } from "@purin-labs/control-api/portal/email-review";
 import type { EmailReplyQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import {

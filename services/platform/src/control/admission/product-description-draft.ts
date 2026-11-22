@@ -6,9 +6,9 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError } from "../http";
-import { authorizeOrganisationSocket } from "./organisation-socket";
+} from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
+import { authorizeOrganisationSocket } from "@purin-labs/control/worker/admission/organisation-socket";
 
 export type ProductDescriptionDraftRoute = Readonly<{
   kind: "productDescriptionDraft";

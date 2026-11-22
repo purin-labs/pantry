@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ControlApiError } from "../../../apps/portal/src/control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 // @ts-expect-error Platform test TypeScript excludes portal JSX; the portal build validates it.
 import { executeIntegrationsCommand } from "../../../apps/portal/src/features/integrations/settings-routes";
 

@@ -10,7 +10,10 @@ import {
   type RecipeItem,
   type RecipeWrite,
 } from "@purin-labs/kitchen-control-api";
-import { controlRead, ControlApiError } from "../../control-client";
+import {
+  controlRead,
+  ControlApiError,
+} from "@purin-labs/control/portal/control-client";
 import { Select } from "../../ui/select";
 import {
   recipesPath,

@@ -3,8 +3,8 @@ import React from "react";
 
 import { identityServiceErrorMessage } from "./identity-copy";
 import { assertNever, isRecord } from "@purin-labs/std";
-import { readCookie } from "./control-client";
-import { signInPath } from "./control-paths";
+import { readCookie } from "@purin-labs/control/portal/control-client";
+import { signInPath } from "@purin-labs/control/portal/control-paths";
 
 type Invitation = {
   challengeId: string;

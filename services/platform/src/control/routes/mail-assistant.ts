@@ -7,8 +7,8 @@ import {
   type OrganisationId,
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";

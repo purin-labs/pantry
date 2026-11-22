@@ -3,8 +3,8 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import {
   permissionRequiredResponse,
   personPermission,
-} from "../../permission-required";
-import { controlError } from "../../http";
+} from "@purin-labs/control/worker/permission-required";
+import { controlError } from "@purin-labs/control/worker/http";
 
 /**
  * The refusal of a person's direct commerce write that the organisation's

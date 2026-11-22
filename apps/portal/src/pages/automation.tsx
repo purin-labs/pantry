@@ -27,13 +27,13 @@ import {
   parseTrackingBatchPreviewResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-operations";
 import type { CommerceOperationsTransport } from "../features/commerce/operations";
-import { ControlApiError } from "../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
 } from "../features/access/permission-required-prompt";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
-import type { PageContent } from "../page-content";
+import type { PageContent } from "@purin-labs/control/portal/page-content";
 import {
   EmptyState,
   Notice,

@@ -10,7 +10,7 @@ const mocks = vi.hoisted(createMocks);
 function createMocks() {
   return { authorize: vi.fn(), put: vi.fn(), get: vi.fn(), list: vi.fn() };
 }
-vi.mock("../src/control/authorization", authModule);
+vi.mock("@purin-labs/control/worker/authorization", authModule);
 function authModule() {
   return { authorizeOrganisationRequest: mocks.authorize };
 }

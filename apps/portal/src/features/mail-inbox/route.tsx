@@ -6,7 +6,7 @@ import { formatListDate, formatMailDate, senderParts } from "./thread";
 import React from "react";
 import { toast } from "sonner";
 import { assertNever } from "@purin-labs/std";
-import { forgetWithControlReads } from "../../control-client";
+import { forgetWithControlReads } from "@purin-labs/control/portal/control-client";
 import { mailRuleLabel } from "./rule-label";
 import type {
   MailInboxAccount,

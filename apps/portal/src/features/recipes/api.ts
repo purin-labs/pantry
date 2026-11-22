@@ -1,5 +1,5 @@
 import type { Quantity } from "@purin-labs/commerce-contracts";
-import type { ControlMutationIntent } from "../../control-client";
+import type { ControlMutationIntent } from "@purin-labs/control/portal/control-client";
 export type RecipeMutation = (
   path: string,
   body: unknown,

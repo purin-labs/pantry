@@ -23,8 +23,8 @@ const checkoutControlMocks = vi.hoisted(() => ({
   listPaymentAccounts: vi.fn(),
 }));
 
-vi.mock("../src/control/authorization", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../src/control/authorization")>()),
+vi.mock("@purin-labs/control/worker/authorization", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@purin-labs/control/worker/authorization")>()),
   authorizeOrganisationRequest:
     checkoutControlMocks.authorizeOrganisationRequest,
 }));
@@ -49,7 +49,7 @@ vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => (
   ...(await importOriginal<typeof import("@purin-labs/tenancy/data/control-mutation")>()),
   readControlMutationReplay: checkoutControlMocks.readControlMutationReplay,
 }));
-vi.mock("../src/control/mutation-receipt", () => ({
+vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt:
     checkoutControlMocks.recordCommerceMutationReceipt,
 }));

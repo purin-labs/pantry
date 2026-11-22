@@ -8,8 +8,8 @@ import {
 } from "@purin-labs/menu-board-crdt/board";
 import { captureBakeryBrowserContext } from "../bakery-browser-context";
 import { boardChat } from "./board-chat";
-import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlAnswer, controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 import type { MenuBoardClient } from "./board-client";
 import "./prompt-edit.css";
 import type { Variant } from "@purin-labs/type-utils";

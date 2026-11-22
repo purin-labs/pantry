@@ -22,8 +22,12 @@ import type { StrictUnion } from "@purin-labs/type-utils";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { bakeryRunSnapshotPrefix } from "../../commerce/bakery/saved-runs";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 export type BakeryRunArtifactRoute = Readonly<{
   kind: "bakeryRunArtifacts";

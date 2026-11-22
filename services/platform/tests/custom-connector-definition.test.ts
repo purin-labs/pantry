@@ -3,7 +3,7 @@ import { fileURLToPath, URL as NodeUrl } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import type { JsonRecord } from "../src/control/http";
+import type { JsonRecord } from "@purin-labs/control/worker/http";
 import {
   buildCustomConnectorRevisionIdentity,
   parseCustomConnectorDefinition,

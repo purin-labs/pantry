@@ -11,7 +11,7 @@ import {
   parseCostsOverview,
   type CalculatedRecipeCost,
 } from "@purin-labs/kitchen-control-api";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { costsPath } from "../costs/api";
 import {

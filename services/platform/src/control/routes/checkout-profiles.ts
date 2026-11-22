@@ -17,7 +17,7 @@ import type {
 import {
   admitControlMutation,
   resolveMutationUser,
-} from "../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   resolveMerchantControlContext,
   type MerchantControlContext,
@@ -25,14 +25,14 @@ import {
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../http";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import type { Variant } from "@purin-labs/type-utils";
 import { hasExactKeys, sha256Hex } from "@purin-labs/std";
 

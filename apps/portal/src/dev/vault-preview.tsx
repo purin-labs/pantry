@@ -10,7 +10,7 @@ import type {
   VaultStoreView,
 } from "@purin-labs/control-api";
 
-import { ControlApiError } from "../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import type { VaultTransport } from "../features/vault/api";
 import type { VaultKeyView } from "../features/vault/keys";
 import { VaultRoute } from "../features/vault/route";

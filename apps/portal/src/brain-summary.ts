@@ -6,8 +6,11 @@ import {
   type BrainSummary,
 } from "@purin-labs/control-api";
 
-import { controlRead, forgetWithControlReads } from "./control-client";
-import { brainSummaryPath } from "./control-paths";
+import {
+  controlRead,
+  forgetWithControlReads,
+} from "@purin-labs/control/portal/control-client";
+import { brainSummaryPath } from "@purin-labs/control/portal/control-paths";
 
 /**
  * What waits for the signed-in person in the Brain. The navigation and the

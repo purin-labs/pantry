@@ -2,7 +2,11 @@ import { parseRecipeWrite } from "@purin-labs/kitchen-control-api";
 import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import { recipeCollectionOf } from "../../commerce/recipe-commands";
 import type { Env } from "@purin-labs/kernel/env";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   resolveInventoryAccess,
   resolveInventoryMutation,

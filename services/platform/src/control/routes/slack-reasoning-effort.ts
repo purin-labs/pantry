@@ -5,9 +5,13 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   admitUserMutation,
   controlMutationIdentity,
-} from "../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import { prepareControlMutationReceipt } from "@purin-labs/tenancy/data/control-mutation";
 import {
   prepareOrganisationSlackReasoningEffortWrite,

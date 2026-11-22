@@ -18,7 +18,7 @@ import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "./authorization";
+} from "@purin-labs/control/worker/authorization";
 import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
 import type { Variant } from "@purin-labs/type-utils";
 

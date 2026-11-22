@@ -54,7 +54,7 @@ import {
   commerceHeaders as headers,
 } from "./commerce-support";
 import { expect, it, vi } from "vitest";
-import { responseJson } from "../../../../apps/portal/src/control-client";
+import { responseJson } from "@purin-labs/control/portal/control-client";
 import { savePreparedScenarioCopy } from "../../../../apps/portal/src/features/workflow-simulator/workspace-commands";
 import { savePreparedProductionScenario } from "../../../../apps/portal/src/features/workflow-simulator/production-scenario-api";
 import { type IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";

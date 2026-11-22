@@ -9,7 +9,7 @@ import {
   type ReconcileCommerceInventoryV1,
 } from "@purin-labs/commerce-client";
 import { isRecord } from "@purin-labs/std";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
 import { parseInventoryQuantityText as inventoryQuantityInput } from "@purin-labs/kitchen-control-api";
 import type { CommerceMutationTransport } from "./entity-plane/api";

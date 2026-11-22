@@ -8,10 +8,10 @@ import {
   ControlApiError,
   controlRead,
   lastControlRead,
-} from "../control-client";
-import { homePath } from "../control-paths";
+} from "@purin-labs/control/portal/control-client";
+import { homePath } from "@purin-labs/control/portal/control-paths";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
-import type { PageContent } from "../page-content";
+import type { PageContent } from "@purin-labs/control/portal/page-content";
 import {
   EmptyState,
   Notice,

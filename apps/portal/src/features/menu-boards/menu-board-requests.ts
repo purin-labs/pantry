@@ -4,8 +4,8 @@ import type {
   MenuSection,
 } from "@purin-labs/menu-draft-crdt";
 import { isNonNegativeInteger, isPositiveInteger, isRecord } from "@purin-labs/std";
-import { controlRead } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlRead } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 
 /** The shop's saved menu draft, which names the sections and items. */
 export async function readMenuDraft(

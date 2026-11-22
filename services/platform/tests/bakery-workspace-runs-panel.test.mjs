@@ -3,7 +3,7 @@ import recording from "../../../assets/bakery-mujoco/fr10-workcell/recordings/no
 import { parsePhysicsReplay } from "@purin-labs/bakery-model/bakery-physics";
 import { sampleSettings } from "@purin-labs/bakery-model/bakery";
 import { WorkspaceRunsPanel } from "../../../apps/portal/src/features/workflow-simulator/workspace-runs-panel";
-import { ControlApiError } from "../../../apps/portal/src/control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { editRehearsalWorkcells } from "../../../packages/production-simulation/src/recipes/bakery/production-workcells.ts";
 import {
   rehearsalFromRecording,
@@ -18,10 +18,10 @@ const transport = vi.hoisted(createTransport);
 function createTransport() {
   return { read: vi.fn() };
 }
-vi.mock("../../../apps/portal/src/control-client", controlClient);
+vi.mock("@purin-labs/control/portal/control-client", controlClient);
 async function controlClient() {
   const original = await vi.importActual(
-    "../../../apps/portal/src/control-client",
+    "@purin-labs/control/portal/control-client",
   );
   return { ...original, controlRead: transport.read };
 }

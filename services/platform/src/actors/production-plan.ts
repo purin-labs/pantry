@@ -18,8 +18,8 @@ import {
 import type { CollaborationAgent } from "@purin-labs/collaboration";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 import type { SessionTurnExecution } from "../chat/turn-access";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import {
   listOrganisationMembers,
   resolveUser,
@@ -30,7 +30,7 @@ import {
   authorizeConversation,
   readConversationCaseId,
 } from "../chat/conversation-access";
-import { readJsonRecord } from "../control/http";
+import { readJsonRecord } from "@purin-labs/control/worker/http";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
 import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
 import type { Env } from "@purin-labs/kernel/env";

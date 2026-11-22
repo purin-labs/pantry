@@ -7,7 +7,11 @@ import {
   type ConversationId,
 } from "@purin-labs/control-api";
 import { errorMessage } from "@purin-labs/std";
-import { controlRead, controlWrite, readCookie } from "../../control-client";
+import {
+  controlRead,
+  controlWrite,
+  readCookie,
+} from "@purin-labs/control/portal/control-client";
 import { syncDialog, cancelDialog } from "../../dialog";
 import "./goal.css";
 

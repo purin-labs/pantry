@@ -2,7 +2,7 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import { listDerivedChats } from "./forks";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   listConversationDirectory,
   type StoredConversation,

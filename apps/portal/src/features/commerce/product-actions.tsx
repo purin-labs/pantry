@@ -1,6 +1,6 @@
 import React from "react";
 import { cancelDialog, DialogHeading, syncDialog } from "../../dialog";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import type { CommerceMutationTransport } from "./entity-plane/api";
 
 /** What the Products page knows about one product when a person acts on it. */

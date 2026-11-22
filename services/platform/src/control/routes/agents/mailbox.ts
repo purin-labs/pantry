@@ -22,20 +22,20 @@ import {
   parseIntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { activateRevocationPolicy } from "../../credential-revocation-policy";
+import { activateRevocationPolicy } from "@purin-labs/control/worker/credential-revocation-policy";
 import {
   admitUserMutation,
   controlMutationIdentity,
-} from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   isBoundedIdentifier,
   readJsonRecord,
-} from "../../http";
-import { readInstallationPins } from "../../installation-pins";
-import { recordCommerceMutationReceipt } from "../../mutation-receipt";
+} from "@purin-labs/control/worker/http";
+import { readInstallationPins } from "@purin-labs/control/worker/installation-pins";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import { readIntegrationAccountReasonCode } from "@purin-labs/connections/data/integration-account-reads";
 import {

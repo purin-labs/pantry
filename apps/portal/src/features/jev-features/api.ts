@@ -9,7 +9,7 @@ import {
   ControlApiError,
   controlMutation,
   controlRead,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 
 function jevFeaturesPath(organisationId: string): string {
   return `/v1/control/organisations/${encodeURIComponent(organisationId)}/jev-features`;

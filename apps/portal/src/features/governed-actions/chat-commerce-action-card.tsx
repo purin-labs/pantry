@@ -6,7 +6,7 @@ import {
   type CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { parseCommerceApprovalResponse } from "@purin-labs/control-api/portal/portal-reads";
-import { ControlApiError, controlMutation, controlRead } from "../../control-client";
+import { ControlApiError, controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 import {
   clearPendingCommerceApproval,
   currentPortalPath,
@@ -15,7 +15,7 @@ import {
 } from "../../portal-commerce-approval";
 import { commerceActionStateLabel, commerceActionTitle } from "./commerce";
 import { commerceActionDetailSummary, renderCommerceActionChange } from "./commerce-action-status";
-import { signInForApproval } from "../../approval-sign-in-popup";
+import { signInForApproval } from "@purin-labs/control/portal/approval-sign-in-popup";
 import { DecisionButtons } from "../../ui";
 import { GOVERNED_ACTION_ALLOW, governedActionRefusal } from "./decision-labels";
 import "./chat-commerce-action-card.css";

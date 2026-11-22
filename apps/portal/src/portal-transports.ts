@@ -3,7 +3,7 @@ import {
   controlRead,
   controlSignal,
   controlMutation,
-} from "./control-client";
+} from "@purin-labs/control/portal/control-client";
 import type { BrainTransport } from "./features/brain/api";
 import { readMailboxSetup } from "./features/mail-setup/run";
 import type { OrganisationActions } from "./pages/workspaces";

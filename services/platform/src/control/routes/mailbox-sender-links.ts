@@ -21,23 +21,23 @@ import {
   readSenderSupplierLink,
   senderLinkAddress,
 } from "../../mail-inbox/sender-supplier-link";
-import { admitUserMutation } from "../admission/control-mutation";
+import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
+} from "@purin-labs/control/worker/authorization";
 import { commerceGraphReads } from "../../commerce/contract/graph-reads";
 import {
   controlError,
   controlJson,
   readBoundedJsonRecord,
   readJsonRecord,
-} from "../http";
+} from "@purin-labs/control/worker/http";
 import { authorizeMailSource } from "../../mail-inbox/contract/mail-source-authorization";
 import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 
 /**
  * The supplier that one sender of a mailbox is linked to, for the Inbox.

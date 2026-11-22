@@ -18,13 +18,13 @@ import {
   type CustomConnectorSetupTarget,
 } from "../../../custom-connectors";
 import { parseIntegrationAccountId } from "@purin-labs/kernel/ids";
-import { authorizeOrganisationRequest } from "../../authorization";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../../http";
+} from "@purin-labs/control/worker/http";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   assertNever,

@@ -19,8 +19,8 @@ import {
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../control/authorization";
-import { controlError, controlJson } from "../control/http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

@@ -19,8 +19,12 @@ import {
   observeProjectReference,
   searchProjectReferences,
 } from "../../projects/references";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 // Projects and the Cases filed in them, for every surface. A member's sidebar
 // ordering is the chat directory's.

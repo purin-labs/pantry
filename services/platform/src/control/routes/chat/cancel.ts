@@ -2,8 +2,12 @@ import { isConversationId, type ConversationId } from "@purin-labs/control-api";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseRequestId, parseSessionId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../../../models/route";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   isChatId,
   conversationTimeline,

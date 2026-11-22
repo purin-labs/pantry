@@ -13,7 +13,7 @@ import {
   readJsonObject,
 } from "@purin-labs/kernel/http";
 import type { Result } from "@purin-labs/kernel/result";
-import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "./request-helpers";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "@purin-labs/control/worker/gateway/request-helpers";
 
 type CueStatusRow = {
   cueId: unknown;

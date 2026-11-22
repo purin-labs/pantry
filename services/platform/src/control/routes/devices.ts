@@ -54,8 +54,8 @@ import { shopMacDevices } from "../../devices/contract/shop-mac-devices";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 
 /**
  * The Devices page's routes (Plan 85):

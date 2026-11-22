@@ -14,8 +14,8 @@ import {
   ControlApiError,
   controlMutation,
   controlRead,
-} from "../../control-client";
-import { controlPath } from "../../control-paths";
+} from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 
 /**
  * The Bakes page's calls to the Platform (Plan 24 S1). The read is for

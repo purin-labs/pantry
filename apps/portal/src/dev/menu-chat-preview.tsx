@@ -13,7 +13,7 @@ import { registerPortalBoardChat } from "../portal-board-chat";
 import PermissionRequestsDrawer from "../features/access/permission-requests-drawer";
 import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
 import { createAccessRouteTransport } from "../features/access/api";
-import { controlMutation, controlRead } from "../control-client";
+import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 
 // The Menus page with the chat beside it, as the Portal shows them, for one
 // Organisation of the Worker behind this server (`?organisation=<id>`) under

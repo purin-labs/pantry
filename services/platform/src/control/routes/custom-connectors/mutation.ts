@@ -8,12 +8,16 @@ import {
 import {
   admitUserMutation,
   controlMutationIdentity,
-} from "../../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../../authorization";
-import { controlError, controlJson, type JsonRecord } from "../../http";
+} from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  type JsonRecord,
+} from "@purin-labs/control/worker/http";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   prepareConfigurationVersionAdvance,

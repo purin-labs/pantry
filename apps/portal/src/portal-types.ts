@@ -5,7 +5,7 @@ import type { OrganisationChoice } from "./shell";
 import {
   MutationLedger,
   type OrganisationMutation,
-} from "./mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import type { IntegrationAccount, ReadinessAssessment, SetupSelection } from "@purin-labs/control-api/portal/settings";
 import type {
   CommerceActionRecord,

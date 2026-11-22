@@ -14,10 +14,14 @@ import {
 } from "../../../data/agent-operation-runner";
 import type { PublishedResourceBoundaryError } from "../../../data/agent-operations/scope-commerce";
 import { readAgentOperationsWithActivity } from "../../agent-operation-activity";
-import { admitUserMutation } from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
-import { recordCommerceMutationReceipt } from "../../mutation-receipt";
+import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { assertNever } from "@purin-labs/std";
 
 /**

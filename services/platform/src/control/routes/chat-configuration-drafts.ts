@@ -20,8 +20,8 @@ import {
   presentConfigurationCommand,
   previewCode,
 } from "../../slack/configuration-presentation";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import { roleMayConfigure } from "@purin-labs/tenancy/data/control-plane";
 import { conversationCase } from "./chat-slack-messages";
 

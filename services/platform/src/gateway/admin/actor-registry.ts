@@ -78,7 +78,7 @@ import type { VariantBy } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { conversationResidencyStub } from "@purin-labs/actor-runtime/actors/conversation-residency";
 import { type QuarantinedCaseActorRegistryEntry, actorResolutionErrorResponse } from "../support";
-import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readPositiveSafeIntegerField } from "../request-helpers";
+import { isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readPositiveSafeIntegerField } from "@purin-labs/control/worker/gateway/request-helpers";
 
 type ActorRegistryAdminRequest =
   | {

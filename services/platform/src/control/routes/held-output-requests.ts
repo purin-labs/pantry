@@ -2,7 +2,7 @@ import type {
   DecidePendingDecision,
   PendingDecisionAnswer,
   PendingDecisionProof,
-} from "../decide-pending-decision";
+} from "@purin-labs/control/worker/decide-pending-decision";
 import {
   parseAgentPermissionDecision,
   type HeldOutputSummary,
@@ -31,8 +31,12 @@ import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   readDiscoveredResourceLabel,
   readSessionConversationId,

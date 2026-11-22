@@ -53,18 +53,18 @@ import {
   parseMutationBoundary,
   replayControlMutation,
   resolveMutationUser,
-} from "../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authenticateControlMutation,
   authenticateControlRead,
   authorizeOrganisationRequest,
-} from "../authorization";
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../http";
+} from "@purin-labs/control/worker/http";
 import {
   activationErrorStatus,
   runtimeAdmissionStatus,

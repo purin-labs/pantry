@@ -1,10 +1,10 @@
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import type { IntegrationsCommandResult } from "./settings-types";
 import type { SelectInferenceCommand, OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";
 import {
   codexConnectionPath,
   inferencePath,
-} from "../../control-paths";
+} from "@purin-labs/control/portal/control-paths";
 import { parseCredentialInventoryResponse, type CredentialInventory } from "@purin-labs/control-api/portal/credential-inventory";
 import { parseOrganisationCodexConnectionResponse, parseOrganisationInferenceSelectionResponse } from "@purin-labs/control-api/portal/codex";
 

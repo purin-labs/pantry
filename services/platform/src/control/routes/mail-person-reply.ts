@@ -28,15 +28,15 @@ import {
   parseMutationBoundary,
   replayControlMutation,
   resolveMutationUser,
-} from "../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../authorization";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../http";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";

@@ -16,7 +16,7 @@ import {
   ControlApiError,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { voiceIsListening, type VoiceSession } from "./session";
 import { WAKE_PHRASE } from "./wake-phrase";
 

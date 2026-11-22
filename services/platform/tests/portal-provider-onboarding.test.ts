@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MutationLedger } from "../../../apps/portal/src/mutation-state";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   beginProviderAuthorizationWatch,
   beginProviderCompletionListener,

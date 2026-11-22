@@ -23,7 +23,7 @@ const SINKS = "foundation/authority/policy/information-flow/sinks.ts";
 // Each caller that names one is checked.
 const EFFECTS_WITH_A_NAMED_CALLER = new Set([
   "foundation/authority/access-control/decision-explanation.ts",
-  "services/platform/src/control/routes/access-control-explain.ts",
+  "foundation/control/worker/routes/access-control-explain.ts",
   "services/platform/src/actors/agent-session.ts",
   // Refactor 10 moved these effects out of agent-session.ts unchanged.
   "services/platform/src/agent-tools/channels/handlers.ts",
@@ -41,7 +41,7 @@ const CONVERSATION_DELIVERIES = new Set([
   "services/platform/src/chat/turn/timeline.ts",
   "services/platform/src/chat/conversation-disclosure.ts",
   "services/platform/src/chat/information-flow.ts",
-  "services/platform/src/control/routes/access-control-explain.ts",
+  "foundation/control/worker/routes/access-control-explain.ts",
   "services/platform/src/control/routes/supplier-payouts.ts",
   "services/platform/src/mail-inbox/contract/mail-source-authorization.ts",
   "services/platform/src/mail-inbox/chat-source-access.ts",

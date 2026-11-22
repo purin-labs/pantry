@@ -1,4 +1,4 @@
-import type { JsonRecord } from "../control/http";
+import type { JsonRecord } from "@purin-labs/control/worker/http";
 import {
   readMessageLink,
   type MessageLinkEgress,

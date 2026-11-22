@@ -5,8 +5,8 @@ import {
 } from "@purin-labs/control-api";
 import { isRecord } from "@purin-labs/std";
 
-import { controlMutation } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlMutation } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 
 /**
  * The calls of the setup dialog and the invitation page (Plan 95 step 2).

@@ -1,4 +1,4 @@
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { isNonNegativeInteger } from "@purin-labs/std";
 import {
   type DatedSupplierPayout,

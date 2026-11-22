@@ -45,8 +45,8 @@ import { PRODUCT_DRAG_TYPE, ProductsPanel, useMenuDraftAdder, type BoardProduct 
 import { IMAGE_DRAG_TYPE, ImagesPanel, imageElement, parseShopImage, useShopImages, type ShopImage } from "./images-panel";
 import { StackChildFields, StackFields } from "./stack-fields";
 import { toCanvas, toFrames, toShape } from "./canvas-geometry";
-import { controlAnswer, controlRead, controlWrite } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlAnswer, controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 import { readMenuDraft } from "./menu-board-requests";
 import "./menu-boards.css";
 import "./board-workspace.css";

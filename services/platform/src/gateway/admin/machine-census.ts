@@ -9,7 +9,7 @@ import type {
   MachineCensus,
   MachineStateAge,
 } from "@purin-labs/actor-runtime/actors/lifecycle/machine-census";
-import { isAuthorizedOrganisationAdminRequest } from "../request-helpers";
+import { isAuthorizedOrganisationAdminRequest } from "@purin-labs/control/worker/gateway/request-helpers";
 
 /** The most Actors that one census request reads. */
 const CENSUS_ACTOR_LIMIT = 2_000;

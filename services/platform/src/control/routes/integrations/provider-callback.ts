@@ -13,7 +13,7 @@ import type {
   ProviderOnboardingError,
 } from "../../../integrations/contract/provider-lifecycle";
 import { requirePublicOrigin as requireConfiguredPublicOrigin } from "@purin-labs/kernel/public-origin";
-import { controlError } from "../../http";
+import { controlError } from "@purin-labs/control/worker/http";
 import { assertNever } from "@purin-labs/std";
 import { readProviderAuthorizationState } from "@purin-labs/connections/data/provider-authorization-state";
 import {

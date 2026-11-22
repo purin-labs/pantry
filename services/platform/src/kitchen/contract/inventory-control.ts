@@ -10,14 +10,14 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";
-import { admitUserMutation } from "../../control/admission/control-mutation";
+import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../../control/authorization";
-import { controlError, controlJson } from "../../control/http";
-import { recordCommerceMutationReceipt } from "../../control/mutation-receipt";
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import type { CommerceAdminClient } from "@purin-labs/commerce-client";
 
 export type InventoryControlAccess = Readonly<{

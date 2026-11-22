@@ -6,7 +6,7 @@ import {
   type InventoryDelivery,
 } from "@purin-labs/kitchen-control-api";
 
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { PageSkeleton, RecoverableError } from "../../page-components";
 import {
   nowIn,

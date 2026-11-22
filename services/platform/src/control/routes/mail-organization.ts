@@ -2,8 +2,8 @@ import {
   parseMailOrganizationCommand,
   parseMailClassificationSelection,
 } from "@purin-labs/control-api";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";

@@ -20,8 +20,8 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import {
   type MenuBoardSocketRoute,
   authorizeMenuBoardSocketRequest,

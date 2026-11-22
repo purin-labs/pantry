@@ -31,8 +31,14 @@ import {
   type AgentDefinition,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
 import { type Skill } from "@purin-labs/control-api";
-import { ControlApiError, lastControlRead } from "../../control-client";
-import { evalsPath, memoriesPath } from "../../control-paths";
+import {
+  ControlApiError,
+  lastControlRead,
+} from "@purin-labs/control/portal/control-client";
+import {
+  evalsPath,
+  memoriesPath,
+} from "@purin-labs/control/portal/control-paths";
 
 /** How the Brain page reaches the control API. A preview supplies its own. */
 export type BrainTransport = Readonly<{

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import {
   parseInventoryReceiptContext,
   type InventoryReceiptContext,

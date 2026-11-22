@@ -3,7 +3,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   EmptyState,
   Notice,
@@ -12,7 +12,7 @@ import {
 } from "../../page-components";
 import type { WhatsAppPolicyDraft, WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
-import { MutationLedger } from "../../mutation-state";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   parseIntegrationRouteSelection,
   type IntegrationRouteId,

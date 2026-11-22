@@ -6,7 +6,7 @@ import {
   WHATSAPP_SUPPORT_ACTIVE_CASES_SCOPE,
   capabilityDefinitionById,
 } from "@purin-labs/authority/authorization/capability-catalogue";
-import { personPermission } from "../control/permission-required";
+import { personPermission } from "@purin-labs/control/worker/permission-required";
 import { listAccessGrants } from "@purin-labs/authority/data/access-grants";
 import { resolveActiveProviderAccountContext } from "@purin-labs/connections/data/integration-account";
 import type { IntegrationAccountId } from "@purin-labs/kernel/ids";

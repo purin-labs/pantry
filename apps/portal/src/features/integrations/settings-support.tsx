@@ -10,7 +10,7 @@ import {
   sameOrganisationMutation,
   type MutationProvider,
   type OrganisationMutation,
-} from "../../mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import type { ProviderConnectionState } from "../../provider-onboarding";
 import { formatLifecycle } from "../../formatting";
 import type { Provider } from "../../integration-catalogue";

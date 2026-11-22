@@ -5,8 +5,11 @@ import {
   type AgentPermissionRequestList,
 } from "@purin-labs/control-api";
 
-import { controlRead, forgetWithControlReads } from "../../control-client";
-import { permissionRequestsPath } from "../../control-paths";
+import {
+  controlRead,
+  forgetWithControlReads,
+} from "@purin-labs/control/portal/control-client";
+import { permissionRequestsPath } from "@purin-labs/control/portal/control-paths";
 
 /**
  * The permission requests that wait for an owner or admin. The navigation

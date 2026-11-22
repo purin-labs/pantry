@@ -32,9 +32,13 @@ import {
   controlMutationIdentity,
   projectionReplay,
   projectionResponse,
-} from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import { resolveConfiguredSlackInstallationIdentity } from "@purin-labs/connections/slack/installation-identity";
 import { assertNever } from "@purin-labs/std";
 import { account } from "../integrations";

@@ -4,8 +4,8 @@ import {
   type VaultStoreSummary,
 } from "@purin-labs/control-api";
 
-import { controlRead } from "../../control-client";
-import { vaultStorePath } from "../../control-paths";
+import { controlRead } from "@purin-labs/control/portal/control-client";
+import { vaultStorePath } from "@purin-labs/control/portal/control-paths";
 
 /**
  * The 1Password card's status on Integrations (Plan 79). It reads where the

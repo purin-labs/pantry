@@ -64,8 +64,8 @@ import { assertNever, canonicalJson, sha256Hex } from "@purin-labs/std";
 
 import type { SessionTurnExecution } from "../chat/turn-access";
 
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import { resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";

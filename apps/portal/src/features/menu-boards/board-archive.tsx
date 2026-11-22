@@ -1,8 +1,8 @@
 import React from "react";
 import { Archive, ArchiveRestore } from "lucide-react";
 import { isRecord } from "@purin-labs/std";
-import { controlAnswer, controlWrite } from "../../control-client";
-import { controlPath } from "../../control-paths";
+import { controlAnswer, controlWrite } from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 import "./board-archive.css";
 
 /**

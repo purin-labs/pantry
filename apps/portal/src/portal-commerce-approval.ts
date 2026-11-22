@@ -1,5 +1,5 @@
 import { isRecord } from "@purin-labs/std";
-import { PENDING_APPROVAL_MAX_AGE_MS } from "./approval-sign-in-popup";
+import { PENDING_APPROVAL_MAX_AGE_MS } from "@purin-labs/control/portal/approval-sign-in-popup";
 
 /** An approval that waits for the person's step-up sign-in. */
 type PendingCommerceApproval = {

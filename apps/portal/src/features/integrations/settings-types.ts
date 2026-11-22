@@ -3,14 +3,14 @@ import type { CommerceSystemSyncView, CommerceSystemView } from "@purin-labs/con
 import React from "react";
 import type { ControlErrorKind } from "@purin-labs/control-api/portal/errors";
 import type { CredentialInventory, CredentialRotationReceipt, CredentialRevocationReceipt } from "@purin-labs/control-api/portal/credential-inventory";
-import type { PageContent } from "../../page-content";
+import type { PageContent } from "@purin-labs/control/portal/page-content";
 import type { WhatsAppSurface } from "@purin-labs/control-api/portal/whatsapp";
 import type { WhatsAppPanelActions } from "../../pages/whatsapp";
 import {
   MutationLedger,
   type MutationProvider,
   type OrganisationMutation,
-} from "../../mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import type { AgentMailboxView, EmailReplyPreviewResult, EmailReplyQueueItem, EmailOperationalPreviewResult, EmailOperationalQueueItem } from "@purin-labs/control-api/portal/agent-mailbox";
 import type { MailboxInstallationOption } from "../../pages/agent-mailbox";
 import type { IntegrationRouteId } from "./model";

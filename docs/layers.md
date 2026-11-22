@@ -88,11 +88,12 @@ import. A module with no line for one of these has none.
 ## foundation/control
 
 - Folders: 5
-  - `apps/portal/src/`
-  - `services/platform/src/control/`
-  - `services/platform/src/control/admission/`
-  - `services/platform/src/control/routes/`
-  - `services/platform/src/gateway/`
+  - `foundation/control/portal/`
+  - `foundation/control/worker/`
+  - `foundation/control/worker/admission/`
+  - `foundation/control/worker/gateway/`
+  - `foundation/control/worker/routes/`
+- Packages: `foundation/control`
 - Tables (1): `control_oidc_state`
 
 ## foundation/ui

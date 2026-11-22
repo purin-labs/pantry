@@ -3,7 +3,7 @@ import type {
   CheckoutProfileConfiguration,
 } from "@purin-labs/commerce-contracts";
 import { parseCheckoutProfileActivations, parseStorefrontIds, type CommerceCheckoutProfileActivationV1 } from "@purin-labs/commerce-client";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import type { VariantBy } from "@purin-labs/type-utils";
 import {
   type CheckoutProfileSummary,

@@ -2,7 +2,7 @@ import type {
   DecidePendingDecision,
   PendingDecisionAnswer,
   PendingDecisionProof,
-} from "../decide-pending-decision";
+} from "@purin-labs/control/worker/decide-pending-decision";
 import {
   parseAgentPermissionDecision,
   type AgentPermissionGrantTarget,
@@ -46,9 +46,13 @@ import { slackSurfaceParts } from "@purin-labs/authority/slack/surface-parts";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
+} from "@purin-labs/control/worker/authorization";
 import { heldOutputSummaries } from "./held-output-requests";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import type { AgentPermissionRequestSummary } from "@purin-labs/control-api";
 
 export type AgentPermissionRequestRoute =

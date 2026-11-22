@@ -25,7 +25,7 @@ import {
 } from "@purin-labs/kernel/ids";
 import { traceLog } from "@purin-labs/kernel/observability";
 import { assertNever } from "@purin-labs/std";
-import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "../request-helpers";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleAdministerPersonRoles(
   request: Request,

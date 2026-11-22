@@ -3,7 +3,7 @@
 //
 // A Portal feature reads the control API through `controlRead` and changes it
 // through `controlMutation`, `controlUpload` or `controlSecretMutation`
-// (apps/portal/src/control-client.ts). The baseline in
+// (foundation/control/portal/control-client.ts). The baseline in
 // scripts/portal-fetch-ratchet.json lists each file that still calls `fetch`
 // itself, with its count. A listed file may not add a call, and a new file may
 // not call `fetch`. When a file loses a call, lower its entry with --update.
@@ -51,5 +51,5 @@ runCountRatchet({
       ? (read().match(CALL)?.length ?? 0)
       : 0,
   refusal: (file, calls, allowed) =>
-    `${file} has ${calls} raw fetch calls, ${allowed} allowed. Read the control API with controlRead and change it with controlMutation (apps/portal/src/control-client.ts).`,
+    `${file} has ${calls} raw fetch calls, ${allowed} allowed. Read the control API with controlRead and change it with controlMutation (foundation/control/portal/control-client.ts).`,
 });

@@ -10,8 +10,8 @@ import {
   decidePendingDecision,
   type DecidePendingDecision,
   type PendingDecisionDeciders,
-} from "./decide-pending-decision";
-import type { PendingDecisionSources } from "./pending-decisions";
+} from "@purin-labs/control/worker/decide-pending-decision";
+import type { PendingDecisionSources } from "@purin-labs/control/worker/pending-decisions";
 import { handleEmailOperational } from "./routes/agents/email-operational";
 import { handleEmailReply } from "./routes/agents/email-reply";
 import {

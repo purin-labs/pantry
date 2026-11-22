@@ -14,8 +14,12 @@ import type { Env } from "@purin-labs/kernel/env";
 import {
   authenticateControlRead,
   authenticateControlMutation,
-} from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 export type UserPreferencesRoute = Readonly<{
   kind: "userPreferences";

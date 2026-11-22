@@ -4,7 +4,7 @@ import { downloadBakeryFile } from "./file-download";
 import { type BakeryExportFile } from "./production-files";
 import { MAX_EXPERIMENT_BYTES } from "@purin-labs/production-simulation/recipes/bakery/workcell-experiment";
 import type { BakeryWorkspaceViewAction } from "@purin-labs/bakery-model/bakery-surface";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import { readProductionScenario } from "./production-scenario-api";
 import { assertNever, sha256Hex } from "@purin-labs/std";
 import {

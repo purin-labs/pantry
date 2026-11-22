@@ -19,8 +19,12 @@ import { deriveDirectCaseIdentities } from "../../actors/case-direct-processing"
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import { resolveOrganisationModelRoute } from "../../models/route";
 import type { Env } from "@purin-labs/kernel/env";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 export type ChatGoalRoute = Readonly<{
   kind: "chatGoal";

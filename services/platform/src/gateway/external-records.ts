@@ -33,7 +33,7 @@ import {
   fieldErrorResponse,
   isAuthorizedOrganisationAdminRequest,
   jsonBodyErrorResponse,
-} from "./request-helpers";
+} from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleConfigureExternalRecordsCredential(
   request: Request,

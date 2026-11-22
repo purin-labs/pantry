@@ -1,8 +1,8 @@
-import type { DecidePendingDecision } from "../decide-pending-decision";
+import type { DecidePendingDecision } from "@purin-labs/control/worker/decide-pending-decision";
 import type { Env } from "@purin-labs/kernel/env";
 import { parseCustomConnectorRevision } from "../../custom-connectors";
-import { controlError } from "../http";
-import { decodeSegment as decode, matchPath as match } from "../path-match";
+import { controlError } from "@purin-labs/control/worker/http";
+import { decodeSegment as decode, matchPath as match } from "@purin-labs/control/worker/path-match";
 import { assertNever } from "@purin-labs/std";
 import {
   handleConnectorLifecycle,

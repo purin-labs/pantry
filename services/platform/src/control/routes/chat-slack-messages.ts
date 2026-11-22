@@ -36,8 +36,12 @@ import type { Env } from "@purin-labs/kernel/env";
 import type { ConnectorActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
 import { parseConnectorId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 export type SlackMessageAction = "send" | "discard" | "edit";
 

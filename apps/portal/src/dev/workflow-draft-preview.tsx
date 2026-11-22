@@ -1,5 +1,8 @@
 import { createRoot } from "react-dom/client";
-import { controlMutation, type ControlMutationIntent } from "../control-client";
+import {
+  controlMutation,
+  type ControlMutationIntent,
+} from "@purin-labs/control/portal/control-client";
 import { LatteWorkspace } from "../features/production-run/latte/latte-physics-view";
 import { RecipeWorkspaceContext } from "../features/production-run/recipe-workspace";
 import "../styles.css";

@@ -5,7 +5,7 @@ import {
   controlRefusal,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { type ConfigurationDraftView, parseConfigurationDraft } from "@purin-labs/control-api/portal/configuration-drafts";
 
 export type ConfigurationDraftActions = Readonly<{

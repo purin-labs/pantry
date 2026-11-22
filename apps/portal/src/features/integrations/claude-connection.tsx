@@ -5,7 +5,7 @@ import {
   controlMutation,
   controlRead,
   controlSecretMutation,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { StatusChip } from "../../page-components";
 import type { StatusChipStatus } from "../../status-chip";
 import { openAuthorizationPopup } from "./authorization-popup";

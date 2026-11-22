@@ -7,7 +7,7 @@ import React from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
 import { workspacePagePath } from "../../route";
-import { MutationLedger } from "../../mutation-state";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import type { Variant } from "@purin-labs/type-utils";
 import {
   BLOCKER_COPY,

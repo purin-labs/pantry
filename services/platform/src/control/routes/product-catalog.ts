@@ -5,7 +5,7 @@ import {
   type CommerceMutationResultV1,
 } from "@purin-labs/commerce-client";
 import type { Env } from "@purin-labs/kernel/env";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import {
   finishInventoryOperation,
   resolveInventoryAccess,

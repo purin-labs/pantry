@@ -38,7 +38,10 @@ import {
   type CostsSheetCellChange,
   type CostsSheetTab,
 } from "@purin-labs/costs-sheet-crdt";
-import { controlRead, forgetControlReads } from "../../control-client";
+import {
+  controlRead,
+  forgetControlReads,
+} from "@purin-labs/control/portal/control-client";
 import { formatMoneyMinor } from "../../formatting";
 import { PageSkeleton, RecoverableError } from "../../page-components";
 import { CrmTable, Select, type CrmColumn, type CrmRowAction } from "../../ui";

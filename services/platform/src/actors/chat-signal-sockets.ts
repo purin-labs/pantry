@@ -8,8 +8,8 @@ import { assertNever, isNonNegativeInteger, isRecord } from "@purin-labs/std";
 
 import { visibleConversationsSql } from "../chat/conversation-access";
 import type { ChatSignalTarget } from "../chat/signals";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseControlSessionId,

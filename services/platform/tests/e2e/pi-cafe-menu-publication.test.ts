@@ -16,7 +16,7 @@ import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { googleConfig } from "../../src/control/google-oidc-config";
+import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import type { IssuedControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { enableCapability, mutationHeaders } from "./access-route-support";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";

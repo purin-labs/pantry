@@ -10,7 +10,7 @@ import {
   controlRefusal,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 
 /** What a person does with a side Case card (Plan 74). */
 export type SideCaseActions = Readonly<{

@@ -25,7 +25,7 @@ import {
 } from "../../src/cues/engine";
 import { buildWorkflowAuthority } from "@purin-labs/authority/request-authority/index";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
-import { googleConfig } from "../../src/control/google-oidc-config";
+import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import {
   ORGANISATION_ID,
   WORKSPACE_ID,

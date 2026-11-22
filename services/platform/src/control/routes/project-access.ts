@@ -8,8 +8,8 @@ import {
   listProjectMembers,
 } from "../../projects/access";
 import { mutateProjectAccess } from "../../projects/membership";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 
 export type ProjectAccessRoute = Readonly<{
   kind: "projectAccess";

@@ -61,20 +61,20 @@ import {
   projectionReplay,
   projectionResponse,
   resolveMutationUser,
-} from "../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authenticateControlMutation,
   authenticateControlRead,
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { readOrganisationHomeRegions } from "../home-region";
+} from "@purin-labs/control/worker/authorization";
+import { readOrganisationHomeRegions } from "@purin-labs/control/worker/home-region";
 import {
   readJsonRecord,
   controlError,
   controlHeaders,
   controlJson,
-} from "../http";
+} from "@purin-labs/control/worker/http";
 import {
   activationErrorStatus,
   runtimeAdmissionStatus,

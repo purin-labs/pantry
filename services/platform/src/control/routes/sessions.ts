@@ -11,7 +11,7 @@ import {
   beginGoogleOidc,
   completeGoogleOidc,
   issueGoogleApprovalGrant,
-} from "../oidc";
+} from "@purin-labs/control/worker/oidc";
 import {
   issueControlSession,
   listEligibleControlMemberships,
@@ -34,9 +34,13 @@ import {
   authorizeOrganisationRequest,
   controlSessionError,
   parseCookies,
-} from "../authorization";
-import { googleConfig } from "../google-oidc-config";
-import { controlError, controlHeaders, controlJson } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
+import {
+  controlError,
+  controlHeaders,
+  controlJson,
+} from "@purin-labs/control/worker/http";
 import { assertNever } from "@purin-labs/std";
 
 const OIDC_STATE_COOKIE = "pantry_oidc_state";

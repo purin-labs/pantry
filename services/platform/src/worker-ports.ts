@@ -35,7 +35,7 @@ import { entityPlaneObservationParser } from "./cues/engine";
 import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
 import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
 import { commerceExceptionInbox } from "./control/agent-operation-activity";
-import { onboardingProjection } from "./control/admission/control-mutation";
+import { onboardingProjection } from "@purin-labs/control/worker/admission/control-mutation";
 import { buildOnboardingProjection } from "./data/onboarding-projection";
 import {
   bakeryRunSnapshotPrefix,

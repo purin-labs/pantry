@@ -8,7 +8,7 @@ import {
   type ScreenRelevanceChoice,
   type ScreenRelevanceView,
 } from "@purin-labs/control-api";
-import { controlMutation } from "../../control-client";
+import { controlMutation } from "@purin-labs/control/portal/control-client";
 import { captureSurfaceObservation } from "../surface-observation";
 import type { Variant } from "@purin-labs/type-utils";
 

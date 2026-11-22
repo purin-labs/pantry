@@ -15,8 +15,8 @@ import {
   ControlApiError,
   controlMutation,
   controlRead,
-} from "../../control-client";
-import { heldOutputPath } from "../../control-paths";
+} from "@purin-labs/control/portal/control-client";
+import { heldOutputPath } from "@purin-labs/control/portal/control-paths";
 import { AGENT_NAME } from "../../agent-name";
 import { PermissionRequestDialog, PantryMark } from "../../ui";
 

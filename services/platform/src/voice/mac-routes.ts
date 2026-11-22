@@ -8,7 +8,7 @@ import {
   type VoiceVocabulary,
 } from "@purin-labs/control-api";
 
-import { controlError, controlJson } from "../control/http";
+import { controlError, controlJson } from "@purin-labs/control/worker/http";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

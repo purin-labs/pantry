@@ -18,7 +18,7 @@ import {
   parsePageBrowserContext,
   type PageBrowserContext,
 } from "@purin-labs/contracts";
-import type { JsonRecord } from "../control/http";
+import type { JsonRecord } from "@purin-labs/control/worker/http";
 import type { Result } from "@purin-labs/kernel/result";
 import type { ConnectorCardTarget as ConversationCardTarget } from "./conversation";
 import { parseCustomConnectorId } from "@purin-labs/connections/custom-connectors/identity";

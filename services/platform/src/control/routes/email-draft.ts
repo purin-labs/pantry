@@ -1,6 +1,6 @@
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
 import type { Env } from "@purin-labs/kernel/env";
-import { controlError } from "../http";
+import { controlError } from "@purin-labs/control/worker/http";
 import {
   type EmailDraftRoute,
   authorizeEmailDraftRequest,

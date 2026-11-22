@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   handleAccessControlExplainRoute,
   parseAccessDecisionQuestion,
-} from "../src/control/routes/access-control-explain";
+} from "@purin-labs/control/worker/routes/access-control-explain";
 import { ACCESS_CONTROL_PARTS } from "../src/control/access-control-parts";
 
 const SUBJECT_REF = "subject_0123456789abcdef0123456789abcdef";

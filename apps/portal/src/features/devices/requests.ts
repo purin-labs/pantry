@@ -17,8 +17,8 @@ import {
   controlAnswer,
   controlMutation,
   controlRead,
-} from "../../control-client";
-import { controlPath } from "../../control-paths";
+} from "@purin-labs/control/portal/control-client";
+import { controlPath } from "@purin-labs/control/portal/control-paths";
 
 /**
  * The Devices page's calls to the Platform. A read for `useLatestRead` and a

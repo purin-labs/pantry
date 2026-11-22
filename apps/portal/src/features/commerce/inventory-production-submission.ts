@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/kitchen-control-api";
 import { isNormalizedText, isRecord } from "@purin-labs/std";
 import { parseEntityPlaneCommandResult } from "@purin-labs/commerce-client";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 
 type ProductionBody =
   InventoryProductionCreation | InventoryProductionTransition;

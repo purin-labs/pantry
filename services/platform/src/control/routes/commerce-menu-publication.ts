@@ -4,8 +4,12 @@ import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors
 import type { Env } from "@purin-labs/kernel/env";
 import { sha256Hex } from "@purin-labs/std";
 import { resolveMerchantControlContext } from "../../commerce/contract/merchant-control";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   CAFE_MENU_ID,
   CAFE_STOREFRONT_ID,

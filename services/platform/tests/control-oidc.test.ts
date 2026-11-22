@@ -7,7 +7,7 @@ import {
   issueGoogleApprovalGrant,
   verifyGoogleApprovalGrant,
   type GoogleOidcFetcher,
-} from "../src/control/oidc";
+} from "@purin-labs/control/worker/oidc";
 import {
   approvalActionBindingMatches,
   parseApprovalEvidence,

@@ -43,7 +43,7 @@ import {
   controlRead,
   controlWrite,
   readCookie,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { voiceCountsToday, voiceHeardLastDays } from "./counts";
 import { WAKE_PHRASE } from "./wake-phrase";
 import {

@@ -1,6 +1,6 @@
 import type { RunSnapshotPage } from "@purin-labs/bakery-model/bakery-run-snapshot";
 import React from "react";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import type {
   BakeryWorkspaceAction,
   SimulatorConnection,

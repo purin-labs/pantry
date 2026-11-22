@@ -1,7 +1,7 @@
 import { parsePaymentsDay, type PaymentsDay } from "@purin-labs/control-api";
 
-import { controlRead } from "../../control-client";
-import { periodPath } from "../../control-paths";
+import { controlRead } from "@purin-labs/control/portal/control-client";
+import { periodPath } from "@purin-labs/control/portal/control-paths";
 import type { PeriodWindow } from "../../ui";
 
 /** The Payments page's reads of the Platform. */

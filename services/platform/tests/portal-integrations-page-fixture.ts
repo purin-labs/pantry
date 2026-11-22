@@ -4,7 +4,7 @@ import React from "../../../apps/portal/node_modules/react";
 // @ts-expect-error React DOM runtime declarations are scoped to apps/portal.
 import { renderToStaticMarkup as renderStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
 import { StaticRouter } from "../../../apps/portal/node_modules/react-router";
-import { MutationLedger } from "../../../apps/portal/src/mutation-state";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import {
   IntegrationsPage,
   // @ts-expect-error The portal build type-checks this JSX module.

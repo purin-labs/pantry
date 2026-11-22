@@ -4,7 +4,7 @@ import {
   ControlApiError,
   controlMutation,
   controlRead,
-} from "../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { type CommerceApiKey, parseKey, unexpected } from "@purin-labs/control-api/portal/api-keys";
 
 /** Scopes that no API key may hold; Commerce refuses them for a key. */

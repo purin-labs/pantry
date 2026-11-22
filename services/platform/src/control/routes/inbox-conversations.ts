@@ -36,10 +36,10 @@ import {
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
+} from "@purin-labs/control/worker/authorization";
 import { readEmailReplyHeadlines } from "../email-review-headlines";
 import { emailReviewQueueItemWire } from "../email-review";
-import { controlError, noStoreJson } from "../http";
+import { controlError, noStoreJson } from "@purin-labs/control/worker/http";
 import {
   mailControlAuthority,
 } from "../../mail-inbox/contract/control-authority";

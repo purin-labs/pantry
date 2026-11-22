@@ -7,8 +7,8 @@ import {
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../../authorization";
-import { controlError } from "../../http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 
 /**
  * The method, the authority and the account of a request about one

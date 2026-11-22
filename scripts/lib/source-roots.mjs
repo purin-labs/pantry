@@ -20,7 +20,11 @@ export const PLATFORM_SOURCE = ["services/platform/src", "foundation"];
  * apps/portal/src with their moves (Refactor 17, Stage B); the control move
  * adds its folder here.
  */
-export const PORTAL_SOURCE = ["apps/portal/src", "foundation/ui"];
+export const PORTAL_SOURCE = [
+  "apps/portal/src",
+  "foundation/control/portal",
+  "foundation/ui",
+];
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

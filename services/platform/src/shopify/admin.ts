@@ -61,7 +61,7 @@ import {
   jsonBodyErrorResponse,
   parsePublicServiceUrl,
   readCueChannelRequest,
-} from "../gateway/request-helpers";
+} from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleConfigureShopifyCredential(
   request: Request,

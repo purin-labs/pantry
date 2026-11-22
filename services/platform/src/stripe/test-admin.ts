@@ -30,7 +30,7 @@ import {
   isRecord,
 } from "@purin-labs/std";
 import { createActiveAdminIntegration } from "../integrations/contract/admin-integration";
-import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readJsonFailure } from "../gateway/request-helpers";
+import { fieldErrorResponse, isAuthorizedOrganisationAdminRequest, jsonBodyErrorResponse, readJsonFailure } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleConfigureStripeTestCredential(
   request: Request,

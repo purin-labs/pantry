@@ -1,5 +1,5 @@
 import React from "react";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import type { Variant } from "@purin-labs/type-utils";
 import type {
   IntegrationsRouteData,

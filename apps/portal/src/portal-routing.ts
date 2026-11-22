@@ -14,7 +14,7 @@ import {
 import {
   MutationLedger,
   type OrganisationMutation,
-} from "./mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import type {
   CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";

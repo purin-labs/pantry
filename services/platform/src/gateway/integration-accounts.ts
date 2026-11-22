@@ -14,7 +14,7 @@ import {
   isAuthorizedOrganisationAdminRequest,
   isLocalDebugRequest,
   jsonBodyErrorResponse,
-} from "./request-helpers";
+} from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleListIntegrationAccounts(
   request: Request,

@@ -5,7 +5,7 @@
 // Vault secret is revoked, and the revocation's policy is published, so no
 // later call sends the dead token. A repeated event changes nothing.
 import { revokeCredential } from "@purin-labs/authority/credential-vault/index";
-import { activateRevocationPolicy } from "../../control/credential-revocation-policy";
+import { activateRevocationPolicy } from "@purin-labs/control/worker/credential-revocation-policy";
 import {
   resolveIntegrationAccount,
   resolveProviderConnection,

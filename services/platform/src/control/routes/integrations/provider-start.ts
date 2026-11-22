@@ -33,17 +33,17 @@ import {
   admitUserMutation,
   controlMutationIdentity,
   resolveMutationUser,
-} from "../../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../../authorization";
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
   readJsonRecord,
   type JsonRecord,
-} from "../../http";
+} from "@purin-labs/control/worker/http";
 import { isRecord } from "@purin-labs/std";
 import { readOnboardingRow } from "@purin-labs/tenancy/data/organisation-onboarding-row";
 import { account } from "../integrations";

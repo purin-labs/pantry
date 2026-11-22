@@ -1,4 +1,4 @@
-import { controlMutation, controlRead } from "../../control-client";
+import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 import type {
   CounterRegisterPaymentMethod,
   CounterRegisterSnapshot,

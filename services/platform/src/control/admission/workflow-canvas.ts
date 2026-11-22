@@ -7,9 +7,9 @@ import {
   parseOrganisationId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError } from "../http";
-import { authorizeOrganisationSocket } from "./organisation-socket";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
+import { authorizeOrganisationSocket } from "@purin-labs/control/worker/admission/organisation-socket";
 
 export type WorkflowCanvasRoute = Readonly<{
   kind: "workflowCanvas";

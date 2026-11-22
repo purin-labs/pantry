@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // The receipt writer uses a batched session the SQLite fixture cannot bind.
 // Mocked here for the same reason every other control-route test mocks it: the
 // subject under test is the payout gating, not the receipt ledger.
-vi.mock("../src/control/mutation-receipt", () => ({
+vi.mock("@purin-labs/control/worker/mutation-receipt", () => ({
   recordCommerceMutationReceipt: vi.fn(async () => ({ ok: true, value: null })),
 }));
 

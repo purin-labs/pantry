@@ -20,8 +20,8 @@ import {
   type EmailDraftFailureCode,
   type EmailDraftRoomMetadata,
 } from "@purin-labs/email-draft-crdt/protocol";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError, readJsonRecord } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError, readJsonRecord } from "@purin-labs/control/worker/http";
 import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import {

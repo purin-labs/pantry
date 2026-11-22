@@ -6,8 +6,8 @@ import {
   type ChatEffort,
 } from "@purin-labs/control-api";
 
-import { controlMutation, controlRead } from "../../control-client";
-import { inferencePath } from "../../control-paths";
+import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
+import { inferencePath } from "@purin-labs/control/portal/control-paths";
 import { StatusChip } from "../../page-components";
 import { effortDescription, effortLabel } from "../chat/effort-labels";
 import type { OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";

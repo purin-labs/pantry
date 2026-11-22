@@ -15,7 +15,7 @@ import type {
   ConversationId,
 } from "@purin-labs/control-api";
 import { assertNever } from "@purin-labs/std";
-import { controlRead } from "../../control-client";
+import { controlRead } from "@purin-labs/control/portal/control-client";
 import {
   readChatExecution,
   readExecutionNode,

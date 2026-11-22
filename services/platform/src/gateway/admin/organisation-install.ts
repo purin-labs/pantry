@@ -40,7 +40,7 @@ import {
 import { parseInitialOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { assertNever } from "@purin-labs/std";
-import { fieldErrorResponse, isAuthorizedFaultInjectionRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath, parseSurfaceKindPath, parseWorkspacePath, routeParamErrorResponse } from "../request-helpers";
+import { fieldErrorResponse, isAuthorizedFaultInjectionRequest, isLocalDebugRequest, jsonBodyErrorResponse, parseOrganisationPath, parseSurfaceKindPath, parseWorkspacePath, routeParamErrorResponse } from "@purin-labs/control/worker/gateway/request-helpers";
 
 export async function handleCreateOrganisationInstall(
   request: Request,

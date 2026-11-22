@@ -17,14 +17,18 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "@purin-labs/kernel/ids";
-import { admitUserMutation } from "../admission/control-mutation";
+import { admitUserMutation } from "@purin-labs/control/worker/admission/control-mutation";
 import { resolveMerchantBinding } from "../../commerce/contract/merchant-control";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
-import { recordCommerceMutationReceipt } from "../mutation-receipt";
+} from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 
 export type PurchasingControlAction =
   "activate" | "reconcile" | "create_supplier";

@@ -11,7 +11,7 @@ import {
   controlMutation,
   controlRead,
   controlUpload,
-} from "../../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { formatMoneyMinor } from "../../../formatting";
 
 type SaleDetails = InventoryData["untrackedProducts"][number] | null;

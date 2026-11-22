@@ -28,8 +28,8 @@ import { mailControlAuthority } from "../../mail-inbox/contract/control-authorit
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../authorization";
-import { controlError, controlJson, readBoundedJsonRecord } from "../http";
+} from "@purin-labs/control/worker/authorization";
+import { controlError, controlJson, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 import { openMailInboxCursor, sealMailInboxCursor } from "../mail-inbox-cursor";
 
 export type MailInboxRoute = Readonly<{

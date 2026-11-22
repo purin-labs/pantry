@@ -18,7 +18,7 @@ import { resolveOrganisationCommerceMerchantBinding } from "@purin-labs/connecti
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import type { Result } from "@purin-labs/kernel/result";
-import type { AuthorizedOrganisationRequest } from "./authorization";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import { readOrganisationEnvironment } from "./organisation-runtime";
 
 type ControlCommerceGraph = Readonly<{

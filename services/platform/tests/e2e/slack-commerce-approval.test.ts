@@ -12,7 +12,7 @@ import {
   digestApprovalAction,
   type MerchantActionRejectionEvidence,
 } from "@purin-labs/authority/approval-authentication";
-import { googleConfig } from "../../src/control/google-oidc-config";
+import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
 import { mutationHeaders } from "./access-route-support";
 import { completeCommerceApprovalFixture } from "./commerce-approval-fixture";
 import { network } from "./network";

@@ -11,7 +11,7 @@ import {
   type ComboboxOption,
 } from "../../combobox";
 import { workspacePagePath } from "../../route";
-import { MutationLedger } from "../../mutation-state";
+import { MutationLedger } from "@purin-labs/control/portal/mutation-state";
 import { ProviderConnectAction } from "../../provider-onboarding";
 import { formatLifecycle } from "../../formatting";
 import { assertNever } from "@purin-labs/std";

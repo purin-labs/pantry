@@ -38,7 +38,7 @@ import {
   SUPPLIERS_VIEW_ID,
 } from "@purin-labs/commerce-client";
 
-import { ControlApiError } from "../../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,

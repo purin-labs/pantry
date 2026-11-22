@@ -1,5 +1,5 @@
 import React from "react";
-import { controlRead, controlWrite } from "../../control-client";
+import { controlRead, controlWrite } from "@purin-labs/control/portal/control-client";
 import { parseSharedThreadResponse } from "@purin-labs/control-api/portal/slack-thread";
 
 type SharedThreadState =

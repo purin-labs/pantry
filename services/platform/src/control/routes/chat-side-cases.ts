@@ -30,8 +30,12 @@ import { readConversation, type ConversationScope } from "../../chat/store";
 import { readActiveOrganisationMembershipRevision } from "@purin-labs/tenancy/data/control-plane";
 import type { Env } from "@purin-labs/kernel/env";
 import { buildControlAuthority } from "@purin-labs/authority/request-authority/index";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 export type SideCaseAction = "start" | "dismiss";
 

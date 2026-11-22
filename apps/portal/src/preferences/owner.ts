@@ -12,7 +12,7 @@ import {
   controlRead,
   controlWrite,
   readCookie,
-} from "../control-client";
+} from "@purin-labs/control/portal/control-client";
 import { parsePreferenceResponse } from "@purin-labs/control-api/portal/preferences";
 
 type PendingEdit = Readonly<{

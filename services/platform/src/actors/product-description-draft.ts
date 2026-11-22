@@ -20,8 +20,8 @@ import {
 } from "@purin-labs/product-description-crdt/protocol";
 import { listOrganisationMembers, resolveUser } from "@purin-labs/tenancy/data/control-plane";
 import { resolveOrganisationCommerceSystemAuthority } from "@purin-labs/connections/data/organisation-commerce-system";
-import type { AuthorizedOrganisationRequest } from "../control/authorization";
-import { controlError } from "../control/http";
+import type { AuthorizedOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlError } from "@purin-labs/control/worker/http";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
 import type { UserId } from "@purin-labs/control-api/ids";
@@ -39,7 +39,7 @@ import {
   type IntegrationAccountId,
 } from "@purin-labs/kernel/ids";
 import { parseUserId } from "@purin-labs/control-api/ids";
-import { readJsonRecord } from "../control/http";
+import { readJsonRecord } from "@purin-labs/control/worker/http";
 import {
   CollaborationRoom,
   type CollaborationRoomBacking,

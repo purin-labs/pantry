@@ -11,7 +11,7 @@ import {
   type ScenarioCopy,
 } from "@purin-labs/bakery-model/bakery-scenario";
 
-import { ControlApiError } from "../../control-client.ts";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import type { CommerceMutationTransport } from "../commerce/entity-plane/api";
 import type { ProcedureRun } from "@purin-labs/production-simulation/simulator/procedure";
 import { readScenario, type ScenarioRead } from "./scenario-api";

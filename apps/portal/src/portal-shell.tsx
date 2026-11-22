@@ -15,7 +15,7 @@ import {
   workspacePagePath,
   type PortalRoute,
 } from "./route";
-import { signInPath } from "./control-paths";
+import { signInPath } from "@purin-labs/control/portal/control-paths";
 import { PortalFrame } from "./shell";
 import {
   PageHeader,

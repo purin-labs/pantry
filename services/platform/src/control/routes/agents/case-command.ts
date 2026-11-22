@@ -7,9 +7,13 @@ import { buildControlAuthority } from "@purin-labs/authority/request-authority/i
 import {
   admitUserMutation,
   controlMutationIdentity,
-} from "../../admission/control-mutation";
-import { authorizeOrganisationRequest } from "../../authorization";
-import { controlError, controlJson, readJsonRecord } from "../../http";
+} from "@purin-labs/control/worker/admission/control-mutation";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 
 export async function handleCaseCommand(
   request: Request,

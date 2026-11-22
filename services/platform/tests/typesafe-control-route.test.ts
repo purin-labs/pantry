@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   read: vi.fn(),
   mutate: vi.fn(),
 }));
-vi.mock("../src/control/authorization", () => ({
+vi.mock("@purin-labs/control/worker/authorization", () => ({
   authorizeOrganisationRequest: mocks.authorize,
 }));
 vi.mock("@purin-labs/actor-runtime/actors/actor-router", () => ({

@@ -1,10 +1,10 @@
 import React from "react";
 import { toast } from "sonner";
-import { ControlApiError } from "../../control-client";
+import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   MutationLedger,
   type OrganisationMutation,
-} from "../../mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import {
   editEmailReply as editReplyBody,
   reloadEmailReplyDraft,

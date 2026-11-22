@@ -3,7 +3,7 @@ import {
   controlMutation,
   controlSignal,
   readCookie,
-} from "./control-client";
+} from "@purin-labs/control/portal/control-client";
 import type { CheckoutProfileMutationTransport } from "./features/checkout-profiles/api";
 import type { PayoutMutationTransport } from "./features/payouts/api";
 

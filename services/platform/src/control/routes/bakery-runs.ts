@@ -18,13 +18,13 @@ import {
 } from "@purin-labs/bakery-model/bakery-surface";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationId } from "@purin-labs/kernel/ids";
-import { authorizeOrganisationRequest } from "../authorization";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlHeaders,
   controlJson,
   readBoundedJsonRecord,
-} from "../http";
+} from "@purin-labs/control/worker/http";
 import { hasExactKeys } from "@purin-labs/std";
 import { artifactPublicationReady } from "./bakery-run-artifacts";
 import {

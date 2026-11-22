@@ -22,7 +22,11 @@ import {
   commerceListEntryPatchCommand,
   productionRequestCreateCommand,
 } from "../../commerce/contract/list-entry-commands";
-import { controlError, controlJson, readJsonRecord } from "../http";
+import {
+  controlError,
+  controlJson,
+  readJsonRecord,
+} from "@purin-labs/control/worker/http";
 import {
   finishInventoryOperation,
   resolveInventoryAccess,

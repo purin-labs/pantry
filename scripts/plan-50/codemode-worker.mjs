@@ -95,7 +95,7 @@ import {
   markSteeringInputQueued,
   markSteeringInputWithdrawn,
 } from "../../services/platform/src/actors/harness-steering.ts";
-import { readJsonRecord } from "../../services/platform/src/control/http.ts";
+import { readJsonRecord } from "../../foundation/control/worker/http.ts";
 import { canonicalJson, sha256Hex } from "../../packages/std/src/index.ts";
 import {
   portalInputRequestId,

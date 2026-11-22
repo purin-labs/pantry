@@ -43,11 +43,11 @@ import { CAPABILITY_KEYS } from "@purin-labs/authority/authorization/capability-
 import {
   permissionRequiredResponse,
   personPermission,
-} from "../../permission-required";
+} from "@purin-labs/control/worker/permission-required";
 import {
   consumeGoogleApprovalCeremony,
   verifyGoogleApprovalGrant,
-} from "../../oidc";
+} from "@purin-labs/control/worker/oidc";
 import {
   readActiveOrganisationMembershipRevision,
   type ActiveOrganisationMembership,
@@ -98,20 +98,20 @@ import {
   parseMutationBoundary,
   replayControlMutation,
   resolveMutationUser,
-} from "../../admission/control-mutation";
+} from "@purin-labs/control/worker/admission/control-mutation";
 import {
   authorizeOrganisationRequest,
   APPROVAL_GRANT_COOKIE,
   parseCookies,
   type AuthorizedOrganisationRequest,
-} from "../../authorization";
+} from "@purin-labs/control/worker/authorization";
 import { readSupplierPayout } from "../../../data/supplier-payout-store";
 import { readSealedPayoutPlan } from "../../../data/supplier-payout-plan";
 import { readSupplierPayoutAttempt } from "../../../data/supplier-payout-attempt";
 import { readSupplierDestinationRevision } from "../../../data/supplier-payable-store";
-import { controlError, controlJson, readJsonRecord } from "../../http";
-import { googleConfig } from "../../google-oidc-config";
-import { recordCommerceMutationReceipt } from "../../mutation-receipt";
+import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
+import { googleConfig } from "@purin-labs/control/worker/google-oidc-config";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import { readOrganisationEnvironment } from "../../organisation-runtime";
 import { executeApprovedSupplierPayout } from "../supplier-payout-execution";
 import type { Variant } from "@purin-labs/type-utils";

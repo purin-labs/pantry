@@ -3,7 +3,7 @@ import {
   controlRead,
   forgetControlReads,
   controlMutation,
-} from "./control-client";
+} from "@purin-labs/control/portal/control-client";
 import {
   AccountInvitationPage,
   readAccountInvitationRoute,
@@ -52,7 +52,7 @@ import { PageSkeleton } from "./page-components";
 import {
   MutationLedger,
   type OrganisationMutation,
-} from "./mutation-state";
+} from "@purin-labs/control/portal/mutation-state";
 import {
   OrganisationsRoute,
   type WorkspaceRouteTarget,
@@ -75,7 +75,7 @@ import type { Variant } from "@purin-labs/type-utils";
 import { assertNever } from "@purin-labs/std";
 import { CommerceActionStatus } from "./features/governed-actions/commerce-action-status";
 import { fetchCodexUsagePercent } from "./features/integrations/codex-transport";
-import { signInForApproval } from "./approval-sign-in-popup";
+import { signInForApproval } from "@purin-labs/control/portal/approval-sign-in-popup";
 import {
   clearPendingCommerceApproval,
   currentPortalPath,

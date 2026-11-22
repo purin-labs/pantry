@@ -1,11 +1,11 @@
 import { runtimeFetch } from "@purin-labs/kernel/runtime-fetch";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { readInstallationPins } from "../control/installation-pins";
-import { recordCommerceMutationReceipt } from "../control/mutation-receipt";
+import { readInstallationPins } from "@purin-labs/control/worker/installation-pins";
+import { recordCommerceMutationReceipt } from "@purin-labs/control/worker/mutation-receipt";
 import {
   authorizeOrganisationRequest,
   type AuthorizedOrganisationRequest,
-} from "../control/authorization";
+} from "@purin-labs/control/worker/authorization";
 import {
   controlError,
   controlJson,
@@ -13,7 +13,7 @@ import {
   noStoreJson,
   readJsonRecord,
   type JsonRecord,
-} from "../control/http";
+} from "@purin-labs/control/worker/http";
 import {
   parseControlMutationBoundary,
   readControlMutationReplay,
@@ -40,7 +40,7 @@ import {
   type WhatsAppPhoneNumber,
 } from "../data/whatsapp";
 import type { Env } from "@purin-labs/kernel/env";
-import { permissionRequiredResponse } from "../control/permission-required";
+import { permissionRequiredResponse } from "@purin-labs/control/worker/permission-required";
 import { mailControlAuthority } from "../mail-inbox/contract/control-authority";
 import { whatsappConnector } from "../mail-inbox/agent-mailbox-connector";
 import {

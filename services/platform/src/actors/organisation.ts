@@ -148,7 +148,10 @@ import {
   authorizeMenuBoardSocketRequest,
   matchMenuBoardSocketRoute,
 } from "../control/admission/menu-boards";
-import { controlError, readBoundedJsonRecord } from "../control/http";
+import {
+  controlError,
+  readBoundedJsonRecord,
+} from "@purin-labs/control/worker/http";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   parseOrganisationId,

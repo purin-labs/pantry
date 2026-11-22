@@ -430,7 +430,7 @@ file that only a tool starts, such as a new Worker entry or a page with its own
 HTML file, goes into the entry list of its workspace in `knip.json`. When a
 copy or an unused export goes, run the script with `--update`.
 A Portal feature reads the control API through `controlRead` and changes it
-through `controlMutation` (`apps/portal/src/control-client.ts`); `pnpm
+through `controlMutation` (`foundation/control/portal/control-client.ts`); `pnpm
 lint:portal-fetch` refuses a new raw `fetch`. When a file loses one, run
 `node scripts/check-portal-fetch-ratchet.mjs --update`.
 A Portal component reads through `useLatestRead` and changes through

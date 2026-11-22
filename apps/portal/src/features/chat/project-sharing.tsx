@@ -15,7 +15,7 @@ import {
   type UserId,
 } from "@purin-labs/control-api";
 import { errorMessage, isRecord } from "@purin-labs/std";
-import { controlRead, controlWrite, readCookie, refusedBody } from "../../control-client";
+import { controlRead, controlWrite, readCookie, refusedBody } from "@purin-labs/control/portal/control-client";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import "./project-sharing.css";
 

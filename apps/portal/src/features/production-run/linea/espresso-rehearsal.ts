@@ -5,7 +5,7 @@ import {
   controlRead,
   controlMutation,
   type ControlMutationIntent,
-} from "../../../control-client";
+} from "@purin-labs/control/portal/control-client";
 import {
   prepareEspressoWorkspaceRun,
   savePreparedWorkspaceRun,

@@ -10,7 +10,7 @@ import {
 } from "@purin-labs/control-api";
 import { useBlocker, useLocation, useNavigate } from "react-router";
 import { pageAddress, pageLink } from "../../page-address";
-import { controlRead, controlRefusal, controlWrite } from "../../control-client";
+import { controlRead, controlRefusal, controlWrite } from "@purin-labs/control/portal/control-client";
 import {
   MENU_ITEM_LIMIT,
   MENU_SECTION_LIMIT,

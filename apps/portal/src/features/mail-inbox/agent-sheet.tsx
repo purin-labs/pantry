@@ -2,7 +2,10 @@ import React from "react";
 import { WHATSAPP_DEFAULT_ALWAYS_WAIT_TOPICS } from "@purin-labs/control-api";
 import type { WhatsAppAgentMode } from "@purin-labs/control-api";
 import { Check } from "lucide-react";
-import { controlMutation, controlRead } from "../../control-client";
+import {
+  controlMutation,
+  controlRead,
+} from "@purin-labs/control/portal/control-client";
 import {
   parseWhatsAppSurface,
   type WhatsAppAccountView,

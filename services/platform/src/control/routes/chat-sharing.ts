@@ -16,8 +16,8 @@ import {
   shareConversation,
   type ConversationSharingCommand,
 } from "../../chat/conversation-sharing";
-import { authorizeOrganisationRequest } from "../authorization";
-import { controlJson, controlError, readBoundedJsonRecord } from "../http";
+import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
+import { controlJson, controlError, readBoundedJsonRecord } from "@purin-labs/control/worker/http";
 
 export type ChatSharingRoute = Readonly<{
   kind: "chatSharing";

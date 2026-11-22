@@ -1,4 +1,4 @@
-import { controlJson } from "../../http";
+import { controlJson } from "@purin-labs/control/worker/http";
 import { saveConversation } from "../../../chat/store";
 
 export function chatError(

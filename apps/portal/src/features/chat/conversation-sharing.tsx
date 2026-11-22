@@ -8,7 +8,7 @@ import {
   type ChatInsertion,
 } from "@purin-labs/control-api";
 import { errorMessage, isNonNegativeInteger, isRecord } from "@purin-labs/std";
-import { controlRead, controlWrite, readCookie, refusedBody } from "../../control-client";
+import { controlRead, controlWrite, readCookie, refusedBody } from "@purin-labs/control/portal/control-client";
 import { DialogHeading, cancelDialog, syncDialog } from "../../dialog";
 import { readChat, mutateChatDirectory, UNFINISHED_WORK_MESSAGE } from "./api";
 import type { ChatConversationSummary } from "@purin-labs/control-api/portal/chat";
