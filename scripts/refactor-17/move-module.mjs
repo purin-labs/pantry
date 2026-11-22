@@ -21,7 +21,10 @@
 //    1. `git mv` of each source file that is still at its old path.
 //    2. package.json and tsconfig.json of the new package: source only, with
 //       an `exports` map and no build step. With `package.typeCheck: false`
-//       in the plan, the package has no check:types script.
+//       in the plan, the package has no check:types script. With
+//       `package.existing: true`, the module joins a package that exists:
+//       its manifest gets the export entries and the dependencies of the
+//       plan, and it keeps the rest and its tsconfig.
 //    3. The workspace entry, and the dependency in each package that imports
 //       the module by name.
 //    4. Each import of a moved file, in each source file of the tree: `from`,
@@ -35,7 +38,8 @@
 //       Worker source that selects a moved file of a folder that does not
 //       move whole is a fault: the plan adds the new path with an edit.
 //    6. scripts/layers.json: one rule for the folder, the package and the
-//       cover. The rule of a folder that moved whole goes.
+//       cover. The rule of a folder that moved whole goes. A package that
+//       exists keeps its line, which gives the module each file in it.
 //    7. The ratchet files in their own order. No count changes.
 //    8. The text edits of the plan.
 //    9. Prettier, only for a file that this run changed and that was clean
@@ -320,28 +324,79 @@ function versionOf(name) {
   return version;
 }
 const manifestPath = `${plan.target}/package.json`;
-await putJson(
-  manifestPath,
-  {
-    name: packageName,
-    version: "0.1.0",
-    private: true,
-    type: "module",
-    exports: plan.package.exports,
-    // A package that reads an `Env` key that another module merges fails a
-    // type check of its own; the Worker program checks its files.
-    scripts:
-      plan.package.typeCheck === false
-        ? undefined
-        : { "check:types": "tsrs --noEmit" },
-    dependencies: plan.package.dependencies,
-    devDependencies: Object.fromEntries(
-      plan.package.devDependencies.map((name) => [name, versionOf(name)]),
-    ),
-  },
-  "package",
-);
-await putJson(`${plan.target}/tsconfig.json`, plan.package.tsconfig, "package");
+/** A manifest with one more dependency, after its last workspace dependency. */
+function withDependency(manifest, name, version) {
+  if (
+    manifest.dependencies?.[name] !== undefined ||
+    manifest.devDependencies?.[name] !== undefined
+  ) {
+    return manifest;
+  }
+  const entries = Object.entries(manifest.dependencies ?? {});
+  const last = entries.findLastIndex(([, value]) =>
+    String(value).startsWith("workspace:"),
+  );
+  entries.splice(last + 1, 0, [name, version]);
+  return { ...manifest, dependencies: Object.fromEntries(entries) };
+}
+if (plan.package.existing === true) {
+  // The module joins a package that exists: the manifest gets the export
+  // entries and the dependencies of the plan and keeps the rest. The package
+  // keeps its tsconfig and its scripts.
+  const manifest =
+    original(manifestPath) === null ? null : readJson(manifestPath);
+  if (manifest?.name !== packageName) {
+    faults.push(
+      `${planArgument}: package.existing is true, and ${manifestPath} is not the manifest of ${packageName}.`,
+    );
+  } else {
+    let next = { ...manifest, exports: { ...manifest.exports } };
+    for (const [key, value] of Object.entries(plan.package.exports)) {
+      const now = next.exports[key];
+      if (now !== undefined && JSON.stringify(now) !== JSON.stringify(value)) {
+        faults.push(
+          `${manifestPath}: the export ${key} has another target than the plan gives.`,
+        );
+      }
+      next.exports[key] = value;
+    }
+    for (const [name, version] of Object.entries(
+      plan.package.dependencies ?? {},
+    )) {
+      next = withDependency(next, name, version);
+    }
+    if (JSON.stringify(next) !== JSON.stringify(manifest)) {
+      await putJson(manifestPath, next, "package");
+    }
+  }
+} else {
+  await putJson(
+    manifestPath,
+    {
+      name: packageName,
+      version: "0.1.0",
+      private: true,
+      type: "module",
+      exports: plan.package.exports,
+      // A package that reads an `Env` key that another module merges fails a
+      // type check of its own; the Worker program checks its files.
+      scripts:
+        plan.package.typeCheck === false
+          ? undefined
+          : { "check:types": "tsrs --noEmit" },
+      dependencies: plan.package.dependencies,
+      devDependencies: Object.fromEntries(
+        plan.package.devDependencies.map((name) => [name, versionOf(name)]),
+      ),
+    },
+    "package",
+  );
+  await putJson(
+    `${plan.target}/tsconfig.json`,
+    plan.package.tsconfig,
+    "package",
+  );
+}
 
 /** The specifier of a file of the package, by name, or null. */
 function specifierByName(inside) {
@@ -362,6 +417,14 @@ function specifierByName(inside) {
     if (match === null) continue;
     if (target.replace("*", match) === `./${inside}`) {
       return `${packageName}${subpath.slice(1)}`;
+    }
+  }
+  // An entry whose name is not its path, such as "./boundary":
+  // "./src/boundary.ts" in a package that exists.
+  for (const [key, value] of Object.entries(plan.package.exports)) {
+    const target = typeof value === "string" ? value : value.default;
+    if (!key.includes("*") && target === `./${inside}`) {
+      return key === "." ? packageName : `${packageName}${key.slice(1)}`;
     }
   }
   return null;
@@ -551,20 +614,9 @@ for (const path of tree) {
 for (const folder of [...consumers].sort()) {
   const path = `${folder}/package.json`;
   const manifest = readJson(path);
-  if (
-    manifest.dependencies?.[packageName] !== undefined ||
-    manifest.devDependencies?.[packageName] !== undefined
-  ) {
-    continue;
-  }
   // After the last workspace dependency, so that they stay together.
-  const entries = Object.entries(manifest.dependencies ?? {});
-  const last = entries.findLastIndex(([, version]) =>
-    String(version).startsWith("workspace:"),
-  );
-  entries.splice(last + 1, 0, [packageName, "workspace:*"]);
-  manifest.dependencies = Object.fromEntries(entries);
-  await putJson(path, manifest, "config");
+  const next = withDependency(manifest, packageName, "workspace:*");
+  if (next !== manifest) await putJson(path, next, "config");
 }
 
 // ---------------------------------------------------------------------------
@@ -754,26 +806,36 @@ for (const path of tree) {
       delete map.files[key];
     }
   }
-  // A rule of a folder that moved whole is now inside the rule of the target.
-  for (const key of Object.keys(map.rules)) {
-    if (
-      key !== rule &&
-      key.startsWith(rule) &&
-      map.rules[key] === plan.module
-    ) {
-      delete map.rules[key];
+  if (plan.package.existing === true) {
+    // The line of the package gives the module each file in it.
+    if (map.packages[plan.target] !== plan.module) {
+      faults.push(
+        `${LAYER_MAP}: packages gives ${plan.target} to ${map.packages[plan.target] ?? "no module"}, and the plan moves ${plan.module} into it.`,
+      );
     }
-  }
-  if (map.rules[rule] === undefined) {
-    map.rules = { [rule]: plan.module, ...map.rules };
-  } else if (map.rules[rule] !== plan.module) {
-    faults.push(`${LAYER_MAP}: the rule ${rule} names another module`);
-  }
-  if (map.packages[plan.target] === undefined) {
-    map.packages = { [plan.target]: plan.module, ...map.packages };
-  }
-  if (!map.covers.some((cover) => rule.startsWith(cover))) {
-    map.covers.push(`${plan.target.split("/")[0]}/`);
+  } else {
+    // A rule of a folder that moved whole is now inside the rule of the
+    // target.
+    for (const key of Object.keys(map.rules)) {
+      if (
+        key !== rule &&
+        key.startsWith(rule) &&
+        map.rules[key] === plan.module
+      ) {
+        delete map.rules[key];
+      }
+    }
+    if (map.rules[rule] === undefined) {
+      map.rules = { [rule]: plan.module, ...map.rules };
+    } else if (map.rules[rule] !== plan.module) {
+      faults.push(`${LAYER_MAP}: the rule ${rule} names another module`);
+    }
+    if (map.packages[plan.target] === undefined) {
+      map.packages = { [plan.target]: plan.module, ...map.packages };
+    }
+    if (!map.covers.some((cover) => rule.startsWith(cover))) {
+      map.covers.push(`${plan.target.split("/")[0]}/`);
+    }
   }
   await putJson(LAYER_MAP, map, "layer map");
 }
