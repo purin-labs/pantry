@@ -1,4 +1,5 @@
 import type { ProviderCompletionTerminal } from "./provider-callback";
+import { PURIN_ICON } from "./purin-icon";
 
 export function providerCompletionPage(
   provider: string,
@@ -30,22 +31,23 @@ export function providerCompletionPage(
   <style>${PROVIDER_CALLBACK_PAGE_STYLES}</style>
 </head>
 <body>
-  <main class="callback-shell">
-    <section class="callback-panel" aria-labelledby="callback-title">
-      <p class="callback-brand">PURIN PANTRY</p>
-      <span class="callback-mark ${connected ? "is-ok" : "is-neutral"}" aria-hidden="true">${connected ? CALLBACK_CHECK_ICON : CALLBACK_LINK_ICON}</span>
-      <h1 id="callback-title">${connected ? "You&rsquo;re connected" : failed ? "Connection not finished" : "Authorization received"}</h1>
-      <p class="callback-copy" id="status">${
-        connected
-          ? "Taking you back to Pantry&hellip;"
-          : failed
-            ? "Head back to Pantry for the next step."
-            : "Head back to Pantry to see where this connection landed."
-      }</p>
-      <a class="callback-action" id="return-link" href=${returnUrl}>Back to Pantry</a>
-      <p class="callback-footnote">If nothing happens, use the button above.</p>
-    </section>
-  </main>
+  ${callbackCard({
+    tone: connected ? "ok" : failed ? "warn" : "neutral",
+    title: connected
+      ? "You&rsquo;re connected"
+      : failed
+        ? "Connection not finished"
+        : "Authorization received",
+    detail: `<p class="callback-copy" id="status">${
+      connected
+        ? "Taking you back to Pantry&hellip;"
+        : failed
+          ? "Head back to Pantry for the next step."
+          : "Head back to Pantry to see where this connection landed."
+    }</p>`,
+    action: `<a class="callback-action" id="return-link" href=${returnUrl}>Back to Pantry</a>`,
+    footnote: "If nothing happens, use the button above.",
+  })}
   <script>
     const portalOrigin = ${expectedOrigin};
     const attemptId = ${expectedAttemptId};
@@ -138,16 +140,13 @@ export function providerCallbackFailurePage(
   <style>${PROVIDER_CALLBACK_PAGE_STYLES}</style>
 </head>
 <body>
-  <main class="callback-shell">
-    <section class="callback-panel" aria-labelledby="callback-title">
-      <p class="callback-brand">PURIN PANTRY</p>
-      <span class="callback-mark is-warn" aria-hidden="true">${CALLBACK_ALERT_ICON}</span>
-      <h1 id="callback-title">We couldn&rsquo;t finish that connection</h1>
-      <p class="callback-copy">${detail}</p>
-      <a class="callback-action" href=${returnUrl}>Back to Pantry</a>
-      <p class="callback-footnote">Nothing was changed in your workspace.</p>
-    </section>
-  </main>
+  ${callbackCard({
+    tone: "warn",
+    title: "We couldn&rsquo;t finish that connection",
+    detail: `<p class="callback-copy">${detail}</p>`,
+    action: `<a class="callback-action" href=${returnUrl}>Back to Pantry</a>`,
+    footnote: "Nothing was changed in your workspace.",
+  })}
 </body>
 </html>`;
   return new Response(html, {
@@ -161,33 +160,107 @@ export function providerCallbackFailurePage(
   });
 }
 
-const CALLBACK_CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.8 12.6 4.8 4.8L19.2 6.6"/></svg>`;
+/** `ok` is a finished connection, `warn` one that stopped, `neutral` neither. */
+type CallbackTone = "ok" | "warn" | "neutral";
 
-const CALLBACK_LINK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 14.4 14.4 9.6"/><path d="M11.2 6.6 13 4.8a4.4 4.4 0 0 1 6.2 6.2l-1.8 1.8"/><path d="M12.8 17.4 11 19.2A4.4 4.4 0 0 1 4.8 13l1.8-1.8"/></svg>`;
+/**
+ * The card of every state, as the Portal's authorization screen shows a
+ * result: the Purin Pantry brand, the status mark, the title, the detail, the
+ * way back and a footnote. Every part is HTML that the caller has escaped.
+ */
+function callbackCard(
+  card: Readonly<{
+    tone: CallbackTone;
+    title: string;
+    detail: string;
+    action: string;
+    footnote: string;
+  }>,
+): string {
+  return `<main class="callback-shell">
+    <section class="callback-card" aria-labelledby="callback-title">
+      <p class="callback-brand"><svg class="callback-brand-mark" viewBox="${PURIN_ICON.viewBox}" aria-hidden="true" focusable="false">${PURIN_ICON.body}</svg>Purin Pantry</p>
+      <div class="callback-result">
+        <span class="callback-mark" data-tone="${card.tone}" aria-hidden="true">${CALLBACK_TONE_ICONS[card.tone]}</span>
+        <h1 class="callback-title" id="callback-title">${card.title}</h1>
+        ${card.detail}
+        ${card.action}
+        <p class="callback-footnote">${card.footnote}</p>
+      </div>
+    </section>
+  </main>`;
+}
 
-const CALLBACK_ALERT_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.3h.01"/></svg>`;
+const CALLBACK_TONE_ICONS: Readonly<Record<CallbackTone, string>> = {
+  ok: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m4.8 12.6 4.8 4.8L19.2 6.6"/></svg>`,
+  warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.3h.01"/></svg>`,
+  neutral: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 14.4 14.4 9.6"/><path d="M11.2 6.6 13 4.8a4.4 4.4 0 0 1 6.2 6.2l-1.8 1.8"/><path d="M12.8 17.4 11 19.2A4.4 4.4 0 0 1 4.8 13l1.8-1.8"/></svg>`,
+};
 
-/* One small card, centred. The heading stays at reading size: this page is a
-   two-second waypoint, not a destination that needs display type. */
+/* The page looks like the result card of the Portal's authorization screen
+   (apps/portal/src/ui/permission-request.css, the compact layout) on the
+   default Portal theme (packages/frontend-themes/slate-coral.css). The Worker
+   imports no Portal code, so the values are a copy: the slate and coral
+   steps of that theme, in light and dark. The brand row is the one of the
+   Portal header.
+
+   Motion: the card is the one entrance, so its content moves with it. The
+   status mark lands just after the card starts, with the glide spring of the
+   Portal; reduced motion keeps only a short fade of the card. */
 
 const PROVIDER_CALLBACK_PAGE_STYLES = `
   :root {
-    color-scheme: light;
-    --cb-ground: #fdfcfc;
-    --cb-paper: #ffffff;
-    --cb-surface: #f5f3f1;
-    --cb-ink: #000000;
-    --cb-ink-2: #777169;
-    --cb-ink-3: #a59f97;
-    --cb-ok-text: #2e6b47;
-    --cb-ok-bg: #eaf0eb;
-    --cb-warn-text: #7c5220;
-    --cb-warn-bg: #f5eee2;
+    color-scheme: light dark;
+    --ground: oklch(0.95 0.007 248);
+    --paper: oklch(0.978 0.004 248);
+    --surface: oklch(0.922 0.009 248);
+    --border: oklch(0.893 0.012 248);
+    --ink: oklch(0.278 0.021 258);
+    --ink-strong: oklch(0.278 0.021 258);
+    --ink-2: oklch(0.445 0.028 255.2);
+    --primary: oklch(0.387 0.025 257.5);
+    --primary-hover: oklch(0.332 0.023 258);
+    --on-primary: oklch(0.978 0.004 248);
+    --focus: oklch(0.503 0.12 27.5);
+    --ok-text: oklch(0.45 0.06 158);
+    --ok-bg: oklch(0.95 0.02 160);
+    --warn-text: oklch(0.44 0.075 75);
+    --warn-bg: oklch(0.94 0.035 85);
+    --shadow-color: oklch(0.278 0.021 258);
+    --shadow-strength: 4%;
+    --glide-duration: 390ms;
+    --glide-ease: linear(
+      0, 0.005 1.2%, 0.022 2.8%, 0.055 4.5%, 0.099 6.2%, 0.142 7.8%, 0.198 9.5%,
+      0.429 16.2%, 0.534 19.5%, 0.63 22.8%, 0.676 24.5%, 0.713 26%, 0.779 29%,
+      0.839 32.2%, 0.887 35.5%, 0.928 39%, 0.96 42.8%, 0.985 47%, 1.001 51.5%,
+      1.011 56.8%, 1.015 61.5%, 1.015 67.2%, 1.002 99.8%, 1
+    );
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: var(--cb-ink);
-    background: var(--cb-ground);
+    color: var(--ink);
+    background: var(--ground);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: oklch(0.278 0.021 258);
+      --paper: oklch(0.387 0.025 257.5);
+      --surface: oklch(0.332 0.023 258);
+      --border: oklch(0.445 0.028 255.2);
+      --ink: oklch(0.978 0.004 248);
+      --ink-strong: oklch(0.95 0.007 248);
+      --ink-2: oklch(0.893 0.012 248);
+      --primary: oklch(0.922 0.009 248);
+      --primary-hover: oklch(0.95 0.007 248);
+      --on-primary: oklch(0.278 0.021 258);
+      --focus: oklch(0.717 0.106 31.5);
+      --ok-text: oklch(0.84 0.06 158);
+      --ok-bg: oklch(0.36 0.03 160);
+      --warn-text: oklch(0.89 0.087 85);
+      --warn-bg: oklch(0.4 0.045 75);
+      --shadow-color: oklch(0.18 0.02 258);
+      --shadow-strength: 24%;
+    }
   }
   * { box-sizing: border-box; }
   body {
@@ -197,8 +270,8 @@ const PROVIDER_CALLBACK_PAGE_STYLES = `
     margin: 0;
     display: grid;
     place-items: center;
-    padding: 24px;
-    background: var(--cb-ground);
+    padding: 16px;
+    background: var(--ground);
     letter-spacing: 0.005em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -208,90 +281,134 @@ const PROVIDER_CALLBACK_PAGE_STYLES = `
     display: grid;
     place-items: center;
   }
-  .callback-panel {
-    width: min(100%, 380px);
+  .callback-card {
+    width: min(100%, 400px);
+    min-width: 0;
+    border-radius: 24px;
+    background: var(--paper);
+    box-shadow:
+      0 0 0 1px var(--border),
+      0 2px 4px color-mix(in oklch, var(--shadow-color) var(--shadow-strength), transparent),
+      0 6px 16px color-mix(in oklch, var(--shadow-color) var(--shadow-strength), transparent);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .callback-card p { margin: 0; }
+  .callback-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px 24px 0;
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .callback-brand-mark {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+  }
+  .callback-result {
     display: grid;
     justify-items: center;
-    padding: 30px 28px 26px;
-    border-radius: 18px;
-    background: var(--cb-paper);
-    box-shadow: 0 0 1px rgb(0 0 0 / 40%), 0 2px 4px rgb(0 0 0 / 4%), 0 6px 16px rgb(0 0 0 / 4%);
+    gap: 10px;
+    padding: 28px 28px 24px;
     text-align: center;
-  }
-  .callback-brand {
-    margin: 0 0 22px;
-    color: var(--cb-ink-3);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
   }
   .callback-mark {
     display: grid;
     place-items: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 9999px;
-    animation: callback-mark-in 260ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+    width: 64px;
+    height: 64px;
+    margin-block-end: 8px;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink-2);
   }
   .callback-mark svg {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
   }
-  .callback-mark.is-ok { color: var(--cb-ok-text); background: var(--cb-ok-bg); }
-  .callback-mark.is-neutral { color: var(--cb-ink-2); background: var(--cb-surface); }
-  .callback-mark.is-warn { color: var(--cb-warn-text); background: var(--cb-warn-bg); }
-  h1 {
-    margin: 18px 0 0;
-    font-size: 21px;
-    font-weight: 500;
-    line-height: 1.28;
+  .callback-mark[data-tone="ok"] { background: var(--ok-bg); color: var(--ok-text); }
+  .callback-mark[data-tone="warn"] { background: var(--warn-bg); color: var(--warn-text); }
+  .callback-title {
+    margin: 0;
+    color: var(--ink-strong);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.3;
     letter-spacing: -0.015em;
     text-wrap: balance;
+    overflow-wrap: anywhere;
   }
   .callback-copy {
-    max-width: 32ch;
-    margin: 8px 0 0;
-    color: var(--cb-ink-2);
+    max-width: 36ch;
+    color: var(--ink-2);
     font-size: 14px;
-    line-height: 1.5;
     text-wrap: pretty;
   }
   .callback-action {
-    min-height: 42px;
-    display: inline-flex;
+    justify-self: stretch;
+    display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 22px;
-    padding-inline: 24px;
+    min-height: 46px;
+    margin-block-start: 14px;
+    padding: 0 18px;
     border-radius: 9999px;
-    background: var(--cb-ink);
-    color: #ffffff;
-    font-size: 14px;
+    background: var(--primary);
+    color: var(--on-primary);
+    font-size: 15px;
     font-weight: 500;
     text-decoration: none;
-    transition: background-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
   }
-  .callback-action:hover { background: #262626; }
+  .callback-action:hover { background: var(--primary-hover); }
   .callback-action:focus-visible {
-    outline: 2px solid var(--cb-ink);
-    outline-offset: 3px;
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
   }
   .callback-footnote {
-    max-width: 32ch;
-    margin: 14px 0 0;
-    color: var(--cb-ink-3);
-    font-size: 12px;
-    line-height: 1.45;
+    max-width: 36ch;
+    color: var(--ink-2);
+    font-size: 13px;
+    text-wrap: pretty;
   }
-  @keyframes callback-mark-in {
-    from { opacity: 0; transform: scale(0.82); }
-    to { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .callback-card {
+      animation: callback-card-enter var(--glide-duration) var(--glide-ease) both;
+    }
+    .callback-mark {
+      animation: callback-mark-enter var(--glide-duration) var(--glide-ease) 80ms both;
+    }
+    .callback-action {
+      transition: background-color 150ms ease, scale 150ms ease;
+    }
+    .callback-action:active { scale: 0.97; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .callback-mark { animation: none; }
+    .callback-card { animation: callback-card-fade 150ms ease-out both; }
   }
-  @media (max-width: 24rem) {
-    .callback-panel { padding: 26px 20px 22px; border-radius: 16px; }
+  @keyframes callback-card-enter {
+    from { opacity: 0; translate: 0 6px; }
+    to { opacity: 1; translate: 0 0; }
+  }
+  @keyframes callback-mark-enter {
+    from { opacity: 0; scale: 0.5; }
+    60% { opacity: 1; scale: 1.08; }
+    to { opacity: 1; scale: 1; }
+  }
+  @keyframes callback-card-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @media (forced-colors: active) {
+    .callback-card { border: 1px solid CanvasText; }
+    .callback-action { border: 1px solid ButtonText; }
   }
 `;
 

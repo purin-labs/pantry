@@ -10,8 +10,11 @@ this image on 19 November 2026. The mark has four flat colours:
 | Caramel | `#B54D1F` | The sauce                     |
 | Cream   | `#FBF0DC` | Eyes, mouth and the icon tile |
 
-Nothing uses the mark yet. The Portal shows the goat mark until the brand
-switch; `apps/portal/public/brand/README.md` describes the goat files.
+The Portal shows the goat mark until the brand switch;
+`apps/portal/public/brand/README.md` describes the goat files. The page that
+the Worker shows after a provider sign-in shows the icon beside the name
+Purin Pantry
+(`services/platform/src/control/routes/integrations/provider-callback-page.ts`).
 
 ## Files
 
@@ -107,7 +110,11 @@ node scripts/brand/build-purin-logo.mjs
 ```
 
 The first command writes `paths.json`. It needs Pillow, numpy, scipy and
-contourpy. The second command writes every other file in this folder, and
-`purin-mark-paths.ts` and `purin-mark.css` in `apps/portal/src/ui`. To change
-a colour, a size or the motion, edit the constants at the top of
-`build-purin-logo.mjs` and run it again.
+contourpy. The second command writes every other file in this folder,
+`purin-mark-paths.ts` and `purin-mark.css` in `apps/portal/src/ui`, and
+`purin-icon.ts` for the Worker pages in
+`services/platform/src/control/routes/integrations`. The Worker imports no
+Portal code, so it gets its own copy of the icon. The PNG and ICO files need
+`sharp`; with `--no-png`, the script writes the other files and keeps the PNG
+and ICO files as they are. To change a colour, a size or the motion, edit the
+constants at the top of `build-purin-logo.mjs` and run it again.

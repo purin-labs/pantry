@@ -7,9 +7,12 @@
 //         docs/brand/purin-logo/icon-pack/*            favicons, app icons and PNG marks
 //         apps/portal/src/ui/purin-mark-paths.ts       the curves for the PurinMark component
 //         apps/portal/src/ui/purin-mark.css            the motion for the PurinMark component
+//         services/platform/src/control/routes/integrations/purin-icon.ts
+//                                                      the icon for the pages that the Worker serves
 //
 // The PNG and ICO files need `sharp`. No package declares it; pnpm hoists it
-// for another package. If it is missing, run with --no-png for the other files.
+// for another package. If it is missing, run with --no-png for the other
+// files; the PNG and ICO files in the icon pack then stay as they are.
 
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -24,6 +27,10 @@ const root = path.resolve(
 const logoDir = path.join(root, "docs/brand/purin-logo");
 const packDir = path.join(logoDir, "icon-pack");
 const uiDir = path.join(root, "apps/portal/src/ui");
+const workerIconFile = path.join(
+  root,
+  "services/platform/src/control/routes/integrations/purin-icon.ts",
+);
 const withPng = !process.argv.includes("--no-png");
 
 const traced = JSON.parse(
@@ -138,13 +145,14 @@ const tileTransform = (scale) =>
   `translate(${BOX / 2} ${BOX / 2}) scale(${scale}) translate(${-CENTRE[0]} ${-CENTRE[1]})`;
 const mark = (id, animated = false) =>
   svg(MARK_VIEW_BOX, artwork(id, animated));
+const TILE_VIEW_BOX = `0 0 ${BOX} ${BOX}`;
+/** The tile and the mark with no <svg> wrapper. */
+const tileBody = (id, scale, { radius = TILE_RADIUS, animated = false } = {}) =>
+  `<rect width="${BOX}" height="${BOX}"${radius ? ` rx="${radius}"` : ""} fill="${COLOURS.cream}"/>` +
+  `<g transform="${tileTransform(scale)}">${artwork(id, animated)}</g>`;
 /** The mark on a cream tile. `radius` 0 gives a full square for the systems that cut their own shape. */
-const tile = (id, scale, { radius = TILE_RADIUS, animated = false } = {}) =>
-  svg(
-    `0 0 ${BOX} ${BOX}`,
-    `<rect width="${BOX}" height="${BOX}"${radius ? ` rx="${radius}"` : ""} fill="${COLOURS.cream}"/>` +
-      `<g transform="${tileTransform(scale)}">${artwork(id, animated)}</g>`,
-  );
+const tile = (id, scale, options) =>
+  svg(TILE_VIEW_BOX, tileBody(id, scale, options));
 
 async function loadSharp() {
   try {
@@ -204,7 +212,8 @@ await save(
 );
 
 /* ---------- icon pack ---------- */
-await rm(packDir, { recursive: true, force: true });
+// Without `sharp` the PNG and ICO files cannot be made again, so they stay.
+if (withPng) await rm(packDir, { recursive: true, force: true });
 await save(path.join(packDir, "favicon.svg"), sources.favicon);
 const manifest = {
   name: "Purin",
@@ -337,6 +346,27 @@ await save(
 await save(
   path.join(uiDir, "purin-mark.css"),
   await prettier.format(css, { ...options, parser: "css" }),
+);
+
+/* ---------- Worker pages ---------- */
+// The Worker imports no Portal code, so its static pages get their own copy.
+// The tile carries its cream ground, so the icon reads on a light page and
+// on a dark page.
+const workerIcon = `// ${generated}
+
+/** The Purin icon: the cat mark on its cream tile, for a page that the Worker serves. */
+export const PURIN_ICON = ${JSON.stringify(
+  { viewBox: TILE_VIEW_BOX, body: tileBody("purin", TILE_SCALE.icon) },
+  null,
+  2,
+)} as const;
+`;
+await save(
+  workerIconFile,
+  await prettier.format(workerIcon, {
+    ...((await prettier.resolveConfig(workerIconFile)) ?? {}),
+    parser: "typescript",
+  }),
 );
 
 console.log(written.join("\n"));
