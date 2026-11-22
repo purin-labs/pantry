@@ -449,6 +449,16 @@ engine type check, `pnpm lint:static`, `pnpm lint:d1-patch`,
 `pnpm test:units` (Platform: 301 files, 1,728 tests), `pnpm portal:build`,
 `cargo test --workspace` (47 tests) and `git diff --check`.
 
+Missed: the freeze checks did not run the commerce engine suite
+(`services/commerce`, part of CI). After the push, CI found
+`tests/punter-acceptance.test.ts` failing with
+`commercial_snapshot_mismatch`: `scripts/punter/src/scenario-fixtures.ts`
+pins six quote, carrier, tax, duty and package-plan digests, and the rename
+changed text inside those hashes (no price, item or date changed). The
+Refactor 17 session made the fix (`2372ad0f`, branch `punter-digests`); the
+test passes on it. A later codemod run needs the commerce suite in its
+checks.
+
 **What keeps an old name on purpose** (the `git grep` exceptions):
 
 - The wake phrase "Hey Satyr", `hey_satyr.onnx` and the wake training
@@ -558,6 +568,41 @@ sign-in start sends
 two names under `pantry.purin.io` had no TLS for about five minutes after
 the deploy, while Cloudflare issued their certificates. The live versions of
 the nine old Workers did not change.
+
+The Plan 91 phase 4 push of the Purin names (dev `7fccf635`) came after the
+build, so `pantry` (`787aec6a`) and `pantry-docs` (`8d23a786`) were deployed
+again from dev `f6993814`, with the owner's yes. The Portal, `/docs/privacy`
+and `/docs/terms` now have the title "Purin Pantry"; Google brand
+verification reads these pages.
+
+**3.6 Idle cost.** In the hour 12:10 to 13:10 JST, with no organisation,
+the GraphQL Analytics datasets show: `pantry-global-apac` 2 rows written in
+one write query (the sign-in state of the start-route check above) and 656
+rows read; `pantry-organisation-apac` no row written, 5,237 rows read in 132
+queries (the crons); no Durable Object of the 15 new namespaces read or
+wrote a row. The sign-up and chat checks of 3.6 wait for the new Google
+client.
+
+#### Step 4 results so far (22 November 2026)
+
+**Secrets: reuse, no rotation.** The owner chose to keep the provider
+secrets of the same apps, so the old stack works until the switch, and
+confirmed it in the Plan 91 phase 4 session ("reuse, no rotation"). New
+values come only where a console makes one (the new Google project of Plan
+91 phase 4 decision 2, the new Stripe webhook endpoints). Each reused
+value was checked where a provider allows it without side effects: Slack
+`oauth.v2.access`, the Square token endpoint and the Notion token endpoint
+accept the client and refuse only the bad code; for Dropbox only the
+`services/platform/.dev.vars.local` value is valid. Set on the new Workers
+with `wrangler secret bulk`: the Slack signing and client secrets (`pantry`
+and `pantry-slack-ingress`), Square, Shopify, Stripe Connect (test mode),
+Airtable, Notion, Dropbox and the WhatsApp app secret (`pantry`), and Square
+(`pantry-commerce`). The commerce engine's Stripe keys wait for its new
+webhook secret, so that no Stripe payment starts without a webhook.
+
+A signed Slack `url_verification` to
+`https://slack.pantry.purin.io/slack/events` returns its challenge, so the
+Slack request URLs can switch.
 
 ### 4. Switch the outside parties
 
