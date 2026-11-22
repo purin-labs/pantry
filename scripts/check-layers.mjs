@@ -59,8 +59,17 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import {
+  compareModules,
+  coveredSourceFiles,
+  crossingKind,
+  hasLayer,
   importStatementsOf,
+  isPublic,
+  keysWithoutReason,
+  layerOf,
+  linkCounter,
   moduleOf,
+  publicPaths,
   relativeResolver,
   root,
   targets,
@@ -87,10 +96,6 @@ if (
   process.exit(2);
 }
 
-const layerRank = new Map(targets.layers.map((layer, index) => [layer, index]));
-const orderRank = new Map(
-  targets.foundationOrder.map((name, index) => [`foundation/${name}`, index]),
-);
 // The workspace packages that are the contract of their area. A package of
 // another area may depend on them.
 const contractPackages = new Set(
@@ -98,15 +103,6 @@ const contractPackages = new Set(
     .filter((path) => targets.packages[path] !== undefined)
     .map((folder) => posix.basename(folder)),
 );
-// The public source files and folders of the areas.
-const publicPaths = (targets.contracts ?? []).filter(
-  (path) => targets.packages[path] === undefined,
-);
-function isPublic(path) {
-  return publicPaths.some((entry) =>
-    entry.endsWith("/") ? path.startsWith(entry) : path === entry,
-  );
-}
 const packageByName = new Map(
   Object.entries(targets.packages).map(([folder, module]) => [
     posix.basename(folder),
@@ -116,29 +112,11 @@ const packageByName = new Map(
 
 const faults = [];
 
-function layerOf(module) {
-  return module.slice(0, module.indexOf("/"));
-}
-
 /** The kind of a crossing from one module to another, or null. */
 function crossing(from, to) {
-  if (from === to) return null;
-  const fromLayer = layerOf(from);
-  const toLayer = layerOf(to);
-  if (layerRank.get(fromLayer) < layerRank.get(toLayer)) return "upward";
-  if (fromLayer === "areas" && toLayer === "areas") return "areas";
-  if (fromLayer === "foundation" && toLayer === "foundation") {
-    const a = orderRank.get(from);
-    const b = orderRank.get(to);
-    if (a === undefined || b === undefined) {
-      faults.push(
-        `${TARGETS}: foundationOrder lacks ${a === undefined ? from : to}`,
-      );
-      return null;
-    }
-    return a < b ? "order" : null;
-  }
-  return null;
+  return crossingKind(from, to, (module) =>
+    faults.push(`${TARGETS}: foundationOrder lacks ${module}`),
+  );
 }
 
 for (const module of [
@@ -146,18 +124,12 @@ for (const module of [
   ...Object.values(targets.files),
   ...Object.values(targets.packages),
 ]) {
-  if (!layerRank.has(layerOf(module))) {
+  if (!hasLayer(module)) {
     faults.push(`${TARGETS}: ${module} names no layer`);
   }
 }
 
-const tracked = trackedFiles(...targets.covers).filter(
-  (path) =>
-    /\.(ts|tsx)$/.test(path) &&
-    !path.endsWith(".d.ts") &&
-    !/\/generated\//.test(path) &&
-    existsSync(join(root, path)),
-);
+const tracked = coveredSourceFiles();
 const resolveRelative = relativeResolver(new Set(tracked));
 
 for (const entry of publicPaths) {
@@ -181,15 +153,9 @@ const WORKSPACE = /^@[a-z0-9-]+\/([a-z0-9-]+)/;
 /** pair -> { kind, count, sites } */
 const found = new Map();
 /** file -> { module: count } for the files that it imports and that import it */
-const links = new Map();
+const { links, link } = linkCounter();
 /** The imports between two areas that go through a contract. */
 const throughContracts = { files: 0, packages: 0 };
-
-function link(path, module) {
-  const entry = links.get(path) ?? {};
-  entry[module] = (entry[module] ?? 0) + 1;
-  links.set(path, entry);
-}
 
 function record(from, to, site) {
   const kind = crossing(from, to);
@@ -379,18 +345,13 @@ function moduleList(only, counts) {
     ...Object.values(targets.packages),
     ...Object.values(targets.tables),
   ]);
-  // The layers bottom-up, the foundation in its order, then by name.
-  const order = (a, b) =>
-    layerRank.get(layerOf(a)) - layerRank.get(layerOf(b)) ||
-    (orderRank.get(a) ?? 0) - (orderRank.get(b) ?? 0) ||
-    (a < b ? -1 : 1);
   const selected = [...modules]
-    .filter((module) => layerRank.has(layerOf(module)))
+    .filter(hasLayer)
     .filter(
       (module) =>
         only === null || module === only || module === `areas/${only}`,
     )
-    .sort(order);
+    .sort(compareModules);
   const sections = [];
   for (const module of selected) {
     const lines = [`## ${module}`, ""];
@@ -591,18 +552,10 @@ function writeBaseline(crossings) {
 
 /** The pairs of `crossings` with no reason or no fix. */
 function unexplained(crossings) {
-  return Object.keys(crossings)
-    .filter(
-      (pair) =>
-        typeof reasons[pair]?.reason !== "string" ||
-        reasons[pair].reason.trim() === "" ||
-        typeof reasons[pair]?.fix !== "string" ||
-        reasons[pair].fix.trim() === "",
-    )
-    .map(
-      (pair) =>
-        `${pair}: no written reason. Add { "reason": "...", "fix": "..." } for it under reasons in ${BASELINE}.`,
-    );
+  return keysWithoutReason(Object.keys(crossings), reasons).map(
+    (pair) =>
+      `${pair}: no written reason. Add { "reason": "...", "fix": "..." } for it under reasons in ${BASELINE}.`,
+  );
 }
 
 if (mode === "--init") {

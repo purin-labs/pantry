@@ -58,12 +58,17 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, posix } from "node:path";
 import {
+  coveredSourceFiles,
+  crossingKind,
   importStatementsOf,
+  isPublic,
+  keysWithoutReason,
+  layerOf,
+  linkCounter,
   moduleOf,
   relativeResolver,
   root,
   targets,
-  trackedFiles,
 } from "./lib/layers.mjs";
 
 const BASELINE = "scripts/layer-debts-ratchet.json";
@@ -89,49 +94,15 @@ if (!["check", "--update", "--init", "--report"].includes(mode)) {
 
 // --- The map -----------------------------------------------------------
 
-const layerRank = new Map(targets.layers.map((layer, index) => [layer, index]));
-const orderRank = new Map(
-  targets.foundationOrder.map((name, index) => [`foundation/${name}`, index]),
-);
-
-function layerOf(module) {
-  return module.slice(0, module.indexOf("/"));
-}
-
 /**
  * True when `from` may not import `to`: the rule of scripts/check-layers.mjs
  * for an import between two modules.
  */
 function mayNotImport(from, to) {
-  if (from === to) return false;
-  const fromLayer = layerOf(from);
-  const toLayer = layerOf(to);
-  if (layerRank.get(fromLayer) < layerRank.get(toLayer)) return true;
-  if (fromLayer === "areas" && toLayer === "areas") return true;
-  if (fromLayer === "foundation" && toLayer === "foundation") {
-    const a = orderRank.get(from);
-    const b = orderRank.get(to);
-    return a !== undefined && b !== undefined && a < b;
-  }
-  return false;
+  return crossingKind(from, to) !== null;
 }
 
-const publicPaths = (targets.contracts ?? []).filter(
-  (path) => targets.packages[path] === undefined,
-);
-function isPublic(path) {
-  return publicPaths.some((entry) =>
-    entry.endsWith("/") ? path.startsWith(entry) : path === entry,
-  );
-}
-
-const tracked = trackedFiles(...targets.covers).filter(
-  (path) =>
-    /\.(ts|tsx)$/.test(path) &&
-    !path.endsWith(".d.ts") &&
-    !/\/generated\//.test(path) &&
-    existsSync(join(root, path)),
-);
+const tracked = coveredSourceFiles();
 const known = new Set(tracked);
 const resolveRelative = relativeResolver(known);
 const texts = new Map(
@@ -413,12 +384,7 @@ const NEUTRAL = new Set([
 const MISFIT_SHARE = 0.6;
 const MISFIT_LINKS = 4;
 /** file -> { module: count } for the files that it imports and that import it */
-const links = new Map();
-function link(path, module) {
-  const entry = links.get(path) ?? {};
-  entry[module] = (entry[module] ?? 0) + 1;
-  links.set(path, entry);
-}
+const { links, link } = linkCounter();
 for (const [path, list] of imports) {
   const from = moduleOf(path);
   if (from === null) continue;
@@ -727,18 +693,10 @@ function writeBaseline(counts) {
 
 /** The kinds of `counts` with no reason or no fix. */
 function unexplained(counts) {
-  return Object.keys(counts)
-    .filter(
-      (kind) =>
-        typeof storedKinds[kind]?.reason !== "string" ||
-        storedKinds[kind].reason.trim() === "" ||
-        typeof storedKinds[kind]?.fix !== "string" ||
-        storedKinds[kind].fix.trim() === "",
-    )
-    .map(
-      (kind) =>
-        `${kind}: no written reason. Add "reason" and "fix" for it under kinds in ${BASELINE}.`,
-    );
+  return keysWithoutReason(Object.keys(counts), storedKinds).map(
+    (kind) =>
+      `${kind}: no written reason. Add "reason" and "fix" for it under kinds in ${BASELINE}.`,
+  );
 }
 
 if (mode === "--init") {
