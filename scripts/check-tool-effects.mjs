@@ -22,12 +22,16 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE =
   /^(services\/platform\/src\/(agent-tools|custom-connectors)|foundation\/agent-tools)\/.+\.ts$/;
+// An area package keeps the folders of the Worker source in server/
+// (Refactor 17, Stage B), with its tool families.
+const AREA_SOURCE =
+  /^areas\/[^/]+\/server\/(agent-tools|custom-connectors)\/.+\.ts$/;
 const DEFINITION = /define\w+Tool\(\{\n([\s\S]*?)\n\}\);/g;
 const EFFECTS_WITH_PREPARE = new Set(["draft", "receipt", "scheduled"]);
 
 const files = execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8" })
   .split("\n")
-  .filter((path) => SOURCE.test(path));
+  .filter((path) => SOURCE.test(path) || AREA_SOURCE.test(path));
 
 const faults = [];
 let tools = 0;
