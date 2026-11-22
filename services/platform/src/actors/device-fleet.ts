@@ -163,6 +163,10 @@ export type DeviceSample = Readonly<{
   at: number;
 }>;
 
+/**
+ * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * Durable Object binding DEVICE_FLEET of `wrangler.jsonc`.
+ */
 export class DeviceFleetActor extends DurableObject<Env> {
   readonly #sql: SqlStorage;
   /** An erased Actor has no tables, so a late socket event does nothing. */

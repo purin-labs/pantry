@@ -5,7 +5,12 @@ import type { Env } from "@purin-labs/kernel/env";
 
 const CUSTOM_CONNECTOR_FETCH_PORT = 8080;
 
-/** Credentialed egress for reviewed custom connector operations. */
+/**
+ * Credentialed egress for reviewed custom connector operations.
+ *
+ * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * container binding CUSTOM_CONNECTOR_FETCH of `wrangler.jsonc`.
+ */
 export class CustomConnectorFetchContainer extends Container<Env> {
   defaultPort = CUSTOM_CONNECTOR_FETCH_PORT;
   requiredPorts = [CUSTOM_CONNECTOR_FETCH_PORT];
