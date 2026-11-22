@@ -1,0 +1,163 @@
+{
+  "about": "Refactor 17, Stage B, decision D1: the files of the area devices join one workspace package @purin-labs/area-devices in areas/devices. scripts/refactor-17/move-module.mjs reads this plan. files: each source file that scripts/layers.json gives the module, with its place in the target folder: a Worker file goes to server/ with its sub-path below services/platform/src/, less its first folder when that folder is devices/ or commerce/ (the longer lines of sourcePrefixes give this rule, one time for each file, and no two files then share a place), a Portal file goes to ui/ and keeps its sub-path below apps/portal/src/. sourcePrefixes: where --sync-plan puts a file that the module gets later. package: the manifest and the tsconfig of the new package; the versions of devDependencies come from the Worker and the Portal manifests. The exports map gives each .ts file of server/ and of ui/ and each style sheet of ui/ as an entry; a .tsx file that another module imports has an entry of its own. The tsconfig of the package reads server/ only. The Worker tsconfigs include areas/*/server and the Portal tsconfig includes areas/*/ui (the preparation commit \"Type checks: the Worker and the Portal programs read the area packages\"), so each file stays in the program that checked it before the move. edits: text edits of the files that name a root folder or a source folder and cannot read scripts/lib/source-roots.mjs; an edit is done when the file holds its replace text. keepForm: each file where an import stays on its line, because the wrap of Prettier would move a ratchet, with its reason. regenerate: the commands that write a generated file again. package.typeCheck false: the package has no check:types script of its own. Its own file server/actors/device-fleet.ts reads the Env key BAKE_RUN, which services/platform/src/actors/bake-run.ts (workers/platform) merges with declare module of @purin-labs/kernel/env. Through @purin-labs/tenancy, @purin-labs/actor-runtime, @purin-labs/agent, @purin-labs/tool-handlers and @purin-labs/conversation the program also lacks ORGANISATION, SESSION, CASE, CONNECTOR, CODE_MODE_SANDBOX, MESSAGE_LINK_FETCH and EVENT_Q, and two public files of cafe that it imports by a relative path type-import Worker files. The package alone gives 159 errors, 2 of them in its own files. The first area package: the edits add the root folder areas to the source roots, the clone scan, knip and the IFC ESLint run.",
+  "module": "areas/devices",
+  "target": "areas/devices",
+  "workspaceEntry": "areas/*",
+  "sourcePrefixes": {
+    "services/platform/src/devices/": "server/",
+    "services/platform/src/commerce/": "server/",
+    "services/platform/src/": "server/",
+    "apps/portal/src/": "ui/"
+  },
+  "package": {
+    "name": "@purin-labs/area-devices",
+    "exports": {
+      "./server/*": {
+        "types": "./server/*.ts",
+        "default": "./server/*.ts"
+      },
+      "./ui/*.css": "./ui/*.css",
+      "./ui/*": {
+        "types": "./ui/*.ts",
+        "default": "./ui/*.ts"
+      },
+      "./ui/features/devices/route": "./ui/features/devices/route.tsx"
+    },
+    "dependencies": {
+      "@purin-labs/actor-runtime": "workspace:*",
+      "@purin-labs/agent": "workspace:*",
+      "@purin-labs/agent-tools": "workspace:*",
+      "@purin-labs/authority": "workspace:*",
+      "@purin-labs/cafe-control-api": "workspace:*",
+      "@purin-labs/control": "workspace:*",
+      "@purin-labs/control-api": "workspace:*",
+      "@purin-labs/kernel": "workspace:*",
+      "@purin-labs/std": "workspace:*",
+      "@purin-labs/tenancy": "workspace:*",
+      "@purin-labs/tool-handlers": "workspace:*",
+      "@purin-labs/type-utils": "workspace:*",
+      "@purin-labs/ui": "workspace:*",
+      "react": "^19.1.1",
+      "react-router": "^7.18.2"
+    },
+    "devDependencies": [
+      "@cloudflare/workers-types",
+      "@types/react",
+      "tsrs"
+    ],
+    "versionsFrom": [
+      "services/platform/package.json",
+      "apps/portal/package.json"
+    ],
+    "tsconfig": {
+      "extends": "../../tsconfig.base.json",
+      "compilerOptions": {
+        "noEmit": true,
+        "lib": [
+          "ESNext"
+        ],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "types": [
+          "@cloudflare/workers-types"
+        ],
+        "allowImportingTsExtensions": true
+      },
+      "include": [
+        "server/**/*.ts"
+      ]
+    },
+    "typeCheck": false
+  },
+  "edits": [
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints that walk the product source read the new root folder areas",
+      "find": "export const SOURCE_ROOTS = [\"apps\", \"foundation\", \"packages\", \"services\"];",
+      "replace": "export const SOURCE_ROOTS = [\n  \"apps\",\n  \"areas\",\n  \"foundation\",\n  \"packages\",\n  \"services\",\n];"
+    },
+    {
+      "file": ".jscpd.json",
+      "why": "the clone scan reads the new root folder areas",
+      "find": "\"path\": [\"apps\", \"foundation\", \"packages\", \"services\", \"crates\"]",
+      "replace": "\"path\": [\"apps\", \"areas\", \"foundation\", \"packages\", \"services\", \"crates\"]"
+    },
+    {
+      "file": "knip.json",
+      "why": "knip reads each area package and judges each of its exports (includeEntryExports), as it judged them in the Worker and the Portal: an area package is a module of the Worker and the Portal, not an entry for others",
+      "find": "    \"foundation/ui\": {\n",
+      "replace": "    \"areas/*\": {\n      \"entry\": [\n        \"server/**/*.fixtures.ts\",\n        \"server/**/*.type-fixtures.ts\",\n        \"ui/**/*.type-fixtures.ts\",\n        \"ui/**/*.typecheck.ts\"\n      ],\n      \"project\": [\"**/*.{ts,tsx}\"],\n      \"includeEntryExports\": true\n    },\n    \"foundation/ui\": {\n"
+    },
+    {
+      "file": "package.json",
+      "why": "ESLint reads the new root folder areas in pnpm lint:ifc-boundaries",
+      "find": "eslint services/platform/src foundation apps/portal/src",
+      "replace": "eslint services/platform/src foundation areas apps/portal/src"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the lints of the Worker source and ESLint read the Worker files of the package",
+      "find": "PLATFORM_SOURCE.push(\"packages/collaboration/worker\");\n",
+      "replace": "PLATFORM_SOURCE.push(\"packages/collaboration/worker\");\n// The Worker side of the area devices (Refactor 17, Stage B).\nPLATFORM_SOURCE.push(\"areas/devices/server\");\n"
+    },
+    {
+      "file": "scripts/lib/source-roots.mjs",
+      "why": "the Portal lints and the ESLint rules of the Portal source read the Portal files of the package",
+      "find": "PORTAL_SOURCE.push(\"packages/collaboration/portal\");\n",
+      "replace": "PORTAL_SOURCE.push(\"packages/collaboration/portal\");\n// The Portal side of the area devices (Refactor 17, Stage B).\nPORTAL_SOURCE.push(\"areas/devices/ui\");\n"
+    }
+  ],
+  "keepForm": [
+    {
+      "file": "services/platform/src/actors/bake-run-ports.ts",
+      "why": "a file of the Worker module with logic (worker-logic of pnpm lint:layer-debts): Prettier wraps its two longer device imports by package name, which adds 6 lines to that count"
+    }
+  ],
+  "regenerate": [
+    {
+      "run": [
+        "node",
+        "scripts/check-layers.mjs",
+        "--areas",
+        "--write"
+      ],
+      "writes": [
+        "docs/layers.md"
+      ]
+    }
+  ],
+  "files": {
+    "apps/portal/src/features/devices/add-gateway.tsx": "ui/features/devices/add-gateway.tsx",
+    "apps/portal/src/features/devices/devices.css": "ui/features/devices/devices.css",
+    "apps/portal/src/features/devices/drawer.tsx": "ui/features/devices/drawer.tsx",
+    "apps/portal/src/features/devices/requests.ts": "ui/features/devices/requests.ts",
+    "apps/portal/src/features/devices/route.tsx": "ui/features/devices/route.tsx",
+    "apps/portal/src/features/devices/status.ts": "ui/features/devices/status.ts",
+    "services/platform/src/actors/device-command.machine.ts": "server/actors/device-command.machine.ts",
+    "services/platform/src/actors/device-command.ts": "server/actors/device-command.ts",
+    "services/platform/src/actors/device-fleet-cobot.ts": "server/actors/device-fleet-cobot.ts",
+    "services/platform/src/actors/device-fleet-printer.ts": "server/actors/device-fleet-printer.ts",
+    "services/platform/src/actors/device-fleet-schema.ts": "server/actors/device-fleet-schema.ts",
+    "services/platform/src/actors/device-fleet-terminal.ts": "server/actors/device-fleet-terminal.ts",
+    "services/platform/src/actors/device-fleet.ts": "server/actors/device-fleet.ts",
+    "services/platform/src/agent-tools/devices/devices.ts": "server/agent-tools/devices/devices.ts",
+    "services/platform/src/agent-tools/devices/handlers.ts": "server/agent-tools/devices/handlers.ts",
+    "services/platform/src/agent-tools/devices/services.ts": "server/agent-tools/devices/services.ts",
+    "services/platform/src/agent-tools/devices/turn-services.ts": "server/agent-tools/devices/turn-services.ts",
+    "services/platform/src/control/routes/devices.ts": "server/control/routes/devices.ts",
+    "services/platform/src/devices/alerts.ts": "server/alerts.ts",
+    "services/platform/src/devices/commands.ts": "server/commands.ts",
+    "services/platform/src/devices/contract/alert-delivery.ts": "server/contract/alert-delivery.ts",
+    "services/platform/src/devices/contract/device-commands.ts": "server/contract/device-commands.ts",
+    "services/platform/src/devices/contract/fleet-stub.ts": "server/contract/fleet-stub.ts",
+    "services/platform/src/devices/contract/shop-mac-devices.ts": "server/contract/shop-mac-devices.ts",
+    "services/platform/src/devices/gateway-routes.ts": "server/gateway-routes.ts",
+    "services/platform/src/devices/purge.ts": "server/purge.ts",
+    "services/platform/src/devices/readiness.ts": "server/readiness.ts",
+    "services/platform/src/devices/snapshots.ts": "server/snapshots.ts",
+    "services/platform/src/devices/store.ts": "server/store.ts",
+    "services/platform/src/devices/views.ts": "server/views.ts",
+    "services/platform/src/devices/work.ts": "server/work.ts"
+  }
+}
