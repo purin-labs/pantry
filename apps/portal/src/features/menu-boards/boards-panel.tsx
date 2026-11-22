@@ -1,5 +1,5 @@
 import React from "react";
-import { useChatAgentRequest } from "../collaboration/agent-request";
+import { useChatAgentRequest } from "@purin-labs/collaboration/portal/agent-request";
 import { History, Plus, Redo2, Undo2 } from "lucide-react";
 import {
   parseMenuBoardSummaries,

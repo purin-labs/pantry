@@ -1,4 +1,4 @@
-import { DraftLeaveDialog } from "../collaboration/draft-leave-dialog";
+import { DraftLeaveDialog } from "@purin-labs/collaboration/portal/draft-leave-dialog";
 import { Select } from "@purin-labs/ui/select";
 import { SideDrawer } from "@purin-labs/ui/index";
 import React from "react";
@@ -23,7 +23,7 @@ import {
   DraftMousePointers,
   DraftParticipants,
   type DraftPresenceView,
-} from "../collaboration/draft-presence";
+} from "@purin-labs/collaboration/portal/draft-presence";
 import { MenuDraftClient, type MenuDraftView } from "./menu-client";
 import { MenuBoardsPanel } from "../menu-boards/boards-panel";
 import { MenuScreensPanel } from "../menu-boards/screens-panel";

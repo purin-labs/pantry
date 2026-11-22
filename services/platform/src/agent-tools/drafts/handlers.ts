@@ -1,7 +1,7 @@
 import {
   resolveCanvasCollaborationAgent,
   resolveCollaborationAgent,
-} from "../../actors/collaboration-agent";
+} from "@purin-labs/collaboration/worker/collaboration-agent";
 import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import {
   type MenuDraftEdit,

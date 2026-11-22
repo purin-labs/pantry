@@ -14,7 +14,7 @@ import {
   DocumentSocket,
   webSocketUrl,
   type DocumentConnection,
-} from "../collaboration/document-client";
+} from "@purin-labs/collaboration/portal/document-client";
 
 export type DraftConnectionView = Readonly<{
   status: "connecting" | "syncing" | "synced" | "reconnecting" | "failed";

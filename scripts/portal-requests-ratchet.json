@@ -8,7 +8,6 @@
     "apps/portal/src/features/chat/goal.tsx": 2,
     "apps/portal/src/features/chat/project-sharing.tsx": 2,
     "apps/portal/src/features/chat/screen-relevance.ts": 2,
-    "apps/portal/src/features/collaboration/slack-thread-control.tsx": 2,
     "apps/portal/src/features/commerce/description-draft/control.tsx": 1,
     "apps/portal/src/features/commerce/entity-plane/product-sale-details.tsx": 3,
     "apps/portal/src/features/commerce/inventory-production.tsx": 4,
@@ -43,6 +42,7 @@
     "apps/portal/src/features/voice/control.tsx": 2,
     "apps/portal/src/features/workflow-simulator/workspace-runs-panel.tsx": 1,
     "apps/portal/src/pages/home.tsx": 1,
-    "apps/portal/src/portal.tsx": 8
+    "apps/portal/src/portal.tsx": 8,
+    "packages/collaboration/portal/slack-thread-control.tsx": 2
   }
 }

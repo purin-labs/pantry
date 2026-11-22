@@ -707,13 +707,58 @@ importers:
 
   packages/collaboration:
     dependencies:
+      '@purin-labs/actor-runtime':
+        specifier: workspace:*
+        version: link:../../foundation/actor-runtime
+      '@purin-labs/agent':
+        specifier: workspace:*
+        version: link:../../foundation/agent
+      '@purin-labs/async-control':
+        specifier: workspace:*
+        version: link:../async-control
+      '@purin-labs/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@purin-labs/control':
+        specifier: workspace:*
+        version: link:../../foundation/control
+      '@purin-labs/control-api':
+        specifier: workspace:*
+        version: link:../control-api
+      '@purin-labs/conversation':
+        specifier: workspace:*
+        version: link:../../foundation/conversation
+      '@purin-labs/kernel':
+        specifier: workspace:*
+        version: link:../../foundation/kernel
       '@purin-labs/std':
         specifier: workspace:*
         version: link:../std
+      '@purin-labs/tenancy':
+        specifier: workspace:*
+        version: link:../../foundation/tenancy
+      '@purin-labs/type-utils':
+        specifier: workspace:*
+        version: link:../type-utils
+      '@purin-labs/ui':
+        specifier: workspace:*
+        version: link:../../foundation/ui
+      lucide-react:
+        specifier: ^0.542.0
+        version: 0.542.0(react@19.2.7)
+      react:
+        specifier: ^19.1.1
+        version: 19.2.7
+      react-router:
+        specifier: ^7.18.2
+        version: 7.18.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       yjs:
         specifier: 13.6.32
         version: 13.6.32
     devDependencies:
+      '@types/react':
+        specifier: ^19.1.12
+        version: 19.2.17
       tsrs:
         specifier: 0.18.0-ts7.1.0-dev.20260929
         version: 0.18.0-ts7.1.0-dev.20260929

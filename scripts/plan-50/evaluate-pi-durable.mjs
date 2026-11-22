@@ -449,7 +449,7 @@ async function sourceEvidence() {
       "scripts/plan-50/draft-worker.mjs",
       "scripts/plan-50/draft-seed.mjs",
       "services/platform/src/actors/product-description-draft.ts",
-      "services/platform/src/actors/collaboration-room.ts",
+      "packages/collaboration/worker/collaboration-room.ts",
       "services/platform/src/actors/commerce-projection.ts",
       "foundation/agent/actors/session-execution-admission.ts",
       "foundation/actor-runtime/actors/actor-activation.ts",

@@ -71,7 +71,7 @@ import {
   resolveCollaborationSocket,
   type CollaborationRoomRoute,
   type CollaborationSocketRooms,
-} from "./collaboration-room-dispatch";
+} from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
 import { commerceCollaborationRooms } from "./commerce-collaboration-rooms";
 import { inboxCollaborationRooms } from "./inbox-collaboration-rooms";
 import { kitchenCollaborationRooms } from "./kitchen-collaboration-rooms";
@@ -121,7 +121,7 @@ import { WorkflowDraftRooms } from "./workflow-draft";
 import {
   collaborationSocketRoute,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 import {
   acceptedSocket,
   closeAcceptedSocket,

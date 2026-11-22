@@ -1,4 +1,4 @@
-import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
+import { resolveCollaborationAgent } from "@purin-labs/collaboration/worker/collaboration-agent";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { workflowCanvasDocumentId } from "@purin-labs/bakery-model/bakery-canvas-source";
 import type {

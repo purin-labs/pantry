@@ -1,5 +1,5 @@
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import { resolveCanvasCollaborationAgent } from "../../actors/collaboration-agent";
+import { resolveCanvasCollaborationAgent } from "@purin-labs/collaboration/worker/collaboration-agent";
 import type { HarnessToolArgumentObserver } from "@purin-labs/agent/actors/embedded-harness";
 import type { MenuBoardDraftEdit } from "../../actors/menu-board-agent-action";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";

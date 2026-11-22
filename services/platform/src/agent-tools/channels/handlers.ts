@@ -1,5 +1,5 @@
 import type { OrganisationDatabase } from "@purin-labs/kernel/database-handles";
-import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
+import { resolveCollaborationAgent } from "@purin-labs/collaboration/worker/collaboration-agent";
 import { acceptedExecutionAuthority } from "@purin-labs/tenancy/organisation-access/access";
 import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { registerEmailSelfTest } from "../../data/email-self-test";

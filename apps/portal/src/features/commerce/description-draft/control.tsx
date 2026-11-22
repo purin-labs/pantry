@@ -4,7 +4,7 @@ import { ControlApiError, controlRead } from "@purin-labs/control/portal/control
 import type {
   CommerceActionRecord,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
-import { SlackThreadControl } from "../../collaboration/slack-thread-control";
+import { SlackThreadControl } from "@purin-labs/collaboration/portal/slack-thread-control";
 import type { ProductDescriptionActionTransport, ProductDescriptionSnapshot } from "./editor";
 import "./styles.css";
 import { type ProductDescriptionResponse, parseProductDescriptionResponse } from "@purin-labs/control-api/portal/description-draft";

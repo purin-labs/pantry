@@ -32,7 +32,7 @@ import {
 } from "@purin-labs/conversation/chat/conversation-access";
 import { readJsonRecord } from "@purin-labs/control/worker/http";
 import { parseUserId, type UserId } from "@purin-labs/control-api/ids";
-import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
+import { resolveCollaborationSlackThread } from "@purin-labs/collaboration/worker/collaboration-slack-thread";
 import type { Env } from "@purin-labs/kernel/env";
 import type { ControlSessionId, OrganisationId } from "@purin-labs/kernel/ids";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
@@ -45,7 +45,7 @@ import {
   type CollaborationRoomProtocol,
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 
 /**
  * Plan 40D: the shared production plan of each location. The plan holds draft

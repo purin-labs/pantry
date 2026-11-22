@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useBlocker } from "react-router";
-import { DraftLeaveDialog } from "../collaboration/draft-leave-dialog";
+import { DraftLeaveDialog } from "@purin-labs/collaboration/portal/draft-leave-dialog";
 import type { RecipeRevision } from "@purin-labs/commerce-contracts";
 import {
   parseRecipeCollection,

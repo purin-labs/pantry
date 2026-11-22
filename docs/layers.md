@@ -183,10 +183,10 @@ import. A module with no line for one of these has none.
 ## foundation/collaboration
 
 - Folders: 4
-  - `apps/portal/src/features/collaboration/`
+  - `packages/collaboration/portal/`
   - `packages/collaboration/src/`
   - `packages/collaboration/tests/`
-  - `services/platform/src/actors/`
+  - `packages/collaboration/worker/`
 - Packages: `packages/collaboration`
 
 ## areas/brain

@@ -52,7 +52,7 @@ import {
   type CollaborationRoomProtocol,
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 
 /**
  * Plan 40D: a shared draft of one Inbox reply. The Gmail draft stays the

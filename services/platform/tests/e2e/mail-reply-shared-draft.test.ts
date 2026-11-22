@@ -42,7 +42,7 @@ import {
 } from "./memory-support";
 import type { ModelRoute } from "@purin-labs/contracts";
 import { readEmailProposalChatContext } from "../../src/actors/email-proposal-sources";
-import { CollaborationRoom } from "../../src/actors/collaboration-room";
+import { CollaborationRoom } from "@purin-labs/collaboration/worker/collaboration-room";
 import { ConnectorEmail } from "../../src/actors/connector/connector-email-actor";
 import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { network } from "./network";

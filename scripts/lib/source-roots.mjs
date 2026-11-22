@@ -13,6 +13,8 @@ export const SOURCE_ROOTS = ["apps", "foundation", "packages", "services"];
 
 /** The folders that hold the source of the Platform Worker. */
 export const PLATFORM_SOURCE = ["services/platform/src", "foundation"];
+// The Worker side of packages/collaboration (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("packages/collaboration/worker");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
@@ -25,6 +27,8 @@ export const PORTAL_SOURCE = [
   "foundation/control/portal",
   "foundation/ui",
 ];
+// The Portal side of packages/collaboration (Refactor 17, Stage B).
+PORTAL_SOURCE.push("packages/collaboration/portal");
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

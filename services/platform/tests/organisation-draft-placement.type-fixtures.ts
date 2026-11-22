@@ -1,4 +1,4 @@
-import type { CollaborationMutationAuthority } from "../src/actors/collaboration-room";
+import type { CollaborationMutationAuthority } from "@purin-labs/collaboration/worker/collaboration-room";
 import type { ProductDescriptionDraftRooms } from "../src/actors/product-description-draft";
 import type { EmailDraftRooms } from "../src/actors/email-draft";
 

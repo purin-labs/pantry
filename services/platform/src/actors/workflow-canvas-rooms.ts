@@ -1,5 +1,5 @@
 import type { CollaborationAgent } from "@purin-labs/collaboration";
-import type { CollaborationMutationOrigin } from "./collaboration-room";
+import type { CollaborationMutationOrigin } from "@purin-labs/collaboration/worker/collaboration-room";
 import {
   parseWorkflowCanvasSource,
   workflowCanvasDocumentId,
@@ -38,7 +38,7 @@ import {
   openRoomSockets,
   type CollaborationRoomSocket,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 import { readWorkflowCanvasSource } from "./workflow-canvas-source";
 import {
   createWorkflowCanvasSchema,

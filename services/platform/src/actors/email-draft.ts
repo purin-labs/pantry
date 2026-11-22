@@ -39,8 +39,8 @@ import {
   type CollaborationRoomProtocol,
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
-import { resolveCollaborationSlackThread } from "./collaboration-slack-thread";
+} from "@purin-labs/collaboration/worker/collaboration-room";
+import { resolveCollaborationSlackThread } from "@purin-labs/collaboration/worker/collaboration-slack-thread";
 import type { Variant } from "@purin-labs/type-utils";
 import { assertNever, hasExactKeys, isRecord } from "@purin-labs/std";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";

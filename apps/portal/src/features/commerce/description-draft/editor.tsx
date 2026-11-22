@@ -1,9 +1,9 @@
-import { AgentCursors } from "../../collaboration/agent-cursors";
+import { AgentCursors } from "@purin-labs/collaboration/portal/agent-cursors";
 import React from "react";
 import { useBlocker, type Blocker } from "react-router";
 import { DESCRIPTION_LIMIT } from "@purin-labs/product-description-crdt";
 import { DescriptionDraftClient, type DescriptionDraftView } from "./client";
-import { DraftParticipants, DraftPresenceOverlay, DraftMousePointers } from "../../collaboration/draft-presence";
+import { DraftParticipants, DraftPresenceOverlay, DraftMousePointers } from "@purin-labs/collaboration/portal/draft-presence";
 import { cancelDialog, syncDialog } from "@purin-labs/ui/dialog";
 import type {
   CommerceActionRecord,

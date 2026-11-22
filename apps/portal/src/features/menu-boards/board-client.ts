@@ -30,7 +30,7 @@ import {
   webSocketUrl,
   type DocumentParticipant,
   type DocumentState,
-} from "../collaboration/document-client";
+} from "@purin-labs/collaboration/portal/document-client";
 
 /**
  * The Portal's side of one board's shared draft (Plan 40B). It is the menu

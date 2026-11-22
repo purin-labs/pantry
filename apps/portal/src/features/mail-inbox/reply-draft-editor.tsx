@@ -2,11 +2,11 @@ import React from "react";
 import type { CollaborationAgentActivity } from "@purin-labs/collaboration";
 import { assertNever } from "@purin-labs/std";
 import { BODY_LIMIT } from "@purin-labs/mail-reply-crdt";
-import { AgentCursors } from "../collaboration/agent-cursors";
+import { AgentCursors } from "@purin-labs/collaboration/portal/agent-cursors";
 import {
   DraftParticipants,
   DraftPresenceOverlay,
-} from "../collaboration/draft-presence";
+} from "@purin-labs/collaboration/portal/draft-presence";
 import { ReplyDraftClient, type ReplyDraftView } from "./reply-draft-client";
 
 type Props = Readonly<{

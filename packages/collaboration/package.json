@@ -4,7 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./worker/*": "./worker/*.ts",
+    "./portal/*.css": "./portal/*.css",
+    "./portal/*": "./portal/*.ts",
+    "./portal/agent-cursors": "./portal/agent-cursors.tsx",
+    "./portal/draft-leave-dialog": "./portal/draft-leave-dialog.tsx",
+    "./portal/draft-presence": "./portal/draft-presence.tsx",
+    "./portal/slack-thread-control": "./portal/slack-thread-control.tsx"
   },
   "scripts": {
     "check:types": "tsrs --noEmit",
@@ -12,10 +19,25 @@
   },
   "dependencies": {
     "@purin-labs/std": "workspace:*",
+    "@purin-labs/actor-runtime": "workspace:*",
+    "@purin-labs/agent": "workspace:*",
+    "@purin-labs/async-control": "workspace:*",
+    "@purin-labs/contracts": "workspace:*",
+    "@purin-labs/control": "workspace:*",
+    "@purin-labs/control-api": "workspace:*",
+    "@purin-labs/conversation": "workspace:*",
+    "@purin-labs/kernel": "workspace:*",
+    "@purin-labs/tenancy": "workspace:*",
+    "@purin-labs/type-utils": "workspace:*",
+    "@purin-labs/ui": "workspace:*",
+    "react-router": "^7.18.2",
+    "react": "^19.1.1",
+    "lucide-react": "^0.542.0",
     "yjs": "13.6.32"
   },
   "devDependencies": {
     "tsrs": "0.18.0-ts7.1.0-dev.20260929",
-    "vitest": "4.1.9"
+    "vitest": "4.1.9",
+    "@types/react": "^19.1.12"
   }
 }

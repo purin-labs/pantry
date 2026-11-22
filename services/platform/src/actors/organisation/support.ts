@@ -5,7 +5,7 @@ import {
   selectOrganisationPlacementDatabase,
 } from "@purin-labs/tenancy/organisation-execution-scope";
 import { isOrganisationExecutionActive } from "@purin-labs/actor-runtime/actors/actor-execution-quiescence";
-import { collaborationSocketRoute } from "../collaboration-room";
+import { collaborationSocketRoute } from "@purin-labs/collaboration/worker/collaboration-room";
 import {
   SOCKET_SILENCE_LIMIT_MS,
   SOCKET_SWEEP_INTERVAL_MS,

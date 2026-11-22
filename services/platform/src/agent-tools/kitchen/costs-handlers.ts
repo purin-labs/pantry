@@ -76,7 +76,7 @@ import { CommerceReadRequestError } from "../../commerce/contract/read-errors";
 import type { Env } from "@purin-labs/kernel/env";
 import { requireActiveOrganisationActorAtPlacement } from "@purin-labs/actor-runtime/actors/actor-router";
 import { preflightHarnessTurnLease } from "@purin-labs/agent/actors/agent-session-harness-authority";
-import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
+import { resolveCollaborationAgent } from "@purin-labs/collaboration/worker/collaboration-agent";
 import {
   requireSessionExecution,
   type SessionExecutionAdmission,

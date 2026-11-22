@@ -37,7 +37,7 @@ import {
   type CollaborationRoomProtocol,
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 
 type DraftUpdate = DraftEncoding<"update">;
 type DraftStateVector = DraftEncoding<"state_vector">;

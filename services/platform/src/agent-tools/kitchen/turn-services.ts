@@ -1,5 +1,5 @@
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { collaborationAgentLabel } from "../../actors/collaboration-agent";
+import { collaborationAgentLabel } from "@purin-labs/collaboration/worker/collaboration-agent";
 import {
   beginProposalStaging,
   type StageConfigurationDraft,

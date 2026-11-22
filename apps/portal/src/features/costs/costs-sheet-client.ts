@@ -21,7 +21,7 @@ import {
   webSocketUrl,
   type DocumentParticipant,
   type DocumentState,
-} from "../collaboration/document-client";
+} from "@purin-labs/collaboration/portal/document-client";
 
 const SYNC_RETRY_LIMIT = 3;
 

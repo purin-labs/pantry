@@ -21,9 +21,9 @@ import {
   type TextCollaborationView,
   type TextDocumentAdapter,
   type TextProtocolAdapter,
-} from "../../collaboration/text-client";
-import { webSocketUrl } from "../../collaboration/document-client";
-import type { DraftPresenceView } from "../../collaboration/draft-presence";
+} from "@purin-labs/collaboration/portal/text-client";
+import { webSocketUrl } from "@purin-labs/collaboration/portal/document-client";
+import type { DraftPresenceView } from "@purin-labs/collaboration/portal/draft-presence";
 import { assertNever } from "@purin-labs/std";
 import { parseDescriptionServerMessage } from "@purin-labs/commerce-control-api/portal/description-collaboration";
 

@@ -12,8 +12,8 @@ import type {
   TextSelectionDirection,
 } from "@purin-labs/collaboration";
 import { assertNever } from "@purin-labs/std";
-import { TextCollaborationClient, type TextCollaborationClientMessage, type TextCollaborationView, type TextDocumentAdapter, type TextProtocolAdapter } from "../collaboration/text-client";
-import type { DraftPresenceView } from "../collaboration/draft-presence";
+import { TextCollaborationClient, type TextCollaborationClientMessage, type TextCollaborationView, type TextDocumentAdapter, type TextProtocolAdapter } from "@purin-labs/collaboration/portal/text-client";
+import type { DraftPresenceView } from "@purin-labs/collaboration/portal/draft-presence";
 import {
   parseReplyServerMessage,
 } from "@purin-labs/inbox-control-api/portal/reply-draft";

@@ -14,7 +14,7 @@ import {
 import type {
   CollaborationRoomRoute,
   CollaborationSocketRooms,
-} from "./collaboration-room-dispatch";
+} from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
 import type { CostsSheetRooms } from "./costs-sheet-draft";
 import type { ProductionPlanRooms } from "./production-plan";
 import type { WorkflowCanvasRooms } from "./workflow-canvas-rooms";

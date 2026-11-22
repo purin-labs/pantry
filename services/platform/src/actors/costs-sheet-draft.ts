@@ -36,7 +36,7 @@ import {
   type CollaborationRoomProtocol,
   type CollaborationRoomServerMessage,
   type CollaborationSocketRoom,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 
 const COSTS_SHEET_ID = "costs-sheet";
 const COMPACT_STATE_BYTES = 48 * 1024;

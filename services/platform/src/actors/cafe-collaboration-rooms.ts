@@ -6,7 +6,7 @@ import {
 import type {
   CollaborationRoomRoute,
   CollaborationSocketRooms,
-} from "./collaboration-room-dispatch";
+} from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
 import type { MenuBoardRooms } from "./menu-boards";
 import type { MenuDraftRooms } from "./menu-draft";
 

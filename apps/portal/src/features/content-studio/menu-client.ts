@@ -20,7 +20,7 @@ import {
   webSocketUrl,
   type DocumentParticipant,
   type DocumentState,
-} from "../collaboration/document-client";
+} from "@purin-labs/collaboration/portal/document-client";
 
 export type MenuDraftView = Readonly<{
   draft: MenuDraftSnapshot;

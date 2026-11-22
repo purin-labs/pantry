@@ -3,7 +3,7 @@ import {
   SURFACE_EFFECT_SIGNAL,
   type ChatSignal,
 } from "@purin-labs/control-api";
-import { SocketLiveness } from "../collaboration/socket-liveness";
+import { SocketLiveness } from "@purin-labs/collaboration/portal/socket-liveness";
 import {
   announceSurfaceEffect,
   setSurfaceSignalsLive,

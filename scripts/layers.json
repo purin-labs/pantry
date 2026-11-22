@@ -423,7 +423,6 @@
     "apps/portal/src/features/brain/": "areas/brain",
     "apps/portal/src/features/chat/": "surfaces/portal",
     "apps/portal/src/features/checkout-profiles/": "areas/commerce",
-    "apps/portal/src/features/collaboration/": "foundation/collaboration",
     "packages/collaboration/src/": "foundation/collaboration",
     "packages/collaboration/tests/": "foundation/collaboration",
     "apps/portal/src/features/commerce/": "areas/commerce",
@@ -503,7 +502,9 @@
     "services/platform/src/stripe/": "areas/commerce",
     "services/platform/src/vault-onepassword/": "foundation/authority",
     "services/platform/src/voice/": "surfaces/voice",
-    "services/platform/src/whatsapp/": "surfaces/whatsapp"
+    "services/platform/src/whatsapp/": "surfaces/whatsapp",
+    "packages/collaboration/portal/": "foundation/collaboration",
+    "packages/collaboration/worker/": "foundation/collaboration"
   },
   "files": {
     "apps/portal/src/agent-operations.ts": "areas/organisation",
@@ -542,14 +543,10 @@
     "services/platform/src/actors/bakery-surface-effect.ts": "areas/kitchen",
     "services/platform/src/actors/case-execution-records.ts": "areas/brain",
     "services/platform/src/actors/case.ts": "workers/platform",
-    "services/platform/src/actors/collaboration-agent.ts": "foundation/collaboration",
-    "services/platform/src/actors/collaboration-room.ts": "foundation/collaboration",
-    "services/platform/src/actors/collaboration-room-dispatch.ts": "foundation/collaboration",
     "services/platform/src/actors/cafe-collaboration-rooms.ts": "areas/cafe",
     "services/platform/src/actors/commerce-collaboration-rooms.ts": "areas/commerce",
     "services/platform/src/actors/inbox-collaboration-rooms.ts": "areas/inbox",
     "services/platform/src/actors/kitchen-collaboration-rooms.ts": "areas/kitchen",
-    "services/platform/src/actors/collaboration-slack-thread.ts": "foundation/collaboration",
     "services/platform/src/actors/commerce-context-tool-result.ts": "areas/commerce",
     "services/platform/src/actors/commerce-projection.ts": "areas/commerce",
     "services/platform/src/actors/commerce-query-schema.ts": "areas/commerce",

@@ -1,4 +1,4 @@
-import { resolveCollaborationAgent } from "../../actors/collaboration-agent";
+import { resolveCollaborationAgent } from "@purin-labs/collaboration/worker/collaboration-agent";
 import { sessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import type { CaseAssignment, HarnessTurnLease } from "@purin-labs/contracts";
 import type { Env } from "@purin-labs/kernel/env";

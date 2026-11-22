@@ -10,7 +10,7 @@ import {
 import type {
   CollaborationRoomRoute,
   CollaborationSocketRooms,
-} from "./collaboration-room-dispatch";
+} from "@purin-labs/collaboration/worker/collaboration-room-dispatch";
 import type { EmailDraftRooms } from "./email-draft";
 import type { MailReplyDraftRooms } from "./mail-reply-draft";
 

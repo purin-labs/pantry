@@ -1,6 +1,6 @@
 import type { ChatStreamState } from "./delivery";
 import type { PageState } from "./page-state";
-import { setChatAgentRequest } from "../collaboration/agent-request";
+import { setChatAgentRequest } from "@purin-labs/collaboration/portal/agent-request";
 
 /** Called by the chat after each change of its page or its stream. */
 export function publishChatAgentRequest(

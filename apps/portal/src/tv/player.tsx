@@ -17,7 +17,7 @@ import {
   type MenuScreenPickup,
 } from "@purin-labs/control-api";
 import { backoffDelay } from "@purin-labs/std";
-import { webSocketUrl } from "../features/collaboration/document-client";
+import { webSocketUrl } from "@purin-labs/collaboration/portal/document-client";
 import { ScaledBoard } from "../features/menu-boards/board-view";
 
 /**

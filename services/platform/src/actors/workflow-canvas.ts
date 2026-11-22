@@ -34,7 +34,7 @@ import type {
   CollaborationRoomBacking,
   CollaborationRoomProtocol,
   CollaborationRoomServerMessage,
-} from "./collaboration-room";
+} from "@purin-labs/collaboration/worker/collaboration-room";
 
 type CanvasUpdate = CanvasEncoding<"update">;
 type CanvasStateVector = CanvasEncoding<"state_vector">;
