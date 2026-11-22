@@ -844,6 +844,11 @@ belong only to the deleted folders; no kept file shares their hash. A read
 on 22 November 2026 found all 201, and all 3,330 kept objects. The bucket
 also holds 43 objects that no manifest names; this step leaves them.
 
+After the owner's yes ("Push and delete R2"), `921fcc45` went to dev, and
+then the 201 objects were deleted through the R2 API. A list of the bucket
+afterwards: 3,373 objects, none of the 201, all 3,330 kept objects. A branch
+that still names a deleted folder cannot fetch it from R2.
+
 ### 6. Clean the records
 
 - Update AGENTS.md ("Old and new names", "Active runtime", "Deployment"),
