@@ -6,6 +6,7 @@ import ts from "typescript";
 import { describe, expect, it } from "vitest";
 import { createMigratedDatabase } from "./sqlite-d1";
 import { schemaDatabase } from "./split-topology";
+import { PLATFORM_SOURCE } from "../../../scripts/lib/source-roots.mjs";
 
 // The deployed schema is split over the global database (`env.DB`) and one
 // regional database per placement cell. Most suites run on one combined
@@ -16,14 +17,14 @@ import { schemaDatabase } from "./split-topology";
 // its substitutions. A fragment that a statement interpolates by name is
 // checked on its own.
 
-// The Worker source and the foundation packages that the Worker bundles
-// (Refactor 17). A file is named by its path from the repository root.
+// The Worker source: services/platform/src and the folders of the packages
+// that the Worker bundles (Refactor 17), as scripts/lib/source-roots.mjs
+// lists them for the lints. A file is named by its path from the repository
+// root.
 const REPOSITORY_ROOT = fileURLToPath(
   new URL("../../../", import.meta.url).href,
 );
-const SOURCE_ROOTS = ["services/platform/src", "foundation"].map((root) =>
-  join(REPOSITORY_ROOT, root),
-);
+const SOURCE_ROOTS = PLATFORM_SOURCE.map((root) => join(REPOSITORY_ROOT, root));
 
 // Receivers whose name says which database they are. A local `const` is
 // followed to its initialiser, so `env.DB.withSession(…)` kept in `session`
