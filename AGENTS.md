@@ -654,6 +654,7 @@ Production deploys use the platform package, after the fetch of the R2 files
 
 ```bash
 node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics
+node scripts/repo-binaries.mjs fetch assets
 pnpm --filter @purin-labs/platform run deploy
 ```
 

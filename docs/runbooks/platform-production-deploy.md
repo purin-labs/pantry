@@ -13,14 +13,21 @@ the Portal. `AGENTS.md` (Deployment) gives the order of the six Workers.
    pnpm install --prefer-offline --frozen-lockfile
    ```
 
-3. Fetch the files that the Portal serves from R2. The Kitchen physics bundles
-   that no pin names are in the R2 bucket `pantry-repo-binaries-apac`, not in
-   git. A saved run can name any of them, so the Portal build must hold all of
-   them. The fetch needs a Wrangler sign-in, or `R2_ACCESS_KEY_ID`,
-   `R2_SECRET_ACCESS_KEY` and `R2_ENDPOINT`:
+3. Fetch the files that the Portal build needs from R2. They are in the R2
+   bucket `pantry-repo-binaries-apac`, not in git. The Kitchen physics bundles
+   that no pin names: a saved run can name any of them, so the Portal build
+   must hold all of them. The Kitchen models in `assets/`: the Portal type
+   check imports JSON files from `assets/bakery-mujoco` and
+   `assets/bakery-robots`. The fetch takes one path prefix, and it needs a
+   Wrangler sign-in, or `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and
+   `R2_ENDPOINT`:
 
    ```bash
    node scripts/repo-binaries.mjs fetch apps/portal/public/bakery-physics
+   ```
+
+   ```bash
+   node scripts/repo-binaries.mjs fetch assets
    ```
 
 4. Deploy:
