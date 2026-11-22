@@ -231,6 +231,17 @@ This table replaces the first rows of "Authority and ownership" in
 - The Portal setup dialog has three steps: Organisation (the name), Prepare
   and Done. The Project and Billing steps go, because they were Console
   records.
+- Test organisations (22 November 2026, for Plan 91 phase 4): a request with
+  `purpose: "test"` makes the organisation in the development environment
+  on any deployment, so that it takes provider test accounts (a Stripe test
+  account, a Shopify development store). A production organisation refuses
+  them by design. Only a person whose verified Google email is on the Worker
+  secret `PANTRY_TEST_ORGANISATION_OWNERS` may make one; every other person
+  gets `organisation_test_not_allowed` (403). The list is a secret because
+  the repository is public. A test organisation counts toward the limit of
+  5. The Portal has no control for it: an owner on the list sends the
+  request from a signed-in Portal session. Journey: the second case of
+  `tests/e2e/organisation-setup.test.ts`.
 
 ### Members and invitations
 
@@ -356,8 +367,8 @@ This table replaces the first rows of "Authority and ownership" in
 - The chat agent gets one read tool for the plan, the payment state, the use
   and the spending limit: one `defineTool` value in an agent tool family and
   one line in its `registry.ts`.
-- The agent does not create an organisation, invite, accept, remove a member,
-  start payment setup or change the limit. Each of these changes who can act
+- The agent does not create an organisation (a test organisation included),
+  invite, accept, remove a member, start payment setup or change the limit. Each of these changes who can act
   or what the organisation pays, so the person does it (Plan 88 D11).
 
 ### Cost for an idle organisation

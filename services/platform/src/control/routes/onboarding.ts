@@ -304,6 +304,7 @@ async function handleCreateOrganisation(
     case "organisation_create_invalid":
       return controlError(created.error.code, 422);
     case "organisation_owner_unverified":
+    case "organisation_test_not_allowed":
       return controlError(created.error.code, 403);
     case "organisation_limit_reached":
     case "idempotency_key_conflict":

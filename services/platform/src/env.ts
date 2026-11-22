@@ -62,6 +62,8 @@ export interface Env {
   PANTRY_PUBLIC_ORIGIN: string;
   PANTRY_ORGANISATION_PLACEMENT_PROFILE: string;
   PANTRY_DEPLOYMENT_PROFILE?: string;
+  /** Verified Google emails, separated by commas, that may make a test organisation (secret). */
+  PANTRY_TEST_ORGANISATION_OWNERS?: string;
   PANTRY_FAULT_INJECTION_TOKEN?: string;
   /**
    * "on" lets Connectors start warm Case and Session slots (Plan 55F). Every

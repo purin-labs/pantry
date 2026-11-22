@@ -25,6 +25,16 @@ it(
   120_000,
 );
 
+// Plan 91 phase 4. A person on the deployment's list of test organisation
+// owners makes a test organisation, which lives in the development
+// environment, so that it takes provider test accounts. Every other person
+// is refused one.
+it(
+  "makes a test organisation in the development environment for a listed owner, and refuses an owner who is not on the list",
+  testOrganisationJourney,
+  120_000,
+);
+
 type Created = Readonly<{
   status: number;
   organisationId: string | null;
@@ -122,17 +132,138 @@ async function setupJourney(context: TestContext): Promise<void> {
   };
 }
 
+async function testOrganisationJourney(context: TestContext): Promise<void> {
+  // The list is `Test-Owner@pantry.test, second@pantry.test`: the check
+  // ignores case and spaces.
+  const now = Date.now();
+  const listed = await upsertUser({
+    db: env.DB,
+    identity: {
+      issuer: "https://accounts.google.com",
+      subject: `test-owner-${crypto.randomUUID()}`,
+      email: "test-owner@pantry.test",
+      displayName: "Test owner",
+      emailVerified: true,
+    },
+    now,
+  });
+  const listedSession = await issueControlSession({
+    db: env.DB,
+    userId: listed.userId,
+    now,
+    ttlMs: 600_000,
+  });
+  const other = await commerceClient(`test-other-${crypto.randomUUID()}`);
+
+  // Denied: a verified owner who is not on the list.
+  const refused = await create(
+    other.session,
+    "test_operation_other",
+    "Not a test shop",
+    "test",
+  );
+  expect(refused).toMatchObject({
+    status: 403,
+    code: "organisation_test_not_allowed",
+  });
+  expect(await ownedOrganisations(other.session)).toEqual([]);
+
+  // Denied: a purpose that Pantry does not know.
+  const unknownPurpose = await create(
+    listedSession,
+    "test_operation_unknown",
+    "Live shop",
+    "live",
+  );
+  expect(unknownPurpose).toMatchObject({
+    status: 422,
+    code: "organisation_create_invalid",
+  });
+
+  const made = await create(
+    listedSession,
+    "test_operation_listed",
+    "Test shop",
+    "test",
+  );
+  expect(made.status, JSON.stringify(made)).toBe(200);
+  const environment = await organisationEnvironment(
+    listedSession,
+    String(made.organisationId),
+  );
+  expect(environment).toBe("development");
+  // A repeat answers with the same test organisation.
+  const repeat = await create(
+    listedSession,
+    "test_operation_listed",
+    "Test shop",
+    "test",
+  );
+  expect(repeat).toEqual(made);
+  // Denied: the same operation id as an ordinary organisation.
+  const asBusiness = await create(
+    listedSession,
+    "test_operation_listed",
+    "Test shop",
+  );
+  expect(asBusiness).toMatchObject({
+    status: 409,
+    code: "idempotency_key_conflict",
+  });
+  expect(await ownedOrganisations(listedSession)).toEqual([
+    made.organisationId,
+  ]);
+
+  context.task.meta.organisationSetup = {
+    refused,
+    unknownPurpose,
+    made: made.status,
+    environment,
+    repeatSameOrganisation: repeat.organisationId === made.organisationId,
+    asBusiness,
+  };
+}
+
+/** The environment that the Portal reads for the organisation. */
+async function organisationEnvironment(
+  session: IssuedControlSession,
+  organisationId: string,
+): Promise<unknown> {
+  const response = await exports.default.fetch(
+    `https://localhost/v1/control/organisations/${organisationId}`,
+    { headers: commerceHeaders(session) },
+  );
+  const body: unknown = await response.json();
+  const found: unknown[] = [];
+  const visit = (value: unknown): void => {
+    if (Array.isArray(value)) value.forEach(visit);
+    else if (isRecord(value))
+      for (const [key, child] of Object.entries(value))
+        if (key === "environment") found.push(child);
+        else visit(child);
+  };
+  visit(body);
+  if (response.status !== 200 || found.length === 0)
+    throw new Error(`No environment in ${JSON.stringify(body).slice(0, 400)}`);
+  return new Set(found).size === 1 ? found[0] : found;
+}
+
 async function create(
   session: IssuedControlSession,
   operationId: string,
   name: string,
+  purpose?: string,
 ): Promise<Created> {
   const response = await exports.default.fetch(
     "https://localhost/v1/control/organisations",
     {
       method: "POST",
       headers: commerceHeaders(session),
-      body: JSON.stringify({ operationId, name }),
+      body: JSON.stringify(
+        purpose === undefined
+          ? { operationId, name }
+          : { operationId, name, purpose },
+      ),
     },
   );
   const body: unknown = await response.json();

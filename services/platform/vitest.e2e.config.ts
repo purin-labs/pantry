@@ -46,6 +46,7 @@ const TEST_VALUE_BINDINGS = {
   NOTION_OAUTH_CLIENT_ID: "notion-e2e-client",
   PANTRY_DEPLOYMENT_PROFILE: "local",
   PANTRY_PUBLIC_ORIGIN: "https://localhost",
+  PANTRY_TEST_ORGANISATION_OWNERS: "Test-Owner@pantry.test, second@pantry.test",
   SQUARE_OAUTH_CLIENT_ID: "sandbox-sq0idb-e2e",
   SQUARE_OAUTH_ENVIRONMENT: "development",
   PANTRY_ORGANISATION_PLACEMENT_PROFILE: JSON.stringify({

@@ -23,10 +23,38 @@ export type OrganisationCreationError = Readonly<{
   code:
     | "organisation_create_invalid"
     | "organisation_owner_unverified"
+    | "organisation_test_not_allowed"
     | "organisation_limit_reached"
     | "idempotency_key_conflict"
     | "authority_unavailable";
 }>;
+
+/**
+ * A test organisation lives in the development environment on any
+ * deployment, so it takes provider test accounts: a Stripe test account and a
+ * Shopify development store (Plan 91 phase 4). Only a person whose verified
+ * Google email is on the secret `PANTRY_TEST_ORGANISATION_OWNERS` (emails
+ * separated by commas) may make one. Every other organisation follows the
+ * deployment profile.
+ */
+function organisationEnvironment(
+  env: Pick<Env, "PANTRY_DEPLOYMENT_PROFILE" | "PANTRY_TEST_ORGANISATION_OWNERS">,
+  owner: User,
+  request: OrganisationCreationRequest,
+): "development" | "production" | null {
+  if (request.purpose === "test") {
+    const allowed = new Set(
+      (env.PANTRY_TEST_ORGANISATION_OWNERS ?? "")
+        .split(",")
+        .map((email) => email.trim().toLowerCase())
+        .filter((email) => email.length > 0),
+    );
+    return allowed.has(owner.email.toLowerCase()) ? "development" : null;
+  }
+  return env.PANTRY_DEPLOYMENT_PROFILE === "production"
+    ? "production"
+    : "development";
+}
 
 export type CreatedOrganisation = Readonly<{
   organisationId: OrganisationId;
@@ -49,6 +77,8 @@ export async function createOwnedOrganisation(
   const { env, owner, request, now } = input;
   if (owner.issuer !== "https://accounts.google.com" || !owner.emailVerified)
     return failure("organisation_owner_unverified");
+  const environment = organisationEnvironment(env, owner, request);
+  if (environment === null) return failure("organisation_test_not_allowed");
   const cells = parseOrganisationPlacementCells(
     env.PANTRY_ORGANISATION_PLACEMENT_PROFILE,
   );
@@ -64,6 +94,8 @@ export async function createOwnedOrganisation(
         canonicalJson({
           name: request.name,
           placementCellId: cell.placement.placementCellId,
+          // A business request keeps the hash that it had before tests.
+          ...(request.purpose === "test" ? { purpose: "test" } : {}),
         }),
       ),
     },
@@ -91,10 +123,7 @@ export async function createOwnedOrganisation(
       env,
       owner,
       organisationName: request.name,
-      environment:
-        env.PANTRY_DEPLOYMENT_PROFILE === "production"
-          ? "production"
-          : "development",
+      environment,
       placement: cell.placement,
       mutation: {
         ...mutation,
