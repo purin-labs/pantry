@@ -2,6 +2,11 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "include": ["files", "exports", "types"],
   "ignore": ["**/public/**", "**/dist/**", "**/*.d.mts"],
+  "ignoreIssues": {
+    "areas/*/**/*.fixtures.ts": ["exports", "types"],
+    "areas/*/**/*.type-fixtures.ts": ["exports", "types"],
+    "areas/*/**/*.typecheck.ts": ["exports", "types"]
+  },
   "workspaces": {
     ".": {
       "entry": [
