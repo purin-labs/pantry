@@ -55,6 +55,10 @@ export type WorkspaceExecutorInspectionInvocation =
       readonly usage: WorkspaceExecutorTrustedUsage;
     };
 
+/**
+ * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * container binding of `wrangler.jsonc`.
+ */
 export class WorkspaceExecutorContainer extends Container<Env> {
   defaultPort = WORKSPACE_EXECUTOR_PORT;
   requiredPorts = [WORKSPACE_EXECUTOR_PORT];

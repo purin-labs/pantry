@@ -7,6 +7,9 @@ const MESSAGE_LINK_FETCH_PORT = 8080;
 /**
  * One short-lived, credential-free network boundary for public-link reads.
  * The service itself owns address pinning and the TLS Host/SNI contract.
+ *
+ * @public `services/platform/src/integration-gateway.ts` exports it for the
+ * container binding of `wrangler.jsonc`.
  */
 export class MessageLinkFetchContainer extends Container<Env> {
   defaultPort = MESSAGE_LINK_FETCH_PORT;

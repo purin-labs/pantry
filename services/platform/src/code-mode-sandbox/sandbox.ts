@@ -16,6 +16,9 @@ import {
  * cannot hold the session Actor's thread. `worker.ts` is the entry of that
  * Worker. This file holds the class and its `Env` key beside the code of the
  * session Actor that reads the binding.
+ *
+ * @public `services/platform/src/code-mode-sandbox/worker.ts` exports it for
+ * the binding SANDBOX of `wrangler.code-mode-sandbox.jsonc`.
  */
 export class CodeModeSandbox extends CodemodeSandboxDurableObject {
   protected override maxInterruptBudget = CODE_MODE_SANDBOX_INTERRUPT_BUDGET;
