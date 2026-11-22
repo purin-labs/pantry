@@ -83,7 +83,6 @@ export interface Env {
   // Sandbox and production are separate seller populations, so the environment
   // is a property of the configured application rather than a per-request flag.
   SQUARE_OAUTH_ENVIRONMENT?: string;
-  SQUARE_SANDBOX_DEFAULT_ACCESS_TOKEN?: string;
   SQUARE_OAUTH_CLIENT_ID?: string;
   SQUARE_OAUTH_CLIENT_SECRET?: string;
   STRIPE_CONNECT_CLIENT_ID?: string;
