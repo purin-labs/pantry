@@ -1,5 +1,5 @@
 {
-  "total": {"copies":791,"lines":14206},
+  "total": {"copies":790,"lines":14190},
   "pairs": {
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/text-components-preview.tsx": {"copies":1,"lines":9},
     "apps/portal/src/dev/agent-components-preview.tsx = apps/portal/src/dev/trace-preview.tsx": {"copies":1,"lines":14},
@@ -286,7 +286,6 @@
     "services/platform/src/control/routes/agents/email-operational.ts = services/platform/src/control/routes/chat/cancel.ts": {"copies":1,"lines":14},
     "services/platform/src/control/routes/agents/email-operational.ts = services/platform/src/control/routes/onboarding.ts": {"copies":1,"lines":14},
     "services/platform/src/control/routes/agents/inference.ts = services/platform/src/control/routes/slack-reasoning-effort.ts": {"copies":1,"lines":22},
-    "services/platform/src/control/routes/agents/mailbox.ts = services/platform/src/control/routes/agents/mailbox.ts": {"copies":1,"lines":16},
     "services/platform/src/control/routes/agents/mailbox.ts = services/platform/src/control/routes/integrations/credentials.ts": {"copies":2,"lines":28},
     "services/platform/src/control/routes/agents/mailbox.ts = services/platform/src/whatsapp/control.ts": {"copies":1,"lines":13},
     "services/platform/src/control/routes/bank-payouts.ts = services/platform/src/control/routes/order-times.ts": {"copies":1,"lines":13},

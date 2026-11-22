@@ -644,6 +644,7 @@ export async function executeIntegrationsRoute(
         target,
         command.agent,
         command.turnOn,
+        command.accepted,
       );
       return { kind: "completed" };
     }

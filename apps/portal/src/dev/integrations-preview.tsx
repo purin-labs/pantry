@@ -21,9 +21,11 @@
  * connections: one on, one off, one paused, one with no agent and one that
  * only sends. Add `&account=intacc_gmail_orders` (or click a row) for one
  * mailbox's own view. A mailbox that is off shows Turn on: `&setup=new` for
- * a workspace with no agent, `&setup=model` for a model that is not
- * approved (Turn on waits), and `&setup=failed` for a setup that cannot be
- * read.
+ * a workspace with no agent, `&setup=model` for a reviewed model whose
+ * terms nobody accepted yet (the checkbox above Turn on; a mailbox that is
+ * on shows Continue), `&setup=unreviewed` for a model that Purin has not
+ * reviewed for email (Turn on waits), and `&setup=failed` for a setup that
+ * cannot be read.
  *
  * Route mode (`?mode=route&integration=<tile>&scenario=…`) mounts the real
  * IntegrationsRoute over an in-memory transport, so the consent-window watch
@@ -56,6 +58,7 @@ import type { IntegrationAccount, SupportDiagnostics } from "@purin-labs/control
 import type { IntegrationsCommand, IntegrationsCommandResult, IntegrationsPageActions, IntegrationsPageProps, IntegrationDetailRouteData, IntegrationsRouteData, IntegrationsRouteTransport, SettingsMutationFeedback } from "../features/integrations/settings-types";
 import type { WhatsAppPanelActions } from "../pages/whatsapp";
 import type {
+  MailboxModelReview,
   MailboxSetupAgent,
   MailboxSetupAgentChoice,
   MailboxSetupPlan,
@@ -461,7 +464,7 @@ async function previewMailboxSetup(
   const assigned = ASSIGNED_MAILBOXES.includes(integrationAccountId);
   const agent = previewSetupAgent(choice, assigned, variant);
   const answers = agent.state === "assigned";
-  const approved = variant !== "model";
+  const approved = variant !== "model" && variant !== "unreviewed";
   return {
     agent,
     requirements: [
@@ -474,9 +477,26 @@ async function previewMailboxSetup(
     next: answers
       ? null
       : { kind: "assign_agent", body: { installationId: "inst_urk" } },
-    model: { kind: approved ? "approved" : "not_approved" },
+    model:
+      variant === "unreviewed"
+        ? { kind: "not_reviewed", name: "Qwen3.7 Flash" }
+        : {
+            kind: approved ? "approved" : "consent_needed",
+            review: PREVIEW_MODEL_REVIEW,
+          },
   };
 }
+
+/** Purin's review of the paid route's default model, as the setup names it. */
+const PREVIEW_MODEL_REVIEW: MailboxModelReview = {
+  keySource: "platform",
+  provider: "openai-compatible",
+  model: "google/gemini-4-hydrogen",
+  name: "Gemini 4 Hydrogen",
+  recipients: "OpenRouter and Google Vertex AI",
+  termsUrl: "https://openrouter.ai/docs/guides/features/zdr",
+  reviewExpiresAt: Date.UTC(2027, 1, 20),
+};
 
 /** One reply that waits for review, with the memories its draft used. */
 const WAITING_REPLY: EmailReplyQueueItem = {

@@ -48,6 +48,55 @@ the same client, with the topic `pantry-gmail-push-local`.
 `roles/pubsub.publisher` to `gmail-api-push@system.gserviceaccount.com` or the
 watch call fails outright.
 
+## Model review
+
+Mail goes only to a model route that Purin reviewed for Google's Limited Use
+rules: the provider trains on no prompt and keeps no prompt after the answer.
+The reviews are in
+`services/platform/src/mail-inbox/contract/gmail-model-reviews.ts`, and
+[Plan 83](../plan-83-one-inbox.md#model-review-and-consent) gives the design.
+No operator writes a row by hand. An owner or admin accepts the reviewed
+model's terms with the checkbox above **Turn on**, and the Portal writes the
+row of `gmail_inference_eligibility`.
+
+| Route                                       | State on 2026-11-22 | Terms                                                                                                      |
+| ------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Paid route, Gemini 4 Hydrogen (the default) | Reviewed            | OpenRouter zero data retention; Google Vertex AI keeps a flagged prompt for 90 days, for abuse checks only |
+| Paid route, Kimi K3                         | Reviewed            | OpenRouter zero data retention; no Safety Retention                                                        |
+| Paid route, Qwen3.7 Flash                   | Not reviewed        | No zero-retention endpoint                                                                                 |
+| An Organisation's own API key               | Not reviewed        | The provider keeps each prompt for an abuse check; Pantry cannot see the account's terms                   |
+| ChatGPT sign-in, Claude account             | Not reviewed        | The person chooses model training in their own settings                                                    |
+
+Each review ends 90 days after it (the first ones on 2027-02-20). When a
+review ends, the dispatch check stops new mail for that model in every
+Organisation, and the mail journeys fail. Before the end:
+
+1. Read the terms of the review again (`evidenceReference`) and OpenRouter's
+   list of zero-retention endpoints (`https://openrouter.ai/api/v1/endpoints/zdr`).
+2. Check that each request of the model still sets `data_collection: "deny"`
+   and `zdr: true` (`PLATFORM_PI_MODEL_TABLE` in
+   `services/platform/src/actors/pi-model-transport.ts`).
+3. Check in OpenRouter's privacy settings of the Purin account that Input &
+   Output Logging is off, and that "ZDR only" for Google models is off.
+   "ZDR only" refuses every Gemini request: Google Vertex AI serves Gemini
+   with Safety Retention.
+4. Move `REVIEWED_AT` and `REVIEW_EXPIRES_AT` in the reviews file, and release.
+   Each owner accepts the renewed terms again at the next Turn on or
+   **Continue**.
+
+To add a model route, add it to the reviews file with the terms that show no
+training and no retention after the answer. The type of a reviewed paid
+route accepts only a model whose `retention` is `zero`. To withdraw a route,
+remove its review; new mail for it stops at the next dispatch.
+
+The chat agent cannot accept the terms for a person. Only an owner or admin
+with a Portal session reaches `POST …/agent-mailboxes/{account}/model-consent`.
+
+The release that brought the review list adds the column
+`consented_by_user_id`. Apply
+`services/platform/scripts/gmail-model-consent-d1-patch.sql` to each regional
+database before that release.
+
 ## Normal operating loop
 
 1. A Gmail change publishes a Pub/Sub notification to the topic.
@@ -202,6 +251,10 @@ Limited audit metadata is retained under the workspace retention policy.
 Verify after revoking: the mailbox reports no active processing, no proposal
 remains in an approvable state, and the credential no longer resolves.
 
+Turn off and Remove also withdraw the acceptance of each model's terms
+(`revoked_at`) when no mailbox of the Organisation stays on. The next Turn on
+asks for the checkbox again.
+
 ## Evidence to retain
 
 Provider review and incident review both ask for the same artifacts:
@@ -214,4 +267,7 @@ Provider review and incident review both ask for the same artifacts:
 - proof that proposal drafts are deleted after delivery, and that failures
   surface as cleanup needed rather than disappearing; and
 - proof that a transient turn appends no accepted history and writes no
-  checkpoint.
+  checkpoint; and
+- for each Organisation, the acceptance of the model's terms: the row of
+  `gmail_inference_eligibility` names the review, the person
+  (`consented_by_user_id`), the time and the receipt.

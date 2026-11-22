@@ -14,6 +14,10 @@ import { ConsentPoint } from "./connect-consent-dialog";
 import { EmailReviewSurface } from "../email-review/review";
 import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";
 import {
+  MailboxModelConsent,
+  useMailboxModelConsent,
+} from "../mail-setup/model-consent";
+import {
   useMailboxSetup,
   type MailboxSetupControl,
 } from "../mail-setup/use-mailbox-setup";
@@ -259,8 +263,11 @@ function proposalBelongsToAccount(
 /**
  * The one control of the mailbox. While it is off, Turn on makes every change
  * that the mailbox needs and turns it on with the default limits, in one
- * press. While it is on, Turn off stops it. Finish setup shows only when
- * someone removed access that the agent needs.
+ * press. Purin must have reviewed the workspace's AI model for email, and
+ * the checkbox above Turn on accepts its data terms. While it is on, Turn
+ * off stops it. Finish setup shows only when someone removed access that
+ * the agent needs, and Continue only when the model changed or its review
+ * ended, so its terms need a new acceptance.
  */
 function GmailMailboxSwitch(props: {
   readonly mailbox: AgentMailboxView;
@@ -271,7 +278,28 @@ function GmailMailboxSwitch(props: {
   const mailbox = props.mailbox;
   const setup = props.setup.state;
   const plan = setup.kind === "ready" ? setup.plan : null;
+  const consent = useMailboxModelConsent(plan);
   const hintId = `mailbox-switch-hint-${mailbox.integrationAccountId}`;
+  const settling = props.busy || props.setup.reading;
+  const press = (turnOn: boolean): (() => void) | undefined =>
+    plan === null
+      ? undefined
+      : props.actions.setUpMailbox.bind(null, {
+          integrationAccountId: mailbox.integrationAccountId,
+          address: mailbox.observedAddress,
+          agent: plan.agent,
+          turnOn,
+          accepted: consent.accepted,
+        });
+  const consentField =
+    consent.review === null ? null : (
+      <MailboxModelConsent
+        review={consent.review}
+        accepted={consent.accepted !== null}
+        disabled={settling}
+        onChange={consent.setAccepted}
+      />
+    );
   if (mailbox.policy.kind === "enabled") {
     const unfinished = plan !== null && plan.next !== null;
     return (
@@ -285,52 +313,59 @@ function GmailMailboxSwitch(props: {
           >
             Turn off
           </button>
-          {plan === null || !unfinished ? null : (
+          {consent.review === null && unfinished ? (
             <button
               type="button"
               aria-describedby={hintId}
-              onClick={props.actions.setUpMailbox.bind(null, {
-                integrationAccountId: mailbox.integrationAccountId,
-                address: mailbox.observedAddress,
-                agent: plan.agent,
-                turnOn: false,
-              })}
-              disabled={props.busy || props.setup.reading}
+              onClick={press(false)}
+              disabled={settling}
             >
               Finish setup
             </button>
-          )}
+          ) : null}
         </div>
-        {plan === null || !unfinished ? null : (
+        {consent.review !== null ? (
+          <>
+            <p className="notice-text" id={hintId}>
+              The agent answers no new mail until you accept the terms of the AI
+              model again. The model changed, or Purin&apos;s review of it
+              ended.
+            </p>
+            {consentField}
+            <div className="connection-actions">
+              <button
+                type="button"
+                className="connection-primary-action"
+                onClick={press(false)}
+                disabled={consent.accepted === null || settling}
+              >
+                Continue
+              </button>
+            </div>
+          </>
+        ) : plan !== null && plan.model.kind === "not_reviewed" ? (
+          <p className="notice-text" id={hintId}>
+            {turnOnHint(plan)} The agent answers no new mail with it.
+          </p>
+        ) : unfinished && plan !== null ? (
           <p className="notice-text" id={hintId}>
             {plan.agent.name} lost access that it needs to answer mail. Finish
             setup gives it back.
           </p>
-        )}
+        ) : null}
       </div>
     );
   }
   return (
     <div className="mailbox-switch">
+      {consentField}
       <button
         type="button"
         className="connection-primary-action"
         aria-describedby={hintId}
-        onClick={
-          plan === null
-            ? undefined
-            : props.actions.setUpMailbox.bind(null, {
-                integrationAccountId: mailbox.integrationAccountId,
-                address: mailbox.observedAddress,
-                agent: plan.agent,
-                turnOn: true,
-              })
-        }
+        onClick={press(true)}
         disabled={
-          plan === null ||
-          !mailboxCanTurnOn(plan) ||
-          props.busy ||
-          props.setup.reading
+          plan === null || !mailboxCanTurnOn(plan, consent.accepted) || settling
         }
       >
         Turn on

@@ -659,6 +659,17 @@ body:has(.permission-request-dialog[data-stands-in][open]:not([data-closing]))
 .provider-consent .connect-consent-points {
   margin: 0;
 }
+/* The checkbox above Turn on: the acceptance of the AI model's data terms.
+   Its sentence wraps, so the box sits on the first line. */
+label.mailbox-model-consent {
+  align-items: start;
+  max-width: 60ch;
+  line-height: 1.45;
+}
+label.mailbox-model-consent input[type="checkbox"] {
+  flex: none;
+  margin-block-start: 2px;
+}
 /* What happens to the data, for the person who wants to read it. It stays on
    the sheet, quiet, so nothing has to be opened to see it. */
 .connection-fine-print {

@@ -10,7 +10,7 @@ import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
 import {
-  approveMailboxModel,
+  acceptMailboxModel,
   connectGmailMailbox,
   draftReplyTurn,
   evaluateAt,
@@ -59,15 +59,18 @@ async function emailsInProgressJourney({ task }: TestContext): Promise<void> {
     address: ADDRESS,
   });
   const mailboxPath = `/v1/control/organisations/${organisationId}/agent-mailboxes/${account}`;
-  await approveMailboxModel(organisationId, "emails-in-progress-e2e");
+  await acceptMailboxModel(organisationId, owner);
 
   // The owner presses Turn on: the Portal's own press, which names no
-  // limits. The mailbox takes the server's limits: three emails in progress.
+  // limits. The owner accepted the model's terms above, so the press needs
+  // no checkbox. The mailbox takes the server's limits: three emails in
+  // progress.
   await setUpMailbox(
     portalSetupTransport(owner),
     { organisationId, integrationAccountId: account },
     { kind: "automatic" },
     true,
+    null,
   );
   const policy = await mailboxPolicy(owner, mailboxPath);
   expect(policy).toMatchObject({ kind: "enabled", maxActiveCases: 3 });

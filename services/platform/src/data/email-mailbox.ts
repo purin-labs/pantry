@@ -93,7 +93,7 @@ export type MailboxIngressPolicy =
       readonly publishedAt: number;
     };
 
-type MailboxIngressPolicyPublishRequest =
+export type MailboxIngressPolicyPublishRequest =
   | { readonly kind: "disabled_by_operator" }
   | {
       readonly kind: "enabled";

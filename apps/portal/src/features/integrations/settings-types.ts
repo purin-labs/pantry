@@ -16,7 +16,11 @@ import type { MailboxInstallationOption } from "../../pages/agent-mailbox";
 import type { IntegrationRouteId } from "./model";
 import type { EmailReviewActions } from "../email-review/api";
 import type { Variant } from "@purin-labs/type-utils";
-import type { MailboxSetupAgentChoice, MailboxSetupPlan } from "@purin-labs/control-api";
+import type {
+  MailboxModelReview,
+  MailboxSetupAgentChoice,
+  MailboxSetupPlan,
+} from "@purin-labs/control-api";
 import type { MailboxSetupRequest } from "./mailbox-actions";
 import type { ReadMailboxSetup } from "../mail-setup/use-mailbox-setup";
 import type { CapabilityProfile, ControlRole, IntegrationAccount, OrganisationCodexConnection, OrganisationInferenceSelection, OrganisationInvitation, OrganisationMember, ProviderResource, ReadinessAssessment, SelectInferenceCommand, SetupSelection, SlackRoutingConnection, SupportDiagnostics } from "@purin-labs/control-api/portal/settings";
@@ -245,6 +249,8 @@ export type IntegrationsCommand =
       readonly agent: MailboxSetupAgentChoice;
       /** Turn the mailbox on after the setup, with the server's limits. */
       readonly turnOn: boolean;
+      /** The model review whose data terms the person accepted, if any. */
+      readonly accepted: MailboxModelReview | null;
     }
   | { readonly kind: "resume_mailbox"; readonly integrationAccountId: string }
   | {

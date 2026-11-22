@@ -50,8 +50,8 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../../services/platform/src/ids";
-import { resolveOrganisationModelRoute } from "../../services/platform/src/models/route";
 import { OrganisationExecutionScope } from "../../services/platform/src/organisation-execution-scope";
+import { acceptMailboxModelTerms } from "../../services/platform/tests/mailbox-model-consent-fixture";
 import { defaultDenyPolicy } from "../../services/platform/src/policy-snapshot";
 import { fixturePeople } from "./account-authority";
 
@@ -518,25 +518,13 @@ async function seed(env: Env) {
   });
   if (!published.ok || published.value.kind !== "enabled")
     throw new Error("Mailbox ingress policy missing");
-  const route = await resolveOrganisationModelRoute({
+  const scope = await OrganisationExecutionScope.resolve(env, organisationId);
+  if (!scope.ok) throw new Error(scope.error.code);
+  await acceptMailboxModelTerms({
     env,
-    organisationId,
-    now,
+    scope: scope.value,
+    userId: owner.userId,
   });
-  if (!route.ok) throw new Error(route.error.code);
-  await env.DB.prepare(
-    "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'synthetic-plan42j-browser', 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-  )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      now,
-      now + 3_600_000,
-      now,
-    )
-    .run();
   const organisation = await requireActiveOrganisationActor({
     env,
     organisationId,

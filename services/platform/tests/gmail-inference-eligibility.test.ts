@@ -2,10 +2,11 @@ import { singleDatabaseSchema } from "../scripts/single-database-schema.mjs";
 import { DatabaseSync } from "node:sqlite";
 import { expect, it } from "vitest";
 import { readGmailInferenceEligibility } from "../src/mail-inbox/contract/gmail-inference-eligibility";
+import { GMAIL_MODEL_REVIEWS } from "../src/mail-inbox/contract/gmail-model-reviews";
 import { parseOrganisationId } from "../src/ids";
 import { d1Database } from "./sqlite-d1";
 
-it("requires current evidence and consent for the exact organisation, funding route, provider and model", async function checksEligibility() {
+it("sends mail only to a reviewed route whose terms the Organisation accepted, until the review ends", async function checksEligibility() {
   const sqlite = new DatabaseSync(":memory:");
   try {
     sqlite.exec(singleDatabaseSchema());
@@ -14,43 +15,68 @@ it("requires current evidence and consent for the exact organisation, funding ro
     );
     const organisation = parseOrganisationId("organisation_eligibility");
     if (!organisation.ok) throw new Error("Invalid fixture organisation");
+    const [review] = GMAIL_MODEL_REVIEWS;
+    if (review === undefined) throw new Error("No reviewed route");
+    const now = review.reviewedAt + 86_400_000;
     const input = {
       db: d1Database(sqlite),
       organisationId: organisation.value,
-      modelRoute: {
-        keySource: "platform" as const,
-        provider: "openai-compatible" as const,
-        model: "reviewed-model",
-      },
-      now: 20,
+      modelRoute: review.route,
+      now,
     };
+    const accept = (model: string, evidence: string) =>
+      sqlite
+        .prepare(
+          `INSERT INTO gmail_inference_eligibility (organisation_id, key_source,
+             provider, model, evidence_reference, evidence_owner,
+             disclosed_recipients, permitted_purpose, consent_reference,
+             reviewed_at, review_expires_at, consented_at, consented_by_user_id,
+             revoked_at)
+           VALUES ('organisation_eligibility', 'platform', 'openai-compatible',
+             ?, ?, 'Purin', 'OpenRouter', 'email_processing', 'receipt_1', ?, ?,
+             ?, 'user_owner', NULL)
+           ON CONFLICT DO UPDATE SET evidence_reference = excluded.evidence_reference`,
+        )
+        .run(
+          model,
+          evidence,
+          review.reviewedAt,
+          review.reviewExpiresAt,
+          now - 1,
+        );
+    // No acceptance.
     expect(await readGmailInferenceEligibility(input)).toEqual({
       kind: "blocked",
     });
-    sqlite.exec(`INSERT INTO gmail_inference_eligibility VALUES (
-      'organisation_eligibility', 'platform', 'openai-compatible', 'reviewed-model',
-      'review-1', 'reviewer-1', 'provider and downstream recipient', 'email triage',
-      'consent-1', 10, 30, 15, NULL
-    )`);
+    accept(review.route.model, review.evidenceReference);
     expect(await readGmailInferenceEligibility(input)).toEqual({
       kind: "eligible",
-      evidenceReference: "review-1",
-      reviewExpiresAt: 30,
+      evidenceReference: review.evidenceReference,
+      reviewExpiresAt: review.reviewExpiresAt,
     });
-    expect(await readGmailInferenceEligibility({ ...input, now: 30 })).toEqual({
-      kind: "blocked",
-    });
+    // The review ended.
     expect(
       await readGmailInferenceEligibility({
         ...input,
-        modelRoute: {
-          keySource: "platform",
-          provider: "openai-compatible",
-          model: "unreviewed-model",
-        },
+        now: review.reviewExpiresAt,
       }),
     ).toEqual({ kind: "blocked" });
-    sqlite.exec("UPDATE gmail_inference_eligibility SET revoked_at = 20");
+    // An acceptance of a route that Purin did not review.
+    accept("qwen/qwen3.7-flash", review.evidenceReference);
+    expect(
+      await readGmailInferenceEligibility({
+        ...input,
+        modelRoute: { ...review.route, model: "qwen/qwen3.7-flash" },
+      }),
+    ).toEqual({ kind: "blocked" });
+    // The person accepted other terms than the review names now.
+    accept(review.route.model, "https://example.test/older-terms");
+    expect(await readGmailInferenceEligibility(input)).toEqual({
+      kind: "blocked",
+    });
+    accept(review.route.model, review.evidenceReference);
+    // The acceptance was withdrawn.
+    sqlite.exec(`UPDATE gmail_inference_eligibility SET revoked_at = ${now}`);
     expect(await readGmailInferenceEligibility(input)).toEqual({
       kind: "blocked",
     });

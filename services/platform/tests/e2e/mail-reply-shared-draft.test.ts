@@ -24,7 +24,6 @@ import {
   writeOrganisationCapabilityPolicy,
 } from "../../src/data/capability-policy";
 import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
-import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -49,6 +48,7 @@ import { issueControlSession } from "../../src/data/control-plane";
 import { network } from "./network";
 import { pendingDecisionsOf } from "./access-route-support";
 import {
+  acceptMailboxModel,
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
@@ -732,7 +732,7 @@ async function draftReply() {
     },
   );
   expect(policy).toMatchObject({ status: 200, body: { ok: true } });
-  await approveMailboxModel(organisationId);
+  await acceptMailboxModel(organisationId, owner);
   const connector = await mailboxConnector(organisationId, account);
   await runDurableObjectAlarm(connector);
   await grantOwnerReplyTools(organisationId, account);
@@ -1346,30 +1346,4 @@ async function grantOwnerReplyTools(
     now: Date.now(),
   });
   if (!created.ok) throw new Error(created.error.code);
-}
-
-async function approveMailboxModel(
-  organisationId: OrganisationId,
-): Promise<void> {
-  const now = Date.now();
-  const route = await resolveOrganisationModelRoute({
-    env,
-    organisationId,
-    now,
-  });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase()
-    .prepare(
-      "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'synthetic-shared-reply-e2e', 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-    )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      now,
-      now + 3_600_000,
-      now,
-    )
-    .run();
 }

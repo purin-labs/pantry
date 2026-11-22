@@ -39,25 +39,53 @@ type PiModelRouteInput = Pick<
  * `PANTRY_PLATFORM_PI_MODEL` selects a cheaper one for tests that call
  * OpenRouter. An earlier default stays here while a Session can pin it: an
  * unfinished turn restores only on a model that has an adapter.
+ *
+ * `retention` says which OpenRouter endpoints may serve the model. Every
+ * request refuses an endpoint that trains on prompts. `zero` also sets
+ * OpenRouter's `zdr`: only an endpoint that keeps no prompt after the
+ * answer serves it, or one with Google's Safety Retention, which keeps only
+ * the prompts that a safety check flags, for abuse checks. Only a `zero`
+ * model can receive Gmail content (Google's Limited Use rules; see
+ * `mail-inbox/contract/gmail-model-reviews.ts`). `provider` keeps the
+ * endpoint's own retention: Qwen3.7 Flash has no zero-retention endpoint.
  */
-const PLATFORM_PI_MODEL_NAMES = {
-  "google/gemini-4-hydrogen": "Gemini 4 Hydrogen",
-  "moonshotai/kimi-k3": "Kimi K3",
-  "qwen/qwen3.7-flash": "Qwen3.7 Flash",
-} as const;
-export type PlatformPiModel = keyof typeof PLATFORM_PI_MODEL_NAMES;
+const PLATFORM_PI_MODEL_TABLE = {
+  "google/gemini-4-hydrogen": { name: "Gemini 4 Hydrogen", retention: "zero" },
+  "moonshotai/kimi-k3": { name: "Kimi K3", retention: "zero" },
+  "qwen/qwen3.7-flash": { name: "Qwen3.7 Flash", retention: "provider" },
+} as const satisfies Record<
+  string,
+  Readonly<{ name: string; retention: "zero" | "provider" }>
+>;
+type PlatformPiModelTable = typeof PLATFORM_PI_MODEL_TABLE;
+export type PlatformPiModel = keyof PlatformPiModelTable;
+/** A paid-route model whose every request goes to a zero-retention endpoint. */
+export type ZeroRetentionPlatformPiModel = {
+  [
+    Model in PlatformPiModel
+  ]: PlatformPiModelTable[Model]["retention"] extends "zero" ? Model : never;
+}[PlatformPiModel];
 export const PLATFORM_DEFAULT_PI_MODEL: PlatformPiModel =
   "google/gemini-4-hydrogen";
 export const PLATFORM_PI_MODELS = Object.keys(
-  PLATFORM_PI_MODEL_NAMES,
+  PLATFORM_PI_MODEL_TABLE,
 ) as readonly PlatformPiModel[];
 
 export function isPlatformPiModel(model: string): model is PlatformPiModel {
-  return Object.hasOwn(PLATFORM_PI_MODEL_NAMES, model);
+  return Object.hasOwn(PLATFORM_PI_MODEL_TABLE, model);
 }
 
 export function platformPiModelName(model: PlatformPiModel): string {
-  return PLATFORM_PI_MODEL_NAMES[model];
+  return PLATFORM_PI_MODEL_TABLE[model].name;
+}
+
+/** The OpenRouter provider preferences of every request for one model. */
+function platformPiModelRouting(
+  model: PlatformPiModel,
+): NonNullable<Model<"openai-completions">["compat"]>["openRouterRouting"] {
+  return PLATFORM_PI_MODEL_TABLE[model].retention === "zero"
+    ? { sort: "throughput", data_collection: "deny", zdr: true }
+    : { sort: "throughput", data_collection: "deny" };
 }
 export const PACKAGED_PI_OPENAI_MODEL = "gpt-5.6-luna";
 
@@ -357,7 +385,7 @@ function anthropicModelHasId(
 }
 
 function createPiOpenRouterModel(
-  modelId: string,
+  modelId: PlatformPiModel,
   tokenAllowance: number,
 ): Model<"openai-completions"> {
   return {
@@ -381,7 +409,7 @@ function createPiOpenRouterModel(
       supportsUsageInStreaming: true,
       maxTokensField: "max_tokens",
       thinkingFormat: "openrouter",
-      openRouterRouting: { sort: "throughput" },
+      openRouterRouting: platformPiModelRouting(modelId),
       sendSessionAffinityHeaders: true,
       sessionAffinityFormat: "openrouter",
       supportsStrictMode: true,

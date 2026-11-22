@@ -1,4 +1,9 @@
-import { hasExactKeys, isNonBlankString, isRecord } from "@purin-labs/std";
+import {
+  hasExactKeys,
+  isNonBlankString,
+  isNonNegativeInteger,
+  isRecord,
+} from "@purin-labs/std";
 
 /**
  * What a connected mailbox still needs before its agent writes a reply, and
@@ -39,7 +44,10 @@ export type MailboxSetupRequirementId =
   | "agent_context"
   /** Owners and admins may read the mailbox and its drafts in Pantry. */
   | "review"
-  /** Pantry has approved the workspace's model for mailbox content. */
+  /**
+   * Purin reviewed the workspace's model for mailbox content, and an owner
+   * or admin accepted its data terms.
+   */
   | "model";
 
 export const MAILBOX_SETUP_REQUIREMENTS: readonly MailboxSetupRequirementId[] =
@@ -77,12 +85,82 @@ export type MailboxSetupChange =
       body: Readonly<Record<string, unknown>>;
     }>;
 
+/**
+ * A model route that Purin reviewed for mailbox content (Gmail's Limited
+ * Use rules): the provider trains on no mail and keeps no mail after the
+ * answer. A person accepts it before new mail goes to it.
+ */
+export type MailboxModelReview = Readonly<{
+  keySource: string;
+  provider: string;
+  model: string;
+  /** The model's name, as a person reads it. */
+  name: string;
+  /** Who receives the content of new mail. */
+  recipients: string;
+  /** The data terms that Purin's review read. The consent names them. */
+  termsUrl: string;
+  /** When Purin's review ends. Each consent ends with it. */
+  reviewExpiresAt: number;
+}>;
+
 /** Whether the workspace's model may receive mailbox content. */
 export type MailboxSetupModel =
-  | Readonly<{ kind: "approved" }>
-  | Readonly<{ kind: "not_approved" }>
+  /** An owner or admin accepted the reviewed model's data terms. */
+  | Readonly<{ kind: "approved"; review: MailboxModelReview }>
+  /**
+   * Purin reviewed the model. Nobody accepted its terms yet, or the
+   * acceptance ended: the model changed, the review ended, or the last
+   * mailbox turned off.
+   */
+  | Readonly<{ kind: "consent_needed"; review: MailboxModelReview }>
+  /** Purin has not reviewed this model for mailbox content. */
+  | Readonly<{ kind: "not_reviewed"; name: string }>
   /** The workspace has no model connection that resolves. */
   | Readonly<{ kind: "unavailable" }>;
+
+/**
+ * The body of `POST …/agent-mailboxes/{account}/model-consent`: the route
+ * and the terms that the person read. The server refuses it when the
+ * workspace's model or Purin's review changed in between.
+ */
+export type MailboxModelConsentRequest = Readonly<{
+  keySource: string;
+  provider: string;
+  model: string;
+  termsUrl: string;
+}>;
+
+export function mailboxModelConsentRequest(
+  review: MailboxModelReview,
+): MailboxModelConsentRequest {
+  return {
+    keySource: review.keySource,
+    provider: review.provider,
+    model: review.model,
+    termsUrl: review.termsUrl,
+  };
+}
+
+export function parseMailboxModelConsentRequest(
+  raw: unknown,
+): MailboxModelConsentRequest | null {
+  if (
+    !isRecord(raw) ||
+    !hasExactKeys(raw, ["keySource", "provider", "model", "termsUrl"]) ||
+    !isNonBlankString(raw.keySource) ||
+    !isNonBlankString(raw.provider) ||
+    !isNonBlankString(raw.model) ||
+    !isNonBlankString(raw.termsUrl)
+  )
+    return null;
+  return {
+    keySource: raw.keySource,
+    provider: raw.provider,
+    model: raw.model,
+    termsUrl: raw.termsUrl,
+  };
+}
 
 export type MailboxSetupPlan = Readonly<{
   agent: MailboxSetupAgent;
@@ -203,15 +281,59 @@ function parseAgent(raw: unknown): MailboxSetupAgent | null {
 }
 
 function parseModel(raw: unknown): MailboxSetupModel | null {
-  if (!isRecord(raw) || !hasExactKeys(raw, ["kind"])) return null;
+  if (!isRecord(raw)) return null;
   switch (raw.kind) {
     case "approved":
-    case "not_approved":
+    case "consent_needed": {
+      if (!hasExactKeys(raw, ["kind", "review"])) return null;
+      const review = parseModelReview(raw.review);
+      return review === null ? null : { kind: raw.kind, review };
+    }
+    case "not_reviewed":
+      return hasExactKeys(raw, ["kind", "name"]) && isNonBlankString(raw.name)
+        ? { kind: "not_reviewed", name: raw.name }
+        : null;
     case "unavailable":
-      return { kind: raw.kind };
+      return hasExactKeys(raw, ["kind"]) ? { kind: "unavailable" } : null;
     default:
       return null;
   }
+}
+
+function parseModelReview(raw: unknown): MailboxModelReview | null {
+  const route = parseMailboxModelConsentRequest(
+    isRecord(raw)
+      ? {
+          keySource: raw.keySource,
+          provider: raw.provider,
+          model: raw.model,
+          termsUrl: raw.termsUrl,
+        }
+      : null,
+  );
+  if (
+    route === null ||
+    !isRecord(raw) ||
+    !hasExactKeys(raw, [
+      "keySource",
+      "provider",
+      "model",
+      "name",
+      "recipients",
+      "termsUrl",
+      "reviewExpiresAt",
+    ]) ||
+    !isNonBlankString(raw.name) ||
+    !isNonBlankString(raw.recipients) ||
+    !isNonNegativeInteger(raw.reviewExpiresAt)
+  )
+    return null;
+  return {
+    ...route,
+    name: raw.name,
+    recipients: raw.recipients,
+    reviewExpiresAt: raw.reviewExpiresAt,
+  };
 }
 
 function parseChange(raw: unknown): MailboxSetupChange | null {

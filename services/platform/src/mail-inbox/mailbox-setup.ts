@@ -2,7 +2,6 @@ import type {
   MailboxSetupAgent,
   MailboxSetupAgentChoice,
   MailboxSetupChange,
-  MailboxSetupModel,
   MailboxSetupPlan,
   MailboxSetupRequirement,
   MailboxSetupRequirementId,
@@ -30,10 +29,9 @@ import {
   readAgentMailboxBinding,
   readEmailMailboxAccount,
 } from "../data/email-mailbox";
-import { readGmailInferenceEligibility } from "./contract/gmail-inference-eligibility";
+import { readGmailModelState } from "./gmail-model-consent";
 import type { Env } from "../env";
 import type { IntegrationAccountId } from "../ids";
-import { resolveOrganisationModelRoute } from "../models/route";
 import type { OrganisationExecutionScope } from "../organisation-execution-scope";
 import type { Result } from "../result";
 
@@ -108,7 +106,7 @@ export async function readMailboxSetupPlan(
         organisationId: scope.organisationId,
         lifecycle: "active",
       }),
-      readModel(input),
+      readGmailModelState(input),
     ]);
   if (!mailbox.ok) return failure("agent_mailbox_not_connected");
   if (!access.ok || !grants.ok) return failure("mailbox_setup_unavailable");
@@ -246,7 +244,9 @@ export async function readMailboxSetupPlan(
       });
   }
 
-  // 5. The model. Pantry records this approval; the plan has no change for it.
+  // 5. The model. Purin reviewed it, and an owner or admin accepted its
+  //    terms. Only the person's own checkbox gives the acceptance, so the
+  //    plan has no change for it.
   if (model.kind === "approved") met.add("model");
 
   const requirements: MailboxSetupRequirement[] =
@@ -280,31 +280,6 @@ function readsMailbox(
     grant.target.integrationAccountId === integrationAccountId &&
     grant.target.resourceScope === EMAIL_MAILBOX_RESOURCE_SCOPE
   );
-}
-
-/** Whether the workspace's present model may receive mailbox content. */
-async function readModel(
-  input: Readonly<{
-    env: Env;
-    scope: OrganisationExecutionScope;
-    now: number;
-  }>,
-): Promise<MailboxSetupModel> {
-  const route = await resolveOrganisationModelRoute({
-    env: input.env,
-    organisationId: input.scope.organisationId,
-    now: input.now,
-  });
-  if (!route.ok) return { kind: "unavailable" };
-  const eligibility = await readGmailInferenceEligibility({
-    db: input.scope.database,
-    organisationId: input.scope.organisationId,
-    modelRoute: route.value,
-    now: input.now,
-  });
-  return {
-    kind: eligibility.kind === "eligible" ? "approved" : "not_approved",
-  };
 }
 
 type ResolvedAgent = Readonly<{

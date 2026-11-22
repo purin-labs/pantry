@@ -35,7 +35,6 @@ import {
   type IntegrationAccountId,
   type OrganisationId,
 } from "../../src/ids";
-import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { compilePublishAndActivateOrganisationPolicy } from "../../src/policy-snapshot";
 import { readDefaultProjectId } from "../../src/projects/case-project";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
@@ -58,6 +57,7 @@ import {
 } from "./memory-support";
 import { network } from "./network";
 import {
+  acceptMailboxModel,
   connectGmailMailbox,
   sendAs,
   setUpMailbox,
@@ -189,7 +189,7 @@ async function chatReplySourcesJourney({ task }: TestContext): Promise<void> {
     },
   });
   expect(on).toMatchObject({ status: 200, body: { ok: true } });
-  await approveMailboxModel(organisationId);
+  await acceptMailboxModel(organisationId, owner);
   const connector = await mailboxConnector(organisationId, account);
   await runDurableObjectAlarm(connector);
   const merchantId = await seedOrder(organisationId, owner.userId);
@@ -1301,34 +1301,4 @@ async function seedOrder(
   const seeded = await purchasingFixture(organisationId, merchantId, "order");
   expect(seeded.status, await seeded.text()).toBe(200);
   return merchantId;
-}
-
-/**
- * Pantry's operator approves the workspace's model for mailbox content. The
- * setup never writes this record.
- */
-async function approveMailboxModel(
-  organisationId: OrganisationId,
-): Promise<void> {
-  const now = Date.now();
-  const route = await resolveOrganisationModelRoute({
-    env,
-    organisationId,
-    now,
-  });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase()
-    .prepare(
-      "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'synthetic-chat-reply-e2e', 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-    )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      now,
-      now + 3_600_000,
-      now,
-    )
-    .run();
 }

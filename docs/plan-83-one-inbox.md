@@ -209,6 +209,42 @@ an allergy that contains the word "orders" can match. D5 exists for this reason.
 - The grant also guards `GET …/whatsapp-cases/:id` and `GET …/whatsapp-replies/:id`, so a
   viewer cannot read the text through the older routes.
 
+## Model review and consent
+
+Gmail's restricted scopes fall under Google's Limited Use rules. Mail goes to a model
+only to answer it, and no one trains a model on it. The Google app for Gmail is "In
+production" and not verified yet, so the code holds the rule (D7).
+
+- Purin reviews each model route one time, in code:
+  `services/platform/src/mail-inbox/contract/gmail-model-reviews.ts`. A review names
+  the route, the terms that it read, who receives the mail, the purpose, `reviewedAt`
+  and `reviewExpiresAt` (90 days later). A route enters the list only when its requests
+  enforce the rule in code. On Pantry's paid route, every OpenRouter request sets
+  `data_collection: "deny"`, and a reviewed model also sets `zdr: true`
+  (`pi-model-transport.ts`).
+- Reviewed on 2026-11-22: Gemini 4 Hydrogen and Kimi K3 on the paid route. Left off,
+  with the reason in the file: Qwen3.7 Flash (no zero-retention endpoint), an
+  Organisation's own OpenAI, Anthropic or Gemini key (the provider keeps each prompt for
+  an abuse check, and Pantry cannot see the account's terms), a ChatGPT sign-in and a
+  Claude account (the person chooses model training in their own settings).
+- In the Gmail drawer and in the Inbox sheet, one checkbox above **Turn on** accepts
+  that new mail goes to the named model under its terms. Turn on sends
+  `POST …/agent-mailboxes/{account}/model-consent` and then the policy, in one press.
+  The acceptance and its receipt are one batch in `gmail_inference_eligibility`:
+  the review's fields, `consent_reference` (the receipt), `consented_at` and
+  `consented_by_user_id`.
+- Each dispatch reads the row against the list. A new pinned model, new terms, a route
+  that leaves the list or an ended review stops new mail. The drawer then asks for the
+  checkbox again, with **Continue** while the mailbox is on. A model that is not on the
+  list keeps Turn on disabled, with "Purin has not reviewed this model for email yet".
+- Turn off and Remove withdraw each acceptance (`revoked_at`) when no mailbox of the
+  Organisation stays on.
+- The chat agent cannot give this acceptance. The route admits only an owner or admin
+  with a Portal session, and no agent tool or Code Mode capability reaches it. The
+  acceptance is a person's own agreement to send the Organisation's mail to a third
+  party, so an agent that reads that mail must not give it for them (Plan 81 and
+  Plan 89).
+
 ## Limits that the product must show
 
 - Satyr keeps WhatsApp text for at most 24 hours, and until the Case closes. A closed
@@ -332,14 +368,15 @@ Run `pnpm --filter satyr-edge check:types`, `check:test-types`, `pnpm portal:bui
 
 ## Decisions
 
-| ID | Decision | Recommendation | Cost | Default |
-| --- | --- | --- | --- | --- |
-| D1 | Layout | B, two panes | Accepted by the owner | Accepted |
-| D2 | Who reads WhatsApp text | A person grant, as for a mailbox, with the access modal | One capability and one backfill. A viewer loses access until granted | Grant |
-| D3 | WhatsApp text after close | Keep Plan 32's limit | **Handled** rows have no text | Keep the limit |
-| D4 | "Agent answers" on email | Stay locked | Each email waits for a person | Locked |
-| D5 | Topics that always wait | Add a list, with allergens as the first value | One policy field and one journey step | Add |
-| D6 | **Review all** | Remove it after Phase 2 | One button goes. Auto-next does its work | Remove |
+| ID  | Decision                  | Recommendation                                                                        | Cost                                                                 | Default                             |
+| --- | ------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ----------------------------------- |
+| D1  | Layout                    | B, two panes                                                                          | Accepted by the owner                                                | Accepted                            |
+| D2  | Who reads WhatsApp text   | A person grant, as for a mailbox, with the access modal                               | One capability and one backfill. A viewer loses access until granted | Grant                               |
+| D3  | WhatsApp text after close | Keep Plan 32's limit                                                                  | **Handled** rows have no text                                        | Keep the limit                      |
+| D4  | "Agent answers" on email  | Stay locked                                                                           | Each email waits for a person                                        | Locked                              |
+| D5  | Topics that always wait   | Add a list, with allergens as the first value                                         | One policy field and one journey step                                | Add                                 |
+| D6  | **Review all**            | Remove it after Phase 2                                                               | One button goes. Auto-next does its work                             | Remove                              |
+| D7  | Gmail model gate          | Purin reviews each model route in code; the owner accepts its terms with one checkbox | A review in code every 90 days; mail stops when a review ends        | Accepted by the owner on 2026-11-22 |
 
 ## Risks
 

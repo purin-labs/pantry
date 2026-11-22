@@ -39,6 +39,7 @@ import { handleOrganisationInference } from "./agents/inference";
 import {
   handleAgentMailbox,
   handleAgentMailboxCheck,
+  isAgentMailboxRouteAction,
   type AgentMailboxRouteAction,
 } from "./agents/mailbox";
 import {
@@ -494,20 +495,6 @@ function matchEmailOperational(
     };
   }
   return null;
-}
-
-function isAgentMailboxRouteAction(
-  value: string | undefined,
-): value is AgentMailboxRouteAction {
-  return (
-    value === "bind" ||
-    value === "policy" ||
-    value === "resume" ||
-    value === "skip-and-resume" ||
-    value === "reconnect" ||
-    value === "disable" ||
-    value === "revoke"
-  );
 }
 
 function organisation(pathname: string, suffix: string): string | null {

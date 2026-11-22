@@ -3557,6 +3557,7 @@ CREATE TABLE gmail_inference_eligibility (
   review_expires_at INTEGER NOT NULL CHECK (review_expires_at > reviewed_at),
   consented_at INTEGER NOT NULL CHECK (consented_at >= 0),
   revoked_at INTEGER CHECK (revoked_at >= reviewed_at),
+  consented_by_user_id TEXT CHECK (length(trim(consented_by_user_id)) > 0),
   PRIMARY KEY (organisation_id, key_source, provider, model),
   CHECK (
     (key_source = 'organisation_subscription' AND provider = 'openai') OR

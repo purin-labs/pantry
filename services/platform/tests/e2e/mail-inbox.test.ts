@@ -132,6 +132,7 @@ import {
   readEmailCommerceEvidence,
 } from "../../src/mail-inbox/supplier-context";
 import { buildAgentMailboxAuthority } from "../../src/request-authority";
+import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { admitControlTurnFixture } from "../organisation-execution-fixture";
 import type { SessionTurnExecution } from "../../src/chat/turn-access";
 import { gmailGetMessageContent } from "../../src/mail/gmail-adapter";
@@ -381,22 +382,11 @@ async function prepareMailBudgetJourney() {
     now,
   });
   if (!selected.ok) throw new Error(selected.error.code);
-  const route = await resolveOrganisationModelRoute({ env, organisationId, now });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase().prepare(
-    "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'mail-budget-e2e', 'synthetic-reviewer', ?, 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-  )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      "openrouter",
-      now,
-      now + 3600000,
-      now,
-    )
-    .run();
+  await acceptMailboxModelTerms({
+    env,
+    scope: await requireMailFixtureScope(organisationId),
+    userId: owner.identity.userId,
+  });
   const connectorId = gmailConnectorId(accountId);
   if (!connectorId.ok) throw new Error(connectorId.error.code);
   const connector = await resolveActiveConnectorActor({
@@ -3257,21 +3247,11 @@ async function runDraftOnlyJourney(
   )
     .bind(organisationId, owner.identity.userId, now)
     .run();
-  const route = await resolveOrganisationModelRoute({ env, organisationId, now });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase().prepare(
-    "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'synthetic-draft-only-e2e', 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-  )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      now,
-      now + 3600000,
-      now,
-    )
-    .run();
+  await acceptMailboxModelTerms({
+    env,
+    scope: await requireMailFixtureScope(organisationId),
+    userId: owner.identity.userId,
+  });
   const fixture: DraftTurnFixture = {
     organisationId,
     integrationAccountId: account.value,
@@ -8800,21 +8780,11 @@ async function caseContextCollectionReplyJourney(
   )
     .bind(organisationId, owner.identity.userId, now)
     .run();
-  const route = await resolveOrganisationModelRoute({ env, organisationId, now });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase().prepare(
-    "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'synthetic-case-context-discovery-e2e', 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-  )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      now,
-      now + 3600000,
-      now,
-    )
-    .run();
+  await acceptMailboxModelTerms({
+    env,
+    scope: await requireMailFixtureScope(organisationId),
+    userId: owner.identity.userId,
+  });
   const connectorId = gmailConnectorId(account.value);
   if (!connectorId.ok) throw new Error(connectorId.error.code);
   const connector = await resolveActiveConnectorActor({
@@ -11145,10 +11115,10 @@ async function verifySupplierEvalRuns(
     }),
   ).toMatchObject({ ok: true });
 
-  // The organisation also holds a ChatGPT subscription that mailbox
-  // inference may use. Its selected authority stays the platform route. On
-  // the subscription, Pi asks the ChatGPT backend; each turn reads its
-  // scenario, chooses once and settles, as on the platform route.
+  // The organisation also holds a ChatGPT subscription. Its selected
+  // authority stays the platform route. Purin has not reviewed the
+  // subscription for mailbox content (a ChatGPT plan can train on it), so
+  // no Eval turn may run on it: Pi never asks the ChatGPT backend.
   const chatgpt = new FakeChatGpt();
   const subscriptionStarts: string[] = [];
   chatgpt.answer = evalSubscriptionAnswer.bind(null, subscriptionStarts);
@@ -11165,19 +11135,6 @@ async function verifySupplierEvalRuns(
     selection: { kind: "codex_subscription" },
   });
   if (!subscription.ok) throw new Error(subscription.error.code);
-  await fixtureDatabase().prepare(
-    "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'eval-runs-e2e', 'synthetic-reviewer', 'openai', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-  )
-    .bind(
-      organisationId,
-      subscription.value.keySource,
-      subscription.value.provider,
-      subscription.value.model,
-      now,
-      now + 3_600_000,
-      now,
-    )
-    .run();
 
   // Sydney is eleven hours ahead of UTC on the scenario's date.
   const scenario = (
@@ -11580,8 +11537,8 @@ async function verifySupplierEvalRuns(
   }
 
   // The comparison: both configurations, on the platform route, on the
-  // organisation's ChatGPT subscription, and on a route the organisation
-  // holds no credential for.
+  // organisation's ChatGPT subscription that Purin has not reviewed, and on
+  // a route the organisation holds no credential for.
   const before = {
     sends: state.sends,
     drafts: state.draftCreates,
@@ -11623,7 +11580,7 @@ async function verifySupplierEvalRuns(
   // Under the accepted revision the midday change is escalated, which the
   // reviewed criteria say is wrong. Under the candidate every scenario
   // passes, and the other supplier is handled as before under both.
-  const available = ["pantry_platform", "codex_subscription"] as const;
+  const available = ["pantry_platform"] as const;
   for (const route of available) {
     expect(byScenario(route), route).toEqual({
       late_change: { current: "passed", candidate: "passed" },
@@ -11636,22 +11593,25 @@ async function verifySupplierEvalRuns(
       "passed",
     );
   }
-  // The route with no credential tried nothing. Its tasks are unavailable:
-  // they carry no verdict, ran on no other authority, and leave the
-  // configuration's answer across all routes incomplete.
+  // The route with no credential, and the subscription that Purin has not
+  // reviewed for mailbox content, tried nothing. Their tasks are
+  // unavailable: they carry no verdict, ran on no other authority, and
+  // leave the configuration's answer across all routes incomplete.
   const absent = "unavailable:authority_unavailable";
-  expect(byScenario("organisation_openai_api_key")).toEqual({
-    late_change: { current: absent, candidate: absent },
-    midday_change: { current: absent, candidate: absent },
-    early_change: { current: absent, candidate: absent },
-    other_supplier: { current: absent, candidate: absent },
-  });
+  for (const route of [
+    "codex_subscription",
+    "organisation_openai_api_key",
+  ] as const)
+    expect(byScenario(route), route).toEqual({
+      late_change: { current: absent, candidate: absent },
+      midday_change: { current: absent, candidate: absent },
+      early_change: { current: absent, candidate: absent },
+      other_supplier: { current: absent, candidate: absent },
+    });
   expect(evalConfigurationVerdict(compared, "candidate")).toBe("incomplete");
-  const ran = compared.tasks.filter(
-    (task) => task.route !== "organisation_openai_api_key",
-  );
+  const ran = compared.tasks.filter((task) => task.route === "pantry_platform");
   const notRun = compared.tasks.filter(
-    (task) => task.route === "organisation_openai_api_key",
+    (task) => task.route !== "pantry_platform",
   );
   expect(
     notRun.map((task) => [task.execution, task.pins, task.totalTokens]),
@@ -11682,35 +11642,24 @@ async function verifySupplierEvalRuns(
       ]),
     ),
   );
-  // Each task that ran names what it ran against. A route is one model and
-  // one authority, and the two routes differ in both.
+  // Each task that ran names what it ran against: a route is one model
+  // and one authority.
   expect(ran.every((task) => task.pins !== null)).toBe(true);
-  for (const pin of ["model", "modelRouteDigest"] as const) {
-    expect(
-      available.map(
-        (route) =>
-          new Set(
-            ran
-              .filter((task) => task.route === route)
-              .map((task) => task.pins?.[pin]),
-          ).size,
-      ),
-    ).toEqual([1, 1]);
-    expect(new Set(ran.map((task) => task.pins?.[pin])).size).toBe(2);
-  }
+  for (const pin of ["model", "modelRouteDigest"] as const)
+    expect(new Set(ran.map((task) => task.pins?.[pin])).size).toBe(1);
   // One Case holds one assignment for each task that ran, each in its own
   // Session, and each completed.
   const assignments = await assignmentsOf(comparison.caseId);
   expect(assignments.map((entry) => entry.assignmentId).sort()).toEqual(
     ran.map((task) => task.execution?.assignmentId).sort(),
   );
-  expect(assignments).toHaveLength(16);
-  expect(new Set(assignments.map((entry) => entry.sessionId)).size).toBe(16);
+  expect(assignments).toHaveLength(8);
+  expect(new Set(assignments.map((entry) => entry.sessionId)).size).toBe(8);
   expect(assignments.every((entry) => entry.end === "completed")).toBe(true);
-  // On each route each turn read its scenario and chose once: three model
-  // requests.
+  // Each turn read its scenario and chose once: three model requests. The
+  // ChatGPT backend got none.
   expect(state.evalInputs.length - before.requests).toBe(24);
-  expect(chatgpt.modelRequestCount()).toBe(24);
+  expect(chatgpt.modelRequestCount()).toBe(0);
   // Nothing that an Eval turn shows the model names the Eval, its scenario
   // or its run, on either route. The agent reads the request of a turn for
   // arrived mail.
@@ -11723,7 +11672,7 @@ async function verifySupplierEvalRuns(
     ),
   ).toEqual([]);
   expect(state.evalMessages).toHaveLength(8);
-  expect(subscriptionStarts).toHaveLength(8);
+  expect(subscriptionStarts).toHaveLength(0);
   // Nothing reached the mailbox, and the candidate is still a candidate.
   expect({
     sends: state.sends - before.sends,
@@ -11745,7 +11694,7 @@ async function verifySupplierEvalRuns(
           )
           .toArray(),
     ),
-  ).toEqual([{ state: "settled", reservations: 16 }]);
+  ).toEqual([{ state: "settled", reservations: 8 }]);
 
   // A second run is stopped during its first turn: the Session's instance
   // ends, then the Connector's. While it is in progress the run shows how
@@ -12675,8 +12624,15 @@ async function verifyDraftsAcrossMailboxSettings(
   });
   expect(state.sends).toBe(sendsBeforeStop);
 
-  // 4. The operator starts processing again. The restart schedules one
-  // evaluation at once, and it finds no new mail.
+  // 4. The operator starts processing again. Turn off withdrew the
+  // acceptance of the model's terms, so the operator accepts them again, as
+  // the Portal's Turn on does. The restart schedules one evaluation at once,
+  // and it finds no new mail.
+  await acceptMailboxModelTerms({
+    env,
+    scope: await requireMailFixtureScope(organisationId),
+    userId: owner.identity.userId,
+  });
   expect(await settings("policy", { policy: raisedLimits })).toMatchObject({
     ok: true,
     policy: { kind: "enabled", policyVersion: admittedUnder + 3 },

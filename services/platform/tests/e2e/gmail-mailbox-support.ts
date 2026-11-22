@@ -31,7 +31,7 @@ import {
   runMailboxSetup,
   type MailboxSetupTransport,
 } from "../../../../apps/portal/src/features/mail-setup/run";
-import { resolveOrganisationModelRoute } from "../../src/models/route";
+import { acceptMailboxModelTerms } from "../mailbox-model-consent-fixture";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import type { Member } from "./memory-support";
@@ -351,35 +351,19 @@ function base64UrlJson(value: unknown): string {
 }
 
 /**
- * Pantry's operator approves the workspace's model for mailbox content. The
- * setup never writes this record. `evidence` names the journey in it.
+ * The owner accepts the data terms of the workspace's reviewed model for
+ * new mail, as the checkbox beside Turn on does. The product's own consent
+ * writes the record.
  */
-export async function approveMailboxModel(
+export async function acceptMailboxModel(
   organisationId: OrganisationId,
-  evidence: string,
+  owner: Pick<Member, "userId">,
 ): Promise<void> {
-  const now = Date.now();
-  const route = await resolveOrganisationModelRoute({
+  await acceptMailboxModelTerms({
     env,
-    organisationId,
-    now,
+    scope: await requireOrganisationExecutionScope(env, organisationId),
+    userId: owner.userId,
   });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase()
-    .prepare(
-      "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, ?, 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-    )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      evidence,
-      now - 1,
-      now + 3_600_000,
-      now - 1,
-    )
-    .run();
 }
 
 /** Makes the Connector's held reply turns due now and runs one alarm. */

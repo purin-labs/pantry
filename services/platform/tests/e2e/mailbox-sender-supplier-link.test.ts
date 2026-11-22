@@ -14,7 +14,7 @@ import { purchasingFixture } from "./mail-purchasing-support";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
 import {
-  approveMailboxModel,
+  acceptMailboxModel,
   connectGmailMailbox,
   draftReplyTurn,
   FakeGmailMailbox,
@@ -91,7 +91,7 @@ async function senderSupplierLinkJourney({ task }: TestContext): Promise<void> {
     },
   });
   expect(on).toMatchObject({ status: 200, body: { ok: true } });
-  await approveMailboxModel(organisationId, "synthetic-sender-link-e2e");
+  await acceptMailboxModel(organisationId, owner);
   const connector = await mailboxConnector(organisationId, account);
   await runDurableObjectAlarm(connector);
   const scope = await requireOrganisationExecutionScope(env, organisationId);

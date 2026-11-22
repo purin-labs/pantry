@@ -19,7 +19,7 @@
     },
     "worker-logic": {
       "files": 10,
-      "lines": 3778
+      "lines": 3765
     },
     "shopify-rule": {
       "imports": 10
@@ -173,7 +173,7 @@
       "fix": "Move the logic to the area that owns it, and give it the other area through a contract or a port. Keep registration lines, route tables with no branch and class shells in the Worker module.",
       "counts": {
         "files workers/platform": 10,
-        "lines workers/platform": 3778
+        "lines workers/platform": 3765
       }
     },
     "shopify-rule": {

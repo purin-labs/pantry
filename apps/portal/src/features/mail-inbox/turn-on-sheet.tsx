@@ -5,6 +5,10 @@ import { ProviderTile } from "../../page-components";
 import { ConnectionDialog } from "../integrations/connection-dialog";
 import { mailboxCanTurnOn, turnOnHint } from "../mail-setup/model";
 import {
+  MailboxModelConsent,
+  useMailboxModelConsent,
+} from "../mail-setup/model-consent";
+import {
   readMailboxSetup,
   type MailboxSetupTransport,
 } from "../mail-setup/run";
@@ -35,8 +39,8 @@ type Props = Readonly<{
 
 /**
  * Turns a mailbox on from the Inbox, with the same one press as the
- * mailbox's own view: the setup that it still needs, then the default
- * limits.
+ * mailbox's own view: the setup that it still needs, the acceptance of the
+ * AI model's terms, then the default limits.
  */
 export function MailboxTurnOnSheet(props: Props): React.ReactNode {
   const [run, setRun] = React.useState<Run>({ kind: "idle" });
@@ -57,8 +61,9 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
     run.kind !== "running",
   );
   const plan = setup.state.kind === "ready" ? setup.state.plan : null;
+  const consent = useMailboxModelConsent(plan);
   const turnOn = async (): Promise<void> => {
-    if (plan === null || !mailboxCanTurnOn(plan)) return;
+    if (plan === null || !mailboxCanTurnOn(plan, consent.accepted)) return;
     setRun({ kind: "running" });
     try {
       await setUpMailbox(
@@ -69,6 +74,7 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
         },
         plan.agent.choice,
         true,
+        consent.accepted,
       );
       setRun({ kind: "idle" });
       setRevision(nextRevision);
@@ -94,6 +100,14 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
     >
       {plan !== null ? (
         <section className="provider-consent" aria-label="Turn on">
+          {consent.review === null ? null : (
+            <MailboxModelConsent
+              review={consent.review}
+              accepted={consent.accepted !== null}
+              disabled={run.kind === "running" || setup.reading}
+              onChange={consent.setAccepted}
+            />
+          )}
           <p className="notice-text">{turnOnHint(plan)}</p>
           {run.kind === "failed" ? (
             <p className="error-text" role="alert">
@@ -108,7 +122,7 @@ export function MailboxTurnOnSheet(props: Props): React.ReactNode {
               disabled={
                 run.kind === "running" ||
                 setup.reading ||
-                !mailboxCanTurnOn(plan)
+                !mailboxCanTurnOn(plan, consent.accepted)
               }
             >
               {run.kind === "running" ? "Turning on…" : "Turn on"}

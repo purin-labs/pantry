@@ -1,6 +1,12 @@
 import React from "react";
-import type { EmailReplyPreviewResult, EmailOperationalPreviewResult } from "@purin-labs/control-api/portal/agent-mailbox";
-import type { MailboxSetupAgent } from "@purin-labs/control-api";
+import type {
+  EmailReplyPreviewResult,
+  EmailOperationalPreviewResult,
+} from "@purin-labs/control-api/portal/agent-mailbox";
+import type {
+  MailboxModelReview,
+  MailboxSetupAgent,
+} from "@purin-labs/control-api";
 import {
   runIntegrationsCommand,
   runProviderConnection,
@@ -67,18 +73,24 @@ export async function connectWhatsApp(
   );
 }
 
-/** One press of the mailbox's Turn on, or of Finish setup while it is on. */
+/**
+ * One press of the mailbox's Turn on, or of Finish setup or Continue while
+ * it is on.
+ */
 export type MailboxSetupRequest = {
   readonly integrationAccountId: string;
   readonly address: string;
   readonly agent: MailboxSetupAgent;
   /** Turn the mailbox on after the setup. False leaves it as it is. */
   readonly turnOn: boolean;
+  /** The model review whose data terms the person accepted, if any. */
+  readonly accepted: MailboxModelReview | null;
 };
 
 /**
- * Makes each change that the mailbox's setup names. With `turnOn`, it then
- * turns the mailbox on with the server's default limits.
+ * Makes each change that the mailbox's setup names, and records the
+ * acceptance of the model's terms. With `turnOn`, it then turns the mailbox
+ * on with the server's default limits.
  */
 export async function setUpMailbox(
   context: IntegrationsRouteMutationContext,
@@ -91,11 +103,14 @@ export async function setUpMailbox(
       integrationAccountId: request.integrationAccountId,
       agent: request.agent.choice,
       turnOn: request.turnOn,
+      accepted: request.accepted,
     },
     { kind: "agent_mailbox", integrationAccountId: request.integrationAccountId },
     request.turnOn
       ? `${request.agent.name} now reads new mail in ${request.address}.`
-      : `${request.agent.name} has the access it needs again.`,
+      : request.accepted !== null
+        ? `${request.agent.name} reads new mail in ${request.address} again.`
+        : `${request.agent.name} has the access it needs again.`,
   );
 }
 
