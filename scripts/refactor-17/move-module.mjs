@@ -20,7 +20,8 @@
 // One run does the whole move, in this order:
 //    1. `git mv` of each source file that is still at its old path.
 //    2. package.json and tsconfig.json of the new package: source only, with
-//       an `exports` map and no build step.
+//       an `exports` map and no build step. With `package.typeCheck: false`
+//       in the plan, the package has no check:types script.
 //    3. The workspace entry, and the dependency in each package that imports
 //       the module by name.
 //    4. Each import of a moved file, in each source file of the tree: `from`,
@@ -28,8 +29,12 @@
 //       of a workspace package imports the module by name. A file with no
 //       package of its own (scripts/) keeps a relative path.
 //    5. Each path of a moved file in a lint, a ratchet, a config, a Dockerfile,
-//       a CI file and a document. Plans and evidence keep the old paths.
-//    6. scripts/layers.json: one rule for the folder, the package and the cover.
+//       a CI file and a document, and the path of each folder that moves
+//       whole. Plans and evidence keep the old paths. A glob of the Worker
+//       source that selects a moved file of a folder that does not move whole
+//       is a fault: the plan adds the new path with an edit.
+//    6. scripts/layers.json: one rule for the folder, the package and the
+//       cover. The rule of a folder that moved whole goes.
 //    7. The ratchet files in their own order. No count changes.
 //    8. The text edits of the plan.
 //    9. Prettier, only for a file that this run changed and that was clean
@@ -299,7 +304,12 @@ await putJson(
     private: true,
     type: "module",
     exports: plan.package.exports,
-    scripts: { "check:types": "tsrs --noEmit" },
+    // A package that reads an `Env` key that another module merges fails a
+    // type check of its own; the Worker program checks its files.
+    scripts:
+      plan.package.typeCheck === false
+        ? undefined
+        : { "check:types": "tsrs --noEmit" },
     dependencies: plan.package.dependencies,
     devDependencies: Object.fromEntries(
       plan.package.devDependencies.map((name) => [name, versionOf(name)]),
@@ -548,6 +558,76 @@ const FROM_ROOT = new RegExp(
 );
 const RELATIVE_PATH = /(?<![\w/@.-])(\.{1,2}\/[\w@./-]+)/g;
 
+// A folder moves whole when each tracked file in it is in the plan and keeps
+// its place below the folder. A lint, a config or a document can name such a
+// folder (`.../data/shared-rows/`, `.../actor-journal/**/*.ts`): the name
+// moves with it.
+/** old folder -> new folder, for each folder that moves whole. */
+const movedFolders = new Map();
+const notWhole = new Set();
+const treeOnDisk = tree.map(diskPath);
+for (const [from, to] of planFiles) {
+  let folder = posix.dirname(from);
+  let next = posix.dirname(to);
+  while (folder !== "." && posix.basename(folder) === posix.basename(next)) {
+    if (notWhole.has(folder)) break;
+    if (!movedFolders.has(folder)) {
+      const prefix = `${folder}/`;
+      const whole = treeOnDisk
+        .filter((path) => path.startsWith(prefix))
+        .every(
+          (path) =>
+            planFiles.get(path) === `${next}/${path.slice(prefix.length)}`,
+        );
+      if (!whole) {
+        notWhole.add(folder);
+        break;
+      }
+      movedFolders.set(folder, next);
+    }
+    folder = posix.dirname(folder);
+    next = posix.dirname(next);
+  }
+}
+const FOLDER_FROM_ROOT =
+  movedFolders.size === 0
+    ? null
+    : new RegExp(
+        `(?<![\\w./@-])(${[...movedFolders.keys()]
+          .sort((a, b) => b.length - a.length)
+          .map(escaped)
+          .join("|")})(?=/|[^\\w./-]|$)`,
+        "g",
+      );
+// A glob of the Worker source below its root that selects a moved file, in a
+// folder that does not move whole: the moved file leaves the glob.
+const GLOB =
+  /(?<![\w./@-])(services\/platform\/src\/[\w@./-]*\*[\w@.*/{},-]*)/g;
+// A path or a glob in the target folder, which can select the moved file.
+const TARGET_PATH = new RegExp(
+  `(?<![\\w./@-])(${escaped(plan.target)}/[\\w@.*/{},-]*)`,
+  "g",
+);
+function globPattern(glob) {
+  let source = "";
+  for (let at = 0; at < glob.length; at += 1) {
+    const char = glob[at];
+    if (glob.startsWith("**/", at)) {
+      source += "(?:.*/)?";
+      at += 2;
+    } else if (char === "*") source += "[^/]*";
+    else if (char === "{") source += "(?:";
+    else if (char === "}") source += ")";
+    else if (
+      char === "," &&
+      source.lastIndexOf("(?:") > source.lastIndexOf(")")
+    )
+      source += "|";
+    else source += escaped(char);
+  }
+  return new RegExp(`^${source}$`);
+}
+
 for (const path of tree) {
   if (!TEXT.test(path) || UNREAD.some((pattern) => pattern.test(path))) {
     continue;
@@ -562,6 +642,12 @@ for (const path of tree) {
     changed += 1;
     return planFiles.get(from);
   });
+  if (FOLDER_FROM_ROOT !== null) {
+    next = next.replace(FOLDER_FROM_ROOT, (_, from) => {
+      changed += 1;
+      return movedFolders.get(from);
+    });
+  }
   // A path from the folder of a config or of a document. The imports of a
   // source file are done above.
   if (!SOURCE.test(path) && !oldPathOf.has(path)) {
@@ -594,6 +680,16 @@ for (const path of tree) {
         faults.push(`${LAYER_MAP}: ${key} is not a file of ${plan.module}`);
       }
       delete map.files[key];
+    }
+  }
+  // A rule of a folder that moved whole is now inside the rule of the target.
+  for (const key of Object.keys(map.rules)) {
+    if (
+      key !== rule &&
+      key.startsWith(rule) &&
+      map.rules[key] === plan.module
+    ) {
+      delete map.rules[key];
     }
   }
   if (map.rules[rule] === undefined) {
@@ -687,6 +783,32 @@ for (const edit of plan.edits ?? []) {
   } else {
     faults.push(
       `${edit.file}: the plan looks for this text, and the file does not have it:\n    ${edit.find}\n  Correct the edit in the plan (${edit.why}).`,
+    );
+  }
+}
+
+// A glob of the Worker source that selects a moved file, after the edits.
+for (const path of tree) {
+  if (!TEXT.test(path) || UNREAD.some((pattern) => pattern.test(path))) {
+    continue;
+  }
+  if (FROZEN.some((pattern) => pattern.test(path))) continue;
+  const text = textOf(path);
+  if (text === null || !text.includes("*")) continue;
+  const targetPatterns = [...text.matchAll(TARGET_PATH)].map((match) =>
+    globPattern(match[1]),
+  );
+  for (const match of text.matchAll(GLOB)) {
+    const pattern = globPattern(match[1]);
+    const selected = [...planFiles.keys()].find(
+      (from) =>
+        pattern.test(from) &&
+        !targetPatterns.some((target) => target.test(planFiles.get(from))),
+    );
+    if (selected === undefined) continue;
+    const line = text.slice(0, match.index).split("\n").length;
+    faults.push(
+      `${path}:${line}: the glob ${match[1]} selects ${selected}, which moves to ${planFiles.get(selected)}. Add the new path to the plan as an edit.`,
     );
   }
 }
