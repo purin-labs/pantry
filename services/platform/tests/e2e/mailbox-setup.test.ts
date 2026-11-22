@@ -18,19 +18,22 @@ import {
 } from "../../src/data/control-plane";
 import { type IntegrationAccountId, type OrganisationId } from "../../src/ids";
 import { authorizeMailSource } from "../../src/mail-inbox/contract/mail-source-authorization";
-import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { readCurrentOrganisationPolicySnapshot } from "../../src/policy-snapshot";
 import {
   buildAgentMailboxAuthority,
   buildControlAuthority,
 } from "../../src/request-authority";
-import type { MailboxSetupTransport } from "../../../../apps/portal/src/features/mail-setup/run";
 import { setUpMailbox } from "../../../../apps/portal/src/features/mail-setup/turn-on";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import { installMemoryFixture, type Member } from "./memory-support";
 import { network } from "./network";
-import { connectGmailMailbox, sendAs } from "./gmail-mailbox-support";
+import {
+  approveMailboxModel,
+  connectGmailMailbox,
+  portalSetupTransport,
+  sendAs,
+} from "./gmail-mailbox-support";
 
 const ADDRESS = "orders@example.test";
 
@@ -86,7 +89,7 @@ async function mailboxTurnOnJourney({ task }: TestContext): Promise<void> {
 
   // 2. Pantry records the approval of the model for mailbox content. The
   //    Portal's Turn on is then ready.
-  await approveModel(organisationId);
+  await approveMailboxModel(organisationId, "mailbox-setup-e2e");
   expect((await plan()).plan?.model).toEqual({ kind: "approved" });
 
   // 3. A member without the right presses Turn on. The Portal's own press
@@ -173,23 +176,9 @@ async function turnOn(
   account: IntegrationAccountId,
 ): Promise<Readonly<{ turnedOn: boolean; changes: readonly string[] }>> {
   const changes: string[] = [];
-  const transport: MailboxSetupTransport = {
-    read: async (path) => {
-      const response = await exports.default.fetch(`https://localhost${path}`, {
-        headers: commerceHeaders(person.session),
-      });
-      const body: unknown = await response.json();
-      if (!response.ok) throw new Error(JSON.stringify(body));
-      return body;
-    },
-    mutate: async (path, _method, body) => {
-      const sent = await sendAs(person, path, body);
-      if (sent.status !== 200 && sent.status !== 201)
-        throw new Error(JSON.stringify(sent));
-      changes.push(changeName(path, body));
-      return sent.body;
-    },
-  };
+  const transport = portalSetupTransport(person, (path, body) =>
+    changes.push(changeName(path, body)),
+  );
   const turnedOn = await setUpMailbox(
     transport,
     { organisationId, integrationAccountId: account },
@@ -356,31 +345,6 @@ async function readsMailbox(
     account,
   );
   return authorized !== null;
-}
-
-/** What Pantry's operator records after the review of a model route. */
-async function approveModel(organisationId: OrganisationId): Promise<void> {
-  const now = Date.now();
-  const route = await resolveOrganisationModelRoute({
-    env,
-    organisationId,
-    now,
-  });
-  if (!route.ok) throw new Error(route.error.code);
-  await fixtureDatabase()
-    .prepare(
-      "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, 'mailbox-setup-e2e', 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
-    )
-    .bind(
-      organisationId,
-      route.value.keySource,
-      route.value.provider,
-      route.value.model,
-      now - 1,
-      now + 3_600_000,
-      now - 1,
-    )
-    .run();
 }
 
 /**

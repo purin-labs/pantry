@@ -7,13 +7,12 @@ import {
   claimDueEmailEvaluation,
   completeEmailEvaluation,
   countEmailAdmissionsSince,
-  countOpenEmailCases,
   createConnectorEmailSchema,
   disableEmailRuntime,
   emailMessageDisposition,
   emailTokenWindowTotals,
   nextEmailEvaluationAt,
-  openEmailCaseForThread,
+  emailCaseForThread,
   pauseEmailRuntime,
   readEmailRuntime,
   reconnectEmailRuntime,
@@ -237,8 +236,7 @@ function cursorTest(): void {
   });
   expect(emailMessageDisposition(sql, "m1")).toBe("admitted");
   expect(countEmailAdmissionsSince(sql, NOW - 1)).toBe(2);
-  expect(countOpenEmailCases(sql)).toBe(1);
-  expect(openEmailCaseForThread(sql, "t1")).toBe("case_gmail_a_t1");
+  expect(emailCaseForThread(sql, "t1")).toBe("case_gmail_a_t1");
 }
 
 function malformedPauseTest(): void {

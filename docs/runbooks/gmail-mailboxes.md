@@ -17,15 +17,15 @@ Five variables gate the entire path. Each is optional at the type level so the
 Worker deploys without Gmail; every one must be present before a mailbox can
 process mail.
 
-| Variable                         | Kind          | Value                                                                                                            |
-| -------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `GMAIL_OAUTH_CLIENT_ID`          | var           | OAuth client ID                                                                                                  |
-| `GMAIL_OAUTH_CLIENT_SECRET`      | secret        | OAuth client secret                                                                                              |
-| `GMAIL_PUBSUB_TOPIC`             | var           | `projects/PROJECT/topics/TOPIC`, fully qualified                                                                 |
-| `GMAIL_PUBSUB_AUDIENCE`          | var           | Exact `aud` claim on the push token                                                                              |
-| `GMAIL_PUBSUB_SERVICE_ACCOUNT`   | var           | Exact `email` claim on the push token                                                                            |
-| `GMAIL_PILOT_ACCOUNT_CAP`        | var, optional | Connected Google accounts this project may consume. Defaults to 80                                               |
-| `GMAIL_PILOT_SUBMISSION_TRIGGER` | var, optional | Consumption at which to begin verification. Defaults to 50                                                       |
+| Variable                         | Kind          | Value                                                              |
+| -------------------------------- | ------------- | ------------------------------------------------------------------ |
+| `GMAIL_OAUTH_CLIENT_ID`          | var           | OAuth client ID                                                    |
+| `GMAIL_OAUTH_CLIENT_SECRET`      | secret        | OAuth client secret                                                |
+| `GMAIL_PUBSUB_TOPIC`             | var           | `projects/PROJECT/topics/TOPIC`, fully qualified                   |
+| `GMAIL_PUBSUB_AUDIENCE`          | var           | Exact `aud` claim on the push token                                |
+| `GMAIL_PUBSUB_SERVICE_ACCOUNT`   | var           | Exact `email` claim on the push token                              |
+| `GMAIL_PILOT_ACCOUNT_CAP`        | var, optional | Connected Google accounts this project may consume. Defaults to 80 |
+| `GMAIL_PILOT_SUBMISSION_TRIGGER` | var, optional | Consumption at which to begin verification. Defaults to 50         |
 
 Two URLs are registered with Google and must match byte for byte:
 
@@ -128,13 +128,18 @@ them. To raise a limit, an owner or admin posts the full enabled policy to
 
 | Pause reason                 | Operator action                                         |
 | ---------------------------- | ------------------------------------------------------- |
-| `active_case_limit`          | Close Cases or raise the limit, then resume             |
+| `active_case_limit`          | Resume: the waiting replies finish, then new mail comes |
 | `hourly_message_limit`       | Wait for the window, or raise the limit, then resume    |
 | `daily_token_budget`         | Wait for UTC rollover, or raise the budget, then resume |
 | `message_too_large`          | Raise the limit, or skip that exact message and resume  |
 | `attachment_too_large`       | Raise the limit, or skip that exact message and resume  |
 | `attachment_total_too_large` | Raise the limit, or skip that exact message and resume  |
 | `authorization_expired`      | Reconnect the mailbox. Resume cannot clear this one     |
+
+An email is in progress from its admission until its reply turn ends: a
+reply sent, a draft saved, no reply, a refusal, or the last failed attempt. A
+paused mailbox runs no reply turns. Resume runs the waiting turns before it
+reads new mail, so a pause at `active_case_limit` clears when the turns end.
 
 Skip-and-resume accepts only the exact message named by the pause. New mail
 stays in Gmail while paused and was never sent to the agent.

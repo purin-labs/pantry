@@ -48,7 +48,7 @@ import {
   claimDueEmailEvaluation,
   completeEmailEvaluation,
   countEmailAdmissionsSince,
-  countOpenEmailCases,
+  countEmailThreadsInProgress,
   emailMessageDisposition,
   emailTokenWindowTotals,
   markEmailWatch,
@@ -56,7 +56,8 @@ import {
   nextEmailWatchCleanupAt,
   readEmailRuntime,
   settleEmailWatchCleanup,
-  openEmailCaseForThread,
+  emailCaseForThread,
+  emailThreadInProgress,
   pauseEmailRuntime,
   recordEmailAdmissions,
   recordEmailCaseContextDiscovery,
@@ -724,7 +725,7 @@ export function decideEmailAdmissions(
   const admitted: EmailAdmission[] = [];
   const admittedThreads = new Set<string>();
   let hourlyCount = countEmailAdmissionsSince(input.sql, input.now - HOUR_MS);
-  let openCases = countOpenEmailCases(input.sql);
+  let inProgress = countEmailThreadsInProgress(input.sql);
   const window = emailTokenWindowTotals(input.sql, utcDayKey(input.now));
   for (const message of input.messages) {
     if (window.reserved + window.consumed >= input.limits.dailyTokenBudget) {
@@ -761,25 +762,25 @@ export function decideEmailAdmissions(
         },
       };
     }
-    const existingCase =
-      openEmailCaseForThread(input.sql, message.threadId) ??
-      (admittedThreads.has(message.threadId)
-        ? caseIdForThread(input.runtime.integrationAccountId, message.threadId)
-        : null);
-    if (existingCase === null && openCases >= input.limits.maxActiveCases) {
+    // A thread whose reply is still in progress takes the new message into
+    // that work. Any other thread needs a free place.
+    const joinsWork =
+      admittedThreads.has(message.threadId) ||
+      emailThreadInProgress(input.sql, message.threadId);
+    if (!joinsWork && inProgress >= input.limits.maxActiveCases) {
       return {
         admitted,
         pause: {
           kind: "active_case_limit",
-          observed: openCases,
+          observed: inProgress,
           limit: input.limits.maxActiveCases,
         },
       };
     }
     const caseId =
-      existingCase ??
+      emailCaseForThread(input.sql, message.threadId) ??
       caseIdForThread(input.runtime.integrationAccountId, message.threadId);
-    if (existingCase === null) openCases += 1;
+    if (!joinsWork) inProgress += 1;
     admittedThreads.add(message.threadId);
     hourlyCount += 1;
     admitted.push({

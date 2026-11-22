@@ -68,7 +68,7 @@ import {
   type EmailCorrectionLearningWork,
   type EmailReplyTurnWork,
   countEmailAdmissionsSince,
-  countOpenEmailCases,
+  countEmailThreadsInProgress,
   disableEmailRuntime,
   emailTokenWindowTotals,
   latestEmailDraftOperation,
@@ -738,7 +738,7 @@ export class ConnectorEmail {
       value: {
         ...runtime,
         usage: {
-          activeCases: countOpenEmailCases(sql),
+          activeCases: countEmailThreadsInProgress(sql),
           admittedLastHour: countEmailAdmissionsSince(sql, now - 3_600_000),
           tokens: emailTokenWindowTotals(sql, utcDayKey(now)),
           nextEvaluationAt: nextEmailEvaluationAt(sql),
@@ -1826,6 +1826,12 @@ export class ConnectorEmail {
   private async runDueEmailEvaluation(
     scope: OrganisationExecutionScope,
   ): Promise<void> {
+    // The reply turns that wait run first. Each one that ends frees its
+    // place under the in-progress limit, so the evaluation after a Resume
+    // admits the mail that paused the mailbox instead of pausing again.
+    await this.runDueEmailReplyTurns(scope);
+    if (!(await isActorExecutionActive(this.host.ctx.storage.sql, scope)))
+      return;
     try {
       // Admission queues the reply turn each admitted burst is owed.
       await runConnectorEmailEvaluation({

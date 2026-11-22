@@ -90,8 +90,8 @@ function gmailPauseReasonLabel(reason: MailboxPauseReasonView): string {
   switch (reason.kind) {
     case "active_case_limit":
       return reason.observed === null
-        ? "open Case limit"
-        : `${reason.observed.toLocaleString()} open ${reason.observed === 1 ? "Case" : "Cases"}`;
+        ? "emails in progress"
+        : `${reason.observed.toLocaleString()} ${reason.observed === 1 ? "email" : "emails"} in progress`;
     case "hourly_message_limit":
       return "hourly message limit";
     case "daily_token_budget":
@@ -113,7 +113,7 @@ export function gmailPauseCopy(reason: MailboxPauseReasonView): string {
   const limit = reason.limit?.toLocaleString() ?? null;
   switch (reason.kind) {
     case "active_case_limit":
-      return `Processing paused at the active-Case limit (${observed} open of ${limit} allowed).`;
+      return `Processing paused: ${observed} emails are in progress, and ${limit} is the most at one time. Resume lets them finish first.`;
     case "hourly_message_limit":
       return `Processing paused at the hourly message limit (${observed} of ${limit} this hour).`;
     case "daily_token_budget":

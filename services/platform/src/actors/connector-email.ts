@@ -126,6 +126,8 @@ export function createConnectorEmailSchema(
   )`);
   sql.exec(`CREATE INDEX IF NOT EXISTS idx_connector_email_message_admitted
     ON connector_email_message (disposition, admitted_at)`);
+  // A thread keeps its Case for good. Nothing writes `closed_at`; the reply
+  // turn queue says which threads are in progress.
   sql.exec(`CREATE TABLE IF NOT EXISTS connector_email_case (
     case_id TEXT PRIMARY KEY,
     thread_id TEXT NOT NULL UNIQUE,
@@ -1669,22 +1671,45 @@ export function countEmailAdmissionsSince(
   return row?.total ?? 0;
 }
 
-export function countOpenEmailCases(sql: SqlStorage): number {
+/**
+ * The emails in progress: the threads whose reply turn is queued or running.
+ * The turn is queued with the mail's admission and leaves the queue when its
+ * work ends: a reply sent, a draft saved, no reply, a refusal, or the last
+ * failed attempt. So a thread holds a place under `maxActiveCases` only
+ * while the agent works on it.
+ */
+export function countEmailThreadsInProgress(sql: SqlStorage): number {
   const row = sql
     .exec<{ total: number }>(
-      "SELECT COUNT(*) AS total FROM connector_email_case WHERE closed_at IS NULL",
+      "SELECT COUNT(DISTINCT thread_id) AS total FROM connector_email_reply_turn",
     )
     .toArray()[0];
   return row?.total ?? 0;
 }
 
-export function openEmailCaseForThread(
+/** Whether a reply turn of this thread is queued or running. */
+export function emailThreadInProgress(
+  sql: SqlStorage,
+  threadId: string,
+): boolean {
+  return (
+    sql
+      .exec(
+        "SELECT 1 FROM connector_email_reply_turn WHERE thread_id = ? LIMIT 1",
+        threadId,
+      )
+      .toArray().length > 0
+  );
+}
+
+/** The Case of a thread that the mailbox admitted before, or null. */
+export function emailCaseForThread(
   sql: SqlStorage,
   threadId: string,
 ): string | null {
   const row = sql
     .exec<{ case_id: string }>(
-      "SELECT case_id FROM connector_email_case WHERE thread_id = ? AND closed_at IS NULL",
+      "SELECT case_id FROM connector_email_case WHERE thread_id = ?",
       threadId,
     )
     .toArray()[0];

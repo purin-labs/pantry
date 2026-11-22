@@ -1,7 +1,8 @@
 import { env, exports } from "cloudflare:workers";
-import { runInDurableObject } from "cloudflare:test";
+import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
+import { http, HttpResponse } from "msw";
 import { expect } from "vitest";
-import { decodeBase64, isRecord } from "@purin-labs/std";
+import { decodeBase64, encodeBase64Url, isRecord } from "@purin-labs/std";
 import { resolveActiveConnectorActor } from "../../src/actors/actor-router";
 import type { ConnectorDO } from "../../src/actors/connector";
 import {
@@ -30,10 +31,15 @@ import {
   runMailboxSetup,
   type MailboxSetupTransport,
 } from "../../../../apps/portal/src/features/mail-setup/run";
+import { resolveOrganisationModelRoute } from "../../src/models/route";
 import { requireOrganisationExecutionScope } from "../organisation-execution-fixture";
 import { commerceHeaders } from "./commerce-support";
 import type { Member } from "./memory-support";
+import { network } from "./network";
+import { openRouterText, openRouterToolCall } from "./slack-journey-support";
 import { fixtureDatabase } from "./organisation-database";
+
+const GMAIL = "https://gmail.googleapis.com/gmail/v1/users/me";
 
 /** The Connector Actor of a mailbox. */
 export type MailboxConnector = DurableObjectStub<ConnectorDO>;
@@ -140,13 +146,16 @@ export async function connectGmailMailbox(
   return account.value;
 }
 
-/** One press of the setup action with the Portal's own runner. */
-export async function setUpMailbox(
+/**
+ * The Portal's mailbox setup transport, with the session of one person. A
+ * refused read or change throws, as the Portal's control client does.
+ * `made` hears each change that succeeded.
+ */
+export function portalSetupTransport(
   person: Member,
-  organisationId: OrganisationId,
-  account: IntegrationAccountId,
-): Promise<void> {
-  const transport: MailboxSetupTransport = {
+  made: (path: string, body: unknown) => void = () => {},
+): MailboxSetupTransport {
+  return {
     read: async (path) => {
       const response = await exports.default.fetch(`https://localhost${path}`, {
         headers: commerceHeaders(person.session),
@@ -159,11 +168,20 @@ export async function setUpMailbox(
       const sent = await sendAs(person, path, body);
       if (sent.status !== 200 && sent.status !== 201)
         throw new Error(JSON.stringify(sent));
+      made(path, body);
       return sent.body;
     },
   };
+}
+
+/** One press of the setup action with the Portal's own runner. */
+export async function setUpMailbox(
+  person: Member,
+  organisationId: OrganisationId,
+  account: IntegrationAccountId,
+): Promise<void> {
   const plan = await runMailboxSetup(
-    transport,
+    portalSetupTransport(person),
     { organisationId, integrationAccountId: account },
     { kind: "automatic" },
   );
@@ -330,4 +348,260 @@ function base64UrlJson(value: unknown): string {
     .replaceAll("+", "-")
     .replaceAll("/", "_")
     .replace(/=+$/u, "");
+}
+
+/**
+ * Pantry's operator approves the workspace's model for mailbox content. The
+ * setup never writes this record. `evidence` names the journey in it.
+ */
+export async function approveMailboxModel(
+  organisationId: OrganisationId,
+  evidence: string,
+): Promise<void> {
+  const now = Date.now();
+  const route = await resolveOrganisationModelRoute({
+    env,
+    organisationId,
+    now,
+  });
+  if (!route.ok) throw new Error(route.error.code);
+  await fixtureDatabase()
+    .prepare(
+      "INSERT INTO gmail_inference_eligibility (organisation_id, key_source, provider, model, evidence_reference, evidence_owner, disclosed_recipients, permitted_purpose, consent_reference, reviewed_at, review_expires_at, consented_at, revoked_at) VALUES (?, ?, ?, ?, ?, 'synthetic-reviewer', 'openrouter', 'email_processing', 'synthetic-consent', ?, ?, ?, NULL)",
+    )
+    .bind(
+      organisationId,
+      route.value.keySource,
+      route.value.provider,
+      route.value.model,
+      evidence,
+      now - 1,
+      now + 3_600_000,
+      now - 1,
+    )
+    .run();
+}
+
+/** Makes the Connector's held reply turns due now and runs one alarm. */
+export async function runDueMailWork(
+  connector: MailboxConnector,
+): Promise<void> {
+  await runInDurableObject(
+    connector,
+    async (_actor: unknown, state: DurableObjectState) => {
+      state.storage.sql.exec(
+        "UPDATE connector_email_reply_turn SET available_at = 0",
+      );
+      await state.storage.setAlarm(Date.now());
+    },
+  );
+  await runDurableObjectAlarm(connector);
+}
+
+/** The one kind of mail that arrives in a fake Gmail mailbox. */
+export type FakeGmailMail = Readonly<{
+  /** The mailbox's own address. */
+  address: string;
+  /** The address of the person who writes each arriving mail. */
+  sender: string;
+  subject: string;
+  text: string;
+}>;
+
+/**
+ * Gmail for one mailbox: its Inbox history, its messages and its drafts.
+ * Each arriving mail comes from the same sender with the same text. A call
+ * that the fake does not serve is recorded in `unexpected`.
+ */
+export class FakeGmailMailbox {
+  historyId = 1000;
+  arrivals: { id: string; threadId: string; historyId: number }[] = [];
+  drafts = new Map<string, { raw: string; threadId: string }>();
+  sent = 0;
+  unexpected: string[] = [];
+
+  constructor(private readonly mail: FakeGmailMail) {}
+
+  arrive(id: string, threadId: string): void {
+    this.historyId += 5;
+    this.arrivals.push({ id, threadId, historyId: this.historyId });
+  }
+
+  serve(): void {
+    network.use(
+      http.get(`${GMAIL}/profile`, () =>
+        HttpResponse.json({
+          emailAddress: this.mail.address,
+          historyId: String(this.historyId),
+        }),
+      ),
+      http.post(`${GMAIL}/watch`, () =>
+        HttpResponse.json({
+          historyId: String(this.historyId),
+          expiration: String(Date.now() + 2 * 86_400_000),
+        }),
+      ),
+      http.post(`${GMAIL}/stop`, () => new HttpResponse(null, { status: 204 })),
+      http.get(`${GMAIL}/history`, ({ request }) => {
+        const start = Number(
+          new URL(request.url).searchParams.get("startHistoryId"),
+        );
+        return HttpResponse.json({
+          historyId: String(this.historyId),
+          history: this.arrivals
+            .filter((arrival) => arrival.historyId > start)
+            .map((arrival) => ({
+              id: String(arrival.historyId),
+              messages: [{ id: arrival.id, threadId: arrival.threadId }],
+              messagesAdded: [
+                {
+                  message: {
+                    id: arrival.id,
+                    threadId: arrival.threadId,
+                    labelIds: ["INBOX", "UNREAD"],
+                  },
+                },
+              ],
+            })),
+        });
+      }),
+      http.get(`${GMAIL}/messages`, () => HttpResponse.json({ messages: [] })),
+      http.get(`${GMAIL}/messages/:messageId`, ({ params }) => {
+        const arrival = this.arrivals.find(
+          (candidate) => candidate.id === params.messageId,
+        );
+        if (arrival === undefined)
+          return HttpResponse.json({ error: { code: 404 } }, { status: 404 });
+        return HttpResponse.json({
+          id: arrival.id,
+          threadId: arrival.threadId,
+          labelIds: ["INBOX", "UNREAD"],
+          sizeEstimate: 2_048,
+          internalDate: String(Date.now() - 60_000),
+          payload: {
+            mimeType: "text/plain",
+            headers: [
+              { name: "From", value: this.mail.sender },
+              { name: "To", value: this.mail.address },
+              { name: "Subject", value: this.mail.subject },
+              { name: "Message-ID", value: `<${arrival.id}@example.test>` },
+            ],
+            body: {
+              data: encodeBase64Url(new TextEncoder().encode(this.mail.text)),
+            },
+          },
+        });
+      }),
+      http.get(`${GMAIL}/drafts`, ({ request }) => {
+        const query = new URL(request.url).searchParams.get("q");
+        const drafts: { id: string }[] = [];
+        for (const [id, draft] of this.drafts)
+          if (query === `rfc822msgid:${header(draft.raw, "Message-ID")}`)
+            drafts.push({ id });
+        return HttpResponse.json({ drafts });
+      }),
+      http.get(`${GMAIL}/drafts/:draftId`, ({ params }) => {
+        const id = String(params.draftId);
+        const draft = this.drafts.get(id);
+        if (draft === undefined)
+          return HttpResponse.json({ error: { code: 404 } }, { status: 404 });
+        return HttpResponse.json({
+          id,
+          message: {
+            id: `message_${id}`,
+            threadId: draft.threadId,
+            payload: {
+              mimeType: "text/plain",
+              headers: [
+                { name: "From", value: this.mail.address },
+                {
+                  name: "To",
+                  value: header(draft.raw, "To") ?? this.mail.sender,
+                },
+                {
+                  name: "Subject",
+                  value:
+                    header(draft.raw, "Subject") ?? `Re: ${this.mail.subject}`,
+                },
+              ],
+              body: {
+                data: encodeBase64Url(
+                  new TextEncoder().encode(draftBody(draft.raw)),
+                ),
+              },
+            },
+          },
+        });
+      }),
+      http.post(`${GMAIL}/drafts`, async ({ request }) => {
+        const raw: unknown = await request.json();
+        if (
+          !isRecord(raw) ||
+          !isRecord(raw.message) ||
+          typeof raw.message.raw !== "string"
+        )
+          throw new Error("Invalid Gmail draft");
+        const id = `draft_${this.drafts.size + 1}`;
+        const threadId =
+          typeof raw.message.threadId === "string" ? raw.message.threadId : "";
+        this.drafts.set(id, { raw: raw.message.raw, threadId });
+        return HttpResponse.json({
+          id,
+          message: { id: `message_${id}`, threadId },
+        });
+      }),
+      http.put(`${GMAIL}/drafts/:draftId`, async ({ request, params }) => {
+        const id = String(params.draftId);
+        const raw: unknown = await request.json();
+        const draft = this.drafts.get(id);
+        if (
+          draft === undefined ||
+          !isRecord(raw) ||
+          !isRecord(raw.message) ||
+          typeof raw.message.raw !== "string"
+        )
+          throw new Error("Invalid Gmail draft update");
+        this.drafts.set(id, { ...draft, raw: raw.message.raw });
+        return HttpResponse.json({
+          id,
+          message: { id: `message_${id}_${Date.now()}` },
+        });
+      }),
+      http.delete(`${GMAIL}/drafts/:draftId`, ({ params }) => {
+        this.drafts.delete(String(params.draftId));
+        return new HttpResponse(null, { status: 204 });
+      }),
+      http.post(`${GMAIL}/messages/send`, async ({ request }) => {
+        const raw: unknown = await request.json();
+        this.sent += 1;
+        return HttpResponse.json({
+          id: `sent_${this.sent}`,
+          threadId:
+            isRecord(raw) && typeof raw.threadId === "string"
+              ? raw.threadId
+              : "",
+        });
+      }),
+      http.all(`${GMAIL}/*`, ({ request }) => {
+        this.unexpected.push(`${request.method} ${request.url}`);
+        return HttpResponse.json({ error: { code: 404 } }, { status: 404 });
+      }),
+    );
+  }
+}
+
+/**
+ * One model answer in a mailbox agent's reply turn, by the count of tool
+ * results so far: read the Case, draft `body` for approval, then stop.
+ */
+export function draftReplyTurn(results: number, body: string): Response {
+  if (results === 0)
+    return openRouterToolCall("read_email_case", {}, "reply_case");
+  return results === 1
+    ? openRouterToolCall(
+        "email_reply_for_approval",
+        { body, sources: null },
+        "reply_draft",
+      )
+    : openRouterText("Prepared for review.", "reply_done");
 }
