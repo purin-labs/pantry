@@ -963,15 +963,18 @@ Stripe Connect redirects, the Meta webhook and the remaining console names.
   the Purin account, which the API cannot read; the zone `seams.tech`,
   which Cloudflare refuses to remove because this account holds its
   Cloudflare Registrar registration, expired on 11 October 2026 and now in
-  the redemption period (restore: $66.00 plus $49.20 for one year); the
-  Cloudflare token "seams-monorepo GitHub Actions", which can edit Pages,
-  D1 and Workers scripts in the whole account and may be the purin.io
-  deploy token (`COMPANY_CLOUDFLARE_API_TOKEN` of `purin-monorepo`); and
+  the redemption period (restore: $66.00 plus $49.20 for one year); and
   the `speak-to-sign` project (Pages, KV `speak-to-sign-faucet-limits`)
   with the domain `tatchi.xyz`, which still serves visitors from this
   account. The stale zone record `seams.sh` (its name servers point to the
   other account) and the token "Cloudflare Tunnel API Token for seams.sh"
-  (no tunnel exists) are deleted. Of step 7 only `hadimar` (the owner keeps
+  (no tunnel exists) are deleted. The token "seams-monorepo GitHub
+  Actions" (Pages, D1 and Workers scripts in the whole account) was the
+  purin.io deploy token: `purin-monorepo` now uses the token "Purin company
+  site (purin-monorepo CI)", with only Cloudflare Pages: Edit, in its
+  staging and production environments; a staging deploy passed with it
+  (run 45041819567), and the old token is deleted. The Seams CI moved its
+  Cloudflare secrets to the seamsadmin account on 20 November. Of step 7 only `hadimar` (the owner keeps
   it) and the Pages project `outlayer-email-recovery-example` remain; the
   other groups are gone.
 
