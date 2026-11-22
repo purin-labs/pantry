@@ -3,7 +3,7 @@
 client_id = "54e4960b970012a1e8259fc94237602d"
 application_url = "https://pantry.purin.io/portal"
 embedded = false
-name = "Nuki"
+name = "Purin Pantry"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes

@@ -12,7 +12,7 @@ async function main() {
   const token = await promptForHiddenTerminalValue(
     process.stdin,
     process.stderr,
-    "Paste the Nuki App Automation Token (input hidden): ",
+    "Paste the Purin Pantry Shopify App Automation Token (input hidden): ",
   );
 
   assertShopifyAutomationToken(token);
