@@ -140,9 +140,7 @@ async function verifyFactoryControlsBrowser(page) {
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
-  await page.waitForFunction(factoryControlCompleted, null, {
-    timeout: 240000,
-  });
+  await waitForRunState(page, runCompleted);
   const completed = await page.evaluate(factoryControlState);
   if (completed.orders !== paused.orders)
     throw new Error("Restore admitted orders after accepted closure.");
@@ -212,12 +210,6 @@ function factoryControlPaused() {
       ?.getAttribute("data-lifecycle") === "settled" &&
     document.querySelector('[aria-label="Execution status"]')?.textContent ===
       "paused"
-  );
-}
-function factoryControlCompleted() {
-  return (
-    document.querySelector('[aria-label="Execution status"]')?.textContent ===
-    "completed"
   );
 }
 function factoryClosing() {

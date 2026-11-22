@@ -24,7 +24,7 @@ async function verifyTwoCellWorkspaceBrowser(page) {
   await page
     .getByRole("button", { name: "Start production", exact: true })
     .click();
-  await page.waitForFunction(twoCellCongested, null, { timeout: 180000 });
+  await waitForRunState(page, twoCellCongested);
   await page
     .getByRole("button", { name: "Pause production run", exact: true })
     .click();
@@ -116,8 +116,9 @@ async function verifyTwoCellWorkspaceBrowser(page) {
     .click({ timeout: 120000 });
   await page.waitForFunction(twoCellRestoreReceived, null, { timeout: 120000 });
   const restored = await page.evaluate(checkTwoCellRestore);
-  // The restored overload run took 575 s to complete under SwiftShader.
-  await page.waitForFunction(twoCellCompleted, null, { timeout: 720000 });
+  // The restored overload run takes 140 s on a Mac under SwiftShader and more
+  // than 720 s on a slow CI runner; the wait ends only if the run stops.
+  await waitForRunState(page, runCompleted);
   const completed = await page.evaluate(twoCellState);
   const returned = await page
     .locator('[data-storage="tray-store"]')
@@ -338,12 +339,6 @@ function twoCellPaused() {
       ?.getAttribute("data-lifecycle") === "settled" &&
     document.querySelector('[aria-label="Execution status"]')?.textContent ===
       "paused"
-  );
-}
-function twoCellCompleted() {
-  return (
-    document.querySelector('[aria-label="Execution status"]')?.textContent ===
-    "completed"
   );
 }
 // Each canvas pane reports its scene, and the cell picker names each cell.

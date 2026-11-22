@@ -50,6 +50,14 @@ const options = {
   },
 };
 
+// The time limit of a Playwright action, a screenshot and a wait that gives
+// none (Playwright's default is 30 s). A click waits for two stable frames and
+// a screenshot for one; under SwiftShader on a 4-vCPU CI runner one frame of
+// a Kitchen scene took 6 to 25 s (CI run 45043765222: a click 30.9 s, a
+// screenshot 30.0 s, and a screenshot that failed at 30 s). The journey's
+// own --timeout bounds the whole journey.
+const ACTION_TIMEOUT_MS = 120000;
+
 // Outside the artifact directory, so that CI does not upload it.
 const profile = mkdtempSync(join(tmpdir(), "bakery-acceptance-profile-"));
 
@@ -222,6 +230,7 @@ function scopedJourney(journey) {
     function locatorScreenshot(options) { return capture(this, locatorCapture, options); }
     page.screenshot = pageScreenshot;
     locatorPrototype.screenshot = locatorScreenshot;
+    page.setDefaultTimeout(${ACTION_TIMEOUT_MS});
     globalThis.bakeryEvidence = ${JSON.stringify(artifactDir)};
     globalThis.bakeryBase = ${JSON.stringify(new URL(values.url).origin)};
     const result = await (() => {

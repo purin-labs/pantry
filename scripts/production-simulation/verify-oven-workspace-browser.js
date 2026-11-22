@@ -44,10 +44,12 @@ async function verifyOvenWorkspaceBrowser(page) {
     .getByRole("button", { name: "Start production", exact: true })
     .click();
   await page.evaluate(checkOvenSurfaceSuspended);
-  await page.waitForFunction(pressPauseWhen, ovenHasActiveTransfer.toString(), {
-    timeout: 120000,
-    polling: 50,
-  });
+  await waitForRunState(
+    page,
+    pressPauseWhen,
+    ovenHasActiveTransfer.toString(),
+    { polling: 50 },
+  );
   await page.waitForFunction(ovenPaused);
   const first = await saveOvenDownload(page, "first-pause");
   await page.waitForFunction(ovenLiveReady);
@@ -71,10 +73,11 @@ async function verifyOvenWorkspaceBrowser(page) {
   await page
     .getByRole("button", { name: "Resume production run", exact: true })
     .click();
-  await page.waitForFunction(
+  await waitForRunState(
+    page,
     pressPauseWhen,
     ovenPassedCoolingBlock.toString(),
-    { timeout: 120000, polling: 50 },
+    { polling: 50 },
   );
   await page.waitForFunction(ovenPaused);
   const second = await saveOvenDownload(page, "second-pause");
@@ -139,7 +142,7 @@ async function verifyOvenWorkspaceBrowser(page) {
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
-  await page.waitForFunction(ovenCompleted, null, { timeout: 120000 });
+  await waitForRunState(page, runCompleted);
   const final = await saveOvenDownload(page, "completed");
   await page.waitForFunction(ovenLiveReady);
   const finalLive = await page.evaluate(checkLiveOvenPhysics, final);
@@ -194,7 +197,7 @@ async function verifyOvenWorkspaceBrowser(page) {
   await page
     .getByRole("button", { name: "Continue saved run", exact: true })
     .click();
-  await page.waitForFunction(ovenCompleted);
+  await page.waitForFunction(runCompleted);
   await page.waitForFunction(ovenLiveReady);
   const reopenedLive = await page.evaluate(checkLiveOvenPhysics, final);
   if (JSON.stringify(reopenedLive) !== JSON.stringify(finalLive))
@@ -428,7 +431,8 @@ async function checkLiveRecordingBoundaries(evidence) {
   const records = await (
     await fetch(`${evidence}/live-observations.json`)
   ).json();
-  const { readPhysicsView } = await import("/@id/@purin-labs/production-simulation");
+  const { readPhysicsView } =
+    await import("/@id/@purin-labs/production-simulation");
   const { parsePersistentCell } = await import(
     `/@fs${window.pantryCheckout}/packages/bakery-model/src/bakery-physics.ts`
   );
@@ -917,12 +921,6 @@ function ovenPassedCoolingBlock() {
     Number(
       document.querySelector('[aria-label="Simulation seconds"]')?.textContent,
     ) >= 600
-  );
-}
-function ovenCompleted() {
-  return (
-    document.querySelector('[aria-label="Execution status"]')?.textContent ===
-    "completed"
   );
 }
 

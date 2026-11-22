@@ -1,5 +1,6 @@
 // Page helpers of the Playwright browser journeys. Each one takes the page or
-// a locator and uses the Portal control as a person does.
+// a locator and uses the Portal control as a person does, or waits for a
+// state that a person sees.
 //
 // A run-code journey cannot import a module. browser-acceptance.mjs puts the
 // source of these functions in front of each bakery journey (see
@@ -87,7 +88,55 @@ function selectValue(trigger) {
   });
 }
 
+// Waits until `predicate(arg)` is true in a page with a production run. The
+// wait has no time limit of its own: it fails when the run's "Simulation
+// seconds" and "Execution status" stay the same for `stallMs`. A slower
+// runner only makes the wait longer; the journey's run.timeoutMs bounds it.
+// CI run 45043765222 drew one frame in about 25 s and ran 1.26 times slower
+// than the two runs before it, so fixed run waits of 120 s and 720 s failed
+// on runs that completed a few seconds later.
+async function waitForRunState(
+  page,
+  predicate,
+  arg = null,
+  { polling, stallMs = 180000 } = {},
+) {
+  function runProgress() {
+    const read = (label) =>
+      document.querySelector(`[aria-label="${label}"]`)?.textContent ?? "-";
+    return `${read("Simulation seconds")} s, ${read("Execution status")}`;
+  }
+  const options =
+    polling === undefined
+      ? { timeout: stallMs }
+      : { timeout: stallMs, polling };
+  let last = await page.evaluate(runProgress);
+  for (;;) {
+    try {
+      return await page.waitForFunction(predicate, arg, options);
+    } catch (error) {
+      if (error?.name !== "TimeoutError") throw error;
+      const now = await page.evaluate(runProgress);
+      if (now === last)
+        throw new Error(
+          `${predicate.name} stayed false and the run did not move for ${stallMs / 1000} s (${now}).`,
+        );
+      last = now;
+    }
+  }
+}
+
+// In the page: the production run has completed.
+function runCompleted() {
+  return (
+    document.querySelector('[aria-label="Execution status"]')?.textContent ===
+    "completed"
+  );
+}
+
 /** The source of the page helpers, for a journey that cannot import them. */
 export function pageHelperSource() {
-  return [chooseOption, selectItems, selectValue].map(String).join("\n\n");
+  return [chooseOption, selectItems, selectValue, waitForRunState, runCompleted]
+    .map(String)
+    .join("\n\n");
 }

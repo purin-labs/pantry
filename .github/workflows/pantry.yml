@@ -158,6 +158,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Describe the runner
+        # The free runners differ in speed: every journey of CI run 45043765222
+        # took 1.26 times as long as in the two runs before it. The processor
+        # model tells a slow runner from a slow change.
+        run: |
+          nproc
+          grep -m1 "model name" /proc/cpuinfo
+          free -m
+
       - name: Fetch large files from R2
         # The Kitchen models, the unpinned Kitchen bundles and the equipment manuals
         # live in R2 (repo-binaries.json, Plan 92). The secrets hold a read-only key.

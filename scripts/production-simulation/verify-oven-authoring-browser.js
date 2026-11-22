@@ -124,7 +124,7 @@ async function verifyOvenAuthoringBrowser(page) {
   await page
     .getByRole("button", { name: "Start production", exact: true })
     .click();
-  await page.waitForFunction(authorRunCompleted, null, { timeout: 300000 });
+  await waitForRunState(page, runCompleted);
   const pending = downloadFactorySave(page);
   const finalPath = `${globalThis.bakeryEvidence}/authored-oven-run.json`;
   await (await pending).saveAs(finalPath);
@@ -203,13 +203,6 @@ async function openAuthorProduction(page) {
     .getByRole("button", { name: "Edit scenario", exact: true })
     .waitFor();
 }
-function authorRunCompleted() {
-  return (
-    document.querySelector('[aria-label="Execution status"]')?.textContent ===
-    "completed"
-  );
-}
-
 async function inspectAuthorResult({ finalPath, storage, id }) {
   const { parseProductionScenario } =
     await import("/@id/@purin-labs/bakery-model/bakery-production-scenario");
