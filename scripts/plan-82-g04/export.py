@@ -1,12 +1,14 @@
-"""Plan 82 G0.4: write the classifier as ONNX, then measure it on voices from another engine.
+"""Plan 82 G0.4 and Plan 91 phase 6: write the classifier as ONNX, then measure it on voices from
+another engine.
 
 The model never trained on macOS voices. So this test shows how far the Piper voices carry.
+The phrase is "satyr" when the command has no second word (phrases.py).
 
 Usage:
-  <bench venv>/bin/python export.py weights
-  <wake venv>/bin/python export.py onnx
-  <wake venv>/bin/python export.py voices
-  <wake venv>/bin/python export.py stream
+  uv run --no-project --python 3.13 --with torch --with numpy python export.py weights [sous-chef]
+  <wake venv>/bin/python export.py onnx [sous-chef]
+  <wake venv>/bin/python export.py voices [sous-chef]
+  <wake venv>/bin/python export.py stream [sous-chef]
 """
 import json
 import subprocess
@@ -16,11 +18,14 @@ from pathlib import Path
 
 import numpy as np
 
-DATA = Path.home() / ".pantry-voice-test/wake"
+from phrases import DATA, PHRASES
+
+PHRASE = PHRASES[sys.argv[2] if len(sys.argv) > 2 else "satyr"]
+FOLDER = PHRASE.folder(DATA)
+MODEL = PHRASE.onnx(DATA)
 THRESHOLD = 0.995
-WAKE = ("hey sayter", "hey, sayter", "hey pantry", "hey, pantry")
-NEAR = ("hey sailor", "hey setter", "hey data", "hey waiter", "hey later", "say to her", "see you later",
-        "put the second tray in the oven", "hey can you pass the scraper", "the butter needs ten more minutes")
+WAKE = PHRASE.macos_wake
+NEAR = PHRASE.macos_near
 RATES = (160, 190, 220)
 VOICES = ("Samantha", "Daniel", "Karen", "Moira", "Rishi", "Tessa", "Eddy (English (US))", "Flo (English (UK))", "Reed (English (US))", "Shelley (English (UK))")
 CONDITIONS = (("clean", None, None), ("mixer10", "DWASHING", 10.0), ("mixer5", "DWASHING", 5.0), ("mixer0", "DWASHING", 0.0),
@@ -29,22 +34,22 @@ CONDITIONS = (("clean", None, None), ("mixer10", "DWASHING", 10.0), ("mixer5", "
 
 def weights() -> None:
     import torch
-    state = torch.load(DATA / "hey-satyr.pt", weights_only=True)
-    np.savez(DATA / "hey-satyr-weights.npz", **{k: v.numpy() for k, v in state.items()})
+    state = torch.load(FOLDER / f"{PHRASE.slug}.pt", weights_only=True)
+    np.savez(FOLDER / f"{PHRASE.slug}-weights.npz", **{k: v.numpy() for k, v in state.items()})
     sys.path.insert(0, str(Path(__file__).parent))
     from train import Wake
     model = Wake(64)
     model.load_state_dict(state)
     model.eval()
-    x = np.load(DATA / "features/test-clips.npz")["wake-clean-1m"][:64, :16].astype(np.float32)
+    x = np.load(PHRASE.features(DATA) / "test-clips.npz")["wake-clean-1m"][:64, :16].astype(np.float32)
     with torch.no_grad():
-        np.savez(DATA / "hey-satyr-check.npz", x=x, y=torch.sigmoid(model(torch.from_numpy(x))).numpy())
+        np.savez(FOLDER / f"{PHRASE.slug}-check.npz", x=x, y=torch.sigmoid(model(torch.from_numpy(x))).numpy())
 
 
 def build() -> None:
     import onnx
     from onnx import TensorProto, helper, numpy_helper
-    w = np.load(DATA / "hey-satyr-weights.npz")
+    w = np.load(FOLDER / f"{PHRASE.slug}-weights.npz")
     init = []
     nodes = [helper.make_node("Flatten", ["input"], ["x0"], axis=1)]
 
@@ -68,18 +73,19 @@ def build() -> None:
     nodes.append(helper.make_node("Relu", ["x5"], ["x6"]))
     dense(9, "x6", "x7")
     nodes.append(helper.make_node("Sigmoid", ["x7"], ["score"]))
-    graph = helper.make_graph(nodes, "hey_satyr", [helper.make_tensor_value_info("input", TensorProto.FLOAT, [None, 16, 96])],
+    graph = helper.make_graph(nodes, PHRASE.stem, [helper.make_tensor_value_info("input", TensorProto.FLOAT, [None, 16, 96])],
                               [helper.make_tensor_value_info("score", TensorProto.FLOAT, [None, 1])], init)
     model = helper.make_model(graph, opset_imports=[helper.make_opsetid("", 17)])
     model.ir_version = 8
     onnx.checker.check_model(model)
-    onnx.save(model, DATA / "models/hey_satyr.onnx")
+    MODEL.parent.mkdir(parents=True, exist_ok=True)
+    onnx.save(model, MODEL)
 
     import onnxruntime as ort
-    check = np.load(DATA / "hey-satyr-check.npz")
-    session = ort.InferenceSession(str(DATA / "models/hey_satyr.onnx"), providers=["CPUExecutionProvider"])
+    check = np.load(FOLDER / f"{PHRASE.slug}-check.npz")
+    session = ort.InferenceSession(str(MODEL), providers=["CPUExecutionProvider"])
     got = session.run(None, {"input": check["x"]})[0].squeeze(-1)
-    print(f"bytes {(DATA / 'models/hey_satyr.onnx').stat().st_size}, largest difference from torch {np.abs(got - check['y']).max():.2e}")
+    print(f"bytes {MODEL.stat().st_size}, largest difference from torch {np.abs(got - check['y']).max():.2e}")
 
 
 def voices() -> None:
@@ -92,7 +98,7 @@ def voices() -> None:
     import wake as w
 
     names = list(VOICES)
-    session = ort.InferenceSession(str(DATA / "models/hey_satyr.onnx"), providers=["CPUExecutionProvider"])
+    session = ort.InferenceSession(str(MODEL), providers=["CPUExecutionProvider"])
     features = w.Features(DATA / "models")
     noise = np.load(DATA / "noise-test.npz")
     rng = np.random.default_rng(85)
@@ -137,7 +143,7 @@ def voices() -> None:
     per_voice = {v: round(float(np.mean([best(a, "DWASHING", 5.0) >= THRESHOLD for n, a in wake_audio if n == v])), 3) for v in names}
     results["mixer5ByVoice"] = per_voice
     print(len(names), per_voice)
-    (DATA / "report-macos-voices.json").write_text(json.dumps(results, indent=1))
+    (FOLDER / "report-macos-voices.json").write_text(json.dumps(results, indent=1))
 
 
 def stream() -> None:
@@ -151,8 +157,8 @@ def stream() -> None:
     rng = np.random.default_rng(7)
     noise = np.load(DATA / "noise-test.npz")["DWASHING"]
     clip = np.zeros(w.RATE * 45)
-    for at, voice, text in ((8, "Tessa", "hey, sayter"), (16, "Daniel", "put the second tray in the oven"), (24, "Reed (English (US))", "hey, pantry"),
-                            (32, "Karen", "see you later"), (38, "Eddy (English (US))", "hey sayter")):
+    for at, voice, text in ((8, "Tessa", WAKE[1]), (16, "Daniel", "put the second tray in the oven"), (24, "Reed (English (US))", WAKE[3]),
+                            (32, "Karen", "see you later"), (38, "Eddy (English (US))", WAKE[0])):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "a.wav"
             subprocess.run(["say", "-v", voice, "-o", str(path), "--data-format=LEI16@16000", text], check=True, timeout=60)
@@ -160,8 +166,8 @@ def stream() -> None:
         speech = fftconvolve(w.level(audio, -26), w.room(rng, 1.0))
         clip[at * w.RATE:at * w.RATE + len(speech)] = speech
     clip = w.add_noise(clip, noise, 5.0, rng)
-    (DATA / "stream.pcm").write_bytes((np.clip(clip, -1, 1) * 32767).astype(np.int16).tobytes())
-    session = ort.InferenceSession(str(DATA / "models/hey_satyr.onnx"), providers=["CPUExecutionProvider"])
+    (FOLDER / "stream.pcm").write_bytes((np.clip(clip, -1, 1) * 32767).astype(np.int16).tobytes())
+    session = ort.InferenceSession(str(MODEL), providers=["CPUExecutionProvider"])
     frames = w.Features(DATA / "models")(clip).astype(np.float32)
     x = np.stack([frames[i:i + 16] for i in range(len(frames) - 15)])
     scores = session.run(None, {"input": x})[0].squeeze(-1)

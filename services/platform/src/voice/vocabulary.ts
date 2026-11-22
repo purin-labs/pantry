@@ -16,7 +16,7 @@ const CACHE_MS = 5 * 60_000;
 const PROMPT_CHARACTER_LIMIT = 600;
 const TERM_CHARACTER_LIMIT = 80;
 /**
- * The names that a person says to the agent, first in the list. "Pantry" is
+ * The names that a person says to the agent, first in the list. "Satyr" is
  * the wake phrase's name: Whisper once wrote it as "Seder" (Plan 82 Phase 4).
  * "Sous Chef" is the agent and "Pantry" the short name of Purin Pantry.
  */

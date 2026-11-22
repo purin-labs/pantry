@@ -1,12 +1,14 @@
-"""Plan 82 G0.4: train the "Hey Satyr" classifier on the embeddings from wake.py and measure it.
+"""Plan 82 G0.4 and Plan 91 phase 6: train a wake phrase classifier on the embeddings from wake.py
+and measure it.
 
 The classifier has the openWakeWord shape: 16 frames of 96 values, then small dense layers.
 Training runs in rounds. After each round, the training speech that tricks the model joins the
 near phrases. False wakes count one event for each run of frames above the threshold, with a
 2 s lock. LibriSpeech test-clean tunes the threshold. The held-out train-clean-100 speakers only
-report it.
+report it. The wake and near clips belong to the phrase. The speech, the noise and every
+false-wake set are shared, so two phrases compare on the same hours.
 
-Usage: train.py --data <folder>
+Usage: train.py [--phrase sous-chef] [--data <folder>]
 """
 import argparse
 import json
@@ -15,6 +17,8 @@ from pathlib import Path
 import numpy as np
 import torch
 from torch import nn
+
+from phrases import DATA, PHRASES, Phrase
 
 FRAMES = 16
 FRAMES_PER_HOUR = 12.5 * 3600
@@ -89,19 +93,22 @@ def false_wakes(model: Wake, path: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", type=Path, default=Path.home() / ".pantry-voice-test/wake")
+    parser.add_argument("--phrase", type=PHRASES.__getitem__, default=PHRASES["satyr"], help=" or ".join(PHRASES))
+    parser.add_argument("--data", type=Path, default=DATA)
     parser.add_argument("--width", type=int, default=64)
     parser.add_argument("--rounds", type=int, nargs="+", default=[15000, 10000, 10000, 15000])
     parser.add_argument("--near-weight", type=float, default=8)
     parser.add_argument("--speech-weight", type=float, default=40)
     args = parser.parse_args()
+    phrase: Phrase = args.phrase
     features = args.data / "features"
+    own = phrase.features(args.data)
     torch.manual_seed(82)
     torch.set_num_threads(6)
     rng = np.random.default_rng(82)
 
-    wake = np.concatenate([np.load(path).astype(np.float32) for path in sorted(features.glob("train-wake*.npy"))])
-    near = np.concatenate([np.load(features / name).astype(np.float32) for name in ("train-near.npy", "train-near2.npy", "train-near3.npy")])
+    wake = np.concatenate([np.load(path).astype(np.float32) for path in sorted(own.glob("train-wake*.npy"))])
+    near = np.concatenate([np.load(own / name).astype(np.float32) for name in ("train-near.npy", "train-near2.npy", "train-near3.npy")])
     speech, speech_starts = load_sequences([features / "train-train-clean-100.npz", features / "train-speech.npz", features / "train-noise.npz"])
     print(f"wake {len(wake)}, near {len(near)}, speech hours {len(speech) / FRAMES_PER_HOUR:.1f}", flush=True)
 
@@ -138,8 +145,8 @@ def main() -> None:
         print(f"step {done} loss {loss.item():.4f} tricked {len(hard)} mined {len(mined)}", flush=True)
 
     model.eval()
-    torch.save(model.state_dict(), args.data / "hey-satyr.pt")
-    clips = np.load(features / "test-clips.npz")
+    torch.save(model.state_dict(), phrase.folder(args.data) / f"{phrase.slug}.pt")
+    clips = np.load(own / "test-clips.npz")
     report = {"thresholds": THRESHOLDS, "wake": {}, "falseWakes": {}, "near": {}, "parameters": sum(p.numel() for p in model.parameters())}
     for name in clips.files:
         if name.startswith("wake-"):
@@ -155,7 +162,7 @@ def main() -> None:
     for path in sorted(features.glob("test-*.npz")):
         if path.name != "test-clips.npz":
             report["falseWakes"][path.stem] = false_wakes(model, path)
-    (args.data / "report.json").write_text(json.dumps(report, indent=1))
+    (phrase.folder(args.data) / "report.json").write_text(json.dumps(report, indent=1))
 
     def rate(names: list[str], threshold: float) -> tuple[float, int, float]:
         hours = sum(report["falseWakes"][n]["hours"] for n in names)

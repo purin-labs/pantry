@@ -1,4 +1,4 @@
-"""Plan 82 D11: how much the "Hey Satyr" score depends on where the phrase falls in an 80 ms chunk.
+"""Plan 82 D11: how much the wake score depends on where the phrase falls in an 80 ms chunk.
 
 The wake worker (apps/portal/src/features/voice/wake-worker.ts) makes one embedding for each 80 ms
 chunk, so the model sees the phrase on an 80 ms grid. This bench runs the Portal's own ONNX files
@@ -8,15 +8,21 @@ phases, the share of wake phrases heard, the share of near phrases accepted, and
 café talk. The voices are macOS voices, which the model did not train on, and the noise is the
 DEMAND test part, so the numbers compare the phase counts and do not predict a real shop.
 
+Plan 91 phase 6 runs it for each wake phrase (phrases.py), on the same voices, noise and café
+talk, with the near phrases and six talk lines of each phrase. The classifier is the Portal's file
+when it exists, or else the trained file in the wake folder.
+
 Run it with the wake bench's Python (onnxruntime, numpy, scipy):
 
-    ~/.pantry-voice-test/wake/.venv/bin/python scripts/plan-82-g04/phase-bench.py
+    ~/.satyr-voice-test/wake/.venv/bin/python scripts/plan-82-g04/phase-bench.py [sous-chef]
 
-Results: output/shop-voice/wake-phase-bench.json
+Results: output/shop-voice/wake-phase-bench.json ("Hey Satyr") and
+output/shop-voice/wake-phase-bench-<slug>.json (another phrase)
 """
 import json
 import os
 import subprocess
+import sys
 from concurrent.futures import ProcessPoolExecutor
 import tempfile
 import uuid
@@ -26,10 +32,14 @@ from pathlib import Path
 import numpy as np
 import onnxruntime as ort
 
+from phrases import DATA, PHRASES
+
+PHRASE = PHRASES[sys.argv[1] if len(sys.argv) > 1 else "satyr"]
 ROOT = Path(__file__).resolve().parents[2]
 MODELS = ROOT / "apps/portal/public/voice"
-NOISE = Path(os.environ.get("WAKE_PHASE_NOISE", Path.home() / ".pantry-voice-test/wake/noise-test.npz"))
-RESULTS = ROOT / "output/shop-voice/wake-phase-bench.json"
+CLASSIFIER = MODELS / f"{PHRASE.stem}.onnx" if (MODELS / f"{PHRASE.stem}.onnx").exists() else PHRASE.onnx(DATA)
+NOISE = Path(os.environ.get("WAKE_PHASE_NOISE", DATA / "noise-test.npz"))
+RESULTS = ROOT / "output/shop-voice" / ("wake-phase-bench.json" if PHRASE.key == "satyr" else f"wake-phase-bench-{PHRASE.slug}.json")
 RATE = 16_000
 CHUNK = 1280
 MEL_OVERLAP = 480
@@ -48,21 +58,9 @@ VOICES = (
     "Eddy (English (UK))", "Flo (English (US))", "Reed (English (UK))", "Sandy (English (US))",
     "Shelley (English (UK))", "Rocko (English (US))", "Grandma (English (US))", "Grandpa (English (UK))",
 )
-WAKE_PHRASES = ("Hey Satyr", "Hey, Satyr")
-NEAR_PHRASES = ("Hey sayter", "Hey Sarah", "Hey satire", "Hey Peter", "Hey sailor", "Hey Saturday",
-                "Hey cedar", "Hey, setter")
-TALK = (
-    "Put two trays of kouign amann in the second oven.", "How much butter is left for tomorrow?",
-    "Can you pass me the piping bag?", "The croissants need another five minutes.",
-    "Say hi to Sarah for me.", "Hey, did the flour delivery come in?", "It's a satire, really.",
-    "We have a lot of orders for Saturday.", "Hey Peter, can you take the next customer?",
-    "Mark the black sesame financiers as sold out.", "That will be six hundred yen, please.",
-    "Would you like that warmed up?", "The setter on the mixer is stuck again.",
-    "Hey, can you check the proofer temperature?", "Thank you, have a nice day!",
-    "Is the matcha latte with oat milk?", "We are out of the pistachio cakes.",
-    "Hey there, what can I get for you?", "The sailor stripes on the boxes look great.",
-    "Start the shift for the morning bake.",
-)
+WAKE_PHRASES = PHRASE.bench_wake
+NEAR_PHRASES = PHRASE.bench_near
+TALK = PHRASE.bench_talk
 TALK_LEVEL_DB = 5
 WORKERS = max(1, (os.cpu_count() or 2) - 4)
 
@@ -73,8 +71,8 @@ class Wake:
         options.intra_op_num_threads = 1
         options.inter_op_num_threads = 1
         self.mel, self.embedding, self.classifier = (
-            ort.InferenceSession(str(MODELS / f"{name}.onnx"), options, providers=["CPUExecutionProvider"])
-            for name in ("melspectrogram", "embedding_model", "hey_satyr"))
+            ort.InferenceSession(str(path), options, providers=["CPUExecutionProvider"])
+            for path in (MODELS / "melspectrogram.onnx", MODELS / "embedding_model.onnx", CLASSIFIER))
 
     def mel_frames(self, samples: np.ndarray) -> np.ndarray:
         """The worker's mel stream: each 80 ms chunk with the last 480 samples before it."""
@@ -240,6 +238,8 @@ def main() -> None:
     talk_events = wake.events(talk)
     hours = len(talk) / RATE / 3600
     report = {
+        "phrase": PHRASE.title,
+        "classifier": str(CLASSIFIER.relative_to(ROOT) if CLASSIFIER.is_relative_to(ROOT) else CLASSIFIER),
         "threshold": THRESHOLD,
         "wakePhrases": heard(wake_rows),
         "nearPhrases": heard(near_rows),

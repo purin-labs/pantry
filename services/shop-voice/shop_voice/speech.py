@@ -128,7 +128,7 @@ class AnswerVoice:
             vocabulary = json.loads((folder / "tokenizer.json").read_text())["model"]["vocab"]
             phonemes = en.G2P(trf=False, british=False, fallback=lambda token: (_sounds_of(token.text), 1))
             phonemes.lexicon.golds["Satyr"] = "sˈATəɹ"
-            phonemes.lexicon.golds["pantry"] = "sˈATəɹ"
+            phonemes.lexicon.golds["satyr"] = "sˈATəɹ"
             self._model = (session, voice, vocabulary, phonemes)
             self.read("Ready.")
         except Exception:  # A failed load leaves the browser's voice in use, and the next check retries.
