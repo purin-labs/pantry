@@ -317,16 +317,16 @@ no value writes nothing. An unknown area answers `404`.
 
 ### Main files
 
-| File                                                                                  | Owns                                                                                             |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `foundation/ui/route.ts`, `apps/portal/src/pages.tsx`                                 | The page list, the address parser and the render function of each page                           |
-| `apps/portal/src/portal.tsx`                                                          | The router and the `ControlPortalApp` state                                                      |
-| `apps/portal/src/shell.tsx`, `foundation/ui/console-sidebar.tsx`                      | `PortalFrame`, `WorkspaceLayout`, the page search, the product switcher, the rail and the drawer |
-| `apps/portal/src/workspace-switcher.tsx`                                              | The Organisation and workspace switcher                                                          |
-| `apps/portal/src/portal-shell.tsx`                                                    | Sign-in, loading, failure and not-found views                                                    |
-| `apps/portal/src/pages/home.tsx`, `services/platform/src/control/routes/workspace.ts` | The Home page and its server view                                                                |
-| `foundation/ui/preferences/`                                                          | The preference owner and the appearance control                                                  |
-| `apps/portal/src/styles.css`, `packages/frontend-theme.css`                           | The Portal styles and the shared tokens                                                          |
+| File                                                                                      | Owns                                                                                             |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `foundation/ui/route.ts`, `apps/portal/src/pages.tsx`                                     | The page list, the address parser and the render function of each page                           |
+| `apps/portal/src/portal.tsx`                                                              | The router and the `ControlPortalApp` state                                                      |
+| `apps/portal/src/shell.tsx`, `foundation/ui/console-sidebar.tsx`                          | `PortalFrame`, `WorkspaceLayout`, the page search, the product switcher, the rail and the drawer |
+| `areas/organisation/ui/workspace-switcher.tsx`                                            | The Organisation and workspace switcher                                                          |
+| `apps/portal/src/portal-shell.tsx`                                                        | Sign-in, loading, failure and not-found views                                                    |
+| `apps/portal/src/pages/home.tsx`, `areas/organisation/server/control/routes/workspace.ts` | The Home page and its server view                                                                |
+| `foundation/ui/preferences/`                                                              | The preference owner and the appearance control                                                  |
+| `apps/portal/src/styles.css`, `packages/frontend-theme.css`                               | The Portal styles and the shared tokens                                                          |
 
 In `scripts/layers.json`, `portal.tsx`, `shell.tsx`, `portal-shell.tsx` and the chat are
 `surfaces/portal`. `console-sidebar.tsx`, `console-tools.tsx`, `route.ts`,

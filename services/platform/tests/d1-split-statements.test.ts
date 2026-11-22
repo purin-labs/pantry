@@ -80,10 +80,10 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "upsertUser",
     "validateControlCsrf",
   ],
-  "services/platform/src/data/onboarding-support-audit.ts": [
+  "areas/organisation/server/data/onboarding-support-audit.ts": [
     "operatorSupportAccessStatement",
   ],
-  "services/platform/src/data/onboarding-support.ts": [
+  "areas/organisation/server/data/onboarding-support.ts": [
     "resolveControlSupportRole",
   ],
   "foundation/tenancy/data/organisation.ts": ["ensureSystemUserId"],
@@ -112,7 +112,7 @@ const GLOBAL_DATABASE_FUNCTIONS: Readonly<Record<string, readonly string[]>> = {
     "prepareSlackInstallationDisconnectAuditEvent",
     "readSlackConnectionIntegrationAccountId",
   ],
-  "services/platform/src/data/user-preferences.ts": [
+  "areas/organisation/server/data/user-preferences.ts": [
     "readUserPreferences",
     "updateUserPreferences",
   ],

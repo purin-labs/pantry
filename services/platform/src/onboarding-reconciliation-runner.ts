@@ -14,7 +14,7 @@ import {
 import {
   listOnboardingReconciliationOrganisationIds,
   reconcileOrganisationOnboarding,
-} from "./data/onboarding-reconciliation";
+} from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import { reconcileProviderAccountCleanup } from "./provider-lifecycle/cleanup-reconciliation";
 import { archiveOrganisation } from "@purin-labs/tenancy/data/organisation-lifecycle";
 import { publishOrganisationDirectoryRow } from "@purin-labs/tenancy/data/shared-rows/organisation-row";

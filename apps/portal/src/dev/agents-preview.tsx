@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 
 import "../styles.css";
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "../agent-operations";
+import { EMPTY_AGENT_OPERATIONS_SNAPSHOT } from "@purin-labs/area-organisation/ui/agent-operations";
 import type {
   AgentDefinition,
   AgentDocumentRevision,
@@ -14,8 +14,8 @@ import {
   AgentsPage,
   AgentsTabs,
   SkillsLibraryPage,
-} from "../pages/agent-console";
-import type { AgentOperationSubmitter } from "../pages/agent-console-shared";
+} from "@purin-labs/area-organisation/ui/pages/agent-console";
+import type { AgentOperationSubmitter } from "@purin-labs/area-organisation/ui/pages/agent-console-shared";
 import { PortalFrame } from "../shell";
 
 const MERCHANT_AGENT: AgentDefinition = {

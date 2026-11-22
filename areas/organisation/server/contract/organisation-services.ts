@@ -1,10 +1,10 @@
-import type { removeIntegrationAccount } from "../../data/account-removal";
+import type { removeIntegrationAccount } from "../data/account-removal";
 import type {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
   previewCode,
   readOperatorDraft,
-} from "../../data/operator-configuration-draft";
+} from "../data/operator-configuration-draft";
 import { definePort } from "@purin-labs/kernel/port";
 
 /**

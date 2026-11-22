@@ -135,7 +135,7 @@ The byte and token limits of Related Cases alone stop it at 50 calls.
 
 ### Settings › Billing
 
-Settings › Billing (`apps/portal/src/features/billing/route.tsx`) reads the same view.
+Settings › Billing (`areas/organisation/ui/features/billing/route.tsx`) reads the same view.
 It shows the Jev use of the month against the free use, paid use, the charge of the
 month, the spending limit and the prompt. Its "Turn on paid use" opens Settings › Jev at
 `#jev-paid-use`. It keeps no copy of a balance.
@@ -143,7 +143,7 @@ month, the spending limit and the prompt. Its "Turn on paid use" opens Settings 
 ### The setup step
 
 The setup dialog has a step Jev between Prepare and Done
-(`apps/portal/src/pages/account-onboarding-jev.tsx`). It names TypeSafe as the processor
+(`areas/organisation/ui/pages/account-onboarding-jev.tsx`). It names TypeSafe as the processor
 and links to Settings › Jev. "Turn on Jev" turns on the three switches through the
 jev-features route. A switch that cannot turn on shows its reason, and the setup
 continues. Skip leaves every switch off. A new Organisation has no Gmail mailbox, so

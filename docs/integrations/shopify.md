@@ -268,11 +268,11 @@ the same maintenance window.
 ## Implementation references
 
 - OAuth and onboarding:
-  [`onboarding.ts`](../../services/platform/src/control/routes/onboarding.ts)
+  [`onboarding.ts`](../../areas/organisation/server/control/routes/onboarding.ts)
 - Shopify GraphQL, webhook, and snapshot boundary:
   [`shopify-connector.ts`](../../services/platform/src/shopify-connector.ts)
 - Provider health projection:
-  [`onboarding-projection.ts`](../../services/platform/src/data/onboarding-projection.ts)
+  [`onboarding-projection.ts`](../../areas/organisation/server/data/onboarding-projection.ts)
 - Merchant presentation: [commerce feature](../../apps/portal/src/features/commerce/index.ts)
 - Operational failure codes:
   [`onboarding-operations.md`](../runbooks/onboarding-operations.md)

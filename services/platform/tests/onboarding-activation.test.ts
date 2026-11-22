@@ -10,7 +10,7 @@ import {
   completeOnboardingActivation,
   failOnboardingActivation,
   type ActivationContext,
-} from "../src/data/activation";
+} from "@purin-labs/area-organisation/server/data/activation";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import {
   newControlMutationIdentity,
@@ -21,7 +21,7 @@ import {
   consumeOnboardingActivationAcceptanceFault,
   inspectOnboardingActivationAcceptanceFault,
   type OnboardingActivationAcceptanceFaultStorage,
-} from "../src/organisation/contract/onboarding-activation-acceptance-fault";
+} from "@purin-labs/area-organisation/server/contract/onboarding-activation-acceptance-fault";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { type UserId } from "@purin-labs/control-api/ids";
 import {
@@ -30,12 +30,12 @@ import {
   loadSetupSelection,
   readCurrentReadiness,
   selectSetupTemplates,
-} from "../src/data/onboarding";
-import { buildOnboardingProjection } from "../src/data/onboarding-projection";
-import { readMerchantSupportDiagnostics } from "../src/data/onboarding-support";
+} from "@purin-labs/area-organisation/server/data/onboarding";
+import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/data/onboarding-projection";
+import { readMerchantSupportDiagnostics } from "@purin-labs/area-organisation/server/data/onboarding-support";
 import {
   recordProviderStartFailure,
-} from "../src/organisation/contract/provider-support-references";
+} from "@purin-labs/area-organisation/server/contract/provider-support-references";
 import { organisationBootstrapMutation } from "./control-mutation-fixture";
 import { TEST_INITIAL_ORGANISATION_PLACEMENT } from "./fixtures/organisation-placement";
 import { isRecord } from "@purin-labs/std";

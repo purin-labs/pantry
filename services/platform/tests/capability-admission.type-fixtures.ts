@@ -8,7 +8,7 @@ import {
   type CapabilityPolicyAdmission,
   type CapabilityPolicyWrite,
 } from "@purin-labs/authority/data/capability-policy";
-import { selectSetupTemplates } from "../src/data/onboarding";
+import { selectSetupTemplates } from "@purin-labs/area-organisation/server/data/onboarding";
 import { publishCommerceExportPreset } from "../src/data/export-preset";
 import {
   assignWhatsAppSupportAgent,

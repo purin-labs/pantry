@@ -10,7 +10,7 @@ import type {
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { VariantBy } from "@purin-labs/type-utils";
 import type { PermissionRequired } from "@purin-labs/control-api";
-import { PermissionRequiredPrompt, permissionRequiredOf } from "../../access/permission-required-prompt";
+import { PermissionRequiredPrompt, permissionRequiredOf } from "@purin-labs/area-organisation/ui/features/access/permission-required-prompt";
 import { assertNever } from "@purin-labs/std";
 
 export type ProductDescriptionSnapshot = Readonly<{

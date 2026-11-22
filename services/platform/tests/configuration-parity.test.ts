@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { AgentOperationInput } from "@purin-labs/agent/data/agent-operations";
-import type { OperatorDraftCommand } from "../src/data/operator-configuration-draft";
+import type { OperatorDraftCommand } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import {
   presentConfigurationCommand,
   previewCode,
@@ -10,7 +10,7 @@ import {
   replyAcceptsDraft,
   replyCancelsDraft,
 } from "../src/slack/configuration-presentation";
-import type { OperatorConfigurationDraft } from "../src/data/operator-configuration-draft";
+import type { OperatorConfigurationDraft } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { requireOrganisationId } from "./test-ids";
 
 const ORGANISATION = requireOrganisationId("organisation_parity");

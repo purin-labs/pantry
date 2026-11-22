@@ -12,7 +12,7 @@ import {
   type OrganisationListItem,
   type WorkspaceSupportTools,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/pages/workspaces";
+} from "@purin-labs/area-organisation/ui/pages/workspaces";
 // @ts-expect-error Platform's test tsconfig intentionally excludes JSX; the portal builds this module separately.
 import { selectPreferredWorkspace } from "../../../apps/portal/src/portal";
 

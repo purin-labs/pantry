@@ -309,7 +309,7 @@ The control routes are under `/v1/control/organisations/:id/access-control`, in
   again.
 - The shapes `HeldOutputSummary`, `HeldOutputView` and `HeldEffectAction` are in
   `packages/control-api/src/agent-permission-requests.ts`. The Portal prompt is in
-  `apps/portal/src/features/access/` (`held-output-prompt.tsx`,
+  `areas/organisation/ui/features/access/` (`held-output-prompt.tsx`,
   `chat-held-step-prompt.tsx`). A Slack card links to `access?heldOutput=<requestId>`.
 - This subsystem has no event kind, no capability and no agent tool of its own.
   `settleToolEffect` in `agent-tools/session-support.ts` is the one place that runs the

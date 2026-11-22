@@ -72,7 +72,7 @@ void campaignAuthority;
 // @ts-expect-error A campaign draft cannot omit origin authorization through a spread.
 const invalidCampaign: typeof campaignDraft = unboundCampaign;
 void invalidCampaign;
-declare const configurationDraft: import("../src/data/operator-configuration-draft").CreateOperatorDraftInput;
+declare const configurationDraft: import("@purin-labs/area-organisation/server/data/operator-configuration-draft").CreateOperatorDraftInput;
 const { scope: configurationScope, ...unplacedConfiguration } =
   configurationDraft;
 void configurationScope;

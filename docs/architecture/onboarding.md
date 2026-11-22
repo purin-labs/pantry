@@ -58,7 +58,7 @@ No outside account takes part.
    (`organisation_limit_reached`).
 
 The Portal page
-[`account-onboarding.tsx`](../../apps/portal/src/pages/account-onboarding.tsx)
+[`account-onboarding.tsx`](../../areas/organisation/ui/pages/account-onboarding.tsx)
 keeps one request per user in session storage. A retry reuses its
 `operationId`, which is the idempotency key of the route, so a lost response
 cannot create a second Organisation. A repeat answers with the first
@@ -153,7 +153,7 @@ instead of CSRF tokens (Spec 12).
 ### HTTP contract
 
 All routes are under `/v1/control`, mostly in
-[`control/routes/onboarding.ts`](../../services/platform/src/control/routes/onboarding.ts).
+[`control/routes/onboarding.ts`](../../areas/organisation/server/control/routes/onboarding.ts).
 Provider routes, the commerce system choice and Projects are in other areas.
 
 | Route family                                                | Methods and minimum role                                     |
@@ -177,7 +177,7 @@ Provider routes, the commerce system choice and Projects are in other areas.
 `GET /v1/control/organisations/:id` returns one
 [`OnboardingProjectionV1`](../../packages/contracts/src/types/OnboardingProjectionV1.ts),
 built in
-[`onboarding-projection.ts`](../../services/platform/src/data/onboarding-projection.ts).
+[`onboarding-projection.ts`](../../areas/organisation/server/data/onboarding-projection.ts).
 The browser does not join control-plane state. The projection holds the
 revisions, Organisation, membership, steps, provider accounts, operating
 profile, readiness, activation, `next_action`, `first_task` and
@@ -230,7 +230,7 @@ lists the policy template `commerce_operator` and the cue presets
 `PUT …/setup` sends a policy template, a capability profile
 (`read_and_propose` or `approved_provider_writes`), a cue preset and a Slack
 workspace and channel ID. `selectSetupTemplates` in
-[`data/onboarding.ts`](../../services/platform/src/data/onboarding.ts) writes
+[`data/onboarding.ts`](../../areas/organisation/server/data/onboarding.ts) writes
 the policy and cue snapshot pair, the selection, the destination, the receipt
 and the events in one batch. The channel ID must be accessible through a
 connected Slack account. A save is refused while `activating` or `archived`.
@@ -268,7 +268,7 @@ changed. A live signal that reports `unknown` does not vote.
 mutation headers. If no model route resolves, the route returns `409` with a
 code such as `codex_subscription_required`. Then
 `OrganisationActor.activateOnboarding` runs one serialized Organisation
-command ([`data/activation.ts`](../../services/platform/src/data/activation.ts)).
+command ([`data/activation.ts`](../../areas/organisation/server/data/activation.ts)).
 
 An attempt is unique per Organisation and readiness hash, and holds a
 five-minute lease. An activated hash returns its receipt again. A stale fence
@@ -386,9 +386,9 @@ revision. The Portal shows them in a technical details disclosure.
 
 Support access needs a `control_support_role` row with role `support_agent`
 or `support_admin`. The routes are in
-[`control/routes/operators.ts`](../../services/platform/src/control/routes/operators.ts)
+[`control/routes/operators.ts`](../../areas/organisation/server/control/routes/operators.ts)
 and the reads in
-[`data/onboarding-support.ts`](../../services/platform/src/data/onboarding-support.ts).
+[`data/onboarding-support.ts`](../../areas/organisation/server/data/onboarding-support.ts).
 
 - `GET /v1/control/operator/onboarding` takes one of `supportReference`,
   `organisationId`, `providerAccount` or `correlationId`. Each case shows the

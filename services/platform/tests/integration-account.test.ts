@@ -27,7 +27,7 @@ import {
 } from "@purin-labs/connections/data/integration-account";
 import {
   recordProviderStartFailure,
-} from "../src/organisation/contract/provider-support-references";
+} from "@purin-labs/area-organisation/server/contract/provider-support-references";
 import {
   type ProviderConnectionId,
   type OrganisationId,

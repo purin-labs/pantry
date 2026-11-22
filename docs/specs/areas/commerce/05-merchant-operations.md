@@ -89,7 +89,7 @@ Case opens again.
 ### Approvals and activity on Home
 
 The old Operations page is retired: its path opens Home. Home has the section
-**Approvals and activity** (`OperationsPage` in `apps/portal/src/pages/automation.tsx`):
+**Approvals and activity** (`OperationsPage` in `areas/organisation/ui/pages/automation.tsx`):
 
 - **Commerce exceptions** (`CommerceExceptionWorkbench`): a shipment with a label and a
   tracking number, whose fulfillment is still `requested` and has an `expected_by`

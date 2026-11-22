@@ -4,7 +4,7 @@ import {
   controlMutation,
   controlSecretMutation,
 } from "@purin-labs/control/portal/control-client";
-import { accountInvitationHref } from "../../pages/account-invitation-link";
+import { accountInvitationHref } from "@purin-labs/area-organisation/ui/pages/account-invitation-link";
 import { setUpMailbox } from "../mail-setup/turn-on";
 import type { IntegrationDetailReadContext, IntegrationDetailRouteData, IntegrationsCommand, IntegrationsCommandResult, IntegrationsRouteData, WorkspaceSettingsCommand, WorkspaceSettingsRouteData, WorkspaceSettingsCommandResult } from "./settings-types";
 import type { OrganisationCodexConnection, OrganisationInferenceSelection } from "@purin-labs/control-api/portal/settings";

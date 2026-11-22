@@ -40,11 +40,11 @@ import {
   type OnboardingActivationAcceptanceFaultInput,
   type OnboardingActivationAcceptanceFaultInspection,
   type OnboardingActivationAcceptanceFaultRecord,
-} from "../../organisation/contract/onboarding-activation-acceptance-fault";
+} from "../../contract/onboarding-activation-acceptance-fault";
 import type {
   ActivationExecutionFailure,
   OnboardingActivationError,
-} from "../../organisation/contract/activation-types";
+} from "../../contract/activation-types";
 
 async function ensureActivationReadinessStep(
   db: OrganisationDatabase,

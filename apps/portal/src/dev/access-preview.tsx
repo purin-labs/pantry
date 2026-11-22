@@ -25,7 +25,7 @@ import type {
 import "../styles.css";
 import { installCustomConnectorPreview } from "./custom-connector-preview";
 import { installPermissionRequestsPreview } from "./permission-requests-preview-data";
-import { AccessRoute } from "../features/access/route";
+import { AccessRoute } from "@purin-labs/area-organisation/ui/features/access/route";
 import { WorkspaceLayout } from "../shell";
 import type {
   AiBudgetLimits,

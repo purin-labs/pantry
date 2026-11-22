@@ -27,7 +27,7 @@ import {
   handleUserPreferencesRoute,
   matchUserPreferencesRoute,
   type UserPreferencesRoute,
-} from "./control/routes/user-preferences";
+} from "@purin-labs/area-organisation/server/control/routes/user-preferences";
 import {
   handleMailAssistantRoute,
   matchMailAssistantRoute,
@@ -226,23 +226,23 @@ import {
   handleOnboardingControlRoute,
   matchOnboardingControlRoute,
   type OnboardingControlRoute,
-} from "./control/routes/onboarding";
+} from "@purin-labs/area-organisation/server/control/routes/onboarding";
 import {
   handleOperatorControlRoute,
   matchOperatorControlRoute,
   type OperatorControlRoute,
-} from "./control/routes/operators";
+} from "@purin-labs/area-organisation/server/control/routes/operators";
 import {
   handleSessionControlRoute,
   matchSessionControlRoute,
   type SessionControlRoute,
 } from "@purin-labs/agent/control/routes/sessions";
-import { resolveControlSupportRole } from "./data/onboarding-support";
+import { resolveControlSupportRole } from "@purin-labs/area-organisation/server/data/onboarding-support";
 import {
   handleWorkspaceControlRoute,
   matchWorkspaceControlRoute,
   type WorkspaceControlRoute,
-} from "./control/routes/workspace";
+} from "@purin-labs/area-organisation/server/control/routes/workspace";
 import { assertNever } from "@purin-labs/std";
 import { ACCESS_CONTROL_PARTS } from "./control/access-control-parts";
 import {

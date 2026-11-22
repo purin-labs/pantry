@@ -1,4 +1,4 @@
-import type { ArchiveCleanupParts } from "./data/onboarding-reconciliation";
+import type { ArchiveCleanupParts } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import { purgeOrganisationWhatsAppConnectors } from "./data/whatsapp";
 import { purgeOrganisationDeviceFleets } from "@purin-labs/area-devices/server/purge";
 import { revokeOrganisationDevicesStatements } from "@purin-labs/area-devices/server/store";

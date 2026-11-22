@@ -1,4 +1,4 @@
-import { prepareEmailWatchReconciliationRun } from "../data/onboarding-reconciliation-run";
+import { prepareEmailWatchReconciliationRun } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation-run";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import type { Env } from "@purin-labs/kernel/env";
 import { gmailConnectorIdValue } from "../mail-inbox/contract/connector-ids";

@@ -19,14 +19,14 @@ import {
   parseAgentRevisionsResponse,
   parseAgentOperationForm as parseOperationForm,
 } from "@purin-labs/commerce-control-api/portal/agent-operations";
-import { commerceActionTitle, commerceActionStateLabel, formatCommerceActionAmount } from "../features/governed-actions/commerce";
+import { commerceActionTitle, commerceActionStateLabel, formatCommerceActionAmount } from "../../../../apps/portal/src/features/governed-actions/commerce";
 import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import {
   parseTrackingBatchPreviewResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-operations";
-import type { CommerceOperationsTransport } from "../features/commerce/operations";
+import type { CommerceOperationsTransport } from "../../../../apps/portal/src/features/commerce/operations";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequiredPrompt,

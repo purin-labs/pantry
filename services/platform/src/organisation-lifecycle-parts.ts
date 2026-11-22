@@ -11,7 +11,7 @@ import {
 } from "@purin-labs/connections/data/integration-account-writes";
 import type { OrganisationLifecycleParts } from "@purin-labs/tenancy/data/organisation-lifecycle-port";
 import { prepareInitialOrganisationWorkspace } from "@purin-labs/agent/data/organisation-workspace";
-import { prepareReadinessAssessmentDeletion } from "./data/onboarding";
+import { prepareReadinessAssessmentDeletion } from "@purin-labs/area-organisation/server/data/onboarding";
 import {
   prepareArchivedOrganisationConnectionsDisable,
   prepareOrganisationPurgeConnections,

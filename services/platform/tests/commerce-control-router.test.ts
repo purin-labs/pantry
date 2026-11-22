@@ -99,9 +99,9 @@ vi.mock("@purin-labs/tenancy/data/control-mutation", async (importOriginal) => (
   prepareControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
   prepareOrganisationControlMutationReceipt: mutationMocks.prepareControlMutationReceipt,
 }));
-vi.mock("../src/data/onboarding-projection", async (importOriginal) => ({
+vi.mock("@purin-labs/area-organisation/server/data/onboarding-projection", async (importOriginal) => ({
   ...(await importOriginal<
-    typeof import("../src/data/onboarding-projection")
+    typeof import("@purin-labs/area-organisation/server/data/onboarding-projection")
   >()),
   buildOnboardingProjection: onboardingMocks.buildOnboardingProjection,
 }));

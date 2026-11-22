@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { buildOnboardingProjection } from "../../src/data/onboarding-projection";
+import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/data/onboarding-projection";
 import {
   prepareFirstOperationalTask,
   readFirstOperationalTask,
-} from "../../src/data/first-operational-task";
+} from "@purin-labs/area-organisation/server/data/first-operational-task";
 import {
   newActivationAttemptId,
   newActivationReceiptId,

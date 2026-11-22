@@ -12,7 +12,7 @@ import {
 } from "@purin-labs/tenancy/organisation-access/invitations";
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import { requireActiveOrganisationActor } from "@purin-labs/actor-runtime/actors/actor-router";
-import { commerceSystemReadiness } from "../../commerce/contract/system-readiness";
+import { commerceSystemReadiness } from "../../../../../services/platform/src/commerce/contract/system-readiness";
 import {
   ensureCurrentReadiness,
   ensureCurrentReadinessFromSignals,
@@ -53,7 +53,7 @@ import {
   resolveOrganisationModelRoute,
 } from "@purin-labs/agent/models/route";
 import { holdOrganisationPolicyDistribution } from "@purin-labs/authority/policy-snapshot";
-import { providerServices } from "../../integrations/contract/provider-services";
+import { providerServices } from "../../../../../services/platform/src/integrations/contract/provider-services";
 import {
   admitUserMutation,
   controlMutationIdentity,

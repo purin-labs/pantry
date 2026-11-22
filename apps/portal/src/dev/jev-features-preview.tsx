@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { MemoryRouter, Route, Routes } from "react-router";
 import type { JevFeaturesView } from "@purin-labs/control-api/portal/jev-features";
 import "../styles.css";
-import { BillingRoute } from "../features/billing/route";
+import { BillingRoute } from "@purin-labs/area-organisation/ui/features/billing/route";
 import { JevFeaturesRoute } from "../features/jev-features/route";
 
 // Settings › Jev and Settings › Billing with a stand-in Platform.

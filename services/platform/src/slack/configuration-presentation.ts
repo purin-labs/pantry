@@ -9,7 +9,7 @@ import {
   type OperatorConfigurationDraft,
   type DeviceDraftCommand,
   type OperatorDraftCommand,
-} from "../data/operator-configuration-draft";
+} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 
 export { previewCode };
 import type { OfferPriceAllowanceCommand } from "../commerce/contract/offer-price-allowance";

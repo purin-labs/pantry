@@ -1,4 +1,4 @@
-import type { OnboardingActivationInput } from "../src/data/activation";
+import type { OnboardingActivationInput } from "@purin-labs/area-organisation/server/data/activation";
 import type { ProviderConnectionAttempt } from "@purin-labs/connections/data/provider-attempt";
 import {
   parseProviderConnectionAttemptId,

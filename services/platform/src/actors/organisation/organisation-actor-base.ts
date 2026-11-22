@@ -10,7 +10,7 @@ import {
   evaluateMail,
   type MailEvaluationInput,
 } from "../../mail-inbox/evaluation";
-import { reconcileAdmittedOrganisationArchiveCleanup } from "../../data/onboarding-reconciliation";
+import { reconcileAdmittedOrganisationArchiveCleanup } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import { ARCHIVE_CLEANUP_PARTS } from "../../archive-cleanup-parts";
 import {
   AdmittedOrganisationArchiveCleanup,

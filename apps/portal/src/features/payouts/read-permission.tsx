@@ -11,12 +11,12 @@ import type {
   AccessControlOption,
   AccessRouteTransport,
 } from "@purin-labs/control-api/portal/access-models";
-import { workspaceParty } from "../access/agent-permission-request";
+import { workspaceParty } from "@purin-labs/area-organisation/ui/features/access/agent-permission-request";
 import {
   accessErrorMessage,
   createGrants,
   enableCapabilities,
-} from "../access/permission-enable";
+} from "@purin-labs/area-organisation/ui/features/access/permission-enable";
 import { PermissionRequestDialog } from "@purin-labs/ui/index";
 
 export type PayoutReadRole = "owner" | "admin";

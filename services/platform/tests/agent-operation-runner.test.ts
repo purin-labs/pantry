@@ -24,7 +24,7 @@ vi.mock("@purin-labs/tenancy/data/control-plane", async (importOriginal) => ({
 }));
 
 import { runAgentOperation } from "@purin-labs/conversation/data/agent-operation-runner";
-import { createOperatorConfigurationDraft } from "../src/data/operator-configuration-draft";
+import { createOperatorConfigurationDraft } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import {
   installMerchantAgent,
   merchantAgentDefaultSkills,

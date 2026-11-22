@@ -25,6 +25,8 @@ PLATFORM_SOURCE.push("packages/collaboration/worker");
 PLATFORM_SOURCE.push("areas/devices/server");
 // The Worker side of the area brain (Refactor 17, Stage B).
 PLATFORM_SOURCE.push("areas/brain/server");
+// The Worker side of the area organisation (Refactor 17, Stage B).
+PLATFORM_SOURCE.push("areas/organisation/server");
 
 /**
  * The folders that hold the source of the Portal, in the browser. The package
@@ -43,6 +45,8 @@ PORTAL_SOURCE.push("packages/collaboration/portal");
 PORTAL_SOURCE.push("areas/devices/ui");
 // The Portal side of the area brain (Refactor 17, Stage B).
 PORTAL_SOURCE.push("areas/brain/ui");
+// The Portal side of the area organisation (Refactor 17, Stage B).
+PORTAL_SOURCE.push("areas/organisation/ui");
 
 /** True when a repository path is in one of `folders`. */
 export function inFolders(path, folders) {

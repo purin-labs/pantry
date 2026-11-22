@@ -5,7 +5,7 @@ import { resolveMerchantControlContext } from "../../commerce/contract/merchant-
 import { authorizeOrganisationRequest } from "@purin-labs/control/worker/authorization";
 import {
   resolveOpenProviderSupportReferences,
-} from "../../organisation/contract/provider-support-references";
+} from "@purin-labs/area-organisation/server/contract/provider-support-references";
 import { controlError, controlJson, readJsonRecord } from "@purin-labs/control/worker/http";
 import { PRIMARY_ONLINE_PAYMENT_BINDING_ID } from "../../commerce/contract/stripe-link";
 

@@ -13,7 +13,7 @@ import {
   listOperatorDraftsForCase,
   readOperatorDraft,
   type OperatorConfigurationDraft,
-} from "../../data/operator-configuration-draft";
+} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import type { Env } from "@purin-labs/kernel/env";
 import type { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
 import {

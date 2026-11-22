@@ -10,7 +10,7 @@ import { issueControlSession } from "@purin-labs/tenancy/data/control-plane";
 import { parseUserId } from "@purin-labs/control-api/ids";
 import { authorizeSessionTurnExecution } from "@purin-labs/conversation/chat/turn-access";
 import { proposeCampaignBrief } from "../../src/data/campaign-brief";
-import { createOperatorConfigurationDraft } from "../../src/data/operator-configuration-draft";
+import { createOperatorConfigurationDraft } from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import {
   admitOperatorControlTurnFixture,
   requireOrganisationExecutionScope,

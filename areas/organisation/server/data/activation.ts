@@ -42,7 +42,7 @@ import {
 import type { CapabilityProfile } from "./onboarding";
 import {
   prepareResolveOpenSupportReferences,
-} from "../organisation/contract/provider-support-references";
+} from "../contract/provider-support-references";
 import {
   deriveFirstOperationalTask,
   prepareFirstOperationalTask,

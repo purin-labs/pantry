@@ -5,7 +5,7 @@ import React from "../../../apps/portal/node_modules/react";
 import { renderToStaticMarkup } from "../../../apps/portal/node_modules/react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "../../../apps/portal/src/agent-operations";
+import { EMPTY_AGENT_OPERATIONS_SNAPSHOT, type AgentOperationsTransport } from "@purin-labs/area-organisation/ui/agent-operations";
 import {
   parseAgentOperationForm,
   parseAgentOperationsResponse,
@@ -19,9 +19,9 @@ import {
   AgentOperationsRouteView,
   type AgentOperationsPageContent,
   // @ts-expect-error The portal build type-checks this JSX module.
-} from "../../../apps/portal/src/pages/automation";
+} from "@purin-labs/area-organisation/ui/pages/automation";
 // @ts-expect-error Platform's test tsconfig intentionally excludes JSX; the portal build type-checks this module separately.
-import { diffLines } from "../../../apps/portal/src/pages/agent-documents";
+import { diffLines } from "@purin-labs/area-organisation/ui/pages/agent-documents";
 import type { Variant } from "@purin-labs/type-utils";
 
 const ORGANISATION_ID = "organisation_cafe";

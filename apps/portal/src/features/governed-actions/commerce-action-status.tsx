@@ -13,7 +13,7 @@ import type {
   MerchantPluginPreview,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import { formatCommerceActionAmount, formatOfferPrice, commerceActionStateLabel, commerceActionTitle } from "./commerce";
-import { runAsync } from "../../pages/agent-console-shared";
+import { runAsync } from "@purin-labs/area-organisation/ui/pages/agent-console-shared";
 import { DecisionButtons } from "@purin-labs/ui/index";
 import { GOVERNED_ACTION_ALLOW, governedActionRefusal } from "./decision-labels";
 import {

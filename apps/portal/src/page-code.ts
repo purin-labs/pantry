@@ -186,7 +186,8 @@ async function loadJevFeaturesRoute() {
 }
 
 async function loadBillingRoute() {
-  const module = await import("./features/billing/route");
+  const module =
+    await import("@purin-labs/area-organisation/ui/features/billing/route");
   return { default: module.BillingRoute };
 }
 
@@ -216,16 +217,19 @@ async function loadWorkspaceSettingsRoute() {
 }
 
 async function loadAgentsRoute() {
-  const module = await import("./pages/automation");
+  const module =
+    await import("@purin-labs/area-organisation/ui/pages/automation");
   return { default: module.AgentsRoute };
 }
 
 async function loadAgentOperationsRoute() {
-  const module = await import("./pages/automation");
+  const module =
+    await import("@purin-labs/area-organisation/ui/pages/automation");
   return { default: module.AgentOperationsRoute };
 }
 
 async function loadAccessRoute() {
-  const module = await import("./features/access/route");
+  const module =
+    await import("@purin-labs/area-organisation/ui/features/access/route");
   return { default: module.AccessRoute };
 }

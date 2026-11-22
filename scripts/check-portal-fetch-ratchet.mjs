@@ -23,7 +23,7 @@ const EXCLUDED = [
 ];
 // Files that fetch assets, models, bundles or another origin, not the control API.
 const NOT_CONTROL = new Set([
-  "apps/portal/src/features/access/google-drive-picker.ts",
+  "areas/organisation/ui/features/access/google-drive-picker.ts",
   "apps/portal/src/features/production-run/execution-client.ts",
   "apps/portal/src/features/production-run/execution-worker.ts",
   "apps/portal/src/features/production-run/retained-appliance-worker.ts",

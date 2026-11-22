@@ -300,7 +300,7 @@ exported `PurinMark` and `PurinIcon`.
 - The stored preference area `bakeryos` (`packages/control-api/src/user-preferences.ts`,
   the `area` column of `user_preferences`).
 - The home view version `pantry.cafeos.home.v1` (`packages/control-api/src/portal/home.ts`,
-  `services/platform/src/control/routes/workspace.ts`).
+  `areas/organisation/server/control/routes/workspace.ts`).
 - The browser storage keys `pantry:cafeos:sidebar-expanded` and
   `pantry.bakeryos.vitrineCustomOrders.v1`.
 - The root package name `seams-pantry`.
@@ -308,7 +308,7 @@ exported `PurinMark` and `PurinIcon`.
 - A comment in `areas/devices/server/agent-tools/devices/handlers.ts` has an old name.
 - The docstring of `scripts/shop-voice/phrase-bench.py` names Satyr.
 
-**The commerce engine in Portal text:** `apps/portal/src/pages/automation.tsx` and
+**The commerce engine in Portal text:** `areas/organisation/ui/pages/automation.tsx` and
 `apps/portal/src/features/commerce/production-plan.tsx` show these words to people.
 
 **Seams text in the Portal:**

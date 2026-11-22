@@ -14,7 +14,7 @@ import {
   finalizeConnectedIntegrationAccount,
   upsertSurfaceInstallation,
 } from "@purin-labs/connections/data/integration-account";
-import { buildOnboardingProjection } from "../src/data/onboarding-projection";
+import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/data/onboarding-projection";
 import { createAuthorizingProviderAttempt } from "@purin-labs/connections/data/provider-attempt";
 import { persistProviderResourceSnapshot } from "@purin-labs/connections/data/provider-resource";
 import { parseVaultHandle } from "@purin-labs/authority/credential-vault/index";

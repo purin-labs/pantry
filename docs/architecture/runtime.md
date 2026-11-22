@@ -244,7 +244,7 @@ recent uploads, and deletes the rest. It never deletes on a partial listing.
 
 The onboarding reconciliation runner erases harness history from the D1
 `organisation_harness_erasure` rows
-([`onboarding-reconciliation.ts`](../../services/platform/src/data/onboarding-reconciliation.ts)).
+([`onboarding-reconciliation.ts`](../../areas/organisation/server/data/onboarding-reconciliation.ts)).
 Each `AgentSessionActor` deletes its own rows through `eraseHarnessHistory`
 and returns its object keys. Each object becomes `retained` or `deleted`.
 See the [harness erasure runbook](../runbooks/harness-erasure.md).

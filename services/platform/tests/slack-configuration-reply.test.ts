@@ -5,7 +5,7 @@ import { readAgentOperations } from "@purin-labs/agent/data/agent-operations";
 import {
   createOperatorConfigurationDraft,
   readPendingOperatorDraft,
-} from "../src/data/operator-configuration-draft";
+} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { renderConfigurationPreview } from "../src/slack/configuration-presentation";
 import {
   resolveSlackConfigurationReply,

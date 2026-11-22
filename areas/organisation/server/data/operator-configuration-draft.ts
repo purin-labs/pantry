@@ -19,7 +19,7 @@ import { parseRunFindings } from "@purin-labs/bakery-workflow/findings";
 import {
   workflowChanges,
   type WorkflowChangeCommand,
-} from "../kitchen/contract/workflow-changes";
+} from "../../../../services/platform/src/kitchen/contract/workflow-changes";
 import { deviceCommands } from "@purin-labs/area-devices/server/contract/device-commands";
 import {
   parseBakeStockLevelInput,
@@ -32,14 +32,14 @@ import {
   parseJevDraftCommand,
   type JevDraftCommand,
   type JevDraftRefusal,
-} from "../integrations/contract/jev-draft";
+} from "../../../../services/platform/src/integrations/contract/jev-draft";
 import {
   applyOfferPriceAllowance,
   offerPriceAllowanceAlreadyApplied,
   parseOfferPriceAllowanceCommand,
   type OfferPriceAllowanceCommand,
-} from "../commerce/contract/offer-price-allowance";
-import type { PublishedResourceBoundaryError } from "../commerce/contract/types";
+} from "../../../../services/platform/src/commerce/contract/offer-price-allowance";
+import type { PublishedResourceBoundaryError } from "../../../../services/platform/src/commerce/contract/types";
 import type { Result } from "@purin-labs/kernel/result";
 import { digestCanonical } from "@purin-labs/authority/policy/index";
 import {

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildHomeView,
   type HomeViewBuildInput,
-} from "../src/control/routes/workspace";
+} from "@purin-labs/area-organisation/server/control/routes/workspace";
 import { requireCaseId } from "./test-ids";
 
 const OBSERVED_AT = "2026-07-26T00:00:00.000Z";

@@ -10,7 +10,7 @@ import {
   readWorkflowFindings,
   writeWorkflowFindings,
 } from "../../commerce/bakery/workflow-revisions";
-import { organisationServices } from "../../organisation/contract/organisation-services";
+import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
 import type { Env } from "@purin-labs/kernel/env";
 import { newRequestId, type OrganisationId } from "@purin-labs/kernel/ids";
 import { traceWarn } from "@purin-labs/kernel/observability";

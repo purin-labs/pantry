@@ -72,7 +72,7 @@ import { ChatResponseIndicator, renderChatTimeline } from "./activity";
 import { ChatWorkGlow } from "./work-glow";
 import { ChatSelectedFile } from "./selected-file";
 import { ChatPermissionPrompt } from "./permission-prompt";
-import { ChatHeldStepPrompt } from "../access/chat-held-step-prompt";
+import { ChatHeldStepPrompt } from "@purin-labs/area-organisation/ui/features/access/chat-held-step-prompt";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
 import {
   Archive,

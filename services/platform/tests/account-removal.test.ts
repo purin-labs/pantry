@@ -5,7 +5,7 @@ import { TEST_ORGANISATION_PLACEMENT_PROFILE } from "./fixtures/organisation-pla
 import { requireOrganisationBootstrap } from "./organisation-execution-fixture";
 import { describe, expect, it, vi } from "vitest";
 
-import { removeIntegrationAccount } from "../src/data/account-removal";
+import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import { reconcileProviderAccountCleanup } from "../src/provider-lifecycle/cleanup-reconciliation";
 import { upsertUser } from "@purin-labs/tenancy/data/control-plane";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";

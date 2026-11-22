@@ -17,7 +17,7 @@ import type {
 } from "@purin-labs/contracts";
 import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import { signInPath } from "@purin-labs/control/portal/control-paths";
-import { ArchiveConfirm } from "../features/integrations/archive-confirm";
+import { ArchiveConfirm } from "../../../../apps/portal/src/features/integrations/archive-confirm";
 import {
   EmptyState,
   Notice,

@@ -67,7 +67,7 @@ import {
   routeWhatsAppWebhookAccount,
 } from "../src/data/whatsapp";
 import { whatsappErasureStatements } from "../src/mail-inbox/contract/account-erasure";
-import { reconcileOrganisationOnboarding } from "../src/data/onboarding-reconciliation";
+import { reconcileOrganisationOnboarding } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import type { SessionDO } from "../src/actors/agent-session";
 import {
   parseE164PhoneNumber,

@@ -192,7 +192,7 @@ import type { CommerceBoardPresenceEntry } from "@purin-labs/commerce-control-ap
 import {
   OrganisationActivation,
   type OrganisationActivationRpc,
-} from "./organisation/activation";
+} from "@purin-labs/area-organisation/server/actors/organisation/activation";
 import {
   CASE_CONTEXT_SOURCE_FOR_POLICY,
   deliverCaseContextCollectionInvalidations,

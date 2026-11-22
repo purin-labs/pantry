@@ -4,7 +4,7 @@ import type { JevFeature } from "@purin-labs/control-api/portal/jev-features";
 import {
   changeJevFeature,
   jevFeatureErrorMessage,
-} from "../features/jev-features/api";
+} from "../../../../apps/portal/src/features/jev-features/api";
 import { organisationPath, workspacePagePath } from "@purin-labs/ui/route";
 
 /**

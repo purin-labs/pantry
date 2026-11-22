@@ -10,7 +10,7 @@ import {
   readLatestDecidedOperatorDraft,
   readPendingOperatorDraft,
   type OperatorConfigurationDraft,
-} from "../data/operator-configuration-draft";
+} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import {
   renderConfigurationReceipt,
   replyAcceptsDraft,

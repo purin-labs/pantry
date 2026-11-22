@@ -34,7 +34,7 @@ import {
   createConnectedIntegration,
   setIntegrationAccountLifecycle,
 } from "@purin-labs/connections/data/integration-account";
-import { removeIntegrationAccount } from "../src/data/account-removal";
+import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import { newControlMutationIdentity } from "@purin-labs/tenancy/data/control-mutation";
 import { bindCommerceMerchant } from "@purin-labs/connections/data/commerce-merchant-binding";
 import { handleContactVerification } from "../src/control/routes/contact-verification";

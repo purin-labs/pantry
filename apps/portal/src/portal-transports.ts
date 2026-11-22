@@ -6,7 +6,7 @@ import {
 } from "@purin-labs/control/portal/control-client";
 import type { BrainTransport } from "@purin-labs/area-brain/ui/features/brain/api";
 import { readMailboxSetup } from "./features/mail-setup/run";
-import type { OrganisationActions } from "./pages/workspaces";
+import type { OrganisationActions } from "@purin-labs/area-organisation/ui/pages/workspaces";
 import type { ProductDescriptionActionTransport } from "./features/commerce/description-draft/editor";
 import type {
   IntegrationsRouteTransport,
@@ -18,9 +18,9 @@ import {
   parseCommerceActionRecordResponse,
 } from "@purin-labs/commerce-control-api/portal/commerce-actions";
 import type { CommerceOperationsTransport } from "./features/commerce/operations";
-import type { AgentOperationsTransport } from "./pages/automation";
-import { createAccessRouteTransport } from "./features/access/api";
-import { pickGoogleDriveFile } from "./features/access/google-drive-picker";
+import type { AgentOperationsTransport } from "@purin-labs/area-organisation/ui/pages/automation";
+import { createAccessRouteTransport } from "@purin-labs/area-organisation/ui/features/access/api";
+import { pickGoogleDriveFile } from "@purin-labs/area-organisation/ui/features/access/google-drive-picker";
 import {
   readEmailOperationalPreview,
   readEmailReplyPreview,

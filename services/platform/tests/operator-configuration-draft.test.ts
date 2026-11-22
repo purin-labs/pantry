@@ -10,7 +10,7 @@ import {
   confirmOperatorConfigurationDraft,
   createOperatorConfigurationDraft,
   readPendingOperatorDraft,
-} from "../src/data/operator-configuration-draft";
+} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import {
   createAgentOperationsDatabase,
   proposalFixtureAuthority,

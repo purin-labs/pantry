@@ -495,7 +495,7 @@ stays connected.
   asynchronous and visible.
 - **Removal** needs a disabled account that is not the default, is not in use
   and has no open attempt
-  ([`account-removal.ts`](../../services/platform/src/data/account-removal.ts)).
+  ([`account-removal.ts`](../../areas/organisation/server/data/account-removal.ts)).
   It writes a `provider_account_tombstone` with a hash of the provider account
   ID.
 

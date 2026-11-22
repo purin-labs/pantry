@@ -343,7 +343,7 @@ commands.
 - **End of an Organisation.** The archive cleanup revokes each Mac and tries to remove its
   DNS names. The purge repeats the removal, and it stops and tries again if DNS fails,
   because the voice rows hold the only list of the names. It then erases the three tables
-  (`services/platform/src/data/onboarding-reconciliation.ts`).
+  (`areas/organisation/server/data/onboarding-reconciliation.ts`).
 
 ### Information flow
 

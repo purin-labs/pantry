@@ -15,8 +15,8 @@ import type { UserId } from "@purin-labs/control-api/ids";
 import {
   prepareAccountContactVerificationsDelete,
   whatsappErasureStatements,
-} from "../mail-inbox/contract/account-erasure";
-import { prepareProviderAccountCleanup } from "../integrations/contract/provider-account-cleanup";
+} from "../../../../services/platform/src/mail-inbox/contract/account-erasure";
+import { prepareProviderAccountCleanup } from "../../../../services/platform/src/integrations/contract/provider-account-cleanup";
 import type { Result } from "@purin-labs/kernel/result";
 import {
   resolveIntegrationAccount,
@@ -28,7 +28,7 @@ import {
   prepareOnboardingAuditEvent,
   prepareOnboardingEvent,
 } from "@purin-labs/tenancy/data/control-mutation";
-import { providerServices } from "../integrations/contract/provider-services";
+import { providerServices } from "../../../../services/platform/src/integrations/contract/provider-services";
 import { parseActiveIntegrationProvider } from "@purin-labs/connections/data/integration-provider-directory";
 import { fileAccountErasureStatements } from "@purin-labs/agent/context/files/index";
 import { sha256Hex } from "@purin-labs/std";

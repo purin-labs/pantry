@@ -9,17 +9,17 @@ import {
   OrganisationsRoute,
   type OrganisationActions,
   type OrganisationListItem,
-} from "../pages/workspaces";
+} from "@purin-labs/area-organisation/ui/pages/workspaces";
 import {
   AccountSetupDialog,
   type AccountSetupActions,
   type AccountSetupListing,
   type OpenAccountSetupView,
-} from "../pages/account-onboarding";
+} from "@purin-labs/area-organisation/ui/pages/account-onboarding";
 import {
   AccountInvitationPage,
   readAccountInvitationRoute,
-} from "../pages/account-invitation";
+} from "@purin-labs/area-organisation/ui/pages/account-invitation";
 
 const root = document.getElementById("root");
 if (root === null || !import.meta.env.DEV) {

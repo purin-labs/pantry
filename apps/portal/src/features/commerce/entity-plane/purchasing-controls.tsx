@@ -32,7 +32,7 @@ import { type SupplierCreation } from "@purin-labs/commerce-control-api";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
-} from "../../access/permission-required-prompt";
+} from "@purin-labs/area-organisation/ui/features/access/permission-required-prompt";
 
 type PurchasingControlIntent =
   | Readonly<{ kind: "idle" }>

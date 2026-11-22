@@ -21,7 +21,7 @@ import {
   readOrganisationHarnessErasureReceipts,
   reconcileOrganisationOnboarding,
   reconcileAdmittedOrganisationArchiveCleanup,
-} from "../src/data/onboarding-reconciliation";
+} from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import { ARCHIVE_CLEANUP_PARTS } from "../src/archive-cleanup-parts";
 import type { SessionDO } from "../src/actors/agent-session";
 import type { OrganisationDO } from "../src/actors/organisation";

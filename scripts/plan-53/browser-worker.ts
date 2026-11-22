@@ -1,7 +1,7 @@
 import {
   handleUserPreferencesRoute,
   matchUserPreferencesRoute,
-} from "../../services/platform/src/control/routes/user-preferences";
+} from "../../areas/organisation/server/control/routes/user-preferences";
 import {
   issueControlSession,
   upsertUser,

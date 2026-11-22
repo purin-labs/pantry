@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 
-import { providerLabel, providerTile } from "../../integration-catalogue";
+import { providerLabel, providerTile } from "../../../../../apps/portal/src/integration-catalogue";
 import { ProviderTile } from "@purin-labs/ui/page-components";
 import { SideDrawer } from "@purin-labs/ui/index";
 import type {

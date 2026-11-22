@@ -39,7 +39,7 @@ import {
 } from "@purin-labs/actor-runtime/actors/actor-registry";
 import type { OrganisationDO } from "../../src/actors/organisation";
 import { actorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { readOrganisationHarnessErasureReceipts } from "../../src/data/onboarding-reconciliation";
+import { readOrganisationHarnessErasureReceipts } from "@purin-labs/area-organisation/server/data/onboarding-reconciliation";
 import {
   readOrganisationArchiveCleanup,
   type OrganisationArchiveCleanupRequest,

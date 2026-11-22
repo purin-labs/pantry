@@ -42,7 +42,7 @@ import { ControlApiError } from "@purin-labs/control/portal/control-client";
 import {
   PermissionRequiredPrompt,
   permissionRequiredOf,
-} from "../../access/permission-required-prompt";
+} from "@purin-labs/area-organisation/ui/features/access/permission-required-prompt";
 import { cancelDialog, DialogHeading, syncDialog } from "@purin-labs/ui/dialog";
 import {
   EmptyState,

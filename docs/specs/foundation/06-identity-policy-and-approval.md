@@ -325,7 +325,7 @@ The main files, under `services/platform/src/`:
 | Ledger, approval             | `actors/action-ledger.ts`, `approval-authentication.ts`, `control/routes/commerce/actions.ts`, `control/routes/custom-connectors/write-actions.ts`, `slack/commerce-approval.ts`                                                                                                                                                                                                         |
 | Decisions                    | `control/pending-decisions.ts`, `control/decide-pending-decision.ts`, `control/pending-decision-parts.ts`, `control/routes/pending-decisions.ts`, `control/routes/agent-permission-requests.ts`, `control/routes/held-output-requests.ts`, `slack/decision-card.ts`, `slack/permission-request-deny.ts`                                                                                  |
 
-The Portal files are `apps/portal/src/features/access/` (the Access page and the
+The Portal files are `areas/organisation/ui/features/access/` (the Access page and the
 prompts), `features/integrations/workspace.tsx` (members and invitations),
 `pages/account-invitation.tsx` and `ui/decision-buttons.tsx`.
 

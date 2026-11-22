@@ -22,7 +22,7 @@ import {
   kitchenToolServices,
   pageViewCommandExecutor,
 } from "./kitchen/turn-services";
-import { stageConfigurationDraft } from "./organisation/configuration-draft";
+import { stageConfigurationDraft } from "@purin-labs/area-organisation/server/agent-tools/organisation/configuration-draft";
 import { TOOL_REGISTRY, type ToolServices } from "./registry";
 import { slackThreadSideCase } from "../slack/side-cases";
 import { sessionConversation } from "@purin-labs/conversation/chat/session-conversation";

@@ -1,5 +1,5 @@
 import type { Env } from "@purin-labs/kernel/env";
-import { organisationServices } from "../../../organisation/contract/organisation-services";
+import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
 import {
   disableIntegrationAccount,
   listIntegrationAccounts,

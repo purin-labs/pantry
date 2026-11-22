@@ -37,7 +37,7 @@ import type { AdmittedOrganisationArchiveCleanup } from "@purin-labs/actor-runti
 import { resolveActiveOrganisationPlacementRecord } from "@purin-labs/tenancy/data/organisation-placement";
 import type { Env } from "@purin-labs/kernel/env";
 import type { SessionActorStub } from "@purin-labs/actor-runtime/actors/actor-stubs";
-import { closeOrganisationCommerceMerchants } from "../commerce/contract/merchant-closure";
+import { closeOrganisationCommerceMerchants } from "../../../../services/platform/src/commerce/contract/merchant-closure";
 import { parseOrganisationPlacement } from "@purin-labs/tenancy/placement";
 import type { Result } from "@purin-labs/kernel/result";
 import { traceWarn } from "@purin-labs/kernel/observability";

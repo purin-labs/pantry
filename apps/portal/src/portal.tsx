@@ -7,7 +7,7 @@ import {
 import {
   AccountInvitationPage,
   readAccountInvitationRoute,
-} from "./pages/account-invitation";
+} from "@purin-labs/area-organisation/ui/pages/account-invitation";
 import { UserPreferencesProvider } from "@purin-labs/ui/preferences/context";
 import { BakeryWorkspaceReveal } from "./features/bakery-workspace-reveal";
 import { revealBakeryWorkspace } from "./features/bakery-surface-registry";
@@ -56,8 +56,8 @@ import {
 import {
   OrganisationsRoute,
   type WorkspaceRouteTarget,
-} from "./pages/workspaces";
-import type { AccountSetupListing } from "./pages/account-onboarding";
+} from "@purin-labs/area-organisation/ui/pages/workspaces";
+import type { AccountSetupListing } from "@purin-labs/area-organisation/ui/pages/account-onboarding";
 import {
   startShellReads,
   startWorkspacePageReads,

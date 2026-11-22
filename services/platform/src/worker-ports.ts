@@ -36,7 +36,7 @@ import { CommerceEngineSource } from "./commerce/entity-plane/commerce-source";
 import { readCommerceExceptionInbox } from "./commerce/operations-workbench";
 import { commerceExceptionInbox } from "@purin-labs/agent/control/agent-operation-activity";
 import { onboardingProjection } from "@purin-labs/control/worker/admission/control-mutation";
-import { buildOnboardingProjection } from "./data/onboarding-projection";
+import { buildOnboardingProjection } from "@purin-labs/area-organisation/server/data/onboarding-projection";
 import {
   bakeryRunSnapshotPrefix,
   bakeryRunSnapshotSummary,
@@ -103,25 +103,25 @@ import { readTerminalOperations } from "./data/terminal-operations-readback";
 import { inboxServices } from "./mail-inbox/contract/inbox-services";
 import { readGmailPilotBudget } from "./data/email-mailbox";
 import { registerSupplierOperationalEmailContact } from "./data/email-operational";
-import { organisationServices } from "./organisation/contract/organisation-services";
-import { removeIntegrationAccount } from "./data/account-removal";
+import { organisationServices } from "@purin-labs/area-organisation/server/contract/organisation-services";
+import { removeIntegrationAccount } from "@purin-labs/area-organisation/server/data/account-removal";
 import {
   cancelOperatorConfigurationDraft,
   confirmOperatorConfigurationDraft,
   previewCode,
   readOperatorDraft,
-} from "./data/operator-configuration-draft";
+} from "@purin-labs/area-organisation/server/data/operator-configuration-draft";
 import { workflowChanges } from "./kitchen/contract/workflow-changes";
 import { applyApprovedWorkflowChange } from "./commerce/bakery/workflow-proposals";
 import { deviceCommands } from "@purin-labs/area-devices/server/contract/device-commands";
 import { runDeviceCommand } from "@purin-labs/area-devices/server/commands";
 import { connectionFlowParts } from "@purin-labs/connections/data/connection-flow-parts";
 import { prepareCredentialRefReplacement } from "@purin-labs/authority/credential-vault/service";
-import { prepareCommunicationDestinationAccount } from "./data/onboarding";
+import { prepareCommunicationDestinationAccount } from "@purin-labs/area-organisation/server/data/onboarding";
 import {
   prepareProviderAttemptSupportReference,
   prepareResolveOpenSupportReferences,
-} from "./organisation/contract/provider-support-references";
+} from "@purin-labs/area-organisation/server/contract/provider-support-references";
 import { fileGrantParts } from "@purin-labs/authority/authorization/access-grants/file-grant-parts";
 import {
   prepareChangedFileGrantSync,

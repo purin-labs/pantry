@@ -1,7 +1,7 @@
 import React from "react";
 import { CheckCircle2, LockKeyhole, ShieldQuestion } from "lucide-react";
 
-import { providerLabel } from "../../integration-catalogue";
+import { providerLabel } from "../../../../../apps/portal/src/integration-catalogue";
 import type {
   AccessControlCapabilityView,
   AccessControlGrantView,

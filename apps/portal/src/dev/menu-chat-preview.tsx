@@ -10,9 +10,9 @@ import { workspacePageDescriptor } from "@purin-labs/ui/route";
 import { ConnectedChatPage as ChatPage } from "../features/chat/route";
 import { MenuDraftRoute } from "../features/content-studio/route";
 import { registerPortalBoardChat } from "../portal-board-chat";
-import PermissionRequestsDrawer from "../features/access/permission-requests-drawer";
-import { UNAVAILABLE_ACCESS } from "../features/access/unavailable-access";
-import { createAccessRouteTransport } from "../features/access/api";
+import PermissionRequestsDrawer from "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer";
+import { UNAVAILABLE_ACCESS } from "@purin-labs/area-organisation/ui/features/access/unavailable-access";
+import { createAccessRouteTransport } from "@purin-labs/area-organisation/ui/features/access/api";
 import { controlMutation, controlRead } from "@purin-labs/control/portal/control-client";
 
 // The Menus page with the chat beside it, as the Portal shows them, for one

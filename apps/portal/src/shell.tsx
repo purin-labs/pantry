@@ -56,14 +56,15 @@ import {
   type WorkspaceSystem,
 } from "@purin-labs/ui/route";
 import { useBrainItemsToReview } from "@purin-labs/area-brain/ui/brain-summary";
-import { useRequestsToDecide } from "./features/access/permission-requests-summary";
+import { useRequestsToDecide } from "@purin-labs/area-organisation/ui/features/access/permission-requests-summary";
 import type { AccessRouteTransport } from "@purin-labs/control-api/portal/access-models";
-import "./features/access/permission-requests-drawer.css";
+import "@purin-labs/area-organisation/ui/features/access/permission-requests-drawer.css";
 import "./portal-brand.css";
 
 const VoicePageMark = React.lazy(() => import("./features/voice/page-mark"));
 const PermissionRequestsDrawer = React.lazy(
-  () => import("./features/access/permission-requests-drawer"),
+  () =>
+    import("@purin-labs/area-organisation/ui/features/access/permission-requests-drawer"),
 );
 import { ChatUnderlay, type WorkspaceChat } from "./features/chat/underlay";
 import { usePortalTheme } from "@purin-labs/ui/use-portal-theme";
@@ -85,7 +86,7 @@ import {
   type OrganisationShellContext,
   type WorkspaceChoice,
   type WorkspaceShellContext,
-} from "./workspace-switcher";
+} from "@purin-labs/area-organisation/ui/workspace-switcher";
 
 export type { OrganisationChoice, WorkspaceChoice };
 import { useConsoleSidebarPreference } from "./use-console-sidebar-preference";
