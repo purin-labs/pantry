@@ -155,7 +155,11 @@ async function verifyTwoCellWorkspaceBrowser(page) {
     !(await comparison.textContent()).includes("6240.000")
   )
     throw new Error("Closing the run lost its completed comparison result.");
-  await comparison.scrollIntoViewIfNeeded();
+  // The checks above are the proof. The screenshot is evidence only, so the
+  // scroll does not wait for a layout that a slow runner still paints.
+  await comparison.evaluate((section) =>
+    section.scrollIntoView({ block: "center" }),
+  );
   await page.screenshot({
     path: "retained-factory-comparison.png",
     fullPage: true,
