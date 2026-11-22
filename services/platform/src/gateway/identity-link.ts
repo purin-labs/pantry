@@ -3,7 +3,7 @@ import {
   readStringField,
   readOrganisationIdField,
   readWorkspaceIdField,
-} from "../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   consumeIdentityLink,
   issueIdentityLink,

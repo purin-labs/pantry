@@ -104,7 +104,7 @@
     "foundation/connections/data/provider-attempt.ts = foundation/connections/data/provider-attempt.ts": {"copies":5,"lines":87},
     "foundation/connections/mail/gmail-adapter.ts = foundation/connections/mail/gmail-adapter.ts": {"copies":2,"lines":24},
     "foundation/connections/mail/operational-message.ts = foundation/connections/mail/reply-target.ts": {"copies":1,"lines":11},
-    "foundation/kernel/queue-fields.ts = services/platform/src/boundary.ts": {"copies":1,"lines":13},
+    "foundation/kernel/queue-fields.ts = packages/contracts/src/boundary.ts": {"copies":1,"lines":13},
     "foundation/tenancy/data/control-plane.ts = foundation/tenancy/data/control-plane.ts": {"copies":1,"lines":38},
     "foundation/tenancy/data/organisation-lifecycle.ts = foundation/tenancy/data/organisation-lifecycle.ts": {"copies":11,"lines":184},
     "foundation/tenancy/data/organisation-lifecycle.ts = services/platform/src/data/onboarding.ts": {"copies":1,"lines":20},

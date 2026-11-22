@@ -8,7 +8,7 @@ import type { CommerceProviderReceipt } from "@purin-labs/control-api";
 import {
   readStringField,
   readOrganisationIdField,
-} from "../../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   parseOrganisationPlacementMoveTarget,
   type OrganisationPlacementMoveTarget,

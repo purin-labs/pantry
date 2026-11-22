@@ -2,7 +2,7 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import {
   readStringField,
   readOrganisationIdField,
-} from "../../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   configurePersonRole,
   listOrganisationPersonRoles,

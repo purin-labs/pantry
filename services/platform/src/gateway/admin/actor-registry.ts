@@ -9,7 +9,7 @@ import {
 import {
   readStringField,
   readOrganisationIdField,
-} from "../../boundary";
+} from "@purin-labs/contracts/boundary";
 import type { OrganisationMetaInput } from "@purin-labs/tenancy/actors/organisation/types";
 import {
   advanceActiveActorRegistrySchema,

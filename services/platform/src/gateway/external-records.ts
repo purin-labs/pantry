@@ -4,7 +4,7 @@ import {
   readIntegrationAccountIdField,
   readStringField,
   readOrganisationIdField,
-} from "../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   requireConnectionCredentialAuthority,
   resolveActiveProviderAccountContext,

@@ -1,7 +1,7 @@
 import {
   readStringField,
   readOrganisationIdField,
-} from "../../boundary";
+} from "@purin-labs/contracts/boundary";
 import { codeModeExecutionReceiptId } from "../../actors/agent-session-code-mode-settlement";
 import type {
   CodeModePlatformAdmissionControlInput,

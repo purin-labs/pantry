@@ -29,8 +29,6 @@ import. A module with no line for one of these has none.
 
 ## foundation/contracts
 
-- Folders: 1
-  - `services/platform/src/`
 - Packages: `packages/contracts`, `packages/control-api`
 
 ## foundation/tenancy

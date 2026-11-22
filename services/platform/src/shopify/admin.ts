@@ -5,7 +5,7 @@ import {
   readStringField,
   readOrganisationIdField,
   type FieldError,
-} from "../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   compileAndStoreCueSnapshot,
   writeTierOneShopifySubscription,

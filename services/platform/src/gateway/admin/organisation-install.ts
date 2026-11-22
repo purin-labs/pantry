@@ -12,7 +12,7 @@ import {
   readOrganisationIdField,
   readWorkspaceIdField,
   type FieldError,
-} from "../../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   createOrganisationInstallPreservingExistingInstallModel,
   resolveInstallOrganisation,

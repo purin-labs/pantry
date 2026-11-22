@@ -1,5 +1,5 @@
 import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-execution-scope";
-import { readOrganisationIdField } from "../boundary";
+import { readOrganisationIdField } from "@purin-labs/contracts/boundary";
 import { listIntegrationAccounts } from "@purin-labs/connections/data/integration-account";
 import type { Env } from "@purin-labs/kernel/env";
 import {

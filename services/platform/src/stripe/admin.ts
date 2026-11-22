@@ -3,7 +3,7 @@ import { OrganisationExecutionScope } from "@purin-labs/tenancy/organisation-exe
 import {
   readIntegrationAccountIdField,
   readOrganisationIdField,
-} from "../boundary";
+} from "@purin-labs/contracts/boundary";
 import {
   compileAndStoreCueSnapshot,
   writeTierOneStripeSubscription,

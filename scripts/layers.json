@@ -775,7 +775,6 @@
     "services/platform/src/agent-tools/session-wiring.ts": "workers/platform",
     "services/platform/src/agent-tools/session-support.ts": "foundation/tool-handlers",
     "services/platform/src/archive-cleanup-parts.ts": "workers/platform",
-    "services/platform/src/boundary.ts": "foundation/contracts",
     "services/platform/src/case-context-discovery/metadata.ts": "foundation/conversation",
     "services/platform/src/case-execution/records.ts": "foundation/agent",
     "services/platform/src/chat/application.ts": "surfaces/portal",

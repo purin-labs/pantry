@@ -214,7 +214,7 @@ Other files: `services/platform/src/actor-wasm.ts` calls the Session reducer,
 `services/platform/src/messages/message-wasm.ts` calls the message and attachment
 parsers. The three run TypeScript only.
 `services/platform/src/actors/pi-tool-arguments.ts` holds the tool argument check.
-`services/platform/src/boundary.ts` reads plain request fields.
+`packages/contracts/src/boundary.ts` reads plain request fields.
 
 | Check | Command | Where it runs |
 | --- | --- | --- |

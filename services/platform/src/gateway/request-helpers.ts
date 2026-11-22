@@ -7,7 +7,7 @@ import {
   readStringField,
   readWorkspaceIdField,
   type FieldError,
-} from "../boundary";
+} from "@purin-labs/contracts/boundary";
 import type { Env } from "@purin-labs/kernel/env";
 import {
   authorizeConfiguredBearer,
