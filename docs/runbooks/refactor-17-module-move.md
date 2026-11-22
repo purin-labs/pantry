@@ -18,6 +18,10 @@ was cut before the move, the limits, and the plan of the next module.
 The move changes paths and import specifiers only. In the dry run of the
 kernel, the Worker bundle had the same bytes before and after the move.
 
+Five modules are packages: `kernel`, and since 2026-11-23 `tenancy`,
+`actor-runtime`, `connections` and `authority`, which moved as one group in one
+freeze ([The group of 2026-11-23](#the-group-of-2026-11-23)).
+
 ## Before the day
 
 1. Land the commit that holds the script, its plan, this runbook and the shared
@@ -89,6 +93,18 @@ Rules for the day:
 - **Prettier.** The script formats a changed file only if the file was clean
   before. A file that was not clean keeps its form, and so does a file of
   `keepForm`: it then has an import line of more than 80 characters.
+- **The bundle.** Compare the Worker bundle before and after the move. A state
+  machine file (`*.machine.ts`) holds its own path as the text `owner`, and
+  that text is in the bundle. So the rule is: the same bytes after the old
+  `owner` paths in the bundle of before are replaced by the new ones.
+- **A group of modules in one freeze.** Run the plans in the order of
+  `foundationOrder`, with one move commit for each. Use one pair of tags for the
+  group (`refactor-17-<group>-before` and `-after`). Run the checks of steps 6
+  to 8 one time, after the last move. Between two moves of a group, `pnpm
+lint:clones` can report a pair that got smaller: jscpd reads the files in a
+  new order and pairs the same lines in another way. No file changed. Do not
+  run `--update`; the count returns when the last module of the group moves. A
+  ratchet that still differs after the last move is a real difference.
 - **To go back** before step 9: `git reset --hard refactor-17-<module>-before`
   and `pnpm install`. After step 9: revert the one move commit.
 
@@ -113,6 +129,10 @@ git rebase origin/dev                              # 4. the usual conflicts
 pnpm --filter @purin-labs/platform check:types
 ```
 
+- For a group, do step 3 with each plan of the group, in the order of the
+  move, and then one commit. The group of 2026-11-23 has the tags
+  `refactor-17-foundation-1-before` and `refactor-17-foundation-1-after` and
+  the plans `tenancy`, `actor-runtime`, `connections` and `authority`.
 - Step 2 has only the move between the two tags. Where the branch and the move
   changed the same lines, `-X theirs` keeps the lines of the branch, with their
   old imports. The move changed nothing but imports there, so no work is lost.
@@ -138,9 +158,17 @@ In each order, git follows the rename: the change of the kernel file arrives in
 
 ## Limits
 
-- Plans, refactor documents, evidence and handovers keep the old paths. The
-  script does not read `docs/plan-*`, `docs/refactor-*`, `docs/evidence/`,
-  `docs/handoffs/` and `scripts/refactor-17/`.
+- Plans, refactor documents, evidence and handovers keep the old paths in
+  their text. In `docs/plan-*`, `docs/refactor-*`, `docs/evidence/`,
+  `docs/handoffs/` and `docs/history/` the script changes one thing: the target
+  of a Markdown link to a moved file, because `pnpm lint:doc-links` refuses a
+  link to a file that is gone. It does not read `scripts/refactor-17/`.
+- A folder that moves whole takes its name with it in each lint, config and
+  document, and its old line in `scripts/layers.json` goes. A glob of the
+  Worker source that selects a moved file of a folder that does not move whole
+  is a fault: add the new path to the plan as an edit.
+- A document that moves (a `README.md` in a module folder) gets its own
+  relative links corrected.
 - `AGENTS.md` gets no line about `foundation/`. Write it by hand after the
   move.
 - `node scripts/list-tests.mjs --of <file>` counts relative imports only. It
@@ -154,7 +182,23 @@ In each order, git follows the rename: the change of the kernel file arrives in
   workspace. The script stops with a fault for such a file.
 - A package passes its own type check only if it reads no key that another
   module merges into `Env`. The kernel reads none since the Actor stub types
-  left `env.ts`.
+  left `env.ts`. `tenancy`, `actor-runtime`, `connections` and `authority` read
+  `ORGANISATION`, `SESSION`, `CONNECTOR` and `CASE`, which the Actor files of
+  the Worker merge, and `authority` reads `CommerceTypeParts.entityPlaneEffect`,
+  which the commerce area merges. Their plans set `package.typeCheck: false`:
+  the package has no `check:types` script, and the type check of the Worker
+  checks each of its files. The debt kind `env-merge` of `pnpm
+lint:layer-debts` counts these merges.
+- A package cannot import a file of the Worker. The script stops and names the
+  import. For the group of 2026-11-23, the type `InstallModel` moved to
+  `@purin-labs/contracts`, and the entry of the 1Password store Worker
+  (`vault-onepassword/worker.ts`) went to `workers/platform` in
+  `scripts/layers.json`. The entries of the other Workers (`model-exit`,
+  `chatgpt-exit`, `code-mode-sandbox`) need the same line before the module
+  `agent` moves.
+- knip judges each export of a foundation package (`includeEntryExports` for
+  `foundation/*` in `knip.json`), so a known unused export keeps its line in
+  `scripts/unused-ratchet.json` under its new path.
 
 ## The plan of the next module
 
@@ -171,8 +215,48 @@ Copy `scripts/refactor-17/plans/kernel.json` and change:
 - `edits`: the six edits of the kernel plan that add the root `foundation` are
   done. Keep only the edits that the new module needs.
 - `keepForm`: empty at the start.
+- `package.typeCheck`: `false` if the module reads a key that another module
+  merges into `Env`. Give the keys in `about`.
+
+The modules that are left, with what each needs first:
+
+| Module                                   | What it needs                                                                                                                                                                         |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent-tools`                            | An ESLint edit for `context/**`, the dependencies `typebox` and `@earendil-works/pi-codemode`, and an edit of `scripts/check-tool-effects.mjs`, which names the folder `agent-tools/` |
+| `agent`, `conversation`, `tool-handlers` | The Worker entries of `model-exit`, `chatgpt-exit` and `code-mode-sandbox` in `workers/platform` first. `agent` has 206 files                                                         |
+| `contracts`                              | One Worker file (`boundary.ts`) beside the package `@purin-labs/contracts`. The script cannot move a file into a package that exists                                                  |
+| `control`                                | 21 Worker files and 5 Portal files. `scripts/check-runtime-boundary.mjs` must read an import of `control/routes/` by package name                                                     |
+| `ui`                                     | 64 Portal files: React and DOM code, so the package needs the `tsconfig` of the Portal                                                                                                |
+| `collaboration`                          | 8 Portal files and 4 Actor files beside `packages/collaboration`. The script moves a module into one target only                                                                      |
 
 Run the script with `--check` first: it changes nothing and prints each fault.
+
+## The group of 2026-11-23
+
+Branch `refactor-17-foundation-group-1`, on `origin/dev` at `e4be3233`. Before
+the moves, in their own commits: five corrections of the script, the split-D1
+statement test reads `foundation/`, the knip option, `InstallModel` in
+`@purin-labs/contracts`, the 1Password Worker entry in `workers/platform`, and
+the four plans.
+
+| Module          | Files moved | Files changed | Imports changed (by name / relative) | `keepForm`                                           |
+| --------------- | ----------- | ------------- | ------------------------------------ | ---------------------------------------------------- |
+| `tenancy`       | 33          | 735           | 1,116 (1,094 / 22)                   | `actors/organisation/support.ts`, for `worker-logic` |
+| `actor-runtime` | 31          | 445           | 670 (653 / 17)                       | —                                                    |
+| `connections`   | 26          | 309           | 483 (481 / 2)                        | —                                                    |
+| `authority`     | 79          | 640           | 1,217 (1,189 / 28)                   | —                                                    |
+
+- The four moves change 1,231 files in all. Each move commit is the output of
+  the script, and `--check` prints "Nothing to change." for each plan.
+- After the last move, each quick check of the table passes, with the type
+  check of the kernel as the only package type check. The five other Workers
+  pass their checks. The layer check finds 0 crossings, and no ratchet count
+  changes.
+- The Worker bundle has 10,411,729 bytes before and 10,411,723 bytes after.
+  The `owner` paths in `organisation-lifecycle.machine.ts` and
+  `placement-move.machine.ts` are the whole difference: with the new paths in
+  the bundle of before, the bytes are the same.
+- Not run: the full E2E suite, the Kitchen journeys and a release.
 
 ## The dry run of the kernel
 

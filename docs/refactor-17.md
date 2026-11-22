@@ -6,8 +6,9 @@ and after a second review with the owner's request to prune
 Status: Stage A is done and on `dev` since 2026-11-21 (`6373495d`), with step S1. Step
 S2 started on 2026-11-22 with the pilot spec `DEV-01`, after the brand names became
 final; 13 of the 33 specs are written, and the other 20 are in work. The Plan 93
-cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and the kernel
-is the first package since 2026-11-23 (`82d52faa`). On 2026-11-22 the owner asked to finish the
+cutover ended on 2026-11-22, so Stage B is open: decision D1 is a mix, and five
+foundation modules are packages since 2026-11-23 (the kernel, `tenancy`,
+`actor-runtime`, `connections` and `authority`). On 2026-11-22 the owner asked to finish the
 tail: the A2.1 decisions are made and built, and two sessions finish Plan 91 phase 4
 and Plan 93, so that Stage S and Stage B can start. [What is left](#what-is-left)
 lists the open work. The owner accepted the two stages, one decision API for approvals, specs by
@@ -438,17 +439,17 @@ with a literal table name. These kinds of crossing exist today, and the check do
 count them. Stage B moves files by this map, so each kind needs a decision first: a
 new count with a ratchet, or a written reason to accept it.
 
-| Kind | Today | Example | Count in `lint:layer-debts` |
-| --- | --- | --- | --- |
-| A `declare module` merge puts a Worker class into `Env`, and lower code calls its methods | 16 merges; 171 methods of `OrganisationDO` and `ConnectorDO` called from below | `actors/harness-follow-up.ts` (foundation) calls `scheduleSlackFollowUp` | `env-merge`: 16 merges; 83 methods, counted by name |
-| Area or surface code in a foundation module, because it imports nothing above | About 40 files | `mail/gmail-adapter.ts` in `foundation/connections` | `foundation-misfit`: 14 files by their links, 45 files by a word of their path |
-| A read of a D1 table of another module (only writes have a rule) | 91 reads | `access-control/decision-explanation.ts` reads `mailbox_ingress_policy` | `table-read`: 91 reads |
-| A surface imports an area file that is not public | 250 of 294 imports | `actors/connector/email-work.ts` imports `mail-inbox/execution.ts` | `surface-nonpublic`: 249 imports |
-| Each area package passes as a contract; `contracts` lists one | 78 of 124 imports | `commerce-client` from `areas/kitchen` | `area-package`: 78 imports |
-| Logic in the Worker module | 24 files, 9,800 lines | `readBakeBoard` in `actors/organisation/bake-kitchen.ts` | `worker-logic`: 10 files, 3,778 lines |
-| The Shopify rule of step A2.5 has no check | 5 of 7 importers | `integration-gateway.ts` | `shopify-rule`: 10 imports in 6 files |
-| A table name in a template string, and each Actor SQLite table | 6 writes | `data/organisation-purge.ts` | `interpolated-table`: 17 writes (8 to D1, 9 to Actor SQLite) |
-| A new Portal file gets `surfaces/portal` by the folder rule and is never refused | — | — | `portal-default`: 26 files |
+| Kind                                                                                      | Today                                                                          | Example                                                                  | Count in `lint:layer-debts`                                                    |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| A `declare module` merge puts a Worker class into `Env`, and lower code calls its methods | 16 merges; 171 methods of `OrganisationDO` and `ConnectorDO` called from below | `actors/harness-follow-up.ts` (foundation) calls `scheduleSlackFollowUp` | `env-merge`: 16 merges; 83 methods, counted by name                            |
+| Area or surface code in a foundation module, because it imports nothing above             | About 40 files                                                                 | `mail/gmail-adapter.ts` in `foundation/connections`                      | `foundation-misfit`: 14 files by their links, 45 files by a word of their path |
+| A read of a D1 table of another module (only writes have a rule)                          | 91 reads                                                                       | `access-control/decision-explanation.ts` reads `mailbox_ingress_policy`  | `table-read`: 91 reads                                                         |
+| A surface imports an area file that is not public                                         | 250 of 294 imports                                                             | `actors/connector/email-work.ts` imports `mail-inbox/execution.ts`       | `surface-nonpublic`: 249 imports                                               |
+| Each area package passes as a contract; `contracts` lists one                             | 78 of 124 imports                                                              | `commerce-client` from `areas/kitchen`                                   | `area-package`: 78 imports                                                     |
+| Logic in the Worker module                                                                | 24 files, 9,800 lines                                                          | `readBakeBoard` in `actors/organisation/bake-kitchen.ts`                 | `worker-logic`: 10 files, 3,778 lines                                          |
+| The Shopify rule of step A2.5 has no check                                                | 5 of 7 importers                                                               | `integration-gateway.ts`                                                 | `shopify-rule`: 10 imports in 6 files                                          |
+| A table name in a template string, and each Actor SQLite table                            | 6 writes                                                                       | `data/organisation-purge.ts`                                             | `interpolated-table`: 17 writes (8 to D1, 9 to Actor SQLite)                   |
+| A new Portal file gets `surfaces/portal` by the folder rule and is never refused          | —                                                                              | —                                                                        | `portal-default`: 26 files                                                     |
 
 `pnpm lint:layer-debts` (`scripts/check-layer-debts.mjs`, a part of `pnpm lint:source`)
 holds each kind since 2026-11-22: a count in `scripts/layer-debts-ratchet.json` may not
@@ -484,8 +485,18 @@ the old stack is deleted. Stage B starts with step 1. In this order:
    `scripts/refactor-17/move-module.mjs` changed 1,247 files in a freeze of `dev` of
    about 7 minutes. The Worker bundle has the same bytes before and after. The
    [runbook](runbooks/refactor-17-module-move.md) gives the steps of the day and of an
-   open branch. Next: a plan and a dry run for each other foundation module, from the
-   bottom of the order, and one freeze for a group of them.
+   open branch. Done on 2026-11-23, as one group in one freeze: `tenancy`,
+   `actor-runtime`, `connections` and `authority` are the packages
+   `@purin-labs/tenancy`, `@purin-labs/actor-runtime`, `@purin-labs/connections` and
+   `@purin-labs/authority` (tags `refactor-17-foundation-1-before` and
+   `refactor-17-foundation-1-after`). 169 files moved and 1,231 files changed. The
+   Worker bundle differs only in the `owner` paths of two state machine files. The four
+   packages have no type check of their own, because each reads a binding that another
+   module merges into `Env`; the type check of the Worker checks their files. Two
+   decisions made the group possible: the type `InstallModel` is in
+   `@purin-labs/contracts`, and the entry of the 1Password store Worker belongs to
+   `workers/platform`. Next: `agent-tools`, `agent`, `conversation` and
+   `tool-handlers`; the runbook lists what each module that is left needs first.
 2. The journeys: a `testing` entry for each module, or an exception in the lint. 178
    journeys import the inside of the Worker.
 3. The move script and its dry run in a scratch worktree (`pnpm lint` with the guard of
